@@ -1,0 +1,34 @@
+[
+    {
+        "tab"       : "Number formats",
+        "key"       : "format.number_decimals",
+        "label"     : "Number of decimal places",
+        "type"      : "text",
+        "default"   : "2"
+    },
+    {
+        "tab"       : "Number formats",
+        "key"       : "format.separator_decimal",
+        "label"     : "Decimal separator",
+        "type"      : "text",
+        "default"   : ","
+    },
+    {
+        "tab"       : "Number formats",
+        "key"       : "format.separator_thousands",
+        "label"     : "Thousands separator",
+        "type"      : "text",
+        "default"   : "."
+    },
+    {
+        "tab"       : "Number formats",
+        "key"       : "format.use_locale_currency_format",
+        "label"     : "Use customer specific price format",
+        "type"      : "dropdown",
+        "possibleValues" : {
+            "1" : "YES",
+            "0" : "NO"
+        },
+        "default": "1"
+    }
+]

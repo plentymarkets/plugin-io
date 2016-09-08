@@ -1,0 +1,12 @@
+{
+    "version"           : "0.1.0",
+    "name"              : "PluginLayoutCore",
+    "description"       : "Basic hack functions for plentymarkets shop designs",
+    "author"            : "plentymarkets GmbH",
+    "keywords"          : ["plentymarkets", "plugins", "layout", "template"],
+    "type"              : "template",
+    "require"           : [],
+    "namespace"         : "LayoutCore",
+    "serviceProvider"   : "LayoutCore\\Providers\\LayoutCoreServiceProvider",
+    "javaScriptFiles"   : []
+}
