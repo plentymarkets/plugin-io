@@ -21,7 +21,7 @@ class CountryService
 
     public function getActiveCountriesList():?array<Country>
     {
-        return $this->countryRepository->getCountriesList(1, array(''));
+        return $this->countryRepository->getCountriesList(1, []);
     }
 
     public function getActiveCountryNameMap(string $language):array<string, string>
