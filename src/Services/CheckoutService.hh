@@ -3,30 +3,34 @@
 namespace LayoutCore\Services;
 
 use Plenty\Modules\Frontend\PaymentMethod\Contracts\FrontendPaymentMethodRepositoryContract;
-use Plenty\Modules\Order\Payment\Method\Models\PaymentMethod;
+use Plenty\Modules\Payment\Method\Models\PaymentMethod;
 use Plenty\Modules\Frontend\Contracts\Checkout;
 use Plenty\Modules\Basket\Contracts\BasketRepositoryContract;
 use Plenty\Modules\Basket\Models\Basket;
 use Plenty\Modules\Frontend\Session\Storage\Contracts\FrontendSessionStorageFactoryContract;
+use Plenty\Modules\Payment\Method\Contracts\PaymentMethodRepositoryContract;
 use LayoutCore\Constants\SessionStorageKeys;
 
 class CheckoutService
 {
-    private FrontendPaymentMethodRepositoryContract $paymentMethodRepository;
+    private FrontendPaymentMethodRepositoryContract $frontendPaymentMethodRepository;
     private Checkout $checkout;
     private BasketRepositoryContract $basketRepository;
-    private FrontendSessionStorageFactoryContract $sessionStorage;
+    private FrontendSessionStorageFactoryContract $sessionStorage
+    private PaymentMethodRepositoryContract $paymentMethodrepository;
 
     public function __construct(
-        FrontendPaymentMethodRepositoryContract $paymentMethodRepository,
+        FrontendPaymentMethodRepositoryContract $frontendPaymentMethodRepository,
         Checkout $checkout,
         BasketRepositoryContract $basketRepository,
-        FrontendSessionStorageFactoryContract $sessionStorage )
+        FrontendSessionStorageFactoryContract $sessionStorage,
+        PaymentMethodRepositoryContract $paymentMethodrepository )
     {
-        $this->paymentMethodRepository = $paymentMethodRepository;
+        $this->frontendPaymentMethodRepository = $frontendPaymentMethodRepository;
         $this->checkout = $checkout;
         $this->basketRepository = $basketRepository;
         $this->sessionStorage = $sessionStorage;
+        $this->paymentMethodrepository = $paymentMethodrepository;
     }
 
     public function getCheckout(): array<string, mixed>
@@ -60,24 +64,48 @@ class CheckoutService
 
     public function getMethodOfPaymentId():int
     {
-        foreach( $this->getMethodOfPaymentList() as $payment )
+        $methodOfPaymentID = (int)$this->sessionStorage->getPlugin()->getValue( 'MethodOfPaymentID' );
+        if( $methodOfPaymentID === null )
         {
-            if( $payment->active )
-            {
-                return $payment->id;
-            }
+            $methodOfPaymentList = $this->getMethodOfPaymentList();
+            $methodOfPaymentID = $methodOfPaymentList[0]->id;
+            $this->setMethodOfPaymentId($methodOfPaymentID);
         }
-        return -1;
+        return $methodOfPaymentID;
     }
 
     public function setMethodOfPaymentId( int $methodOfPaymentID ):void
     {
         $this->checkout->setPaymentMethodId( $methodOfPaymentID );
+        $this->sessionStorage->getPlugin()->setValue( 'MethodOfPaymentID', $methodOfPaymentID );
     }
+
+    public function preparePayment():?array<mixed>
+    {
+        $mopId = $this->getMethodOfPaymentId();
+        return $this->paymentMethodrepository->preparePaymentMethod($mopId);
+     }
 
     public function getMethodOfPaymentList():array<PaymentMethod>
     {
-        return $this->paymentMethodRepository->getCurrentPaymentMethodsList();
+        return $this->frontendPaymentMethodRepository->getCurrentPaymentMethodsList();
+    }
+
+    public function getCheckoutPaymentDataList():array<mixed>
+    {
+        $paymentDataList = array();
+        $mopList = $this->getMethodOfPaymentList();
+        foreach($mopList as $paymentMethod)
+        {
+            $paymentData = array();
+            $paymentData['id'] = $paymentMethod->id;
+            $paymentData['name'] = $this->frontendPaymentMethodRepository->getPaymentMethodName($paymentMethod);
+            $paymentData['fee'] = $this->frontendPaymentMethodRepository->getPaymentMethodFee($paymentMethod);
+            $paymentData['icon'] = $this->frontendPaymentMethodRepository->getPaymentMethodIcon($paymentMethod);
+            $paymentData['description'] = $this->frontendPaymentMethodRepository->getPaymentMethodDescription($paymentMethod);
+            $paymentDataList[] = $paymentData;
+        }
+        return $paymentDataList;
     }
 
     public function getShippingCountryId():int
