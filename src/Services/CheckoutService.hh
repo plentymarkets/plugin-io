@@ -16,7 +16,7 @@ class CheckoutService
     private FrontendPaymentMethodRepositoryContract $frontendPaymentMethodRepository;
     private Checkout $checkout;
     private BasketRepositoryContract $basketRepository;
-    private FrontendSessionStorageFactoryContract $sessionStorage
+    private FrontendSessionStorageFactoryContract $sessionStorage;
     private PaymentMethodRepositoryContract $paymentMethodrepository;
 
     public function __construct(
