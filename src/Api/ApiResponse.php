@@ -61,29 +61,29 @@ class ApiResponse
 			$this->eventData["BeforeBasketItemAdd"] = [
 				"basketItem" => $event->getBasketItem()
 			];
-		});
+		}, 0);
 		$this->dispatcher->listen(AfterBasketItemAdd::class, function ($event)
 		{
 			$this->eventData["AfterBasketItemAdd"] = [
 				"basketItem" => $event->getBasketItem()
 			];
-		});
+		}, 0);
 		$this->dispatcher->listen(BeforeBasketItemRemove::class, function ()
 		{
 			$this->eventData["BeforeBasketItemRemove"] = [];
-		});
+		}, 0);
 		$this->dispatcher->listen(AfterBasketItemRemove::class, function ()
 		{
 			$this->eventData["AfterBasketItemRemove"] = [];
-		});
+		}, 0);
 		$this->dispatcher->listen(BeforeBasketItemUpdate::class, function ()
 		{
 			$this->eventData["BeforeBasketItemUpdate"] = [];
-		});
+		}, 0);
 		$this->dispatcher->listen(AfterBasketItemUpdate::class, function ()
 		{
 			$this->eventData["AfterBasketItemUpdate"] = [];
-		});
+		}, 0);
 
 		// register Frontend Events
 		$this->dispatcher->listen(FrontendCurrencyChanged::class, function ($event)
@@ -92,19 +92,19 @@ class ApiResponse
 				"curency"       => $event->getCurrency(),
 				"exchangeRatio" => $event->getCurrencyExchangeRatio()
 			];
-		});
+		}, 0);
 		$this->dispatcher->listen(FrontendLanguageChanged::class, function ($event)
 		{
 			$this->eventData["FrontendLanguageChanged"] = [
 				"language" => $event->getLanguage()
 			];
-		});
+		}, 0);
 		$this->dispatcher->listen(FrontendUpdateDeliveryAddress::class, function ($event)
 		{
 			$this->eventData["FrontendUpdateDeliveryAddress"] = [
 				"accountAddressId" => $event->getAccountAddressId()
 			];
-		});
+		}, 0);
 		$this->dispatcher->listen(FrontendUpdateShippingSettings::class, function ($event)
 		{
 			$this->eventData["FrontendUpdateShippingSettings"] = [
@@ -112,7 +112,7 @@ class ApiResponse
 				"parcelServiceId"       => $event->getParcelServiceId(),
 				"parcelServicePresetId" => $event->getParcelServicePresetId()
 			];
-		});
+		}, 0);
 		$this->dispatcher->listen(FrontendUpdateCustomerSettings::class, function ($event)
 		{
 			$this->eventData["FrontendUpdateCustomerSettings"] = [
@@ -124,13 +124,13 @@ class ApiResponse
 				"salesAgent"             => $event->getSalesAgent(),
 				"accountContractClassId" => $event->getAccountContractClassId()
 			];
-		});
+		}, 0);
 		$this->dispatcher->listen(FrontendUpdatePaymentSettings::class, function ($event)
 		{
 			$this->eventData["FrontendUpdatePaymentSettings"] = [
 				"paymentMethodId" => $event->getPaymentMethodId()
 			];
-		});
+		}, 0);
 
 		// register Auth Events
 		$this->dispatcher->listen(AfterAccountAuthentication::class, function ($event)
@@ -139,11 +139,11 @@ class ApiResponse
 				"isSuccess"      => $event->isSuccessful(),
 				"accountContact" => $event->getAccountContact()
 			];
-		});
+		}, 0);
 		$this->dispatcher->listen(AfterAccountContactLogout::class, function ()
 		{
 			$this->eventData["AfterAccountContactLogout"] = [];
-		});
+		}, 0);
 	}
 
 	public function error(int $code, $message = null):ApiResponse
