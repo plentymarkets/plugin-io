@@ -33,26 +33,24 @@ class BasketService
      * Returns basket as array
      * @return array<string, mixed>
      */
-    public function getBasket():array<string, mixed>
+    public function getBasket():Basket
     {
-        $basket = $this->basketRepository->load();
-        $basketItems = $this->basketItemRepository->all();
-        $basketItemData = $this->getBasketItemData( $basketItems );
-        return [
-            "basket" => $basket,
-            "basketItems" => $basketItems,
-            "items" => $basketItemData
-        ];
+        return $this->basketRepository->load();
     }
 
     public function getBasketItems():array<string, mixed>
     {
+        $result = array();
         $basketItems = $this->basketItemRepository->all();
         $basketItemData = $this->getBasketItemData( $basketItems );
-        return [
-            "basketItems" => $basketItems,
-            "items" => $basketItemData
-        ];
+        foreach( $basketItems as $basketItem )
+        {
+            array_push(
+                $result,
+                $this->addVariationData($basketItem, $basketItemData[$basketItem->variationId])
+            );
+        }
+        return $result;
     }
 
     public function getBasketItem( int $basketItemId ):array<string, mixed>
@@ -63,10 +61,14 @@ class BasketService
             return array();
         }
         $basketItemData = $this->getBasketItemData( [$basketItem] );
-        return [
-            "basketItem" => $basketItem,
-            "item" => $basketItemData
-        ];
+        return $this->addVariationData( $basketItem, $basketItemData[$basketItem->variationId] );
+    }
+
+    private function addVariationData( BasketItem $basketItem, mixed $variationData ):array<string, mixed>
+    {
+        $arr = $basketItem->toArray();
+        $arr["variation"] = $variationData;
+        return $arr;
     }
 
     public function addBasketItem( array<string, mixed> $data ):array<string, mixed>
@@ -83,20 +85,20 @@ class BasketService
           $this->basketItemRepository->addBasketItem( $data );
         }
 
-        return $this->getBasket();
+        return $this->getBasketItems();
     }
 
     public function updateBasketItem( int $basketItemId, array<string, mixed> $data ):array<string, mixed>
     {
         $data['id'] = $basketItemId;
         $this->basketItemRepository->updateBasketItem( $basketItemId, $data );
-        return $this->getBasket();
+        return $this->getBasketItems();
     }
 
     public function deleteBasketItem( int $basketItemId ):array<string, mixed>
     {
         $this->basketItemRepository->removeBasketItem( $basketItemId );
-        return $this->getBasket();
+        return $this->getBasketItems();
     }
 
     public function findExistingOneByData( array<string, mixed> $data ):?BasketItem
