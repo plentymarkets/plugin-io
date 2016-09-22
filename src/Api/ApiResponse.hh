@@ -89,6 +89,18 @@ class ApiResponse
     public function __construct( Dispatcher $dispatcher )
     {
         $this->dispatcher = $dispatcher;
+        // register basket Events
+        $this->dispatcher->listen( \Plenty\Modules\Basket\Events\Basket\AfterBasketChanged::class, ($event) ==> {
+            $this->eventData["AfterBasketChanged"] = [
+                "basket" => $event->getBasket()
+            ];
+        });
+
+        $this->dispatcher->listen( \Plenty\Modules\Basket\Events\Basket\AfterBasketCreate::class, ($event) ==> {
+            $this->eventData["AfterBasketCreate"] = [
+                "basket" => $event->getBasket()
+            ];
+        });
 
         // register Basket Item Events
         $this->dispatcher->listen( \Plenty\Modules\Basket\Events\BasketItem\BeforeBasketItemAdd::class, ($event) ==> {
