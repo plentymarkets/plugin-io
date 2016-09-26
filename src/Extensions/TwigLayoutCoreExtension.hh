@@ -15,6 +15,7 @@ use LayoutCore\Extensions\Filters\URLFilter;
 use LayoutCore\Extensions\Filters\ItemNameFilter;
 
 use LayoutCore\Extensions\Functions\GetBasePrice;
+use LayoutCore\Extensions\Functions\Component;
 
 /**
  * Provide services and helper functions to twig engine
@@ -29,6 +30,7 @@ class TwigLayoutCoreExtension extends Twig_Extension
         NumberFormatFilter $numberFormatFilter,
         URLFilter $urlFilter,
         GetBasePrice $getBasePrice,
+        Component $component,
         ItemNameFilter $itemNameFilter
     )
     {
