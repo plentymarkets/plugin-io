@@ -12,8 +12,10 @@ use LayoutCore\Extensions\AbstractFunction;
 use LayoutCore\Extensions\Filters\PatternFilter;
 use LayoutCore\Extensions\Filters\NumberFormatFilter;
 use LayoutCore\Extensions\Filters\URLFilter;
+use LayoutCore\Extensions\Filters\ItemNameFilter;
 
 use LayoutCore\Extensions\Functions\GetBasePrice;
+use LayoutCore\Extensions\Functions\Component;
 
 /**
  * Provide services and helper functions to twig engine
@@ -24,18 +26,19 @@ class TwigLayoutCoreExtension extends Twig_Extension
 	 * @var TwigFactory
 	 */
 	private $twig;
-	
+
 	public function __construct(
 		TwigFactory $twig,
 		PatternFilter $patternFilter,
 		NumberFormatFilter $numberFormatFilter,
 		URLFilter $urlFilter,
-		GetBasePrice $getBasePrice
+		GetBasePrice $getBasePrice,
+		Component $component
 	)
 	{
 		$this->twig = $twig;
 	}
-	
+
 	/**
 	 * Returns the name of the extension. Must be unique.
 	 *
@@ -45,7 +48,7 @@ class TwigLayoutCoreExtension extends Twig_Extension
 	{
 		return "LayoutCore_Extension_TwigLayoutCoreExtensions";
 	}
-	
+
 	/**
 	 * Returns a list of filters to add.
 	 *
@@ -66,7 +69,7 @@ class TwigLayoutCoreExtension extends Twig_Extension
 		}
 		return $filters;
 	}
-	
+
 	/**
 	 * Returns a list of functions to add.
 	 *

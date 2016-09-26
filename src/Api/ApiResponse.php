@@ -17,6 +17,8 @@ use Plenty\Modules\Frontend\Events\FrontendLanguageChanged;
 use Plenty\Modules\Frontend\Events\FrontendUpdateDeliveryAddress;
 use Plenty\Modules\Frontend\Events\FrontendUpdatePaymentSettings;
 use Plenty\Modules\Frontend\Events\FrontendUpdateShippingSettings;
+use Plenty\Modules\Basket\Events\Basket\AfterBasketChanged;
+use Plenty\Modules\Basket\Events\Basket\AfterBasketCreate;
 use Plenty\Plugin\Application;
 use Plenty\Plugin\Events\Dispatcher;
 
@@ -49,7 +51,7 @@ class ApiResponse
 	 * @var null|Application
 	 */
 	private $app = null;
-    
+
     /**
      * @var null|Response
      */
@@ -60,6 +62,19 @@ class ApiResponse
 		$this->app = $app;
 		$this->dispatcher = $dispatcher;
         $this->response = $response;
+
+		// register basket Events
+        $this->dispatcher->listen( AfterBasketChanged::class, ($event) ==> {
+            $this->eventData["AfterBasketChanged"] = [
+                "basket" => $event->getBasket()
+            ];
+        }, 0);
+
+        $this->dispatcher->listen( AfterBasketCreate::class, ($event) ==> {
+            $this->eventData["AfterBasketCreate"] = [
+                "basket" => $event->getBasket()
+            ];
+        }, 0);
 
 		// register Basket Item Events
 		$this->dispatcher->listen(BeforeBasketItemAdd::class, function ($event)

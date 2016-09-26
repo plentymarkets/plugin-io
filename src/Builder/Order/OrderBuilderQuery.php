@@ -44,11 +44,7 @@ class OrderBuilderQuery
 	{
 		if($basket === null)
 		{
-			$basket = $this->basketService->getBasket()["basket"];
-			if(!$basket instanceof Basket)
-			{
-				throw new \Exception("Error while reading basket");
-			}
+			$basket = $this->basketService->getBasket();
 		}
 
 		// add basket items to order

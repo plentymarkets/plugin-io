@@ -25,8 +25,8 @@ class BasketService
 	 * @var ItemService
 	 */
 	private $itemService;
-	
-	
+
+
 	public function __construct(
 		BasketRepositoryContract $basketRepository,
 		BasketItemRepositoryContract $basketItemRepository,
@@ -37,56 +37,49 @@ class BasketService
 		$this->basketItemRepository = $basketItemRepository;
 		$this->itemService          = $itemService;
 	}
-	
+
 	/**
 	 * Returns basket as array
 	 * @return array
 	 */
 	public function getBasket():array
 	{
-		$basket         = $this->basketRepository->load();
-		$basketItems    = $this->basketItemRepository->all();
-
-		if($basketItems instanceof BasketService)
-		{
-			$basketItemData = $this->getBasketItemData($basketItems);
-		}
-		else
-		{
-			$basketItemData = null;
-		}
-
-		return [
-			"basket"      => $basket,
-			"basketItems" => $basketItems,
-			"items"       => $basketItemData
-		];
+		return $this->basketRepository->load();
 	}
-	
+
 	public function getBasketItems():array
 	{
-		$basketItems    = $this->basketItemRepository->all();
-		$basketItemData = $this->getBasketItemData($basketItems);
-		return [
-			"basketItems" => $basketItems,
-			"items"       => $basketItemData
-		];
+		$result = array();
+        $basketItems = $this->basketItemRepository->all();
+        $basketItemData = $this->getBasketItemData( $basketItems );
+        foreach( $basketItems as $basketItem )
+        {
+            array_push(
+                $result,
+                $this->addVariationData($basketItem, $basketItemData[$basketItem->variationId])
+            );
+        }
+        return $result;
 	}
-	
+
 	public function getBasketItem(int $basketItemId):array
 	{
-		$basketItem = $this->basketItemRepository->findOneById($basketItemId);
-		if($basketItem === null)
-		{
-			return [];
-		}
-		$basketItemData = $this->getBasketItemData([$basketItem]);
-		return [
-			"basketItem" => $basketItem,
-			"item"       => $basketItemData
-		];
-	}
-	
+		$basketItem = $this->basketItemRepository->findOneById( $basketItemId );
+        if( $basketItem === null )
+        {
+            return array();
+        }
+        $basketItemData = $this->getBasketItemData( [$basketItem] );
+        return $this->addVariationData( $basketItem, $basketItemData[$basketItem->variationId] );
+    }
+
+	private function addVariationData( BasketItem $basketItem, mixed $variationData ):array
+    {
+        $arr = $basketItem->toArray();
+        $arr["variation"] = $variationData;
+        return $arr;
+    }
+
 	public function addBasketItem(array $data):array
 	{
 		$basketItem = $this->findExistingOneByData($data);
@@ -100,41 +93,41 @@ class BasketService
 		{
 			$this->basketItemRepository->addBasketItem($data);
 		}
-		
-		return $this->getBasket();
+
+		return $this->getBasketItems();
 	}
-	
+
 	public function updateBasketItem(int $basketItemId, array $data):array
 	{
 		$data['id'] = $basketItemId;
 		$this->basketItemRepository->updateBasketItem($basketItemId, $data);
-		return $this->getBasket();
+		return $this->getBasketItems();
 	}
-	
+
 	public function deleteBasketItem(int $basketItemId):array
 	{
 		$this->basketItemRepository->removeBasketItem($basketItemId);
-		return $this->getBasket();
+		return $this->getBasketItems();
 	}
-	
+
 	public function findExistingOneByData(array $data):BasketItem
 	{
 		return $this->basketItemRepository->findExistingOneByData($data);
 	}
-	
+
 	private function getBasketItemData(array $basketItems = []):array
 	{
 		if(count($basketItems) <= 0)
 		{
 			return [];
 		}
-		
+
 		$basketItemVariationIds = [];
 		foreach($basketItems as $basketItem)
 		{
 			array_push($basketItemVariationIds, $basketItem->variationId);
 		}
-		
+
 		$items  = $this->itemService->getVariations($basketItemVariationIds);
 		$result = [];
 		foreach($items as $item)
@@ -142,9 +135,9 @@ class BasketService
 			$variationId          = $item->variationBase->id;
 			$result[$variationId] = $item;
 		}
-		
+
 		return $result;
 	}
-	
-	
+
+
 }
