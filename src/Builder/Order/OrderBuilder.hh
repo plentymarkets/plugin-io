@@ -60,8 +60,7 @@ class OrderBuilderQuery
     {
         if( $basket === null )
         {
-            $basket = $this->basketService->getBasket()["basket"];
-            invariant( $basket instanceof Basket, "Error while reading basket" );
+            $basket = $this->basketService->getBasket();
         }
 
         // add basket items to order

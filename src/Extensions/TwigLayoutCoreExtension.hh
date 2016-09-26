@@ -12,6 +12,7 @@ use LayoutCore\Extensions\AbstractFunction;
 use LayoutCore\Extensions\Filters\PatternFilter;
 use LayoutCore\Extensions\Filters\NumberFormatFilter;
 use LayoutCore\Extensions\Filters\URLFilter;
+use LayoutCore\Extensions\Filters\ItemNameFilter;
 
 use LayoutCore\Extensions\Functions\GetBasePrice;
 
@@ -27,7 +28,8 @@ class TwigLayoutCoreExtension extends Twig_Extension
         PatternFilter $patternFilter,
         NumberFormatFilter $numberFormatFilter,
         URLFilter $urlFilter,
-        GetBasePrice $getBasePrice
+        GetBasePrice $getBasePrice,
+        ItemNameFilter $itemNameFilter
     )
     {
         $this->twig = $twig;
