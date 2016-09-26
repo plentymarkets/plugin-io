@@ -2,7 +2,7 @@
 
 namespace LayoutCore\Api;
 
-use Illuminate\Http\Response;
+use Plenty\Plugin\Http\Response;
 use Plenty\Plugin\Controller;
 use Plenty\Plugin\Http\Request;
 use LayoutCore\Api\ApiResponse;

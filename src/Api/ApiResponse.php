@@ -2,7 +2,7 @@
 
 namespace LayoutCore\Api;
 
-use Illuminate\Http\Response;
+use Plenty\Plugin\Http\Response;
 use Plenty\Modules\Account\Events\FrontendUpdateCustomerSettings;
 use Plenty\Modules\Authentication\Events\AfterAccountAuthentication;
 use Plenty\Modules\Authentication\Events\AfterAccountContactLogout;
@@ -49,11 +49,17 @@ class ApiResponse
 	 * @var null|Application
 	 */
 	private $app = null;
+    
+    /**
+     * @var null|Response
+     */
+    private $response = null;
 
-	public function __construct(Dispatcher $dispatcher, Application $app)
+	public function __construct(Dispatcher $dispatcher, Application $app, Response $response)
 	{
 		$this->app = $app;
 		$this->dispatcher = $dispatcher;
+        $this->response = $response;
 
 		// register Basket Item Events
 		$this->dispatcher->listen(BeforeBasketItemAdd::class, function ($event)
@@ -222,6 +228,6 @@ class ApiResponse
 		$responseData["events"] = $this->eventData;
 		$responseData["data"]   = $data;
 
-		return $this->app->make(Response::class, [$responseData, $code, $this->headers]);
+        return $this->response->make(json_encode($responseData), $code, $this->headers);
 	}
 }

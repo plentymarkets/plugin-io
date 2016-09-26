@@ -50,7 +50,7 @@ class CategoryService
 	 * @param int $catID The id of the current category
 	 * @return void
 	 */
-	public function setCurrentCategoryID(int $catID)
+	public function setCurrentCategoryID(int $catID = 0)
 	{
 		$this->setCurrentCategory(
 			$this->category->get($catID)
@@ -87,7 +87,7 @@ class CategoryService
 	 * @param string $lang The language to get the category
 	 * @return Category
 	 */
-	public function get(int $catID = 0, string $lang = "de")
+	public function get($catID = 0, string $lang = "de")
 	{
 		return $this->category->get($catID, $lang);
 	}
@@ -148,9 +148,17 @@ class CategoryService
 	 * @param int $catID The ID for the category to check
 	 * @return bool
 	 */
-	public function isActive(Category $category):bool
+	public function isActive(Category $category = null):bool
 	{
-		return ($this->isCurrent($category) || $this->isOpen($category));
+        if($category instanceof Category)
+        {
+            return ($this->isCurrent($category) || $this->isOpen($category));
+        }
+        else
+        {
+            return false;
+        }
+		
 	}
 
 	public function isHome():bool
@@ -167,7 +175,7 @@ class CategoryService
 		return $this->item->getItemForCategory($category->id, $variationShowType);
 	}
 
-	public function getCategoryTreeAsList($catID): array
+	public function getCategoryTreeAsList(int $catID = 0): array
 	{
 		$categoryTree = [];
 

@@ -83,7 +83,7 @@ class LayoutController extends Controller
 		if($category === null)
 		{
 			$category = $this->categoryRepo->get(
-				$this->categoryMap->getID(CategoryKey::PAGE_NOT_FOUND)
+                (int)$this->categoryMap->getID(CategoryKey::PAGE_NOT_FOUND)
 			);
 		}
 

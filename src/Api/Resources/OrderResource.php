@@ -3,7 +3,7 @@
 namespace LayoutCore\Api\Resources;
 
 use Plenty\Plugin\Http\Request;
-use Illuminate\Http\Response;
+use Plenty\Plugin\Http\Response;
 use LayoutCore\Api\ApiResource;
 use LayoutCore\Api\ApiResponse;
 use LayoutCore\Api\ResponseCode;
