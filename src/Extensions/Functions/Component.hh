@@ -17,13 +17,15 @@ use LayoutCore\Extensions\AbstractFunction;
 
 class Component extends AbstractFunction
 {
+    private int $currentComponent = 0;
     private array<string> $components = [];
 
     public function getFunctions():array<string, string>
     {
         return [
             "component" => "component",
-            "get_components" => "getComponents"
+            "has_component_template" => "hasComponentTemplate",
+            "get_component_template" => "getComponentTemplate"
         ];
     }
 
@@ -34,9 +36,16 @@ class Component extends AbstractFunction
             array_push( $this->components, $path );
         }
     }
-
-    public function getComponents():array<string>
+    public function hasComponentTemplate():bool
     {
-        return $this->components;
+        return $this->currentComponent < count( $this->components );
     }
+
+    public function getComponentTemplate():string
+    {
+        $template = $this->components[$this->currentComponent];
+        $this->currentComponent++;
+        return $template;
+    }
+
 }
