@@ -2,12 +2,12 @@
 
 namespace LayoutCore\Api\Resources;
 
-use Illuminate\Http\Response;
 use Plenty\Plugin\Http\Request;
 use LayoutCore\Api\ApiResource;
 use LayoutCore\Api\ApiResponse;
 use LayoutCore\Api\ResponseCode;
 use LayoutCore\Services\CheckoutService;
+use Plenty\Plugin\Http\Response;
 
 class CheckoutPaymentResource extends ApiResource
 {
@@ -22,6 +22,9 @@ class CheckoutPaymentResource extends ApiResource
         $this->checkoutService = $checkoutService;
     }
 
+    /**
+     * @return Response
+     */
     public function store():Response
     {
         $event = $this->checkoutService->preparePayment();

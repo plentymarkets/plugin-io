@@ -40,9 +40,9 @@ class BasketService
 
 	/**
 	 * Returns basket as array
-	 * @return array
+	 * @return Basket
 	 */
-	public function getBasket():array
+	public function getBasket():Basket
 	{
 		return $this->basketRepository->load();
 	}

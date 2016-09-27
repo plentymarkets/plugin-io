@@ -99,7 +99,7 @@ class CheckoutService
 	public function preparePayment():array
 	{
 		$mopId = $this->getMethodOfPaymentId();
-		return $this->paymentMethodrepository->preparePaymentMethod($mopId);
+		return $this->paymentMethodRepository->preparePaymentMethod($mopId);
 	}
 
 	public function getMethodOfPaymentList():array
