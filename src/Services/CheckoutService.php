@@ -73,7 +73,7 @@ class CheckoutService
 		return $currency;
 	}
 
-	public function setCurrency(string $currency): void
+	public function setCurrency(string $currency)
 	{
 		$this->sessionStorage->getPlugin()->setValue(SessionStorageKeys::CURRENCY, $currency);
 	}
@@ -151,7 +151,7 @@ class CheckoutService
 		return (int)$this->sessionStorage->getPlugin()->getValue(SessionStorageKeys::DELIVERY_ADDRESS_ID);
 	}
 
-	public function setDeliveryAddressId(int $deliveryAddressId): void
+	public function setDeliveryAddressId(int $deliveryAddressId)
 	{
 		$this->sessionStorage->getPlugin()->setValue(SessionStorageKeys::DELIVERY_ADDRESS_ID, $deliveryAddressId);
 	}
@@ -161,7 +161,7 @@ class CheckoutService
 		return (int)$this->sessionStorage->getPlugin()->getValue(SessionStorageKeys::BILLING_ADDRESS_ID);
 	}
 
-	public function setBillingAddressId(int $billingAddressId): void
+	public function setBillingAddressId(int $billingAddressId)
 	{
 		$this->sessionStorage->getPlugin()->setValue(SessionStorageKeys::BILLING_ADDRESS_ID, $billingAddressId);
 		if($this->getDeliveryAddressId() <= 0)

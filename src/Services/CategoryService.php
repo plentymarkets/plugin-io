@@ -48,7 +48,6 @@ class CategoryService
 	/**
 	 * Set the current category by id.
 	 * @param int $catID The id of the current category
-	 * @return void
 	 */
 	public function setCurrentCategoryID(int $catID = 0)
 	{
@@ -60,7 +59,6 @@ class CategoryService
 	/**
 	 * Set the current category by id.
 	 * @param Category $cat The current category
-	 * @return void
 	 */
 	public function setCurrentCategory($cat)
 	{
