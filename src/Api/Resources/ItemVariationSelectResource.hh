@@ -26,7 +26,7 @@ class ItemVariationSelectResource extends ApiResource
 
     public function show( string $itemId ):Response
     {
-        $attributeList =  $this->itemService->getItemVariationAttributes((int)$itemId);
+        $attributeList =  $this->itemService->getAttributeNameMap((int)$itemId);
         return $this->response->create($attributeList, ResponseCode::OK);
     }
 }

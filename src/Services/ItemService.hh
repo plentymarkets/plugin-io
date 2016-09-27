@@ -186,7 +186,10 @@ class ItemService
                 VariationAttributeValueFields::ATTRIBUTE_VALUE_ID
             ))->build();
 
-        $filter = $this->filterBuilder->hasId(array($itemId))->build();
+        $filter = $this->filterBuilder
+            ->hasId(array($itemId))
+            ->variationIsChild()
+            ->build();
 
         $params = $this->paramsBuilder
             ->withParam( ItemColumnsParams::LANGUAGE, Language::DE )
@@ -200,14 +203,10 @@ class ItemService
         $attributeList['variations'] = [];
         $attributeList['attributeNames'] = [];
 
-        $foo = 1;
-
         foreach($recordList as $variation)
         {
             foreach($variation->variationAttributeValueList as $attribute)
             {
-
-
                 $attributeId = $attribute->attributeId;
                 $attributeValueId = $attribute->attributeValueId;
 
@@ -221,6 +220,90 @@ class ItemService
 
             $variationId = $variation->variationBase->id;
             $attributeList['variations'][$variationId] = $variation->variationAttributeValueList;
+        }
+
+        return $attributeList;
+    }
+
+    public function getVariationAttributeMap(int $itemId = 0):array<int, mixed>
+    {
+        $columns = $this->columnBuilder
+            ->withVariationBase(array(
+                VariationBaseFields::ID,
+                VariationBaseFields::ITEM_ID,
+                VariationBaseFields::AVAILABILITY,
+                VariationBaseFields::PACKING_UNITS,
+                VariationBaseFields::CUSTOM_NUMBER
+            ))
+            ->withVariationAttributeValueList(array(
+                VariationAttributeValueFields::ATTRIBUTE_ID,
+                VariationAttributeValueFields::ATTRIBUTE_VALUE_ID
+            ))->build();
+
+        $filter = $this->filterBuilder
+            ->hasId(array($itemId))
+            ->variationIsChild()
+            ->build();
+
+        $params = $this->paramsBuilder
+            ->withParam( ItemColumnsParams::LANGUAGE, Language::DE )
+            ->withParam( ItemColumnsParams::PLENTY_ID, $this->app->getPlentyId() )
+            ->build();
+
+        $recordList = $this->itemRepository->search( $columns, $filter, $params );
+
+        $attributeList = [];
+        foreach($recordList as $variation)
+        {
+            $variationId = $variation->variationBase->id;
+            $attributeList[$variationId] = $variation->variationAttributeValueList;
+        }
+
+        return $attributeList;
+    }
+
+    public function getAttributeNameMap(int $itemId = 0):array<int, mixed>
+    {
+        $columns = $this->columnBuilder
+            ->withVariationBase(array(
+                VariationBaseFields::ID,
+                VariationBaseFields::ITEM_ID,
+                VariationBaseFields::AVAILABILITY,
+                VariationBaseFields::PACKING_UNITS,
+                VariationBaseFields::CUSTOM_NUMBER
+            ))
+            ->withVariationAttributeValueList(array(
+                VariationAttributeValueFields::ATTRIBUTE_ID,
+                VariationAttributeValueFields::ATTRIBUTE_VALUE_ID
+            ))->build();
+
+        $filter = $this->filterBuilder
+            ->hasId(array($itemId))
+            ->variationIsChild()
+            ->build();
+
+        $params = $this->paramsBuilder
+            ->withParam( ItemColumnsParams::LANGUAGE, Language::DE )
+            ->withParam( ItemColumnsParams::PLENTY_ID, $this->app->getPlentyId() )
+            ->build();
+
+        $recordList = $this->itemRepository->search( $columns, $filter, $params );
+
+        $attributeList = [];
+        foreach($recordList as $variation)
+        {
+            foreach($variation->variationAttributeValueList as $attribute)
+            {
+                $attributeId = $attribute->attributeId;
+                $attributeValueId = $attribute->attributeValueId;
+
+                $attributeList[$attributeId]["name"] = $this->getAttributeName($attributeId);
+
+                if(!in_array($attributeValueId, $attributeList[$attributeId]["values"]))
+                {
+                    $attributeList[$attributeId]["values"][$attributeValueId] = $this->getAttributeValueName($attributeValueId);
+                }
+            }
         }
 
         return $attributeList;
