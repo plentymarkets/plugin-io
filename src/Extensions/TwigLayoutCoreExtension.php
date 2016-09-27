@@ -33,7 +33,8 @@ class TwigLayoutCoreExtension extends Twig_Extension
 		NumberFormatFilter $numberFormatFilter,
 		URLFilter $urlFilter,
 		GetBasePrice $getBasePrice,
-		Component $component
+		Component $component,
+        ItemNameFilter $itemNameFilter
 	)
 	{
 		$this->twig = $twig;

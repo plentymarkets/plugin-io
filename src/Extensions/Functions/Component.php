@@ -29,7 +29,7 @@ class Component extends AbstractFunction
         ];
     }
 
-    public function component( string $path ):void
+    public function component( string $path )
     {
         if( !in_array( $path, $this->components ) )
         {

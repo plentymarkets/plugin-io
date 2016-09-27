@@ -69,7 +69,7 @@ class BasketService
         {
             return array();
         }
-        $basketItemData = $this->getBasketItemData( [$basketItem] );
+        $basketItemData = $this->getBasketItemData( array($basketItem) );
         return $this->addVariationData( $basketItem, $basketItemData[$basketItem->variationId] );
     }
 
@@ -115,7 +115,7 @@ class BasketService
 		return $this->basketItemRepository->findExistingOneByData($data);
 	}
 
-	private function getBasketItemData(array $basketItems = []):array
+	private function getBasketItemData($basketItems = array()):array
 	{
 		if(count($basketItems) <= 0)
 		{
