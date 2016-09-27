@@ -96,7 +96,7 @@ class CheckoutService
 		$this->sessionStorage->getPlugin()->setValue( 'MethodOfPaymentID', $methodOfPaymentID );
 	}
 
-	public function preparePayment():?array<mixed>
+	public function preparePayment():array
 	{
 		$mopId = $this->getMethodOfPaymentId();
 		return $this->paymentMethodrepository->preparePaymentMethod($mopId);
@@ -107,7 +107,7 @@ class CheckoutService
 		return $this->frontendPaymentMethodRepository->getCurrentPaymentMethodsList();
 	}
 
-	public function getCheckoutPaymentDataList():array<mixed>
+	public function getCheckoutPaymentDataList():array
     {
         $paymentDataList = array();
         $mopList = $this->getMethodOfPaymentList();

@@ -64,13 +64,13 @@ class ApiResponse
         $this->response = $response;
 
 		// register basket Events
-        $this->dispatcher->listen( AfterBasketChanged::class, ($event) ==> {
+        $this->dispatcher->listen( AfterBasketChanged::class, function($event) {
             $this->eventData["AfterBasketChanged"] = [
                 "basket" => $event->getBasket()
             ];
         }, 0);
 
-        $this->dispatcher->listen( AfterBasketCreate::class, ($event) ==> {
+        $this->dispatcher->listen( AfterBasketCreate::class, function($event) {
             $this->eventData["AfterBasketCreate"] = [
                 "basket" => $event->getBasket()
             ];

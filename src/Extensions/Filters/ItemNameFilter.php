@@ -20,7 +20,7 @@ class ItemNameFilter extends AbstractFilter
       $this->config = $config;
   }
 
-  public function getFilters():array<string, string>
+  public function getFilters():array
   {
       return [
           "itemName" => "itemName"

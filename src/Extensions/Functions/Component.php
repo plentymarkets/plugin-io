@@ -20,7 +20,7 @@ class Component extends AbstractFunction
     private $currentComponent = 0;
     private $components = array();
 
-    public function getFunctions():array<string, string>
+    public function getFunctions():array
     {
         return [
             "component" => "component",
