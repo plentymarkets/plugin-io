@@ -10,6 +10,10 @@ use LayoutCore\Api\ResponseCode;
 use LayoutCore\Services\CheckoutService;
 use Plenty\Plugin\Http\Response;
 
+/**
+ * Class CheckoutPaymentResource
+ * @package LayoutCore\Api\Resources
+ */
 class CheckoutPaymentResource extends ApiResource
 {
     /**
@@ -17,6 +21,12 @@ class CheckoutPaymentResource extends ApiResource
      */
     private $checkoutService;
     
+    /**
+     * CheckoutPaymentResource constructor.
+     * @param Request $request
+     * @param ApiResponse $response
+     * @param CheckoutService $checkoutService
+     */
     public function __construct( Request $request, ApiResponse $response, CheckoutService $checkoutService )
     {
         parent::__construct( $request, $response );
@@ -24,6 +34,7 @@ class CheckoutPaymentResource extends ApiResource
     }
 
     /**
+     * prepare payment
      * @return Response
      */
     public function store():BaseReponse

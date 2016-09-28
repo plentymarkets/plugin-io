@@ -2,7 +2,7 @@
 
 namespace LayoutCore\Api\Resources;
 
-use Symfony\Component\HttpFoundation\Response as BaseReponse;
+use Symfony\Component\HttpFoundation\Response as BaseResponse;
 use Plenty\Plugin\Http\Response;
 use Plenty\Plugin\Http\Request;
 use LayoutCore\Api\ApiResource;
@@ -11,32 +11,54 @@ use LayoutCore\Api\ResponseCode;
 use LayoutCore\Services\CustomerService;
 use LayoutCore\Builder\Order\AddressType;
 
+/**
+ * Class CustomerAddressResource
+ * @package LayoutCore\Api\Resources
+ */
 class CustomerAddressResource extends ApiResource
 {
 	/**
 	 * @var CustomerService
 	 */
 	private $customerService;
-	
+    
+    /**
+     * CustomerAddressResource constructor.
+     * @param Request $request
+     * @param ApiResponse $response
+     * @param CustomerService $customerService
+     */
 	public function __construct(Request $request, ApiResponse $response, CustomerService $customerService)
 	{
 		parent::__construct($request, $response);
 		$this->customerService = $customerService;
 	}
-	
+    
+    /**
+     * get address type from request
+     * @return int
+     */
 	private function getAddressType():int
 	{
 		return (INT)$this->request->get("typeId", null);
 	}
-	
-	public function index():BaseReponse
+    
+    /**
+     * get address by type
+     * @return BaseResponse
+     */
+	public function index():BaseResponse
 	{
 		$type      = $this->getAddressType();
 		$addresses = $this->customerService->getAddresses($type);
 		return $this->response->create($addresses, ResponseCode::OK);
 	}
-	
-	public function store():BaseReponse
+    
+    /**
+     * create address with given type
+     * @return BaseResponse
+     */
+	public function store():BaseResponse
 	{
 		$type = $this->getAddressType();
 		if($type === 0)
@@ -47,8 +69,13 @@ class CustomerAddressResource extends ApiResource
 		$address = $this->customerService->createAddress($this->request->all(), $type);
 		return $this->response->create($address, ResponseCode::CREATED);
 	}
-	
-	public function update(string $addressId):BaseReponse
+    
+    /**
+     * update address with given id
+     * @param string $addressId
+     * @return BaseResponse
+     */
+	public function update(string $addressId):BaseResponse
 	{
 		$type = $this->getAddressType();
 		if($type === 0)
@@ -61,8 +88,13 @@ class CustomerAddressResource extends ApiResource
 		$address   = $this->customerService->updateAddress($addressId, $this->request->all(), $type);
 		return $this->response->create($address, ResponseCode::OK);
 	}
-	
-	public function destroy(string $addressId):BaseReponse
+    
+    /**
+     * delete address with given id
+     * @param string $addressId
+     * @return BaseResponse
+     */
+	public function destroy(string $addressId):BaseResponse
 	{
 		$type = $this->getAddressType();
 		if($type === 0)

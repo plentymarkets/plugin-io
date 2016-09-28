@@ -52,13 +52,13 @@ class ApiResponse
 	 * @var null|Application
 	 */
 	private $app = null;
-
+    
     /**
      * @var null|Response
      */
     private $response = null;
 
-	public function __construct(Dispatcher $dispatcher, Application $app, Response $response)
+	public function __construct(Dispatcher $dispatcher, Application $app, BaseResponse $response)
 	{
 		$this->app = $app;
 		$this->dispatcher = $dispatcher;
@@ -222,7 +222,7 @@ class ApiResponse
 	 * @param $data
 	 * @param int $code
 	 * @param array $headers
-	 * @return Response
+	 * @return BaseResponse
 	 */
 	public function create($data, int $code = ResponseCode::OK, array $headers = []):BaseResponse
 	{

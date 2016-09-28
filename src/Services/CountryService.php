@@ -27,17 +27,17 @@ class CountryService
 
 	public function getActiveCountriesList():array
 	{
-/*        $list = $this->countryRepository->getCountriesList(1, array());
-
+        /*$list = $this->countryRepository->getCountriesList(1, array());
+        
         $countriesList = array();
         foreach($list as $country)
         {
             $countriesList[] = $country;
         }
-
-		return $countriesList;
-*/
-		return array();
+        
+		return $countriesList;*/
+        
+        return array();
 	}
 
 	public function getActiveCountryNameMap(string $language):array

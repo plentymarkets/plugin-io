@@ -2,7 +2,7 @@
 
 namespace LayoutCore\Api\Resources;
 
-use Symfony\Component\HttpFoundation\Response as BaseReponse;
+use Symfony\Component\HttpFoundation\Response as BaseResponse;
 use Plenty\Plugin\Http\Response;
 use Plenty\Plugin\Http\Request;
 use LayoutCore\Api\ApiResource;
@@ -12,6 +12,10 @@ use LayoutCore\Services\CheckoutService;
 use LayoutCore\Services\CustomerService;
 use LayoutCore\Builder\Order\AddressType;
 
+/**
+ * Class CheckoutResource
+ * @package LayoutCore\Api\Resources
+ */
 class CheckoutResource extends ApiResource
 {
 	/**
@@ -22,21 +26,36 @@ class CheckoutResource extends ApiResource
 	 * @var CustomerService
 	 */
 	private $customerService;
-	
+    
+    /**
+     * CheckoutResource constructor.
+     * @param Request $request
+     * @param ApiResponse $response
+     * @param CheckoutService $checkoutService
+     * @param CustomerService $customerService
+     */
 	public function __construct(Request $request, ApiResponse $response, CheckoutService $checkoutService, CustomerService $customerService)
 	{
 		parent::__construct($request, $response);
 		$this->checkoutService = $checkoutService;
 		$this->customerService = $customerService;
 	}
-	
-	public function index():BaseReponse
+    
+    /**
+     * get checkout
+     * @return BaseResponse
+     */
+	public function index():BaseResponse
 	{
 		$checkout = $this->checkoutService->getCheckout();
 		return $this->response->create($checkout, ResponseCode::OK);
 	}
 	
-	public function store():BaseReponse
+    /**
+     * save adresses and set checkout data
+     * @return BaseResponse
+     */
+	public function store():BaseResponse
 	{
 		$methodOfPaymentId = (int)$this->request->get("methodOfPaymentId");
 		$this->checkoutService->setMethodOfPaymentId($methodOfPaymentId);
