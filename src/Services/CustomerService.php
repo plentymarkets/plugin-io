@@ -116,7 +116,7 @@ class CustomerService
 		return null;
 	}
 	
-	public function getAddresses($type = null):array
+	public function getAddresses($type = null)
 	{
 		return $this->addressRepository->getAddresses($this->getContactId(), $type);
 	}
