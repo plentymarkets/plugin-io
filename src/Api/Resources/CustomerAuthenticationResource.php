@@ -2,6 +2,7 @@
 
 namespace LayoutCore\Api\Resources;
 
+use Symfony\Component\HttpFoundation\Response as BaseReponse;
 use Plenty\Plugin\Http\Request;
 use Plenty\Plugin\Http\Response;
 use LayoutCore\Api\ApiResource;
@@ -22,7 +23,7 @@ class CustomerAuthenticationResource extends ApiResource
 		$this->authService = $authService;
 	}
 	
-	public function store():Response
+	public function store():BaseReponse
 	{
 		$email    = $this->request->get('email', '');
 		$password = $this->request->get('password', '');

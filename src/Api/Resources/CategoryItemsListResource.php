@@ -2,6 +2,7 @@
 
 namespace LayoutCore\Api\Resources;
 
+use Symfony\Component\HttpFoundation\Response as BaseReponse;
 use Plenty\Plugin\Http\Request;
 use Plenty\Plugin\Http\Response;
 use LayoutCore\Api\ApiResource;
@@ -22,12 +23,12 @@ class CategoryItemsListResource extends ApiResource
 		$this->itemService = $itemService;
 	}
 	
-	public function index():Response
+	public function index():BaseReponse
 	{
 		return $this->response->create(null, ResponseCode::OK);
 	}
 	
-	public function show(string $categoryId):Response
+	public function show(string $categoryId):BaseReponse
 	{
 		$itemsList = $this->itemService->getItemForCategory((int)$categoryId);
 		return $this->response->create($itemsList, ResponseCode::OK);

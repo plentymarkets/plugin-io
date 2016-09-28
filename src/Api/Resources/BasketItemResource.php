@@ -2,6 +2,7 @@
 
 namespace LayoutCore\Api\Resources;
 
+use Symfony\Component\HttpFoundation\Response as BaseReponse;
 use Plenty\Plugin\Http\Response;
 use Plenty\Plugin\Http\Request;
 use LayoutCore\Api\ApiResource;
@@ -22,35 +23,35 @@ class BasketItemResource extends ApiResource
 		$this->basketService = $basketService;
 	}
 	
-	public function index():Response
+	public function index():BaseReponse
 	{
 		$basketItems = $this->basketService->getBasketItems();
 		return $this->response->create($basketItems, ResponseCode::OK);
 	}
 	
 	// post
-	public function store():Response
+	public function store():BaseReponse
 	{
 		$basketItems = $this->basketService->addBasketItem($this->request->all());
 		return $this->response->create($basketItems, ResponseCode::CREATED);
 	}
 	
 	// get
-	public function show(string $selector):Response
+	public function show(string $selector):BaseReponse
 	{
 		$basketItem = $this->basketService->getBasketItem((int)$selector);
 		return $this->response->create($basketItem, ResponseCode::OK);
 	}
 	
 	// put/patch
-	public function update(string $selector):Response
+	public function update(string $selector):BaseReponse
 	{
 		$basketItems = $this->basketService->updateBasketItem((int)$selector, $this->request->all());
 		return $this->response->create($basketItems, ResponseCode::OK);
 	}
 	
 	// delete
-	public function destroy(string $selector):Response
+	public function destroy(string $selector):BaseReponse
 	{
 		$basketItems = $this->basketService->deleteBasketItem((int)$selector);
 		return $this->response->create($basketItems, ResponseCode::OK);

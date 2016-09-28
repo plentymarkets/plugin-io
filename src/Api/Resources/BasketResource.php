@@ -2,6 +2,7 @@
 
 namespace LayoutCore\Api\Resources;
 
+use Symfony\Component\HttpFoundation\Response as BaseReponse;
 use Plenty\Plugin\Http\Response;
 use Plenty\Plugin\Http\Request;
 use LayoutCore\Api\ApiResource;
@@ -22,7 +23,7 @@ class BasketResource extends ApiResource
 		$this->basketService = $basketService;
 	}
 
-	public function index():Response
+	public function index():BaseReponse
 	{
 		$basket = $this->basketService->getBasket();
 		return $this->response->create($basket, ResponseCode::OK);

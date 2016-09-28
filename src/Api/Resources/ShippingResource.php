@@ -2,6 +2,7 @@
 
 namespace LayoutCore\Api\Resources;
 
+use Symfony\Component\HttpFoundation\Response as BaseReponse;
 use Plenty\Plugin\Http\Response;
 use Plenty\Plugin\Http\Request;
 use LayoutCore\Api\ApiResource;
@@ -24,7 +25,7 @@ class ShippingResource extends ApiResource
 	}
 	
 	// put/patch
-	public function update(string $shippingProfileId):Response
+	public function update(string $shippingProfileId):BaseReponse
 	{
 		$this->shippingService->setShippingProfileId((int)$shippingProfileId);
 		return $this->response->create(ResponseCode::OK);

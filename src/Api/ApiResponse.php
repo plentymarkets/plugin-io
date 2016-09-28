@@ -2,6 +2,7 @@
 
 namespace LayoutCore\Api;
 
+use Symfony\Component\HttpFoundation\Response as BaseResponse;
 use Plenty\Plugin\Http\Response;
 use Plenty\Modules\Account\Events\FrontendUpdateCustomerSettings;
 use Plenty\Modules\Authentication\Events\AfterAccountAuthentication;
@@ -217,7 +218,13 @@ class ApiResponse
 		return $this;
 	}
 
-	public function create($data, int $code = ResponseCode::OK, array $headers = []):Response
+	/**
+	 * @param $data
+	 * @param int $code
+	 * @param array $headers
+	 * @return Response
+	 */
+	public function create($data, int $code = ResponseCode::OK, array $headers = []):BaseResponse
 	{
 		foreach($headers as $key => $value)
 		{

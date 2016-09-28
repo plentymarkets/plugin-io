@@ -2,6 +2,7 @@
 
 namespace LayoutCore\Api\Resources;
 
+use Symfony\Component\HttpFoundation\Response as BaseReponse;
 use Plenty\Plugin\Http\Request;
 use Plenty\Plugin\Http\Response;
 use LayoutCore\Api\ApiResource;
@@ -22,7 +23,7 @@ class CustomerLogoutResource extends ApiResource
 		$this->authService = $authService;
 	}
 	
-	public function index():Response
+	public function index():BaseReponse
 	{
 		$this->authService->logout();
 		return $this->response->create(ResponseCode::OK);

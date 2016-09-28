@@ -2,6 +2,7 @@
 
 namespace LayoutCore\Api\Resources;
 
+use Symfony\Component\HttpFoundation\Response as BaseReponse;
 use Plenty\Plugin\Http\Response;
 use Plenty\Plugin\Http\Request;
 use LayoutCore\Api\ApiResource;
@@ -29,13 +30,13 @@ class CheckoutResource extends ApiResource
 		$this->customerService = $customerService;
 	}
 	
-	public function index():Response
+	public function index():BaseReponse
 	{
 		$checkout = $this->checkoutService->getCheckout();
 		return $this->response->create($checkout, ResponseCode::OK);
 	}
 	
-	public function store():Response
+	public function store():BaseReponse
 	{
 		$methodOfPaymentId = (int)$this->request->get("methodOfPaymentId");
 		$this->checkoutService->setMethodOfPaymentId($methodOfPaymentId);

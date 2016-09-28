@@ -2,6 +2,7 @@
 
 namespace LayoutCore\Api\Resources;
 
+use Symfony\Component\HttpFoundation\Response as BaseReponse;
 use Plenty\Plugin\Http\Response;
 use Plenty\Plugin\Http\Request;
 use LayoutCore\Api\ApiResource;
@@ -28,14 +29,14 @@ class CustomerAddressResource extends ApiResource
 		return (INT)$this->request->get("typeId", null);
 	}
 	
-	public function index():Response
+	public function index():BaseReponse
 	{
 		$type      = $this->getAddressType();
 		$addresses = $this->customerService->getAddresses($type);
 		return $this->response->create($addresses, ResponseCode::OK);
 	}
 	
-	public function store():Response
+	public function store():BaseReponse
 	{
 		$type = $this->getAddressType();
 		if($type === 0)
@@ -47,7 +48,7 @@ class CustomerAddressResource extends ApiResource
 		return $this->response->create($address, ResponseCode::CREATED);
 	}
 	
-	public function update(string $addressId):Response
+	public function update(string $addressId):BaseReponse
 	{
 		$type = $this->getAddressType();
 		if($type === 0)
@@ -61,7 +62,7 @@ class CustomerAddressResource extends ApiResource
 		return $this->response->create($address, ResponseCode::OK);
 	}
 	
-	public function destroy(string $addressId):Response
+	public function destroy(string $addressId):BaseReponse
 	{
 		$type = $this->getAddressType();
 		if($type === 0)

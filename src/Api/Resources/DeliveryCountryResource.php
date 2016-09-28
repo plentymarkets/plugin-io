@@ -2,6 +2,7 @@
 
 namespace LayoutCore\Api\Resources;
 
+use Symfony\Component\HttpFoundation\Response as BaseReponse;
 use Plenty\Plugin\Http\Response;
 use Plenty\Plugin\Http\Request;
 use LayoutCore\Api\ApiResource;
@@ -30,7 +31,7 @@ class DeliveryCountryResource extends ApiResource
 	
 	
 	// put/patch
-	public function update(string $shippingCountryId):Response
+	public function update(string $shippingCountryId):BaseReponse
 	{
 		$this->countryService->setShippingCountryId((int)$shippingCountryId);
 		$basket = $this->basketService->getBasket();

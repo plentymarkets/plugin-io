@@ -2,6 +2,7 @@
 
 namespace LayoutCore\Api\Resources;
 
+use Symfony\Component\HttpFoundation\Response as BaseReponse;
 use Plenty\Plugin\Http\Request;
 use Plenty\Plugin\Http\Response;
 use LayoutCore\Api\ApiResource;
@@ -22,12 +23,12 @@ class ItemVariationSelectResource extends ApiResource
 		$this->itemService = $itemService;
 	}
 	
-	public function index():Response
+	public function index():BaseReponse
 	{
 		return $this->response->create(null, ResponseCode::OK);
 	}
 	
-	public function show(string $itemId):Response
+	public function show(string $itemId):BaseReponse
 	{
 		$attributeList = $this->itemService->getItemVariationAttributes((int)$itemId);
 		return $this->response->create($attributeList, ResponseCode::OK);
