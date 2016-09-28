@@ -2,23 +2,39 @@
 
 namespace LayoutCore\Api;
 
-use Symfony\Component\HttpFoundation\Response as BaseReponse;
+use Symfony\Component\HttpFoundation\Response as BaseResponse;
 use Plenty\Plugin\Http\Response;
 use Plenty\Plugin\Controller;
 use Plenty\Plugin\Http\Request;
 use LayoutCore\Api\ApiResponse;
 use LayoutCore\Api\ResponseCode;
 
+/**
+ * Class ApiResource
+ * @package LayoutCore\Api
+ */
 class ApiResource extends Controller
 {
+    /**
+     * @var \LayoutCore\Api\ApiResponse
+     */
 	protected $response;
+    
+    /**
+     * @var Request
+     */
 	protected $request;
 	
 	/**
 	 * @var ResponseCode
 	 */
 	private $defaultCode = ResponseCode::NOT_IMPLEMENTED;
-	
+    
+    /**
+     * ApiResource constructor.
+     * @param Request $request
+     * @param \LayoutCore\Api\ApiResponse $response
+     */
 	public function __construct(Request $request, ApiResponse $response)
 	{
 		$this->response = $response;
@@ -26,31 +42,49 @@ class ApiResource extends Controller
 	}
 	
 	// get all
-	public function index():BaseReponse
+    /**
+     * @return BaseResponse
+     */
+	public function index():BaseResponse
 	{
 		return $this->response->create(null, $this->defaultCode);
 	}
 	
 	// post
-	public function store():BaseReponse
+    /**
+     * @return BaseResponse
+     */
+	public function store():BaseResponse
 	{
 		return $this->response->create(null, $this->defaultCode);
 	}
 	
 	// get
-	public function show(string $selector):BaseReponse
+    /**
+     * @param string $selector
+     * @return BaseResponse
+     */
+	public function show(string $selector):BaseResponse
 	{
 		return $this->response->create(null, $this->defaultCode);
 	}
 	
 	// put/patch
-	public function update(string $selector):BaseReponse
+    /**
+     * @param string $selector
+     * @return BaseResponse
+     */
+	public function update(string $selector):BaseResponse
 	{
 		return $this->response->create(null, $this->defaultCode);
 	}
 	
 	// delete
-	public function destroy(string $selector):BaseReponse
+    /**
+     * @param string $selector
+     * @return BaseResponse
+     */
+	public function destroy(string $selector):BaseResponse
 	{
 		return $this->response->create(null, $this->defaultCode);
 	}

@@ -23,6 +23,10 @@ use Plenty\Modules\Basket\Events\Basket\AfterBasketCreate;
 use Plenty\Plugin\Application;
 use Plenty\Plugin\Events\Dispatcher;
 
+/**
+ * Class ApiResponse
+ * @package LayoutCore\Api
+ */
 class ApiResponse
 {
 	/**
@@ -57,7 +61,13 @@ class ApiResponse
      * @var null|Response
      */
     private $response = null;
-
+    
+    /**
+     * ApiResponse constructor.
+     * @param Dispatcher $dispatcher
+     * @param Application $app
+     * @param Response $response
+     */
 	public function __construct(Dispatcher $dispatcher, Application $app, Response $response)
 	{
 		$this->app = $app;
@@ -167,25 +177,46 @@ class ApiResponse
 			$this->eventData["AfterAccountContactLogout"] = [];
 		}, 0);
 	}
-
+    
+    /**
+     * @param int $code
+     * @param null $message
+     * @return ApiResponse
+     */
 	public function error(int $code, $message = null):ApiResponse
 	{
 		$this->pushNotification("error", $code, $message);
 		return $this;
 	}
-
+    
+    /**
+     * @param int $code
+     * @param null $message
+     * @return ApiResponse
+     */
 	public function success(int $code, $message = null):ApiResponse
 	{
 		$this->pushNotification("success", $code, $message);
 		return $this;
 	}
-
+    
+    /**
+     * @param int $code
+     * @param null $message
+     * @return ApiResponse
+     */
 	public function info(int $code, $message = null):ApiResponse
 	{
 		$this->pushNotification("info", $code, $message);
 		return $this;
 	}
-
+    
+    /**
+     * @param string $context
+     * @param int $code
+     * @param null $message
+     * @return ApiResponse
+     */
 	private function pushNotification(string $context, int $code, $message = null):ApiResponse
 	{
 		if($message === null)
@@ -211,7 +242,12 @@ class ApiResponse
 		$this->notifications[$context] = $notification;
 		return $this;
 	}
-
+    
+    /**
+     * @param string $key
+     * @param string $value
+     * @return ApiResponse
+     */
 	public function header(string $key, string $value):ApiResponse
 	{
 		$this->headers[$key] = $value;

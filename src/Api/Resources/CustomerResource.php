@@ -2,7 +2,7 @@
 
 namespace LayoutCore\Api\Resources;
 
-use Symfony\Component\HttpFoundation\Response as BaseReponse;
+use Symfony\Component\HttpFoundation\Response as BaseResponse;
 use Plenty\Plugin\Http\Response;
 use Plenty\Plugin\Http\Request;
 use LayoutCore\Api\ApiResource;
@@ -10,20 +10,34 @@ use LayoutCore\Api\ApiResponse;
 use LayoutCore\Api\ResponseCode;
 use LayoutCore\Services\CustomerService;
 
+/**
+ * Class CustomerResource
+ * @package LayoutCore\Api\Resources
+ */
 class CustomerResource extends ApiResource
 {
 	/**
 	 * @var CustomerService
 	 */
 	private $customerService;
-	
+    
+    /**
+     * CustomerResource constructor.
+     * @param Request $request
+     * @param ApiResponse $response
+     * @param CustomerService $customerService
+     */
 	public function __construct(Request $request, ApiResponse $response, CustomerService $customerService)
 	{
 		parent::__construct($request, $response);
 		$this->customerService = $customerService;
 	}
-	
-	public function index():BaseReponse
+    
+    /**
+     * get contact
+     * @return BaseResponse
+     */
+	public function index():BaseResponse
 	{
 		$customer = null;
 		$contact  = $this->customerService->getContact();
@@ -37,8 +51,12 @@ class CustomerResource extends ApiResource
 		
 		return $this->response->create($customer, ResponseCode::OK);
 	}
-	
-	public function store():BaseReponse
+    
+    /**
+     * save contact
+     * @return BaseResponse
+     */
+	public function store():BaseResponse
 	{
 		$contactData         = $this->request->get("contact", null);
 		$billingAddressData  = $this->request->get("billingAddress", []);

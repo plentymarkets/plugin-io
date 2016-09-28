@@ -2,7 +2,7 @@
 
 namespace LayoutCore\Api\Resources;
 
-use Symfony\Component\HttpFoundation\Response as BaseReponse;
+use Symfony\Component\HttpFoundation\Response as BaseResponse;
 use Plenty\Plugin\Http\Request;
 use LayoutCore\Api\ApiResource;
 use LayoutCore\Api\ApiResponse;
@@ -35,9 +35,9 @@ class CheckoutPaymentResource extends ApiResource
 
     /**
      * prepare payment
-     * @return Response
+     * @return BaseResponse
      */
-    public function store():BaseReponse
+    public function store():BaseResponse
     {
         $event = $this->checkoutService->preparePayment();
         return $this->response->create( $event, ResponseCode::OK );
