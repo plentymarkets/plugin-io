@@ -58,7 +58,7 @@ class ApiResponse
      */
     private $response = null;
 
-	public function __construct(Dispatcher $dispatcher, Application $app, BaseResponse $response)
+	public function __construct(Dispatcher $dispatcher, Application $app, Response $response)
 	{
 		$this->app = $app;
 		$this->dispatcher = $dispatcher;
