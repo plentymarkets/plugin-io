@@ -73,7 +73,7 @@ class BasketService
         return $this->addVariationData( $basketItem, $basketItemData[$basketItem->variationId] );
     }
 
-	private function addVariationData( BasketItem $basketItem, mixed $variationData ):array
+	private function addVariationData( BasketItem $basketItem, $variationData ):array
     {
         $arr = $basketItem->toArray();
         $arr["variation"] = $variationData;
@@ -109,8 +109,8 @@ class BasketService
 		$this->basketItemRepository->removeBasketItem($basketItemId);
 		return $this->getBasketItems();
 	}
-
-	public function findExistingOneByData(array $data):BasketItem
+    
+	public function findExistingOneByData(array $data)
 	{
 		return $this->basketItemRepository->findExistingOneByData($data);
 	}
@@ -119,17 +119,17 @@ class BasketService
 	{
 		if(count($basketItems) <= 0)
 		{
-			return [];
+			return array();
 		}
 
-		$basketItemVariationIds = [];
+		$basketItemVariationIds = array();
 		foreach($basketItems as $basketItem)
 		{
 			array_push($basketItemVariationIds, $basketItem->variationId);
 		}
 
 		$items  = $this->itemService->getVariations($basketItemVariationIds);
-		$result = [];
+		$result = array();
 		foreach($items as $item)
 		{
 			$variationId          = $item->variationBase->id;
