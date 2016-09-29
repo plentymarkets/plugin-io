@@ -31,9 +31,8 @@
         },
         "default": "1"
     },
-
     {
-        "tab"                       : "Sorting",
+        "tab"                       : "Pagination and sorting",
         "key"                       : "sort.defaultSorting",
         "label"                     : "Sort by: Default entry",
         "type"                      : "dropdown",
@@ -71,4 +70,17 @@
         },
         "default"                   : "variationId_asc"
     },
+    {
+       "tab"           : "Pagination and sorting",
+       "key"           : "sort.defaultItemsPerPage",
+       "label"         : "Default number of items per page",
+       "type"          : "dropdown",
+       "possibleValues":
+       {
+         "20"          : "20",
+         "50"          : "50",
+         "100"         : "100"
+       },
+       "default"       : "20"
+   }
 ]

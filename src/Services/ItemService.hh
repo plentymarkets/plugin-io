@@ -125,8 +125,13 @@ class ItemService
         $limit = $this->request->get('limit', 20);
         $offset = $this->request->get('offset', 0);
         $currentPage = $this->request->get('page', 0);
-        $itemsPerPage = $this->request->get('items_per_page', 20);
+        $itemsPerPage = $this->request->get('items_per_page');
         $orderBy = $this->request->get('itemSorting');
+
+        if (NULL == $itemsPerPage)
+        {
+            $itemsPerPage = $this->config->get('PluginLayoutCore.sort.defaultItemsPerPage');
+        }
 
         if((int)$currentPage > 0)
         {
