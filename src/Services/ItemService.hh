@@ -252,14 +252,17 @@ class ItemService
 
         $recordList = $this->itemRepository->search( $columns, $filter, $params );
 
-        $attributeList = [];
+        $variations = [];
         foreach($recordList as $variation)
         {
-            $variationId = $variation->variationBase->id;
-            $attributeList[$variationId] = $variation->variationAttributeValueList;
+            $data = [
+                "variationId" => $variation->variationBase->id,
+                "attributes" => $variation->variationAttributeValueList
+            ];
+            array_push( $variations, $data );
         }
 
-        return $attributeList;
+        return $variations;
     }
 
     public function getAttributeNameMap(int $itemId = 0):array<int, mixed>
