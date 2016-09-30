@@ -212,60 +212,6 @@ class ItemService
         return $this->itemRepository->searchWithPagination( $columns, $filter, $params );
     }
 
-    public function getItemVariationAttributes(int $itemId = 0):array<string, mixed>
-    {
-        $columns = $this->columnBuilder
-            ->withVariationBase(array(
-                VariationBaseFields::ID,
-                VariationBaseFields::ITEM_ID,
-                VariationBaseFields::AVAILABILITY,
-                VariationBaseFields::PACKING_UNITS,
-                VariationBaseFields::CUSTOM_NUMBER
-            ))
-            ->withVariationAttributeValueList(array(
-                VariationAttributeValueFields::ATTRIBUTE_ID,
-                VariationAttributeValueFields::ATTRIBUTE_VALUE_ID
-            ))->build();
-
-        $filter = $this->filterBuilder
-            ->hasId(array($itemId))
-            ->variationIsChild()
-            ->build();
-
-        $params = $this->paramsBuilder
-            ->withParam( ItemColumnsParams::LANGUAGE, Language::DE )
-            ->withParam( ItemColumnsParams::PLENTY_ID, $this->app->getPlentyId() )
-            ->build();
-
-        $recordList = $this->itemRepository->search( $columns, $filter, $params );
-
-        $attributeList = [];
-        $attributeList['selectionValues'] = [];
-        $attributeList['variations'] = [];
-        $attributeList['attributeNames'] = [];
-
-        foreach($recordList as $variation)
-        {
-            foreach($variation->variationAttributeValueList as $attribute)
-            {
-                $attributeId = $attribute->attributeId;
-                $attributeValueId = $attribute->attributeValueId;
-
-                $attributeList['attributeNames'][$attributeId] = $this->getAttributeName($attributeId);
-
-                if(!in_array($attributeValueId, $attributeList['selectionValues'][$attributeId]))
-                {
-                    $attributeList['selectionValues'][$attributeId][$attributeValueId] = $this->getAttributeValueName($attributeValueId);
-                }
-            }
-
-            $variationId = $variation->variationBase->id;
-            $attributeList['variations'][$variationId] = $variation->variationAttributeValueList;
-        }
-
-        return $attributeList;
-    }
-
     public function getVariationAttributeMap(int $itemId = 0):array<int, mixed>
     {
         $columns = $this->columnBuilder
