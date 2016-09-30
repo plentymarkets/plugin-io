@@ -18,7 +18,6 @@ class LayoutCoreRouteServiceProvider extends RouteServiceProvider
 		$api->version(['v1'], ['namespace' => 'LayoutCore\Api\Resources'], (ApiRouter $api) ==> {
 			$api->resource( 'basket', 'BasketResource' );
 			$api->resource( 'basket/items', 'BasketItemResource' );
-			$api->resource( 'item_variation_select', 'ItemVariationSelectResource' );
 			$api->resource( 'category_items_list', 'CategoryItemsListResource' );
 			$api->resource( 'order', 'OrderResource' );
 			$api->resource( 'checkout', 'CheckoutResource' );
