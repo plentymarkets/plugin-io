@@ -116,6 +116,47 @@ class ItemService
         );
     }
 
+    public function getVariationList( int $itemId, bool $withPrimary = false ):array<int>
+    {
+        $columns = $this->columnBuilder
+            ->withVariationBase([
+                VariationBaseFields::ID
+            ])
+            ->build();
+
+        // filter current item by item id
+        $filter = $this->filterBuilder
+            ->hasId( [$itemId] );
+
+        if( !$withPrimary )
+        {
+            $filter->variationIsChild();
+        }
+
+        $filter = $filter->build();
+
+        // set params
+        // TODO: make current language global
+        $params = $this->paramsBuilder
+            ->withParam( ItemColumnsParams::LANGUAGE, Language::DE )
+            ->withParam( ItemColumnsParams::PLENTY_ID, $this->app->getPlentyId() )
+            ->build();
+
+        $variations = $this->itemRepository->search(
+            $columns,
+            $filter,
+            $params
+        );
+
+        $variationIds = [];
+
+        foreach( $variations as $variation )
+        {
+            array_push( $variationIds, $variation->variationBase->id );
+        }
+        return $variationIds;
+    }
+
     public function getItemForCategory( int $catID, int $variationShowType = 1 ):PaginatedResult
     {
         $limit = $this->request->get('limit', 20);
