@@ -142,7 +142,7 @@ class CategoryService
         return $this->currentCategory !== null && $this->currentCategory->id == $this->categoryMap->getID( CategoryKey::HOME );
     }
 
-    public function getItems( ?Category $category = $this->currentCategory, int $defaultItemPerPage = 0, int $variationShowType = 1 ):?PaginatedResult
+    public function getItems( ?Category $category = $this->currentCategory, int $variationShowType = 1 ):?PaginatedResult
     {
         if( $category == null )
         {

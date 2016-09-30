@@ -11,7 +11,7 @@ enum ItemColumnsParams:string {
     QUANTITY        = "quantity";
     PLENTY_ID       = "plentyId";
     WAREHOUSE_ID    = "warehouseId";
-    ORDER_BY        = "orderBy";
+    ORDER_BY        = "order_by";
     LIMIT           = "limit";
     OFFSET          = "offset";
 }

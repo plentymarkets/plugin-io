@@ -23,6 +23,7 @@ use LayoutCore\Builder\Item\Fields\ItemCrossSellingFields;
 use LayoutCore\Constants\Language;
 use Plenty\Plugin\Http\Request;
 use Plenty\Repositories\Models\PaginatedResult;
+use Plenty\Plugin\ConfigRepository;
 
 class ItemService
 {
@@ -34,6 +35,7 @@ class ItemService
     private ItemFilterBuilder $filterBuilder;
     private ItemParamsBuilder $paramsBuilder;
     private Request $request;
+    private ConfigRepository $config;
 
     public function __construct(
         Application $app,
@@ -43,7 +45,8 @@ class ItemService
         ItemColumnBuilder $columnBuilder,
         ItemFilterBuilder $filterBuilder,
         ItemParamsBuilder $paramsBuilder,
-        Request $request
+        Request $request,
+        ConfigRepository $config
     )
     {
         $this->app = $app;
@@ -54,6 +57,7 @@ class ItemService
         $this->filterBuilder = $filterBuilder;
         $this->paramsBuilder = $paramsBuilder;
         $this->request = $request;
+        $this->config = $config;
     }
 
     public function getItem(int $itemId = 0) : Record
@@ -121,7 +125,13 @@ class ItemService
         $limit = $this->request->get('limit', 20);
         $offset = $this->request->get('offset', 0);
         $currentPage = $this->request->get('page', 0);
-        $itemsPerPage = $this->request->get('items_per_page', 20);
+        $itemsPerPage = $this->request->get('items_per_page');
+        $orderBy = $this->request->get('itemSorting');
+
+        if (NULL == $itemsPerPage)
+        {
+            $itemsPerPage = $this->config->get('PluginLayoutCore.sort.defaultItemsPerPage');
+        }
 
         if((int)$currentPage > 0)
         {
@@ -132,8 +142,6 @@ class ItemService
         $columns = $this->columnBuilder
             ->defaults()
             ->build();
-
-
 
         if($variationShowType == 2)
         {
@@ -160,8 +168,29 @@ class ItemService
             ->variationHasCategory( $catID )
             ->build();*/
 
+        if (NULL != $orderBy)
+        {
+            list($key, $sorting) = explode("_", (string) $orderBy);
+            if (NULL != $key && NULL != $sorting)
+            {
+                $params = $this->paramsBuilder->withParam( ItemColumnsParams::ORDER_BY, array("orderBy." . $key => strtoupper($sorting)));
+            }
+            elseif ("itemRand" == $key)
+            {
+                $params = $this->paramsBuilder->withParam( ItemColumnsParams::ORDER_BY, array("orderBy.itemRand" => "ASC"));
+            }
+        }
+        else
+        {
+            $defaultSorting = $this->config->get('PluginLayoutCore.sort.defaultSorting');
+            list($key, $sorting) = explode("_", (string) $defaultSorting);
+            if (NULL != $key && NULL != $sorting)
+            {
+                $params = $this->paramsBuilder->withParam( ItemColumnsParams::ORDER_BY, array("orderBy." . $key => strtoupper($sorting)));
+            }
+        }
+
         $params = $this->paramsBuilder
-            ->withParam( ItemColumnsParams::ORDER_BY, array('orderBy.itemPrice', 'ASC') )
             ->withParam( ItemColumnsParams::LIMIT, $limit )
             ->withParam( ItemColumnsParams::OFFSET, $offset )
             ->withParam( ItemColumnsParams::LANGUAGE, Language::DE )
