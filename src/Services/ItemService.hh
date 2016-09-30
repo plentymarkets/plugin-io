@@ -366,12 +366,19 @@ class ItemService
                 ->withParam( ItemColumnsParams::PLENTY_ID, $this->app->getPlentyId() )
                 ->build();
 
-            $currentItem = $this->itemRepository->search( $columns, $filter, $params )->current();
+            $records = $this->itemRepository->search( $columns, $filter, $params );
 
-            foreach($currentItem->itemCrossSellingList as $crossSellingItem)
+            if( $records->count() > 0 )
             {
-                $crossSellingItems[] = $crossSellingItem;
+                $currentItem = $records->current();
+
+                foreach($currentItem->itemCrossSellingList as $crossSellingItem)
+                {
+                    $crossSellingItems[] = $crossSellingItem;
+                }
             }
+
+
         }
 
         return $crossSellingItems;
