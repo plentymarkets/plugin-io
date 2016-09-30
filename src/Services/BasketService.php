@@ -11,6 +11,10 @@ use Plenty\Modules\Item\DataLayer\Models\Record;
 
 use LayoutCore\Services\ItemService;
 
+/**
+ * Class BasketService
+ * @package LayoutCore\Services
+ */
 class BasketService
 {
 	/**
@@ -25,8 +29,13 @@ class BasketService
 	 * @var ItemService
 	 */
 	private $itemService;
-
-
+    
+    /**
+     * BasketService constructor.
+     * @param BasketRepositoryContract $basketRepository
+     * @param BasketItemRepositoryContract $basketItemRepository
+     * @param \LayoutCore\Services\ItemService $itemService
+     */
 	public function __construct(
 		BasketRepositoryContract $basketRepository,
 		BasketItemRepositoryContract $basketItemRepository,
@@ -46,7 +55,11 @@ class BasketService
 	{
 		return $this->basketRepository->load();
 	}
-
+    
+    /**
+     * get list of basket items
+     * @return array
+     */
 	public function getBasketItems():array
 	{
 		$result = array();
@@ -61,7 +74,12 @@ class BasketService
         }
         return $result;
 	}
-
+    
+    /**
+     * get one basket item
+     * @param int $basketItemId
+     * @return array
+     */
 	public function getBasketItem(int $basketItemId):array
 	{
 		$basketItem = $this->basketItemRepository->findOneById( $basketItemId );
@@ -72,14 +90,25 @@ class BasketService
         $basketItemData = $this->getBasketItemData( array($basketItem) );
         return $this->addVariationData( $basketItem, $basketItemData[$basketItem->variationId] );
     }
-
+    
+    /**
+     * load variation data for basket item
+     * @param BasketItem $basketItem
+     * @param $variationData
+     * @return array
+     */
 	private function addVariationData( BasketItem $basketItem, $variationData ):array
     {
         $arr = $basketItem->toArray();
         $arr["variation"] = $variationData;
         return $arr;
     }
-
+    
+    /**
+     * add item to basket or update
+     * @param array $data
+     * @return array
+     */
 	public function addBasketItem(array $data):array
 	{
 		$basketItem = $this->findExistingOneByData($data);
@@ -96,25 +125,46 @@ class BasketService
 
 		return $this->getBasketItems();
 	}
-
+    
+    /**
+     * update basket item
+     * @param int $basketItemId
+     * @param array $data
+     * @return array
+     */
 	public function updateBasketItem(int $basketItemId, array $data):array
 	{
 		$data['id'] = $basketItemId;
 		$this->basketItemRepository->updateBasketItem($basketItemId, $data);
 		return $this->getBasketItems();
 	}
-
+    
+    /**
+     * delete item from basket
+     * @param int $basketItemId
+     * @return array
+     */
 	public function deleteBasketItem(int $basketItemId):array
 	{
 		$this->basketItemRepository->removeBasketItem($basketItemId);
 		return $this->getBasketItems();
 	}
     
+    /**
+     * check if item is already in the basket
+     * @param array $data
+     * @return null|BasketItem
+     */
 	public function findExistingOneByData(array $data)
 	{
 		return $this->basketItemRepository->findExistingOneByData($data);
 	}
-
+    
+    /**
+     * get data of basket items
+     * @param array $basketItems
+     * @return array
+     */
 	private function getBasketItemData($basketItems = array()):array
 	{
 		if(count($basketItems) <= 0)

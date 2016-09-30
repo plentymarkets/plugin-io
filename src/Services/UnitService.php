@@ -7,22 +7,34 @@ use Plenty\Modules\Item\Unit\Contracts\UnitNameRepositoryContract;
 //use Plenty\Modules\Item\Unit\Models\UnitLang;
 use Plenty\Modules\Item\Unit\Models\UnitName;
 
+/**
+ * Class UnitService
+ * @package LayoutCore\Services
+ */
 class UnitService
 {
 	/**
 	 * @var UnitNameRepositoryContract
 	 */
 	private $unitRepository;
-	
-	//public function __construct( UnitLangRepositoryContract $unitRepository )
+    
+    /**
+     * UnitService constructor.
+     * @param UnitNameRepositoryContract $unitRepository
+     */
 	public function __construct(UnitNameRepositoryContract $unitRepository)
 	{
 		$this->unitRepository = $unitRepository;
 	}
-	
+    
+    /**
+     * get unit by id
+     * @param int $unitId
+     * @param string $lang
+     * @return UnitName
+     */
 	public function getUnitById(int $unitId, string $lang = "de"):UnitName
 	{
-		//return $this->unitRepository->findUnit($unitId, $lang);
 		return $this->unitRepository->findOne($unitId, $lang);
 	}
 }

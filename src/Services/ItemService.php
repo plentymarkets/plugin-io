@@ -24,6 +24,10 @@ use LayoutCore\Constants\Language;
 use Plenty\Plugin\Http\Request;
 use Plenty\Repositories\Models\PaginatedResult;
 
+/**
+ * Class ItemService
+ * @package LayoutCore\Services
+ */
 class ItemService
 {
 	/**
@@ -58,7 +62,18 @@ class ItemService
 	 * @var Request
 	 */
 	private $request;
-	
+    
+    /**
+     * ItemService constructor.
+     * @param Application $app
+     * @param ItemDataLayerRepositoryContract $itemRepository
+     * @param AttributeNameRepositoryContract $attributeNameRepository
+     * @param AttributeValueNameRepositoryContract $attributeValueNameRepository
+     * @param ItemColumnBuilder $columnBuilder
+     * @param ItemFilterBuilder $filterBuilder
+     * @param ItemParamsBuilder $paramsBuilder
+     * @param Request $request
+     */
 	public function __construct(
 		Application $app,
 		ItemDataLayerRepositoryContract $itemRepository,
@@ -79,12 +94,22 @@ class ItemService
 		$this->paramsBuilder                = $paramsBuilder;
 		$this->request                      = $request;
 	}
-	
+    
+    /**
+     * get item by id
+     * @param int $itemId
+     * @return Record
+     */
 	public function getItem(int $itemId = 0) : Record
 	{
 		return $this->getItems([$itemId])->current();
 	}
-	
+    
+    /**
+     * get a list of items with specified item ids
+     * @param array $itemIds
+     * @return RecordList
+     */
 	public function getItems(array $itemIds):RecordList
 	{
 		$columns = $this->columnBuilder
@@ -109,12 +134,22 @@ class ItemService
 			$params
 		);
 	}
-	
+    
+    /**
+     * get item variation by id
+     * @param int $variationId
+     * @return Record
+     */
 	public function getVariation(int $variationId = 0):Record
 	{
 		return $this->getVariations([$variationId])->current();
 	}
-	
+    
+    /**
+     * get a list of item variations with specified variation ids
+     * @param array $variationIds
+     * @return RecordList
+     */
 	public function getVariations(array $variationIds):RecordList
 	{
 		$columns = $this->columnBuilder
@@ -138,7 +173,13 @@ class ItemService
 			$params
 		);
 	}
-	
+    
+    /**
+     * get list of items for specified category id
+     * @param int $catID
+     * @param int $variationShowType
+     * @return PaginatedResult
+     */
 	public function getItemForCategory(int $catID, int $variationShowType = 1):PaginatedResult
 	{
 		$limit        = $this->request->get('limit', 20);
@@ -192,7 +233,12 @@ class ItemService
 		
 		return $this->itemRepository->searchWithPagination($columns, $filter, $params);
 	}
-	
+    
+    /**
+     * get attributes of an item variation
+     * @param int $itemId
+     * @return array
+     */
 	public function getItemVariationAttributes(int $itemId = 0):array
 	{
 		$columns = $this->columnBuilder
@@ -247,7 +293,12 @@ class ItemService
 		
 		return $attributeList;
 	}
-	
+    
+    /**
+     * get the item url
+     * @param int $itemId
+     * @return Record
+     */
 	public function getItemURL(int $itemId):Record
 	{
 		$columns = $this->columnBuilder
@@ -265,7 +316,12 @@ class ItemService
 		$record = $this->itemRepository->search($columns, $filter, $params)->current();
 		return $record;
 	}
-	
+    
+    /**
+     * get the name of an attribute by id
+     * @param int $attributeId
+     * @return string
+     */
 	public function getAttributeName(int $attributeId = 0):string
 	{
 		$name      = '';
@@ -278,7 +334,12 @@ class ItemService
 		
 		return $name;
 	}
-	
+    
+    /**
+     * get the name of an attribute value by id
+     * @param int $attributeValueId
+     * @return string
+     */
 	public function getAttributeValueName(int $attributeValueId = 0):string
 	{
 		$name           = '';
@@ -290,7 +351,12 @@ class ItemService
 		
 		return $name;
 	}
-	
+    
+    /**
+     * get a list of crossselling items for specified item id
+     * @param int $itemId
+     * @return array
+     */
 	public function getItemCrossSellingList(int $itemId = 0):array
 	{
 		$crossSellingItems = [];

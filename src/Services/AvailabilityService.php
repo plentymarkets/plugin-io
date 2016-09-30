@@ -5,18 +5,31 @@ namespace LayoutCore\Services;
 use Plenty\Modules\Item\Availability\Contracts\AvailabilityRepositoryContract;
 use Plenty\Modules\Item\Availability\Models\Availability;
 
+/**
+ * Class AvailabilityService
+ * @package LayoutCore\Services
+ */
 class AvailabilityService
 {
 	/**
 	 * @var AvailabilityRepositoryContract
 	 */
 	private $availabilityRepository;
-
+    
+    /**
+     * AvailabilityService constructor.
+     * @param AvailabilityRepositoryContract $availabilityRepository
+     */
 	public function __construct(AvailabilityRepositoryContract $availabilityRepository)
 	{
 		$this->availabilityRepository = $availabilityRepository;
 	}
-
+    
+    /**
+     * get item availability by id
+     * @param int $availabilityId
+     * @return Availability
+     */
 	public function getAvailabilityById(int $availabilityId = 0) : Availability
 	{
 		return $this->availabilityRepository->findAvailability($availabilityId);

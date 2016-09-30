@@ -12,6 +12,10 @@ use LayoutCore\Services\ItemService;
 use LayoutCore\Helper\CategoryMap;
 use LayoutCore\Helper\CategoryKey;
 
+/**
+ * Class CategoryService
+ * @package LayoutCore\Services
+ */
 class CategoryService
 {
 	/**
@@ -37,7 +41,13 @@ class CategoryService
 	 * @var array
 	 */
 	private $currentCategoryTree = [];
-
+    
+    /**
+     * CategoryService constructor.
+     * @param CategoryRepository $category
+     * @param \LayoutCore\Services\ItemService $item
+     * @param CategoryMap $categoryMap
+     */
 	public function __construct(CategoryRepository $category, ItemService $item, CategoryMap $categoryMap)
 	{
 		$this->category    = $category;
@@ -158,12 +168,23 @@ class CategoryService
         }
 		
 	}
-
+    
+    /**
+     * check which category is the home category
+     * @return bool
+     */
 	public function isHome():bool
 	{
 		return $this->currentCategory !== null && $this->currentCategory->id == $this->categoryMap->getID(CategoryKey::HOME);
 	}
-
+    
+    /**
+     * get items for specified category
+     * @param null $category
+     * @param int $defaultItemPerPage
+     * @param int $variationShowType
+     * @return null|PaginatedResult
+     */
 	public function getItems($category = null, int $defaultItemPerPage = 0, int $variationShowType = 1)
 	{
 		if(!$category instanceof Category)
@@ -172,7 +193,12 @@ class CategoryService
 		}
 		return $this->item->getItemForCategory($category->id, $variationShowType);
 	}
-
+    
+    /**
+     * get the category tree as list
+     * @param int $catID
+     * @return array
+     */
 	public function getCategoryTreeAsList(int $catID = 0): array
 	{
 		$categoryTree = [];

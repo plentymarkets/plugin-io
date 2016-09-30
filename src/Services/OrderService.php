@@ -16,6 +16,10 @@ use LayoutCore\Services\CustomerService;
 //TODO BasketService => basketItems
 //TODO SessionStorageService => billingAddressId, deliveryAddressId
 
+/**
+ * Class OrderService
+ * @package LayoutCore\Services
+ */
 class OrderService
 {
 	/**
@@ -38,7 +42,15 @@ class OrderService
 	 * @var CustomerService
 	 */
 	private $customerService;
-	
+    
+    /**
+     * OrderService constructor.
+     * @param OrderRepositoryContract $orderRepository
+     * @param OrderBuilder $orderBuilder
+     * @param \LayoutCore\Services\BasketService $basketService
+     * @param \LayoutCore\Services\CheckoutService $checkoutService
+     * @param \LayoutCore\Services\CustomerService $customerService
+     */
 	public function __construct(
 		OrderRepositoryContract $orderRepository,
 		OrderBuilder $orderBuilder,
@@ -53,7 +65,11 @@ class OrderService
 		$this->checkoutService = $checkoutService;
 		$this->customerService = $customerService;
 	}
-	
+    
+    /**
+     * place an order
+     * @return Order
+     */
 	public function placeOrder():Order
 	{
 		$order = $this->orderBuilder->prepare(OrderType::ORDER)
@@ -67,7 +83,12 @@ class OrderService
 		
 		return $this->orderRepository->createOrder($order);
 	}
-	
+    
+    /**
+     * find order by id
+     * @param int $orderId
+     * @return Order
+     */
 	public function findOrderById(int $orderId):Order
 	{
 		return $this->orderRepository->findOrderById($orderId);

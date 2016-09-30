@@ -8,6 +8,10 @@ use Plenty\Modules\Category\Models\Category;
 use LayoutCore\Constants\CategoryType;
 use LayoutCore\Constants\Language;
 
+/**
+ * Class NavigationService
+ * @package LayoutCore\Services
+ */
 class NavigationService
 {
 	
@@ -15,7 +19,11 @@ class NavigationService
 	 * @var CategoryRepository
 	 */
 	private $categoryRepository;
-	
+    
+    /**
+     * NavigationService constructor.
+     * @param CategoryRepository $categoryRepository
+     */
 	public function __construct(CategoryRepository $categoryRepository)
 	{
 		$this->categoryRepository = $categoryRepository;
@@ -44,6 +52,10 @@ class NavigationService
 	}
 	
 	// FIXME arrays of objects are not transformed to arrays of native types before passing to twig templates.
+    /**
+     * @param array $categories
+     * @return array
+     */
 	private function toArray(array $categories):array
 	{
 		$result = [];
