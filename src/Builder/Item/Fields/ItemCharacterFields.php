@@ -2,6 +2,10 @@
 
 namespace LayoutCore\Builder\Item\Fields;
 
+/**
+ * Class ItemCharacterFields
+ * @package LayoutCore\Builder\Item\Fields
+ */
 class ItemCharacterFields
 {
 	const ITEM_CHARACTER_ID      = "itemCharacterId";

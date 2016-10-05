@@ -6,8 +6,11 @@ use Plenty\Plugin\Templates\Extensions\Twig_Extension;
 use Plenty\Plugin\Templates\Extensions\Twig_SimpleFunction;
 use Plenty\Plugin\Templates\Extensions\Twig_SimpleFilter;
 use LayoutCore\Helper\AbstractFactory;
+
 /**
  * Provide services and helper functions to twig engine
+ * Class TwigServiceProvider
+ * @package LayoutCore\Extensions
  */
 class TwigServiceProvider extends Twig_Extension
 {

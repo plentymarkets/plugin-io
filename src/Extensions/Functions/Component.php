@@ -15,11 +15,26 @@ use LayoutCore\Builder\Item\Params\ItemColumnsParams;
 use LayoutCore\Constants\Language;
 use LayoutCore\Extensions\AbstractFunction;
 
+/**
+ * Class Component
+ * @package LayoutCore\Extensions\Functions
+ */
 class Component extends AbstractFunction
 {
+    /**
+     * @var int
+     */
     private $currentComponent = 0;
+    
+    /**
+     * @var array
+     */
     private $components = array();
-
+    
+    /**
+     * return available filter methods
+     * @return array
+     */
     public function getFunctions():array
     {
         return [
@@ -28,7 +43,11 @@ class Component extends AbstractFunction
             "get_component_template" => "getComponentTemplate"
         ];
     }
-
+    
+    /**
+     * push compnent to component stack
+     * @param string $path
+     */
     public function component( string $path )
     {
         if( !in_array( $path, $this->components ) )
@@ -36,11 +55,20 @@ class Component extends AbstractFunction
             array_push( $this->components, $path );
         }
     }
+    
+    /**
+     * check if component template exists
+     * @return bool
+     */
     public function hasComponentTemplate():bool
     {
         return $this->currentComponent < count( $this->components );
     }
-
+    
+    /**
+     * get component from component stack
+     * @return string
+     */
     public function getComponentTemplate():string
     {
         $template = $this->components[$this->currentComponent];

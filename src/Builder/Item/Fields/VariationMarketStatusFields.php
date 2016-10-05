@@ -2,6 +2,10 @@
 
 namespace LayoutCore\Builder\Item\Fields;
 
+/**
+ * Class VariationMarketStatusFields
+ * @package LayoutCore\Builder\Item\Fields
+ */
 class VariationMarketStatusFields
 {
 	const ID                     = "id";

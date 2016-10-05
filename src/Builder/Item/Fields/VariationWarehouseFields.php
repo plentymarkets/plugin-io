@@ -2,6 +2,10 @@
 
 namespace LayoutCore\Builder\Item\Fields;
 
+/**
+ * Class VariationWarehouseFields
+ * @package LayoutCore\Builder\Item\Fields
+ */
 class VariationWarehouseFields
 {
 	const VARIATION_ID           = "variationId";

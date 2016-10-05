@@ -6,6 +6,8 @@ use LayoutCore\Builder\Item\Params\ItemColumnsParams;
 
 /**
  * Builds array of ItemDataLayer params to pass to ItemDataLayerRepository::search
+ * Class ItemParamsBuilder
+ * @package LayoutCore\Builder\Item
  */
 class ItemParamsBuilder
 {

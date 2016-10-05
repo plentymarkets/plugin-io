@@ -2,6 +2,10 @@
 
 namespace LayoutCore\Builder\Item\Params;
 
+/**
+ * Class ItemColumnsParams
+ * @package LayoutCore\Builder\Item\Params
+ */
 class ItemColumnsParams
 {
 	const TYPE         = "type";

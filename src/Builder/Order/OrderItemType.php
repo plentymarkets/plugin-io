@@ -2,6 +2,10 @@
 
 namespace LayoutCore\Builder\Order;
 
+/**
+ * Class OrderItemType
+ * @package LayoutCore\Builder\Order
+ */
 class OrderItemType
 {
 	const VARIATION            = 1;

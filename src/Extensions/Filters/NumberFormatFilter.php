@@ -5,19 +5,31 @@ namespace LayoutCore\Extensions\Filters;
 use Plenty\Plugin\ConfigRepository;
 use LayoutCore\Extensions\AbstractFilter;
 
+/**
+ * Class NumberFormatFilter
+ * @package LayoutCore\Extensions\Filters
+ */
 class NumberFormatFilter extends AbstractFilter
 {
 	/**
 	 * @var ConfigRepository
 	 */
 	private $config;
-
+    
+    /**
+     * NumberFormatFilter constructor.
+     * @param ConfigRepository $config
+     */
 	public function __construct(ConfigRepository $config)
 	{
 		parent::__construct();
 		$this->config = $config;
 	}
-
+    
+    /**
+     * return available filter methods
+     * @return array
+     */
 	public function getFilters():array
 	{
 		return [
@@ -25,7 +37,13 @@ class NumberFormatFilter extends AbstractFilter
 			"formatMonetary" => "formatMonetary"
 		];
 	}
-
+    
+    /**
+     * format given value to decimal
+     * @param float $value
+     * @param int $decimal_places
+     * @return string
+     */
 	public function formatDecimal(float $value, int $decimal_places = -1):string
 	{
 		if($decimal_places < 0)
@@ -41,7 +59,13 @@ class NumberFormatFilter extends AbstractFilter
 		$thousands_separator = $this->config->get('PluginLayoutCore.format.separator_thousands');
 		return number_format($value, $decimal_places, $decimal_separator, $thousands_separator);
 	}
-
+    
+    /**
+     * format given value to currency
+     * @param float $value
+     * @param string $currencyISO
+     * @return string
+     */
 	public function formatMonetary(float $value, string $currencyISO):string
 	{
 		$locale            = 'de_DE';

@@ -26,6 +26,8 @@ use LayoutCore\Builder\Item\Params\ItemColumnsParams;
 
 /**
  * Builds array of ItemDataLayer columns to request from ItemDataLayerRepository::search
+ * Class ItemColumnBuilder
+ * @package LayoutCore\Builder\Item
  */
 class ItemColumnBuilder
 {
@@ -37,7 +39,11 @@ class ItemColumnBuilder
 	 * @var array>
 	 */
 	private $columnParams = [];
-
+    
+    /**
+     * get item data that is used in most scenarios
+     * @return ItemColumnBuilder
+     */
 	public function defaults():ItemColumnBuilder
 	{
 		return $this
@@ -121,7 +127,14 @@ class ItemColumnBuilder
 		}
 		return $columns;
 	}
-
+    
+    /**
+     * add column to get from ItemDataLayerRepository
+     * @param string $columnKey
+     * @param array $columnValues
+     * @param null $columnParams
+     * @return ItemColumnBuilder
+     */
 	private function withColumn(string $columnKey, array $columnValues, $columnParams = null):ItemColumnBuilder
 	{
 
@@ -133,7 +146,12 @@ class ItemColumnBuilder
 
 		return $this;
 	}
-
+    
+    /**
+     * add column fields to get from ItemDataLayerRepository
+     * @param string $columnKey
+     * @param array $columnValues
+     */
 	private function addColumnFields(string $columnKey, array $columnValues)
 	{
 		$column = $this->columnFields[$columnKey];
@@ -147,7 +165,12 @@ class ItemColumnBuilder
 		}
 		$this->columnFields[$columnKey] = $column;
 	}
-
+    
+    /**
+     * add column params to get from ItemDataLayerRepository
+     * @param string $columnKey
+     * @param array $columnParams
+     */
 	private function addColumnParams(string $columnKey, array $columnParams)
 	{
 		foreach($columnParams as $paramName => $paramValue)

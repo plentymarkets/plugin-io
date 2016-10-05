@@ -2,6 +2,10 @@
 
 namespace LayoutCore\Builder\Item\Fields;
 
+/**
+ * Class VariationStockFields
+ * @package LayoutCore\Builder\Item\Fields
+ */
 class VariationStockFields
 {
 	const WAREHOUSE_ID             = "warehouseId";

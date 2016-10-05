@@ -6,6 +6,8 @@ use LayoutCore\Constants\Language;
 
 /**
  * Builds array of ItemDataLayer filters to pass to ItemDataLayerRepository:search
+ * Class ItemFilterBuilder
+ * @package LayoutCore\Builder\Item
  */
 class ItemFilterBuilder
 {
@@ -22,7 +24,13 @@ class ItemFilterBuilder
 	{
 		return $this->filter;
 	}
-
+    
+    /**
+     * filter items by specific filter key
+     * @param string $filterKey
+     * @param array $filterValue
+     * @return ItemFilterBuilder
+     */
 	private function hasFilter(string $filterKey, array $filterValue = []):ItemFilterBuilder
 	{
 		if($this->filter === null)

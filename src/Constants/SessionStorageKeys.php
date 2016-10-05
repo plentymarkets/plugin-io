@@ -2,6 +2,10 @@
 
 namespace LayoutCore\Constants;
 
+/**
+ * Class SessionStorageKeys
+ * @package LayoutCore\Constants
+ */
 class SessionStorageKeys
 {
 	const DELIVERY_ADDRESS_ID = "deliveryAddressId";

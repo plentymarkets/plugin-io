@@ -7,18 +7,32 @@ use Plenty\Modules\Basket\Models\BasketItem;
 use Plenty\Modules\Item\DataLayer\Models\Record;
 use LayoutCore\Services\CheckoutService;
 
+/**
+ * Class OrderItemBuilder
+ * @package LayoutCore\Builder\Order
+ */
 class OrderItemBuilder
 {
 	/**
 	 * @var CheckoutService
 	 */
 	private $checkoutService;
-
+    
+    /**
+     * OrderItemBuilder constructor.
+     * @param CheckoutService $checkoutService
+     */
 	public function __construct(CheckoutService $checkoutService)
 	{
 		$this->checkoutService = $checkoutService;
 	}
-
+    
+    /**
+     * add basket item to order
+     * @param Basket $basket
+     * @param array $items
+     * @return array
+     */
 	public function fromBasket(Basket $basket, array $items):array
 	{
 		$orderItems = [];
@@ -30,7 +44,13 @@ class OrderItemBuilder
 
 		return $orderItems;
 	}
-
+    
+    /**
+     * add basket item to order
+     * @param BasketItem $basketItem
+     * @param string $basketItemName
+     * @return array
+     */
 	private function basketItemToOrderItem(BasketItem $basketItem, string $basketItemName):array
 	{
 		return [

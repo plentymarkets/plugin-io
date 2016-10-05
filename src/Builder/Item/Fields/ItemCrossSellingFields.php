@@ -2,6 +2,10 @@
 
 namespace LayoutCore\Builder\Item\Fields;
 
+/**
+ * Class ItemCrossSellingFields
+ * @package LayoutCore\Builder\Item\Fields
+ */
 class ItemCrossSellingFields
 {
 	const ITEM_ID       = "itemId";

@@ -2,6 +2,10 @@
 
 namespace LayoutCore\Builder\Item\Fields;
 
+/**
+ * Class VariationImageFields
+ * @package LayoutCore\Builder\Item\Fields
+ */
 class VariationImageFields
 {
 	const IMAGE_ID              = "imageId";

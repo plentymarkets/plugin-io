@@ -2,6 +2,10 @@
 
 namespace LayoutCore\Builder\Item\Fields;
 
+/**
+ * Class VariationBaseFields
+ * @package LayoutCore\Builder\Item\Fields
+ */
 class VariationBaseFields
 {
 	const ACTIVE                         = "active";

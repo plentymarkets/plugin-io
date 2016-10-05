@@ -6,6 +6,10 @@ use LayoutCore\Helper\CategoryKey;
 use LayoutCore\Services\ItemService;
 use Plenty\Modules\Category\Models\Category;
 
+/**
+ * Class ItemController
+ * @package LayoutCore\Controllers
+ */
 class ItemController extends LayoutController
 {
 	

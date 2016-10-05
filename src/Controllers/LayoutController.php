@@ -19,8 +19,10 @@ use LayoutCore\Constants\Language;
 use LayoutCore\Services\CategoryService;
 
 /**
- * Supercall for concrete controllers:
- * Provides global methods for rendering templates received from separate layout plugin.
+ * Supercall for concrete controllers
+ * Provides global methods for rendering templates received from separate layout plugin
+ * Class LayoutController
+ * @package LayoutCore\Controllers
  */
 class LayoutController extends Controller
 {
@@ -53,7 +55,17 @@ class LayoutController extends Controller
 	 * @var bool
 	 */
 	private $debug = true;
-
+    
+    /**
+     * LayoutController constructor.
+     * @param Application $app
+     * @param Twig $twig
+     * @param Dispatcher $event
+     * @param TemplateContainer $templateContainer
+     * @param CategoryRepository $categoryRepo
+     * @param CategoryMap $categoryMap
+     * @param CategoryService $categoryService
+     */
 	public function __construct(Application $app, Twig $twig, Dispatcher $event, TemplateContainer $templateContainer, CategoryRepository $categoryRepo, CategoryMap $categoryMap, CategoryService $categoryService)
 	{
 		$this->app               = $app;
@@ -77,7 +89,12 @@ class LayoutController extends Controller
 
 		return $this->templateContainer;
 	}
-
+    
+    /**
+     * render category data
+     * @param $category
+     * @return string
+     */
 	protected function renderCategory($category):string
 	{
 		if($category === null)

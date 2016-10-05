@@ -2,6 +2,10 @@
 
 namespace LayoutCore\Builder\Order;
 
+/**
+ * Class OrderOptionType
+ * @package LayoutCore\Builder\Order
+ */
 class OrderOptionType
 {
 	const WAREHOUSE         = 1;

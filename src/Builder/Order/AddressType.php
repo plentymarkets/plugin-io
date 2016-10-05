@@ -2,6 +2,10 @@
 
 namespace LayoutCore\Builder\Order;
 
+/**
+ * Class AddressType
+ * @package LayoutCore\Builder\Order
+ */
 class AddressType
 {
 	const BILLING    = 1;

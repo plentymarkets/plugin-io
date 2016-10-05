@@ -2,6 +2,10 @@
 
 namespace LayoutCore\Builder\Item\Fields;
 
+/**
+ * Class ItemBaseFields
+ * @package LayoutCore\Builder\Item\Fields
+ */
 class ItemBaseFields
 {
 	const ABO                          = "abo";

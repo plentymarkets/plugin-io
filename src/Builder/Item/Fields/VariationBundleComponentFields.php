@@ -2,6 +2,10 @@
 
 namespace LayoutCore\Builder\Item\Fields;
 
+/**
+ * Class VariationBundleComponentFields
+ * @package LayoutCore\Builder\Item\Fields
+ */
 class VariationBundleComponentFields
 {
 	const COMPONENT_VARIATION_ID = "componentVariationId";

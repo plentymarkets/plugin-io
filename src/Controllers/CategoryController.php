@@ -7,6 +7,10 @@ use Plenty\Modules\Category\Models\Category;
 
 use LayoutCore\Helper\CategoryKey;
 
+/**
+ * Class CategoryController
+ * @package LayoutCore\Controllers
+ */
 class CategoryController extends LayoutController
 {
 	

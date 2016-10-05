@@ -2,6 +2,10 @@
 
 namespace LayoutCore\Constants;
 
+/**
+ * Class Language
+ * @package LayoutCore\Constants
+ */
 class Language
 {
 

@@ -19,6 +19,8 @@ use LayoutCore\Extensions\Functions\Component;
 
 /**
  * Provide services and helper functions to twig engine
+ * Class TwigLayoutCoreExtension
+ * @package LayoutCore\Extensions
  */
 class TwigLayoutCoreExtension extends Twig_Extension
 {

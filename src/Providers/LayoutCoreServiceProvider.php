@@ -8,9 +8,15 @@ use LayoutCore\Providers\LayoutCoreRouteServiceProvider;
 use Plenty\Plugin\ServiceProvider;
 use Plenty\Plugin\Templates\Twig;
 
-
+/**
+ * Class LayoutCoreServiceProvider
+ * @package LayoutCore\Providers
+ */
 class LayoutCoreServiceProvider extends ServiceProvider
 {
+    /**
+     * register core functions
+     */
 	public function register()
 	{
 		$this->getApplication()->register(LayoutCoreRouteServiceProvider::class);
@@ -25,7 +31,11 @@ class LayoutCoreServiceProvider extends ServiceProvider
 		$this->getApplication()->singleton('LayoutCore\Services\CategoryService');
 
 	}
-
+    
+    /**
+     * boot twig extensions and services
+     * @param Twig $twig
+     */
 	public function boot(Twig $twig)
 	{
 		$twig->addExtension(TwigServiceProvider::class);

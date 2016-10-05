@@ -2,6 +2,10 @@
 
 namespace LayoutCore\Builder\Item\Fields;
 
+/**
+ * Class VariationSupplierFields
+ * @package LayoutCore\Builder\Item\Fields
+ */
 class VariationSupplierFields
 {
 	const CREATED_TIMESTAMP     = "createdTimestamp";

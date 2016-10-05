@@ -6,31 +6,49 @@ use Plenty\Plugin\ConfigRepository;
 use LayoutCore\Extensions\AbstractFilter;
 use Plenty\Modules\Item\DataLayer\Models\ItemDescription;
 
+/**
+ * Class ItemNameFilter
+ * @package LayoutCore\Extensions\Filters
+ */
 class ItemNameFilter extends AbstractFilter
 {
 
-  /**
-   * @var ConfigRepository
-   */
-  private $config;
-
-  public function __construct( ConfigRepository $config )
-  {
+    /**
+    * @var ConfigRepository
+    */
+    private $config;
+    
+    /**
+     * ItemNameFilter constructor.
+     * @param ConfigRepository $config
+     */
+    public function __construct( ConfigRepository $config )
+    {
       parent::__construct();
       $this->config = $config;
-  }
-
-  public function getFilters():array
-  {
+    }
+    
+    /**
+     * return available filter methods
+     * @return array
+     */
+    public function getFilters():array
+    {
       return [
           "itemName" => "itemName"
       ];
-  }
-
-  public function itemName( ItemDescription $itemDescription, string $configName ):string
-  {
+    }
+    
+    /**
+     * build item name from configuration
+     * @param ItemDescription $itemDescription
+     * @param string $configName
+     * @return string
+     */
+    public function itemName( ItemDescription $itemDescription, string $configName ):string
+    {
     $showName = '';
-
+    
     if ($configName == '0' && $itemDescription->name1 != '')
     {
       $showName = $itemDescription->name1;
@@ -47,8 +65,8 @@ class ItemNameFilter extends AbstractFilter
     {
       $showName = $itemDescription->name1;
     }
-
+    
     return $showName;
-  }
+    }
 
 }

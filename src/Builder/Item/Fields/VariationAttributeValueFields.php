@@ -2,6 +2,10 @@
 
 namespace LayoutCore\Builder\Item\Fields;
 
+/**
+ * Class VariationAttributeValueFields
+ * @package LayoutCore\Builder\Item\Fields
+ */
 class VariationAttributeValueFields
 {
 	const ATTRIBUTE_ID       = "attributeId";

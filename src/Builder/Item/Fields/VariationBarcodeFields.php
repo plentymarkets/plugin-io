@@ -2,6 +2,10 @@
 
 namespace LayoutCore\Builder\Item\Fields;
 
+/**
+ * Class VariationBarcodeFields
+ * @package LayoutCore\Builder\Item\Fields
+ */
 class VariationBarcodeFields
 {
 	const CODE              = "code";

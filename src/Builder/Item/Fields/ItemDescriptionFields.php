@@ -2,6 +2,10 @@
 
 namespace LayoutCore\Builder\Item\Fields;
 
+/**
+ * Class ItemDescriptionFields
+ * @package LayoutCore\Builder\Item\Fields
+ */
 class ItemDescriptionFields
 {
 	const ITEM_ID             = "id";

@@ -6,6 +6,10 @@ use Plenty\Plugin\Application;
 use Plenty\Modules\Basket\Models\Basket;
 use LayoutCore\Services\BasketService;
 
+/**
+ * Class OrderBuilder
+ * @package LayoutCore\Builder\Order
+ */
 class OrderBuilder
 {
 	/**

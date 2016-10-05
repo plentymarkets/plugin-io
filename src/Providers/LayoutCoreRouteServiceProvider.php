@@ -7,12 +7,21 @@ use Plenty\Plugin\Routing\Router;
 use Plenty\Plugin\Routing\ApiRouter;
 use Plenty\Plugin\Templates\Twig;
 
+/**
+ * Class LayoutCoreRouteServiceProvider
+ * @package LayoutCore\Providers
+ */
 class LayoutCoreRouteServiceProvider extends RouteServiceProvider
 {
 	public function register()
 	{
 	}
-
+    
+    /**
+     * define an map routes to templates or rest resources
+     * @param Router $router
+     * @param ApiRouter $api
+     */
 	public function map(Router $router, ApiRouter $api)
 	{
 		$api->version(['v1'], ['namespace' => 'LayoutCore\Api\Resources'], function ($api)

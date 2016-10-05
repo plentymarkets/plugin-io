@@ -11,6 +11,10 @@ use LayoutCore\Builder\Item\Params\ItemColumnsParams;
 use LayoutCore\Builder\Item\Fields\ItemDescriptionFields;
 use LayoutCore\Constants\Language;
 
+/**
+ * Class BlogController
+ * @package LayoutCore\Controllers
+ */
 class BlogController extends LayoutController
 {
 
@@ -41,7 +45,7 @@ class BlogController extends LayoutController
             $itemId = (int)$slug;
         }
 
-// define needed fields to get from db
+        // define needed fields to get from db
         $columns = $columnBuilder
             ->withItemDescription([
                                       ItemDescriptionFields::NAME_1,
@@ -49,13 +53,13 @@ class BlogController extends LayoutController
                                   ])
             ->build();
 
-// filter current item by item id
+        // filter current item by item id
         $filter = $filterBuilder
             ->hasId([$itemId])
             ->build();
 
-// set params
-// TODO: make current language global
+        // set params
+        // TODO: make current language global
         $params = $paramsBuilder
             ->withParam(ItemColumnsParams::LANGUAGE, Language::DE)
             ->build();
@@ -66,7 +70,7 @@ class BlogController extends LayoutController
             $params
         )->current();
 
-// render template; see: LayoutController
+        // render template; see: LayoutController
         return $this->renderTemplate(
             "tpl.category.blog",
             [

@@ -2,6 +2,10 @@
 
 namespace LayoutCore\Constants;
 
+/**
+ * Class CategoryType
+ * @package LayoutCore\Constants
+ */
 class CategoryType
 {
 	const ALL       = "all";

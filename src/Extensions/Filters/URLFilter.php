@@ -6,6 +6,10 @@ use Plenty\Plugin\ConfigRepository;
 use LayoutCore\Extensions\AbstractFilter;
 use LayoutCore\Services\ItemService;
 
+/**
+ * Class URLFilter
+ * @package LayoutCore\Extensions\Filters
+ */
 class URLFilter extends AbstractFilter
 {
 	/**
@@ -16,21 +20,37 @@ class URLFilter extends AbstractFilter
 	 * @var ItemService
 	 */
 	private $itemService;
-
+    
+    /**
+     * URLFilter constructor.
+     * @param ConfigRepository $config
+     * @param ItemService $itemService
+     */
 	public function __construct(ConfigRepository $config, ItemService $itemService)
 	{
 		parent::__construct();
 		$this->config      = $config;
 		$this->itemService = $itemService;
 	}
-
+    
+    /**
+     * return available filter methods
+     * @return array
+     */
 	public function getFilters():array
 	{
 		return [
 			"buildItemURL" => "buildItemURL"
 		];
 	}
-
+    
+    /**
+     * build url for item by item id or variation id
+     * @param int $itemId
+     * @param int $variationId
+     * @param bool $withItemName
+     * @return string
+     */
 	public function buildItemURL(int $itemId = 0, int $variationId = 0, bool $withItemName = false):string
 	{
 		$itemURL = '/' . $itemId;

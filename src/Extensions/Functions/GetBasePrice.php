@@ -15,6 +15,10 @@ use LayoutCore\Builder\Item\Params\ItemColumnsParams;
 use LayoutCore\Constants\Language;
 use LayoutCore\Extensions\AbstractFunction;
 
+/**
+ * Class GetBasePrice
+ * @package LayoutCore\Extensions\Functions
+ */
 class GetBasePrice extends AbstractFunction
 {
 	/**
@@ -37,7 +41,15 @@ class GetBasePrice extends AbstractFunction
 	 * @var ItemParamsBuilder
 	 */
 	private $paramsBuilder;
-
+    
+    /**
+     * GetBasePrice constructor.
+     * @param Application $app
+     * @param ItemDataLayerRepositoryContract $itemRepository
+     * @param ItemColumnBuilder $columnBuilder
+     * @param ItemFilterBuilder $filterBuilder
+     * @param ItemParamsBuilder $paramsBuilder
+     */
 	public function __construct(
 		Application $app,
 		ItemDataLayerRepositoryContract $itemRepository,
@@ -53,14 +65,23 @@ class GetBasePrice extends AbstractFunction
 		$this->filterBuilder  = $filterBuilder;
 		$this->paramsBuilder  = $paramsBuilder;
 	}
-
+    
+    /**
+     * return available filter methods
+     * @return array
+     */
 	public function getFunctions():array
 	{
 		return [
 			"getBasePrice" => "getBasePrice"
 		];
 	}
-
+    
+    /**
+     * get base price for specified variation
+     * @param int $variationId
+     * @return array
+     */
 	public function getBasePrice(int $variationId):array
 	{
 		$columns = $this->columnBuilder

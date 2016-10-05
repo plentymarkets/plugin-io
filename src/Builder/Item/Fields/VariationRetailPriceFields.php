@@ -2,6 +2,10 @@
 
 namespace LayoutCore\Builder\Item\Fields;
 
+/**
+ * Class VariationRetailPriceFields
+ * @package LayoutCore\Builder\Item\Fields
+ */
 class VariationRetailPriceFields
 {
 	const PRICE_ID                = "priceId";

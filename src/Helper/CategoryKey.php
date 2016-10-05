@@ -2,7 +2,6 @@
 namespace LayoutCore\Helper;
 
 /**
- * Created by ptopczewski, 15.09.16 16:19
  * Class CategoryKey
  * @package LayoutCore\Helper
  */

@@ -2,6 +2,10 @@
 
 namespace LayoutCore\Builder\Order;
 
+/**
+ * Class OrderType
+ * @package LayoutCore\Builder\Order
+ */
 class OrderType
 {
 	const ORDER              = 1;
