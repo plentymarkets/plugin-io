@@ -20,7 +20,7 @@ class CustomerPasswordResource extends ApiResource
 	 * @var CustomerService
 	 */
 	private $customerService;
-    
+
     /**
      * CustomerPasswordResource constructor.
      * @param Request $request
@@ -32,9 +32,9 @@ class CustomerPasswordResource extends ApiResource
 		parent::__construct($request, $response);
 		$this->customerService = $customerService;
 	}
-    
+
     /**
-     * set password for contact
+     * Set the password for the contact
      * @return BaseResponse
      */
 	public function store():BaseResponse
@@ -51,5 +51,5 @@ class CustomerPasswordResource extends ApiResource
 		$this->response->error(0, "Missing parameter: password");
 		return $this->response->create(null, ResponseCode::BAD_REQUEST);
 	}
-	
+
 }

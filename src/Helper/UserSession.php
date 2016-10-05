@@ -14,7 +14,7 @@ class UserSession
 	 * @var AccountService
 	 */
 	private $accountService;
-    
+
     /**
      * UserSession constructor.
      * @param AccountService $accountService
@@ -23,18 +23,18 @@ class UserSession
 	{
 		$this->accountService = $accountService;
 	}
-    
+
     /**
-     * get current contact id
+     * Get the current contact ID
      * @return int
      */
 	public function getCurrentContactId():int
 	{
 		return $this->accountService->getAccountContactId();
 	}
-    
+
     /**
-     * check if contact is logged in
+     * Check whether contact is logged in
      * @return bool
      */
 	public function isContactLoggedIn():bool

@@ -62,7 +62,7 @@ class ItemService
 	 * @var Request
 	 */
 	private $request;
-    
+
     /**
      * ItemService constructor.
      * @param Application $app
@@ -94,9 +94,9 @@ class ItemService
 		$this->paramsBuilder                = $paramsBuilder;
 		$this->request                      = $request;
 	}
-    
+
     /**
-     * get item by id
+     * Get an item by ID
      * @param int $itemId
      * @return Record
      */
@@ -104,9 +104,9 @@ class ItemService
 	{
 		return $this->getItems([$itemId])->current();
 	}
-    
+
     /**
-     * get a list of items with specified item ids
+     * Get a list of items with the specified item IDs
      * @param array $itemIds
      * @return RecordList
      */
@@ -115,28 +115,28 @@ class ItemService
 		$columns = $this->columnBuilder
 			->defaults()
 			->build();
-		
-		// filter current item by item id
+
+		// Filter the current item by item ID
 		$filter = $this->filterBuilder
 			->hasId($itemIds)
 			->build();
-		
-		// set params
+
+		// Set the parameters
 		// TODO: make current language global
 		$params = $this->paramsBuilder
 			->withParam(ItemColumnsParams::LANGUAGE, Language::DE)
 			->withParam(ItemColumnsParams::PLENTY_ID, $this->app->getPlentyId())
 			->build();
-		
+
 		return $this->itemRepository->search(
 			$columns,
 			$filter,
 			$params
 		);
 	}
-    
+
     /**
-     * get item variation by id
+     * Get an item variation by ID
      * @param int $variationId
      * @return Record
      */
@@ -144,9 +144,9 @@ class ItemService
 	{
 		return $this->getVariations([$variationId])->current();
 	}
-    
+
     /**
-     * get a list of item variations with specified variation ids
+     * Get a list of item variations with the specified variation IDs
      * @param array $variationIds
      * @return RecordList
      */
@@ -155,27 +155,27 @@ class ItemService
 		$columns = $this->columnBuilder
 			->defaults()
 			->build();
-		// filter current item by item id
+		// Filter the current item by item ID
 		$filter = $this->filterBuilder
 			->variationHasId($variationIds)
 			->build();
-		
-		// set params
+
+		// Set the parameters
 		// TODO: make current language global
 		$params = $this->paramsBuilder
 			->withParam(ItemColumnsParams::LANGUAGE, Language::DE)
 			->withParam(ItemColumnsParams::PLENTY_ID, $this->app->getPlentyId())
 			->build();
-		
+
 		return $this->itemRepository->search(
 			$columns,
 			$filter,
 			$params
 		);
 	}
-    
+
     /**
-     * get list of items for specified category id
+     * Get a list of items for the specified category ID
      * @param int $catID
      * @param int $variationShowType
      * @return PaginatedResult
@@ -186,18 +186,18 @@ class ItemService
 		$offset       = $this->request->get('offset', 0);
 		$currentPage  = $this->request->get('page', 0);
 		$itemsPerPage = $this->request->get('items_per_page', 20);
-		
+
 		if((int)$currentPage > 0)
 		{
 			$limit  = $itemsPerPage;
 			$offset = ((int)$currentPage * (int)$itemsPerPage) - (int)$itemsPerPage;
 		}
-		
+
 		$columns = $this->columnBuilder
 			->defaults()
 			->build();
-		
-		
+
+
 		if($variationShowType == 2)
 		{
 			$filter = $this->filterBuilder#
@@ -218,11 +218,11 @@ class ItemService
 			->variationHasCategory($catID)
 			->build();
 		}
-		
+
 		/*$filter = $this->filterBuilder
 			->variationHasCategory( $catID )
 			->build();*/
-		
+
 		$params = $this->paramsBuilder
 			->withParam(ItemColumnsParams::ORDER_BY, ['orderBy.itemPrice', 'ASC'])
 			->withParam(ItemColumnsParams::LIMIT, $limit)
@@ -230,12 +230,12 @@ class ItemService
 			->withParam(ItemColumnsParams::LANGUAGE, Language::DE)
 			->withParam(ItemColumnsParams::PLENTY_ID, $this->app->getPlentyId())
 			->build();
-		
+
 		return $this->itemRepository->searchWithPagination($columns, $filter, $params);
 	}
-    
+
     /**
-     * get attributes of an item variation
+     * List the attributes of an item variation
      * @param int $itemId
      * @return array
      */
@@ -253,49 +253,49 @@ class ItemService
 				                                  VariationAttributeValueFields::ATTRIBUTE_ID,
 				                                  VariationAttributeValueFields::ATTRIBUTE_VALUE_ID
 			                                  ])->build();
-		
+
 		$filter = $this->filterBuilder->hasId([$itemId])->build();
-		
+
 		$params = $this->paramsBuilder
 			->withParam(ItemColumnsParams::LANGUAGE, Language::DE)
 			->withParam(ItemColumnsParams::PLENTY_ID, $this->app->getPlentyId())
 			->build();
-		
+
 		$recordList = $this->itemRepository->search($columns, $filter, $params);
-		
+
 		$attributeList                    = [];
 		$attributeList['selectionValues'] = [];
 		$attributeList['variations']      = [];
 		$attributeList['attributeNames']  = [];
-		
+
 		$foo = 1;
-		
+
 		foreach($recordList as $variation)
 		{
 			foreach($variation->variationAttributeValueList as $attribute)
 			{
-				
-				
+
+
 				$attributeId      = $attribute->attributeId;
 				$attributeValueId = $attribute->attributeValueId;
-				
+
 				$attributeList['attributeNames'][$attributeId] = $this->getAttributeName($attributeId);
-				
+
 				if(!in_array($attributeValueId, $attributeList['selectionValues'][$attributeId]))
 				{
 					$attributeList['selectionValues'][$attributeId][$attributeValueId] = $this->getAttributeValueName($attributeValueId);
 				}
 			}
-			
+
 			$variationId                               = $variation->variationBase->id;
 			$attributeList['variations'][$variationId] = $variation->variationAttributeValueList;
 		}
-		
+
 		return $attributeList;
 	}
-    
+
     /**
-     * get the item url
+     * Get the item URL
      * @param int $itemId
      * @return Record
      */
@@ -305,20 +305,20 @@ class ItemService
 			->withItemDescription([
 				                      ItemDescriptionFields::URL_CONTENT
 			                      ])->build();
-		
+
 		$filter = $this->filterBuilder->hasId([$itemId])->build();
-		
+
 		$params = $this->paramsBuilder
 			->withParam(ItemColumnsParams::LANGUAGE, Language::DE)
 			->withParam(ItemColumnsParams::PLENTY_ID, $this->app->getPlentyId())
 			->build();
-		
+
 		$record = $this->itemRepository->search($columns, $filter, $params)->current();
 		return $record;
 	}
-    
+
     /**
-     * get the name of an attribute by id
+     * Get the name of an attribute by ID
      * @param int $attributeId
      * @return string
      */
@@ -326,17 +326,17 @@ class ItemService
 	{
 		$name      = '';
 		$attribute = $this->attributeNameRepository->findOne($attributeId, 'de');
-		
+
 		if(!is_null($attribute))
 		{
 			$name = $attribute->name;
 		}
-		
+
 		return $name;
 	}
-    
+
     /**
-     * get the name of an attribute value by id
+     * Get the name of an attribute value by ID
      * @param int $attributeValueId
      * @return string
      */
@@ -348,19 +348,19 @@ class ItemService
 		{
 			$name = $attributeValue->name;
 		}
-		
+
 		return $name;
 	}
-    
+
     /**
-     * get a list of crossselling items for specified item id
+     * Get a list of cross-selling items for the specified item ID
      * @param int $itemId
      * @return array
      */
 	public function getItemCrossSellingList(int $itemId = 0):array
 	{
 		$crossSellingItems = [];
-		
+
 		if($itemId > 0)
 		{
 			$columns = $this->columnBuilder
@@ -371,24 +371,24 @@ class ItemService
 					                           ItemCrossSellingFields::DYNAMIC
 				                           ])
 				->build();
-			
+
 			$filter = $this->filterBuilder
 				->hasId([$itemId])
 				->build();
-			
+
 			$params = $this->paramsBuilder
 				->withParam(ItemColumnsParams::LANGUAGE, Language::DE)
 				->withParam(ItemColumnsParams::PLENTY_ID, $this->app->getPlentyId())
 				->build();
-			
+
 			$currentItem = $this->itemRepository->search($columns, $filter, $params)->current();
-			
+
 			foreach($currentItem->itemCrossSellingList as $crossSellingItem)
 			{
 				$crossSellingItems[] = $crossSellingItem;
 			}
 		}
-		
+
 		return $crossSellingItems;
 	}
 }

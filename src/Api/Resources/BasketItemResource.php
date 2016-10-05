@@ -20,7 +20,7 @@ class BasketItemResource extends ApiResource
 	 * @var BasketService
 	 */
 	private $basketService;
-    
+
     /**
      * BasketItemResource constructor.
      * @param Request $request
@@ -34,7 +34,7 @@ class BasketItemResource extends ApiResource
 	}
 
     /**
-     * get basket items
+     * List basket items
      * @return BaseResponse
      */
 	public function index():BaseResponse
@@ -42,10 +42,10 @@ class BasketItemResource extends ApiResource
 		$basketItems = $this->basketService->getBasketItems();
 		return $this->response->create($basketItems, ResponseCode::OK);
 	}
-	
-	// post
+
+	// Post
     /**
-     * add item to basket
+     * Add an item to the basket
      * @return BaseResponse
      */
 	public function store():BaseResponse
@@ -53,10 +53,10 @@ class BasketItemResource extends ApiResource
 		$basketItems = $this->basketService->addBasketItem($this->request->all());
 		return $this->response->create($basketItems, ResponseCode::CREATED);
 	}
-	
-	// get
+
+	// Get
     /**
-     * get basket item
+     * Get a basket item
      * @param string $selector
      * @return BaseResponse
      */
@@ -65,10 +65,10 @@ class BasketItemResource extends ApiResource
 		$basketItem = $this->basketService->getBasketItem((int)$selector);
 		return $this->response->create($basketItem, ResponseCode::OK);
 	}
-	
-	// put/patch
+
+	// Put/patch
     /**
-     * update basket item
+     * Update the basket item
      * @param string $selector
      * @return BaseResponse
      */
@@ -77,10 +77,10 @@ class BasketItemResource extends ApiResource
 		$basketItems = $this->basketService->updateBasketItem((int)$selector, $this->request->all());
 		return $this->response->create($basketItems, ResponseCode::OK);
 	}
-	
-	// delete
+
+	// Delete
     /**
-     * delete item from basket
+     * Delete an item from the basket
      * @param string $selector
      * @return BaseResponse
      */

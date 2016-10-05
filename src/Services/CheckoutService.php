@@ -38,7 +38,7 @@ class CheckoutService
 	 * @var PaymentMethodRepositoryContract
 	 */
 	private $paymentMethodRepository;
-    
+
     /**
      * CheckoutService constructor.
      * @param FrontendPaymentMethodRepositoryContract $frontendPaymentMethodRepository
@@ -60,9 +60,9 @@ class CheckoutService
 		$this->sessionStorage          = $sessionStorage;
 		$this->paymentMethodRepository = $paymentMethodRepository;
 	}
-    
+
     /**
-     * get relevant data for checkout
+     * Get the relevant data for the checkout
      * @return array
      */
 	public function getCheckout(): array
@@ -77,9 +77,9 @@ class CheckoutService
 			"billingAddressId"    => $this->getBillingAddressId(),
 		];
 	}
-    
+
     /**
-     * get the current currency from session
+     * Get the current currency from the session
      * @return string
      */
 	public function getCurrency():string
@@ -92,18 +92,18 @@ class CheckoutService
 		}
 		return $currency;
 	}
-    
+
     /**
-     * set the current currency from session
+     * Set the current currency from the session
      * @param string $currency
      */
 	public function setCurrency(string $currency)
 	{
 		$this->sessionStorage->getPlugin()->setValue(SessionStorageKeys::CURRENCY, $currency);
 	}
-    
+
     /**
-     * get id of the current payment method
+     * Get the ID of the current payment method
      * @return int
      */
 	public function getMethodOfPaymentId():int
@@ -117,9 +117,9 @@ class CheckoutService
         }
         return $methodOfPaymentID;
 	}
-    
+
     /**
-     * set id of the current payment method
+     * Set the ID of the current payment method
      * @param int $methodOfPaymentID
      */
 	public function setMethodOfPaymentId(int $methodOfPaymentID)
@@ -127,9 +127,9 @@ class CheckoutService
 		$this->checkout->setPaymentMethodId($methodOfPaymentID);
 		$this->sessionStorage->getPlugin()->setValue( 'MethodOfPaymentID', $methodOfPaymentID );
 	}
-    
+
     /**
-     * prepare the payment
+     * Prepare the payment
      * @return array
      */
 	public function preparePayment():array
@@ -137,18 +137,18 @@ class CheckoutService
 		$mopId = $this->getMethodOfPaymentId();
 		return $this->paymentMethodRepository->preparePaymentMethod($mopId);
 	}
-    
+
     /**
-     * get list of available payment methods
+     * List all available payment methods
      * @return array
      */
 	public function getMethodOfPaymentList():array
 	{
 		return $this->frontendPaymentMethodRepository->getCurrentPaymentMethodsList();
 	}
-    
+
     /**
-     * get a list of payment method data
+     * Get a list of the payment method data
      * @return array
      */
 	public function getCheckoutPaymentDataList():array
@@ -167,9 +167,9 @@ class CheckoutService
         }
         return $paymentDataList;
     }
-    
+
     /**
-     * get the current shipping country id
+     * Get the ID of the current shipping country
      * @return int
      */
 	public function getShippingCountryId():int
@@ -177,18 +177,18 @@ class CheckoutService
 		$basket = $this->basketRepository->load();
 		return $basket->shippingCountryId;
 	}
-    
+
     /**
-     * set the current shipping country id
+     * Set the ID of thevcurrent shipping country
      * @param int $shippingCountryId
      */
 	public function setShippingCountryId(int $shippingCountryId)
 	{
 		$this->checkout->setShippingCountryId($shippingCountryId);
 	}
-    
+
     /**
-     * get the current shipping profile id
+     * Get the ID of the current shipping profile
      * @return int
      */
 	public function getShippingProfileId():int
@@ -196,45 +196,45 @@ class CheckoutService
 		$basket = $this->basketRepository->load();
 		return $basket->shippingProfileId;
 	}
-    
+
     /**
-     * set the current shipping profile id
+     * Set the ID of the current shipping profile
      * @param int $shippingProfileId
      */
 	public function setShippingProfileId(int $shippingProfileId)
 	{
 		$this->checkout->setShippingProfileId($shippingProfileId);
 	}
-    
+
     /**
-     * get the current delivery address id
+     * Get the ID of the current delivery address
      * @return int
      */
 	public function getDeliveryAddressId():int
 	{
 		return (int)$this->sessionStorage->getPlugin()->getValue(SessionStorageKeys::DELIVERY_ADDRESS_ID);
 	}
-    
+
     /**
-     * set the current delivery address id
+     * Set the ID of the current delivery address
      * @param int $deliveryAddressId
      */
 	public function setDeliveryAddressId(int $deliveryAddressId)
 	{
 		$this->sessionStorage->getPlugin()->setValue(SessionStorageKeys::DELIVERY_ADDRESS_ID, $deliveryAddressId);
 	}
-    
+
     /**
-     * get the current billing address id
+     * Get the ID of the current invoice address
      * @return int
      */
 	public function getBillingAddressId(): int
 	{
 		return (int)$this->sessionStorage->getPlugin()->getValue(SessionStorageKeys::BILLING_ADDRESS_ID);
 	}
-    
+
     /**
-     * set the current billing address id
+     * Set the ID of the current invoice address
      * @param int $billingAddressId
      */
 	public function setBillingAddressId(int $billingAddressId)

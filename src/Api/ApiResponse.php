@@ -56,12 +56,12 @@ class ApiResponse
 	 * @var null|Application
 	 */
 	private $app = null;
-    
+
     /**
      * @var null|Response
      */
     private $response = null;
-    
+
     /**
      * ApiResponse constructor.
      * @param Dispatcher $dispatcher
@@ -74,7 +74,7 @@ class ApiResponse
 		$this->dispatcher = $dispatcher;
         $this->response = $response;
 
-		// register basket Events
+		// Register basket events
         $this->dispatcher->listen( AfterBasketChanged::class, function($event) {
             $this->eventData["AfterBasketChanged"] = [
                 "basket" => $event->getBasket()
@@ -87,7 +87,7 @@ class ApiResponse
             ];
         }, 0);
 
-		// register Basket Item Events
+		// Register events for basket items
 		$this->dispatcher->listen(BeforeBasketItemAdd::class, function ($event)
 		{
 			$this->eventData["BeforeBasketItemAdd"] = [
@@ -117,7 +117,7 @@ class ApiResponse
 			$this->eventData["AfterBasketItemUpdate"] = [];
 		}, 0);
 
-		// register Frontend Events
+		// Register front end events
 		$this->dispatcher->listen(FrontendCurrencyChanged::class, function ($event)
 		{
 			$this->eventData["FrontendCurrencyChanged"] = [
@@ -164,7 +164,7 @@ class ApiResponse
 			];
 		}, 0);
 
-		// register Auth Events
+		// Register auth events
 		$this->dispatcher->listen(AfterAccountAuthentication::class, function ($event)
 		{
 			$this->eventData["AfterAccountAuthentication"] = [
@@ -177,7 +177,7 @@ class ApiResponse
 			$this->eventData["AfterAccountContactLogout"] = [];
 		}, 0);
 	}
-    
+
     /**
      * @param int $code
      * @param null $message
@@ -188,7 +188,7 @@ class ApiResponse
 		$this->pushNotification("error", $code, $message);
 		return $this;
 	}
-    
+
     /**
      * @param int $code
      * @param null $message
@@ -199,7 +199,7 @@ class ApiResponse
 		$this->pushNotification("success", $code, $message);
 		return $this;
 	}
-    
+
     /**
      * @param int $code
      * @param null $message
@@ -210,7 +210,7 @@ class ApiResponse
 		$this->pushNotification("info", $code, $message);
 		return $this;
 	}
-    
+
     /**
      * @param string $context
      * @param int $code
@@ -242,7 +242,7 @@ class ApiResponse
 		$this->notifications[$context] = $notification;
 		return $this;
 	}
-    
+
     /**
      * @param string $key
      * @param string $value

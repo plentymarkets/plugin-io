@@ -24,7 +24,7 @@ class OrderBuilderQuery
 	 * @var BasketService
 	 */
 	private $basketService;
-    
+
     /**
      * OrderBuilderQuery constructor.
      * @param Application $app
@@ -41,18 +41,18 @@ class OrderBuilderQuery
 		$this->order["typeId"]   = $type;
 		$this->order["plentyId"] = $plentyId;
 	}
-    
+
     /**
-     * retrun the order array
+     * Return the order array
      * @return array
      */
 	public function done():array
 	{
 		return $this->order;
 	}
-    
+
     /**
-     * build order from basket data
+     * Build order from basket data
      * @param null $basket
      * @return OrderBuilderQuery
      * @throws \Exception
@@ -64,7 +64,7 @@ class OrderBuilderQuery
 			$basket = $this->basketService->getBasket();
 		}
 
-		// add basket items to order
+		// Add basket items to order
 		$orderItemBuilder = $this->app->make(OrderItemBuilder::class);
 		if(!$orderItemBuilder instanceof OrderItemBuilder)
 		{
@@ -84,9 +84,9 @@ class OrderBuilderQuery
 
 		return $this;
 	}
-    
+
     /**
-     * add status to order
+     * Add the status to the order
      * @param float $status
      * @return OrderBuilderQuery
      */
@@ -95,9 +95,9 @@ class OrderBuilderQuery
 		$this->order["statusId"] = $status;
 		return $this;
 	}
-    
+
     /**
-     * add owner to order
+     * Add the owner to the order
      * @param int $ownerId
      * @return OrderBuilderQuery
      */
@@ -106,9 +106,9 @@ class OrderBuilderQuery
 		$this->order["ownerId"] = $ownerId;
 		return $this;
 	}
-    
+
     /**
-     * add order item to order
+     * Add an order item to the order
      * @param array $orderItem
      * @return OrderBuilderQuery
      */
@@ -122,9 +122,9 @@ class OrderBuilderQuery
 
 		return $this;
 	}
-    
+
     /**
-     * add order items to order
+     * Add order items to the order
      * @param array $orderItems
      * @return OrderBuilderQuery
      */
@@ -137,9 +137,9 @@ class OrderBuilderQuery
 
 		return $this;
 	}
-    
+
     /**
-     * add address to order
+     * Add an address to the order
      * @param int $addressId
      * @param int $type
      * @return OrderBuilderQuery
@@ -158,9 +158,9 @@ class OrderBuilderQuery
 		array_push($this->order["addresses"], $address);
 		return $this;
 	}
-    
+
     /**
-     * add relation to order
+     * Add the relation to the order
      * @param string $type
      * @param int $referenceId
      * @param string $relationType
@@ -182,9 +182,9 @@ class OrderBuilderQuery
 		array_push($this->order["relations"], $relation);
 		return $this;
 	}
-    
+
     /**
-     * add comtact to order
+     * Add a contact to the order
      * @param int $customerId
      * @return OrderBuilderQuery
      */
@@ -193,9 +193,9 @@ class OrderBuilderQuery
 		$this->withRelation(ReferenceType::CONTACT, $customerId, RelationType::RECEIVER);
 		return $this;
 	}
-    
+
     /**
-     * add order option to order
+     * Add an order option to the order
      * @param int $type
      * @param int $subType
      * @param $value

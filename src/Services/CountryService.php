@@ -20,7 +20,7 @@ class CountryService
 	 * @var Checkout
 	 */
 	private $checkout;
-    
+
     /**
      * CountryService constructor.
      * @param CountryRepositoryContract $countryRepository
@@ -33,28 +33,28 @@ class CountryService
 		$this->countryRepository = $countryRepository;
 		$this->checkout          = $checkout;
 	}
-    
+
     /**
-     * get list of all active countries
+     * List all active countries
      * @return array
      */
 	public function getActiveCountriesList():array
 	{
         /*$list = $this->countryRepository->getCountriesList(1, array());
-        
+
         $countriesList = array();
         foreach($list as $country)
         {
             $countriesList[] = $country;
         }
-        
+
 		return $countriesList;*/
-        
+
         return array();
 	}
-    
+
     /**
-     * get list of names for the active countries
+     * Get a list of names for the active countries
      * @param string $language
      * @return array
      */
@@ -62,18 +62,18 @@ class CountryService
 	{
 		return $this->countryRepository->getActiveCountryNameMap($language);
 	}
-    
+
     /**
-     * set the current shipping country id
+     * Set the ID of the current shipping country
      * @param int $shippingCountryId
      */
 	public function setShippingCountryId(int $shippingCountryId)
 	{
 		$this->checkout->setShippingCountryId($shippingCountryId);
 	}
-    
+
     /**
-     * get specific country by id
+     * Get a specific country by ID
      * @param int $countryId
      * @return Country
      */
@@ -81,9 +81,9 @@ class CountryService
 	{
 		return $this->countryRepository->getCountryById($countryId);
 	}
-    
+
     /**
-     * get the name of specific country
+     * Get the name of specific country
      * @param int $countryId
      * @param string $lang
      * @return string

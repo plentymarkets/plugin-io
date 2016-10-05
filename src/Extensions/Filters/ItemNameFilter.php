@@ -17,7 +17,7 @@ class ItemNameFilter extends AbstractFilter
     * @var ConfigRepository
     */
     private $config;
-    
+
     /**
      * ItemNameFilter constructor.
      * @param ConfigRepository $config
@@ -27,9 +27,9 @@ class ItemNameFilter extends AbstractFilter
       parent::__construct();
       $this->config = $config;
     }
-    
+
     /**
-     * return available filter methods
+     * Return the available filter methods
      * @return array
      */
     public function getFilters():array
@@ -38,9 +38,9 @@ class ItemNameFilter extends AbstractFilter
           "itemName" => "itemName"
       ];
     }
-    
+
     /**
-     * build item name from configuration
+     * Build the item name from the configuration
      * @param ItemDescription $itemDescription
      * @param string $configName
      * @return string
@@ -48,7 +48,7 @@ class ItemNameFilter extends AbstractFilter
     public function itemName( ItemDescription $itemDescription, string $configName ):string
     {
     $showName = '';
-    
+
     if ($configName == '0' && $itemDescription->name1 != '')
     {
       $showName = $itemDescription->name1;
@@ -65,7 +65,7 @@ class ItemNameFilter extends AbstractFilter
     {
       $showName = $itemDescription->name1;
     }
-    
+
     return $showName;
     }
 

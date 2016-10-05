@@ -11,7 +11,7 @@ use LayoutCore\Extensions\AbstractFilter;
 class PatternFilter extends AbstractFilter
 {
     /**
-     * return available filter methods
+     * Return the available filter methods
      * @return array
      */
 	public function getFilters():array
@@ -20,9 +20,9 @@ class PatternFilter extends AbstractFilter
 			"find" => "findPattern"
 		];
 	}
-    
+
     /**
-     * find matches in input with given regex
+     * Find matches in input with given regex
      * @param string $input
      * @param string $regex
      * @return array

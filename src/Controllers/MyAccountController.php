@@ -10,7 +10,7 @@ use LayoutCore\Helper\TemplateContainer;
 class MyAccountController extends LayoutController
 {
     /**
-     * prepare and render data for my account
+     * Prepare and render the data for the my account page
      * @return string
      */
 	public function showMyAccount(): string

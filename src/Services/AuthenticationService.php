@@ -14,7 +14,7 @@ class AuthenticationService
 	 * @var ContactAuthenticationRepositoryContract
 	 */
 	private $contactAuthRepository;
-    
+
     /**
      * AuthenticationService constructor.
      * @param ContactAuthenticationRepositoryContract $contactAuthRepository
@@ -23,9 +23,9 @@ class AuthenticationService
 	{
 		$this->contactAuthRepository = $contactAuthRepository;
 	}
-    
+
     /**
-     * perform login with email and password
+     * Perform the login with email and password
      * @param string $email
      * @param string $password
      */
@@ -33,9 +33,9 @@ class AuthenticationService
 	{
 		$this->contactAuthRepository->authenticateWithContactEmail($email, $password);
 	}
-    
+
     /**
-     * perform login with customer id and password
+     * Perform the login with customer ID and password
      * @param int $contactId
      * @param string $password
      */
@@ -43,9 +43,9 @@ class AuthenticationService
 	{
 		$this->contactAuthRepository->authenticateWithContactId($contactId, $password);
 	}
-    
+
     /**
-     * log out the customer
+     * Log out the customer
      */
 	public function logout()
 	{

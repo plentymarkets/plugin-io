@@ -25,7 +25,7 @@ use LayoutCore\Builder\Item\Fields\VariationWarehouseFields;
 use LayoutCore\Builder\Item\Params\ItemColumnsParams;
 
 /**
- * Builds array of ItemDataLayer columns to request from ItemDataLayerRepository::search
+ * Build an array of ItemDataLayer columns to request from ItemDataLayerRepository::search
  * Class ItemColumnBuilder
  * @package LayoutCore\Builder\Item
  */
@@ -39,9 +39,9 @@ class ItemColumnBuilder
 	 * @var array>
 	 */
 	private $columnParams = [];
-    
+
     /**
-     * get item data that is used in most scenarios
+     * Get the item data that is used in most scenarios
      * @return ItemColumnBuilder
      */
 	public function defaults():ItemColumnBuilder
@@ -104,7 +104,7 @@ class ItemColumnBuilder
 	}
 
 	/**
-	 * Returns generated columns to pass to ItemDataLayerRepository
+	 * Return generated columns to pass to ItemDataLayerRepository
 	 * @return array
 	 */
 	public function build():array
@@ -127,9 +127,9 @@ class ItemColumnBuilder
 		}
 		return $columns;
 	}
-    
+
     /**
-     * add column to get from ItemDataLayerRepository
+     * Add the column to get from ItemDataLayerRepository
      * @param string $columnKey
      * @param array $columnValues
      * @param null $columnParams
@@ -146,9 +146,9 @@ class ItemColumnBuilder
 
 		return $this;
 	}
-    
+
     /**
-     * add column fields to get from ItemDataLayerRepository
+     * Add column fields to get from ItemDataLayerRepository
      * @param string $columnKey
      * @param array $columnValues
      */
@@ -165,9 +165,9 @@ class ItemColumnBuilder
 		}
 		$this->columnFields[$columnKey] = $column;
 	}
-    
+
     /**
-     * add column params to get from ItemDataLayerRepository
+     * Add column parameters to get from ItemDataLayerRepository
      * @param string $columnKey
      * @param array $columnParams
      */
@@ -180,7 +180,7 @@ class ItemColumnBuilder
 	}
 
 	/**
-	 * Adds fields in ItemBase to get from ItemDataLayerRepository
+	 * Add fields in ItemBase to get from ItemDataLayerRepository
 	 * @param array $itemBaseFields List of fields
 	 * @return ItemColumnBuilder current builder instance
 	 */
@@ -190,7 +190,7 @@ class ItemColumnBuilder
 	}
 
 	/**
-	 * Adds fields int ItemCharacterList to get from ItemDataLayerRepository
+	 * Add fields in ItemCharacterList to get from ItemDataLayerRepository
 	 * @param array $itemCharacterFields List of fields
 	 * @param ?array additional params to use for ItemCharacterList
 	 * @return ItemColumnBuilder current builder instance
@@ -201,7 +201,7 @@ class ItemColumnBuilder
 	}
 
 	/**
-	 * Adds fields in ItemCrossSellingList to get from ItemDataLayerRepository
+	 * Add fields in ItemCrossSellingList to get from ItemDataLayerRepository
 	 * @param array $itemCrossSellingListFields List of fields
 	 * @return ItemColumnBuilder current builder instance
 	 */
@@ -211,7 +211,7 @@ class ItemColumnBuilder
 	}
 
 	/**
-	 * Adds fields in ItemDescription to get from ItemDataLayerRepository
+	 * Add fields in ItemDescription to get from ItemDataLayerRepository
 	 * @param array $itemDescriptionFields List of fields
 	 * @param ?array additional params to use for ItemDescription
 	 * @return ItemColumnBuilder current builder instance
@@ -222,7 +222,7 @@ class ItemColumnBuilder
 	}
 
 	/**
-	 * Adds fields in VariationAttributeValue to get from ItemDataLayerRepository
+	 * Add fields in VariationAttributeValue to get from ItemDataLayerRepository
 	 * @param array $variationAttributeValueListFields List of fields
 	 * @return ItemColumnBuilder current builder instance
 	 */
@@ -232,7 +232,7 @@ class ItemColumnBuilder
 	}
 
 	/**
-	 * Adds fields in VariationBarcode to get from ItemDataLayerRepository
+	 * Add fields in VariationBarcode to get from ItemDataLayerRepository
 	 * @param array $variationBarcodeFields List of fields
 	 * @param ?array additional params to use for VariationBarcode
 	 * @return ItemColumnBuilder current builder instance
@@ -243,7 +243,7 @@ class ItemColumnBuilder
 	}
 
 	/**
-	 * Adds fields in VariationBarcodeList to get from ItemDataLayerRepository
+	 * Add fields in VariationBarcodeList to get from ItemDataLayerRepository
 	 * @param array $variationBarcodeFields List of fields
 	 * @return ItemColumnBuilder current builder instance
 	 */
@@ -253,7 +253,7 @@ class ItemColumnBuilder
 	}
 
 	/**
-	 * Adds fields in VariationBase to get from ItemDataLayerRepository
+	 * Add fields in VariationBase to get from ItemDataLayerRepository
 	 * @param array $variationBaseFields List of fields
 	 * @return ItemColumnBuilder current builder instance
 	 */
@@ -263,7 +263,7 @@ class ItemColumnBuilder
 	}
 
 	/**
-	 * Adds fields in VariationBundleComponentList to get from ItemDataLayerRepository
+	 * Add fields in VariationBundleComponentList to get from ItemDataLayerRepository
 	 * @param array $variationBundleComponentListFields List of fields
 	 * @return ItemColumnBuilder current builder instance
 	 */
@@ -273,7 +273,7 @@ class ItemColumnBuilder
 	}
 
 	/**
-	 * Adds fields in VariationCategory to get from ItemDataLayerRepository
+	 * Add fields in VariationCategory to get from ItemDataLayerRepository
 	 * @param array $variationCategoryFields List of fields
 	 * @return ItemColumnBuilder current builder instance
 	 */
@@ -283,7 +283,7 @@ class ItemColumnBuilder
 	}
 
 	/**
-	 * Adds fields in VariationImageList to get from ItemDataLayerRepository
+	 * Add fields in VariationImageList to get from ItemDataLayerRepository
 	 * @param array $variationImageListFields List of fields
 	 * @return ItemColumnBuilder current builder instance
 	 */
@@ -293,7 +293,7 @@ class ItemColumnBuilder
 	}
 
 	/**
-	 * Adds fields in VariationLinkMarketplace to get from ItemDataLayerRepository
+	 * Add fields in VariationLinkMarketplace to get from ItemDataLayerRepository
 	 * @param array $variationLinkMarketplaceFields List of fields
 	 * @return ItemColumnBuilder current builder instance
 	 */
@@ -303,7 +303,7 @@ class ItemColumnBuilder
 	}
 
 	/**
-	 * Adds fields in VariationLinkWebstore to get from ItemDataLayerRepository
+	 * Add fields in VariationLinkWebstore to get from ItemDataLayerRepository
 	 * @param array $variationLinkWebstoreFields List of fields
 	 * @return ItemColumnBuilder current builder instance
 	 */
@@ -313,7 +313,7 @@ class ItemColumnBuilder
 	}
 
 	/**
-	 * Adds fields in VariationMarketStatus to get from ItemDataLayerRepository
+	 * Add fields in VariationMarketStatus to get from ItemDataLayerRepository
 	 * @param array $variationMarketStatusFields List of fields
 	 * @param ?array additional params to use for VariationMarketStatus
 	 * @return ItemColumnBuilder current builder instance
@@ -324,7 +324,7 @@ class ItemColumnBuilder
 	}
 
 	/**
-	 * Adds fields in VariationRecommendedRetailPrice to get from ItemDataLayerRepository
+	 * Add fields in VariationRecommendedRetailPrice to get from ItemDataLayerRepository
 	 * @param array $variationRecommendedPriceFields List of fields
 	 * @param ?array additional params to use for VariationRecommendedRetailPrice
 	 * @return ItemColumnBuilder current builder instance
@@ -335,7 +335,7 @@ class ItemColumnBuilder
 	}
 
 	/**
-	 * Adds fields in VariationRecommendedRetailPriceList to get from ItemDataLayerRepository
+	 * Add fields in VariationRecommendedRetailPriceList to get from ItemDataLayerRepository
 	 * @param array $variationRecommendedPriceListFields List of fields
 	 * @param ?array additional params to use for VariationRecommendedRetailPriceList
 	 * @return ItemColumnBuilder current builder instance
@@ -346,7 +346,7 @@ class ItemColumnBuilder
 	}
 
 	/**
-	 * Adds fields in VariationRetailPrice to get from ItemDataLayerRepository
+	 * Add fields in VariationRetailPrice to get from ItemDataLayerRepository
 	 * @param array $variationRetailPriceFields List of fields
 	 * @param ?array additional params to use for VariationRetailPrice
 	 * @return ItemColumnBuilder current builder instance
@@ -357,7 +357,7 @@ class ItemColumnBuilder
 	}
 
 	/**
-	 * Adds fields in VariationRetailPriceList to get from ItemDataLayerRepository
+	 * Add fields in VariationRetailPriceList to get from ItemDataLayerRepository
 	 * @param array $variationRetailPriceListFields List of fields
 	 * @param ?array additional params to use for VariationRetailPriceList
 	 * @return ItemColumnBuilder current builder instance
@@ -368,7 +368,7 @@ class ItemColumnBuilder
 	}
 
 	/**
-	 * Adds fields in VariationSpecialOfferRetailPrice to get from ItemDataLayerRepository
+	 * Add fields in VariationSpecialOfferRetailPrice to get from ItemDataLayerRepository
 	 * @param array $variationSpecialOfferRetailPriceFields List of fields
 	 * @param ?array additional params to use for VariationSpecialOfferRetailPrice
 	 * @return ItemColumnBuilder current builder instance
@@ -379,7 +379,7 @@ class ItemColumnBuilder
 	}
 
 	/**
-	 * Adds fields in VariationSpecialOfferRetailPriceList to get from ItemDataLayerRepository
+	 * Add fields in VariationSpecialOfferRetailPriceList to get from ItemDataLayerRepository
 	 * @param array $variationSpecialOfferRetailPriceListFields List of fields
 	 * @param ?array additional params to use for VariationSpecialOfferRetailPriceList
 	 * @return ItemColumnBuilder current builder instance
@@ -390,7 +390,7 @@ class ItemColumnBuilder
 	}
 
 	/**
-	 * Adds fields in VariationStandardCategory to get from ItemDataLayerRepository
+	 * Add fields in VariationStandardCategory to get from ItemDataLayerRepository
 	 * @param array $variationStandardCategoryFields List of fields
 	 * @param ?array additional params to use for VariationStandardCategory
 	 * @return ItemColumnBuilder current builder instance
@@ -401,7 +401,7 @@ class ItemColumnBuilder
 	}
 
 	/**
-	 * Adds fields in VariationStock to get from ItemDataLayerRepository
+	 * Add fields in VariationStock to get from ItemDataLayerRepository
 	 * @param array $variationStockFields List of fields
 	 * @param ?array additional params to use for VariationStock
 	 * @return ItemColumnBuilder current builder instance
@@ -412,7 +412,7 @@ class ItemColumnBuilder
 	}
 
 	/**
-	 * Adds fields in VariationStockBuffer to get from ItemDataLayerRepository
+	 * Add fields in VariationStockBuffer to get from ItemDataLayerRepository
 	 * @param array $variationStockBufferFields List of fields
 	 * @param ?array additional params to use for VariationStockBuffer
 	 * @return ItemColumnBuilder current builder instance
@@ -423,7 +423,7 @@ class ItemColumnBuilder
 	}
 
 	/**
-	 * Adds fields in VariationStockList to get from ItemDataLayerRepository
+	 * Add fields in VariationStockList to get from ItemDataLayerRepository
 	 * @param array $variationStockFields List of fields
 	 * @return ItemColumnBuilder current builder instance
 	 */
@@ -433,7 +433,7 @@ class ItemColumnBuilder
 	}
 
 	/**
-	 * Adds fields in VariationSupplierList to get from ItemDataLayerRepository
+	 * Add fields in VariationSupplierList to get from ItemDataLayerRepository
 	 * @param array $variationSupplierFields List of fields
 	 * @return ItemColumnBuilder current builder instance
 	 */
@@ -443,7 +443,7 @@ class ItemColumnBuilder
 	}
 
 	/**
-	 * Adds fields in VariationWarehouse to get from ItemDataLayerRepository
+	 * Add fields in VariationWarehouse to get from ItemDataLayerRepository
 	 * @param array $variationWarehouseFields List of fields
 	 * @param ?array additional params to use for VariationWarehouse
 	 * @return ItemColumnBuilder current builder instance
@@ -454,7 +454,7 @@ class ItemColumnBuilder
 	}
 
 	/**
-	 * Adds fields in VariationWarehouseList to get from ItemDataLayerRepository
+	 * Add fields in VariationWarehouseList to get from ItemDataLayerRepository
 	 * @param array $variationWarehouseFields List of fields
 	 * @param ?array additional params to use for VariationWarehouseList
 	 * @return ItemColumnBuilder current builder instance

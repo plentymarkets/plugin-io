@@ -25,7 +25,7 @@ class DeliveryCountryResource extends ApiResource
 	 * @var CountryService
 	 */
 	private $countryService;
-    
+
     /**
      * DeliveryCountryResource constructor.
      * @param Request $request
@@ -39,11 +39,11 @@ class DeliveryCountryResource extends ApiResource
 		$this->basketService  = $basketService;
 		$this->countryService = $countryService;
 	}
-	
-	
-	// put/patch
+
+
+	// Put/patch
     /**
-     * set shipping country
+     * Set the shipping country
      * @param string $shippingCountryId
      * @return BaseResponse
      */
@@ -53,6 +53,6 @@ class DeliveryCountryResource extends ApiResource
 		$basket = $this->basketService->getBasket();
 		return $this->response->create($basket, ResponseCode::OK);
 	}
-	
-	
+
+
 }

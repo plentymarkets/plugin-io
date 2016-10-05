@@ -14,7 +14,7 @@ class ShippingService
 	 * @var Checkout
 	 */
 	private $checkout;
-    
+
     /**
      * ShippingService constructor.
      * @param Checkout $checkout
@@ -23,9 +23,9 @@ class ShippingService
 	{
 		$this->checkout = $checkout;
 	}
-    
+
     /**
-     * set the current shipping profile id
+     * Set the ID of the current shipping profile
      * @param int $shippingProfileId
      */
 	public function setShippingProfileId(int $shippingProfileId)

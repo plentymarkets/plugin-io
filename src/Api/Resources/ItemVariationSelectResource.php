@@ -20,7 +20,7 @@ class ItemVariationSelectResource extends ApiResource
 	 * @var ItemService
 	 */
 	private $itemService;
-    
+
     /**
      * ItemVariationSelectResource constructor.
      * @param Request $request
@@ -32,7 +32,7 @@ class ItemVariationSelectResource extends ApiResource
 		parent::__construct($request, $response);
 		$this->itemService = $itemService;
 	}
-    
+
     /**
      * @return BaseResponse
      */
@@ -40,9 +40,9 @@ class ItemVariationSelectResource extends ApiResource
 	{
 		return $this->response->create(null, ResponseCode::OK);
 	}
-    
+
     /**
-     * get variation attributes by variation id
+     * List variation attributes by variation ID
      * @param string $itemId
      * @return BaseResponse
      */

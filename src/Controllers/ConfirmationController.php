@@ -10,7 +10,7 @@ use LayoutCore\Helper\TemplateContainer;
 class ConfirmationController extends LayoutController
 {
     /**
-     * prepare and render data for order confirmation
+     * Prepare and render the data for the order confirmation
      * @return string
      */
 	public function showConfirmation(): string

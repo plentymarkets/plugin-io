@@ -19,8 +19,8 @@ use LayoutCore\Constants\Language;
 use LayoutCore\Services\CategoryService;
 
 /**
- * Supercall for concrete controllers
- * Provides global methods for rendering templates received from separate layout plugin
+ * Supercall for specific controllers
+ * Provide global methods for rendering templates received from separate layout plugin
  * Class LayoutController
  * @package LayoutCore\Controllers
  */
@@ -48,14 +48,14 @@ class LayoutController extends Controller
 
 	protected $categoryMap;
 
-	// used by concrete controllers to set current category
+	// Used by specific controllers to set the current category
 	protected $categoryService;
 
 	/**
 	 * @var bool
 	 */
 	private $debug = true;
-    
+
     /**
      * LayoutController constructor.
      * @param Application $app
@@ -78,7 +78,7 @@ class LayoutController extends Controller
 	}
 
 	/**
-	 * Prepare global template data which should be available in all templates.
+	 * Prepare global template data which should be available in all templates
 	 * @param array $customData Data to pass to template from concrete Controller.
 	 * @return TemplateContainer
 	 */
@@ -89,9 +89,9 @@ class LayoutController extends Controller
 
 		return $this->templateContainer;
 	}
-    
+
     /**
-     * render category data
+     * Render the category data
      * @param $category
      * @return string
      */
@@ -120,7 +120,7 @@ class LayoutController extends Controller
 	}
 
 	/**
-	 * Aborts handling current route and passes request to plentymarkets system.
+	 * Abort handling current route and pass request to the plentymarkets system
 	 */
 	protected function abort(int $code, string $message):string
 	{
@@ -132,17 +132,17 @@ class LayoutController extends Controller
 	}
 
 	/**
-	 * Emits event to layout plugin to receive twig-template to use for current request.
-	 * Adds global template data to custom data from concrete controller.
-	 * Will pass request to plentymarkets system if no template is provided by layout plugin.
+	 * Emit an event to layout plugin to receive twig-template to use for current request.
+	 * Add global template data to custom data from specific controller.
+	 * Will pass request to the plentymarkets system if no template is provided by the layout plugin.
 	 * @param string $templateEvent The event to emit to separate layout plugin
 	 * @param array Additional template data from concrete controller
 	 * @return string
 	 */
 	protected function renderTemplate(string $templateEvent, array $templateData):string
 	{
-		// emit event to receive layout to use.
-		// Add TemplateContainer and template data from concrete controller to event's payload
+		// Emit event to receive layout to use.
+		// Add TemplateContainer and template data from specific controller to event's payload
 		$this->event->fire($templateEvent, [
 			$this->templateContainer,
 			$templateData
@@ -150,10 +150,10 @@ class LayoutController extends Controller
 
 		if($this->templateContainer->hasTemplate())
 		{
-			// prepare global data only if template is available
+			// Prepare the global data only if the template is available
 			$this->prepareTemplateData($templateData);
 
-			// render received plugin
+			// Render the received plugin
 			return $this->twig->render(
 				$this->templateContainer->getTemplate(),
 				$this->templateContainer->getTemplateData()

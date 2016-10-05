@@ -29,7 +29,7 @@ class BasketService
 	 * @var ItemService
 	 */
 	private $itemService;
-    
+
     /**
      * BasketService constructor.
      * @param BasketRepositoryContract $basketRepository
@@ -48,16 +48,16 @@ class BasketService
 	}
 
 	/**
-	 * Returns basket as array
+	 * Return the basket as an array
 	 * @return Basket
 	 */
 	public function getBasket():Basket
 	{
 		return $this->basketRepository->load();
 	}
-    
+
     /**
-     * get list of basket items
+     * List the basket items
      * @return array
      */
 	public function getBasketItems():array
@@ -74,9 +74,9 @@ class BasketService
         }
         return $result;
 	}
-    
+
     /**
-     * get one basket item
+     * Get a basket item
      * @param int $basketItemId
      * @return array
      */
@@ -90,9 +90,9 @@ class BasketService
         $basketItemData = $this->getBasketItemData( array($basketItem) );
         return $this->addVariationData( $basketItem, $basketItemData[$basketItem->variationId] );
     }
-    
+
     /**
-     * load variation data for basket item
+     * Load the variation data for the basket item
      * @param BasketItem $basketItem
      * @param $variationData
      * @return array
@@ -103,9 +103,9 @@ class BasketService
         $arr["variation"] = $variationData;
         return $arr;
     }
-    
+
     /**
-     * add item to basket or update
+     * Add an item to the basket or update the basket
      * @param array $data
      * @return array
      */
@@ -125,9 +125,9 @@ class BasketService
 
 		return $this->getBasketItems();
 	}
-    
+
     /**
-     * update basket item
+     * Update a basket item
      * @param int $basketItemId
      * @param array $data
      * @return array
@@ -138,9 +138,9 @@ class BasketService
 		$this->basketItemRepository->updateBasketItem($basketItemId, $data);
 		return $this->getBasketItems();
 	}
-    
+
     /**
-     * delete item from basket
+     * Delete an item from the basket
      * @param int $basketItemId
      * @return array
      */
@@ -149,9 +149,9 @@ class BasketService
 		$this->basketItemRepository->removeBasketItem($basketItemId);
 		return $this->getBasketItems();
 	}
-    
+
     /**
-     * check if item is already in the basket
+     * Check whether the item is already in the basket
      * @param array $data
      * @return null|BasketItem
      */
@@ -159,9 +159,9 @@ class BasketService
 	{
 		return $this->basketItemRepository->findExistingOneByData($data);
 	}
-    
+
     /**
-     * get data of basket items
+     * Get the data of the basket items
      * @param array $basketItems
      * @return array
      */

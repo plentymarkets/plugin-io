@@ -20,7 +20,7 @@ class CustomerAuthenticationResource extends ApiResource
 	 * @var AuthenticationService
 	 */
 	private $authService;
-    
+
     /**
      * CustomerAuthenticationResource constructor.
      * @param Request $request
@@ -32,19 +32,19 @@ class CustomerAuthenticationResource extends ApiResource
 		parent::__construct($request, $response);
 		$this->authService = $authService;
 	}
-    
+
     /**
-     * perform login with email and password
+     * Perform the login with email and password
      * @return BaseResponse
      */
 	public function store():BaseResponse
 	{
 		$email    = $this->request->get('email', '');
 		$password = $this->request->get('password', '');
-		
+
 		$this->authService->login((string)$email, (string)$password);
-		
+
 		return $this->response->create(null, ResponseCode::OK);
 	}
-	
+
 }
