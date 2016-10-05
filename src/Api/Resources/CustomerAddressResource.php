@@ -21,7 +21,7 @@ class CustomerAddressResource extends ApiResource
 	 * @var CustomerService
 	 */
 	private $customerService;
-    
+
     /**
      * CustomerAddressResource constructor.
      * @param Request $request
@@ -33,18 +33,18 @@ class CustomerAddressResource extends ApiResource
 		parent::__construct($request, $response);
 		$this->customerService = $customerService;
 	}
-    
+
     /**
-     * get address type from request
+     * Get the address type from the request
      * @return int
      */
 	private function getAddressType():int
 	{
 		return (INT)$this->request->get("typeId", null);
 	}
-    
+
     /**
-     * get address by type
+     * Get an address by type
      * @return BaseResponse
      */
 	public function index():BaseResponse
@@ -53,9 +53,9 @@ class CustomerAddressResource extends ApiResource
 		$addresses = $this->customerService->getAddresses($type);
 		return $this->response->create($addresses, ResponseCode::OK);
 	}
-    
+
     /**
-     * create address with given type
+     * Create an address with the given type
      * @return BaseResponse
      */
 	public function store():BaseResponse
@@ -69,9 +69,9 @@ class CustomerAddressResource extends ApiResource
 		$address = $this->customerService->createAddress($this->request->all(), $type);
 		return $this->response->create($address, ResponseCode::CREATED);
 	}
-    
+
     /**
-     * update address with given id
+     * Update the address with the given ID
      * @param string $addressId
      * @return BaseResponse
      */
@@ -83,14 +83,14 @@ class CustomerAddressResource extends ApiResource
 			$this->response->error(0, "Missing type id.");
 			return $this->response->create(null, ResponseCode::BAD_REQUEST);
 		}
-		
+
 		$addressId = (int)$addressId;
 		$address   = $this->customerService->updateAddress($addressId, $this->request->all(), $type);
 		return $this->response->create($address, ResponseCode::OK);
 	}
-    
+
     /**
-     * delete address with given id
+     * Delete the address with the given ID
      * @param string $addressId
      * @return BaseResponse
      */
@@ -102,7 +102,7 @@ class CustomerAddressResource extends ApiResource
 			$this->response->error(0, "Missing type id.");
 			return $this->response->create(null, ResponseCode::BAD_REQUEST);
 		}
-		
+
 		$addressId = (int)$addressId;
 		$this->customerService->deleteAddress($addressId, $type);
 		return $this->index();

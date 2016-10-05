@@ -16,12 +16,12 @@ use LayoutCore\Services\ShippingService;
  */
 class ShippingResource extends ApiResource
 {
-	
+
 	/**
 	 * @var ShippingService
 	 */
 	private $shippingService;
-    
+
     /**
      * ShippingResource constructor.
      * @param Request $request
@@ -33,10 +33,10 @@ class ShippingResource extends ApiResource
 		parent::__construct($request, $response);
 		$this->shippingService = $shippingService;
 	}
-	
-	// put/patch
+
+	// Put/patch
     /**
-     * set shipping profile
+     * Set the shipping profile
      * @param string $shippingProfileId
      * @return BaseResponse
      */
@@ -45,5 +45,5 @@ class ShippingResource extends ApiResource
 		$this->shippingService->setShippingProfileId((int)$shippingProfileId);
 		return $this->response->create(ResponseCode::OK);
 	}
-	
+
 }

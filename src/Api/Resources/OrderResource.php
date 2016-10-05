@@ -22,7 +22,7 @@ class OrderResource extends ApiResource
 	 * @var AbstractFactory
 	 */
 	private $factory;
-    
+
     /**
      * OrderResource constructor.
      * @param Request $request
@@ -37,22 +37,22 @@ class OrderResource extends ApiResource
 		parent::__construct($request, $response);
 		$this->factory = $factory;
 	}
-    
+
     /**
-     * get orders for customer
+     * List the orders of the customer
      * @return BaseResponse
      */
 	public function index():BaseResponse
 	{
 		$page  = (int)$this->request->get("page", 1);
 		$items = (int)$this->request->get("items", 50);
-		
+
 		$data = $this->factory->make(CustomerService::class)->getOrders($page, $items);
 		return $this->response->create($data, ResponseCode::OK);
 	}
-    
+
     /**
-     * create order
+     * Create an order
      * @return BaseResponse
      */
 	public function store():BaseResponse

@@ -20,7 +20,7 @@ class CustomerLogoutResource extends ApiResource
 	 * @var AuthenticationService
 	 */
 	private $authService;
-    
+
     /**
      * CustomerLogoutResource constructor.
      * @param Request $request
@@ -32,9 +32,9 @@ class CustomerLogoutResource extends ApiResource
 		parent::__construct($request, $response);
 		$this->authService = $authService;
 	}
-    
+
     /**
-     * logout customer from current session
+     * Log out the customer from the current session
      * @return BaseResponse
      */
 	public function index():BaseResponse
@@ -42,5 +42,5 @@ class CustomerLogoutResource extends ApiResource
 		$this->authService->logout();
 		return $this->response->create(ResponseCode::OK);
 	}
-	
+
 }

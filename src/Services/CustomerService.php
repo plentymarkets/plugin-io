@@ -44,7 +44,7 @@ class CustomerService
 	 * @var AbstractFactory
 	 */
 	private $factory;
-    
+
     /**
      * CustomerService constructor.
      * @param ContactRepositoryContract $contactRepository
@@ -66,9 +66,9 @@ class CustomerService
 		$this->authService       = $authService;
 		$this->factory           = $factory;
 	}
-    
+
     /**
-     * get id of the current contact from session
+     * Get the ID of the current contact from the session
      * @return int
      */
 	public function getContactId():int
@@ -79,9 +79,9 @@ class CustomerService
 		}
 		return $this->userSession->getCurrentContactId();
 	}
-    
+
     /**
-     * create a new contact with addresses if specified
+     * Create a contact with addresses if specified
      * @param array $contactData
      * @param null $billingAddressData
      * @param null $deliveryAddressData
@@ -90,13 +90,13 @@ class CustomerService
 	public function registerCustomer(array $contactData, $billingAddressData = null, $deliveryAddressData = null):Contact
 	{
 		$contact = $this->createContact($contactData);
-		
+
 		if($contact->id > 0)
 		{
-			//login
+			//Login
 			$this->authService->loginWithContactId($contact->id, (string)$contactData['password']);
 		}
-		
+
 		if($billingAddressData !== null)
 		{
 			$this->createAddress($billingAddressData, AddressType::BILLING);
@@ -105,17 +105,17 @@ class CustomerService
 				$this->createAddress($billingAddressData, AddressType::DELIVERY);
 			}
 		}
-		
+
 		if($deliveryAddressData !== null)
 		{
 			$this->createAddress($deliveryAddressData, AddressType::DELIVERY);
 		}
-		
+
 		return $contact;
 	}
-    
+
     /**
-     * create a new contact
+     * Create a new contact
      * @param array $contactData
      * @return Contact
      */
@@ -124,9 +124,9 @@ class CustomerService
 		$contact = $this->contactRepository->createContact($contactData);
 		return $contact;
 	}
-    
+
     /**
-     * find current contact by id
+     * Find the current contact by ID
      * @return null|Contact
      */
 	public function getContact()
@@ -137,9 +137,9 @@ class CustomerService
 		}
 		return null;
 	}
-    
+
     /**
-     * update a contact
+     * Update a contact
      * @param array $contactData
      * @return null|Contact
      */
@@ -149,12 +149,12 @@ class CustomerService
 		{
 			return $this->contactRepository->updateContact($contactData, $this->getContactId());
 		}
-		
+
 		return null;
 	}
-    
+
     /**
-     * get the addresses of a contact
+     * List the addresses of a contact
      * @param null $type
      * @return array|\Illuminate\Database\Eloquent\Collection
      */
@@ -162,9 +162,9 @@ class CustomerService
 	{
 		return $this->addressRepository->getAddresses($this->getContactId(), $type);
 	}
-    
+
     /**
-     * get address by id
+     * Get an address by ID
      * @param int $addressId
      * @param int $type
      * @return Address
@@ -173,9 +173,9 @@ class CustomerService
 	{
 		return $this->addressRepository->getAddress($addressId, $this->getContactId(), $type);
 	}
-    
+
     /**
-     * create a new address with specified address typw
+     * Create an address with the specified address type
      * @param array $addressData
      * @param int $type
      * @return Address
@@ -183,7 +183,7 @@ class CustomerService
 	public function createAddress(array $addressData, int $type):Address
 	{
 		$response = $this->addressRepository->createAddress($addressData, $this->getContactId(), $type);
-		
+
 		if($type == AddressType::BILLING)
 		{
 			$this->addressRepository->createAddress($addressData, $this->getContactId(), AddressType::DELIVERY);
@@ -192,12 +192,12 @@ class CustomerService
 		{
 			$this->addressRepository->createAddress($addressData, $this->getContactId(), AddressType::BILLING);
 		}
-		
+
 		return $response;
 	}
-    
+
     /**
-     * update an existing address
+     * Update an address
      * @param int $addressId
      * @param array $addressData
      * @param int $type
@@ -207,9 +207,9 @@ class CustomerService
 	{
 		return $this->addressRepository->updateAddress($addressData, $addressId, $this->getContactId(), $type);
 	}
-    
+
     /**
-     * delete an address
+     * Delete an address
      * @param int $addressId
      * @param int $type
      */
@@ -217,9 +217,9 @@ class CustomerService
 	{
 		$this->addressRepository->deleteAddress($addressId, $this->getContactId(), $type);
 	}
-    
+
     /**
-     * get a list of orders for the current contact
+     * Get a list of orders for the current contact
      * @param int $page
      * @param int $items
      * @return array|\Plenty\Repositories\Models\PaginatedResult
@@ -232,9 +232,9 @@ class CustomerService
 			$items
 		);
 	}
-    
+
     /**
-     * get the last order created by the current contact
+     * Get the last order created by the current contact
      * @return Order
      */
 	public function getLatestOrder():Order

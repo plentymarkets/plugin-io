@@ -10,7 +10,7 @@ use LayoutCore\Helper\TemplateContainer;
 class LoginController extends LayoutController
 {
     /**
-     * prepare and render data for login
+     * Prepare and render the data for the login
      * @return string
      */
 	public function showLogin(): string

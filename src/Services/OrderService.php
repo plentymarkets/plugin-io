@@ -42,7 +42,7 @@ class OrderService
 	 * @var CustomerService
 	 */
 	private $customerService;
-    
+
     /**
      * OrderService constructor.
      * @param OrderRepositoryContract $orderRepository
@@ -65,9 +65,9 @@ class OrderService
 		$this->checkoutService = $checkoutService;
 		$this->customerService = $customerService;
 	}
-    
+
     /**
-     * place an order
+     * Place an order
      * @return Order
      */
 	public function placeOrder():Order
@@ -80,12 +80,12 @@ class OrderService
 		                            ->withAddressId($this->checkoutService->getDeliveryAddressId(), AddressType::DELIVERY)
 		                            ->withOrderOption(OrderOptionType::METHOD_OF_PAYMENT, OrderOptionSubType::MAIN_VALUE, $this->checkoutService->getMethodOfPaymentId())
 		                            ->done();
-		
+
 		return $this->orderRepository->createOrder($order);
 	}
-    
+
     /**
-     * find order by id
+     * Find an order by ID
      * @param int $orderId
      * @return Order
      */

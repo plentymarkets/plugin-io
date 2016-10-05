@@ -14,12 +14,12 @@ use LayoutCore\Constants\Language;
  */
 class NavigationService
 {
-	
+
 	/**
 	 * @var CategoryRepository
 	 */
 	private $categoryRepository;
-    
+
     /**
      * NavigationService constructor.
      * @param CategoryRepository $categoryRepository
@@ -28,9 +28,9 @@ class NavigationService
 	{
 		$this->categoryRepository = $categoryRepository;
 	}
-	
+
 	/**
-	 * Returns sitemap tree as array
+	 * Return the sitemap tree as an array
 	 * @param string $type Only return categories of given type
 	 * @param string $lang The language to get sitemap tree for
 	 * @return array
@@ -39,9 +39,9 @@ class NavigationService
 	{
 		return $this->categoryRepository->getSitemapTree($type, $lang);
 	}
-	
+
 	/**
-	 * Returns sitemap list as array
+	 * Return the sitemap list as an array
 	 * @param string $type Only return categories of given type
 	 * @param string $lang The language to get sitemap list for
 	 * @return array
@@ -50,7 +50,7 @@ class NavigationService
 	{
 		return $this->toArray($this->categoryRepository->getSitemapList($type, $lang));
 	}
-	
+
 	// FIXME arrays of objects are not transformed to arrays of native types before passing to twig templates.
     /**
      * @param array $categories
@@ -63,8 +63,8 @@ class NavigationService
 		{
 			array_push($result, $category->toArray());
 		}
-		
+
 		return $result;
 	}
-	
+
 }

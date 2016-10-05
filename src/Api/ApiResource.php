@@ -19,17 +19,17 @@ class ApiResource extends Controller
      * @var \LayoutCore\Api\ApiResponse
      */
 	protected $response;
-    
+
     /**
      * @var Request
      */
 	protected $request;
-	
+
 	/**
 	 * @var ResponseCode
 	 */
 	private $defaultCode = ResponseCode::NOT_IMPLEMENTED;
-    
+
     /**
      * ApiResource constructor.
      * @param Request $request
@@ -40,8 +40,8 @@ class ApiResource extends Controller
 		$this->response = $response;
 		$this->request  = $request;
 	}
-	
-	// get all
+
+	// Get all
     /**
      * @return BaseResponse
      */
@@ -49,8 +49,8 @@ class ApiResource extends Controller
 	{
 		return $this->response->create(null, $this->defaultCode);
 	}
-	
-	// post
+
+	// Post
     /**
      * @return BaseResponse
      */
@@ -58,8 +58,8 @@ class ApiResource extends Controller
 	{
 		return $this->response->create(null, $this->defaultCode);
 	}
-	
-	// get
+
+	// Get
     /**
      * @param string $selector
      * @return BaseResponse
@@ -68,8 +68,8 @@ class ApiResource extends Controller
 	{
 		return $this->response->create(null, $this->defaultCode);
 	}
-	
-	// put/patch
+
+	// Put/patch
     /**
      * @param string $selector
      * @return BaseResponse
@@ -78,8 +78,8 @@ class ApiResource extends Controller
 	{
 		return $this->response->create(null, $this->defaultCode);
 	}
-	
-	// delete
+
+	// Delete
     /**
      * @param string $selector
      * @return BaseResponse

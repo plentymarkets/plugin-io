@@ -15,7 +15,7 @@ class NumberFormatFilter extends AbstractFilter
 	 * @var ConfigRepository
 	 */
 	private $config;
-    
+
     /**
      * NumberFormatFilter constructor.
      * @param ConfigRepository $config
@@ -25,9 +25,9 @@ class NumberFormatFilter extends AbstractFilter
 		parent::__construct();
 		$this->config = $config;
 	}
-    
+
     /**
-     * return available filter methods
+     * Return the available filter methods
      * @return array
      */
 	public function getFilters():array
@@ -37,9 +37,9 @@ class NumberFormatFilter extends AbstractFilter
 			"formatMonetary" => "formatMonetary"
 		];
 	}
-    
+
     /**
-     * format given value to decimal
+     * Format the given value to decimal
      * @param float $value
      * @param int $decimal_places
      * @return string
@@ -59,9 +59,9 @@ class NumberFormatFilter extends AbstractFilter
 		$thousands_separator = $this->config->get('PluginLayoutCore.format.separator_thousands');
 		return number_format($value, $decimal_places, $decimal_separator, $thousands_separator);
 	}
-    
+
     /**
-     * format given value to currency
+     * Format the given value to currency
      * @param float $value
      * @param string $currencyISO
      * @return string

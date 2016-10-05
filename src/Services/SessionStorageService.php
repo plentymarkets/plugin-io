@@ -14,7 +14,7 @@ class SessionStorageService
 	 * @var FrontendSessionStorageFactoryContract
 	 */
 	private $sessionStorage;
-    
+
     /**
      * SessionStorageService constructor.
      * @param FrontendSessionStorageFactoryContract $sessionStorage
@@ -23,9 +23,9 @@ class SessionStorageService
 	{
 		$this->sessionStorage = $sessionStorage;
 	}
-    
+
     /**
-     * set value in session
+     * Set the value in the session
      * @param string $name
      * @param $value
      */
@@ -33,9 +33,9 @@ class SessionStorageService
 	{
 		$this->sessionStorage->getPlugin()->setValue($name, $value);
 	}
-    
+
     /**
-     * get value from session
+     * Get a value from the session
      * @param string $name
      * @return mixed
      */
@@ -43,9 +43,9 @@ class SessionStorageService
 	{
 		return $this->sessionStorage->getPlugin()->getValue($name);
 	}
-    
+
     /**
-     * get language from session
+     * Get the language from session
      * @return string
      */
 	public function getLang():string

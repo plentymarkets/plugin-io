@@ -41,7 +41,7 @@ class CategoryService
 	 * @var array
 	 */
 	private $currentCategoryTree = [];
-    
+
     /**
      * CategoryService constructor.
      * @param CategoryRepository $category
@@ -56,7 +56,7 @@ class CategoryService
 	}
 
 	/**
-	 * Set the current category by id.
+	 * Set the current category by ID.
 	 * @param int $catID The id of the current category
 	 */
 	public function setCurrentCategoryID(int $catID = 0)
@@ -67,7 +67,7 @@ class CategoryService
 	}
 
 	/**
-	 * Set the current category by id.
+	 * Set the current category by ID.
 	 * @param Category $cat The current category
 	 */
 	public function setCurrentCategory($cat)
@@ -80,7 +80,7 @@ class CategoryService
 			return;
 		}
 
-		// get parent/open categories
+		// List parent/open categories
 		$this->currentCategory = $cat;
 		while($cat !== null)
 		{
@@ -90,7 +90,7 @@ class CategoryService
 	}
 
 	/**
-	 * Get a category by id
+	 * Get a category by ID
 	 * @param int $catID The category ID
 	 * @param string $lang The language to get the category
 	 * @return Category
@@ -101,7 +101,7 @@ class CategoryService
 	}
 
 	/**
-	 * Returns the URL for a given category id.
+	 * Return the URL for a given category ID.
 	 * @param Category $category the category to get the URL for
 	 * @param string $lang the language to get the URL for
 	 * @return string
@@ -116,7 +116,7 @@ class CategoryService
 	}
 
 	/**
-	 * Checks if a category is referenced by current route
+	 * Check whether a category is referenced by the current route
 	 * @param int $catID The ID for the category to check
 	 * @return bool
 	 */
@@ -130,7 +130,7 @@ class CategoryService
 	}
 
 	/**
-	 * Checks if any child of a category is referenced by current route
+	 * Check whether any child of a category is referenced by the current route
 	 * @param int $catID The ID for the category to check
 	 * @return bool
 	 */
@@ -152,7 +152,7 @@ class CategoryService
 	}
 
 	/**
-	 * Checks if a category or any of its children is referenced by current route
+	 * Check whether a category or any of its children is referenced by the current route
 	 * @param int $catID The ID for the category to check
 	 * @return bool
 	 */
@@ -166,20 +166,20 @@ class CategoryService
         {
             return false;
         }
-		
+
 	}
-    
+
     /**
-     * check which category is the home category
+     * Check which category is the home category
      * @return bool
      */
 	public function isHome():bool
 	{
 		return $this->currentCategory !== null && $this->currentCategory->id == $this->categoryMap->getID(CategoryKey::HOME);
 	}
-    
+
     /**
-     * get items for specified category
+     * List the items of the specified category
      * @param null $category
      * @param int $defaultItemPerPage
      * @param int $variationShowType
@@ -193,9 +193,9 @@ class CategoryService
 		}
 		return $this->item->getItemForCategory($category->id, $variationShowType);
 	}
-    
+
     /**
-     * get the category tree as list
+     * Get the category tree as a list
      * @param int $catID
      * @return array
      */

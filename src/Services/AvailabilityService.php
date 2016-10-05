@@ -15,7 +15,7 @@ class AvailabilityService
 	 * @var AvailabilityRepositoryContract
 	 */
 	private $availabilityRepository;
-    
+
     /**
      * AvailabilityService constructor.
      * @param AvailabilityRepositoryContract $availabilityRepository
@@ -24,9 +24,9 @@ class AvailabilityService
 	{
 		$this->availabilityRepository = $availabilityRepository;
 	}
-    
+
     /**
-     * get item availability by id
+     * Get the item availability by ID
      * @param int $availabilityId
      * @return Availability
      */

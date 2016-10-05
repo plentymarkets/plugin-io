@@ -20,7 +20,7 @@ class BasketResource extends ApiResource
 	 * @var BasketService
 	 */
 	private $basketService;
-    
+
     /**
      * BasketResource constructor.
      * @param Request $request
@@ -32,9 +32,9 @@ class BasketResource extends ApiResource
 		parent::__construct($request, $response);
 		$this->basketService = $basketService;
 	}
-    
+
     /**
-     * get basket
+     * Get the basket
      * @return BaseResponse
      */
 	public function index():BaseResponse

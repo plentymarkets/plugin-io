@@ -20,7 +20,7 @@ class CheckoutPaymentResource extends ApiResource
      * @var CheckoutService
      */
     private $checkoutService;
-    
+
     /**
      * CheckoutPaymentResource constructor.
      * @param Request $request
@@ -34,7 +34,7 @@ class CheckoutPaymentResource extends ApiResource
     }
 
     /**
-     * prepare payment
+     * Prepare the payment
      * @return BaseResponse
      */
     public function store():BaseResponse

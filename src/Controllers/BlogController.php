@@ -19,7 +19,7 @@ class BlogController extends LayoutController
 {
 
     /**
-     * Prepare and render item data.
+     * Prepare and render the item data.
      * @param ItemDataLayerRepositoryContract $itemRepository repository to search item data
      * @param ItemColumnBuilder $columnBuilder Helper for creating column params for searching items in ItemDataLayerRepositoryContract
      * @param ItemFilterBuilder $filterBuilder Helper for creating item filters for searching items in ItemDataLayerRepositoryContract
@@ -39,13 +39,13 @@ class BlogController extends LayoutController
     {
         if($itemId === null)
         {
-            // if request url does not contain a slug, e.g.:
+            // If request URL does not contain a slug, e.g.:
             // master.plentymarkets.com/a-123
             // => get $itemId from $slug
             $itemId = (int)$slug;
         }
 
-        // define needed fields to get from db
+        // Define the required fields to get from data base
         $columns = $columnBuilder
             ->withItemDescription([
                                       ItemDescriptionFields::NAME_1,
@@ -53,12 +53,12 @@ class BlogController extends LayoutController
                                   ])
             ->build();
 
-        // filter current item by item id
+        // Filter the current item by item ID
         $filter = $filterBuilder
             ->hasId([$itemId])
             ->build();
 
-        // set params
+        // Set parameters
         // TODO: make current language global
         $params = $paramsBuilder
             ->withParam(ItemColumnsParams::LANGUAGE, Language::DE)
@@ -70,7 +70,7 @@ class BlogController extends LayoutController
             $params
         )->current();
 
-        // render template; see: LayoutController
+        // Render the template; i.e. LayoutController
         return $this->renderTemplate(
             "tpl.category.blog",
             [

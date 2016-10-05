@@ -41,7 +41,7 @@ class GetBasePrice extends AbstractFunction
 	 * @var ItemParamsBuilder
 	 */
 	private $paramsBuilder;
-    
+
     /**
      * GetBasePrice constructor.
      * @param Application $app
@@ -65,9 +65,9 @@ class GetBasePrice extends AbstractFunction
 		$this->filterBuilder  = $filterBuilder;
 		$this->paramsBuilder  = $paramsBuilder;
 	}
-    
+
     /**
-     * return available filter methods
+     * Return the available filter methods
      * @return array
      */
 	public function getFunctions():array
@@ -76,9 +76,9 @@ class GetBasePrice extends AbstractFunction
 			"getBasePrice" => "getBasePrice"
 		];
 	}
-    
+
     /**
-     * get base price for specified variation
+     * Get the base price for the specified variation
      * @param int $variationId
      * @return array
      */
@@ -98,7 +98,7 @@ class GetBasePrice extends AbstractFunction
 			->variationHasId([$variationId])
 			->build();
 
-		// set params
+		// Set the parameters
 		// TODO: make current language global
 		$params = $this->paramsBuilder
 			->withParam(ItemColumnsParams::LANGUAGE, Language::DE)

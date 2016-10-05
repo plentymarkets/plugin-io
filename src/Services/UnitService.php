@@ -17,7 +17,7 @@ class UnitService
 	 * @var UnitNameRepositoryContract
 	 */
 	private $unitRepository;
-    
+
     /**
      * UnitService constructor.
      * @param UnitNameRepositoryContract $unitRepository
@@ -26,9 +26,9 @@ class UnitService
 	{
 		$this->unitRepository = $unitRepository;
 	}
-    
+
     /**
-     * get unit by id
+     * Get the unit by ID
      * @param int $unitId
      * @param string $lang
      * @return UnitName

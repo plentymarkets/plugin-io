@@ -45,7 +45,7 @@ class TemplateContainer
 	}
 
 	/**
-	 * Checks if separate layout plugin has set a template to use for current request.
+	 * Check whether a separate layout plugin has set a template to use for the current request.
 	 */
 	public function hasTemplate():bool
 	{
@@ -73,7 +73,7 @@ class TemplateContainer
 	}
 
 	/**
-	 * Add additional template data to existing values.
+	 * Add additional template data to the existing values.
 	 * @param mixed $data The data to add to map.
 	 * @param string $identifier An identifying string to access the given data
 	 * @return TemplateContainer

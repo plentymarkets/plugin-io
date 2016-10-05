@@ -10,7 +10,7 @@ use LayoutCore\Helper\TemplateContainer;
 class RegisterController extends LayoutController
 {
     /**
-     * prepare and render data for registration
+     * Prepare and render the data for the registration
      * @return string
      */
 	public function showRegister(): string

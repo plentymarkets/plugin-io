@@ -20,7 +20,7 @@ class URLFilter extends AbstractFilter
 	 * @var ItemService
 	 */
 	private $itemService;
-    
+
     /**
      * URLFilter constructor.
      * @param ConfigRepository $config
@@ -32,9 +32,9 @@ class URLFilter extends AbstractFilter
 		$this->config      = $config;
 		$this->itemService = $itemService;
 	}
-    
+
     /**
-     * return available filter methods
+     * Return the available filter methods
      * @return array
      */
 	public function getFilters():array
@@ -43,9 +43,9 @@ class URLFilter extends AbstractFilter
 			"buildItemURL" => "buildItemURL"
 		];
 	}
-    
+
     /**
-     * build url for item by item id or variation id
+     * Build the URL for the item by item ID or variation ID
      * @param int $itemId
      * @param int $variationId
      * @param bool $withItemName

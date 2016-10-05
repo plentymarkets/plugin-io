@@ -14,7 +14,7 @@ class CategoryMap
 	 * @var array
 	 */
 	private $categoryMap = [];
-    
+
     /**
      * CategoryMap constructor.
      * @param Dispatcher $event
@@ -26,18 +26,18 @@ class CategoryMap
 			[$this]
 		);
 	}
-    
+
     /**
-     * set category map
+     * Set the category map
      * @param array $categoryMap
      */
 	public function setCategoryMap(array $categoryMap)
 	{
 		$this->categoryMap = $categoryMap;
 	}
-    
+
     /**
-     * get category id by key
+     * Get the category ID by key
      * @param string $key
      * @return int
      */

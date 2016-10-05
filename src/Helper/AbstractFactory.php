@@ -14,7 +14,7 @@ class AbstractFactory
 	 * @var Application
 	 */
 	private $app;
-    
+
     /**
      * AbstractFactory constructor.
      * @param Application $app
@@ -23,9 +23,9 @@ class AbstractFactory
 	{
 		$this->app = $app;
 	}
-    
+
     /**
-     * create a class instance
+     * Create a class instance
      * @param string $className
      * @return mixed
      * @throws \Exception

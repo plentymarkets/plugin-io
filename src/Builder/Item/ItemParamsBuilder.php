@@ -5,20 +5,20 @@ namespace LayoutCore\Builder\Item;
 use LayoutCore\Builder\Item\Params\ItemColumnsParams;
 
 /**
- * Builds array of ItemDataLayer params to pass to ItemDataLayerRepository::search
+ * Build an array of ItemDataLayer parameters to pass to ItemDataLayerRepository::search
  * Class ItemParamsBuilder
  * @package LayoutCore\Builder\Item
  */
 class ItemParamsBuilder
 {
-	
+
 	/**
 	 * @var array
 	 */
 	private $params = [];
-	
+
 	/**
-	 * Set a param value.
+	 * Set a parameter value
 	 * @param ItemColumnsParams $paramName The name of the param to set.
 	 * @param mixed $paramValue The value of the param to set.
 	 * @return ItemParamsBuilder The instance of the current builder.
@@ -28,14 +28,14 @@ class ItemParamsBuilder
 		$this->params[(string)$paramName] = $paramValue;
 		return $this;
 	}
-	
+
 	/**
-	 * Returns generated params to pass to ItemDataLayerRepository
+	 * Return the generated parameters to pass to ItemDataLayerRepository
 	 * @return array
 	 */
 	public function build():array
 	{
 		return $this->params;
 	}
-	
+
 }

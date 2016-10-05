@@ -43,7 +43,7 @@ class TwigLayoutCoreExtension extends Twig_Extension
 	}
 
 	/**
-	 * Returns the name of the extension. Must be unique.
+	 * Return the name of the extension. The name must be unique.
 	 *
 	 * @return string The name of the extension
 	 */
@@ -53,7 +53,7 @@ class TwigLayoutCoreExtension extends Twig_Extension
 	}
 
 	/**
-	 * Returns a list of filters to add.
+	 * Return a list of filters to add.
 	 *
 	 * @return array The list of filters to add.
 	 */
@@ -74,7 +74,7 @@ class TwigLayoutCoreExtension extends Twig_Extension
 	}
 
 	/**
-	 * Returns a list of functions to add.
+	 * Return a list of functions to add.
 	 *
 	 * @return array the list of functions to add.
 	 */

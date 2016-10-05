@@ -5,7 +5,7 @@ namespace LayoutCore\Builder\Item;
 use LayoutCore\Constants\Language;
 
 /**
- * Builds array of ItemDataLayer filters to pass to ItemDataLayerRepository:search
+ * Build an array of ItemDataLayer filters to pass to ItemDataLayerRepository:search
  * Class ItemFilterBuilder
  * @package LayoutCore\Builder\Item
  */
@@ -17,16 +17,16 @@ class ItemFilterBuilder
 	private $filter = null;
 
 	/**
-	 * Returns generated filters to pass to ItemDataLayerRepository::search
+	 * Return the generated filters to pass to ItemDataLayerRepository::search
 	 * @return array
 	 */
 	public function build():array
 	{
 		return $this->filter;
 	}
-    
+
     /**
-     * filter items by specific filter key
+     * Filter items by specific filter key
      * @param string $filterKey
      * @param array $filterValue
      * @return ItemFilterBuilder
@@ -184,7 +184,7 @@ class ItemFilterBuilder
 	}
 
 	/**
-	 * Filter items by marking 1
+	 * Filter items by flag 1
 	 * @param array $markingOneIDs IDs of the markings to filter
 	 * @return ItemFilterBuilder the current instance of the builder
 	 */
@@ -196,7 +196,7 @@ class ItemFilterBuilder
 	}
 
 	/**
-	 * Filter items by marking 2
+	 * Filter items by flag 2
 	 * @param array $markingTwoIDs IDs of the markings to filter
 	 * @return ItemFilterBuilder the current instance of the builder
 	 */
@@ -208,8 +208,8 @@ class ItemFilterBuilder
 	}
 
 	/**
-	 * Filter items by producers. Do not pass any producer id to filter items
-	 * having any producer.
+	 * Filter items by manufacturers. Do not pass the manufacturer ID to filter items
+	 * not having a manufacturer.
 	 * @param array $producerIDs The producers to filter
 	 * @return ItemFilterBuilder the current instance of the builder
 	 */
@@ -228,7 +228,7 @@ class ItemFilterBuilder
 	}
 
 	/**
-	 * Filter items not having any producer
+	 * Filter items not having a manufacturer
 	 * @return ItemFilterBuilder the current instance of the builder
 	 */
 	public function notHasProducer():ItemFilterBuilder
@@ -312,7 +312,7 @@ class ItemFilterBuilder
 	}
 
 	/**
-	 * Filter items by shop action
+	 * Filter items by store special
 	 * @param array $shopActions IDs of allowed shop actions
 	 * @return ItemFilterBuilder the current instance of the builder
 	 */
@@ -369,7 +369,7 @@ class ItemFilterBuilder
 	}
 
 	/**
-	 * Filter items having a description in specific language
+	 * Filter items having a description in a specific language
 	 * @param Language $lang the language to use
 	 * @return ItemFilterBuilder the current instance of the builder
 	 */
@@ -381,7 +381,7 @@ class ItemFilterBuilder
 	}
 
 	/**
-	 * Filter items not having a description in specific language.
+	 * Filter items not having a description in a specific language
 	 * @param Language $lang the language to use
 	 * @return ItemFilterBuilder the current instance of the builder
 	 */
@@ -393,7 +393,7 @@ class ItemFilterBuilder
 	}
 
 	/**
-	 * Filter items linked with a specific listing
+	 * Filter items linked to a specific listing
 	 * @param string $auctionType Type of listing
 	 * @return ItemFilterBuilder the current instance of the builder
 	 */
@@ -405,7 +405,7 @@ class ItemFilterBuilder
 	}
 
 	/**
-	 * Filter items not linked with any listing
+	 * Filter items not linked to a listing
 	 * @param string $auctionType Tyoe of listing
 	 * @return ItemFilterBuilder the current instance of the builder
 	 */
@@ -417,7 +417,7 @@ class ItemFilterBuilder
 	}
 
 	/**
-	 * Filter variations with any attribute
+	 * Filter variations with attributes
 	 * @return ItemFilterBuilder the current instance of the builder
 	 */
 	public function variationHasAttributes():ItemFilterBuilder
@@ -426,7 +426,7 @@ class ItemFilterBuilder
 	}
 
 	/**
-	 * Filter variations not having any attribute
+	 * Filter variations not having an attribute
 	 * @return ItemFilterBuilder the current instance of the builder
 	 */
 	public function variationNotHasAttributes():ItemFilterBuilder
@@ -435,7 +435,7 @@ class ItemFilterBuilder
 	}
 
 	/**
-	 * Filter variations linked with specific attribute values.
+	 * Filter variations linked to specific attribute values
 	 * @param array $attributes A Map of attributes: attributeID => attributeValue
 	 * @return ItemFilterBuilder the current instance of the builder
 	 */
@@ -486,8 +486,8 @@ class ItemFilterBuilder
 	}
 
 	/**
-	 * Filter variations by external id.
-	 * @param string $externalId The external id to filter.
+	 * Filter variations by external variation ID.
+	 * @param string $externalId The external ID to filter.
 	 * @return ItemFilterBuilder the current instance of the builder
 	 */
 	public function variationHasExternalId(string $externalId):ItemFilterBuilder
@@ -498,7 +498,7 @@ class ItemFilterBuilder
 	}
 
 	/**
-	 * Filter variations by variationIDs
+	 * Filter variations by variation ID
 	 * @param array $variationIDs The variation IDs
 	 * @return ItemFilterBuilder the current instance of the builder
 	 */
@@ -510,7 +510,7 @@ class ItemFilterBuilder
 	}
 
 	/**
-	 * Filter variations by default warehouseIDs
+	 * Filter variations by default warehouse ID
 	 * @param array $warehouseIDs The warehouse IDs
 	 * @return ItemFilterBuilder the current instance of the builder
 	 */
@@ -553,7 +553,7 @@ class ItemFilterBuilder
 	}
 
 	/**
-	 * Filter variations by unit combination.
+	 * Filter variations by unit combination
 	 * @param int $unitCombinationId The unit combination id
 	 * @return ItemFilterBuilder the current instance of the builder
 	 */
@@ -592,7 +592,7 @@ class ItemFilterBuilder
 	}
 
 	/**
-	 * Exclude the primary variation.
+	 * Exclude the primary variation
 	 * @return ItemFilterBuilder the current instance of the builder
 	 */
 	public function variationIsChild():ItemFilterBuilder
@@ -601,8 +601,8 @@ class ItemFilterBuilder
 	}
 
 	/**
-	 * If item has variations with any attribute, exclude variations without attributes.
-	 * Otherwise return all variations without atrributes.
+	 * If an item has variations with attributes, exclude variations without attributes.
+	 * Otherwise, return all variations without attributes.
 	 * @return ItemFilterBuilder the current instance of the builder
 	 */
 	public function onlyBasicVariations():ItemFilterBuilder
@@ -681,7 +681,7 @@ class ItemFilterBuilder
 	}
 
 	/**
-	 * Filter variations by gross weight.
+	 * Filter variations by gross weight
 	 * @param int $weightG Weight in gramm
 	 * @return ItemFilterBuilder the current instance of the builder
 	 */
@@ -693,7 +693,7 @@ class ItemFilterBuilder
 	}
 
 	/**
-	 * Filter variations by net weight.
+	 * Filter variations by net weight
 	 * @param int $weightG Weight in gramm
 	 * @return ItemFilterBuilder the current instance of the builder
 	 */
@@ -705,8 +705,8 @@ class ItemFilterBuilder
 	}
 
 	/**
-	 * Filter variations linked with specific category. Do not pass any category
-	 * to filter variations linked with any categories.
+	 * Filter variations linked to a specific category. Do not pass any category
+	 * to filter variations linked to any categories.
 	 * @param int $categoryID The category ID
 	 * @return ItemFilterBuilder the current instance of the builder
 	 */
@@ -725,7 +725,7 @@ class ItemFilterBuilder
 	}
 
 	/**
-	 * Filter variations not linked with any category
+	 * Filter variations not linked to a category
 	 * @return ItemFilterBuilder the current instance of the builder
 	 */
 	public function variationNotHasCategory():ItemFilterBuilder
@@ -734,7 +734,7 @@ class ItemFilterBuilder
 	}
 
 	/**
-	 * Filter variations linked with specific category branch
+	 * Filter variations linked to a specific category level
 	 * @param int $lvl1 Category ID at first layer
 	 * @param int ?lvl2 Category ID at second layer
 	 * @param int ?lvl3 Category ID at third layer
@@ -756,7 +756,7 @@ class ItemFilterBuilder
 	}
 
 	/**
-	 * Filter variations by additional content for specific marketplace.
+	 * Filter variations by additional content for specific markets
 	 * @param string $additionalInformation
 	 * @param float $marketplaceId Referred marketplace id
 	 * @return ItemFilterBuilder the current instance of the builder
@@ -770,7 +770,7 @@ class ItemFilterBuilder
 	}
 
 	/**
-	 * Filter variations by date of first export to specific marketplace
+	 * Filter variations by date of first export to specific markets
 	 * @param string $from The start datetime of the period in unix format
 	 * @param string $to The end datetime of the period in unix format
 	 * @param float $marketplaceId Referred marketplace id
@@ -786,7 +786,7 @@ class ItemFilterBuilder
 	}
 
 	/**
-	 * Filter variations by date of last export to specific marketplace
+	 * Filter variations by date of last export to specific markets
 	 * @param string $from The start datetime of the period in unix format
 	 * @param string $to The end datetime of the period in unix format
 	 * @param float $marketplaceId Referred marketplace idv
@@ -838,7 +838,7 @@ class ItemFilterBuilder
 	}
 
 	/**
-	 * Filter variations which are salable because of stock
+	 * Filter variations which are for sale because of stock
 	 * @return ItemFilterBuilder the current instance of the builder
 	 */
 	public function variationStockIsSalable():ItemFilterBuilder
@@ -847,7 +847,7 @@ class ItemFilterBuilder
 	}
 
 	/**
-	 * Filter variations by net stock.
+	 * Filter variations by net stock
 	 * @param mixed $warehouseId "primary, "virtual" or the warehouse id
 	 * @param float $stockConditionOperand stock value to filters
 	 * @param string $stockConditionOperator the operator to compare stock value
@@ -939,7 +939,7 @@ class ItemFilterBuilder
 	}
 
 	/**
-	 * Filter variations with physical stock value of 0.
+	 * Filter variations with physical stock value of 0
 	 * @param mixed $warehouseId "primary", "virtual" or warehouse id
 	 * @return ItemFilterBuilder the current instance of the builder
 	 */
@@ -967,7 +967,7 @@ class ItemFilterBuilder
 	}
 
 	/**
-	 * Filter variation fallen below reorder level.
+	 * Filter variations fallen below reorder level
 	 * @param mixed $warehouseId "primary", "virtual" or warehouse id
 	 * @return ItemFilterBuilder the current instance of the builder
 	 */
@@ -979,7 +979,7 @@ class ItemFilterBuilder
 	}
 
 	/**
-	 * Filter variations by date of lanst changes on stock
+	 * Filter variations by date of last changes to stock
 	 * @param string $from The start datetime of the period in unix format
 	 * @param string $to The end datetime of the period in unix format
 	 * @return ItemFilterBuilder the current instance of the builder
@@ -993,7 +993,7 @@ class ItemFilterBuilder
 	}
 
 	/**
-	 * Filter variations by specific supplier.
+	 * Filter variations by specific supplier
 	 * @param array $supplierIDs Supplier IDs to filter.
 	 * @return ItemFilterBuilder the current instance of the builder
 	 */
@@ -1005,7 +1005,7 @@ class ItemFilterBuilder
 	}
 
 	/**
-	 * Filter variations not having a specific supplier.
+	 * Filter variations not having a specific supplier
 	 * @param array $supplierIDs Supplier IDs to deny.
 	 * @return ItemFilterBuilder the current instance of the builder
 	 */
@@ -1017,7 +1017,7 @@ class ItemFilterBuilder
 	}
 
 	/**
-	 * Filter variations by supplier number.
+	 * Filter variations by supplier number
 	 * @param int $supplierNumber the supplier number
 	 * @return ItemFilterBuilder the current instance of the builder
 	 */
@@ -1029,7 +1029,7 @@ class ItemFilterBuilder
 	}
 
 	/**
-	 * Filter items which are visible for specific marketplace
+	 * Filter items which are visible for specific markets
 	 * @param array $mandatoryAllMarketplace All listed marketplaces have to be linked with filtered item.
 	 * @param array $mandatoryOneMarketplace At least one marketplace have to be linked with filtered item.
 	 * @return ItemFilterBuilder the current instance of the builder
@@ -1043,7 +1043,7 @@ class ItemFilterBuilder
 	}
 
 	/**
-	 * Filter items which are not visible for specific marketplace
+	 * Filter items which are not visible for specific markets
 	 * @param array $mandatoryAllMarketplace All listed marketplaces have to be linked with filtered item.
 	 * @param array $mandatoryOneMarketplace At least one marketplace have to be linked with filtered item.
 	 * @return ItemFilterBuilder the current instance of the builder
@@ -1057,7 +1057,7 @@ class ItemFilterBuilder
 	}
 
 	/**
-	 * Filter items which are visible for specific webshop
+	 * Filter items which are visible for specific client (store)
 	 * @param array $mandatoryAllPlentyId All listed shops have to be linked with filtered item.
 	 * @param array $mandatoryOnePlentyId At least one shop has to be linked with filtered item.
 	 * @return ItemFilterBuilder the current instance of the builder
@@ -1071,7 +1071,7 @@ class ItemFilterBuilder
 	}
 
 	/**
-	 * Filter items which are not visible for specific webshop
+	 * Filter items which are not visible for specific client (store)
 	 * @param array $mandatoryAllPlentyId All listed shops have to be linked with filtered item.
 	 * @param array $mandatoryOnePlentyId At least one shop has to be linked with filtered item.
 	 * @return ItemFilterBuilder the current instance of the builder

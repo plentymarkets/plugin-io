@@ -12,7 +12,7 @@ abstract class AbstractFunction
 	 * @var array
 	 */
 	public static $functions = [];
-    
+
     /**
      * AbstractFunction constructor.
      */
@@ -20,9 +20,9 @@ abstract class AbstractFunction
 	{
 		array_push(self::$functions, $this);
 	}
-    
+
     /**
-     * return available functions
+     * Return the available functions
      * @return array
      */
 	public abstract function getFunctions():array;

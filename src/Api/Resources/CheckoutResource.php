@@ -26,7 +26,7 @@ class CheckoutResource extends ApiResource
 	 * @var CustomerService
 	 */
 	private $customerService;
-    
+
     /**
      * CheckoutResource constructor.
      * @param Request $request
@@ -40,9 +40,9 @@ class CheckoutResource extends ApiResource
 		$this->checkoutService = $checkoutService;
 		$this->customerService = $customerService;
 	}
-    
+
     /**
-     * get checkout
+     * Get the checkout
      * @return BaseResponse
      */
 	public function index():BaseResponse
@@ -50,22 +50,22 @@ class CheckoutResource extends ApiResource
 		$checkout = $this->checkoutService->getCheckout();
 		return $this->response->create($checkout, ResponseCode::OK);
 	}
-	
+
     /**
-     * save adresses and set checkout data
+     * Save adresses and set the checkout data
      * @return BaseResponse
      */
 	public function store():BaseResponse
 	{
 		$methodOfPaymentId = (int)$this->request->get("methodOfPaymentId");
 		$this->checkoutService->setMethodOfPaymentId($methodOfPaymentId);
-		
+
 		$shippingCountryId = (int)$this->request->get("shippingCountryId");
 		$this->checkoutService->setShippingCountryId($shippingCountryId);
-		
+
 		$shippingProfileId = (int)$this->request->get("shippingProfileId");
 		$this->checkoutService->setShippingProfileId($shippingProfileId);
-		
+
 		$deliveryAddressData = $this->request->get("deliveryAddress", null);
 		if($deliveryAddressData !== null && is_array($deliveryAddressData))
 		{
@@ -77,7 +77,7 @@ class CheckoutResource extends ApiResource
 			$deliveryAddressId = (int)$this->request->get("deliveryAddressId");
 			$this->checkoutService->setDeliveryAddressId($deliveryAddressId);
 		}
-		
+
 		$billingAddressData = $this->request->get("billingAddress", null);
 		if($billingAddressData !== null && is_array($billingAddressData))
 		{
@@ -89,7 +89,7 @@ class CheckoutResource extends ApiResource
 			$billingAddressId = (int)$this->request->get("billingAddressId");
 			$this->checkoutService->setBillingAddressId($billingAddressId);
 		}
-		
+
 		return $this->index();
 	}
 }

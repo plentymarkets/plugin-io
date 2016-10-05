@@ -10,7 +10,7 @@ use LayoutCore\Helper\TemplateContainer;
 class GuestController extends LayoutController
 {
     /**
-     * prepare and render data for guest registration
+     * Prepare and render the data for the guest registration
      * @return string
      */
 	public function showGuest(): string

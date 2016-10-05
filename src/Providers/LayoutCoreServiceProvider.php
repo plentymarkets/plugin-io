@@ -15,7 +15,7 @@ use Plenty\Plugin\Templates\Twig;
 class LayoutCoreServiceProvider extends ServiceProvider
 {
     /**
-     * register core functions
+     * Register the core functions
      */
 	public function register()
 	{
@@ -31,7 +31,7 @@ class LayoutCoreServiceProvider extends ServiceProvider
 		$this->getApplication()->singleton('LayoutCore\Services\CategoryService');
 
 	}
-    
+
     /**
      * boot twig extensions and services
      * @param Twig $twig

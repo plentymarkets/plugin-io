@@ -11,7 +11,7 @@ use LayoutCore\Services\BasketService;
 class BasketController extends LayoutController
 {
     /**
-     * prepare and render data for basket
+     * Prepare and render the data for the basket
      * @param BasketService $basketService
      * @return string
      */

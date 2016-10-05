@@ -20,7 +20,7 @@ class CategoryItemsListResource extends ApiResource
 	 * @var ItemService
 	 */
 	private $itemService;
-    
+
     /**
      * CategoryItemsListResource constructor.
      * @param Request $request
@@ -32,7 +32,7 @@ class CategoryItemsListResource extends ApiResource
 		parent::__construct($request, $response);
 		$this->itemService = $itemService;
 	}
-    
+
     /**
      * @return BaseResponse
      */
@@ -42,7 +42,7 @@ class CategoryItemsListResource extends ApiResource
 	}
     
     /**
-     * get all items from specific category
+     * List all items of a specific category
      * @param string $categoryId
      * @return BaseResponse
      */

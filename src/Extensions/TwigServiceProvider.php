@@ -15,7 +15,7 @@ use LayoutCore\Helper\AbstractFactory;
 class TwigServiceProvider extends Twig_Extension
 {
     /**
-    * @var AbstractFactory 
+    * @var AbstractFactory
     */
   private $factory;
 
@@ -25,7 +25,7 @@ class TwigServiceProvider extends Twig_Extension
     }
 
     /**
-     * Returns the name of the extension. Must be unique.
+     * Return the name of the extension. The name must be unique.
      *
      * @return string The name of the extension
      */
@@ -35,7 +35,7 @@ class TwigServiceProvider extends Twig_Extension
     }
 
     /**
-     * Returns a list of filters to add.
+     * Return a list of filters to add.
      *
      * @return array The list of filters to add.
      */
@@ -45,7 +45,7 @@ class TwigServiceProvider extends Twig_Extension
     }
 
     /**
-     * Returns a list of functions to add.
+     * Return a list of functions to add.
      *
      * @return array the list of functions to add.
      */
@@ -55,7 +55,7 @@ class TwigServiceProvider extends Twig_Extension
     }
 
     /**
-     * Returns a map of global helper objects to add.
+     * Return a map of global helper objects to add.
      *
      * @return array the map of helper objects to add.
      */

@@ -13,9 +13,9 @@ use LayoutCore\Helper\CategoryKey;
  */
 class CategoryController extends LayoutController
 {
-	
+
 	/**
-	 * Prepare and render data for categories
+	 * Prepare and render the data for categories
 	 * @param CategoryRepository $category Repository to receive category data from
 	 * @param string $lvl1 Level 1 of category url. Will be null at root page
 	 * @param string $lvl2 Level 2 of category url.
@@ -33,10 +33,10 @@ class CategoryController extends LayoutController
 		$lvl5 = null,
 		$lvl6 = null):string
 	{
-		// get current category
+		// Get the current category
 		if($lvl1 === null)
 		{
-			// get start page id from layout plugin config
+			// Get the start page ID from the layout plugin config
 			$currentCategory = $this->categoryRepo->get(
 				$this->categoryMap->getID(CategoryKey::HOME)
 			);
@@ -52,5 +52,5 @@ class CategoryController extends LayoutController
 		}
 		return '';
 	}
-	
+
 }

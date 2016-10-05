@@ -16,9 +16,9 @@ class LayoutCoreRouteServiceProvider extends RouteServiceProvider
 	public function register()
 	{
 	}
-    
+
     /**
-     * define an map routes to templates or rest resources
+     * Define the map routes to templates or REST resources
      * @param Router $router
      * @param ApiRouter $api
      */
@@ -43,26 +43,26 @@ class LayoutCoreRouteServiceProvider extends RouteServiceProvider
 		/*
 		 * STATIC ROUTES
 		 */
-		//basket route
+		//Basket route
 		// TODO: get slug from config
 		$router->get('basket', 'LayoutCore\Controllers\BasketController@showBasket');
 
-		//checkout-confirm buy route
+		//Checkout-confirm purchase route
 		$router->get('checkout', 'LayoutCore\Controllers\CheckoutController@showCheckout');
 
-		//my-account route
+		//My-account route
 		$router->get('my-account', 'LayoutCore\Controllers\MyAccountController@showMyAccount');
 
-		//confiramtion route
+		//Confiramtion route
 		$router->get('confirmation', 'LayoutCore\Controllers\ConfirmationController@showConfirmation');
 
-		//guest route
+		//Guest route
 		$router->get('guest', 'LayoutCore\Controllers\GuestController@showGuest');
 
-		//login page route
+		//Login page route
 		$router->get('login', 'LayoutCore\Controllers\LoginController@showLogin');
 
-		//register page route
+		//Register page route
 		$router->get('register', 'LayoutCore\Controllers\RegisterController@showRegister');
 
 		/*

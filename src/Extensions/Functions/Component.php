@@ -25,14 +25,14 @@ class Component extends AbstractFunction
      * @var int
      */
     private $currentComponent = 0;
-    
+
     /**
      * @var array
      */
     private $components = array();
-    
+
     /**
-     * return available filter methods
+     * Return the available filter methods
      * @return array
      */
     public function getFunctions():array
@@ -43,9 +43,9 @@ class Component extends AbstractFunction
             "get_component_template" => "getComponentTemplate"
         ];
     }
-    
+
     /**
-     * push compnent to component stack
+     * Push the component to the component stack
      * @param string $path
      */
     public function component( string $path )
@@ -55,18 +55,18 @@ class Component extends AbstractFunction
             array_push( $this->components, $path );
         }
     }
-    
+
     /**
-     * check if component template exists
+     * Check whether a component template exists
      * @return bool
      */
     public function hasComponentTemplate():bool
     {
         return $this->currentComponent < count( $this->components );
     }
-    
+
     /**
-     * get component from component stack
+     * Get the component from the component stack
      * @return string
      */
     public function getComponentTemplate():string

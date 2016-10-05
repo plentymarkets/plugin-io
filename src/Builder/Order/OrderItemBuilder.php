@@ -17,7 +17,7 @@ class OrderItemBuilder
 	 * @var CheckoutService
 	 */
 	private $checkoutService;
-    
+
     /**
      * OrderItemBuilder constructor.
      * @param CheckoutService $checkoutService
@@ -26,9 +26,9 @@ class OrderItemBuilder
 	{
 		$this->checkoutService = $checkoutService;
 	}
-    
+
     /**
-     * add basket item to order
+     * Add a basket item to the order
      * @param Basket $basket
      * @param array $items
      * @return array
@@ -44,9 +44,9 @@ class OrderItemBuilder
 
 		return $orderItems;
 	}
-    
+
     /**
-     * add basket item to order
+     * Add a basket item to the order
      * @param BasketItem $basketItem
      * @param string $basketItemName
      * @return array
