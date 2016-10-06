@@ -120,6 +120,47 @@ class ItemService
         );
     }
 
+    public function getVariationList( int $itemId, bool $withPrimary = false ):array<int>
+    {
+        $columns = $this->columnBuilder
+            ->withVariationBase([
+                VariationBaseFields::ID
+            ])
+            ->build();
+
+        // filter current item by item id
+        $filter = $this->filterBuilder
+            ->hasId( [$itemId] );
+
+        if( !$withPrimary )
+        {
+            $filter->variationIsChild();
+        }
+
+        $filter = $filter->build();
+
+        // set params
+        // TODO: make current language global
+        $params = $this->paramsBuilder
+            ->withParam( ItemColumnsParams::LANGUAGE, Language::DE )
+            ->withParam( ItemColumnsParams::PLENTY_ID, $this->app->getPlentyId() )
+            ->build();
+
+        $variations = $this->itemRepository->search(
+            $columns,
+            $filter,
+            $params
+        );
+
+        $variationIds = [];
+
+        foreach( $variations as $variation )
+        {
+            array_push( $variationIds, $variation->variationBase->id );
+        }
+        return $variationIds;
+    }
+
     public function getItemForCategory( int $catID, int $variationShowType = 1 ):PaginatedResult
     {
         $limit = $this->request->get('limit', 20);
@@ -200,7 +241,7 @@ class ItemService
         return $this->itemRepository->searchWithPagination( $columns, $filter, $params );
     }
 
-    public function getItemVariationAttributes(int $itemId = 0):array<string, mixed>
+    public function getVariationAttributeMap(int $itemId = 0):array<int, mixed>
     {
         $columns = $this->columnBuilder
             ->withVariationBase(array(
@@ -215,7 +256,50 @@ class ItemService
                 VariationAttributeValueFields::ATTRIBUTE_VALUE_ID
             ))->build();
 
-        $filter = $this->filterBuilder->hasId(array($itemId))->build();
+        $filter = $this->filterBuilder
+            ->hasId(array($itemId))
+            ->variationIsChild()
+            ->build();
+
+        $params = $this->paramsBuilder
+            ->withParam( ItemColumnsParams::LANGUAGE, Language::DE )
+            ->withParam( ItemColumnsParams::PLENTY_ID, $this->app->getPlentyId() )
+            ->build();
+
+        $recordList = $this->itemRepository->search( $columns, $filter, $params );
+
+        $variations = [];
+        foreach($recordList as $variation)
+        {
+            $data = [
+                "variationId" => $variation->variationBase->id,
+                "attributes" => $variation->variationAttributeValueList
+            ];
+            array_push( $variations, $data );
+        }
+
+        return $variations;
+    }
+
+    public function getAttributeNameMap(int $itemId = 0):array<int, mixed>
+    {
+        $columns = $this->columnBuilder
+            ->withVariationBase(array(
+                VariationBaseFields::ID,
+                VariationBaseFields::ITEM_ID,
+                VariationBaseFields::AVAILABILITY,
+                VariationBaseFields::PACKING_UNITS,
+                VariationBaseFields::CUSTOM_NUMBER
+            ))
+            ->withVariationAttributeValueList(array(
+                VariationAttributeValueFields::ATTRIBUTE_ID,
+                VariationAttributeValueFields::ATTRIBUTE_VALUE_ID
+            ))->build();
+
+        $filter = $this->filterBuilder
+            ->hasId(array($itemId))
+            ->variationIsChild()
+            ->build();
 
         $params = $this->paramsBuilder
             ->withParam( ItemColumnsParams::LANGUAGE, Language::DE )
@@ -225,31 +309,20 @@ class ItemService
         $recordList = $this->itemRepository->search( $columns, $filter, $params );
 
         $attributeList = [];
-        $attributeList['selectionValues'] = [];
-        $attributeList['variations'] = [];
-        $attributeList['attributeNames'] = [];
-
-        $foo = 1;
-
         foreach($recordList as $variation)
         {
             foreach($variation->variationAttributeValueList as $attribute)
             {
-
-
                 $attributeId = $attribute->attributeId;
                 $attributeValueId = $attribute->attributeValueId;
 
-                $attributeList['attributeNames'][$attributeId] = $this->getAttributeName($attributeId);
+                $attributeList[$attributeId]["name"] = $this->getAttributeName($attributeId);
 
-                if(!in_array($attributeValueId, $attributeList['selectionValues'][$attributeId]))
+                if(!in_array($attributeValueId, $attributeList[$attributeId]["values"]))
                 {
-                    $attributeList['selectionValues'][$attributeId][$attributeValueId] = $this->getAttributeValueName($attributeValueId);
+                    $attributeList[$attributeId]["values"][$attributeValueId] = $this->getAttributeValueName($attributeValueId);
                 }
             }
-
-            $variationId = $variation->variationBase->id;
-            $attributeList['variations'][$variationId] = $variation->variationAttributeValueList;
         }
 
         return $attributeList;
@@ -322,12 +395,19 @@ class ItemService
                 ->withParam( ItemColumnsParams::PLENTY_ID, $this->app->getPlentyId() )
                 ->build();
 
-            $currentItem = $this->itemRepository->search( $columns, $filter, $params )->current();
+            $records = $this->itemRepository->search( $columns, $filter, $params );
 
-            foreach($currentItem->itemCrossSellingList as $crossSellingItem)
+            if( $records->count() > 0 )
             {
-                $crossSellingItems[] = $crossSellingItem;
+                $currentItem = $records->current();
+
+                foreach($currentItem->itemCrossSellingList as $crossSellingItem)
+                {
+                    $crossSellingItems[] = $crossSellingItem;
+                }
             }
+
+
         }
 
         return $crossSellingItems;

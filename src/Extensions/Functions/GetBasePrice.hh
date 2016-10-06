@@ -42,14 +42,21 @@ class GetBasePrice extends AbstractFunction
     public function getFunctions():array<string, string>
     {
         return [
-            "getBasePrice" => "getBasePrice"
+            "getBasePrice" => "getBasePrice",
+            "getBasePriceList" => "getBasePriceList"
         ];
     }
 
     public function getBasePrice( int $variationId ):array<string, mixed>
     {
+        return $this->getBasePriceList( [$variationId] )[$variationId];
+    }
+
+    public function getBasePriceList( array<int> $variationIds ):array<int, array<string, mixed>>
+    {
         $columns = $this->columnBuilder
             ->withVariationBase([
+                VariationBaseFields::ID,
                 VariationBaseFields::CONTENT,
                 VariationBaseFields::UNIT_ID
             ])
@@ -59,7 +66,7 @@ class GetBasePrice extends AbstractFunction
             ->build();
 
         $filter = $this->filterBuilder
-            ->variationHasId( [$variationId] )
+            ->variationHasId( $variationIds )
             ->build();
 
         // set params
@@ -69,64 +76,70 @@ class GetBasePrice extends AbstractFunction
             ->withParam( ItemColumnsParams::PLENTY_ID, $this->app->getPlentyId() )
             ->build();
 
-        $variation = $this->itemRepository->search(
+        $variations = $this->itemRepository->search(
             $columns,
             $filter,
             $params
-        )->current();
+        );
 
-        $price = $variation->variationRetailPrice->price;
-        $lot = (int) $variation->variationBase->content;
-        $unit = $variation->variationBase->unitId;
-
-        $bp_lot = 1;
-        $bp_unit = $unit;
-        $factor = 1.0;
-
-        if( (float) $lot <= 0 )
+        $basePriceList = array();
+        foreach( $variations as $variation )
         {
-            $lot = 1;
+            $price = $variation->variationRetailPrice->price;
+            $lot = (int) $variation->variationBase->content;
+            $unit = $variation->variationBase->unitId;
+
+            $bp_lot = 1;
+            $bp_unit = $unit;
+            $factor = 1.0;
+
+            if( (float) $lot <= 0 )
+            {
+                $lot = 1;
+            }
+
+            if( $unit == 'LTR' || $unit == 'KGM' )
+        		{
+        			$bp_lot = 1;
+        		}
+        		elseif( $unit == 'GRM' || $unit == 'MLT' )
+        		{
+        			if( $lot <= 250 )
+        			{
+        				$bp_lot = 100;
+        			}
+        			else
+        			{
+        				$factor = 1000.0;
+        				$bp_lot = 1;
+        				$bp_unit = $unit == 'GRM' ? 'KGM' : 'LTR';
+        			}
+          		}
+          		elseif( $unit == 'CMK' )
+          		{
+          			if( $lot <= 2500 )
+          			{
+          				$bp_lot = 10000;
+          			}
+          			else
+          			{
+          				$factor = 10000.0;
+          				$bp_lot = 1;
+          				$bp_unit = 'MTK';
+          			}
+          		}
+          		else
+                  {
+          			$bp_lot = 1;
+          		}
+
+            $basePriceList[$variation->variationBase->id] = [
+                "lot" => $bp_lot,
+                "price" => $price * $factor * ($bp_lot/$lot),
+                "unit" => $bp_unit
+            ];
         }
 
-        if( $unit == 'LTR' || $unit == 'KGM' )
-    		{
-    			$bp_lot = 1;
-    		}
-    		elseif( $unit == 'GRM' || $unit == 'MLT' )
-    		{
-    			if( $lot <= 250 )
-    			{
-    				$bp_lot = 100;
-    			}
-    			else
-    			{
-    				$factor = 1000.0;
-    				$bp_lot = 1;
-    				$bp_unit = $unit == 'GRM' ? 'KGM' : 'LTR';
-    			}
-      		}
-      		elseif( $unit == 'CMK' )
-      		{
-      			if( $lot <= 2500 )
-      			{
-      				$bp_lot = 10000;
-      			}
-      			else
-      			{
-      				$factor = 10000.0;
-      				$bp_lot = 1;
-      				$bp_unit = 'MTK';
-      			}
-      		}
-      		else
-              {
-      			$bp_lot = 1;
-      		}
-
-        return [
-            "lot" => $bp_lot,
-            "price" => $price * $factor * ($bp_lot/$lot),
-            "unit" => $bp_unit
-        ];
+        return $basePriceList;
     }
 }

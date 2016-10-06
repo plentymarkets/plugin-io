@@ -18,4 +18,14 @@ class AvailabilityService
     {
         return $this->availabilityRepository->findAvailability($availabilityId);
     }
+
+    public function getAvailabilities():array<Availability>
+    {
+        $availabilities = array();
+        for( $i = 1; $i <= 10; $i++ )
+        {
+            array_push( $availabilities, $this->getAvailabilityById( $i ) );
+        }
+        return $availabilities;
+    }
 }
