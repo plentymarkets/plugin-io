@@ -6,7 +6,7 @@ use Plenty\Plugin\Application;
 use Plenty\Plugin\Controller;
 use Plenty\Plugin\Templates\Twig;
 use Plenty\Plugin\Events\Dispatcher;
-use Plenty\Modules\Category\Contracts\CategoryRepository;
+use Plenty\Modules\Category\Contracts\CategoryRepositoryContract;
 use Plenty\Modules\Category\Models\Category;
 
 use LayoutCore\Helper\TemplateContainer;
@@ -27,7 +27,7 @@ class LayoutController extends Controller {
     protected Application $app;
     private Twig $twig;
     private Dispatcher $event;
-    protected CategoryRepository $categoryRepo;
+    protected CategoryRepositoryContract $categoryRepo;
     private TemplateContainer $templateContainer;
     protected CategoryMap $categoryMap;
 
@@ -36,7 +36,7 @@ class LayoutController extends Controller {
 
     private bool $debug = true;
 
-    public function __construct( Application $app, Twig $twig, Dispatcher $event, TemplateContainer $templateContainer, CategoryRepository $categoryRepo, CategoryMap $categoryMap, CategoryService $categoryService )
+    public function __construct( Application $app, Twig $twig, Dispatcher $event, TemplateContainer $templateContainer, CategoryRepositoryContract $categoryRepo, CategoryMap $categoryMap, CategoryService $categoryService )
     {
         $this->app = $app;
         $this->twig = $twig;
