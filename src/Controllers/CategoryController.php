@@ -1,7 +1,7 @@
 <?php //strict
 namespace LayoutCore\Controllers;
 
-use Plenty\Modules\Category\Contracts\CategoryRepository;
+use Plenty\Modules\Category\Contracts\CategoryRepositoryContract;
 use Plenty\Modules\Item\DataLayer\Contracts\ItemDataLayerRepositoryContract;
 use Plenty\Modules\Category\Models\Category;
 
@@ -16,7 +16,6 @@ class CategoryController extends LayoutController
 
 	/**
 	 * Prepare and render the data for categories
-	 * @param CategoryRepository $category Repository to receive category data from
 	 * @param string $lvl1 Level 1 of category url. Will be null at root page
 	 * @param string $lvl2 Level 2 of category url.
 	 * @param string $lvl3 Level 3 of category url.

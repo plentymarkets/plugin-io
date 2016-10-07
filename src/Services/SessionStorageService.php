@@ -46,7 +46,7 @@ class SessionStorageService
 
     /**
      * Get the language from session
-     * @return string
+     * @return string|null
      */
 	public function getLang():string
 	{

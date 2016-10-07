@@ -2,11 +2,11 @@
 
 namespace LayoutCore\Controllers;
 
+use Plenty\Modules\Category\Contracts\CategoryRepositoryContract;
 use Plenty\Plugin\Application;
 use Plenty\Plugin\Controller;
 use Plenty\Plugin\Templates\Twig;
 use Plenty\Plugin\Events\Dispatcher;
-use Plenty\Modules\Category\Contracts\CategoryRepository;
 use Plenty\Modules\Category\Models\Category;
 
 use LayoutCore\Helper\TemplateContainer;
@@ -40,6 +40,9 @@ class LayoutController extends Controller
 	 */
 	private $event;
 
+	/**
+	 * @var CategoryRepositoryContract
+	 */
 	protected $categoryRepo;
 	/**
 	 * @var TemplateContainer
@@ -62,11 +65,11 @@ class LayoutController extends Controller
      * @param Twig $twig
      * @param Dispatcher $event
      * @param TemplateContainer $templateContainer
-     * @param CategoryRepository $categoryRepo
+     * @param CategoryRepositoryContract $categoryRepo
      * @param CategoryMap $categoryMap
      * @param CategoryService $categoryService
      */
-	public function __construct(Application $app, Twig $twig, Dispatcher $event, TemplateContainer $templateContainer, CategoryRepository $categoryRepo, CategoryMap $categoryMap, CategoryService $categoryService)
+	public function __construct(Application $app, Twig $twig, Dispatcher $event, TemplateContainer $templateContainer, CategoryRepositoryContract $categoryRepo, CategoryMap $categoryMap, CategoryService $categoryService)
 	{
 		$this->app               = $app;
 		$this->twig              = $twig;

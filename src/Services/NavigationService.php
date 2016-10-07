@@ -2,7 +2,7 @@
 
 namespace LayoutCore\Services;
 
-use Plenty\Modules\Category\Contracts\CategoryRepository;
+use Plenty\Modules\Category\Contracts\CategoryRepositoryContract;
 use Plenty\Modules\Category\Models\Category;
 
 use LayoutCore\Constants\CategoryType;
@@ -16,15 +16,15 @@ class NavigationService
 {
 
 	/**
-	 * @var CategoryRepository
+	 * @var CategoryRepositoryContract
 	 */
 	private $categoryRepository;
 
     /**
      * NavigationService constructor.
-     * @param CategoryRepository $categoryRepository
+     * @param CategoryRepositoryContract $categoryRepository
      */
-	public function __construct(CategoryRepository $categoryRepository)
+	public function __construct(CategoryRepositoryContract $categoryRepository)
 	{
 		$this->categoryRepository = $categoryRepository;
 	}
