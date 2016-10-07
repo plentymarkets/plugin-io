@@ -48,7 +48,7 @@ class SessionStorageService
      * Get the language from session
      * @return string|null
      */
-	public function getLang():string
+	public function getLang()
 	{
 		return $this->sessionStorage->getLocaleSettings()->language;
 	}

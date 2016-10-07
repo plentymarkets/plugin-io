@@ -44,12 +44,8 @@ class CategoryController extends LayoutController
 		{
 			$currentCategory = $this->categoryRepo->findCategoryByUrl($lvl1, $lvl2, $lvl3, $lvl4, $lvl5, $lvl6);
 		}
-
-		if($currentCategory instanceof Category)
-		{
-			return $this->renderCategory($currentCategory);
-		}
-		return '';
+        
+        return $this->renderCategory($currentCategory);
 	}
 
 }
