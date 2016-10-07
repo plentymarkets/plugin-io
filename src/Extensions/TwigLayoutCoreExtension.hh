@@ -7,6 +7,8 @@ use Plenty\Plugin\Templates\Extensions\Twig_SimpleFunction;
 use Plenty\Plugin\Templates\Extensions\Twig_SimpleFilter;
 use Plenty\Plugin\Templates\Factories\TwigFactory;
 
+use Plenty\Plugin\Http\Request;
+
 use LayoutCore\Extensions\AbstractFilter;
 use LayoutCore\Extensions\AbstractFunction;
 use LayoutCore\Extensions\Filters\PatternFilter;
@@ -23,9 +25,11 @@ use LayoutCore\Extensions\Functions\Component;
 class TwigLayoutCoreExtension extends Twig_Extension
 {
     private TwigFactory $twig;
+    private Request $request;
 
     public function __construct(
         TwigFactory $twig,
+        Request $request,
         PatternFilter $patternFilter,
         NumberFormatFilter $numberFormatFilter,
         URLFilter $urlFilter,
@@ -35,6 +39,7 @@ class TwigLayoutCoreExtension extends Twig_Extension
     )
     {
         $this->twig = $twig;
+        $this->request = $request;
     }
 
     /**
@@ -87,5 +92,12 @@ class TwigLayoutCoreExtension extends Twig_Extension
             }
         }
         return $functions;
+    }
+
+    public function getGlobals():array<string, mixed>
+    {
+        return [
+            "request" => $this->request
+        ];
     }
 }
