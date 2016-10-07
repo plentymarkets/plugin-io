@@ -3,7 +3,7 @@
 namespace LayoutCore\Services;
 
 use Plenty\Modules\Category\Models\Category;
-use Plenty\Modules\Category\Contracts\CategoryRepository;
+use Plenty\Modules\Category\Contracts\CategoryRepositoryContract;
 use Plenty\Modules\Item\DataLayer\Models\RecordList;
 use Plenty\Repositories\Models\PaginatedResult;
 
@@ -14,7 +14,7 @@ use LayoutCore\Helper\CategoryKey;
 
 class CategoryService
 {
-    private CategoryRepository $category;
+    private CategoryRepositoryContract $category;
     private ItemService $item;
     private CategoryMap $categoryMap;
 
@@ -22,7 +22,7 @@ class CategoryService
     private ?Category $currentCategory = null;
     private array<int, Category> $currentCategoryTree = array();
 
-    public function __construct( CategoryRepository $category, ItemService $item, CategoryMap $categoryMap )
+    public function __construct( CategoryRepositoryContract $category, ItemService $item, CategoryMap $categoryMap )
     {
         $this->category = $category;
         $this->item = $item;
