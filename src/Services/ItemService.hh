@@ -20,6 +20,7 @@ use LayoutCore\Builder\Item\Fields\ItemBaseFields;
 use LayoutCore\Builder\Item\Fields\VariationStandardCategoryFields;
 use LayoutCore\Builder\Item\Fields\VariationAttributeValueFields;
 use LayoutCore\Builder\Item\Fields\ItemCrossSellingFields;
+use LayoutCore\Builder\Category\CategoryParams;
 use LayoutCore\Constants\Language;
 use Plenty\Plugin\Http\Request;
 use Plenty\Repositories\Models\PaginatedResult;
@@ -161,78 +162,34 @@ class ItemService
         return $variationIds;
     }
 
-    public function getItemForCategory( int $catID, int $variationShowType = 1 ):PaginatedResult
+    public function getItemForCategory( int $catID, CategoryParams $params, int $page = 1 ):PaginatedResult
     {
-        $limit = $this->request->get('limit', 20);
-        $offset = $this->request->get('offset', 0);
-        $currentPage = $this->request->get('page', 0);
-        $itemsPerPage = $this->request->get('items_per_page');
-        $orderBy = $this->request->get('itemSorting');
-
-        if (NULL == $itemsPerPage)
-        {
-            $itemsPerPage = $this->config->get('PluginLayoutCore.sort.defaultItemsPerPage');
-        }
-
-        if((int)$currentPage > 0)
-        {
-            $limit = $itemsPerPage;
-            $offset = ((int)$currentPage * (int)$itemsPerPage) - (int)$itemsPerPage;
-        }
-
         $columns = $this->columnBuilder
             ->defaults()
             ->build();
 
-        if($variationShowType == 2)
+        if( $params->variationShowType == 2 )
         {
-            $filter = $this->filterBuilder#
-                ->variationHasCategory( $catID )
-                ->variationIsPrimary()
-                ->build();
-        }
-        elseif($variationShowType == 3)
-        {
-            $filter = $this->filterBuilder#
-                ->variationHasCategory( $catID )
-                ->variationIsChild()
-                ->build();
-        }
-        else
-        {
-            $filter = $this->filterBuilder#
-                ->variationHasCategory( $catID )
-                ->build();
+            $this->filterBuilder->variationIsPrimary();
         }
 
-        /*$filter = $this->filterBuilder
+        if( $params->variationShowType == 3 )
+        {
+            $this->filterBuilder->variationIsChild();
+        }
+
+        $filter = $this->filterBuilder
             ->variationHasCategory( $catID )
-            ->build();*/
+            ->build();
 
-        if (NULL != $orderBy)
+        if( $params->orderBy != null && strlen( $params->orderBy ) > 0 )
         {
-            list($key, $sorting) = explode("_", (string) $orderBy);
-            if (NULL != $key && NULL != $sorting)
-            {
-                $params = $this->paramsBuilder->withParam( ItemColumnsParams::ORDER_BY, array("orderBy." . $key => strtoupper($sorting)));
-            }
-            elseif ("itemRand" == $key)
-            {
-                $params = $this->paramsBuilder->withParam( ItemColumnsParams::ORDER_BY, array("orderBy.itemRand" => "ASC"));
-            }
-        }
-        else
-        {
-            $defaultSorting = $this->config->get('PluginLayoutCore.sort.defaultSorting');
-            list($key, $sorting) = explode("_", (string) $defaultSorting);
-            if (NULL != $key && NULL != $sorting)
-            {
-                $params = $this->paramsBuilder->withParam( ItemColumnsParams::ORDER_BY, array("orderBy." . $key => strtoupper($sorting)));
-            }
+            $this->paramsBuilder->withParam( ItemColumnsParams::ORDER_BY, ["orderBy." . $params->orderBy => $params->orderByKey]);
         }
 
+        $offset = ( $page - 1 ) * $params->itemsPerPage;
         $params = $this->paramsBuilder
-            ->withParam( ItemColumnsParams::LIMIT, $limit )
+            ->withParam( ItemColumnsParams::LIMIT, $params->itemsPerPage )
             ->withParam( ItemColumnsParams::OFFSET, $offset )
             ->withParam( ItemColumnsParams::LANGUAGE, Language::DE )
             ->withParam( ItemColumnsParams::PLENTY_ID, $this->app->getPlentyId() )

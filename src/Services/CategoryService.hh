@@ -11,22 +11,25 @@ use LayoutCore\Constants\CategoryType;
 use LayoutCore\Services\ItemService;
 use LayoutCore\Helper\CategoryMap;
 use LayoutCore\Helper\CategoryKey;
+use LayoutCore\Builder\Category\CategoryParamsBuilder;
 
 class CategoryService
 {
     private CategoryRepositoryContract $category;
     private ItemService $item;
     private CategoryMap $categoryMap;
+    private CategoryParamsBuilder $categoryParamsBuilder;
 
     // is set from controllers
     private ?Category $currentCategory = null;
     private array<int, Category> $currentCategoryTree = array();
 
-    public function __construct( CategoryRepositoryContract $category, ItemService $item, CategoryMap $categoryMap )
+    public function __construct( CategoryRepositoryContract $category, ItemService $item, CategoryMap $categoryMap, CategoryParamsBuilder $categoryParamsBuilder )
     {
         $this->category = $category;
         $this->item = $item;
         $this->categoryMap = $categoryMap;
+        $this->categoryParamsBuilder = $categoryParamsBuilder;
     }
 
     /**
@@ -142,13 +145,14 @@ class CategoryService
         return $this->currentCategory !== null && $this->currentCategory->id == $this->categoryMap->getID( CategoryKey::HOME );
     }
 
-    public function getItems( ?Category $category = $this->currentCategory, int $variationShowType = 1 ):?PaginatedResult
+    public function getItems( ?Category $category = $this->currentCategory, array<string, mixed> $params = [], int $page = 1 ):?PaginatedResult
     {
-        if( $category == null )
+        if( $category == null || $params == null )
         {
             return null;
         }
-        return $this->item->getItemForCategory( $category->id, $variationShowType );
+
+        return $this->item->getItemForCategory( $category->id, $this->categoryParamsBuilder->fromArray($params), $page );
     }
 
     public function getCategoryTreeAsList( ?int $catID ): array<string, string>
