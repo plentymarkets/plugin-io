@@ -30,8 +30,22 @@ class AvailabilityService
      * @param int $availabilityId
      * @return Availability
      */
-	public function getAvailabilityById(int $availabilityId = 0) : Availability
-	{
-		return $this->availabilityRepository->findAvailability($availabilityId);
-	}
+	public function getAvailabilityById( int $availabilityId = 0 ):Availability
+    {
+        return $this->availabilityRepository->findAvailability( $availabilityId );
+    }
+
+    /**
+     *
+     * @return array
+     */
+    public function getAvailabilities():array
+    {
+        $availabilities = array();
+        for( $i = 1; $i <= 10; $i++ )
+        {
+            array_push( $availabilities, $this->getAvailabilityById( $i ) );
+        }
+        return $availabilities;
+    }
 }

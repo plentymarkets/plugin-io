@@ -11,6 +11,7 @@ use LayoutCore\Constants\CategoryType;
 use LayoutCore\Services\ItemService;
 use LayoutCore\Helper\CategoryMap;
 use LayoutCore\Helper\CategoryKey;
+use LayoutCore\Builder\Category\CategoryParamsBuilder;
 
 /**
  * Class CategoryService
@@ -32,6 +33,11 @@ class CategoryService
 	 */
 	private $categoryMap;
 
+    /**
+     * @var CategoryParamsBuilder
+     */
+    private $categoryParamsBuilder;
+
 	// is set from controllers
 	/**
 	 * @var Category
@@ -48,11 +54,12 @@ class CategoryService
      * @param \LayoutCore\Services\ItemService $item
      * @param CategoryMap $categoryMap
      */
-	public function __construct(CategoryRepositoryContract $category, ItemService $item, CategoryMap $categoryMap)
+	public function __construct(CategoryRepositoryContract $category, ItemService $item, CategoryMap $categoryMap, CategoryParamsBuilder $categoryParamsBuilder )
 	{
 		$this->category    = $category;
 		$this->item        = $item;
 		$this->categoryMap = $categoryMap;
+        $this->categoryParamsBuilder = $categoryParamsBuilder;
 	}
 
 	/**
@@ -179,20 +186,25 @@ class CategoryService
 	}
 
     /**
-     * List the items of the specified category
-     * @param null $category
-     * @param int $defaultItemPerPage
-     * @param int $variationShowType
+     * @param Category $category
+     * @param array $params
+     * @param int $page
      * @return null|PaginatedResult
      */
-	public function getItems($category = null, int $defaultItemPerPage = 0, int $variationShowType = 1)
-	{
-		if(!$category instanceof Category)
-		{
-			return null;
-		}
-		return $this->item->getItemForCategory($category->id, $variationShowType);
-	}
+    public function getItems( $category = null, array $params = [], int $page = 1 )
+    {
+        if( $category == null )
+        {
+            $category = $this->currentCategory;
+        }
+
+        if( $category == null || $params == null )
+        {
+            return null;
+        }
+
+        return $this->item->getItemForCategory( $category->id, $this->categoryParamsBuilder->fromArray($params), $page );
+    }
 
     /**
      * Get the category tree as a list

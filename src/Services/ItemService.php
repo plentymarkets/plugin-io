@@ -23,6 +23,9 @@ use LayoutCore\Builder\Item\Fields\ItemCrossSellingFields;
 use LayoutCore\Constants\Language;
 use Plenty\Plugin\Http\Request;
 use Plenty\Repositories\Models\PaginatedResult;
+use LayoutCore\Builder\Category\CategoryParams;
+
+
 
 /**
  * Class ItemService
@@ -174,65 +177,49 @@ class ItemService
 		);
 	}
 
+
     /**
-     * Get a list of items for the specified category ID
+     * Get all items for a specific category
      * @param int $catID
-     * @param int $variationShowType
+     * @param CategoryParams $params
+     * @param int $page
      * @return PaginatedResult
      */
-	public function getItemForCategory(int $catID, int $variationShowType = 1):PaginatedResult
-	{
-		$limit        = $this->request->get('limit', 20);
-		$offset       = $this->request->get('offset', 0);
-		$currentPage  = $this->request->get('page', 0);
-		$itemsPerPage = $this->request->get('items_per_page', 20);
+    public function getItemForCategory( int $catID, CategoryParams $params, int $page = 1 )
+    {
+        $columns = $this->columnBuilder
+            ->defaults()
+            ->build();
 
-		if((int)$currentPage > 0)
-		{
-			$limit  = $itemsPerPage;
-			$offset = ((int)$currentPage * (int)$itemsPerPage) - (int)$itemsPerPage;
-		}
+        if( $params->variationShowType == 2 )
+        {
+            $this->filterBuilder->variationIsPrimary();
+        }
 
-		$columns = $this->columnBuilder
-			->defaults()
-			->build();
+        if( $params->variationShowType == 3 )
+        {
+            $this->filterBuilder->variationIsChild();
+        }
 
+        $filter = $this->filterBuilder
+            ->variationHasCategory( $catID )
+            ->build();
 
-		if($variationShowType == 2)
-		{
-			$filter = $this->filterBuilder#
-			->variationHasCategory($catID)
-			->variationIsPrimary()
-			->build();
-		}
-		elseif($variationShowType == 3)
-		{
-			$filter = $this->filterBuilder#
-			->variationHasCategory($catID)
-			->variationIsChild()
-			->build();
-		}
-		else
-		{
-			$filter = $this->filterBuilder#
-			->variationHasCategory($catID)
-			->build();
-		}
+        if( $params->orderBy != null && strlen( $params->orderBy ) > 0 )
+        {
+            $this->paramsBuilder->withParam( ItemColumnsParams::ORDER_BY, ["orderBy." . $params->orderBy => $params->orderByKey]);
+        }
 
-		/*$filter = $this->filterBuilder
-			->variationHasCategory( $catID )
-			->build();*/
+        $offset = ( $page - 1 ) * $params->itemsPerPage;
+        $params = $this->paramsBuilder
+            ->withParam( ItemColumnsParams::LIMIT, $params->itemsPerPage )
+            ->withParam( ItemColumnsParams::OFFSET, $offset )
+            ->withParam( ItemColumnsParams::LANGUAGE, Language::DE )
+            ->withParam( ItemColumnsParams::PLENTY_ID, $this->app->getPlentyId() )
+            ->build();
 
-		$params = $this->paramsBuilder
-			->withParam(ItemColumnsParams::ORDER_BY, ['orderBy.itemPrice', 'ASC'])
-			->withParam(ItemColumnsParams::LIMIT, $limit)
-			->withParam(ItemColumnsParams::OFFSET, $offset)
-			->withParam(ItemColumnsParams::LANGUAGE, Language::DE)
-			->withParam(ItemColumnsParams::PLENTY_ID, $this->app->getPlentyId())
-			->build();
-
-		return $this->itemRepository->searchWithPagination($columns, $filter, $params);
-	}
+        return $this->itemRepository->searchWithPagination( $columns, $filter, $params );
+    }
 
     /**
      * List the attributes of an item variation
