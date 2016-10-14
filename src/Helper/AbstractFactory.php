@@ -10,10 +10,15 @@ use Plenty\Plugin\Application;
  */
 class AbstractFactory
 {
-	/**
-	 * @var Application
-	 */
-	private $app;
+    /**
+     * @var Application
+     */
+    private $app;
+
+    /**
+     * @var Application
+     */
+    public static $application;
 
     /**
      * AbstractFactory constructor.
@@ -39,4 +44,14 @@ class AbstractFactory
 		}
 		return $instance;
 	}
+
+	public static function create( string $className )
+    {
+        $instance = self::$application->make($className);
+        if(!$instance instanceof $className)
+        {
+            throw new \Exception("Cannot create instance of class: " . $className);
+        }
+        return $instance;
+    }
 }

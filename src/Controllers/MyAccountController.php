@@ -1,7 +1,10 @@
 <?php //strict
 namespace LayoutCore\Controllers;
 
+use LayoutCore\Guards\AuthGuard;
 use LayoutCore\Helper\TemplateContainer;
+use LayoutCore\Helper\UserSession;
+use LayoutCore\Helper\RouteGuard;
 
 /**
  * Class MyAccountController
@@ -15,6 +18,8 @@ class MyAccountController extends LayoutController
      */
 	public function showMyAccount(): string
 	{
+        AuthGuard::assertOrRedirect( true, "/login" );
+
 		return $this->renderTemplate(
 			"tpl.my-account",
 			[

@@ -2,6 +2,7 @@
 
 namespace LayoutCore\Extensions;
 
+use LayoutCore\Guards\AbstractGuard;
 use Plenty\Plugin\Templates\Extensions\Twig_Extension;
 use Plenty\Plugin\Templates\Extensions\Twig_SimpleFunction;
 use Plenty\Plugin\Templates\Extensions\Twig_SimpleFilter;
@@ -109,7 +110,8 @@ class TwigLayoutCoreExtension extends Twig_Extension
     public function getGlobals():array
     {
         return [
-            "request" => $this->request
+            "request" => $this->request,
+            "backlinkURL" => AbstractGuard::getBacklinkUrl()
         ];
     }
 }
