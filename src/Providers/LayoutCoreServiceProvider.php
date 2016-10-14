@@ -22,7 +22,6 @@ class LayoutCoreServiceProvider extends ServiceProvider
 	public function register()
 	{
         AbstractFactory::$application = $this->getApplication();
-        $d = AbstractGuard::getBacklinkUrl();
 
 		$this->getApplication()->register(LayoutCoreRouteServiceProvider::class);
 

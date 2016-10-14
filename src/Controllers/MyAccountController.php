@@ -2,9 +2,6 @@
 namespace LayoutCore\Controllers;
 
 use LayoutCore\Guards\AuthGuard;
-use LayoutCore\Helper\TemplateContainer;
-use LayoutCore\Helper\UserSession;
-use LayoutCore\Helper\RouteGuard;
 
 /**
  * Class MyAccountController
@@ -16,9 +13,9 @@ class MyAccountController extends LayoutController
      * Prepare and render the data for the my account page
      * @return string
      */
-	public function showMyAccount(): string
+	public function showMyAccount( AuthGuard $guard ): string
 	{
-        AuthGuard::assertOrRedirect( true, "/login" );
+        $guard->assertOrRedirect( true, "/login" );
 
 		return $this->renderTemplate(
 			"tpl.my-account",

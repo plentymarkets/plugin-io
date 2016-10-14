@@ -11,44 +11,45 @@ abstract class AbstractGuard
      */
     protected abstract function assert();
 
-    public static function assertOrRedirect( $expected, string $redirectUrl )
+    public function assertOrRedirect( $expected, string $redirectUrl )
     {
-        $guard = AbstractFactory::create(get_called_class());
-        if ( $guard->assert() !== $expected )
+        if ( $this->assert() !== $expected )
         {
-            $session = AbstractFactory::create(\Plenty\Modules\Frontend\Session\Storage\Contracts\FrontendSessionStorageFactoryContract::class);
-            $session->getPlugin()->setValue( "BACKLINK_URL", self::getUrl() );
-
-            self::redirect( $redirectUrl );
+            self::redirect( $redirectUrl, ["backlink" => self::getUrl()] );
         }
     }
 
-    public static function redirect( string $uri )
+    public static function redirect( string $uri, array $params = [] )
     {
         $url = self::getUrl( $uri );
-        header( 'Location: ' . $url );
+
+        $queryParams = [];
+        foreach( $params as $key => $value )
+        {
+            $param = rawurlencode( $key ) . "=" . rawurlencode( $value );
+            array_push( $queryParams, $param );
+        }
+
+        $query = "";
+        if( count( $queryParams ) > 0 )
+        {
+            $query = "?" . implode("&", $queryParams);
+        }
+
+        header( 'Location: ' . $url . $query );
         exit;
-    }
-
-    public static function getBacklinkUrl()
-    {
-        $session = AbstractFactory::create(\Plenty\Modules\Frontend\Session\Storage\Contracts\FrontendSessionStorageFactoryContract::class);
-        $url = $session->getPlugin()->getValue( "BACKLINK_URL" );
-
-        return $url;
     }
 
     private static function getUrl( string $uri = null )
     {
         if( $uri === null )
         {
-            $_SERVER['REQUEST_URI'];
+            $uri = $_SERVER['REQUEST_URI'];
         }
 
         $protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off' ? 'https' : 'http';
-        $separator = substr( $uri, -1 ) == '/' ? '' : '/';
 
-        return $protocol . "://" . $_SERVER['SERVER_NAME'] . $separator . $uri;
+        return $protocol . "://" . $_SERVER['SERVER_NAME'] . $uri;
     }
 
 

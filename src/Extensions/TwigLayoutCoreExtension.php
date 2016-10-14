@@ -110,8 +110,7 @@ class TwigLayoutCoreExtension extends Twig_Extension
     public function getGlobals():array
     {
         return [
-            "request" => $this->request,
-            "backlinkURL" => AbstractGuard::getBacklinkUrl()
+            "request" => $this->request
         ];
     }
 }
