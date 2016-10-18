@@ -93,94 +93,102 @@ class GetBasePrice extends AbstractFunction
      * @param array $variationIds
      * @return array
      */
-    public function getBasePriceList( array $variationIds ):array
+    public function getBasePriceList( $variationIds ):array
     {
-        $columns = $this->columnBuilder
-            ->withVariationBase([
-                VariationBaseFields::ID,
-                VariationBaseFields::CONTENT,
-                VariationBaseFields::UNIT_ID
-            ])
-            ->withVariationRetailPrice([
-                VariationRetailPriceFields::PRICE
-            ])
-            ->build();
-
-        $filter = $this->filterBuilder
-            ->variationHasId( $variationIds )
-            ->build();
-
-        // set params
-        // TODO: make current language global
-        $params = $this->paramsBuilder
-            ->withParam( ItemColumnsParams::LANGUAGE, Language::DE )
-            ->withParam( ItemColumnsParams::PLENTY_ID, $this->app->getPlentyId() )
-            ->build();
-
-        $variations = $this->itemRepository->search(
-            $columns,
-            $filter,
-            $params
-        );
-
-        $basePriceList = array();
-        foreach( $variations as $variation )
+        $variations = array();
+        if(count($variationIds))
         {
-            $price = $variation->variationRetailPrice->price;
-            $lot = (int) $variation->variationBase->content;
-            $unit = $variation->variationBase->unitId;
-
-            $bp_lot = 1;
-            $bp_unit = $unit;
-            $factor = 1.0;
-
-            if( (float) $lot <= 0 )
-            {
-                $lot = 1;
-            }
-
-            if( $unit == 'LTR' || $unit == 'KGM' )
-            {
-                $bp_lot = 1;
-            }
-            elseif( $unit == 'GRM' || $unit == 'MLT' )
-            {
-                if( $lot <= 250 )
-                {
-                    $bp_lot = 100;
-                }
-                else
-                {
-                    $factor = 1000.0;
-                    $bp_lot = 1;
-                    $bp_unit = $unit == 'GRM' ? 'KGM' : 'LTR';
-                }
-            }
-            elseif( $unit == 'CMK' )
-            {
-                if( $lot <= 2500 )
-                {
-                    $bp_lot = 10000;
-                }
-                else
-                {
-                    $factor = 10000.0;
-                    $bp_lot = 1;
-                    $bp_unit = 'MTK';
-                }
-            }
-            else
-            {
-                $bp_lot = 1;
-            }
-
-            $basePriceList[$variation->variationBase->id] = [
-                "lot" => $bp_lot,
-                "price" => $price * $factor * ($bp_lot/$lot),
-                "unit" => $bp_unit
-            ];
+            $columns = $this->columnBuilder
+                ->withVariationBase([
+                                        VariationBaseFields::ID,
+                                        VariationBaseFields::CONTENT,
+                                        VariationBaseFields::UNIT_ID
+                                    ])
+                ->withVariationRetailPrice([
+                                               VariationRetailPriceFields::PRICE
+                                           ])
+                ->build();
+    
+            $filter = $this->filterBuilder
+                ->variationHasId( $variationIds )
+                ->build();
+    
+            // set params
+            // TODO: make current language global
+            $params = $this->paramsBuilder
+                ->withParam( ItemColumnsParams::LANGUAGE, Language::DE )
+                ->withParam( ItemColumnsParams::PLENTY_ID, $this->app->getPlentyId() )
+                ->build();
+    
+            $variations = $this->itemRepository->search(
+                $columns,
+                $filter,
+                $params
+            );
         }
-
+        
+        $basePriceList = array();
+        
+        if(count($variations))
+        {
+            foreach( $variations as $variation )
+            {
+                $price = $variation->variationRetailPrice->price;
+                $lot = (int) $variation->variationBase->content;
+                $unit = $variation->variationBase->unitId;
+        
+                $bp_lot = 1;
+                $bp_unit = $unit;
+                $factor = 1.0;
+        
+                if( (float) $lot <= 0 )
+                {
+                    $lot = 1;
+                }
+        
+                if( $unit == 'LTR' || $unit == 'KGM' )
+                {
+                    $bp_lot = 1;
+                }
+                elseif( $unit == 'GRM' || $unit == 'MLT' )
+                {
+                    if( $lot <= 250 )
+                    {
+                        $bp_lot = 100;
+                    }
+                    else
+                    {
+                        $factor = 1000.0;
+                        $bp_lot = 1;
+                        $bp_unit = $unit == 'GRM' ? 'KGM' : 'LTR';
+                    }
+                }
+                elseif( $unit == 'CMK' )
+                {
+                    if( $lot <= 2500 )
+                    {
+                        $bp_lot = 10000;
+                    }
+                    else
+                    {
+                        $factor = 10000.0;
+                        $bp_lot = 1;
+                        $bp_unit = 'MTK';
+                    }
+                }
+                else
+                {
+                    $bp_lot = 1;
+                }
+        
+                $basePriceList[$variation->variationBase->id] = [
+                    "lot" => $bp_lot,
+                    "price" => $price * $factor * ($bp_lot/$lot),
+                    "unit" => $bp_unit
+                ];
+            }
+        }
+        
         return $basePriceList;
     }
 }

@@ -176,7 +176,11 @@ class CheckoutService
         }
         return $paymentDataList;
     }
-
+    
+    /**
+     * Get the list of shipping profiles
+     * @return array|\Illuminate\Database\Eloquent\Collection|\Plenty\Modules\Order\Shipping\ParcelService\Models\ParcelServicePreset[]
+     */
     public function getShippingProfileList()
     {
         return $this->parcelServicePresetRepository->getPresetList();
