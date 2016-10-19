@@ -9,6 +9,7 @@ use LayoutCore\Builder\Order\OrderType;
 use LayoutCore\Builder\Order\OrderOptionType;
 use LayoutCore\Builder\Order\OrderOptionSubType;
 use LayoutCore\Builder\Order\AddressType;
+use LayoutCore\Constants\OrderStatusTexts;
 use LayoutCore\Services\BasketService;
 use LayoutCore\Services\CheckoutService;
 use LayoutCore\Services\CustomerService;
@@ -93,4 +94,14 @@ class OrderService
 	{
 		return $this->orderRepository->findOrderById($orderId);
 	}
+    
+    /**
+     * Return order status text by status id
+     * @param $statusId
+     * @return string
+     */
+	public function getOrderStatusText($statusId):string
+    {
+        return OrderStatusTexts::$orderStatusTexts[(string)$statusId];
+    }
 }
