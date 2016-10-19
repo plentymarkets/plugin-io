@@ -2,6 +2,7 @@
 
 namespace LayoutCore\Providers;
 
+use LayoutCore\Guards\AbstractGuard;
 use Plenty\Plugin\RouteServiceProvider;
 use Plenty\Plugin\Routing\Router;
 use Plenty\Plugin\Routing\ApiRouter;

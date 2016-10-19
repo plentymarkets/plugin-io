@@ -2,6 +2,7 @@
 
 namespace LayoutCore\Extensions;
 
+use LayoutCore\Guards\AbstractGuard;
 use Plenty\Plugin\Templates\Extensions\Twig_Extension;
 use Plenty\Plugin\Templates\Extensions\Twig_SimpleFunction;
 use Plenty\Plugin\Templates\Extensions\Twig_SimpleFilter;
