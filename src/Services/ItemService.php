@@ -24,6 +24,7 @@ use LayoutCore\Constants\Language;
 use Plenty\Plugin\Http\Request;
 use Plenty\Repositories\Models\PaginatedResult;
 use LayoutCore\Builder\Category\CategoryParams;
+use LayoutCore\Constants\ItemConditionTexts;
 
 
 
@@ -378,4 +379,9 @@ class ItemService
 
 		return $crossSellingItems;
 	}
+	
+	public function getItemConditionText(int $conditionId):string
+    {
+        return ItemConditionTexts::$itemConditionTexts[(string)$conditionId];
+    }
 }

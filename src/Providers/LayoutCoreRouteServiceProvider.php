@@ -30,6 +30,7 @@ class LayoutCoreRouteServiceProvider extends RouteServiceProvider
 			$api->resource('basket', 'BasketResource');
 			$api->resource('basket/items', 'BasketItemResource');
 			$api->resource('order', 'OrderResource');
+            $api->resource('order/status', 'OrderStatusResource');
 			$api->resource('checkout', 'CheckoutResource');
 			$api->resource('checkout/payment', 'CheckoutPaymentResource');
 			$api->resource('customer', 'CustomerResource');
@@ -37,7 +38,9 @@ class LayoutCoreRouteServiceProvider extends RouteServiceProvider
 			$api->resource('customer/login', 'CustomerAuthenticationResource');
 			$api->resource('customer/logout', 'CustomerLogoutResource');
 			$api->resource('customer/password', 'CustomerPasswordResource');
-            $api->resource( 'variations', 'VariationResource' );
+            $api->resource('variations', 'VariationResource');
+            $api->resource('item/availability', 'AvailabilityResource');
+            $api->resource('item/condition', 'ItemConditionResource');
 		});
 
 		/*
