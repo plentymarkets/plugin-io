@@ -64,7 +64,7 @@ class BasketService
 	{
 		$result = array();
         $basketItems = $this->basketItemRepository->all();
-        $basketItemData = $this->getBasketItemData( [$basketItems] );
+        $basketItemData = $this->getBasketItemData( $basketItems );
         foreach( $basketItems as $basketItem )
         {
             array_push(
