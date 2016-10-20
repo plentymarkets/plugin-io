@@ -23,6 +23,8 @@ class AvailabilityResource extends ApiResource
     
     /**
      * AvailabilityResource constructor.
+     * @param Request $request
+     * @param ApiResponse $response
      * @param AvailabilityService $availabilityService
      */
     public function __construct(Request $request, ApiResponse $response, AvailabilityService $availabilityService)
@@ -42,7 +44,7 @@ class AvailabilityResource extends ApiResource
         
         if((int)$availabilityId > 0)
         {
-            $availability = $this->availabilityService->getAvailabilityById($availabilityId);
+            $availability = $this->availabilityService->getAvailabilityById((int)$availabilityId);
         }
     
         return $this->response->create($availability, ResponseCode::OK);
