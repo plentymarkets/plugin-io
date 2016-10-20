@@ -23,10 +23,9 @@ use LayoutCore\Builder\Item\Fields\ItemCrossSellingFields;
 use LayoutCore\Constants\Language;
 use Plenty\Plugin\Http\Request;
 use Plenty\Repositories\Models\PaginatedResult;
+use LayoutCore\Constants\CrossSellingType;
 use LayoutCore\Builder\Category\CategoryParams;
 use LayoutCore\Constants\ItemConditionTexts;
-
-
 
 /**
  * Class ItemService
@@ -345,7 +344,7 @@ class ItemService
      * @param int $itemId
      * @return array
      */
-	public function getItemCrossSellingList(int $itemId = 0):array
+	public function getItemCrossSellingList(int $itemId = 0, string $crossSellingType = CrossSellingType::SIMILAR):array
 	{
 		$crossSellingItems = [];
 
@@ -373,7 +372,11 @@ class ItemService
 
 			foreach($currentItem->itemCrossSellingList as $crossSellingItem)
 			{
-				$crossSellingItems[] = $crossSellingItem;
+                //TODO filter through datalayer - performance
+                if($crossSellingItem['relationship'] == $crossSellingType)
+                {
+                    $crossSellingItems[] = $crossSellingItem;
+                }
 			}
 		}
 
