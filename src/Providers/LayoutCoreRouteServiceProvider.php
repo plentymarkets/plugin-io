@@ -2,6 +2,7 @@
 
 namespace LayoutCore\Providers;
 
+use LayoutCore\Guards\AbstractGuard;
 use Plenty\Plugin\RouteServiceProvider;
 use Plenty\Plugin\Routing\Router;
 use Plenty\Plugin\Routing\ApiRouter;
@@ -28,16 +29,16 @@ class LayoutCoreRouteServiceProvider extends RouteServiceProvider
 		{
 			$api->resource('basket', 'BasketResource');
 			$api->resource('basket/items', 'BasketItemResource');
-			$api->resource('item_variation_select', 'ItemVariationSelectResource');
-			$api->resource('category_items_list', 'CategoryItemsListResource');
 			$api->resource('order', 'OrderResource');
 			$api->resource('checkout', 'CheckoutResource');
-			$api->resource( 'checkout/payment', 'CheckoutPaymentResource');
+			$api->resource('checkout/payment', 'CheckoutPaymentResource');
 			$api->resource('customer', 'CustomerResource');
 			$api->resource('customer/address', 'CustomerAddressResource');
 			$api->resource('customer/login', 'CustomerAuthenticationResource');
 			$api->resource('customer/logout', 'CustomerLogoutResource');
 			$api->resource('customer/password', 'CustomerPasswordResource');
+            $api->resource('variations', 'VariationResource');
+            $api->resource('item/availability', 'AvailabilityResource');
 		});
 
 		/*

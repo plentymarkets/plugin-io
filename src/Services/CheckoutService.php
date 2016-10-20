@@ -9,6 +9,7 @@ use Plenty\Modules\Basket\Contracts\BasketRepositoryContract;
 use Plenty\Modules\Basket\Models\Basket;
 use Plenty\Modules\Frontend\Session\Storage\Contracts\FrontendSessionStorageFactoryContract;
 use Plenty\Modules\Payment\Method\Contracts\PaymentMethodRepositoryContract;
+use Plenty\Modules\Order\Shipping\Contracts\ParcelServicePresetRepositoryContract;
 use LayoutCore\Constants\SessionStorageKeys;
 
 /**
@@ -38,6 +39,11 @@ class CheckoutService
 	 * @var PaymentMethodRepositoryContract
 	 */
 	private $paymentMethodRepository;
+    
+    /**
+     * @var ParcelServicePresetRepositoryContract
+     */
+    private $parcelServicePresetRepository;
 
     /**
      * CheckoutService constructor.
@@ -52,13 +58,15 @@ class CheckoutService
 		Checkout $checkout,
 		BasketRepositoryContract $basketRepository,
 		FrontendSessionStorageFactoryContract $sessionStorage,
-		PaymentMethodRepositoryContract $paymentMethodRepository )
+		PaymentMethodRepositoryContract $paymentMethodRepository,
+        ParcelServicePresetRepositoryContract $parcelServicePresetRepository)
 	{
 		$this->frontendPaymentMethodRepository = $frontendPaymentMethodRepository;
 		$this->checkout                = $checkout;
 		$this->basketRepository        = $basketRepository;
 		$this->sessionStorage          = $sessionStorage;
 		$this->paymentMethodRepository = $paymentMethodRepository;
+        $this->parcelServicePresetRepository = $parcelServicePresetRepository;
 	}
 
     /**
@@ -73,6 +81,7 @@ class CheckoutService
 			"methodOfPaymentList" => $this->getMethodOfPaymentList(),
 			"shippingCountryId"   => $this->getShippingCountryId(),
 			"shippingProfileId"   => $this->getShippingProfileId(),
+            "shippingProfileList" => $this->getShippingProfileList(),
 			"deliveryAddressId"   => $this->getDeliveryAddressId(),
 			"billingAddressId"    => $this->getBillingAddressId(),
 		];
@@ -167,7 +176,16 @@ class CheckoutService
         }
         return $paymentDataList;
     }
-
+    
+    /**
+     * Get the list of shipping profiles
+     * @return array|\Illuminate\Database\Eloquent\Collection|\Plenty\Modules\Order\Shipping\ParcelService\Models\ParcelServicePreset[]
+     */
+    public function getShippingProfileList()
+    {
+        return $this->parcelServicePresetRepository->getPresetList();
+    }
+    
     /**
      * Get the ID of the current shipping country
      * @return int

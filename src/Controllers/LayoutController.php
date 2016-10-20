@@ -51,7 +51,7 @@ class LayoutController extends Controller
 
 	protected $categoryMap;
 
-	// Used by specific controllers to set the current category
+	// Used by concrete controllers to set the current category
 	protected $categoryService;
 
 	/**
