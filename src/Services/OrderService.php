@@ -100,7 +100,7 @@ class OrderService
      * @param $statusId
      * @return string
      */
-	public function getOrderStatusText($statusId):string
+	public function getOrderStatusText($statusId)
     {
         return OrderStatusTexts::$orderStatusTexts[(string)$statusId];
     }
