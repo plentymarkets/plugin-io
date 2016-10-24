@@ -71,9 +71,9 @@ class OrderBuilderQuery
 			throw new \Exception("Error while instantiating OrderItemBuilder.");
 		}
 
-		$items = $this->basketService->getBasketItems()["items"];
+		$items = $this->basketService->getBasketItems();
 
-		if(!is_array($items) instanceof OrderItemBuilder)
+		if(!is_array($items))
 		{
 			throw new \Exception("Error while reading item data from basket");
 		}
