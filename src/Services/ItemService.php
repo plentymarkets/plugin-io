@@ -385,6 +385,6 @@ class ItemService
 	
 	public function getItemConditionText(int $conditionId):string
     {
-        return ItemConditionTexts::$itemConditionTexts[(string)$conditionId];
+        return ItemConditionTexts::$itemConditionTexts[$conditionId];
     }
 }
