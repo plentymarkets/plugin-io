@@ -48,6 +48,8 @@ class CategoryService
 	 */
 	private $currentCategoryTree = [];
 
+
+
     /**
      * CategoryService constructor.
      * @param CategoryRepositoryContract $category
@@ -215,7 +217,7 @@ class CategoryService
 	{
 		$categoryTree = [];
 
-		if($catID !== null)
+		if($catID > 0)
 		{
 			$this->setCurrentCategoryID($catID);
 		}
