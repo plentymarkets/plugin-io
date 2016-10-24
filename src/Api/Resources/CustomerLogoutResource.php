@@ -32,12 +32,11 @@ class CustomerLogoutResource extends ApiResource
 		parent::__construct($request, $response);
 		$this->authService = $authService;
 	}
-
+    
     /**
-     * Log out the customer from the current session
      * @return BaseResponse
      */
-	public function index():BaseResponse
+	public function store():BaseResponse
 	{
 		$this->authService->logout();
 		return $this->response->create(ResponseCode::OK);
