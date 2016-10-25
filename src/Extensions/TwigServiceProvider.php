@@ -72,7 +72,8 @@ class TwigServiceProvider extends Twig_Extension
                 "item"          => $this->factory->make( \LayoutCore\Services\ItemService::class ),
                 "order"         => $this->factory->make( \LayoutCore\Services\OrderService::class ),
                 "sessionStorage"=> $this->factory->make( \LayoutCore\Services\SessionStorageService::class ),
-                "unit"          => $this->factory->make( \LayoutCore\Services\UnitService::class)
+                "unit"          => $this->factory->make( \LayoutCore\Services\UnitService::class),
+                "template"      => $this->factory->make( \LayoutCore\Services\TemplateService::class)
             ]
         ];
     }

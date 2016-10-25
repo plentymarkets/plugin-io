@@ -48,6 +48,8 @@ class CategoryService
 	 */
 	private $currentCategoryTree = [];
 
+
+
     /**
      * CategoryService constructor.
      * @param CategoryRepositoryContract $category
@@ -208,7 +210,6 @@ class CategoryService
     {
         return $this->categoryRepository->getLinklistTree($type, $lang);
     }
-
     /**
      * Return the sitemap list as an array
      * @param string $type Only return categories of given type
