@@ -66,7 +66,8 @@ class LayoutCoreRouteServiceProvider extends RouteServiceProvider
 		//Register page route
 		$router->get('register', 'LayoutCore\Controllers\RegisterController@showRegister');
 
-        $router->get('place_order', 'LayoutCore\Controllers\PlaceOrderController@showPlaceOrder');
+        //place order and redirect to confirmation or checkout if no success
+        $router->get('place_order', 'LayoutCore\Controllers\PlaceOrderController@placeOrder');
 
 		/*
 		 * ITEM ROUTES

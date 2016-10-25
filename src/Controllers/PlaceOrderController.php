@@ -1,6 +1,7 @@
 <?php //strict
 namespace LayoutCore\Controllers;
 
+use LayoutCore\Guards\AbstractGuard;
 use LayoutCore\Services\OrderService;
 
 /**
@@ -10,20 +11,19 @@ use LayoutCore\Services\OrderService;
 class PlaceOrderController extends LayoutController
 {
     /**
-     * Prepare and render the data for the my account page
-     * @return string
+     * @param OrderService $orderService
      */
-    public function showPlaceOrder(OrderService $orderService): string
+    public function placeOrder(OrderService $orderService)
     {
-        $order = $orderService->placeOrder();
+        try {
+            $orderService->placeOrder();
+        }
+        catch (\Exception $exception)
+        {
+            AbstractGuard::redirect("/checkout");
+            // TODO error message
+        }
 
-
-
-        return $this->renderTemplate(
-            "tpl.place_order",
-            [
-                "place_order" => $order
-            ]
-        );
+        AbstractGuard::redirect("/confirmation");
     }
 }
