@@ -2,6 +2,7 @@
 
 namespace LayoutCore\Controllers;
 
+use LayoutCore\Services\TemplateService;
 use Plenty\Modules\Category\Contracts\CategoryRepositoryContract;
 use Plenty\Plugin\Application;
 use Plenty\Plugin\Controller;
@@ -85,7 +86,7 @@ class LayoutController extends Controller
 	 * @param array $customData Data to pass to template from concrete Controller.
 	 * @return TemplateContainer
 	 */
-	private function prepareTemplateData( $customData = null):TemplateContainer
+	private function prepareTemplateData( $customData = null ):TemplateContainer
 	{
 		$this->templateContainer
 			->setTemplateData($customData);
@@ -138,11 +139,11 @@ class LayoutController extends Controller
 	 * Emit an event to layout plugin to receive twig-template to use for current request.
 	 * Add global template data to custom data from specific controller.
 	 * Will pass request to the plentymarkets system if no template is provided by the layout plugin.
-	 * @param string $templateEvent The event to emit to separate layout plugin
-	 * @param array Additional template data from concrete controller
+	 * @param string $templateEvent     The event to emit to separate layout plugin
+	 * @param array $templateData       Additional template data from concrete controller
 	 * @return string
 	 */
-	protected function renderTemplate(string $templateEvent, array $templateData):string
+	protected function renderTemplate(string $templateEvent, array $templateData = array() ):string
 	{
 		// Emit event to receive layout to use.
 		// Add TemplateContainer and template data from specific controller to event's payload
@@ -153,6 +154,8 @@ class LayoutController extends Controller
 
 		if($this->templateContainer->hasTemplate())
 		{
+            TemplateService::$currentTemplate = $templateEvent;
+
 			// Prepare the global data only if the template is available
 			$this->prepareTemplateData($templateData);
 

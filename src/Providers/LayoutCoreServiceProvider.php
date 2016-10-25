@@ -31,7 +31,6 @@ class LayoutCoreServiceProvider extends ServiceProvider
 		$this->getApplication()->bind('LayoutCore\Builder\Item\ItemFilterBuilder');
 		$this->getApplication()->bind('LayoutCore\Builder\Item\ItemParamsBuilder');
 
-		$this->getApplication()->singleton('LayoutCore\Services\NavigationService');
 		$this->getApplication()->singleton('LayoutCore\Services\CategoryService');
 
 	}

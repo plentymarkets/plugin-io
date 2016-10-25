@@ -182,18 +182,7 @@ class CustomerService
      */
 	public function createAddress(array $addressData, int $type):Address
 	{
-		$response = $this->addressRepository->createAddress($addressData, $this->getContactId(), $type);
-
-		if($type == AddressType::BILLING)
-		{
-			$this->addressRepository->createAddress($addressData, $this->getContactId(), AddressType::DELIVERY);
-		}
-		elseif($type == AddressType::DELIVERY)
-		{
-			$this->addressRepository->createAddress($addressData, $this->getContactId(), AddressType::BILLING);
-		}
-
-		return $response;
+		return $this->addressRepository->createAddress($addressData, $this->getContactId(), $type);
 	}
 
     /**
