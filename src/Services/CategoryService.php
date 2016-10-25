@@ -22,7 +22,7 @@ class CategoryService
 	/**
 	 * @var CategoryRepositoryContract
 	 */
-	private $category;
+	private $categoryRepository;
 
 	/**
 	 * @var ItemService
@@ -54,11 +54,11 @@ class CategoryService
      * @param \LayoutCore\Services\ItemService $item
      * @param CategoryMap $categoryMap
      */
-	public function __construct(CategoryRepositoryContract $category, ItemService $item, CategoryMap $categoryMap, CategoryParamsBuilder $categoryParamsBuilder )
+	public function __construct(CategoryRepositoryContract $categoryRepository, ItemService $item, CategoryMap $categoryMap, CategoryParamsBuilder $categoryParamsBuilder )
 	{
-		$this->category    = $category;
-		$this->item        = $item;
-		$this->categoryMap = $categoryMap;
+		$this->categoryRepository    = $categoryRepository;
+		$this->item                  = $item;
+		$this->categoryMap           = $categoryMap;
         $this->categoryParamsBuilder = $categoryParamsBuilder;
 	}
 
@@ -69,7 +69,7 @@ class CategoryService
 	public function setCurrentCategoryID(int $catID = 0)
 	{
 		$this->setCurrentCategory(
-			$this->category->get($catID)
+			$this->categoryRepository->get($catID)
 		);
 	}
 
@@ -92,7 +92,7 @@ class CategoryService
 		while($cat !== null)
 		{
 			$this->currentCategoryTree[$cat->level] = $cat;
-			$cat                                    = $this->category->get($cat->parentCategoryId);
+			$cat                                    = $this->categoryRepository->get($cat->parentCategoryId);
 		}
 	}
 
@@ -104,7 +104,7 @@ class CategoryService
 	 */
 	public function get($catID = 0, string $lang = "de")
 	{
-		return $this->category->get($catID, $lang);
+		return $this->categoryRepository->get($catID, $lang);
 	}
 
 	/**
@@ -119,7 +119,7 @@ class CategoryService
 		{
 			return "ERR";
 		}
-		return "/" . $this->category->getUrl($category->id, $lang);
+		return "/" . $this->categoryRepository->getUrl($category->id, $lang);
 	}
 
 	/**
@@ -138,7 +138,7 @@ class CategoryService
 
 	/**
 	 * Check whether any child of a category is referenced by the current route
-	 * @param int $catID The ID for the category to check
+	 * @param Category $category The category to check
 	 * @return bool
 	 */
 	public function isOpen(Category $category):bool
@@ -160,19 +160,12 @@ class CategoryService
 
 	/**
 	 * Check whether a category or any of its children is referenced by the current route
-	 * @param int $catID The ID for the category to check
+	 * @param Category $category The category to check
 	 * @return bool
 	 */
 	public function isActive(Category $category = null):bool
 	{
-        if($category instanceof Category)
-        {
-            return ($this->isCurrent($category) || $this->isOpen($category));
-        }
-        else
-        {
-            return false;
-        }
+        return ($this->isCurrent($category) || $this->isOpen($category));
 
 	}
 
@@ -204,6 +197,28 @@ class CategoryService
         }
 
         return $this->item->getItemForCategory( $category->id, $this->categoryParamsBuilder->fromArray($params), $page );
+    }
+
+    /**
+     * Return the sitemap tree as an array
+     * @param string $type Only return categories of given type
+     * @param string $lang The language to get sitemap tree for
+     * @return array
+     */
+    public function getNavigationTree(string $type = "all", string $lang = "de"):array
+    {
+        return $this->categoryRepository->getLinklistTree($type, $lang);
+    }
+
+    /**
+     * Return the sitemap list as an array
+     * @param string $type Only return categories of given type
+     * @param string $lang The language to get sitemap list for
+     * @return array
+     */
+    public function getNavigationList(string $type = "all", string $lang = "de"):array
+    {
+        return $this->categoryRepository->getLinklistList($type, $lang);
     }
 
     /**
