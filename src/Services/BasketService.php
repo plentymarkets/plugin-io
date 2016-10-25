@@ -87,7 +87,7 @@ class BasketService
         {
             return array();
         }
-        $basketItemData = $this->getBasketItemData( $basketItem->toArray() );
+        $basketItemData = $this->getBasketItemData( array($basketItem) );
         return $this->addVariationData( $basketItem, $basketItemData[$basketItem->variationId] );
     }
 

@@ -38,15 +38,7 @@ class OrderItemBuilder
 		$orderItems = [];
 		foreach($basket->basketItems as $basketItem)
 		{
-			//$basketItemName = $items[$basketItem->variationId]->itemDescription->name1;
-            $basketItemName = '';
-            foreach($items as $item)
-            {
-                if($basketItem->variationId == $item['variationId'])
-                {
-                    $basketItemName = $item['variation']->itemDescription->name1;
-                }
-            }
+			$basketItemName = $items[$basketItem->variationId]->itemDescription->name1;
 			array_push($orderItems, $this->basketItemToOrderItem($basketItem, $basketItemName));
 		}
 
