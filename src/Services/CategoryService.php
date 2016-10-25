@@ -165,8 +165,7 @@ class CategoryService
 	 */
 	public function isActive(Category $category = null):bool
 	{
-        return ($this->isCurrent($category) || $this->isOpen($category));
-
+        return $category !== null && ($this->isCurrent($category) || $this->isOpen($category));
 	}
 
     /**
