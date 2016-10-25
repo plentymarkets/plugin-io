@@ -70,7 +70,6 @@ class TwigServiceProvider extends Twig_Extension
                 "country"       => $this->factory->make( \LayoutCore\Services\CountryService::class ),
                 "customer"      => $this->factory->make( \LayoutCore\Services\CustomerService::class ),
                 "item"          => $this->factory->make( \LayoutCore\Services\ItemService::class ),
-                "navigation"    => $this->factory->make( \LayoutCore\Services\NavigationService::class ),
                 "order"         => $this->factory->make( \LayoutCore\Services\OrderService::class ),
                 "sessionStorage"=> $this->factory->make( \LayoutCore\Services\SessionStorageService::class ),
                 "unit"          => $this->factory->make( \LayoutCore\Services\UnitService::class),
