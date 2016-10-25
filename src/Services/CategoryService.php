@@ -221,28 +221,36 @@ class CategoryService
     }
 
     /**
-     * Get the category tree as a list
-     * @param int $catID
-     * @return array
+     * Returns a list of all parent categories including given category
+     * @param int   $catID      The category Id to get the parents for or 0 to use current category
+     * @param bool  $bottomUp   Set true to order result from bottom (deepest category) to top (= level 1)
+     * @return array            The parents of the category
      */
-	public function getCategoryTreeAsList(int $catID = 0): array
-	{
-		$categoryTree = [];
+	public function getHierarchy( int $catID = 0, bool $bottomUp = false ):array
+    {
+        if( $catID > 0 )
+        {
+            $this->setCurrentCategoryID( $catID );
+        }
 
-		if($catID !== null)
-		{
-			$this->setCurrentCategoryID($catID);
-		}
+        $hierarchy = [];
 
-		for($i = 0; $i <= count($this->currentCategoryTree); $i++)
-		{
-			if($this->currentCategoryTree[$i] !== null)
-			{
-				$details                      = $this->currentCategoryTree[$i]->details[0];
-				$categoryTree[$details->name] = $details->nameUrl;
-			}
-		}
+        /**
+         * @var Category $category
+         */
+        foreach ( $this->currentCategoryTree as $lvl => $category )
+        {
+            if( $category->linklist === 'Y' )
+            {
+                array_push( $hierarchy, $category );
+            }
+        }
 
-		return $categoryTree;
-	}
+        if( $bottomUp === false )
+        {
+            $hierarchy = array_reverse( $hierarchy );
+        }
+
+        return $hierarchy;
+    }
 }
