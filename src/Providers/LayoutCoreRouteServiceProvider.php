@@ -66,6 +66,8 @@ class LayoutCoreRouteServiceProvider extends RouteServiceProvider
 		//Register page route
 		$router->get('register', 'LayoutCore\Controllers\RegisterController@showRegister');
 
+        $router->get('place_order', 'LayoutCore\Controllers\PlaceOrderController@showPlaceOrder');
+
 		/*
 		 * ITEM ROUTES
 		 */
@@ -84,6 +86,5 @@ class LayoutCoreRouteServiceProvider extends RouteServiceProvider
 		 * CATEGORY ROUTES
 		 */
 		$router->get('{level1?}/{level2?}/{level3?}/{level4?}/{level5?}/{level6?}', 'LayoutCore\Controllers\CategoryController@showCategory');
-
 	}
 }
