@@ -224,13 +224,13 @@ class CustomerService
      * @param int $items
      * @return array|\Plenty\Repositories\Models\PaginatedResult
      */
-	public function getOrders(int $page = 1, int $items = 50)
+	public function getOrders(int $page = 1, int $items = 10)
 	{
-		return $this->orderRepository->allOrdersByContact(
-			$this->getContactId(),
-			$page,
-			$items
-		);
+		return AbstractFactory::create(\LayoutCore\Services\OrderService::class)->getOrdersForContact(
+		    $this->getContactId(),
+            $page,
+            $items
+        );
 	}
 
     /**
@@ -239,8 +239,8 @@ class CustomerService
      */
 	public function getLatestOrder():Order
 	{
-		return $this->orderRepository->getLatestOrderByContactId(
-			$this->getContactId()
-		);
+        return AbstractFactory::create(\LayoutCore\Services\OrderService::class)->getLatestOrderForContact(
+            $this->getContactId()
+        );
 	}
 }

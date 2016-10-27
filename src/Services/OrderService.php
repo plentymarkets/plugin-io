@@ -2,6 +2,7 @@
 
 namespace LayoutCore\Services;
 
+use LayoutCore\Models\LocalizedOrder;
 use Plenty\Modules\Order\Contracts\OrderRepositoryContract;
 use Plenty\Modules\Order\Models\Order;
 use LayoutCore\Builder\Order\OrderBuilder;
@@ -10,9 +11,7 @@ use LayoutCore\Builder\Order\OrderOptionType;
 use LayoutCore\Builder\Order\OrderOptionSubType;
 use LayoutCore\Builder\Order\AddressType;
 use LayoutCore\Constants\OrderStatusTexts;
-use LayoutCore\Services\BasketService;
-use LayoutCore\Services\CheckoutService;
-use LayoutCore\Services\CustomerService;
+use Plenty\Repositories\Models\PaginatedResult;
 
 //TODO BasketService => basketItems
 //TODO SessionStorageService => billingAddressId, deliveryAddressId
@@ -88,12 +87,42 @@ class OrderService
     /**
      * Find an order by ID
      * @param int $orderId
-     * @return Order
+     * @return LocalizedOrder
      */
-	public function findOrderById(int $orderId):Order
+	public function findOrderById(int $orderId):LocalizedOrder
 	{
-		return $this->orderRepository->findOrderById($orderId);
+		$order = $this->orderRepository->findOrderById($orderId);
+        return LocalizedOrder::wrap( $order, "de" );
 	}
+
+    /**
+     * Get a list of orders for a contact
+     * @param int $contactId
+     * @param int $page
+     * @param int $items
+     * @return PaginatedResult
+     */
+    public function getOrdersForContact(int $contactId, int $page = 1, int $items = 50):PaginatedResult
+    {
+        $orders = $this->orderRepository->allOrdersByContact(
+            $contactId,
+            $page,
+            $items
+        );
+
+        return LocalizedOrder::wrapPaginated( $orders, "de" );
+    }
+
+    /**
+     * Get the last order created by the current contact
+     * @param int $contactId
+     * @return LocalizedOrder
+     */
+    public function getLatestOrderForContact( int $contactId ):LocalizedOrder
+    {
+        $order = $this->orderRepository->getLatestOrderByContactId( $contactId );
+        return LocalizedOrder::wrap( $order, "de" );
+    }
     
     /**
      * Return order status text by status id
