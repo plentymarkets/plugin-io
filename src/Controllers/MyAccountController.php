@@ -17,11 +17,6 @@ class MyAccountController extends LayoutController
 	{
         $guard->assertOrRedirect( true, "/login" );
 
-		return $this->renderTemplate(
-			"tpl.my-account",
-			[
-				"my-account" => ""
-			]
-		);
+		return $this->renderTemplate( "tpl.my-account" );
 	}
 }
