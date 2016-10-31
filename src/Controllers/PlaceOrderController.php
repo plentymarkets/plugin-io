@@ -2,6 +2,7 @@
 namespace LayoutCore\Controllers;
 
 use LayoutCore\Guards\AbstractGuard;
+use LayoutCore\Services\NotificationService;
 use LayoutCore\Services\OrderService;
 
 /**
@@ -12,18 +13,18 @@ class PlaceOrderController extends LayoutController
 {
     /**
      * @param OrderService $orderService
+     * @param NotificationService $notificationService
      */
-    public function placeOrder(OrderService $orderService)
+    public function placeOrder(OrderService $orderService, NotificationService $notificationService)
     {
         try {
             $orderService->placeOrder();
         }
         catch (\Exception $exception)
         {
+            $notificationService->error($exception->getMessage());
             AbstractGuard::redirect("/checkout");
-            // TODO error message
         }
-
         AbstractGuard::redirect("/confirmation");
     }
 }
