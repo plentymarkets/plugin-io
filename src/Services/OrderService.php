@@ -70,7 +70,7 @@ class OrderService
      * Place an order
      * @return Order
      */
-	public function placeOrder():Order
+	public function placeOrder():LocalizedOrder
 	{
 		$order = $this->orderBuilder->prepare(OrderType::ORDER)
 		                            ->fromBasket()
@@ -81,7 +81,8 @@ class OrderService
 		                            ->withOrderOption(OrderOptionType::METHOD_OF_PAYMENT, OrderOptionSubType::MAIN_VALUE, $this->checkoutService->getMethodOfPaymentId())
 		                            ->done();
 
-		return $this->orderRepository->createOrder($order);
+		$order = $this->orderRepository->createOrder($order);
+        return LocalizedOrder::wrap( $order, "de" );
 	}
 
     /**

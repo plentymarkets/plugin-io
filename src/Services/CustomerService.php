@@ -2,6 +2,7 @@
 
 namespace LayoutCore\Services;
 
+use LayoutCore\Models\LocalizedOrder;
 use Plenty\Modules\Account\Contact\Contracts\ContactRepositoryContract;
 use Plenty\Modules\Account\Contact\Contracts\ContactAddressRepositoryContract;
 use Plenty\Modules\Account\Contact\Models\Contact;
@@ -235,9 +236,9 @@ class CustomerService
 
     /**
      * Get the last order created by the current contact
-     * @return Order
+     * @return LocalizedOrder
      */
-	public function getLatestOrder():Order
+	public function getLatestOrder():LocalizedOrder
 	{
         return AbstractFactory::create(\LayoutCore\Services\OrderService::class)->getLatestOrderForContact(
             $this->getContactId()
