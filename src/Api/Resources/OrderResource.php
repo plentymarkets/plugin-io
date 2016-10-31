@@ -45,7 +45,7 @@ class OrderResource extends ApiResource
 	public function index():BaseResponse
 	{
 		$page  = (int)$this->request->get("page", 1);
-		$items = (int)$this->request->get("items", 50);
+		$items = (int)$this->request->get("items", 10);
 
 		$data = $this->factory->make(CustomerService::class)->getOrders($page, $items);
 		return $this->response->create($data, ResponseCode::OK);

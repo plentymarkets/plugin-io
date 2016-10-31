@@ -39,6 +39,7 @@ class LayoutCoreRouteServiceProvider extends RouteServiceProvider
 			$api->resource('customer/password', 'CustomerPasswordResource');
             $api->resource('variations', 'VariationResource');
             $api->resource('item/availability', 'AvailabilityResource');
+            $api->resource('item/condition', 'ItemConditionResource');
 		});
 
 		/*
