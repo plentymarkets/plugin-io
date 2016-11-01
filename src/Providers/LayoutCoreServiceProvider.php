@@ -7,6 +7,7 @@ use LayoutCore\Extensions\TwigServiceProvider;
 use LayoutCore\Guards\AbstractGuard;
 use LayoutCore\Helper\AbstractFactory;
 use LayoutCore\Providers\LayoutCoreRouteServiceProvider;
+use LayoutCore\Services\NotificationService;
 use Plenty\Plugin\ServiceProvider;
 use Plenty\Plugin\Templates\Twig;
 
@@ -33,6 +34,7 @@ class LayoutCoreServiceProvider extends ServiceProvider
 
 		$this->getApplication()->singleton('LayoutCore\Services\CategoryService');
 
+        $this->getApplication()->singleton(NotificationService::class);
 	}
 
     /**
