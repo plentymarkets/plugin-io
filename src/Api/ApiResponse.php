@@ -2,6 +2,7 @@
 
 namespace LayoutCore\Api;
 
+use LayoutCore\Services\BasketService;
 use Symfony\Component\HttpFoundation\Response as BaseResponse;
 use Plenty\Plugin\Http\Response;
 use Plenty\Modules\Account\Events\FrontendUpdateCustomerSettings;
@@ -63,21 +64,32 @@ class ApiResponse
     private $response = null;
 
     /**
+     * @var BasketService
+     */
+    private $basketService;
+
+    /**
      * ApiResponse constructor.
      * @param Dispatcher $dispatcher
      * @param Application $app
      * @param Response $response
+     * @param BasketService $basketService
      */
-	public function __construct(Dispatcher $dispatcher, Application $app, Response $response)
+	public function __construct(
+	    Dispatcher $dispatcher,
+        Application $app,
+        Response $response,
+        BasketService $basketService)
 	{
 		$this->app = $app;
 		$this->dispatcher = $dispatcher;
         $this->response = $response;
+        $this->basketService = $basketService;
 
 		// Register basket events
-        $this->dispatcher->listen( AfterBasketChanged::class, function($event) {
+        $this->dispatcher->listen( AfterBasketChanged::class, function($event) use ($basketService){
             $this->eventData["AfterBasketChanged"] = [
-                "basket" => $event->getBasket()
+                "basket" => $basketService->getBasket()
             ];
         }, 0);
 
