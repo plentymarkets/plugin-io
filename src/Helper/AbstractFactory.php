@@ -35,9 +35,9 @@ class AbstractFactory
      * @return mixed
      * @throws \Exception
      */
-	public function make(string $className)
+	public function make(string $className, array $params = [] )
 	{
-		$instance = $this->app->make($className);
+		$instance = $this->app->make($className, $params);
 		if(!$instance instanceof $className)
 		{
 			throw new \Exception("Cannot create instance of class: " . $className);
@@ -45,9 +45,9 @@ class AbstractFactory
 		return $instance;
 	}
 
-	public static function create( string $className )
+	public static function create( string $className, array $params = [] )
     {
-        $instance = self::$application->make($className);
+        $instance = self::$application->make($className, $params);
         if(!$instance instanceof $className)
         {
             throw new \Exception("Cannot create instance of class: " . $className);

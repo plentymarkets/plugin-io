@@ -29,6 +29,7 @@ abstract class AbstractGuard
         }
     }
 
+    // TODO move to more general class
     /**
      * Redirect to a given URI. Appends params as query string.
      * @param string    $uri    The URI to redirect to.

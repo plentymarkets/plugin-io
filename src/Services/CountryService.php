@@ -40,7 +40,7 @@ class CountryService
      */
 	public function getActiveCountriesList():array
 	{
-        $list = $this->countryRepository->getCountriesList(1, array());
+        $list = $this->countryRepository->getCountriesList(1, array('states'));
 
         $countriesList = array();
         foreach($list as $country)
