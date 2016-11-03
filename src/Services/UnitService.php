@@ -2,9 +2,7 @@
 
 namespace LayoutCore\Services;
 
-//use Plenty\Modules\Item\Unit\Contracts\UnitLangRepositoryContract;
 use Plenty\Modules\Item\Unit\Contracts\UnitNameRepositoryContract;
-//use Plenty\Modules\Item\Unit\Models\UnitLang;
 use Plenty\Modules\Item\Unit\Models\UnitName;
 
 /**

@@ -74,7 +74,8 @@ class TwigServiceProvider extends Twig_Extension
                 "sessionStorage"=> $this->factory->make( \LayoutCore\Services\SessionStorageService::class ),
                 "unit"          => $this->factory->make( \LayoutCore\Services\UnitService::class),
                 "template"      => $this->factory->make( \LayoutCore\Services\TemplateService::class),
-                "notifications" => $this->factory->make( \LayoutCore\Services\NotificationService::class )
+                "notifications" => $this->factory->make( \LayoutCore\Services\NotificationService::class ),
+                "webstoreConfig"=> $this->factory->make( \LayoutCore\Services\WebstoreConfigurationService::class)
             ]
         ];
     }

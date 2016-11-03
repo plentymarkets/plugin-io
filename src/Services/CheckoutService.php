@@ -40,7 +40,7 @@ class CheckoutService
 	 * @var PaymentMethodRepositoryContract
 	 */
 	private $paymentMethodRepository;
-    
+
     /**
      * @var ParcelServicePresetRepositoryContract
      */
@@ -184,7 +184,7 @@ class CheckoutService
         }
         return $paymentDataList;
     }
-    
+
     /**
      * Get the shipping profile list
      * @return array
@@ -194,15 +194,14 @@ class CheckoutService
         $contact = $this->customerService->getContact();
         return $this->parcelServicePresetRepository->getLastWeightedPresetCombinations($this->basketRepository->load(), $contact->classId);
     }
-    
+
     /**
      * Get the ID of the current shipping country
      * @return int
      */
 	public function getShippingCountryId():int
 	{
-		$basket = $this->basketRepository->load();
-		return $basket->shippingCountryId;
+		return $this->checkout->getShippingCountryId();
 	}
 
     /**

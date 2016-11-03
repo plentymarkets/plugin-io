@@ -3,6 +3,7 @@
 namespace LayoutCore\Services;
 
 use Plenty\Plugin\Application;
+use LayoutCore\Services\SessionStorageService;
 use Plenty\Modules\Item\DataLayer\Models\Record;
 use Plenty\Modules\Item\DataLayer\Models\RecordList;
 use Plenty\Modules\Item\DataLayer\Contracts\ItemDataLayerRepositoryContract;
@@ -65,6 +66,10 @@ class ItemService
 	 * @var Request
 	 */
 	private $request;
+	/**
+	 * SessionStorageService
+	 */
+	private $sessionStorage;
 
     /**
      * ItemService constructor.
@@ -76,6 +81,7 @@ class ItemService
      * @param ItemFilterBuilder $filterBuilder
      * @param ItemParamsBuilder $paramsBuilder
      * @param Request $request
+     * @param SessionStorageService $sessionStorage
      */
 	public function __construct(
 		Application $app,
@@ -85,7 +91,8 @@ class ItemService
 		ItemColumnBuilder $columnBuilder,
 		ItemFilterBuilder $filterBuilder,
 		ItemParamsBuilder $paramsBuilder,
-		Request $request
+		Request $request,
+		SessionStorageService $sessionStorage
 	)
 	{
 		$this->app                          = $app;
@@ -96,6 +103,7 @@ class ItemService
 		$this->filterBuilder                = $filterBuilder;
 		$this->paramsBuilder                = $paramsBuilder;
 		$this->request                      = $request;
+		$this->sessionStorage				= $sessionStorage;
 	}
 
     /**
@@ -127,7 +135,7 @@ class ItemService
 		// Set the parameters
 		// TODO: make current language global
 		$params = $this->paramsBuilder
-			->withParam(ItemColumnsParams::LANGUAGE, Language::DE)
+			->withParam(ItemColumnsParams::LANGUAGE, $this->sessionStorage->getLang())
 			->withParam(ItemColumnsParams::PLENTY_ID, $this->app->getPlentyId())
 			->build();
 
@@ -166,7 +174,7 @@ class ItemService
 		// Set the parameters
 		// TODO: make current language global
 		$params = $this->paramsBuilder
-			->withParam(ItemColumnsParams::LANGUAGE, Language::DE)
+			->withParam(ItemColumnsParams::LANGUAGE, $this->sessionStorage->getLang())
 			->withParam(ItemColumnsParams::PLENTY_ID, $this->app->getPlentyId())
 			->build();
 
@@ -214,7 +222,7 @@ class ItemService
         $params = $this->paramsBuilder
             ->withParam( ItemColumnsParams::LIMIT, $params->itemsPerPage )
             ->withParam( ItemColumnsParams::OFFSET, $offset )
-            ->withParam( ItemColumnsParams::LANGUAGE, Language::DE )
+            ->withParam( ItemColumnsParams::LANGUAGE, $this->sessionStorage->getLang() )
             ->withParam( ItemColumnsParams::PLENTY_ID, $this->app->getPlentyId() )
             ->build();
 
@@ -244,7 +252,7 @@ class ItemService
 		$filter = $this->filterBuilder->hasId([$itemId])->build();
 
 		$params = $this->paramsBuilder
-			->withParam(ItemColumnsParams::LANGUAGE, Language::DE)
+			->withParam(ItemColumnsParams::LANGUAGE, $this->sessionStorage->getLang())
 			->withParam(ItemColumnsParams::PLENTY_ID, $this->app->getPlentyId())
 			->build();
 
@@ -296,7 +304,7 @@ class ItemService
 		$filter = $this->filterBuilder->hasId([$itemId])->build();
 
 		$params = $this->paramsBuilder
-			->withParam(ItemColumnsParams::LANGUAGE, Language::DE)
+			->withParam(ItemColumnsParams::LANGUAGE, $this->sessionStorage->getLang())
 			->withParam(ItemColumnsParams::PLENTY_ID, $this->app->getPlentyId())
 			->build();
 
@@ -312,7 +320,7 @@ class ItemService
 	public function getAttributeName(int $attributeId = 0):string
 	{
 		$name      = '';
-		$attribute = $this->attributeNameRepository->findOne($attributeId, 'de');
+		$attribute = $this->attributeNameRepository->findOne($attributeId, $this->sessionStorage->getLang());
 
 		if(!is_null($attribute))
 		{
@@ -330,7 +338,7 @@ class ItemService
 	public function getAttributeValueName(int $attributeValueId = 0):string
 	{
 		$name           = '';
-		$attributeValue = $this->attributeValueNameRepository->findOne($attributeValueId, 'de');
+		$attributeValue = $this->attributeValueNameRepository->findOne($attributeValueId, $this->sessionStorage->getLang());
 		if(!is_null($attributeValue))
 		{
 			$name = $attributeValue->name;
@@ -364,7 +372,7 @@ class ItemService
 				->build();
 
 			$params = $this->paramsBuilder
-				->withParam(ItemColumnsParams::LANGUAGE, Language::DE)
+				->withParam(ItemColumnsParams::LANGUAGE, $this->sessionStorage->getLang())
 				->withParam(ItemColumnsParams::PLENTY_ID, $this->app->getPlentyId())
 				->build();
 
