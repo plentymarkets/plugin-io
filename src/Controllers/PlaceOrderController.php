@@ -19,7 +19,7 @@ class PlaceOrderController extends LayoutController
     {
         try {
             $orderData = $orderService->placeOrder();
-            AbstractGuard::redirect( "/execute_payment/" . $orderData->order->id );
+            AbstractGuard::redirect( "/execute-payment/" . $orderData->order->id );
         }
         catch (\Exception $exception)
         {

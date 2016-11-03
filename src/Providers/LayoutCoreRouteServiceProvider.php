@@ -69,10 +69,10 @@ class LayoutCoreRouteServiceProvider extends RouteServiceProvider
 
         // PaymentPlugin entry points
         // place the current order and redirect to /execute_payment
-        $router->get('place_order', 'LayoutCore\Controllers\PlaceOrderController@placeOrder');
+        $router->get('place-order', 'LayoutCore\Controllers\PlaceOrderController@placeOrder');
 
         // execute payment after order is created. PaymentPlugins can redirect to this route if order was created by the PaymentPlugin itself.
-        $router->get('execute_payment/{orderId}/{paymentId?}', 'LayoutCore\Controllers\PlaceOrderController@executePayment')
+        $router->get('execute-payment/{orderId}/{paymentId?}', 'LayoutCore\Controllers\PlaceOrderController@executePayment')
             ->where('orderId', '[0-9]+');
 
 		/*
