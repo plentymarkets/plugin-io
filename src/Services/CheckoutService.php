@@ -187,7 +187,7 @@ class CheckoutService
     
     /**
      * Get the shipping profile list
-     * @return array|\ShippingParcelData[]
+     * @return array
      */
     public function getShippingProfileList()
     {
