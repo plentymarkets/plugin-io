@@ -26,15 +26,21 @@ class NotificationService
     }
 
     /**
+     * @param bool $clear
      * @return array
      */
-    public function getNotifications():array
+    public function getNotifications($clear = true):array
     {
         $notifications = json_decode($this->sessionStorageService->getSessionValue(SessionStorageKeys::NOTIFICATIONS));
 
         if ($notifications == null || !is_array($notifications))
         {
             $notifications = array();
+        }
+
+        if ($clear)
+        {
+            $this->sessionStorageService->setSessionValue(SessionStorageKeys::NOTIFICATIONS, json_encode(array()));
         }
 
         return $notifications;
@@ -46,7 +52,7 @@ class NotificationService
      */
     private function addNotification(string $message, string $type)
     {
-        $notifications = $this->getNotifications();
+        $notifications = $this->getNotifications(false);
 
         array_push($notifications, array(
             'message' => $message,
