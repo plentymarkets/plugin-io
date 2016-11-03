@@ -39,7 +39,7 @@ class CheckoutService
 	 * @var PaymentMethodRepositoryContract
 	 */
 	private $paymentMethodRepository;
-    
+
     /**
      * @var ParcelServicePresetRepositoryContract
      */
@@ -176,7 +176,7 @@ class CheckoutService
         }
         return $paymentDataList;
     }
-    
+
     /**
      * Get the list of shipping profiles
      * @return array|\Illuminate\Database\Eloquent\Collection|\Plenty\Modules\Order\Shipping\ParcelService\Models\ParcelServicePreset[]
@@ -185,15 +185,14 @@ class CheckoutService
     {
         return $this->parcelServicePresetRepository->getPresetList();
     }
-    
+
     /**
      * Get the ID of the current shipping country
      * @return int
      */
 	public function getShippingCountryId():int
 	{
-		$basket = $this->basketRepository->load();
-		return $basket->shippingCountryId;
+		return $this->checkout->getShippingCountryId();
 	}
 
     /**
