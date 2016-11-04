@@ -5,6 +5,7 @@ namespace LayoutCore\Services;
 use LayoutCore\Models\LocalizedOrder;
 use Plenty\Modules\Account\Contact\Contracts\ContactRepositoryContract;
 use Plenty\Modules\Account\Contact\Contracts\ContactAddressRepositoryContract;
+use Plenty\Modules\Account\Address\Contracts\AddressRepositoryContract;
 use Plenty\Modules\Account\Contact\Models\Contact;
 use LayoutCore\Builder\Order\AddressType;
 use Plenty\Modules\Account\Address\Models\Address;
@@ -14,6 +15,8 @@ use LayoutCore\Helper\UserSession;
 use Plenty\Modules\Order\Contracts\OrderRepositoryContract;
 use Plenty\Modules\Order\Models\Order;
 use LayoutCore\Services\AuthenticationService;
+use LayoutCore\Services\SessionStorageService;
+use LayoutCore\Constants\SessionStorageKeys;
 
 /**
  * Class CustomerService
@@ -28,7 +31,11 @@ class CustomerService
 	/**
 	 * @var ContactAddressRepositoryContract
 	 */
-	private $addressRepository;
+	private $contactAddressRepository;
+    /**
+     * @var AddressRepositoryContract
+     */
+    private $addressRepository;
 	/**
 	 * @var OrderRepositoryContract
 	 */
@@ -37,6 +44,10 @@ class CustomerService
 	 * @var AuthenticationService
 	 */
 	private $authService;
+    /**
+     * @var SessionStorageService
+     */
+    private $sessionStorage;
 	/**
 	 * @var UserSession
 	 */
@@ -45,27 +56,32 @@ class CustomerService
 	 * @var AbstractFactory
 	 */
 	private $factory;
-
+    
     /**
      * CustomerService constructor.
      * @param ContactRepositoryContract $contactRepository
-     * @param ContactAddressRepositoryContract $addressRepository
+     * @param ContactAddressRepositoryContract $contactAddressRepository
+     * @param AddressRepositoryContract $addressRepository
      * @param OrderRepositoryContract $orderRepository
      * @param \LayoutCore\Services\AuthenticationService $authService
      * @param AbstractFactory $factory
      */
 	public function __construct(
 		ContactRepositoryContract $contactRepository,
-		ContactAddressRepositoryContract $addressRepository,
+		ContactAddressRepositoryContract $contactAddressRepository,
+        AddressRepositoryContract $addressRepository,
 		OrderRepositoryContract $orderRepository,
 		AuthenticationService $authService,
+        SessionStorageService $sessionStorage,
 		AbstractFactory $factory)
 	{
-		$this->contactRepository = $contactRepository;
-		$this->addressRepository = $addressRepository;
-		$this->orderRepository   = $orderRepository;
-		$this->authService       = $authService;
-		$this->factory           = $factory;
+		$this->contactRepository        = $contactRepository;
+		$this->contactAddressRepository = $contactAddressRepository;
+        $this->addressRepository        = $addressRepository;
+		$this->orderRepository          = $orderRepository;
+		$this->authService              = $authService;
+        $this->sessionStorage           = $sessionStorage;
+		$this->factory                  = $factory;
 	}
 
     /**
@@ -161,7 +177,32 @@ class CustomerService
      */
 	public function getAddresses($type = null)
 	{
-		return $this->addressRepository->getAddresses($this->getContactId(), $type);
+        if($this->getContactId() > 0)
+        {
+            return $this->contactAddressRepository->getAddresses($this->getContactId(), $type);
+        }
+        else
+        {
+            $address = null;
+            
+            if($type == 1 && $this->sessionStorage->getSessionValue(SessionStorageKeys::BILLING_ADDRESS_ID) > 0)
+            {
+                $address = $this->addressRepository->findAddressById($this->sessionStorage->getSessionValue(SessionStorageKeys::BILLING_ADDRESS_ID));
+            }
+            elseif($type == 2 && $this->sessionStorage->getSessionValue(SessionStorageKeys::DELIVERY_ADDRESS_ID) > 0)
+            {
+                $address = $this->addressRepository->findAddressById($this->sessionStorage->getSessionValue(SessionStorageKeys::DELIVERY_ADDRESS_ID));
+            }
+    
+            if($address instanceof Address)
+            {
+                return [
+                    $address
+                ];
+            }
+    
+            return [];
+        }
 	}
 
     /**
@@ -172,7 +213,21 @@ class CustomerService
      */
 	public function getAddress(int $addressId, int $type):Address
 	{
-		return $this->addressRepository->getAddress($addressId, $this->getContactId(), $type);
+        if($this->getContactId() > 0)
+        {
+            return $this->contactAddressRepository->getAddress($addressId, $this->getContactId(), $type);
+        }
+        else
+        {
+            if($type == 1)
+            {
+                return $this->addressRepository->findAddressById($this->sessionStorage->getSessionValue(SessionStorageKeys::BILLING_ADDRESS_ID));
+            }
+            elseif($type == 2)
+            {
+                return $this->addressRepository->findAddressById($this->sessionStorage->getSessionValue(SessionStorageKeys::DELIVERY_ADDRESS_ID));
+            }
+        }
 	}
 
     /**
@@ -183,8 +238,35 @@ class CustomerService
      */
 	public function createAddress(array $addressData, int $type):Address
 	{
-		return $this->addressRepository->createAddress($addressData, $this->getContactId(), $type);
+        if($this->getContactId() > 0)
+        {
+            return $this->contactAddressRepository->createAddress($addressData, $this->getContactId(), $type);
+        }
+		else
+        {
+            return $this->createGuestAddress($addressData, $type);
+        }
 	}
+    
+    /**
+     * @param array $addressData
+     * @return Address
+     */
+	private function createGuestAddress(array $addressData, int $type):Address
+    {
+        $newAddress = $this->addressRepository->createAddress($addressData);
+    
+        if($type == 1)
+        {
+            $this->sessionStorage->setSessionValue(SessionStorageKeys::BILLING_ADDRESS_ID, $newAddress->id);
+        }
+        elseif($type == 2)
+        {
+            $this->sessionStorage->setSessionValue(SessionStorageKeys::DELIVERY_ADDRESS_ID, $newAddress->id);
+        }
+        
+        return $newAddress;
+    }
 
     /**
      * Update an address
@@ -195,7 +277,7 @@ class CustomerService
      */
 	public function updateAddress(int $addressId, array $addressData, int $type):Address
 	{
-		return $this->addressRepository->updateAddress($addressData, $addressId, $this->getContactId(), $type);
+		return $this->contactAddressRepository->updateAddress($addressData, $addressId, $this->getContactId(), $type);
 	}
 
     /**
@@ -205,7 +287,7 @@ class CustomerService
      */
 	public function deleteAddress(int $addressId, int $type)
 	{
-		$this->addressRepository->deleteAddress($addressId, $this->getContactId(), $type);
+		$this->contactAddressRepository->deleteAddress($addressId, $this->getContactId(), $type);
 	}
 
     /**

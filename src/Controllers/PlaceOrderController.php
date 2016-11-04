@@ -4,6 +4,8 @@ namespace LayoutCore\Controllers;
 use LayoutCore\Services\NotificationService;
 use LayoutCore\Services\OrderService;
 use Plenty\Plugin\Http\Response;
+use LayoutCore\Constants\SessionStorageKeys;
+use LayoutCore\Services\SessionStorageService;
 
 /**
  * Class PlaceOrderController
@@ -21,10 +23,12 @@ class PlaceOrderController extends LayoutController
     public function placeOrder(
         OrderService $orderService,
         NotificationService $notificationService,
-        Response $response
+        Response $response,
+        SessionStorageService $sessionStorage
     )
     {
-        try {
+        try
+        {
             $orderService->placeOrder();
         }
         catch (\Exception $exception)
@@ -34,6 +38,7 @@ class PlaceOrderController extends LayoutController
 
             return $response->redirectTo("checkout");
         }
+    
         return $response->redirectTo("confirmation");
     }
 }

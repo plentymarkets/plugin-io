@@ -199,7 +199,7 @@ class CheckoutService
      * Get the ID of the current shipping country
      * @return int
      */
-	public function getShippingCountryId():int
+	public function getShippingCountryId()
 	{
 		return $this->checkout->getShippingCountryId();
 	}
@@ -256,7 +256,8 @@ class CheckoutService
      */
 	public function getBillingAddressId(): int
 	{
-		return (int)$this->sessionStorage->getPlugin()->getValue(SessionStorageKeys::BILLING_ADDRESS_ID);
+        $id = (int)$this->sessionStorage->getPlugin()->getValue(SessionStorageKeys::BILLING_ADDRESS_ID);
+		return $id;
 	}
 
     /**

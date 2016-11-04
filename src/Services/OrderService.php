@@ -12,6 +12,9 @@ use LayoutCore\Builder\Order\OrderOptionSubType;
 use LayoutCore\Builder\Order\AddressType;
 use LayoutCore\Constants\OrderStatusTexts;
 use Plenty\Repositories\Models\PaginatedResult;
+use LayoutCore\Constants\SessionStorageKeys;
+use LayoutCore\Services\SessionStorageService;
+use Plenty\Plugin\Http\Request;
 
 //TODO BasketService => basketItems
 //TODO SessionStorageService => billingAddressId, deliveryAddressId
@@ -42,6 +45,14 @@ class OrderService
 	 * @var CustomerService
 	 */
 	private $customerService;
+    /**
+     * @var SessionStorageService
+     */
+    private $sessionStorage;
+    /**
+     * @var Request
+     */
+    private $request;
 
     /**
      * OrderService constructor.
@@ -56,7 +67,9 @@ class OrderService
 		OrderBuilder $orderBuilder,
 		BasketService $basketService,
 		CheckoutService $checkoutService,
-		CustomerService $customerService
+		CustomerService $customerService,
+        SessionStorageService $sessionStorage,
+        Request $request
 	)
 	{
 		$this->orderRepository = $orderRepository;
@@ -64,6 +77,8 @@ class OrderService
 		$this->basketService   = $basketService;
 		$this->checkoutService = $checkoutService;
 		$this->customerService = $customerService;
+        $this->sessionStorage  = $sessionStorage;
+        $this->request         = $request;
 	}
 
     /**
@@ -82,6 +97,12 @@ class OrderService
 		                            ->done();
 
 		$order = $this->orderRepository->createOrder($order);
+        
+        if($this->customerService->getContactId() <= 0)
+        {
+            $this->sessionStorage->setSessionValue(SessionStorageKeys::LATEST_ORDER_ID, $order->id);
+        }
+        
         return LocalizedOrder::wrap( $order, "de" );
 	}
 
@@ -121,7 +142,15 @@ class OrderService
      */
     public function getLatestOrderForContact( int $contactId ):LocalizedOrder
     {
-        $order = $this->orderRepository->getLatestOrderByContactId( $contactId );
+        if($contactId > 0)
+        {
+            $order = $this->orderRepository->getLatestOrderByContactId( $contactId );
+        }
+        else
+        {
+            $order = $this->orderRepository->findOrderById($this->sessionStorage->getSessionValue(SessionStorageKeys::LATEST_ORDER_ID));
+        }
+        
         return LocalizedOrder::wrap( $order, "de" );
     }
     
