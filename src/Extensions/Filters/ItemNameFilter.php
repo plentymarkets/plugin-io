@@ -45,7 +45,7 @@ class ItemNameFilter extends AbstractFilter
      * @param string $configName
      * @return string
      */
-    public function itemName( ItemDescription $itemDescription, string $configName ):string
+    public function itemName( ItemDescription $itemDescription, string $configName )
     {
     $showName = '';
 

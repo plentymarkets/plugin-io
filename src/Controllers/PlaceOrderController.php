@@ -1,9 +1,9 @@
 <?php //strict
 namespace LayoutCore\Controllers;
 
-use LayoutCore\Guards\AbstractGuard;
 use LayoutCore\Services\NotificationService;
 use LayoutCore\Services\OrderService;
+use Plenty\Plugin\Http\Response;
 
 /**
  * Class PlaceOrderController
@@ -14,28 +14,37 @@ class PlaceOrderController extends LayoutController
     /**
      * @param OrderService $orderService
      * @param NotificationService $notificationService
+     * @param Response $response
+     * @return \Symfony\Component\HttpFoundation\Response|void
+     * @internal param Response $response
      */
-    public function placeOrder(OrderService $orderService, NotificationService $notificationService)
+    public function placeOrder(
+        OrderService $orderService,
+        NotificationService $notificationService,
+        Response $response
+    )
     {
         try {
             $orderData = $orderService->placeOrder();
-            AbstractGuard::redirect( "/execute-payment/" . $orderData->order->id );
+            return $response->redirectTo( "/execute-payment/" . $orderData->order->id );
         }
         catch (\Exception $exception)
         {
+            // TODO get better error text
             $notificationService->error($exception->getMessage());
-            AbstractGuard::redirect("/checkout");
+
+            return $response->redirectTo("checkout");
         }
     }
 
-    public function executePayment( OrderService $orderService, NotificationService $notificationService, int $orderId, int $paymentId = -1 )
+    public function executePayment( OrderService $orderService, NotificationService $notificationService, Response $response, int $orderId, int $paymentId = -1 )
     {
         // find order by id to check if order really exists
         $orderData = $orderService->findOrderById( $orderId );
         if( $orderData == null )
         {
             $notificationService->error("Order (". $orderId .") not found!");
-            AbstractGuard::redirect("/checkout");
+            return $response->redirectTo("checkout");
         }
 
         if( $paymentId < 0 )
@@ -60,6 +69,6 @@ class PlaceOrderController extends LayoutController
 
         // show confirmation page, even if payment execution failed because order has already been replaced.
         // in case of failure, the order should have been marked as "not payed"
-        AbstractGuard::redirect("/confirmation");
+        return $response->redirectTo("confirmation");
     }
 }
