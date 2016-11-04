@@ -185,11 +185,11 @@ class CustomerService
         {
             $address = null;
             
-            if($type == 1 && $this->sessionStorage->getSessionValue(SessionStorageKeys::BILLING_ADDRESS_ID) > 0)
+            if($type == AddressType::BILLING && $this->sessionStorage->getSessionValue(SessionStorageKeys::BILLING_ADDRESS_ID) > 0)
             {
                 $address = $this->addressRepository->findAddressById($this->sessionStorage->getSessionValue(SessionStorageKeys::BILLING_ADDRESS_ID));
             }
-            elseif($type == 2 && $this->sessionStorage->getSessionValue(SessionStorageKeys::DELIVERY_ADDRESS_ID) > 0)
+            elseif($type == AddressType::DELIVERY && $this->sessionStorage->getSessionValue(SessionStorageKeys::DELIVERY_ADDRESS_ID) > 0)
             {
                 $address = $this->addressRepository->findAddressById($this->sessionStorage->getSessionValue(SessionStorageKeys::DELIVERY_ADDRESS_ID));
             }
@@ -219,11 +219,11 @@ class CustomerService
         }
         else
         {
-            if($type == 1)
+            if($type == AddressType::BILLING)
             {
                 return $this->addressRepository->findAddressById($this->sessionStorage->getSessionValue(SessionStorageKeys::BILLING_ADDRESS_ID));
             }
-            elseif($type == 2)
+            elseif($type == AddressType::DELIVERY)
             {
                 return $this->addressRepository->findAddressById($this->sessionStorage->getSessionValue(SessionStorageKeys::DELIVERY_ADDRESS_ID));
             }
@@ -256,11 +256,11 @@ class CustomerService
     {
         $newAddress = $this->addressRepository->createAddress($addressData);
     
-        if($type == 1)
+        if($type == AddressType::BILLING)
         {
             $this->sessionStorage->setSessionValue(SessionStorageKeys::BILLING_ADDRESS_ID, $newAddress->id);
         }
-        elseif($type == 2)
+        elseif($type == AddressType::DELIVERY)
         {
             $this->sessionStorage->setSessionValue(SessionStorageKeys::DELIVERY_ADDRESS_ID, $newAddress->id);
         }

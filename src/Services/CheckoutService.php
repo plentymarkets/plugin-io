@@ -265,6 +265,9 @@ class CheckoutService
      */
 	public function setBillingAddressId($billingAddressId)
 	{
-		$this->sessionStorage->getPlugin()->setValue(SessionStorageKeys::BILLING_ADDRESS_ID, $billingAddressId);
+        if((int)$billingAddressId > 0)
+        {
+            $this->sessionStorage->getPlugin()->setValue(SessionStorageKeys::BILLING_ADDRESS_ID, $billingAddressId);
+        }
 	}
 }
