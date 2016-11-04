@@ -236,7 +236,7 @@ class CheckoutService
      * Get the ID of the current delivery address
      * @return int
      */
-	public function getDeliveryAddressId():int
+	public function getDeliveryAddressId()
 	{
 		return (int)$this->sessionStorage->getPlugin()->getValue(SessionStorageKeys::DELIVERY_ADDRESS_ID);
 	}
@@ -245,7 +245,7 @@ class CheckoutService
      * Set the ID of the current delivery address
      * @param int $deliveryAddressId
      */
-	public function setDeliveryAddressId(int $deliveryAddressId)
+	public function setDeliveryAddressId($deliveryAddressId)
 	{
 		$this->sessionStorage->getPlugin()->setValue(SessionStorageKeys::DELIVERY_ADDRESS_ID, $deliveryAddressId);
 	}
@@ -254,22 +254,17 @@ class CheckoutService
      * Get the ID of the current invoice address
      * @return int
      */
-	public function getBillingAddressId(): int
+	public function getBillingAddressId()
 	{
-        $id = (int)$this->sessionStorage->getPlugin()->getValue(SessionStorageKeys::BILLING_ADDRESS_ID);
-		return $id;
+		return (int)$this->sessionStorage->getPlugin()->getValue(SessionStorageKeys::BILLING_ADDRESS_ID);
 	}
 
     /**
      * Set the ID of the current invoice address
      * @param int $billingAddressId
      */
-	public function setBillingAddressId(int $billingAddressId)
+	public function setBillingAddressId($billingAddressId)
 	{
 		$this->sessionStorage->getPlugin()->setValue(SessionStorageKeys::BILLING_ADDRESS_ID, $billingAddressId);
-		if($this->getDeliveryAddressId() <= 0)
-		{
-			$this->setDeliveryAddressId($billingAddressId);
-		}
 	}
 }
