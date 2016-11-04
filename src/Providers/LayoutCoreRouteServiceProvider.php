@@ -65,8 +65,13 @@ class LayoutCoreRouteServiceProvider extends RouteServiceProvider
 		//Register page route
 		$router->get('register', 'LayoutCore\Controllers\RegisterController@showRegister');
 
-        //place order and redirect to confirmation or checkout if no success
-        $router->get('place_order', 'LayoutCore\Controllers\PlaceOrderController@placeOrder');
+        // PaymentPlugin entry points
+        // place the current order and redirect to /execute_payment
+        $router->get('place-order', 'LayoutCore\Controllers\PlaceOrderController@placeOrder');
+
+        // execute payment after order is created. PaymentPlugins can redirect to this route if order was created by the PaymentPlugin itself.
+        $router->get('execute-payment/{orderId}/{paymentId?}', 'LayoutCore\Controllers\PlaceOrderController@executePayment')
+            ->where('orderId', '[0-9]+');
 
 		/*
 		 * ITEM ROUTES

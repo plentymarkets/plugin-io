@@ -146,16 +146,16 @@ class OrderBuilderQuery
      */
 	public function withAddressId(int $addressId, int $type):OrderBuilderQuery
 	{
-		if($this->order["addresses"] === null)
+		if($this->order["addressRelations"] === null)
 		{
-			$this->order["addresses"] = [];
+			$this->order["addressRelations"] = [];
 		}
 
 		$address = [
 			"typeId"    => (int)$type,
 			"addressId" => $addressId
 		];
-		array_push($this->order["addresses"], $address);
+		array_push($this->order["addressRelations"], $address);
 		return $this;
 	}
 
