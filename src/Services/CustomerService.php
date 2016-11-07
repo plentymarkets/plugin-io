@@ -287,7 +287,14 @@ class CustomerService
      */
 	public function deleteAddress(int $addressId, int $type)
 	{
-		$this->contactAddressRepository->deleteAddress($addressId, $this->getContactId(), $type);
+        if($this->getContactId() > 0)
+        {
+            $this->contactAddressRepository->deleteAddress($addressId, $this->getContactId(), $type);
+        }
+        else
+        {
+            $this->addressRepository->deleteAddress($addressId);
+        }
 	}
 
     /**
