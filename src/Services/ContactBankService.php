@@ -14,10 +14,9 @@ class ContactBankService
         $this->contactPaymentRepository = $contactPaymentRepository;
     }
 
-    public function getBanksOfContact(int $contactId, array $columns = ['*'], int $perPage = 50):Collection
+    public function getBanksOfContact(int $contactId, array $columns = ['*'], int $perPage = 50)
     {
-        $banks = $this->contactPaymentRepository->getBanksOfContact( $contactId, $columns, $perPage );
-        return $banks;
+        return $this->contactPaymentRepository->getBanksOfContact( $contactId, $columns, $perPage );
     }
 
     public function createContactBank( array $data)
