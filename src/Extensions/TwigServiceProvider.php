@@ -75,7 +75,8 @@ class TwigServiceProvider extends Twig_Extension
                 "unit"          => $this->factory->make( \LayoutCore\Services\UnitService::class),
                 "template"      => $this->factory->make( \LayoutCore\Services\TemplateService::class),
                 "notifications" => $this->factory->make( \LayoutCore\Services\NotificationService::class ),
-                "contactBank"   => $this->factory->make( \LayoutCore\Services\ContactBankService::class)
+                "contactBank"   => $this->factory->make( \LayoutCore\Services\ContactBankService::class),
+                "webstoreConfig"=> $this->factory->make( \LayoutCore\Services\WebstoreConfigurationService::class)
             ]
         ];
     }

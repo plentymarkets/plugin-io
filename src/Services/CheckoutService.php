@@ -11,6 +11,7 @@ use Plenty\Modules\Frontend\Session\Storage\Contracts\FrontendSessionStorageFact
 use Plenty\Modules\Payment\Method\Contracts\PaymentMethodRepositoryContract;
 use Plenty\Modules\Order\Shipping\Contracts\ParcelServicePresetRepositoryContract;
 use LayoutCore\Constants\SessionStorageKeys;
+use LayoutCore\Services\CustomerService;
 
 /**
  * Class CheckoutService
@@ -39,11 +40,16 @@ class CheckoutService
 	 * @var PaymentMethodRepositoryContract
 	 */
 	private $paymentMethodRepository;
-    
+
     /**
      * @var ParcelServicePresetRepositoryContract
      */
     private $parcelServicePresetRepository;
+    
+    /**
+     * @var CustomerService
+     */
+    private $customerService;
 
     /**
      * CheckoutService constructor.
@@ -59,14 +65,16 @@ class CheckoutService
 		BasketRepositoryContract $basketRepository,
 		FrontendSessionStorageFactoryContract $sessionStorage,
 		PaymentMethodRepositoryContract $paymentMethodRepository,
-        ParcelServicePresetRepositoryContract $parcelServicePresetRepository)
+        ParcelServicePresetRepositoryContract $parcelServicePresetRepository,
+        CustomerService $customerService)
 	{
 		$this->frontendPaymentMethodRepository = $frontendPaymentMethodRepository;
-		$this->checkout                = $checkout;
-		$this->basketRepository        = $basketRepository;
-		$this->sessionStorage          = $sessionStorage;
-		$this->paymentMethodRepository = $paymentMethodRepository;
+		$this->checkout                      = $checkout;
+		$this->basketRepository              = $basketRepository;
+		$this->sessionStorage                = $sessionStorage;
+		$this->paymentMethodRepository       = $paymentMethodRepository;
         $this->parcelServicePresetRepository = $parcelServicePresetRepository;
+        $this->customerService               = $customerService;
 	}
 
     /**
@@ -176,24 +184,24 @@ class CheckoutService
         }
         return $paymentDataList;
     }
-    
+
     /**
-     * Get the list of shipping profiles
-     * @return array|\Illuminate\Database\Eloquent\Collection|\Plenty\Modules\Order\Shipping\ParcelService\Models\ParcelServicePreset[]
+     * Get the shipping profile list
+     * @return array
      */
     public function getShippingProfileList()
     {
-        return $this->parcelServicePresetRepository->getPresetList();
+        $contact = $this->customerService->getContact();
+        return $this->parcelServicePresetRepository->getLastWeightedPresetCombinations($this->basketRepository->load(), $contact->classId);
     }
-    
+
     /**
      * Get the ID of the current shipping country
      * @return int
      */
 	public function getShippingCountryId():int
 	{
-		$basket = $this->basketRepository->load();
-		return $basket->shippingCountryId;
+		return $this->checkout->getShippingCountryId();
 	}
 
     /**
