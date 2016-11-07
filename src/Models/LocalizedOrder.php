@@ -25,6 +25,11 @@ class LocalizedOrder extends ModelWrapper
      */
     public static function wrap( $order, ...$data ):LocalizedOrder
     {
+        if( $order == null )
+        {
+            return null;
+        }
+
         list( $lang ) = $data;
 
         $statusRepository = AbstractFactory::create( \Plenty\Modules\Order\Status\Contracts\StatusRepositoryContract::class );

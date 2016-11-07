@@ -2,6 +2,7 @@
 
 namespace LayoutCore\Services;
 
+use LayoutCore\Helper\AbstractFactory;
 use LayoutCore\Models\LocalizedOrder;
 use Plenty\Modules\Order\Contracts\OrderRepositoryContract;
 use Plenty\Modules\Order\Models\Order;
@@ -105,6 +106,17 @@ class OrderService
         
         return LocalizedOrder::wrap( $order, "de" );
 	}
+
+    /**
+     * Execute the payment for a given order.
+     * @param Order $order  The order to execute payment for
+     * @return array        An array containing a type ("succes"|"error") and a value.
+     */
+	public function executePayment( int $orderId, int $paymentId ):array
+    {
+        $paymentRepository = AbstractFactory::create( \Plenty\Modules\Payment\Method\Contracts\PaymentMethodRepositoryContract::class );
+        return $paymentRepository->executePayment( $paymentId, $orderId );
+    }
 
     /**
      * Find an order by ID
