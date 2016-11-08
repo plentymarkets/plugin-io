@@ -146,6 +146,27 @@ class ItemService
 		);
 	}
 
+    public function getItemImage( int $itemId = 0 ):string
+    {
+        $item = $this->getItem( $itemId );
+
+        if( $item == null )
+        {
+            return "";
+        }
+
+        $imageList = $item->variationImageList;
+        foreach( $imageList as $image )
+        {
+            if( $image->path !== "" )
+            {
+                return $image->path;
+            }
+        }
+
+        return "";
+    }
+
     /**
      * Get an item variation by ID
      * @param int $variationId
@@ -184,6 +205,28 @@ class ItemService
 			$params
 		);
 	}
+
+    public function getVariationImage( int $variationId = 0 ):string
+    {
+        $variation = $this->getVariation( $variationId );
+
+        if( $variation == null )
+        {
+            return "";
+        }
+
+        $imageList = $variation->variationImageList;
+
+        foreach( $imageList as $image )
+        {
+            if( $image->path !== "" )
+            {
+                return $image->path;
+            }
+        }
+
+        return "";
+    }
 
 
     /**
