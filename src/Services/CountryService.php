@@ -38,13 +38,14 @@ class CountryService
      * List all active countries
      * @return array
      */
-	public function getActiveCountriesList():array
+	public function getActiveCountriesList(string $lang = "de"):array
 	{
         $list = $this->countryRepository->getCountriesList(1, array('states'));
 
         $countriesList = array();
         foreach($list as $country)
         {
+			$country->currLangName = $this->getCountryName($country->id, $lang);
             $countriesList[] = $country;
         }
 

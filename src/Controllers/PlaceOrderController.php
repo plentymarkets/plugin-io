@@ -15,16 +15,15 @@ class PlaceOrderController extends LayoutController
      * @param OrderService $orderService
      * @param NotificationService $notificationService
      * @param Response $response
-     * @return \Symfony\Component\HttpFoundation\Response|void
-     * @internal param Response $response
+     * @return \Symfony\Component\HttpFoundation\Response
      */
     public function placeOrder(
         OrderService $orderService,
         NotificationService $notificationService,
-        Response $response
-    )
+        Response $response)
     {
-        try {
+        try
+        {
             $orderData = $orderService->placeOrder();
             return $response->redirectTo( "/execute-payment/" . $orderData->order->id );
         }
@@ -32,7 +31,6 @@ class PlaceOrderController extends LayoutController
         {
             // TODO get better error text
             $notificationService->error($exception->getMessage());
-
             return $response->redirectTo("checkout");
         }
     }
