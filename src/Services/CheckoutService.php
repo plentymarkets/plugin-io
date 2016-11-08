@@ -176,10 +176,10 @@ class CheckoutService
         {
             $paymentData = array();
             $paymentData['id'] = $paymentMethod->id;
-            $paymentData['name'] = $this->frontendPaymentMethodRepository->getPaymentMethodName($paymentMethod);
+            $paymentData['name'] = $this->frontendPaymentMethodRepository->getPaymentMethodName($paymentMethod, "de");
             $paymentData['fee'] = $this->frontendPaymentMethodRepository->getPaymentMethodFee($paymentMethod);
-            $paymentData['icon'] = $this->frontendPaymentMethodRepository->getPaymentMethodIcon($paymentMethod);
-            $paymentData['description'] = $this->frontendPaymentMethodRepository->getPaymentMethodDescription($paymentMethod);
+            $paymentData['icon'] = $this->frontendPaymentMethodRepository->getPaymentMethodIcon($paymentMethod, "de");
+            $paymentData['description'] = $this->frontendPaymentMethodRepository->getPaymentMethodDescription($paymentMethod, "de");
             $paymentDataList[] = $paymentData;
         }
         return $paymentDataList;

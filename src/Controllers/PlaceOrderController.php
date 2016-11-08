@@ -26,7 +26,7 @@ class PlaceOrderController extends LayoutController
     {
         try {
             $orderData = $orderService->placeOrder();
-            return $response->redirectTo( "/execute-payment/" . $orderData->order->id );
+            return $response->redirectTo( "execute-payment/" . $orderData->order->id );
         }
         catch (\Exception $exception)
         {

@@ -2,9 +2,11 @@
 
 namespace LayoutCore\Models;
 
-use LayoutCore\Helper\AbstractFactory;
 use Plenty\Modules\Order\Models\Order;
+use Plenty\Modules\Order\Shipping\ParcelService\Models\ParcelServicePreset;
+use Plenty\Modules\Order\Shipping\ParcelService\Models\ParcelServicePresetName;
 use Plenty\Modules\Order\Status\Models\OrderStatusName;
+use Plenty\Modules\Frontend\PaymentMethod\Contracts\FrontendPaymentMethodRepositoryContract;
 
 class LocalizedOrder extends ModelWrapper
 {
@@ -17,6 +19,11 @@ class LocalizedOrder extends ModelWrapper
      * @var OrderStatusName
      */
     public $status = null;
+
+    public $shippingProvider = "";
+    public $shippingProfileName = "";
+    public $paymentMethodName = "";
+    public $paymentMethodIcon = "";
 
     /**
      * @param Order $order
@@ -32,11 +39,36 @@ class LocalizedOrder extends ModelWrapper
 
         list( $lang ) = $data;
 
-        $statusRepository = AbstractFactory::create( \Plenty\Modules\Order\Status\Contracts\StatusRepositoryContract::class );
-
-        $instance = AbstractFactory::create( self::class );
+        $instance = pluginApp( self::class );
         $instance->order = $order;
+
+        $statusRepository = pluginApp( \Plenty\Modules\Order\Status\Contracts\StatusRepositoryContract::class );
         $instance->status = $statusRepository->findStatusNameById( $order->statusId, $lang );
+
+        $parcelServicePresetRepository = pluginApp( \Plenty\Modules\Order\Shipping\Contracts\ParcelServicePresetRepositoryContract::class );
+        $shippingProfile = $parcelServicePresetRepository->getPresetById( $order->shippingProfileId );
+        foreach( $shippingProfile->parcelServicePresetNames as $name )
+        {
+            if( $name->lang === $lang )
+            {
+                $instance->shippingProfileName = $name->name;
+                break;
+            }
+        }
+
+        foreach( $shippingProfile->parcelServiceNames as $name )
+        {
+            if( $name->lang === $lang )
+            {
+                $instance->shippingProvider = $name->name;
+                break;
+            }
+        }
+
+        $frontentPaymentRepository = pluginApp( FrontendPaymentMethodRepositoryContract::class );
+        $instance->paymentMethodName = $frontentPaymentRepository->getPaymentMethodNameById( $order->methodOfPaymentId, $lang );
+        $instance->paymentMethodIcon = $frontentPaymentRepository->getPaymentMethodIconById( $order->methodOfPaymentId, $lang );
+
 
         return $instance;
     }
@@ -47,8 +79,12 @@ class LocalizedOrder extends ModelWrapper
     public function toArray():array
     {
         return [
-            "order" => $this->order->toArray(),
-            "status" => $this->status->toArray()
+            "order"                 => $this->order->toArray(),
+            "status"                => $this->status->toArray(),
+            "shippingProvider"      => $this->shippingProvider,
+            "shippingProfileName"   => $this->shippingProfileName,
+            "paymentMethodName"     => $this->paymentMethodName,
+            "paymentMethodIcon"     => $this->paymentMethodIcon
         ];
     }
 }

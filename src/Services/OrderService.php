@@ -74,12 +74,13 @@ class OrderService
 	public function placeOrder():LocalizedOrder
 	{
 		$order = $this->orderBuilder->prepare(OrderType::ORDER)
-		                            ->fromBasket()
+		                            ->fromBasket() //TODO: Add shipping costs & payment surcharge as OrderItem
 		                            ->withStatus(3.3)
 		                            ->withContactId($this->customerService->getContactId())
 		                            ->withAddressId($this->checkoutService->getBillingAddressId(), AddressType::BILLING)
 		                            ->withAddressId($this->checkoutService->getDeliveryAddressId(), AddressType::DELIVERY)
-		                            ->withOrderOption(OrderOptionType::METHOD_OF_PAYMENT, OrderOptionSubType::MAIN_VALUE, $this->checkoutService->getMethodOfPaymentId())
+		                            ->withOrderProperty(OrderOptionType::METHOD_OF_PAYMENT, OrderOptionSubType::MAIN_VALUE, $this->checkoutService->getMethodOfPaymentId())
+                                    ->withOrderProperty(OrderOptionType::SHIPPING_PROFIL, OrderOptionSubType::MAIN_VALUE, $this->checkoutService->getShippingProfileId())
 		                            ->done();
 
 		$order = $this->orderRepository->createOrder($order);
