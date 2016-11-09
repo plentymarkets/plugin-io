@@ -25,6 +25,9 @@ class LocalizedOrder extends ModelWrapper
     public $paymentMethodName = "";
     public $paymentMethodIcon = "";
 
+    public $itemURLs = [];
+    public $itemImages = [];
+
     /**
      * @param Order $order
      * @param array ...$data
@@ -70,6 +73,23 @@ class LocalizedOrder extends ModelWrapper
         $instance->paymentMethodIcon = $frontentPaymentRepository->getPaymentMethodIconById( $order->methodOfPaymentId, $lang );
 
 
+        $urlFilter = pluginApp( \LayoutCore\Extensions\Filters\URLFilter::class );
+        $itemService = pluginApp( \LayoutCore\Services\ItemService::class );
+
+        foreach( $order->orderItems as $orderItem )
+        {
+            if( $orderItem->itemVariationId !== 0 )
+            {
+                $itemUrl = $urlFilter->buildVariationURL($orderItem->itemVariationId, true);
+                $instance->itemURLs[$orderItem->itemVariationId] = $itemUrl;
+
+                $itemImage = $itemService->getVariationImage($orderItem->itemVariationId);
+                $instance->itemImages[$orderItem->itemVariationId] = $itemImage;
+            }
+
+        }
+
+
         return $instance;
     }
 
@@ -78,13 +98,20 @@ class LocalizedOrder extends ModelWrapper
      */
     public function toArray():array
     {
-        return [
+        $data = [
             "order"                 => $this->order->toArray(),
             "status"                => $this->status->toArray(),
             "shippingProvider"      => $this->shippingProvider,
             "shippingProfileName"   => $this->shippingProfileName,
             "paymentMethodName"     => $this->paymentMethodName,
-            "paymentMethodIcon"     => $this->paymentMethodIcon
+            "paymentMethodIcon"     => $this->paymentMethodIcon,
+            "itemURLs"              => $this->itemURLs,
+            "itemImages"            => $this->itemImages
         ];
+
+        $data["order"]["billingAddress"] = $this->order->billingAddress->toArray();
+        $data["order"]["deliveryAddress"] = $this->order->deliveryAddress->toArray();
+
+        return $data;
     }
 }
