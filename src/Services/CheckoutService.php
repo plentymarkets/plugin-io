@@ -172,14 +172,15 @@ class CheckoutService
     {
         $paymentDataList = array();
         $mopList = $this->getMethodOfPaymentList();
+        $lang = pluginApp(SessionStorageService::class)->getLang();
         foreach($mopList as $paymentMethod)
         {
             $paymentData = array();
             $paymentData['id'] = $paymentMethod->id;
-            $paymentData['name'] = $this->frontendPaymentMethodRepository->getPaymentMethodName($paymentMethod, "de");
+            $paymentData['name'] = $this->frontendPaymentMethodRepository->getPaymentMethodName($paymentMethod, $lang);
             $paymentData['fee'] = $this->frontendPaymentMethodRepository->getPaymentMethodFee($paymentMethod);
-            $paymentData['icon'] = $this->frontendPaymentMethodRepository->getPaymentMethodIcon($paymentMethod, "de");
-            $paymentData['description'] = $this->frontendPaymentMethodRepository->getPaymentMethodDescription($paymentMethod, "de");
+            $paymentData['icon'] = $this->frontendPaymentMethodRepository->getPaymentMethodIcon($paymentMethod, $lang);
+            $paymentData['description'] = $this->frontendPaymentMethodRepository->getPaymentMethodDescription($paymentMethod, $lang);
             $paymentDataList[] = $paymentData;
         }
         return $paymentDataList;
