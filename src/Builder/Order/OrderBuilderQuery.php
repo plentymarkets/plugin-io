@@ -201,20 +201,20 @@ class OrderBuilderQuery
      * @param $value
      * @return OrderBuilderQuery
      */
-	public function withOrderOption(int $type, int $subType, $value):OrderBuilderQuery
+	public function withOrderProperty(int $type, int $subType, $value):OrderBuilderQuery
 	{
-		if($this->order["options"] === null)
+		if($this->order["properties"] === null)
 		{
-			$this->order["options"] = [];
+			$this->order["properties"] = [];
 		}
 
 		$option = [
 			"typeId"    => (int)$type,
 			"subTypeId" => (int)$subType,
-			"value"     => $value
+			"value"     => (string)$value
 		];
 
-		array_push($this->order["options"], $option);
+		array_push($this->order["properties"], $option);
 		return $this;
 	}
 

@@ -40,7 +40,8 @@ class URLFilter extends AbstractFilter
 	public function getFilters():array
 	{
 		return [
-			"buildItemURL" => "buildItemURL"
+			"buildItemURL" => "buildItemURL",
+            "buildVariationURL" => "buildVariationURL"
 		];
 	}
 
@@ -73,4 +74,10 @@ class URLFilter extends AbstractFilter
 
 		return $itemURL;
 	}
+
+	public function buildVariationURL(int $variationId = 0, bool $withItemName = false):string
+    {
+        $itemId = $this->itemService->getVariation( $variationId )->itemBase->id;
+        return $this->buildItemURL( $itemId, $variationId, $withItemName );
+    }
 }

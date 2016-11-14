@@ -4,8 +4,8 @@ namespace LayoutCore\Builder\Order;
 
 use Plenty\Modules\Basket\Models\Basket;
 use Plenty\Modules\Basket\Models\BasketItem;
-use Plenty\Modules\Item\DataLayer\Models\Record;
 use LayoutCore\Services\CheckoutService;
+use Plenty\Modules\Frontend\PaymentMethod\Contracts\FrontendPaymentMethodRepositoryContract;
 
 /**
  * Class OrderItemBuilder
@@ -50,6 +50,44 @@ class OrderItemBuilder
 			array_push($orderItems, $this->basketItemToOrderItem($basketItem, $basketItemName));
 		}
 
+
+		// add shipping costs
+        $shippingCosts = [
+            "typeId"        => OrderItemType::SHIPPING_COSTS,
+            "referrerId"    => $basket->basketItems->first()->referredId,
+            "quantity"      => 1,
+            "orderItemName" => "shipping costs",
+            "countryVatId"  => 1, // TODO get country VAT id
+            "vatRate"       => 0, // FIXME get vat rate for shipping costs
+            "amounts"       => [
+                [
+                    "currency"              => $this->checkoutService->getCurrency(),
+                    "priceOriginalGross"    => $basket->shippingAmount
+                ]
+            ]
+        ];
+        array_push($orderItems, $shippingCosts);
+
+        $paymentFee = pluginApp( FrontendPaymentMethodRepositoryContract::class )
+            ->getPaymentMethodFeeById( $this->checkoutService->getMethodOfPaymentId() );
+
+        $paymentSurcharge = [
+            "typeId"        => OrderItemType::PAYMENT_SURCHARGE,
+            "referrerId"    => $basket->basketItems->first()->referredId,
+            "quantity"      => 1,
+            "orderItemName" => "payment surcharge",
+            "countryVatId"  => 1, // TODO get country VAT id
+            "vatRate"       => 0, // FIXME get vat rate for shipping costs
+            "amounts"       => [
+                [
+                    "currency"              => $this->checkoutService->getCurrency(),
+                    "priceOriginalGross"    => $paymentFee
+                ]
+            ]
+        ];
+        array_push($orderItems, $paymentSurcharge);
+
+
 		return $orderItems;
 	}
 
@@ -75,8 +113,7 @@ class OrderItemBuilder
 					"currency"           => $this->checkoutService->getCurrency(),
 					"priceOriginalGross" => $basketItem->price
 				]
-			],
-			"options"           => [] // TODO
+			]
 		];
 	}
 
