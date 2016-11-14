@@ -16,7 +16,7 @@ class ItemColumnsParams
 	const QUANTITY     = "quantity";
 	const PLENTY_ID    = "plentyId";
 	const WAREHOUSE_ID = "warehouseId";
-	const ORDER_BY     = "orderBy";
+	const ORDER_BY     = "order_by";
 	const LIMIT        = "limit";
 	const OFFSET       = "offset";
 }
