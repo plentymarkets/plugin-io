@@ -41,6 +41,16 @@ class ItemFilterBuilder
 		return $this;
 	}
 
+    /**
+     * Filter items by propertyId
+     * @param array $propertyId
+     * @return ItemFilterBuilder
+     */
+    public function hasProperty(array $propertyId):ItemFilterBuilder
+    {
+        return $this->hasFilter("variationBase.hasProperty", ["propertyId" => $propertyId]);
+    }
+
 	/**
 	 * Filter items by amazon product genre
 	 * @param string $productGenre The amazon genre
