@@ -131,6 +131,7 @@ class ItemService
 		// Filter the current item by item ID
 		$filter = $this->filterBuilder
 			->hasId($itemIds)
+            ->variationIsActive()
 			->build();
 
 		// Set the parameters
@@ -191,6 +192,7 @@ class ItemService
 		// Filter the current item by item ID
 		$filter = $this->filterBuilder
 			->variationHasId($variationIds)
+            ->variationIsActive()
 			->build();
 
 		// Set the parameters
@@ -255,6 +257,7 @@ class ItemService
 
         $filter = $this->filterBuilder
             ->variationHasCategory( $catID )
+            ->variationIsActive()
             ->build();
 
         if( $params->orderBy != null && strlen( $params->orderBy ) > 0 )
@@ -293,7 +296,10 @@ class ItemService
 				                                  VariationAttributeValueFields::ATTRIBUTE_VALUE_ID
 			                                  ])->build();
 
-		$filter = $this->filterBuilder->hasId([$itemId])->build();
+		$filter = $this->filterBuilder
+            ->hasId([$itemId])
+            ->variationIsActive()
+            ->build();
 
 		$params = $this->paramsBuilder
 			->withParam(ItemColumnsParams::LANGUAGE, $this->sessionStorage->getLang())
@@ -306,8 +312,6 @@ class ItemService
 		$attributeList['selectionValues'] = [];
 		$attributeList['variations']      = [];
 		$attributeList['attributeNames']  = [];
-
-		$foo = 1;
 
 		foreach($recordList as $variation)
 		{
@@ -345,7 +349,10 @@ class ItemService
 				                      ItemDescriptionFields::URL_CONTENT
 			                      ])->build();
 
-		$filter = $this->filterBuilder->hasId([$itemId])->build();
+		$filter = $this->filterBuilder
+            ->hasId([$itemId])
+            ->variationIsActive()
+            ->build();
 
 		$params = $this->paramsBuilder
 			->withParam(ItemColumnsParams::LANGUAGE, $this->sessionStorage->getLang())
@@ -413,6 +420,7 @@ class ItemService
 
 			$filter = $this->filterBuilder
 				->hasId([$itemId])
+                ->variationIsActive()
 				->build();
 
 			$params = $this->paramsBuilder
@@ -467,7 +475,7 @@ class ItemService
 
         $filter = $filterBuilder->build();
 
-        $params = $this->paramsBuilder
+        $params = $paramBuilder
             ->withParam(ItemColumnsParams::LANGUAGE, $this->sessionStorage->getLang())
             ->withParam(ItemColumnsParams::PLENTY_ID, $this->app->getPlentyId())
             ->withParam(ItemColumnsParams::ORDER_BY, ["orderBy.variationCreateTimestamp" => "desc"])
