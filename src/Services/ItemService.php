@@ -2,6 +2,7 @@
 
 namespace LayoutCore\Services;
 
+use Plenty\Modules\Item\DataLayer\Services\ColumnBuilder;
 use Plenty\Plugin\Application;
 use LayoutCore\Services\SessionStorageService;
 use Plenty\Modules\Item\DataLayer\Models\Record;
@@ -437,5 +438,43 @@ class ItemService
 	public function getItemConditionText(int $conditionId):string
     {
         return ItemConditionTexts::$itemConditionTexts[$conditionId];
+    }
+
+    public function getLatestItems( int $limit = 5, int $categoryId = 0 )
+    {
+        /** @var ItemColumnBuilder $columnBuilder */
+        $columnBuilder = pluginApp( ItemColumnBuilder::class );
+
+        /** @var ItemFilterBuilder $filterBuilder */
+        $filterBuilder = pluginApp( ItemFilterBuilder::class );
+
+        /** @var ItemParamsBuilder $paramBuilder */
+        $paramBuilder = pluginApp( ItemParamsBuilder::class );
+
+        $columns = $columnBuilder
+            ->defaults()
+            ->build();
+
+
+        $filterBuilder
+            ->variationIsActive()
+            ->variationIsPrimary();
+
+        if( $categoryId > 0 )
+        {
+            $filterBuilder->variationHasCategory([$categoryId]);
+        }
+
+        $filter = $filterBuilder->build();
+
+        $params = $this->paramsBuilder
+            ->withParam(ItemColumnsParams::LANGUAGE, $this->sessionStorage->getLang())
+            ->withParam(ItemColumnsParams::PLENTY_ID, $this->app->getPlentyId())
+            ->withParam(ItemColumnsParams::ORDER_BY, ["orderBy.variationCreateTimestamp" => "desc"])
+            ->withParam(ItemColumnsParams::LIMIT, $limit)
+            ->build();
+
+        return $this->itemRepository->search( $columns, $filter, $params );
+
     }
 }
