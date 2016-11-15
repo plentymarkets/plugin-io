@@ -2,6 +2,7 @@
 
 namespace LayoutCore\Services;
 
+use Plenty\Modules\Item\DataLayer\Services\ColumnBuilder;
 use Plenty\Plugin\Application;
 use LayoutCore\Services\SessionStorageService;
 use Plenty\Modules\Item\DataLayer\Models\Record;
@@ -130,6 +131,7 @@ class ItemService
 		// Filter the current item by item ID
 		$filter = $this->filterBuilder
 			->hasId($itemIds)
+            ->variationIsActive()
 			->build();
 
 		// Set the parameters
@@ -190,6 +192,7 @@ class ItemService
 		// Filter the current item by item ID
 		$filter = $this->filterBuilder
 			->variationHasId($variationIds)
+            ->variationIsActive()
 			->build();
 
 		// Set the parameters
@@ -254,6 +257,7 @@ class ItemService
 
         $filter = $this->filterBuilder
             ->variationHasCategory( $catID )
+            ->variationIsActive()
             ->build();
 
         if( $params->orderBy != null && strlen( $params->orderBy ) > 0 )
@@ -292,7 +296,10 @@ class ItemService
 				                                  VariationAttributeValueFields::ATTRIBUTE_VALUE_ID
 			                                  ])->build();
 
-		$filter = $this->filterBuilder->hasId([$itemId])->build();
+		$filter = $this->filterBuilder
+            ->hasId([$itemId])
+            ->variationIsActive()
+            ->build();
 
 		$params = $this->paramsBuilder
 			->withParam(ItemColumnsParams::LANGUAGE, $this->sessionStorage->getLang())
@@ -305,8 +312,6 @@ class ItemService
 		$attributeList['selectionValues'] = [];
 		$attributeList['variations']      = [];
 		$attributeList['attributeNames']  = [];
-
-		$foo = 1;
 
 		foreach($recordList as $variation)
 		{
@@ -344,7 +349,10 @@ class ItemService
 				                      ItemDescriptionFields::URL_CONTENT
 			                      ])->build();
 
-		$filter = $this->filterBuilder->hasId([$itemId])->build();
+		$filter = $this->filterBuilder
+            ->hasId([$itemId])
+            ->variationIsActive()
+            ->build();
 
 		$params = $this->paramsBuilder
 			->withParam(ItemColumnsParams::LANGUAGE, $this->sessionStorage->getLang())
@@ -412,6 +420,7 @@ class ItemService
 
 			$filter = $this->filterBuilder
 				->hasId([$itemId])
+                ->variationIsActive()
 				->build();
 
 			$params = $this->paramsBuilder
@@ -437,5 +446,43 @@ class ItemService
 	public function getItemConditionText(int $conditionId):string
     {
         return ItemConditionTexts::$itemConditionTexts[$conditionId];
+    }
+
+    public function getLatestItems( int $limit = 5, int $categoryId = 0 )
+    {
+        /** @var ItemColumnBuilder $columnBuilder */
+        $columnBuilder = pluginApp( ItemColumnBuilder::class );
+
+        /** @var ItemFilterBuilder $filterBuilder */
+        $filterBuilder = pluginApp( ItemFilterBuilder::class );
+
+        /** @var ItemParamsBuilder $paramBuilder */
+        $paramBuilder = pluginApp( ItemParamsBuilder::class );
+
+        $columns = $columnBuilder
+            ->defaults()
+            ->build();
+
+
+        $filterBuilder
+            ->variationIsActive()
+            ->variationIsPrimary();
+
+        if( $categoryId > 0 )
+        {
+            $filterBuilder->variationHasCategory([$categoryId]);
+        }
+
+        $filter = $filterBuilder->build();
+
+        $params = $paramBuilder
+            ->withParam(ItemColumnsParams::LANGUAGE, $this->sessionStorage->getLang())
+            ->withParam(ItemColumnsParams::PLENTY_ID, $this->app->getPlentyId())
+            ->withParam(ItemColumnsParams::ORDER_BY, ["orderBy.variationCreateTimestamp" => "desc"])
+            ->withParam(ItemColumnsParams::LIMIT, $limit)
+            ->build();
+
+        return $this->itemRepository->search( $columns, $filter, $params );
+
     }
 }
