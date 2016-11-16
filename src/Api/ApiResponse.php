@@ -4,6 +4,7 @@ namespace LayoutCore\Api;
 
 use LayoutCore\Helper\AbstractFactory;
 use LayoutCore\Services\BasketService;
+use LayoutCore\Services\CheckoutService;
 use Symfony\Component\HttpFoundation\Response as BaseResponse;
 use Plenty\Plugin\Http\Response;
 use Plenty\Modules\Account\Events\FrontendUpdateCustomerSettings;
@@ -20,6 +21,7 @@ use Plenty\Modules\Frontend\Events\FrontendLanguageChanged;
 use Plenty\Modules\Frontend\Events\FrontendUpdateDeliveryAddress;
 use Plenty\Modules\Frontend\Events\FrontendUpdatePaymentSettings;
 use Plenty\Modules\Frontend\Events\FrontendUpdateShippingSettings;
+use Plenty\Modules\Frontend\Events\FrontendPaymentMethodChanged;
 use Plenty\Modules\Basket\Events\Basket\AfterBasketChanged;
 use Plenty\Modules\Basket\Events\Basket\AfterBasketCreate;
 use Plenty\Plugin\Application;
@@ -168,7 +170,14 @@ class ApiResponse
 				"paymentMethodId" => $event->getPaymentMethodId()
 			];
 		}, 0);
-
+        
+        $this->dispatcher->listen(FrontendPaymentMethodChanged::class, function ($event)
+        {
+            $this->eventData["FrontendPaymentMethodChanged"] = [
+                "shippingProfileList" => pluginApp(CheckoutService::class)->getShippingProfileList
+            ];
+        }, 0);
+        
 		// Register auth events
 		$this->dispatcher->listen(AfterAccountAuthentication::class, function ($event)
 		{
