@@ -77,12 +77,13 @@ class LayoutCoreRouteServiceProvider extends RouteServiceProvider
 		/*
 		 * ITEM ROUTES
 		 */
-		//$router->get('{itemName?}/{itemId}', 'LayoutCore\Controllers\ItemController@showItem')
-		//->where('itemId', '[0-9]+');
+        $router->get('{itemId}/{variationId?}', 'LayoutCore\Controllers\ItemController@showItemWithoutName')
+               ->where('itemId', '[0-9]+')
+               ->where('variationId', '[0-9]+');
 
-		$router->get('{itemName?}/{itemId}/{variationId?}', 'LayoutCore\Controllers\ItemController@showItem')
-		       ->where('itemId', '[0-9]+')
-		       ->where('variationId', '[0-9]+');
+        $router->get('{itemName}/{itemId}/{variationId?}', 'LayoutCore\Controllers\ItemController@showItem')
+               ->where('itemId', '[0-9]+')
+               ->where('variationId', '[0-9]+');
 
 		$router->get('a-{itemId}', 'LayoutCore\Controllers\ItemController@showItemFromAdmin')
 		       ->where('itemId', '[0-9]+');

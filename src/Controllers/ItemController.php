@@ -64,6 +64,11 @@ class ItemController extends LayoutController
 		);
 	}
 
+	public function showItemWithoutName(ItemService $itemService, int $itemId, int $variationId):string
+    {
+        return $this->showItem( $itemService, "", $itemId, $variationId );
+    }
+
 	public function showItemFromAdmin(ItemService $itemService, int $itemId):string
 	{
 		return $this->showItem($itemService, "", $itemId, 0);
