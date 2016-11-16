@@ -66,10 +66,13 @@ class URLFilter extends AbstractFilter
 			$item           = $this->itemService->getItemURL($itemId);
 			$itemURLContent = $item->itemDescription->urlContent;
 
-			$e        = explode('/', $itemURLContent);
-			$itemName = $e[count($e) - 1];
+            if( $itemURLContent != "" )
+            {
+                $e        = explode('/', $itemURLContent);
+                $itemName = $e[count($e) - 1];
 
-			$itemURL = '/' . $itemName . $itemURL;
+                $itemURL = '/' . $itemName . $itemURL;
+            }
 		}
 
 		return $itemURL;

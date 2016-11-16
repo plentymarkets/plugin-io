@@ -39,34 +39,12 @@ class ItemService
 	 * @var Application
 	 */
 	private $app;
+
 	/**
 	 * @var ItemDataLayerRepositoryContract
 	 */
 	private $itemRepository;
-	/**
-	 * @var AttributeNameRepositoryContract
-	 */
-	private $attributeNameRepository;
-	/**
-	 * @var AttributeValueNameRepositoryContract
-	 */
-	private $attributeValueNameRepository;
-	/**
-	 * @var ItemColumnBuilder
-	 */
-	private $columnBuilder;
-	/**
-	 * @var ItemFilterBuilder
-	 */
-	private $filterBuilder;
-	/**
-	 * @var ItemParamsBuilder
-	 */
-	private $paramsBuilder;
-	/**
-	 * @var Request
-	 */
-	private $request;
+
 	/**
 	 * SessionStorageService
 	 */
@@ -76,34 +54,16 @@ class ItemService
      * ItemService constructor.
      * @param Application $app
      * @param ItemDataLayerRepositoryContract $itemRepository
-     * @param AttributeNameRepositoryContract $attributeNameRepository
-     * @param AttributeValueNameRepositoryContract $attributeValueNameRepository
-     * @param ItemColumnBuilder $columnBuilder
-     * @param ItemFilterBuilder $filterBuilder
-     * @param ItemParamsBuilder $paramsBuilder
-     * @param Request $request
      * @param SessionStorageService $sessionStorage
      */
 	public function __construct(
 		Application $app,
 		ItemDataLayerRepositoryContract $itemRepository,
-		AttributeNameRepositoryContract $attributeNameRepository,
-		AttributeValueNameRepositoryContract $attributeValueNameRepository,
-		ItemColumnBuilder $columnBuilder,
-		ItemFilterBuilder $filterBuilder,
-		ItemParamsBuilder $paramsBuilder,
-		Request $request,
 		SessionStorageService $sessionStorage
 	)
 	{
 		$this->app                          = $app;
 		$this->itemRepository               = $itemRepository;
-		$this->attributeNameRepository      = $attributeNameRepository;
-		$this->attributeValueNameRepository = $attributeValueNameRepository;
-		$this->columnBuilder                = $columnBuilder;
-		$this->filterBuilder                = $filterBuilder;
-		$this->paramsBuilder                = $paramsBuilder;
-		$this->request                      = $request;
 		$this->sessionStorage				= $sessionStorage;
 	}
 
@@ -124,19 +84,24 @@ class ItemService
      */
 	public function getItems(array $itemIds):RecordList
 	{
-		$columns = $this->columnBuilder
+        /** @var ItemColumnBuilder $columnBuilder */
+        $columnBuilder = pluginApp( ItemColumnBuilder::class );
+		$columns = $columnBuilder
 			->defaults()
 			->build();
 
 		// Filter the current item by item ID
-		$filter = $this->filterBuilder
+        /** @var ItemFilterBuilder $filterBuilder */
+        $filterBuilder = pluginApp( ItemFilterBuilder::class );
+		$filter = $filterBuilder
 			->hasId($itemIds)
             ->variationIsActive()
 			->build();
 
 		// Set the parameters
-		// TODO: make current language global
-		$params = $this->paramsBuilder
+        /** @var ItemParamsBuilder $paramsBuilder */
+        $paramsBuilder = pluginApp( ItemParamsBuilder::class );
+		$params = $paramsBuilder
 			->withParam(ItemColumnsParams::LANGUAGE, $this->sessionStorage->getLang())
 			->withParam(ItemColumnsParams::PLENTY_ID, $this->app->getPlentyId())
 			->build();
@@ -186,18 +151,24 @@ class ItemService
      */
 	public function getVariations(array $variationIds):RecordList
 	{
-		$columns = $this->columnBuilder
+        /** @var ItemColumnBuilder $columnBuilder */
+        $columnBuilder = pluginApp( ItemColumnBuilder::class );
+		$columns = $columnBuilder
 			->defaults()
 			->build();
-		// Filter the current item by item ID
-		$filter = $this->filterBuilder
+
+		// Filter the current variation by variation ID
+        /** @var ItemFilterBuilder $filterBuilder */
+        $filterBuilder = pluginApp( ItemFilterBuilder::class );
+		$filter = $filterBuilder
 			->variationHasId($variationIds)
             ->variationIsActive()
 			->build();
 
 		// Set the parameters
-		// TODO: make current language global
-		$params = $this->paramsBuilder
+        /** @var ItemParamsBuilder $paramsBuilder */
+        $paramsBuilder = pluginApp( ItemParamsBuilder::class );
+		$params = $paramsBuilder
 			->withParam(ItemColumnsParams::LANGUAGE, $this->sessionStorage->getLang())
 			->withParam(ItemColumnsParams::PLENTY_ID, $this->app->getPlentyId())
 			->build();
@@ -241,32 +212,38 @@ class ItemService
      */
     public function getItemForCategory( int $catID, CategoryParams $params, int $page = 1 )
     {
-        $columns = $this->columnBuilder
+        /** @var ItemColumnBuilder $columnBuilder */
+        $columnBuilder = pluginApp( ItemColumnBuilder::class );
+        $columns = $columnBuilder
             ->defaults()
             ->build();
 
+        /** @var ItemFilterBuilder $filterBuilder */
+        $filterBuilder = pluginApp( ItemFilterBuilder::class );
         if( $params->variationShowType == 2 )
         {
-            $this->filterBuilder->variationIsPrimary();
+            $filterBuilder->variationIsPrimary();
         }
 
         if( $params->variationShowType == 3 )
         {
-            $this->filterBuilder->variationIsChild();
+            $filterBuilder->variationIsChild();
         }
 
-        $filter = $this->filterBuilder
+        $filter = $filterBuilder
             ->variationHasCategory( $catID )
             ->variationIsActive()
             ->build();
 
+        /** @var ItemParamsBuilder $paramsBuilder */
+        $paramsBuilder = pluginApp( ItemParamsBuilder::class );
         if( $params->orderBy != null && strlen( $params->orderBy ) > 0 )
         {
-            $this->paramsBuilder->withParam( ItemColumnsParams::ORDER_BY, ["orderBy." . $params->orderBy => $params->orderByKey]);
+            $paramsBuilder->withParam( ItemColumnsParams::ORDER_BY, ["orderBy." . $params->orderBy => $params->orderByKey]);
         }
 
         $offset = ( $page - 1 ) * $params->itemsPerPage;
-        $params = $this->paramsBuilder
+        $params = $paramsBuilder
             ->withParam( ItemColumnsParams::LIMIT, $params->itemsPerPage )
             ->withParam( ItemColumnsParams::OFFSET, $offset )
             ->withParam( ItemColumnsParams::LANGUAGE, $this->sessionStorage->getLang() )
@@ -283,7 +260,9 @@ class ItemService
      */
 	public function getItemVariationAttributes(int $itemId = 0):array
 	{
-		$columns = $this->columnBuilder
+        /** @var ItemColumnBuilder $columnBuilder */
+        $columnBuilder = pluginApp( ItemColumnBuilder::class );
+		$columns = $columnBuilder
 			->withVariationBase([
 				                    VariationBaseFields::ID,
 				                    VariationBaseFields::ITEM_ID,
@@ -296,12 +275,16 @@ class ItemService
 				                                  VariationAttributeValueFields::ATTRIBUTE_VALUE_ID
 			                                  ])->build();
 
-		$filter = $this->filterBuilder
+        /** @var ItemFilterBuilder $filterBuilder */
+        $filterBuilder = pluginApp( ItemFilterBuilder::class );
+		$filter = $filterBuilder
             ->hasId([$itemId])
             ->variationIsActive()
             ->build();
 
-		$params = $this->paramsBuilder
+        /** @var ItemParamsBuilder $paramsBuilder */
+        $paramsBuilder = pluginApp( ItemParamsBuilder::class );
+		$params = $paramsBuilder
 			->withParam(ItemColumnsParams::LANGUAGE, $this->sessionStorage->getLang())
 			->withParam(ItemColumnsParams::PLENTY_ID, $this->app->getPlentyId())
 			->build();
@@ -344,17 +327,24 @@ class ItemService
      */
 	public function getItemURL(int $itemId):Record
 	{
-		$columns = $this->columnBuilder
+        /** @var ItemColumnBuilder $columnBuilder */
+        $columnBuilder = pluginApp( ItemColumnBuilder::class );
+		$columns = $columnBuilder
 			->withItemDescription([
-				                      ItemDescriptionFields::URL_CONTENT
-			                      ])->build();
+                  ItemDescriptionFields::URL_CONTENT
+              ])
+            ->build();
 
-		$filter = $this->filterBuilder
+        /** @var ItemFilterBuilder $filterBuilder */
+        $filterBuilder = pluginApp( ItemFilterBuilder::class );
+		$filter = $filterBuilder
             ->hasId([$itemId])
             ->variationIsActive()
             ->build();
 
-		$params = $this->paramsBuilder
+        /** @var ItemParamsBuilder $paramsBuilder */
+        $paramsBuilder = pluginApp( ItemParamsBuilder::class );
+		$params = $paramsBuilder
 			->withParam(ItemColumnsParams::LANGUAGE, $this->sessionStorage->getLang())
 			->withParam(ItemColumnsParams::PLENTY_ID, $this->app->getPlentyId())
 			->build();
@@ -370,8 +360,11 @@ class ItemService
      */
 	public function getAttributeName(int $attributeId = 0):string
 	{
+        /** @var AttributeNameRepositoryContract $attributeNameRepository */
+        $attributeNameRepository = pluginApp( AttributeNameRepositoryContract::class );
+
 		$name      = '';
-		$attribute = $this->attributeNameRepository->findOne($attributeId, $this->sessionStorage->getLang());
+		$attribute = $attributeNameRepository->findOne($attributeId, $this->sessionStorage->getLang());
 
 		if(!is_null($attribute))
 		{
@@ -388,8 +381,11 @@ class ItemService
      */
 	public function getAttributeValueName(int $attributeValueId = 0):string
 	{
+        /** @var AttributeValueNameRepositoryContract $attributeValueNameRepository */
+        $attributeValueNameRepository = pluginApp( AttributeValueNameRepositoryContract::class );
+
 		$name           = '';
-		$attributeValue = $this->attributeValueNameRepository->findOne($attributeValueId, $this->sessionStorage->getLang());
+		$attributeValue = $attributeValueNameRepository->findOne($attributeValueId, $this->sessionStorage->getLang());
 		if(!is_null($attributeValue))
 		{
 			$name = $attributeValue->name;
@@ -409,21 +405,27 @@ class ItemService
 
 		if($itemId > 0)
 		{
-			$columns = $this->columnBuilder
+            /** @var ItemColumnBuilder $columnBuilder */
+            $columnBuilder = pluginApp( ItemColumnBuilder::class );
+			$columns = $columnBuilder
 				->withItemCrossSellingList([
-					                           ItemCrossSellingFields::ITEM_ID,
-					                           ItemCrossSellingFields::CROSS_ITEM_ID,
-					                           ItemCrossSellingFields::RELATIONSHIP,
-					                           ItemCrossSellingFields::DYNAMIC
-				                           ])
+                    ItemCrossSellingFields::ITEM_ID,
+                    ItemCrossSellingFields::CROSS_ITEM_ID,
+                    ItemCrossSellingFields::RELATIONSHIP,
+                    ItemCrossSellingFields::DYNAMIC
+                ])
 				->build();
 
-			$filter = $this->filterBuilder
+            /** @var ItemFilterBuilder $filterBuilder */
+            $filterBuilder = pluginApp( ItemFilterBuilder::class );
+			$filter = $filterBuilder
 				->hasId([$itemId])
                 ->variationIsActive()
 				->build();
 
-			$params = $this->paramsBuilder
+            /** @var ItemParamsBuilder $paramsBuilder */
+            $paramsBuilder = pluginApp( ItemParamsBuilder::class );
+			$params = $paramsBuilder
 				->withParam(ItemColumnsParams::LANGUAGE, $this->sessionStorage->getLang())
 				->withParam(ItemColumnsParams::PLENTY_ID, $this->app->getPlentyId())
 				->build();
