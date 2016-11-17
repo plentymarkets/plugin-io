@@ -255,10 +255,22 @@ class CheckoutService
      * Get the ID of the current invoice address
      * @return int
      */
-	public function getBillingAddressId()
-	{
-		return (int)$this->sessionStorage->getPlugin()->getValue(SessionStorageKeys::BILLING_ADDRESS_ID);
-	}
+    public function getBillingAddressId()
+    {
+        $billingAddressId = (int)$this->sessionStorage->getPlugin()->getValue(SessionStorageKeys::BILLING_ADDRESS_ID);
+
+        if ($billingAddressId === 0)
+        {
+            $addresses = $this->customerService->getAddresses(AddressType::BILLING);
+            if (count($addresses) > 0)
+            {
+                $billingAddressId = $addresses[0]->id;
+                $this->setBillingAddressId($billingAddressId);
+            }
+        }
+
+        return $billingAddressId;
+    }
 
     /**
      * Set the ID of the current invoice address
