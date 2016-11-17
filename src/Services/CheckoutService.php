@@ -2,16 +2,15 @@
 
 namespace LayoutCore\Services;
 
+use LayoutCore\Builder\Order\AddressType;
 use Plenty\Modules\Frontend\PaymentMethod\Contracts\FrontendPaymentMethodRepositoryContract;
-use Plenty\Modules\Payment\Method\Models\PaymentMethod;
 use Plenty\Modules\Frontend\Contracts\Checkout;
 use Plenty\Modules\Basket\Contracts\BasketRepositoryContract;
-use Plenty\Modules\Basket\Models\Basket;
 use Plenty\Modules\Frontend\Session\Storage\Contracts\FrontendSessionStorageFactoryContract;
 use Plenty\Modules\Payment\Method\Contracts\PaymentMethodRepositoryContract;
 use Plenty\Modules\Order\Shipping\Contracts\ParcelServicePresetRepositoryContract;
 use LayoutCore\Constants\SessionStorageKeys;
-use LayoutCore\Services\CustomerService;
+use Plenty\Modules\System\Contracts\WebstoreRepositoryContract;
 
 /**
  * Class CheckoutService
@@ -104,7 +103,9 @@ class CheckoutService
 		$currency = (string)$this->sessionStorage->getPlugin()->getValue(SessionStorageKeys::CURRENCY);
 		if($currency === null || $currency === "")
 		{
-			$currency = "EUR";
+            /** @var WebstoreConfigurationService $webstoreConfig */
+            $webstoreConfig = pluginApp( WebstoreConfigurationService::class );
+			$currency = $webstoreConfig->getWebstoreConfig()->defaultCurrency;
 			$this->setCurrency($currency);
 		}
 		return $currency;
