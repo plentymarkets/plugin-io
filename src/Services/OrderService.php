@@ -2,9 +2,9 @@
 
 namespace LayoutCore\Services;
 
-use LayoutCore\Helper\AbstractFactory;
 use LayoutCore\Models\LocalizedOrder;
 use Plenty\Modules\Order\Contracts\OrderRepositoryContract;
+use Plenty\Modules\Payment\Method\Contracts\PaymentMethodRepositoryContract;
 use Plenty\Modules\Order\Models\Order;
 use LayoutCore\Builder\Order\OrderBuilder;
 use LayoutCore\Builder\Order\OrderType;
@@ -115,7 +115,7 @@ class OrderService
      */
 	public function executePayment( int $orderId, int $paymentId ):array
     {
-        $paymentRepository = AbstractFactory::create( \Plenty\Modules\Payment\Method\Contracts\PaymentMethodRepositoryContract::class );
+        $paymentRepository = pluginApp( PaymentMethodRepositoryContract::class );
         return $paymentRepository->executePayment( $paymentId, $orderId );
     }
 

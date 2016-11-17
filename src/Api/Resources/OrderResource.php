@@ -8,7 +8,6 @@ use Plenty\Plugin\Http\Response;
 use LayoutCore\Api\ApiResource;
 use LayoutCore\Api\ApiResponse;
 use LayoutCore\Api\ResponseCode;
-use LayoutCore\Helper\AbstractFactory;
 use LayoutCore\Services\OrderService;
 use LayoutCore\Services\CustomerService;
 
@@ -18,24 +17,16 @@ use LayoutCore\Services\CustomerService;
  */
 class OrderResource extends ApiResource
 {
-	/**
-	 * @var AbstractFactory
-	 */
-	private $factory;
-
     /**
      * OrderResource constructor.
      * @param Request $request
      * @param ApiResponse $response
-     * @param AbstractFactory $factory
      */
 	public function __construct(
 		Request $request,
-		ApiResponse $response,
-		AbstractFactory $factory)
+		ApiResponse $response)
 	{
 		parent::__construct($request, $response);
-		$this->factory = $factory;
 	}
 
     /**
@@ -47,7 +38,7 @@ class OrderResource extends ApiResource
 		$page  = (int)$this->request->get("page", 1);
 		$items = (int)$this->request->get("items", 10);
 
-		$data = $this->factory->make(CustomerService::class)->getOrders($page, $items);
+		$data = pluginApp(CustomerService::class)->getOrders($page, $items);
 		return $this->response->create($data, ResponseCode::OK);
 	}
 
@@ -57,7 +48,7 @@ class OrderResource extends ApiResource
      */
 	public function store():BaseResponse
 	{
-		$order = $this->factory->make(OrderService::class)->placeOrder();
+		$order = pluginApp(OrderService::class)->placeOrder();
 		return $this->response->create($order, ResponseCode::OK);
 	}
 }

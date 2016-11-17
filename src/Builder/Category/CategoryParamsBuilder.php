@@ -1,9 +1,7 @@
 <?php //strict
 
 namespace LayoutCore\Builder\Category;
-
 use LayoutCore\Builder\Category\CategoryParams;
-use LayoutCore\Helper\AbstractFactory;
 
 class CategoryParamsBuilder
 {
@@ -12,9 +10,9 @@ class CategoryParamsBuilder
      */
     private $params;
 
-    public function __construct( AbstractFactory $factory )
+    public function __construct()
     {
-        $this->params = $factory->make( \LayoutCore\Builder\Category\CategoryParams::class );
+        $this->params = pluginApp(CategoryParams::class);
     }
 
     public function build():CategoryParams
