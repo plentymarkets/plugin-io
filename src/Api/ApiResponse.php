@@ -22,6 +22,7 @@ use Plenty\Modules\Frontend\Events\FrontendUpdateDeliveryAddress;
 use Plenty\Modules\Frontend\Events\FrontendUpdatePaymentSettings;
 use Plenty\Modules\Frontend\Events\FrontendUpdateShippingSettings;
 use Plenty\Modules\Frontend\Events\FrontendPaymentMethodChanged;
+use Plenty\Modules\Frontend\Events\FrontendShippingProfileChanged;
 use Plenty\Modules\Basket\Events\Basket\AfterBasketChanged;
 use Plenty\Modules\Basket\Events\Basket\AfterBasketCreate;
 use Plenty\Plugin\Application;
@@ -170,11 +171,16 @@ class ApiResponse
 				"paymentMethodId" => $event->getPaymentMethodId()
 			];
 		}, 0);
-        
         $this->dispatcher->listen(FrontendPaymentMethodChanged::class, function ($event)
         {
             $this->eventData["FrontendPaymentMethodChanged"] = [
-                "shippingProfileList" => pluginApp(CheckoutService::class)->getShippingProfileList
+                "shippingProfileList" => pluginApp(CheckoutService::class)->getShippingProfileList()
+            ];
+        }, 0);
+        $this->dispatcher->listen(FrontendShippingProfileChanged::class, function ($event)
+        {
+            $this->eventData["FrontendShippingProfileChanged"] = [
+                "methodOfPaymentList" => pluginApp(CheckoutService::class)->getMethodOfPaymentList()
             ];
         }, 0);
         
