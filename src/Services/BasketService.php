@@ -189,5 +189,14 @@ class BasketService
 		return $result;
 	}
 
+    public function resetBasket()
+    {
+        $basketItems = $this->basketItemRepository->all();
+        foreach( $basketItems as $basketItem )
+        {
+            $this->basketItemRepository->removeBasketItem( $basketItem->id );
+        }
+    }
+
 
 }
