@@ -72,11 +72,12 @@ class TwigServiceProvider extends Twig_Extension
                 "item"          => $this->factory->make( \LayoutCore\Services\ItemService::class ),
                 "order"         => $this->factory->make( \LayoutCore\Services\OrderService::class ),
                 "sessionStorage"=> $this->factory->make( \LayoutCore\Services\SessionStorageService::class ),
-                "unit"          => $this->factory->make( \LayoutCore\Services\UnitService::class),
-                "template"      => $this->factory->make( \LayoutCore\Services\TemplateService::class),
+                "unit"          => $this->factory->make( \LayoutCore\Services\UnitService::class ),
+                "template"      => $this->factory->make( \LayoutCore\Services\TemplateService::class ),
                 "notifications" => $this->factory->make( \LayoutCore\Services\NotificationService::class ),
-                "contactBank"   => $this->factory->make( \LayoutCore\Services\ContactBankService::class),
-                "webstoreConfig"=> $this->factory->make( \LayoutCore\Services\WebstoreConfigurationService::class)
+                "contactBank"   => $this->factory->make( \LayoutCore\Services\ContactBankService::class ),
+                "webstoreConfig"=> $this->factory->make( \LayoutCore\Services\WebstoreConfigurationService::class ),
+                "localization"  => $this->factory->make( \LayoutCore\Services\LocalizationService::class )
             ]
         ];
     }
