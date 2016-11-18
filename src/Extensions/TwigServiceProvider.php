@@ -3,8 +3,6 @@
 namespace LayoutCore\Extensions;
 
 use Plenty\Plugin\Templates\Extensions\Twig_Extension;
-use Plenty\Plugin\Templates\Extensions\Twig_SimpleFunction;
-use Plenty\Plugin\Templates\Extensions\Twig_SimpleFilter;
 
 use LayoutCore\Services\AvailabilityService;
 use LayoutCore\Services\BasketService;

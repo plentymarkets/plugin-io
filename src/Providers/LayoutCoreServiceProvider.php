@@ -4,8 +4,6 @@ namespace LayoutCore\Providers;
 
 use LayoutCore\Extensions\TwigLayoutCoreExtension;
 use LayoutCore\Extensions\TwigServiceProvider;
-use LayoutCore\Guards\AbstractGuard;
-use LayoutCore\Providers\LayoutCoreRouteServiceProvider;
 use LayoutCore\Services\NotificationService;
 use Plenty\Plugin\ServiceProvider;
 use Plenty\Plugin\Templates\Twig;

@@ -3,8 +3,6 @@
 namespace LayoutCore\Extensions\Functions;
 
 use Plenty\Plugin\Application;
-use Plenty\Modules\Item\DataLayer\Models\Record;
-use Plenty\Modules\Item\DataLayer\Models\RecordList;
 use Plenty\Modules\Item\DataLayer\Contracts\ItemDataLayerRepositoryContract;
 use LayoutCore\Builder\Item\ItemColumnBuilder;
 use LayoutCore\Builder\Item\ItemFilterBuilder;
@@ -14,6 +12,7 @@ use LayoutCore\Builder\Item\Fields\VariationRetailPriceFields;
 use LayoutCore\Builder\Item\Params\ItemColumnsParams;
 use LayoutCore\Constants\Language;
 use LayoutCore\Extensions\AbstractFunction;
+use LayoutCore\Services\SessionStorageService;
 
 /**
  * Class GetBasePrice
@@ -41,6 +40,11 @@ class GetBasePrice extends AbstractFunction
 	 * @var ItemParamsBuilder
 	 */
 	private $paramsBuilder;
+    
+    /**
+     * @var SessionStorageService
+     */
+    private $sessionStorage;
 
     /**
      * GetBasePrice constructor.
@@ -55,7 +59,8 @@ class GetBasePrice extends AbstractFunction
 		ItemDataLayerRepositoryContract $itemRepository,
 		ItemColumnBuilder $columnBuilder,
 		ItemFilterBuilder $filterBuilder,
-		ItemParamsBuilder $paramsBuilder
+		ItemParamsBuilder $paramsBuilder,
+        SessionStorageService $sessionStorage
 	)
 	{
 		parent::__construct();
@@ -64,6 +69,7 @@ class GetBasePrice extends AbstractFunction
 		$this->columnBuilder  = $columnBuilder;
 		$this->filterBuilder  = $filterBuilder;
 		$this->paramsBuilder  = $paramsBuilder;
+        $this->sessionStorage = $sessionStorage;
 	}
 
     /**
@@ -114,9 +120,8 @@ class GetBasePrice extends AbstractFunction
                 ->build();
     
             // set params
-            // TODO: make current language global
             $params = $this->paramsBuilder
-                ->withParam( ItemColumnsParams::LANGUAGE, Language::DE )
+                ->withParam( ItemColumnsParams::LANGUAGE, $this->sessionStorage->getLang() )
                 ->withParam( ItemColumnsParams::PLENTY_ID, $this->app->getPlentyId() )
                 ->build();
     
