@@ -38,7 +38,10 @@ class WebstoreConfigurationService
 	 */
     public function getActiveLanguageList()
 	{
-		return $this->getWebstoreConfig()->languageList;
+        $languageList = $this->getWebstoreConfig()->languageList;
+        $languages = explode(', ', $languageList);
+        
+		return $languages;
 	}
 
 	/**
