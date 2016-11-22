@@ -6,9 +6,6 @@ use Plenty\Modules\Basket\Contracts\BasketRepositoryContract;
 use Plenty\Modules\Basket\Contracts\BasketItemRepositoryContract;
 use Plenty\Modules\Basket\Models\Basket;
 use Plenty\Modules\Basket\Models\BasketItem;
-use Plenty\Modules\Item\DataLayer\Models\RecordList;
-use Plenty\Modules\Item\DataLayer\Models\Record;
-
 use LayoutCore\Services\ItemService;
 
 /**
@@ -18,33 +15,17 @@ use LayoutCore\Services\ItemService;
 class BasketService
 {
 	/**
-	 * @var BasketRepositoryContract
-	 */
-	private $basketRepository;
-	/**
 	 * @var BasketItemRepositoryContract
 	 */
 	private $basketItemRepository;
-	/**
-	 * @var ItemService
-	 */
-	private $itemService;
 
     /**
      * BasketService constructor.
-     * @param BasketRepositoryContract $basketRepository
      * @param BasketItemRepositoryContract $basketItemRepository
-     * @param \LayoutCore\Services\ItemService $itemService
      */
-	public function __construct(
-		BasketRepositoryContract $basketRepository,
-		BasketItemRepositoryContract $basketItemRepository,
-		ItemService $itemService
-	)
+	public function __construct(BasketItemRepositoryContract $basketItemRepository)
 	{
-		$this->basketRepository     = $basketRepository;
 		$this->basketItemRepository = $basketItemRepository;
-		$this->itemService          = $itemService;
 	}
 
 	/**
@@ -53,7 +34,7 @@ class BasketService
 	 */
 	public function getBasket():Basket
 	{
-		return $this->basketRepository->load();
+		return pluginApp(BasketRepositoryContract::class)->load();
 	}
 
     /**
@@ -178,7 +159,7 @@ class BasketService
 			array_push($basketItemVariationIds, $basketItem->variationId);
 		}
 
-		$items  = $this->itemService->getVariations($basketItemVariationIds);
+		$items  = pluginApp(BasketService::class)->getVariations($basketItemVariationIds);
 		$result = array();
 		foreach($items as $item)
 		{

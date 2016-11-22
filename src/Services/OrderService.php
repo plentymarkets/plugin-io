@@ -5,7 +5,6 @@ namespace LayoutCore\Services;
 use LayoutCore\Models\LocalizedOrder;
 use Plenty\Modules\Order\Contracts\OrderRepositoryContract;
 use Plenty\Modules\Payment\Method\Contracts\PaymentMethodRepositoryContract;
-use Plenty\Modules\Order\Models\Order;
 use LayoutCore\Builder\Order\OrderBuilder;
 use LayoutCore\Builder\Order\OrderType;
 use LayoutCore\Builder\Order\OrderOptionType;
@@ -15,10 +14,6 @@ use LayoutCore\Constants\OrderStatusTexts;
 use Plenty\Repositories\Models\PaginatedResult;
 use LayoutCore\Constants\SessionStorageKeys;
 use LayoutCore\Services\SessionStorageService;
-use Plenty\Plugin\Http\Request;
-
-//TODO BasketService => basketItems
-//TODO SessionStorageService => billingAddressId, deliveryAddressId
 
 /**
  * Class OrderService
@@ -31,55 +26,29 @@ class OrderService
 	 */
 	private $orderRepository;
 	/**
-	 * @var OrderBuilder
-	 */
-	private $orderBuilder;
-	/**
 	 * @var BasketService
 	 */
 	private $basketService;
-	/**
-	 * @var CheckoutService
-	 */
-	private $checkoutService;
-	/**
-	 * @var CustomerService
-	 */
-	private $customerService;
     /**
      * @var SessionStorageService
      */
     private $sessionStorage;
-    /**
-     * @var Request
-     */
-    private $request;
-
+    
     /**
      * OrderService constructor.
      * @param OrderRepositoryContract $orderRepository
-     * @param OrderBuilder $orderBuilder
-     * @param \LayoutCore\Services\BasketService $basketService
-     * @param \LayoutCore\Services\CheckoutService $checkoutService
-     * @param \LayoutCore\Services\CustomerService $customerService
+     * @param BasketService $basketService
+     * @param \LayoutCore\Services\SessionStorageService $sessionStorage
      */
 	public function __construct(
 		OrderRepositoryContract $orderRepository,
-		OrderBuilder $orderBuilder,
 		BasketService $basketService,
-		CheckoutService $checkoutService,
-		CustomerService $customerService,
-        SessionStorageService $sessionStorage,
-        Request $request
+        SessionStorageService $sessionStorage
 	)
 	{
 		$this->orderRepository = $orderRepository;
-		$this->orderBuilder    = $orderBuilder;
 		$this->basketService   = $basketService;
-		$this->checkoutService = $checkoutService;
-		$this->customerService = $customerService;
         $this->sessionStorage  = $sessionStorage;
-        $this->request         = $request;
 	}
 
     /**
@@ -88,19 +57,22 @@ class OrderService
      */
 	public function placeOrder():LocalizedOrder
 	{
-		$order = $this->orderBuilder->prepare(OrderType::ORDER)
+        $checkoutService = pluginApp(CheckoutService::class);
+        $customerService = pluginApp(CustomerService::class);
+        
+		$order = pluginApp(OrderBuilder::class)->prepare(OrderType::ORDER)
 		                            ->fromBasket() //TODO: Add shipping costs & payment surcharge as OrderItem
 		                            ->withStatus(3.3)
-		                            ->withContactId($this->customerService->getContactId())
-		                            ->withAddressId($this->checkoutService->getBillingAddressId(), AddressType::BILLING)
-		                            ->withAddressId($this->checkoutService->getDeliveryAddressId(), AddressType::DELIVERY)
-		                            ->withOrderProperty(OrderOptionType::METHOD_OF_PAYMENT, OrderOptionSubType::MAIN_VALUE, $this->checkoutService->getMethodOfPaymentId())
-                                    ->withOrderProperty(OrderOptionType::SHIPPING_PROFIL, OrderOptionSubType::MAIN_VALUE, $this->checkoutService->getShippingProfileId())
+		                            ->withContactId($customerService->getContactId())
+		                            ->withAddressId($checkoutService->getBillingAddressId(), AddressType::BILLING)
+		                            ->withAddressId($checkoutService->getDeliveryAddressId(), AddressType::DELIVERY)
+		                            ->withOrderProperty(OrderOptionType::METHOD_OF_PAYMENT, OrderOptionSubType::MAIN_VALUE, $checkoutService->getMethodOfPaymentId())
+                                    ->withOrderProperty(OrderOptionType::SHIPPING_PROFIL, OrderOptionSubType::MAIN_VALUE, $checkoutService->getShippingProfileId())
 		                            ->done();
 
 		$order = $this->orderRepository->createOrder($order);
         
-        if($this->customerService->getContactId() <= 0)
+        if($customerService->getContactId() <= 0)
         {
             $this->sessionStorage->setSessionValue(SessionStorageKeys::LATEST_ORDER_ID, $order->id);
         }

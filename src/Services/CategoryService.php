@@ -4,10 +4,8 @@ namespace LayoutCore\Services;
 
 use Plenty\Modules\Category\Models\Category;
 use Plenty\Modules\Category\Contracts\CategoryRepositoryContract;
-use Plenty\Modules\Item\DataLayer\Models\RecordList;
 use Plenty\Repositories\Models\PaginatedResult;
 
-use LayoutCore\Constants\CategoryType;
 use LayoutCore\Services\ItemService;
 use LayoutCore\Helper\CategoryMap;
 use LayoutCore\Helper\CategoryKey;
@@ -24,20 +22,6 @@ class CategoryService
 	 */
 	private $categoryRepository;
 
-	/**
-	 * @var ItemService
-	 */
-	private $item;
-	/**
-	 * @var CategoryMap
-	 */
-	private $categoryMap;
-
-    /**
-     * @var CategoryParamsBuilder
-     */
-    private $categoryParamsBuilder;
-
 	// is set from controllers
 	/**
 	 * @var Category
@@ -48,20 +32,13 @@ class CategoryService
 	 */
 	private $currentCategoryTree = [];
 
-
-
     /**
      * CategoryService constructor.
      * @param CategoryRepositoryContract $category
-     * @param \LayoutCore\Services\ItemService $item
-     * @param CategoryMap $categoryMap
      */
-	public function __construct(CategoryRepositoryContract $categoryRepository, ItemService $item, CategoryMap $categoryMap, CategoryParamsBuilder $categoryParamsBuilder )
+	public function __construct(CategoryRepositoryContract $categoryRepository)
 	{
 		$this->categoryRepository    = $categoryRepository;
-		$this->item                  = $item;
-		$this->categoryMap           = $categoryMap;
-        $this->categoryParamsBuilder = $categoryParamsBuilder;
 	}
 
 	/**
@@ -176,7 +153,7 @@ class CategoryService
      */
 	public function isHome():bool
 	{
-		return $this->currentCategory !== null && $this->currentCategory->id == $this->categoryMap->getID(CategoryKey::HOME);
+		return $this->currentCategory !== null && $this->currentCategory->id == pluginApp(CategoryMap::class)->getID(CategoryKey::HOME);
 	}
 
     /**
@@ -197,7 +174,7 @@ class CategoryService
             return null;
         }
 
-        return $this->item->getItemForCategory( $category->id, $this->categoryParamsBuilder->fromArray($params), $page );
+        return pluginApp(ItemService::class)->getItemForCategory( $category->id, pluginApp(CategoryParamsBuilder::class)->fromArray($params), $page );
     }
 
     /**
