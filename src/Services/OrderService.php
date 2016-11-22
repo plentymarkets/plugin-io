@@ -84,7 +84,7 @@ class OrderService
 
     /**
      * Place an order
-     * @return Order
+     * @return LocalizedOrder
      */
 	public function placeOrder():LocalizedOrder
 	{
@@ -104,14 +104,18 @@ class OrderService
         {
             $this->sessionStorage->setSessionValue(SessionStorageKeys::LATEST_ORDER_ID, $order->id);
         }
+
+        // reset basket after order was created
+        $this->basketService->resetBasket();
         
         return LocalizedOrder::wrap( $order, "de" );
 	}
 
     /**
      * Execute the payment for a given order.
-     * @param Order $order  The order to execute payment for
-     * @return array        An array containing a type ("succes"|"error") and a value.
+     * @param int $orderId      The order id to execute payment for
+     * @param int $paymentId    The MoP-ID to execute
+     * @return array            An array containing a type ("succes"|"error") and a value.
      */
 	public function executePayment( int $orderId, int $paymentId ):array
     {

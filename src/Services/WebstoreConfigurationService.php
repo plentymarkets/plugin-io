@@ -2,6 +2,7 @@
 
 namespace LayoutCore\Services;
 
+use Plenty\Modules\System\Models\WebstoreConfiguration;
 use Plenty\Plugin\Application;
 use Plenty\Modules\System\Contracts\WebstoreRepositoryContract;
 
@@ -11,48 +12,41 @@ use Plenty\Modules\System\Contracts\WebstoreRepositoryContract;
  */
 class WebstoreConfigurationService
 {
-	/**
-	 * @var WebstoreRepositoryContract
-	 */
-	private $webstoreRepository;
-
     /**
-     * @var Apllication
+     * @var WebstoreConfiguration
      */
-    private $app;
+    private $webstoreConfig;
 
-    /**
-     * @var webstoreId
-     */
-    private $webstoreId;
+	public function getWebstoreConfig():WebstoreConfiguration
+    {
+        if( $this->webstoreConfig === null )
+        {
+            /** @var WebstoreRepositoryContract $webstoreRepository */
+            $webstoreRepository = pluginApp( WebstoreRepositoryContract::class );
 
-    /**
-     * WebstoreConfigurationService constructor.
-     * @param WebstoreRepositoryContract $webstoreRepository
-     * @param Application $app
-     */
-	public function __construct(Application $app, WebstoreRepositoryContract $webstoreRepository)
-	{
-        $this->app                = $app;
-		$this->webstoreRepository = $webstoreRepository;
+            /** @var Application $app */
+            $app = pluginApp( Application::class );
 
-        $this->webstoreId         = $app->getPlentyId();
-	}
+            $this->webstoreConfig = $webstoreRepository->findByPlentyId($app->getPlentyId())->configuration;
+        }
+
+        return $this->webstoreConfig;
+    }
 
 	/**
 	 * Get the activate languages of the webstore
 	 */
     public function getActiveLanguageList()
 	{
-		return $this->webstoreRepository->findByPlentyId($this->webstoreId)->configuration->languageList;
+		return $this->getWebstoreConfig()->languageList;
 	}
 
 	/**
-	 * Get the defaultlanguage of the webstore
+	 * Get the default language of the webstore
 	 */
-    public function getdefaultLanguage()
+    public function getDefaultLanguage()
     {
-        return $this->webstoreRepository->findByPlentyId($this->webstoreId)->configuration->defaultLanguage;
+        return $this->getWebstoreConfig()->defaultLanguage;
     }
 
 }
