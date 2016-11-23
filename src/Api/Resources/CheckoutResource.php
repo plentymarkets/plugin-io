@@ -97,7 +97,7 @@ class CheckoutResource extends ApiResource
      * Update the checkout information
      * @return BaseResponse
      */
-	public function update(string $selector):BaseResponse
+	public function update(string $selector = ''):BaseResponse
     {
         $billingAddressId = (int)$this->request->get("billingAddressId");
         $this->checkoutService->setBillingAddressId($billingAddressId);
