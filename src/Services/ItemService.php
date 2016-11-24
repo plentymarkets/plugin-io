@@ -487,4 +487,35 @@ class ItemService
         return $this->itemRepository->search( $columns, $filter, $params );
 
     }
+    
+    public function searchItems(string $searchString, CategoryParams $params, int $page = 1)
+    {
+        /** @var ItemColumnBuilder $columnBuilder */
+        $columnBuilder = pluginApp( ItemColumnBuilder::class );
+    
+        /** @var ItemFilterBuilder $filterBuilder */
+        $filterBuilder = pluginApp( ItemFilterBuilder::class );
+    
+        /** @var ItemParamsBuilder $paramBuilder */
+        $paramsBuilder = pluginApp( ItemParamsBuilder::class );
+    
+        $columns = $columnBuilder
+            ->defaults()
+            ->build();
+        
+        $filter = $filterBuilder
+            ->descriptionContains($searchString, true)
+            ->build();
+    
+        $offset = ( $page - 1 ) * $params->itemsPerPage;
+        
+        $params = $paramsBuilder
+            ->withParam( ItemColumnsParams::LIMIT, $params->itemsPerPage )
+            ->withParam( ItemColumnsParams::OFFSET, $offset )
+            ->withParam( ItemColumnsParams::LANGUAGE, $this->sessionStorage->getLang() )
+            ->withParam( ItemColumnsParams::PLENTY_ID, $this->app->getPlentyId() )
+            ->build();
+        
+        return $this->itemRepository->searchWithPagination( $columns, $filter, $params );
+    }
 }
