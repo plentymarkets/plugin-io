@@ -34,8 +34,13 @@ class ItemSearchResource extends ApiResource
     public function index():BaseResponse
     {
         $searchString = $this->request->get('searchString');
-        $params       = $this->request->get('searchParams');
         $page         = $this->request->get('page');
+    
+        $params = [
+            'itemsPerPage' => $this->request->get('itemsPerPage'),
+            'orderBy'      => $this->request->get('orderBy'),
+            'orderByKey'   => $this->request->get('orderByKey')
+        ];
     
         /**
          * @var CategoryParamsBuilder $categoryParamsBuilder
@@ -45,9 +50,9 @@ class ItemSearchResource extends ApiResource
          * @var ItemService $itemService
          */
         $itemService           = pluginApp(ItemService::class);
-        
+    
         $response = $itemService->searchItems($searchString, $categoryParamsBuilder->fromArray($params), $page);
-        
+    
         return $this->response->create($response, ResponseCode::OK);
     }
 }
