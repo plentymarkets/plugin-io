@@ -74,6 +74,8 @@ class LayoutCoreRouteServiceProvider extends RouteServiceProvider
         // execute payment after order is created. PaymentPlugins can redirect to this route if order was created by the PaymentPlugin itself.
         $router->get('execute-payment/{orderId}/{paymentId?}', 'LayoutCore\Controllers\PlaceOrderController@executePayment')
             ->where('orderId', '[0-9]+');
+        
+        $router->get('search', 'LayoutCore\Controllers\ItemSearchController@showSearch');
 
 		/*
 		 * ITEM ROUTES
