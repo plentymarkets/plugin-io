@@ -3,10 +3,12 @@
 namespace LayoutCore\Models;
 
 use Plenty\Modules\Order\Models\Order;
-use Plenty\Modules\Order\Shipping\ParcelService\Models\ParcelServicePreset;
-use Plenty\Modules\Order\Shipping\ParcelService\Models\ParcelServicePresetName;
 use Plenty\Modules\Order\Status\Models\OrderStatusName;
 use Plenty\Modules\Frontend\PaymentMethod\Contracts\FrontendPaymentMethodRepositoryContract;
+use Plenty\Modules\Order\Status\Contracts\StatusRepositoryContract;
+use Plenty\Modules\Order\Shipping\Contracts\ParcelServicePresetRepositoryContract;
+use LayoutCore\Extensions\Filters\URLFilter;
+use LayoutCore\Services\ItemService;
 
 class LocalizedOrder extends ModelWrapper
 {
@@ -45,10 +47,10 @@ class LocalizedOrder extends ModelWrapper
         $instance = pluginApp( self::class );
         $instance->order = $order;
 
-        $statusRepository = pluginApp( \Plenty\Modules\Order\Status\Contracts\StatusRepositoryContract::class );
+        $statusRepository = pluginApp(StatusRepositoryContract::class);
         $instance->status = $statusRepository->findStatusNameById( $order->statusId, $lang );
 
-        $parcelServicePresetRepository = pluginApp( \Plenty\Modules\Order\Shipping\Contracts\ParcelServicePresetRepositoryContract::class );
+        $parcelServicePresetRepository = pluginApp(ParcelServicePresetRepositoryContract::class);
         $shippingProfile = $parcelServicePresetRepository->getPresetById( $order->shippingProfileId );
         foreach( $shippingProfile->parcelServicePresetNames as $name )
         {
@@ -73,8 +75,8 @@ class LocalizedOrder extends ModelWrapper
         $instance->paymentMethodIcon = $frontentPaymentRepository->getPaymentMethodIconById( $order->methodOfPaymentId, $lang );
 
 
-        $urlFilter = pluginApp( \LayoutCore\Extensions\Filters\URLFilter::class );
-        $itemService = pluginApp( \LayoutCore\Services\ItemService::class );
+        $urlFilter = pluginApp(URLFilter::class);
+        $itemService = pluginApp(ItemService::class);
 
         foreach( $order->orderItems as $orderItem )
         {
@@ -88,8 +90,7 @@ class LocalizedOrder extends ModelWrapper
             }
 
         }
-
-
+        
         return $instance;
     }
 
