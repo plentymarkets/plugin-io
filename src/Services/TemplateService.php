@@ -10,14 +10,9 @@ class TemplateService
 {
     public static $currentTemplate = "";
 
-    /**
-     * @var CategoryService
-     */
-    private $categoryService;
-
-    public function __construct( CategoryService $categoryService )
+    public function __construct()
     {
-        $this->categoryService = $categoryService;
+        
     }
 
     public function getCurrentTemplate():string
@@ -27,7 +22,7 @@ class TemplateService
 
     public function isHome():bool
     {
-        return $this->categoryService->isHome();
+        return pluginApp(CategoryService::class)->isHome();
     }
 
     public function isMyAccount():bool

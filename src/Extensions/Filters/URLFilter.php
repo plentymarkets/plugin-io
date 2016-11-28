@@ -2,7 +2,6 @@
 
 namespace LayoutCore\Extensions\Filters;
 
-use Plenty\Plugin\ConfigRepository;
 use LayoutCore\Extensions\AbstractFilter;
 use LayoutCore\Services\ItemService;
 
@@ -13,23 +12,17 @@ use LayoutCore\Services\ItemService;
 class URLFilter extends AbstractFilter
 {
 	/**
-	 * @var ConfigRepository
-	 */
-	private $config;
-	/**
 	 * @var ItemService
 	 */
 	private $itemService;
 
     /**
      * URLFilter constructor.
-     * @param ConfigRepository $config
      * @param ItemService $itemService
      */
-	public function __construct(ConfigRepository $config, ItemService $itemService)
+	public function __construct(ItemService $itemService)
 	{
 		parent::__construct();
-		$this->config      = $config;
 		$this->itemService = $itemService;
 	}
 

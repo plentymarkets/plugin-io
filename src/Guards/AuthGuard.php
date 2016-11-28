@@ -6,14 +6,9 @@ use LayoutCore\Helper\UserSession;
 
 class AuthGuard extends AbstractGuard
 {
-    /**
-     * @var UserSession
-     */
-    private $session;
-
-    public function __construct( UserSession $session )
+    public function __construct()
     {
-        $this->session = $session;
+        
     }
 
     /**
@@ -21,6 +16,6 @@ class AuthGuard extends AbstractGuard
      */
     protected function assert()
     {
-        return $this->session->isContactLoggedIn();
+        return pluginApp(UserSession::class)->isContactLoggedIn();
     }
 }

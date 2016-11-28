@@ -3,9 +3,22 @@
 namespace LayoutCore\Extensions;
 
 use Plenty\Plugin\Templates\Extensions\Twig_Extension;
-use Plenty\Plugin\Templates\Extensions\Twig_SimpleFunction;
-use Plenty\Plugin\Templates\Extensions\Twig_SimpleFilter;
-use LayoutCore\Helper\AbstractFactory;
+
+use LayoutCore\Services\AvailabilityService;
+use LayoutCore\Services\BasketService;
+use LayoutCore\Services\CategoryService;
+use LayoutCore\Services\CheckoutService;
+use LayoutCore\Services\CountryService;
+use LayoutCore\Services\CustomerService;
+use LayoutCore\Services\ItemService;
+use LayoutCore\Services\OrderService;
+use LayoutCore\Services\SessionStorageService;
+use LayoutCore\Services\UnitService;
+use LayoutCore\Services\TemplateService;
+use LayoutCore\Services\NotificationService;
+use LayoutCore\Services\ContactBankService;
+use LayoutCore\Services\WebstoreConfigurationService;
+use LayoutCore\Services\LocalizationService;
 
 /**
  * Provide services and helper functions to twig engine
@@ -14,14 +27,9 @@ use LayoutCore\Helper\AbstractFactory;
  */
 class TwigServiceProvider extends Twig_Extension
 {
-    /**
-    * @var AbstractFactory
-    */
-  private $factory;
-
-    public function __construct( AbstractFactory $factory )
+    public function __construct()
     {
-        $this->factory  = $factory;
+        
     }
 
     /**
@@ -63,21 +71,21 @@ class TwigServiceProvider extends Twig_Extension
     {
         return [
             "services" => [
-                "availability"  => $this->factory->make( \LayoutCore\Services\AvailabilityService::class ),
-                "basket"        => $this->factory->make( \LayoutCore\Services\BasketService::class ),
-                "category"      => $this->factory->make( \LayoutCore\Services\CategoryService::class ),
-                "checkout"      => $this->factory->make( \LayoutCore\Services\CheckoutService::class ),
-                "country"       => $this->factory->make( \LayoutCore\Services\CountryService::class ),
-                "customer"      => $this->factory->make( \LayoutCore\Services\CustomerService::class ),
-                "item"          => $this->factory->make( \LayoutCore\Services\ItemService::class ),
-                "order"         => $this->factory->make( \LayoutCore\Services\OrderService::class ),
-                "sessionStorage"=> $this->factory->make( \LayoutCore\Services\SessionStorageService::class ),
-                "unit"          => $this->factory->make( \LayoutCore\Services\UnitService::class ),
-                "template"      => $this->factory->make( \LayoutCore\Services\TemplateService::class ),
-                "notifications" => $this->factory->make( \LayoutCore\Services\NotificationService::class ),
-                "contactBank"   => $this->factory->make( \LayoutCore\Services\ContactBankService::class ),
-                "webstoreConfig"=> $this->factory->make( \LayoutCore\Services\WebstoreConfigurationService::class ),
-                "localization"  => $this->factory->make( \LayoutCore\Services\LocalizationService::class )
+                "availability"  => pluginApp( AvailabilityService::class ),
+                "basket"        => pluginApp( BasketService::class ),
+                "category"      => pluginApp( CategoryService::class ),
+                "checkout"      => pluginApp( CheckoutService::class ),
+                "country"       => pluginApp( CountryService::class ),
+                "customer"      => pluginApp( CustomerService::class ),
+                "item"          => pluginApp( ItemService::class ),
+                "order"         => pluginApp( OrderService::class ),
+                "sessionStorage"=> pluginApp( SessionStorageService::class ),
+                "unit"          => pluginApp( UnitService::class),
+                "template"      => pluginApp( TemplateService::class),
+                "notifications" => pluginApp( NotificationService::class ),
+                "contactBank"   => pluginApp( ContactBankService::class),
+                "webstoreConfig"=> pluginApp( WebstoreConfigurationService::class),
+                "localization"  => pluginApp( LocalizationService::class )
             ]
         ];
     }

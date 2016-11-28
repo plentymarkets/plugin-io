@@ -2,8 +2,6 @@
 
 namespace LayoutCore\Guards;
 
-use LayoutCore\Helper\AbstractFactory;
-
 /**
  * Class AbstractGuard
  * @package LayoutCore\Guards
