@@ -44,6 +44,8 @@ class ApiResponse
 	 * @var mixed
 	 */
 	private $data = null;
+    
+    private $additionalData = [];
 
 	private $notifications = [
 		"error"   => null,
@@ -59,7 +61,7 @@ class ApiResponse
      * @var null|Response
      */
     private $response = null;
-
+    
     /**
      * ApiResponse constructor.
      * @param Dispatcher $dispatcher
@@ -77,6 +79,7 @@ class ApiResponse
             $this->eventData["AfterBasketChanged"] = [
                 "basket" => pluginApp(BasketService::class)->getBasket()
             ];
+            $this->additionalData['checkout'] = pluginApp(CheckoutService::class)->getCheckout();
         }, 0);
 
         $this->dispatcher->listen( AfterBasketCreate::class, function($event) {
@@ -163,15 +166,11 @@ class ApiResponse
 		}, 0);
         $this->dispatcher->listen(FrontendPaymentMethodChanged::class, function ($event)
         {
-            $this->eventData["FrontendPaymentMethodChanged"] = [
-                "shippingProfileList" => pluginApp(CheckoutService::class)->getShippingProfileList()
-            ];
+            $this->eventData["FrontendPaymentMethodChanged"] = [];
         }, 0);
         $this->dispatcher->listen(FrontendShippingProfileChanged::class, function ($event)
         {
-            $this->eventData["FrontendShippingProfileChanged"] = [
-                "methodOfPaymentList" => pluginApp(CheckoutService::class)->getMethodOfPaymentList()
-            ];
+            $this->eventData["FrontendShippingProfileChanged"] = [];
         }, 0);
         
 		// Register auth events
@@ -295,6 +294,14 @@ class ApiResponse
 
 		$responseData["events"] = $this->eventData;
 		$responseData["data"]   = $data;
+        
+        if(count($this->additionalData))
+        {
+            foreach($this->additionalData as $key => $value)
+            {
+                $responseData['data'][$key] = $value;
+            }
+        }
 
         return $this->response->make(json_encode($responseData), $code, $this->headers);
 	}
