@@ -159,7 +159,7 @@ class BasketService
 			array_push($basketItemVariationIds, $basketItem->variationId);
 		}
 
-		$items  = pluginApp(BasketService::class)->getVariations($basketItemVariationIds);
+		$items  = pluginApp(ItemService::class)->getVariations($basketItemVariationIds);
 		$result = array();
 		foreach($items as $item)
 		{
