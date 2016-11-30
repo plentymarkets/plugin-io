@@ -44,8 +44,6 @@ class ApiResponse
 	 * @var mixed
 	 */
 	private $data = null;
-    
-    private $additionalData = [];
 
 	private $notifications = [
 		"error"   => null,
@@ -79,7 +77,9 @@ class ApiResponse
             $this->eventData["AfterBasketChanged"] = [
                 "basket" => pluginApp(BasketService::class)->getBasket()
             ];
-            $this->additionalData['checkout'] = pluginApp(CheckoutService::class)->getCheckout();
+            $this->eventData['CheckoutChanged'] = [
+                'checkout' => pluginApp(CheckoutService::class)->getCheckout()
+            ];
         }, 0);
 
         $this->dispatcher->listen( AfterBasketCreate::class, function($event) {
@@ -294,16 +294,6 @@ class ApiResponse
 
 		$responseData["events"] = $this->eventData;
 		$responseData["data"]   = $data;
-        
-        if(count($this->additionalData))
-        {
-            $responseData = [];
-            $responseData['data']['list'] = $data;
-            foreach($this->additionalData as $key => $value)
-            {
-                $responseData['data'][$key] = $value;
-            }
-        }
 
         return $this->response->make(json_encode($responseData), $code, $this->headers);
 	}
