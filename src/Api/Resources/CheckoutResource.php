@@ -92,4 +92,25 @@ class CheckoutResource extends ApiResource
 
 		return $this->index();
 	}
+    
+    /**
+     * Update the checkout information
+     * @return BaseResponse
+     */
+	public function update(string $selector = ''):BaseResponse
+    {
+        $billingAddressId = (int)$this->request->get("billingAddressId");
+        $this->checkoutService->setBillingAddressId($billingAddressId);
+    
+        $deliveryAddressId = (int)$this->request->get("deliveryAddressId");
+        $this->checkoutService->setDeliveryAddressId($deliveryAddressId);
+        
+        $methodOfPaymentId = (int)$this->request->get("methodOfPaymentId");
+        $this->checkoutService->setMethodOfPaymentId($methodOfPaymentId);
+    
+        $shippingProfileId = (int)$this->request->get("shippingProfileId");
+        $this->checkoutService->setShippingProfileId($shippingProfileId);
+        
+        return $this->index();
+    }
 }

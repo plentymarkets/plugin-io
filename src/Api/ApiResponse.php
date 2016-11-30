@@ -2,8 +2,8 @@
 
 namespace LayoutCore\Api;
 
-use LayoutCore\Helper\AbstractFactory;
 use LayoutCore\Services\BasketService;
+use LayoutCore\Services\CheckoutService;
 use Symfony\Component\HttpFoundation\Response as BaseResponse;
 use Plenty\Plugin\Http\Response;
 use Plenty\Modules\Account\Events\FrontendUpdateCustomerSettings;
@@ -20,9 +20,10 @@ use Plenty\Modules\Frontend\Events\FrontendLanguageChanged;
 use Plenty\Modules\Frontend\Events\FrontendUpdateDeliveryAddress;
 use Plenty\Modules\Frontend\Events\FrontendUpdatePaymentSettings;
 use Plenty\Modules\Frontend\Events\FrontendUpdateShippingSettings;
+use Plenty\Modules\Frontend\Events\FrontendPaymentMethodChanged;
+use Plenty\Modules\Frontend\Events\FrontendShippingProfileChanged;
 use Plenty\Modules\Basket\Events\Basket\AfterBasketChanged;
 use Plenty\Modules\Basket\Events\Basket\AfterBasketCreate;
-use Plenty\Plugin\Application;
 use Plenty\Plugin\Events\Dispatcher;
 
 /**
@@ -53,36 +54,31 @@ class ApiResponse
 	 * @var array
 	 */
 	private $headers = [];
-
-	/**
-	 * @var null|Application
-	 */
-	private $app = null;
-
+    
     /**
      * @var null|Response
      */
     private $response = null;
-
+    
     /**
      * ApiResponse constructor.
      * @param Dispatcher $dispatcher
-     * @param Application $app
      * @param Response $response
      */
 	public function __construct(
 	    Dispatcher $dispatcher,
-        Application $app,
         Response $response)
 	{
-		$this->app = $app;
 		$this->dispatcher = $dispatcher;
         $this->response = $response;
 
 		// Register basket events
         $this->dispatcher->listen( AfterBasketChanged::class, function($event) {
             $this->eventData["AfterBasketChanged"] = [
-                "basket" => AbstractFactory::create(BasketService::class)->getBasket()
+                "basket" => pluginApp(BasketService::class)->getBasket()
+            ];
+            $this->eventData['CheckoutChanged'] = [
+                'checkout' => pluginApp(CheckoutService::class)->getCheckout()
             ];
         }, 0);
 
@@ -168,7 +164,15 @@ class ApiResponse
 				"paymentMethodId" => $event->getPaymentMethodId()
 			];
 		}, 0);
-
+        $this->dispatcher->listen(FrontendPaymentMethodChanged::class, function ($event)
+        {
+            $this->eventData["FrontendPaymentMethodChanged"] = [];
+        }, 0);
+        $this->dispatcher->listen(FrontendShippingProfileChanged::class, function ($event)
+        {
+            $this->eventData["FrontendShippingProfileChanged"] = [];
+        }, 0);
+        
 		// Register auth events
 		$this->dispatcher->listen(AfterAccountAuthentication::class, function ($event)
 		{

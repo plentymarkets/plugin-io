@@ -9,14 +9,11 @@ use Plenty\Modules\Account\Address\Contracts\AddressRepositoryContract;
 use Plenty\Modules\Account\Contact\Models\Contact;
 use LayoutCore\Builder\Order\AddressType;
 use Plenty\Modules\Account\Address\Models\Address;
-use Plenty\Plugin\Application;
-use LayoutCore\Helper\AbstractFactory;
 use LayoutCore\Helper\UserSession;
 use Plenty\Modules\Order\Contracts\OrderRepositoryContract;
-use Plenty\Modules\Order\Models\Order;
-use LayoutCore\Services\AuthenticationService;
 use LayoutCore\Services\SessionStorageService;
 use LayoutCore\Constants\SessionStorageKeys;
+use LayoutCore\Services\OrderService;
 
 /**
  * Class CustomerService
@@ -36,14 +33,6 @@ class CustomerService
      * @var AddressRepositoryContract
      */
     private $addressRepository;
-	/**
-	 * @var OrderRepositoryContract
-	 */
-	private $orderRepository;
-	/**
-	 * @var AuthenticationService
-	 */
-	private $authService;
     /**
      * @var SessionStorageService
      */
@@ -52,36 +41,24 @@ class CustomerService
 	 * @var UserSession
 	 */
 	private $userSession = null;
-	/**
-	 * @var AbstractFactory
-	 */
-	private $factory;
     
     /**
      * CustomerService constructor.
      * @param ContactRepositoryContract $contactRepository
      * @param ContactAddressRepositoryContract $contactAddressRepository
      * @param AddressRepositoryContract $addressRepository
-     * @param OrderRepositoryContract $orderRepository
      * @param \LayoutCore\Services\AuthenticationService $authService
-     * @param AbstractFactory $factory
      */
 	public function __construct(
 		ContactRepositoryContract $contactRepository,
 		ContactAddressRepositoryContract $contactAddressRepository,
         AddressRepositoryContract $addressRepository,
-		OrderRepositoryContract $orderRepository,
-		AuthenticationService $authService,
-        SessionStorageService $sessionStorage,
-		AbstractFactory $factory)
+        SessionStorageService $sessionStorage)
 	{
 		$this->contactRepository        = $contactRepository;
 		$this->contactAddressRepository = $contactAddressRepository;
         $this->addressRepository        = $addressRepository;
-		$this->orderRepository          = $orderRepository;
-		$this->authService              = $authService;
         $this->sessionStorage           = $sessionStorage;
-		$this->factory                  = $factory;
 	}
 
     /**
@@ -92,7 +69,7 @@ class CustomerService
 	{
 		if($this->userSession === null)
 		{
-			$this->userSession = $this->factory->make(UserSession::class);
+			$this->userSession = pluginApp(UserSession::class);
 		}
 		return $this->userSession->getCurrentContactId();
 	}
@@ -111,7 +88,7 @@ class CustomerService
 		if($contact->id > 0)
 		{
 			//Login
-			$this->authService->loginWithContactId($contact->id, (string)$contactData['password']);
+			pluginApp(AuthenticationService::class)->loginWithContactId($contact->id, (string)$contactData['password']);
 		}
 
 		if($billingAddressData !== null)
@@ -305,7 +282,7 @@ class CustomerService
      */
 	public function getOrders(int $page = 1, int $items = 10)
 	{
-		return AbstractFactory::create(\LayoutCore\Services\OrderService::class)->getOrdersForContact(
+		return pluginApp(OrderService::class)->getOrdersForContact(
 		    $this->getContactId(),
             $page,
             $items
@@ -318,7 +295,7 @@ class CustomerService
      */
 	public function getLatestOrder():LocalizedOrder
 	{
-        return AbstractFactory::create(\LayoutCore\Services\OrderService::class)->getLatestOrderForContact(
+        return pluginApp(OrderService::class)->getLatestOrderForContact(
             $this->getContactId()
         );
 	}

@@ -28,7 +28,10 @@ class LayoutCoreRouteServiceProvider extends RouteServiceProvider
 			$api->resource('basket', 'BasketResource');
 			$api->resource('basket/items', 'BasketItemResource');
 			$api->resource('order', 'OrderResource');
-			$api->resource('checkout', 'CheckoutResource');
+			//$api->resource('checkout', 'CheckoutResource');
+            $api->get('checkout', 'CheckoutResource@index');
+            $api->post('checkout', 'CheckoutResource@store');
+            $api->put('checkout', 'CheckoutResource@update');
 			$api->resource('checkout/payment', 'CheckoutPaymentResource');
 			$api->resource('customer', 'CustomerResource');
 			$api->resource('customer/address', 'CustomerAddressResource');

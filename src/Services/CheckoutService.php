@@ -10,7 +10,6 @@ use Plenty\Modules\Frontend\Session\Storage\Contracts\FrontendSessionStorageFact
 use Plenty\Modules\Payment\Method\Contracts\PaymentMethodRepositoryContract;
 use Plenty\Modules\Order\Shipping\Contracts\ParcelServicePresetRepositoryContract;
 use LayoutCore\Constants\SessionStorageKeys;
-use Plenty\Modules\System\Contracts\WebstoreRepositoryContract;
 
 /**
  * Class CheckoutService
@@ -34,16 +33,6 @@ class CheckoutService
 	 * @var FrontendSessionStorageFactoryContract
 	 */
 	private $sessionStorage;
-
-	/**
-	 * @var PaymentMethodRepositoryContract
-	 */
-	private $paymentMethodRepository;
-
-    /**
-     * @var ParcelServicePresetRepositoryContract
-     */
-    private $parcelServicePresetRepository;
     
     /**
      * @var CustomerService
@@ -56,23 +45,19 @@ class CheckoutService
      * @param Checkout $checkout
      * @param BasketRepositoryContract $basketRepository
      * @param FrontendSessionStorageFactoryContract $sessionStorage
-     * @param PaymentMethodRepositoryContract $paymentMethodRepository
+     * @param CustomerService $customerService
      */
 	public function __construct(
 		FrontendPaymentMethodRepositoryContract $frontendPaymentMethodRepository,
 		Checkout $checkout,
 		BasketRepositoryContract $basketRepository,
 		FrontendSessionStorageFactoryContract $sessionStorage,
-		PaymentMethodRepositoryContract $paymentMethodRepository,
-        ParcelServicePresetRepositoryContract $parcelServicePresetRepository,
         CustomerService $customerService)
 	{
 		$this->frontendPaymentMethodRepository = $frontendPaymentMethodRepository;
 		$this->checkout                      = $checkout;
 		$this->basketRepository              = $basketRepository;
 		$this->sessionStorage                = $sessionStorage;
-		$this->paymentMethodRepository       = $paymentMethodRepository;
-        $this->parcelServicePresetRepository = $parcelServicePresetRepository;
         $this->customerService               = $customerService;
 	}
 
@@ -153,7 +138,7 @@ class CheckoutService
 	public function preparePayment():array
 	{
 		$mopId = $this->getMethodOfPaymentId();
-		return $this->paymentMethodRepository->preparePaymentMethod($mopId);
+		return pluginApp(PaymentMethodRepositoryContract::class)->preparePaymentMethod($mopId);
 	}
 
     /**
@@ -194,7 +179,7 @@ class CheckoutService
     public function getShippingProfileList()
     {
         $contact = $this->customerService->getContact();
-        return $this->parcelServicePresetRepository->getLastWeightedPresetCombinations($this->basketRepository->load(), $contact->classId);
+        return pluginApp(ParcelServicePresetRepositoryContract::class)->getLastWeightedPresetCombinations($this->basketRepository->load(), $contact->classId);
     }
 
     /**

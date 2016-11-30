@@ -16,22 +16,14 @@ class CountryService
 	 * @var CountryRepositoryContract
 	 */
 	private $countryRepository;
-	/**
-	 * @var Checkout
-	 */
-	private $checkout;
 
     /**
      * CountryService constructor.
      * @param CountryRepositoryContract $countryRepository
-     * @param Checkout $checkout
      */
-	public function __construct(
-		CountryRepositoryContract $countryRepository,
-		Checkout $checkout)
+	public function __construct(CountryRepositoryContract $countryRepository)
 	{
 		$this->countryRepository = $countryRepository;
-		$this->checkout          = $checkout;
 	}
 
     /**
@@ -68,7 +60,7 @@ class CountryService
      */
 	public function setShippingCountryId(int $shippingCountryId)
 	{
-		$this->checkout->setShippingCountryId($shippingCountryId);
+		pluginApp(Checkout::class)->setShippingCountryId($shippingCountryId);
 	}
 
     /**

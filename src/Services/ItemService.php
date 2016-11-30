@@ -2,7 +2,6 @@
 
 namespace LayoutCore\Services;
 
-use Plenty\Modules\Item\DataLayer\Services\ColumnBuilder;
 use Plenty\Plugin\Application;
 use LayoutCore\Services\SessionStorageService;
 use Plenty\Modules\Item\DataLayer\Models\Record;
@@ -16,14 +15,9 @@ use LayoutCore\Builder\Item\ItemParamsBuilder;
 use LayoutCore\Builder\Item\Params\ItemColumnsParams;
 use LayoutCore\Builder\Item\Fields\ItemDescriptionFields;
 use LayoutCore\Builder\Item\Fields\VariationBaseFields;
-use LayoutCore\Builder\Item\Fields\VariationRetailPriceFields;
-use LayoutCore\Builder\Item\Fields\VariationImageFields;
-use LayoutCore\Builder\Item\Fields\ItemBaseFields;
-use LayoutCore\Builder\Item\Fields\VariationStandardCategoryFields;
 use LayoutCore\Builder\Item\Fields\VariationAttributeValueFields;
 use LayoutCore\Builder\Item\Fields\ItemCrossSellingFields;
 use LayoutCore\Constants\Language;
-use Plenty\Plugin\Http\Request;
 use Plenty\Repositories\Models\PaginatedResult;
 use LayoutCore\Constants\CrossSellingType;
 use LayoutCore\Builder\Category\CategoryParams;
