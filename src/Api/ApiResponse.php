@@ -297,6 +297,8 @@ class ApiResponse
         
         if(count($this->additionalData))
         {
+            $responseData = [];
+            $responseData['data']['list'] = $data;
             foreach($this->additionalData as $key => $value)
             {
                 $responseData['data'][$key] = $value;
