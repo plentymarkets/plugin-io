@@ -34,4 +34,9 @@ class TemplateService
     {
         return TemplateService::$currentTemplate == "tpl.checkout";
     }
+
+    public function isSearch():bool
+    {
+        return TemplateService::$currentTemplate == "tpl.search";
+    }
 }
