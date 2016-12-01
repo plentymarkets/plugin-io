@@ -107,6 +107,8 @@ class ItemService
 		);
 	}
 
+	
+	
     public function getItemImage( int $itemId = 0 ):string
     {
         $item = $this->getItem( $itemId );
@@ -173,6 +175,50 @@ class ItemService
 			$params
 		);
 	}
+    
+    public function getVariationList( int $itemId, bool $withPrimary = false ):array
+    {
+        /** @var ItemColumnBuilder $columnBuilder */
+        $columnBuilder = pluginApp( ItemColumnBuilder::class );
+        $columns = $columnBuilder
+            ->withVariationBase([
+                VariationBaseFields::ID
+            ])
+            ->build();
+
+        // filter current item by item id
+        /** @var ItemFilterBuilder $filterBuilder */
+        $filterBuilder = pluginApp( ItemFilterBuilder::class );
+        $filter = $filterBuilder
+            ->hasId( [$itemId] );
+
+        if($withPrimary)
+        {
+            $filter->variationIsChild();
+        }
+        
+        $filter = $filter->build();
+        
+        // set params
+        /** @var ItemParamsBuilder $paramsBuilder */
+        $paramsBuilder = pluginApp( ItemParamsBuilder::class );
+        $params = $paramsBuilder
+            ->withParam( ItemColumnsParams::LANGUAGE, Language::DE )
+            ->withParam( ItemColumnsParams::PLENTY_ID, $this->app->getPlentyId() )
+            ->build();
+        $variations = $this->itemRepository->search(
+            $columns,
+            $filter,
+            $params
+        );
+        
+        $variationIds = [];
+        foreach( $variations as $variation )
+        {
+            array_push( $variationIds, $variation->variationBase->id );
+        }
+        return $variationIds;
+    }
 
     public function getVariationImage( int $variationId = 0 ):string
     {
@@ -252,7 +298,7 @@ class ItemService
      * @param int $itemId
      * @return array
      */
-	public function getItemVariationAttributes(int $itemId = 0):array
+	public function getVariationAttributeMap(int $itemId = 0):array
 	{
         /** @var ItemColumnBuilder $columnBuilder */
         $columnBuilder = pluginApp( ItemColumnBuilder::class );
@@ -273,6 +319,7 @@ class ItemService
         $filterBuilder = pluginApp( ItemFilterBuilder::class );
 		$filter = $filterBuilder
             ->hasId([$itemId])
+            ->variationIsChild()
             ->variationIsActive()
             ->build();
 
@@ -284,35 +331,68 @@ class ItemService
 			->build();
 
 		$recordList = $this->itemRepository->search($columns, $filter, $params);
-
-		$attributeList                    = [];
-		$attributeList['selectionValues'] = [];
-		$attributeList['variations']      = [];
-		$attributeList['attributeNames']  = [];
-
-		foreach($recordList as $variation)
-		{
-			foreach($variation->variationAttributeValueList as $attribute)
-			{
-
-
-				$attributeId      = $attribute->attributeId;
-				$attributeValueId = $attribute->attributeValueId;
-
-				$attributeList['attributeNames'][$attributeId] = $this->getAttributeName($attributeId);
-
-				if(!in_array($attributeValueId, $attributeList['selectionValues'][$attributeId]))
-				{
-					$attributeList['selectionValues'][$attributeId][$attributeValueId] = $this->getAttributeValueName($attributeValueId);
-				}
-			}
-
-			$variationId                               = $variation->variationBase->id;
-			$attributeList['variations'][$variationId] = $variation->variationAttributeValueList;
-		}
-
-		return $attributeList;
+        
+        $variations = [];
+        foreach($recordList as $variation)
+        {
+            $data = [
+                    "variationId" => $variation->variationBase->id,
+                    "attributes" => $variation->variationAttributeValueList
+                    ];
+            array_push( $variations, $data );
+        }
+        
+		return $variations;
 	}
+    
+    public function getAttributeNameMap(int $itemId = 0):array
+    {
+        $columnBuilder = pluginApp( ItemColumnBuilder::class );
+        $columns = $columnBuilder
+            ->withVariationBase(array(
+                VariationBaseFields::ID,
+                VariationBaseFields::ITEM_ID,
+                VariationBaseFields::AVAILABILITY,
+                VariationBaseFields::PACKING_UNITS,
+                VariationBaseFields::CUSTOM_NUMBER
+            ))
+            ->withVariationAttributeValueList(array(
+                VariationAttributeValueFields::ATTRIBUTE_ID,
+                VariationAttributeValueFields::ATTRIBUTE_VALUE_ID
+            ))->build();
+    
+        $filterBuilder = pluginApp( ItemFilterBuilder::class );
+        $filter = $filterBuilder
+            ->hasId(array($itemId))
+            ->variationIsChild()
+            ->build();
+    
+        $paramsBuilder = pluginApp( ItemParamsBuilder::class );
+        $params = $paramsBuilder
+            ->withParam( ItemColumnsParams::LANGUAGE, Language::DE )
+            ->withParam( ItemColumnsParams::PLENTY_ID, $this->app->getPlentyId() )
+            ->build();
+        
+        $recordList = $this->itemRepository->search( $columns, $filter, $params );
+        
+        $attributeList = [];
+        
+        foreach($recordList as $variation)
+        {
+            foreach($variation->variationAttributeValueList as $attribute)
+            {
+                $attributeId = $attribute->attributeId;
+                $attributeValueId = $attribute->attributeValueId;
+                $attributeList[$attributeId]["name"] = $this->getAttributeName($attributeId);
+                if(!in_array($attributeValueId, $attributeList[$attributeId]["values"]))
+                {
+                    $attributeList[$attributeId]["values"][$attributeValueId] = $this->getAttributeValueName($attributeValueId);
+                }
+            }
+        }
+        
+        return $attributeList;
+    }
 
     /**
      * Get the item URL
@@ -424,16 +504,20 @@ class ItemService
 				->withParam(ItemColumnsParams::PLENTY_ID, $this->app->getPlentyId())
 				->build();
 
-			$currentItem = $this->itemRepository->search($columns, $filter, $params)->current();
-
-			foreach($currentItem->itemCrossSellingList as $crossSellingItem)
-			{
-                //TODO filter through datalayer - performance
-                if($crossSellingItem['relationship'] == $crossSellingType)
+			$records = $this->itemRepository->search($columns, $filter, $params);
+            
+            if( $records->count() > 0 )
+            {
+                $currentItem = $records->current();
+                foreach($currentItem->itemCrossSellingList as $crossSellingItem)
                 {
-                    $crossSellingItems[] = $crossSellingItem;
+                    if($crossSellingItem['relationship'] == $crossSellingType)
+                    {
+                        $crossSellingItems[] = $crossSellingItem;
+                    }
                 }
-			}
+            }
+			
 		}
 
 		return $crossSellingItems;
