@@ -52,8 +52,7 @@ class ItemSearchResource extends ApiResource
             /**
              * @var ItemService $itemService
              */
-            $itemService           = pluginApp(ItemService::class);
-    
+            $itemService = pluginApp(ItemService::class);
             $response = $itemService->searchItems($searchString, $categoryParamsBuilder->fromArray($params), $page);
     
             return $this->response->create($response, ResponseCode::OK);
