@@ -1,12 +1,12 @@
 <?php //strict
-namespace LayoutCore\Controllers;
+namespace IO\Controllers;
 
-use LayoutCore\Helper\TemplateContainer;
-use LayoutCore\Services\BasketService;
+use IO\Helper\TemplateContainer;
+use IO\Services\BasketService;
 
 /**
  * Class BasketController
- * @package LayoutCore\Controllers
+ * @package IO\Controllers
  */
 class BasketController extends LayoutController
 {

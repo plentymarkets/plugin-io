@@ -1,9 +1,9 @@
 <?php
-namespace LayoutCore\Helper;
+namespace IO\Helper;
 
 /**
  * Class CategoryKey
- * @package LayoutCore\Helper
+ * @package IO\Helper
  */
 class CategoryKey
 {

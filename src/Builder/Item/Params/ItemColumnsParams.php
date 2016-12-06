@@ -1,10 +1,10 @@
 <?php //strict
 
-namespace LayoutCore\Builder\Item\Params;
+namespace IO\Builder\Item\Params;
 
 /**
  * Class ItemColumnsParams
- * @package LayoutCore\Builder\Item\Params
+ * @package IO\Builder\Item\Params
  */
 class ItemColumnsParams
 {

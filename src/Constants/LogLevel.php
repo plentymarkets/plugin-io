@@ -1,10 +1,10 @@
 <?php
 
-namespace LayoutCore\Constants;
+namespace IO\Constants;
 
 /**
  * Class LogLevel
- * @package LayoutCore\Helper
+ * @package IO\Helper
  */
 class LogLevel
 {

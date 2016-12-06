@@ -1,22 +1,22 @@
 <?php //strict
 
-namespace LayoutCore\Extensions\Functions;
+namespace IO\Extensions\Functions;
 
 use Plenty\Plugin\Application;
 use Plenty\Modules\Item\DataLayer\Contracts\ItemDataLayerRepositoryContract;
-use LayoutCore\Builder\Item\ItemColumnBuilder;
-use LayoutCore\Builder\Item\ItemFilterBuilder;
-use LayoutCore\Builder\Item\ItemParamsBuilder;
-use LayoutCore\Builder\Item\Fields\VariationBaseFields;
-use LayoutCore\Builder\Item\Fields\VariationRetailPriceFields;
-use LayoutCore\Builder\Item\Params\ItemColumnsParams;
-use LayoutCore\Constants\Language;
-use LayoutCore\Extensions\AbstractFunction;
-use LayoutCore\Services\SessionStorageService;
+use IO\Builder\Item\ItemColumnBuilder;
+use IO\Builder\Item\ItemFilterBuilder;
+use IO\Builder\Item\ItemParamsBuilder;
+use IO\Builder\Item\Fields\VariationBaseFields;
+use IO\Builder\Item\Fields\VariationRetailPriceFields;
+use IO\Builder\Item\Params\ItemColumnsParams;
+use IO\Constants\Language;
+use IO\Extensions\AbstractFunction;
+use IO\Services\SessionStorageService;
 
 /**
  * Class GetBasePrice
- * @package LayoutCore\Extensions\Functions
+ * @package IO\Extensions\Functions
  */
 class GetBasePrice extends AbstractFunction
 {

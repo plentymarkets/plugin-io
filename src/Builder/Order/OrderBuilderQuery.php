@@ -1,12 +1,12 @@
 <?php
-namespace LayoutCore\Builder\Order;
-use LayoutCore\Services\BasketService;
+namespace IO\Builder\Order;
+use IO\Services\BasketService;
 use Plenty\Modules\Basket\Models\Basket;
 use Plenty\Plugin\Application;
 
 /**
  * Class OrderBuilderQuery
- * @package LayoutCore\Builder\Order
+ * @package IO\Builder\Order
  */
 class OrderBuilderQuery
 {

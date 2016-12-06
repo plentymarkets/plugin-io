@@ -1,33 +1,33 @@
 <?php // strict
 
-namespace LayoutCore\Providers;
+namespace IO\Providers;
 
-use LayoutCore\Extensions\TwigLayoutCoreExtension;
-use LayoutCore\Extensions\TwigServiceProvider;
-use LayoutCore\Services\NotificationService;
+use IO\Extensions\TwigIOExtension;
+use IO\Extensions\TwigServiceProvider;
+use IO\Services\NotificationService;
 use Plenty\Plugin\ServiceProvider;
 use Plenty\Plugin\Templates\Twig;
 
 /**
- * Class LayoutCoreServiceProvider
- * @package LayoutCore\Providers
+ * Class IOServiceProvider
+ * @package IO\Providers
  */
-class LayoutCoreServiceProvider extends ServiceProvider
+class IOServiceProvider extends ServiceProvider
 {
     /**
      * Register the core functions
      */
 	public function register()
 	{
-		$this->getApplication()->register(LayoutCoreRouteServiceProvider::class);
+		$this->getApplication()->register(IORouteServiceProvider::class);
 
-		$this->getApplication()->singleton('LayoutCore\Helper\TemplateContainer');
+		$this->getApplication()->singleton('IO\Helper\TemplateContainer');
 
-		$this->getApplication()->bind('LayoutCore\Builder\Item\ItemColumnBuilder');
-		$this->getApplication()->bind('LayoutCore\Builder\Item\ItemFilterBuilder');
-		$this->getApplication()->bind('LayoutCore\Builder\Item\ItemParamsBuilder');
+		$this->getApplication()->bind('IO\Builder\Item\ItemColumnBuilder');
+		$this->getApplication()->bind('IO\Builder\Item\ItemFilterBuilder');
+		$this->getApplication()->bind('IO\Builder\Item\ItemParamsBuilder');
 
-		$this->getApplication()->singleton('LayoutCore\Services\CategoryService');
+		$this->getApplication()->singleton('IO\Services\CategoryService');
 
         $this->getApplication()->singleton(NotificationService::class);
 	}
@@ -39,7 +39,7 @@ class LayoutCoreServiceProvider extends ServiceProvider
 	public function boot(Twig $twig)
 	{
 		$twig->addExtension(TwigServiceProvider::class);
-		$twig->addExtension(TwigLayoutCoreExtension::class);
+		$twig->addExtension(TwigIOExtension::class);
 		$twig->addExtension('Twig_Extensions_Extension_Intl');
 	}
 }

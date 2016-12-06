@@ -1,10 +1,10 @@
 <?php // strict
 
-namespace LayoutCore\Guards;
+namespace IO\Guards;
 
 /**
  * Class AbstractGuard
- * @package LayoutCore\Guards
+ * @package IO\Guards
  */
 abstract class AbstractGuard
 {

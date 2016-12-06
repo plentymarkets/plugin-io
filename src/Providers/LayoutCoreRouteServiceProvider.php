@@ -1,16 +1,16 @@
 <?php //strict
 
-namespace LayoutCore\Providers;
+namespace IO\Providers;
 
 use Plenty\Plugin\RouteServiceProvider;
 use Plenty\Plugin\Routing\Router;
 use Plenty\Plugin\Routing\ApiRouter;
 
 /**
- * Class LayoutCoreRouteServiceProvider
- * @package LayoutCore\Providers
+ * Class IORouteServiceProvider
+ * @package IO\Providers
  */
-class LayoutCoreRouteServiceProvider extends RouteServiceProvider
+class IORouteServiceProvider extends RouteServiceProvider
 {
 	public function register()
 	{
@@ -23,7 +23,7 @@ class LayoutCoreRouteServiceProvider extends RouteServiceProvider
      */
 	public function map(Router $router, ApiRouter $api)
 	{
-		$api->version(['v1'], ['namespace' => 'LayoutCore\Api\Resources'], function ($api)
+		$api->version(['v1'], ['namespace' => 'IO\Api\Resources'], function ($api)
 		{
 			$api->resource('basket', 'BasketResource');
 			$api->resource('basket/items', 'BasketItemResource');
@@ -50,54 +50,54 @@ class LayoutCoreRouteServiceProvider extends RouteServiceProvider
 		 */
 		//Basket route
 		// TODO: get slug from config
-		$router->get('basket', 'LayoutCore\Controllers\BasketController@showBasket');
+		$router->get('basket', 'IO\Controllers\BasketController@showBasket');
 
 		//Checkout-confirm purchase route
-		$router->get('checkout', 'LayoutCore\Controllers\CheckoutController@showCheckout');
+		$router->get('checkout', 'IO\Controllers\CheckoutController@showCheckout');
 
 		//My-account route
-		$router->get('my-account', 'LayoutCore\Controllers\MyAccountController@showMyAccount');
+		$router->get('my-account', 'IO\Controllers\MyAccountController@showMyAccount');
 
 		//Confiramtion route
-		$router->get('confirmation', 'LayoutCore\Controllers\ConfirmationController@showConfirmation');
+		$router->get('confirmation', 'IO\Controllers\ConfirmationController@showConfirmation');
 
 		//Guest route
-		$router->get('guest', 'LayoutCore\Controllers\GuestController@showGuest');
+		$router->get('guest', 'IO\Controllers\GuestController@showGuest');
 
 		//Login page route
-		$router->get('login', 'LayoutCore\Controllers\LoginController@showLogin');
+		$router->get('login', 'IO\Controllers\LoginController@showLogin');
 
 		//Register page route
-		$router->get('register', 'LayoutCore\Controllers\RegisterController@showRegister');
+		$router->get('register', 'IO\Controllers\RegisterController@showRegister');
 
         // PaymentPlugin entry points
         // place the current order and redirect to /execute_payment
-        $router->get('place-order', 'LayoutCore\Controllers\PlaceOrderController@placeOrder');
+        $router->get('place-order', 'IO\Controllers\PlaceOrderController@placeOrder');
 
         // execute payment after order is created. PaymentPlugins can redirect to this route if order was created by the PaymentPlugin itself.
-        $router->get('execute-payment/{orderId}/{paymentId?}', 'LayoutCore\Controllers\PlaceOrderController@executePayment')
+        $router->get('execute-payment/{orderId}/{paymentId?}', 'IO\Controllers\PlaceOrderController@executePayment')
             ->where('orderId', '[0-9]+');
         
-        $router->get('search', 'LayoutCore\Controllers\ItemSearchController@showSearch');
+        $router->get('search', 'IO\Controllers\ItemSearchController@showSearch');
 
 		/*
 		 * ITEM ROUTES
 		 */
-        $router->get('{itemId}/{variationId?}', 'LayoutCore\Controllers\ItemController@showItemWithoutName')
+        $router->get('{itemId}/{variationId?}', 'IO\Controllers\ItemController@showItemWithoutName')
                ->where('itemId', '[0-9]+')
                ->where('variationId', '[0-9]+');
 
-        $router->get('{itemName}/{itemId}/{variationId?}', 'LayoutCore\Controllers\ItemController@showItem')
+        $router->get('{itemName}/{itemId}/{variationId?}', 'IO\Controllers\ItemController@showItem')
                ->where('itemId', '[0-9]+')
                ->where('variationId', '[0-9]+');
 
-		$router->get('a-{itemId}', 'LayoutCore\Controllers\ItemController@showItemFromAdmin')
+		$router->get('a-{itemId}', 'IO\Controllers\ItemController@showItemFromAdmin')
 		       ->where('itemId', '[0-9]+');
 
 
 		/*
 		 * CATEGORY ROUTES
 		 */
-		$router->get('{level1?}/{level2?}/{level3?}/{level4?}/{level5?}/{level6?}', 'LayoutCore\Controllers\CategoryController@showCategory');
+		$router->get('{level1?}/{level2?}/{level3?}/{level4?}/{level5?}/{level6?}', 'IO\Controllers\CategoryController@showCategory');
 	}
 }

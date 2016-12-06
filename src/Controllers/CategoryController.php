@@ -1,15 +1,15 @@
 <?php //strict
-namespace LayoutCore\Controllers;
+namespace IO\Controllers;
 
 use Plenty\Modules\Category\Contracts\CategoryRepositoryContract;
 use Plenty\Modules\Item\DataLayer\Contracts\ItemDataLayerRepositoryContract;
 use Plenty\Modules\Category\Models\Category;
 
-use LayoutCore\Helper\CategoryKey;
+use IO\Helper\CategoryKey;
 
 /**
  * Class CategoryController
- * @package LayoutCore\Controllers
+ * @package IO\Controllers
  */
 class CategoryController extends LayoutController
 {

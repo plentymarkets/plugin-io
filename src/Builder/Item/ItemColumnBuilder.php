@@ -1,33 +1,33 @@
 <?php //strict
 
-namespace LayoutCore\Builder\Item;
+namespace IO\Builder\Item;
 
-use LayoutCore\Builder\Item\Fields\ItemBaseFields;
-use LayoutCore\Builder\Item\Fields\ItemCharacterFields;
-use LayoutCore\Builder\Item\Fields\ItemCrossSellingFields;
-use LayoutCore\Builder\Item\Fields\ItemDescriptionFields;
-use LayoutCore\Builder\Item\Fields\VariationAttributeValueFields;
-use LayoutCore\Builder\Item\Fields\VariationBarcodeFields;
-use LayoutCore\Builder\Item\Fields\VariationBaseFields;
-use LayoutCore\Builder\Item\Fields\VariationBundleComponentFields;
-use LayoutCore\Builder\Item\Fields\VariationCategoryFields;
-use LayoutCore\Builder\Item\Fields\VariationImageFields;
-use LayoutCore\Builder\Item\Fields\VariationLinkMarketplaceFields;
-use LayoutCore\Builder\Item\Fields\VariationLinkWebstoreFields;
-use LayoutCore\Builder\Item\Fields\VariationMarketStatusFields;
-use LayoutCore\Builder\Item\Fields\VariationRetailPriceFields;
-use LayoutCore\Builder\Item\Fields\VariationStandardCategoryFields;
-use LayoutCore\Builder\Item\Fields\VariationStockBufferFields;
-use LayoutCore\Builder\Item\Fields\VariationStockFields;
-use LayoutCore\Builder\Item\Fields\VariationSupplierFields;
-use LayoutCore\Builder\Item\Fields\VariationWarehouseFields;
+use IO\Builder\Item\Fields\ItemBaseFields;
+use IO\Builder\Item\Fields\ItemCharacterFields;
+use IO\Builder\Item\Fields\ItemCrossSellingFields;
+use IO\Builder\Item\Fields\ItemDescriptionFields;
+use IO\Builder\Item\Fields\VariationAttributeValueFields;
+use IO\Builder\Item\Fields\VariationBarcodeFields;
+use IO\Builder\Item\Fields\VariationBaseFields;
+use IO\Builder\Item\Fields\VariationBundleComponentFields;
+use IO\Builder\Item\Fields\VariationCategoryFields;
+use IO\Builder\Item\Fields\VariationImageFields;
+use IO\Builder\Item\Fields\VariationLinkMarketplaceFields;
+use IO\Builder\Item\Fields\VariationLinkWebstoreFields;
+use IO\Builder\Item\Fields\VariationMarketStatusFields;
+use IO\Builder\Item\Fields\VariationRetailPriceFields;
+use IO\Builder\Item\Fields\VariationStandardCategoryFields;
+use IO\Builder\Item\Fields\VariationStockBufferFields;
+use IO\Builder\Item\Fields\VariationStockFields;
+use IO\Builder\Item\Fields\VariationSupplierFields;
+use IO\Builder\Item\Fields\VariationWarehouseFields;
 
-use LayoutCore\Builder\Item\Params\ItemColumnsParams;
+use IO\Builder\Item\Params\ItemColumnsParams;
 
 /**
  * Build an array of ItemDataLayer columns to request from ItemDataLayerRepository::search
  * Class ItemColumnBuilder
- * @package LayoutCore\Builder\Item
+ * @package IO\Builder\Item
  */
 class ItemColumnBuilder
 {

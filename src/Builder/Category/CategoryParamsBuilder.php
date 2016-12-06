@@ -1,7 +1,7 @@
 <?php //strict
 
-namespace LayoutCore\Builder\Category;
-use LayoutCore\Builder\Category\CategoryParams;
+namespace IO\Builder\Category;
+use IO\Builder\Category\CategoryParams;
 
 class CategoryParamsBuilder
 {

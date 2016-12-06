@@ -1,10 +1,10 @@
 <?php //strict
 
-namespace LayoutCore\Services;
+namespace IO\Services;
 
 /**
  * Class TemplateService
- * @package LayoutCore\Services
+ * @package IO\Services
  */
 class TemplateService
 {

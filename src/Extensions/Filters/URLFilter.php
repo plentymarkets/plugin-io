@@ -1,13 +1,13 @@
 <?php //strict
 
-namespace LayoutCore\Extensions\Filters;
+namespace IO\Extensions\Filters;
 
-use LayoutCore\Extensions\AbstractFilter;
-use LayoutCore\Services\ItemService;
+use IO\Extensions\AbstractFilter;
+use IO\Services\ItemService;
 
 /**
  * Class URLFilter
- * @package LayoutCore\Extensions\Filters
+ * @package IO\Extensions\Filters
  */
 class URLFilter extends AbstractFilter
 {

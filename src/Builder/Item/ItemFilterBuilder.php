@@ -1,13 +1,13 @@
 <?php //strict
 
-namespace LayoutCore\Builder\Item;
+namespace IO\Builder\Item;
 
-use LayoutCore\Constants\Language;
+use IO\Constants\Language;
 
 /**
  * Build an array of ItemDataLayer filters to pass to ItemDataLayerRepository:search
  * Class ItemFilterBuilder
- * @package LayoutCore\Builder\Item
+ * @package IO\Builder\Item
  */
 class ItemFilterBuilder
 {

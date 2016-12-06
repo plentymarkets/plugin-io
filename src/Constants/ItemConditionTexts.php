@@ -1,10 +1,10 @@
 <?php //strict
 
-namespace LayoutCore\Constants;
+namespace IO\Constants;
 
 /**
  * Class ItemConditionTexts
- * @package LayoutCore\Constants
+ * @package IO\Constants
  */
 class ItemConditionTexts
 {

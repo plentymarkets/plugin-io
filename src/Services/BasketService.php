@@ -1,16 +1,16 @@
 <?php //strict
 
-namespace LayoutCore\Services;
+namespace IO\Services;
 
 use Plenty\Modules\Basket\Contracts\BasketRepositoryContract;
 use Plenty\Modules\Basket\Contracts\BasketItemRepositoryContract;
 use Plenty\Modules\Basket\Models\Basket;
 use Plenty\Modules\Basket\Models\BasketItem;
-use LayoutCore\Services\ItemService;
+use IO\Services\ItemService;
 
 /**
  * Class BasketService
- * @package LayoutCore\Services
+ * @package IO\Services
  */
 class BasketService
 {

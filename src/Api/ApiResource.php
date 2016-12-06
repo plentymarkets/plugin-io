@@ -1,22 +1,22 @@
 <?php //strict
 
-namespace LayoutCore\Api;
+namespace IO\Api;
 
 use Symfony\Component\HttpFoundation\Response as BaseResponse;
 use Plenty\Plugin\Http\Response;
 use Plenty\Plugin\Controller;
 use Plenty\Plugin\Http\Request;
-use LayoutCore\Api\ApiResponse;
-use LayoutCore\Api\ResponseCode;
+use IO\Api\ApiResponse;
+use IO\Api\ResponseCode;
 
 /**
  * Class ApiResource
- * @package LayoutCore\Api
+ * @package IO\Api
  */
 class ApiResource extends Controller
 {
     /**
-     * @var \LayoutCore\Api\ApiResponse
+     * @var \IO\Api\ApiResponse
      */
 	protected $response;
 
@@ -33,7 +33,7 @@ class ApiResource extends Controller
     /**
      * ApiResource constructor.
      * @param Request $request
-     * @param \LayoutCore\Api\ApiResponse $response
+     * @param \IO\Api\ApiResponse $response
      */
 	public function __construct(Request $request, ApiResponse $response)
 	{

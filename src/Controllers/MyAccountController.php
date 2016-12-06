@@ -1,11 +1,11 @@
 <?php //strict
-namespace LayoutCore\Controllers;
+namespace IO\Controllers;
 
-use LayoutCore\Guards\AuthGuard;
+use IO\Guards\AuthGuard;
 
 /**
  * Class MyAccountController
- * @package LayoutCore\Controllers
+ * @package IO\Controllers
  */
 class MyAccountController extends LayoutController
 {

@@ -1,18 +1,18 @@
 <?php //strict
 
-namespace LayoutCore\Api\Resources;
+namespace IO\Api\Resources;
 
 use Symfony\Component\HttpFoundation\Response as BaseResponse;
 use Plenty\Plugin\Http\Request;
 use Illuminate\Http\Response;
-use LayoutCore\Api\ApiResource;
-use LayoutCore\Api\ApiResponse;
-use LayoutCore\Api\ResponseCode;
-use LayoutCore\Services\ItemService;
+use IO\Api\ApiResource;
+use IO\Api\ApiResponse;
+use IO\Api\ResponseCode;
+use IO\Services\ItemService;
 
 /**
  * Class VariationResource
- * @package LayoutCore\Api\Resources
+ * @package IO\Api\Resources
  */
 class VariationResource extends ApiResource
 {

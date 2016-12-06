@@ -1,23 +1,23 @@
 <?php //strict
 
-namespace LayoutCore\Services;
+namespace IO\Services;
 
-use LayoutCore\Models\LocalizedOrder;
+use IO\Models\LocalizedOrder;
 use Plenty\Modules\Order\Contracts\OrderRepositoryContract;
 use Plenty\Modules\Payment\Method\Contracts\PaymentMethodRepositoryContract;
-use LayoutCore\Builder\Order\OrderBuilder;
-use LayoutCore\Builder\Order\OrderType;
-use LayoutCore\Builder\Order\OrderOptionType;
-use LayoutCore\Builder\Order\OrderOptionSubType;
-use LayoutCore\Builder\Order\AddressType;
-use LayoutCore\Constants\OrderStatusTexts;
+use IO\Builder\Order\OrderBuilder;
+use IO\Builder\Order\OrderType;
+use IO\Builder\Order\OrderOptionType;
+use IO\Builder\Order\OrderOptionSubType;
+use IO\Builder\Order\AddressType;
+use IO\Constants\OrderStatusTexts;
 use Plenty\Repositories\Models\PaginatedResult;
-use LayoutCore\Constants\SessionStorageKeys;
-use LayoutCore\Services\SessionStorageService;
+use IO\Constants\SessionStorageKeys;
+use IO\Services\SessionStorageService;
 
 /**
  * Class OrderService
- * @package LayoutCore\Services
+ * @package IO\Services
  */
 class OrderService
 {
@@ -38,7 +38,7 @@ class OrderService
      * OrderService constructor.
      * @param OrderRepositoryContract $orderRepository
      * @param BasketService $basketService
-     * @param \LayoutCore\Services\SessionStorageService $sessionStorage
+     * @param \IO\Services\SessionStorageService $sessionStorage
      */
 	public function __construct(
 		OrderRepositoryContract $orderRepository,

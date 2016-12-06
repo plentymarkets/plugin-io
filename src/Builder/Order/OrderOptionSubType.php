@@ -1,9 +1,9 @@
 <?php
-namespace LayoutCore\Builder\Order;
+namespace IO\Builder\Order;
 
 /**
  * Class OrderOptionSubType
- * @package LayoutCore\Builder\Order
+ * @package IO\Builder\Order
  */
 class OrderOptionSubType
 {

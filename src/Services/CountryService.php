@@ -1,6 +1,6 @@
 <?php //strict
 
-namespace LayoutCore\Services;
+namespace IO\Services;
 
 use Plenty\Modules\Order\Shipping\Countries\Contracts\CountryRepositoryContract;
 use Plenty\Modules\Order\Shipping\Countries\Models\Country;
@@ -8,7 +8,7 @@ use Plenty\Modules\Frontend\Contracts\Checkout;
 
 /**
  * Class CountryService
- * @package LayoutCore\Services
+ * @package IO\Services
  */
 class CountryService
 {

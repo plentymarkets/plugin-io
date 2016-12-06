@@ -1,29 +1,29 @@
 <?php //strict
 
-namespace LayoutCore\Extensions;
+namespace IO\Extensions;
 
 use Plenty\Plugin\Templates\Extensions\Twig_Extension;
 
-use LayoutCore\Services\AvailabilityService;
-use LayoutCore\Services\BasketService;
-use LayoutCore\Services\CategoryService;
-use LayoutCore\Services\CheckoutService;
-use LayoutCore\Services\CountryService;
-use LayoutCore\Services\CustomerService;
-use LayoutCore\Services\ItemService;
-use LayoutCore\Services\OrderService;
-use LayoutCore\Services\SessionStorageService;
-use LayoutCore\Services\UnitService;
-use LayoutCore\Services\TemplateService;
-use LayoutCore\Services\NotificationService;
-use LayoutCore\Services\ContactBankService;
-use LayoutCore\Services\WebstoreConfigurationService;
-use LayoutCore\Services\LocalizationService;
+use IO\Services\AvailabilityService;
+use IO\Services\BasketService;
+use IO\Services\CategoryService;
+use IO\Services\CheckoutService;
+use IO\Services\CountryService;
+use IO\Services\CustomerService;
+use IO\Services\ItemService;
+use IO\Services\OrderService;
+use IO\Services\SessionStorageService;
+use IO\Services\UnitService;
+use IO\Services\TemplateService;
+use IO\Services\NotificationService;
+use IO\Services\ContactBankService;
+use IO\Services\WebstoreConfigurationService;
+use IO\Services\LocalizationService;
 
 /**
  * Provide services and helper functions to twig engine
  * Class TwigServiceProvider
- * @package LayoutCore\Extensions
+ * @package IO\Extensions
  */
 class TwigServiceProvider extends Twig_Extension
 {
@@ -39,7 +39,7 @@ class TwigServiceProvider extends Twig_Extension
      */
     public function getName():string
     {
-        return "LayoutCore_Extension_TwigServiceProvider";
+        return "IO_Extension_TwigServiceProvider";
     }
 
     /**

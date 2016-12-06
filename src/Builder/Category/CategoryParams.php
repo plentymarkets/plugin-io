@@ -1,6 +1,6 @@
 <?php //strict
 
-namespace LayoutCore\Builder\Category;
+namespace IO\Builder\Category;
 
 class CategoryParams
 {

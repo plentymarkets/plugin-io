@@ -1,12 +1,12 @@
 <?php //strict
 
-namespace LayoutCore\Services;
+namespace IO\Services;
 
 use Plenty\Modules\Frontend\Contracts\Checkout;
 
 /**
  * Class ShippingService
- * @package LayoutCore\Services
+ * @package IO\Services
  */
 class ShippingService
 {

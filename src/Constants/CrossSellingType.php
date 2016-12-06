@@ -1,6 +1,6 @@
 <?php //strict
 
-namespace LayoutCore\Constants;
+namespace IO\Constants;
 
 class CrossSellingType
 {

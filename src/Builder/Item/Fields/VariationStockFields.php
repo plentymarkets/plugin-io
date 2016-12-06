@@ -1,10 +1,10 @@
 <?php //strict
 
-namespace LayoutCore\Builder\Item\Fields;
+namespace IO\Builder\Item\Fields;
 
 /**
  * Class VariationStockFields
- * @package LayoutCore\Builder\Item\Fields
+ * @package IO\Builder\Item\Fields
  */
 class VariationStockFields
 {

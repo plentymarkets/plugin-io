@@ -1,19 +1,19 @@
 <?php //strict
 
-namespace LayoutCore\Api\Resources;
+namespace IO\Api\Resources;
 
 use Symfony\Component\HttpFoundation\Response as BaseResponse;
 use Plenty\Plugin\Http\Response;
 use Plenty\Plugin\Http\Request;
-use LayoutCore\Api\ApiResource;
-use LayoutCore\Api\ApiResponse;
-use LayoutCore\Api\ResponseCode;
-use LayoutCore\Builder\Category\CategoryParamsBuilder;
-use LayoutCore\Services\ItemService;
+use IO\Api\ApiResource;
+use IO\Api\ApiResponse;
+use IO\Api\ResponseCode;
+use IO\Builder\Category\CategoryParamsBuilder;
+use IO\Services\ItemService;
 
 /**
  * Class ItemSearchResource
- * @package LayoutCore\Api\Resources
+ * @package IO\Api\Resources
  */
 class ItemSearchResource extends ApiResource
 {

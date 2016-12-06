@@ -1,6 +1,6 @@
 <?php //strict
 
-namespace LayoutCore\Services;
+namespace IO\Services;
 
 use Plenty\Modules\Account\Contact\Contracts\ContactPaymentRepositoryContract;
 use Plenty\Modules\Account\Contact\Models\ContactBank;

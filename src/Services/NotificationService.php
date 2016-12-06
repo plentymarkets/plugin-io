@@ -1,13 +1,13 @@
 <?php //strict
 
-namespace LayoutCore\Services;
+namespace IO\Services;
 
-use LayoutCore\Constants\SessionStorageKeys;
-use LayoutCore\Constants\LogLevel;
+use IO\Constants\SessionStorageKeys;
+use IO\Constants\LogLevel;
 
 /**
  * Class BasketService
- * @package LayoutCore\Services
+ * @package IO\Services
  */
 class NotificationService
 {
@@ -18,7 +18,7 @@ class NotificationService
 
     /**
      * BasketService constructor.
-     * @param \LayoutCore\Services\SessionStorageService $sessionStorageService
+     * @param \IO\Services\SessionStorageService $sessionStorageService
      */
     public function __construct(SessionStorageService $sessionStorageService)
     {

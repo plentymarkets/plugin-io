@@ -1,12 +1,12 @@
 <?php //strict
 
-namespace LayoutCore\Helper;
+namespace IO\Helper;
 
 use Plenty\Modules\Frontend\Services\AccountService;
 
 /**
  * Class UserSession
- * @package LayoutCore\Helper
+ * @package IO\Helper
  */
 class UserSession
 {

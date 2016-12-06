@@ -1,31 +1,31 @@
 <?php //strict
 
-namespace LayoutCore\Services;
+namespace IO\Services;
 
 use Plenty\Plugin\Application;
-use LayoutCore\Services\SessionStorageService;
+use IO\Services\SessionStorageService;
 use Plenty\Modules\Item\DataLayer\Models\Record;
 use Plenty\Modules\Item\DataLayer\Models\RecordList;
 use Plenty\Modules\Item\DataLayer\Contracts\ItemDataLayerRepositoryContract;
 use Plenty\Modules\Item\Attribute\Contracts\AttributeNameRepositoryContract;
 use Plenty\Modules\Item\Attribute\Contracts\AttributeValueNameRepositoryContract;
-use LayoutCore\Builder\Item\ItemColumnBuilder;
-use LayoutCore\Builder\Item\ItemFilterBuilder;
-use LayoutCore\Builder\Item\ItemParamsBuilder;
-use LayoutCore\Builder\Item\Params\ItemColumnsParams;
-use LayoutCore\Builder\Item\Fields\ItemDescriptionFields;
-use LayoutCore\Builder\Item\Fields\VariationBaseFields;
-use LayoutCore\Builder\Item\Fields\VariationAttributeValueFields;
-use LayoutCore\Builder\Item\Fields\ItemCrossSellingFields;
-use LayoutCore\Constants\Language;
+use IO\Builder\Item\ItemColumnBuilder;
+use IO\Builder\Item\ItemFilterBuilder;
+use IO\Builder\Item\ItemParamsBuilder;
+use IO\Builder\Item\Params\ItemColumnsParams;
+use IO\Builder\Item\Fields\ItemDescriptionFields;
+use IO\Builder\Item\Fields\VariationBaseFields;
+use IO\Builder\Item\Fields\VariationAttributeValueFields;
+use IO\Builder\Item\Fields\ItemCrossSellingFields;
+use IO\Constants\Language;
 use Plenty\Repositories\Models\PaginatedResult;
-use LayoutCore\Constants\CrossSellingType;
-use LayoutCore\Builder\Category\CategoryParams;
-use LayoutCore\Constants\ItemConditionTexts;
+use IO\Constants\CrossSellingType;
+use IO\Builder\Category\CategoryParams;
+use IO\Constants\ItemConditionTexts;
 
 /**
  * Class ItemService
- * @package LayoutCore\Services
+ * @package IO\Services
  */
 class ItemService
 {

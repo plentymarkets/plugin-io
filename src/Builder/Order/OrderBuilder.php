@@ -1,14 +1,14 @@
 <?php //strict
 
-namespace LayoutCore\Builder\Order;
+namespace IO\Builder\Order;
 
 use Plenty\Plugin\Application;
 use Plenty\Modules\Basket\Models\Basket;
-use LayoutCore\Services\BasketService;
+use IO\Services\BasketService;
 
 /**
  * Class OrderBuilder
- * @package LayoutCore\Builder\Order
+ * @package IO\Builder\Order
  */
 class OrderBuilder
 {

@@ -1,10 +1,10 @@
 <?php //strict
 
-namespace LayoutCore\Constants;
+namespace IO\Constants;
 
 /**
  * Class Language
- * @package LayoutCore\Constants
+ * @package IO\Constants
  */
 class Language
 {

@@ -1,15 +1,15 @@
 <?php //strict
 
-namespace LayoutCore\Builder\Order;
+namespace IO\Builder\Order;
 
 use Plenty\Modules\Basket\Models\Basket;
 use Plenty\Modules\Basket\Models\BasketItem;
-use LayoutCore\Services\CheckoutService;
+use IO\Services\CheckoutService;
 use Plenty\Modules\Frontend\PaymentMethod\Contracts\FrontendPaymentMethodRepositoryContract;
 
 /**
  * Class OrderItemBuilder
- * @package LayoutCore\Builder\Order
+ * @package IO\Builder\Order
  */
 class OrderItemBuilder
 {

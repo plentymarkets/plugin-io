@@ -1,12 +1,12 @@
 <?php //strict
 
-namespace LayoutCore\Extensions\Filters;
+namespace IO\Extensions\Filters;
 
-use LayoutCore\Extensions\AbstractFilter;
+use IO\Extensions\AbstractFilter;
 
 /**
  * Class PatternFilter
- * @package LayoutCore\Extensions\Filters
+ * @package IO\Extensions\Filters
  */
 class PatternFilter extends AbstractFilter
 {

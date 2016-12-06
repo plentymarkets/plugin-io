@@ -1,19 +1,19 @@
 <?php //strict
-namespace LayoutCore\Controllers;
+namespace IO\Controllers;
 
 use Plenty\Modules\Item\DataLayer\Contracts\ItemDataLayerRepositoryContract;
 
-use LayoutCore\Helper\TemplateContainer;
-use LayoutCore\Builder\Item\ItemColumnBuilder;
-use LayoutCore\Builder\Item\ItemFilterBuilder;
-use LayoutCore\Builder\Item\ItemParamsBuilder;
-use LayoutCore\Builder\Item\Params\ItemColumnsParams;
-use LayoutCore\Builder\Item\Fields\ItemDescriptionFields;
-use LayoutCore\Constants\Language;
+use IO\Helper\TemplateContainer;
+use IO\Builder\Item\ItemColumnBuilder;
+use IO\Builder\Item\ItemFilterBuilder;
+use IO\Builder\Item\ItemParamsBuilder;
+use IO\Builder\Item\Params\ItemColumnsParams;
+use IO\Builder\Item\Fields\ItemDescriptionFields;
+use IO\Constants\Language;
 
 /**
  * Class BlogController
- * @package LayoutCore\Controllers
+ * @package IO\Controllers
  */
 class BlogController extends LayoutController
 {

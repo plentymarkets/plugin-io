@@ -1,30 +1,30 @@
 <?php //strict
 
-namespace LayoutCore\Extensions;
+namespace IO\Extensions;
 
-use LayoutCore\Guards\AbstractGuard;
+use IO\Guards\AbstractGuard;
 use Plenty\Plugin\Templates\Extensions\Twig_Extension;
 use Plenty\Plugin\Templates\Extensions\Twig_SimpleFunction;
 use Plenty\Plugin\Templates\Extensions\Twig_SimpleFilter;
 use Plenty\Plugin\Templates\Factories\TwigFactory;
 use Plenty\Plugin\Http\Request;
 
-use LayoutCore\Extensions\AbstractFilter;
-use LayoutCore\Extensions\AbstractFunction;
-use LayoutCore\Extensions\Filters\PatternFilter;
-use LayoutCore\Extensions\Filters\NumberFormatFilter;
-use LayoutCore\Extensions\Filters\URLFilter;
-use LayoutCore\Extensions\Filters\ItemNameFilter;
+use IO\Extensions\AbstractFilter;
+use IO\Extensions\AbstractFunction;
+use IO\Extensions\Filters\PatternFilter;
+use IO\Extensions\Filters\NumberFormatFilter;
+use IO\Extensions\Filters\URLFilter;
+use IO\Extensions\Filters\ItemNameFilter;
 
-use LayoutCore\Extensions\Functions\GetBasePrice;
-use LayoutCore\Extensions\Functions\Component;
+use IO\Extensions\Functions\GetBasePrice;
+use IO\Extensions\Functions\Component;
 
 /**
  * Provide services and helper functions to twig engine
- * Class TwigLayoutCoreExtension
- * @package LayoutCore\Extensions
+ * Class TwigIOExtension
+ * @package IO\Extensions
  */
-class TwigLayoutCoreExtension extends Twig_Extension
+class TwigIOExtension extends Twig_Extension
 {
 	/**
 	 * @var TwigFactory
@@ -58,7 +58,7 @@ class TwigLayoutCoreExtension extends Twig_Extension
 	 */
 	public function getName():string
 	{
-		return "LayoutCore_Extension_TwigLayoutCoreExtensions";
+		return "IO_Extension_TwigIOExtensions";
 	}
 
 	/**

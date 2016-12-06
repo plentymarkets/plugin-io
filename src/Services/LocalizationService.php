@@ -1,11 +1,11 @@
 <?php //strict
 
-namespace LayoutCore\Services;
+namespace IO\Services;
 
-use LayoutCore\Services\SessionStorageService;
-use LayoutCore\Services\CountryService;
-use LayoutCore\Services\WebstoreConfigurationService;
-use LayoutCore\Services\CheckoutService;
+use IO\Services\SessionStorageService;
+use IO\Services\CountryService;
+use IO\Services\WebstoreConfigurationService;
+use IO\Services\CheckoutService;
 
 class LocalizationService
 {

@@ -1,14 +1,14 @@
 <?php
 
-namespace LayoutCore\Models;
+namespace IO\Models;
 
 use Plenty\Modules\Order\Models\Order;
 use Plenty\Modules\Order\Status\Models\OrderStatusName;
 use Plenty\Modules\Frontend\PaymentMethod\Contracts\FrontendPaymentMethodRepositoryContract;
 use Plenty\Modules\Order\Status\Contracts\StatusRepositoryContract;
 use Plenty\Modules\Order\Shipping\Contracts\ParcelServicePresetRepositoryContract;
-use LayoutCore\Extensions\Filters\URLFilter;
-use LayoutCore\Services\ItemService;
+use IO\Extensions\Filters\URLFilter;
+use IO\Services\ItemService;
 
 class LocalizedOrder extends ModelWrapper
 {

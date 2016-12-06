@@ -1,8 +1,8 @@
 <?php // strict
 
-namespace LayoutCore\Guards;
+namespace IO\Guards;
 
-use LayoutCore\Helper\UserSession;
+use IO\Helper\UserSession;
 
 class AuthGuard extends AbstractGuard
 {

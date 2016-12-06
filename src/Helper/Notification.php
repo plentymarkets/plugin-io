@@ -1,6 +1,6 @@
 <?php
 
-namespace LayoutCore\Helper\Notifications;
+namespace IO\Helper\Notifications;
 
 
 class Notification

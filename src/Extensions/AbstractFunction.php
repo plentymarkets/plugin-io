@@ -1,10 +1,10 @@
 <?php //strict
 
-namespace LayoutCore\Extensions;
+namespace IO\Extensions;
 
 /**
  * Class AbstractFunction
- * @package LayoutCore\Extensions
+ * @package IO\Extensions
  */
 abstract class AbstractFunction
 {

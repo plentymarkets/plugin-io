@@ -1,6 +1,6 @@
 <?php //strict
 
-namespace LayoutCore\Controllers;
+namespace IO\Controllers;
 
 class ItemSearchController extends LayoutController
 {

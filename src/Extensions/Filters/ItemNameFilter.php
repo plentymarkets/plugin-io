@@ -1,13 +1,13 @@
 <?php //strict
 
-namespace LayoutCore\Extensions\Filters;
+namespace IO\Extensions\Filters;
 
-use LayoutCore\Extensions\AbstractFilter;
+use IO\Extensions\AbstractFilter;
 use Plenty\Modules\Item\DataLayer\Models\ItemDescription;
 
 /**
  * Class ItemNameFilter
- * @package LayoutCore\Extensions\Filters
+ * @package IO\Extensions\Filters
  */
 class ItemNameFilter extends AbstractFilter
 {

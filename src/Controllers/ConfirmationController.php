@@ -1,11 +1,11 @@
 <?php //strict
-namespace LayoutCore\Controllers;
+namespace IO\Controllers;
 
-use LayoutCore\Helper\TemplateContainer;
+use IO\Helper\TemplateContainer;
 
 /**
  * Class ConfirmationController
- * @package LayoutCore\Controllers
+ * @package IO\Controllers
  */
 class ConfirmationController extends LayoutController
 {

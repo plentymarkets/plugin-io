@@ -1,13 +1,13 @@
 <?php //strict
 
-namespace LayoutCore\Extensions\Filters;
+namespace IO\Extensions\Filters;
 
 use Plenty\Plugin\ConfigRepository;
-use LayoutCore\Extensions\AbstractFilter;
+use IO\Extensions\AbstractFilter;
 
 /**
  * Class NumberFormatFilter
- * @package LayoutCore\Extensions\Filters
+ * @package IO\Extensions\Filters
  */
 class NumberFormatFilter extends AbstractFilter
 {
@@ -48,15 +48,15 @@ class NumberFormatFilter extends AbstractFilter
 	{
 		if($decimal_places < 0)
 		{
-			$decimal_places = $this->config->get('PluginLayoutCore.format.number_decimals');
+			$decimal_places = $this->config->get('PluginIO.format.number_decimals');
 		}
 
 		if($decimal_places === "")
 		{
 			$decimal_places = 0;
 		}
-		$decimal_separator   = $this->config->get('PluginLayoutCore.format.separator_decimal');
-		$thousands_separator = $this->config->get('PluginLayoutCore.format.separator_thousands');
+		$decimal_separator   = $this->config->get('PluginIO.format.separator_decimal');
+		$thousands_separator = $this->config->get('PluginIO.format.separator_thousands');
 		return number_format($value, $decimal_places, $decimal_separator, $thousands_separator);
 	}
 
@@ -78,10 +78,10 @@ class NumberFormatFilter extends AbstractFilter
 			$formatter->setSymbol(\NumberFormatter::CURRENCY_SYMBOL, $currencyISO);
 		}
 
-		if($this->config->get('PluginLayoutCore.format.use_locale_currency_format') === "0")
+		if($this->config->get('PluginIO.format.use_locale_currency_format') === "0")
 		{
-			$decimal_separator   = $this->config->get('PluginLayoutCore.format.separator_decimal');
-			$thousands_separator = $this->config->get('PluginLayoutCore.format.separator_thousands');
+			$decimal_separator   = $this->config->get('PluginIO.format.separator_decimal');
+			$thousands_separator = $this->config->get('PluginIO.format.separator_thousands');
 			$formatter->setSymbol(\NumberFormatter::MONETARY_SEPARATOR_SYMBOL, $decimal_separator);
 			$formatter->setSymbol(\NumberFormatter::MONETARY_GROUPING_SEPARATOR_SYMBOL, $thousands_separator);
 		}

@@ -1,14 +1,14 @@
 <?php //strict
-namespace LayoutCore\Controllers;
+namespace IO\Controllers;
 
-use LayoutCore\Helper\TemplateContainer;
-use LayoutCore\Helper\CategoryKey;
-use LayoutCore\Services\ItemService;
+use IO\Helper\TemplateContainer;
+use IO\Helper\CategoryKey;
+use IO\Services\ItemService;
 use Plenty\Modules\Category\Models\Category;
 
 /**
  * Class ItemController
- * @package LayoutCore\Controllers
+ * @package IO\Controllers
  */
 class ItemController extends LayoutController
 {

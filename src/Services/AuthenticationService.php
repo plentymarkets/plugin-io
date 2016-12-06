@@ -1,12 +1,12 @@
 <?php //strict
 
-namespace LayoutCore\Services;
+namespace IO\Services;
 
 use Plenty\Modules\Authentication\Contracts\ContactAuthenticationRepositoryContract;
 
 /**
  * Class AuthenticationService
- * @package LayoutCore\Services
+ * @package IO\Services
  */
 class AuthenticationService
 {

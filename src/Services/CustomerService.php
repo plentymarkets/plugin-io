@@ -1,23 +1,23 @@
 <?php //strict
 
-namespace LayoutCore\Services;
+namespace IO\Services;
 
-use LayoutCore\Models\LocalizedOrder;
+use IO\Models\LocalizedOrder;
 use Plenty\Modules\Account\Contact\Contracts\ContactRepositoryContract;
 use Plenty\Modules\Account\Contact\Contracts\ContactAddressRepositoryContract;
 use Plenty\Modules\Account\Address\Contracts\AddressRepositoryContract;
 use Plenty\Modules\Account\Contact\Models\Contact;
-use LayoutCore\Builder\Order\AddressType;
+use IO\Builder\Order\AddressType;
 use Plenty\Modules\Account\Address\Models\Address;
-use LayoutCore\Helper\UserSession;
+use IO\Helper\UserSession;
 use Plenty\Modules\Order\Contracts\OrderRepositoryContract;
-use LayoutCore\Services\SessionStorageService;
-use LayoutCore\Constants\SessionStorageKeys;
-use LayoutCore\Services\OrderService;
+use IO\Services\SessionStorageService;
+use IO\Constants\SessionStorageKeys;
+use IO\Services\OrderService;
 
 /**
  * Class CustomerService
- * @package LayoutCore\Services
+ * @package IO\Services
  */
 class CustomerService
 {
@@ -47,7 +47,7 @@ class CustomerService
      * @param ContactRepositoryContract $contactRepository
      * @param ContactAddressRepositoryContract $contactAddressRepository
      * @param AddressRepositoryContract $addressRepository
-     * @param \LayoutCore\Services\AuthenticationService $authService
+     * @param \IO\Services\AuthenticationService $authService
      */
 	public function __construct(
 		ContactRepositoryContract $contactRepository,

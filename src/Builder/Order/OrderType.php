@@ -1,10 +1,10 @@
 <?php // strict
 
-namespace LayoutCore\Builder\Order;
+namespace IO\Builder\Order;
 
 /**
  * Class OrderType
- * @package LayoutCore\Builder\Order
+ * @package IO\Builder\Order
  */
 class OrderType
 {

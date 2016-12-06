@@ -1,10 +1,10 @@
 <?php //strict
 
-namespace LayoutCore\Extensions;
+namespace IO\Extensions;
 
 /**
  * Class AbstractFilter
- * @package LayoutCore\Extensions
+ * @package IO\Extensions
  */
 abstract class AbstractFilter
 {

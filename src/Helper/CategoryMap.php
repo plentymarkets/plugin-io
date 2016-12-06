@@ -1,12 +1,12 @@
 <?php //strict
 
-namespace LayoutCore\Helper;
+namespace IO\Helper;
 
 use Plenty\Plugin\Events\Dispatcher;
 
 /**
  * Class CategoryMap
- * @package LayoutCore\Helper
+ * @package IO\Helper
  */
 class CategoryMap
 {

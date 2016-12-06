@@ -1,8 +1,8 @@
 <?php //strict
 
-namespace LayoutCore\Controllers;
+namespace IO\Controllers;
 
-use LayoutCore\Services\TemplateService;
+use IO\Services\TemplateService;
 use Plenty\Modules\Category\Contracts\CategoryRepositoryContract;
 use Plenty\Plugin\Application;
 use Plenty\Plugin\Controller;
@@ -10,20 +10,20 @@ use Plenty\Plugin\Templates\Twig;
 use Plenty\Plugin\Events\Dispatcher;
 use Plenty\Modules\Category\Models\Category;
 
-use LayoutCore\Helper\TemplateContainer;
-use LayoutCore\Helper\CategoryMap;
-use LayoutCore\Helper\CategoryKey;
-use LayoutCore\Services\NavigationService;
+use IO\Helper\TemplateContainer;
+use IO\Helper\CategoryMap;
+use IO\Helper\CategoryKey;
+use IO\Services\NavigationService;
 
-use LayoutCore\Constants\CategoryType;
-use LayoutCore\Constants\Language;
-use LayoutCore\Services\CategoryService;
+use IO\Constants\CategoryType;
+use IO\Constants\Language;
+use IO\Services\CategoryService;
 
 /**
  * Supercall for specific controllers
  * Provide global methods for rendering templates received from separate layout plugin
  * Class LayoutController
- * @package LayoutCore\Controllers
+ * @package IO\Controllers
  */
 class LayoutController extends Controller
 {

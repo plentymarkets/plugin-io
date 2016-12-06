@@ -1,9 +1,9 @@
 <?php //strict
 
-namespace LayoutCore\Api;
+namespace IO\Api;
 
-use LayoutCore\Services\BasketService;
-use LayoutCore\Services\CheckoutService;
+use IO\Services\BasketService;
+use IO\Services\CheckoutService;
 use Symfony\Component\HttpFoundation\Response as BaseResponse;
 use Plenty\Plugin\Http\Response;
 use Plenty\Modules\Account\Events\FrontendUpdateCustomerSettings;
@@ -28,7 +28,7 @@ use Plenty\Plugin\Events\Dispatcher;
 
 /**
  * Class ApiResponse
- * @package LayoutCore\Api
+ * @package IO\Api
  */
 class ApiResponse
 {

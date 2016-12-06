@@ -1,6 +1,6 @@
 <?php //strict
 
-namespace LayoutCore\Services;
+namespace IO\Services;
 
 use Plenty\Modules\System\Models\WebstoreConfiguration;
 use Plenty\Plugin\Application;
@@ -8,7 +8,7 @@ use Plenty\Modules\System\Contracts\WebstoreRepositoryContract;
 
 /**
  * Class WebstoreConfigurationService
- * @package LayoutCore\Services
+ * @package IO\Services
  */
 class WebstoreConfigurationService
 {

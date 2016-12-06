@@ -1,13 +1,13 @@
 <?php //strict
 
-namespace LayoutCore\Builder\Item;
+namespace IO\Builder\Item;
 
-use LayoutCore\Builder\Item\Params\ItemColumnsParams;
+use IO\Builder\Item\Params\ItemColumnsParams;
 
 /**
  * Build an array of ItemDataLayer parameters to pass to ItemDataLayerRepository::search
  * Class ItemParamsBuilder
- * @package LayoutCore\Builder\Item
+ * @package IO\Builder\Item
  */
 class ItemParamsBuilder
 {

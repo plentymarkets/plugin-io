@@ -1,12 +1,12 @@
 <?php //strict
 
-namespace LayoutCore\Services;
+namespace IO\Services;
 
 use Plenty\Modules\Frontend\Session\Storage\Contracts\FrontendSessionStorageFactoryContract;
 
 /**
  * Class SessionStorageService
- * @package LayoutCore\Services
+ * @package IO\Services
  */
 class SessionStorageService
 {

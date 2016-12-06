@@ -1,12 +1,12 @@
 <?php //strict
 
-namespace LayoutCore\Extensions\Functions;
+namespace IO\Extensions\Functions;
 
-use LayoutCore\Extensions\AbstractFunction;
+use IO\Extensions\AbstractFunction;
 
 /**
  * Class Component
- * @package LayoutCore\Extensions\Functions
+ * @package IO\Extensions\Functions
  */
 class Component extends AbstractFunction
 {

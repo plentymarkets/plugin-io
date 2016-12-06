@@ -1,19 +1,19 @@
 <?php //strict
 
-namespace LayoutCore\Services;
+namespace IO\Services;
 
-use LayoutCore\Builder\Order\AddressType;
+use IO\Builder\Order\AddressType;
 use Plenty\Modules\Frontend\PaymentMethod\Contracts\FrontendPaymentMethodRepositoryContract;
 use Plenty\Modules\Frontend\Contracts\Checkout;
 use Plenty\Modules\Basket\Contracts\BasketRepositoryContract;
 use Plenty\Modules\Frontend\Session\Storage\Contracts\FrontendSessionStorageFactoryContract;
 use Plenty\Modules\Payment\Method\Contracts\PaymentMethodRepositoryContract;
 use Plenty\Modules\Order\Shipping\Contracts\ParcelServicePresetRepositoryContract;
-use LayoutCore\Constants\SessionStorageKeys;
+use IO\Constants\SessionStorageKeys;
 
 /**
  * Class CheckoutService
- * @package LayoutCore\Services
+ * @package IO\Services
  */
 class CheckoutService
 {

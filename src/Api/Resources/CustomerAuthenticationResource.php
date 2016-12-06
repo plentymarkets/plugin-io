@@ -1,18 +1,18 @@
 <?php //strict
 
-namespace LayoutCore\Api\Resources;
+namespace IO\Api\Resources;
 
 use Symfony\Component\HttpFoundation\Response as BaseResponse;
 use Plenty\Plugin\Http\Request;
 use Plenty\Plugin\Http\Response;
-use LayoutCore\Api\ApiResource;
-use LayoutCore\Api\ApiResponse;
-use LayoutCore\Api\ResponseCode;
-use LayoutCore\Services\AuthenticationService;
+use IO\Api\ApiResource;
+use IO\Api\ApiResponse;
+use IO\Api\ResponseCode;
+use IO\Services\AuthenticationService;
 
 /**
  * Class CustomerAuthenticationResource
- * @package LayoutCore\Api\Resources
+ * @package IO\Api\Resources
  */
 class CustomerAuthenticationResource extends ApiResource
 {

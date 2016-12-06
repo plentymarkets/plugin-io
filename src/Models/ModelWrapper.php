@@ -1,6 +1,6 @@
 <?php
 
-namespace LayoutCore\Models;
+namespace IO\Models;
 
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model as BaseModel;

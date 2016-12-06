@@ -1,11 +1,11 @@
 <?php //strict
 
-namespace LayoutCore\Helper;
+namespace IO\Helper;
 
 /**
  * Container to pass current template between separate layout plugins and this plugin.
  * Class TemplateContainer
- * @package LayoutCore\Helper
+ * @package IO\Helper
  */
 class TemplateContainer
 {

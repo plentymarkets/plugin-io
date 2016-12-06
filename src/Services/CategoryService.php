@@ -1,19 +1,19 @@
 <?php //strict
 
-namespace LayoutCore\Services;
+namespace IO\Services;
 
 use Plenty\Modules\Category\Models\Category;
 use Plenty\Modules\Category\Contracts\CategoryRepositoryContract;
 use Plenty\Repositories\Models\PaginatedResult;
 
-use LayoutCore\Services\ItemService;
-use LayoutCore\Helper\CategoryMap;
-use LayoutCore\Helper\CategoryKey;
-use LayoutCore\Builder\Category\CategoryParamsBuilder;
+use IO\Services\ItemService;
+use IO\Helper\CategoryMap;
+use IO\Helper\CategoryKey;
+use IO\Builder\Category\CategoryParamsBuilder;
 
 /**
  * Class CategoryService
- * @package LayoutCore\Services
+ * @package IO\Services
  */
 class CategoryService
 {

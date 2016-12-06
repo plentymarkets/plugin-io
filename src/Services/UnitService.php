@@ -1,13 +1,13 @@
 <?php //strict
 
-namespace LayoutCore\Services;
+namespace IO\Services;
 
 use Plenty\Modules\Item\Unit\Contracts\UnitNameRepositoryContract;
 use Plenty\Modules\Item\Unit\Models\UnitName;
 
 /**
  * Class UnitService
- * @package LayoutCore\Services
+ * @package IO\Services
  */
 class UnitService
 {

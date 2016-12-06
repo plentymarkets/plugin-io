@@ -1,13 +1,13 @@
 <?php //strict
-namespace LayoutCore\Controllers;
+namespace IO\Controllers;
 
-use LayoutCore\Services\NotificationService;
-use LayoutCore\Services\OrderService;
+use IO\Services\NotificationService;
+use IO\Services\OrderService;
 use Plenty\Plugin\Http\Response;
 
 /**
  * Class PlaceOrderController
- * @package LayoutCore\Controllers
+ * @package IO\Controllers
  */
 class PlaceOrderController extends LayoutController
 {

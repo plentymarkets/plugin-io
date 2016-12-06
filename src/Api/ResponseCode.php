@@ -1,10 +1,10 @@
 <?php
-namespace LayoutCore\Api;
+namespace IO\Api;
 
 /**
  * Created by ptopczewski, 15.09.16 15:32
  * Class ResponseCode
- * @package LayoutCore\Api
+ * @package IO\Api
  */
 class ResponseCode
 {
