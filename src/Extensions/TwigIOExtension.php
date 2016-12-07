@@ -18,6 +18,7 @@ use IO\Extensions\Filters\ItemNameFilter;
 
 use IO\Extensions\Functions\GetBasePrice;
 use IO\Extensions\Functions\Component;
+use IO\Extensions\Functions\ExternalContent;
 
 /**
  * Provide services and helper functions to twig engine
@@ -44,7 +45,8 @@ class TwigIOExtension extends Twig_Extension
 		URLFilter $urlFilter,
 		GetBasePrice $getBasePrice,
 		Component $component,
-        ItemNameFilter $itemNameFilter
+        ItemNameFilter $itemNameFilter,
+        ExternalContent $externalContent
 	)
 	{
 		$this->twig = $twig;
