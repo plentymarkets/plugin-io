@@ -66,25 +66,30 @@ class NumberFormatFilter extends AbstractFilter
      * @param string $currencyISO
      * @return string
      */
-	public function formatMonetary(float $value, string $currencyISO):string
+	public function formatMonetary($value, string $currencyISO):string
 	{
-		$locale            = 'de_DE';
-		$useCurrencySymbol = true;
-
-		$formatter = numfmt_create($locale, \NumberFormatter::CURRENCY);
-		if(!$useCurrencySymbol)
-		{
-			$formatter->setTextAttribute(\NumberFormatter::CURRENCY_CODE, $currencyISO);
-			$formatter->setSymbol(\NumberFormatter::CURRENCY_SYMBOL, $currencyISO);
-		}
-
-		if($this->config->get('PluginIO.format.use_locale_currency_format') === "0")
-		{
-			$decimal_separator   = $this->config->get('PluginIO.format.separator_decimal');
-			$thousands_separator = $this->config->get('PluginIO.format.separator_thousands');
-			$formatter->setSymbol(\NumberFormatter::MONETARY_SEPARATOR_SYMBOL, $decimal_separator);
-			$formatter->setSymbol(\NumberFormatter::MONETARY_GROUPING_SEPARATOR_SYMBOL, $thousands_separator);
-		}
-		return $formatter->format($value);
+        if(!is_null($value))
+        {
+            $locale            = 'de_DE';
+            $useCurrencySymbol = true;
+    
+            $formatter = numfmt_create($locale, \NumberFormatter::CURRENCY);
+            if(!$useCurrencySymbol)
+            {
+                $formatter->setTextAttribute(\NumberFormatter::CURRENCY_CODE, $currencyISO);
+                $formatter->setSymbol(\NumberFormatter::CURRENCY_SYMBOL, $currencyISO);
+            }
+    
+            if($this->config->get('PluginIO.format.use_locale_currency_format') === "0")
+            {
+                $decimal_separator   = $this->config->get('PluginIO.format.separator_decimal');
+                $thousands_separator = $this->config->get('PluginIO.format.separator_thousands');
+                $formatter->setSymbol(\NumberFormatter::MONETARY_SEPARATOR_SYMBOL, $decimal_separator);
+                $formatter->setSymbol(\NumberFormatter::MONETARY_GROUPING_SEPARATOR_SYMBOL, $thousands_separator);
+            }
+            return $formatter->format($value);
+        }
+		
+        return '';
 	}
 }
