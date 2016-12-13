@@ -81,10 +81,10 @@ class TwigServiceProvider extends Twig_Extension
                 "order"         => pluginApp( OrderService::class ),
                 "sessionStorage"=> pluginApp( SessionStorageService::class ),
                 "unit"          => pluginApp( UnitService::class),
+                "contactBank"   => pluginApp( ContactBankService::class ),
                 "template"      => pluginApp( TemplateService::class),
                 "notifications" => pluginApp( NotificationService::class ),
-                "contactBank"   => pluginApp( ContactBankService::class),
-                "webstoreConfig"=> pluginApp( WebstoreConfigurationService::class),
+                "webstoreConfig"=> pluginApp( WebstoreConfigurationService::class ),
                 "localization"  => pluginApp( LocalizationService::class )
             ]
         ];
