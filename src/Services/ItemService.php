@@ -73,9 +73,23 @@ class ItemService
      * @param int $itemId
      * @return Record
      */
-    public function getItem(int $itemId = 0) : Record
+    public function getItem(int $itemId = 0):array
     {
-        return $this->getItems([$itemId])->current();
+        $elasticSearchRepo = pluginApp(ItemElasticSearchSearchRepositoryContract::class);
+    
+        $clientFilter = pluginApp(ClientFilter::class);
+        $clientFilter->isVisibleForClient($this->app->getPlentyId());
+    
+        $variationFilter = pluginApp(VariationBaseFilter::class);
+        $variationFilter
+            ->isActive()
+            ->hasItemId($itemId);
+    
+        $elasticSearchRepo
+            ->addFilter($clientFilter)
+            ->addFilter($variationFilter);
+        
+        return $elasticSearchRepo->execute();
     }
     
     /**
@@ -138,9 +152,23 @@ class ItemService
      * @param int $variationId
      * @return Record
      */
-    public function getVariation(int $variationId = 0):Record
+    public function getVariation(int $variationId = 0):array
     {
-        return $this->getVariations([$variationId])->current();
+        $elasticSearchRepo = pluginApp(ItemElasticSearchSearchRepositoryContract::class);
+    
+        $clientFilter = pluginApp(ClientFilter::class);
+        $clientFilter->isVisibleForClient($this->app->getPlentyId());
+    
+        $variationFilter = pluginApp(VariationBaseFilter::class);
+        $variationFilter
+            ->isActive()
+            ->hasId($variationId);
+    
+        $elasticSearchRepo
+            ->addFilter($clientFilter)
+            ->addFilter($variationFilter);
+        
+        return $elasticSearchRepo->execute();
     }
     
     /**

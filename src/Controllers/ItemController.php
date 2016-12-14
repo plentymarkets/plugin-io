@@ -52,9 +52,9 @@ class ItemController extends LayoutController
 			return '';
 		}
 
-		$this->categoryService->setCurrentCategoryID(
+		/*$this->categoryService->setCurrentCategoryID(
 			$currentItem->variationStandardCategory->categoryId
-		);
+		)*/;
 
 		return $this->renderTemplate(
 			"tpl.item",
