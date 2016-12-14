@@ -570,8 +570,7 @@ class ItemService
         $elasticSearchRepo
             ->addFilter($clientFilter)
             ->addFilter($variationFilter)
-            ->addFilter($searchFilter)
-            ->setPage($page, $params['itemsPerPage']);
+            ->addFilter($searchFilter);
         
         return $elasticSearchRepo->execute();
     }
