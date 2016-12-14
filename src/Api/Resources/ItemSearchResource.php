@@ -46,14 +46,10 @@ class ItemSearchResource extends ApiResource
             ];
     
             /**
-             * @var CategoryParamsBuilder $categoryParamsBuilder
-             */
-            $categoryParamsBuilder = pluginApp(CategoryParamsBuilder::class);
-            /**
              * @var ItemService $itemService
              */
             $itemService = pluginApp(ItemService::class);
-            $response = $itemService->searchItems($searchString, $categoryParamsBuilder->fromArray($params), $page);
+            $response = $itemService->searchItems($searchString, $params, $page);
     
             return $this->response->create($response, ResponseCode::OK);
         }
