@@ -52,4 +52,20 @@ class WebstoreConfigurationService
         return $this->getWebstoreConfig()->defaultLanguage;
     }
 
+    /**
+	 * Get the default parcel-service-Id of the webstore
+	 */
+    public function getDefaultParcelServiceId()
+    {
+        return $this->getWebstoreConfig()->defaultParcelServiceId;
+    }
+
+    /**
+     * Get the default shipping-country-Id of the webstore
+     */
+    public function getDefaultShippingCountryId()
+    {
+        return $this->getWebstoreConfig()->defaultShippingCountryId;
+    }
+
 }
