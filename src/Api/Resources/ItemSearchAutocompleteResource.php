@@ -14,7 +14,7 @@ use IO\Services\ItemService;
  * Class ItemSearchResource
  * @package IO\Api\Resources
  */
-class ItemSearchAutocomplete extends ApiResource
+class ItemSearchAutocompleteResource extends ApiResource
 {
     /**
      * ItemSearchResource constructor.
