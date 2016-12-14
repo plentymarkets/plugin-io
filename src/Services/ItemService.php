@@ -23,10 +23,12 @@ use IO\Constants\CrossSellingType;
 use IO\Builder\Category\CategoryParams;
 use IO\Constants\ItemConditionTexts;
 
+use Plenty\Modules\Cloud\ElasticSearch\Lib\ElasticSearch;
 use Plenty\Modules\Item\Search\Contracts\ItemElasticSearchSearchRepositoryContract;
 use Plenty\Modules\Item\Search\Filter\SearchFilter;
 use Plenty\Modules\Item\Search\Filter\CategoryFilter;
 use Plenty\Modules\Item\Search\Filter\VariationBaseFilter;
+use Plenty\Modules\Item\Search\Filter\ClientFilter;
 
 /**
  * Class ItemService
@@ -246,44 +248,26 @@ class ItemService
      * @param int $page
      * @return PaginatedResult
      */
-    public function getItemForCategory(int $catID, CategoryParams $params, int $page = 1)
+    public function getItemForCategory(int $catID, $params = array(), int $page = 1):array
     {
-        /** @var ItemColumnBuilder $columnBuilder */
-        $columnBuilder = pluginApp(ItemColumnBuilder::class);
-        $columns       = $columnBuilder
-            ->defaults()
-            ->build();
+        $elasticSearchRepo = pluginApp(ItemElasticSearchSearchRepositoryContract::class);
+    
+        $clientFilter = pluginApp(ClientFilter::class);
+        $clientFilter->isVisibleForClient($this->app->getPlentyId());
         
-        /** @var ItemFilterBuilder $filterBuilder */
-        $filterBuilder = pluginApp(ItemFilterBuilder::class);
-        if ($params->variationShowType == 2) {
-            $filterBuilder->variationIsPrimary();
-        }
+        $variationFilter = pluginApp(VariationBaseFilter::class);
+        $variationFilter->isActive();
         
-        if ($params->variationShowType == 3) {
-            $filterBuilder->variationIsChild();
-        }
+        $categoryFilter = pluginApp(CategoryFilter::class);
+        $categoryFilter->isInCategory($catID);
         
-        $filter = $filterBuilder
-            ->variationHasCategory($catID)
-            ->variationIsActive()
-            ->build();
+        $elasticSearchRepo
+            ->addFilter($clientFilter)
+            ->addFilter($variationFilter)
+            ->addFilter($categoryFilter)
+            ->setPage($page, $params['itemsPerPage']);
         
-        /** @var ItemParamsBuilder $paramsBuilder */
-        $paramsBuilder = pluginApp(ItemParamsBuilder::class);
-        if ($params->orderBy != null && strlen($params->orderBy) > 0) {
-            $paramsBuilder->withParam(ItemColumnsParams::ORDER_BY, ["orderBy." . $params->orderBy => $params->orderByKey]);
-        }
-        
-        $offset = ($page - 1) * $params->itemsPerPage;
-        $params = $paramsBuilder
-            ->withParam(ItemColumnsParams::LIMIT, $params->itemsPerPage)
-            ->withParam(ItemColumnsParams::OFFSET, $offset)
-            ->withParam(ItemColumnsParams::LANGUAGE, $this->sessionStorage->getLang())
-            ->withParam(ItemColumnsParams::PLENTY_ID, $this->app->getPlentyId())
-            ->build();
-        
-        return $this->itemRepository->searchWithPagination($columns, $filter, $params);
+        return $elasticSearchRepo->execute();
     }
     
     /**
@@ -548,16 +532,30 @@ class ItemService
         
     }
     
-    public function searchItems(string $searchString):array
+    public function searchItems(string $searchString, $params = array(), int $page = 1, $autocomplete = false):array
     {
         $elasticSearchRepo = pluginApp(ItemElasticSearchSearchRepositoryContract::class);
-        $searchFilter = pluginApp(SearchFilter::class, [$searchString]);
-        $elasticSearchRepo->addFilter($searchFilter);
-        return $elasticSearchRepo->execute();
-    }
     
-    public function testElasticSearch():array
-    {
-        return pluginApp(ItemElasticSearchSearchRepositoryContract::class)->execute();
+        $variationFilter = pluginApp(VariationBaseFilter::class);
+        $variationFilter->isActive();
+        
+        $clientFilter = pluginApp(ClientFilter::class);
+        $clientFilter->isVisibleForClient($this->app->getPlentyId());
+        
+        $searchType = ElasticSearch::SEARCH_TYPE_FUZZY;
+        if($autocomplete)
+        {
+            $searchType = ElasticSearch::SEARCH_TYPE_AUTOCOMPLETE;
+        }
+        $searchFilter = pluginApp(SearchFilter::class);
+        $searchFilter->setSearchString($searchString, $searchType);
+        
+        $elasticSearchRepo
+            ->addFilter($clientFilter)
+            ->addFilter($variationFilter)
+            ->addFilter($searchFilter)
+            ->setPage($page, $params['itemsPerPage']);
+        
+        return $elasticSearchRepo->execute();
     }
 }

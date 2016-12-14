@@ -42,6 +42,7 @@ class IORouteServiceProvider extends RouteServiceProvider
             $api->resource('item/availability', 'AvailabilityResource');
             $api->resource('item/condition', 'ItemConditionResource');
             $api->resource('item/search', 'ItemSearchResource');
+            $api->resource('item/search/autocomplete', 'ItemSearchAutocompleteResource');
 			$api->resource('customer/bank_data', 'ContactBankResource');
 		});
 
