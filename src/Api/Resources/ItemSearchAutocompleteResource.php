@@ -36,19 +36,11 @@ class ItemSearchAutocomplete extends ApiResource
         
         if(strlen($searchString))
         {
-            $page         = $this->request->get('page', 1);
-            
-            $params = [
-                'itemsPerPage' => $this->request->get('itemsPerPage', 20),
-                'orderBy'      => $this->request->get('orderBy', 'itemName'),
-                'orderByKey'   => $this->request->get('orderByKey', 'ASC')
-            ];
-            
             /**
              * @var ItemService $itemService
              */
             $itemService = pluginApp(ItemService::class);
-            $response = $itemService->searchItems($searchString, $params, $page, true);
+            $response = $itemService->searchItemsAutocomplete($searchString);
             
             return $this->response->create($response, ResponseCode::OK);
         }

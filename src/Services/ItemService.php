@@ -532,7 +532,7 @@ class ItemService
         
     }
     
-    public function searchItems(string $searchString, $params = array(), int $page = 1, $autocomplete = false):array
+    public function searchItems(string $searchString, $params = array(), int $page = 1):array
     {
         $elasticSearchRepo = pluginApp(ItemElasticSearchSearchRepositoryContract::class);
     
@@ -542,13 +542,30 @@ class ItemService
         $clientFilter = pluginApp(ClientFilter::class);
         $clientFilter->isVisibleForClient($this->app->getPlentyId());
         
-        $searchType = ElasticSearch::SEARCH_TYPE_FUZZY;
-        if($autocomplete)
-        {
-            $searchType = ElasticSearch::SEARCH_TYPE_AUTOCOMPLETE;
-        }
         $searchFilter = pluginApp(SearchFilter::class);
-        $searchFilter->setSearchString($searchString, $searchType);
+        $searchFilter->setSearchString($searchString);
+        
+        $elasticSearchRepo
+            ->addFilter($clientFilter)
+            ->addFilter($variationFilter)
+            ->addFilter($searchFilter)
+            ->setPage($page, $params['itemsPerPage']);
+        
+        return $elasticSearchRepo->execute();
+    }
+    
+    public function searchItemsAutocomplete(string $searchString):array
+    {
+        $elasticSearchRepo = pluginApp(ItemElasticSearchSearchRepositoryContract::class);
+        
+        $variationFilter = pluginApp(VariationBaseFilter::class);
+        $variationFilter->isActive();
+        
+        $clientFilter = pluginApp(ClientFilter::class);
+        $clientFilter->isVisibleForClient($this->app->getPlentyId());
+        
+        $searchFilter = pluginApp(SearchFilter::class);
+        $searchFilter->setSearchString($searchString, ElasticSearch::SEARCH_TYPE_AUTOCOMPLETE);
         
         $elasticSearchRepo
             ->addFilter($clientFilter)
