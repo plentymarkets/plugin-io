@@ -593,7 +593,7 @@ class ItemService
         $clientFilter->isVisibleForClient($this->app->getPlentyId());
         
         $searchFilter = pluginApp(SearchFilter::class);
-        $searchFilter->setSearchString($searchString, ElasticSearch::SEARCH_TYPE_AUTOCOMPLETE);
+        $searchFilter->setSearchString($searchString); //ElasticSearch::SEARCH_TYPE_AUTOCOMPLETE
         
         $elasticSearchRepo
             ->addFilter($clientFilter)
