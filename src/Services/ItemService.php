@@ -81,9 +81,8 @@ class ItemService
         $clientFilter->isVisibleForClient($this->app->getPlentyId());
     
         $variationFilter = pluginApp(VariationBaseFilter::class);
-        $variationFilter
-            ->isActive()
-            ->hasItemId($itemId);
+        $variationFilter->isActive();
+        $variationFilter->hasItemId($itemId);
     
         $elasticSearchRepo
             ->addFilter($clientFilter)
@@ -99,33 +98,20 @@ class ItemService
      */
     public function getItems(array $itemIds):RecordList
     {
-        /** @var ItemColumnBuilder $columnBuilder */
-        $columnBuilder = pluginApp(ItemColumnBuilder::class);
-        $columns       = $columnBuilder
-            ->defaults()
-            ->build();
-        
-        // Filter the current item by item ID
-        /** @var ItemFilterBuilder $filterBuilder */
-        $filterBuilder = pluginApp(ItemFilterBuilder::class);
-        $filter        = $filterBuilder
-            ->hasId($itemIds)
-            ->variationIsActive()
-            ->build();
-        
-        // Set the parameters
-        /** @var ItemParamsBuilder $paramsBuilder */
-        $paramsBuilder = pluginApp(ItemParamsBuilder::class);
-        $params        = $paramsBuilder
-            ->withParam(ItemColumnsParams::LANGUAGE, $this->sessionStorage->getLang())
-            ->withParam(ItemColumnsParams::PLENTY_ID, $this->app->getPlentyId())
-            ->build();
-        
-        return $this->itemRepository->search(
-            $columns,
-            $filter,
-            $params
-        );
+        $elasticSearchRepo = pluginApp(ItemElasticSearchSearchRepositoryContract::class);
+    
+        $clientFilter = pluginApp(ClientFilter::class);
+        $clientFilter->isVisibleForClient($this->app->getPlentyId());
+    
+        $variationFilter = pluginApp(VariationBaseFilter::class);
+        $variationFilter->isActive();
+        $variationFilter->hasItemIds($itemIds);
+    
+        $elasticSearchRepo
+            ->addFilter($clientFilter)
+            ->addFilter($variationFilter);
+    
+        return $elasticSearchRepo->execute();
     }
     
     
@@ -160,9 +146,8 @@ class ItemService
         $clientFilter->isVisibleForClient($this->app->getPlentyId());
     
         $variationFilter = pluginApp(VariationBaseFilter::class);
-        $variationFilter
-            ->isActive()
-            ->hasId($variationId);
+        $variationFilter->isActive();
+        $variationFilter->hasId($variationId);
     
         $elasticSearchRepo
             ->addFilter($clientFilter)
@@ -178,33 +163,20 @@ class ItemService
      */
     public function getVariations(array $variationIds):RecordList
     {
-        /** @var ItemColumnBuilder $columnBuilder */
-        $columnBuilder = pluginApp(ItemColumnBuilder::class);
-        $columns       = $columnBuilder
-            ->defaults()
-            ->build();
-        
-        // Filter the current variation by variation ID
-        /** @var ItemFilterBuilder $filterBuilder */
-        $filterBuilder = pluginApp(ItemFilterBuilder::class);
-        $filter        = $filterBuilder
-            ->variationHasId($variationIds)
-            ->variationIsActive()
-            ->build();
-        
-        // Set the parameters
-        /** @var ItemParamsBuilder $paramsBuilder */
-        $paramsBuilder = pluginApp(ItemParamsBuilder::class);
-        $params        = $paramsBuilder
-            ->withParam(ItemColumnsParams::LANGUAGE, $this->sessionStorage->getLang())
-            ->withParam(ItemColumnsParams::PLENTY_ID, $this->app->getPlentyId())
-            ->build();
-        
-        return $this->itemRepository->search(
-            $columns,
-            $filter,
-            $params
-        );
+        $elasticSearchRepo = pluginApp(ItemElasticSearchSearchRepositoryContract::class);
+    
+        $clientFilter = pluginApp(ClientFilter::class);
+        $clientFilter->isVisibleForClient($this->app->getPlentyId());
+    
+        $variationFilter = pluginApp(VariationBaseFilter::class);
+        $variationFilter->isActive();
+        $variationFilter->hasIds($variationIds);
+    
+        $elasticSearchRepo
+            ->addFilter($clientFilter)
+            ->addFilter($variationFilter);
+    
+        return $elasticSearchRepo->execute();
     }
     
     public function getVariationList(int $itemId, bool $withPrimary = false):array

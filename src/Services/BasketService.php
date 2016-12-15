@@ -160,14 +160,14 @@ class BasketService
 		}
 
 		$items  = pluginApp(ItemService::class)->getVariations($basketItemVariationIds);
-		$result = array();
+		/*$result = array();
 		foreach($items as $item)
 		{
 			$variationId          = $item->variationBase->id;
 			$result[$variationId] = $item;
-		}
+		}*/
 
-		return $result;
+		return $items;
 	}
 
     public function resetBasket()
