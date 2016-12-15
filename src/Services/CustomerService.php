@@ -125,16 +125,20 @@ class CustomerService
 		
 		if($billingAddressData !== null)
 		{
-			$this->createAddress($billingAddressData, AddressType::BILLING);
+            $newBillingAddress = $this->createAddress($billingAddressData, AddressType::BILLING);
+            $this->sessionStorage->setSessionValue(SessionStorageKeys::BILLING_ADDRESS_ID, $newBillingAddress->id);
+            
 			if($deliveryAddressData === null)
 			{
-				$this->createAddress($billingAddressData, AddressType::DELIVERY);
+                $newDeliveryAddress = $this->createAddress($billingAddressData, AddressType::DELIVERY);
+                $this->sessionStorage->setSessionValue(SessionStorageKeys::DELIVERY_ADDRESS_ID, $newDeliveryAddress->id);
 			}
 		}
 
 		if($deliveryAddressData !== null)
 		{
-			$this->createAddress($deliveryAddressData, AddressType::DELIVERY);
+            $newDeliveryAddress = $this->createAddress($deliveryAddressData, AddressType::DELIVERY);
+            $this->sessionStorage->setSessionValue(SessionStorageKeys::DELIVERY_ADDRESS_ID, $newDeliveryAddress->id);
 		}
 
 		return $contact;
