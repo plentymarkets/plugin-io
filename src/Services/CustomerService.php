@@ -83,14 +83,46 @@ class CustomerService
      */
 	public function registerCustomer(array $contactData, $billingAddressData = null, $deliveryAddressData = null):Contact
 	{
-		$contact = $this->createContact($contactData);
-
-		if($contact->id > 0)
-		{
-			//Login
-			pluginApp(AuthenticationService::class)->loginWithContactId($contact->id, (string)$contactData['password']);
-		}
-
+        $guestBillingAddress = null;
+        $guestBillingAddressId = $this->sessionStorage->getSessionValue(SessionStorageKeys::BILLING_ADDRESS_ID);
+        if((int)$guestBillingAddressId > 0)
+        {
+            $guestBillingAddress = $this->addressRepository->findAddressById($guestBillingAddressId);
+        }
+        
+        $guestDeliveryAddress = null;
+        $guestDeliveryAddressId = $this->sessionStorage->getSessionValue(SessionStorageKeys::DELIVERY_ADDRESS_ID);
+        if((int)$guestDeliveryAddressId > 0)
+        {
+            $guestDeliveryAddress = $this->addressRepository->findAddressById($guestDeliveryAddressId);
+        }
+        
+        $contact = $this->createContact($contactData);
+        
+        if($contact->id > 0)
+        {
+            //Login
+            pluginApp(AuthenticationService::class)->loginWithContactId($contact->id, (string)$contactData['password']);
+            
+            if($guestBillingAddress !== null)
+            {
+                $newBillingAddress = $this->createAddress(
+                    $guestBillingAddress->toArray(),
+                    AddressType::BILLING
+                );
+                $this->sessionStorage->setSessionValue(SessionStorageKeys::BILLING_ADDRESS_ID, $newBillingAddress->id);
+            }
+            
+            if($guestDeliveryAddress !== null)
+            {
+                $newDeliveryAddress = $this->createAddress(
+                    $guestDeliveryAddress->toArray(),
+                    AddressType::DELIVERY
+                );
+                $this->sessionStorage->setSessionValue(SessionStorageKeys::DELIVERY_ADDRESS_ID, $newDeliveryAddress->id);
+            }
+        }
+		
 		if($billingAddressData !== null)
 		{
 			$this->createAddress($billingAddressData, AddressType::BILLING);
