@@ -96,7 +96,7 @@ class ItemService
      * @param array $itemIds
      * @return RecordList
      */
-    public function getItems(array $itemIds):RecordList
+    public function getItems(array $itemIds):array
     {
         $elasticSearchRepo = pluginApp(ItemElasticSearchSearchRepositoryContract::class);
     
@@ -161,7 +161,7 @@ class ItemService
      * @param array $variationIds
      * @return RecordList
      */
-    public function getVariations(array $variationIds):RecordList
+    public function getVariations(array $variationIds):array
     {
         $elasticSearchRepo = pluginApp(ItemElasticSearchSearchRepositoryContract::class);
     
