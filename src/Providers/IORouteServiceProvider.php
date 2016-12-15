@@ -41,8 +41,10 @@ class IORouteServiceProvider extends RouteServiceProvider
             $api->resource('variations', 'VariationResource');
             $api->resource('item/availability', 'AvailabilityResource');
             $api->resource('item/condition', 'ItemConditionResource');
-            $api->resource('item/search', 'ItemSearchResource');
-            $api->resource('item/search/autocomplete', 'ItemSearchAutocompleteResource');
+            //$api->resource('item/search', 'ItemSearchResource');
+            $api->get('item/search', 'ItemSearchResource@index');
+            //$api->resource('item/search/autocomplete', 'ItemSearchAutocompleteResource');
+            $api->get('item/search/autocomplete', 'ItemSearchAutocompleteResource@index');
 			$api->resource('customer/bank_data', 'ContactBankResource');
 		});
 
