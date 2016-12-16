@@ -456,48 +456,51 @@ class ItemService
      * @param int $itemId
      * @return array
      */
-    public function getItemCrossSellingList(int $itemId = 0, string $crossSellingType = CrossSellingType::SIMILAR):array
+    public function getItemCrossSellingList($itemId = 0, string $crossSellingType = CrossSellingType::SIMILAR):array
     {
         $crossSellingItems = [];
         
-        if ($itemId > 0) {
-            /** @var ItemColumnBuilder $columnBuilder */
-            $columnBuilder = pluginApp(ItemColumnBuilder::class);
-            $columns       = $columnBuilder
-                ->withItemCrossSellingList([
-                                               ItemCrossSellingFields::ITEM_ID,
-                                               ItemCrossSellingFields::CROSS_ITEM_ID,
-                                               ItemCrossSellingFields::RELATIONSHIP,
-                                               ItemCrossSellingFields::DYNAMIC
-                                           ])
-                ->build();
-            
-            /** @var ItemFilterBuilder $filterBuilder */
-            $filterBuilder = pluginApp(ItemFilterBuilder::class);
-            $filter        = $filterBuilder
-                ->hasId([$itemId])
-                ->variationIsActive()
-                ->build();
-            
-            /** @var ItemParamsBuilder $paramsBuilder */
-            $paramsBuilder = pluginApp(ItemParamsBuilder::class);
-            $params        = $paramsBuilder
-                ->withParam(ItemColumnsParams::LANGUAGE, $this->sessionStorage->getLang())
-                ->withParam(ItemColumnsParams::PLENTY_ID, $this->app->getPlentyId())
-                ->build();
-            
-            $records = $this->itemRepository->search($columns, $filter, $params);
-            
-            if ($records->count() > 0) {
-                $currentItem = $records->current();
-                foreach ($currentItem->itemCrossSellingList as $crossSellingItem) {
-                    if ($crossSellingItem['relationship'] == $crossSellingType) {
-                        $crossSellingItems[] = $crossSellingItem;
+        if((int)$itemId > 0)
+        {
+            if ($itemId > 0) {
+                /** @var ItemColumnBuilder $columnBuilder */
+                $columnBuilder = pluginApp(ItemColumnBuilder::class);
+                $columns       = $columnBuilder
+                    ->withItemCrossSellingList([
+                                                   ItemCrossSellingFields::ITEM_ID,
+                                                   ItemCrossSellingFields::CROSS_ITEM_ID,
+                                                   ItemCrossSellingFields::RELATIONSHIP,
+                                                   ItemCrossSellingFields::DYNAMIC
+                                               ])
+                    ->build();
+        
+                /** @var ItemFilterBuilder $filterBuilder */
+                $filterBuilder = pluginApp(ItemFilterBuilder::class);
+                $filter        = $filterBuilder
+                    ->hasId([$itemId])
+                    ->variationIsActive()
+                    ->build();
+        
+                /** @var ItemParamsBuilder $paramsBuilder */
+                $paramsBuilder = pluginApp(ItemParamsBuilder::class);
+                $params        = $paramsBuilder
+                    ->withParam(ItemColumnsParams::LANGUAGE, $this->sessionStorage->getLang())
+                    ->withParam(ItemColumnsParams::PLENTY_ID, $this->app->getPlentyId())
+                    ->build();
+        
+                $records = $this->itemRepository->search($columns, $filter, $params);
+        
+                if ($records->count() > 0) {
+                    $currentItem = $records->current();
+                    foreach ($currentItem->itemCrossSellingList as $crossSellingItem) {
+                        if ($crossSellingItem['relationship'] == $crossSellingType) {
+                            $crossSellingItems[] = $crossSellingItem;
+                        }
                     }
                 }
             }
-            
         }
+        
         
         return $crossSellingItems;
     }
