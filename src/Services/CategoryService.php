@@ -174,7 +174,7 @@ class CategoryService
             return null;
         }
 
-        return pluginApp(ItemService::class)->getItemForCategory( $category->id, pluginApp(CategoryParamsBuilder::class)->fromArray($params), $page );
+        return pluginApp(ItemService::class)->getItemForCategory( $category->id, $params, $page );
     }
 
     /**
