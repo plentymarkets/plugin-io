@@ -43,19 +43,20 @@ class BasketService
      */
 	public function getBasketItems():array
 	{
-		//$result = array();
+		$result = array();
         
         $basketItems = $this->basketItemRepository->all();
         $basketItemData = $this->getBasketItemData( $basketItems );
         
-        /*foreach( $basketItems as $basketItem )
+        foreach( $basketItems as $basketItem )
         {
             array_push(
                 $result,
                 $this->addVariationData($basketItem, $basketItemData[$basketItem->variationId])
             );
-        }*/
-        return $basketItemData;
+        }
+        
+        return $result;
 	}
 
     /**
@@ -162,14 +163,15 @@ class BasketService
 		}
 
 		$items  = pluginApp(ItemService::class)->getVariations($basketItemVariationIds);
-		/*$result = array();
-		foreach($items as $item)
-		{
-			$variationId          = $item->variationBase->id;
-			$result[$variationId] = $item;
-		}*/
-
-		return $items;
+        
+        $result = array();
+        foreach($items['documents'] as $item)
+        {
+            $variationId          = $item['data']['variation']['id'];
+            $result[$variationId] = $item;
+        }
+        
+        return $result;
 	}
 
     public function resetBasket()
