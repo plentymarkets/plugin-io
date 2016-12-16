@@ -43,17 +43,19 @@ class BasketService
      */
 	public function getBasketItems():array
 	{
-		$result = array();
+		//$result = array();
+        
         $basketItems = $this->basketItemRepository->all();
         $basketItemData = $this->getBasketItemData( $basketItems );
-        foreach( $basketItems as $basketItem )
+        
+        /*foreach( $basketItems as $basketItem )
         {
             array_push(
                 $result,
                 $this->addVariationData($basketItem, $basketItemData[$basketItem->variationId])
             );
-        }
-        return $result;
+        }*/
+        return $basketItemData;
 	}
 
     /**
