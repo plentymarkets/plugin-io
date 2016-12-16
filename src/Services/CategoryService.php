@@ -173,7 +173,7 @@ class CategoryService
         {
             return null;
         }
-
+        
         return pluginApp(ItemService::class)->getItemForCategory( $category->id, $params, $page );
     }
 

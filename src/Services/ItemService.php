@@ -275,49 +275,52 @@ class ItemService
      * @param int $itemId
      * @return array
      */
-    public function getVariationAttributeMap(int $itemId = 0):array
+    public function getVariationAttributeMap($itemId = 0):array
     {
-        /** @var ItemColumnBuilder $columnBuilder */
-        $columnBuilder = pluginApp(ItemColumnBuilder::class);
-        $columns       = $columnBuilder
-            ->withVariationBase([
-                                    VariationBaseFields::ID,
-                                    VariationBaseFields::ITEM_ID,
-                                    VariationBaseFields::AVAILABILITY,
-                                    VariationBaseFields::PACKING_UNITS,
-                                    VariationBaseFields::CUSTOM_NUMBER
-                                ])
-            ->withVariationAttributeValueList([
-                                                  VariationAttributeValueFields::ATTRIBUTE_ID,
-                                                  VariationAttributeValueFields::ATTRIBUTE_VALUE_ID
-                                              ])->build();
-        
-        /** @var ItemFilterBuilder $filterBuilder */
-        $filterBuilder = pluginApp(ItemFilterBuilder::class);
-        $filter        = $filterBuilder
-            ->hasId([$itemId])
-            ->variationIsChild()
-            ->variationIsActive()
-            ->build();
-        
-        /** @var ItemParamsBuilder $paramsBuilder */
-        $paramsBuilder = pluginApp(ItemParamsBuilder::class);
-        $params        = $paramsBuilder
-            ->withParam(ItemColumnsParams::LANGUAGE, $this->sessionStorage->getLang())
-            ->withParam(ItemColumnsParams::PLENTY_ID, $this->app->getPlentyId())
-            ->build();
-        
-        $recordList = $this->itemRepository->search($columns, $filter, $params);
-        
         $variations = [];
-        foreach ($recordList as $variation) {
-            $data = [
-                "variationId" => $variation->variationBase->id,
-                "attributes" => $variation->variationAttributeValueList
-            ];
-            array_push($variations, $data);
+        if((int)$itemId > 0)
+        {
+            /** @var ItemColumnBuilder $columnBuilder */
+            $columnBuilder = pluginApp(ItemColumnBuilder::class);
+            $columns       = $columnBuilder
+                ->withVariationBase([
+                                        VariationBaseFields::ID,
+                                        VariationBaseFields::ITEM_ID,
+                                        VariationBaseFields::AVAILABILITY,
+                                        VariationBaseFields::PACKING_UNITS,
+                                        VariationBaseFields::CUSTOM_NUMBER
+                                    ])
+                ->withVariationAttributeValueList([
+                                                      VariationAttributeValueFields::ATTRIBUTE_ID,
+                                                      VariationAttributeValueFields::ATTRIBUTE_VALUE_ID
+                                                  ])->build();
+    
+            /** @var ItemFilterBuilder $filterBuilder */
+            $filterBuilder = pluginApp(ItemFilterBuilder::class);
+            $filter        = $filterBuilder
+                ->hasId([$itemId])
+                ->variationIsChild()
+                ->variationIsActive()
+                ->build();
+    
+            /** @var ItemParamsBuilder $paramsBuilder */
+            $paramsBuilder = pluginApp(ItemParamsBuilder::class);
+            $params        = $paramsBuilder
+                ->withParam(ItemColumnsParams::LANGUAGE, $this->sessionStorage->getLang())
+                ->withParam(ItemColumnsParams::PLENTY_ID, $this->app->getPlentyId())
+                ->build();
+    
+            $recordList = $this->itemRepository->search($columns, $filter, $params);
+            
+            foreach ($recordList as $variation) {
+                $data = [
+                    "variationId" => $variation->variationBase->id,
+                    "attributes" => $variation->variationAttributeValueList
+                ];
+                array_push($variations, $data);
+            }
         }
-        
+    
         return $variations;
     }
     
