@@ -52,9 +52,14 @@ class PlaceOrderController extends LayoutController
         }
 
         // execute payment
-        try {
+        try
+        {
             $paymentResult = $orderService->executePayment($orderId, $paymentId);
-            if ($paymentResult["type"] === "error")
+            if ($paymentResult["type"] === "redirectUrl")
+            {
+                return $response->redirectTo($paymentResult["value"]);
+            }
+            elseif ($paymentResult["type"] === "error")
             {
                 // send errors
                 $notificationService->error($paymentResult["value"]);
