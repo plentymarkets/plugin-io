@@ -179,45 +179,50 @@ class ItemService
         return $elasticSearchRepo->execute();
     }
     
-    public function getVariationList(int $itemId, bool $withPrimary = false):array
+    public function getVariationList($itemId, bool $withPrimary = false):array
     {
-        /** @var ItemColumnBuilder $columnBuilder */
-        $columnBuilder = pluginApp(ItemColumnBuilder::class);
-        $columns       = $columnBuilder
-            ->withVariationBase([
-                                    VariationBaseFields::ID
-                                ])
-            ->build();
-        
-        // filter current item by item id
-        /** @var ItemFilterBuilder $filterBuilder */
-        $filterBuilder = pluginApp(ItemFilterBuilder::class);
-        $filter        = $filterBuilder
-            ->hasId([$itemId]);
-        
-        if ($withPrimary) {
-            $filter->variationIsChild();
-        }
-        
-        $filter = $filter->build();
-        
-        // set params
-        /** @var ItemParamsBuilder $paramsBuilder */
-        $paramsBuilder = pluginApp(ItemParamsBuilder::class);
-        $params        = $paramsBuilder
-            ->withParam(ItemColumnsParams::LANGUAGE, Language::DE)
-            ->withParam(ItemColumnsParams::PLENTY_ID, $this->app->getPlentyId())
-            ->build();
-        $variations    = $this->itemRepository->search(
-            $columns,
-            $filter,
-            $params
-        );
-        
         $variationIds = [];
-        foreach ($variations as $variation) {
-            array_push($variationIds, $variation->variationBase->id);
+        
+        if((int)$itemId > 0)
+        {
+            /** @var ItemColumnBuilder $columnBuilder */
+            $columnBuilder = pluginApp(ItemColumnBuilder::class);
+            $columns       = $columnBuilder
+                ->withVariationBase([
+                                        VariationBaseFields::ID
+                                    ])
+                ->build();
+    
+            // filter current item by item id
+            /** @var ItemFilterBuilder $filterBuilder */
+            $filterBuilder = pluginApp(ItemFilterBuilder::class);
+            $filter        = $filterBuilder
+                ->hasId([$itemId]);
+    
+            if ($withPrimary) {
+                $filter->variationIsChild();
+            }
+    
+            $filter = $filter->build();
+    
+            // set params
+            /** @var ItemParamsBuilder $paramsBuilder */
+            $paramsBuilder = pluginApp(ItemParamsBuilder::class);
+            $params        = $paramsBuilder
+                ->withParam(ItemColumnsParams::LANGUAGE, Language::DE)
+                ->withParam(ItemColumnsParams::PLENTY_ID, $this->app->getPlentyId())
+                ->build();
+            $variations    = $this->itemRepository->search(
+                $columns,
+                $filter,
+                $params
+            );
+            
+            foreach ($variations as $variation) {
+                array_push($variationIds, $variation->variationBase->id);
+            }
         }
+        
         return $variationIds;
     }
     
@@ -278,6 +283,7 @@ class ItemService
     public function getVariationAttributeMap($itemId = 0):array
     {
         $variations = [];
+        
         if((int)$itemId > 0)
         {
             /** @var ItemColumnBuilder $columnBuilder */
@@ -324,45 +330,48 @@ class ItemService
         return $variations;
     }
     
-    public function getAttributeNameMap(int $itemId = 0):array
+    public function getAttributeNameMap($itemId = 0):array
     {
-        $columnBuilder = pluginApp(ItemColumnBuilder::class);
-        $columns       = $columnBuilder
-            ->withVariationBase(array(
-                                    VariationBaseFields::ID,
-                                    VariationBaseFields::ITEM_ID,
-                                    VariationBaseFields::AVAILABILITY,
-                                    VariationBaseFields::PACKING_UNITS,
-                                    VariationBaseFields::CUSTOM_NUMBER
-                                ))
-            ->withVariationAttributeValueList(array(
-                                                  VariationAttributeValueFields::ATTRIBUTE_ID,
-                                                  VariationAttributeValueFields::ATTRIBUTE_VALUE_ID
-                                              ))->build();
-        
-        $filterBuilder = pluginApp(ItemFilterBuilder::class);
-        $filter        = $filterBuilder
-            ->hasId(array($itemId))
-            ->variationIsChild()
-            ->build();
-        
-        $paramsBuilder = pluginApp(ItemParamsBuilder::class);
-        $params        = $paramsBuilder
-            ->withParam(ItemColumnsParams::LANGUAGE, Language::DE)
-            ->withParam(ItemColumnsParams::PLENTY_ID, $this->app->getPlentyId())
-            ->build();
-        
-        $recordList = $this->itemRepository->search($columns, $filter, $params);
-        
         $attributeList = [];
         
-        foreach ($recordList as $variation) {
-            foreach ($variation->variationAttributeValueList as $attribute) {
-                $attributeId                         = $attribute->attributeId;
-                $attributeValueId                    = $attribute->attributeValueId;
-                $attributeList[$attributeId]["name"] = $this->getAttributeName($attributeId);
-                if (!in_array($attributeValueId, $attributeList[$attributeId]["values"])) {
-                    $attributeList[$attributeId]["values"][$attributeValueId] = $this->getAttributeValueName($attributeValueId);
+        if((int)$itemId > 0)
+        {
+            $columnBuilder = pluginApp(ItemColumnBuilder::class);
+            $columns       = $columnBuilder
+                ->withVariationBase(array(
+                                        VariationBaseFields::ID,
+                                        VariationBaseFields::ITEM_ID,
+                                        VariationBaseFields::AVAILABILITY,
+                                        VariationBaseFields::PACKING_UNITS,
+                                        VariationBaseFields::CUSTOM_NUMBER
+                                    ))
+                ->withVariationAttributeValueList(array(
+                                                      VariationAttributeValueFields::ATTRIBUTE_ID,
+                                                      VariationAttributeValueFields::ATTRIBUTE_VALUE_ID
+                                                  ))->build();
+    
+            $filterBuilder = pluginApp(ItemFilterBuilder::class);
+            $filter        = $filterBuilder
+                ->hasId(array($itemId))
+                ->variationIsChild()
+                ->build();
+    
+            $paramsBuilder = pluginApp(ItemParamsBuilder::class);
+            $params        = $paramsBuilder
+                ->withParam(ItemColumnsParams::LANGUAGE, Language::DE)
+                ->withParam(ItemColumnsParams::PLENTY_ID, $this->app->getPlentyId())
+                ->build();
+    
+            $recordList = $this->itemRepository->search($columns, $filter, $params);
+    
+            foreach ($recordList as $variation) {
+                foreach ($variation->variationAttributeValueList as $attribute) {
+                    $attributeId                         = $attribute->attributeId;
+                    $attributeValueId                    = $attribute->attributeValueId;
+                    $attributeList[$attributeId]["name"] = $this->getAttributeName($attributeId);
+                    if (!in_array($attributeValueId, $attributeList[$attributeId]["values"])) {
+                        $attributeList[$attributeId]["values"][$attributeValueId] = $this->getAttributeValueName($attributeValueId);
+                    }
                 }
             }
         }
