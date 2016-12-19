@@ -76,6 +76,7 @@ class CheckoutService
             "shippingProfileList" => $this->getShippingProfileList(),
 			"deliveryAddressId"   => $this->getDeliveryAddressId(),
 			"billingAddressId"    => $this->getBillingAddressId(),
+			"paymentDataList"     => $this->getCheckoutPaymentDataList(),
 		];
 	}
 
