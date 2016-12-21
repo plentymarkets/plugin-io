@@ -6,6 +6,7 @@ use Plenty\Modules\Category\Models\Category;
 use Plenty\Modules\Category\Contracts\CategoryRepositoryContract;
 use Plenty\Repositories\Models\PaginatedResult;
 
+use IO\Services\WebstoreConfigurationService;
 use IO\Services\ItemService;
 use IO\Helper\CategoryMap;
 use IO\Helper\CategoryKey;
@@ -22,6 +23,11 @@ class CategoryService
 	 */
 	private $categoryRepository;
 
+	/**
+	 * @var WebstoreConfigurationService
+	 */
+	private $webstoreConfig;
+
 	// is set from controllers
 	/**
 	 * @var Category
@@ -36,9 +42,10 @@ class CategoryService
      * CategoryService constructor.
      * @param CategoryRepositoryContract $category
      */
-	public function __construct(CategoryRepositoryContract $categoryRepository)
+	 public function __construct(CategoryRepositoryContract $categoryRepository, WebstoreConfigurationService $webstoreConfig)
 	{
 		$this->categoryRepository    = $categoryRepository;
+		$this->webstoreConfig 		 = $webstoreConfig;
 	}
 
 	/**
@@ -185,7 +192,7 @@ class CategoryService
      */
     public function getNavigationTree(string $type = "all", string $lang = "de"):array
     {
-        return $this->categoryRepository->getLinklistTree($type, $lang);
+		return $this->categoryRepository->getLinklistTree($type, $lang, $this->webstoreConfig->getWebstoreConfig()->webstoreId);
     }
     /**
      * Return the sitemap list as an array
@@ -195,7 +202,7 @@ class CategoryService
      */
     public function getNavigationList(string $type = "all", string $lang = "de"):array
     {
-        return $this->categoryRepository->getLinklistList($type, $lang);
+		return $this->categoryRepository->getLinklistList($type, $lang, $this->webstoreConfig->getWebstoreConfig()->webstoreId);
     }
 
     /**
