@@ -2,6 +2,11 @@
 
 namespace IO\Services;
 
+use Plenty\Modules\Cloud\ElasticSearch\Lib\Processor\DocumentProcessor;
+use Plenty\Modules\Cloud\ElasticSearch\Lib\Search\Document\DocumentSearch;
+use Plenty\Modules\Cloud\ElasticSearch\Lib\Source\Mutator\BuiltIn\LanguageMutator;
+use Plenty\Modules\Item\Search\Aggregations\AttributeValueListAggregation;
+use Plenty\Modules\Item\Search\Aggregations\AttributeValueListAggregationProcessor;
 use Plenty\Plugin\Application;
 use IO\Services\SessionStorageService;
 use Plenty\Modules\Item\DataLayer\Models\Record;
@@ -75,8 +80,20 @@ class ItemService
      */
     public function getItem(int $itemId = 0):array
     {
+        //$languageMutator = pluginApp(LanguageMutator::class);
+        //$documentProcessor->addMutator($languageMutator);
+        //$attributeProcessor->addMutator($languageMutator);
+        
+        $documentProcessor = pluginApp(DocumentProcessor::class);
+        $documentSearch = pluginApp(DocumentSearch::class, [$documentProcessor]);
+        
+        $attributeProcessor = pluginApp(AttributeValueListAggregationProcessor::class);
+        $attributeSearch    = pluginApp(AttributeValueListAggregation::class, [$attributeProcessor]);
+        
         $elasticSearchRepo = pluginApp(ItemElasticSearchSearchRepositoryContract::class);
-    
+        $elasticSearchRepo->addSearch($documentSearch);
+        $elasticSearchRepo->addSearch($attributeSearch);
+        
         $clientFilter = pluginApp(ClientFilter::class);
         $clientFilter->isVisibleForClient($this->app->getPlentyId());
     
@@ -84,7 +101,7 @@ class ItemService
         $variationFilter->isActive();
         $variationFilter->hasItemId($itemId);
     
-        $elasticSearchRepo
+        $documentSearch
             ->addFilter($clientFilter)
             ->addFilter($variationFilter);
         
@@ -98,7 +115,11 @@ class ItemService
      */
     public function getItems(array $itemIds):array
     {
+        $documentProcessor = pluginApp(DocumentProcessor::class);
+        $documentSearch = pluginApp(DocumentSearch::class, [$documentProcessor]);
+        
         $elasticSearchRepo = pluginApp(ItemElasticSearchSearchRepositoryContract::class);
+        $elasticSearchRepo->addSearch($documentSearch);
     
         $clientFilter = pluginApp(ClientFilter::class);
         $clientFilter->isVisibleForClient($this->app->getPlentyId());
@@ -107,7 +128,7 @@ class ItemService
         $variationFilter->isActive();
         $variationFilter->hasItemIds($itemIds);
     
-        $elasticSearchRepo
+        $documentSearch
             ->addFilter($clientFilter)
             ->addFilter($variationFilter);
     
@@ -140,8 +161,16 @@ class ItemService
      */
     public function getVariation(int $variationId = 0):array
     {
-        $elasticSearchRepo = pluginApp(ItemElasticSearchSearchRepositoryContract::class);
+        $documentProcessor = pluginApp(DocumentProcessor::class);
+        $documentSearch = pluginApp(DocumentSearch::class, [$documentProcessor]);
     
+        $attributeProcessor = pluginApp(AttributeValueListAggregationProcessor::class);
+        $attributeSearch    = pluginApp(AttributeValueListAggregation::class, [$attributeProcessor]);
+        
+        $elasticSearchRepo = pluginApp(ItemElasticSearchSearchRepositoryContract::class);
+        $elasticSearchRepo->addSearch($documentSearch);
+        $elasticSearchRepo->addSearch($attributeSearch);
+        
         $clientFilter = pluginApp(ClientFilter::class);
         $clientFilter->isVisibleForClient($this->app->getPlentyId());
     
@@ -149,7 +178,7 @@ class ItemService
         $variationFilter->isActive();
         $variationFilter->hasId($variationId);
     
-        $elasticSearchRepo
+        $documentSearch
             ->addFilter($clientFilter)
             ->addFilter($variationFilter);
         
@@ -163,7 +192,11 @@ class ItemService
      */
     public function getVariations(array $variationIds):array
     {
+        $documentProcessor = pluginApp(DocumentProcessor::class);
+        $documentSearch = pluginApp(DocumentSearch::class, [$documentProcessor]);
+        
         $elasticSearchRepo = pluginApp(ItemElasticSearchSearchRepositoryContract::class);
+        $elasticSearchRepo->addSearch($documentSearch);
     
         $clientFilter = pluginApp(ClientFilter::class);
         $clientFilter->isVisibleForClient($this->app->getPlentyId());
@@ -172,7 +205,7 @@ class ItemService
         $variationFilter->isActive();
         $variationFilter->hasIds($variationIds);
     
-        $elasticSearchRepo
+        $documentSearch
             ->addFilter($clientFilter)
             ->addFilter($variationFilter);
     
@@ -255,7 +288,11 @@ class ItemService
      */
     public function getItemForCategory(int $catID, $params = array(), int $page = 1):array
     {
+        $documentProcessor = pluginApp(DocumentProcessor::class);
+        $documentSearch = pluginApp(DocumentSearch::class, [$documentProcessor]);
+        
         $elasticSearchRepo = pluginApp(ItemElasticSearchSearchRepositoryContract::class);
+        $elasticSearchRepo->addSearch($documentSearch);
     
         $clientFilter = pluginApp(ClientFilter::class);
         $clientFilter->isVisibleForClient($this->app->getPlentyId());
@@ -266,7 +303,7 @@ class ItemService
         $categoryFilter = pluginApp(CategoryFilter::class);
         $categoryFilter->isInCategory($catID);
         
-        $elasticSearchRepo
+        $documentSearch
             ->addFilter($clientFilter)
             ->addFilter($variationFilter)
             ->addFilter($categoryFilter)
@@ -549,8 +586,12 @@ class ItemService
     
     public function searchItems(string $searchString, $params = array(), int $page = 1):array
     {
+        $documentProcessor = pluginApp(DocumentProcessor::class);
+        $documentSearch = pluginApp(DocumentSearch::class, [$documentProcessor]);
+        
         $elasticSearchRepo = pluginApp(ItemElasticSearchSearchRepositoryContract::class);
-    
+        $elasticSearchRepo->addSearch($documentSearch);
+        
         $variationFilter = pluginApp(VariationBaseFilter::class);
         $variationFilter->isActive();
         
@@ -560,7 +601,7 @@ class ItemService
         $searchFilter = pluginApp(SearchFilter::class);
         $searchFilter->setSearchString($searchString);
         
-        $elasticSearchRepo
+        $documentSearch
             ->addFilter($clientFilter)
             ->addFilter($variationFilter)
             ->addFilter($searchFilter)
@@ -571,7 +612,11 @@ class ItemService
     
     public function searchItemsAutocomplete(string $searchString):array
     {
+        $documentProcessor = pluginApp(DocumentProcessor::class);
+        $documentSearch = pluginApp(DocumentSearch::class, [$documentProcessor]);
+        
         $elasticSearchRepo = pluginApp(ItemElasticSearchSearchRepositoryContract::class);
+        $elasticSearchRepo->addSearch($documentSearch);
         
         $variationFilter = pluginApp(VariationBaseFilter::class);
         $variationFilter->isActive();
@@ -580,9 +625,9 @@ class ItemService
         $clientFilter->isVisibleForClient($this->app->getPlentyId());
         
         $searchFilter = pluginApp(SearchFilter::class);
-        $searchFilter->setSearchString($searchString); //ElasticSearch::SEARCH_TYPE_AUTOCOMPLETE
+        $searchFilter->setSearchString($searchString, ElasticSearch::SEARCH_TYPE_AUTOCOMPLETE); //ElasticSearch::SEARCH_TYPE_AUTOCOMPLETE
         
-        $elasticSearchRepo
+        $documentSearch
             ->addFilter($clientFilter)
             ->addFilter($variationFilter)
             ->addFilter($searchFilter);
