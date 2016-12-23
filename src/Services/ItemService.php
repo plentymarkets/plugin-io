@@ -4,6 +4,7 @@ namespace IO\Services;
 
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Processor\DocumentProcessor;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Search\Document\DocumentSearch;
+use Plenty\Modules\Cloud\ElasticSearch\Lib\Source\IncludeSource;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Source\Mutator\BuiltIn\LanguageMutator;
 use Plenty\Modules\Item\Search\Aggregations\AttributeValueListAggregation;
 use Plenty\Modules\Item\Search\Aggregations\AttributeValueListAggregationProcessor;
@@ -612,6 +613,9 @@ class ItemService
     
     public function searchItemsAutocomplete(string $searchString):array
     {
+        $includeSource = pluginApp(IncludeSource::class);
+        $includeSource->activate('texts.name*');
+        
         $documentProcessor = pluginApp(DocumentProcessor::class);
         $documentSearch = pluginApp(DocumentSearch::class, [$documentProcessor]);
         
@@ -625,12 +629,13 @@ class ItemService
         $clientFilter->isVisibleForClient($this->app->getPlentyId());
         
         $searchFilter = pluginApp(SearchFilter::class);
-        $searchFilter->setSearchString($searchString, ElasticSearch::SEARCH_TYPE_AUTOCOMPLETE); //ElasticSearch::SEARCH_TYPE_AUTOCOMPLETE
+        $searchFilter->setSearchString($searchString, ElasticSearch::SEARCH_TYPE_AUTOCOMPLETE);
         
         $documentSearch
             ->addFilter($clientFilter)
             ->addFilter($variationFilter)
-            ->addFilter($searchFilter);
+            ->addFilter($searchFilter)
+            ->addSource($includeSource);
         
         return $elasticSearchRepo->execute();
     }
