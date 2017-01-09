@@ -4,6 +4,7 @@ namespace IO\Providers;
 
 use IO\Extensions\TwigIOExtension;
 use IO\Extensions\TwigServiceProvider;
+use IO\Services\ItemLoader\Extensions\TwigLoaderPresets;
 use IO\Services\NotificationService;
 use Plenty\Plugin\ServiceProvider;
 use Plenty\Plugin\Templates\Twig;
@@ -41,5 +42,6 @@ class IOServiceProvider extends ServiceProvider
 		$twig->addExtension(TwigServiceProvider::class);
 		$twig->addExtension(TwigIOExtension::class);
 		$twig->addExtension('Twig_Extensions_Extension_Intl');
+		$twig->addExtension(TwigLoaderPresets::class);
 	}
 }

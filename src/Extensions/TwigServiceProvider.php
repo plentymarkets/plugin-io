@@ -2,6 +2,7 @@
 
 namespace IO\Extensions;
 
+use IO\Services\ItemLoader\Services\ItemLoaderService;
 use Plenty\Plugin\Templates\Extensions\Twig_Extension;
 
 use IO\Services\AvailabilityService;
@@ -78,6 +79,7 @@ class TwigServiceProvider extends Twig_Extension
                 "country"       => pluginApp( CountryService::class ),
                 "customer"      => pluginApp( CustomerService::class ),
                 "item"          => pluginApp( ItemService::class ),
+                "itemLoader"    => pluginApp( ItemLoaderService::class ),
                 "order"         => pluginApp( OrderService::class ),
                 "sessionStorage"=> pluginApp( SessionStorageService::class ),
                 "unit"          => pluginApp( UnitService::class),
