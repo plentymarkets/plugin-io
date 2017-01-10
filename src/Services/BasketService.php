@@ -6,6 +6,7 @@ use Plenty\Modules\Basket\Contracts\BasketRepositoryContract;
 use Plenty\Modules\Basket\Contracts\BasketItemRepositoryContract;
 use Plenty\Modules\Basket\Models\Basket;
 use Plenty\Modules\Basket\Models\BasketItem;
+use Plenty\Modules\Frontend\Contracts\Checkout;
 use IO\Services\ItemService;
 
 /**
@@ -14,25 +15,25 @@ use IO\Services\ItemService;
  */
 class BasketService
 {
-    /**
-     * @var BasketRepositoryContract
-     */
-    private $basketRepository;
-    
 	/**
 	 * @var BasketItemRepositoryContract
 	 */
 	private $basketItemRepository;
     
     /**
-     * BasketService constructor.
-     * @param BasketRepositoryContract $basketRepository
-     * @param BasketItemRepositoryContract $basketItemRepository
+     * @var Checkout
      */
-	public function __construct(BasketRepositoryContract $basketRepository, BasketItemRepositoryContract $basketItemRepository)
+    private $checkout;
+    
+    /**
+     * BasketService constructor.
+     * @param BasketItemRepositoryContract $basketItemRepository
+     * @param Checkout $checkout
+     */
+	public function __construct(BasketItemRepositoryContract $basketItemRepository, Checkout $checkout)
 	{
-        $this->basketRepository = $basketRepository;
 		$this->basketItemRepository = $basketItemRepository;
+        $this->checkout = $checkout;
 	}
 
 	/**
@@ -41,7 +42,7 @@ class BasketService
 	 */
 	public function getBasket():Basket
 	{
-		return $this->basketRepository->load();
+		return pluginApp(BasketRepositoryContract::class)->load();
 	}
 
     /**
@@ -192,7 +193,7 @@ class BasketService
      */
     public function setBillingAddressId(int $billingAddressId)
     {
-        $this->basketRepository->setCustomerInvoiceAddressId($billingAddressId);
+        $this->checkout->setCustomerInvoiceAddressId($billingAddressId);
     }
     
     /**
@@ -201,8 +202,7 @@ class BasketService
      */
     public function getBillingAddressId()
     {
-        $id = $this->getBasket()->customerInvoiceAddressId;
-        return $id;
+        return $this->checkout->getCustomerInvoiceAddressId();
     }
     
     /**
@@ -211,7 +211,7 @@ class BasketService
      */
     public function setDeliveryAddressId(int $deliveryAddressId)
     {
-        $this->basketRepository->setCustomerShippingAddressId($deliveryAddressId);
+        $this->checkout->setCustomerShippingAddressId($deliveryAddressId);
     }
     
     /**
@@ -220,7 +220,6 @@ class BasketService
      */
     public function getDeliveryAddressId()
     {
-        $id = $this->getBasket()->customerShippingAddressId;
-        return $id;
+        return $this->checkout->getCustomerShippingAddressId();
     }
 }
