@@ -25,24 +25,24 @@ class IORouteServiceProvider extends RouteServiceProvider
 	{
 		$api->version(['v1'], ['namespace' => 'IO\Api\Resources'], function ($api)
 		{
-			$api->resource('basket', 'BasketResource');
-			$api->resource('basket/items', 'BasketItemResource');
-			$api->resource('order', 'OrderResource');
+			$api->resource('io/basket', 'BasketResource');
+			$api->resource('io/basket/items', 'BasketItemResource');
+			$api->resource('io/order', 'OrderResource');
 			//$api->resource('checkout', 'CheckoutResource');
-            $api->get('checkout', 'CheckoutResource@index');
-            $api->post('checkout', 'CheckoutResource@store');
-            $api->put('checkout', 'CheckoutResource@update');
-			$api->resource('checkout/payment', 'CheckoutPaymentResource');
-			$api->resource('customer', 'CustomerResource');
-			$api->resource('customer/address', 'CustomerAddressResource');
-			$api->resource('customer/login', 'CustomerAuthenticationResource');
-			$api->resource('customer/logout', 'CustomerLogoutResource');
-			$api->resource('customer/password', 'CustomerPasswordResource');
-            $api->resource('variations', 'VariationResource');
-            $api->resource('item/availability', 'AvailabilityResource');
-            $api->resource('item/condition', 'ItemConditionResource');
-            $api->resource('item/search', 'ItemSearchResource');
-			$api->resource('customer/bank_data', 'ContactBankResource');
+            $api->get('io/checkout', 'CheckoutResource@index');
+            $api->post('io/checkout', 'CheckoutResource@store');
+            $api->put('io/checkout', 'CheckoutResource@update');
+			$api->resource('io/checkout/payment', 'CheckoutPaymentResource');
+			$api->resource('io/customer', 'CustomerResource');
+			$api->resource('io/customer/address', 'CustomerAddressResource');
+			$api->resource('io/customer/login', 'CustomerAuthenticationResource');
+			$api->resource('io/customer/logout', 'CustomerLogoutResource');
+			$api->resource('io/customer/password', 'CustomerPasswordResource');
+            $api->resource('io/variations', 'VariationResource');
+            $api->resource('io/item/availability', 'AvailabilityResource');
+            $api->resource('io/item/condition', 'ItemConditionResource');
+            $api->resource('io/item/search', 'ItemSearchResource');
+			$api->resource('io/customer/bank_data', 'ContactBankResource');
 		});
 
 		/*
