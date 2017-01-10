@@ -14,17 +14,24 @@ use IO\Services\ItemService;
  */
 class BasketService
 {
+    /**
+     * @var BasketRepositoryContract
+     */
+    private $basketRepository;
+    
 	/**
 	 * @var BasketItemRepositoryContract
 	 */
 	private $basketItemRepository;
-
+    
     /**
      * BasketService constructor.
+     * @param BasketRepositoryContract $basketRepository
      * @param BasketItemRepositoryContract $basketItemRepository
      */
-	public function __construct(BasketItemRepositoryContract $basketItemRepository)
+	public function __construct(BasketRepositoryContract $basketRepository, BasketItemRepositoryContract $basketItemRepository)
 	{
+        $this->basketRepository = $basketRepository;
 		$this->basketItemRepository = $basketItemRepository;
 	}
 
@@ -34,7 +41,7 @@ class BasketService
 	 */
 	public function getBasket():Basket
 	{
-		return pluginApp(BasketRepositoryContract::class)->load();
+		return $this->basketRepository->load();
 	}
 
     /**
@@ -178,6 +185,42 @@ class BasketService
             $this->basketItemRepository->removeBasketItem( $basketItem->id );
         }
     }
-
-
+    
+    /**
+     * Set the billing address id
+     * @param int $billingAddressId
+     */
+    public function setBillingAddressId(int $billingAddressId)
+    {
+        $this->basketRepository->setCustomerInvoiceAddressId($billingAddressId);
+    }
+    
+    /**
+     * Return the billing address id
+     * @return int
+     */
+    public function getBillingAddressId()
+    {
+        $id = $this->getBasket()->customerInvoiceAddressId;
+        return $id;
+    }
+    
+    /**
+     * Set the delivery address id
+     * @param int $deliveryAddressId
+     */
+    public function setDeliveryAddressId(int $deliveryAddressId)
+    {
+        $this->basketRepository->setCustomerShippingAddressId($deliveryAddressId);
+    }
+    
+    /**
+     * Return the delivery address id
+     * @return int
+     */
+    public function getDeliveryAddressId()
+    {
+        $id = $this->getBasket()->customerShippingAddressId;
+        return $id;
+    }
 }

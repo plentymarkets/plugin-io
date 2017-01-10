@@ -3,8 +3,7 @@
 namespace IO\Services;
 
 use Plenty\Modules\Authentication\Contracts\ContactAuthenticationRepositoryContract;
-use IO\Services\SessionStorageService;
-use IO\Constants\SessionStorageKeys;
+use IO\Services\BasketService;
 
 /**
  * Class AuthenticationService
@@ -51,9 +50,12 @@ class AuthenticationService
      */
 	public function logout()
 	{
-        $sessionStorage = pluginApp(SessionStorageService::class);
-        $sessionStorage->setSessionValue(SessionStorageKeys::BILLING_ADDRESS_ID, 0);
-        $sessionStorage->setSessionValue(SessionStorageKeys::DELIVERY_ADDRESS_ID, 0);
+        /**
+         * @var BasketService $basketService
+         */
+        $basketService = pluginApp(BasketService::class);
+        $basketService->setBillingAddressId(0);
+        $basketService->setDeliveryAddressId(0);
         
 		$this->contactAuthRepository->logout();
 	}
