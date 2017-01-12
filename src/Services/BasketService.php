@@ -2,6 +2,8 @@
 
 namespace IO\Services;
 
+use IO\Services\ItemLoader\Loaders\BasketItems;
+use IO\Services\ItemLoader\Services\ItemLoaderService;
 use Plenty\Modules\Basket\Contracts\BasketRepositoryContract;
 use Plenty\Modules\Basket\Contracts\BasketItemRepositoryContract;
 use Plenty\Modules\Basket\Models\Basket;
@@ -58,6 +60,24 @@ class BasketService
         
         return $result;
 	}
+	
+	public function getBasketItemsForTemplate(string $template):array
+    {
+        $result = array();
+    
+        $basketItems = $this->basketItemRepository->all();
+        $basketItemData = $this->getBasketItemData( $basketItems, $template );
+    
+        foreach( $basketItems as $basketItem )
+        {
+            array_push(
+                $result,
+                $this->addVariationData($basketItem, $basketItemData[$basketItem->variationId])
+            );
+        }
+    
+        return $result;
+    }
 
     /**
      * Get a basket item
@@ -149,7 +169,7 @@ class BasketService
      * @param array $basketItems
      * @return array
      */
-	private function getBasketItemData($basketItems = array()):array
+	private function getBasketItemData($basketItems = array(), string $template = ''):array
 	{
 		if(count($basketItems) <= 0)
 		{
@@ -162,7 +182,9 @@ class BasketService
 			array_push($basketItemVariationIds, $basketItem->variationId);
 		}
 
-		$items  = pluginApp(ItemService::class)->getVariations($basketItemVariationIds);
+		//$items  = pluginApp(ItemService::class)->getVariations($basketItemVariationIds);
+        $items = pluginApp(ItemLoaderService::class)
+            ->loadForTemplate($template, [BasketItems::class], ['variationIds' => $basketItemVariationIds]);
         
         $result = array();
         foreach($items['documents'] as $item)

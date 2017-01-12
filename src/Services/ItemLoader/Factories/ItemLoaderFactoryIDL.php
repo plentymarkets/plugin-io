@@ -311,20 +311,6 @@ class ItemLoaderFactoryIDL implements ItemLoaderFactory
                 "clients": [
                         1000
                     ],
-                "texts": [
-                  {
-                      "name3": "",
-                    "keywords": "",
-                    "technicalData": "",
-                    "description": "Der Zweisitzer Paradise Now kommt in schlichter und doch edler Optik daher. Das klassische Design mit moderner Silhouette macht in jedem Wohnzimmer eine gute Figur. Dank abwaschbarem und Ã¤uÃŸerst strapazierfÃ¤higem Glattleder kÃ¶nnen auch zum Beispiel schmutzige KinderhÃ¤nde keinen dauerhaften Schaden anrichten. StandfÃ¼ÃŸe aus Echtholz setzen warme, interessante Akzente.\n",
-                    "shortDescription": "",
-                    "lang": "de",
-                    "name2": "",
-                    "name1": "Zweisitzer Paradise Now",
-                    "metaDescription": "",
-                    "urlPath": "wohnzimmer/sofas/zweisitzer-paradise-now"
-                  }
-                ],
                 "defaultCategories": [
                   {
                       "linklist": true,
