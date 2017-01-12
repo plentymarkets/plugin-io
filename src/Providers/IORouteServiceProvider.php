@@ -80,6 +80,17 @@ class IORouteServiceProvider extends RouteServiceProvider
         
         $router->get('search', 'IO\Controllers\ItemSearchController@showSearch');
 
+        //home route
+        $router->get('', 'IO\Controllers\HomepageController@showHomepage');
+
+        //page not found
+
+        //item not found
+
+        //gtc page
+
+        //
+
 		/*
 		 * ITEM ROUTES
 		 */
