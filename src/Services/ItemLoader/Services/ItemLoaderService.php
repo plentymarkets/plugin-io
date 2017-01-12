@@ -1,7 +1,7 @@
 <?php
 namespace IO\Services\ItemLoader\Services;
 
-use IO\Services\ItemLoader\Factories\ItemLoaderFactory;
+use IO\Services\ItemLoader\Contracts\ItemLoaderFactory;
 
 /**
  * Created by ptopczewski, 09.01.17 10:47

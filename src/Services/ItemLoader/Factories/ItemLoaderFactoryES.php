@@ -2,6 +2,7 @@
 namespace IO\Services\ItemLoader\Factories;
 
 use IO\Services\ItemLoader\Contracts\ItemLoaderContract;
+use IO\Services\ItemLoader\Contracts\ItemLoaderFactory;
 use IO\Services\ItemLoader\Contracts\ItemLoaderPaginationContract;
 use IO\Services\ItemLoader\Contracts\ItemLoaderSortingContract;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Search\Document\DocumentSearch;
@@ -11,10 +12,10 @@ use Plenty\Modules\Item\Search\Contracts\ItemElasticSearchSearchRepositoryContra
 
 /**
  * Created by ptopczewski, 09.01.17 08:35
- * Class ItemLoaderFactory
+ * Class ItemLoaderFactoryES
  * @package IO\Services\ItemLoader\Factories
  */
-class ItemLoaderFactory
+class ItemLoaderFactoryES implements ItemLoaderFactory
 {
 	/**
 	 * @param array $loaderClassList
