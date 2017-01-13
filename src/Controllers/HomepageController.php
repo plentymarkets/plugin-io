@@ -18,7 +18,7 @@ class HomepageController extends LayoutController
         return $this->renderTemplate(
             "tpl.home",
             [
-                "home" => ""
+                "object" => ""
             ]
         );
     }
