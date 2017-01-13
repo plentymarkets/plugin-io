@@ -20,6 +20,8 @@ class BasketService
 	 * @var BasketItemRepositoryContract
 	 */
 	private $basketItemRepository;
+    
+    private $template = '';
 
     /**
      * BasketService constructor.
@@ -29,6 +31,11 @@ class BasketService
 	{
 		$this->basketItemRepository = $basketItemRepository;
 	}
+	
+	public function setTemplate(string $template)
+    {
+        $this->template = $template;
+    }
 
 	/**
 	 * Return the basket as an array
@@ -61,8 +68,13 @@ class BasketService
         return $result;
 	}
 	
-	public function getBasketItemsForTemplate(string $template):array
+	public function getBasketItemsForTemplate(string $template = ''):array
     {
+        if(!strlen($template))
+        {
+            $template = $this->template;
+        }
+        
         $result = array();
     
         $basketItems = $this->basketItemRepository->all();
@@ -127,7 +139,7 @@ class BasketService
 			$this->basketItemRepository->addBasketItem($data);
 		}
 
-		return $this->getBasketItems();
+		return $this->getBasketItemsForTemplate();
 	}
 
     /**
@@ -140,7 +152,7 @@ class BasketService
 	{
 		$data['id'] = $basketItemId;
 		$this->basketItemRepository->updateBasketItem($basketItemId, $data);
-		return $this->getBasketItems();
+		return $this->getBasketItemsForTemplate();
 	}
 
     /**
@@ -151,7 +163,7 @@ class BasketService
 	public function deleteBasketItem(int $basketItemId):array
 	{
 		$this->basketItemRepository->removeBasketItem($basketItemId);
-		return $this->getBasketItems();
+		return $this->getBasketItemsForTemplate();
 	}
 
     /**
@@ -171,6 +183,11 @@ class BasketService
      */
 	private function getBasketItemData($basketItems = array(), string $template = ''):array
 	{
+        if(!strlen($template))
+        {
+            $template = $this->template;
+        }
+        
 		if(count($basketItems) <= 0)
 		{
 			return array();
