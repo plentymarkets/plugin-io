@@ -8,7 +8,8 @@ use Plenty\Plugin\Http\Request;
 use IO\Api\ApiResource;
 use IO\Api\ApiResponse;
 use IO\Api\ResponseCode;
-use IO\Services\ItemService;
+use IO\Services\ItemLoader\Services\ItemLoaderService;
+use IO\Services\ItemLoader\Loaders\SearchItems;
 
 /**
  * Class ItemSearchResource
@@ -36,11 +37,10 @@ class ItemSearchAutocompleteResource extends ApiResource
         
         if(strlen($searchString))
         {
-            /**
-             * @var ItemService $itemService
-             */
-            $itemService = pluginApp(ItemService::class);
-            $response = $itemService->searchItemsAutocomplete($searchString);
+            $template = $this->request->get('template', '');
+            
+            $response = pluginApp(ItemLoaderService::class)
+                ->loadForTemplate($template, [SearchItems::class], ['searchString' => $searchString]);
             
             return $this->response->create($response, ResponseCode::OK);
         }

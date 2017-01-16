@@ -39,12 +39,6 @@ class ItemSearchResource extends ApiResource
         
         if(strlen($searchString))
         {
-            /**
-             * @var ItemService $itemService
-             */
-            //$itemService = pluginApp(ItemService::class);
-            //$response = $itemService->searchItems($searchString, $params, $page);
-    
             $response = pluginApp(ItemLoaderService::class)
                 ->loadForTemplate($template, [SearchItems::class], [
                     'searchString'  => $searchString,
