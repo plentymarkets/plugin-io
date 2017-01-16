@@ -4,7 +4,7 @@ namespace IO\Services\ItemLoader\Loaders;
 
 use IO\Services\ItemLoader\Contracts\ItemLoaderContract;
 use IO\Services\ItemLoader\Contracts\ItemLoaderPaginationContract;
-use IO\Services\ItemLoader\Contracts\ItemLoaderSortingContract;
+//use IO\Services\ItemLoader\Contracts\ItemLoaderSortingContract;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Processor\DocumentProcessor;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Query\Type\TypeInterface;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Search\Document\DocumentSearch;
@@ -15,7 +15,7 @@ use Plenty\Modules\Item\Search\Filter\VariationBaseFilter;
 use Plenty\Modules\Item\Search\Filter\SearchFilter;
 use Plenty\Plugin\Application;
 
-class SearchItems implements ItemLoaderContract, ItemLoaderPaginationContract, ItemLoaderSortingContract
+class SearchItems implements ItemLoaderContract, ItemLoaderPaginationContract //, ItemLoaderSortingContract
 {
     /**
      * @return SearchInterface
@@ -73,8 +73,8 @@ class SearchItems implements ItemLoaderContract, ItemLoaderPaginationContract, I
         return (INT)$options['itemsPerPage'];
     }
     
-    public function getSorting($options = [])
+    /*public function getSorting($options = [])
     {
         return pluginApp(SortingInterface::class, $options);
-    }
+    }*/
 }
