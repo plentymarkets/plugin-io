@@ -9,7 +9,8 @@ use IO\Api\ApiResource;
 use IO\Api\ApiResponse;
 use IO\Api\ResponseCode;
 use IO\Builder\Category\CategoryParamsBuilder;
-use IO\Services\ItemService;
+use IO\Services\ItemLoader\Services\ItemLoaderService;
+use IO\Services\ItemLoader\Loaders\SearchItems;
 
 /**
  * Class ItemSearchResource
@@ -34,22 +35,24 @@ class ItemSearchResource extends ApiResource
     public function index():BaseResponse
     {
         $searchString = $this->request->get('searchString', '');
+        $template = $this->request->get('template', '');
         
         if(strlen($searchString))
         {
-            $page         = $this->request->get('page', 1);
-    
-            $params = [
-                'itemsPerPage' => $this->request->get('itemsPerPage', 20),
-                'orderBy'      => $this->request->get('orderBy', 'itemName'),
-                'orderByKey'   => $this->request->get('orderByKey', 'ASC')
-            ];
-    
             /**
              * @var ItemService $itemService
              */
-            $itemService = pluginApp(ItemService::class);
-            $response = $itemService->searchItems($searchString, $params, $page);
+            //$itemService = pluginApp(ItemService::class);
+            //$response = $itemService->searchItems($searchString, $params, $page);
+    
+            $response = pluginApp(ItemLoaderService::class)
+                ->loadForTemplate($template, [SearchItems::class], [
+                    'searchString'  => $searchString,
+                    'page'          => $this->request->get('page', 1),
+                    'itemsPerPage'  => $this->request->get('itemsPerPage', 20),
+                    'orderBy'       => $this->request->get('orderBy', 'itemName'),
+                    'orderByKey'    => $this->request->get('orderByKey', 'ASC')
+                ]);
     
             return $this->response->create($response, ResponseCode::OK);
         }
