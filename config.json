@@ -30,5 +30,26 @@
             "0" : "NO"
         },
         "default": "1"
+    },
+    {
+        "tab"                           : "Routing",
+        "key"                           : "routing.enabled_routes",
+        "label"                         : "Enable routes",
+        "type"                          : "multi_select",
+        "possibleValues"                :
+        {
+            "basket"        : "/basket",
+            "checkout"      : "/checkout",
+            "my-account"    : "/my-account",
+            "confirmation"  : "/confirmation",
+            "guest"         : "/guest",
+            "login"         : "/login",
+            "register"      : "/register",
+            "search"        : "/search",
+            "place-order"   : "/place-order & /execute-payment",
+            "item"          : "Item routes",
+            "category"      : "Category routes"
+        },
+        "default"                       : "all"
     }
 ]
