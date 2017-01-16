@@ -14,6 +14,7 @@ use Plenty\Modules\Item\Search\Filter\ClientFilter;
 use Plenty\Modules\Item\Search\Filter\VariationBaseFilter;
 use Plenty\Modules\Item\Search\Filter\SearchFilter;
 use Plenty\Plugin\Application;
+use Plenty\Modules\Cloud\ElasticSearch\Lib\ElasticSearch;
 
 class SearchItems implements ItemLoaderContract, ItemLoaderPaginationContract //, ItemLoaderSortingContract
 {
@@ -45,7 +46,12 @@ class SearchItems implements ItemLoaderContract, ItemLoaderPaginationContract //
         
         if(array_key_exists('searchString', $options) && strlen($options['searchString']))
         {
-            $searchFilter->setSearchString($options['searchString']);
+            $searchType = ElasticSearch::SEARCH_TYPE_FUZZY;
+            if(array_key_exists('autocomplete', $options) && $options['autocomplete'] === true)
+            {
+                $searchType = ElasticSearch::SEARCH_TYPE_AUTOCOMPLETE;
+            }
+            $searchFilter->setSearchString($options['searchString'], $searchType);
         }
         
         return [

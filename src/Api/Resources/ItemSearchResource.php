@@ -8,7 +8,6 @@ use Plenty\Plugin\Http\Request;
 use IO\Api\ApiResource;
 use IO\Api\ApiResponse;
 use IO\Api\ResponseCode;
-use IO\Builder\Category\CategoryParamsBuilder;
 use IO\Services\ItemLoader\Services\ItemLoaderService;
 use IO\Services\ItemLoader\Loaders\SearchItems;
 
