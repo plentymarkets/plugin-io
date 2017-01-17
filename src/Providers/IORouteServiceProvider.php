@@ -77,8 +77,30 @@ class IORouteServiceProvider extends RouteServiceProvider
         // execute payment after order is created. PaymentPlugins can redirect to this route if order was created by the PaymentPlugin itself.
         $router->get('execute-payment/{orderId}/{paymentId?}', 'IO\Controllers\PlaceOrderController@executePayment')
             ->where('orderId', '[0-9]+');
-        
+
+        //search page route
         $router->get('search', 'IO\Controllers\ItemSearchController@showSearch');
+
+        //homepage route
+        $router->get('', 'IO\Controllers\HomepageController@showHomepage');
+
+        //page not found
+        $router->get('404', 'IO\Controllers\StaticPagesController@showPageNotFound');
+
+        //item not found
+        $router->get('item-404', 'IO\Controllers\StaticPagesController@showItemNotFound');
+
+        //cancellation rights page
+        $router->get('cancellation-rights', 'IO\Controllers\StaticPagesController@showCancellationRights');
+
+        //legal disclosure page
+        $router->get('legal-disclosure', 'IO\Controllers\StaticPagesController@showLegalDisclosure');
+
+        //privacy policy page
+        $router->get('privacy-policy', 'IO\Controllers\StaticPagesController@showPrivacyPolicy');
+
+        //terms and conditions page
+        $router->get('terms-conditions', 'IO\Controllers\StaticPagesController@showTermsAndConditions');
 
 		/*
 		 * ITEM ROUTES
