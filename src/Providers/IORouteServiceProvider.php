@@ -100,7 +100,7 @@ class IORouteServiceProvider extends RouteServiceProvider
         $router->get('privacy-policy', 'IO\Controllers\StaticPagesController@showPrivacyPolicy');
 
         //terms and conditions page
-        $router->get('terms-conditions', 'IO\Controllers\StaticPagesController@showTermsAndConditions');
+        $router->get('gtc', 'IO\Controllers\StaticPagesController@showTermsAndConditions');
 
 		/*
 		 * ITEM ROUTES
