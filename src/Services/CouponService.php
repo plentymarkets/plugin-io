@@ -22,6 +22,10 @@ class CouponService
     
     public function removeCoupon()
     {
-        //TODO
+        /**
+         * @var BasketRepositoryContract $basket
+         */
+        $basket = pluginApp(BasketRepositoryContract::class);
+        return $basket->save(['couponCode' => '']);
     }
 }

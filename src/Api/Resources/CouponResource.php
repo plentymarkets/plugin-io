@@ -25,10 +25,24 @@ class CouponResource extends ApiResource
     public function store():BaseResponse
     {
         $couponCode = $this->request->get('couponCode', '');
-        
+    
+        /**
+         * @var CouponService $couponService
+         */
         $couponService = pluginApp(CouponService::class);
         $response = $couponService->setCoupon($couponCode);
         
+        return $this->response->create( $response, ResponseCode::CREATED );
+    }
+    
+    public function destroy():BaseResponse
+    {
+        /**
+         * @var CouponService $couponService
+         */
+        $couponService = pluginApp(CouponService::class);
+        $response = $couponService->removeCoupon();
+    
         return $this->response->create( $response, ResponseCode::CREATED );
     }
 }
