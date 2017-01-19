@@ -25,6 +25,11 @@ class TemplateService
         return pluginApp(CategoryService::class)->isHome();
     }
 
+    public function isItem():bool
+    {
+        return TemplateService::$currentTemplate == "tpl.item";
+    }
+
     public function isMyAccount():bool
     {
         return TemplateService::$currentTemplate == "tpl.my-account";
