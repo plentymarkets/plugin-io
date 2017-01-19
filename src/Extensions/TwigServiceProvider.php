@@ -62,6 +62,7 @@ class TwigServiceProvider extends Twig_Extension
         return [];
     }
 
+
     /**
      * Return a map of global helper objects to add.
      *

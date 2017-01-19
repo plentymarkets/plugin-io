@@ -2,15 +2,10 @@
 
 namespace IO\Extensions;
 
-use IO\Guards\AbstractGuard;
 use Plenty\Plugin\Templates\Extensions\Twig_Extension;
-use Plenty\Plugin\Templates\Extensions\Twig_SimpleFunction;
-use Plenty\Plugin\Templates\Extensions\Twig_SimpleFilter;
 use Plenty\Plugin\Templates\Factories\TwigFactory;
 use Plenty\Plugin\Http\Request;
 
-use IO\Extensions\AbstractFilter;
-use IO\Extensions\AbstractFunction;
 use IO\Extensions\Filters\PatternFilter;
 use IO\Extensions\Filters\NumberFormatFilter;
 use IO\Extensions\Filters\URLFilter;
@@ -19,6 +14,7 @@ use IO\Extensions\Filters\ItemNameFilter;
 use IO\Extensions\Functions\GetBasePrice;
 use IO\Extensions\Functions\Component;
 use IO\Extensions\Functions\ExternalContent;
+use IO\Extensions\Functions\Partial;
 
 /**
  * Provide services and helper functions to twig engine
@@ -46,7 +42,8 @@ class TwigIOExtension extends Twig_Extension
 		GetBasePrice $getBasePrice,
 		Component $component,
         ItemNameFilter $itemNameFilter,
-        ExternalContent $externalContent
+        ExternalContent $externalContent,
+        Partial $partial
 	)
 	{
 		$this->twig = $twig;
