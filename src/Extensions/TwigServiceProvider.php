@@ -19,6 +19,7 @@ use IO\Services\NotificationService;
 use IO\Services\ContactBankService;
 use IO\Services\WebstoreConfigurationService;
 use IO\Services\LocalizationService;
+use IO\Services\CouponService;
 
 /**
  * Provide services and helper functions to twig engine
@@ -86,7 +87,8 @@ class TwigServiceProvider extends Twig_Extension
                 "notifications" => pluginApp( NotificationService::class ),
                 "contactBank"   => pluginApp( ContactBankService::class),
                 "webstoreConfig"=> pluginApp( WebstoreConfigurationService::class),
-                "localization"  => pluginApp( LocalizationService::class )
+                "localization"  => pluginApp( LocalizationService::class ),
+                "coupon"        => pluginApp( CouponService::class )
             ]
         ];
     }
