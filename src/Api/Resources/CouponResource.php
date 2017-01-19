@@ -35,7 +35,7 @@ class CouponResource extends ApiResource
         return $this->response->create( $response, ResponseCode::CREATED );
     }
     
-    public function destroy():BaseResponse
+    public function destroy(string $selector):BaseResponse
     {
         /**
          * @var CouponService $couponService
