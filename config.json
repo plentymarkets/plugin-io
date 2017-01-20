@@ -30,5 +30,33 @@
             "0" : "NO"
         },
         "default": "1"
+    },
+    {
+        "tab"                           : "Routing",
+        "key"                           : "routing.enabled_routes",
+        "label"                         : "Enable routes",
+        "type"                          : "multi_select",
+        "possibleValues"                :
+        {
+            "home"                  : "/",
+            "basket"                : "/basket",
+            "checkout"              : "/checkout",
+            "my-account"            : "/my-account",
+            "confirmation"          : "/confirmation",
+            "guest"                 : "/guest",
+            "login"                 : "/login",
+            "register"              : "/register",
+            "search"                : "/search",
+            "place-order"           : "/place-order & /execute-payment",
+            "404"                   : "/404",
+            "item-404"              : "/item-404",
+            "cancellation-rights"   : "/cancellation-rights",
+            "legal-disclosure"      : "/legal-disclosure",
+            "privacy-policy"        : "/privacy-policy",
+            "gtc"                   : "/gtc",
+            "item"                  : "Item routes",
+            "category"              : "Category routes"
+        },
+        "default"                       : "all"
     }
 ]
