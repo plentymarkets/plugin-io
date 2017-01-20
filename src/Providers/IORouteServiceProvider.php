@@ -26,24 +26,24 @@ class IORouteServiceProvider extends RouteServiceProvider
 	{
 		$api->version(['v1'], ['namespace' => 'IO\Api\Resources'], function ($api)
 		{
-			$api->resource('basket', 'BasketResource');
-			$api->resource('basket/items', 'BasketItemResource');
-			$api->resource('order', 'OrderResource');
+			$api->resource('io/basket', 'BasketResource');
+			$api->resource('io/basket/items', 'BasketItemResource');
+			$api->resource('io/order', 'OrderResource');
 			//$api->resource('checkout', 'CheckoutResource');
-            $api->get('checkout', 'CheckoutResource@index');
-            $api->post('checkout', 'CheckoutResource@store');
-            $api->put('checkout', 'CheckoutResource@update');
-			$api->resource('checkout/payment', 'CheckoutPaymentResource');
-			$api->resource('customer', 'CustomerResource');
-			$api->resource('customer/address', 'CustomerAddressResource');
-			$api->resource('customer/login', 'CustomerAuthenticationResource');
-			$api->resource('customer/logout', 'CustomerLogoutResource');
-			$api->resource('customer/password', 'CustomerPasswordResource');
-            $api->resource('variations', 'VariationResource');
-            $api->resource('item/availability', 'AvailabilityResource');
-            $api->resource('item/condition', 'ItemConditionResource');
-            $api->resource('item/search', 'ItemSearchResource');
-			$api->resource('customer/bank_data', 'ContactBankResource');
+            $api->get('io/checkout', 'CheckoutResource@index');
+            $api->post('io/checkout', 'CheckoutResource@store');
+            $api->put('io/checkout', 'CheckoutResource@update');
+			$api->resource('io/checkout/payment', 'CheckoutPaymentResource');
+			$api->resource('io/customer', 'CustomerResource');
+			$api->resource('io/customer/address', 'CustomerAddressResource');
+			$api->resource('io/customer/login', 'CustomerAuthenticationResource');
+			$api->resource('io/customer/logout', 'CustomerLogoutResource');
+			$api->resource('io/customer/password', 'CustomerPasswordResource');
+            $api->resource('io/variations', 'VariationResource');
+            $api->resource('io/item/availability', 'AvailabilityResource');
+            $api->resource('io/item/condition', 'ItemConditionResource');
+            $api->resource('io/item/search', 'ItemSearchResource');
+			$api->resource('io/customer/bank_data', 'ContactBankResource');
 		});
 
 		$enabledRoutes = explode(", ",  $config->get("PluginIO.routing.enabled_routes") );
@@ -108,6 +108,41 @@ class IORouteServiceProvider extends RouteServiceProvider
         if ( in_array("search", $enabledRoutes) || in_array("all", $enabledRoutes) )
         {
             $router->get('search', 'IO\Controllers\ItemSearchController@showSearch');
+        }
+
+        if ( in_array("home", $enabledRoutes) || in_array("all", $enabledRoutes) ) {
+            //homepage route
+            $router->get('', 'IO\Controllers\HomepageController@showHomepage');
+        }
+
+        if ( in_array("404", $enabledRoutes) || in_array("all", $enabledRoutes) ) {
+            //page not found
+            $router->get('404', 'IO\Controllers\StaticPagesController@showPageNotFound');
+        }
+
+        if ( in_array("item-404", $enabledRoutes) || in_array("all", $enabledRoutes) ) {
+            //item not found
+            $router->get('item-404', 'IO\Controllers\StaticPagesController@showItemNotFound');
+        }
+
+        if ( in_array("cancellation-rights", $enabledRoutes) || in_array("all", $enabledRoutes) ) {
+            //cancellation rights page
+            $router->get('cancellation-rights', 'IO\Controllers\StaticPagesController@showCancellationRights');
+        }
+
+        if ( in_array("legal-disclosure", $enabledRoutes) || in_array("all", $enabledRoutes) ) {
+            //legal disclosure page
+            $router->get('legal-disclosure', 'IO\Controllers\StaticPagesController@showLegalDisclosure');
+        }
+
+        if ( in_array("privacy-policy", $enabledRoutes) || in_array("all", $enabledRoutes) ) {
+            //privacy policy page
+            $router->get('privacy-policy', 'IO\Controllers\StaticPagesController@showPrivacyPolicy');
+        }
+
+        if ( in_array("gtc", $enabledRoutes) || in_array("all", $enabledRoutes) ) {
+            //terms and conditions page
+            $router->get('gtc', 'IO\Controllers\StaticPagesController@showTermsAndConditions');
         }
 
 		/*
