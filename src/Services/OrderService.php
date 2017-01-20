@@ -59,6 +59,12 @@ class OrderService
         $checkoutService = pluginApp(CheckoutService::class);
         $customerService = pluginApp(CustomerService::class);
         
+        $couponCode = null;
+        if(strlen($this->basketService->getBasket()->couponCode))
+        {
+            $couponCode = $this->basketService->getBasket()->couponCode;
+        }
+        
 		$order = pluginApp(OrderBuilder::class)->prepare(OrderType::ORDER)
 		                            ->fromBasket() //TODO: Add shipping costs & payment surcharge as OrderItem
 		                            ->withStatus(3.3)
@@ -68,8 +74,8 @@ class OrderService
 		                            ->withOrderProperty(OrderPropertyType::PAYMENT_METHOD, OrderOptionSubType::MAIN_VALUE, $checkoutService->getMethodOfPaymentId())
                                     ->withOrderProperty(OrderPropertyType::SHIPPING_PROFILE, OrderOptionSubType::MAIN_VALUE, $checkoutService->getShippingProfileId())
 		                            ->done();
-
-		$order = $this->orderRepository->createOrder($order);
+        
+		$order = $this->orderRepository->createOrder($order, $couponCode);
         
         if($customerService->getContactId() <= 0)
         {
