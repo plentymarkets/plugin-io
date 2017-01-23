@@ -34,7 +34,7 @@ class CheckoutService
 	 * @var FrontendSessionStorageFactoryContract
 	 */
 	private $sessionStorage;
-    
+
     /**
      * @var CustomerService
      */
@@ -169,6 +169,7 @@ class CheckoutService
             $paymentData['fee'] = $this->frontendPaymentMethodRepository->getPaymentMethodFee($paymentMethod);
             $paymentData['icon'] = $this->frontendPaymentMethodRepository->getPaymentMethodIcon($paymentMethod, $lang);
             $paymentData['description'] = $this->frontendPaymentMethodRepository->getPaymentMethodDescription($paymentMethod, $lang);
+			$paymentData['key'] = $paymentMethod->pluginKey;
             $paymentDataList[] = $paymentData;
         }
         return $paymentDataList;
@@ -257,7 +258,7 @@ class CheckoutService
          * @var BasketService $basketService
          */
         $basketService = pluginApp(BasketService::class);
-        
+
         $billingAddressId = $basketService->getBillingAddressId();
 
         if ($billingAddressId === 0)
