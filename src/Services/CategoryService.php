@@ -23,10 +23,10 @@ class CategoryService
 	 */
 	private $categoryRepository;
 
-    /**
-     * @var WebstoreConfigurationService
-     */
-    private $webstoreConfig;
+	/**
+	 * @var WebstoreConfigurationService
+	 */
+	private $webstoreConfig;
 
 	// is set from controllers
 	/**
@@ -42,7 +42,7 @@ class CategoryService
      * CategoryService constructor.
      * @param CategoryRepositoryContract $category
      */
-	public function __construct(CategoryRepositoryContract $categoryRepository, WebstoreConfigurationService $webstoreConfig)
+	 public function __construct(CategoryRepositoryContract $categoryRepository, WebstoreConfigurationService $webstoreConfig)
 	{
 		$this->categoryRepository    = $categoryRepository;
 		$this->webstoreConfig 		 = $webstoreConfig;
@@ -192,8 +192,9 @@ class CategoryService
      */
     public function getNavigationTree(string $type = "all", string $lang = "de"):array
     {
-        return $this->categoryRepository->getLinklistTree($type, $lang, $this->webstoreConfig->getWebstoreConfig()->webstoreId);
+		return $this->categoryRepository->getLinklistTree($type, $lang, $this->webstoreConfig->getWebstoreConfig()->webstoreId);
     }
+
     /**
      * Return the sitemap list as an array
      * @param string $type Only return categories of given type
@@ -202,7 +203,7 @@ class CategoryService
      */
     public function getNavigationList(string $type = "all", string $lang = "de"):array
     {
-        return $this->categoryRepository->getLinklistList($type, $lang, $this->webstoreConfig->getWebstoreConfig()->webstoreId);
+		return $this->categoryRepository->getLinklistList($type, $lang, $this->webstoreConfig->getWebstoreConfig()->webstoreId);
     }
 
     /**

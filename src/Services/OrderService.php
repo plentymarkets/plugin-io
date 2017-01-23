@@ -4,16 +4,15 @@ namespace IO\Services;
 
 use IO\Models\LocalizedOrder;
 use Plenty\Modules\Order\Contracts\OrderRepositoryContract;
+use Plenty\Modules\Order\Property\Models\OrderPropertyType;
 use Plenty\Modules\Payment\Method\Contracts\PaymentMethodRepositoryContract;
 use IO\Builder\Order\OrderBuilder;
 use IO\Builder\Order\OrderType;
-use IO\Builder\Order\OrderOptionType;
 use IO\Builder\Order\OrderOptionSubType;
 use IO\Builder\Order\AddressType;
 use IO\Constants\OrderStatusTexts;
 use Plenty\Repositories\Models\PaginatedResult;
 use IO\Constants\SessionStorageKeys;
-use IO\Services\SessionStorageService;
 
 /**
  * Class OrderService
@@ -66,8 +65,8 @@ class OrderService
 		                            ->withContactId($customerService->getContactId())
 		                            ->withAddressId($checkoutService->getBillingAddressId(), AddressType::BILLING)
 		                            ->withAddressId($checkoutService->getDeliveryAddressId(), AddressType::DELIVERY)
-		                            ->withOrderProperty(OrderOptionType::METHOD_OF_PAYMENT, OrderOptionSubType::MAIN_VALUE, $checkoutService->getMethodOfPaymentId())
-                                    ->withOrderProperty(OrderOptionType::SHIPPING_PROFIL, OrderOptionSubType::MAIN_VALUE, $checkoutService->getShippingProfileId())
+		                            ->withOrderProperty(OrderPropertyType::PAYMENT_METHOD, OrderOptionSubType::MAIN_VALUE, $checkoutService->getMethodOfPaymentId())
+                                    ->withOrderProperty(OrderPropertyType::SHIPPING_PROFILE, OrderOptionSubType::MAIN_VALUE, $checkoutService->getShippingProfileId())
 		                            ->done();
 
 		$order = $this->orderRepository->createOrder($order);

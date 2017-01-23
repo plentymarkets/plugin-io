@@ -10,6 +10,7 @@ use Plenty\Modules\Frontend\Session\Storage\Contracts\FrontendSessionStorageFact
 use Plenty\Modules\Payment\Method\Contracts\PaymentMethodRepositoryContract;
 use Plenty\Modules\Order\Shipping\Contracts\ParcelServicePresetRepositoryContract;
 use IO\Constants\SessionStorageKeys;
+use IO\Services\BasketService;
 
 /**
  * Class CheckoutService
@@ -226,7 +227,11 @@ class CheckoutService
      */
 	public function getDeliveryAddressId()
 	{
-		return (int)$this->sessionStorage->getPlugin()->getValue(SessionStorageKeys::DELIVERY_ADDRESS_ID);
+        /**
+         * @var BasketService $basketService
+         */
+        $basketService = pluginApp(BasketService::class);
+        return (int)$basketService->getDeliveryAddressId();
 	}
 
     /**
@@ -235,7 +240,11 @@ class CheckoutService
      */
 	public function setDeliveryAddressId($deliveryAddressId)
 	{
-		$this->sessionStorage->getPlugin()->setValue(SessionStorageKeys::DELIVERY_ADDRESS_ID, $deliveryAddressId);
+        /**
+         * @var BasketService $basketService
+         */
+        $basketService = pluginApp(BasketService::class);
+		$basketService->setDeliveryAddressId($deliveryAddressId);
 	}
 
     /**
@@ -244,7 +253,12 @@ class CheckoutService
      */
     public function getBillingAddressId()
     {
-        $billingAddressId = (int)$this->sessionStorage->getPlugin()->getValue(SessionStorageKeys::BILLING_ADDRESS_ID);
+        /**
+         * @var BasketService $basketService
+         */
+        $basketService = pluginApp(BasketService::class);
+        
+        $billingAddressId = $basketService->getBillingAddressId();
 
         if ($billingAddressId === 0)
         {
@@ -267,7 +281,12 @@ class CheckoutService
 	{
         if((int)$billingAddressId > 0)
         {
-            $this->sessionStorage->getPlugin()->setValue(SessionStorageKeys::BILLING_ADDRESS_ID, $billingAddressId);
+            /**
+             * @var BasketService $basketService
+             */
+            $basketService = pluginApp(BasketService::class);
+            $basketService->setBillingAddressId($billingAddressId);
+            //$this->sessionStorage->getPlugin()->setValue(SessionStorageKeys::BILLING_ADDRESS_ID, $billingAddressId);
         }
 	}
 }
