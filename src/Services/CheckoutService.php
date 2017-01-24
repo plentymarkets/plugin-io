@@ -90,10 +90,22 @@ class CheckoutService
 		$currency = (string)$this->sessionStorage->getPlugin()->getValue(SessionStorageKeys::CURRENCY);
 		if($currency === null || $currency === "")
 		{
+            /** @var SessionStorageService $sessionService */
+            $sessionService = pluginApp(SessionStorageService::class);
+
             /** @var WebstoreConfigurationService $webstoreConfig */
             $webstoreConfig = pluginApp( WebstoreConfigurationService::class );
-			$currency = $webstoreConfig->getWebstoreConfig()->defaultCurrency;
-			$this->setCurrency($currency);
+
+            $currency = 'EUR';
+
+            if(
+                !is_array($webstoreConfig->getWebstoreConfig()->defaultCurrencyList) ||
+                !array_key_exists($sessionService->getLang(), $webstoreConfig->getWebstoreConfig()->defaultCurrencyList)
+            )
+            {
+                $currency = $webstoreConfig->getWebstoreConfig()->defaultCurrencyList[$sessionService->getLang()];
+            }
+            $this->setCurrency($currency);
 		}
 		return $currency;
 	}
