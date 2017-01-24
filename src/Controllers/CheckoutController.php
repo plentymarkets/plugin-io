@@ -3,6 +3,8 @@ namespace IO\Controllers;
 
 use IO\Helper\TemplateContainer;
 use IO\Services\BasketService;
+use Plenty\Modules\Basket\Contracts\BasketItemRepositoryContract;
+use IO\Guards\AuthGuard;
 
 /**
  * Class CheckoutController
@@ -15,15 +17,22 @@ class CheckoutController extends LayoutController
      * @param BasketService $basketService
      * @return string
      */
-	public function showCheckout(BasketService $basketService): string
-	{
-		$basket = $basketService->getBasket();
+    public function showCheckout(BasketService $basketService, BasketItemRepositoryContract $basketItemRepository): string
+    {
+        $basketItems = $basketItemRepository->all();
 
-		return $this->renderTemplate(
-			"tpl.checkout",
-			[
-				"basket" => $basket
-			]
-		);
-	}
+        if ($basketItems->isEmpty())
+        {
+            AuthGuard::redirect("/", []);
+        }
+
+        $basket = $basketService->getBasket();
+
+        return $this->renderTemplate(
+            "tpl.checkout",
+            [
+                "basket" => $basket
+            ]
+        );
+    }
 }
