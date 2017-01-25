@@ -40,7 +40,7 @@ class WebstoreConfigurationService
 	{
         $languageList = $this->getWebstoreConfig()->languageList;
         $languages = explode(', ', $languageList);
-        
+
 		return $languages;
 	}
 
@@ -65,7 +65,17 @@ class WebstoreConfigurationService
      */
     public function getDefaultShippingCountryId()
     {
-        return $this->getWebstoreConfig()->defaultShippingCountryId;
+        $defaultShippingCountryId = $this->getWebstoreConfig()->defaultShippingCountryId;
+
+        /** @var SessionStorageService $sessionService */
+        $sessionService = pluginApp(SessionStorageService::class);
+
+        if($defaultShippingCountryId !== null || $defaultShippingCountryId !== "")
+        {
+            return $defaultShippingCountryId;
+        }
+
+        return $this->getWebstoreConfig()->defaultShippingCountryList[$sessionService->getLang()];
     }
 
 }
