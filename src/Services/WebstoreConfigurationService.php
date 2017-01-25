@@ -70,17 +70,12 @@ class WebstoreConfigurationService
         /** @var SessionStorageService $sessionService */
         $sessionService = pluginApp(SessionStorageService::class);
 
-        if($defaultShippingCountryId === null || $defaultShippingCountryId === "")
+        if($defaultShippingCountryId !== null || $defaultShippingCountryId !== "")
         {
             return $defaultShippingCountryId;
         }
 
         return $this->getWebstoreConfig()->defaultShippingCountryList[$sessionService->getLang()];
-    }
-
-    public function getWebstoreConfigList() 
-    {
-        return $this->getWebstoreConfig();
     }
 
 }
