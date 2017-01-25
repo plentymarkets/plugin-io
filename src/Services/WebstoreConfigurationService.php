@@ -72,7 +72,7 @@ class WebstoreConfigurationService
 
         if($defaultShippingCountryId === null || $defaultShippingCountryId === "")
         {
-            return $this->getWebstoreConfig()->defaultShippingCountryId();
+            return $defaultShippingCountryId;
         }
 
         return $this->getWebstoreConfig()->defaultShippingCountryList[$sessionService->getLang()];
