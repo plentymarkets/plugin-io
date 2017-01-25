@@ -21,7 +21,7 @@ class CheckoutController extends LayoutController
     {
         $basketItems = $basketItemRepository->all();
 
-        if ($basketItems->isEmpty())
+        if(!count($basketItems))
         {
             AuthGuard::redirect("/", []);
         }
