@@ -181,6 +181,7 @@ class CheckoutService
             $paymentData['fee'] = $this->frontendPaymentMethodRepository->getPaymentMethodFee($paymentMethod);
             $paymentData['icon'] = $this->frontendPaymentMethodRepository->getPaymentMethodIcon($paymentMethod, $lang);
             $paymentData['description'] = $this->frontendPaymentMethodRepository->getPaymentMethodDescription($paymentMethod, $lang);
+			$paymentData['key'] = $paymentMethod->pluginKey;
             $paymentDataList[] = $paymentData;
         }
         return $paymentDataList;

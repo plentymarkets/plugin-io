@@ -4,6 +4,7 @@ namespace IO\Controllers;
 use IO\Services\NotificationService;
 use IO\Services\OrderService;
 use Plenty\Plugin\Http\Response;
+use Plenty\Plugin\Http\Request;
 
 /**
  * Class PlaceOrderController
@@ -22,10 +23,14 @@ class PlaceOrderController extends LayoutController
         NotificationService $notificationService,
         Response $response)
     {
+
+        $request = pluginApp(Request::class);
+        $redirectParam = $request->get('redirectParam', '');
+
         try
         {
             $orderData = $orderService->placeOrder();
-            return $response->redirectTo( "execute-payment/" . $orderData->order->id );
+            return $response->redirectTo( "execute-payment/" . $orderData->order->id . (strlen($redirectParam) ? "/?redirectParam=" . $redirectParam : '') );
         }
         catch (\Exception $exception)
         {
@@ -37,6 +42,9 @@ class PlaceOrderController extends LayoutController
 
     public function executePayment( OrderService $orderService, NotificationService $notificationService, Response $response, int $orderId, int $paymentId = -1 )
     {
+        $request = pluginApp(Request::class);
+        $redirectParam = $request->get('redirectParam', '');
+
         // find order by id to check if order really exists
         $orderData = $orderService->findOrderById( $orderId );
         if( $orderData == null )
@@ -72,6 +80,11 @@ class PlaceOrderController extends LayoutController
 
         // show confirmation page, even if payment execution failed because order has already been replaced.
         // in case of failure, the order should have been marked as "not payed"
+        if( strlen($redirectParam) )
+        {
+            return $response->redirectTo($redirectParam);
+        }
+
         return $response->redirectTo("confirmation");
     }
 }
