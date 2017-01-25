@@ -13,4 +13,5 @@ class SessionStorageKeys
 	const CURRENCY            = "currency";
     const NOTIFICATIONS       = "notifications";
     const LATEST_ORDER_ID     = "latestOrderId";
+    const GUEST_EMAIL         = "guestEmail";
 }

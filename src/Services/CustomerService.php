@@ -3,6 +3,7 @@
 namespace IO\Services;
 
 use IO\Models\LocalizedOrder;
+use Plenty\Modules\Account\Address\Models\AddressOption;
 use Plenty\Modules\Account\Contact\Contracts\ContactRepositoryContract;
 use Plenty\Modules\Account\Contact\Contracts\ContactAddressRepositoryContract;
 use Plenty\Modules\Account\Address\Contracts\AddressRepositoryContract;
@@ -275,13 +276,38 @@ class CustomerService
 	{
         if($this->getContactId() > 0)
         {
+            $addressData['options'] = $this->buildAddressEmailOptions([], false);
             return $this->contactAddressRepository->createAddress($addressData, $this->getContactId(), $type);
         }
 		else
         {
+            $addressData['options'] = $this->buildAddressEmailOptions([], true);
             return $this->createGuestAddress($addressData, $type);
         }
 	}
+	
+	private function buildAddressEmailOptions(array $options = [], $isGuest = false)
+    {
+        if($isGuest)
+        {
+            /**
+             * @var SessionStorageService $sessionStorage
+             */
+            $sessionStorage = pluginApp(SessionStorageService::class);
+            $value = $sessionStorage->getSessionValue(SessionStorageKeys::GUEST_EMAIL);
+        }
+        else
+        {
+            $value = $this->getContact()->email;
+        }
+        
+        $options[] = [
+            'typeId' => AddressOption::TYPE_EMAIL,
+            'value' => $value
+        ];
+        
+        return $options;
+    }
     
     /**
      * @param array $addressData
@@ -298,12 +324,10 @@ class CustomerService
         
         if($type == AddressType::BILLING)
         {
-            //$this->sessionStorage->setSessionValue(SessionStorageKeys::BILLING_ADDRESS_ID, $newAddress->id);
             $basketService->setBillingAddressId($newAddress->id);
         }
         elseif($type == AddressType::DELIVERY)
         {
-            //$this->sessionStorage->setSessionValue(SessionStorageKeys::DELIVERY_ADDRESS_ID, $newAddress->id);
             $basketService->setDeliveryAddressId($newAddress->id);
         }
         
