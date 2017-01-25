@@ -34,7 +34,7 @@ class CheckoutService
 	 * @var FrontendSessionStorageFactoryContract
 	 */
 	private $sessionStorage;
-    
+
     /**
      * @var CustomerService
      */
@@ -99,8 +99,8 @@ class CheckoutService
             $currency = 'EUR';
 
             if(
-                !is_array($webstoreConfig->getWebstoreConfig()->defaultCurrencyList) ||
-                !array_key_exists($sessionService->getLang(), $webstoreConfig->getWebstoreConfig()->defaultCurrencyList)
+                is_array($webstoreConfig->getWebstoreConfig()->defaultCurrencyList) &&
+                array_key_exists($sessionService->getLang(), $webstoreConfig->getWebstoreConfig()->defaultCurrencyList)
             )
             {
                 $currency = $webstoreConfig->getWebstoreConfig()->defaultCurrencyList[$sessionService->getLang()];
@@ -269,7 +269,7 @@ class CheckoutService
          * @var BasketService $basketService
          */
         $basketService = pluginApp(BasketService::class);
-        
+
         $billingAddressId = $basketService->getBillingAddressId();
 
         if ($billingAddressId === 0)
