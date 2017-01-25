@@ -78,4 +78,9 @@ class WebstoreConfigurationService
         return $this->getWebstoreConfig()->defaultShippingCountryList[$sessionService->getLang()];
     }
 
+    public function getWebstoreConfigList() 
+    {
+        return $this->getWebstoreConfig();
+    }
+
 }
