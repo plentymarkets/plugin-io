@@ -65,12 +65,17 @@ class WebstoreConfigurationService
      */
     public function getDefaultShippingCountryId()
     {
-        return $this->getWebstoreConfig()->defaultShippingCountryId;
-    }
+        $defaultShippingCountryId = $this->getWebstoreConfig()->defaultShippingCountryId;
 
-    public function getWebstoreConfigList()
-    {
-        return $this->getWebstoreConfig();
+        /** @var SessionStorageService $sessionService */
+        $sessionService = pluginApp(SessionStorageService::class);
+
+        if($defaultShippingCountryId === null || $defaultShippingCountryId === "")
+        {
+            return $this->getWebstoreConfig()->defaultShippingCountryId();
+        }
+
+        return $this->getWebstoreConfig()->defaultShippingCountryList[$sessionService->getLang()];
     }
 
 }
