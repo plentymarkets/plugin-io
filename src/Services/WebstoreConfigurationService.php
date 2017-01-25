@@ -65,12 +65,12 @@ class WebstoreConfigurationService
      */
     public function getDefaultShippingCountryId()
     {
-        $defaultShippingCountryId = $this->getWebstoreConfig()->defaultShippingCountryId;
+        $defaultShippingCountryId = (string)$this->getWebstoreConfig()->defaultShippingCountryId;
 
         /** @var SessionStorageService $sessionService */
         $sessionService = pluginApp(SessionStorageService::class);
 
-        if($defaultShippingCountryId !== null || $defaultShippingCountryId !== "")
+        if($defaultShippingCountryId !== null && $defaultShippingCountryId !== "")
         {
             return $defaultShippingCountryId;
         }
