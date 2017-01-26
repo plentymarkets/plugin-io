@@ -294,17 +294,20 @@ class CustomerService
              * @var SessionStorageService $sessionStorage
              */
             $sessionStorage = pluginApp(SessionStorageService::class);
-            $value = $sessionStorage->getSessionValue(SessionStorageKeys::GUEST_EMAIL);
+            $email = $sessionStorage->getSessionValue(SessionStorageKeys::GUEST_EMAIL);
         }
         else
         {
-            $value = $this->getContact()->email;
+            $email = $this->getContact()->email;
         }
         
-        $options[] = [
-            'typeId' => AddressOption::TYPE_EMAIL,
-            'value' => $value
-        ];
+        if(strlen($email))
+        {
+            $options[] = [
+                'typeId' => AddressOption::TYPE_EMAIL,
+                'value' => $email
+            ];
+        }
         
         return $options;
     }
