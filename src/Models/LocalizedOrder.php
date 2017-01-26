@@ -5,7 +5,7 @@ namespace IO\Models;
 use Plenty\Modules\Order\Models\Order;
 use Plenty\Modules\Order\Status\Models\OrderStatusName;
 use Plenty\Modules\Frontend\PaymentMethod\Contracts\FrontendPaymentMethodRepositoryContract;
-use Plenty\Modules\Order\Status\Contracts\StatusRepositoryContract;
+//use Plenty\Modules\Order\Status\Contracts\StatusRepositoryContract;
 use Plenty\Modules\Order\Shipping\Contracts\ParcelServicePresetRepositoryContract;
 use IO\Extensions\Filters\URLFilter;
 use IO\Services\ItemService;
@@ -47,8 +47,8 @@ class LocalizedOrder extends ModelWrapper
         $instance = pluginApp( self::class );
         $instance->order = $order;
 
-        $statusRepository = pluginApp(StatusRepositoryContract::class);
-        $instance->status = $statusRepository->findStatusNameById( $order->statusId, $lang );
+        //$statusRepository = pluginApp(StatusRepositoryContract::class);
+        $instance->status = ''; //$statusRepository->findStatusNameById( $order->statusId, $lang );
 
         $parcelServicePresetRepository = pluginApp(ParcelServicePresetRepositoryContract::class);
         $shippingProfile = $parcelServicePresetRepository->getPresetById( $order->shippingProfileId );
