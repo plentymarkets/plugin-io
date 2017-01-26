@@ -28,9 +28,9 @@ class AvailabilityService
     /**
      * Get the item availability by ID
      * @param int $availabilityId
-     * @return Availability
+     * @return Availability|null
      */
-	public function getAvailabilityById( int $availabilityId = 0 ):Availability
+	public function getAvailabilityById( int $availabilityId = 0 )
     {
         return $this->availabilityRepository->findAvailability( $availabilityId );
     }
@@ -44,7 +44,11 @@ class AvailabilityService
         $availabilities = array();
         for( $i = 1; $i <= 10; $i++ )
         {
-            array_push( $availabilities, $this->getAvailabilityById( $i ) );
+	        $availability = $this->getAvailabilityById( $i );
+	        if($availability instanceof Availability)
+	        {
+	            array_push( $availabilities, $this->getAvailabilityById( $i ) );
+	        }
         }
         return $availabilities;
     }
