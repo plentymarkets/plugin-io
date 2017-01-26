@@ -44,7 +44,7 @@ class NumberFormatFilter extends AbstractFilter
      * @param int $decimal_places
      * @return string
      */
-	public function formatDecimal(float $value, int $decimal_places = -1):string
+	public function formatDecimal($value, int $decimal_places = -1):string
 	{
 		if($decimal_places < 0)
 		{

@@ -2,6 +2,8 @@
 
 namespace IO\Services;
 
+use IO\Services\ItemLoader\Loaders\BasketItems;
+use IO\Services\ItemLoader\Services\ItemLoaderService;
 use Plenty\Modules\Basket\Contracts\BasketRepositoryContract;
 use Plenty\Modules\Basket\Contracts\BasketItemRepositoryContract;
 use Plenty\Modules\Basket\Models\Basket;
@@ -25,6 +27,8 @@ class BasketService
      */
     private $checkout;
     
+    private $template = '';
+
     /**
      * BasketService constructor.
      * @param BasketItemRepositoryContract $basketItemRepository
@@ -35,6 +39,11 @@ class BasketService
 		$this->basketItemRepository = $basketItemRepository;
         $this->checkout = $checkout;
 	}
+	
+	public function setTemplate(string $template)
+    {
+        $this->template = $template;
+    }
 
 	/**
 	 * Return the basket as an array
@@ -52,8 +61,10 @@ class BasketService
 	public function getBasketItems():array
 	{
 		$result = array();
+        
         $basketItems = $this->basketItemRepository->all();
         $basketItemData = $this->getBasketItemData( $basketItems );
+        
         foreach( $basketItems as $basketItem )
         {
             array_push(
@@ -61,8 +72,32 @@ class BasketService
                 $this->addVariationData($basketItem, $basketItemData[$basketItem->variationId])
             );
         }
+        
         return $result;
 	}
+	
+	public function getBasketItemsForTemplate(string $template = ''):array
+    {
+        if(!strlen($template))
+        {
+            $template = $this->template;
+        }
+        
+        $result = array();
+    
+        $basketItems = $this->basketItemRepository->all();
+        $basketItemData = $this->getBasketItemData( $basketItems, $template );
+    
+        foreach( $basketItems as $basketItem )
+        {
+            array_push(
+                $result,
+                $this->addVariationData($basketItem, $basketItemData[$basketItem->variationId])
+            );
+        }
+    
+        return $result;
+    }
 
     /**
      * Get a basket item
@@ -112,7 +147,7 @@ class BasketService
 			$this->basketItemRepository->addBasketItem($data);
 		}
 
-		return $this->getBasketItems();
+		return $this->getBasketItemsForTemplate();
 	}
 
     /**
@@ -125,7 +160,7 @@ class BasketService
 	{
 		$data['id'] = $basketItemId;
 		$this->basketItemRepository->updateBasketItem($basketItemId, $data);
-		return $this->getBasketItems();
+		return $this->getBasketItemsForTemplate();
 	}
 
     /**
@@ -136,7 +171,7 @@ class BasketService
 	public function deleteBasketItem(int $basketItemId):array
 	{
 		$this->basketItemRepository->removeBasketItem($basketItemId);
-		return $this->getBasketItems();
+		return $this->getBasketItemsForTemplate();
 	}
 
     /**
@@ -154,8 +189,13 @@ class BasketService
      * @param array $basketItems
      * @return array
      */
-	private function getBasketItemData($basketItems = array()):array
+	private function getBasketItemData($basketItems = array(), string $template = ''):array
 	{
+        if(!strlen($template))
+        {
+            $template = $this->template;
+        }
+        
 		if(count($basketItems) <= 0)
 		{
 			return array();
@@ -167,15 +207,18 @@ class BasketService
 			array_push($basketItemVariationIds, $basketItem->variationId);
 		}
 
-		$items  = pluginApp(ItemService::class)->getVariations($basketItemVariationIds);
-		$result = array();
-		foreach($items as $item)
-		{
-			$variationId          = $item->variationBase->id;
-			$result[$variationId] = $item;
-		}
-
-		return $result;
+		//$items  = pluginApp(ItemService::class)->getVariations($basketItemVariationIds);
+        $items = pluginApp(ItemLoaderService::class)
+            ->loadForTemplate($template, [BasketItems::class], ['variationIds' => $basketItemVariationIds]);
+        
+        $result = array();
+        foreach($items['documents'] as $item)
+        {
+            $variationId          = $item['data']['variation']['id'];
+            $result[$variationId] = $item;
+        }
+        
+        return $result;
 	}
 
     public function resetBasket()

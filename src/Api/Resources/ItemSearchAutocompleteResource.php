@@ -15,7 +15,7 @@ use IO\Services\ItemLoader\Loaders\SearchItems;
  * Class ItemSearchResource
  * @package IO\Api\Resources
  */
-class ItemSearchResource extends ApiResource
+class ItemSearchAutocompleteResource extends ApiResource
 {
     /**
      * ItemSearchResource constructor.
@@ -34,19 +34,19 @@ class ItemSearchResource extends ApiResource
     public function index():BaseResponse
     {
         $searchString = $this->request->get('searchString', '');
-        $template = $this->request->get('template', '');
         
         if(strlen($searchString))
         {
+            $template = $this->request->get('template', '');
+            
             $response = pluginApp(ItemLoaderService::class)
                 ->loadForTemplate($template, [SearchItems::class], [
                     'searchString'  => $searchString,
-                    'page'          => $this->request->get('page', 1),
-                    'itemsPerPage'  => $this->request->get('itemsPerPage', 20),
-                    'orderBy'       => $this->request->get('orderBy', 'itemName'),
-                    'orderByKey'    => $this->request->get('orderByKey', 'ASC')
+                    'autocomplete'  => true,
+                    'page'          => 1,
+                    'itemsPerPage'  => 20
                 ]);
-    
+            
             return $this->response->create($response, ResponseCode::OK);
         }
         else

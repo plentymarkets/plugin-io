@@ -2,6 +2,7 @@
 
 namespace IO\Builder\Order;
 
+use IO\Services\SessionStorageService;
 use Plenty\Modules\Basket\Models\Basket;
 use Plenty\Modules\Basket\Models\BasketItem;
 use IO\Services\CheckoutService;
@@ -18,40 +19,49 @@ class OrderItemBuilder
 	 */
 	private $checkoutService;
 
-    /**
-     * OrderItemBuilder constructor.
-     * @param CheckoutService $checkoutService
-     */
+	/**
+	 * OrderItemBuilder constructor.
+	 * @param CheckoutService $checkoutService
+	 */
 	public function __construct(CheckoutService $checkoutService)
 	{
 		$this->checkoutService = $checkoutService;
 	}
 
-    /**
-     * Add a basket item to the order
-     * @param Basket $basket
-     * @param array $items
-     * @return array
-     */
+	/**
+	 * Add a basket item to the order
+	 * @param Basket $basket
+	 * @param array $items
+	 * @return array
+	 */
 	public function fromBasket(Basket $basket, array $items):array
 	{
-		$orderItems = [];
+		$currentLanguage = pluginApp(SessionStorageService::class)->getLang();
+		$orderItems      = [];
 		foreach($basket->basketItems as $basketItem)
 		{
 			//$basketItemName = $items[$basketItem->variationId]->itemDescription->name1;
-            $basketItemName = '';
-            foreach($items as $item)
-            {
-                if($basketItem->variationId == $item['variationId'])
-                {
-                    $basketItemName = $item['variation']->itemDescription->name1;
-                }
-            }
-			array_push($orderItems, $this->basketItemToOrderItem($basketItem, $basketItemName));
+			$basketItemName = '';
+			foreach($items as $item)
+			{
+				if($basketItem->variationId == $item['variationId'])
+				{
+					foreach($item['variation']['data']['texts'] as $itemText)
+					{
+						if($itemText['lang'] == $currentLanguage)
+						{
+							$basketItemName = $itemText['name1'];
+						}
+					}
+				}
+			}
+
+			array_push($orderItems, $this->basketItemToOrderItem($basketItem, (STRING)$basketItemName));
 		}
 
 
 		// add shipping costs
+<<<<<<< HEAD
         $shippingCosts = [
             "typeId"        => OrderItemType::SHIPPING_COSTS,
             "referrerId"    => $basket->basketItems->first()->referrerId,
@@ -67,36 +77,53 @@ class OrderItemBuilder
             ]
         ];
         array_push($orderItems, $shippingCosts);
+=======
+		$shippingCosts = [
+			"typeId"        => OrderItemType::SHIPPING_COSTS,
+			"referrerId"    => $basket->basketItems->first()->referredId,
+			"quantity"      => 1,
+			"orderItemName" => "shipping costs",
+			"countryVatId"  => 1, // TODO get country VAT id
+			"vatRate"       => 0, // FIXME get vat rate for shipping costs
+			"amounts"       => [
+				[
+					"currency"           => $this->checkoutService->getCurrency(),
+					"priceOriginalGross" => $basket->shippingAmount
+				]
+			]
+		];
+		array_push($orderItems, $shippingCosts);
+>>>>>>> release/elastic_search
 
-        $paymentFee = pluginApp( FrontendPaymentMethodRepositoryContract::class )
-            ->getPaymentMethodFeeById( $this->checkoutService->getMethodOfPaymentId() );
+		$paymentFee = pluginApp(FrontendPaymentMethodRepositoryContract::class)
+			->getPaymentMethodFeeById($this->checkoutService->getMethodOfPaymentId());
 
-        $paymentSurcharge = [
-            "typeId"        => OrderItemType::PAYMENT_SURCHARGE,
-            "referrerId"    => $basket->basketItems->first()->referredId,
-            "quantity"      => 1,
-            "orderItemName" => "payment surcharge",
-            "countryVatId"  => 1, // TODO get country VAT id
-            "vatRate"       => 0, // FIXME get vat rate for shipping costs
-            "amounts"       => [
-                [
-                    "currency"              => $this->checkoutService->getCurrency(),
-                    "priceOriginalGross"    => $paymentFee
-                ]
-            ]
-        ];
-        array_push($orderItems, $paymentSurcharge);
+		$paymentSurcharge = [
+			"typeId"        => OrderItemType::PAYMENT_SURCHARGE,
+			"referrerId"    => $basket->basketItems->first()->referredId,
+			"quantity"      => 1,
+			"orderItemName" => "payment surcharge",
+			"countryVatId"  => 1, // TODO get country VAT id
+			"vatRate"       => 0, // FIXME get vat rate for shipping costs
+			"amounts"       => [
+				[
+					"currency"           => $this->checkoutService->getCurrency(),
+					"priceOriginalGross" => $paymentFee
+				]
+			]
+		];
+		array_push($orderItems, $paymentSurcharge);
 
 
 		return $orderItems;
 	}
 
-    /**
-     * Add a basket item to the order
-     * @param BasketItem $basketItem
-     * @param string $basketItemName
-     * @return array
-     */
+	/**
+	 * Add a basket item to the order
+	 * @param BasketItem $basketItem
+	 * @param string $basketItemName
+	 * @return array
+	 */
 	private function basketItemToOrderItem(BasketItem $basketItem, string $basketItemName):array
 	{
 		return [
