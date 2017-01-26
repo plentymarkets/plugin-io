@@ -54,7 +54,7 @@ class OrderItemBuilder
 		// add shipping costs
         $shippingCosts = [
             "typeId"        => OrderItemType::SHIPPING_COSTS,
-            "referrerId"    => $basket->basketItems->first()->referredId,
+            "referrerId"    => $basket->basketItems->first()->referrerId,
             "quantity"      => 1,
             "orderItemName" => "shipping costs",
             "countryVatId"  => 1, // TODO get country VAT id
