@@ -14,13 +14,15 @@ use Plenty\Modules\Category\Models\Category;
 class ItemController extends ItemLoaderController
 {
 
-	/**
-	 * Prepare and render the item data.
-	 * @param int $itemId The itemId read from current request url. Will be null if item url does not contain a slug.
-	 * @param int $variationId
-	 * @return string
-	 */
+    /**
+     * Prepare and render the item data.
+     * @param string $itemName
+     * @param int $itemId The itemId read from current request url. Will be null if item url does not contain a slug.
+     * @param int $variationId
+     * @return string
+     */
 	public function showItem(
+		string $itemName = "",
 		int $itemId = 0,
 		int $variationId = 0
 	):string
@@ -74,7 +76,7 @@ class ItemController extends ItemLoaderController
 	 */
 	public function showItemWithoutName(int $itemId, $variationId = 0):string
 	{
-		return $this->showItem($itemId, $variationId);
+		return $this->showItem("", $itemId, $variationId);
 	}
 
 	/**
@@ -83,6 +85,6 @@ class ItemController extends ItemLoaderController
 	 */
 	public function showItemFromAdmin(int $itemId):string
 	{
-		return $this->showItem($itemId, 0);
+		return $this->showItem("", $itemId, 0);
 	}
 }
