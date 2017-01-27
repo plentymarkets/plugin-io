@@ -90,7 +90,7 @@ class LocalizedOrder extends ModelWrapper
             }
 
         }
-        
+
         return $instance;
     }
 
@@ -101,7 +101,7 @@ class LocalizedOrder extends ModelWrapper
     {
         $data = [
             "order"                 => $this->order->toArray(),
-            "status"                => $this->status->toArray(),
+            "status"                => [], //$this->status->toArray(),
             "shippingProvider"      => $this->shippingProvider,
             "shippingProfileName"   => $this->shippingProfileName,
             "paymentMethodName"     => $this->paymentMethodName,

@@ -61,6 +61,14 @@ class WebstoreConfigurationService
     }
 
     /**
+     * Get the default parcel-service-preset-Id of the webstore
+     */
+    public function getDefaultParcelServicePresetId()
+    {
+        return $this->getWebstoreConfig()->defaultParcelServicePresetId;
+    }
+
+    /**
      * Get the default shipping-country-Id of the webstore
      */
     public function getDefaultShippingCountryId()
