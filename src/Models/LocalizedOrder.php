@@ -82,7 +82,12 @@ class LocalizedOrder extends ModelWrapper
         {
             if( $orderItem->itemVariationId !== 0 )
             {
-                $itemUrl = $urlFilter->buildVariationURL($orderItem->itemVariationId, true);
+                $itemUrl = '';
+                if((INT)$orderItem->itemVariationId > 0)
+                {
+                    $itemUrl = $urlFilter->buildVariationURL($orderItem->itemVariationId, true);
+                }
+                
                 $instance->itemURLs[$orderItem->itemVariationId] = $itemUrl;
 
                 $itemImage = $itemService->getVariationImage($orderItem->itemVariationId);
