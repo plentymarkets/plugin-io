@@ -22,7 +22,7 @@ class CategoryMap
 	public function __construct(Dispatcher $event)
 	{
 		$event->fire(
-			"init.categories",
+			"IO.init.categories",
 			[$this]
 		);
 	}

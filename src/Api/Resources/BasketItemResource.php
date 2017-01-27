@@ -39,7 +39,7 @@ class BasketItemResource extends ApiResource
      */
 	public function index():BaseResponse
 	{
-		$basketItems = $this->basketService->getBasketItems();
+		$basketItems = $this->basketService->getBasketItemsForTemplate($this->request->get('template', ''));
 		return $this->response->create($basketItems, ResponseCode::OK);
 	}
 
@@ -50,6 +50,7 @@ class BasketItemResource extends ApiResource
      */
 	public function store():BaseResponse
 	{
+        $this->basketService->setTemplate($this->request->get('template', ''));
 		$basketItems = $this->basketService->addBasketItem($this->request->all());
 		return $this->response->create($basketItems, ResponseCode::CREATED);
 	}
@@ -62,6 +63,7 @@ class BasketItemResource extends ApiResource
      */
 	public function show(string $selector):BaseResponse
 	{
+        $this->basketService->setTemplate($this->request->get('template', ''));
 		$basketItem = $this->basketService->getBasketItem((int)$selector);
 		return $this->response->create($basketItem, ResponseCode::OK);
 	}
@@ -74,6 +76,7 @@ class BasketItemResource extends ApiResource
      */
 	public function update(string $selector):BaseResponse
 	{
+        $this->basketService->setTemplate($this->request->get('template', ''));
 		$basketItems = $this->basketService->updateBasketItem((int)$selector, $this->request->all());
 		return $this->response->create($basketItems, ResponseCode::OK);
 	}
@@ -86,6 +89,7 @@ class BasketItemResource extends ApiResource
      */
 	public function destroy(string $selector):BaseResponse
 	{
+        $this->basketService->setTemplate($this->request->get('template', ''));
 		$basketItems = $this->basketService->deleteBasketItem((int)$selector);
 		return $this->response->create($basketItems, ResponseCode::OK);
 	}

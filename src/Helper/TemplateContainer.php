@@ -1,5 +1,4 @@
-<?php //strict
-
+<?php
 namespace IO\Helper;
 
 /**
@@ -14,10 +13,16 @@ class TemplateContainer
 	 * @var string
 	 */
 	private $template = null;
+	
 	/**
 	 * @var array
 	 */
 	private $templateData = [];
+
+	/**
+	 * @var string
+	 */
+	private $templateKey = '';
 
 	/**
 	 * Set the layout to use for current request.
@@ -59,9 +64,11 @@ class TemplateContainer
 	{
 		return $this->templateData;
 	}
-
+	
 	/**
 	 * Override template data used by LayoutController when rendering a template for current request.
+	 * @param array|null $customData
+	 * @return TemplateContainer
 	 */
 	public function setTemplateData( $customData = null):TemplateContainer
 	{
@@ -69,6 +76,24 @@ class TemplateContainer
 		{
 			$this->templateData = $customData;
 		}
+		return $this;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getTemplateKey()
+	{
+		return $this->templateKey;
+	}
+
+	/**
+	 * @param string $templateKey
+	 * @return $this
+	 */
+	public function setTemplateKey($templateKey)
+	{
+		$this->templateKey = $templateKey;
 		return $this;
 	}
 
