@@ -22,6 +22,10 @@ class LocalizationService
         $checkout       = pluginApp(CheckoutService::class);
         
         $lang = $sessionStorage->getLang();
+        if(is_null($lang) || !strlen($lang))
+        {
+            $lang = 'de';
+        }
         
         return [
             'activeShippingCountries'  => $country->getActiveCountriesList($lang),
