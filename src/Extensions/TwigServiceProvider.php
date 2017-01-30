@@ -21,6 +21,7 @@ use IO\Services\ContactBankService;
 use IO\Services\WebstoreConfigurationService;
 use IO\Services\LocalizationService;
 use IO\Services\CouponService;
+use IO\Services\LegalInformationService;
 
 /**
  * Provide services and helper functions to twig engine
@@ -74,23 +75,24 @@ class TwigServiceProvider extends Twig_Extension
     {
         return [
             "services" => [
-                "availability"  => pluginApp( AvailabilityService::class ),
-                "basket"        => pluginApp( BasketService::class ),
-                "category"      => pluginApp( CategoryService::class ),
-                "checkout"      => pluginApp( CheckoutService::class ),
-                "country"       => pluginApp( CountryService::class ),
-                "customer"      => pluginApp( CustomerService::class ),
-                "item"          => pluginApp( ItemService::class ),
-                "itemLoader"    => pluginApp( ItemLoaderService::class ),
-                "order"         => pluginApp( OrderService::class ),
-                "sessionStorage"=> pluginApp( SessionStorageService::class ),
-                "unit"          => pluginApp( UnitService::class),
-                "contactBank"   => pluginApp( ContactBankService::class ),
-                "template"      => pluginApp( TemplateService::class),
-                "notifications" => pluginApp( NotificationService::class ),
-                "webstoreConfig"=> pluginApp( WebstoreConfigurationService::class),
-                "localization"  => pluginApp( LocalizationService::class ),
-                "coupon"        => pluginApp( CouponService::class )
+                "availability"      => pluginApp( AvailabilityService::class ),
+                "basket"            => pluginApp( BasketService::class ),
+                "category"          => pluginApp( CategoryService::class ),
+                "checkout"          => pluginApp( CheckoutService::class ),
+                "country"           => pluginApp( CountryService::class ),
+                "customer"          => pluginApp( CustomerService::class ),
+                "item"              => pluginApp( ItemService::class ),
+                "itemLoader"        => pluginApp( ItemLoaderService::class ),
+                "order"             => pluginApp( OrderService::class ),
+                "sessionStorage"    => pluginApp( SessionStorageService::class ),
+                "unit"              => pluginApp( UnitService::class),
+                "contactBank"       => pluginApp( ContactBankService::class ),
+                "template"          => pluginApp( TemplateService::class),
+                "notifications"     => pluginApp( NotificationService::class ),
+                "webstoreConfig"    => pluginApp( WebstoreConfigurationService::class),
+                "localization"      => pluginApp( LocalizationService::class ),
+                "coupon"            => pluginApp( CouponService::class ),
+                "legalInformation"  => pluginApp( LegalInformationService::class )
             ]
         ];
     }
