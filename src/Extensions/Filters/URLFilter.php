@@ -73,7 +73,8 @@ class URLFilter extends AbstractFilter
 
 	public function buildVariationURL($variationId = 0, bool $withItemName = false):string
     {
-        $itemId = $this->itemService->getVariation( $variationId )->itemBase->id;
+        $variation = $this->itemService->getVariation( $variationId );
+        $itemId = (int)$variation['documents'][0]['data']['item']['id'];
         return $this->buildItemURL( $itemId, $variationId, $withItemName );
     }
 }
