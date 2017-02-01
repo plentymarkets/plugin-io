@@ -48,7 +48,7 @@ class LocalizedOrder extends ModelWrapper
         $instance->order = $order;
 
         //$statusRepository = pluginApp(StatusRepositoryContract::class);
-        $instance->status = ''; //$statusRepository->findStatusNameById( $order->statusId, $lang );
+        $instance->status = []; //$statusRepository->findStatusNameById( $order->statusId, $lang );
 
         $parcelServicePresetRepository = pluginApp(ParcelServicePresetRepositoryContract::class);
         $shippingProfile = $parcelServicePresetRepository->getPresetById( $order->shippingProfileId );
@@ -90,7 +90,7 @@ class LocalizedOrder extends ModelWrapper
             }
 
         }
-        
+
         return $instance;
     }
 
@@ -101,7 +101,7 @@ class LocalizedOrder extends ModelWrapper
     {
         $data = [
             "order"                 => $this->order->toArray(),
-            "status"                => $this->status->toArray(),
+            "status"                => [], //$this->status->toArray(),
             "shippingProvider"      => $this->shippingProvider,
             "shippingProfileName"   => $this->shippingProfileName,
             "paymentMethodName"     => $this->paymentMethodName,

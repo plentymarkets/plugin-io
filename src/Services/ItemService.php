@@ -107,8 +107,8 @@ class ItemService
 		);
 	}
 
-	
-	
+
+
     public function getItemImage( int $itemId = 0 ):string
     {
         $item = $this->getItem( $itemId );
@@ -175,7 +175,7 @@ class ItemService
 			$params
 		);
 	}
-    
+
     public function getVariationList( int $itemId, bool $withPrimary = false ):array
     {
         /** @var ItemColumnBuilder $columnBuilder */
@@ -196,9 +196,9 @@ class ItemService
         {
             $filter->variationIsChild();
         }
-        
+
         $filter = $filter->build();
-        
+
         // set params
         /** @var ItemParamsBuilder $paramsBuilder */
         $paramsBuilder = pluginApp( ItemParamsBuilder::class );
@@ -211,7 +211,7 @@ class ItemService
             $filter,
             $params
         );
-        
+
         $variationIds = [];
         foreach( $variations as $variation )
         {
@@ -331,7 +331,7 @@ class ItemService
 			->build();
 
 		$recordList = $this->itemRepository->search($columns, $filter, $params);
-        
+
         $variations = [];
         foreach($recordList as $variation)
         {
@@ -341,10 +341,10 @@ class ItemService
                     ];
             array_push( $variations, $data );
         }
-        
+
 		return $variations;
 	}
-    
+
     public function getAttributeNameMap(int $itemId = 0):array
     {
         $columnBuilder = pluginApp( ItemColumnBuilder::class );
@@ -360,23 +360,23 @@ class ItemService
                 VariationAttributeValueFields::ATTRIBUTE_ID,
                 VariationAttributeValueFields::ATTRIBUTE_VALUE_ID
             ))->build();
-    
+
         $filterBuilder = pluginApp( ItemFilterBuilder::class );
         $filter = $filterBuilder
             ->hasId(array($itemId))
             ->variationIsChild()
             ->build();
-    
+
         $paramsBuilder = pluginApp( ItemParamsBuilder::class );
         $params = $paramsBuilder
             ->withParam( ItemColumnsParams::LANGUAGE, Language::DE )
             ->withParam( ItemColumnsParams::PLENTY_ID, $this->app->getPlentyId() )
             ->build();
-        
+
         $recordList = $this->itemRepository->search( $columns, $filter, $params );
-        
+
         $attributeList = [];
-        
+
         foreach($recordList as $variation)
         {
             foreach($variation->variationAttributeValueList as $attribute)
@@ -390,7 +390,7 @@ class ItemService
                 }
             }
         }
-        
+
         return $attributeList;
     }
 
@@ -505,7 +505,7 @@ class ItemService
 				->build();
 
 			$records = $this->itemRepository->search($columns, $filter, $params);
-            
+
             if( $records->count() > 0 )
             {
                 $currentItem = $records->current();
@@ -517,12 +517,12 @@ class ItemService
                     }
                 }
             }
-			
+
 		}
 
 		return $crossSellingItems;
 	}
-	
+
 	public function getItemConditionText(int $conditionId):string
     {
         return ItemConditionTexts::$itemConditionTexts[$conditionId];
@@ -550,7 +550,7 @@ class ItemService
 
         if( $categoryId > 0 )
         {
-            $filterBuilder->variationHasCategory([$categoryId]);
+            $filterBuilder->variationHasCategory($categoryId);
         }
 
         $filter = $filterBuilder->build();
@@ -565,35 +565,35 @@ class ItemService
         return $this->itemRepository->search( $columns, $filter, $params );
 
     }
-    
+
     public function searchItems(string $searchString, CategoryParams $params, int $page = 1)
     {
         /** @var ItemColumnBuilder $columnBuilder */
         $columnBuilder = pluginApp( ItemColumnBuilder::class );
-    
+
         /** @var ItemFilterBuilder $filterBuilder */
         $filterBuilder = pluginApp( ItemFilterBuilder::class );
-    
+
         /** @var ItemParamsBuilder $paramBuilder */
         $paramsBuilder = pluginApp( ItemParamsBuilder::class );
-    
+
         $columns = $columnBuilder
             ->defaults()
             ->build();
-        
+
         $filter = $filterBuilder
             ->descriptionContains($searchString, true)
             ->build();
-    
+
         $offset = ( $page - 1 ) * $params->itemsPerPage;
-        
+
         $params = $paramsBuilder
             ->withParam( ItemColumnsParams::LIMIT, $params->itemsPerPage )
             ->withParam( ItemColumnsParams::OFFSET, $offset )
             ->withParam( ItemColumnsParams::LANGUAGE, $this->sessionStorage->getLang() )
             ->withParam( ItemColumnsParams::PLENTY_ID, $this->app->getPlentyId() )
             ->build();
-        
+
         return $this->itemRepository->searchWithPagination( $columns, $filter, $params );
     }
 }
