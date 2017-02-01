@@ -50,6 +50,11 @@ class SessionStorageService
      */
 	public function getLang()
 	{
-		return $this->sessionStorage->getLocaleSettings()->language;
+        $lang = $this->sessionStorage->getLocaleSettings()->language;
+        if(is_null($lang) || !strlen($lang))
+        {
+            $lang = 'de';
+        }
+		return $lang;
 	}
 }

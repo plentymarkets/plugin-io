@@ -95,7 +95,7 @@ class LocalizedOrder extends ModelWrapper
             }
 
         }
-        
+
         return $instance;
     }
 
