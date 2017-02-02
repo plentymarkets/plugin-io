@@ -1,6 +1,7 @@
 <?php //strict
 namespace IO\Controllers;
 
+use IO\Guards\AuthGuard;
 use IO\Helper\TemplateContainer;
 use IO\Services\CustomerService;
 
