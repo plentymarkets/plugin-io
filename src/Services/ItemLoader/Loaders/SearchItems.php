@@ -4,6 +4,7 @@ namespace IO\Services\ItemLoader\Loaders;
 
 use IO\Services\ItemLoader\Contracts\ItemLoaderContract;
 use IO\Services\ItemLoader\Contracts\ItemLoaderPaginationContract;
+use IO\Services\SessionStorageService;
 //use IO\Services\ItemLoader\Contracts\ItemLoaderSortingContract;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Processor\DocumentProcessor;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Query\Type\TypeInterface;
@@ -34,6 +35,12 @@ class SearchItems implements ItemLoaderContract, ItemLoaderPaginationContract //
      */
     public function getFilterStack($options = [])
     {
+        /**
+         * @var SessionStorageService $sessionStorage
+         */
+        $sessionStorage = pluginApp(SessionStorageService::class);
+        $lang = $sessionStorage->getLang();
+        
         /** @var ClientFilter $clientFilter */
         $clientFilter = pluginApp(ClientFilter::class);
         $clientFilter->isVisibleForClient(pluginApp(Application::class)->getPlentyId());
@@ -42,6 +49,9 @@ class SearchItems implements ItemLoaderContract, ItemLoaderPaginationContract //
         $variationFilter = pluginApp(VariationBaseFilter::class);
         $variationFilter->isActive();
     
+        /**
+         * @var SearchFilter $searchFilter
+         */
         $searchFilter = pluginApp(SearchFilter::class);
         
         if(array_key_exists('searchString', $options) && strlen($options['searchString']))
@@ -49,9 +59,12 @@ class SearchItems implements ItemLoaderContract, ItemLoaderPaginationContract //
             $searchType = ElasticSearch::SEARCH_TYPE_FUZZY;
             if(array_key_exists('autocomplete', $options) && $options['autocomplete'] === true)
             {
-                $searchType = ElasticSearch::SEARCH_TYPE_AUTOCOMPLETE;
+                $searchFilter->setNamesString($options['searchString'], $lang);
             }
-            $searchFilter->setSearchString($options['searchString'], $searchType);
+            else
+            {
+                $searchFilter->setSearchString($options['searchString'], $lang, $searchType);
+            }
         }
         
         return [
