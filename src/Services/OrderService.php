@@ -32,7 +32,7 @@ class OrderService
      * @var SessionStorageService
      */
     private $sessionStorage;
-    
+
     /**
      * OrderService constructor.
      * @param OrderRepositoryContract $orderRepository
@@ -58,7 +58,7 @@ class OrderService
 	{
         $checkoutService = pluginApp(CheckoutService::class);
         $customerService = pluginApp(CustomerService::class);
-        
+
 		$order = pluginApp(OrderBuilder::class)->prepare(OrderType::ORDER)
 		                            ->fromBasket() //TODO: Add shipping costs & payment surcharge as OrderItem
 		                            ->withStatus(3.3)
@@ -70,7 +70,7 @@ class OrderService
 		                            ->done();
 
 		$order = $this->orderRepository->createOrder($order);
-        
+
         if($customerService->getContactId() <= 0)
         {
             $this->sessionStorage->setSessionValue(SessionStorageKeys::LATEST_ORDER_ID, $order->id);
@@ -78,8 +78,8 @@ class OrderService
 
         // reset basket after order was created
         $this->basketService->resetBasket();
-        
-        return LocalizedOrder::wrap( $order, "de" );
+
+        return LocalizedOrder::wrap( $order, $this->sessionStorage->getLang() );
 	}
 
     /**
@@ -102,7 +102,7 @@ class OrderService
 	public function findOrderById(int $orderId):LocalizedOrder
 	{
 		$order = $this->orderRepository->findOrderById($orderId);
-        return LocalizedOrder::wrap( $order, "de" );
+        return LocalizedOrder::wrap( $order, $this->sessionStorage->getLang() );
 	}
 
     /**
@@ -120,7 +120,7 @@ class OrderService
             $items
         );
 
-        return LocalizedOrder::wrapPaginated( $orders, "de" );
+        return LocalizedOrder::wrapPaginated( $orders, $this->sessionStorage->getLang() );
     }
 
     /**
@@ -138,10 +138,10 @@ class OrderService
         {
             $order = $this->orderRepository->findOrderById($this->sessionStorage->getSessionValue(SessionStorageKeys::LATEST_ORDER_ID));
         }
-        
-        return LocalizedOrder::wrap( $order, "de" );
+
+        return LocalizedOrder::wrap( $order, $this->sessionStorage->getLang() );
     }
-    
+
     /**
      * Return order status text by status id
      * @param $statusId
