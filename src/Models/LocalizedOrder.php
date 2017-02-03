@@ -8,6 +8,7 @@ use Plenty\Modules\Frontend\PaymentMethod\Contracts\FrontendPaymentMethodReposit
 //use Plenty\Modules\Order\Status\Contracts\StatusRepositoryContract;
 use Plenty\Modules\Order\Shipping\Contracts\ParcelServicePresetRepositoryContract;
 use IO\Extensions\Filters\URLFilter;
+use IO\Services\NotificationService;
 use IO\Services\ItemService;
 
 class LocalizedOrder extends ModelWrapper
@@ -51,23 +52,33 @@ class LocalizedOrder extends ModelWrapper
         //$instance->status = $statusRepository->findStatusNameById( $order->statusId, $lang );
 
         $parcelServicePresetRepository = pluginApp(ParcelServicePresetRepositoryContract::class);
-        $shippingProfile = $parcelServicePresetRepository->getPresetById( $order->shippingProfileId );
-        foreach( $shippingProfile->parcelServicePresetNames as $name )
+
+        try
         {
-            if( $name->lang === $lang )
+            $shippingProfile = $parcelServicePresetRepository->getPresetById( $order->shippingProfileId );
+            foreach( $shippingProfile->parcelServicePresetNames as $name )
             {
-                $instance->shippingProfileName = $name->name;
-                break;
+                if( $name->lang === $lang )
+                {
+                    $instance->shippingProfileName = $name->name;
+                    break;
+                }
+            }
+
+            foreach( $shippingProfile->parcelServiceNames as $name )
+            {
+                if( $name->lang === $lang )
+                {
+                    $instance->shippingProvider = $name->name;
+                    break;
+                }
             }
         }
-
-        foreach( $shippingProfile->parcelServiceNames as $name )
+        catch(\Exception $exception)
         {
-            if( $name->lang === $lang )
-            {
-                $instance->shippingProvider = $name->name;
-                break;
-            }
+            pluginApp(NotificationService::class)->error("LocalizedOrder.php / Line 58" . $exception->getMessage());
+            $instance->shippingProvider = "Nicht hinterlegt";
+            $instance->shippingProfileName = "Nicht hinterlegt";
         }
 
         $frontentPaymentRepository = pluginApp( FrontendPaymentMethodRepositoryContract::class );
