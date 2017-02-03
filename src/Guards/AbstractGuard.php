@@ -60,7 +60,7 @@ abstract class AbstractGuard
      * @param string|null $uri 
      * @return string
      */
-    private static function getUrl( string $uri = null )
+    public static function getUrl( string $uri = null )
     {
         if( $uri === null )
         {
