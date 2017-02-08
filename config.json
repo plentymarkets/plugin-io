@@ -48,7 +48,6 @@
             "register"              : "/register",
             "search"                : "/search",
             "place-order"           : "/place-order & /execute-payment",
-            "404"                   : "/404",
             "cancellation-rights"   : "/cancellation-rights",
             "legal-disclosure"      : "/legal-disclosure",
             "privacy-policy"        : "/privacy-policy",
