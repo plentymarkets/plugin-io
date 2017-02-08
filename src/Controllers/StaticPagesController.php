@@ -66,20 +66,6 @@ class StaticPagesController extends LayoutController
     }
 
     /**
-     * Prepare and render the data for the item not found page
-     * @return string
-     */
-    public function showItemNotFound():string
-    {
-        return $this->renderTemplate(
-            "tpl.item-not-found",
-            [
-                "object" => ""
-            ]
-        );
-    }
-
-    /**
      * Prepare and render the data for the page not found page
      * @return string
      */

@@ -118,16 +118,6 @@ class IORouteServiceProvider extends RouteServiceProvider
             $router->get('', 'IO\Controllers\HomepageController@showHomepage');
         }
 
-        if ( in_array("404", $enabledRoutes) || in_array("all", $enabledRoutes) ) {
-            //page not found
-            $router->get('404', 'IO\Controllers\StaticPagesController@showPageNotFound');
-        }
-
-        if ( in_array("item-404", $enabledRoutes) || in_array("all", $enabledRoutes) ) {
-            //item not found
-            $router->get('item-404', 'IO\Controllers\StaticPagesController@showItemNotFound');
-        }
-
         if ( in_array("cancellation-rights", $enabledRoutes) || in_array("all", $enabledRoutes) ) {
             //cancellation rights page
             $router->get('cancellation-rights', 'IO\Controllers\StaticPagesController@showCancellationRights');
