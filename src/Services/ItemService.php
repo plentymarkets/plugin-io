@@ -137,31 +137,21 @@ class ItemService
 		return $elasticSearchRepo->execute();
 	}
 
-	/**
-	 * @param int $itemId
-	 * @return string
-	 */
-	public function getItemImage(int $itemId = 0):string
-	{
-		$item = $this->getItem($itemId);
+    /**
+     * @param int $itemId
+     * @return string
+     */
+    public function getItemImage(int $itemId = 0):string
+    {
+        $item = $this->getItem($itemId);
 
-		if($item == null)
-		{
-			return "";
-		}
+        if(is_array($item) && strlen($item['documents'][0]['data']['images']['item'][0]['path']))
+        {
+            return $item['documents'][0]['data']['images']['item'][0]['path'];
+        }
 
-		//FIXME $item is not an object
-		$imageList = $item->variationImageList;
-		foreach($imageList as $image)
-		{
-			if($image->path !== "")
-			{
-				return $image->path;
-			}
-		}
-
-		return "";
-	}
+        return '';
+    }
 
 	/**
 	 * Get an item variation by ID
@@ -282,32 +272,21 @@ class ItemService
 		return $variationIds;
 	}
 
-	/**
-	 * @param int $variationId
-	 * @return string
-	 */
-	public function getVariationImage(int $variationId = 0):string
-	{
-		$variation = $this->getVariation($variationId);
+    /**
+     * @param int $variationId
+     * @return string
+     */
+    public function getVariationImage(int $variationId = 0):string
+    {
+        $variation = $this->getVariation($variationId);
 
-		if($variation == null)
-		{
-			return "";
-		}
+        if(is_array($variation) && strlen($variation['documents'][0]['data']['images']['item'][0]['path']))
+        {
+            return $variation['documents'][0]['data']['images']['item'][0]['path'];
+        }
 
-		//FIXME $variation is not an object
-		$imageList = $variation->variationImageList;
-
-		foreach($imageList as $image)
-		{
-			if($image->path !== "")
-			{
-				return $image->path;
-			}
-		}
-
-		return "";
-	}
+        return '';
+    }
 
 
 	/**
