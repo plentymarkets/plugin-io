@@ -1,12 +1,25 @@
 {
-    "version"           : "0.1.0",
+    "version"           : "1.0.0",
     "name"              : "PluginIO",
+    "license"           : "AGPL-3.0",
+    "pluginIcon"        : "icon_plugin_xs.png",
+    "price"             : 0.00,
     "description"       : "Basic php functions for plentymarkets shop designs",
+    "shortDescription"  : [{"de": "Basis PHP Funktionen für plentymarkets Shops"},{"en": "Basic php functions for plentymarkets shop designs"}],
+    "categories"        : ["Plugins/Templates"],
     "author"            : "plentymarkets GmbH",
+    "authorIcon"        : "icon_author_xs.png",
+    "email"             : "sales@plentymarkets.com",
+    "phone"             : "+49 561 98 681 100",
+
     "keywords"          : ["plentymarkets", "plugins", "layout", "template"],
     "type"              : "template",
     "require"           : [],
     "namespace"         : "IO",
     "serviceProvider"   : "IO\\Providers\\IOServiceProvider",
-    "javaScriptFiles"   : []
+    "javaScriptFiles"   : [],
+    "containers"        : [],
+    "dataProviders"     : [],
+    "dependencies"      : [],
+    "runOnBuild"        : []
 }
