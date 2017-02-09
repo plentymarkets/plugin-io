@@ -51,6 +51,10 @@ class LocalizedOrder extends ModelWrapper
         $instance->status = [];//$statusRepository->findStatusNameById( $order->statusId, $lang );
 
         $parcelServicePresetRepository = pluginApp(ParcelServicePresetRepositoryContract::class);
+        if($parcelServicePresetRepository instanceof ParcelServicePresetRepositoryContract)
+        {
+            
+        }
         $shippingProfile = $parcelServicePresetRepository->getPresetById( $order->shippingProfileId );
         foreach( $shippingProfile->parcelServicePresetNames as $name )
         {
