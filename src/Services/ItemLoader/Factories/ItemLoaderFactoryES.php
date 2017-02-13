@@ -5,10 +5,12 @@ use IO\Services\ItemLoader\Contracts\ItemLoaderContract;
 use IO\Services\ItemLoader\Contracts\ItemLoaderFactory;
 use IO\Services\ItemLoader\Contracts\ItemLoaderPaginationContract;
 use IO\Services\ItemLoader\Contracts\ItemLoaderSortingContract;
+use IO\Services\SalesPriceService;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Search\Document\DocumentSearch;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Sorting\SortingInterface;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Source\IncludeSource;
 use Plenty\Modules\Item\Search\Contracts\ItemElasticSearchSearchRepositoryContract;
+use Plenty\Modules\Item\SalesPrice\Models\SalesPriceSearchResponse;
 
 /**
  * Created by ptopczewski, 09.01.17 08:35
@@ -85,7 +87,27 @@ class ItemLoaderFactoryES implements ItemLoaderFactory
 
 			$elasticSearchRepo->addSearch($search);
 		}
-
-		return $elasticSearchRepo->execute();
+        
+        $result = $elasticSearchRepo->execute();
+        
+        if(count($result['documents']))
+        {
+            /**
+             * @var SalesPriceService $salesPriceService
+             */
+            $salesPriceService = pluginApp(SalesPriceService::class);
+            
+            foreach($result['documents'] as $key => $variation)
+            {
+                $salesPrice = $salesPriceService->getSalesPriceForVariation($variation['data']['variation']['id']);
+                if($salesPrice instanceof SalesPriceSearchResponse)
+                {
+                    $variation['data']['calculatedPrices'] = $salesPrice;
+                    $result['documents'][$key] = $variation;
+                }
+            }
+        }
+        
+        return $result;
 	}
 }
