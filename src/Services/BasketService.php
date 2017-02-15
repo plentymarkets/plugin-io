@@ -202,14 +202,16 @@ class BasketService
 		}
 
 		$basketItemVariationIds = array();
+        $basketVariationQuantities = array();
+        
 		foreach($basketItems as $basketItem)
 		{
 			array_push($basketItemVariationIds, $basketItem->variationId);
+            $basketVariationQuantities[$basketItem->variationId] = $basketItem->quantity;
 		}
 
-		//$items  = pluginApp(ItemService::class)->getVariations($basketItemVariationIds);
         $items = pluginApp(ItemLoaderService::class)
-            ->loadForTemplate($template, [BasketItems::class], ['variationIds' => $basketItemVariationIds]);
+            ->loadForTemplate($template, [BasketItems::class], ['variationIds' => $basketItemVariationIds, 'basketVariationQuantities' => $basketVariationQuantities]);
         
         $result = array();
         foreach($items['documents'] as $item)

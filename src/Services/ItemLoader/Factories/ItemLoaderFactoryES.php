@@ -102,7 +102,13 @@ class ItemLoaderFactoryES implements ItemLoaderFactory
             
             foreach($result['documents'] as $key => $variation)
             {
-                $salesPrice = $salesPriceService->getSalesPriceForVariation($variation['data']['variation']['id']);
+                $quantity = 1;
+                if(isset($options['basketVariationQuantities'][$variation['data']['variation']['id']]) && (int)$options['basketVariationQuantities'][$variation['data']['variation']['id']] > 0)
+                {
+                    $quantity = (int)$options['basketVariationQuantities'][$variation['data']['variation']['id']];
+                }
+                
+                $salesPrice = $salesPriceService->getSalesPriceForVariation($variation['data']['variation']['id'], 'default', $quantity);
                 if($salesPrice instanceof SalesPriceSearchResponse)
                 {
                     $variation['data']['calculatedPrices']['default'] = $salesPrice;
