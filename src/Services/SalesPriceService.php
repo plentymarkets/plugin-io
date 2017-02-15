@@ -25,7 +25,7 @@ class SalesPriceService
         $this->checkoutService = $checkoutService;
     }
     
-    public function getSalesPriceForVariation(int $variationId, int $quantity = 1)
+    public function getSalesPriceForVariation(int $variationId, $type = 'default', int $quantity = 1)
     {
         /**
          * @var Contact $contact
@@ -46,7 +46,7 @@ class SalesPriceService
         $salesPriceSearchRequest->plentyId = $this->app->getPlentyId();
         $salesPriceSearchRequest->quantity = $quantity;
         $salesPriceSearchRequest->referrerId = 1;
-        $salesPriceSearchRequest->type = '';
+        $salesPriceSearchRequest->type = $type;
     
         /**
          * @var SalesPriceSearchResponse $salesPrice

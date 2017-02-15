@@ -102,9 +102,22 @@ class ItemLoaderFactoryES implements ItemLoaderFactory
                 $salesPrice = $salesPriceService->getSalesPriceForVariation($variation['data']['variation']['id']);
                 if($salesPrice instanceof SalesPriceSearchResponse)
                 {
-                    $variation['data']['calculatedPrices'] = $salesPrice;
-                    $result['documents'][$key] = $variation;
+                    $variation['data']['calculatedPrices']['default'] = $salesPrice;
                 }
+                
+                $rrp = $salesPriceService->getSalesPriceForVariation($variation['data']['variation']['id'], 'rrp');
+                if($rrp instanceof SalesPriceSearchResponse)
+                {
+                    $variation['data']['calculatedPrices']['rrp'] = $rrp;
+                }
+    
+                $specialOffer = $salesPriceService->getSalesPriceForVariation($variation['data']['variation']['id'], 'specialOffer');
+                if($specialOffer instanceof SalesPriceSearchResponse)
+                {
+                    $variation['data']['calculatedPrices']['specialOffer'] = $specialOffer;
+                }
+    
+                $result['documents'][$key] = $variation;
             }
         }
         
