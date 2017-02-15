@@ -2,6 +2,7 @@
     "version"           : "0.1.0",
     "name"              : "PluginIO",
     "description"       : "Basic php functions for plentymarkets shop designs",
+    "shortDescription": { "de": "deutsch","en": "englisch"},
     "author"            : "plentymarkets GmbH",
     "keywords"          : ["plentymarkets", "plugins", "layout", "template"],
     "type"              : "template",
