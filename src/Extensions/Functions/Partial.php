@@ -52,7 +52,7 @@ class Partial extends AbstractFunction
 
             /** @var Partial $partial */
             $this->partial = pluginApp(Partial::class);
-            $event->fire('IO.init.templates', $this->partial);
+            $event->fire('IO.init.templates', [$this->partial]);
         }
 
         return $this->partial->getTemplate($key);
