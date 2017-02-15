@@ -32,13 +32,16 @@ class ItemLoaderFactoryES implements ItemLoaderFactory
 		{
 			/** @var ItemLoaderContract $loader */
 			$loader = pluginApp($loaderClass);
-
-			//search, filter
-			$search = $loader->getSearch();
-			foreach($loader->getFilterStack($options) as $filter)
-			{
-				$search->addFilter($filter);
-			}
+            
+            if($loader instanceof ItemLoaderContract)
+            {
+                //search, filter
+                $search = $loader->getSearch();
+                foreach($loader->getFilterStack($options) as $filter)
+                {
+                    $search->addFilter($filter);
+                }
+            }
 
 			//sorting
 			if($loader instanceof ItemLoaderSortingContract)
@@ -72,7 +75,7 @@ class ItemLoaderFactoryES implements ItemLoaderFactory
 			$fieldsFound = false;
 			foreach($currentFields as $fieldName)
 			{
-				$source->activate($fieldName);
+				$source->activateList([$fieldName]);
 				$fieldsFound = true;
 			}
 

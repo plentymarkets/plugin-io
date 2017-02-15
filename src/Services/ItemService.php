@@ -634,6 +634,12 @@ class ItemService
 	 */
 	public function searchItems(string $searchString, $params = [], int $page = 1):array
 	{
+        /**
+         * @var SessionStorageService $sessionStorage
+         */
+        $sessionStorage = pluginApp(SessionStorageService::class);
+        $lang = $sessionStorage->getLang();
+        
 		$documentProcessor = pluginApp(DocumentProcessor::class);
 		$documentSearch    = pluginApp(DocumentSearch::class, [$documentProcessor]);
 
@@ -651,7 +657,7 @@ class ItemService
 
 		/** @var SearchFilter $searchFilter */
 		$searchFilter = pluginApp(SearchFilter::class);
-		$searchFilter->setSearchString($searchString);
+		$searchFilter->setSearchString($searchString, $lang, ElasticSearch::SEARCH_TYPE_FUZZY);
 
 		$documentSearch
 			->addFilter($clientFilter)
@@ -661,42 +667,42 @@ class ItemService
 
 		return $elasticSearchRepo->execute();
 	}
-	
-	/**
-	 * @param string $searchString
-	 * @return array
-	 */
-	public function searchItemsAutocomplete(string $searchString):array
-	{
-		/** @var IncludeSource $includeSource */
-		$includeSource = pluginApp(IncludeSource::class);
-		$includeSource->activate('test', 'test');
-
-		$documentProcessor = pluginApp(DocumentProcessor::class);
-		$documentSearch    = pluginApp(DocumentSearch::class, [$documentProcessor]);
-
-		/** @var ItemElasticSearchSearchRepositoryContract $elasticSearchRepo */
-		$elasticSearchRepo = pluginApp(ItemElasticSearchSearchRepositoryContract::class);
-		$elasticSearchRepo->addSearch($documentSearch);
-
-		/** @var VariationBaseFilter $variationFilter */
-		$variationFilter = pluginApp(VariationBaseFilter::class);
-		$variationFilter->isActive();
-
-		/** @var ClientFilter $clientFilter */
-		$clientFilter = pluginApp(ClientFilter::class);
-		$clientFilter->isVisibleForClient($this->app->getPlentyId());
-
-		/** @var SearchFilter $searchFilter */
-		$searchFilter = pluginApp(SearchFilter::class);
-		$searchFilter->setSearchString($searchString, ElasticSearch::SEARCH_TYPE_AUTOCOMPLETE);
-
-		$documentSearch
-			->addFilter($clientFilter)
-			->addFilter($variationFilter)
-			->addFilter($searchFilter)
-			->addSource($includeSource);
-
-		return $elasticSearchRepo->execute();
-	}
+    
+    /**
+     * @param string $searchString
+     * @return array
+     */
+    /*public function searchItemsAutocomplete(string $searchString):array
+    {
+        /** @var IncludeSource $includeSource */
+        /*$includeSource = pluginApp(IncludeSource::class);
+        $includeSource->activate('test', 'test');
+    
+        $documentProcessor = pluginApp(DocumentProcessor::class);
+        $documentSearch    = pluginApp(DocumentSearch::class, [$documentProcessor]);
+    
+        /** @var ItemElasticSearchSearchRepositoryContract $elasticSearchRepo */
+        /*$elasticSearchRepo = pluginApp(ItemElasticSearchSearchRepositoryContract::class);
+        $elasticSearchRepo->addSearch($documentSearch);
+    
+        /** @var VariationBaseFilter $variationFilter */
+        /*$variationFilter = pluginApp(VariationBaseFilter::class);
+        $variationFilter->isActive();
+    
+        /** @var ClientFilter $clientFilter */
+        /*$clientFilter = pluginApp(ClientFilter::class);
+        $clientFilter->isVisibleForClient($this->app->getPlentyId());
+    
+        /** @var SearchFilter $searchFilter */
+        /*$searchFilter = pluginApp(SearchFilter::class);
+        $searchFilter->setSearchString($searchString, ElasticSearch::SEARCH_TYPE_AUTOCOMPLETE);
+    
+        $documentSearch
+            ->addFilter($clientFilter)
+            ->addFilter($variationFilter)
+            ->addFilter($searchFilter)
+            ->addSource($includeSource);
+    
+        return $elasticSearchRepo->execute();
+    }*/
 }
