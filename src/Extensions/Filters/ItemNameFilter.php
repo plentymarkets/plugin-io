@@ -32,29 +32,29 @@ class ItemNameFilter extends AbstractFilter
 
     /**
      * Build the item name from the configuration
-     * @param ItemDescription $itemDescription
+     * @param array $itemTexts
      * @param string $configName
      * @return string
      */
-    public function itemName( ItemDescription $itemDescription, string $configName )
+    public function itemName( array $itemTexts, string $configName )
     {
         $showName = '';
     
-        if($configName == '0' && $itemDescription->name1 != '')
+        if($configName == '0' && $itemTexts['name1'] != '')
         {
-            $showName = $itemDescription->name1;
+            $showName = $itemTexts['name1'];
         }
-        elseif($configName == '1' && $itemDescription->name2 != '')
+        elseif($configName == '1' && $itemTexts['name2'] != '')
         {
-            $showName = $itemDescription->name2;
+            $showName = $itemTexts['name2'];
         }
-        elseif($configName == '2' && $itemDescription->name3 != '')
+        elseif($configName == '2' && $itemTexts['name3'] != '')
         {
-            $showName = $itemDescription->name3;
+            $showName = $itemTexts['name3'];
         }
         else
         {
-            $showName = $itemDescription->name1;
+            $showName = $itemTexts['name1'];
         }
         
         return $showName;
