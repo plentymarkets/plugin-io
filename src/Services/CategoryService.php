@@ -180,8 +180,12 @@ class CategoryService
         {
             return null;
         }
-
-        return pluginApp(ItemService::class)->getItemForCategory( $category->id, pluginApp(CategoryParamsBuilder::class)->fromArray($params), $page );
+    
+        /**
+         * @var ItemService $itemService
+         */
+        $itemService = pluginApp(ItemService::class);
+        return $itemService->getItemForCategory( $category->id, pluginApp(CategoryParamsBuilder::class)->fromArray($params), $page );
     }
 
     /**
