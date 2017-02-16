@@ -102,31 +102,34 @@ class ItemLoaderFactoryES implements ItemLoaderFactory
             
             foreach($result['documents'] as $key => $variation)
             {
-                $quantity = 1;
-                if(isset($options['basketVariationQuantities'][$variation['data']['variation']['id']]) && (int)$options['basketVariationQuantities'][$variation['data']['variation']['id']] > 0)
+                if((int)$variation['data']['variation']['id'] > 0)
                 {
-                    $quantity = (int)$options['basketVariationQuantities'][$variation['data']['variation']['id']];
+                    $quantity = 1;
+                    if(isset($options['basketVariationQuantities'][$variation['data']['variation']['id']]) && (int)$options['basketVariationQuantities'][$variation['data']['variation']['id']] > 0)
+                    {
+                        $quantity = (int)$options['basketVariationQuantities'][$variation['data']['variation']['id']];
+                    }
+                    
+                    $salesPrice = $salesPriceService->getSalesPriceForVariation($variation['data']['variation']['id'], 'default', $quantity);
+                    if($salesPrice instanceof SalesPriceSearchResponse)
+                    {
+                        $variation['data']['calculatedPrices']['default'] = $salesPrice;
+                    }
+                    
+                    $rrp = $salesPriceService->getSalesPriceForVariation($variation['data']['variation']['id'], 'rrp');
+                    if($rrp instanceof SalesPriceSearchResponse)
+                    {
+                        $variation['data']['calculatedPrices']['rrp'] = $rrp;
+                    }
+        
+                    $specialOffer = $salesPriceService->getSalesPriceForVariation($variation['data']['variation']['id'], 'specialOffer');
+                    if($specialOffer instanceof SalesPriceSearchResponse)
+                    {
+                        $variation['data']['calculatedPrices']['specialOffer'] = $specialOffer;
+                    }
+        
+                    $result['documents'][$key] = $variation;
                 }
-                
-                $salesPrice = $salesPriceService->getSalesPriceForVariation($variation['data']['variation']['id'], 'default', $quantity);
-                if($salesPrice instanceof SalesPriceSearchResponse)
-                {
-                    $variation['data']['calculatedPrices']['default'] = $salesPrice;
-                }
-                
-                $rrp = $salesPriceService->getSalesPriceForVariation($variation['data']['variation']['id'], 'rrp');
-                if($rrp instanceof SalesPriceSearchResponse)
-                {
-                    $variation['data']['calculatedPrices']['rrp'] = $rrp;
-                }
-    
-                $specialOffer = $salesPriceService->getSalesPriceForVariation($variation['data']['variation']['id'], 'specialOffer');
-                if($specialOffer instanceof SalesPriceSearchResponse)
-                {
-                    $variation['data']['calculatedPrices']['specialOffer'] = $specialOffer;
-                }
-    
-                $result['documents'][$key] = $variation;
             }
         }
         
