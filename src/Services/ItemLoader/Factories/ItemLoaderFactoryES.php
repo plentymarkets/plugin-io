@@ -9,7 +9,7 @@ use IO\Services\SalesPriceService;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Search\Document\DocumentSearch;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Sorting\SortingInterface;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Source\IncludeSource;
-use Plenty\Modules\Item\Search\Contracts\ItemElasticSearchSearchRepositoryContract;
+use Plenty\Modules\Item\Search\Contracts\VariationElasticSearchSearchRepositoryContract;
 use Plenty\Modules\Item\SalesPrice\Models\SalesPriceSearchResponse;
 
 /**
@@ -27,8 +27,8 @@ class ItemLoaderFactoryES implements ItemLoaderFactory
 	 */
 	public function runSearch($loaderClassList, $resultFields,  $options = [])
 	{
-		/** @var ItemElasticSearchSearchRepositoryContract $elasticSearchRepo */
-		$elasticSearchRepo = pluginApp(ItemElasticSearchSearchRepositoryContract::class);
+		/** @var VariationElasticSearchSearchRepositoryContract $elasticSearchRepo */
+		$elasticSearchRepo = pluginApp(VariationElasticSearchSearchRepositoryContract::class);
 
 		foreach($loaderClassList as $loaderClass)
 		{

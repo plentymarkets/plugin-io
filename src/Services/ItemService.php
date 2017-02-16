@@ -23,7 +23,7 @@ use Plenty\Modules\Item\DataLayer\Models\Record;
 use Plenty\Modules\Item\DataLayer\Models\RecordList;
 use Plenty\Modules\Item\Search\Aggregations\AttributeValueListAggregation;
 use Plenty\Modules\Item\Search\Aggregations\AttributeValueListAggregationProcessor;
-use Plenty\Modules\Item\Search\Contracts\ItemElasticSearchSearchRepositoryContract;
+use Plenty\Modules\Item\Search\Contracts\VariationElasticSearchSearchRepositoryContract;
 use Plenty\Modules\Item\Search\Filter\CategoryFilter;
 use Plenty\Modules\Item\Search\Filter\ClientFilter;
 use Plenty\Modules\Item\Search\Filter\SearchFilter;
@@ -86,8 +86,8 @@ class ItemService
 		$attributeProcessor = pluginApp(AttributeValueListAggregationProcessor::class);
 		$attributeSearch    = pluginApp(AttributeValueListAggregation::class, [$attributeProcessor]);
 
-		/** @var ItemElasticSearchSearchRepositoryContract $elasticSearchRepo */
-		$elasticSearchRepo = pluginApp(ItemElasticSearchSearchRepositoryContract::class);
+		/** @var VariationElasticSearchSearchRepositoryContract $elasticSearchRepo */
+		$elasticSearchRepo = pluginApp(VariationElasticSearchSearchRepositoryContract::class);
 		$elasticSearchRepo->addSearch($documentSearch);
 		$elasticSearchRepo->addSearch($attributeSearch);
 
@@ -117,8 +117,8 @@ class ItemService
 		$documentProcessor = pluginApp(DocumentProcessor::class);
 		$documentSearch    = pluginApp(DocumentSearch::class, [$documentProcessor]);
 
-		/** @var ItemElasticSearchSearchRepositoryContract $elasticSearchRepo */
-		$elasticSearchRepo = pluginApp(ItemElasticSearchSearchRepositoryContract::class);
+		/** @var VariationElasticSearchSearchRepositoryContract $elasticSearchRepo */
+		$elasticSearchRepo = pluginApp(VariationElasticSearchSearchRepositoryContract::class);
 		$elasticSearchRepo->addSearch($documentSearch);
 
 		/** @var ClientFilter $clientFilter */
@@ -167,8 +167,8 @@ class ItemService
 		$attributeSearch    = pluginApp(AttributeValueListAggregation::class, [$attributeProcessor]);
 
 
-		/** @var ItemElasticSearchSearchRepositoryContract $elasticSearchRepo */
-		$elasticSearchRepo = pluginApp(ItemElasticSearchSearchRepositoryContract::class);
+		/** @var VariationElasticSearchSearchRepositoryContract $elasticSearchRepo */
+		$elasticSearchRepo = pluginApp(VariationElasticSearchSearchRepositoryContract::class);
 		$elasticSearchRepo->addSearch($documentSearch);
 		$elasticSearchRepo->addSearch($attributeSearch);
 
@@ -198,8 +198,8 @@ class ItemService
 		$documentProcessor = pluginApp(DocumentProcessor::class);
 		$documentSearch    = pluginApp(DocumentSearch::class, [$documentProcessor]);
 
-		/** @var ItemElasticSearchSearchRepositoryContract $elasticSearchRepo */
-		$elasticSearchRepo = pluginApp(ItemElasticSearchSearchRepositoryContract::class);
+		/** @var VariationElasticSearchSearchRepositoryContract $elasticSearchRepo */
+		$elasticSearchRepo = pluginApp(VariationElasticSearchSearchRepositoryContract::class);
 		$elasticSearchRepo->addSearch($documentSearch);
 
 		/** @var ClientFilter $clientFilter */
@@ -301,8 +301,8 @@ class ItemService
 		$documentProcessor = pluginApp(DocumentProcessor::class);
 		$documentSearch    = pluginApp(DocumentSearch::class, [$documentProcessor]);
 
-		/** @var ItemElasticSearchSearchRepositoryContract $elasticSearchRepo */
-		$elasticSearchRepo = pluginApp(ItemElasticSearchSearchRepositoryContract::class);
+		/** @var VariationElasticSearchSearchRepositoryContract $elasticSearchRepo */
+		$elasticSearchRepo = pluginApp(VariationElasticSearchSearchRepositoryContract::class);
 		$elasticSearchRepo->addSearch($documentSearch);
 
 		/** @var ClientFilter $clientFilter */
@@ -643,8 +643,8 @@ class ItemService
 		$documentProcessor = pluginApp(DocumentProcessor::class);
 		$documentSearch    = pluginApp(DocumentSearch::class, [$documentProcessor]);
 
-		/** @var ItemElasticSearchSearchRepositoryContract $elasticSearchRepo */
-		$elasticSearchRepo = pluginApp(ItemElasticSearchSearchRepositoryContract::class);
+		/** @var VariationElasticSearchSearchRepositoryContract $elasticSearchRepo */
+		$elasticSearchRepo = pluginApp(VariationElasticSearchSearchRepositoryContract::class);
 		$elasticSearchRepo->addSearch($documentSearch);
 
 		/** @var VariationBaseFilter $variationFilter */
@@ -681,8 +681,8 @@ class ItemService
         $documentProcessor = pluginApp(DocumentProcessor::class);
         $documentSearch    = pluginApp(DocumentSearch::class, [$documentProcessor]);
     
-        /** @var ItemElasticSearchSearchRepositoryContract $elasticSearchRepo */
-        /*$elasticSearchRepo = pluginApp(ItemElasticSearchSearchRepositoryContract::class);
+        /** @var VariationElasticSearchSearchRepositoryContract $elasticSearchRepo */
+        /*$elasticSearchRepo = pluginApp(VariationElasticSearchSearchRepositoryContract::class);
         $elasticSearchRepo->addSearch($documentSearch);
     
         /** @var VariationBaseFilter $variationFilter */
