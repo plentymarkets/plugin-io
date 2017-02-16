@@ -2,9 +2,8 @@
 
 namespace IO\Extensions;
 
-use IO\Services\ItemLoader\Services\ItemLoaderService;
 use Plenty\Plugin\Templates\Extensions\Twig_Extension;
-
+use IO\Services\ItemLoader\Services\ItemLoaderService;
 use IO\Services\AvailabilityService;
 use IO\Services\BasketService;
 use IO\Services\CategoryService;
@@ -22,6 +21,7 @@ use IO\Services\WebstoreConfigurationService;
 use IO\Services\LocalizationService;
 use IO\Services\CouponService;
 use IO\Services\LegalInformationService;
+use IO\Services\SalesPriceService;
 
 /**
  * Provide services and helper functions to twig engine
@@ -92,7 +92,8 @@ class TwigServiceProvider extends Twig_Extension
                 "webstoreConfig"    => pluginApp( WebstoreConfigurationService::class),
                 "localization"      => pluginApp( LocalizationService::class ),
                 "coupon"            => pluginApp( CouponService::class ),
-                "legalInformation"  => pluginApp( LegalInformationService::class )
+                "legalInformation"  => pluginApp( LegalInformationService::class ),
+                "salesPrice"        => pluginApp( SalesPriceService::class )
             ]
         ];
     }
