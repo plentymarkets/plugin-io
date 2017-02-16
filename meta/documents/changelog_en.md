@@ -1,6 +1,6 @@
 # Release Notes for PluginIO
 
-## v1.0.0 (2017-02-13)
+## v1.0.2 (2017-02-16)
 
 ### Features
 **IO** offers a variety of logic funcitons for a plentymarkets online store and serves as an interface between plentymarkets and the following online store pages:
