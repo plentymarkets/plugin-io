@@ -1,4 +1,4 @@
-# Release Notes für PluginIO
+# Release Notes für IO
 
 ## v1.0.2 (2017-02-16)
 
