@@ -180,8 +180,12 @@ class CategoryService
         {
             return null;
         }
-        
-        return pluginApp(ItemService::class)->getItemForCategory( $category->id, $params, $page );
+    
+        /**
+         * @var ItemService $itemService
+         */
+        $itemService = pluginApp(ItemService::class);
+        return $itemService->getItemForCategory( $category->id, pluginApp(CategoryParamsBuilder::class)->fromArray($params), $page );
     }
 
     /**
@@ -194,6 +198,7 @@ class CategoryService
     {
 		return $this->categoryRepository->getLinklistTree($type, $lang, $this->webstoreConfig->getWebstoreConfig()->webstoreId);
     }
+
     /**
      * Return the sitemap list as an array
      * @param string $type Only return categories of given type

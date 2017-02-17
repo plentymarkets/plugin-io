@@ -51,10 +51,12 @@ class SessionStorageService
 	public function getLang()
 	{
         $lang = $this->sessionStorage->getLocaleSettings()->language;
+
         if(is_null($lang) || !strlen($lang))
         {
             $lang = 'de';
         }
+
 		return $lang;
 	}
 }
