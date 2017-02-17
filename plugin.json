@@ -1,6 +1,6 @@
 {
     "version"           : "1.0.2",
-    "name"              : "PluginIO",
+    "name"              : "IO",
     "license"           : "AGPL-3.0",
     "pluginIcon"        : "icon_plugin_xs.png",
     "price"             : 0.00,

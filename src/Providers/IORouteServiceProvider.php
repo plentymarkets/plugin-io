@@ -51,7 +51,7 @@ class IORouteServiceProvider extends RouteServiceProvider
             $api->resource('io/guest', 'GuestResource');
 		});
 
-		$enabledRoutes = explode(", ",  $config->get("PluginIO.routing.enabled_routes") );
+		$enabledRoutes = explode(", ",  $config->get("IO.routing.enabled_routes") );
 
 		/*
 		 * STATIC ROUTES
