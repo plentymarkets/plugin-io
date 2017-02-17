@@ -39,24 +39,24 @@ class ItemNameFilter extends AbstractFilter
     public function itemName( array $itemTexts, string $configName )
     {
         $showName = '';
-    
-        if($configName == '0' && $itemTexts['name1'] != '')
+
+        if($configName == '0' && $itemTexts[0]['name1'] != '')
         {
-            $showName = $itemTexts['name1'];
+            $showName = $itemTexts[0]['name1'];
         }
-        elseif($configName == '1' && $itemTexts['name2'] != '')
+        elseif($configName == '1' && $itemTexts[0]['name2'] != '')
         {
-            $showName = $itemTexts['name2'];
+            $showName = $itemTexts[0]['name2'];
         }
-        elseif($configName == '2' && $itemTexts['name3'] != '')
+        elseif($configName == '2' && $itemTexts[0]['name3'] != '')
         {
-            $showName = $itemTexts['name3'];
+            $showName = $itemTexts[0]['name3'];
         }
         else
         {
-            $showName = $itemTexts['name1'];
+            $showName = $itemTexts[0]['name1'];
         }
-        
+
         return $showName;
     }
 
