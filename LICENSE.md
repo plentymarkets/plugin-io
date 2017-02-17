@@ -1,4 +1,4 @@
-plentymarkets plugin IO
+plentymarkets IO
 
 Copyright © 2017 plentymarkets GmbH
 
