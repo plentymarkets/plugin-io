@@ -41,7 +41,7 @@ class CustomerService
 	 * @var UserSession
 	 */
 	private $userSession = null;
-    
+
     /**
      * CustomerService constructor.
      * @param ContactRepositoryContract $contactRepository
@@ -87,7 +87,7 @@ class CustomerService
          * @var BasketService $basketService
          */
         $basketService = pluginApp(BasketService::class);
-        
+
         $guestBillingAddress = null;
         //$guestBillingAddressId = $this->sessionStorage->getSessionValue(SessionStorageKeys::BILLING_ADDRESS_ID);
         $guestBillingAddressId = $basketService->getBillingAddressId();
@@ -95,7 +95,7 @@ class CustomerService
         {
             $guestBillingAddress = $this->addressRepository->findAddressById($guestBillingAddressId);
         }
-        
+
         $guestDeliveryAddress = null;
         //$guestDeliveryAddressId = $this->sessionStorage->getSessionValue(SessionStorageKeys::DELIVERY_ADDRESS_ID);
         $guestDeliveryAddressId = $basketService->getDeliveryAddressId();
@@ -103,14 +103,14 @@ class CustomerService
         {
             $guestDeliveryAddress = $this->addressRepository->findAddressById($guestDeliveryAddressId);
         }
-        
+
         $contact = $this->createContact($contactData);
-        
+
         if($contact->id > 0)
         {
             //Login
             pluginApp(AuthenticationService::class)->loginWithContactId($contact->id, (string)$contactData['password']);
-            
+
             if($guestBillingAddress !== null)
             {
                 $newBillingAddress = $this->createAddress(
@@ -120,7 +120,7 @@ class CustomerService
                 //$this->sessionStorage->setSessionValue(SessionStorageKeys::BILLING_ADDRESS_ID, $newBillingAddress->id);
                 $basketService->setBillingAddressId($newBillingAddress->id);
             }
-            
+
             if($guestDeliveryAddress !== null)
             {
                 $newDeliveryAddress = $this->createAddress(
@@ -131,13 +131,13 @@ class CustomerService
                 $basketService->setDeliveryAddressId($newDeliveryAddress->id);
             }
         }
-		
+
 		if($billingAddressData !== null)
 		{
             $newBillingAddress = $this->createAddress($billingAddressData, AddressType::BILLING);
             //$this->sessionStorage->setSessionValue(SessionStorageKeys::BILLING_ADDRESS_ID, $newBillingAddress->id);
             $basketService->setBillingAddressId($newBillingAddress->id);
-            
+
 			if($deliveryAddressData === null)
 			{
                 $newDeliveryAddress = $this->createAddress($billingAddressData, AddressType::DELIVERY);
@@ -212,9 +212,9 @@ class CustomerService
              * @var BasketService $basketService
              */
             $basketService = pluginApp(BasketService::class);
-            
+
             $address = null;
-            
+
             if($type == AddressType::BILLING && $basketService->getBillingAddressId() > 0)
             {
                 $address = $this->addressRepository->findAddressById($basketService->getBillingAddressId());
@@ -223,14 +223,14 @@ class CustomerService
             {
                 $address = $this->addressRepository->findAddressById($basketService->getDeliveryAddressId());
             }
-    
+
             if($address instanceof Address)
             {
                 return [
                     $address
                 ];
             }
-    
+
             return [];
         }
 	}
@@ -253,7 +253,7 @@ class CustomerService
              * @var BasketService $basketService
              */
             $basketService = pluginApp(BasketService::class);
-            
+
             if($type == AddressType::BILLING)
             {
                 return $this->addressRepository->findAddressById($basketService->getBillingAddressId());
@@ -282,7 +282,7 @@ class CustomerService
             return $this->createGuestAddress($addressData, $type);
         }
 	}
-    
+
     /**
      * @param array $addressData
      * @return Address
@@ -290,12 +290,12 @@ class CustomerService
 	private function createGuestAddress(array $addressData, int $type):Address
     {
         $newAddress = $this->addressRepository->createAddress($addressData);
-    
+
         /**
          * @var BasketService $basketService
          */
         $basketService = pluginApp(BasketService::class);
-        
+
         if($type == AddressType::BILLING)
         {
             //$this->sessionStorage->setSessionValue(SessionStorageKeys::BILLING_ADDRESS_ID, $newAddress->id);
@@ -306,7 +306,7 @@ class CustomerService
             //$this->sessionStorage->setSessionValue(SessionStorageKeys::DELIVERY_ADDRESS_ID, $newAddress->id);
             $basketService->setDeliveryAddressId($newAddress->id);
         }
-        
+
         return $newAddress;
     }
 
@@ -345,13 +345,19 @@ class CustomerService
      * @param int $items
      * @return array|\Plenty\Repositories\Models\PaginatedResult
      */
-	public function getOrders(int $page = 1, int $items = 10)
+	public function getOrders(int $page = 1, int $items = 10, array $filters = [])
 	{
-		return pluginApp(OrderService::class)->getOrdersForContact(
-		    $this->getContactId(),
-            $page,
-            $items
-        );
+        if($this->getContactId() > 0)
+        {
+            return pluginApp(OrderService::class)->getOrdersForContact(
+                $this->getContactId(),
+                $page,
+                $items,
+                $filters
+            );
+        }
+
+        return [];
 	}
 
     /**
