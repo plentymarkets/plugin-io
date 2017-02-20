@@ -2,7 +2,6 @@
 namespace IO\Controllers;
 
 use IO\Constants\SessionStorageKeys;
-use IO\Helper\TemplateContainer;
 use IO\Services\BasketService;
 use IO\Services\CustomerService;
 use IO\Services\SessionStorageService;

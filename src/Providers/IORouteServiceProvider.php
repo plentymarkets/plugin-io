@@ -29,7 +29,6 @@ class IORouteServiceProvider extends RouteServiceProvider
 			$api->get('io/basket', 'BasketResource@index');
 			$api->resource('io/basket/items', 'BasketItemResource');
 			$api->resource('io/order', 'OrderResource');
-			//$api->resource('checkout', 'CheckoutResource');
             $api->get('io/checkout', 'CheckoutResource@index');
             $api->post('io/checkout', 'CheckoutResource@store');
             $api->put('io/checkout', 'CheckoutResource@update');
@@ -42,8 +41,6 @@ class IORouteServiceProvider extends RouteServiceProvider
             $api->resource('io/variations', 'VariationResource');
             $api->resource('io/item/availability', 'AvailabilityResource');
             $api->resource('io/item/condition', 'ItemConditionResource');
-//            $api->resource('io/item/search', 'ItemSearchResource');
-//            $api->resource('io/item/search/autocomplete', 'ItemSearchAutocompleteResource');
             $api->get('io/item/search', 'ItemSearchResource@index');
             $api->get('io/item/search/autocomplete', 'ItemSearchAutocompleteResource@index');
 			$api->resource('io/customer/bank_data', 'ContactBankResource');
