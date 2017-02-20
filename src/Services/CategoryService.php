@@ -185,7 +185,7 @@ class CategoryService
          * @var ItemService $itemService
          */
         $itemService = pluginApp(ItemService::class);
-        return $itemService->getItemForCategory( $category->id, pluginApp(CategoryParamsBuilder::class)->fromArray($params), $page );
+        return $itemService->getItemForCategory( $category->id, $params, $page );
     }
 
     /**
