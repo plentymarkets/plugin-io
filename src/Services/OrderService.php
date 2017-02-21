@@ -112,10 +112,8 @@ class OrderService
      * @param int $items
      * @return PaginatedResult
      */
-    public function getOrdersForContact(int $contactId, int $page = 1, int $items = 50, array $filters = []):PaginatedResult
+    public function getOrdersForContact(int $contactId, int $page = 1, int $items = 50):PaginatedResult
     {
-		$this->orderRepository->setFilters($filters);
-
         $orders = $this->orderRepository->allOrdersByContact(
             $contactId,
             $page,
