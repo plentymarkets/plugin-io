@@ -2,7 +2,6 @@
 
 namespace IO\Api\Resources;
 
-use Symfony\Component\HttpFoundation\Response as BaseResponse;
 use Plenty\Plugin\Http\Response;
 use Plenty\Plugin\Http\Request;
 use IO\Api\ApiResource;
@@ -29,9 +28,9 @@ class ItemSearchAutocompleteResource extends ApiResource
     
     /**
      * Search items
-     * @return BaseResponse
+     * @return Response
      */
-    public function index():BaseResponse
+    public function index():Response
     {
         $searchString = $this->request->get('searchString', '');
         

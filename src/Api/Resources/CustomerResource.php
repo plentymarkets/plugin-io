@@ -2,7 +2,6 @@
 
 namespace IO\Api\Resources;
 
-use Symfony\Component\HttpFoundation\Response as BaseResponse;
 use Plenty\Plugin\Http\Response;
 use Plenty\Plugin\Http\Request;
 use IO\Api\ApiResource;
@@ -35,9 +34,9 @@ class CustomerResource extends ApiResource
 
     /**
      * Get the contact
-     * @return BaseResponse
+     * @return Response
      */
-	public function index():BaseResponse
+	public function index():Response
 	{
 		$customer = null;
 		$contact  = $this->customerService->getContact();
@@ -54,9 +53,9 @@ class CustomerResource extends ApiResource
 
     /**
      * Save the contact
-     * @return BaseResponse
+     * @return Response
      */
-	public function store():BaseResponse
+	public function store():Response
 	{
 		$contactData         = $this->request->get("contact", null);
 		$billingAddressData  = $this->request->get("billingAddress", []);

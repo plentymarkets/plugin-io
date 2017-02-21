@@ -2,7 +2,6 @@
 
 namespace IO\Api;
 
-use Symfony\Component\HttpFoundation\Response as BaseResponse;
 use Plenty\Plugin\Http\Response;
 use Plenty\Plugin\Controller;
 use Plenty\Plugin\Http\Request;
@@ -43,18 +42,18 @@ class ApiResource extends Controller
 
 	// Get all
     /**
-     * @return BaseResponse
+     * @return Response
      */
-	public function index():BaseResponse
+	public function index():Response
 	{
 		return $this->response->create(null, $this->defaultCode);
 	}
 
 	// Post
     /**
-     * @return BaseResponse
+     * @return Response
      */
-	public function store():BaseResponse
+	public function store():Response
 	{
 		return $this->response->create(null, $this->defaultCode);
 	}
@@ -62,9 +61,9 @@ class ApiResource extends Controller
 	// Get
     /**
      * @param string $selector
-     * @return BaseResponse
+     * @return Response
      */
-	public function show(string $selector):BaseResponse
+	public function show(string $selector):Response
 	{
 		return $this->response->create(null, $this->defaultCode);
 	}
@@ -72,9 +71,9 @@ class ApiResource extends Controller
 	// Put/patch
     /**
      * @param string $selector
-     * @return BaseResponse
+     * @return Response
      */
-	public function update(string $selector):BaseResponse
+	public function update(string $selector):Response
 	{
 		return $this->response->create(null, $this->defaultCode);
 	}
@@ -82,9 +81,9 @@ class ApiResource extends Controller
 	// Delete
     /**
      * @param string $selector
-     * @return BaseResponse
+     * @return Response
      */
-	public function destroy(string $selector):BaseResponse
+	public function destroy(string $selector):Response
 	{
 		return $this->response->create(null, $this->defaultCode);
 	}

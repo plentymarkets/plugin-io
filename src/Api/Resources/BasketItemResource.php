@@ -2,7 +2,6 @@
 
 namespace IO\Api\Resources;
 
-use Symfony\Component\HttpFoundation\Response as BaseResponse;
 use Plenty\Plugin\Http\Response;
 use Plenty\Plugin\Http\Request;
 use IO\Api\ApiResource;
@@ -35,9 +34,9 @@ class BasketItemResource extends ApiResource
 
     /**
      * List basket items
-     * @return BaseResponse
+     * @return Response
      */
-	public function index():BaseResponse
+	public function index():Response
 	{
 		$basketItems = $this->basketService->getBasketItemsForTemplate($this->request->get('template', ''));
 		return $this->response->create($basketItems, ResponseCode::OK);
@@ -46,9 +45,9 @@ class BasketItemResource extends ApiResource
 	// Post
     /**
      * Add an item to the basket
-     * @return BaseResponse
+     * @return Response
      */
-	public function store():BaseResponse
+	public function store():Response
 	{
         $this->basketService->setTemplate($this->request->get('template', ''));
 		$basketItems = $this->basketService->addBasketItem($this->request->all());
@@ -59,9 +58,9 @@ class BasketItemResource extends ApiResource
     /**
      * Get a basket item
      * @param string $selector
-     * @return BaseResponse
+     * @return Response
      */
-	public function show(string $selector):BaseResponse
+	public function show(string $selector):Response
 	{
         $this->basketService->setTemplate($this->request->get('template', ''));
 		$basketItem = $this->basketService->getBasketItem((int)$selector);
@@ -72,9 +71,9 @@ class BasketItemResource extends ApiResource
     /**
      * Update the basket item
      * @param string $selector
-     * @return BaseResponse
+     * @return Response
      */
-	public function update(string $selector):BaseResponse
+	public function update(string $selector):Response
 	{
         $this->basketService->setTemplate($this->request->get('template', ''));
 		$basketItems = $this->basketService->updateBasketItem((int)$selector, $this->request->all());
@@ -85,9 +84,9 @@ class BasketItemResource extends ApiResource
     /**
      * Delete an item from the basket
      * @param string $selector
-     * @return BaseResponse
+     * @return Response
      */
-	public function destroy(string $selector):BaseResponse
+	public function destroy(string $selector):Response
 	{
         $this->basketService->setTemplate($this->request->get('template', ''));
 		$basketItems = $this->basketService->deleteBasketItem((int)$selector);

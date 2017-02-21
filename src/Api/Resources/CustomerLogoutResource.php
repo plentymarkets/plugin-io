@@ -2,7 +2,6 @@
 
 namespace IO\Api\Resources;
 
-use Symfony\Component\HttpFoundation\Response as BaseResponse;
 use Plenty\Plugin\Http\Request;
 use Plenty\Plugin\Http\Response;
 use IO\Api\ApiResource;
@@ -34,9 +33,9 @@ class CustomerLogoutResource extends ApiResource
 	}
     
     /**
-     * @return BaseResponse
+     * @return Response
      */
-	public function store():BaseResponse
+	public function store():Response
 	{
 		$this->authService->logout();
 		return $this->response->create(ResponseCode::OK);

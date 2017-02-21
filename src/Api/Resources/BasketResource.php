@@ -2,7 +2,6 @@
 
 namespace IO\Api\Resources;
 
-use Symfony\Component\HttpFoundation\Response as BaseResponse;
 use Plenty\Plugin\Http\Response;
 use Plenty\Plugin\Http\Request;
 use IO\Api\ApiResource;
@@ -35,9 +34,9 @@ class BasketResource extends ApiResource
 
     /**
      * Get the basket
-     * @return BaseResponse
+     * @return Response
      */
-	public function index():BaseResponse
+	public function index():Response
 	{
 		$basket = $this->basketService->getBasket();
 		return $this->response->create($basket, ResponseCode::OK);

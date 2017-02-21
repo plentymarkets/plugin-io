@@ -4,7 +4,6 @@ namespace IO\Api;
 
 use IO\Services\BasketService;
 use IO\Services\CheckoutService;
-use Symfony\Component\HttpFoundation\Response as BaseResponse;
 use Plenty\Plugin\Http\Response;
 use Plenty\Modules\Account\Events\FrontendUpdateCustomerSettings;
 use Plenty\Modules\Authentication\Events\AfterAccountAuthentication;
@@ -267,9 +266,9 @@ class ApiResponse
 	 * @param $data
 	 * @param int $code
 	 * @param array $headers
-	 * @return BaseResponse
+	 * @return Response
 	 */
-	public function create($data, int $code = ResponseCode::OK, array $headers = []):BaseResponse
+	public function create($data, int $code = ResponseCode::OK, array $headers = []):Response
 	{
 		foreach($headers as $key => $value)
 		{

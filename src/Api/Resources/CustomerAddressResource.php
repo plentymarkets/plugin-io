@@ -2,7 +2,6 @@
 
 namespace IO\Api\Resources;
 
-use Symfony\Component\HttpFoundation\Response as BaseResponse;
 use Plenty\Plugin\Http\Response;
 use Plenty\Plugin\Http\Request;
 use IO\Api\ApiResource;
@@ -45,9 +44,9 @@ class CustomerAddressResource extends ApiResource
 
     /**
      * Get an address by type
-     * @return BaseResponse
+     * @return Response
      */
-	public function index():BaseResponse
+	public function index():Response
 	{
 		$type      = $this->getAddressType();
 		$addresses = $this->customerService->getAddresses($type);
@@ -56,9 +55,9 @@ class CustomerAddressResource extends ApiResource
 
     /**
      * Create an address with the given type
-     * @return BaseResponse
+     * @return Response
      */
-	public function store():BaseResponse
+	public function store():Response
 	{
 		$type = $this->getAddressType();
 		if($type === 0)
@@ -73,9 +72,9 @@ class CustomerAddressResource extends ApiResource
     /**
      * Update the address with the given ID
      * @param string $addressId
-     * @return BaseResponse
+     * @return Response
      */
-	public function update(string $addressId):BaseResponse
+	public function update(string $addressId):Response
 	{
 		$type = $this->getAddressType();
 		if($type === 0)
@@ -92,9 +91,9 @@ class CustomerAddressResource extends ApiResource
     /**
      * Delete the address with the given ID
      * @param string $addressId
-     * @return BaseResponse
+     * @return Response
      */
-	public function destroy(string $addressId):BaseResponse
+	public function destroy(string $addressId):Response
 	{
 		$type = $this->getAddressType();
 		if($type === 0)

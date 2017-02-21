@@ -2,7 +2,6 @@
 
 namespace IO\Api\Resources;
 
-use Symfony\Component\HttpFoundation\Response as BaseResponse;
 use Plenty\Plugin\Http\Response;
 use Plenty\Plugin\Http\Request;
 use IO\Api\ApiResource;
@@ -38,9 +37,9 @@ class ShippingResource extends ApiResource
     /**
      * Set the shipping profile
      * @param string $shippingProfileId
-     * @return BaseResponse
+     * @return Response
      */
-	public function update(string $shippingProfileId):BaseResponse
+	public function update(string $shippingProfileId):Response
 	{
 		$this->shippingService->setShippingProfileId((int)$shippingProfileId);
 		return $this->response->create(ResponseCode::OK);

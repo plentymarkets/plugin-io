@@ -2,7 +2,6 @@
 
 namespace IO\Api\Resources;
 
-use Symfony\Component\HttpFoundation\Response as BaseResponse;
 use Plenty\Plugin\Http\Request;
 use Plenty\Plugin\Http\Response;
 use IO\Api\ApiResource;
@@ -31,9 +30,9 @@ class OrderResource extends ApiResource
 
     /**
      * List the orders of the customer
-     * @return BaseResponse
+     * @return Response
      */
-	public function index():BaseResponse
+	public function index():Response
 	{
 		$page  = (int)$this->request->get("page", 1);
 		$items = (int)$this->request->get("items", 10);
@@ -44,9 +43,9 @@ class OrderResource extends ApiResource
 
     /**
      * Create an order
-     * @return BaseResponse
+     * @return Response
      */
-	public function store():BaseResponse
+	public function store():Response
 	{
 		$order = pluginApp(OrderService::class)->placeOrder();
 		return $this->response->create($order, ResponseCode::OK);

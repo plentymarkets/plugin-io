@@ -2,8 +2,7 @@
 
 namespace IO\Api\Resources;
 
-use Symfony\Component\HttpFoundation\Response as BaseResponse;
-use Illuminate\Http\Response;
+use Plenty\Plugin\Http\Response;
 use Plenty\Plugin\Http\Request;
 use IO\Api\ApiResource;
 use IO\Api\ApiResponse;
@@ -20,26 +19,26 @@ class ContactBankResource extends ApiResource
         $this->contactBankService = $contactBankService;
     }
 
-    public function show( string $contactBankId ):BaseResponse
+    public function show( string $contactBankId ):Response
     {
         $response = $this->contactBankService->findContactBankById((int)$contactBankId);
         return $this->response->create($response, ResponseCode::OK);
     }
 
-    public function store():BaseResponse
+    public function store():Response
     {
         $requestData = $this->request->all();
         $response = $this->contactBankService->createContactBank($requestData);
         return $this->response->create( $response, ResponseCode::CREATED );
     }
 
-    public function destroy( string $contactBankId ):BaseResponse
+    public function destroy( string $contactBankId ):Response
     {
         $response = $this->contactBankService->deleteContactBank((int)$contactBankId);
         return $this->response->create( $response, ResponseCode::OK );
     }
 
-    public function update( string $contactBankId ):BaseResponse
+    public function update( string $contactBankId ):Response
     {
         $requestData = $this->request->all();
         $response = $this->contactBankService->updateContactBank( $requestData, (int) $contactBankId );

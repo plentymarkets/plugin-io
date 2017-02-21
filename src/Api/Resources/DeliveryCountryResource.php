@@ -2,7 +2,6 @@
 
 namespace IO\Api\Resources;
 
-use Symfony\Component\HttpFoundation\Response as BaseResponse;
 use Plenty\Plugin\Http\Response;
 use Plenty\Plugin\Http\Request;
 use IO\Api\ApiResource;
@@ -45,9 +44,9 @@ class DeliveryCountryResource extends ApiResource
     /**
      * Set the shipping country
      * @param string $shippingCountryId
-     * @return BaseResponse
+     * @return Response
      */
-	public function update(string $shippingCountryId):BaseResponse
+	public function update(string $shippingCountryId):Response
 	{
 		$this->countryService->setShippingCountryId((int)$shippingCountryId);
 		$basket = $this->basketService->getBasket();

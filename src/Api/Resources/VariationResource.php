@@ -2,9 +2,8 @@
 
 namespace IO\Api\Resources;
 
-use Symfony\Component\HttpFoundation\Response as BaseResponse;
 use Plenty\Plugin\Http\Request;
-use Illuminate\Http\Response;
+use Plenty\Plugin\Http\Response;
 use IO\Api\ApiResource;
 use IO\Api\ApiResponse;
 use IO\Api\ResponseCode;
@@ -39,9 +38,9 @@ class VariationResource extends ApiResource
     /**
      * Get variation by id
      * @param string $variationId
-     * @return BaseResponse
+     * @return Response
      */
-    public function show( string $variationId ):BaseResponse
+    public function show( string $variationId ):Response
     {
         $variation = $this->itemService->getVariation( (int) $variationId );
         return $this->response->create($variation, ResponseCode::OK);

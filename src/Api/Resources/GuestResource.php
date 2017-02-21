@@ -2,7 +2,6 @@
 
 namespace IO\Api\Resources;
 
-use Symfony\Component\HttpFoundation\Response as BaseResponse;
 use Plenty\Plugin\Http\Response;
 use Plenty\Plugin\Http\Request;
 use IO\Api\ApiResource;
@@ -19,7 +18,7 @@ class GuestResource extends ApiResource
         parent::__construct($request, $response);
     }
     
-    public function store():BaseResponse
+    public function store():Response
     {
         $email = $this->request->get('email', '');
     

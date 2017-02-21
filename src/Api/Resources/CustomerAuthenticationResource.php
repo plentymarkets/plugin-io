@@ -2,7 +2,6 @@
 
 namespace IO\Api\Resources;
 
-use Symfony\Component\HttpFoundation\Response as BaseResponse;
 use Plenty\Plugin\Http\Request;
 use Plenty\Plugin\Http\Response;
 use IO\Api\ApiResource;
@@ -35,9 +34,9 @@ class CustomerAuthenticationResource extends ApiResource
 
     /**
      * Perform the login with email and password
-     * @return BaseResponse
+     * @return Response
      */
-	public function store():BaseResponse
+	public function store():Response
 	{
 		$email    = $this->request->get('email', '');
 		$password = $this->request->get('password', '');

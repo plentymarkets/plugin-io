@@ -2,7 +2,6 @@
 
 namespace IO\Api\Resources;
 
-use Symfony\Component\HttpFoundation\Response as BaseResponse;
 use Plenty\Plugin\Http\Response;
 use Plenty\Plugin\Http\Request;
 use IO\Api\ApiResource;
@@ -43,9 +42,9 @@ class CheckoutResource extends ApiResource
 
     /**
      * Get the checkout
-     * @return BaseResponse
+     * @return Response
      */
-	public function index():BaseResponse
+	public function index():Response
 	{
 		$checkout = $this->checkoutService->getCheckout();
 		return $this->response->create($checkout, ResponseCode::OK);
@@ -53,9 +52,9 @@ class CheckoutResource extends ApiResource
 
     /**
      * Save adresses and set the checkout data
-     * @return BaseResponse
+     * @return Response
      */
-	public function store():BaseResponse
+	public function store():Response
 	{
 		$methodOfPaymentId = (int)$this->request->get("methodOfPaymentId");
 		$this->checkoutService->setMethodOfPaymentId($methodOfPaymentId);
@@ -95,9 +94,9 @@ class CheckoutResource extends ApiResource
     
     /**
      * Update the checkout information
-     * @return BaseResponse
+     * @return Response
      */
-	public function update(string $selector = ''):BaseResponse
+	public function update(string $selector = ''):Response
     {
         $billingAddressId = (int)$this->request->get("billingAddressId");
         $this->checkoutService->setBillingAddressId($billingAddressId);

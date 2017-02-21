@@ -2,7 +2,6 @@
 
 namespace IO\Api\Resources;
 
-use Symfony\Component\HttpFoundation\Response as BaseResponse;
 use Plenty\Plugin\Http\Response;
 use Plenty\Plugin\Http\Request;
 use IO\Api\ApiResource;
@@ -36,9 +35,9 @@ class AvailabilityResource extends ApiResource
     /**
      * Get the Availability by Id
      * @param string $availabilityId
-     * @return BaseResponse
+     * @return Response
      */
-    public function show(string $availabilityId):BaseResponse
+    public function show(string $availabilityId):Response
     {
         $availability = null;
         

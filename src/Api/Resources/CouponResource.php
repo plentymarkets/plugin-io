@@ -2,7 +2,6 @@
 
 namespace IO\Api\Resources;
 
-use Symfony\Component\HttpFoundation\Response as BaseResponse;
 use Plenty\Plugin\Http\Response;
 use Plenty\Plugin\Http\Request;
 use IO\Api\ApiResource;
@@ -17,12 +16,12 @@ class CouponResource extends ApiResource
         parent::__construct($request, $response);
     }
     
-    public function index():BaseResponse
+    public function index():Response
     {
         return $this->response->create([], ResponseCode::OK);
     }
     
-    public function store():BaseResponse
+    public function store():Response
     {
         $couponCode = $this->request->get('couponCode', '');
     
@@ -35,7 +34,7 @@ class CouponResource extends ApiResource
         return $this->response->create( $response, ResponseCode::CREATED );
     }
     
-    public function destroy(string $selector):BaseResponse
+    public function destroy(string $selector):Response
     {
         /**
          * @var CouponService $couponService

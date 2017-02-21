@@ -2,7 +2,6 @@
 
 namespace IO\Api\Resources;
 
-use Symfony\Component\HttpFoundation\Response as BaseResponse;
 use Plenty\Plugin\Http\Response;
 use Plenty\Plugin\Http\Request;
 use IO\Api\ApiResource;
@@ -37,9 +36,9 @@ class ItemConditionResource extends ApiResource
     
     /**
      * @param string $conditionId
-     * @return BaseResponse
+     * @return Response
      */
-    public function show(string $conditionId):BaseResponse
+    public function show(string $conditionId):Response
     {
         $conditionText = '';
         
