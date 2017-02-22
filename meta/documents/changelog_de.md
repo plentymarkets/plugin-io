@@ -1,5 +1,11 @@
 # Release Notes für IO
 
+## v1.0.1 (2017-02-22)
+
+### Behoben
+
+- Fehler beim Erweitern der Shop-Sprachen behoben. Wenn zusätzliche Sprachdateien im Ordner `resources/lang` [erstellt](https://developers.plentymarkets.com/dev-doc/template-plugins#design-lang) und per [Gulp kompiliert](https://developers.plentymarkets.com/dev-doc/template-plugins#gulp-ceres) wurden, wird das Template nun auch in der gewählten Sprache angezeigt.
+
 ## v1.0.0 (2017-02-20)
 
 ### Funktionen
