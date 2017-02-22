@@ -91,7 +91,7 @@ class CountryService
 					return $countryName->name;
 				}
 			}
-			return array_shift($country->names)->name;
+			return $country->names[0]->name;
 		}
 		return "";
 	}
