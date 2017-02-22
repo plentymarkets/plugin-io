@@ -112,8 +112,10 @@ class OrderService
      * @param int $items
      * @return PaginatedResult
      */
-    public function getOrdersForContact(int $contactId, int $page = 1, int $items = 50):PaginatedResult
+    public function getOrdersForContact(int $contactId, int $page = 1, int $items = 50 , array $filters = []):PaginatedResult
     {
+		$this->orderRepository->setFilters($filters);
+
         $orders = $this->orderRepository->allOrdersByContact(
             $contactId,
             $page,
@@ -128,7 +130,7 @@ class OrderService
      * @param int $contactId
      * @return LocalizedOrder
      */
-    public function getLatestOrderForContact( int $contactId ):LocalizedOrder
+    public function getLatestOrderForContact( int $contactId):LocalizedOrder
     {
         if($contactId > 0)
         {

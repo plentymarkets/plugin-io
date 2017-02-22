@@ -345,12 +345,13 @@ class CustomerService
      * @param int $items
      * @return array|\Plenty\Repositories\Models\PaginatedResult
      */
-	public function getOrders(int $page = 1, int $items = 10)
+	public function getOrders(int $page = 1, int $items = 10, array $filters = [])
 	{
-        return pluginApp(OrderService::class)->getOrdersForContact(
+		return pluginApp(OrderService::class)->getOrdersForContact(
             $this->getContactId(),
             $page,
-            $items
+            $items,
+			$filters
         );
 	}
 
