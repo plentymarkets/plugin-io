@@ -36,8 +36,9 @@ class TwigLoaderPresets extends Twig_Extension
 				],
 			    
 			    "categoryList" => [
-				    CategoryItems::class
-			    ]
+				    CategoryItems::class,
+                    SingleItemAttributes::class
+			    ],
 			]
 		];
 	}
