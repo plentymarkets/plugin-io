@@ -4,6 +4,7 @@ namespace IO\Providers;
 
 use IO\Extensions\TwigIOExtension;
 use IO\Extensions\TwigServiceProvider;
+use IO\Middlewares\Middleware;
 use IO\Services\ItemLoader\Contracts\ItemLoaderFactory;
 use IO\Services\ItemLoader\Extensions\TwigLoaderPresets;
 use IO\Services\ItemLoader\Factories\ItemLoaderFactoryES;
@@ -22,6 +23,7 @@ class IOServiceProvider extends ServiceProvider
      */
     public function register()
     {
+        $this->addGlobalMiddleware(Middleware::class);
         $this->getApplication()->register(IORouteServiceProvider::class);
 
         $this->getApplication()->singleton('IO\Helper\TemplateContainer');
