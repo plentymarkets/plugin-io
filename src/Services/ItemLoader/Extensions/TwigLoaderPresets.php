@@ -1,6 +1,7 @@
 <?php
 namespace IO\Services\ItemLoader\Extensions;
 use IO\Services\ItemLoader\Loaders\CategoryItems;
+use IO\Services\ItemLoader\Loaders\Facets;
 use IO\Services\ItemLoader\Loaders\SingleItem;
 use IO\Services\ItemLoader\Loaders\SingleItemAttributes;
 use Plenty\Plugin\Templates\Extensions\Twig_Extension;
@@ -37,7 +38,7 @@ class TwigLoaderPresets extends Twig_Extension
 			    
 			    "categoryList" => [
 				    CategoryItems::class,
-                    SingleItemAttributes::class
+                    Facets::class
 			    ],
 			]
 		];
