@@ -66,9 +66,9 @@ class NumberFormatFilter extends AbstractFilter
      * @param string $currencyISO
      * @return string
      */
-	public function formatMonetary($value, string $currencyISO):string
+	public function formatMonetary($value, $currencyISO):string
 	{
-        if(!is_null($value) && !is_null($currencyISO))
+        if(!is_null($value) && !is_null($currencyISO) && strlen($currencyISO))
         {
             $locale            = 'de_DE';
             $useCurrencySymbol = true;
