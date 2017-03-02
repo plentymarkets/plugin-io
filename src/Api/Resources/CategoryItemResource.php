@@ -8,17 +8,17 @@ use IO\Api\ApiResource;
 use IO\Api\ApiResponse;
 use IO\Api\ResponseCode;
 use IO\Services\ItemLoader\Services\ItemLoaderService;
-use IO\Services\ItemLoader\Loaders\SearchItems;
+use IO\Services\ItemLoader\Loaders\CategoryItems;
 use IO\Services\ItemLoader\Loaders\Facets;
 
 /**
- * Class ItemSearchResource
+ * Class CategoryItemResource
  * @package IO\Api\Resources
  */
-class ItemSearchResource extends ApiResource
+class CategoryItemResource extends ApiResource
 {
     /**
-     * ItemSearchResource constructor.
+     * CategoryItemResource constructor.
      * @param Request $request
      * @param ApiResponse $response
      */
@@ -28,26 +28,26 @@ class ItemSearchResource extends ApiResource
     }
     
     /**
-     * Search items
+     * Get Category Items
      * @return Response
      */
     public function index():Response
     {
-        $searchString = $this->request->get('searchString', '');
+        $categoryId = $this->request->get('categoryId', 0);
         $template = $this->request->get('template', '');
         
-        if(strlen($searchString))
+        if((int)$categoryId > 0)
         {
             $response = pluginApp(ItemLoaderService::class)
-                ->loadForTemplate($template, [SearchItems::class, Facets::class], [
-                    'searchString'  => $searchString,
+                ->loadForTemplate($template, [CategoryItems::class, Facets::class], [
+                    'categoryId'    => $this->request->get('page', 1),
                     'page'          => $this->request->get('page', 1),
                     'itemsPerPage'  => $this->request->get('itemsPerPage', 20),
                     'orderBy'       => $this->request->get('orderBy', 'itemName'),
                     'orderByKey'    => $this->request->get('orderByKey', 'ASC'),
                     'facets'        => $this->request->get('facets', [])
                 ]);
-    
+            
             return $this->response->create($response, ResponseCode::OK);
         }
         else
