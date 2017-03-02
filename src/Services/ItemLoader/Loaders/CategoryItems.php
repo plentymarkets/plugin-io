@@ -44,6 +44,12 @@ class CategoryItems implements ItemLoaderContract, ItemLoaderPaginationContract
 		/** @var CategoryFilter $categoryFilter */
 		$categoryFilter = pluginApp(CategoryFilter::class);
 		$categoryFilter->isInCategory($options['categoryId']);
+        
+        return [
+            $clientFilter,
+            $variationFilter,
+            $categoryFilter
+        ];
 	}
 	
 	/**
