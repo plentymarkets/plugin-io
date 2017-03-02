@@ -45,7 +45,7 @@ class CategoryItemResource extends ApiResource
                     'itemsPerPage'  => $this->request->get('itemsPerPage', 20),
                     'orderBy'       => $this->request->get('orderBy', 'itemName'),
                     'orderByKey'    => $this->request->get('orderByKey', 'ASC'),
-                    'facets'        => $this->request->get('facets', [])
+                    'facets'        => $this->request->get('facets', '')
                 ]);
             
             return $this->response->create($response, ResponseCode::OK);
