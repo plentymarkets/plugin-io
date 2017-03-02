@@ -4,24 +4,18 @@ namespace IO\Builder\Facet;
 
 class FacetBuilder
 {
-    public static function buildFacetValues($requestArray)
+    public static function buildFacetValues($facetValueString)
     {
         $facetValues = [];
-        $facetIdentifier = 'f_';
         
-        foreach($requestArray as $key => $value)
+        if(strlen($facetValueString))
         {
-            $filterPos = strpos($key, $facetIdentifier);
-            if($filterPos !== false && $filterPos === 0)
+            $facetValues = explode(',', $facetValueString);
+            if(count($facetValues))
             {
-                $values = explode(',', $value);
-                if(count($values))
+                foreach($facetValues as $k => $v)
                 {
-                    foreach($values as $k => $v)
-                    {
-                        $values[$k] = (int)$v;
-                    }
-                    $facetValues = array_merge($facetValues, $values);
+                    $facetValues[$k] = (int)$v;
                 }
             }
         }

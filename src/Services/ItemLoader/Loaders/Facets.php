@@ -35,9 +35,9 @@ class Facets implements ItemLoaderContract
     {
         $facetValues = [];
         
-        if(array_key_exists('facetValues', $options) && count($options['facetValues']))
+        if(array_key_exists('facets', $options) && count($options['facets']))
         {
-            $facetValues = $options['facetValues'];
+            $facetValues = FacetBuilder::buildFacetValues($options['facets']);
         }
         else
         {
@@ -45,7 +45,7 @@ class Facets implements ItemLoaderContract
              * @var Request $request
              */
             $request = pluginApp(Request::class);
-            $facetValues = FacetBuilder::buildFacetValues($request->all());
+            $facetValues = FacetBuilder::buildFacetValues($request->get('facets', ''));
         }
         
         if(count($facetValues))
