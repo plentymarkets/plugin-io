@@ -93,8 +93,6 @@ class ItemLoaderFactoryES implements ItemLoaderFactory
 			}
 
 			$search->addSource($source);
-
-			$elasticSearchRepo->addSearch($search);
             
             $aggregations = $loader->getAggregations();
             if(count($aggregations))
@@ -105,6 +103,11 @@ class ItemLoaderFactoryES implements ItemLoaderFactory
                 }
             }
 		}
+        
+		if(!is_null($search))
+        {
+            $elasticSearchRepo->addSearch($search);
+        }
         
         $result = $elasticSearchRepo->execute();
         
