@@ -30,6 +30,8 @@ class ItemLoaderFactoryES implements ItemLoaderFactory
 		/** @var VariationElasticSearchSearchRepositoryContract $elasticSearchRepo */
 		$elasticSearchRepo = pluginApp(VariationElasticSearchSearchRepositoryContract::class);
 
+        $search = null;
+        
 		foreach($loaderClassList as $loaderClass)
 		{
 			/** @var ItemLoaderContract $loader */
@@ -37,8 +39,12 @@ class ItemLoaderFactoryES implements ItemLoaderFactory
             
             if($loader instanceof ItemLoaderContract)
             {
-                //search, filter
-                $search = $loader->getSearch();
+                if(!$search instanceof DocumentSearch)
+                {
+                    //search, filter
+                    $search = $loader->getSearch();
+                }
+                
                 foreach($loader->getFilterStack($options) as $filter)
                 {
                     $search->addFilter($filter);
@@ -89,6 +95,15 @@ class ItemLoaderFactoryES implements ItemLoaderFactory
 			$search->addSource($source);
 
 			$elasticSearchRepo->addSearch($search);
+            
+            $aggregations = $loader->getAggregations();
+            if(count($aggregations))
+            {
+                foreach($aggregations as $aggregation)
+                {
+                    $elasticSearchRepo->addSearch($aggregation);
+                }
+            }
 		}
         
         $result = $elasticSearchRepo->execute();

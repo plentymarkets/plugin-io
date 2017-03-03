@@ -9,6 +9,8 @@ use Plenty\Modules\Item\Search\Aggregations\FacetAggregation;
 use Plenty\Modules\Item\Search\Aggregations\FacetAggregationProcessor;
 use Plenty\Modules\Item\Search\Filter\FacetFilter;
 use Plenty\Plugin\Http\Request;
+use Plenty\Modules\Cloud\ElasticSearch\Lib\Processor\DocumentProcessor;
+use Plenty\Modules\Cloud\ElasticSearch\Lib\Search\Document\DocumentSearch;
 
 /**
  * Created by ptopczewski, 06.01.17 14:44
@@ -23,8 +25,21 @@ class Facets implements ItemLoaderContract
      */
     public function getSearch()
     {
+        $documentProcessor = pluginApp(DocumentProcessor::class);
+        return pluginApp(DocumentSearch::class, [$documentProcessor]);
+    }
+    
+    /**
+     * @return array
+     */
+    public function getAggregations()
+    {
         $facetProcessor = pluginApp(FacetAggregationProcessor::class);
-        return pluginApp(FacetAggregation::class, [$facetProcessor]);
+        $facetSearch = pluginApp(FacetAggregation::class, [$facetProcessor]);
+        
+        return [
+            $facetSearch
+        ];
     }
     
     /**

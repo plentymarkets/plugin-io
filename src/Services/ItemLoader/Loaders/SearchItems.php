@@ -29,6 +29,14 @@ class SearchItems implements ItemLoaderContract, ItemLoaderPaginationContract //
     }
     
     /**
+     * @return array
+     */
+    public function getAggregations()
+    {
+        return [];
+    }
+    
+    /**
      * @param array $options
      *
      * @return TypeInterface[]

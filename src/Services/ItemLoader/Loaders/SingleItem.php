@@ -25,6 +25,14 @@ class SingleItem implements ItemLoaderContract
 		$documentProcessor = pluginApp(DocumentProcessor::class);
 		return pluginApp(DocumentSearch::class, [$documentProcessor]);
 	}
+    
+    /**
+     * @return array
+     */
+    public function getAggregations()
+    {
+        return [];
+    }
 	
 	/**
 	 * @param array $options

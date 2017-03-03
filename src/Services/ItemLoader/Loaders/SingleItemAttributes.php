@@ -6,6 +6,8 @@ use Plenty\Modules\Cloud\ElasticSearch\Lib\Query\Type\TypeInterface;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Search\SearchInterface;
 use Plenty\Modules\Item\Search\Aggregations\AttributeValueListAggregation;
 use Plenty\Modules\Item\Search\Aggregations\AttributeValueListAggregationProcessor;
+use Plenty\Modules\Cloud\ElasticSearch\Lib\Processor\DocumentProcessor;
+use Plenty\Modules\Cloud\ElasticSearch\Lib\Search\Document\DocumentSearch;
 
 /**
  * Created by ptopczewski, 06.01.17 14:44
@@ -20,11 +22,24 @@ class SingleItemAttributes implements ItemLoaderContract
 	 */
 	public function getSearch()
 	{
-		$attributeProcessor = pluginApp(AttributeValueListAggregationProcessor::class);
-		return pluginApp(AttributeValueListAggregation::class, [$attributeProcessor]);
+        $documentProcessor = pluginApp(DocumentProcessor::class);
+        return pluginApp(DocumentSearch::class, [$documentProcessor]);
 	}
-
-	/**
+    
+    /**
+     * @return array
+     */
+	public function getAggregations()
+    {
+        $attributeProcessor = pluginApp(AttributeValueListAggregationProcessor::class);
+        $attributeSearch = pluginApp(AttributeValueListAggregation::class, [$attributeProcessor]);
+        
+        return [
+            $attributeSearch
+        ];
+    }
+    
+    /**
 	 * @param array $options
 	 * @return TypeInterface[]
 	 */

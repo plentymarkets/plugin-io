@@ -23,6 +23,14 @@ class BasketItems implements ItemLoaderContract
     }
     
     /**
+     * @return array
+     */
+    public function getAggregations()
+    {
+        return [];
+    }
+    
+    /**
      * @param array $options
      *
      * @return TypeInterface[]
