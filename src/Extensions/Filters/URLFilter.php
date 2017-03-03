@@ -47,26 +47,31 @@ class URLFilter extends AbstractFilter
      */
 	public function buildItemURL(int $itemId = 0, int $variationId = 0, bool $withItemName = false):string
 	{
-		$itemURL = '/' . $itemId;
-
-		if($variationId > 0)
-		{
-			$itemURL .= '/' . $variationId;
-		}
-
-		if($withItemName)
-		{
-			$item           = $this->itemService->getItemURL($itemId);
-			$itemURLContent = $item->itemDescription->urlContent;
-
-            if( $itemURLContent != "" )
+        $itemURL = '';
+        
+        if((int)$itemId > 0)
+        {
+            $itemURL = '/' . $itemId;
+    
+            if($variationId > 0)
             {
-                $e        = explode('/', $itemURLContent);
-                $itemName = $e[count($e) - 1];
-
-                $itemURL = '/' . $itemName . $itemURL;
+                $itemURL .= '/' . $variationId;
             }
-		}
+    
+            if($withItemName)
+            {
+                $item           = $this->itemService->getItemURL($itemId);
+                $itemURLContent = $item->itemDescription->urlContent;
+    
+                if( $itemURLContent != "" )
+                {
+                    $e        = explode('/', $itemURLContent);
+                    $itemName = $e[count($e) - 1];
+    
+                    $itemURL = '/' . $itemName . $itemURL;
+                }
+            }
+        }
 
 		return $itemURL;
 	}
