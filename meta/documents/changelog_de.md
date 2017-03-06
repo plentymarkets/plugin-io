@@ -1,5 +1,13 @@
 # Release Notes für IO
 
+## v1.0.2 (2017-03-06)
+
+### Behoben
+
+- Fehler beim Aufrufen der Kategorieansicht und der Artikel-Einzelansicht behoben.
+- Fehler behoben, bei dem auch Artikel in einer Kategorie auftauchten, die mit dieser nicht verknüpft waren.
+- Fehler behoben, bei welchem Routen von anderen Plugins von der 404-Route von IO überschrieben wurden.
+
 ## v1.0.1 (2017-02-22)
 
 ### Behoben

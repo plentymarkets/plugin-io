@@ -1,5 +1,13 @@
 # Release Notes for IO
 
+## v1.0.2 (2017-03-06)
+
+### Fixed
+
+- Fixed an error when accessing Category layout and Single item layout.
+- Fixed an error with items showing up in a category which they weren‘t linked with.
+- Fixed an error with other plugin routes being overwritten by the 404 route of IO.
+
 ## v1.0.1 (2017-02-22)
 
 ### Fixed
