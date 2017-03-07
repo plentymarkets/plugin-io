@@ -82,7 +82,8 @@ class ItemColumnBuilder
 				                    VariationBaseFields::WIDTH_MM,
 				                    VariationBaseFields::HEIGHT_MM,
 				                    VariationBaseFields::LENGTH_MM,
-				                    VariationBaseFields::UNIT_COMBINATION_ID
+				                    VariationBaseFields::UNIT_COMBINATION_ID,
+									VariationBaseFields::LAST_UPDATE_TIMESTAMP
 			                    ])
 			->withVariationImageList([
 				                         VariationImageFields::IMAGE_ID,
