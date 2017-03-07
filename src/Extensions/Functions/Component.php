@@ -3,6 +3,8 @@
 namespace IO\Extensions\Functions;
 
 use IO\Extensions\AbstractFunction;
+use IO\Helper\ComponentContainer;
+use Plenty\Plugin\Events\Dispatcher;
 
 /**
  * Class Component
@@ -11,15 +13,23 @@ use IO\Extensions\AbstractFunction;
 class Component extends AbstractFunction
 {
     /**
-     * @var int
-     */
-    private $currentComponent = 0;
-
-    /**
      * @var array
      */
     private $components = array();
-
+    /**
+     * @var Dispatcher
+     */
+    private $event;
+    
+    /**
+     * Component constructor
+     */
+    public function __construct(Dispatcher $event)
+    {
+        parent::__construct();
+        $this->event = $event;
+    }
+    
     /**
      * Return the available filter methods
      * @return array
@@ -39,9 +49,16 @@ class Component extends AbstractFunction
      */
     public function component( string $path )
     {
-        if( !in_array( $path, $this->components ) )
+        if( !array_key_exists( $path, $this->components ) )
         {
-            array_push( $this->components, $path );
+            /** @var ComponentContainer $componentContainer */
+            $componentContainer = pluginApp(ComponentContainer::class, ['originComponentTemplate' => $path]);
+            
+            $this->event->fire('IO.Component.Import', [
+               $componentContainer
+            ]);
+            
+            $this->components[$path] = empty($componentContainer->getNewComponentTemplate()) ? $componentContainer->getOriginComponentTemplate() : $componentContainer->getNewComponentTemplate();
         }
     }
 
@@ -51,7 +68,7 @@ class Component extends AbstractFunction
      */
     public function hasComponentTemplate():bool
     {
-        return $this->currentComponent < count( $this->components );
+        return !empty($this->components);
     }
 
     /**
@@ -60,9 +77,7 @@ class Component extends AbstractFunction
      */
     public function getComponentTemplate():string
     {
-        $template = $this->components[$this->currentComponent];
-        $this->currentComponent++;
-        return $template;
+        return array_shift($this->components);
     }
 
 }
