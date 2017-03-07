@@ -32,7 +32,8 @@ class TemplateResource extends ApiResource
      */
     public function index():Response
     {
-        $template         = $this->request->get('template', '');
+        $template = $this->request->get('template', '');
+        $params = $this->request->get('params', []);
         $renderedTemplate = '';
         
         if (strlen($template)) {
@@ -40,7 +41,7 @@ class TemplateResource extends ApiResource
              * @var Twig $twig
              */
             $twig             = pluginApp(Twig::class);
-            $renderedTemplate = $twig->render($template);
+            $renderedTemplate = $twig->render($template, $params);
         }
         
         return $this->response->create($renderedTemplate, ResponseCode::OK);
