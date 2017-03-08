@@ -134,7 +134,7 @@ class OrderService
      * @param int $contactId
      * @return LocalizedOrder
      */
-    public function getLatestOrderForContact( int $contactId ):LocalizedOrder
+    public function getLatestOrderForContact( int $contactId )
     {
         if($contactId > 0)
         {
