@@ -385,7 +385,7 @@ class CustomerService
      * Get the last order created by the current contact
      * @return LocalizedOrder
      */
-	public function getLatestOrder():LocalizedOrder
+	public function getLatestOrder()
 	{
         return pluginApp(OrderService::class)->getLatestOrderForContact(
             $this->getContactId()
