@@ -145,7 +145,12 @@ class OrderService
             $order = $this->orderRepository->findOrderById($this->sessionStorage->getSessionValue(SessionStorageKeys::LATEST_ORDER_ID));
         }
         
-        return LocalizedOrder::wrap( $order, "de" );
+        if(!is_null($order))
+        {
+            return LocalizedOrder::wrap( $order, "de" );
+        }
+        
+        return null;
     }
     
     /**
