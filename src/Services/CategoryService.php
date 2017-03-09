@@ -81,6 +81,11 @@ class CategoryService
 			$cat                                    = $this->categoryRepository->get($cat->parentCategoryId);
 		}
 	}
+	
+	public function getCurrentCategory()
+    {
+        return $this->currentCategory;
+    }
 
 	/**
 	 * Get a category by ID
