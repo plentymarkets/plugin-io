@@ -70,6 +70,8 @@ class NumberFormatFilter extends AbstractFilter
 	{
         if(!is_null($value) && !is_null($currencyISO) && strlen($currencyISO))
         {
+            $value = trim(preg_replace('/\s\s+/', '', $value));
+
             $locale            = 'de_DE';
             $useCurrencySymbol = true;
 
