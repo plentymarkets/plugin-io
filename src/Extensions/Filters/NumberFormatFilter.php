@@ -34,9 +34,20 @@ class NumberFormatFilter extends AbstractFilter
 	{
 		return [
 			"formatDecimal"  => "formatDecimal",
-			"formatMonetary" => "formatMonetary"
+			"formatMonetary" => "formatMonetary",
+            "trimNewlines"   => "trimNewlines"
 		];
 	}
+
+    /**
+     * Trim newlines from string
+     * @param string $value
+     * @return string
+     */
+    public function trimNewlines($value):string
+    {
+        return preg_replace('/\s+/', '', $value);
+    }
 
     /**
      * Format the given value to decimal
@@ -70,7 +81,7 @@ class NumberFormatFilter extends AbstractFilter
 	{
         if(!is_null($value) && !is_null($currencyISO) && strlen($currencyISO))
         {
-            $value = trim(preg_replace('/\s\s+/', '', $value));
+            $value = $this->trimNewlines($value);
 
             $locale            = 'de_DE';
             $useCurrencySymbol = true;
