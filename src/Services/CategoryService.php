@@ -81,7 +81,10 @@ class CategoryService
 			$cat                                    = $this->categoryRepository->get($cat->parentCategoryId);
 		}
 	}
-	
+    
+    /**
+     * @return Category
+     */
 	public function getCurrentCategory()
     {
         return $this->currentCategory;
@@ -98,6 +101,16 @@ class CategoryService
 		return $this->categoryRepository->get($catID, $lang);
 	}
 
+	public function getChildren($categoryId, $lang = "de")
+    {
+        if($categoryId > 0)
+        {
+            return $this->categoryRepository->getChildren($categoryId, $lang);
+        }
+        
+        return null;
+    }
+	
 	/**
 	 * Return the URL for a given category ID.
 	 * @param Category $category the category to get the URL for
