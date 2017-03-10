@@ -125,7 +125,7 @@ class CheckoutService
      */
 	public function getMethodOfPaymentId():int
 	{
-		$methodOfPaymentID = (int)$this->sessionStorage->getPlugin()->getValue( 'MethodOfPaymentID' );
+		$methodOfPaymentID = (int)$this->checkout->getPaymentMethodId();
         if( $methodOfPaymentID === null )
         {
             $methodOfPaymentList = $this->getMethodOfPaymentList();
