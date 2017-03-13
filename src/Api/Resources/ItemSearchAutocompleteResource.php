@@ -32,7 +32,7 @@ class ItemSearchAutocompleteResource extends ApiResource
      */
     public function index():Response
     {
-        $searchString = $this->request->get('searchString', '');
+        $searchString = $this->request->get('query', '');
         
         if(strlen($searchString))
         {
@@ -40,10 +40,10 @@ class ItemSearchAutocompleteResource extends ApiResource
             
             $response = pluginApp(ItemLoaderService::class)
                 ->loadForTemplate($template, [SearchItems::class], [
-                    'searchString'  => $searchString,
+                    'query'  => $searchString,
                     'autocomplete'  => true,
                     'page'          => 1,
-                    'itemsPerPage'  => 20
+                    'items'  => 20
                 ]);
             
             return $this->response->create($response, ResponseCode::OK);

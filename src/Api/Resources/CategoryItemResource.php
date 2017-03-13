@@ -42,9 +42,8 @@ class CategoryItemResource extends ApiResource
                 ->loadForTemplate($template, [CategoryItems::class, Facets::class], [
                     'categoryId'    => $this->request->get('categoryId', 1),
                     'page'          => $this->request->get('page', 1),
-                    'itemsPerPage'  => $this->request->get('itemsPerPage', 20),
-                    'orderBy'       => $this->request->get('orderBy', 'itemName'),
-                    'orderByKey'    => $this->request->get('orderByKey', 'ASC'),
+                    'items'  => $this->request->get('items', 20),
+                    'sorting'       => $this->request->get('sorting', ''),
                     'facets'        => $this->request->get('facets', '')
                 ]);
             
