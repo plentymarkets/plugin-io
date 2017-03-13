@@ -25,7 +25,7 @@ class TemplateResource extends ApiResource
     {
         parent::__construct($request, $response);
     }
-    
+
     /**
      * Return the given rendered template
      * @return Response
@@ -35,7 +35,16 @@ class TemplateResource extends ApiResource
         $template = $this->request->get('template', '');
         $params = $this->request->get('params', []);
         $renderedTemplate = '';
-        
+
+        foreach($params as $key => $value)
+        {
+            $decoded = json_decode($value);
+            if($decoded !== false)
+            {
+                $params[$key] = $decoded;
+            }
+        }
+
         if (strlen($template)) {
             /**
              * @var Twig $twig
@@ -43,7 +52,7 @@ class TemplateResource extends ApiResource
             $twig             = pluginApp(Twig::class);
             $renderedTemplate = $twig->render($template, $params);
         }
-        
+
         return $this->response->create($renderedTemplate, ResponseCode::OK);
     }
     
