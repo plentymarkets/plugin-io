@@ -14,12 +14,23 @@ class PatternFilter extends AbstractFilter
      * Return the available filter methods
      * @return array
      */
-	public function getFilters():array
-	{
-		return [
-			"find" => "findPattern"
-		];
-	}
+    public function getFilters(): array
+    {
+        return [
+            "find"              => "findPattern",
+            "getObjectValue"    => "getObjectValue"
+        ];
+    }
+
+    public function getObjectValue($object, $key)
+    {
+        if(is_array($object))
+        {
+            return $object[$key];
+        }
+
+        return $object->$key;
+    }
 
     /**
      * Find matches in input with given regex
@@ -27,10 +38,10 @@ class PatternFilter extends AbstractFilter
      * @param string $regex
      * @return array
      */
-	public function findPattern(string $input, string $regex):array
-	{
-		$matches = [];
-		preg_match_all("/(" . $regex . ")/", $input, $matches);
-		return $matches[0];
-	}
+    public function findPattern(string $input, string $regex):array
+    {
+        $matches = [];
+        preg_match_all("/(" . $regex . ")/", $input, $matches);
+        return $matches[0];
+    }
 }
