@@ -22,14 +22,13 @@ class PatternFilter extends AbstractFilter
         ];
     }
 
-    public function getObjectValue($object, $key)
+    public function getObjectValue($object, $key):string
     {
-        if(is_array($object))
-        {
-            return $object[$key];
-        }
+        $jsonObject = json_encode($object);
 
-        return $object->$key;
+        $jsonDecodedObject = json_decode($jsonObject, true);
+
+        return (string)$jsonDecodedObject[$key];
     }
 
     /**
