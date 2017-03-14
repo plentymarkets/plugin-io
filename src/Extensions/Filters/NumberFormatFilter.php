@@ -47,7 +47,7 @@ class NumberFormatFilter extends AbstractFilter
      */
     public function formatDateTime($value):string
     {
-        if(strpos($value, '+') === false)
+        if(strpos($value, '+') === false && !is_Object($value))
         {
             $value = str_replace(' ', '+', $value);
         }
