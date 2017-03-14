@@ -35,9 +35,25 @@ class NumberFormatFilter extends AbstractFilter
 		return [
 			"formatDecimal"  => "formatDecimal",
 			"formatMonetary" => "formatMonetary",
-            "trimNewlines"   => "trimNewlines"
+            "trimNewlines"   => "trimNewlines",
+            "formatDateTime" => "formatDateTime"
 		];
 	}
+
+    /**
+     * Format incorrect JSON ENCODED dateTimeFormat
+     * @param $value
+     * @return string
+     */
+    public function formatDateTime($value):string
+    {
+        if(strpos($value, '+') === false)
+        {
+            $value = str_replace(' ', '+', $value);
+        }
+
+        return $value;
+    }
 
     /**
      * Trim newlines from string
