@@ -47,6 +47,7 @@ class IORouteServiceProvider extends RouteServiceProvider
 			$api->resource('io/coupon', 'CouponResource');
             $api->resource('io/guest', 'GuestResource');
             $api->resource('io/category', 'CategoryItemResource');
+            $api->resource('io/template', 'TemplateResource');
 		});
 
 		$enabledRoutes = explode(", ",  $config->get("IO.routing.enabled_routes") );
