@@ -69,11 +69,11 @@ class SearchItems implements ItemLoaderContract, ItemLoaderPaginationContract, I
             $searchType = ElasticSearch::SEARCH_TYPE_FUZZY;
             if(array_key_exists('autocomplete', $options) && $options['autocomplete'] === true)
             {
-                $searchFilter->setNamesString($options['searchString'], $lang);
+                $searchFilter->setNamesString($options['query'], $lang);
             }
             else
             {
-                $searchFilter->setSearchString($options['searchString'], $lang, $searchType);
+                $searchFilter->setSearchString($options['query'], $lang, $searchType);
             }
         }
         
