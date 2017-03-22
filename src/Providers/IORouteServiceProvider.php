@@ -151,12 +151,16 @@ class IORouteServiceProvider extends RouteServiceProvider
             $router->get('{itemName}/{itemId}/{variationId?}', 'IO\Controllers\ItemController@showItem')
                    ->where('itemId', '[0-9]+')
                    ->where('variationId', '[0-9]+');
-
+    
+            //old webshop routes mapping
+            $router->get('{slug}a-{itemId}', 'IO\Controllers\ItemController@showItemOld')
+                   ->where('slug', '.*')
+                   ->where('itemId', '[0-9]+');
+            
             $router->get('a-{itemId}', 'IO\Controllers\ItemController@showItemFromAdmin')
                    ->where('itemId', '[0-9]+');
         }
-
-
+        
 		/*
 		 * CATEGORY ROUTES
 		 */

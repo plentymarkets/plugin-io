@@ -62,7 +62,7 @@ class ItemController extends ItemLoaderController
 		else
 		{
 			$templateContainer->setTemplateData(
-				array_merge(['item' => $itemResult], $templateContainer->getTemplateData())
+				array_merge(['item' => $itemResult], $templateContainer->getTemplateData(), ['http_host' => $_SERVER['HTTP_HOST']])
 			);
 
 			return $this->renderTemplateContainer($templateContainer);
@@ -87,4 +87,14 @@ class ItemController extends ItemLoaderController
 	{
 		return $this->showItem("", $itemId, 0);
 	}
+    
+    public function showItemOld($name = null, $itemId = null)
+    {
+        if(is_null($itemId))
+        {
+            $itemId = $name;
+        }
+        
+        return $this->showItem("", (int)$itemId, 0);
+    }
 }
