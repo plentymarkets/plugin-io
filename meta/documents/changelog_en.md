@@ -1,5 +1,19 @@
 # Release Notes for IO
 
+## v1.0.3 (2017-03-23)
+
+### Added
+
+- Filter functionality via facets
+- Rendered Twig templates can now be retrieved via REST
+- New Twig functions: `trimNewLines` and `formatDateTime` 
+- New method in the **CategoryService**: `getChildren()`
+to get all subcategories
+
+### Changed
+
+- Routing was updated and extended: Old store URLs can now be processed and displayed in **Ceres**. The URL structure was optimised from `/{itemName}/{itemId}/{variationId}` to `/{category}/{subcategory}/.../{itemName}-{itemId}-{variationId}` 
+
 ## v1.0.2 (2017-03-06)
 
 ### Fixed

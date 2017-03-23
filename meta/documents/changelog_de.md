@@ -1,5 +1,19 @@
 # Release Notes für IO
 
+## v1.0.3 (2017-03-23)
+
+### Hinzugefügt
+
+- Filtermöglichkeit über Facetten
+- Abruf von gerenderten Twig-Templates über REST
+- Neue Twig-Funktionen: `trimNewLines` und `formatDateTime` 
+- Neue Funktion im **CategoryService**: `getChildren()`
+um Unterkategorien zu erhalten
+
+### Geändert
+
+- Aktualisierung und Erweiterung des Routings: Alte Shop-URLs können verarbeitet und in **Ceres** angezeigt werden. Die URL-Struktur wurde zudem optimiert von `/{itemName}/{itemId}/{variationId}` zu `/{category}/{subcategory}/.../{itemName}-{itemId}-{variationId}` 
+
 ## v1.0.2 (2017-03-06)
 
 ### Behoben
