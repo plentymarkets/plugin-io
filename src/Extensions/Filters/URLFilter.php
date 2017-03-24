@@ -54,6 +54,7 @@ class URLFilter extends AbstractFilter
         
         if((int)$itemId > 0)
         {
+            $itemURL .= '/';
             if(strlen($urlContent))
             {
                 $itemURL .= $urlContent.'_'.$itemId;
