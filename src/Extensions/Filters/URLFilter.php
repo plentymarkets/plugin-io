@@ -33,8 +33,7 @@ class URLFilter extends AbstractFilter
 	public function getFilters():array
 	{
 		return [
-			"buildItemURL" => "buildItemURL",
-            "buildVariationURL" => "buildVariationURL"
+			"itemURL" => "buildItemURL",
 		];
 	}
 
@@ -45,35 +44,32 @@ class URLFilter extends AbstractFilter
      * @param bool $withItemName
      * @return string
      */
-	public function buildItemURL(int $itemId = 0, int $variationId = 0, bool $withItemName = false):string
+	public function buildItemURL(array $itemData):string
 	{
         $itemURL = '';
         
+        $itemId = $itemData['item']['id'];
+        $variationId = $itemData['variation']['id'];
+        $urlContent = $itemData['texts'][0]['urlPath'];
+        
         if((int)$itemId > 0)
         {
-            $itemURL = '/' . $itemId;
-    
+            if(strlen($urlContent))
+            {
+                $itemURL .= $urlContent.'_'.$itemId;
+            }
+            else
+            {
+                $itemURL .= $itemId;
+            }
+            
             if($variationId > 0)
             {
-                $itemURL .= '/' . $variationId;
-            }
-    
-            if($withItemName)
-            {
-                $item           = $this->itemService->getItemURL($itemId);
-                $itemURLContent = $item->itemDescription->urlContent;
-    
-                if( $itemURLContent != "" )
-                {
-                    $e        = explode('/', $itemURLContent);
-                    $itemName = $e[count($e) - 1];
-    
-                    $itemURL = '/' . $itemName . $itemURL;
-                }
+                $itemURL .= '_' . $variationId;
             }
         }
-
-		return $itemURL;
+        
+        return $itemURL;
 	}
 
 	public function buildVariationURL($variationId = 0, bool $withItemName = false):string
