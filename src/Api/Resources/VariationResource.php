@@ -21,7 +21,6 @@ class VariationResource extends ApiResource
      * VariationResource constructor.
      * @param Request $request
      * @param ApiResponse $response
-     * @param ItemService $itemService
      */
     public function __construct(
         Request $request,
