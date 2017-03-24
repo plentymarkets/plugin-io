@@ -138,20 +138,21 @@ class IORouteServiceProvider extends RouteServiceProvider
             //terms and conditions page
             $router->get('gtc', 'IO\Controllers\StaticPagesController@showTermsAndConditions');
         }
-
+        
 		/*
 		 * ITEM ROUTES
 		 */
-		if ( in_array("item", $enabledRoutes) || in_array("all", $enabledRoutes) )
+        if ( in_array("item", $enabledRoutes) || in_array("all", $enabledRoutes) )
         {
-            $router->get('{itemId}/{variationId?}', 'IO\Controllers\ItemController@showItemWithoutName')
+            $router->get('{itemId}_{variationId?}', 'IO\Controllers\ItemController@showItemWithoutName')
                    ->where('itemId', '[0-9]+')
                    ->where('variationId', '[0-9]+');
-
-            $router->get('{itemName}/{itemId}/{variationId?}', 'IO\Controllers\ItemController@showItem')
+            
+            $router->get('{slug}_{itemId}_{variationId?}', 'IO\Controllers\ItemController@showItem')
+                   ->where('slug', '[^_]+')
                    ->where('itemId', '[0-9]+')
                    ->where('variationId', '[0-9]+');
-    
+            
             //old webshop routes mapping
             $router->get('{slug}a-{itemId}', 'IO\Controllers\ItemController@showItemOld')
                    ->where('slug', '.*')
@@ -161,10 +162,10 @@ class IORouteServiceProvider extends RouteServiceProvider
                    ->where('itemId', '[0-9]+');
         }
         
-		/*
+        /*
 		 * CATEGORY ROUTES
 		 */
-		if ( in_array("category", $enabledRoutes) || in_array("all", $enabledRoutes) )
+        if ( in_array("category", $enabledRoutes) || in_array("all", $enabledRoutes) )
         {
             $router->get('{level1?}/{level2?}/{level3?}/{level4?}/{level5?}/{level6?}', 'IO\Controllers\CategoryController@showCategory');
         }

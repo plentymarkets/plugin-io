@@ -16,13 +16,13 @@ class ItemController extends ItemLoaderController
 
     /**
      * Prepare and render the item data.
-     * @param string $itemName
+     * @param string $slug
      * @param int $itemId The itemId read from current request url. Will be null if item url does not contain a slug.
      * @param int $variationId
      * @return string
      */
 	public function showItem(
-		string $itemName = "",
+		string $slug = "",
 		int $itemId = 0,
 		int $variationId = 0
 	):string
