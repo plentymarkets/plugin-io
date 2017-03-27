@@ -1,5 +1,11 @@
 # Release Notes for IO
 
+## v.1.0.4
+
+### Fixed
+
+- An error that occurred when opening the order confirmation page has been fixed
+
 ## v1.0.3 (2017-03-24)
 
 ### Added

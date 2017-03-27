@@ -34,6 +34,7 @@ class URLFilter extends AbstractFilter
 	{
 		return [
 			"itemURL" => "buildItemURL",
+            "variationURL" => "buildVariationURL"
 		];
 	}
 
@@ -72,4 +73,11 @@ class URLFilter extends AbstractFilter
         
         return $itemURL;
 	}
+    
+    public function buildVariationURL($variationId = 0, bool $withItemName = false):string
+    {
+        $variation = $this->itemService->getVariation( $variationId );
+        return $this->buildItemURL( $variation['documents'][0]['data'] );
+    }
+    
 }

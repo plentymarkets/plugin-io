@@ -1,5 +1,11 @@
 # Release Notes für IO
 
+## v1.0.4 (2017-03-27)
+
+### Behoben
+
+- Fehler beim Aufruf der Auftragsbestätigungsseite
+
 ## v1.0.3 (2017-03-24)
 
 ### Hinzugefügt
