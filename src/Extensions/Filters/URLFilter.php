@@ -45,7 +45,7 @@ class URLFilter extends AbstractFilter
      * @param bool $withItemName
      * @return string
      */
-	public function buildItemURL(array $itemData):string
+	public function buildItemURL(array $itemData, $withVariationId = true):string
 	{
         $itemURL = '';
         
@@ -65,7 +65,7 @@ class URLFilter extends AbstractFilter
                 $itemURL .= $itemId;
             }
             
-            if($variationId > 0)
+            if($withVariationId && $variationId > 0)
             {
                 $itemURL .= '_' . $variationId;
             }
