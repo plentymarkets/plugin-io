@@ -370,14 +370,16 @@ class CustomerService
      * Get a list of orders for the current contact
      * @param int $page
      * @param int $items
+     * @param array $filters
      * @return array|\Plenty\Repositories\Models\PaginatedResult
      */
-	public function getOrders(int $page = 1, int $items = 10)
+	public function getOrders(int $page = 1, int $items = 10, array $filters = [])
 	{
 		return pluginApp(OrderService::class)->getOrdersForContact(
 		    $this->getContactId(),
             $page,
-            $items
+            $items,
+            $filters
         );
 	}
 
