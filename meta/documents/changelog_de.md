@@ -1,10 +1,11 @@
 # Release Notes für IO
 
-## v1.0.5 (2017-04-12)
+## v1.1.0 (2017-04-12)
 
 ### Hinzugefügt
 
-- TemplateService: isCategoryView Methode um zu überprüfen, ob die aktuelle Seite die Kategorie-Seite ist.
+- TemplateService: `isCategoryView` Methode um zu überprüfen, ob die aktuelle Seite die Kategorie-Seite ist.
+- Support für neue Kategorie-Logik in Ceres.
 
 ## v1.0.4 (2017-03-27)
 
