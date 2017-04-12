@@ -1,5 +1,12 @@
 # Release Notes for IO
 
+## v1.0.5 (2017-04-12)
+
+### Added
+
+- TemplateService: isCategoryView method added to check if current page is category page.
+
+
 ## v.1.0.4
 
 ### Fixed
