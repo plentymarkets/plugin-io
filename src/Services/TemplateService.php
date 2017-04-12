@@ -44,4 +44,9 @@ class TemplateService
     {
         return TemplateService::$currentTemplate == "tpl.search";
     }
+
+    public function isCategory():bool
+    {
+        return TemplateService::$currentTemplate == "tpl.category.item";
+    }
 }
