@@ -6,6 +6,7 @@ use Plenty\Modules\Category\Models\Category;
 use Plenty\Modules\Category\Contracts\CategoryRepositoryContract;
 use Plenty\Repositories\Models\PaginatedResult;
 
+use IO\Services\SessionStorageService;
 use IO\Services\WebstoreConfigurationService;
 use IO\Services\ItemService;
 use IO\Helper\CategoryMap;
@@ -28,6 +29,11 @@ class CategoryService
 	 */
 	private $webstoreConfig;
 
+    /**
+     * @var SessionStorageService
+     */
+    private $sessionStorageService;
+
 	// is set from controllers
 	/**
 	 * @var Category
@@ -42,10 +48,11 @@ class CategoryService
      * CategoryService constructor.
      * @param CategoryRepositoryContract $category
      */
-	 public function __construct(CategoryRepositoryContract $categoryRepository, WebstoreConfigurationService $webstoreConfig)
+	 public function __construct(CategoryRepositoryContract $categoryRepository, WebstoreConfigurationService $webstoreConfig, SessionStorageService $sessionStorageService)
 	{
 		$this->categoryRepository    = $categoryRepository;
 		$this->webstoreConfig 		 = $webstoreConfig;
+        $this->sessionStorageService = $sessionStorageService;
 	}
 
 	/**
@@ -55,7 +62,7 @@ class CategoryService
 	public function setCurrentCategoryID(int $catID = 0)
 	{
 		$this->setCurrentCategory(
-			$this->categoryRepository->get($catID)
+			$this->categoryRepository->get($catID, $this->sessionStorageService->getLang())
 		);
 	}
 
@@ -78,7 +85,7 @@ class CategoryService
 		while($cat !== null)
 		{
 			$this->currentCategoryTree[$cat->level] = $cat;
-			$cat                                    = $this->categoryRepository->get($cat->parentCategoryId);
+			$cat                                    = $this->categoryRepository->get($cat->parentCategoryId, $this->sessionStorageService->getLang());
 		}
 	}
     
