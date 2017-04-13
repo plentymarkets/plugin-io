@@ -51,7 +51,7 @@ class URLFilter extends AbstractFilter
         
         $itemId = $itemData['item']['id'];
         $variationId = $itemData['variation']['id'];
-        $urlContent = $itemData['texts'][0]['urlPath'];
+        $urlContent = $itemData['texts']['urlPath'];
         
         if((int)$itemId > 0)
         {
