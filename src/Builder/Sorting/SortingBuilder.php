@@ -2,6 +2,9 @@
 
 namespace IO\Builder\Sorting;
 
+use Plenty\Modules\Cloud\ElasticSearch\Lib\Sorting\SortingInterface;
+use Plenty\Modules\Cloud\ElasticSearch\Lib\Sorting\SingleSorting;
+
 class SortingBuilder
 {
     public static function buildSorting($sortingString)
