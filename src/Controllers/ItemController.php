@@ -2,6 +2,7 @@
 namespace IO\Controllers;
 
 use IO\Helper\CategoryKey;
+use IO\Services\ItemLastSeenService;
 use IO\Services\ItemLoader\Loaders\SingleItem;
 use IO\Services\ItemLoader\Loaders\SingleItemAttributes;
 use IO\Services\ItemLoader\Services\ItemLoaderService;
@@ -61,6 +62,12 @@ class ItemController extends ItemLoaderController
 		}
 		else
 		{
+            /**
+             * @var ItemLastSeenService $itemLastSeenService
+             */
+		    $itemLastSeenService = pluginApp(ItemLastSeenService::class);
+		    $itemLastSeenService->setLastSeenItem($itemResult['documents'][0]['data']['variation']['id']);
+		    
 			$templateContainer->setTemplateData(
 				array_merge(['item' => $itemResult], $templateContainer->getTemplateData(), ['http_host' => $_SERVER['HTTP_HOST']])
 			);
