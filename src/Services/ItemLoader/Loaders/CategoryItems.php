@@ -18,7 +18,6 @@ use Plenty\Modules\Item\Search\Filter\ClientFilter;
 use Plenty\Modules\Item\Search\Filter\VariationBaseFilter;
 use Plenty\Plugin\Application;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Sorting\SortingInterface;
-use Plenty\Modules\Cloud\ElasticSearch\Lib\Sorting\SingleSorting;
 
 /**
  * Created by ptopczewski, 09.01.17 11:15
@@ -97,8 +96,7 @@ class CategoryItems implements ItemLoaderContract, ItemLoaderPaginationContract,
         
         if(isset($options['sorting']) && strlen($options['sorting']))
         {
-            $sorting = SortingBuilder::buildSorting($options['sorting']);
-            $sortingInterface = pluginApp(SingleSorting::class, [$sorting['path'], $sorting['order']]);
+            $sortingInterface = SortingBuilder::buildSorting($options['sorting']);
         }
        
         return $sortingInterface;

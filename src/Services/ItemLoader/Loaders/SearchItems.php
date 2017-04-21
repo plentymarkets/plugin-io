@@ -113,10 +113,11 @@ class SearchItems implements ItemLoaderContract, ItemLoaderPaginationContract, I
         
         if(isset($options['sorting']) && strlen($options['sorting']))
         {
-            $sorting = SortingBuilder::buildSorting($options['sorting']);
-            $sortingInterface = pluginApp(MultipleSorting::class);
-            $sortingInterface->add($sorting['path'], $sorting['order']);
-            $sortingInterface->add('_score', $sorting['order']);
+            $sortingInterface = SortingBuilder::buildSorting($options['sorting']);
+            if($sortingInterface instanceof MultipleSorting)
+            {
+                $sortingInterface->add('_score', 'ASC');
+            }
         }
         
         return $sortingInterface;
