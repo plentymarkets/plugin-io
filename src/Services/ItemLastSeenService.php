@@ -7,20 +7,28 @@ use IO\Services\SessionStorageService;
 
 class ItemLastSeenService
 {
-    const MAX_LENGTH = 10;
+    const MAX_COUNT = 9;
+    private $sessionStorage;
     
-    public function __construct()
+    public function __construct(SessionStorageService $sessionStorage)
     {
+        $this->sessionStorage = $sessionStorage;
+    }
     
+    public function setLastSeenMaxCount(int $maxCount)
+    {
+        $this->sessionStorage->setSessionValue(SessionStorageKeys::LAST_SEEN_MAX_COUNT, $maxCount);
     }
     
     public function setLastSeenItem(int $variationId)
     {
-        /**
-         * @var SessionStorageService $sessionStorage
-         */
-        $sessionStorage = pluginApp(SessionStorageService::class);
-        $lastSeenItems = $sessionStorage->getSessionValue(SessionStorageKeys::LAST_SEEN_ITEMS);
+        $maxCount = $this->sessionStorage->getSessionValue(SessionStorageKeys::LAST_SEEN_MAX_COUNT);
+        if(is_null($maxCount))
+        {
+            $maxCount = self::MAX_COUNT;
+        }
+        
+        $lastSeenItems = $this->sessionStorage->getSessionValue(SessionStorageKeys::LAST_SEEN_ITEMS);
     
         if(is_null($lastSeenItems))
         {
@@ -29,13 +37,13 @@ class ItemLastSeenService
         
         if(!in_array($variationId, $lastSeenItems))
         {
-            if(count($lastSeenItems) >= self::MAX_LENGTH)
+            if(count($lastSeenItems) >= $maxCount)
             {
                 array_pop($lastSeenItems);
             }
             
             array_unshift($lastSeenItems, $variationId);
-            $sessionStorage->setSessionValue(SessionStorageKeys::LAST_SEEN_ITEMS, $lastSeenItems);
+            $this->sessionStorage->setSessionValue(SessionStorageKeys::LAST_SEEN_ITEMS, $lastSeenItems);
         }
     }
 }

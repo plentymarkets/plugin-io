@@ -15,4 +15,5 @@ class SessionStorageKeys
     const LATEST_ORDER_ID     = "latestOrderId";
     const GUEST_EMAIL         = "guestEmail";
     const LAST_SEEN_ITEMS     = "lastSeenItems";
+    const LAST_SEEN_MAX_COUNT = "lastSeenMaxCount";
 }
