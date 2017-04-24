@@ -46,13 +46,7 @@ class OrderItemBuilder
 			{
 				if($basketItem->variationId == $item['variationId'])
 				{
-					foreach($item['variation']['data']['texts'] as $itemText)
-					{
-						if($itemText['lang'] == $currentLanguage)
-						{
-							$basketItemName = $itemText['name1'];
-						}
-					}
+                    $basketItemName = $item['variation']['data']['texts']['name1'];
 				}
 			}
 
