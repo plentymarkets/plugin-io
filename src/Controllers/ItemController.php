@@ -62,12 +62,22 @@ class ItemController extends ItemLoaderController
 		}
 		else
 		{
-            /**
-             * @var ItemLastSeenService $itemLastSeenService
-             */
-		    $itemLastSeenService = pluginApp(ItemLastSeenService::class);
-		    $itemLastSeenService->setLastSeenItem($itemResult['documents'][0]['data']['variation']['id']);
+		    $resultVariationId = $itemResult['documents'][0]['data']['variation']['id'];
 		    
+		    if((int)$resultVariationId <= 0)
+            {
+                $resultVariationId = $variationId;
+            }
+            
+            if((int)$resultVariationId > 0)
+            {
+                /**
+                 * @var ItemLastSeenService $itemLastSeenService
+                 */
+                $itemLastSeenService = pluginApp(ItemLastSeenService::class);
+                $itemLastSeenService->setLastSeenItem($itemResult['documents'][0]['data']['variation']['id']);
+            }
+            
 			$templateContainer->setTemplateData(
 				array_merge(['item' => $itemResult], $templateContainer->getTemplateData(), ['http_host' => $_SERVER['HTTP_HOST']])
 			);
