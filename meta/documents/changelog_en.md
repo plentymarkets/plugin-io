@@ -1,5 +1,16 @@
 # Release Notes for IO
 
+## v1.1.1 (2017-04-24)
+
+### Added
+
+- Logic for the item list of last seen items
+
+### Fixed
+
+- Grouping of variations in the category item list and on the search result page
+- Sorting by item name in the category item list and on the search result page
+
 ## v1.1.0 (2017-04-12)
 
 ### Added

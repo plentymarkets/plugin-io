@@ -4,7 +4,7 @@
 
 ### Hinzugefügt
 
-- Zuletzt angesehene Artikel
+- Logik für die Artikelliste der zuletzt gesehenen Artikel
 
 ### Behoben
 
