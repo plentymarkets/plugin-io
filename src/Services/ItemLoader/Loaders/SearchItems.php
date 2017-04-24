@@ -64,6 +64,15 @@ class SearchItems implements ItemLoaderContract, ItemLoaderPaginationContract, I
         $variationFilter = pluginApp(VariationBaseFilter::class);
         $variationFilter->isActive();
     
+        if(isset($options['variationShowType']) && $options['variationShowType'] == 'main')
+        {
+            $variationFilter->isMain();
+        }
+        elseif(isset($options['variationShowType']) && $options['variationShowType'] == 'child')
+        {
+            $variationFilter->isChild();
+        }
+    
         /**
          * @var SearchFilter $searchFilter
          */
