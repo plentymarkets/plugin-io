@@ -1,5 +1,16 @@
 # Release Notes für IO
 
+## v1.1.1 (2017-04-24)
+
+### Hinzugefügt
+
+- Zuletzt angesehene Artikel
+
+### Behoben
+
+- Variantengruppierung in der Kategorieübersicht und Suchergebnisseite
+- Sortierung nach Artikelnamen in der Kategorieübersicht und auf der Suchergebnisseite
+
 ## v1.1.0 (2017-04-12)
 
 ### Hinzugefügt
