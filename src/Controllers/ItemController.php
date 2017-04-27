@@ -66,7 +66,7 @@ class ItemController extends ItemLoaderController
 		}
 		else
         {
-		    $this->setCategory($itemResult['documents'][0]['data']['defaultCategories'], $itemResult['documents'][0]['data']['variation']['name']);
+		    $this->setCategory($itemResult['documents'][0]['data']['defaultCategories'], $itemResult['documents'][0]['data']['texts']['name1']);
 		    
 		    $resultVariationId = $itemResult['documents'][0]['data']['variation']['id'];
 		    
