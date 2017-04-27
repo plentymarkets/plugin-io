@@ -66,7 +66,13 @@ class ItemController extends ItemLoaderController
 		}
 		else
         {
-		    $this->setCategory($itemResult['documents'][0]['data']['defaultCategories'], $itemResult['documents'][0]['data']['texts']['name1']);
+            $itemNames = [
+                $itemResult['documents'][0]['data']['texts']['name1'],
+                $itemResult['documents'][0]['data']['texts']['name2'],
+                $itemResult['documents'][0]['data']['texts']['name3']
+            ];
+            
+		    $this->setCategory($itemResult['documents'][0]['data']['defaultCategories'], $itemNames);
 		    
 		    $resultVariationId = $itemResult['documents'][0]['data']['variation']['id'];
 		    
@@ -121,7 +127,7 @@ class ItemController extends ItemLoaderController
         return $this->showItem("", (int)$itemId, 0);
     }
     
-    private function setCategory($defaultCategories, $itemName)
+    private function setCategory($defaultCategories, $itemNames)
     {
         if(count($defaultCategories))
         {
@@ -146,7 +152,7 @@ class ItemController extends ItemLoaderController
                  */
                 $categoryService = pluginApp(CategoryService::class);
                 $categoryService->setCurrentCategory($currentCategory);
-                $categoryService->setCurrentItem($itemName);
+                $categoryService->setCurrentItem($itemNames);
             }
         }
     }
