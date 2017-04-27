@@ -262,15 +262,15 @@ class CategoryService
                 array_push( $hierarchy, $category );
             }
         }
-        
-        if(strlen($this->currentItem))
-        {
-            array_push( $hierarchy, $this->currentItem );
-        }
 
         if( $bottomUp === false )
         {
             $hierarchy = array_reverse( $hierarchy );
+        }
+    
+        if(strlen($this->currentItem))
+        {
+            array_push( $hierarchy, $this->currentItem );
         }
 
         return $hierarchy;
