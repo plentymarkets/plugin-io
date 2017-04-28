@@ -1,5 +1,12 @@
 # Release Notes für IO
 
+## v1.2.0 (2017-04-28)
+
+### Behoben
+
+- Registrierungen mit einer bereits vorhandenen E-Mail-Adresse führen nun zu einem Fehler
+- Breadcrumbs funktionieren jetzt auch in der SingleItem
+
 ## v1.1.1 (2017-04-24)
 
 ### Hinzugefügt
