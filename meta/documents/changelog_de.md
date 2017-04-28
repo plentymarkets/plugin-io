@@ -1,5 +1,12 @@
 # Release Notes für IO
 
+## v1.2.0 (2017-04-28)
+
+### Behoben
+
+- Registrierungen mit einer E-Mail-Adresse, für die bereits ein Konto existiert, sind nun nicht mehr möglich.
+- Breadcrumbs funktionieren jetzt auch in der Einzelansicht eines Artikels.
+
 ## v1.1.1 (2017-04-24)
 
 ### Hinzugefügt

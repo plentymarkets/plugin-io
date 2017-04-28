@@ -2,11 +2,15 @@
 namespace IO\Controllers;
 
 use IO\Helper\CategoryKey;
+use IO\Services\CategoryService;
 use IO\Services\ItemLastSeenService;
 use IO\Services\ItemLoader\Loaders\SingleItem;
 use IO\Services\ItemLoader\Loaders\SingleItemAttributes;
 use IO\Services\ItemLoader\Services\ItemLoaderService;
+use IO\Services\SessionStorageService;
+use Plenty\Modules\Category\Contracts\CategoryRepositoryContract;
 use Plenty\Modules\Category\Models\Category;
+use Plenty\Plugin\Application;
 
 /**
  * Class ItemController
@@ -61,7 +65,15 @@ class ItemController extends ItemLoaderController
 			return '';
 		}
 		else
-		{
+        {
+            $itemNames = [
+                $itemResult['documents'][0]['data']['texts']['name1'],
+                $itemResult['documents'][0]['data']['texts']['name2'],
+                $itemResult['documents'][0]['data']['texts']['name3']
+            ];
+            
+		    $this->setCategory($itemResult['documents'][0]['data']['defaultCategories'], $itemNames);
+		    
 		    $resultVariationId = $itemResult['documents'][0]['data']['variation']['id'];
 		    
 		    if((int)$resultVariationId <= 0)
@@ -113,5 +125,35 @@ class ItemController extends ItemLoaderController
         }
         
         return $this->showItem("", (int)$itemId, 0);
+    }
+    
+    private function setCategory($defaultCategories, $itemNames)
+    {
+        if(count($defaultCategories))
+        {
+            $currentCategoryId = 0;
+            foreach($defaultCategories as $defaultCategory)
+            {
+                if((int)$defaultCategory['plentyId'] == pluginApp(Application::class)->getPlentyId())
+                {
+                    $currentCategoryId = $defaultCategory['id'];
+                }
+            }
+            if((int)$currentCategoryId > 0)
+            {
+                /**
+                 * @var CategoryRepositoryContract $categoryRepo
+                 */
+                $categoryRepo = pluginApp(CategoryRepositoryContract::class);
+                $currentCategory = $categoryRepo->get($currentCategoryId, pluginApp(SessionStorageService::class)->getLang());
+            
+                /**
+                 * @var CategoryService $categoryService
+                 */
+                $categoryService = pluginApp(CategoryService::class);
+                $categoryService->setCurrentCategory($currentCategory);
+                $categoryService->setCurrentItem($itemNames);
+            }
+        }
     }
 }

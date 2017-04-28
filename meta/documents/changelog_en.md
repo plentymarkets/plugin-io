@@ -1,5 +1,12 @@
 # Release Notes for IO
 
+## v1.2.0 (2017-04-28)
+
+### Fixed
+
+- Registrations with an email address for which an account already exists are no longer possible.
+- Breadcrumbs are now also working correctly in the single item view.
+
 ## v1.1.1 (2017-04-24)
 
 ### Added

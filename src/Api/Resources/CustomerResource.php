@@ -2,6 +2,7 @@
 
 namespace IO\Api\Resources;
 
+use Plenty\Modules\Account\Contact\Models\Contact;
 use Plenty\Plugin\Http\Response;
 use Plenty\Plugin\Http\Request;
 use IO\Api\ApiResource;
@@ -88,7 +89,14 @@ class CustomerResource extends ApiResource
 			$billingAddressData,
 			$deliveryAddressData
 		);
-
-		return $this->index();
+  
+  
+		if(!$contact instanceof Contact)
+        {
+            $this->response->error(1, '');
+            return $this->response->create($contact, ResponseCode::IM_USED);
+        }
+        
+        return $this->index();
 	}
 }

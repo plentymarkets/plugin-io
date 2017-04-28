@@ -43,6 +43,8 @@ class CategoryService
 	 * @var array
 	 */
 	private $currentCategoryTree = [];
+	
+	private $currentItem = [];
 
     /**
      * CategoryService constructor.
@@ -265,7 +267,17 @@ class CategoryService
         {
             $hierarchy = array_reverse( $hierarchy );
         }
+    
+        if(count($this->currentItem))
+        {
+            array_push( $hierarchy, $this->currentItem );
+        }
 
         return $hierarchy;
+    }
+    
+    public function setCurrentItem($itemNames)
+    {
+        $this->currentItem = $itemNames;
     }
 }
