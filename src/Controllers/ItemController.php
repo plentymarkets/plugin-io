@@ -67,9 +67,9 @@ class ItemController extends ItemLoaderController
 		else
         {
             $itemNames = [
-                $itemResult['documents'][0]['data']['texts']['name1'],
-                $itemResult['documents'][0]['data']['texts']['name2'],
-                $itemResult['documents'][0]['data']['texts']['name3']
+                'name1' => $itemResult['documents'][0]['data']['texts']['name1'],
+                'name2' => $itemResult['documents'][0]['data']['texts']['name2'],
+                'name3' => $itemResult['documents'][0]['data']['texts']['name3']
             ];
             
 		    $this->setCategory($itemResult['documents'][0]['data']['defaultCategories'], $itemNames);
