@@ -93,7 +93,7 @@ class CustomerResource extends ApiResource
   
 		if(!$contact instanceof Contact)
         {
-            $this->response->error(1, $contact);
+            $this->response->error(1, '');
             return $this->response->create($contact, ResponseCode::IM_USED);
         }
         
