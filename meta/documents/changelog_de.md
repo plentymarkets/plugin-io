@@ -4,8 +4,8 @@
 
 ### Behoben
 
-- Registrierungen mit einer bereits vorhandenen E-Mail-Adresse führen nun zu einem Fehler
-- Breadcrumbs funktionieren jetzt auch in der SingleItem
+- Registrierungen mit einer E-Mail-Adresse, für die bereits ein Konto existiert, sind nun nicht mehr möglich.
+- Breadcrumbs funktionieren jetzt auch in der Einzelansicht eines Artikels.
 
 ## v1.1.1 (2017-04-24)
 
