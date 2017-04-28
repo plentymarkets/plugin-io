@@ -76,7 +76,7 @@ class OrderItemBuilder
 
 		$paymentSurcharge = [
 			"typeId"        => OrderItemType::PAYMENT_SURCHARGE,
-			"referrerId"    => $basket->basketItems->first()->referredId,
+			"referrerId"    => $basket->basketItems->first()->referrerId,
 			"quantity"      => 1,
 			"orderItemName" => "payment surcharge",
 			"countryVatId"  => 1, // TODO get country VAT id
