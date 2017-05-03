@@ -286,6 +286,9 @@ class CustomerService
      */
 	public function createAddress(array $addressData, int $type):Address
 	{
+        if (isset($addressData['stateId']) && empty($addressData['stateId'])) {
+            $addressData['stateId'] = null;
+        }
         if($this->getContactId() > 0)
         {
             $addressData['options'] = $this->buildAddressEmailOptions([], false);
@@ -358,6 +361,9 @@ class CustomerService
      */
 	public function updateAddress(int $addressId, array $addressData, int $type):Address
 	{
+        if (isset($addressData['stateId']) && empty($addressData['stateId'])) {
+            $addressData['stateId'] = null;
+        }
 		return $this->contactAddressRepository->updateAddress($addressData, $addressId, $this->getContactId(), $type);
 	}
 
