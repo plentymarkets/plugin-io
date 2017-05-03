@@ -6,6 +6,7 @@ use IO\Services\ItemLoader\Loaders\SearchItems;
 use IO\Services\ItemLoader\Loaders\Facets;
 use IO\Services\ItemLoader\Loaders\SingleItem;
 use IO\Services\ItemLoader\Loaders\SingleItemAttributes;
+use IO\Services\ItemLoader\Loaders\Items;
 use Plenty\Plugin\Templates\Extensions\Twig_Extension;
 
 /**
@@ -48,6 +49,9 @@ class TwigLoaderPresets extends Twig_Extension
                 ],
                 "lastSeenItemsList" => [
                     LastSeenItemList::class
+                ],
+                "items" => [
+                    Items::class
                 ]
 			]
 		];
