@@ -105,9 +105,7 @@ abstract class LayoutController extends Controller
 
 		if($category === null)
 		{
-		    $controller = pluginApp(StaticPagesController::class);
-
-		    return $controller->showPageNotFound();
+            return '';
 		}
 
 		$this->categoryService->setCurrentCategory($category);
