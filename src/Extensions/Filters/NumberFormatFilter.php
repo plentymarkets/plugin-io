@@ -34,9 +34,36 @@ class NumberFormatFilter extends AbstractFilter
 	{
 		return [
 			"formatDecimal"  => "formatDecimal",
-			"formatMonetary" => "formatMonetary"
+			"formatMonetary" => "formatMonetary",
+            "trimNewlines"   => "trimNewlines",
+            "formatDateTime" => "formatDateTime"
 		];
 	}
+
+    /**
+     * Format incorrect JSON ENCODED dateTimeFormat
+     * @param $value
+     * @return string
+     */
+    public function formatDateTime($value):string
+    {
+        if(strpos($value, '+') === false && !is_object($value))
+        {
+            $value = str_replace(' ', '+', $value);
+        }
+
+        return $value;
+    }
+
+    /**
+     * Trim newlines from string
+     * @param string $value
+     * @return string
+     */
+    public function trimNewlines($value):string
+    {
+        return preg_replace('/\s+/', '', $value);
+    }
 
     /**
      * Format the given value to decimal
@@ -62,21 +89,28 @@ class NumberFormatFilter extends AbstractFilter
 
     /**
      * Format the given value to currency
-     * @param float $value
-     * @param string $currencyISO
+     * @param $value
+     * @param $currencyISO
+     * @param bool $useCurrencySymbol
      * @return string
      */
-	public function formatMonetary($value, string $currencyISO):string
-	{
-        if(!is_null($value) && !is_null($currencyISO))
+    public function formatMonetary($value, $currencyISO, $useCurrencySymbol = true ):string
+    {
+        if(!is_null($value) && !is_null($currencyISO) && strlen($currencyISO))
         {
+            $value = $this->trimNewlines($value);
+            $currencyISO = $this->trimNewlines($currencyISO);
+
             $locale            = 'de_DE';
-            $useCurrencySymbol = true;
 
             $formatter = numfmt_create($locale, \NumberFormatter::CURRENCY);
-            if(!$useCurrencySymbol)
+
+            if($useCurrencySymbol)
             {
                 $formatter->setTextAttribute(\NumberFormatter::CURRENCY_CODE, $currencyISO);
+            }
+            else
+            {
                 $formatter->setSymbol(\NumberFormatter::CURRENCY_SYMBOL, $currencyISO);
             }
 
@@ -87,9 +121,11 @@ class NumberFormatFilter extends AbstractFilter
                 $formatter->setSymbol(\NumberFormatter::MONETARY_SEPARATOR_SYMBOL, $decimal_separator);
                 $formatter->setSymbol(\NumberFormatter::MONETARY_GROUPING_SEPARATOR_SYMBOL, $thousands_separator);
             }
+
             return $formatter->format($value);
+
         }
 
         return '';
-	}
+    }
 }

@@ -116,10 +116,13 @@ class OrderService
      * @param int $contactId
      * @param int $page
      * @param int $items
+     * @param array $filters
      * @return PaginatedResult
      */
-    public function getOrdersForContact(int $contactId, int $page = 1, int $items = 50):PaginatedResult
+    public function getOrdersForContact(int $contactId, int $page = 1, int $items = 50, array $filters = []):PaginatedResult
     {
+        $this->orderRepository->setFilters($filters);
+
         $orders = $this->orderRepository->allOrdersByContact(
             $contactId,
             $page,
@@ -134,7 +137,7 @@ class OrderService
      * @param int $contactId
      * @return LocalizedOrder
      */
-    public function getLatestOrderForContact( int $contactId ):LocalizedOrder
+    public function getLatestOrderForContact( int $contactId )
     {
         if($contactId > 0)
         {
@@ -145,7 +148,12 @@ class OrderService
             $order = $this->orderRepository->findOrderById($this->sessionStorage->getSessionValue(SessionStorageKeys::LATEST_ORDER_ID));
         }
         
-        return LocalizedOrder::wrap( $order, "de" );
+        if(!is_null($order))
+        {
+            return LocalizedOrder::wrap( $order, "de" );
+        }
+        
+        return null;
     }
     
     /**

@@ -1,6 +1,9 @@
 <?php
 namespace IO\Services\ItemLoader\Extensions;
 use IO\Services\ItemLoader\Loaders\CategoryItems;
+use IO\Services\ItemLoader\Loaders\LastSeenItemList;
+use IO\Services\ItemLoader\Loaders\SearchItems;
+use IO\Services\ItemLoader\Loaders\Facets;
 use IO\Services\ItemLoader\Loaders\SingleItem;
 use IO\Services\ItemLoader\Loaders\SingleItemAttributes;
 use Plenty\Plugin\Templates\Extensions\Twig_Extension;
@@ -36,8 +39,16 @@ class TwigLoaderPresets extends Twig_Extension
 				],
 			    
 			    "categoryList" => [
-				    CategoryItems::class
-			    ]
+				    CategoryItems::class,
+                    Facets::class
+			    ],
+                "search" => [
+                    SearchItems::class,
+                    Facets::class
+                ],
+                "lastSeenItemsList" => [
+                    LastSeenItemList::class
+                ]
 			]
 		];
 	}

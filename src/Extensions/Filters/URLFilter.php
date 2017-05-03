@@ -33,8 +33,8 @@ class URLFilter extends AbstractFilter
 	public function getFilters():array
 	{
 		return [
-			"buildItemURL" => "buildItemURL",
-            "buildVariationURL" => "buildVariationURL"
+			"itemURL" => "buildItemURL",
+            "variationURL" => "buildVariationURL"
 		];
 	}
 
@@ -45,36 +45,39 @@ class URLFilter extends AbstractFilter
      * @param bool $withItemName
      * @return string
      */
-	public function buildItemURL(int $itemId = 0, int $variationId = 0, bool $withItemName = false):string
+	public function buildItemURL($itemData, $withVariationId = true):string
 	{
-		$itemURL = '/' . $itemId;
-
-		if($variationId > 0)
-		{
-			$itemURL .= '/' . $variationId;
-		}
-
-		if($withItemName)
-		{
-			$item           = $this->itemService->getItemURL($itemId);
-			$itemURLContent = $item->itemDescription->urlContent;
-
-            if( $itemURLContent != "" )
+        $itemURL = '';
+        
+        $itemId = $itemData['item']['id'];
+        $variationId = $itemData['variation']['id'];
+        $urlContent = $itemData['texts']['urlPath'];
+        
+        if((int)$itemId > 0)
+        {
+            $itemURL .= '/';
+            if(strlen($urlContent))
             {
-                $e        = explode('/', $itemURLContent);
-                $itemName = $e[count($e) - 1];
-
-                $itemURL = '/' . $itemName . $itemURL;
+                $itemURL .= $urlContent.'_'.$itemId;
             }
-		}
-
-		return $itemURL;
+            else
+            {
+                $itemURL .= $itemId;
+            }
+            
+            if($withVariationId && $variationId > 0)
+            {
+                $itemURL .= '_' . $variationId;
+            }
+        }
+        
+        return $itemURL;
 	}
-
-	public function buildVariationURL($variationId = 0, bool $withItemName = false):string
+    
+    public function buildVariationURL($variationId = 0, bool $withItemName = false):string
     {
         $variation = $this->itemService->getVariation( $variationId );
-        $itemId = (int)$variation['documents'][0]['data']['item']['id'];
-        return $this->buildItemURL( $itemId, $variationId, $withItemName );
+        return $this->buildItemURL( $variation['documents'][0]['data'] );
     }
+    
 }

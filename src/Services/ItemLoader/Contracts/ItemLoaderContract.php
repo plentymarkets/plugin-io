@@ -14,7 +14,12 @@ interface ItemLoaderContract
 	 * @return SearchInterface
 	 */
 	public function getSearch();
-
+    
+    /**
+     * @return array
+     */
+    public function getAggregations();
+    
 	/**
 	 * @param array $options
 	 * @return TypeInterface[]

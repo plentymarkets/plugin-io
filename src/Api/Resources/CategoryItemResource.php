@@ -8,16 +8,17 @@ use IO\Api\ApiResource;
 use IO\Api\ApiResponse;
 use IO\Api\ResponseCode;
 use IO\Services\ItemLoader\Services\ItemLoaderService;
-use IO\Services\ItemLoader\Loaders\SearchItems;
+use IO\Services\ItemLoader\Loaders\CategoryItems;
+use IO\Services\ItemLoader\Loaders\Facets;
 
 /**
- * Class ItemSearchResource
+ * Class CategoryItemResource
  * @package IO\Api\Resources
  */
-class ItemSearchAutocompleteResource extends ApiResource
+class CategoryItemResource extends ApiResource
 {
     /**
-     * ItemSearchResource constructor.
+     * CategoryItemResource constructor.
      * @param Request $request
      * @param ApiResponse $response
      */
@@ -27,23 +28,23 @@ class ItemSearchAutocompleteResource extends ApiResource
     }
     
     /**
-     * Search items
+     * Get Category Items
      * @return Response
      */
     public function index():Response
     {
-        $searchString = $this->request->get('query', '');
+        $categoryId = $this->request->get('categoryId', 0);
+        $template = $this->request->get('template', '');
         
-        if(strlen($searchString))
+        if((int)$categoryId > 0)
         {
-            $template = $this->request->get('template', '');
-            
             $response = pluginApp(ItemLoaderService::class)
-                ->loadForTemplate($template, [SearchItems::class], [
-                    'query'  => $searchString,
-                    'autocomplete'  => true,
-                    'page'          => 1,
-                    'items'  => 20
+                ->loadForTemplate($template, [CategoryItems::class, Facets::class], [
+                    'categoryId'    => $this->request->get('categoryId', 1),
+                    'page'          => $this->request->get('page', 1),
+                    'items'  => $this->request->get('items', 20),
+                    'sorting'       => $this->request->get('sorting', ''),
+                    'facets'        => $this->request->get('facets', '')
                 ]);
             
             return $this->response->create($response, ResponseCode::OK);

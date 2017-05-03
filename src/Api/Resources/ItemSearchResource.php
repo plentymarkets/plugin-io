@@ -9,6 +9,7 @@ use IO\Api\ApiResponse;
 use IO\Api\ResponseCode;
 use IO\Services\ItemLoader\Services\ItemLoaderService;
 use IO\Services\ItemLoader\Loaders\SearchItems;
+use IO\Services\ItemLoader\Loaders\Facets;
 
 /**
  * Class ItemSearchResource
@@ -32,18 +33,18 @@ class ItemSearchResource extends ApiResource
      */
     public function index():Response
     {
-        $searchString = $this->request->get('searchString', '');
+        $searchString = $this->request->get('query', '');
         $template = $this->request->get('template', '');
         
         if(strlen($searchString))
         {
             $response = pluginApp(ItemLoaderService::class)
-                ->loadForTemplate($template, [SearchItems::class], [
-                    'searchString'  => $searchString,
+                ->loadForTemplate($template, [SearchItems::class, Facets::class], [
+                    'query'         => $searchString,
                     'page'          => $this->request->get('page', 1),
-                    'itemsPerPage'  => $this->request->get('itemsPerPage', 20),
-                    'orderBy'       => $this->request->get('orderBy', 'itemName'),
-                    'orderByKey'    => $this->request->get('orderByKey', 'ASC')
+                    'items'  => $this->request->get('items', 20),
+                    'sorting'       => $this->request->get('sorting', 'itemName'),
+                    'facets'        => $this->request->get('facets', '')
                 ]);
     
             return $this->response->create($response, ResponseCode::OK);

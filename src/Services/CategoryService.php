@@ -6,6 +6,7 @@ use Plenty\Modules\Category\Models\Category;
 use Plenty\Modules\Category\Contracts\CategoryRepositoryContract;
 use Plenty\Repositories\Models\PaginatedResult;
 
+use IO\Services\SessionStorageService;
 use IO\Services\WebstoreConfigurationService;
 use IO\Services\ItemService;
 use IO\Helper\CategoryMap;
@@ -28,6 +29,11 @@ class CategoryService
 	 */
 	private $webstoreConfig;
 
+    /**
+     * @var SessionStorageService
+     */
+    private $sessionStorageService;
+
 	// is set from controllers
 	/**
 	 * @var Category
@@ -37,15 +43,18 @@ class CategoryService
 	 * @var array
 	 */
 	private $currentCategoryTree = [];
+	
+	private $currentItem = [];
 
     /**
      * CategoryService constructor.
      * @param CategoryRepositoryContract $category
      */
-	 public function __construct(CategoryRepositoryContract $categoryRepository, WebstoreConfigurationService $webstoreConfig)
+	 public function __construct(CategoryRepositoryContract $categoryRepository, WebstoreConfigurationService $webstoreConfig, SessionStorageService $sessionStorageService)
 	{
 		$this->categoryRepository    = $categoryRepository;
 		$this->webstoreConfig 		 = $webstoreConfig;
+        $this->sessionStorageService = $sessionStorageService;
 	}
 
 	/**
@@ -55,7 +64,7 @@ class CategoryService
 	public function setCurrentCategoryID(int $catID = 0)
 	{
 		$this->setCurrentCategory(
-			$this->categoryRepository->get($catID)
+			$this->categoryRepository->get($catID, $this->sessionStorageService->getLang())
 		);
 	}
 
@@ -78,9 +87,17 @@ class CategoryService
 		while($cat !== null)
 		{
 			$this->currentCategoryTree[$cat->level] = $cat;
-			$cat                                    = $this->categoryRepository->get($cat->parentCategoryId);
+			$cat                                    = $this->categoryRepository->get($cat->parentCategoryId, $this->sessionStorageService->getLang());
 		}
 	}
+    
+    /**
+     * @return Category
+     */
+	public function getCurrentCategory()
+    {
+        return $this->currentCategory;
+    }
 
 	/**
 	 * Get a category by ID
@@ -93,6 +110,16 @@ class CategoryService
 		return $this->categoryRepository->get($catID, $lang);
 	}
 
+	public function getChildren($categoryId, $lang = "de")
+    {
+        if($categoryId > 0)
+        {
+            return $this->categoryRepository->getChildren($categoryId, $lang);
+        }
+        
+        return null;
+    }
+	
 	/**
 	 * Return the URL for a given category ID.
 	 * @param Category $category the category to get the URL for
@@ -240,7 +267,17 @@ class CategoryService
         {
             $hierarchy = array_reverse( $hierarchy );
         }
+    
+        if(count($this->currentItem))
+        {
+            array_push( $hierarchy, $this->currentItem );
+        }
 
         return $hierarchy;
+    }
+    
+    public function setCurrentItem($itemNames)
+    {
+        $this->currentItem = $itemNames;
     }
 }
