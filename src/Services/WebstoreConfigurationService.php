@@ -17,6 +17,18 @@ class WebstoreConfigurationService
      */
     private $webstoreConfig;
 
+
+    /**
+     * Get the plenty-id
+     */
+    public function getPlentyId()
+    {
+        return pluginApp(Application::class)->getPlentyId();
+    }
+
+    /**
+     * Get the webstore configuraion
+     */
 	public function getWebstoreConfig():WebstoreConfiguration
     {
         if( $this->webstoreConfig === null )
