@@ -51,7 +51,7 @@ class ItemController extends ItemLoaderController
 
 		$itemResult = $loaderService->load();
 
-		if(empty($itemResult))
+		if(empty($itemResult['documents']))
 		{
 			// If item not found, render the error category
 			$itemNotFoundCategory = $this->categoryRepo->get(
