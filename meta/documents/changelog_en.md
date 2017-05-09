@@ -1,5 +1,11 @@
 # Release Notes for IO
 
+## v1.2.1 (2017-05-08)
+
+## Fixed
+
+- Minor bug fixes and improvements.
+
 ## v1.2.0 (2017-04-28)
 
 ### Fixed
