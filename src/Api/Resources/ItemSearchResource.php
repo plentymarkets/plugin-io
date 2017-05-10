@@ -40,11 +40,12 @@ class ItemSearchResource extends ApiResource
         {
             $response = pluginApp(ItemLoaderService::class)
                 ->loadForTemplate($template, [SearchItems::class, Facets::class], [
-                    'query'         => $searchString,
-                    'page'          => $this->request->get('page', 1),
-                    'items'  => $this->request->get('items', 20),
-                    'sorting'       => $this->request->get('sorting', 'itemName'),
-                    'facets'        => $this->request->get('facets', '')
+                    'query'             => $searchString,
+                    'page'              => $this->request->get('page', 1),
+                    'items'             => $this->request->get('items', 20),
+                    'sorting'           => $this->request->get('sorting', 'itemName'),
+                    'facets'            => $this->request->get('facets', ''),
+                    'variationShowType' => $this->request->get('variationShowType', 'all'),
                 ]);
     
             return $this->response->create($response, ResponseCode::OK);

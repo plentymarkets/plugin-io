@@ -40,11 +40,12 @@ class CategoryItemResource extends ApiResource
         {
             $response = pluginApp(ItemLoaderService::class)
                 ->loadForTemplate($template, [CategoryItems::class, Facets::class], [
-                    'categoryId'    => $this->request->get('categoryId', 1),
-                    'page'          => $this->request->get('page', 1),
-                    'items'  => $this->request->get('items', 20),
-                    'sorting'       => $this->request->get('sorting', ''),
-                    'facets'        => $this->request->get('facets', '')
+                    'categoryId'        => $this->request->get('categoryId', 1),
+                    'page'              => $this->request->get('page', 1),
+                    'items'             => $this->request->get('items', 20),
+                    'sorting'           => $this->request->get('sorting', ''),
+                    'facets'            => $this->request->get('facets', ''),
+                    'variationShowType' => $this->request->get('variationShowType', 'all'),
                 ]);
             
             return $this->response->create($response, ResponseCode::OK);
