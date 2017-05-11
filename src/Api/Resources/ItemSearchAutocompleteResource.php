@@ -40,10 +40,11 @@ class ItemSearchAutocompleteResource extends ApiResource
             
             $response = pluginApp(ItemLoaderService::class)
                 ->loadForTemplate($template, [SearchItems::class], [
-                    'query'  => $searchString,
-                    'autocomplete'  => true,
-                    'page'          => 1,
-                    'items'  => 20
+                    'query'             => $searchString,
+                    'autocomplete'      => true,
+                    'page'              => 1,
+                    'items'             => 20,
+                    'variationShowType' => $this->request->get('variationShowType', 'all'),
                 ]);
             
             return $this->response->create($response, ResponseCode::OK);
