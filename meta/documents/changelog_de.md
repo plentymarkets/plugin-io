@@ -1,5 +1,11 @@
 # Release Notes für IO
 
+## v1.2.2 (2017-05-11)
+
+## Behoben
+
+- Die Vorschläge der Autovervollständigung berücksichtigen nun die Einstellung der Variantengruppierung
+
 ## v1.2.1 (2017-05-08)
 
 ## Behoben
