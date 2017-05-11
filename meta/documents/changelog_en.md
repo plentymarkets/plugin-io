@@ -1,5 +1,11 @@
 # Release Notes for IO
 
+## v1.2.2 (2017-05-11)
+
+## Fixed
+
+- Suggested search results created by the auto-complete feature are now taking into account the grouping of variations.
+
 ## v1.2.1 (2017-05-08)
 
 ## Fixed

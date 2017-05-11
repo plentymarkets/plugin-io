@@ -4,7 +4,7 @@
 
 ## Behoben
 
-- Die Vorschläge der Autovervollständigung berücksichtigen nun die Einstellung der Variantengruppierung
+- Die Vorschläge der Autovervollständigung von Suchbegriffen berücksichtigen nun die Einstellung der Variantengruppierung.
 
 ## v1.2.1 (2017-05-08)
 
