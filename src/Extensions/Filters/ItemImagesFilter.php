@@ -3,15 +3,24 @@
 namespace IO\Extensions\Filters;
 
 use IO\Extensions\AbstractFilter;
-use Plenty\Modules\Item\DataLayer\Models\ItemDescription;
 
+/**
+ * Class ItemImagesFilter
+ * @package IO\Extensions\Filters
+ */
 class ItemImagesFilter extends AbstractFilter
 {
+    /**
+     * ItemImagesFilter constructor.
+     */
     public function __construct()
     {
         parent::__construct();
     }
 
+    /**
+     * @return array
+     */
     public function getFilters():array
     {
         return [
@@ -19,7 +28,12 @@ class ItemImagesFilter extends AbstractFilter
         ];
     }
 
-    public function getItemImages( $images, string $imageAccessor = 'url' )
+    /**
+     * @param $images
+     * @param string $imageAccessor
+     * @return array
+     */
+    public function getItemImages( $images, string $imageAccessor = 'url' ):array
     {
         $imageUrls = [];
         $imageObject = (empty( $images['variation'] ) ? 'all' : 'variation');

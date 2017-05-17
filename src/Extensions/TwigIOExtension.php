@@ -2,6 +2,7 @@
 
 namespace IO\Extensions;
 
+use IO\Extensions\Filters\ItemImagesFilter;
 use Plenty\Plugin\Templates\Extensions\Twig_Extension;
 use Plenty\Plugin\Templates\Factories\TwigFactory;
 use Plenty\Plugin\Http\Request;
@@ -43,7 +44,8 @@ class TwigIOExtension extends Twig_Extension
 		Component $component,
         ItemNameFilter $itemNameFilter,
         ExternalContent $externalContent,
-        Partial $partial
+        Partial $partial,
+        ItemImagesFilter $itemImagesFilter
 	)
 	{
 		$this->twig = $twig;
