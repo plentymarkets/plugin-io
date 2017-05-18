@@ -1,5 +1,12 @@
 [
     {
+      "tab"       : "Template",
+      "key"       : "template.template_plugin_name",
+      "label"     : "Namespace of the used template plugin",
+      "type"      : "text",
+      "default"   : "Ceres"
+    },
+    {
         "tab"       : "Number formats",
         "key"       : "format.number_decimals",
         "label"     : "Number of decimal places",
