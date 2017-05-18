@@ -7,6 +7,7 @@ use IO\Services\ItemLoader\Contracts\ItemLoaderPaginationContract;
 use IO\Services\SessionStorageService;
 use IO\Builder\Sorting\SortingBuilder;
 use IO\Services\ItemLoader\Contracts\ItemLoaderSortingContract;
+use IO\Services\TemplateConfigService;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Processor\DocumentProcessor;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Query\Type\TypeInterface;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Search\Document\DocumentSearch;
@@ -17,6 +18,7 @@ use Plenty\Modules\Cloud\ElasticSearch\Lib\Sorting\SortingInterface;
 use Plenty\Modules\Item\Search\Filter\ClientFilter;
 use Plenty\Modules\Item\Search\Filter\VariationBaseFilter;
 use Plenty\Modules\Item\Search\Filter\SearchFilter;
+use Plenty\Modules\Item\Search\Filter\TextFilter;
 use Plenty\Plugin\Application;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\ElasticSearch;
 
@@ -90,11 +92,41 @@ class SearchItems implements ItemLoaderContract, ItemLoaderPaginationContract, I
                 $searchFilter->setSearchString($options['query'], $lang, $searchType);
             }
         }
+    
+        /**
+         * @var TemplateConfigService $templateConfigService
+         */
+        $templateConfigService = pluginApp(TemplateConfigService::class);
+        $usedItemName = $templateConfigService->get('item.name');
+    
+        $textFilterType = TextFilter::FILTER_ANY_NAME;
+        if(strlen($usedItemName))
+        {
+            if($usedItemName == 'name1')
+            {
+                $textFilterType = TextFilter::FILTER_NAME_1;
+            }
+            elseif($usedItemName == 'name2')
+            {
+                $textFilterType = TextFilter::FILTER_NAME_2;
+            }
+            elseif($usedItemName == 'name3')
+            {
+                $textFilterType = TextFilter::FILTER_NAME_3;
+            }
+        }
+    
+        /**
+         * @var TextFilter $textFilter
+         */
+        $textFilter = pluginApp(TextFilter::class);
+        $textFilter->hasNameInLanguage(pluginApp(SessionStorageService::class)->getLang(), $textFilterType);
         
         return [
             $clientFilter,
             $variationFilter,
-            $searchFilter
+            $searchFilter,
+            $textFilter
         ];
     }
     
