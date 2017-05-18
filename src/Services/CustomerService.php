@@ -308,17 +308,17 @@ class CustomerService
         }
         if($this->getContactId() > 0)
         {
-            $addressData['options'] = $this->buildAddressEmailOptions([], false);
+            $addressData['options'] = $this->buildAddressEmailOptions([], false, $addressData);
             return $this->contactAddressRepository->createAddress($addressData, $this->getContactId(), $type);
         }
 		else
         {
-            $addressData['options'] = $this->buildAddressEmailOptions([], true);
+            $addressData['options'] = $this->buildAddressEmailOptions([], true, $addressData);
             return $this->createGuestAddress($addressData, $type);
         }
 	}
 	
-	private function buildAddressEmailOptions(array $options = [], $isGuest = false)
+	private function buildAddressEmailOptions(array $options = [], $isGuest = false, $addressData = [])
     {
         if($isGuest)
         {
@@ -339,6 +339,25 @@ class CustomerService
                 'typeId' => AddressOption::TYPE_EMAIL,
                 'value' => $email
             ];
+        }
+        
+        if(count($addressData))
+        {
+            if(isset($addressData['vatNumber']))
+            {
+                $options[] = [
+                    'typeId' => AddressOption::TYPE_VAT_NUMBER,
+                    'value'  => $addressData['vatNumber']
+                ];
+            }
+            
+            if(isset($addressData['birthday']))
+            {
+                $options[] = [
+                    'typeId' => AddressOption::TYPE_BIRTHDAY,
+                    'value'  => $addressData['birthday']
+                ];
+            }
         }
         
         return $options;
