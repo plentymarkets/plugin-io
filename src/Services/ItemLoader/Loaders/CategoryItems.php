@@ -98,12 +98,26 @@ class CategoryItems implements ItemLoaderContract, ItemLoaderPaginationContract,
                 $textFilterType = TextFilter::FILTER_NAME_3;
             }
         }
-        
+
+        $langMap = [
+            'de' => TextFilter::LANG_DE,
+            'fr' => TextFilter::LANG_FR,
+            'en' => TextFilter::LANG_EN,
+        ];
+
+        $textFilterLanguage = TextFilter::LANG_EN;
+
+        $sessionLang = pluginApp(SessionStorageService::class)->getLang();
+
+        if(isset($langMap[$sessionLang])){
+            $textFilterLanguage = $langMap[$sessionLang];
+        }
+
         /**
          * @var TextFilter $textFilter
          */
         $textFilter = pluginApp(TextFilter::class);
-        $textFilter->hasNameInLanguage(pluginApp(SessionStorageService::class)->getLang(), $textFilterType);
+        $textFilter->hasNameInLanguage($textFilterLanguage, $textFilterType);
         
         return [
             $clientFilter,
