@@ -3,6 +3,7 @@ namespace IO\Services\ItemLoader\Loaders;
 
 use IO\Services\SessionStorageService;
 use IO\Services\ItemLoader\Contracts\ItemLoaderContract;
+use IO\Services\TemplateConfigService;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Processor\DocumentProcessor;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Query\Type\TypeInterface;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Search\Document\DocumentSearch;
@@ -10,6 +11,7 @@ use Plenty\Modules\Cloud\ElasticSearch\Lib\Search\SearchInterface;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Source\Mutator\BuiltIn\LanguageMutator;
 use Plenty\Modules\Item\Search\Filter\ClientFilter;
 use Plenty\Modules\Item\Search\Filter\VariationBaseFilter;
+use Plenty\Modules\Item\Search\Filter\TextFilter;
 use Plenty\Plugin\Application;
 
 /**
@@ -64,10 +66,54 @@ class SingleItem implements ItemLoaderContract
 		{
 			$variationFilter->hasId($options['variationId']);
 		}
+        
+        $sessionLang = pluginApp(SessionStorageService::class)->getLang();
+        
+        $langMap = [
+            'de' => TextFilter::LANG_DE,
+            'fr' => TextFilter::LANG_FR,
+            'en' => TextFilter::LANG_EN,
+        ];
+        
+        /**
+         * @var TextFilter $textFilter
+         */
+        $textFilter = pluginApp(TextFilter::class);
+        
+        if(isset($langMap[$sessionLang]))
+        {
+            $textFilterLanguage = $langMap[$sessionLang];
+            
+            /**
+             * @var TemplateConfigService $templateConfigService
+             */
+            $templateConfigService = pluginApp(TemplateConfigService::class);
+            $usedItemName = $templateConfigService->get('item.name');
+            
+            $textFilterType = TextFilter::FILTER_ANY_NAME;
+            if(strlen($usedItemName))
+            {
+                if($usedItemName == '0')
+                {
+                    $textFilterType = TextFilter::FILTER_NAME_1;
+                }
+                elseif($usedItemName == '1')
+                {
+                    $textFilterType = TextFilter::FILTER_NAME_2;
+                }
+                elseif($usedItemName == '2')
+                {
+                    $textFilterType = TextFilter::FILTER_NAME_3;
+                }
+            }
+            
+            $textFilter->hasNameInLanguage($textFilterLanguage, $textFilterType);
+        }
 
 		return [
 			$clientFilter,
-		    $variationFilter
+		    $variationFilter,
+            $textFilter
 		];
 	}
 }
