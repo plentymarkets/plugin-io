@@ -1,60 +1,67 @@
 [
-    {
-        "tab"       : "Number formats",
-        "key"       : "format.number_decimals",
-        "label"     : "Number of decimal places",
-        "type"      : "text",
-        "default"   : "2"
+  {
+    "tab"       : "Template",
+    "key"       : "template.template_plugin_name",
+    "label"     : "Namespace of the used template plugin",
+    "type"      : "text",
+    "default"   : "Ceres"
+  },
+  {
+    "tab"       : "Number formats",
+    "key"       : "format.number_decimals",
+    "label"     : "Number of decimal places",
+    "type"      : "text",
+    "default"   : "2"
+  },
+  {
+    "tab"       : "Number formats",
+    "key"       : "format.separator_decimal",
+    "label"     : "Decimal separator",
+    "type"      : "text",
+    "default"   : ","
+  },
+  {
+    "tab"       : "Number formats",
+    "key"       : "format.separator_thousands",
+    "label"     : "Thousands separator",
+    "type"      : "text",
+    "default"   : "."
+  },
+  {
+    "tab"       : "Number formats",
+    "key"       : "format.use_locale_currency_format",
+    "label"     : "Use customer specific price format",
+    "type"      : "dropdown",
+    "possibleValues" : {
+      "1" : "YES",
+      "0" : "NO"
     },
+    "default": "1"
+  },
+  {
+    "tab"                           : "Routing",
+    "key"                           : "routing.enabled_routes",
+    "label"                         : "Enable routes",
+    "type"                          : "multi_select",
+    "possibleValues"                :
     {
-        "tab"       : "Number formats",
-        "key"       : "format.separator_decimal",
-        "label"     : "Decimal separator",
-        "type"      : "text",
-        "default"   : ","
+      "home"                  : "/",
+      "basket"                : "/basket",
+      "checkout"              : "/checkout",
+      "my-account"            : "/my-account",
+      "confirmation"          : "/confirmation",
+      "guest"                 : "/guest",
+      "login"                 : "/login",
+      "register"              : "/register",
+      "search"                : "/search",
+      "place-order"           : "/place-order & /execute-payment",
+      "cancellation-rights"   : "/cancellation-rights",
+      "legal-disclosure"      : "/legal-disclosure",
+      "privacy-policy"        : "/privacy-policy",
+      "gtc"                   : "/gtc",
+      "item"                  : "Item routes",
+      "category"              : "Category routes"
     },
-    {
-        "tab"       : "Number formats",
-        "key"       : "format.separator_thousands",
-        "label"     : "Thousands separator",
-        "type"      : "text",
-        "default"   : "."
-    },
-    {
-        "tab"       : "Number formats",
-        "key"       : "format.use_locale_currency_format",
-        "label"     : "Use customer specific price format",
-        "type"      : "dropdown",
-        "possibleValues" : {
-            "1" : "YES",
-            "0" : "NO"
-        },
-        "default": "1"
-    },
-    {
-        "tab"                           : "Routing",
-        "key"                           : "routing.enabled_routes",
-        "label"                         : "Enable routes",
-        "type"                          : "multi_select",
-        "possibleValues"                :
-        {
-            "home"                  : "/",
-            "basket"                : "/basket",
-            "checkout"              : "/checkout",
-            "my-account"            : "/my-account",
-            "confirmation"          : "/confirmation",
-            "guest"                 : "/guest",
-            "login"                 : "/login",
-            "register"              : "/register",
-            "search"                : "/search",
-            "place-order"           : "/place-order & /execute-payment",
-            "cancellation-rights"   : "/cancellation-rights",
-            "legal-disclosure"      : "/legal-disclosure",
-            "privacy-policy"        : "/privacy-policy",
-            "gtc"                   : "/gtc",
-            "item"                  : "Item routes",
-            "category"              : "Category routes"
-        },
-        "default"                       : "all"
-    }
+    "default"                       : "all"
+  }
 ]
