@@ -1,5 +1,18 @@
 # Release Notes for IO
 
+## v.1.2.3 (2017-05-19)
+
+### Added
+
+- The date of birth and the VAT number entered during the address input will now be saved with the address.
+- Added a twig filter for variation images.
+- A corresponding template plugin can now be specified in the configuration of IO.
+- Address validation based on the specified template plugin.
+
+### Fixed
+
+- Items will only be returned when item texts have been saved in the selected store language.
+
 ## v1.2.2 (2017-05-11)
 
 ## Fixed

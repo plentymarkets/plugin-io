@@ -4,14 +4,14 @@
 
 ### Hinzugefügt
 
-- Eingaben für Geburtsdatum und Umsatzsteuer-ID können jetzt an der Adresse gespeichert werden
-- Twig-Filter für Variantenbilder
-- Konfigurationsmöglichkeit für zugehöriges Template-Plugin
-- Validierung von Adresseingaben anhand der Konfiguration des Template-Plugins
+- Eingaben für Geburtsdatum und Umsatzsteuer-ID können jetzt an der Adresse gespeichert werden.
+- Twig-Filter für Variantenbilder hinzugefügt.
+- Konfigurationsmöglichkeit für zugehöriges Template-Plugin.
+- Validierung von Adresseingaben anhand der Konfiguration des Template-Plugins.
 
 ### Behoben
 
-- Artikel, die keine Texte in der ausgewählten Shop-Sprache hinterlegt haben, werden nicht mehr zurückgeliefert
+- Artikel, für die keine Texte in der ausgewählten Shop-Sprache gespeichert wurden, werden nicht mehr zurückgeliefert.
 
 ## v1.2.2 (2017-05-11)
 
