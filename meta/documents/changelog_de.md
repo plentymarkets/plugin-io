@@ -1,14 +1,27 @@
 # Release Notes für IO
 
+## v.1.2.3 (2017-05-19)
+
+### Hinzugefügt
+
+- Eingaben für Geburtsdatum und Umsatzsteuer-ID können jetzt an der Adresse gespeichert werden
+- Twig-Filter für Variantenbilder
+- Konfigurationsmöglichkeit für zugehöriges Template-Plugin
+- Validierung von Adresseingaben anhand der Konfiguration des Template-Plugins
+
+### Behoben
+
+- Artikel, die keine Texte in der ausgewählten Shop-Sprache hinterlegt haben, werden nicht mehr zurückgeliefert
+
 ## v1.2.2 (2017-05-11)
 
-## Behoben
+### Behoben
 
 - Die Vorschläge der Autovervollständigung von Suchbegriffen berücksichtigen nun die Einstellung der Variantengruppierung.
 
 ## v1.2.1 (2017-05-08)
 
-## Behoben
+### Behoben
 
 - Kleinere Bugfixes und Verbesserungen.
 
