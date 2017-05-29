@@ -168,7 +168,16 @@ class SearchItems implements ItemLoaderContract, ItemLoaderPaginationContract, I
         
         if(isset($options['sorting']) && strlen($options['sorting']))
         {
-            $sortingInterface = SortingBuilder::buildSorting($options['sorting']);
+
+            if($options['sorting'] == 'default.standard_sorting')
+            {
+                $sortingInterface = SortingBuilder::buildDefaultSorting();
+            }
+            else
+            {
+                $sortingInterface = SortingBuilder::buildSorting($options['sorting']);
+            }
+
             if($sortingInterface instanceof MultipleSorting)
             {
                 $sortingInterface->add('_score', 'ASC');

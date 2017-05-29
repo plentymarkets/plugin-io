@@ -42,8 +42,7 @@ class SortingBuilder
         {
             //SingleSort
             $sortingParameter1 = self::filterSortingString($usedSortingPriority1);
-            $sortingInterface = pluginApp(SingleSorting::class);
-
+            $sortingInterface =  pluginApp(SingleSorting::class,array($sortingParameter1["sortingPath"], $sortingParameter1["sortingOrder"]));
         }
         else
         {
