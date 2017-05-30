@@ -35,12 +35,12 @@ class OrderByKeyFilter extends AbstractFilter
      */
     public function getItemsOrderedByKey ($array, $sortKey):array
     {
-        usort($array, $this->build_sorter($sortKey));
+        usort($array, $this->orderArrayByKey($sortKey));
 
         return $array;
     }
 
-    private function build_sorter($key)
+    private function orderArrayByKey($key)
     {
         return function ($a, $b) use ($key)
         {
