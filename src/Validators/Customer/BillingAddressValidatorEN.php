@@ -19,8 +19,15 @@ class BillingAddressValidatorEN extends Validator
         $this->requiredFields  = explode(', ', $requiredFieldsString);
         foreach ($this->requiredFields as $key => $value)
         {
-            $this->requiredFields[$key] = str_replace('billing_address.en.', '', $value);
+            $this->requiredFields[$key] = str_replace('billing_address.', '', $value);
         }
+    
+        $this->addString('name2',      true);
+        $this->addString('name3',      true);
+        $this->addString('address1', true);
+        $this->addString('postalCode', true);
+        $this->addString('town',       true);
+        
         
         if(count($this->requiredFields))
         {
@@ -28,7 +35,6 @@ class BillingAddressValidatorEN extends Validator
             $this->addString('vatNumber', $this->isRequired('vatNumber'));
             $this->addString('birthday',  $this->isRequired('birthday'));
             $this->addString('name4',     $this->isRequired('name4'));
-            $this->addString('address1',  $this->isRequired('address1'));
             $this->addString('address2',  $this->isRequired('address2'));
             $this->addString('address3',  $this->isRequired('address3'));
             $this->addString('address4',  $this->isRequired('address4'));
