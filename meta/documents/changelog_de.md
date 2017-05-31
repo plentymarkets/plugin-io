@@ -8,6 +8,7 @@
 - Twig-Filter für Variantenbilder hinzugefügt.
 - Konfigurationsmöglichkeit für zugehöriges Template-Plugin.
 - Validierung von Adresseingaben anhand der Konfiguration des Template-Plugins.
+- Es wurde ein Twig-Filter hinzugefügt, um Objekte anhand eines Keys zu sortieren.
 
 ### Behoben
 
