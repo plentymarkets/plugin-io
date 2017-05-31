@@ -3,6 +3,7 @@
 namespace IO\Builder\Sorting;
 
 use IO\Services\TemplateConfigService;
+use Plenty\Modules\Cloud\ElasticSearch\Lib\Sorting\BaseSorting;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Sorting\SingleSorting;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Sorting\SortingInterface;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Sorting\MultipleSorting;
@@ -19,51 +20,144 @@ class SortingBuilder
         {
             $sortingInterface = pluginApp(NameSorting::class, [self::buildNameSorting($sortingParameter["sortingPath"]), pluginApp(SessionStorageService::class)->getLang(), $sortingParameter["sortingOrder"]]);
         }
+        else if($sortingString == "item.score")
+        {
+            $sortingInterface = pluginApp(MultipleSorting::class);
+            $singleSortingInterface = pluginApp(SingleSorting::class,['_score', 'ASC']);
+
+            $sortingInterface->addSorting($singleSortingInterface);
+        }
         else
         {
             $sortingInterface = pluginApp(MultipleSorting::class);
-            $sortingInterface->add($sortingParameter["sortingPath"], $sortingParameter["sortingOrder"]);
+            $singleSortingInterface = pluginApp(SingleSorting::class,[$sortingParameter["sortingPath"], $sortingParameter["sortingOrder"]]);
+
+            $sortingInterface->addSorting($singleSortingInterface);
         }
 
         return $sortingInterface;
     }
 
-    public static function buildDefaultSorting()
+
+    public static function buildDefaultSortingSearch()
     {
         /**
          * @var TemplateConfigService $templateConfigService
          */
         $templateConfigService = pluginApp(TemplateConfigService::class);
-        $usedSortingPriority1 = $templateConfigService->get('sorting.priority1');
-        $usedSortingPriority2 = $templateConfigService->get('sorting.priority2');
-        $usedSortingPriority3 = $templateConfigService->get('sorting.priority3');
 
-        if($usedSortingPriority2 == 'item.notSelected' && $usedSortingPriority3 == 'item.notSelected')
+        $usedSortingPrioritySearch1 = $templateConfigService->get('sorting.prioritySearch1');
+        $usedSortingPrioritySearch2 = $templateConfigService->get('sorting.prioritySearch2');
+        $usedSortingPrioritySearch3 = $templateConfigService->get('sorting.prioritySearch3');
+
+        if($usedSortingPrioritySearch2 == 'item.notSelected' && $usedSortingPrioritySearch3 == 'item.notSelected')
         {
             //SingleSort
-            $sortingParameter1 = self::filterSortingString($usedSortingPriority1);
-            $sortingInterface =  pluginApp(SingleSorting::class,array($sortingParameter1["sortingPath"], $sortingParameter1["sortingOrder"]));
+            if($usedSortingPrioritySearch1 == 'item.score')
+            {
+                $sortingInterface = pluginApp(SingleSorting::class,['_score', 'ASC']);
+            }
+            else
+            {
+                $sortingInterface = self::SortingPriority($usedSortingPrioritySearch1);
+            }
         }
         else
         {
             //MultiSort
             $sortingInterface = pluginApp(MultipleSorting::class);
 
-            $sortingParameter1 = self::filterSortingString($usedSortingPriority1);
-            $sortingInterface->add($sortingParameter1["sortingPath"], $sortingParameter1["sortingOrder"]);
-            if($usedSortingPriority2 != 'item.notSelected')
+            if($usedSortingPrioritySearch1 == 'item.score')
             {
-                $sortingParameter2 = self::filterSortingString($usedSortingPriority2);
-                $sortingInterface->add($sortingParameter2["sortingPath"], $sortingParameter2["sortingOrder"]);
+                $singleSortingInterface = pluginApp(SingleSorting::class,['_score', 'ASC']);
             }
-            if($usedSortingPriority3 != 'item.notSelected')
+            else
             {
-                $sortingParameter3 = self::filterSortingString($usedSortingPriority3);
-                $sortingInterface->add($sortingParameter3["sortingPath"], $sortingParameter3["sortingOrder"]);
+                $singleSortingInterface = self::SortingPriority($usedSortingPrioritySearch1);
+            }
+            $sortingInterface->addSorting($singleSortingInterface);
+
+            if($usedSortingPrioritySearch2 != 'item.notSelected')
+            {
+                if($usedSortingPrioritySearch2 == 'item.score')
+                {
+                    $singleSortingInterface = pluginApp(SingleSorting::class,['_score', 'ASC']);
+                }
+                else
+                {
+                    $singleSortingInterface = self::SortingPriority($usedSortingPrioritySearch2);
+                }
+                $sortingInterface->addSorting($singleSortingInterface);
+            }
+            if($usedSortingPrioritySearch3 != 'item.notSelected')
+            {
+                if($usedSortingPrioritySearch3 == 'item.score')
+                {
+                    $singleSortingInterface = pluginApp(SingleSorting::class,['_score', 'ASC']);
+                }
+                else
+                {
+                    $singleSortingInterface = self::SortingPriority($usedSortingPrioritySearch3);
+                }
+
+                $sortingInterface->addSorting($singleSortingInterface);
+            }
+        }
+        return $sortingInterface;
+    }
+
+    public static function buildDefaultSortingCategory()
+    {
+        /**
+         * @var TemplateConfigService $templateConfigService
+         */
+        $templateConfigService = pluginApp(TemplateConfigService::class);
+
+        $usedSortingPriorityCategory1 = $templateConfigService->get('sorting.priorityCategory1');
+        $usedSortingPriorityCategory2 = $templateConfigService->get('sorting.priorityCategory2');
+        $usedSortingPriorityCategory3 = $templateConfigService->get('sorting.priorityCategory3');
+
+        if($usedSortingPriorityCategory2 == 'item.notSelected' && $usedSortingPriorityCategory3 == 'item.notSelected')
+        {
+            //SingleSort
+            $sortingInterface = self::SortingPriority($usedSortingPriorityCategory1);
+        }
+        else
+        {
+            //MultiSort
+            $sortingInterface = pluginApp(MultipleSorting::class);
+
+            $singleSortingInterface = self::SortingPriority($usedSortingPriorityCategory1);
+            $sortingInterface->addSorting($singleSortingInterface);
+
+            if($usedSortingPriorityCategory2 != 'item.notSelected')
+            {
+                $singleSortingInterface = self::SortingPriority($usedSortingPriorityCategory2);
+
+                $sortingInterface->addSorting($singleSortingInterface);
+            }
+            if($usedSortingPriorityCategory3 != 'item.notSelected')
+            {
+                $singleSortingInterface = self::SortingPriority($usedSortingPriorityCategory3);
+
+                $sortingInterface->addSorting($singleSortingInterface);
             }
         }
 
         return $sortingInterface;
+    }
+
+    private static function SortingPriority($usedSortingPriority)
+    {
+        $sortingParameter1 = self::filterSortingString($usedSortingPriority);
+        if($usedSortingPriority == 'texts.name1')
+        {
+            return $sortingInterface = pluginApp(NameSorting::class, [self::buildNameSorting($sortingParameter1["sortingPath"]), pluginApp(SessionStorageService::class)->getLang(), $sortingParameter1["sortingOrder"]]);
+        }
+        else
+        {
+            return $sortingInterface = pluginApp(SingleSorting::class,[$sortingParameter1["sortingPath"], $sortingParameter1["sortingOrder"]]);
+        }
     }
 
     private static function filterSortingString($sortingString)
