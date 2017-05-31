@@ -9,6 +9,7 @@ use Plenty\Plugin\Http\Request;
 
 use IO\Extensions\Filters\PatternFilter;
 use IO\Extensions\Filters\NumberFormatFilter;
+use IO\Extensions\Filters\OrderByKeyFilter;
 use IO\Extensions\Filters\URLFilter;
 use IO\Extensions\Filters\ItemNameFilter;
 
@@ -45,7 +46,8 @@ class TwigIOExtension extends Twig_Extension
         ItemNameFilter $itemNameFilter,
         ExternalContent $externalContent,
         Partial $partial,
-        ItemImagesFilter $itemImagesFilter
+        ItemImagesFilter $itemImagesFilter,
+        OrderByKeyFilter $orderByKeyFilter
 	)
 	{
 		$this->twig = $twig;

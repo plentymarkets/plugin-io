@@ -40,7 +40,10 @@ class ItemImagesFilter extends AbstractFilter
 
         foreach ($images[$imageObject] as $image)
         {
-            $imageUrls[] = $image[$imageAccessor];
+            $imageUrls[] = [
+                "url" => $image[$imageAccessor],
+                "position" => $image["position"]
+            ];
         }
 
         return $imageUrls;
