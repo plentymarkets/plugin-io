@@ -6,6 +6,10 @@
 
 The **IO** plugin only needs to be provisioned in plentymarkets. No setup is required. **IO** is a required plugin for the **Ceres** template plugin.
 
+<div class="alert alert-danger" role="alert">
+    When deploying the plugin <b>IO</b> in <b>Productive</b>, the old plentymarkets online store will be unavailable. <b>IO</b> will use the URL of the online store.
+</div>
+
 ## License
 
 This project is licensed under the GNU AFFERO GENERAL PUBLIC LICENSE. – find further information in the [LICENSE.md](https://github.com/plentymarkets/plugin-io/blob/stable/LICENSE.md).
