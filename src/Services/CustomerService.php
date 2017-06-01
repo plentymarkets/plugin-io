@@ -4,8 +4,7 @@ namespace IO\Services;
 
 use IO\Models\LocalizedOrder;
 use IO\Validators\Customer\ContactValidator;
-use IO\Validators\Customer\BillingAddressValidator;
-use IO\Validators\Customer\DeliveryAddressValidator;
+use IO\Validators\Customer\AddressValidator;
 use Plenty\Modules\Account\Address\Models\AddressOption;
 use Plenty\Modules\Account\Contact\Contracts\ContactRepositoryContract;
 use Plenty\Modules\Account\Contact\Contracts\ContactAddressRepositoryContract;
@@ -289,18 +288,7 @@ class CustomerService
      */
 	public function createAddress(array $addressData, int $type):Address
 	{
-	    if($type == AddressType::BILLING)
-        {
-            BillingAddressValidator::validateOrFail($addressData);
-        }
-        elseif($type == AddressType::DELIVERY)
-        {
-            DeliveryAddressValidator::validateOrFail($addressData);
-        }
-        else
-        {
-            BillingAddressValidator::validateOrFail($addressData);
-        }
+        AddressValidator::validateOrFail($type, $addressData);
         
         if (isset($addressData['stateId']) && empty($addressData['stateId']))
         {
@@ -397,6 +385,8 @@ class CustomerService
      */
 	public function updateAddress(int $addressId, array $addressData, int $type):Address
 	{
+        AddressValidator::validateOrFail($type, $addressData);
+	    
         if (isset($addressData['stateId']) && empty($addressData['stateId'])) {
             $addressData['stateId'] = null;
         }
