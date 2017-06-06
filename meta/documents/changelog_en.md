@@ -1,5 +1,12 @@
 # Release Notes for IO
 
+## v.1.2.4 (2017-06-02)
+
+### Added
+
+- A Twig filter for sorting an object by a given key has been added.
+- Validation of the address form for the delivery country **United Kingdom**
+
 ## v.1.2.3 (2017-05-19)
 
 ### Added
