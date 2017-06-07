@@ -3,6 +3,7 @@
 namespace IO\Services;
 
 use IO\Models\LocalizedOrder;
+use Plenty\Modules\Frontend\PaymentMethod\Repositories\FrontendPaymentMethodRepository;
 use Plenty\Modules\Order\Contracts\OrderRepositoryContract;
 use Plenty\Modules\Order\Property\Models\OrderPropertyType;
 use Plenty\Modules\Payment\Method\Contracts\PaymentMethodRepositoryContract;
@@ -164,5 +165,18 @@ class OrderService
 	public function getOrderStatusText($statusId)
     {
         return OrderStatusTexts::$orderStatusTexts[(string)$statusId];
+    }
+    
+    /**
+     * List all payment methods available for switch in MyAccount
+     * @return array|\Illuminate\Support\Collection
+     */
+    public function getPaymentMethodListForSwitch()
+    {
+        /**
+         * @var FrontendPaymentMethodRepository $frontendPaymentMethodRepository
+         */
+        $frontendPaymentMethodRepository = pluginApp(FrontendPaymentMethodRepository::class);
+        return $frontendPaymentMethodRepository->getCurrentPaymentMethodsList(true);
     }
 }
