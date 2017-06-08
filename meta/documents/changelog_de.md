@@ -2,6 +2,10 @@
 
 ## v.1.2.5 (TODO)
 
+### Hinzugefügt
+
+- Laden von Lieferländern und Webshop-Einstellungen aus dem Cache um die Performance zu verbessern
+
 ### Behoben
 
 - Es wurde ein Fehler behoben bei dem manchmal keine Standardlieferland gesetzt wurde. 
