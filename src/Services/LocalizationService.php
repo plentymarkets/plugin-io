@@ -13,24 +13,30 @@ class LocalizationService
     {
         
     }
-    
+
     public function getLocalizationData()
     {
         $sessionStorage = pluginApp(SessionStorageService::class);
         $country        = pluginApp(CountryService::class);
         $webstoreConfig = pluginApp(WebstoreConfigurationService::class);
         $checkout       = pluginApp(CheckoutService::class);
-        
+
         $lang = $sessionStorage->getLang();
         if(is_null($lang) || !strlen($lang))
         {
             $lang = 'de';
         }
-        
+
+        $currentShippingCountryId = $checkout->getShippingCountryId();
+        if($currentShippingCountryId <= 0)
+        {
+            $currentShippingCountryId = $webstoreConfig->getDefaultShippingCountryId();
+        }
+
         return [
             'activeShippingCountries'  => $country->getActiveCountriesList($lang),
             'activeShopLanguageList'   => $webstoreConfig->getActiveLanguageList(),
-            'currentShippingCountryId' => $checkout->getShippingCountryId(),
+            'currentShippingCountryId' => $currentShippingCountryId,
             'shopLanguage'             => $lang
         ];
     }

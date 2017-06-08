@@ -1,5 +1,11 @@
 # Release Notes für IO
 
+## v.1.2.5 (TODO)
+
+### Behoben
+
+- Es wurde ein Fehler behoben bei dem manchmal keine Standardlieferland gesetzt wurde. 
+
 ## v.1.2.4 (2017-06-02)
 
 ### Hinzugefügt
