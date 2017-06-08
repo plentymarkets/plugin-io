@@ -16,6 +16,12 @@ class SalesPriceService
     private $salesPriceSearchRepo;
     private $customerService;
     private $checkoutService;
+
+    private $classId = null;
+    private $singleAccess = null;
+    private $currency = null;
+    private $plentyId = null;
+    private $shippingCountryId = null;
     
     public function __construct(Application $app, SalesPriceSearchRepositoryContract $salesPriceSearchRepo, CustomerService $customerService, CheckoutService $checkoutService)
     {
@@ -23,15 +29,27 @@ class SalesPriceService
         $this->salesPriceSearchRepo = $salesPriceSearchRepo;
         $this->customerService = $customerService;
         $this->checkoutService = $checkoutService;
+
+        $this->init();
     }
     
-    public function getSalesPriceForVariation(int $variationId, $type = 'default', int $quantity = 1)
+    private function init()
     {
-        /**
-         * @var Contact $contact
-         */
         $contact = $this->customerService->getContact();
-        
+
+        if($contact instanceof Contact)
+        {
+            $this->classId = $contact->classId;
+            $this->singleAccess = $contact->singleAccess;
+        }
+
+        $this->currency = $this->checkoutService->getCurrency();
+        $this->shippingCountryId = $this->checkoutService->getShippingCountryId();
+        $this->plentyId = $this->app->getPlentyId();
+    }
+
+    public function getSalesPriceForVariation(int $variationId, $type = 'default', int $quantity = 1)
+    {   
         /**
          * @var SalesPriceSearchRequest $salesPriceSearchRequest
          */
@@ -39,11 +57,11 @@ class SalesPriceService
         
         $salesPriceSearchRequest->variationId = $variationId;
         $salesPriceSearchRequest->accountId = 0;
-        $salesPriceSearchRequest->accountType = $contact->singleAccess;
-        $salesPriceSearchRequest->countryId = $this->checkoutService->getShippingCountryId();
-        $salesPriceSearchRequest->currency = $this->checkoutService->getCurrency();
-        $salesPriceSearchRequest->customerClassId = $contact->classId;
-        $salesPriceSearchRequest->plentyId = $this->app->getPlentyId();
+        $salesPriceSearchRequest->accountType = $this->singleAccess;
+        $salesPriceSearchRequest->countryId = $this->shippingCountryId;
+        $salesPriceSearchRequest->currency = $this->currency;
+        $salesPriceSearchRequest->customerClassId = $this->classId;
+        $salesPriceSearchRequest->plentyId = $this->plentyId;
         $salesPriceSearchRequest->quantity = $quantity;
         $salesPriceSearchRequest->referrerId = 1;
         $salesPriceSearchRequest->type = $type;
