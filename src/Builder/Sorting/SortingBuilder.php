@@ -150,7 +150,7 @@ class SortingBuilder
     private static function SortingPriority($usedSortingPriority)
     {
         $sortingParameter1 = self::filterSortingString($usedSortingPriority);
-        if($sortingParameter1["sortingPath"] == 'texts.name1')
+        if(strpos($sortingParameter1["sortingPath"], 'texts.name') != false)
         {
             return $sortingInterface = pluginApp(NameSorting::class, [self::buildNameSorting($sortingParameter1["sortingPath"]), pluginApp(SessionStorageService::class)->getLang(), $sortingParameter1["sortingOrder"]]);
         }
