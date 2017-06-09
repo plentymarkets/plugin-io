@@ -5,6 +5,8 @@ namespace IO\Services;
 use IO\Models\LocalizedOrder;
 use Plenty\Modules\Frontend\PaymentMethod\Contracts\FrontendPaymentMethodRepositoryContract;
 use Plenty\Modules\Order\Contracts\OrderRepositoryContract;
+use Plenty\Modules\Order\Property\Contracts\OrderPropertyRepositoryContract;
+use Plenty\Modules\Order\Property\Models\OrderProperty;
 use Plenty\Modules\Order\Property\Models\OrderPropertyType;
 use Plenty\Modules\Payment\Method\Contracts\PaymentMethodRepositoryContract;
 use IO\Builder\Order\OrderBuilder;
@@ -35,6 +37,11 @@ class OrderService
     private $sessionStorage;
     
     /**
+     * @var FrontendPaymentMethodRepositoryContract
+     */
+    private $frontendPaymentMethodRepository;
+    
+    /**
      * OrderService constructor.
      * @param OrderRepositoryContract $orderRepository
      * @param BasketService $basketService
@@ -43,12 +50,14 @@ class OrderService
 	public function __construct(
 		OrderRepositoryContract $orderRepository,
 		BasketService $basketService,
-        SessionStorageService $sessionStorage
+        SessionStorageService $sessionStorage,
+        FrontendPaymentMethodRepositoryContract $frontendPaymentMethodRepository
 	)
 	{
 		$this->orderRepository = $orderRepository;
 		$this->basketService   = $basketService;
         $this->sessionStorage  = $sessionStorage;
+        $this->frontendPaymentMethodRepository = $frontendPaymentMethodRepository;
 	}
 
     /**
@@ -167,16 +176,38 @@ class OrderService
         return OrderStatusTexts::$orderStatusTexts[(string)$statusId];
     }
     
+    public function getOrderPropertyByOrderId($orderId, $typeId)
+    {
+        /**
+         * @var OrderPropertyRepositoryContract $orderPropertyRepo
+         */
+        $orderPropertyRepo = pluginApp(OrderPropertyRepositoryContract::class);
+        return $orderPropertyRepo->findByOrderId($orderId, $typeId);
+    }
+    
     /**
      * List all payment methods available for switch in MyAccount
      * @return \Plenty\Modules\Payment\Method\Models\PaymentMethod[]
      */
     public function getPaymentMethodListForSwitch()
     {
-        /**
-         * @var FrontendPaymentMethodRepositoryContract $frontendPaymentMethodRepository
-         */
-        $frontendPaymentMethodRepository = pluginApp(FrontendPaymentMethodRepositoryContract::class);
-        return $frontendPaymentMethodRepository->getCurrentPaymentMethodsList(true);
+        return $this->frontendPaymentMethodRepository->getCurrentPaymentMethodsList(true);
+    }
+    
+    public function allowPaymentMethodSwitchFrom($paymentMethodId)
+    {
+        return $this->frontendPaymentMethodRepository->getPaymentMethodSwitchFromById($paymentMethodId);
+    }
+    
+    public function switchPaymentMethodForOrder($orderId, $paymentMethodId)
+    {
+        if((int)$orderId > 0)
+        {
+            $currentPaymentMethodId = $this->getOrderPropertyByOrderId($orderId, OrderPropertyType::PAYMENT_METHOD);
+            if($this->frontendPaymentMethodRepository->getPaymentMethodSwitchFromById($currentPaymentMethodId) && $this->frontendPaymentMethodRepository->getPaymentMethodSwitchToById($paymentMethodId))
+            {
+                $this->executePayment($orderId, $paymentMethodId);
+            }
+        }
     }
 }
