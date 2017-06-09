@@ -1,5 +1,15 @@
 # Release Notes for IO
 
+## v.1.2.5 (2017-06-08)
+
+### Added
+
+- Countries of delivery and online store settings are now loaded from the cache to improve the overall performance.
+
+### Fixed
+
+- Due to an error the default country of delivery has not been set. This has been fixed.
+
 ## v.1.2.4 (2017-06-02)
 
 ### Added
