@@ -1,5 +1,15 @@
 # Release Notes für IO
 
+## v.1.2.5 (2017-06-08)
+
+### Hinzugefügt
+
+- Lieferländer und Webshop-Einstellungen werden aus dem Cache geladen, um die Performance zu verbessern.
+
+### Behoben
+
+- Es wurde ein Fehler behoben, der dazu führte, dass manchmal keine Standardlieferland gesetzt wurde. 
+
 ## v.1.2.4 (2017-06-02)
 
 ### Hinzugefügt
