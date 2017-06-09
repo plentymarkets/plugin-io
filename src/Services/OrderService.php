@@ -206,8 +206,10 @@ class OrderService
             $currentPaymentMethodId = $this->getOrderPropertyByOrderId($orderId, OrderPropertyType::PAYMENT_METHOD);
             if($this->frontendPaymentMethodRepository->getPaymentMethodSwitchFromById($currentPaymentMethodId) && $this->frontendPaymentMethodRepository->getPaymentMethodSwitchToById($paymentMethodId))
             {
-                $this->executePayment($orderId, $paymentMethodId);
+                return $this->executePayment($orderId, $paymentMethodId);
             }
         }
+        
+        return null;
     }
 }

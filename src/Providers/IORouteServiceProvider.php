@@ -29,6 +29,7 @@ class IORouteServiceProvider extends RouteServiceProvider
 			$api->get('io/basket', 'BasketResource@index');
 			$api->resource('io/basket/items', 'BasketItemResource');
 			$api->resource('io/order', 'OrderResource');
+            $api->resource('io/order/payment', 'OrderPaymentResource');
             $api->get('io/checkout', 'CheckoutResource@index');
             $api->post('io/checkout', 'CheckoutResource@store');
             $api->put('io/checkout', 'CheckoutResource@update');
