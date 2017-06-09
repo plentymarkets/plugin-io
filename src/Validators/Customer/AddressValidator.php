@@ -16,7 +16,7 @@ class AddressValidator
     {
         if($addressType == AddressType::BILLING)
         {
-            if(self::isEnAddress())
+            if(self::isEnAddress($addressData['countryId']))
             {
                 BillingAddressValidatorEN::validateOrFail($addressData);
             }
@@ -28,7 +28,7 @@ class AddressValidator
         }
         elseif($addressType == AddressType::DELIVERY)
         {
-            if(self::isEnAddress())
+            if(self::isEnAddress($addressData['countryId']))
             {
                 DeliveryAddressValidatorEN::validateOrFail($addressData);
             }
@@ -39,7 +39,7 @@ class AddressValidator
         }
         else
         {
-            if(self::isEnAddress())
+            if(self::isEnAddress($addressData['countryId']))
             {
                 BillingAddressValidatorEN::validateOrFail($addressData);
             }
@@ -50,14 +50,8 @@ class AddressValidator
         }
     }
     
-    private static function isEnAddress()
+    public static function isEnAddress($shippingCountryId)
     {
-        /**
-         * @var CheckoutService $checkoutService
-         */
-        $checkoutService = pluginApp(CheckoutService::class);
-        $shippingCountryId = $checkoutService->getShippingCountryId();
-        
         if($shippingCountryId == ShippingCountry::UNITED_KINGDOM || $shippingCountryId == ShippingCountry::IRELAND)
         {
             return true;
