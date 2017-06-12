@@ -1,5 +1,11 @@
 # Release Notes für IO
 
+## v.1.2.6 (TODO)
+
+### Behoben
+
+- Fehler beim Validieren von englischen Rechnungs- und Lieferadressen
+
 ## v.1.2.5 (2017-06-08)
 
 ### Hinzugefügt
