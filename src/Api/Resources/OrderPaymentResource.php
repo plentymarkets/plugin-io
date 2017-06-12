@@ -34,7 +34,9 @@ class OrderPaymentResource extends ApiResource
     {
         $paymentMethodId = $this->request->get('paymentMethodId');
         $orderId = $this->request->get('orderId');
-        return $this->orderService->allowPaymentMethodSwitchFrom($paymentMethodId, $orderId);
+        $response = $this->orderService->allowPaymentMethodSwitchFrom($paymentMethodId, $orderId);
+    
+        return $this->response->create($response, ResponseCode::OK);
     }
     
     public function store():Response
