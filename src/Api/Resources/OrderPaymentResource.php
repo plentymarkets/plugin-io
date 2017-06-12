@@ -30,7 +30,7 @@ class OrderPaymentResource extends ApiResource
         parent::__construct($request, $response);
     }
     
-    public function show():Response
+    public function index():Response
     {
         $paymentMethodId = $this->request->get('paymentMethodId');
         $orderId = $this->request->get('orderId');
