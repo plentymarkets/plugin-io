@@ -16,13 +16,25 @@ use IO\Services\OrderService;
 class OrderPaymentResource extends ApiResource
 {
     /**
+     * @var OrderService
+     */
+    private $orderService;
+    
+    /**
      * OrderPaymentResource constructor.
      * @param Request $request
      * @param ApiResponse $response
      */
-    public function __construct(Request $request, ApiResponse $response)
+    public function __construct(Request $request, ApiResponse $response, OrderService $orderService)
     {
         parent::__construct($request, $response);
+    }
+    
+    public function index():Response
+    {
+        $paymentMethodId = $this->request->get('paymentMethodId');
+        $orderId = $this->request->get('orderId');
+        return $this->orderService->allowPaymentMethodSwitchFrom($paymentMethodId, $orderId);
     }
     
     public function store():Response
@@ -30,11 +42,7 @@ class OrderPaymentResource extends ApiResource
         $orderId = $this->request->get('orderId', 0);
         $paymentMethodId = $this->request->get('paymentMethodId', 0);
         
-        /**
-         * @var OrderService $orderService
-         */
-        $orderService = pluginApp(OrderService::class);
-        $response = $orderService->switchPaymentMethodForOrder($orderId, $paymentMethodId);
+        $response = $this->orderService->switchPaymentMethodForOrder($orderId, $paymentMethodId);
         
         return $this->response->create($response, ResponseCode::CREATED);
     }
