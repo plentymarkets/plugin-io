@@ -225,7 +225,11 @@ class OrderService
         
             if($this->frontendPaymentMethodRepository->getPaymentMethodSwitchFromById($currentPaymentMethodId) && $this->frontendPaymentMethodRepository->getPaymentMethodSwitchToById($paymentMethodId))
             {
-                return $this->orderRepository->updateOrder(['properties' => $newOrderProperties], $orderId);
+                $order = $this->orderRepository->updateOrder(['properties' => $newOrderProperties], $orderId);
+                if(!is_null($order))
+                {
+                    return LocalizedOrder::wrap( $order, "de" );
+                }
             }
         }
     
