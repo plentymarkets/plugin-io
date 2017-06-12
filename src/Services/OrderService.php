@@ -204,27 +204,31 @@ class OrderService
         if((int)$orderId > 0)
         {
             $currentPaymentMethodId = 0;
-            
+        
             $order = $this->findOrderById($orderId);
+        
+            $newOrderProperties = [];
             $orderProperties = $order->order->properties;
+        
             if(count($orderProperties))
             {
                 foreach($orderProperties as $key => $orderProperty)
                 {
+                    $newOrderProperties[$key] = $orderProperty;
                     if($orderProperty->typeId == OrderPropertyType::PAYMENT_METHOD)
                     {
                         $currentPaymentMethodId = $orderProperty->value;
-                        $orderProperties[$key]['value'] = $paymentMethodId;
+                        $newOrderProperties[$key]['value'] = $paymentMethodId;
                     }
                 }
             }
-            
+        
             if($this->frontendPaymentMethodRepository->getPaymentMethodSwitchFromById($currentPaymentMethodId) && $this->frontendPaymentMethodRepository->getPaymentMethodSwitchToById($paymentMethodId))
             {
-                $this->orderRepository->updateOrder(['properties' => $orderProperties], $orderId);
+                return $this->orderRepository->updateOrder(['properties' => $newOrderProperties], $orderId);
             }
         }
-        
+    
         return null;
     }
 }
