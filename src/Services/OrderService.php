@@ -191,12 +191,12 @@ class OrderService
      */
     public function getPaymentMethodListForSwitch()
     {
-        return $this->frontendPaymentMethodRepository->getCurrentPaymentMethodsList(true);
+        return $this->frontendPaymentMethodRepository->getCurrentPaymentMethodsListForSwitch();
     }
     
-    public function allowPaymentMethodSwitchFrom($paymentMethodId)
+    public function allowPaymentMethodSwitchFrom($paymentMethodId, $orderId = null)
     {
-        return $this->frontendPaymentMethodRepository->getPaymentMethodSwitchFromById($paymentMethodId);
+        return $this->frontendPaymentMethodRepository->getPaymentMethodSwitchFromById($paymentMethodId, $orderId);
     }
     
     public function switchPaymentMethodForOrder($orderId, $paymentMethodId)
@@ -217,13 +217,13 @@ class OrderService
                     $newOrderProperties[$key] = $orderProperty;
                     if($orderProperty->typeId == OrderPropertyType::PAYMENT_METHOD)
                     {
-                        $currentPaymentMethodId = $orderProperty->value;
-                        $newOrderProperties[$key]['value'] = $paymentMethodId;
+                        $currentPaymentMethodId = (int)$orderProperty->value;
+                        $newOrderProperties[$key]['value'] = (int)$paymentMethodId;
                     }
                 }
             }
         
-            if($this->frontendPaymentMethodRepository->getPaymentMethodSwitchFromById($currentPaymentMethodId) && $this->frontendPaymentMethodRepository->getPaymentMethodSwitchToById($paymentMethodId))
+            if($this->frontendPaymentMethodRepository->getPaymentMethodSwitchFromById($currentPaymentMethodId, $orderId) && $this->frontendPaymentMethodRepository->getPaymentMethodSwitchToById($paymentMethodId))
             {
                 $order = $this->orderRepository->updateOrder(['properties' => $newOrderProperties], $orderId);
                 if(!is_null($order))
