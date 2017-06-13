@@ -109,7 +109,7 @@ class LocalizedOrder extends ModelWrapper
     public function toArray():array
     {
         $data = [
-            "order"                 => $this->order->toArray(),
+            "order"                 => $this->order,
             "status"                => [], //$this->status->toArray(),
             "shippingProvider"      => $this->shippingProvider,
             "shippingProfileName"   => $this->shippingProfileName,
