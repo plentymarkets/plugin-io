@@ -28,6 +28,7 @@ class OrderPaymentResource extends ApiResource
     public function __construct(Request $request, ApiResponse $response, OrderService $orderService)
     {
         parent::__construct($request, $response);
+        $this->orderService = $orderService;
     }
     
     public function index():Response

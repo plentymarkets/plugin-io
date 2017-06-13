@@ -10,7 +10,7 @@ use IO\Api\ResponseCode;
 use IO\Services\OrderService;
 
 /**
- * Class OrderPaymentResource
+ * Class OrderPaymentAllowedResource
  * @package IO\Api\Resources
  */
 class OrderPaymentAllowedResource extends ApiResource
@@ -28,12 +28,13 @@ class OrderPaymentAllowedResource extends ApiResource
     public function __construct(Request $request, ApiResponse $response, OrderService $orderService)
     {
         parent::__construct($request, $response);
+        $this->orderService = $orderService;
     }
     
     public function index():Response
     {
-        $paymentMethodId = $this->request->get('paymentMethodId');
-        $orderId = $this->request->get('orderId');
+        $paymentMethodId = $this->request->get('paymentMethodId', 0);
+        $orderId = $this->request->get('orderId', 0);
         $response = $this->orderService->allowPaymentMethodSwitchFrom($paymentMethodId, $orderId);
         
         return $this->response->create($response, ResponseCode::OK);
