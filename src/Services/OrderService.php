@@ -233,12 +233,15 @@ class OrderService
                 }
             }
         
-            if($this->frontendPaymentMethodRepository->getPaymentMethodSwitchFromById($currentPaymentMethodId, $orderId) && $this->frontendPaymentMethodRepository->getPaymentMethodSwitchToById($paymentMethodId))
+            if($paymentMethodId !== $currentPaymentMethodId)
             {
-                $order = $this->orderRepository->updateOrder(['properties' => $newOrderProperties], $orderId);
-                if(!is_null($order))
+                if($this->frontendPaymentMethodRepository->getPaymentMethodSwitchFromById($currentPaymentMethodId, $orderId) && $this->frontendPaymentMethodRepository->getPaymentMethodSwitchToById($paymentMethodId))
                 {
-                    return LocalizedOrder::wrap( $order, "de" );
+                    $order = $this->orderRepository->updateOrder(['properties' => $newOrderProperties], $orderId);
+                    if(!is_null($order))
+                    {
+                        return LocalizedOrder::wrap( $order, "de" );
+                    }
                 }
             }
         }
