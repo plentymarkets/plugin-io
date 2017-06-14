@@ -63,7 +63,7 @@ class SalesPriceService
         $salesPriceSearchRequest->customerClassId = $this->classId;
         $salesPriceSearchRequest->plentyId = $this->plentyId;
         $salesPriceSearchRequest->quantity = $quantity;
-        $salesPriceSearchRequest->referrerId = 1;
+        $salesPriceSearchRequest->referrerId = 1; //TODO set to real referrer
         $salesPriceSearchRequest->type = $type;
     
         /**
