@@ -187,18 +187,28 @@ class OrderService
     
     /**
      * List all payment methods available for switch in MyAccount
+     * @param int $currentPaymentMethodId
      * @return \Plenty\Modules\Payment\Method\Models\PaymentMethod[]
      */
-    public function getPaymentMethodListForSwitch()
+    public function getPaymentMethodListForSwitch($currentPaymentMethodId = 0)
     {
-        return $this->frontendPaymentMethodRepository->getCurrentPaymentMethodsListForSwitch();
+        return $this->frontendPaymentMethodRepository->getCurrentPaymentMethodsListForSwitch($currentPaymentMethodId);
     }
     
+    /**
+     * @param $paymentMethodId
+     * @param int $orderId
+     * @return bool
+     */
     public function allowPaymentMethodSwitchFrom($paymentMethodId, $orderId = null)
     {
         return $this->frontendPaymentMethodRepository->getPaymentMethodSwitchFromById($paymentMethodId, $orderId);
     }
     
+    /**
+     * @param int $orderId
+     * @param int $paymentMethodId
+     */
     public function switchPaymentMethodForOrder($orderId, $paymentMethodId)
     {
         if((int)$orderId > 0)
