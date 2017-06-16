@@ -12,9 +12,8 @@ interface ItemLoaderFactory
      * @param array $loaderClassList
      * @param array $resultFields
      * @param array $options
-     * @param bool $isCached
      * @return array
      */
-	public function runSearch($loaderClassList, $resultFields,  $options = [], $isCached = false);
+	public function runSearch($loaderClassList, $resultFields,  $options = []);
 
 }

@@ -53,7 +53,9 @@ class TwigCachedTemplate extends Twig_Extension
             $this->twigFactory->createSimpleFunction(
                 'includeCached',
                 [$this, 'getCachedTemplate'],
-                ['is_safe' => ['html']]
+                [
+                    'is_safe' => ['html']
+                ]
             )
         ];
     }
