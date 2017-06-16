@@ -3,6 +3,7 @@
 namespace IO\Services\ContentCaching\Services;
 
 use IO\Services\CheckoutService;
+use IO\Services\ContentCaching\Models\SmallContentCache;
 use IO\Services\CustomerService;
 use Plenty\Modules\Account\Contact\Models\Contact;
 use Plenty\Modules\Plugin\Storage\Contracts\StorageRepositoryContract;
@@ -40,6 +41,8 @@ class ContentCaching
      * @var Twig
      */
     private $twig;
+
+    const MAX_BYTE_SIZE_FOR_FAST_CACHING = 524288; //bytes
 
     /**
      * ContentCaching constructor.
@@ -101,13 +104,24 @@ class ContentCaching
             $cachingHash .= '_' . md5(implode('_', $itemHashFields));
         }
 
-        $tplName = 'tpl_' . md5($templateName) . $cachingHash . '.html';
+        $tplName = 'tpl_' . md5($templateName) . $cachingHash;
+
+        if($this->cachingRepository->has($tplName)){
+            return $this->cachingRepository->get($tplName)->content;
+        }
 
         try {
             $cachedContentObject = $this->storageRepositoryContract->getObject(
                 'IO',
-                $tplName
+                $tplName . '.html'
             );
+
+            if(strlen((STRING)$cachedContentObject->body) <= self::MAX_BYTE_SIZE_FOR_FAST_CACHING ){
+                $smallContentCache = pluginApp(SmallContentCache::class);
+                $smallContentCache->content = $cachedContentObject->body;
+
+                $this->cachingRepository->put($tplName, $smallContentCache, 15);
+            }
 
             return $cachedContentObject->body;
 
@@ -118,7 +132,7 @@ class ContentCaching
 
         $this->storageRepositoryContract->uploadObject(
             'IO',
-            $tplName,
+            $tplName .  '.html',
             $templateContent,
             false,
             $meta
