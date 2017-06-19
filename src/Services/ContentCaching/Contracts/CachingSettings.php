@@ -15,7 +15,7 @@ interface CachingSettings
     public function containsItems():bool;
 
     /**
-     * @return string
+     * @return array
      */
-    public function getIdentifier():string;
+    public function getData():array;
 }

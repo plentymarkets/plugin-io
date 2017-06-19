@@ -5,6 +5,7 @@ namespace IO\Services\ContentCaching\Services;
 use IO\Services\CheckoutService;
 use IO\Services\ContentCaching\Models\SmallContentCache;
 use IO\Services\CustomerService;
+use IO\Services\SessionStorageService;
 use Plenty\Modules\Account\Contact\Models\Contact;
 use Plenty\Modules\Plugin\Storage\Contracts\StorageRepositoryContract;
 use Plenty\Plugin\CachingRepository;
@@ -42,7 +43,11 @@ class ContentCaching
      */
     private $twig;
 
-    const MAX_BYTE_SIZE_FOR_FAST_CACHING = 524288; //bytes
+    const MAX_BYTE_SIZE_FOR_FAST_CACHING = 524288;
+    /**
+     * @var SessionStorageService
+     */
+    private $sessionStorageService; //bytes
 
     /**
      * ContentCaching constructor.
@@ -52,6 +57,7 @@ class ContentCaching
      * @param StorageRepositoryContract $storageRepositoryContract
      * @param CheckoutService $checkoutService
      * @param CustomerService $customerService
+     * @param SessionStorageService $sessionStorageService
      */
     public function __construct(
         Container $container,
@@ -59,7 +65,8 @@ class ContentCaching
         CachingRepository $cachingRepository,
         StorageRepositoryContract $storageRepositoryContract,
         CheckoutService $checkoutService,
-        CustomerService $customerService
+        CustomerService $customerService,
+        SessionStorageService $sessionStorageService
     )
     {
         $this->container                 = $container;
@@ -68,6 +75,7 @@ class ContentCaching
         $this->checkoutService           = $checkoutService;
         $this->customerService           = $customerService;
         $this->twig                      = $twig;
+        $this->sessionStorageService     = $sessionStorageService;
     }
 
     /**
@@ -78,10 +86,12 @@ class ContentCaching
     {
         $cachingSettings = $this->container->get($templateName);
 
-        $cachingHash = md5($cachingSettings->getIdentifier());
+        $cachingHash = '_'.$this->sessionStorageService->getLang().'_'.md5(implode(';', $cachingSettings->getData()));
 
         $meta = [
-            'identifier' => $cachingSettings->getIdentifier(),
+            'templateName' => $templateName,
+            'language' => $this->sessionStorageService->getLang(),
+            'data' => json_encode($cachingSettings->getData())
         ];
 
         $itemHashFields = null;
@@ -93,7 +103,7 @@ class ContentCaching
                 'referrerId' => 1, //TODO set to real referrer
             ];
 
-            $meta = array_merge($meta, $itemHashFields);
+            $meta['itemData'] = json_encode($itemHashFields);
 
             $contact = $this->customerService->getContact();
 
@@ -106,7 +116,7 @@ class ContentCaching
 
         $tplName = 'tpl_' . md5($templateName) . $cachingHash;
 
-        if($this->cachingRepository->has($tplName)){
+        if ($this->cachingRepository->has($tplName)) {
             return $this->cachingRepository->get($tplName)->content;
         }
 
@@ -116,8 +126,8 @@ class ContentCaching
                 $tplName . '.html'
             );
 
-            if(strlen((STRING)$cachedContentObject->body) <= self::MAX_BYTE_SIZE_FOR_FAST_CACHING ){
-                $smallContentCache = pluginApp(SmallContentCache::class);
+            if (strlen((STRING)$cachedContentObject->body) <= self::MAX_BYTE_SIZE_FOR_FAST_CACHING) {
+                $smallContentCache          = pluginApp(SmallContentCache::class);
                 $smallContentCache->content = $cachedContentObject->body;
 
                 $this->cachingRepository->put($tplName, $smallContentCache, 15);
@@ -128,11 +138,11 @@ class ContentCaching
         } catch (\Exception $exc) {
         }
 
-        $templateContent = $this->twig->render($templateName);
+        $templateContent = $this->twig->render($templateName, ['options' => $cachingSettings->getData()]);
 
         $this->storageRepositoryContract->uploadObject(
             'IO',
-            $tplName .  '.html',
+            $tplName . '.html',
             $templateContent,
             false,
             $meta
