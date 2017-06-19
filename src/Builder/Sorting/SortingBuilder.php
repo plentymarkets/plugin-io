@@ -16,25 +16,22 @@ class SortingBuilder
     {
         $sortingParameter =  self::filterSortingString($sortingString);
 
+        $sortingInterface = pluginApp(MultipleSorting::class);
+
         if(strpos($sortingString, 'texts.name') !== false)
         {
-            $sortingInterface = pluginApp(NameSorting::class, [self::buildNameSorting($sortingParameter["sortingPath"]), pluginApp(SessionStorageService::class)->getLang(), $sortingParameter["sortingOrder"]]);
+            $singleSortingInterface = pluginApp(NameSorting::class, [self::buildNameSorting($sortingParameter["sortingPath"]), pluginApp(SessionStorageService::class)->getLang(), $sortingParameter["sortingOrder"]]);
         }
         else if($sortingString == "item.score")
         {
-            $sortingInterface = pluginApp(MultipleSorting::class);
             $singleSortingInterface = pluginApp(SingleSorting::class,['_score', 'ASC']);
-
-            $sortingInterface->addSorting($singleSortingInterface);
         }
         else
         {
-            $sortingInterface = pluginApp(MultipleSorting::class);
             $singleSortingInterface = pluginApp(SingleSorting::class,[$sortingParameter["sortingPath"], $sortingParameter["sortingOrder"]]);
-
-            $sortingInterface->addSorting($singleSortingInterface);
         }
 
+        $sortingInterface->addSorting($singleSortingInterface);
         return $sortingInterface;
     }
 
