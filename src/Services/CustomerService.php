@@ -290,6 +290,11 @@ class CustomerService
 	{
         AddressValidator::validateOrFail($type, $addressData);
         
+        if(AddressValidator::isEnAddress($addressData['countryId']))
+        {
+            $addressData['useAddressLightValidator'] = true;
+        }
+        
         if (isset($addressData['stateId']) && empty($addressData['stateId']))
         {
             $addressData['stateId'] = null;

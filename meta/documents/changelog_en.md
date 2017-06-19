@@ -1,6 +1,12 @@
 # Release Notes for IO
 
-## v.1.2.5 (2017-06-08)
+## v1.2.6 (2017-06-14)
+
+### Fixed
+
+- Due to an error, the validator for invoice and delivery addresses for the country of delivery **United kingdom** did not work properly. This has been fixed.
+
+## v1.2.5 (2017-06-08)
 
 ### Added
 
@@ -10,14 +16,14 @@
 
 - Due to an error the default country of delivery has not been set. This has been fixed.
 
-## v.1.2.4 (2017-06-02)
+## v1.2.4 (2017-06-02)
 
 ### Added
 
 - A Twig filter for sorting an object by a given key has been added.
 - Validation of the address form for the delivery country **United Kingdom**
 
-## v.1.2.3 (2017-05-19)
+## v1.2.3 (2017-05-19)
 
 ### Added
 

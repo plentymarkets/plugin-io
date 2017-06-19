@@ -1,6 +1,12 @@
 # Release Notes für IO
 
-## v.1.2.5 (2017-06-08)
+## v.1.2.6 (2017-06-14)
+
+### Behoben
+
+- Fehler beim Validieren von englischen Rechnungs- und Lieferadressen.
+
+## v1.2.5 (2017-06-08)
 
 ### Hinzugefügt
 
@@ -10,14 +16,14 @@
 
 - Es wurde ein Fehler behoben, der dazu führte, dass manchmal keine Standardlieferland gesetzt wurde. 
 
-## v.1.2.4 (2017-06-02)
+## v1.2.4 (2017-06-02)
 
 ### Hinzugefügt
 
 - Es wurde ein Twig-Filter hinzugefügt, um Objekte anhand eines Keys zu sortieren.
 - Validierung von Feldern des Adressformulars für das Lieferland **Vereinigtes Königreich**
 
-## v.1.2.3 (2017-05-19)
+## v1.2.3 (2017-05-19)
 
 ### Hinzugefügt
 
