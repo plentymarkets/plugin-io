@@ -187,7 +187,13 @@ class CategoryService
      */
 	public function isHome():bool
 	{
-		return $this->currentCategory !== null && $this->currentCategory->id == pluginApp(CategoryMap::class)->getID(CategoryKey::HOME);
+        $currentDomain = rtrim($_SERVER[HTTP_HOST].$_SERVER[REQUEST_URI], '/').'/';
+
+        $domainToCheck = $this->webstoreConfig->getWebstoreConfig()->domain;
+
+        return $currentDomain == $domainToCheck;
+
+//		return $this->currentCategory !== null && $this->currentCategory->id == pluginApp(CategoryMap::class)->getID(CategoryKey::HOME);
 	}
 
     /**
