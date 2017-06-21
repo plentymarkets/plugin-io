@@ -2,9 +2,11 @@
 
 namespace IO\Services\ContentCaching;
 
+use IO\Services\ContentCaching\CronJobs\RebuildContentCache;
 use IO\Services\ContentCaching\Extensions\TwigCachedTemplate;
 use IO\Services\ContentCaching\Services\Container;
 use IO\Services\ContentCaching\Services\ContentCaching;
+use Plenty\Modules\Cron\Services\CronContainer;
 use Plenty\Plugin\ServiceProvider;
 use Plenty\Plugin\Templates\Twig;
 
@@ -26,9 +28,11 @@ class ContentCachingProvider extends ServiceProvider
 
     /**
      * @param Twig $twig
+     * @param CronContainer $cronContainer
      */
-    public function boot(Twig $twig)
+    public function boot(Twig $twig, CronContainer $cronContainer)
     {
         $twig->addExtension(TwigCachedTemplate::class);
+        $cronContainer->add(CronContainer::EVERY_FIFTEEN_MINUTES, RebuildContentCache::class);
     }
 }

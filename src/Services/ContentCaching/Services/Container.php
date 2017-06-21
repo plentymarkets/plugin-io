@@ -30,20 +30,28 @@ class Container
     }
 
     /**
+     * @return array
+     */
+    public function getRegisteredTemplateNames(): array
+    {
+        return array_keys($this->templateCacheMap);
+    }
+
+    /**
      * @param string $templateName
      * @return CachingSettings
      * @throws \Exception
      */
-    public function get($templateName):CachingSettings
+    public function get($templateName): CachingSettings
     {
-        if(!array_key_exists($templateName, $this->templateCacheMap)){
-            throw new \Exception('no caching settings for '.$templateName.' not found');
+        if (!array_key_exists($templateName, $this->templateCacheMap)) {
+            throw new \Exception('no caching settings for ' . $templateName . ' not found');
         }
 
-        if(!array_key_exists($templateName, $this->settingsContainer)){
+        if (!array_key_exists($templateName, $this->settingsContainer)) {
             $settings = pluginApp($this->templateCacheMap[$templateName]);
 
-            if(!$settings instanceof CachingSettings){
+            if (!$settings instanceof CachingSettings) {
                 throw new \Exception('caching settings class has to implement the CachingSettings interface');
             }
 
