@@ -4,7 +4,7 @@
 
 ### Behoben
 
-- Beim Registrieren des Kunden wird die eingegebene Adresse nicht mehr automatisch als Lieferadresse angelegt
+- Bei der Kundenregistrierung wird die eingegebene Adresse nicht mehr automatisch als Lieferadresse angelegt.
 
 
 ## v.1.2.6 (2017-06-14)

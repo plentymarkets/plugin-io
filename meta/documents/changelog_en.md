@@ -1,5 +1,11 @@
 # Release Notes for IO
 
+## v.1.2.7 (2017-06-21)
+
+### Fixed
+
+- During registration, when the customer enters an invoice address, the entered address is not automatically saved as the delivery address.
+
 ## v1.2.6 (2017-06-14)
 
 ### Fixed
