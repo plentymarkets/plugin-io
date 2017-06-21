@@ -188,11 +188,12 @@ class OrderService
     /**
      * List all payment methods available for switch in MyAccount
      * @param int $currentPaymentMethodId
+     * @param int $orderId
      * @return \Plenty\Modules\Payment\Method\Models\PaymentMethod[]
      */
-    public function getPaymentMethodListForSwitch($currentPaymentMethodId = 0)
+    public function getPaymentMethodListForSwitch($currentPaymentMethodId = 0, $orderId = null)
     {
-        return $this->frontendPaymentMethodRepository->getCurrentPaymentMethodsListForSwitch($currentPaymentMethodId);
+        return $this->frontendPaymentMethodRepository->getCurrentPaymentMethodsListForSwitch($currentPaymentMethodId, $orderId);
     }
     
     /**
