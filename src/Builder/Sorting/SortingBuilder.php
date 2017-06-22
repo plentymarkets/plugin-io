@@ -47,7 +47,7 @@ class SortingBuilder
         $usedSortingPrioritySearch2 = $templateConfigService->get('sorting.prioritySearch2');
         $usedSortingPrioritySearch3 = $templateConfigService->get('sorting.prioritySearch3');
 
-        if($usedSortingPrioritySearch2 == 'item.notSelected' && $usedSortingPrioritySearch3 == 'item.notSelected')
+        if($usedSortingPrioritySearch2 == 'notSelected' && $usedSortingPrioritySearch3 == 'notSelected')
         {
             //SingleSort
             if($usedSortingPrioritySearch1 == 'item.score')
@@ -74,7 +74,7 @@ class SortingBuilder
             }
             $sortingInterface->addSorting($singleSortingInterface);
 
-            if($usedSortingPrioritySearch2 != 'item.notSelected')
+            if($usedSortingPrioritySearch2 != 'notSelected')
             {
                 if($usedSortingPrioritySearch2 == 'item.score')
                 {
@@ -86,7 +86,7 @@ class SortingBuilder
                 }
                 $sortingInterface->addSorting($singleSortingInterface);
             }
-            if($usedSortingPrioritySearch3 != 'item.notSelected')
+            if($usedSortingPrioritySearch3 != 'notSelected')
             {
                 if($usedSortingPrioritySearch3 == 'item.score')
                 {
@@ -114,7 +114,7 @@ class SortingBuilder
         $usedSortingPriorityCategory2 = $templateConfigService->get('sorting.priorityCategory2');
         $usedSortingPriorityCategory3 = $templateConfigService->get('sorting.priorityCategory3');
 
-        if($usedSortingPriorityCategory2 == 'item.notSelected' && $usedSortingPriorityCategory3 == 'item.notSelected')
+        if($usedSortingPriorityCategory2 == 'notSelected' && $usedSortingPriorityCategory3 == 'notSelected')
         {
             //SingleSort
             $sortingInterface = self::SortingPriority($usedSortingPriorityCategory1);
@@ -127,13 +127,13 @@ class SortingBuilder
             $singleSortingInterface = self::SortingPriority($usedSortingPriorityCategory1);
             $sortingInterface->addSorting($singleSortingInterface);
 
-            if($usedSortingPriorityCategory2 != 'item.notSelected')
+            if($usedSortingPriorityCategory2 != 'notSelected')
             {
                 $singleSortingInterface = self::SortingPriority($usedSortingPriorityCategory2);
 
                 $sortingInterface->addSorting($singleSortingInterface);
             }
-            if($usedSortingPriorityCategory3 != 'item.notSelected')
+            if($usedSortingPriorityCategory3 != 'notSelected')
             {
                 $singleSortingInterface = self::SortingPriority($usedSortingPriorityCategory3);
 
