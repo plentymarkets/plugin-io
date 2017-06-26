@@ -99,7 +99,7 @@ class ItemLoaderFactoryES implements ItemLoaderFactory
             {
                 foreach($aggregations as $aggregation)
                 {
-                    $elasticSearchRepo->addSearch($aggregation);
+                    $search->addAggregation($aggregation);
                 }
             }
 		}
