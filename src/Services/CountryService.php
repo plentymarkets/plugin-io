@@ -18,6 +18,11 @@ class CountryService
 	private $countryRepository;
 
     /**
+     * @var Country[][]
+     */
+	private static $activeCountries = [];
+
+    /**
      * CountryService constructor.
      * @param CountryRepositoryContract $countryRepository
      */
@@ -28,21 +33,24 @@ class CountryService
 
     /**
      * List all active countries
-     * @return array
+     * @param string $lang
+     * @return Country[]
      */
-	public function getActiveCountriesList($lang = 'de'):array
-	{
-        $list = $this->countryRepository->getCountriesList(1, array('states'));
+    public function getActiveCountriesList($lang = 'de'):array
+    {
+        if (!isset(self::$activeCountries[$lang])) {
+            $list = $this->countryRepository->getActiveCountriesList();
 
-        $countriesList = array();
-        foreach($list as $country)
-        {
-			$country->currLangName = $this->getCountryName($country->id, $lang);
-            $countriesList[] = $country;
+            foreach ($list as $country) {
+                $country->currLangName   = $country->names->contains('language', $lang) ?
+                    $country->names->where('language', $lang)->first()->name :
+                    $country->names->first()->name;
+                self::$activeCountries[$lang][] = $country;
+            }
         }
 
-		return $countriesList;
-	}
+        return self::$activeCountries[$lang];
+    }
 
     /**
      * Get a list of names for the active countries
@@ -51,7 +59,12 @@ class CountryService
      */
 	public function getActiveCountryNameMap(string $language):array
 	{
-		return $this->countryRepository->getActiveCountryNameMap($language);
+        $nameMap = [];
+        foreach ($this->getActiveCountriesList($language) as $country) {
+            $nameMap[$country->id] = $country->currLangName;
+        }
+
+        return $nameMap;
 	}
 
     /**
