@@ -80,7 +80,7 @@ class RebuildContentCache extends CronHandler
         $this->checkoutService           = $checkoutService;
         $this->twig                      = $twig;
 
-        $dispatcher->fire('IO.init.templates', pluginApp(Partial::class));
+        $dispatcher->fire('IO.init.templates', [pluginApp(Partial::class)]);
         $this->frontendFactory   = $frontendFactory;
         $this->cachingRepository = $cachingRepository;
     }
