@@ -8,12 +8,12 @@ namespace IO\Services\ItemLoader\Contracts;
  */
 interface ItemLoaderFactory
 {
-	/**
-	 * @param array $loaderClassList
-	 * @param array $resultFields
-	 * @param array $options
-	 * @return array
-	 */
+    /**
+     * @param array $loaderClassList
+     * @param array $resultFields
+     * @param array $options
+     * @return array
+     */
 	public function runSearch($loaderClassList, $resultFields,  $options = []);
 
 }

@@ -140,13 +140,6 @@ class CustomerService
                 $newBillingAddress = $this->createAddress($billingAddressData, AddressType::BILLING);
                 //$this->sessionStorage->setSessionValue(SessionStorageKeys::BILLING_ADDRESS_ID, $newBillingAddress->id);
                 $basketService->setBillingAddressId($newBillingAddress->id);
-        
-                if($deliveryAddressData === null)
-                {
-                    $newDeliveryAddress = $this->createAddress($billingAddressData, AddressType::DELIVERY);
-                    //$this->sessionStorage->setSessionValue(SessionStorageKeys::DELIVERY_ADDRESS_ID, $newDeliveryAddress->id);
-                    $basketService->setDeliveryAddressId($newDeliveryAddress->id);
-                }
             }
     
             if($deliveryAddressData !== null)
@@ -289,6 +282,11 @@ class CustomerService
 	public function createAddress(array $addressData, int $type):Address
 	{
         AddressValidator::validateOrFail($type, $addressData);
+        
+        if(AddressValidator::isEnAddress($addressData['countryId']))
+        {
+            $addressData['useAddressLightValidator'] = true;
+        }
         
         if (isset($addressData['stateId']) && empty($addressData['stateId']))
         {

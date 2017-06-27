@@ -5,6 +5,7 @@ namespace IO\Providers;
 use IO\Extensions\TwigIOExtension;
 use IO\Extensions\TwigServiceProvider;
 use IO\Middlewares\Middleware;
+use IO\Services\ContentCaching\ContentCachingProvider;
 use IO\Services\ItemLoader\Contracts\ItemLoaderFactory;
 use IO\Services\ItemLoader\Extensions\TwigLoaderPresets;
 use IO\Services\ItemLoader\Factories\ItemLoaderFactoryES;
@@ -23,6 +24,7 @@ class IOServiceProvider extends ServiceProvider
      */
     public function register()
     {
+        $this->getApplication()->register(ContentCachingProvider::class);
         $this->addGlobalMiddleware(Middleware::class);
         $this->getApplication()->register(IORouteServiceProvider::class);
 
@@ -38,6 +40,7 @@ class IOServiceProvider extends ServiceProvider
 
         //TODO check ES ready state
         $this->getApplication()->bind(ItemLoaderFactory::class, ItemLoaderFactoryES::class);
+
     }
 
     /**
