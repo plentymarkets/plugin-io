@@ -381,15 +381,21 @@ class CustomerService
      * @param int $type
      * @return Address
      */
-	public function updateAddress(int $addressId, array $addressData, int $type):Address
-	{
+    public function updateAddress(int $addressId, array $addressData, int $type):Address
+    {
         AddressValidator::validateOrFail($type, $addressData);
-	    
+
         if (isset($addressData['stateId']) && empty($addressData['stateId'])) {
             $addressData['stateId'] = null;
         }
-		return $this->contactAddressRepository->updateAddress($addressData, $addressId, $this->getContactId(), $type);
-	}
+
+        if ($this->getContactId() != null)
+        {
+            return $this->contactAddressRepository->updateAddress($addressData, $addressId, $this->getContactId(), $type);
+        }
+        //case for guests
+        return $this->addressRepository->updateAddress($addressData, $addressId);
+    }
 
     /**
      * Delete an address
