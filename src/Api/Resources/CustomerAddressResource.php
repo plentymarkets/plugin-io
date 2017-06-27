@@ -2,6 +2,7 @@
 
 namespace IO\Api\Resources;
 
+use IO\Services\BasketService;
 use Plenty\Plugin\Http\Response;
 use Plenty\Plugin\Http\Request;
 use IO\Api\ApiResource;
@@ -104,6 +105,8 @@ class CustomerAddressResource extends ApiResource
 
 		$addressId = (int)$addressId;
 		$this->customerService->deleteAddress($addressId, $type);
+
+		$basketService = pluginApp(BasketService::class);
 
         if ($type === 1 && $basketService->getBillingAddressId() === $addressId)
         {
