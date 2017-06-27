@@ -104,6 +104,16 @@ class CustomerAddressResource extends ApiResource
 
 		$addressId = (int)$addressId;
 		$this->customerService->deleteAddress($addressId, $type);
+
+        if ($type === 1 && $basketService->getBillingAddressId() === $addressId)
+        {
+            $basketService->setBillingAddressId(0);
+        }
+        else if ($type === 2 && $basketService->getDeliveryAddressId() === $addressId)
+        {
+            $basketService->setDeliveryAddressId(-99);
+        }
+
 		return $this->index();
 	}
 }
