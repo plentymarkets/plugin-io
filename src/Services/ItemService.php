@@ -450,6 +450,7 @@ class ItemService
 			$filter        = $filterBuilder
 				->hasId([$itemId])
 				->variationIsChild()
+                ->variationIsActive()
 				->build();
 
 			/** @var ItemParamsBuilder $paramsBuilder */

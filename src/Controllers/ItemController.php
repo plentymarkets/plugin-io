@@ -34,7 +34,8 @@ class ItemController extends ItemLoaderController
 		int $variationId = 0
 	)
 	{
-		$loaderOptions = [];
+        $salable = true;
+        $loaderOptions = [];
 		$itemService = pluginApp(ItemService::class);
 
 		if((int)$variationId > 0)
@@ -52,7 +53,12 @@ class ItemController extends ItemLoaderController
 
         if($isSalable->variationBase->limitOrderByStockSelect == 1 && $isSalable->variationStock->stockPhysical <= 0)
         {
-            return pluginApp(Response::class)->redirectTo($attributeMap[0]['url'] . "_" . $attributeMap[0]['variationId']);
+            if(count($attributeMap) > 0)
+            {
+                return pluginApp(Response::class)->redirectTo($attributeMap[0]['url'] . "_" . $attributeMap[0]['variationId']);
+            }
+
+            $salable = false;
         }
 
 		$templateContainer = $this->buildTemplateContainer("tpl.item", $loaderOptions);
@@ -103,7 +109,7 @@ class ItemController extends ItemLoaderController
             }
 
 			$templateContainer->setTemplateData(
-				array_merge(['item' => $itemResult, 'attributeNameMap' => $attributeNameMap, 'variations' => $attributeMap], $templateContainer->getTemplateData(), ['http_host' => $_SERVER['HTTP_HOST']])
+				array_merge(['item' => $itemResult, 'attributeNameMap' => $attributeNameMap, 'variations' => $attributeMap, 'salable' => $salable], $templateContainer->getTemplateData(), ['http_host' => $_SERVER['HTTP_HOST']])
 			);
 
 			return $this->renderTemplateContainer($templateContainer);
