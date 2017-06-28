@@ -1,5 +1,17 @@
 # Release Notes für IO
 
+## v1.2.8 (unknown)
+
+### Hinzugefügt
+
+- Im **Mein Konto**-Bereich kann nun die Zahlungsart eines Auftrags geändert werden, wenn die Zahlungsart dies zulässt.
+
+
+### Behoben
+
+- Ein Fehler führte dazu, dass eine gelöschte Adresse nicht aus der Adressliste entfernt wurde. Dies wurde behoben.
+- Ein Fehler führte dazu, dass eine Adresse bei einer Gastbestellung nicht bearbeitet werden konnte. Dies wurde behoben.
+
 ## v.1.2.7 (2017-06-21)
 
 ### Behoben
