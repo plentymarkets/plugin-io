@@ -152,7 +152,7 @@ class CategoryItems implements ItemLoaderContract, ItemLoaderPaginationContract,
         if(isset($options['sorting']) && strlen($options['sorting']))
         {
 
-            if($options['sorting'] == 'default.standard_sorting')
+            if($options['sorting'] == 'default.recommended_sorting')
             {
                 $sortingInterface = SortingBuilder::buildDefaultSortingCategory();
             }

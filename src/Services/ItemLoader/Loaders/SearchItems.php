@@ -170,7 +170,7 @@ class SearchItems implements ItemLoaderContract, ItemLoaderPaginationContract, I
         if(isset($options['sorting']) && strlen($options['sorting']))
         {
 
-            if($options['sorting'] == 'default.standard_sorting')
+            if($options['sorting'] == 'default.recommended_sorting')
             {
                 $sortingInterface = SortingBuilder::buildDefaultSortingSearch();
             }
