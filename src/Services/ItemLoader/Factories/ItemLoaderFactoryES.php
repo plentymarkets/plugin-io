@@ -35,6 +35,11 @@ class ItemLoaderFactoryES implements ItemLoaderFactory
         {
             $isMultiSearch = true;
         }
+        elseif(!isset($loaderClassList['single']))
+        {
+            $classList['single'] = $loaderClassList;
+            $loaderClassList = $classList;
+        }
 	    
         if($isMultiSearch)
         {
@@ -243,9 +248,9 @@ class ItemLoaderFactoryES implements ItemLoaderFactory
         {
             if($key == 0)
             {
-                foreach($list as $entry)
+                foreach($list as $k => $entry)
                 {
-                    $result[] = $entry;
+                    $result[$k] = $entry;
                 }
             }
             else
