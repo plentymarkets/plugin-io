@@ -49,4 +49,12 @@ class OrderPaymentResource extends ApiResource
         
         return $this->response->create($response, ResponseCode::CREATED);
     }
+	
+	public function paymentMethodListForSwitch():Response
+	{
+		$paymentMethodId = $this->request->get('paymentMethodId');
+		$orderId = $this->request->get('orderId');
+		$response = $this->orderService->getPaymentMethodListForSwitch($paymentMethodId, $orderId);
+		return $this->response->create($response, ResponseCode::CREATED);
+	}
 }
