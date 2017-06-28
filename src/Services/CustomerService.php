@@ -385,8 +385,14 @@ class CustomerService
     {
         AddressValidator::validateOrFail($type, $addressData);
 
-        if (isset($addressData['stateId']) && empty($addressData['stateId'])) {
+        if (isset($addressData['stateId']) && empty($addressData['stateId']))
+        {
             $addressData['stateId'] = null;
+        }
+
+        if (isset($addressData['checkedAt']) && empty($addressData['checkedAt']))
+        {
+            unset($addressData['checkedAt']);
         }
 
         if((int)$this->getContactId() > 0)
