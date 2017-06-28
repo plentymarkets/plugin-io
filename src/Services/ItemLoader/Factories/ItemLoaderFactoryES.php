@@ -20,18 +20,18 @@ use Plenty\Modules\Item\SalesPrice\Models\SalesPriceSearchResponse;
  */
 class ItemLoaderFactoryES implements ItemLoaderFactory
 {
-	/**
-	 * @param array $loaderClassList
-	 * @param array $resultFields
-	 * @param array $options
-	 * @return array
-	 */
-	public function runSearch($loaderClassList, $resultFields,  $options = [])
-	{
-	    $result = [];
-	    
-	    $isMultiSearch = false;
-	    if(isset($loaderClassList['multi']) && count($loaderClassList['multi']))
+    /**
+     * @param array $loaderClassList
+     * @param array $resultFields
+     * @param array $options
+     * @return array
+     */
+    public function runSearch($loaderClassList, $resultFields,  $options = [])
+    {
+        $result = [];
+        
+        $isMultiSearch = false;
+        if(isset($loaderClassList['multi']) && count($loaderClassList['multi']))
         {
             $isMultiSearch = true;
         }
@@ -40,7 +40,7 @@ class ItemLoaderFactoryES implements ItemLoaderFactory
             $classList['single'] = $loaderClassList;
             $loaderClassList = $classList;
         }
-	    
+        
         if($isMultiSearch)
         {
             $result = $this->buildMultiSearch($loaderClassList, $resultFields, $options);
@@ -53,20 +53,20 @@ class ItemLoaderFactoryES implements ItemLoaderFactory
         $result = $this->attachPrices($result, $options);
         
         return $result;
-	}
-	
-	private function buildSingleSearch($loaderClassList, $resultFields, $options = [])
+    }
+    
+    private function buildSingleSearch($loaderClassList, $resultFields, $options = [])
     {
         /** @var VariationElasticSearchSearchRepositoryContract $elasticSearchRepo */
         $elasticSearchRepo = pluginApp(VariationElasticSearchSearchRepositoryContract::class);
-    
+        
         $search = null;
-    
+        
         foreach($loaderClassList as $loaderClass)
         {
             /** @var ItemLoaderContract $loader */
             $loader = pluginApp($loaderClass);
-        
+            
             if($loader instanceof ItemLoaderContract)
             {
                 if(!$search instanceof DocumentSearch)
@@ -74,13 +74,13 @@ class ItemLoaderFactoryES implements ItemLoaderFactory
                     //search, filter
                     $search = $loader->getSearch();
                 }
-            
+                
                 foreach($loader->getFilterStack($options) as $filter)
                 {
                     $search->addFilter($filter);
                 }
             }
-        
+            
             //sorting
             if($loader instanceof ItemLoaderSortingContract)
             {
@@ -91,7 +91,7 @@ class ItemLoaderFactoryES implements ItemLoaderFactory
                     $search->setSorting($sorting);
                 }
             }
-        
+            
             if($loader instanceof ItemLoaderPaginationContract)
             {
                 if($search instanceof DocumentSearch)
@@ -100,30 +100,30 @@ class ItemLoaderFactoryES implements ItemLoaderFactory
                     $search->setPage($loader->getCurrentPage($options), $loader->getItemsPerPage($options));
                 }
             }
-        
+            
             /** @var IncludeSource $source */
             $source = pluginApp(IncludeSource::class);
-        
+            
             $currentFields = $resultFields;
             if(array_key_exists($loaderClass, $currentFields))
             {
                 $currentFields = $currentFields[$loaderClass];
             }
-        
+            
             $fieldsFound = false;
             foreach($currentFields as $fieldName)
             {
                 $source->activateList([$fieldName]);
                 $fieldsFound = true;
             }
-        
+            
             if(!$fieldsFound)
             {
                 $source->activateAll();
             }
-        
+            
             $search->addSource($source);
-        
+            
             $aggregations = $loader->getAggregations();
             if(count($aggregations))
             {
@@ -133,12 +133,12 @@ class ItemLoaderFactoryES implements ItemLoaderFactory
                 }
             }
         }
-    
+        
         if(!is_null($search))
         {
             $elasticSearchRepo->addSearch($search);
         }
-    
+        
         $result = $elasticSearchRepo->execute();
         
         return $result;
@@ -150,9 +150,9 @@ class ItemLoaderFactoryES implements ItemLoaderFactory
          * @var VariationElasticSearchMultiSearchRepositoryContract $elasticSearchRepo
          */
         $elasticSearchRepo = pluginApp(VariationElasticSearchMultiSearchRepositoryContract::class);
-    
+        
         $search = null;
-    
+        
         $identifiers = [];
         
         foreach($loaderClassList as $type => $loaderClasses)
@@ -161,7 +161,7 @@ class ItemLoaderFactoryES implements ItemLoaderFactory
             {
                 /** @var ItemLoaderContract $loader */
                 $loader = pluginApp($loaderClass);
-            
+                
                 if($loader instanceof ItemLoaderContract)
                 {
                     if(!$search instanceof DocumentSearch)
@@ -169,13 +169,13 @@ class ItemLoaderFactoryES implements ItemLoaderFactory
                         //search, filter
                         $search = $loader->getSearch();
                     }
-                
+                    
                     foreach($loader->getFilterStack($options) as $filter)
                     {
                         $search->addFilter($filter);
                     }
                 }
-            
+                
                 //sorting
                 if($loader instanceof ItemLoaderSortingContract)
                 {
@@ -186,7 +186,7 @@ class ItemLoaderFactoryES implements ItemLoaderFactory
                         $search->setSorting($sorting);
                     }
                 }
-            
+                
                 if($loader instanceof ItemLoaderPaginationContract)
                 {
                     if($search instanceof DocumentSearch)
@@ -195,30 +195,30 @@ class ItemLoaderFactoryES implements ItemLoaderFactory
                         $search->setPage($loader->getCurrentPage($options), $loader->getItemsPerPage($options));
                     }
                 }
-            
+                
                 /** @var IncludeSource $source */
                 $source = pluginApp(IncludeSource::class);
-            
+                
                 $currentFields = $resultFields;
                 if(array_key_exists($loaderClass, $currentFields))
                 {
                     $currentFields = $currentFields[$loaderClass];
                 }
-            
+                
                 $fieldsFound = false;
                 foreach($currentFields as $fieldName)
                 {
                     $source->activateList([$fieldName]);
                     $fieldsFound = true;
                 }
-            
+                
                 if(!$fieldsFound)
                 {
                     $source->activateAll();
                 }
-            
+                
                 $search->addSource($source);
-            
+                
                 $aggregations = $loader->getAggregations();
                 if(count($aggregations))
                 {
@@ -227,13 +227,18 @@ class ItemLoaderFactoryES implements ItemLoaderFactory
                         $search->addAggregation($aggregation);
                     }
                 }
-    
-                if(!in_array($identifier, $identifiers))
+                
+                if($type == 'multi')
                 {
-                    $identifiers[] = $identifier;
+                    $e = explode('\\', $loaderClass);
+                    $identifier = $e[count($e)-1];
+                    if(!in_array($identifier, $identifiers))
+                    {
+                        $identifiers[] = $identifier;
+                    }
                 }
             }
-    
+            
             if(!is_null($search))
             {
                 $elasticSearchRepo->addSearch($search);
@@ -258,7 +263,7 @@ class ItemLoaderFactoryES implements ItemLoaderFactory
                 $result[$identifiers[$key-1]] = $list;
             }
         }
-    
+        
         return $result;
     }
     
@@ -270,7 +275,7 @@ class ItemLoaderFactoryES implements ItemLoaderFactory
              * @var SalesPriceService $salesPriceService
              */
             $salesPriceService = pluginApp(SalesPriceService::class);
-        
+            
             foreach($result['documents'] as $key => $variation)
             {
                 if((int)$variation['data']['variation']['id'] > 0)
@@ -280,25 +285,25 @@ class ItemLoaderFactoryES implements ItemLoaderFactory
                     {
                         $quantity = (int)$options['basketVariationQuantities'][$variation['data']['variation']['id']];
                     }
-                
+                    
                     $salesPrice = $salesPriceService->getSalesPriceForVariation($variation['data']['variation']['id'], 'default', $quantity);
                     if($salesPrice instanceof SalesPriceSearchResponse)
                     {
                         $variation['data']['calculatedPrices']['default'] = $salesPrice;
                     }
-                
+                    
                     $rrp = $salesPriceService->getSalesPriceForVariation($variation['data']['variation']['id'], 'rrp');
                     if($rrp instanceof SalesPriceSearchResponse)
                     {
                         $variation['data']['calculatedPrices']['rrp'] = $rrp;
                     }
-                
+                    
                     $specialOffer = $salesPriceService->getSalesPriceForVariation($variation['data']['variation']['id'], 'specialOffer');
                     if($specialOffer instanceof SalesPriceSearchResponse)
                     {
                         $variation['data']['calculatedPrices']['specialOffer'] = $specialOffer;
                     }
-                
+                    
                     $result['documents'][$key] = $variation;
                 }
             }
