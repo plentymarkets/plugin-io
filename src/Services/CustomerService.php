@@ -389,7 +389,7 @@ class CustomerService
             $addressData['stateId'] = null;
         }
 
-        if ($this->getContactId() != null)
+        if((int)$this->getContactId() > 0)
         {
             return $this->contactAddressRepository->updateAddress($addressData, $addressId, $this->getContactId(), $type);
         }
