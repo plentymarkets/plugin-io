@@ -260,7 +260,7 @@ class ItemLoaderFactoryES implements ItemLoaderFactory
             }
             else
             {
-                $result[$identifiers[$key-1]] = $list;
+                $result[$identifiers[$key-1]] = $this->attachPrices($list);
             }
         }
         
