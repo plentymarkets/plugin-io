@@ -3,6 +3,7 @@ namespace IO\Services\ItemLoader\Loaders;
 
 use IO\Constants\CrossSellingType;
 use IO\Services\SessionStorageService;
+use IO\Services\ItemCrossSellingService;
 use IO\Services\ItemLoader\Contracts\ItemLoaderContract;
 use IO\Services\TemplateConfigService;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Processor\DocumentProcessor;
@@ -60,10 +61,15 @@ class CrossSellingItems implements ItemLoaderContract
         $variationFilter->isMain();
     
         /**
+         * @var ItemCrossSellingService $crossSellingService
+         */
+        $crossSellingService = pluginApp(ItemCrossSellingService::class);
+        
+        /**
          * @var CrossSellingFilter $crossSellingFilter
          */
         $crossSellingFilter = pluginApp(CrossSellingFilter::class, [$options['crossSellingItemId']]);
-        $crossSellingFilter->hasRelation(CrossSellingType::SIMILAR);
+        $crossSellingFilter->hasRelation($crossSellingService->getType());
         
         $sessionLang = pluginApp(SessionStorageService::class)->getLang();
         
