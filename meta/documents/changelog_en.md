@@ -1,5 +1,16 @@
 # Release Notes for IO
 
+## v1.2.8 (unknown)
+
+### Added
+
+- A payment method can be changed subsequently for an order in the **My account** area if this feature is enabled in the payment method.
+
+### Fixed
+
+- Due to an error, a deleted address was not removed from the address list. This has been fixed.
+- Due to an error the address could not be edited when ordering as a guest. This has been fixed.
+
 ## v.1.2.7 (2017-06-21)
 
 ### Fixed
