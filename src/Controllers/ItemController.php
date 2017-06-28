@@ -4,6 +4,7 @@ namespace IO\Controllers;
 use IO\Helper\CategoryKey;
 use IO\Services\CategoryService;
 use IO\Services\ItemLastSeenService;
+use IO\Services\ItemService;
 use IO\Services\ItemLoader\Loaders\SingleItem;
 use IO\Services\ItemLoader\Loaders\SingleItemAttributes;
 use IO\Services\ItemLoader\Services\ItemLoaderService;
@@ -11,6 +12,7 @@ use IO\Services\SessionStorageService;
 use Plenty\Modules\Category\Contracts\CategoryRepositoryContract;
 use Plenty\Modules\Category\Models\Category;
 use Plenty\Plugin\Application;
+use Plenty\Plugin\Http\Response;
 
 /**
  * Class ItemController
@@ -30,9 +32,11 @@ class ItemController extends ItemLoaderController
 		string $slug = "",
 		int $itemId = 0,
 		int $variationId = 0
-	):string
+	)
 	{
-		$loaderOptions = [];
+        $salable = true;
+        $loaderOptions = [];
+		$itemService = pluginApp(ItemService::class);
 
 		if((int)$variationId > 0)
 		{
@@ -41,7 +45,21 @@ class ItemController extends ItemLoaderController
 		elseif($itemId > 0)
 		{
 			$loaderOptions['itemId'] = $itemId;
-		}
+        }
+
+        $isSalable = $itemService->getVariationIsSalable($variationId);
+        $attributeMap = $itemService->getVariationAttributeMap($itemId);
+        $attributeNameMap = $itemService->getAttributeNameMap($itemId);
+
+        if($isSalable->variationBase->limitOrderByStockSelect == 1 && $isSalable->variationStock->stockPhysical <= 0)
+        {
+            if(count($attributeMap) > 0)
+            {
+                return pluginApp(Response::class)->redirectTo($attributeMap[0]['url'] . "_" . $attributeMap[0]['variationId']);
+            }
+
+            $salable = false;
+        }
 
 		$templateContainer = $this->buildTemplateContainer("tpl.item", $loaderOptions);
 		
@@ -89,9 +107,9 @@ class ItemController extends ItemLoaderController
                 $itemLastSeenService = pluginApp(ItemLastSeenService::class);
                 $itemLastSeenService->setLastSeenItem($itemResult['documents'][0]['data']['variation']['id']);
             }
-            
+
 			$templateContainer->setTemplateData(
-				array_merge(['item' => $itemResult], $templateContainer->getTemplateData(), ['http_host' => $_SERVER['HTTP_HOST']])
+				array_merge(['item' => $itemResult, 'attributeNameMap' => $attributeNameMap, 'variations' => $attributeMap, 'salable' => $salable], $templateContainer->getTemplateData(), ['http_host' => $_SERVER['HTTP_HOST']])
 			);
 
 			return $this->renderTemplateContainer($templateContainer);
