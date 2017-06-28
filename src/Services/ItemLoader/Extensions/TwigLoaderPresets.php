@@ -1,6 +1,7 @@
 <?php
 namespace IO\Services\ItemLoader\Extensions;
 use IO\Services\ItemLoader\Loaders\CategoryItems;
+use IO\Services\ItemLoader\Loaders\CrossSellingItems;
 use IO\Services\ItemLoader\Loaders\LastSeenItemList;
 use IO\Services\ItemLoader\Loaders\SearchItems;
 use IO\Services\ItemLoader\Loaders\Facets;
@@ -35,23 +36,41 @@ class TwigLoaderPresets extends Twig_Extension
 			"itemLoaderPresets" => [
 				
 				"singleItem" => [
-					SingleItem::class,
-				    SingleItemAttributes::class
+				    "single" => [
+                        SingleItem::class,
+                        SingleItemAttributes::class,
+                    ],
+                    "multi" => [
+                        'crossSellingItemsList' => CrossSellingItems::class
+                    ]
 				],
 			    
 			    "categoryList" => [
-				    CategoryItems::class,
-                    Facets::class
+			        "single" => [
+                        CategoryItems::class,
+                        Facets::class
+                    ]
 			    ],
                 "search" => [
-                    SearchItems::class,
-                    Facets::class
+                    "single" => [
+                        SearchItems::class,
+                        Facets::class
+                    ]
                 ],
                 "lastSeenItemsList" => [
-                    LastSeenItemList::class
+                    "single" => [
+                        LastSeenItemList::class
+                    ]
                 ],
                 "items" => [
-                    Items::class
+                    "single" => [
+                        Items::class
+                    ]
+                ],
+                "crossSellingItemsList" => [
+                    "single" => [
+                        CrossSellingItems::class
+                    ]
                 ]
 			]
 		];
