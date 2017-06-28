@@ -1,5 +1,12 @@
 # Release Notes für IO
 
+## v1.2.8 (unknown)
+
+## Behoben
+
+- Es wurde ein Fehler behoben, dass nach dem Löschen einer selektierten Adresse, diese weiterhin in den Browserdaten (Session) gespeichert war.
+- Es wurde ein Fehler behoben, dass ein Gast seine erstellte Adresse nicht mehr editieren konnte.
+
 ## v.1.2.7 (2017-06-21)
 
 ### Behoben
