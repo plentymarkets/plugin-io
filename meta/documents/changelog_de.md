@@ -6,6 +6,9 @@
 
 - Im **Mein Konto**-Bereich kann nun die Zahlungsart eines Auftrags geändert werden, wenn die Zahlungsart dies zulässt.
 
+### Geändert
+- Varianten ohne Bestand können nicht mehr in den Warenkorb gelegt werden.
+- Varianten ohne Bestand werden beim Aufruf auf die nächst kaufbare Variante umgeleitet.
 
 ### Behoben
 
@@ -17,7 +20,7 @@
 ### Behoben
 
 - Bei der Kundenregistrierung wird die eingegebene Adresse nicht mehr automatisch als Lieferadresse angelegt.
-
+- In der Einzelansicht werden keine inaktiven Varianten und ohne Bestand im Dropdown angezeigt.
 
 ## v.1.2.6 (2017-06-14)
 
