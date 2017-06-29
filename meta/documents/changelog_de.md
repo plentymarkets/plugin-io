@@ -1,14 +1,15 @@
 # Release Notes für IO
 
-## v1.2.8 (unknown)
+## v1.2.8 (2017-06-29)
 
 ### Hinzugefügt
 
 - Im **Mein Konto**-Bereich kann nun die Zahlungsart eines Auftrags geändert werden, wenn die Zahlungsart dies zulässt.
 
 ### Geändert
+
 - Varianten ohne Bestand können nicht mehr in den Warenkorb gelegt werden.
-- Varianten ohne Bestand werden beim Aufruf auf die nächst kaufbare Variante umgeleitet.
+- Varianten ohne Bestand werden beim Aufruf auf die nächste kaufbare Variante umgeleitet.
 
 ### Behoben
 

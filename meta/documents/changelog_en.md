@@ -1,10 +1,15 @@
 # Release Notes for IO
 
-## v1.2.8 (unknown)
+## v1.2.8 (2017-06-29)
 
 ### Added
 
 - A payment method can be changed subsequently for an order in the **My account** area if this feature is enabled in the payment method.
+
+### Changed
+
+- Variations that are out of stock cannot be added to the shopping cart anymore.
+- When selecting a variation that is out of stock the customer will be forwarded to the next variation with stock.
 
 ### Fixed
 
