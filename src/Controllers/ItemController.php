@@ -34,71 +34,80 @@ class ItemController extends ItemLoaderController
 		int $variationId = 0
 	)
 	{
-        $salable = true;
         $loaderOptions = [];
-		$itemService = pluginApp(ItemService::class);
+        $isSalable = false;
+        $itemService = pluginApp(ItemService::class);
 
-		if((int)$variationId > 0)
-		{
-			$loaderOptions['variationId'] = $variationId;
-		}
-		elseif($itemId > 0)
-		{
-			$loaderOptions['itemId'] = $itemId;
+        if((int)$variationId > 0)
+        {
+            $loaderOptions['variationId'] = $variationId;
+        }
+        elseif($itemId > 0)
+        {
+            $loaderOptions['itemId'] = $itemId;
+            $variationIds = $itemService->getVariationIds($itemId);
+
+            if(count($variationIds) > 0)
+            {
+                $variationId = $variationIds[0];
+                $loaderOptions['variationId'] = $variationId;
+            }
         }
 
-        $isSalable = $itemService->getVariationIsSalable($variationId);
+        if($variationId > 0)
+        {
+            $isSalable = $itemService->getVariationIsSalable($variationId);
+        }
+
         $attributeMap = $itemService->getVariationAttributeMap($itemId);
         $attributeNameMap = $itemService->getAttributeNameMap($itemId);
 
-        if($isSalable->variationBase->limitOrderByStockSelect == 1 && $isSalable->variationStock->stockPhysical <= 0)
+        if($isSalable)
         {
             if(count($attributeMap) > 0)
             {
                 return pluginApp(Response::class)->redirectTo($attributeMap[0]['url'] . "_" . $attributeMap[0]['variationId']);
             }
-
-            $salable = false;
         }
 
-		$templateContainer = $this->buildTemplateContainer("tpl.item", $loaderOptions);
-		
-		/** @var ItemLoaderService $loaderService */
-		$loaderService = $templateContainer->getTemplateData()['itemLoader'];
-		$loaderService->setLoaderClassList([SingleItem::class, SingleItemAttributes::class]);
+        $templateContainer = $this->buildTemplateContainer("tpl.item", $loaderOptions);
 
-		$itemResult = $loaderService->load();
+        /** @var ItemLoaderService $loaderService */
+        $loaderService = $templateContainer->getTemplateData()['itemLoader'];
+        $loaderService->setLoaderClassList([SingleItem::class, SingleItemAttributes::class]);
 
-		if(empty($itemResult['documents']))
-		{
-			// If item not found, render the error category
-			$itemNotFoundCategory = $this->categoryRepo->get(
-				$this->categoryMap->getID(CategoryKey::ITEM_NOT_FOUND)
-			);
+        $itemResult = $loaderService->load();
 
-			if($itemNotFoundCategory instanceof Category)
-			{
-				return $this->renderCategory($itemNotFoundCategory);
-			}
-			return '';
-		}
-		else
+        if(empty($itemResult['documents']))
+        {
+            // If item not found, render the error category
+            $itemNotFoundCategory = $this->categoryRepo->get(
+                $this->categoryMap->getID(CategoryKey::ITEM_NOT_FOUND)
+            );
+
+            if($itemNotFoundCategory instanceof Category)
+            {
+                return $this->renderCategory($itemNotFoundCategory);
+            }
+            return '';
+        }
+        else
         {
             $itemNames = [
                 'name1' => $itemResult['documents'][0]['data']['texts']['name1'],
                 'name2' => $itemResult['documents'][0]['data']['texts']['name2'],
                 'name3' => $itemResult['documents'][0]['data']['texts']['name3']
             ];
-            
-		    $this->setCategory($itemResult['documents'][0]['data']['defaultCategories'], $itemNames);
-		    
-		    $resultVariationId = $itemResult['documents'][0]['data']['variation']['id'];
-		    
-		    if((int)$resultVariationId <= 0)
+
+            $this->setCategory($itemResult['documents'][0]['data']['defaultCategories'], $itemNames);
+
+            $resultVariationId = $itemResult['documents'][0]['data']['variation']['id'];
+
+            if((int)$resultVariationId <= 0)
             {
                 $resultVariationId = $variationId;
             }
-            
+
             if((int)$resultVariationId > 0)
             {
                 /**
@@ -108,12 +117,12 @@ class ItemController extends ItemLoaderController
                 $itemLastSeenService->setLastSeenItem($itemResult['documents'][0]['data']['variation']['id']);
             }
 
-			$templateContainer->setTemplateData(
-				array_merge(['item' => $itemResult, 'attributeNameMap' => $attributeNameMap, 'variations' => $attributeMap, 'salable' => $salable], $templateContainer->getTemplateData(), ['http_host' => $_SERVER['HTTP_HOST']])
-			);
+            $templateContainer->setTemplateData(
+                array_merge(['item' => $itemResult, 'attributeNameMap' => $attributeNameMap, 'variations' => $attributeMap, 'salable' => !$isSalable], $templateContainer->getTemplateData(), ['http_host' => $_SERVER['HTTP_HOST']])
+            );
 
-			return $this->renderTemplateContainer($templateContainer);
-		}
+            return $this->renderTemplateContainer($templateContainer);
+        }
 	}
 
 	/**

@@ -219,6 +219,52 @@ class ItemService
 		return $elasticSearchRepo->execute();
 	}
 
+    /**
+     * @param $itemId
+     * @return array
+     */
+    public function getVariationIds($itemId):array
+    {
+        $variationIds = [];
+
+        if((int)$itemId > 0)
+        {
+            /** @var ItemColumnBuilder $columnBuilder */
+            $columnBuilder = pluginApp(ItemColumnBuilder::class);
+            $columns       = $columnBuilder
+                ->withVariationBase([
+                    VariationBaseFields::ID
+                ])
+                ->build();
+
+            // filter current item by item id
+            /** @var ItemFilterBuilder $filterBuilder */
+            $filterBuilder = pluginApp(ItemFilterBuilder::class);
+            $filter        = $filterBuilder
+                ->hasId([$itemId])
+                ->variationIsActive()
+                ->variationStockIsSalable();
+
+            $filter = $filter->build();
+
+            // set params
+            /** @var ItemParamsBuilder $paramsBuilder */
+            $paramsBuilder = pluginApp(ItemParamsBuilder::class);
+            $params        = $paramsBuilder
+                ->withParam(ItemColumnsParams::LANGUAGE,  $this->sessionStorage->getLang())
+                ->withParam(ItemColumnsParams::PLENTY_ID, $this->app->getPlentyId())
+                ->build();
+            $variations    = $this->itemRepository->search($columns, $filter, $params);
+
+            foreach($variations as $variation)
+            {
+                array_push($variationIds, $variation->variationBase->id);
+            }
+        }
+
+        return $variationIds;
+    }
+
 	/**
 	 * @param int $itemId
 	 * @param bool $withPrimary
@@ -386,10 +432,12 @@ class ItemService
 
     /**
      * @param int $variationId
-     * @return Record
+     * @return bool
      */
-    public function getVariationIsSalable($variationId = 0):Record
+    public function getVariationIsSalable($variationId = 0):Bool
     {
+        $isSalable = false;
+
         /** @var ItemColumnBuilder $columnBuilder */
         $columnBuilder = pluginApp(ItemColumnBuilder::class);
         $columns       = $columnBuilder
@@ -417,7 +465,9 @@ class ItemService
 
         $record = $this->itemRepository->search($columns, $filter, $params)->current();
 
-        return $record;
+        $isSalable = $record['variationBase']['limitOrderByStockSelect'] == 1 && $record['variationStock']['stockPhysical'] <= 0;
+
+        return $isSalable;
     }
 
 	/**
@@ -451,7 +501,8 @@ class ItemService
 				->hasId([$itemId])
 				->variationIsChild()
                 ->variationIsActive()
-				->build();
+                ->variationStockIsSalable()
+                ->build();
 
 			/** @var ItemParamsBuilder $paramsBuilder */
 			$paramsBuilder = pluginApp(ItemParamsBuilder::class);
