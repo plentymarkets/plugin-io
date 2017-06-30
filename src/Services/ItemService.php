@@ -5,6 +5,7 @@ use IO\Builder\Item\Fields\ItemCrossSellingFields;
 use IO\Builder\Item\Fields\ItemDescriptionFields;
 use IO\Builder\Item\Fields\VariationAttributeValueFields;
 use IO\Builder\Item\Fields\VariationBaseFields;
+use IO\Builder\Item\Fields\VariationStockFields;
 use IO\Builder\Item\ItemColumnBuilder;
 use IO\Builder\Item\ItemFilterBuilder;
 use IO\Builder\Item\ItemParamsBuilder;
@@ -218,6 +219,52 @@ class ItemService
 		return $elasticSearchRepo->execute();
 	}
 
+    /**
+     * @param $itemId
+     * @return array
+     */
+    public function getVariationIds($itemId):array
+    {
+        $variationIds = [];
+
+        if((int)$itemId > 0)
+        {
+            /** @var ItemColumnBuilder $columnBuilder */
+            $columnBuilder = pluginApp(ItemColumnBuilder::class);
+            $columns       = $columnBuilder
+                ->withVariationBase([
+                    VariationBaseFields::ID
+                ])
+                ->build();
+
+            // filter current item by item id
+            /** @var ItemFilterBuilder $filterBuilder */
+            $filterBuilder = pluginApp(ItemFilterBuilder::class);
+            $filter        = $filterBuilder
+                ->hasId([$itemId])
+                ->variationIsActive()
+                ->variationStockIsSalable();
+
+            $filter = $filter->build();
+
+            // set params
+            /** @var ItemParamsBuilder $paramsBuilder */
+            $paramsBuilder = pluginApp(ItemParamsBuilder::class);
+            $params        = $paramsBuilder
+                ->withParam(ItemColumnsParams::LANGUAGE,  $this->sessionStorage->getLang())
+                ->withParam(ItemColumnsParams::PLENTY_ID, $this->app->getPlentyId())
+                ->build();
+            $variations    = $this->itemRepository->search($columns, $filter, $params);
+
+            foreach($variations as $variation)
+            {
+                array_push($variationIds, $variation->variationBase->id);
+            }
+        }
+
+        return $variationIds;
+    }
+
 	/**
 	 * @param int $itemId
 	 * @param bool $withPrimary
@@ -288,7 +335,6 @@ class ItemService
         return '';
     }
 
-
 	/**
 	 * Get all items for a specific category
 	 * @param int $catID
@@ -342,11 +388,11 @@ class ItemService
 			$columns       = $columnBuilder
 				->withVariationBase([
 					                    VariationBaseFields::ID,
-					                    VariationBaseFields::ITEM_ID,
-					                    VariationBaseFields::AVAILABILITY,
-					                    VariationBaseFields::PACKING_UNITS,
-					                    VariationBaseFields::CUSTOM_NUMBER
+					                    VariationBaseFields::ITEM_ID
 				                    ])
+                ->withItemDescription([
+                                        ItemDescriptionFields::URL_CONTENT
+                ])
 				->withVariationAttributeValueList([
 					                                  VariationAttributeValueFields::ATTRIBUTE_ID,
 					                                  VariationAttributeValueFields::ATTRIBUTE_VALUE_ID
@@ -358,6 +404,7 @@ class ItemService
 				->hasId([$itemId])
 				->variationIsChild()
 				->variationIsActive()
+                ->variationStockIsSalable()
 				->build();
 
 			/** @var ItemParamsBuilder $paramsBuilder */
@@ -373,7 +420,8 @@ class ItemService
 			{
 				$data = [
 					"variationId" => $variation->variationBase->id,
-					"attributes"  => $variation->variationAttributeValueList
+					"attributes"  => $variation->variationAttributeValueList,
+                    "url"         => $variation->itemDescription->urlContent . "_" . $itemId
 				];
 				array_push($variations, $data);
 			}
@@ -381,6 +429,46 @@ class ItemService
 
 		return $variations;
 	}
+
+    /**
+     * @param int $variationId
+     * @return bool
+     */
+    public function getVariationIsSalable($variationId = 0):Bool
+    {
+        $isSalable = false;
+
+        /** @var ItemColumnBuilder $columnBuilder */
+        $columnBuilder = pluginApp(ItemColumnBuilder::class);
+        $columns       = $columnBuilder
+            ->withVariationStock([
+                VariationStockFields::STOCK_PHYSICAL
+            ])
+            ->withVariationBase([
+                VariationBaseFields::LIMIT_ORDER_BY_STOCK_SELECT
+            ])
+            ->build();
+
+        /** @var ItemFilterBuilder $filterBuilder */
+        $filterBuilder = pluginApp(ItemFilterBuilder::class);
+        $filter        = $filterBuilder
+            ->variationHasId([$variationId])
+            ->build();
+
+        /** @var ItemParamsBuilder $paramsBuilder */
+        $paramsBuilder = pluginApp(ItemParamsBuilder::class);
+        $params        = $paramsBuilder
+            ->withParam(ItemColumnsParams::TYPE, 'virtual')
+            ->withParam(ItemColumnsParams::LANGUAGE, $this->sessionStorage->getLang())
+            ->withParam(ItemColumnsParams::PLENTY_ID, $this->app->getPlentyId())
+            ->build();
+
+        $record = $this->itemRepository->search($columns, $filter, $params)->current();
+
+        $isSalable = $record['variationBase']['limitOrderByStockSelect'] == 1 && $record['variationStock']['stockPhysical'] <= 0;
+
+        return $isSalable;
+    }
 
 	/**
 	 * @param int $itemId
@@ -412,7 +500,9 @@ class ItemService
 			$filter        = $filterBuilder
 				->hasId([$itemId])
 				->variationIsChild()
-				->build();
+                ->variationIsActive()
+                ->variationStockIsSalable()
+                ->build();
 
 			/** @var ItemParamsBuilder $paramsBuilder */
 			$paramsBuilder = pluginApp(ItemParamsBuilder::class);
