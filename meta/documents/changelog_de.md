@@ -4,7 +4,7 @@
 
 ### Behoben
 
-- Beim Klick auf **Zahlungsart ändern** wurde die Liste der Zahlungsarten nicht übersetzt. Dies wurde behoben.
+- Beim Klick auf **Zahlungsart ändern** in der Kaufabwicklung wurde die Liste der Zahlungsarten nicht übersetzt. Dies wurde behoben.
 
 ## v1.2.8 (2017-06-29)
 
