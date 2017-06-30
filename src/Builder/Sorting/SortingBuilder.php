@@ -9,14 +9,13 @@ use Plenty\Modules\Cloud\ElasticSearch\Lib\Sorting\SortingInterface;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Sorting\MultipleSorting;
 use Plenty\Modules\Item\Search\Sort\NameSorting;
 use IO\Services\SessionStorageService;
+use Plenty\Modules\Item\Search\Filter\TextFilter;
 
 class SortingBuilder
 {
     public static function buildSorting($sortingString)
     {
         $sortingParameter =  self::filterSortingString($sortingString);
-
-        $sortingInterface = pluginApp(MultipleSorting::class);
 
         if(strpos($sortingString, 'texts.name') !== false)
         {
@@ -31,8 +30,7 @@ class SortingBuilder
             $singleSortingInterface = pluginApp(SingleSorting::class,[$sortingParameter["sortingPath"], $sortingParameter["sortingOrder"]]);
         }
 
-        $sortingInterface->addSorting($singleSortingInterface);
-        return $sortingInterface;
+        return $singleSortingInterface;
     }
 
 
@@ -147,9 +145,27 @@ class SortingBuilder
     private static function SortingPriority($usedSortingPriority)
     {
         $sortingParameter1 = self::filterSortingString($usedSortingPriority);
-        if(strpos($sortingParameter1["sortingPath"], 'texts.name') != false)
+        if(strpos($sortingParameter1["sortingPath"], 'texts.name') !== false)
         {
-            return $sortingInterface = pluginApp(NameSorting::class, [self::buildNameSorting($sortingParameter1["sortingPath"]), pluginApp(SessionStorageService::class)->getLang(), $sortingParameter1["sortingOrder"]]);
+            $templateConfigService = pluginApp(TemplateConfigService::class);
+            $usedItemName = $templateConfigService->get('item.name');
+
+            if(strlen($usedItemName))
+            {
+                if($usedItemName == '0')
+                {
+                    $textFilterType = "texts.name1";
+                }
+                elseif($usedItemName == '1')
+                {
+                    $textFilterType = "texts.name2";
+                }
+                elseif($usedItemName == '2')
+                {
+                    $textFilterType = "texts.name3";
+                }
+            }
+            return $sortingInterface = pluginApp(NameSorting::class, [self::buildNameSorting($textFilterType), pluginApp(SessionStorageService::class)->getLang(), $sortingParameter1["sortingOrder"]]);
         }
         else
         {
