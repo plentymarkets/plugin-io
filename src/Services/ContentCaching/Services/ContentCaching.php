@@ -86,75 +86,67 @@ class ContentCaching
     {
         $cachingSettings = $this->container->get($templateName);
 
-        // if caching
-        if(false)
-        {
-            $cachingHash = '_'.$this->sessionStorageService->getLang().'_'.md5(implode(';', $cachingSettings->getData()));
+        $cachingHash = '_'.$this->sessionStorageService->getLang().'_'.md5(implode(';', $cachingSettings->getData()));
 
-            $meta = [
-                'templateName' => $templateName,
-                'language' => $this->sessionStorageService->getLang(),
-                'data' => json_encode($cachingSettings->getData())
+        $meta = [
+            'templateName' => $templateName,
+            'language' => $this->sessionStorageService->getLang(),
+            'data' => json_encode($cachingSettings->getData())
+        ];
+
+        $itemHashFields = null;
+        if ($cachingSettings->containsItems()) {
+            $itemHashFields = [
+                'countryId' => $this->checkoutService->getShippingCountryId(),
+                'currency' => $this->checkoutService->getCurrency(),
+                'customerClassId' => '',
+                'referrerId' => 1, //TODO set to real referrer
             ];
 
-            $itemHashFields = null;
-            if ($cachingSettings->containsItems()) {
-                $itemHashFields = [
-                    'countryId' => $this->checkoutService->getShippingCountryId(),
-                    'currency' => $this->checkoutService->getCurrency(),
-                    'customerClassId' => '',
-                    'referrerId' => 1, //TODO set to real referrer
-                ];
+            $meta['itemData'] = json_encode($itemHashFields);
 
-                $meta['itemData'] = json_encode($itemHashFields);
+            $contact = $this->customerService->getContact();
 
-                $contact = $this->customerService->getContact();
-
-                if ($contact instanceof Contact) {
-                    $itemHashFields['customerClassId'] = $contact->classId;
-                }
-
-                $cachingHash .= '_' . md5(implode('_', $itemHashFields));
+            if ($contact instanceof Contact) {
+                $itemHashFields['customerClassId'] = $contact->classId;
             }
 
-            $tplName = 'tpl_' . md5($templateName) . $cachingHash;
+            $cachingHash .= '_' . md5(implode('_', $itemHashFields));
+        }
 
-            if ($this->cachingRepository->has($tplName)) {
-                return $this->cachingRepository->get($tplName)->content;
+        $tplName = 'tpl_' . md5($templateName) . $cachingHash;
+
+        if ($this->cachingRepository->has($tplName)) {
+            return $this->cachingRepository->get($tplName)->content;
+        }
+
+        try {
+            $cachedContentObject = $this->storageRepositoryContract->getObject(
+                'IO',
+                $tplName . '.html'
+            );
+
+            if (strlen((STRING)$cachedContentObject->body) <= self::MAX_BYTE_SIZE_FOR_FAST_CACHING) {
+                $smallContentCache          = pluginApp(SmallContentCache::class);
+                $smallContentCache->content = $cachedContentObject->body;
+
+                $this->cachingRepository->put($tplName, $smallContentCache, 15);
             }
 
-            try {
-                $cachedContentObject = $this->storageRepositoryContract->getObject(
-                    'IO',
-                    $tplName . '.html'
-                );
+            return $cachedContentObject->body;
 
-                if (strlen((STRING)$cachedContentObject->body) <= self::MAX_BYTE_SIZE_FOR_FAST_CACHING) {
-                    $smallContentCache          = pluginApp(SmallContentCache::class);
-                    $smallContentCache->content = $cachedContentObject->body;
-
-                    $this->cachingRepository->put($tplName, $smallContentCache, 15);
-                }
-
-                return $cachedContentObject->body;
-
-            } catch (\Exception $exc) {
-            }
+        } catch (\Exception $exc) {
         }
         
         $templateContent = $this->twig->render($templateName, ['options' => $cachingSettings->getData()]);
 
-        // if caching
-        if(false)
-        {
-            $this->storageRepositoryContract->uploadObject(
-                'IO',
-                $tplName . '.html',
-                $templateContent,
-                false,
-                $meta
-            );
-        }
+        $this->storageRepositoryContract->uploadObject(
+            'IO',
+            $tplName . '.html',
+            $templateContent,
+            false,
+            $meta
+        );
 
         return $templateContent;
     }
