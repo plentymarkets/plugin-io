@@ -56,7 +56,7 @@ class VariationBaseFields
 	const MAXIMUM_ORDER_QUANTITY         = "maximumOrderQuantity";
 	const MINIMUM_ORDER_QUANTITY         = "minimumOrderQuantity";
 	const INTERVAL_ORDER_QUANTITY        = "intervalOrderQuantity";
-	const AVAILABLE_UNTIL                = "availableUnti";
+	const AVAILABLE_UNTIL                = "availableUnit";
 	const RELEASE_DATE                   = "releaseDate";
 	const WIDTH_MM                       = "widthMm";
 	const LENGTH_MM                      = "lengthMm";

@@ -1,5 +1,33 @@
 # Release Notes for IO
 
+## v1.2.9 (2017-06-30)
+
+### Fixed
+
+- The translation in the list of payment methods wasn't displayed, when clicking on **Change payment method** in the checkout. This has been fixed.
+
+## v1.2.8 (2017-06-29)
+
+### Added
+
+- A payment method can be changed subsequently for an order in the **My account** area if this feature is enabled in the payment method.
+
+### Changed
+
+- Variations that are out of stock cannot be added to the shopping cart anymore.
+- When selecting a variation that is out of stock the customer will be forwarded to the next variation with stock.
+
+### Fixed
+
+- Due to an error, a deleted address was not removed from the address list. This has been fixed.
+- Due to an error the address could not be edited when ordering as a guest. This has been fixed.
+
+## v.1.2.7 (2017-06-21)
+
+### Fixed
+
+- During registration, when the customer enters an invoice address, the entered address is not automatically saved as the delivery address.
+
 ## v1.2.6 (2017-06-14)
 
 ### Fixed

@@ -208,13 +208,14 @@ class CategoryService
 
     /**
      * Return the sitemap tree as an array
-     * @param string $type Only return categories of given type
-     * @param string $lang The language to get sitemap tree for
+     * @param string   $type     Only return categories of given type
+     * @param string   $lang     The language to get sitemap tree for
+     * @param int|null $maxLevel The deepest category level to load
      * @return array
      */
-    public function getNavigationTree(string $type = "all", string $lang = "de"):array
+    public function getNavigationTree(string $type = "all", string $lang = "de", int $maxLevel = 2):array
     {
-		return $this->categoryRepository->getLinklistTree($type, $lang, $this->webstoreConfig->getWebstoreConfig()->webstoreId);
+        return $this->categoryRepository->getLinklistTree($type, $lang, $this->webstoreConfig->getWebstoreConfig()->webstoreId, $maxLevel);
     }
 
     /**

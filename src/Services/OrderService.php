@@ -3,7 +3,10 @@
 namespace IO\Services;
 
 use IO\Models\LocalizedOrder;
+use Plenty\Modules\Frontend\PaymentMethod\Contracts\FrontendPaymentMethodRepositoryContract;
 use Plenty\Modules\Order\Contracts\OrderRepositoryContract;
+use Plenty\Modules\Order\Property\Contracts\OrderPropertyRepositoryContract;
+use Plenty\Modules\Order\Property\Models\OrderProperty;
 use Plenty\Modules\Order\Property\Models\OrderPropertyType;
 use Plenty\Modules\Payment\Method\Contracts\PaymentMethodRepositoryContract;
 use IO\Builder\Order\OrderBuilder;
@@ -34,6 +37,11 @@ class OrderService
     private $sessionStorage;
     
     /**
+     * @var FrontendPaymentMethodRepositoryContract
+     */
+    private $frontendPaymentMethodRepository;
+    
+    /**
      * OrderService constructor.
      * @param OrderRepositoryContract $orderRepository
      * @param BasketService $basketService
@@ -42,12 +50,14 @@ class OrderService
 	public function __construct(
 		OrderRepositoryContract $orderRepository,
 		BasketService $basketService,
-        SessionStorageService $sessionStorage
+        SessionStorageService $sessionStorage,
+        FrontendPaymentMethodRepositoryContract $frontendPaymentMethodRepository
 	)
 	{
 		$this->orderRepository = $orderRepository;
 		$this->basketService   = $basketService;
         $this->sessionStorage  = $sessionStorage;
+        $this->frontendPaymentMethodRepository = $frontendPaymentMethodRepository;
 	}
 
     /**
@@ -164,5 +174,79 @@ class OrderService
 	public function getOrderStatusText($statusId)
     {
         return OrderStatusTexts::$orderStatusTexts[(string)$statusId];
+    }
+    
+    public function getOrderPropertyByOrderId($orderId, $typeId)
+    {
+        /**
+         * @var OrderPropertyRepositoryContract $orderPropertyRepo
+         */
+        $orderPropertyRepo = pluginApp(OrderPropertyRepositoryContract::class);
+        return $orderPropertyRepo->findByOrderId($orderId, $typeId);
+    }
+    
+    /**
+     * List all payment methods available for switch in MyAccount
+     * @param int $currentPaymentMethodId
+     * @param int $orderId
+     * @return \Plenty\Modules\Payment\Method\Models\PaymentMethod[]
+     */
+    public function getPaymentMethodListForSwitch($currentPaymentMethodId = 0, $orderId = null)
+    {
+        return $this->frontendPaymentMethodRepository->getCurrentPaymentMethodsListForSwitch($currentPaymentMethodId, $orderId, $this->sessionStorage->getLang());
+    }
+    
+    /**
+     * @param $paymentMethodId
+     * @param int $orderId
+     * @return bool
+     */
+    public function allowPaymentMethodSwitchFrom($paymentMethodId, $orderId = null)
+    {
+        return $this->frontendPaymentMethodRepository->getPaymentMethodSwitchFromById($paymentMethodId, $orderId);
+    }
+    
+    /**
+     * @param int $orderId
+     * @param int $paymentMethodId
+     */
+    public function switchPaymentMethodForOrder($orderId, $paymentMethodId)
+    {
+        if((int)$orderId > 0)
+        {
+            $currentPaymentMethodId = 0;
+        
+            $order = $this->findOrderById($orderId);
+        
+            $newOrderProperties = [];
+            $orderProperties = $order->order->properties;
+        
+            if(count($orderProperties))
+            {
+                foreach($orderProperties as $key => $orderProperty)
+                {
+                    $newOrderProperties[$key] = $orderProperty;
+                    if($orderProperty->typeId == OrderPropertyType::PAYMENT_METHOD)
+                    {
+                        $currentPaymentMethodId = (int)$orderProperty->value;
+                        $newOrderProperties[$key]['value'] = (int)$paymentMethodId;
+                    }
+                }
+            }
+        
+            if($paymentMethodId !== $currentPaymentMethodId)
+            {
+                if($this->frontendPaymentMethodRepository->getPaymentMethodSwitchFromById($currentPaymentMethodId, $orderId) && $this->frontendPaymentMethodRepository->getPaymentMethodSwitchToById($paymentMethodId))
+                {
+                    $order = $this->orderRepository->updateOrder(['properties' => $newOrderProperties], $orderId);
+                    if(!is_null($order))
+                    {
+                        return LocalizedOrder::wrap( $order, "de" );
+                    }
+                }
+            }
+        }
+    
+        return null;
     }
 }

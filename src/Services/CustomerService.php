@@ -140,13 +140,6 @@ class CustomerService
                 $newBillingAddress = $this->createAddress($billingAddressData, AddressType::BILLING);
                 //$this->sessionStorage->setSessionValue(SessionStorageKeys::BILLING_ADDRESS_ID, $newBillingAddress->id);
                 $basketService->setBillingAddressId($newBillingAddress->id);
-        
-                if($deliveryAddressData === null)
-                {
-                    $newDeliveryAddress = $this->createAddress($billingAddressData, AddressType::DELIVERY);
-                    //$this->sessionStorage->setSessionValue(SessionStorageKeys::DELIVERY_ADDRESS_ID, $newDeliveryAddress->id);
-                    $basketService->setDeliveryAddressId($newDeliveryAddress->id);
-                }
             }
     
             if($deliveryAddressData !== null)
@@ -388,15 +381,27 @@ class CustomerService
      * @param int $type
      * @return Address
      */
-	public function updateAddress(int $addressId, array $addressData, int $type):Address
-	{
+    public function updateAddress(int $addressId, array $addressData, int $type):Address
+    {
         AddressValidator::validateOrFail($type, $addressData);
-	    
-        if (isset($addressData['stateId']) && empty($addressData['stateId'])) {
+
+        if (isset($addressData['stateId']) && empty($addressData['stateId']))
+        {
             $addressData['stateId'] = null;
         }
-		return $this->contactAddressRepository->updateAddress($addressData, $addressId, $this->getContactId(), $type);
-	}
+
+        if (isset($addressData['checkedAt']) && empty($addressData['checkedAt']))
+        {
+            unset($addressData['checkedAt']);
+        }
+
+        if((int)$this->getContactId() > 0)
+        {
+            return $this->contactAddressRepository->updateAddress($addressData, $addressId, $this->getContactId(), $type);
+        }
+        //case for guests
+        return $this->addressRepository->updateAddress($addressData, $addressId);
+    }
 
     /**
      * Delete an address
