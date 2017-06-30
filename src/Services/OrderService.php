@@ -193,7 +193,7 @@ class OrderService
      */
     public function getPaymentMethodListForSwitch($currentPaymentMethodId = 0, $orderId = null)
     {
-        return $this->frontendPaymentMethodRepository->getCurrentPaymentMethodsListForSwitch($currentPaymentMethodId, $orderId);
+        return $this->frontendPaymentMethodRepository->getCurrentPaymentMethodsListForSwitch($currentPaymentMethodId, $orderId, $this->sessionStorage->getLang());
     }
     
     /**

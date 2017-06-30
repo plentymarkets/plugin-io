@@ -1,5 +1,11 @@
 # Release Notes für IO
 
+## v1.2.9 (2017-06-30)
+
+### Behoben
+
+- Beim Klick auf **Zahlungsart ändern** wurde die Liste der Zahlungsarten nicht übersetzt. Dies wurde behoben.
+
 ## v1.2.8 (2017-06-29)
 
 ### Hinzugefügt
