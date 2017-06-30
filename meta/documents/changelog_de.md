@@ -5,7 +5,7 @@
 ### Behoben
 
 - Beim Klick auf **Zahlungsart ändern** in der Kaufabwicklung wurde die Liste der Zahlungsarten nicht übersetzt. Dies wurde behoben.
-- Im TemplateService wurde eine Methode ergänzt, um dynamisch das aktuelle Template abzufragen. **isCurrentTemplate**
+- Im `TemplateService` wurde die Methode `isCurrentTemplate` ergänzt, um dynamisch das aktuelle Template abzufragen.
 
 ## v1.2.8 (2017-06-29)
 
