@@ -182,15 +182,6 @@ class CategoryService
 	}
 
     /**
-     * Check which category is the home category
-     * @return bool
-     */
-	public function isHome():bool
-	{
-		return $this->currentCategory !== null && $this->currentCategory->id == pluginApp(CategoryMap::class)->getID(CategoryKey::HOME);
-	}
-
-    /**
      * @param Category $category
      * @param array $params
      * @param int $page
