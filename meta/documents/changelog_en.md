@@ -1,5 +1,12 @@
 # Release Notes for IO
 
+## v1.2.9 (2017-06-30)
+
+### Fixed
+
+- The translation in the list of payment methods wasn't displayed, when clicking on **Change payment method** in the checkout. This has been fixed.
+- In the `TemplateService` the method `isCurrentTemplate` has been added to dynamically request the current template.
+
 ## v1.2.8 (2017-06-29)
 
 ### Added

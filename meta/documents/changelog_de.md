@@ -1,5 +1,18 @@
 # Release Notes für IO
 
+## v1.3.0 (unknown)
+
+### Hinzugefügt
+
+- Eine empfohlene Vorsortierung kann für den Kunden eingestellt werden
+
+## v1.2.9 (2017-06-30)
+
+### Behoben
+
+- Beim Klick auf **Zahlungsart ändern** in der Kaufabwicklung wurde die Liste der Zahlungsarten nicht übersetzt. Dies wurde behoben.
+- Im `TemplateService` wurde die Methode `isCurrentTemplate` ergänzt, um dynamisch das aktuelle Template abzufragen.
+
 ## v1.2.8 (2017-06-29)
 
 ### Hinzugefügt
