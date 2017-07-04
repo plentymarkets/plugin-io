@@ -5,6 +5,7 @@
 ### Hinzugefügt
 
 - Eine empfohlene Vorsortierung kann für den Kunden eingestellt werden
+- Im `CheckoutService` wurde die Methode `getCheckoutPaymentDataList` ergänzt, um die `sourceUrl` der Payment-Plugins zurückzugeben.
 
 ## v1.2.9 (2017-06-30)
 
