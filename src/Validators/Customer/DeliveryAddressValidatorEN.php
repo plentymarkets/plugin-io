@@ -8,6 +8,7 @@ use IO\Services\TemplateConfigService;
 class DeliveryAddressValidatorEN extends Validator
 {
     private $requiredFields;
+    private $shownFields;
     
     public function defineAttributes()
     {
@@ -17,6 +18,8 @@ class DeliveryAddressValidatorEN extends Validator
         $templateConfigService = pluginApp(TemplateConfigService::class);
         $requiredFieldsString  = $templateConfigService->get('delivery_address.en.require');
         $this->requiredFields  = explode(', ', $requiredFieldsString);
+        $shownFieldsString  = $templateConfigService->get('delivery_address.en.show');
+        $this->shownFields  = explode(', ', $shownFieldsString);
         foreach ($this->requiredFields as $key => $value)
         {
             $this->requiredFields[$key] = str_replace('delivery_address.', '', $value);
@@ -42,6 +45,6 @@ class DeliveryAddressValidatorEN extends Validator
     
     private function isRequired($fieldName)
     {
-        return in_array($fieldName, $this->requiredFields);
+        return in_array($fieldName, $this->shownFields) && in_array($fieldName, $this->requiredFields);
     }
 }
