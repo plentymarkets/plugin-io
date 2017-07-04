@@ -54,7 +54,7 @@ class SortingBuilder
             }
             else
             {
-                $sortingInterface = self::SortingPriority($usedSortingPrioritySearch1);
+                $sortingInterface = self::filterSortingInterface($usedSortingPrioritySearch1);
             }
         }
         else
@@ -68,7 +68,7 @@ class SortingBuilder
             }
             else
             {
-                $singleSortingInterface = self::SortingPriority($usedSortingPrioritySearch1);
+                $singleSortingInterface = self::filterSortingInterface($usedSortingPrioritySearch1);
             }
             $sortingInterface->addSorting($singleSortingInterface);
 
@@ -80,7 +80,7 @@ class SortingBuilder
                 }
                 else
                 {
-                    $singleSortingInterface = self::SortingPriority($usedSortingPrioritySearch2);
+                    $singleSortingInterface = self::filterSortingInterface($usedSortingPrioritySearch2);
                 }
                 $sortingInterface->addSorting($singleSortingInterface);
             }
@@ -92,7 +92,7 @@ class SortingBuilder
                 }
                 else
                 {
-                    $singleSortingInterface = self::SortingPriority($usedSortingPrioritySearch3);
+                    $singleSortingInterface = self::filterSortingInterface($usedSortingPrioritySearch3);
                 }
 
                 $sortingInterface->addSorting($singleSortingInterface);
@@ -115,25 +115,25 @@ class SortingBuilder
         if($usedSortingPriorityCategory2 == 'notSelected' && $usedSortingPriorityCategory3 == 'notSelected')
         {
             //SingleSort
-            $sortingInterface = self::SortingPriority($usedSortingPriorityCategory1);
+            $sortingInterface = self::filterSortingInterface($usedSortingPriorityCategory1);
         }
         else
         {
             //MultiSort
             $sortingInterface = pluginApp(MultipleSorting::class);
 
-            $singleSortingInterface = self::SortingPriority($usedSortingPriorityCategory1);
+            $singleSortingInterface = self::filterSortingInterface($usedSortingPriorityCategory1);
             $sortingInterface->addSorting($singleSortingInterface);
 
             if($usedSortingPriorityCategory2 != 'notSelected')
             {
-                $singleSortingInterface = self::SortingPriority($usedSortingPriorityCategory2);
+                $singleSortingInterface = self::filterSortingInterface($usedSortingPriorityCategory2);
 
                 $sortingInterface->addSorting($singleSortingInterface);
             }
             if($usedSortingPriorityCategory3 != 'notSelected')
             {
-                $singleSortingInterface = self::SortingPriority($usedSortingPriorityCategory3);
+                $singleSortingInterface = self::filterSortingInterface($usedSortingPriorityCategory3);
 
                 $sortingInterface->addSorting($singleSortingInterface);
             }
@@ -142,7 +142,7 @@ class SortingBuilder
         return $sortingInterface;
     }
 
-    private static function SortingPriority($usedSortingPriority)
+    private static function filterSortingInterface($usedSortingPriority)
     {
         $sortingParameter1 = self::filterSortingString($usedSortingPriority);
         if(strpos($sortingParameter1["sortingPath"], 'texts.name') !== false)
