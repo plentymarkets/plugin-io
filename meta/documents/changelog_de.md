@@ -7,6 +7,10 @@
 - Eine empfohlene Vorsortierung kann für den Kunden eingestellt werden
 - Im Ergebnis eines geladenen Artikels wird nun auch der formatierte Preis zurückgegeben
 
+### Geändert
+
+- Adressfelder die nicht über die Konfig sichtbargeschaltet wurden werden nun nicht mehr Validiert.
+
 ## v1.2.9 (2017-06-30)
 
 ### Behoben
