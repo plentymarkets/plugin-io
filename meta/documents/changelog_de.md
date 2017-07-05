@@ -5,6 +5,7 @@
 ### Hinzugefügt
 
 - Eine empfohlene Vorsortierung kann für den Kunden eingestellt werden
+- Templates können nun gecached werden.
 
 ## v1.2.9 (2017-06-30)
 
