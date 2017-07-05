@@ -1,5 +1,11 @@
 # Release Notes für IO
 
+## v1.3.0 (unknown)
+
+### Hinzugefügt
+
+- Eine empfohlene Vorsortierung kann für den Kunden eingestellt werden
+
 ## v1.2.9 (2017-06-30)
 
 ### Behoben
