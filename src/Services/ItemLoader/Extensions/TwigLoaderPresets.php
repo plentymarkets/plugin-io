@@ -7,6 +7,7 @@ use IO\Services\ItemLoader\Loaders\Facets;
 use IO\Services\ItemLoader\Loaders\SingleItem;
 use IO\Services\ItemLoader\Loaders\SingleItemAttributes;
 use IO\Services\ItemLoader\Loaders\Items;
+use IO\Services\ItemLoader\Loaders\TagItems;
 use Plenty\Plugin\Templates\Extensions\Twig_Extension;
 
 /**
@@ -52,6 +53,9 @@ class TwigLoaderPresets extends Twig_Extension
                 ],
                 "items" => [
                     Items::class
+                ],
+                "tagList" => [
+                    TagItems::class
                 ]
 			]
 		];
