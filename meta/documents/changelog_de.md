@@ -1,15 +1,15 @@
 # Release Notes für IO
 
-## v1.2.10 (unknown)
+## v1.3.0 (2017-07-05)
 
 ### Hinzugefügt
 
-- Eine empfohlene Vorsortierung kann für den Kunden eingestellt werden
-- Im Ergebnis eines geladenen Artikels wird nun auch der formatierte Preis zurückgegeben
+- Komplexe Sortierungen von Artikeln sind in Kategorieansicht und Suche über die Einstellung **Empfohlen** möglich.
+- Das Ergebnis eines geladenen Artikel beinhaltet nun auch den formatierten Artikelpreis.
 
 ### Geändert
 
-- Adressfelder die nicht über die Konfig sichtbargeschaltet wurden werden nun nicht mehr Validiert.
+- Adressfelder, die in der Konfiguration von Ceres deaktiviert sind, für die aber die Validierung aktiviert ist, werden nun nicht mehr validiert.
 
 ## v1.2.9 (2017-06-30)
 
