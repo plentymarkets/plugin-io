@@ -4,7 +4,6 @@
 
 ### Hinzugefügt
 
-- Eine empfohlene Vorsortierung kann für den Kunden eingestellt werden
 - Im `CheckoutService` wurde die Methode `getCheckoutPaymentDataList` ergänzt, um die `sourceUrl` der Payment-Plugins zurückzugeben.
 - Komplexe Sortierungen von Artikeln sind in Kategorieansicht und Suche über die Einstellung **Empfohlen** möglich.
 - Das Ergebnis eines geladenen Artikel beinhaltet nun auch den formatierten Artikelpreis.
