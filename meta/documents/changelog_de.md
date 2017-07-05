@@ -1,5 +1,12 @@
 # Release Notes für IO
 
+## v1.2.10 (unknown)
+
+### Hinzugefügt
+
+- Eine empfohlene Vorsortierung kann für den Kunden eingestellt werden
+- Im Ergebnis eines geladenen Artikels wird nun auch der formatierte Preis zurückgegeben
+
 ## v1.2.9 (2017-06-30)
 
 ### Behoben
