@@ -1,10 +1,16 @@
 # Release Notes für IO
 
-## v1.3.0 (unknown)
+## v1.2.10 (2017-07-05)
 
 ### Hinzugefügt
 
-- Eine empfohlene Vorsortierung kann für den Kunden eingestellt werden
+- Im `CheckoutService` wurde die Methode `getCheckoutPaymentDataList` ergänzt, um die `sourceUrl` der Payment-Plugins zurückzugeben.
+- Komplexe Sortierungen von Artikeln sind in Kategorieansicht und Suche über die Einstellung **Empfohlen** möglich.
+- Das Ergebnis eines geladenen Artikel beinhaltet nun auch den formatierten Artikelpreis.
+
+### Geändert
+
+- Adressfelder, die in der Konfiguration von Ceres deaktiviert sind, für die aber die Validierung aktiviert ist, werden nun nicht mehr validiert.
 
 ## v1.2.9 (2017-06-30)
 
