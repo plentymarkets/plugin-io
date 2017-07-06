@@ -1,5 +1,14 @@
 # Release Notes für IO
 
+## v1.x.x (unknown)
+
+### Hinzugefügt
+
+- Im `CustomerService` wurde das Speichern des akademischen Titels eingebaut.
+
+### Geändert
+- Im `CustomerService` wurde das Editieren zusätzlicher Adressfelder optimiert.
+
 ## v1.2.10 (2017-07-05)
 
 ### Hinzugefügt
