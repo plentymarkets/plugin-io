@@ -1,5 +1,17 @@
 # Release Notes for IO
 
+## v1.2.10 (2017-07-05)
+
+### Added
+
+- The `getCheckoutPaymentDataList` method was added in the `CheckoutService`, to return the `sourceUrl` of a payment plugin.
+- It is now possible to set up complex item sorting for the category view and the search by using the recommended sorting options.
+- The result of a requested item also contains the formatted item price.
+
+### Changed
+
+- Address fields that are deactivated in the configuration of Ceres but for which validation is activated, will not be validated in the online store anymore.
+
 ## v1.2.9 (2017-06-30)
 
 ### Fixed

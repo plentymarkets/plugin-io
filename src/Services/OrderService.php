@@ -201,10 +201,37 @@ class OrderService
      * @param int $orderId
      * @return bool
      */
-    public function allowPaymentMethodSwitchFrom($paymentMethodId, $orderId = null)
-    {
-        return $this->frontendPaymentMethodRepository->getPaymentMethodSwitchFromById($paymentMethodId, $orderId);
-    }
+	public function allowPaymentMethodSwitchFrom($paymentMethodId, $orderId = null)
+	{
+		/** @var TemplateConfigService $config */
+		$config = pluginApp(TemplateConfigService::class);
+		if ($config->get('my_account.change_payment') == "false")
+		{
+			return false;
+		}
+		if($orderId != null)
+		{
+			$order = $this->orderRepository->findOrderById($orderId);
+			$orderDates = $order->dates->toArray();
+			
+			$paidDate = array_search(OrderPropertyType::PAYMENT_STATUS, array_column($orderDates, 'typeId'));
+			if ($paidDate !== false)
+			{
+				// order was paid
+				return false;
+			}
+			
+			$statusId = $order->statusId;
+			$orderCreatedDate = $order->createdAt;
+			
+			if(!($statusId <= 3.4 || ($statusId == 5 && $orderCreatedDate->toDateString() == date('Y-m-d'))))
+			{
+				return false;
+			}
+		}
+		return $this->frontendPaymentMethodRepository->getPaymentMethodSwitchFromById($paymentMethodId, $orderId);
+	}
+
     
     /**
      * @param int $orderId

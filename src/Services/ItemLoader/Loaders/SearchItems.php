@@ -12,6 +12,7 @@ use Plenty\Modules\Cloud\ElasticSearch\Lib\Processor\DocumentProcessor;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Query\Type\TypeInterface;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Search\Document\DocumentSearch;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Search\SearchInterface;
+use Plenty\Modules\Cloud\ElasticSearch\Lib\Sorting\SingleSorting;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Source\Mutator\BuiltIn\LanguageMutator;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Sorting\MultipleSorting;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Sorting\SortingInterface;
@@ -168,10 +169,21 @@ class SearchItems implements ItemLoaderContract, ItemLoaderPaginationContract, I
         
         if(isset($options['sorting']) && strlen($options['sorting']))
         {
-            $sortingInterface = SortingBuilder::buildSorting($options['sorting']);
-            if($sortingInterface instanceof MultipleSorting)
+
+            if($options['sorting'] == 'default.recommended_sorting')
             {
-                $sortingInterface->add('_score', 'ASC');
+                $sortingInterface = SortingBuilder::buildDefaultSortingSearch();
+            }
+            else
+            {
+                $sortingInterface = SortingBuilder::buildSorting($options['sorting']);
+
+                if($sortingInterface instanceof MultipleSorting)
+                {
+                    $singleSortingInterface = pluginApp(SingleSorting::class,['_score', 'ASC']);
+
+                    $sortingInterface->addSorting($singleSortingInterface);
+                }
             }
         }
         
