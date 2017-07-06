@@ -39,6 +39,7 @@ class DeliveryAddressValidator extends Validator
             $this->addString('address3',  $this->isRequired('address3'));
             $this->addString('address4',  $this->isRequired('address4'));
             $this->addString('stateId',  $this->isRequired('stateId'));
+            $this->addString('title',     $this->isRequired('title'));
         }
     }
     
