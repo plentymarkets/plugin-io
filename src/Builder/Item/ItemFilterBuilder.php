@@ -329,7 +329,7 @@ class ItemFilterBuilder
 	public function isStoreSpecial(array $shopActions):ItemFilterBuilder
 	{
 		return $this->hasFilter("itemBase.isStoreSpecial", [
-			"shopActions" => $shopActions
+			"shopAction" => $shopActions
 		]);
 	}
 
