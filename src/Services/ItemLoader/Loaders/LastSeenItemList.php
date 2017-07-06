@@ -29,10 +29,13 @@ class LastSeenItemList implements ItemLoaderContract
     public function getSearch()
     {
         $languageMutator = pluginApp(LanguageMutator::class, ["languages" => [pluginApp(SessionStorageService::class)->getLang()]]);
-        
+        $imageMutator = pluginApp(ImageMutator::class);
+        $imageMutator->addClient(pluginApp(Application::class)->getPlentyId());
+    
         $documentProcessor = pluginApp(DocumentProcessor::class);
         $documentProcessor->addMutator($languageMutator);
-        
+        $documentProcessor->addMutator($imageMutator);
+    
         return pluginApp(DocumentSearch::class, [$documentProcessor]);
     }
     

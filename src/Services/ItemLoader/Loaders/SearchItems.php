@@ -20,6 +20,7 @@ use Plenty\Modules\Item\Search\Filter\ClientFilter;
 use Plenty\Modules\Item\Search\Filter\VariationBaseFilter;
 use Plenty\Modules\Item\Search\Filter\SearchFilter;
 use Plenty\Modules\Item\Search\Filter\TextFilter;
+use Plenty\Modules\Item\Search\Mutators\ImageMutator;
 use Plenty\Plugin\Application;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\ElasticSearch;
 
@@ -31,9 +32,12 @@ class SearchItems implements ItemLoaderContract, ItemLoaderPaginationContract, I
     public function getSearch()
     {
         $languageMutator = pluginApp(LanguageMutator::class, ["languages" => [pluginApp(SessionStorageService::class)->getLang()]]);
+        $imageMutator = pluginApp(ImageMutator::class);
+        $imageMutator->addClient(pluginApp(Application::class)->getPlentyId());
 
         $documentProcessor = pluginApp(DocumentProcessor::class);
         $documentProcessor->addMutator($languageMutator);
+        $documentProcessor->addMutator($imageMutator);
 
         return pluginApp(DocumentSearch::class, [$documentProcessor]);
     }
@@ -90,7 +94,7 @@ class SearchItems implements ItemLoaderContract, ItemLoaderPaginationContract, I
             }
             else
             {
-                $searchFilter->setSearchString($options['query'], $lang, $searchType);
+                $searchFilter->setSearchString($options['query'], $lang, $searchType, ElasticSearch::AND_OPERATOR);
             }
         }
     
