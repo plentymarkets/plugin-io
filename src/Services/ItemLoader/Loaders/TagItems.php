@@ -124,6 +124,7 @@ class TagItems implements ItemLoaderContract, ItemLoaderPaginationContract, Item
         return [
             $clientFilter,
             $variationFilter,
+            $tagFilter,
             $textFilter
         ];
     }
