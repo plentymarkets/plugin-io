@@ -136,17 +136,21 @@ class BasketService
 	public function addBasketItem(array $data):array
 	{
 		$basketItem = $this->findExistingOneByData($data);
+
+
+        $orderParam = [
+            'propertyId'  => 1,
+            'basketItemId' => 127,
+            'type' => 'text',
+            'name' => 'Personaliesierungstext',
+            'value' => 'test test test'
+        ];
+
+        $data['basketItemOrderParams'] = [$orderParam];
+
 		if($basketItem instanceof BasketItem)
 		{
-		    $orderParam = [
-                'propertyId'  => 1,
-                'basketItemId' => 127,
-                'type' => 'text',
-                'name' => 'Personaliesierungstext',
-                'value' => 'test test test'
-            ];
-		    
-                $data['basketItemOrderParams'] = [$orderParam];
+
 		    
 			$data['id']       = $basketItem->id;
 			$data['quantity'] = (int)$data['quantity'] + $basketItem->quantity;
