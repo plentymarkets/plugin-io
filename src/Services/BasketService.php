@@ -135,8 +135,6 @@ class BasketService
      */
 	public function addBasketItem(array $data):array
 	{
-		$basketItem = $this->findExistingOneByData($data);
-
 
         $orderParam = [
             'propertyId'  => 1,
@@ -147,6 +145,9 @@ class BasketService
         ];
 
         $data['basketItemOrderParams'] = [$orderParam];
+
+		$basketItem = $this->findExistingOneByData($data);
+
 
 		if($basketItem instanceof BasketItem)
 		{
