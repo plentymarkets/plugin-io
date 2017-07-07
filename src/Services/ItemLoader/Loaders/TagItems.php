@@ -135,7 +135,7 @@ class TagItems implements ItemLoaderContract, ItemLoaderPaginationContract, Item
      */
     public function getCurrentPage($options = [])
     {
-        return (INT)$options['page'];
+        return ( (INT)$options['page'] > 0 ? (INT)$options['page'] : 1 );
     }
     
     /**
@@ -144,7 +144,7 @@ class TagItems implements ItemLoaderContract, ItemLoaderPaginationContract, Item
      */
     public function getItemsPerPage($options = [])
     {
-        return (INT)$options['items'];
+        return ( (INT)$options['items'] > 0 ? (INT)$options['items'] : 20 );
     }
     
     public function getSorting($options = [])
