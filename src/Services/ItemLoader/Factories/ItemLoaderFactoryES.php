@@ -1,6 +1,7 @@
 <?php
 namespace IO\Services\ItemLoader\Factories;
 
+use IO\Extensions\Filters\NumberFormatFilter;
 use IO\Services\ItemLoader\Contracts\ItemLoaderContract;
 use IO\Services\ItemLoader\Contracts\ItemLoaderFactory;
 use IO\Services\ItemLoader\Contracts\ItemLoaderPaginationContract;
@@ -286,16 +287,22 @@ class ItemLoaderFactoryES implements ItemLoaderFactory
                         $quantity = (int)$options['basketVariationQuantities'][$variation['data']['variation']['id']];
                     }
                     
+                    $numberFormatFilter = pluginApp(NumberFormatFilter::class);
+                    
                     $salesPrice = $salesPriceService->getSalesPriceForVariation($variation['data']['variation']['id'], 'default', $quantity);
                     if($salesPrice instanceof SalesPriceSearchResponse)
                     {
                         $variation['data']['calculatedPrices']['default'] = $salesPrice;
+                        $variation['data']['calculatedPrices']['formatted']['defaultPrice'] = $numberFormatFilter->formatMonetary($salesPrice->price, $salesPrice->currency);
+                        $variation['data']['calculatedPrices']['formatted']['defaultUnitPrice'] = $numberFormatFilter->formatMonetary($salesPrice->unitPrice, $salesPrice->currency);
                     }
                     
                     $rrp = $salesPriceService->getSalesPriceForVariation($variation['data']['variation']['id'], 'rrp');
                     if($rrp instanceof SalesPriceSearchResponse)
                     {
                         $variation['data']['calculatedPrices']['rrp'] = $rrp;
+                        $variation['data']['calculatedPrices']['formatted']['rrpPrice'] = $numberFormatFilter->formatMonetary($rrp->price, $rrp->currency);
+                        $variation['data']['calculatedPrices']['formatted']['rrpUnitPrice'] = $numberFormatFilter->formatMonetary($rrp->unitPrice, $rrp->currency);
                     }
                     
                     $specialOffer = $salesPriceService->getSalesPriceForVariation($variation['data']['variation']['id'], 'specialOffer');

@@ -1,5 +1,40 @@
 # Release Notes for IO
 
+## v1.2.10 (2017-07-05)
+
+### Added
+
+- The `getCheckoutPaymentDataList` method was added in the `CheckoutService`, to return the `sourceUrl` of a payment plugin.
+- It is now possible to set up complex item sorting for the category view and the search by using the recommended sorting options.
+- The result of a requested item also contains the formatted item price.
+
+### Changed
+
+- Address fields that are deactivated in the configuration of Ceres but for which validation is activated, will not be validated in the online store anymore.
+
+## v1.2.9 (2017-06-30)
+
+### Fixed
+
+- The translation in the list of payment methods wasn't displayed, when clicking on **Change payment method** in the checkout. This has been fixed.
+- In the `TemplateService` the method `isCurrentTemplate` has been added to dynamically request the current template.
+
+## v1.2.8 (2017-06-29)
+
+### Added
+
+- A payment method can be changed subsequently for an order in the **My account** area if this feature is enabled in the payment method.
+
+### Changed
+
+- Variations that are out of stock cannot be added to the shopping cart anymore.
+- When selecting a variation that is out of stock the customer will be forwarded to the next variation with stock.
+
+### Fixed
+
+- Due to an error, a deleted address was not removed from the address list. This has been fixed.
+- Due to an error the address could not be edited when ordering as a guest. This has been fixed.
+
 ## v.1.2.7 (2017-06-21)
 
 ### Fixed

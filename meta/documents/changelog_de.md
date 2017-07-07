@@ -1,18 +1,46 @@
 # Release Notes für IO
 
-## v1.2.8 (unknown)
+## v1.2.10 (2017-07-05)
 
-## Behoben
+### Hinzugefügt
 
-- Es wurde ein Fehler behoben, dass nach dem Löschen einer selektierten Adresse, diese weiterhin in den Browserdaten (Session) gespeichert war.
-- Es wurde ein Fehler behoben, dass ein Gast seine erstellte Adresse nicht mehr editieren konnte.
+- Im `CheckoutService` wurde die Methode `getCheckoutPaymentDataList` ergänzt, um die `sourceUrl` der Payment-Plugins zurückzugeben.
+- Komplexe Sortierungen von Artikeln sind in Kategorieansicht und Suche über die Einstellung **Empfohlen** möglich.
+- Das Ergebnis eines geladenen Artikel beinhaltet nun auch den formatierten Artikelpreis.
+
+### Geändert
+
+- Adressfelder, die in der Konfiguration von Ceres deaktiviert sind, für die aber die Validierung aktiviert ist, werden nun nicht mehr validiert.
+
+## v1.2.9 (2017-06-30)
+
+### Behoben
+
+- Beim Klick auf **Zahlungsart ändern** in der Kaufabwicklung wurde die Liste der Zahlungsarten nicht übersetzt. Dies wurde behoben.
+- Im `TemplateService` wurde die Methode `isCurrentTemplate` ergänzt, um dynamisch das aktuelle Template abzufragen.
+
+## v1.2.8 (2017-06-29)
+
+### Hinzugefügt
+
+- Im **Mein Konto**-Bereich kann nun die Zahlungsart eines Auftrags geändert werden, wenn die Zahlungsart dies zulässt.
+
+### Geändert
+
+- Varianten ohne Bestand können nicht mehr in den Warenkorb gelegt werden.
+- Varianten ohne Bestand werden beim Aufruf auf die nächste kaufbare Variante umgeleitet.
+
+### Behoben
+
+- Ein Fehler führte dazu, dass eine gelöschte Adresse nicht aus der Adressliste entfernt wurde. Dies wurde behoben.
+- Ein Fehler führte dazu, dass eine Adresse bei einer Gastbestellung nicht bearbeitet werden konnte. Dies wurde behoben.
 
 ## v.1.2.7 (2017-06-21)
 
 ### Behoben
 
 - Bei der Kundenregistrierung wird die eingegebene Adresse nicht mehr automatisch als Lieferadresse angelegt.
-
+- In der Einzelansicht werden keine inaktiven Varianten und ohne Bestand im Dropdown angezeigt.
 
 ## v.1.2.6 (2017-06-14)
 
