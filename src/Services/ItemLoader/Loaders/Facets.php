@@ -14,6 +14,7 @@ use Plenty\Modules\Item\Search\Filter\FacetFilter;
 use Plenty\Plugin\Http\Request;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Processor\DocumentProcessor;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Search\Document\DocumentSearch;
+use Plenty\Plugin\Application;
 
 /**
  * Created by ptopczewski, 06.01.17 14:44
