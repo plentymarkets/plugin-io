@@ -216,13 +216,15 @@ class BasketService
 			return array();
 		}
 
-		$basketItemVariationIds = array();
-        $basketVariationQuantities = array();
+		$basketItemVariationIds = [];
+        $basketVariationQuantities = [];
+        $orderPropertries = [];
         
 		foreach($basketItems as $basketItem)
 		{
 			array_push($basketItemVariationIds, $basketItem->variationId);
             $basketVariationQuantities[$basketItem->variationId] = $basketItem->quantity;
+            $orderPropertries[$basketItem->variationId] = $basketItem->basketItemOrderParams()->getResults();
 		}
 
         $items = pluginApp(ItemLoaderService::class)
@@ -233,6 +235,7 @@ class BasketService
         {
             $variationId          = $item['data']['variation']['id'];
             $result[$variationId] = $item;
+            $result[$variationId]['data']['orderProperties'] = $orderPropertries[$variationId];
         }
         
         return $result;
