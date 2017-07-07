@@ -2,18 +2,17 @@
 
 namespace IO\Services;
 
+use IO\Constants\OrderPaymentStatus;
 use IO\Models\LocalizedOrder;
 use Plenty\Modules\Frontend\PaymentMethod\Contracts\FrontendPaymentMethodRepositoryContract;
 use Plenty\Modules\Order\Contracts\OrderRepositoryContract;
 use Plenty\Modules\Order\Property\Contracts\OrderPropertyRepositoryContract;
-use Plenty\Modules\Order\Property\Models\OrderProperty;
 use Plenty\Modules\Order\Property\Models\OrderPropertyType;
 use Plenty\Modules\Payment\Method\Contracts\PaymentMethodRepositoryContract;
 use IO\Builder\Order\OrderBuilder;
 use IO\Builder\Order\OrderType;
 use IO\Builder\Order\OrderOptionSubType;
 use IO\Builder\Order\AddressType;
-use IO\Constants\OrderStatusTexts;
 use Plenty\Repositories\Models\PaginatedResult;
 use IO\Constants\SessionStorageKeys;
 
@@ -173,7 +172,8 @@ class OrderService
      */
 	public function getOrderStatusText($statusId)
     {
-        return OrderStatusTexts::$orderStatusTexts[(string)$statusId];
+	    //OrderStatusTexts::$orderStatusTexts[(string)$statusId];
+        return '';
     }
     
     public function getOrderPropertyByOrderId($orderId, $typeId)
@@ -212,10 +212,7 @@ class OrderService
 		if($orderId != null)
 		{
 			$order = $this->orderRepository->findOrderById($orderId);
-			$orderDates = $order->dates->toArray();
-			
-			$paidDate = array_search(OrderPropertyType::PAYMENT_STATUS, array_column($orderDates, 'typeId'));
-			if ($paidDate !== false)
+			if ($order->paymentStatus !== OrderPaymentStatus::UNPAID)
 			{
 				// order was paid
 				return false;
