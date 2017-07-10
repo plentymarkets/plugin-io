@@ -102,6 +102,20 @@ class OrderItemBuilder
 	 */
 	private function basketItemToOrderItem(BasketItem $basketItem, string $basketItemName):array
 	{
+        $basketItemProperties = [];
+        if(count($basketItem->basketItemOrderParams()->getResults()))
+        {
+            foreach($basketItem->basketItemOrderParams()->getResults() as $property)
+            {
+                $basketItemProperty = [
+                    'propertyId' => $property->id,
+                    'value'      => $property->value
+                ];
+                
+                $basketItemProperties[] = $basketItemProperty;
+            }
+        }
+	    
 		return [
 			"typeId"            => OrderItemType::VARIATION,
 			"referrerId"        => $basketItem->referrerId,
@@ -111,6 +125,7 @@ class OrderItemBuilder
 			"shippingProfileId" => $basketItem->shippingProfileId,
 			"countryVatId"      => 1, // TODO
 			"vatRate"           => $basketItem->vat,
+            "orderProperties"   => $basketItemProperties,
 			"amounts"           => [
 				[
 					"currency"           => $this->checkoutService->getCurrency(),
