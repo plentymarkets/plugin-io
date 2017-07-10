@@ -136,15 +136,10 @@ class BasketService
 	public function addBasketItem(array $data):array
 	{
 
-        $orderParam = [
-            'propertyId'  => 1,
-            'basketItemId' => 127,
-            'type' => 'text',
-            'name' => 'Personaliesierungstext',
-            'value' => 'test test test'
-        ];
-
-        $data['basketItemOrderParams'] = [$orderParam];
+        if(isset($data['basketItemOrderParams']) && is_array($data['basketItemOrderParams']))
+        {
+            $data['basketItemOrderParams'] = $this->parseBasketItemOrderParams($data['basketItemOrderParams']);
+        }
 
 		$basketItem = $this->findExistingOneByData($data);
 
@@ -164,6 +159,25 @@ class BasketService
 
 		return $this->getBasketItemsForTemplate();
 	}
+
+    /**
+     * Parse basket item order params
+     * @param array $basketOrderParams
+     * @return array
+     */
+    private function parseBasketItemOrderParams(array $basketOrderParams):array
+    {
+        $properties = [];
+
+        foreach ($basketOrderParams as $key => $basketOrderParam){
+            $properties[$key]['propertyId'] = $basketOrderParam['property']['names']['propertyId'];
+            $properties[$key]['type'] = $basketOrderParam['property']['valueType'];
+            $properties[$key]['value'] = $basketOrderParam['property']['value'];
+            $properties[$key]['name'] = $basketOrderParam['property']['names']['name'];
+        }
+
+        return $properties;
+    }
 
     /**
      * Update a basket item
