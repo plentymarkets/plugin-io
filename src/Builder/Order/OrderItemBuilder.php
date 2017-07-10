@@ -108,7 +108,7 @@ class OrderItemBuilder
             foreach($basketItem->basketItemOrderParams()->getResults() as $property)
             {
                 $basketItemProperty = [
-                    'propertyId' => $property->id,
+                    'propertyId' => $property->param_id,
                     'value'      => $property->value
                 ];
                 
