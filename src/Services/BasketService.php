@@ -238,7 +238,7 @@ class BasketService
 		{
 			array_push($basketItemVariationIds, $basketItem->variationId);
             $basketVariationQuantities[$basketItem->variationId] = $basketItem->quantity;
-            $orderPropertries[$basketItem->variationId] = $basketItem->basketItemOrderParams()->getResults();
+            $orderPropertries[$basketItem->variationId] = $basketItem->basketItemOrderParams;
 		}
 
         $items = pluginApp(ItemLoaderService::class)

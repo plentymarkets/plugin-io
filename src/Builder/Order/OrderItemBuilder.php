@@ -103,9 +103,9 @@ class OrderItemBuilder
 	private function basketItemToOrderItem(BasketItem $basketItem, string $basketItemName):array
 	{
         $basketItemProperties = [];
-        if(count($basketItem->basketItemOrderParams()->getResults()))
+        if(count($basketItem->basketItemOrderParams))
         {
-            foreach($basketItem->basketItemOrderParams()->getResults() as $property)
+            foreach($basketItem->basketItemOrderParams as $property)
             {
                 $basketItemProperty = [
                     'propertyId' => $property->param_id,
