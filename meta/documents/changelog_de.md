@@ -4,15 +4,15 @@
 
 ### Hinzugefügt
 
-- Templates können nun gechached werden.
-
-### Behoben
-
-- Bei Artikeln werden nun nur noch die für den Mandanten aktivierten Bilder ausgeliefert.
+- Templates können nun gecacht werden.
 
 ### Geändert
 
-- Die Suche wird nun mit einer "UND"-Logik ausgeführt. (Vorher wurden alle Wörter mit "ODER" verkettet)
+- Die Suche wird nun mit einer **UND**-Logik ausgeführt und ersetzt damit die vorherige **ODER**-Suche.
+
+### Behoben
+
+- Bei Artikeln werden nun nur noch die für den Mandanten aktivierten Bilder im Webshop angezeigt.
 
 ## v1.2.10 (2017-07-05)
 
