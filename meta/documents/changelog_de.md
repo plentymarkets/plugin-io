@@ -6,6 +6,14 @@
 
 - Templates können nun gechached werden.
 
+### Behoben
+
+- Bei Artikeln werden nun nur noch die für den Mandanten aktivierten Bilder ausgeliefert.
+
+### Geändert
+
+- Die Suche wird nun mit einer "UND"-Logik ausgeführt. (Vorher wurden alle Wörter mit "ODER" verkettet)
+
 ## v1.2.10 (2017-07-05)
 
 ### Hinzugefügt
