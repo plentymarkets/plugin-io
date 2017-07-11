@@ -1,5 +1,11 @@
 # Release Notes für IO
 
+## v1.3.0 (2017-07-13)
+
+### Hinzugefügt
+
+- Templates können nun gechached werden.
+
 ## v1.2.10 (2017-07-05)
 
 ### Hinzugefügt
