@@ -5,6 +5,7 @@
 ### Hinzugefügt
 
 - Templates können nun gecacht werden.
+- Localization-Event
 
 ### Geändert
 
