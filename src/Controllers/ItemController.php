@@ -54,6 +54,8 @@ class ItemController extends ItemLoaderController
                 $loaderOptions['variationId'] = $variationId;
             }
         }
+        
+        $loaderOptions['crossSellingItemId'] = $itemId;
 
         if($variationId > 0)
         {
@@ -75,7 +77,7 @@ class ItemController extends ItemLoaderController
 
         /** @var ItemLoaderService $loaderService */
         $loaderService = $templateContainer->getTemplateData()['itemLoader'];
-        $loaderService->setLoaderClassList([SingleItem::class, SingleItemAttributes::class]);
+        $loaderService->setLoaderClassList(["single" => [SingleItem::class, SingleItemAttributes::class], "multi" => [CrossSellingItems::class]]);
 
         $itemResult = $loaderService->load();
 

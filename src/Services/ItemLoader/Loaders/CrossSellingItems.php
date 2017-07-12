@@ -121,4 +121,22 @@ class CrossSellingItems implements ItemLoaderContract
             $textFilter
         ];
     }
+    
+    /**
+     * @param array $options
+     * @return int
+     */
+    public function getCurrentPage($options = [])
+    {
+        return ( (INT)$options['page'] > 0 ? (INT)$options['page'] : 1 );
+    }
+    
+    /**
+     * @param array $options
+     * @return int
+     */
+    public function getItemsPerPage($options = [])
+    {
+        return ( (INT)$options['items'] > 0 ? (INT)$options['items'] : 20 );
+    }
 }
