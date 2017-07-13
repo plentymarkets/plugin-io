@@ -7,12 +7,14 @@ use IO\Services\ItemLoader\Contracts\ItemLoaderContract;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Query\Type\TypeInterface;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Search\SearchInterface;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Source\Mutator\BuiltIn\LanguageMutator;
+use Plenty\Modules\Item\Search\Mutators\ImageMutator;
 use Plenty\Modules\Item\Search\Aggregations\FacetAggregation;
 use Plenty\Modules\Item\Search\Aggregations\FacetAggregationProcessor;
 use Plenty\Modules\Item\Search\Filter\FacetFilter;
 use Plenty\Plugin\Http\Request;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Processor\DocumentProcessor;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Search\Document\DocumentSearch;
+use Plenty\Plugin\Application;
 
 /**
  * Created by ptopczewski, 06.01.17 14:44
@@ -28,10 +30,13 @@ class Facets implements ItemLoaderContract
     public function getSearch()
     {
         $languageMutator = pluginApp(LanguageMutator::class, ["languages" => [pluginApp(SessionStorageService::class)->getLang()]]);
-
+        $imageMutator = pluginApp(ImageMutator::class);
+        $imageMutator->addClient(pluginApp(Application::class)->getPlentyId());
+    
         $documentProcessor = pluginApp(DocumentProcessor::class);
         $documentProcessor->addMutator($languageMutator);
-
+        $documentProcessor->addMutator($imageMutator);
+    
         return pluginApp(DocumentSearch::class, [$documentProcessor]);
     }
     
