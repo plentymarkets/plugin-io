@@ -1,5 +1,19 @@
 # Release Notes for IO
 
+## v1.3.0 (2017-07-13)
+
+### Added
+
+- Templates can now be cached.
+
+### Changed
+
+- The online store search will now use the **AND** operator. This replaces the **OR** search that was previously used.
+
+### Fixed
+
+- Only those item images activated for a client will be displayed in the respective online store.
+
 ## v1.2.10 (2017-07-05)
 
 ### Added

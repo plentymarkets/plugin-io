@@ -1,13 +1,21 @@
 # Release Notes für IO
 
-## v1.x.x (unknown)
+## v1.3.0 (2017-07-13)
 
 ### Hinzugefügt
 
+- Templates können nun gecacht werden.
+- Localization-Event
 - Im `CustomerService` wurde das Speichern des akademischen Titels eingebaut.
 
 ### Geändert
+
+- Die Suche wird nun mit einer **UND**-Logik ausgeführt und ersetzt damit die vorherige **ODER**-Suche.
 - Im `CustomerService` wurde das Editieren zusätzlicher Adressfelder optimiert.
+
+### Behoben
+
+- Bei Artikeln werden nun nur noch die für den Mandanten aktivierten Bilder im Webshop angezeigt.
 
 ## v1.2.10 (2017-07-05)
 
