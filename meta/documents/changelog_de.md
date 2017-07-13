@@ -5,8 +5,9 @@
 ### Hinzugefügt
 
 - Templates können nun gecacht werden.
-- Localization-Event
 - Im `CustomerService` wurde das Speichern des akademischen Titels eingebaut.
+- Ein neues Event `LocalizationChanged` wurde hinzugefügt.
+- Es wurden Bedingungen für das Ändern der Zahlungsart im **Mein Konto**-Bereich hinzugefügt. In der Konfiguration von Ceres muss die Einstellung **Allow customer to change the payment method** aktiviert werden. Die Bestellung darf zudem noch nicht bezahlt sein. Der Status der Bestellung muss kleiner als 3.4 sein, bzw. wenn die Bestellung am gleichen Tag aufgegeben wurde, muss der Status gleich 5 oder kleiner als 3.4 sein. 
 
 ### Geändert
 

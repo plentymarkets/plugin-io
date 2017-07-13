@@ -5,10 +5,14 @@
 ### Added
 
 - Templates can now be cached.
+- The academic title can now be saved in the `CustomerService`.
+- A new event `LocalizationChanged` has been added.
+- Multiple conditions for changing the payment method in the **My account** area have been added. The **Allow customer to change the payment method** setting must be activated in the Ceres configuration. Additionally, the order must not be paid yet. The order status must be less than 3.4, or when the order was created the same day the order status must be 5 or less than 3.4.
 
 ### Changed
 
 - The online store search will now use the **AND** operator. This replaces the **OR** search that was previously used.
+- Editing additional address fields has been optimised in the `CustomerService`.
 
 ### Fixed
 
