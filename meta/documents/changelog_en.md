@@ -4,6 +4,7 @@
 
 ### Added
 
+- IO now provides data concerning cross-selling and tags for item lists.
 - Templates can now be cached.
 - The academic title can now be saved in the `CustomerService`.
 - A new event `LocalizationChanged` has been added.

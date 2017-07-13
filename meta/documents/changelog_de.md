@@ -4,6 +4,7 @@
 
 ### Hinzugefügt
 
+- IO stellt nun Daten zu Tags und Cross-Selling für Artikellisten bereit.
 - Templates können nun gecacht werden.
 - Im `CustomerService` wurde das Speichern des akademischen Titels eingebaut.
 - Ein neues Event `LocalizationChanged` wurde hinzugefügt.
