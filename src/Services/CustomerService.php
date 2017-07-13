@@ -344,6 +344,14 @@ class CustomerService
                     'value'  => $addressData['birthday']
                 ];
             }
+
+            if(isset($addressData['title']))
+            {
+                $options[] = [
+                    'typeId' => AddressOption::TYPE_TITLE,
+                    'value'  => $addressData['title']
+                ];
+            }
         }
         
         return $options;
@@ -397,9 +405,11 @@ class CustomerService
 
         if((int)$this->getContactId() > 0)
         {
+            $addressData['options'] = $this->buildAddressEmailOptions([], false, $addressData);
             return $this->contactAddressRepository->updateAddress($addressData, $addressId, $this->getContactId(), $type);
         }
         //case for guests
+        $addressData['options'] = $this->buildAddressEmailOptions([], true, $addressData);
         return $this->addressRepository->updateAddress($addressData, $addressId);
     }
 

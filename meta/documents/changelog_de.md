@@ -6,10 +6,12 @@
 
 - Templates können nun gecacht werden.
 - Localization-Event
+- Im `CustomerService` wurde das Speichern des akademischen Titels eingebaut.
 
 ### Geändert
 
 - Die Suche wird nun mit einer **UND**-Logik ausgeführt und ersetzt damit die vorherige **ODER**-Suche.
+- Im `CustomerService` wurde das Editieren zusätzlicher Adressfelder optimiert.
 
 ### Behoben
 
