@@ -5,8 +5,8 @@
 ### Hinzugefügt
 
 - Templates können nun gecacht werden.
-- Localization-Event
 - Im `CustomerService` wurde das Speichern des akademischen Titels eingebaut.
+- Ein neues Event `LocalizationChanged` wurde hinzugefügt.
 
 ### Geändert
 

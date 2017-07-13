@@ -5,10 +5,13 @@
 ### Added
 
 - Templates can now be cached.
+- The academic title can now be saved in the `CustomerService`.
+- A new event `LocalizationChanged` has been added.
 
 ### Changed
 
 - The online store search will now use the **AND** operator. This replaces the **OR** search that was previously used.
+- Editing additional address fields has been optimised in the `CustomerService`.
 
 ### Fixed
 
