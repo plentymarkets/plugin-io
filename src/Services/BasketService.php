@@ -172,19 +172,22 @@ class BasketService
 
         $totalOrderParamsMarkup = 0;
         foreach ($basketOrderParams as $key => $basketOrderParam){
-            $properties[$key]['propertyId'] = $basketOrderParam['property']['names']['propertyId'];
-            $properties[$key]['type'] = $basketOrderParam['property']['valueType'];
-            $properties[$key]['value'] = $basketOrderParam['property']['value'];
-            $properties[$key]['name'] = $basketOrderParam['property']['names']['name'];
 
-            if($basketOrderParam['surcharge'] > 0)
-			{
-				$totalOrderParamsMarkup += $basketOrderParam['surcharge'];
-			}
-			elseif($basketOrderParam['property']['surcharge'] > 0)
-			{
-				$totalOrderParamsMarkup += $basketOrderParam['property']['surcharge'];
-			}
+            if(strlen($basketOrderParam['property']['value']) > 0 && isset($basketOrderParam['property']['value']))
+            {
+
+                $properties[$key]['propertyId'] = $basketOrderParam['property']['names']['propertyId'];
+                $properties[$key]['type'] = $basketOrderParam['property']['valueType'];
+                $properties[$key]['value'] = $basketOrderParam['property']['value'];
+                $properties[$key]['name'] = $basketOrderParam['property']['names']['name'];
+
+                if ($basketOrderParam['surcharge'] > 0) {
+                    $totalOrderParamsMarkup += $basketOrderParam['surcharge'];
+                } elseif ($basketOrderParam['property']['surcharge'] > 0) {
+                    $totalOrderParamsMarkup += $basketOrderParam['property']['surcharge'];
+                }
+                
+            }
         }
 
         return [$properties, $totalOrderParamsMarkup];
