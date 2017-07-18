@@ -10,6 +10,7 @@ use Plenty\Modules\Basket\Models\Basket;
 use Plenty\Modules\Basket\Models\BasketItem;
 use Plenty\Modules\Frontend\Contracts\Checkout;
 use IO\Services\ItemService;
+use IO\Extensions\Filters\NumberFormatFilter;
 
 /**
  * Class BasketService
@@ -21,12 +22,12 @@ class BasketService
 	 * @var BasketItemRepositoryContract
 	 */
 	private $basketItemRepository;
-    
+
     /**
      * @var Checkout
      */
     private $checkout;
-    
+
     private $template = '';
 
     /**
@@ -39,7 +40,7 @@ class BasketService
 		$this->basketItemRepository = $basketItemRepository;
         $this->checkout = $checkout;
 	}
-	
+
 	public function setTemplate(string $template)
     {
         $this->template = $template;
@@ -61,10 +62,10 @@ class BasketService
 	public function getBasketItems():array
 	{
 		$result = array();
-        
+
         $basketItems = $this->basketItemRepository->all();
         $basketItemData = $this->getBasketItemData( $basketItems );
-        
+
         foreach( $basketItems as $basketItem )
         {
             array_push(
@@ -72,22 +73,22 @@ class BasketService
                 $this->addVariationData($basketItem, $basketItemData[$basketItem->variationId])
             );
         }
-        
+
         return $result;
 	}
-	
+
 	public function getBasketItemsForTemplate(string $template = ''):array
     {
         if(!strlen($template))
         {
             $template = $this->template;
         }
-        
+
         $result = array();
-    
+
         $basketItems = $this->basketItemRepository->all();
         $basketItemData = $this->getBasketItemData( $basketItems, $template );
-    
+
         foreach( $basketItems as $basketItem )
         {
             array_push(
@@ -95,7 +96,7 @@ class BasketService
                 $this->addVariationData($basketItem, $basketItemData[$basketItem->variationId])
             );
         }
-    
+
         return $result;
     }
 
@@ -138,7 +139,7 @@ class BasketService
 
         if(isset($data['basketItemOrderParams']) && is_array($data['basketItemOrderParams']))
         {
-            $data['basketItemOrderParams'] = $this->parseBasketItemOrderParams($data['basketItemOrderParams']);
+            list($data['basketItemOrderParams'], $data['totalOrderParamsMarkup']) = $this->parseBasketItemOrderParams($data['basketItemOrderParams']);
         }
 
 		$basketItem = $this->findExistingOneByData($data);
@@ -147,7 +148,7 @@ class BasketService
 		if($basketItem instanceof BasketItem)
 		{
 
-		    
+
 			$data['id']       = $basketItem->id;
 			$data['quantity'] = (int)$data['quantity'] + $basketItem->quantity;
 			$this->basketItemRepository->updateBasketItem($basketItem->id, $data);
@@ -169,14 +170,27 @@ class BasketService
     {
         $properties = [];
 
+        $totalOrderParamsMarkup = 0;
         foreach ($basketOrderParams as $key => $basketOrderParam){
-            $properties[$key]['propertyId'] = $basketOrderParam['property']['names']['propertyId'];
-            $properties[$key]['type'] = $basketOrderParam['property']['valueType'];
-            $properties[$key]['value'] = $basketOrderParam['property']['value'];
-            $properties[$key]['name'] = $basketOrderParam['property']['names']['name'];
+
+            if(strlen($basketOrderParam['property']['value']) > 0 && isset($basketOrderParam['property']['value']))
+            {
+
+                $properties[$key]['propertyId'] = $basketOrderParam['property']['names']['propertyId'];
+                $properties[$key]['type'] = $basketOrderParam['property']['valueType'];
+                $properties[$key]['value'] = $basketOrderParam['property']['value'];
+                $properties[$key]['name'] = $basketOrderParam['property']['names']['name'];
+
+                if ($basketOrderParam['surcharge'] > 0) {
+                    $totalOrderParamsMarkup += $basketOrderParam['surcharge'];
+                } elseif ($basketOrderParam['property']['surcharge'] > 0) {
+                    $totalOrderParamsMarkup += $basketOrderParam['property']['surcharge'];
+                }
+                
+            }
         }
 
-        return $properties;
+        return [$properties, $totalOrderParamsMarkup];
     }
 
     /**
@@ -224,7 +238,7 @@ class BasketService
         {
             $template = $this->template;
         }
-        
+
 		if(count($basketItems) <= 0)
 		{
 			return array();
@@ -233,7 +247,7 @@ class BasketService
 		$basketItemVariationIds = [];
         $basketVariationQuantities = [];
         $orderPropertries = [];
-        
+
 		foreach($basketItems as $basketItem)
 		{
 			array_push($basketItemVariationIds, $basketItem->variationId);
@@ -243,7 +257,7 @@ class BasketService
 
         $items = pluginApp(ItemLoaderService::class)
             ->loadForTemplate($template, [BasketItems::class], ['variationIds' => $basketItemVariationIds, 'basketVariationQuantities' => $basketVariationQuantities]);
-        
+
         $result = array();
         foreach($items['documents'] as $item)
         {
@@ -251,6 +265,18 @@ class BasketService
             $result[$variationId] = $item;
             $result[$variationId]['data']['orderProperties'] = $orderPropertries[$variationId];
         }
+
+        foreach($basketItems as $basketItem)
+		{
+			$result[$basketItem->variationId]['data']['calculatedPrices']['default']->unitPrice = $basketItem->price;
+			$result[$basketItem->variationId]['data']['calculatedPrices']['default']->price = $basketItem->price;
+			$result[$basketItem->variationId]['data']['calculatedPrices']['default']->unitPriceNet = $basketItem->price / 100 * $basketItem->vat;
+			$result[$basketItem->variationId]['data']['calculatedPrices']['default']->priceNet = $basketItem->price / 100 * $basketItem->vat;
+
+			$numberFormatFilter = pluginApp(NumberFormatFilter::class);
+			$result[$basketItem->variationId]['data']['calculatedPrices']['formatted']['defaultPrice'] = $numberFormatFilter->formatMonetary($basketItem->price, $result[$basketItem->variationId]['data']['calculatedPrices']['default']->currency);
+			$result[$basketItem->variationId]['data']['calculatedPrices']['formatted']['defaultUnitPrice'] = $numberFormatFilter->formatMonetary($basketItem->price, $result[$basketItem->variationId]['data']['calculatedPrices']['default']->currency);
+		}
         
         return $result;
 	}
