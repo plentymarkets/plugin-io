@@ -115,6 +115,12 @@ class OrderItemBuilder
                 $basketItemProperties[] = $basketItemProperty;
             }
         }
+
+        $attributeTotalMarkup = 0;
+
+        if(isset($basketItem->attributeTotalMarkup)){
+            $attributeTotalMarkup = $basketItem->attributeTotalMarkup;
+        }
 	    
 		return [
 			"typeId"            => OrderItemType::VARIATION,
@@ -129,7 +135,8 @@ class OrderItemBuilder
 			"amounts"           => [
 				[
 					"currency"           => $this->checkoutService->getCurrency(),
-					"priceOriginalGross" => $basketItem->price
+					"priceOriginalGross" => $basketItem->price - $attributeTotalMarkup,
+                    "surcharge" => $attributeTotalMarkup
 				]
 			]
 		];
