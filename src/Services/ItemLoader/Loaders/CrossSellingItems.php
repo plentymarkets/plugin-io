@@ -1,30 +1,27 @@
 <?php
-
 namespace IO\Services\ItemLoader\Loaders;
 
-use IO\Services\ItemLoader\Contracts\ItemLoaderContract;
-use IO\Services\ItemLoader\Contracts\ItemLoaderPaginationContract;
+use IO\Constants\CrossSellingType;
 use IO\Services\SessionStorageService;
-use IO\Builder\Sorting\SortingBuilder;
-use IO\Services\ItemLoader\Contracts\ItemLoaderSortingContract;
+use IO\Services\ItemCrossSellingService;
+use IO\Services\ItemLoader\Contracts\ItemLoaderContract;
 use IO\Services\TemplateConfigService;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Processor\DocumentProcessor;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Query\Type\TypeInterface;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Search\Document\DocumentSearch;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Search\SearchInterface;
-use Plenty\Modules\Cloud\ElasticSearch\Lib\Sorting\SingleSorting;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Source\Mutator\BuiltIn\LanguageMutator;
-use Plenty\Modules\Item\Search\Mutators\ImageMutator;
-use Plenty\Modules\Cloud\ElasticSearch\Lib\Sorting\MultipleSorting;
-use Plenty\Modules\Cloud\ElasticSearch\Lib\Sorting\SortingInterface;
 use Plenty\Modules\Item\Search\Filter\ClientFilter;
+use Plenty\Modules\Item\Search\Filter\CrossSellingFilter;
 use Plenty\Modules\Item\Search\Filter\VariationBaseFilter;
-use Plenty\Modules\Item\Search\Filter\SearchFilter;
 use Plenty\Modules\Item\Search\Filter\TextFilter;
 use Plenty\Plugin\Application;
-use Plenty\Modules\Cloud\ElasticSearch\Lib\ElasticSearch;
 
-class SearchItems implements ItemLoaderContract, ItemLoaderPaginationContract, ItemLoaderSortingContract
+/**
+ * Class CrossSellingItems
+ * @package IO\Services\ItemLoader\Loaders
+ */
+class CrossSellingItems implements ItemLoaderContract
 {
     /**
      * @return SearchInterface
@@ -32,13 +29,10 @@ class SearchItems implements ItemLoaderContract, ItemLoaderPaginationContract, I
     public function getSearch()
     {
         $languageMutator = pluginApp(LanguageMutator::class, ["languages" => [pluginApp(SessionStorageService::class)->getLang()]]);
-        $imageMutator = pluginApp(ImageMutator::class);
-        $imageMutator->addClient(pluginApp(Application::class)->getPlentyId());
-
+        
         $documentProcessor = pluginApp(DocumentProcessor::class);
         $documentProcessor->addMutator($languageMutator);
-        $documentProcessor->addMutator($imageMutator);
-
+        
         return pluginApp(DocumentSearch::class, [$documentProcessor]);
     }
     
@@ -57,12 +51,6 @@ class SearchItems implements ItemLoaderContract, ItemLoaderPaginationContract, I
      */
     public function getFilterStack($options = [])
     {
-        /**
-         * @var SessionStorageService $sessionStorage
-         */
-        $sessionStorage = pluginApp(SessionStorageService::class);
-        $lang = $sessionStorage->getLang();
-        
         /** @var ClientFilter $clientFilter */
         $clientFilter = pluginApp(ClientFilter::class);
         $clientFilter->isVisibleForClient(pluginApp(Application::class)->getPlentyId());
@@ -70,57 +58,42 @@ class SearchItems implements ItemLoaderContract, ItemLoaderPaginationContract, I
         /** @var VariationBaseFilter $variationFilter */
         $variationFilter = pluginApp(VariationBaseFilter::class);
         $variationFilter->isActive();
-    
-        if(isset($options['variationShowType']) && $options['variationShowType'] == 'main')
-        {
-            $variationFilter->isMain();
-        }
-        elseif(isset($options['variationShowType']) && $options['variationShowType'] == 'child')
-        {
-            $variationFilter->isChild();
-        }
+        $variationFilter->isMain();
     
         /**
-         * @var SearchFilter $searchFilter
+         * @var ItemCrossSellingService $crossSellingService
          */
-        $searchFilter = pluginApp(SearchFilter::class);
+        $crossSellingService = pluginApp(ItemCrossSellingService::class);
         
-        if(array_key_exists('query', $options) && strlen($options['query']))
-        {
-            $searchType = ElasticSearch::SEARCH_TYPE_FUZZY;
-            if(array_key_exists('autocomplete', $options) && $options['autocomplete'] === true)
-            {
-                $searchFilter->setNamesString($options['query'], $lang);
-            }
-            else
-            {
-                $searchFilter->setSearchString($options['query'], $lang, $searchType, ElasticSearch::AND_OPERATOR);
-            }
-        }
-    
+        /**
+         * @var CrossSellingFilter $crossSellingFilter
+         */
+        $crossSellingFilter = pluginApp(CrossSellingFilter::class, [$options['crossSellingItemId']]);
+        $crossSellingFilter->hasRelation($crossSellingService->getType());
+        
         $sessionLang = pluginApp(SessionStorageService::class)->getLang();
-    
+        
         $langMap = [
             'de' => TextFilter::LANG_DE,
             'fr' => TextFilter::LANG_FR,
             'en' => TextFilter::LANG_EN,
         ];
-    
+        
         /**
          * @var TextFilter $textFilter
          */
         $textFilter = pluginApp(TextFilter::class);
-    
+        
         if(isset($langMap[$sessionLang]))
         {
             $textFilterLanguage = $langMap[$sessionLang];
-        
+            
             /**
              * @var TemplateConfigService $templateConfigService
              */
             $templateConfigService = pluginApp(TemplateConfigService::class);
             $usedItemName = $templateConfigService->get('item.name');
-        
+            
             $textFilterType = TextFilter::FILTER_ANY_NAME;
             if(strlen($usedItemName))
             {
@@ -137,14 +110,14 @@ class SearchItems implements ItemLoaderContract, ItemLoaderPaginationContract, I
                     $textFilterType = TextFilter::FILTER_NAME_3;
                 }
             }
-        
+            
             $textFilter->hasNameInLanguage($textFilterLanguage, $textFilterType);
         }
         
         return [
             $clientFilter,
             $variationFilter,
-            $searchFilter,
+            $crossSellingFilter,
             $textFilter
         ];
     }
@@ -155,7 +128,7 @@ class SearchItems implements ItemLoaderContract, ItemLoaderPaginationContract, I
      */
     public function getCurrentPage($options = [])
     {
-        return (INT)$options['page'];
+        return ( (INT)$options['page'] > 0 ? (INT)$options['page'] : 1 );
     }
     
     /**
@@ -164,33 +137,6 @@ class SearchItems implements ItemLoaderContract, ItemLoaderPaginationContract, I
      */
     public function getItemsPerPage($options = [])
     {
-        return (INT)$options['items'];
-    }
-    
-    public function getSorting($options = [])
-    {
-        $sortingInterface = null;
-        
-        if(isset($options['sorting']) && strlen($options['sorting']))
-        {
-
-            if($options['sorting'] == 'default.recommended_sorting')
-            {
-                $sortingInterface = SortingBuilder::buildDefaultSortingSearch();
-            }
-            else
-            {
-                $sortingInterface = SortingBuilder::buildSorting($options['sorting']);
-
-                if($sortingInterface instanceof MultipleSorting)
-                {
-                    $singleSortingInterface = pluginApp(SingleSorting::class,['_score', 'ASC']);
-
-                    $sortingInterface->addSorting($singleSortingInterface);
-                }
-            }
-        }
-        
-        return $sortingInterface;
+        return ( (INT)$options['items'] > 0 ? (INT)$options['items'] : 20 );
     }
 }

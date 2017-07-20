@@ -84,13 +84,13 @@ class ItemService
 		/** @var DocumentSearch $documentSearch */
 		$documentSearch = pluginApp(DocumentSearch::class, [$documentProcessor]);
 
-		$attributeProcessor = pluginApp(AttributeValueListAggregationProcessor::class);
-		$attributeSearch    = pluginApp(AttributeValueListAggregation::class, [$attributeProcessor]);
+		//$attributeProcessor = pluginApp(AttributeValueListAggregationProcessor::class);
+		//$attributeSearch    = pluginApp(AttributeValueListAggregation::class, [$attributeProcessor]);
 
 		/** @var VariationElasticSearchSearchRepositoryContract $elasticSearchRepo */
 		$elasticSearchRepo = pluginApp(VariationElasticSearchSearchRepositoryContract::class);
 		$elasticSearchRepo->addSearch($documentSearch);
-		$elasticSearchRepo->addSearch($attributeSearch);
+		//$elasticSearchRepo->addSearch($attributeSearch);
 
 		/** @var ClientFilter $clientFilter */
 		$clientFilter = pluginApp(ClientFilter::class);
@@ -164,14 +164,14 @@ class ItemService
 		$documentProcessor = pluginApp(DocumentProcessor::class);
 		$documentSearch    = pluginApp(DocumentSearch::class, [$documentProcessor]);
 
-		$attributeProcessor = pluginApp(AttributeValueListAggregationProcessor::class);
-		$attributeSearch    = pluginApp(AttributeValueListAggregation::class, [$attributeProcessor]);
+		//$attributeProcessor = pluginApp(AttributeValueListAggregationProcessor::class);
+		//$attributeSearch    = pluginApp(AttributeValueListAggregation::class, [$attributeProcessor]);
 
 
 		/** @var VariationElasticSearchSearchRepositoryContract $elasticSearchRepo */
 		$elasticSearchRepo = pluginApp(VariationElasticSearchSearchRepositoryContract::class);
 		$elasticSearchRepo->addSearch($documentSearch);
-		$elasticSearchRepo->addSearch($attributeSearch);
+		//$elasticSearchRepo->addSearch($attributeSearch);
 
 		/** @var ClientFilter $clientFilter */
 		$clientFilter = pluginApp(ClientFilter::class);
@@ -611,7 +611,7 @@ class ItemService
 	 * @param string $crossSellingType
 	 * @return array
 	 */
-	public function getItemCrossSellingList($itemId = 0, string $crossSellingType = CrossSellingType::SIMILAR):array
+	public function getItemCrossSellingList($itemId = 0, string $crossSellingType = 'similar'):array
 	{
 		$crossSellingItems = [];
 

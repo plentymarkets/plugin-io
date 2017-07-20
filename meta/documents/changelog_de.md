@@ -1,5 +1,24 @@
 # Release Notes für IO
 
+## v1.3.0 (2017-07-13)
+
+### Hinzugefügt
+
+- IO stellt nun Daten zu Tags und Cross-Selling für Artikellisten bereit.
+- Templates können nun gecacht werden.
+- Im `CustomerService` wurde das Speichern des akademischen Titels eingebaut.
+- Ein neues Event `LocalizationChanged` wurde hinzugefügt.
+- Es wurden Bedingungen für das Ändern der Zahlungsart im **Mein Konto**-Bereich hinzugefügt. In der Konfiguration von Ceres muss die Einstellung **Allow customer to change the payment method** aktiviert werden. Die Bestellung darf zudem noch nicht bezahlt sein. Der Status der Bestellung muss kleiner als 3.4 sein, bzw. wenn die Bestellung am gleichen Tag aufgegeben wurde, muss der Status gleich 5 oder kleiner als 3.4 sein. 
+
+### Geändert
+
+- Die Suche wird nun mit einer **UND**-Logik ausgeführt und ersetzt damit die vorherige **ODER**-Suche.
+- Im `CustomerService` wurde das Editieren zusätzlicher Adressfelder optimiert.
+
+### Behoben
+
+- Bei Artikeln werden nun nur noch die für den Mandanten aktivierten Bilder im Webshop angezeigt.
+
 ## v1.2.10 (2017-07-05)
 
 ### Hinzugefügt

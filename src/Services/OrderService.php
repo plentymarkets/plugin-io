@@ -2,18 +2,17 @@
 
 namespace IO\Services;
 
+use IO\Constants\OrderPaymentStatus;
 use IO\Models\LocalizedOrder;
 use Plenty\Modules\Frontend\PaymentMethod\Contracts\FrontendPaymentMethodRepositoryContract;
 use Plenty\Modules\Order\Contracts\OrderRepositoryContract;
 use Plenty\Modules\Order\Property\Contracts\OrderPropertyRepositoryContract;
-use Plenty\Modules\Order\Property\Models\OrderProperty;
 use Plenty\Modules\Order\Property\Models\OrderPropertyType;
 use Plenty\Modules\Payment\Method\Contracts\PaymentMethodRepositoryContract;
 use IO\Builder\Order\OrderBuilder;
 use IO\Builder\Order\OrderType;
 use IO\Builder\Order\OrderOptionSubType;
 use IO\Builder\Order\AddressType;
-use IO\Constants\OrderStatusTexts;
 use Plenty\Repositories\Models\PaginatedResult;
 use IO\Constants\SessionStorageKeys;
 
@@ -173,7 +172,8 @@ class OrderService
      */
 	public function getOrderStatusText($statusId)
     {
-        return OrderStatusTexts::$orderStatusTexts[(string)$statusId];
+	    //OrderStatusTexts::$orderStatusTexts[(string)$statusId];
+        return '';
     }
     
     public function getOrderPropertyByOrderId($orderId, $typeId)
@@ -201,10 +201,34 @@ class OrderService
      * @param int $orderId
      * @return bool
      */
-    public function allowPaymentMethodSwitchFrom($paymentMethodId, $orderId = null)
-    {
-        return $this->frontendPaymentMethodRepository->getPaymentMethodSwitchFromById($paymentMethodId, $orderId);
-    }
+	public function allowPaymentMethodSwitchFrom($paymentMethodId, $orderId = null)
+	{
+		/** @var TemplateConfigService $config */
+		$config = pluginApp(TemplateConfigService::class);
+		if ($config->get('my_account.change_payment') == "false")
+		{
+			return false;
+		}
+		if($orderId != null)
+		{
+			$order = $this->orderRepository->findOrderById($orderId);
+			if ($order->paymentStatus !== OrderPaymentStatus::UNPAID)
+			{
+				// order was paid
+				return false;
+			}
+			
+			$statusId = $order->statusId;
+			$orderCreatedDate = $order->createdAt;
+			
+			if(!($statusId <= 3.4 || ($statusId == 5 && $orderCreatedDate->toDateString() == date('Y-m-d'))))
+			{
+				return false;
+			}
+		}
+		return $this->frontendPaymentMethodRepository->getPaymentMethodSwitchFromById($paymentMethodId, $orderId);
+	}
+
     
     /**
      * @param int $orderId

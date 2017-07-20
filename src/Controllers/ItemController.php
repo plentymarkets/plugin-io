@@ -4,6 +4,7 @@ namespace IO\Controllers;
 use IO\Helper\CategoryKey;
 use IO\Services\CategoryService;
 use IO\Services\ItemLastSeenService;
+use IO\Services\ItemLoader\Loaders\CrossSellingItems;
 use IO\Services\ItemService;
 use IO\Services\ItemLoader\Loaders\SingleItem;
 use IO\Services\ItemLoader\Loaders\SingleItemAttributes;
@@ -53,6 +54,8 @@ class ItemController extends ItemLoaderController
                 $loaderOptions['variationId'] = $variationId;
             }
         }
+        
+        $loaderOptions['crossSellingItemId'] = $itemId;
 
         if($variationId > 0)
         {
@@ -74,7 +77,7 @@ class ItemController extends ItemLoaderController
 
         /** @var ItemLoaderService $loaderService */
         $loaderService = $templateContainer->getTemplateData()['itemLoader'];
-        $loaderService->setLoaderClassList([SingleItem::class, SingleItemAttributes::class]);
+        $loaderService->setLoaderClassList(["single" => [SingleItem::class, SingleItemAttributes::class], "multi" => [CrossSellingItems::class]]);
 
         $itemResult = $loaderService->load();
 
