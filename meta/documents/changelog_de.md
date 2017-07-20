@@ -1,5 +1,17 @@
 # Release Notes für IO
 
+## v1.3.1 (2017-07-20)
+
+### Hinzugefügt
+
+- Die Route "io/localization/language" wurde hinzugefügt um die Sprache des Webshops zu setzen.
+
+### Geändert
+
+
+### Behoben
+
+
 ## v1.3.0 (2017-07-13)
 
 ### Hinzugefügt
