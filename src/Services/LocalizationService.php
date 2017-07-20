@@ -6,6 +6,7 @@ use IO\Services\SessionStorageService;
 use IO\Services\CountryService;
 use IO\Services\WebstoreConfigurationService;
 use IO\Services\CheckoutService;
+use Plenty\Modules\Frontend\Services\LocaleService;
 
 class LocalizationService
 {
@@ -39,5 +40,11 @@ class LocalizationService
             'currentShippingCountryId' => $currentShippingCountryId,
             'shopLanguage'             => $lang
         ];
+    }
+
+    public function setLanguage($newLanguage, $fireEvent = true)
+    {
+        $localeService = pluginApp(LocaleService::class);
+        $localeService->setLanguage($newLanguage, $fireEvent);
     }
 }
