@@ -1,6 +1,6 @@
 # Release Notes für IO
 
-## v1.3.1 (2017-07-20)
+## v1.3.1 (2017-07-21)
 
 ### Hinzugefügt
 - Im `BasketService` sowie im `OrderItemBuilder` werden jetzt Basket/Order Properties verarbeitet (minimal Version).
