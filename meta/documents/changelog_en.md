@@ -5,6 +5,7 @@
 ### Added
 
 - Order properties of the **Text** type are now processed in the `BasketService` and the `OrderItemBuilder`.
+- The route `io/localization/language` has been added. This route can be used to set the language of the online store.
 
 ## v1.3.0 (2017-07-13)
 
