@@ -1,5 +1,11 @@
 # Release Notes for IO
 
+## v1.3.1 (2017-07-21)
+
+### Added
+
+- Order properties of the **Text** type are now processed in the `BasketService` and the `OrderItemBuilder`.
+
 ## v1.3.0 (2017-07-13)
 
 ### Added

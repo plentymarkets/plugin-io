@@ -3,7 +3,8 @@
 ## v1.3.1 (2017-07-21)
 
 ### Hinzugefügt
-- Im `BasketService` sowie im `OrderItemBuilder` werden jetzt Basket/Order Properties verarbeitet (minimal Version).
+
+- Im `BasketService` und im `OrderItemBuilder` werden jetzt Bestellmerkmale vom Typ **Text** verarbeitet.
 
 ## v1.3.0 (2017-07-13)
 
