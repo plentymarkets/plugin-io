@@ -102,6 +102,38 @@ class OrderItemBuilder
 	 */
 	private function basketItemToOrderItem(BasketItem $basketItem, string $basketItemName):array
 	{
+        $basketItemProperties = [];
+        if(count($basketItem->basketItemOrderParams))
+        {
+            foreach($basketItem->basketItemOrderParams as $property)
+            {
+                $basketItemProperty = [
+                    'propertyId' => $property->param_id,
+                    'value'      => $property->value
+                ];
+                
+                $basketItemProperties[] = $basketItemProperty;
+            }
+        }
+        
+		$priceOriginal = $basketItem->price;
+
+        $attributeTotalMarkup = 0;
+		if(isset($basketItem->attributeTotalMarkup))
+		{
+            $attributeTotalMarkup = $basketItem->attributeTotalMarkup;
+			if($attributeTotalMarkup != 0)
+			{
+				$priceOriginal -= $attributeTotalMarkup;
+			}
+        }
+        
+        $rebate = 0;
+        if(isset($basketItem->rebate))
+		{
+			$rebate = $basketItem->rebate;
+		}
+	    
 		return [
 			"typeId"            => OrderItemType::VARIATION,
 			"referrerId"        => $basketItem->referrerId,
@@ -111,10 +143,15 @@ class OrderItemBuilder
 			"shippingProfileId" => $basketItem->shippingProfileId,
 			"countryVatId"      => 1, // TODO
 			"vatRate"           => $basketItem->vat,
+			//"vatField"			=> $basketItem->vatField,// TODO
+            "orderProperties"   => $basketItemProperties,
 			"amounts"           => [
 				[
 					"currency"           => $this->checkoutService->getCurrency(),
-					"priceOriginalGross" => $basketItem->price
+					"priceOriginalGross" => $priceOriginal,
+                    "surcharge" => $attributeTotalMarkup,
+					"rebate"	=> $rebate,
+					"isPercentage" => 1
 				]
 			]
 		];

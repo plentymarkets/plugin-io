@@ -1,5 +1,10 @@
 # Release Notes für IO
 
+## v1.3.1 (2017-07-21)
+
+### Hinzugefügt
+- Im `BasketService` sowie im `OrderItemBuilder` werden jetzt Basket/Order Properties verarbeitet (minimal Version).
+
 ## v1.3.0 (2017-07-13)
 
 ### Hinzugefügt
@@ -8,7 +13,7 @@
 - Templates können nun gecacht werden.
 - Im `CustomerService` wurde das Speichern des akademischen Titels eingebaut.
 - Ein neues Event `LocalizationChanged` wurde hinzugefügt.
-- Es wurden Bedingungen für das Ändern der Zahlungsart im **Mein Konto**-Bereich hinzugefügt. In der Konfiguration von Ceres muss die Einstellung **Allow customer to change the payment method** aktiviert werden. Die Bestellung darf zudem noch nicht bezahlt sein. Der Status der Bestellung muss kleiner als 3.4 sein, bzw. wenn die Bestellung am gleichen Tag aufgegeben wurde, muss der Status gleich 5 oder kleiner als 3.4 sein. 
+- Es wurden Bedingungen für das Ändern der Zahlungsart im **Mein Konto**-Bereich hinzugefügt. In der Konfiguration von Ceres muss die Einstellung **Allow customer to change the payment method** aktiviert werden. Die Bestellung darf zudem noch nicht bezahlt sein. Der Status der Bestellung muss kleiner als 3.4 sein, bzw. wenn die Bestellung am gleichen Tag aufgegeben wurde, muss der Status gleich 5 oder kleiner als 3.4 sein.
 
 ### Geändert
 
