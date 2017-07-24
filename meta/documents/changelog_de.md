@@ -5,6 +5,7 @@
 ### Hinzugefügt
 
 - Im `BasketService` und im `OrderItemBuilder` werden jetzt Bestellmerkmale vom Typ **Text** verarbeitet.
+- Die Route "io/localization/language" wurde hinzugefügt um die Sprache des Webshops zu setzen.
 
 ## v1.3.0 (2017-07-13)
 
