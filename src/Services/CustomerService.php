@@ -352,6 +352,14 @@ class CustomerService
                     'value'  => $addressData['title']
                 ];
             }
+
+            if(isset($addressData['telephone']))
+            {
+                $options[] = [
+                    'typeId' => AddressOption::TYPE_TELEPHONE,
+                    'value'  => $addressData['telephone']
+                ];
+            }
         }
         
         return $options;
