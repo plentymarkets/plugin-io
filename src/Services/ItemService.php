@@ -321,16 +321,17 @@ class ItemService
 
     /**
      * @param int $variationId
+     * @param string $imageAccessor
      * @return string
      */
-    public function getVariationImage(int $variationId = 0):string
+    public function getVariationImage(int $variationId = 0, string $imageAccessor = 'urlPreview'):string
     {
         $variation = $this->getVariation($variationId);
 
         if(is_array($variation))
         {
             $itemImageFilter = pluginApp(ItemImagesFilter::class);
-            $variationImages = $itemImageFilter->getItemImages($variation['documents'][0]['data']['images']);
+            $variationImages = $itemImageFilter->getItemImages($variation['documents'][0]['data']['images'], $imageAccessor);
             $variationImage = [];
 
             foreach ($variationImages as $image)
