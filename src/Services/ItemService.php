@@ -327,21 +327,9 @@ class ItemService
     {
         $variation = $this->getVariation($variationId);
 
-        if(is_array($variation))
+        if(is_array($variation) && strlen($variation['documents'][0]['data']['images']['item'][0]['path']))
         {
-            $itemImageFilter = pluginApp(ItemImagesFilter::class);
-            $variationImages = $itemImageFilter->getItemImages($variation['documents'][0]['data']['images']);
-            $variationImage = [];
-
-            foreach ($variationImages as $image)
-            {
-                if(!count($variationImage) || $variationImage['position'] > $image['position'])
-                {
-                    $variationImage = $image;
-                }
-            }
-
-            return $variationImage['url'];
+            return $variation['documents'][0]['data']['images']['item'][0]['path'];
         }
 
         return '';
