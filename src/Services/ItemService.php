@@ -13,6 +13,9 @@ use IO\Builder\Item\Params\ItemColumnsParams;
 use IO\Constants\CrossSellingType;
 use IO\Constants\ItemConditionTexts;
 use IO\Constants\Language;
+use IO\Services\ItemLoader\Services\ItemLoaderService;
+use IO\Services\ItemLoader\Loaders\Items;
+use IO\Extensions\Filters\ItemImagesFilter;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\ElasticSearch;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Processor\DocumentProcessor;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Search\Document\DocumentSearch;
@@ -326,9 +329,19 @@ class ItemService
      */
     public function getVariationImage(int $variationId = 0, string $imageAccessor = 'urlPreview'):string
     {
-        $variation = $this->getVariation($variationId);
+        /**
+         * @var ItemLoaderService $itemLoaderService
+         */
+        $itemLoaderService = pluginApp(ItemLoaderService::class);
+        
+        $itemLoaderService
+            ->setLoaderClassList([Items::class])
+            ->setOptions(['variationIds' => [$variationId]])
+            ->setResultFields(['images']);
+        
+        $variation = $itemLoaderService->load();
 
-        if(is_array($variation))
+        if(is_array($variation) && count($variation['documents']))
         {
             $itemImageFilter = pluginApp(ItemImagesFilter::class);
             $variationImages = $itemImageFilter->getItemImages($variation['documents'][0]['data']['images'], $imageAccessor);
