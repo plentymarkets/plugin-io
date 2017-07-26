@@ -1,5 +1,10 @@
 # Release Notes für IO
 
+## v1.3.2 (UNKOWN)
+
+### Hinzugefügt
+- Im `CustomerService` wurde das Speichern der Telefonnummer eingebaut.
+
 ## v1.3.1 (2017-07-21)
 
 ### Hinzugefügt
