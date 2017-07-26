@@ -2,6 +2,9 @@
 
 ## v1.3.2 (2017-07-26)
 
+### Hinzugefügt
+- Im `CustomerService` wurde das Speichern der Telefonnummer eingebaut.
+
 ### Behoben
 
 - Die Performance der Bestellbestätigungsseite wurde verbessert.
