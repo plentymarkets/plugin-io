@@ -13,6 +13,9 @@ use IO\Builder\Item\Params\ItemColumnsParams;
 use IO\Constants\CrossSellingType;
 use IO\Constants\ItemConditionTexts;
 use IO\Constants\Language;
+use IO\Services\ItemLoader\Services\ItemLoaderService;
+use IO\Services\ItemLoader\Loaders\Items;
+use IO\Extensions\Filters\ItemImagesFilter;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\ElasticSearch;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Processor\DocumentProcessor;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Search\Document\DocumentSearch;
@@ -321,15 +324,38 @@ class ItemService
 
     /**
      * @param int $variationId
+     * @param string $imageAccessor
      * @return string
      */
-    public function getVariationImage(int $variationId = 0):string
+    public function getVariationImage(int $variationId = 0, string $imageAccessor = 'urlPreview'):string
     {
-        $variation = $this->getVariation($variationId);
+        /**
+         * @var ItemLoaderService $itemLoaderService
+         */
+        $itemLoaderService = pluginApp(ItemLoaderService::class);
+        
+        $itemLoaderService
+            ->setLoaderClassList([Items::class])
+            ->setOptions(['variationIds' => [$variationId]])
+            ->setResultFields(['images']);
+        
+        $variation = $itemLoaderService->load();
 
-        if(is_array($variation) && strlen($variation['documents'][0]['data']['images']['item'][0]['path']))
+        if(is_array($variation) && count($variation['documents']))
         {
-            return $variation['documents'][0]['data']['images']['item'][0]['path'];
+            $itemImageFilter = pluginApp(ItemImagesFilter::class);
+            $variationImages = $itemImageFilter->getItemImages($variation['documents'][0]['data']['images'], $imageAccessor);
+            $variationImage = [];
+
+            foreach ($variationImages as $image)
+            {
+                if(!count($variationImage) || $variationImage['position'] > $image['position'])
+                {
+                    $variationImage = $image;
+                }
+            }
+
+            return $variationImage['url'];
         }
 
         return '';
