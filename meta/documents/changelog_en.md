@@ -2,6 +2,10 @@
 
 ## v1.3.2 (2017-07-26)
 
+### Added
+
+- The phone number can now be saved in the `CustomerService`.
+
 ### Fixed
 
 - The performance of the order confirmation page has been improved.

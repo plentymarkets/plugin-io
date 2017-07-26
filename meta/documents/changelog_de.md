@@ -3,7 +3,8 @@
 ## v1.3.2 (2017-07-26)
 
 ### Hinzugefügt
-- Im `CustomerService` wurde das Speichern der Telefonnummer eingebaut.
+
+- Im `CustomerService` kann nun die Telefonnummer gespeichert werden.
 
 ### Behoben
 
