@@ -1,5 +1,12 @@
 # Release Notes for IO
 
+## v1.3.2 (2017-07-26)
+
+### Fixed
+
+- The performance of the order confirmation page has been improved.
+- The item images on the order confirmation page are now displayed correctly.
+
 ## v1.3.1 (2017-07-21)
 
 ### Added

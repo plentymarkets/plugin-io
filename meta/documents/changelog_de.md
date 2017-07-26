@@ -4,8 +4,8 @@
 
 ### Behoben
 
-- Performance der Auftragsübersichtsseite wurde gesteigert
-- Bilderpfade von Auftragsartikeln werden nun korrekt ausgegeben
+- Die Performance der Bestellbestätigungsseite wurde verbessert.
+- Die Artikelbilder in der Bestellbestätigungsseite werden nun korrekt ausgegeben.
 
 ## v1.3.1 (2017-07-21)
 
