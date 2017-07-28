@@ -444,11 +444,16 @@ class ItemService
 
 			foreach($recordList as $variation)
 			{
-				$data = [
-					"variationId" => $variation->variationBase->id,
-					"attributes"  => $variation->variationAttributeValueList,
-                    "url"         => $variation->itemDescription->urlContent . "_" . $itemId
-				];
+                if($variation->itemDescription->urlContent!=="" )
+                    $url = $variation->itemDescription->urlContent  ."_". $itemId;
+                else
+                    $url =  $itemId;
+
+                $data = [
+                    "variationId" => $variation->variationBase->id,
+                    "attributes"  => $variation->variationAttributeValueList,
+                    "url"         => $url
+                ];
 				array_push($variations, $data);
 			}
 		}
