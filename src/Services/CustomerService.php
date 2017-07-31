@@ -45,13 +45,13 @@ class CustomerService
 	 * @var UserSession
 	 */
 	private $userSession = null;
-    
+
     /**
      * CustomerService constructor.
      * @param ContactRepositoryContract $contactRepository
      * @param ContactAddressRepositoryContract $contactAddressRepository
      * @param AddressRepositoryContract $addressRepository
-     * @param \IO\Services\AuthenticationService $authService
+     * @param \IO\Services\SessionStorageService $sessionStorage
      */
 	public function __construct(
 		ContactRepositoryContract $contactRepository,
