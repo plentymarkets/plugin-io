@@ -444,10 +444,14 @@ class ItemService
 
 			foreach($recordList as $variation)
 			{
-                if($variation->itemDescription->urlContent!=="" )
+                if($variation->itemDescription->urlContent !== "" )
+                {
                     $url = $variation->itemDescription->urlContent  ."_". $itemId;
+                }
                 else
-                    $url =  $itemId;
+                {
+                    $url = $itemId;
+                }
 
                 $data = [
                     "variationId" => $variation->variationBase->id,
