@@ -59,6 +59,7 @@ class Items implements ItemLoaderContract
         /** @var VariationBaseFilter $variationFilter */
         $variationFilter = pluginApp(VariationBaseFilter::class);
         $variationFilter->isActive();
+        $variationFilter->isSalable(true);
         
         if(isset($options['itemIds']) && count($options['itemIds']))
         {
