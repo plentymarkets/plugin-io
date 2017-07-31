@@ -1,5 +1,16 @@
 # Release Notes für IO
 
+## v1.3.2 (2017-07-26)
+
+### Hinzugefügt
+
+- Im `CustomerService` kann nun die Telefonnummer gespeichert werden.
+
+### Behoben
+
+- Die Performance der Bestellbestätigungsseite wurde verbessert.
+- Die Artikelbilder in der Bestellbestätigungsseite werden nun korrekt ausgegeben.
+
 ## v1.3.1 (2017-07-21)
 
 ### Hinzugefügt
