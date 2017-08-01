@@ -6,6 +6,7 @@ use IO\Services\ItemLoader\Contracts\ItemLoaderContract;
 use IO\Services\ItemLoader\Contracts\ItemLoaderFactory;
 use IO\Services\ItemLoader\Contracts\ItemLoaderPaginationContract;
 use IO\Services\ItemLoader\Contracts\ItemLoaderSortingContract;
+use IO\Services\ItemWishListService;
 use IO\Services\SalesPriceService;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Search\Document\DocumentSearch;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Sorting\SortingInterface;
@@ -52,7 +53,8 @@ class ItemLoaderFactoryES implements ItemLoaderFactory
         }
         
         $result = $this->attachPrices($result, $options);
-        
+        $result = $this->attachItemWishList($result);
+
         return $result;
     }
     
@@ -141,7 +143,7 @@ class ItemLoaderFactoryES implements ItemLoaderFactory
         }
         
         $result = $elasticSearchRepo->execute();
-        
+
         return $result;
     }
     
@@ -262,6 +264,8 @@ class ItemLoaderFactoryES implements ItemLoaderFactory
             else
             {
                 $result[$identifiers[$key-1]] = $this->attachPrices($list);
+                $result[$identifiers[$key-1]] = $this->attachItemWishList($list);
+
             }
         }
         
@@ -316,6 +320,27 @@ class ItemLoaderFactoryES implements ItemLoaderFactory
             }
         }
         
+        return $result;
+    }
+
+
+    private function attachItemWishList($result)
+    {
+        if(count($result['documents']))
+        {
+            /**
+             * @var ItemWishListService $itemWishListService
+             */
+            $itemWishListService = pluginApp(ItemWishListService::class);
+
+            foreach($result['documents'] as $key => $variation)
+            {
+                if((int)$variation['data']['variation']['id'] > 0)
+                {
+                    $result['documents'][$key]["isInWishListVariation"] = $itemWishListService->isItemInWishList((int)$variation['data']['variation']['id']);
+                }
+            }
+        }
         return $result;
     }
 }
