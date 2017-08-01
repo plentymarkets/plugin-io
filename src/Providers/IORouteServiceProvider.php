@@ -142,6 +142,11 @@ class IORouteServiceProvider extends RouteServiceProvider
             //terms and conditions page
             $router->get('gtc', 'IO\Controllers\StaticPagesController@showTermsAndConditions');
         }
+
+        if( in_array("wish-list", $enabledRoutes) || in_array("all", $enabledRoutes))
+        {
+            $router->get('wish-list', 'IO\Controllers\WishListController@showWishList');
+        }
         
 		/*
 		 * ITEM ROUTES
@@ -172,11 +177,6 @@ class IORouteServiceProvider extends RouteServiceProvider
         if ( in_array("category", $enabledRoutes) || in_array("all", $enabledRoutes) )
         {
             $router->get('{level1?}/{level2?}/{level3?}/{level4?}/{level5?}/{level6?}', 'IO\Controllers\CategoryController@showCategory');
-        }
-
-        if( in_array("wish-list", $enabledRoutes) || in_array("all", $enabledRoutes))
-        {
-            $router->get('wish-list', 'IO\Controllers\WishListController@showWishList');
         }
 	}
 }
