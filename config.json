@@ -60,7 +60,8 @@
       "privacy-policy"        : "/privacy-policy",
       "gtc"                   : "/gtc",
       "item"                  : "Item routes",
-      "category"              : "Category routes"
+      "category"              : "Category routes",
+      "wish-list"             : "/wish-list" 
     },
     "default"                       : "all"
   }

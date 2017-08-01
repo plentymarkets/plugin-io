@@ -173,5 +173,10 @@ class IORouteServiceProvider extends RouteServiceProvider
         {
             $router->get('{level1?}/{level2?}/{level3?}/{level4?}/{level5?}/{level6?}', 'IO\Controllers\CategoryController@showCategory');
         }
+
+        if( in_array("wish-list", $enabledRoutes) || in_array("all", $enabledRoutes))
+        {
+            $router->get('wish-list', 'IO\Controllers\WishListController@showWishList');
+        }
 	}
 }
