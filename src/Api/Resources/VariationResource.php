@@ -8,6 +8,7 @@ use IO\Api\ApiResource;
 use IO\Api\ApiResponse;
 use IO\Api\ResponseCode;
 use IO\Services\ItemLoader\Services\ItemLoaderService;
+use IO\Services\ItemLoader\Loaders\Items;
 use IO\Services\ItemLoader\Loaders\SingleItem;
 use IO\Services\ItemLoader\Loaders\SingleItemAttributes;
 
@@ -27,6 +28,21 @@ class VariationResource extends ApiResource
         ApiResponse $response )
     {
         parent::__construct( $request, $response );
+    }
+
+    public function index():Response
+    {
+        $variations = [];
+
+        $variationsIds = $this->request->get('variationsIds', []);
+        $template = $this->request->get('template', '');
+        
+        if(strlen($template))
+        {
+            $variations = pluginApp(ItemLoaderService::class)->loadForTemplate($template, [Items::class], ['variationIds' => $variationsIds]);
+        }
+
+        return $this->response->create($variations, ResponseCode::OK);
     }
 
     /**
