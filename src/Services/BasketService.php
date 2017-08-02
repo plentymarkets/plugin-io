@@ -50,10 +50,33 @@ class BasketService
 	 * Return the basket as an array
 	 * @return Basket
 	 */
-	public function getBasket():Basket
+	public function getBasket():array
 	{
-		return pluginApp(BasketRepositoryContract::class)->load();
+        $basket = pluginApp(BasketRepositoryContract::class)->load();
+
+        $basket = $basket->toArray();
+
+        $quantityTotals = $this->getBasketQuantity();
+
+        $basket["itemQuantity"] = $quantityTotals;
+
+        return $basket;
 	}
+
+    public function getBasketQuantity()
+    {
+        $itemQuantity = 0;
+
+        foreach ($this->getBasketItems() as $item)
+        {
+            if($item["variationId"] > 0)
+            {
+                $itemQuantity += $item["quantity"];
+            }
+        }
+
+        return $itemQuantity;
+    }
 
     /**
      * List the basket items
