@@ -69,7 +69,7 @@ class BasketService
 
         foreach ($this->getBasketItems() as $item)
         {
-            if($item["variationId"] > 0)
+            if ($item["variationId"] > 0)
             {
                 $itemQuantity += $item["quantity"];
             }
