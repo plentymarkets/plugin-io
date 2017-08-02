@@ -46,21 +46,22 @@ class BasketService
         $this->template = $template;
     }
 
+    public function getBasketForTemplate():array
+    {
+        $basket = $this->getBasket()->toArray();
+
+        $basket["itemQuantity"] = $this->getBasketQuantity();
+
+        return $basket;
+    }
+
 	/**
 	 * Return the basket as an array
 	 * @return Basket
 	 */
-	public function getBasket():array
+	public function getBasket():basket
 	{
-        $basket = pluginApp(BasketRepositoryContract::class)->load();
-
-        $basket = $basket->toArray();
-
-        $quantityTotals = $this->getBasketQuantity();
-
-        $basket["itemQuantity"] = $quantityTotals;
-
-        return $basket;
+        return pluginApp(BasketRepositoryContract::class)->load();
 	}
 
     public function getBasketQuantity()
