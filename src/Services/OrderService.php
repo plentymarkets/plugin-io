@@ -15,6 +15,7 @@ use IO\Builder\Order\OrderOptionSubType;
 use IO\Builder\Order\AddressType;
 use Plenty\Repositories\Models\PaginatedResult;
 use IO\Constants\SessionStorageKeys;
+use Plenty\Modules\Authorization\Services\AuthHelper;
 
 /**
  * Class OrderService
@@ -116,9 +117,27 @@ class OrderService
      */
 	public function findOrderById(int $orderId):LocalizedOrder
 	{
-		$order = $this->orderRepository->findOrderById($orderId);
-        return LocalizedOrder::wrap( $order, "de" );
+        $order = $this->orderRepository->findOrderById($orderId);
+		return LocalizedOrder::wrap( $order, "de" );
 	}
+	
+	//TODO check hash!
+	public function findOrderByIdUnguarded($orderId, $orderHash)
+    {
+        $orderRepo = $this->orderRepository;
+        /** @var AuthHelper $authHelper */
+        $authHelper = pluginApp(AuthHelper::class);
+    
+        /**
+         * @var Order
+         */
+        $order = $authHelper->processUnguarded( function() use ($orderRepo, $orderId)
+        {
+            return $orderRepo->findOrderById($orderId);
+        });
+        
+        return LocalizedOrder::wrap($order, 'de');
+    }
 
     /**
      * Get a list of orders for a contact
