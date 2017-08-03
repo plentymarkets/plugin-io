@@ -36,7 +36,6 @@ class ItemController extends ItemLoaderController
 	)
 	{
         $loaderOptions = [];
-        $isSalable = false;
         $itemService = pluginApp(ItemService::class);
 
         if((int)$variationId > 0)
@@ -46,32 +45,12 @@ class ItemController extends ItemLoaderController
         elseif($itemId > 0)
         {
             $loaderOptions['itemId'] = $itemId;
-            $variationIds = $itemService->getVariationIds($itemId);
-
-            if(count($variationIds) > 0)
-            {
-                $variationId = $variationIds[0];
-                $loaderOptions['variationId'] = $variationId;
-            }
         }
         
         $loaderOptions['crossSellingItemId'] = $itemId;
 
-        if($variationId > 0)
-        {
-            $isSalable = $itemService->getVariationIsSalable($variationId);
-        }
-
         $attributeMap = $itemService->getVariationAttributeMap($itemId);
         $attributeNameMap = $itemService->getAttributeNameMap($itemId);
-
-        if($isSalable)
-        {
-            if(count($attributeMap) > 0)
-            {
-                return pluginApp(Response::class)->redirectTo($attributeMap[0]['url'] . "_" . $attributeMap[0]['variationId']);
-            }
-        }
 
         $templateContainer = $this->buildTemplateContainer("tpl.item", $loaderOptions);
 
@@ -121,7 +100,7 @@ class ItemController extends ItemLoaderController
             }
 
             $templateContainer->setTemplateData(
-                array_merge(['item' => $itemResult, 'attributeNameMap' => $attributeNameMap, 'variations' => $attributeMap, 'salable' => !$isSalable], $templateContainer->getTemplateData(), ['http_host' => $_SERVER['HTTP_HOST']])
+                array_merge(['item' => $itemResult, 'attributeNameMap' => $attributeNameMap, 'variations' => $attributeMap], $templateContainer->getTemplateData(), ['http_host' => $_SERVER['HTTP_HOST']])
             );
 
             return $this->renderTemplateContainer($templateContainer);

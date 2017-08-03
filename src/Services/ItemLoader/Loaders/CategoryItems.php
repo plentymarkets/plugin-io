@@ -67,7 +67,8 @@ class CategoryItems implements ItemLoaderContract, ItemLoaderPaginationContract,
 		$variationFilter = pluginApp(VariationBaseFilter::class);
 		$variationFilter->isActive();
         $variationFilter->isSalable(true);
-		
+        $variationFilter->isHiddenInCategoryList(false);
+
 		if(isset($options['variationShowType']) && $options['variationShowType'] == 'main')
         {
             $variationFilter->isMain();
