@@ -34,12 +34,12 @@ class VariationResource extends ApiResource
     {
         $variations = [];
 
-        $variationsIds = $this->request->get('variationsIds', []);
+        $variationIds = $this->request->get('variationIds', []);
         $template = $this->request->get('template', '');
         
         if(strlen($template))
         {
-            $variations = pluginApp(ItemLoaderService::class)->loadForTemplate($template, [Items::class], ['variationIds' => $variationsIds]);
+            $variations = pluginApp(ItemLoaderService::class)->loadForTemplate($template, [Items::class], ['variationIds' => $variationIds]);
         }
 
         return $this->response->create($variations, ResponseCode::OK);
