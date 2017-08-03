@@ -16,6 +16,7 @@ use IO\Builder\Order\AddressType;
 use Plenty\Repositories\Models\PaginatedResult;
 use IO\Constants\SessionStorageKeys;
 use Plenty\Modules\Authorization\Services\AuthHelper;
+use Plenty\Plugin\Http\Response;
 
 /**
  * Class OrderService
@@ -135,7 +136,37 @@ class OrderService
         {
             return $orderRepo->findOrderById($orderId);
         });
-        
+    
+        /**
+         * @var CustomerService $customerService
+         */
+        $customerService = pluginApp(CustomerService::class);
+    
+        $orderContactId = 0;
+        foreach($order->relations as $relation)
+        {
+            if($relation['referenceType'] == 'contact' && (int)$relation['referenceId'] > 0) //&& )
+            {
+                $orderContactId = $relation['referenceId'];
+            }
+        }
+    
+        if((int)$orderContactId > 0)
+        {
+            if((int)$customerService->getContactId() <= 0)
+            {
+                return pluginApp(Response::class)->redirectTo('login?backlink=confirmation/'.$orderId.'/'.$orderHash);
+            }
+            elseif((int)$orderContactId !== (int)$customerService->getContactId())
+            {
+                return null;
+            }
+        }
+        else
+        {
+            //TODO check hash!
+        }
+    
         return LocalizedOrder::wrap($order, 'de');
     }
 

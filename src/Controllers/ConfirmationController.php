@@ -6,6 +6,7 @@ use IO\Services\CustomerService;
 use IO\Services\OrderService;
 use Plenty\Plugin\Http\Response;
 use Plenty\Plugin\Http\Request;
+use IO\Models\LocalizedOrder;
 
 /**
  * Class ConfirmationController
@@ -17,8 +18,8 @@ class ConfirmationController extends LayoutController
      * Prepare and render the data for the order confirmation
      * @return string
      */
-	public function showConfirmation(int $orderId = 0, $orderHash = '') : string
-	{
+    public function showConfirmation(int $orderId = 0, $orderHash = '')
+    {
         $order = null;
         $showAdditionalPaymentInformation = false;
         
@@ -41,12 +42,19 @@ class ConfirmationController extends LayoutController
             $order = $customerService->getLatestOrder();
         }
         
-        return $this->renderTemplate(
-            "tpl.confirmation",
-            [
-                "data" => $order,
-                "showAdditionalPaymentInformation" => $showAdditionalPaymentInformation
-            ]
-        );
-	}
+        if(!is_null($order) && $order instanceof LocalizedOrder)
+        {
+            return $this->renderTemplate(
+                "tpl.confirmation",
+                [
+                    "data" => $order,
+                    "showAdditionalPaymentInformation" => $showAdditionalPaymentInformation
+                ]
+            );
+        }
+        else
+        {
+            return $order;
+        }
+    }
 }
