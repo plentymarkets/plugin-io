@@ -142,6 +142,11 @@ class IORouteServiceProvider extends RouteServiceProvider
             //terms and conditions page
             $router->get('gtc', 'IO\Controllers\StaticPagesController@showTermsAndConditions');
         }
+
+        if ( in_array("contact", $enabledRoutes) || in_array("all", $enabledRoutes) ) {
+            //contact
+            $router->get('contact', 'IO\Controllers\ContactController@showContact');
+        }
         
 		/*
 		 * ITEM ROUTES
