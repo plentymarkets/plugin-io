@@ -41,6 +41,7 @@ class IORouteServiceProvider extends RouteServiceProvider
 			$api->resource('io/customer/login', 'CustomerAuthenticationResource');
 			$api->resource('io/customer/logout', 'CustomerLogoutResource');
 			$api->resource('io/customer/password', 'CustomerPasswordResource');
+            $api->resource('io/customer/contact/mail', 'ContactMailResource');
             $api->resource('io/variations', 'VariationResource');
             $api->resource('io/item/availability', 'AvailabilityResource');
             $api->resource('io/item/condition', 'ItemConditionResource');
