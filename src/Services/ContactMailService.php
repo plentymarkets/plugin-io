@@ -4,6 +4,7 @@ namespace IO\Services;
 
 use Plenty\Plugin\Mail\Contracts\MailerContract;
 use Plenty\Plugin\Templates\Twig;
+use IO\Services\TemplateConfigService;
 
 class ContactMailService
 {
@@ -15,44 +16,31 @@ class ContactMailService
     
     }
     
-    public function setName($name)
-    {
-        $this->name = $name;
-        return $this;
-    }
-    
-    public function setMessage($message)
-    {
-        $this->message = $message;
-        return $this;
-    }
-    
-    public function getName()
-    {
-        return $this->name;
-    }
-    
-    public function getMessage()
-    {
-        return $this->message;
-    }
-    
     public function sendMail($mailTemplate, $contactData = [])
     {
-        $this
-            ->setName($contactData['name'])
-            ->setMessage($contactData['message']);
-        
         /**
          * @var Twig
          */
         $twig = pluginApp(Twig::class);
-        $renderedMailTemplate = $twig->render($mailTemplate);
+    
+        $mailtemplateParams = [
+            'name' => $contactData['name'],
+            'message' => $contactData['message'],
+            'user_mail' => $contactData['user_mail']
+        ];
+    
+        $renderedMailTemplate = $twig->render($mailTemplate, $mailtemplateParams);
+    
+        /**
+         * @var TemplateConfigService $templateConfigService
+         */
+        $templateConfigService = pluginApp(TemplateConfigService::class);
+        $recipient = $templateConfigService->get('contact.shop_mail');
         
         /**
          * @var MailerContract $mailer
          */
         $mailer = pluginApp(MailerContract::class);
-        $mailer->sendHtml($renderedMailTemplate, 'dominik.meyer@plentymarkets.com', $contactData['subject']);
+        $mailer->sendHtml($renderedMailTemplate, $recipient, $contactData['subject']);
     }
 }
