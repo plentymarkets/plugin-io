@@ -6,6 +6,7 @@ use Plenty\Plugin\ConfigRepository;
 use Plenty\Plugin\RouteServiceProvider;
 use Plenty\Plugin\Routing\Router;
 use Plenty\Plugin\Routing\ApiRouter;
+use IO\Services\TemplateConfigService;
 
 /**
  * Class IORouteServiceProvider
@@ -24,6 +25,8 @@ class IORouteServiceProvider extends RouteServiceProvider
      */
 	public function map(Router $router, ApiRouter $api, ConfigRepository $config)
 	{
+        $templateConfigService = pluginApp(TemplateConfigService::class);
+
 		$api->version(['v1'], ['namespace' => 'IO\Api\Resources'], function ($api)
 		{
 			$api->get('io/basket', 'BasketResource@index');
@@ -144,7 +147,7 @@ class IORouteServiceProvider extends RouteServiceProvider
             $router->get('gtc', 'IO\Controllers\StaticPagesController@showTermsAndConditions');
         }
 
-        if ( in_array("contact", $enabledRoutes) || in_array("all", $enabledRoutes) ) {
+        if ( (in_array("contact", $enabledRoutes) || in_array("all", $enabledRoutes)) && strlen($templateConfigService->get('contact.shop_mail')) > 0 ) {
             //contact
             $router->get('contact', 'IO\Controllers\ContactController@showContact');
         }
