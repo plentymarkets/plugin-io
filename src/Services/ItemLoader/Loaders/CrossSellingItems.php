@@ -58,7 +58,6 @@ class CrossSellingItems implements ItemLoaderContract
         /** @var VariationBaseFilter $variationFilter */
         $variationFilter = pluginApp(VariationBaseFilter::class);
         $variationFilter->isActive();
-        $variationFilter->isSalable(true);
         $variationFilter->isMain();
     
         /**

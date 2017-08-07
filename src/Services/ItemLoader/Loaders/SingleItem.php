@@ -70,10 +70,6 @@ class SingleItem implements ItemLoaderContract
         {
             $variationFilter->hasId($options['variationId']);
         }
-        else
-        {
-            $variationFilter->isSalable(true);
-        }
         
         $sessionLang = pluginApp(SessionStorageService::class)->getLang();
         
