@@ -33,11 +33,16 @@ class ContactMailResource extends ApiResource
         $mailTemplate = $this->request->get('template', '');
         $contactData = $this->request->get('contactData',[]);
         
-        if(strlen($mailTemplate) && count($contactData))
+        $response = $this->contactMailService->sendMail($mailTemplate, $contactData);
+        
+        if($response)
         {
-            $this->contactMailService->sendMail($mailTemplate, $contactData);
+            return $this->response->create($response, ResponseCode::CREATED);
+        }
+        else
+        {
+            return $this->response->create($response, ResponseCode::BAD_REQUEST);
         }
         
-        return $this->response->create('', ResponseCode::CREATED);
     }
 }
