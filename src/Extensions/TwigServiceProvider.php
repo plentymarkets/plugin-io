@@ -3,6 +3,7 @@
 namespace IO\Extensions;
 
 use IO\Services\ItemCrossSellingService;
+use IO\Services\ItemWishListService;
 use Plenty\Plugin\Templates\Extensions\Twig_Extension;
 use IO\Services\ItemLoader\Services\ItemLoaderService;
 use IO\Services\AvailabilityService;
@@ -97,7 +98,8 @@ class TwigServiceProvider extends Twig_Extension
                 "legalInformation"  => pluginApp( LegalInformationService::class ),
                 "salesPrice"        => pluginApp( SalesPriceService::class ),
                 "lastSeen"          => pluginApp( ItemLastSeenService::class ),
-                "crossSelling"      => pluginApp( ItemCrossSellingService::class )
+                "crossSelling"      => pluginApp( ItemCrossSellingService::class ),
+                "wishList"          => pluginApp( ItemWishListService::class )
             ]
         ];
     }
