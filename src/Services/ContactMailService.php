@@ -39,9 +39,9 @@ class ContactMailService
         $twig = pluginApp(Twig::class);
     
         $mailtemplateParams = [
-            'name' => $contactData['name'],
-            'message' => $contactData['message'],
-            'orderId' => $contactData['orderId'],
+            'name'     => $contactData['name'],
+            'message'  => nl2br($contactData['message']),
+            'orderId'  => $contactData['orderId'],
             'userMail' => $contactData['userMail']
         ];
     
