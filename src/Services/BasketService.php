@@ -59,7 +59,7 @@ class BasketService
 	 * Return the basket as an array
 	 * @return Basket
 	 */
-	public function getBasket():basket
+	public function getBasket():Basket
 	{
         return pluginApp(BasketRepositoryContract::class)->load();
 	}
