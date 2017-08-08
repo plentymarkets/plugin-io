@@ -11,6 +11,7 @@ class ContactMailService
 {
     private $name = '';
     private $message = '';
+    private $orderId = '';
     
     public function __construct()
     {
@@ -40,7 +41,8 @@ class ContactMailService
         $mailtemplateParams = [
             'name' => $contactData['name'],
             'message' => $contactData['message'],
-            'user_mail' => $contactData['user_mail']
+            'orderId' => $contactData['orderId'],
+            'userMail' => $contactData['userMail']
         ];
     
         $renderedMailTemplate = $twig->render($mailTemplate, $mailtemplateParams);
