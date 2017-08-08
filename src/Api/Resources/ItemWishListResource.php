@@ -45,7 +45,7 @@ class ItemWishListResource extends ApiResource
      */
     public function index():Response
     {
-        $itemWishList = $this->itemWishListService->getItemWishListForContact();
+        $itemWishList = $this->itemWishListService->getItemWishList();
         return $this->response->create($itemWishList, ResponseCode::OK);
     }
 

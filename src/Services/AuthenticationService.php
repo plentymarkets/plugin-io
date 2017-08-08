@@ -2,8 +2,10 @@
 
 namespace IO\Services;
 
+use IO\Constants\SessionStorageKeys;
 use Plenty\Modules\Authentication\Contracts\ContactAuthenticationRepositoryContract;
 use IO\Services\BasketService;
+use IO\Services\SessionStorageService;
 
 /**
  * Class AuthenticationService
@@ -15,14 +17,20 @@ class AuthenticationService
 	 * @var ContactAuthenticationRepositoryContract
 	 */
 	private $contactAuthRepository;
+    
+    /**
+     * @var SessionStorageService $sessionStorage
+     */
+	private $sessionStorage;
 
     /**
      * AuthenticationService constructor.
      * @param ContactAuthenticationRepositoryContract $contactAuthRepository
      */
-	public function __construct(ContactAuthenticationRepositoryContract $contactAuthRepository)
+	public function __construct(ContactAuthenticationRepositoryContract $contactAuthRepository, SessionStorageService $sessionStorage)
 	{
 		$this->contactAuthRepository = $contactAuthRepository;
+		$this->sessionStorage = $sessionStorage;
 	}
 
     /**
@@ -33,6 +41,7 @@ class AuthenticationService
 	public function login(string $email, string $password)
 	{
 		$this->contactAuthRepository->authenticateWithContactEmail($email, $password);
+		$this->sessionStorage->setSessionValue(SessionStorageKeys::GUEST_WISHLIST_MIGRATION, true);
 	}
 
     /**
@@ -43,6 +52,7 @@ class AuthenticationService
 	public function loginWithContactId(int $contactId, string $password)
 	{
 		$this->contactAuthRepository->authenticateWithContactId($contactId, $password);
+        $this->sessionStorage->setSessionValue(SessionStorageKeys::GUEST_WISHLIST_MIGRATION, true);
 	}
 
     /**

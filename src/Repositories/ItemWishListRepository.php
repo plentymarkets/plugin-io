@@ -4,7 +4,6 @@ namespace IO\Repositories;
 
 use Plenty\Modules\Plugin\DataBase\Contracts\DataBase;
 use Plenty\Modules\Plugin\DataBase\Contracts\Query;
-use IO\Services\SessionStorageService;
 use IO\Services\CustomerService;
 use IO\DBModels\ItemWishList;
 use Plenty\Plugin\Application;
@@ -15,22 +14,17 @@ class ItemWishListRepository
     /** @var  DataBase */
     private $db;
 
-    /** @var  SessionStorageService */
-    private $session;
-
     /** @var  CustomerService */
     private $customer;
 
     /**
      * ItemWishListRepository constructor.
      * @param DataBase $dataBase
-     * @param SessionStorageService $sessionStorageService
      * @param CustomerService $customerService
      */
-    public function __construct(DataBase $dataBase, SessionStorageService $sessionStorageService, CustomerService $customerService)
+    public function __construct(DataBase $dataBase, CustomerService $customerService)
     {
         $this->db 		= $dataBase;
-        $this->session  = $sessionStorageService;
         $this->customer = $customerService;
     }
 
@@ -38,7 +32,7 @@ class ItemWishListRepository
      * List all watched variationIds for contact
      * @return array
      */
-    public function getItemWishListForContact()
+    public function getItemWishList()
     {
         $variationIds = [];
         $plentyId = pluginApp(Application::class)->getPlentyID();
@@ -66,9 +60,9 @@ class ItemWishListRepository
      * Get count WishList entries
      * @return int
      */
-    public function getCountedItemWishListForContact()
+    public function getCountedItemWishList()
     {
-        return count($this->getItemWishListForContact());
+        return count($this->getItemWishList());
     }
 
     /**

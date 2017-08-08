@@ -7,8 +7,11 @@
 
 namespace IO\Services;
 
-
+use IO\Constants\SessionStorageKeys;
+use IO\Services\CustomerService;
 use IO\Repositories\ItemWishListRepository;
+use IO\Repositories\ItemWishListGuestRepository;
+use IO\Services\SessionStorageService;
 
 /**
  * Class WishListService
@@ -16,14 +19,31 @@ use IO\Repositories\ItemWishListRepository;
  */
 class ItemWishListService
 {
-    /**
-     * @var ItemWishListRepository
-     */
-    private $itemWishList;
-
-    public function __construct(ItemWishListRepository $itemWishListRepo)
+    private $itemWishListRepo;
+    
+    public function __construct(SessionStorageService $sessionStorage)
     {
-        $this->itemWishList = $itemWishListRepo;
+        if($sessionStorage->getSessionValue(SessionStorageKeys::GUEST_WISHLIST_MIGRATION))
+        {
+            $this->migrateGuestItemWishList();
+            $sessionStorage->setSessionValue(SessionStorageKeys::GUEST_WISHLIST_MIGRATION, false);
+        }
+        
+        /**
+         * @var CustomerService $customerService
+         */
+        $customerService = pluginApp(CustomerService::class);
+        
+        if((int)$customerService->getContactId() > 0)
+        {
+            $itemWishListRepo = pluginApp(ItemWishListRepository::class);
+        }
+        else
+        {
+            $itemWishListRepo = pluginApp(ItemWishListGuestRepository::class);
+        }
+        
+        $this->itemWishListRepo = $itemWishListRepo;
     }
 
     /**
@@ -33,7 +53,7 @@ class ItemWishListService
      */
     public function addItemWishListEntry(int $variationId, int $quantity)
     {
-        return $this->itemWishList->addItemWishListEntry($variationId, $quantity);
+        return $this->itemWishListRepo->addItemWishListEntry($variationId, $quantity);
     }
 
     /**
@@ -42,23 +62,23 @@ class ItemWishListService
      */
     public function isItemInWishList(int $variationId)
     {
-        return $this->itemWishList->isItemInWishList($variationId);
+        return $this->itemWishListRepo->isItemInWishList($variationId);
     }
 
     /**
      * @return array
      */
-    public function getItemWishListForContact()
+    public function getItemWishList()
     {
-        return $this->itemWishList->getItemWishListForContact();
+        return $this->itemWishListRepo->getItemWishList();
     }
 
     /**
      * @return int
      */
-    public function getCountedItemWishListForContact()
+    public function getCountedItemWishList()
     {
-        return$this->itemWishList->getCountedItemWishListForContact();
+        return$this->itemWishListRepo->getCountedItemWishList();
     }
 
     /**
@@ -67,6 +87,34 @@ class ItemWishListService
      */
     public function removeItemWishListEntry(int $variationId)
     {
-        return $this->itemWishList->removeItemWishListEntry($variationId);
+        return $this->itemWishListRepo->removeItemWishListEntry($variationId);
+    }
+    
+    public function migrateGuestItemWishList()
+    {
+        /**
+         * @var ItemWishListGuestRepository $guestWishListRepo
+         */
+        $guestWishListRepo = pluginApp(ItemWishListGuestRepository::class);
+    
+        $guestWishList = $guestWishListRepo->getItemWishList();
+    
+        if(count($guestWishList))
+        {
+            /**
+             * @var ItemWishListRepository $contactWishListRepo
+             */
+            $contactWishListRepo = pluginApp(ItemWishListRepository::class);
+            
+            foreach($guestWishList as $variationId)
+            {
+                if((int)$variationId > 0)
+                {
+                    $contactWishListRepo->addItemWishListEntry($variationId);
+                }
+            }
+            
+            $guestWishListRepo->resetItemWishList();
+        }
     }
 }

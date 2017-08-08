@@ -146,7 +146,7 @@ class IORouteServiceProvider extends RouteServiceProvider
 
         if( in_array("wish-list", $enabledRoutes) || in_array("all", $enabledRoutes))
         {
-            $router->get('wish-list', 'IO\Controllers\WishListController@showWishList');
+            $router->get('wish-list', 'IO\Controllers\ItemWishListController@showWishList');
         }
         
 		/*
