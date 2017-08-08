@@ -147,7 +147,9 @@ class IORouteServiceProvider extends RouteServiceProvider
             $router->get('gtc', 'IO\Controllers\StaticPagesController@showTermsAndConditions');
         }
 
-        if ( (in_array("contact", $enabledRoutes) || in_array("all", $enabledRoutes)) && strlen($templateConfigService->get('contact.shop_mail')) > 0 ) {
+        if ( (in_array("contact", $enabledRoutes) || in_array("all", $enabledRoutes)) 
+             && strlen($templateConfigService->get('contact.shop_mail')) > 0 
+             && $templateConfigService->get('contact.shop_mail') != "your@email.com") {
             //contact
             $router->get('contact', 'IO\Controllers\ContactController@showContact');
         }
