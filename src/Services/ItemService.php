@@ -33,6 +33,8 @@ use Plenty\Modules\Item\Search\Filter\ClientFilter;
 use Plenty\Modules\Item\Search\Filter\SearchFilter;
 use Plenty\Modules\Item\Search\Filter\VariationBaseFilter;
 use Plenty\Plugin\Application;
+use IO\Services\TemplateConfigService;
+
 
 /**
  * Class ItemService
@@ -426,12 +428,17 @@ class ItemService
 
 			/** @var ItemFilterBuilder $filterBuilder */
 			$filterBuilder = pluginApp(ItemFilterBuilder::class);
-			$filter        = $filterBuilder
+
+            if(pluginApp(TemplateConfigService::class)->get('item.show_variation_over_dropdown') != 'true')
+            {
+                $filterBuilder->variationStockIsSalable();
+            }
+
+			$filter = $filterBuilder
 				->hasId([$itemId])
 				->variationIsChild()
 				->variationIsActive()
-                ->variationStockIsSalable()
-				->build();
+                ->build();
 
 			/** @var ItemParamsBuilder $paramsBuilder */
 			$paramsBuilder = pluginApp(ItemParamsBuilder::class);
@@ -536,13 +543,12 @@ class ItemService
 				->hasId([$itemId])
 				->variationIsChild()
                 ->variationIsActive()
-                ->variationStockIsSalable()
                 ->build();
 
 			/** @var ItemParamsBuilder $paramsBuilder */
 			$paramsBuilder = pluginApp(ItemParamsBuilder::class);
 			$params        = $paramsBuilder
-				->withParam(ItemColumnsParams::LANGUAGE, Language::DE)
+				->withParam(ItemColumnsParams::LANGUAGE, $this->sessionStorage->getLang())
 				->withParam(ItemColumnsParams::PLENTY_ID, $this->app->getPlentyId())
 				->build();
 
