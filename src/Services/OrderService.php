@@ -132,7 +132,7 @@ class OrderService
     
         $order = $this->orderRepository->findOrderByAccessKey($orderId, $orderAccessKey);
         
-        if($redirectToLogin)
+        if($redirectToLogin == 'true')
         {
             /**
              * @var CustomerService $customerService
