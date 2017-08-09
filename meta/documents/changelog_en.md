@@ -1,5 +1,24 @@
 # Release Notes for IO
 
+## v1.4.0 (2017-08-09)
+
+### Added
+
+- The logic and the route `/wish-list` has been added to display a wish list in the online store.
+- The logic and the route `/contact` has been added to display a contact page in the online store. 
+- The `ContactMailService` has been added to process the sending of customer requests via the contact page of the online store.
+- A method has been added in the `BasketService` to get the quantity of items in the shopping cart.
+- The `NotificationService` has been extended to correctly display error messages in the front-end.
+- The link in the order confirmation email now forwards to the order confirmation page of Ceres.
+
+### Fixed
+
+- The language selection in the header of the online store displays languages again.
+
+### Removed
+
+- The logic for item stock has been removed from the `ItemController`. This information is now contained in the `result fields` of ElasticSearch.
+
 ## v1.3.2 (2017-07-26)
 
 ### Added

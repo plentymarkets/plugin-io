@@ -1,5 +1,24 @@
 # Release Notes für IO
 
+## v1.4.0 (2017-08-09)
+
+### Hinzugefügt
+
+- Die Logik und die Route `/wish-list`, um eine Wunschliste im Webshop anzuzeigen, wurde hinzugefügt.
+- Die Logik und die Route `/contact`, um die Kontaktseite im Webshop anzuzeigen, wurde hinzugefügt. 
+- Der `ContactMailService` wurde hinzugefügt und steuert das Versenden von Kontaktanfragen über den Webshop.
+- Im `BasketService` wurde eine Methode hinzugefügt, um die Anzahl der Artikel im Warenkorb auszugeben.
+- Der `NotificationService` wurde erweitert, um Fehlermeldungen im Frontend richtig auszugeben.
+- Der Link aus der Bestellbestätigung leitet nun auf die Bestellbestätigungsseite von Ceres weiter.
+
+### Behoben
+
+- Die Sprachauswahl im Header des Webshops zeigt nun wieder Sprachen an.
+
+### Entfernt
+
+- Im `ItemController` wurde die Logik für den Warenbestand entfernt. Dies wird nun über die `result fields` von ElasticSearch abgebildet.
+
 ## v1.3.2 (2017-07-26)
 
 ### Hinzugefügt
