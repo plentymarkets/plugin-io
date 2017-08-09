@@ -50,9 +50,13 @@ class WebstoreConfigurationService
 	 */
     public function getActiveLanguageList()
 	{
-        $languageList = $this->getWebstoreConfig()->languageList;
-        $languages = explode(', ', $languageList);
-
+        $languages = $this->getWebstoreConfig()->languageList;
+        
+        if(!is_array($languages) && strlen($languages))
+        {
+            $languages = explode(', ', $languages);
+        }
+        
 		return $languages;
 	}
 
