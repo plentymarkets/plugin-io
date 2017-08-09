@@ -49,14 +49,16 @@ class NotificationService
     /**
      * @param string $message
      * @param string $type
+     * @param int $code
      */
-    private function addNotification(string $message, string $type)
+    private function addNotification(string $message, string $type, int $code = 0)
     {
         $notifications = $this->getNotifications(false);
 
         array_push($notifications, array(
             'message' => $message,
-            'type' => $type
+            'type' => $type,
+            'code' => $code
         ));
 
         $this->sessionStorageService->setSessionValue(SessionStorageKeys::NOTIFICATIONS, json_encode($notifications));
@@ -100,5 +102,14 @@ class NotificationService
     public function success(string $message)
     {
         $this->addNotification($message, LogLevel::SUCCESS);
+    }
+
+    /**
+     * @param $type
+     * @param int $code
+     */
+    public function addNotificationCode($type, int $code = 0)
+    {
+        $this->addNotification("", $type, $code);
     }
 }
