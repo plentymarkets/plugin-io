@@ -66,10 +66,10 @@ class SingleItem implements ItemLoaderContract
 			$variationFilter->hasItemId($options['itemId']);
 		}
 
-		if(array_key_exists('variationId', $options) && $options['variationId'] != 0)
-		{
-			$variationFilter->hasId($options['variationId']);
-		}
+        if(array_key_exists('variationId', $options) && $options['variationId'] != 0)
+        {
+            $variationFilter->hasId($options['variationId']);
+        }
         
         $sessionLang = pluginApp(SessionStorageService::class)->getLang();
         

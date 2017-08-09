@@ -64,7 +64,7 @@ class TagItems implements ItemLoaderContract, ItemLoaderPaginationContract, Item
         $variationFilter = pluginApp(VariationBaseFilter::class);
         $variationFilter->isActive();
         $variationFilter->isMain();
-    
+
         $tagFilter = pluginApp(TagFilter::class);
         if(isset($options['tagIds']))
         {
