@@ -122,49 +122,43 @@ class OrderService
 		return LocalizedOrder::wrap( $order, "de" );
 	}
 	
-	//TODO check hash!
-	public function findOrderByIdUnguarded($orderId, $orderHash)
+	public function findOrderByAccessKey($orderId, $orderAccessKey)
     {
-        $orderRepo = $this->orderRepository;
-        /** @var AuthHelper $authHelper */
-        $authHelper = pluginApp(AuthHelper::class);
-    
         /**
-         * @var Order
+         * @var TemplateConfigService $templateConfigService
          */
-        $order = $authHelper->processUnguarded( function() use ($orderRepo, $orderId)
-        {
-            return $orderRepo->findOrderById($orderId);
-        });
+        $templateConfigService = pluginApp(TemplateConfigService::class);
+        $redirectToLogin = $templateConfigService->get('my_account.confirmation_link_login_redirect');
     
-        /**
-         * @var CustomerService $customerService
-         */
-        $customerService = pluginApp(CustomerService::class);
+        $order = $this->orderRepository->findOrderByAccessKey($orderId, $orderAccessKey);
+        
+        if($redirectToLogin)
+        {
+            /**
+             * @var CustomerService $customerService
+             */
+            $customerService = pluginApp(CustomerService::class);
     
-        $orderContactId = 0;
-        foreach($order->relations as $relation)
-        {
-            if($relation['referenceType'] == 'contact' && (int)$relation['referenceId'] > 0) //&& )
+            $orderContactId = 0;
+            foreach ($order->relations as $relation)
             {
-                $orderContactId = $relation['referenceId'];
+                if ($relation['referenceType'] == 'contact' && (int)$relation['referenceId'] > 0)
+                {
+                    $orderContactId = $relation['referenceId'];
+                }
             }
-        }
     
-        if((int)$orderContactId > 0)
-        {
-            if((int)$customerService->getContactId() <= 0)
+            if ((int)$orderContactId > 0)
             {
-                return pluginApp(Response::class)->redirectTo('login?backlink=confirmation/'.$orderId.'/'.$orderHash);
+                if ((int)$customerService->getContactId() <= 0)
+                {
+                    return pluginApp(Response::class)->redirectTo('login?backlink=confirmation/' . $orderId . '/' . $orderAccessKey);
+                }
+                elseif ((int)$orderContactId !== (int)$customerService->getContactId())
+                {
+                    return null;
+                }
             }
-            elseif((int)$orderContactId !== (int)$customerService->getContactId())
-            {
-                return null;
-            }
-        }
-        else
-        {
-            //TODO check hash!
         }
     
         return LocalizedOrder::wrap($order, 'de');

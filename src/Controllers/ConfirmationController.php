@@ -18,12 +18,12 @@ class ConfirmationController extends LayoutController
      * Prepare and render the data for the order confirmation
      * @return string
      */
-    public function showConfirmation(int $orderId = 0, $orderHash = '')
+    public function showConfirmation(int $orderId = 0, $orderAccesskey = '')
     {
         $order = null;
         $showAdditionalPaymentInformation = false;
         
-        if(strlen($orderHash) && (int)$orderId > 0)
+        if(strlen($orderAccesskey) && (int)$orderId > 0)
         {
             $showAdditionalPaymentInformation = true;
             
@@ -31,7 +31,7 @@ class ConfirmationController extends LayoutController
              * @var OrderService $orderService
              */
             $orderService = pluginApp(OrderService::class);
-            $order = $orderService->findOrderByIdUnguarded($orderId, $orderHash);
+            $order = $orderService->findOrderByAccessKey($orderId, $orderAccesskey);
         }
         else
         {
