@@ -88,7 +88,7 @@ class IORouteServiceProvider extends RouteServiceProvider
         {
             //Confiramtion route
             $router->get('confirmation/{orderId?}/{orderAccessKey?}', 'IO\Controllers\ConfirmationController@showConfirmation');
-            $router->get('-/ak{orderAccessKey}/idQQ{orderId}', 'IO\Controllers\ConfirmationEmailController@showConfirmation');
+            $router->get('-/akQQ{orderAccessKey}/idQQ{orderId}', 'IO\Controllers\ConfirmationEmailController@showConfirmation');
         }
 
 		if ( in_array("guest", $enabledRoutes) || in_array("all", $enabledRoutes) )
