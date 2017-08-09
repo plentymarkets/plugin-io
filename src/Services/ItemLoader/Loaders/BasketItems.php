@@ -54,7 +54,7 @@ class BasketItems implements ItemLoaderContract
         /** @var VariationBaseFilter $variationFilter */
         $variationFilter = pluginApp(VariationBaseFilter::class);
         $variationFilter->isActive();
-        
+
         if(array_key_exists('variationIds', $options) && count($options['variationIds']))
         {
             $variationFilter->hasIds($options['variationIds']);
