@@ -10,6 +10,8 @@ use Plenty\Modules\Basket\Models\Basket;
 use Plenty\Modules\Basket\Models\BasketItem;
 use Plenty\Modules\Frontend\Contracts\Checkout;
 use IO\Services\ItemService;
+use IO\Services\NotificationService;
+use IO\Constants\LogLevel;
 use IO\Extensions\Filters\NumberFormatFilter;
 
 /**
@@ -46,14 +48,38 @@ class BasketService
         $this->template = $template;
     }
 
+    public function getBasketForTemplate():array
+    {
+        $basket = $this->getBasket()->toArray();
+
+        $basket["itemQuantity"] = $this->getBasketQuantity();
+
+        return $basket;
+    }
+
 	/**
 	 * Return the basket as an array
 	 * @return Basket
 	 */
 	public function getBasket():Basket
 	{
-		return pluginApp(BasketRepositoryContract::class)->load();
+        return pluginApp(BasketRepositoryContract::class)->load();
 	}
+
+    public function getBasketQuantity()
+    {
+        $itemQuantity = 0;
+
+        foreach ($this->getBasketItems() as $item)
+        {
+            if ($item["variationId"] > 0)
+            {
+                $itemQuantity += $item["quantity"];
+            }
+        }
+
+        return $itemQuantity;
+    }
 
     /**
      * List the basket items
@@ -144,19 +170,23 @@ class BasketService
 
 		$basketItem = $this->findExistingOneByData($data);
 
-
-		if($basketItem instanceof BasketItem)
-		{
-
-
-			$data['id']       = $basketItem->id;
-			$data['quantity'] = (int)$data['quantity'] + $basketItem->quantity;
-			$this->basketItemRepository->updateBasketItem($basketItem->id, $data);
-		}
-		else
-		{
-			$this->basketItemRepository->addBasketItem($data);
-		}
+        try
+        {
+            if($basketItem instanceof BasketItem)
+            {
+                $data['id']       = $basketItem->id;
+                $data['quantity'] = (int)$data['quantity'] + $basketItem->quantity;
+                $this->basketItemRepository->updateBasketItem($basketItem->id, $data);
+            }
+            else
+            {
+                $this->basketItemRepository->addBasketItem($data);
+            }
+        }
+        catch(\Exception $e)
+        {
+            return ["code" => $e->getCode()];
+        }
 
 		return $this->getBasketItemsForTemplate();
 	}

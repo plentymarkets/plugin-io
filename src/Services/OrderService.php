@@ -15,6 +15,8 @@ use IO\Builder\Order\OrderOptionSubType;
 use IO\Builder\Order\AddressType;
 use Plenty\Repositories\Models\PaginatedResult;
 use IO\Constants\SessionStorageKeys;
+use Plenty\Modules\Authorization\Services\AuthHelper;
+use Plenty\Plugin\Http\Response;
 
 /**
  * Class OrderService
@@ -116,9 +118,51 @@ class OrderService
      */
 	public function findOrderById(int $orderId):LocalizedOrder
 	{
-		$order = $this->orderRepository->findOrderById($orderId);
-        return LocalizedOrder::wrap( $order, "de" );
+        $order = $this->orderRepository->findOrderById($orderId);
+		return LocalizedOrder::wrap( $order, "de" );
 	}
+	
+	public function findOrderByAccessKey($orderId, $orderAccessKey)
+    {
+        /**
+         * @var TemplateConfigService $templateConfigService
+         */
+        $templateConfigService = pluginApp(TemplateConfigService::class);
+        $redirectToLogin = $templateConfigService->get('my_account.confirmation_link_login_redirect');
+    
+        $order = $this->orderRepository->findOrderByAccessKey($orderId, $orderAccessKey);
+        
+        if($redirectToLogin)
+        {
+            /**
+             * @var CustomerService $customerService
+             */
+            $customerService = pluginApp(CustomerService::class);
+    
+            $orderContactId = 0;
+            foreach ($order->relations as $relation)
+            {
+                if ($relation['referenceType'] == 'contact' && (int)$relation['referenceId'] > 0)
+                {
+                    $orderContactId = $relation['referenceId'];
+                }
+            }
+    
+            if ((int)$orderContactId > 0)
+            {
+                if ((int)$customerService->getContactId() <= 0)
+                {
+                    return pluginApp(Response::class)->redirectTo('login?backlink=confirmation/' . $orderId . '/' . $orderAccessKey);
+                }
+                elseif ((int)$orderContactId !== (int)$customerService->getContactId())
+                {
+                    return null;
+                }
+            }
+        }
+    
+        return LocalizedOrder::wrap($order, 'de');
+    }
 
     /**
      * Get a list of orders for a contact

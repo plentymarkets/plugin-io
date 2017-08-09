@@ -59,6 +59,7 @@
       "legal-disclosure"      : "/legal-disclosure",
       "privacy-policy"        : "/privacy-policy",
       "gtc"                   : "/gtc",
+      "contact"               : "/contact",
       "item"                  : "Item routes",
       "category"              : "Category routes",
       "wish-list"             : "/wish-list" 

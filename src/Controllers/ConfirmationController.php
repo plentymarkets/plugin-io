@@ -2,6 +2,11 @@
 namespace IO\Controllers;
 
 use IO\Helper\TemplateContainer;
+use IO\Services\CustomerService;
+use IO\Services\OrderService;
+use Plenty\Plugin\Http\Response;
+use Plenty\Plugin\Http\Request;
+use IO\Models\LocalizedOrder;
 
 /**
  * Class ConfirmationController
@@ -13,13 +18,43 @@ class ConfirmationController extends LayoutController
      * Prepare and render the data for the order confirmation
      * @return string
      */
-	public function showConfirmation(): string
-	{
-		return $this->renderTemplate(
-			"tpl.confirmation",
-			[
-				"confirmation" => ""
-			]
-		);
-	}
+    public function showConfirmation(int $orderId = 0, $orderAccesskey = '')
+    {
+        $order = null;
+        $showAdditionalPaymentInformation = false;
+        
+        if(strlen($orderAccesskey) && (int)$orderId > 0)
+        {
+            $showAdditionalPaymentInformation = true;
+            
+            /**
+             * @var OrderService $orderService
+             */
+            $orderService = pluginApp(OrderService::class);
+            $order = $orderService->findOrderByAccessKey($orderId, $orderAccesskey);
+        }
+        else
+        {
+            /**
+             * @var CustomerService $customerService
+             */
+            $customerService = pluginApp(CustomerService::class);
+            $order = $customerService->getLatestOrder();
+        }
+        
+        if(!is_null($order) && $order instanceof LocalizedOrder)
+        {
+            return $this->renderTemplate(
+                "tpl.confirmation",
+                [
+                    "data" => $order,
+                    "showAdditionalPaymentInformation" => $showAdditionalPaymentInformation
+                ]
+            );
+        }
+        else
+        {
+            return $order;
+        }
+    }
 }

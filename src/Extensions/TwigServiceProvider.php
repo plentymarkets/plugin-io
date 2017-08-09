@@ -2,6 +2,7 @@
 
 namespace IO\Extensions;
 
+use IO\Services\ContactMailService;
 use IO\Services\ItemCrossSellingService;
 use IO\Services\ItemWishListService;
 use Plenty\Plugin\Templates\Extensions\Twig_Extension;
@@ -99,7 +100,8 @@ class TwigServiceProvider extends Twig_Extension
                 "salesPrice"        => pluginApp( SalesPriceService::class ),
                 "lastSeen"          => pluginApp( ItemLastSeenService::class ),
                 "crossSelling"      => pluginApp( ItemCrossSellingService::class ),
-                "wishList"          => pluginApp( ItemWishListService::class )
+                "wishList"          => pluginApp( ItemWishListService::class ),
+                "contactMail"       => pluginApp( ContactMailService::class)
             ]
         ];
     }
