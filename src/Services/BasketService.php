@@ -48,14 +48,38 @@ class BasketService
         $this->template = $template;
     }
 
+    public function getBasketForTemplate():array
+    {
+        $basket = $this->getBasket()->toArray();
+
+        $basket["itemQuantity"] = $this->getBasketQuantity();
+
+        return $basket;
+    }
+
 	/**
 	 * Return the basket as an array
 	 * @return Basket
 	 */
 	public function getBasket():Basket
 	{
-		return pluginApp(BasketRepositoryContract::class)->load();
+        return pluginApp(BasketRepositoryContract::class)->load();
 	}
+
+    public function getBasketQuantity()
+    {
+        $itemQuantity = 0;
+
+        foreach ($this->getBasketItems() as $item)
+        {
+            if ($item["variationId"] > 0)
+            {
+                $itemQuantity += $item["quantity"];
+            }
+        }
+
+        return $itemQuantity;
+    }
 
     /**
      * List the basket items

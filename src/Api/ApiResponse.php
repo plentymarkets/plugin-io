@@ -75,7 +75,7 @@ class ApiResponse
 		// Register basket events
         $this->dispatcher->listen( AfterBasketChanged::class, function($event) {
             $this->eventData["AfterBasketChanged"] = [
-                "basket" => pluginApp(BasketService::class)->getBasket()
+                "basket" => pluginApp(BasketService::class)->getBasketForTemplate()
             ];
             $this->eventData['CheckoutChanged'] = [
                 'checkout' => pluginApp(CheckoutService::class)->getCheckout()
