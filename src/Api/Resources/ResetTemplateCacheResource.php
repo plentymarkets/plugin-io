@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by IntelliJ IDEA.
- * User: ihussein
- * Date: 01.08.17
- * Time: 14:58
- */
 
 namespace IO\Api\Resources;
 
@@ -15,6 +9,19 @@ use IO\Api\ApiResource;
 use IO\Api\ApiResponse;
 use IO\Api\ResponseCode;
 use Plenty\Modules\Plugin\Storage\Contracts\StorageRepositoryContract;
+use Plenty\Modules\Frontend\Factories\FrontendFactory;
+use Plenty\Plugin\CachingRepository;
+use IO\Services\SalesPriceService;
+use IO\Extensions\Functions\Partial;
+use IO\Services\CheckoutService;
+use IO\Services\ContentCaching\Models\SmallContentCache;
+use IO\Services\ContentCaching\Services\Container;
+use IO\Services\ContentCaching\Services\ContentCaching;
+use Plenty\Modules\Cloud\Storage\Models\StorageObject;
+use Plenty\Modules\Cron\Contracts\CronHandler;
+use Plenty\Plugin\Events\Dispatcher;
+use Plenty\Plugin\Log\Loggable;
+use Plenty\Plugin\Templates\Twig;
 
 /**
  * Class ResetTemplateCacheResource
@@ -22,6 +29,8 @@ use Plenty\Modules\Plugin\Storage\Contracts\StorageRepositoryContract;
  */
 class ResetTemplateCacheResource extends ApiResource
 {
+    use Loggable;
+
     /**
      * @var StorageRepositoryContract
      */
@@ -38,6 +47,16 @@ class ResetTemplateCacheResource extends ApiResource
     private $cachingRepository;
 
     /**
+     * @var Twig
+     */
+    private $twig;
+
+    /**
+     * @var Container
+     */
+    private $container;
+
+    /**
      * ResetTemplateCacheResource constructor.
      * @param Request $request
      * @param ApiResponse $response
@@ -48,13 +67,17 @@ class ResetTemplateCacheResource extends ApiResource
         ApiResponse $response,
         StorageRepositoryContract $storageRepositoryContract,
         CachingRepository $cachingRepository,
-        FrontendFactory $frontendFactory)
+        FrontendFactory $frontendFactory,
+        Twig $twig,
+        Container $container)
     {
         parent::__construct($request, $response);
 
         $this->storageRepositoryContract = $storageRepositoryContract;
         $this->frontendFactory   = $frontendFactory;
         $this->cachingRepository = $cachingRepository;
+        $this->twig = $twig;
+        $this->container = $container;
     }
 
     // Post
