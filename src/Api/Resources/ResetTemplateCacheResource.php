@@ -69,7 +69,8 @@ class ResetTemplateCacheResource extends ApiResource
         CachingRepository $cachingRepository,
         FrontendFactory $frontendFactory,
         Twig $twig,
-        Container $container)
+        Container $container,
+        Dispatcher $dispatcher)
     {
         parent::__construct($request, $response);
 
@@ -78,6 +79,8 @@ class ResetTemplateCacheResource extends ApiResource
         $this->cachingRepository = $cachingRepository;
         $this->twig = $twig;
         $this->container = $container;
+
+        $dispatcher->fire('IO.init.templates', [pluginApp(Partial::class)]);
     }
 
     // Post
