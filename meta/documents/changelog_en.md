@@ -4,7 +4,7 @@
 
 ### Added
 
-- The logic and the route `/wish-list` has been added to display a wish list in the online store.
+- The logic and the route `/wish-list` has been added to display a wish list in the online store. **Note:** In order for the migration of the data base table to run correctly, the standard client must be activated and the plugin deployed. After deployment the standard client can be deactivated.
 - The logic and the route `/contact` has been added to display a contact page in the online store. 
 - The `ContactMailService` has been added to process the sending of customer requests via the contact page of the online store.
 - A method has been added in the `BasketService` to get the quantity of items in the shopping cart.
