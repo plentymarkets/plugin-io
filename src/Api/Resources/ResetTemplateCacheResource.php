@@ -140,7 +140,7 @@ class ResetTemplateCacheResource extends ApiResource
                 $this->getLogger('RebuildContentCache Job')->error($exc->getMessage());
                 $this->storageRepositoryContract->deleteObject('IO', 'tpl_' . $cacheObject->key);
                 $this->cachingRepository->forget(substr('tpl_' . $cacheObject->key, 0, -5));
-                return $this->response->create([], ResponseCode::BAD_REQUEST);
+                return $this->response->create($exc->getMessage(), ResponseCode::BAD_REQUEST);
             }
         }
     }

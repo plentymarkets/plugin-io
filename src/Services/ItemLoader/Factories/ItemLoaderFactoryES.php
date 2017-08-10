@@ -264,6 +264,7 @@ class ItemLoaderFactoryES implements ItemLoaderFactory
             else
             {
                 $result[$identifiers[$key-1]] = $this->attachPrices($list);
+                $list = $result[$identifiers[$key-1]];
                 $result[$identifiers[$key-1]] = $this->attachItemWishList($list);
 
             }

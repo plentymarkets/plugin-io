@@ -64,7 +64,16 @@ class ItemWishListGuestRepository
      */
     public function isItemInWishList(int $variationId = 0)
     {
-        return in_array($variationId, $this->getItemWishList());
+        $wishList = $this->getItemWishList();
+        
+        if(!is_array($wishList))
+        {
+            return false;
+        }
+        else
+        {
+            return in_array($variationId, $wishList);
+        }
     }
     
     /**
