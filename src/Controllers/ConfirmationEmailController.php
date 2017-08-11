@@ -17,11 +17,11 @@ class ConfirmationEmailController extends LayoutController
      * Prepare and render the data for the order confirmation
      * @return string
      */
-    public function showConfirmation($orderAccesskey = '', int $orderId = 0)
+    public function showConfirmation($orderAccessKey = '', int $orderId = 0)
     {
-        if(strlen($orderAccesskey) && (int)$orderId > 0)
+        if(strlen($orderAccessKey) && (int)$orderId > 0)
         {
-            return pluginApp(Response::class)->redirectTo('confirmation/'.$orderId.'/'.$orderAccesskey);
+            return pluginApp(Response::class)->redirectTo('confirmation/'.$orderId.'/'.$orderAccessKey);
         }
         
         return $this->renderTemplate(

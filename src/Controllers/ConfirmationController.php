@@ -31,7 +31,14 @@ class ConfirmationController extends LayoutController
              * @var OrderService $orderService
              */
             $orderService = pluginApp(OrderService::class);
-            $order = $orderService->findOrderByAccessKey($orderId, $orderAccesskey);
+            try
+            {
+                $order = $orderService->findOrderByAccessKey($orderId, $orderAccesskey);
+            }
+            catch(\Exception $e)
+            {
+                $order = null;
+            }
         }
         else
         {
@@ -54,7 +61,12 @@ class ConfirmationController extends LayoutController
         }
         else
         {
-            return $order;
+            return $this->renderTemplate(
+                "tpl.page-not-found",
+                [
+                    "data" => ""
+                ]
+            );
         }
     }
 }
