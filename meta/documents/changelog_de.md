@@ -4,12 +4,12 @@
 
 ### Hinzugefügt
 
-- Kaufabwicklungslink aus der Auftragsübersicht im Backend kann jetzt interpretiert werden.
+- Der Kaufabwicklungslink aus der Auftragsübersicht im Backend kann jetzt interpretiert werden.
 
 ### Behoben
 
 - Aufgrund eines Fehlers wurden Preise für Cross-Selling-Artikel nicht angezeigt. Dies wurde behoben.
-- Wenn der Link zur Kaufabwicklung ungültig ist, wird nun die 404 Seite angezeigt anstatt eines Twig Fehlers.
+- Wenn der Link zur Kaufabwicklung ungültig ist, wird nun die 404-Seite angezeigt anstatt eines Twig-Fehlers.
 
 ## v1.4.0 (2017-08-09)
 

@@ -2,9 +2,14 @@
 
 ## v1.4.1 (2017-08-11)
 
+### Added
+
+- The order confirmation link in the order overview of the back end can now also be interpreted.
+
 ### Fixed
 
 - Due to an error, prices of cross-selling items were not displayed. This has been fixed.
+- In case of an invalid order confirmation link, a 404 page will be displayed instead of a Twig error.
 
 ## v1.4.0 (2017-08-09)
 
