@@ -1,5 +1,11 @@
 # Release Notes für IO
 
+## v1.4.1 (2017-08-11)
+
+### Behoben
+
+- Preise für Cross-Selling-Artikel werden wieder angezeigt
+
 ## v1.4.0 (2017-08-09)
 
 ### Hinzugefügt
