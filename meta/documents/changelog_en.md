@@ -5,6 +5,7 @@
 ### Added
 
 - The order confirmation link in the order overview of the back end can now also be interpreted.
+- `ContactMailService` now accepts a parameter to submit a copy of the contact form to the sender.
 
 ### Fixed
 
