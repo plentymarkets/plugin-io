@@ -52,11 +52,17 @@ class ContactMailService
             return false;
         }
         
+        $cc = [];
+        if(isset($contactData['cc']) && $contactData['cc'] == 'true')
+        {
+            $cc[] = $contactData['userMail'];
+        }
+        
         /**
          * @var MailerContract $mailer
          */
         $mailer = pluginApp(MailerContract::class);
-        $mailer->sendHtml($renderedMailTemplate, $recipient, $contactData['subject']);
+        $mailer->sendHtml($renderedMailTemplate, $recipient, $contactData['subject'], $cc);
         
         return true;
     }

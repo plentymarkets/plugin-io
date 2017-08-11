@@ -12,5 +12,6 @@ class ContactFormValidator extends Validator
         $this->addString('userMail', true);
         $this->addString('subject', true);
         $this->addString('message', true);
+        $this->addString('cc', false);
     }
 }
