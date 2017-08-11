@@ -5,6 +5,7 @@
 ### Hinzugefügt
 
 - Der Kaufabwicklungslink aus der Auftragsübersicht im Backend kann jetzt interpretiert werden.
+- Der `ContactMailService` kann nun auch einen Parameter entgegennehmen, um die Kontaktanfrage als Kopie an den Ersteller zu schicken.
 
 ### Behoben
 
