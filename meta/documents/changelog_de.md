@@ -4,7 +4,7 @@
 
 ### Behoben
 
-- Preise für Cross-Selling-Artikel werden wieder angezeigt
+- Aufgrund eines Fehlers wurden Preise für Cross-Selling-Artikel nicht angezeigt. Dies wurde behoben.
 
 ## v1.4.0 (2017-08-09)
 

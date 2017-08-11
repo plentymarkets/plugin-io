@@ -1,5 +1,11 @@
 # Release Notes for IO
 
+## v1.4.1 (2017-08-11)
+
+### Fixed
+
+- Due to an error, prices of cross-selling items were not displayed. This has been fixed.
+
 ## v1.4.0 (2017-08-09)
 
 ### Added
