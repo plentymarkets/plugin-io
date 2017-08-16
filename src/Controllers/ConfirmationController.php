@@ -46,7 +46,14 @@ class ConfirmationController extends LayoutController
              * @var CustomerService $customerService
              */
             $customerService = pluginApp(CustomerService::class);
-            $order = $customerService->getLatestOrder();
+            try
+            {
+                $order = $customerService->getLatestOrder();
+            }
+            catch(\Exception $e)
+            {
+                $order = null;
+            }
         }
         
         if(!is_null($order) && $order instanceof LocalizedOrder)
