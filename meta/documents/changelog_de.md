@@ -1,5 +1,11 @@
 # Release Notes für IO
 
+## v1.4.2 (2017-08-16)
+
+### Behoben
+
+- Beim Aufruf der Auftragsübersichtsseite erscheint nun eine 404 Seite anstatt eines Twig Fehlers wenn die Session in der Zwischenzeit abgelaufen ist.
+
 ## v1.4.1 (2017-08-11)
 
 ### Hinzugefügt
