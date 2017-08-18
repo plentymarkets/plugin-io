@@ -165,6 +165,9 @@ class IORouteServiceProvider extends RouteServiceProvider
             $router->get('contact', 'IO\Controllers\ContactController@showContact');
         }
         
+        //TODO config
+        $router->get('password-reset/{contactId}/{hash}', 'IO\Controllers\CustomerPasswordResetController@showReset');
+        
 		/*
 		 * ITEM ROUTES
 		 */
