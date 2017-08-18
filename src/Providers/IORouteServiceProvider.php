@@ -44,13 +44,14 @@ class IORouteServiceProvider extends RouteServiceProvider
 			$api->resource('io/customer/login', 'CustomerAuthenticationResource');
 			$api->resource('io/customer/logout', 'CustomerLogoutResource');
 			$api->resource('io/customer/password', 'CustomerPasswordResource');
+            $api->resource('io/customer/password_reset', 'CustomerPasswordResetResource');
             $api->resource('io/customer/contact/mail', 'ContactMailResource');
+            $api->resource('io/customer/bank_data', 'ContactBankResource');
             $api->resource('io/variations', 'VariationResource');
             $api->resource('io/item/availability', 'AvailabilityResource');
             $api->resource('io/item/condition', 'ItemConditionResource');
             $api->get('io/item/search', 'ItemSearchResource@index');
             $api->get('io/item/search/autocomplete', 'ItemSearchAutocompleteResource@index');
-			$api->resource('io/customer/bank_data', 'ContactBankResource');
 			$api->resource('io/coupon', 'CouponResource');
             $api->resource('io/guest', 'GuestResource');
             $api->resource('io/category', 'CategoryItemResource');
