@@ -74,18 +74,4 @@ class CustomerPasswordResetService
         
         return false;
     }
-    
-    /*
-     * $password = $this->request->get("password", null);
-		if($password !== null)
-		{
-			$this->customerService->updateContact([
-				                                      "changeOnlyPassword" => true,
-				                                      "password"           => $password
-			                                      ]);
-			return $this->response->create(null, ResponseCode::OK);
-		}
-		$this->response->error(0, "Missing parameter: password");
-		return $this->response->create(null, ResponseCode::BAD_REQUEST);
-     */
 }
