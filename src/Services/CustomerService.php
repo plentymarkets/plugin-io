@@ -211,6 +211,7 @@ class CustomerService
          * @var CustomerPasswordResetService $customerPasswordResetService
          */
         $customerPasswordResetService = pluginApp(CustomerPasswordResetService::class);
+        
         if((int)$this->getContactId() <= 0 && strlen($hash) && $customerPasswordResetService->checkHash($contactId, $hash))
         {
             /** @var AuthHelper $authHelper */
@@ -226,6 +227,10 @@ class CustomerService
                                                    (int)$contactId);
             });
             
+            if($result instanceof Contact && (int)$result->id > 0)
+            {
+                $customerPasswordResetService->deleteHash($contactId);
+            }
         }
         else
         {

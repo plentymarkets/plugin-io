@@ -1,8 +1,10 @@
 <?php //strict
 namespace IO\Controllers;
 
+use IO\Constants\LogLevel;
 use IO\Helper\TemplateContainer;
 use IO\Services\CustomerPasswordResetService;
+use IO\Services\NotificationService;
 
 /**
  * Class CustomerPasswordResetController
@@ -33,8 +35,14 @@ class CustomerPasswordResetController extends LayoutController
         }
         else
         {
+            /**
+             * @var NotificationService $notificationService
+             */
+            $notificationService = pluginApp(NotificationService::class);
+            $notificationService->addNotificationCode(LogLevel::ERROR,3);
+            
             return $this->renderTemplate(
-                "tpl.page-not-found",
+                "tpl.home",
                 [
                     "data" => ""
                 ]

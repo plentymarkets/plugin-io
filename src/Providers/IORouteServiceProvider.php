@@ -157,7 +157,7 @@ class IORouteServiceProvider extends RouteServiceProvider
             $router->get('wish-list', 'IO\Controllers\ItemWishListController@showWishList');
         }
 
-        if ( (in_array("contact", $enabledRoutes) || in_array("all", $enabledRoutes))
+        if( (in_array("contact", $enabledRoutes) || in_array("all", $enabledRoutes) )
              && strlen($templateConfigService->get('contact.shop_mail')) > 0 
              && $templateConfigService->get('contact.shop_mail') != "your@email.com")
         {
@@ -165,8 +165,10 @@ class IORouteServiceProvider extends RouteServiceProvider
             $router->get('contact', 'IO\Controllers\ContactController@showContact');
         }
         
-        //TODO config
-        $router->get('password-reset/{contactId}/{hash}', 'IO\Controllers\CustomerPasswordResetController@showReset');
+        if( in_array("password-reset", $enabledRoutes) || in_array("all", $enabledRoutes) )
+        {
+            $router->get('password-reset/{contactId}/{hash}', 'IO\Controllers\CustomerPasswordResetController@showReset');
+        }
         
 		/*
 		 * ITEM ROUTES

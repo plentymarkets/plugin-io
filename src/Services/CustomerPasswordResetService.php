@@ -36,7 +36,7 @@ class CustomerPasswordResetService
         return true;
     }
     
-    private function getContactIdbyEmailAddress($email)
+    public function getContactIdbyEmailAddress($email)
     {
         /**
          * @var ContactRepositoryContract $contactRepo
@@ -67,11 +67,33 @@ class CustomerPasswordResetService
     public function checkHash($contactId, $hash)
     {
         $existingEntry = $this->customerPasswordResetRepo->findExistingEntry((int)pluginApp(Application::class)->getPlentyID(), (int)$contactId);
-        if($existingEntry instanceof PasswordReset && $existingEntry->hash == $hash)
+        if($existingEntry instanceof PasswordReset && $existingEntry->hash == $hash && $this->checkHashExpiration($existingEntry->timestamp))
         {
             return true;
         }
         
         return false;
+    }
+    
+    public function checkHashExpiration($hashTimestamp)
+    {
+        $expirationDays = 1;
+        $unixTimestamp = strtotime($hashTimestamp);
+        if( ((int)$unixTimestamp > 0) && (time() > ($unixTimestamp + ((24*60*60)*$expirationDays))) )
+        {
+            return false;
+        }
+    
+        return true;
+    }
+    
+    public function findExistingHash($contactId)
+    {
+        return $this->customerPasswordResetRepo->findExistingEntry((int)pluginApp(Application::class)->getPlentyID(), $contactId);
+    }
+    
+    public function deleteHash($contactId)
+    {
+        return $this->customerPasswordResetRepo->deleteEntry((int)$contactId);
     }
 }

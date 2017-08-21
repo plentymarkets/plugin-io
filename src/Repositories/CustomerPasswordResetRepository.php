@@ -62,4 +62,26 @@ class CustomerPasswordResetRepository
         $result = $this->db->query(PasswordReset::NAMESPACE)->where('contactId', '=', (int)$contactId)->where('plentyId', '=', (int)$plentyId)->get();
         return $result[0];
     }
+    
+    public function deleteEntry($contactId)
+    {
+        $response = false;
+        $plentyId = pluginApp(Application::class)->getPlentyID();
+    
+        if($contactId > 0)
+        {
+            $existingEntry = $this->findExistingEntry($plentyId, $contactId);
+            
+            if($existingEntry instanceof PasswordReset)
+            {
+                $response = $this->db->delete($existingEntry);
+            }
+        
+            return $response;
+        }
+        else
+        {
+            throw new \Exception('', 401);
+        }
+    }
 }
