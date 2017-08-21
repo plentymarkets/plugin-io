@@ -2,6 +2,10 @@
 
 ## v1.4.2 (2017-08-16)
 
+### Geändert
+
+- Die Suche wurde optimiert so das nun auch Ergebnisse gefunden werden die nicht genau mit dem Suchstring übereinstimmen.
+
 ### Behoben
 
 - Beim Aufruf der Auftragsübersichtsseite erscheint nun eine 404-Seite anstatt eines Twig-Fehlers, wenn die Session in der Zwischenzeit abgelaufen ist.
