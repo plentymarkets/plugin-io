@@ -12,12 +12,14 @@ use Plenty\Modules\Account\Address\Contracts\AddressRepositoryContract;
 use Plenty\Modules\Account\Contact\Models\Contact;
 use IO\Builder\Order\AddressType;
 use Plenty\Modules\Account\Address\Models\Address;
+use Plenty\Modules\Authorization\Services\AuthHelper;
 use IO\Helper\UserSession;
 use Plenty\Modules\Order\Contracts\OrderRepositoryContract;
 use IO\Services\SessionStorageService;
 use IO\Constants\SessionStorageKeys;
 use IO\Services\OrderService;
 use IO\Services\NotificationService;
+use IO\Services\CustomerPasswordResetService;
 
 /**
  * Class CustomerService
@@ -202,6 +204,39 @@ class CustomerService
 
 		return null;
 	}
+	
+	public function updatePassword($newPassword, $contactId = 0, $hash='')
+    {
+        /**
+         * @var CustomerPasswordResetService $customerPasswordResetService
+         */
+        $customerPasswordResetService = pluginApp(CustomerPasswordResetService::class);
+        if((int)$this->getContactId() <= 0 && strlen($hash) && $customerPasswordResetService->checkHash($contactId, $hash))
+        {
+            /** @var AuthHelper $authHelper */
+            $authHelper = pluginApp(AuthHelper::class);
+            $contactRepo = $this->contactRepository;
+            
+            $result = $authHelper->processUnguarded( function() use ($newPassword, $contactId, $contactRepo)
+            {
+                return $contactRepo->updateContact([
+                                                        'changeOnlyPassword' => true,
+                                                        'password'           => $newPassword
+                                                   ],
+                                                   (int)$contactId);
+            });
+            
+        }
+        else
+        {
+            $result = $this->updateContact([
+                                                'changeOnlyPassword' => true,
+                                                'password'           => $newPassword
+                                           ]);
+        }
+        
+        return $result;
+    }
 
     /**
      * List the addresses of a contact

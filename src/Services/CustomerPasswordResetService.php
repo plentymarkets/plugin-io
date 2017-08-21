@@ -2,10 +2,12 @@
 
 namespace IO\Services;
 
+use IO\DBModels\PasswordReset;
 use Plenty\Modules\Account\Contact\Contracts\ContactRepositoryContract;
 use Plenty\Plugin\Mail\Contracts\MailerContract;
 use IO\Repositories\CustomerPasswordResetRepository;
 use IO\Services\WebstoreConfigurationService;
+use Plenty\Plugin\Application;
 
 class CustomerPasswordResetService
 {
@@ -60,6 +62,17 @@ class CustomerPasswordResetService
         $url = $domain.'/password-reset/'.$contactId.'/'.$hash;
         
         return $url;
+    }
+    
+    public function checkHash($contactId, $hash)
+    {
+        $existingEntry = $this->customerPasswordResetRepo->findExistingEntry((int)pluginApp(Application::class)->getPlentyID(), (int)$contactId);
+        if($existingEntry instanceof PasswordReset && $existingEntry->hash == $hash)
+        {
+            return true;
+        }
+        
+        return false;
     }
     
     /*

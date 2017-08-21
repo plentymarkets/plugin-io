@@ -2,6 +2,7 @@
 namespace IO\Controllers;
 
 use IO\Helper\TemplateContainer;
+use IO\Services\CustomerPasswordResetService;
 
 /**
  * Class CustomerPasswordResetController
@@ -15,12 +16,30 @@ class CustomerPasswordResetController extends LayoutController
      */
     public function showReset($contactId, $hash): string
     {
-        return $this->renderTemplate(
-            "tpl.password-reset",
-            [
-                "contactId" => $contactId,
-                "hash"      => $hash
-            ]
-        );
+        /**
+         * @var CustomerPasswordResetService $customerPasswordResetService
+         */
+        $customerPasswordResetService = pluginApp(CustomerPasswordResetService::class);
+        
+        if($customerPasswordResetService->checkHash((int)$contactId, $hash))
+        {
+            return $this->renderTemplate(
+                "tpl.password-reset",
+                [
+                    "contactId" => $contactId,
+                    "hash"      => $hash
+                ]
+            );
+        }
+        else
+        {
+            return $this->renderTemplate(
+                "tpl.page-not-found",
+                [
+                    "data" => ""
+                ]
+            );
+        }
+        
     }
 }

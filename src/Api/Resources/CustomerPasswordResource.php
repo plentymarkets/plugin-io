@@ -38,13 +38,13 @@ class CustomerPasswordResource extends ApiResource
      */
 	public function store():Response
 	{
-		$password = $this->request->get("password", null);
-		if($password !== null)
+        $newPassWord = $this->request->get('password', null);
+	    $contactId = $this->request->get('contactId', 0);
+        $hash = $this->request->get('hash', null);
+	    
+		if($newPassWord !== null)
 		{
-			$this->customerService->updateContact([
-				                                      "changeOnlyPassword" => true,
-				                                      "password"           => $password
-			                                      ]);
+			$result = $this->customerService->updatePassword($newPassWord, $contactId, $hash);
 			return $this->response->create(null, ResponseCode::OK);
 		}
 		$this->response->error(0, "Missing parameter: password");
