@@ -3,14 +3,17 @@
 namespace IO\Services;
 
 use IO\Builder\Order\AddressType;
+use Plenty\Modules\Frontend\Events\ValidateCheckoutEvent;
 use Plenty\Modules\Frontend\PaymentMethod\Contracts\FrontendPaymentMethodRepositoryContract;
 use Plenty\Modules\Frontend\Contracts\Checkout;
 use Plenty\Modules\Basket\Contracts\BasketRepositoryContract;
 use Plenty\Modules\Frontend\Session\Storage\Contracts\FrontendSessionStorageFactoryContract;
+use Plenty\Modules\Payment\Events\Checkout\GetPaymentMethodContent;
 use Plenty\Modules\Payment\Method\Contracts\PaymentMethodRepositoryContract;
 use Plenty\Modules\Order\Shipping\Contracts\ParcelServicePresetRepositoryContract;
 use IO\Constants\SessionStorageKeys;
 use IO\Services\BasketService;
+use Plenty\Plugin\Translation\Translator;
 
 /**
  * Class CheckoutService
@@ -151,6 +154,25 @@ class CheckoutService
      */
 	public function preparePayment():array
 	{
+	    $validateCheckoutEvent = $this->checkout->validateCheckout();
+	    if($validateCheckoutEvent instanceof ValidateCheckoutEvent && !empty($validateCheckoutEvent->getErrorKeysList()))
+        {
+            $translator = pluginApp(Translator::class);
+            if($translator instanceof Translator)
+            {
+                $errors = [];
+                foreach($validateCheckoutEvent->getErrorKeysList() as $errorKey)
+                {
+                    $errors[] = $translator->trans($errorKey);
+                }
+
+                return array(
+                    "type" => GetPaymentMethodContent::RETURN_TYPE_ERROR,
+                    "value" => implode('<br>',$errors)
+                );
+            }
+        }
+
 		$mopId = $this->getMethodOfPaymentId();
 		return pluginApp(PaymentMethodRepositoryContract::class)->preparePaymentMethod($mopId);
 	}
