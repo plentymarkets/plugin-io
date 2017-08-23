@@ -37,7 +37,7 @@ class ItemListService
         }
     
         $tagItemsList = $this->getTagsItems();
-        if(count($lastSeenItems))
+        if(count($tagItemsList))
         {
             $loaderClassList['multi']['TagItemsList'] = $tagItemsList;
         }
