@@ -57,7 +57,7 @@ class ItemListService
     private function getLastSeenItems()
     {
         $result = [];
-        if($this->templateConfigService->get('item.lists.intern.show_last_seen') == 'true')
+        if($this->templateConfigService->get('item.lists.single_item.show_last_seen') == 'true')
         {
             $result = LastSeenItemList::class;
         }
@@ -68,10 +68,10 @@ class ItemListService
     private function getTagsItems()
     {
         $result = [];
-        if($this->templateConfigService->get('item.lists.intern.show_tag_list') == 'true')
+        if($this->templateConfigService->get('item.lists.single_item.show_tag_list') == 'true')
         {
             $loaderOptions = [];
-            $tagIdString = $this->templateConfigService->get('item.lists.intern.tag_ids');
+            $tagIdString = $this->templateConfigService->get('item.lists.single_item.tag_ids');
             if(strlen($tagIdString))
             {
                 $tagIds = explode(',', $tagIdString);
@@ -94,7 +94,7 @@ class ItemListService
     private function getCrossSellingItems()
     {
         $result = [];
-        $crossSellingListString = $this->templateConfigService->get('item.lists.intern.show_cross_lists');
+        $crossSellingListString = $this->templateConfigService->get('item.lists.single_item.show_cross_lists');
         if(strlen($crossSellingListString))
         {
             $e = explode(',', $crossSellingListString);
@@ -102,7 +102,7 @@ class ItemListService
             {
                 foreach($e as $crossSellingType)
                 {
-                    $type = str_replace('item.lists.intern.cross.', '', trim($crossSellingType));
+                    $type = str_replace('item.lists.single_item.cross.', '', trim($crossSellingType));
                     $result['CrossSellingItemsList'.ucfirst($type)] = [CrossSellingItems::class, ['relation' => $type]];
                 }
             }
