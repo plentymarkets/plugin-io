@@ -60,6 +60,7 @@ class BasketService
         $basket = $this->getBasket()->toArray();
 
         $basket["itemQuantity"] = $this->getBasketQuantity();
+        $basket["totalVats"] = $this->getTotalVats();
 
         return $basket;
     }
