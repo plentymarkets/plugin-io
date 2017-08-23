@@ -7,6 +7,7 @@ use Plenty\Modules\Basket\Models\Basket;
 use Plenty\Modules\Basket\Models\BasketItem;
 use IO\Services\CheckoutService;
 use Plenty\Modules\Frontend\PaymentMethod\Contracts\FrontendPaymentMethodRepositoryContract;
+use Plenty\Modules\Frontend\Services\VatService;
 
 /**
  * Class OrderItemBuilder
@@ -19,13 +20,19 @@ class OrderItemBuilder
 	 */
 	private $checkoutService;
 
+    /**
+     * @var VatService
+     */
+	private $vatService;
+
 	/**
 	 * OrderItemBuilder constructor.
 	 * @param CheckoutService $checkoutService
 	 */
-	public function __construct(CheckoutService $checkoutService)
+	public function __construct(CheckoutService $checkoutService, VatService $vatService)
 	{
 		$this->checkoutService = $checkoutService;
+		$this->vatService = $vatService;
 	}
 
 	/**
@@ -60,7 +67,7 @@ class OrderItemBuilder
             "referrerId"    => $basket->basketItems->first()->referrerId,
             "quantity"      => 1,
             "orderItemName" => "shipping costs",
-            "countryVatId"  => 1, // TODO get country VAT id
+            "countryVatId"  => $this->vatService->getCountryVatId(),
             "vatRate"       => 0, // FIXME get vat rate for shipping costs
             "amounts"       => [
                 [
@@ -79,7 +86,7 @@ class OrderItemBuilder
 			"referrerId"    => $basket->basketItems->first()->referrerId,
 			"quantity"      => 1,
 			"orderItemName" => "payment surcharge",
-			"countryVatId"  => 1, // TODO get country VAT id
+			"countryVatId"  => $this->vatService->getCountryVatId(),
 			"vatRate"       => 0, // FIXME get vat rate for shipping costs
 			"amounts"       => [
 				[
@@ -141,7 +148,7 @@ class OrderItemBuilder
 			"quantity"          => $basketItem->quantity,
 			"orderItemName"     => $basketItemName,
 			"shippingProfileId" => $basketItem->shippingProfileId,
-			"countryVatId"      => 1, // TODO
+			"countryVatId"      => $this->vatService->getCountryVatId(),
 			"vatRate"           => $basketItem->vat,
 			//"vatField"			=> $basketItem->vatField,// TODO
             "orderProperties"   => $basketItemProperties,
