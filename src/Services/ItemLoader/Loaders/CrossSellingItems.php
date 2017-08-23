@@ -69,7 +69,17 @@ class CrossSellingItems implements ItemLoaderContract
          * @var CrossSellingFilter $crossSellingFilter
          */
         $crossSellingFilter = pluginApp(CrossSellingFilter::class, [$options['crossSellingItemId']]);
-        $crossSellingFilter->hasRelation($crossSellingService->getType());
+        
+        if(isset($options['relation']) && strlen($options['relation']))
+        {
+            $crossSellingType = $options['relation'];
+        }
+        else
+        {
+            $crossSellingType = $crossSellingService->getType();
+        }
+        
+        $crossSellingFilter->hasRelation($crossSellingType);
         
         $sessionLang = pluginApp(SessionStorageService::class)->getLang();
         

@@ -1,6 +1,10 @@
 <?php
 namespace IO\Controllers;
 
+use Plenty\Modules\Category\Contracts\CategoryRepositoryContract;
+use Plenty\Modules\Category\Models\Category;
+use Plenty\Plugin\Application;
+use Plenty\Plugin\Http\Response;
 use IO\Helper\CategoryKey;
 use IO\Services\CategoryService;
 use IO\Services\ItemLastSeenService;
@@ -10,10 +14,7 @@ use IO\Services\ItemLoader\Loaders\SingleItem;
 use IO\Services\ItemLoader\Loaders\SingleItemAttributes;
 use IO\Services\ItemLoader\Services\ItemLoaderService;
 use IO\Services\SessionStorageService;
-use Plenty\Modules\Category\Contracts\CategoryRepositoryContract;
-use Plenty\Modules\Category\Models\Category;
-use Plenty\Plugin\Application;
-use Plenty\Plugin\Http\Response;
+use IO\Services\ItemLoader\Services\ItemListService;
 
 /**
  * Class ItemController
@@ -56,7 +57,13 @@ class ItemController extends ItemLoaderController
 
         /** @var ItemLoaderService $loaderService */
         $loaderService = $templateContainer->getTemplateData()['itemLoader'];
-        $loaderService->setLoaderClassList(["single" => [SingleItem::class, SingleItemAttributes::class], "multi" => [CrossSellingItems::class]]);
+        
+        /**
+         * @var ItemListService $itemListService
+         */
+        $itemListService = pluginApp(ItemListService::class);
+        $singleItemLoaderClasses = $itemListService->getLoaderClassListForSingleItem();
+        $loaderService->setLoaderClassList($singleItemLoaderClasses);
 
         $itemResult = $loaderService->load();
 
