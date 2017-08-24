@@ -32,12 +32,13 @@ class CustomerPasswordResetResource extends ApiResource
     public function store():Response
     {
         $email = $this->request->get('email', '');
+        $template = $this->request->get('template', '');
         
         /**
          * @var CustomerPasswordResetService $customerPasswordResetService
          */
         $customerPasswordResetService = pluginApp(CustomerPasswordResetService::class);
-        $response = $customerPasswordResetService->resetPassword($email);
+        $response = $customerPasswordResetService->resetPassword($email, $template);
         return $this->response->create($response, ResponseCode::OK);
     }
     
