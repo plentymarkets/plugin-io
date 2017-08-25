@@ -1,5 +1,11 @@
 # Release Notes für IO
 
+## v1.4.3 (2017-08-25)
+
+### Entfernt
+
+- Die ungenutzte Route `/guest` und der `GuestController` wurden entfernt. 
+
 ## v1.4.2 (2017-08-23)
 
 ### Behoben
