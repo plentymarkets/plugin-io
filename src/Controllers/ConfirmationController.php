@@ -48,7 +48,18 @@ class ConfirmationController extends LayoutController
             $customerService = pluginApp(CustomerService::class);
             try
             {
-                $order = $customerService->getLatestOrder();
+                if($orderId > 0)
+                {
+                    /**
+                     * @var OrderService $orderService
+                     */
+                    $orderService = pluginApp(OrderService::class);
+                    $order = $orderService->findOrderById($orderId);
+                }
+                else
+                {
+                    $order = $customerService->getLatestOrder();
+                }
             }
             catch(\Exception $e)
             {
