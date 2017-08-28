@@ -79,7 +79,15 @@ class CrossSellingItems implements ItemLoaderContract
             $crossSellingType = $crossSellingService->getType();
         }
         
-        $crossSellingFilter->hasRelation($crossSellingType);
+        if($crossSellingType == 'dynamic')
+        {
+            $crossSellingFilter->isDynamic();
+        }
+        else
+        {
+            $crossSellingFilter->hasRelation($crossSellingType);
+        }
+        
         
         $sessionLang = pluginApp(SessionStorageService::class)->getLang();
         
