@@ -1,5 +1,11 @@
 # Release Notes for IO
 
+## v1.4.2 (2017-08-23)
+
+### Fixed
+
+- When accessing the order overview page with an expired session, a 404 page is shown instead of a twig error.
+
 ## v1.4.1 (2017-08-11)
 
 ### Added

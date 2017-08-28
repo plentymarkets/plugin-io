@@ -1,5 +1,15 @@
 # Release Notes für IO
 
+## v1.4.2 (2017-08-23)
+
+### Geändert
+
+- Die Suche wurde optimiert so das nun auch Ergebnisse gefunden werden die nicht genau mit dem Suchstring übereinstimmen.
+
+### Behoben
+
+- Beim Aufruf der Auftragsübersichtsseite erscheint nun eine 404-Seite anstatt eines Twig-Fehlers, wenn die Session in der Zwischenzeit abgelaufen ist.
+
 ## v1.4.1 (2017-08-11)
 
 ### Hinzugefügt
