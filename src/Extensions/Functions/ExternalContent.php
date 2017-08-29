@@ -24,7 +24,7 @@ class ExternalContent extends AbstractFunction
     /**
      * Return the content retrieved from external url
      * @param string $url
-     * @return mixed
+     * @return array
      */
     public function getExternalContent(string $url):array
     {
