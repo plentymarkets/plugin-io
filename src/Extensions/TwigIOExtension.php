@@ -12,6 +12,7 @@ use IO\Extensions\Filters\NumberFormatFilter;
 use IO\Extensions\Filters\OrderByKeyFilter;
 use IO\Extensions\Filters\URLFilter;
 use IO\Extensions\Filters\ItemNameFilter;
+use IO\Extensions\Filters\ShuffleFilter;
 
 use IO\Extensions\Functions\GetBasePrice;
 use IO\Extensions\Functions\Component;
@@ -47,7 +48,8 @@ class TwigIOExtension extends Twig_Extension
         ExternalContent $externalContent,
         Partial $partial,
         ItemImagesFilter $itemImagesFilter,
-        OrderByKeyFilter $orderByKeyFilter
+		OrderByKeyFilter $orderByKeyFilter,
+		ShuffleFilter $shuffleFilter
 	)
 	{
 		$this->twig = $twig;
