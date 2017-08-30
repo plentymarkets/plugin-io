@@ -1,5 +1,20 @@
 # Release Notes for IO
 
+## v1.4.4 (2017-08-30)
+
+### Added
+
+- A method has been implemented for sending an email as soon as a customer wants to reset the password.
+- A new password for the customer can be saved.
+
+### Fixed
+
+- The variation selection dropdown in the single item view now also displays the attributes of the main variation.
+
+### TODO
+
+- The `password-reset` route must be activated in IO in order to use the **Forgot your password?** feature in Ceres.
+
 ## v1.4.3 (2017-08-25)
 
 ### Removed
