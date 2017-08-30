@@ -53,6 +53,7 @@
       "guest"                 : "/guest",
       "login"                 : "/login",
       "register"              : "/register",
+      "password-reset"        : "password-reset",
       "search"                : "/search",
       "place-order"           : "/place-order & /execute-payment",
       "cancellation-rights"   : "/cancellation-rights",
@@ -62,7 +63,7 @@
       "contact"               : "/contact",
       "item"                  : "Item routes",
       "category"              : "Category routes",
-      "wish-list"             : "/wish-list" 
+      "wish-list"             : "/wish-list"
     },
     "default"                       : "all"
   }
