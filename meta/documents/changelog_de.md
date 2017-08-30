@@ -1,5 +1,16 @@
 # Release Notes für IO
 
+## v1.4.4 (2017-08-30)
+
+### Hinzugefügt
+
+- Funktion um eine Mail zum zurücksetzen des Kunden-Passworts zu versenden.
+- Neues Passwort für den Kunden kann gespeichert.
+
+### Behoben
+
+- Attribute, die in der Variantenauswahl in der SingleItem angezeigt werden, beziehen nun auch die Attribute der Hauptvariante mit ein.
+
 ## v1.4.3 (2017-08-25)
 
 ### Entfernt
