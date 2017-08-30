@@ -50,7 +50,6 @@
       "checkout"              : "/checkout",
       "my-account"            : "/my-account",
       "confirmation"          : "/confirmation",
-      "guest"                 : "/guest",
       "login"                 : "/login",
       "register"              : "/register",
       "password-reset"        : "password-reset",

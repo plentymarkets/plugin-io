@@ -92,12 +92,6 @@ class IORouteServiceProvider extends RouteServiceProvider
             $router->get('-/akQQ{orderAccessKey}/idQQ{orderId}', 'IO\Controllers\ConfirmationEmailController@showConfirmation');
         }
 
-		if ( in_array("guest", $enabledRoutes) || in_array("all", $enabledRoutes) )
-        {
-            //Guest route
-            $router->get('guest', 'IO\Controllers\GuestController@showGuest');
-        }
-
 		if ( in_array("login", $enabledRoutes) || in_array("all", $enabledRoutes) )
         {
             //Login page route
