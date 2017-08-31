@@ -45,10 +45,9 @@ class BasketResource extends ApiResource
      */
     public function index(): Response
     {
-        $basket                  = $this->basketService->getBasket();
-        $basketData              = $basket->toArray();
-        $basketData['totalVats'] = $this->vatService->getCurrentTotalVats();
+        $basket                  = $this->basketService->getBasketForTemplate();
+        $basket['totalVats']     = $this->vatService->getCurrentTotalVats();
 
-		return $this->response->create($basketData, ResponseCode::OK);
+		return $this->response->create($basket, ResponseCode::OK);
 	}
 }
