@@ -36,7 +36,7 @@ class CheckoutSetPaymentResource extends ApiResource
      * Prepare the payment
      * @return Response
      */
-    public function post():Response
+    public function store():Response
     {
         $paymentId = $this->request->get('paymentId', 0);
 

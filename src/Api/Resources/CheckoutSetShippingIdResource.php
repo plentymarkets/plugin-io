@@ -36,13 +36,12 @@ class CheckoutSetShippingIdResource extends ApiResource
      * Prepare the payment
      * @return Response
      */
-    public function post():Response
+    public function store():Response
     {
         $shippingId = $this->request->get('shippingId', 0);
 
         $this->checkoutService->setShippingProfileId($shippingId);
 
         return $this->response->create( [], ResponseCode::OK );
-
     }
 }
