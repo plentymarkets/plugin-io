@@ -3,6 +3,7 @@ namespace IO\Controllers;
 
 use IO\Helper\TemplateContainer;
 use IO\Services\ItemWishListService;
+use Plenty\Plugin\ConfigRepository;
 
 /**
  * Class WishListController
@@ -16,8 +17,18 @@ class ItemWishListController extends LayoutController
      */
     public function showWishList(ItemWishListService $itemWishListService):string
     {
-        $itemWishList = $itemWishListService->getItemWishList();
-
+        $itemWishList = [];
+    
+        /**
+         * @var ConfigRepository $configRepo
+         */
+        $configRepo = pluginApp(ConfigRepository::class);
+        $enabledRoutes = explode(", ",  $configRepo->get("IO.routing.enabled_routes") );
+        if(in_array('wish-list', $enabledRoutes))
+        {
+            $itemWishList = $itemWishListService->getItemWishList();
+        }
+        
         return $this->renderTemplate(
 			"tpl.wish-list",
 			[

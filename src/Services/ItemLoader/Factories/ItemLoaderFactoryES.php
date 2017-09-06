@@ -14,6 +14,7 @@ use Plenty\Modules\Cloud\ElasticSearch\Lib\Source\IncludeSource;
 use Plenty\Modules\Item\Search\Contracts\VariationElasticSearchSearchRepositoryContract;
 use Plenty\Modules\Item\Search\Contracts\VariationElasticSearchMultiSearchRepositoryContract;
 use Plenty\Modules\Item\SalesPrice\Models\SalesPriceSearchResponse;
+use Plenty\Plugin\ConfigRepository;
 
 /**
  * Created by ptopczewski, 09.01.17 08:35
@@ -327,7 +328,13 @@ class ItemLoaderFactoryES implements ItemLoaderFactory
 
     private function attachItemWishList($result)
     {
-        if(count($result['documents']))
+        /**
+         * @var ConfigRepository $configRepo
+         */
+        $configRepo = pluginApp(ConfigRepository::class);
+        $enabledRoutes = explode(", ",  $configRepo->get("IO.routing.enabled_routes") );
+       
+        if(in_array('wish-list', $enabledRoutes) && count($result['documents']))
         {
             /**
              * @var ItemWishListService $itemWishListService
