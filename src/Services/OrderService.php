@@ -5,6 +5,7 @@ namespace IO\Services;
 use IO\Constants\OrderPaymentStatus;
 use IO\Models\LocalizedOrder;
 use Plenty\Modules\Frontend\PaymentMethod\Contracts\FrontendPaymentMethodRepositoryContract;
+use Plenty\Modules\Order\ContactWish\Contracts\ContactWishRepositoryContract;
 use Plenty\Modules\Order\Contracts\OrderRepositoryContract;
 use Plenty\Modules\Order\Property\Contracts\OrderPropertyRepositoryContract;
 use Plenty\Modules\Order\Property\Models\OrderPropertyType;
@@ -86,6 +87,7 @@ class OrderService
 		                            ->done();
         
 		$order = $this->orderRepository->createOrder($order, $couponCode);
+		$this->saveOrderContactWish($order->id, $this->sessionStorage->getSessionValue(SessionStorageKeys::ORDER_CONTACT_WISH));
         
         if($customerService->getContactId() <= 0)
         {
@@ -97,6 +99,19 @@ class OrderService
         
         return LocalizedOrder::wrap( $order, "de" );
 	}
+	
+	private function saveOrderContactWish($orderId, $text = '')
+    {
+        if(!is_null($text) && strlen($text))
+        {
+            /**
+             * @var ContactWishRepositoryContract $contactWishRepo
+             */
+            $contactWishRepo = pluginApp(ContactWishRepositoryContract::class);
+            $contactWishRepo->createContactWish($orderId, nl2br($text));
+            $this->sessionStorage->setSessionValue(SessionStorageKeys::ORDER_CONTACT_WISH, null);
+        }
+    }
 
     /**
      * Execute the payment for a given order.
@@ -230,9 +245,10 @@ class OrderService
     
     /**
      * List all payment methods available for switch in MyAccount
+     *
      * @param int $currentPaymentMethodId
-     * @param int $orderId
-     * @return \Plenty\Modules\Payment\Method\Models\PaymentMethod[]
+     * @param null $orderId
+     * @return \Illuminate\Support\Collection
      */
     public function getPaymentMethodListForSwitch($currentPaymentMethodId = 0, $orderId = null)
     {
