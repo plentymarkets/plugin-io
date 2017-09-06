@@ -42,6 +42,6 @@ class CheckoutSetShippingIdResource extends ApiResource
 
         $this->checkoutService->setShippingProfileId($shippingId);
 
-        return $this->response->create( [], ResponseCode::OK );
+        return $this->response->create( $shippingId, ResponseCode::OK );
     }
 }

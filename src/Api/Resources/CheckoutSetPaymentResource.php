@@ -42,6 +42,6 @@ class CheckoutSetPaymentResource extends ApiResource
 
         $this->checkoutService->setMethodOfPaymentId($paymentId);
 
-        return $this->response->create( [], ResponseCode::OK );
+        return $this->response->create( $paymentId, ResponseCode::OK );
     }
 }
