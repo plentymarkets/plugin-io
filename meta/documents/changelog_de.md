@@ -1,5 +1,11 @@
 # Release Notes für IO
 
+## v1.4.5 (2017-09-06)
+
+### Behoben
+
+- Durch einen Fehler wurde die Artikelanzahl in der Warenkorbvorschau manchmal nicht richtig anzeigt. Dies wurde behoben.
+
 ## v1.4.4 (2017-08-30)
 
 ### Hinzugefügt
