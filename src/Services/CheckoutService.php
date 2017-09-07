@@ -129,11 +129,24 @@ class CheckoutService
     public function getMethodOfPaymentId(): int
     {
         $methodOfPaymentID = (int)$this->checkout->getPaymentMethodId();
-        if ($methodOfPaymentID === null) {
-            $methodOfPaymentList = $this->getMethodOfPaymentList();
+        
+        $methodOfPaymentList = $this->getMethodOfPaymentList();
+        
+        $methodOfPaymentValid = false;
+        foreach($methodOfPaymentList as $methodOfPayment)
+        {
+            if((int)$methodOfPaymentID == $methodOfPayment->id)
+            {
+                $methodOfPaymentValid = true;
+            }
+        }
+
+        if ($methodOfPaymentID === null || !$methodOfPaymentValid)
+        {
             $methodOfPaymentID   = $methodOfPaymentList[0]->id;
             $this->setMethodOfPaymentId($methodOfPaymentID);
         }
+        
         return $methodOfPaymentID;
     }
 
