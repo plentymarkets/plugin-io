@@ -309,9 +309,11 @@ class CheckoutService
 
         $billingAddressId = $basketService->getBillingAddressId();
 
-        if ($billingAddressId === 0) {
+        if (is_null($billingAddressId) || (int)$billingAddressId <= 0)
+        {
             $addresses = $this->customerService->getAddresses(AddressType::BILLING);
-            if (count($addresses) > 0) {
+            if (count($addresses) > 0)
+            {
                 $billingAddressId = $addresses[0]->id;
                 $this->setBillingAddressId($billingAddressId);
             }
@@ -332,7 +334,6 @@ class CheckoutService
              */
             $basketService = pluginApp(BasketService::class);
             $basketService->setBillingAddressId($billingAddressId);
-            //$this->sessionStorage->getPlugin()->setValue(SessionStorageKeys::BILLING_ADDRESS_ID, $billingAddressId);
         }
     }
 }
