@@ -243,6 +243,13 @@ class OrderService
         return $orderPropertyRepo->findByOrderId($orderId, $typeId);
     }
     
+    public function createOrderReturn($orderId, $orderItems = [])
+    {
+        $order = $this->orderRepository->findOrderById($orderId)->toArray();
+        $order['typeId'] = 3; //TODO constant
+        return $this->orderRepository->createOrder($order);
+    }
+    
     /**
      * List all payment methods available for switch in MyAccount
      *
