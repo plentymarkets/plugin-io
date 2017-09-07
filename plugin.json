@@ -1,5 +1,5 @@
 {
-    "version"           : "1.4.2",
+    "version"           : "1.4.5",
     "name"              : "IO",
     "marketplaceName"   : {"de": "IO","en": "IO"},
     "license"           : "AGPL-3.0",
@@ -23,6 +23,7 @@
     "dataProviders"     : [],
     "dependencies"      : [],
     "runOnBuild"        : [
-        "IO\\Migrations\\ItemWishListMigration_0_0_1"
+        "IO\\Migrations\\ItemWishListMigration_0_0_1",
+        "IO\\Migrations\\PasswordResetTableMigration_0_0_1"
     ]
 }

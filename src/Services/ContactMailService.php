@@ -38,13 +38,13 @@ class ContactMailService
          */
         $twig = pluginApp(Twig::class);
     
-        $mailtemplateParams = [];
+        $mailTemplateParams = [];
         foreach($contactData as $key => $value)
         {
-            $mailtemplateParams[$key] = nl2br($value);
+            $mailTemplateParams[$key] = nl2br($value);
         }
         
-        $renderedMailTemplate = $twig->render($mailTemplate, $mailtemplateParams);
+        $renderedMailTemplate = $twig->render($mailTemplate, $mailTemplateParams);
         
         if(!strlen($renderedMailTemplate))
         {

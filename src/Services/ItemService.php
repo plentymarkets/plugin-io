@@ -436,7 +436,6 @@ class ItemService
 
 			$filter = $filterBuilder
 				->hasId([$itemId])
-				->variationIsChild()
 				->variationIsActive()
                 ->build();
 
@@ -541,7 +540,6 @@ class ItemService
 			$filterBuilder = pluginApp(ItemFilterBuilder::class);
 			$filter        = $filterBuilder
 				->hasId([$itemId])
-				->variationIsChild()
                 ->variationIsActive()
                 ->build();
 

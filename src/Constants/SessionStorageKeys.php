@@ -19,4 +19,5 @@ class SessionStorageKeys
     const CROSS_SELLING_TYPE       = 'crossSellingType';
     const GUEST_WISHLIST           = 'guestWishList';
     const GUEST_WISHLIST_MIGRATION = 'guestWishListMigration';
+    const ORDER_CONTACT_WISH       = 'orderContactWish';
 }
