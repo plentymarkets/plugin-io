@@ -19,21 +19,11 @@ use IO\Services\SessionStorageService;
  */
 class CategoryDescriptionResource extends ApiResource
 {
-    /**
-     * CategoryDescriptionResource constructor.
-     * @param Request $request
-     * @param ApiResponse $response
-     */
     public function __construct(Request $request, ApiResponse $response)
     {
         parent::__construct($request, $response);
     }
     
-    /**
-     * Get Category Items
-     * @param int $categoryId
-     * @return Response
-     */
     public function show(int $categoryId):Response
     {
         $categoryService = pluginApp(CategoryService::class);
