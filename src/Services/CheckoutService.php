@@ -129,11 +129,24 @@ class CheckoutService
     public function getMethodOfPaymentId(): int
     {
         $methodOfPaymentID = (int)$this->checkout->getPaymentMethodId();
-        if ($methodOfPaymentID === null) {
-            $methodOfPaymentList = $this->getMethodOfPaymentList();
+        
+        $methodOfPaymentList = $this->getMethodOfPaymentList();
+        
+        $methodOfPaymentValid = false;
+        foreach($methodOfPaymentList as $methodOfPayment)
+        {
+            if((int)$methodOfPaymentID == $methodOfPayment->id)
+            {
+                $methodOfPaymentValid = true;
+            }
+        }
+
+        if ($methodOfPaymentID === null || !$methodOfPaymentValid)
+        {
             $methodOfPaymentID   = $methodOfPaymentList[0]->id;
             $this->setMethodOfPaymentId($methodOfPaymentID);
         }
+        
         return $methodOfPaymentID;
     }
 
@@ -296,9 +309,11 @@ class CheckoutService
 
         $billingAddressId = $basketService->getBillingAddressId();
 
-        if ($billingAddressId === 0) {
+        if (is_null($billingAddressId) || (int)$billingAddressId <= 0)
+        {
             $addresses = $this->customerService->getAddresses(AddressType::BILLING);
-            if (count($addresses) > 0) {
+            if (count($addresses) > 0)
+            {
                 $billingAddressId = $addresses[0]->id;
                 $this->setBillingAddressId($billingAddressId);
             }
@@ -319,7 +334,6 @@ class CheckoutService
              */
             $basketService = pluginApp(BasketService::class);
             $basketService->setBillingAddressId($billingAddressId);
-            //$this->sessionStorage->getPlugin()->setValue(SessionStorageKeys::BILLING_ADDRESS_ID, $billingAddressId);
         }
     }
 }
