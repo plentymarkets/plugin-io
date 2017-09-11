@@ -31,9 +31,10 @@ class CategoryDescriptionResource extends ApiResource
     
     /**
      * Get Category Items
+     * @param int $categoryId
      * @return Response
      */
-    public function show($categoryId):Response
+    public function show(int $categoryId):Response
     {
         $categoryService = pluginApp(CategoryService::class);
         $sessionStorageService = pluginApp(SessionStorageService::class);
