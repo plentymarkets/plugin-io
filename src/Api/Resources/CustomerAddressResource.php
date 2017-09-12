@@ -60,13 +60,26 @@ class CustomerAddressResource extends ApiResource
      */
 	public function store():Response
 	{
+	    $address = null;
+	    
+	    $addressId = $this->request->get('addressId', 0);
 		$type = $this->getAddressType();
+		
 		if($type === 0)
 		{
 			$this->response->error(0, "Missing type id.");
 			return $this->response->create(null, ResponseCode::BAD_REQUEST);
 		}
-		$address = $this->customerService->createAddress($this->request->all(), $type);
+  
+		if((int)$addressId > 0)
+        {
+            $address = $this->customerService->updateAddress((int)$addressId, $this->request->all(), (int)$type);
+        }
+        else
+        {
+		    $address = $this->customerService->createAddress($this->request->all(), $type);
+        }
+        
 		return $this->response->create($address, ResponseCode::CREATED);
 	}
 
@@ -78,15 +91,30 @@ class CustomerAddressResource extends ApiResource
 	public function update(string $addressId):Response
 	{
 		$type = $this->getAddressType();
-		if($type === 0)
+		if(is_null($type))
 		{
 			$this->response->error(0, "Missing type id.");
 			return $this->response->create(null, ResponseCode::BAD_REQUEST);
 		}
-
-		$addressId = (int)$addressId;
-		$address   = $this->customerService->updateAddress($addressId, $this->request->all(), $type);
-		return $this->response->create($address, ResponseCode::OK);
+        
+        /**
+         * @var BasketService $basketService
+         */
+		$basketService = pluginApp(BasketService::class);
+  
+		if((int)$addressId > 0)
+        {
+            if($type == AddressType::BILLING)
+            {
+                $basketService->setBillingAddressId($addressId);
+            }
+            elseif($type == AddressType::DELIVERY)
+            {
+                $basketService->setDeliveryAddressId($addressId);
+            }
+        }
+        
+		return $this->response->create($addressId, ResponseCode::OK);
 	}
 
     /**
@@ -105,17 +133,6 @@ class CustomerAddressResource extends ApiResource
 
 		$addressId = (int)$addressId;
 		$this->customerService->deleteAddress($addressId, $type);
-
-		$basketService = pluginApp(BasketService::class);
-
-        if ($type === 1 && $basketService->getBillingAddressId() === $addressId)
-        {
-            $basketService->setBillingAddressId(0);
-        }
-        else if ($type === 2 && $basketService->getDeliveryAddressId() === $addressId)
-        {
-            $basketService->setDeliveryAddressId(-99);
-        }
 
 		return $this->index();
 	}

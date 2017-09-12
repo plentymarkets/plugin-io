@@ -332,16 +332,38 @@ class CustomerService
         {
             $addressData['stateId'] = null;
         }
+        
+        $newAddress = null;
+        
         if($this->getContactId() > 0)
         {
             $addressData['options'] = $this->buildAddressEmailOptions([], false, $addressData);
-            return $this->contactAddressRepository->createAddress($addressData, $this->getContactId(), $type);
+            $newAddress = $this->contactAddressRepository->createAddress($addressData, $this->getContactId(), $type);
         }
 		else
         {
             $addressData['options'] = $this->buildAddressEmailOptions([], true, $addressData);
-            return $this->createGuestAddress($addressData, $type);
+            $newAddress =  $this->addressRepository->createAddress($addressData);
         }
+        
+        /**
+         * @var BasketService $basketService
+         */
+        $basketService = pluginApp(BasketService::class);
+        
+        if($newAddress instanceof Address)
+        {
+            if($type == AddressType::BILLING)
+            {
+                $basketService->setBillingAddressId($newAddress->id);
+            }
+            elseif($type == AddressType::DELIVERY)
+            {
+                $basketService->setDeliveryAddressId($newAddress->id);
+            }
+        }
+        
+        return $newAddress;
 	}
 	
 	private function buildAddressEmailOptions(array $options = [], $isGuest = false, $addressData = [])
@@ -404,31 +426,6 @@ class CustomerService
         
         return $options;
     }
-    
-    /**
-     * @param array $addressData
-     * @return Address
-     */
-	private function createGuestAddress(array $addressData, int $type):Address
-    {
-        $newAddress = $this->addressRepository->createAddress($addressData);
-    
-        /**
-         * @var BasketService $basketService
-         */
-        $basketService = pluginApp(BasketService::class);
-        
-        if($type == AddressType::BILLING)
-        {
-            $basketService->setBillingAddressId($newAddress->id);
-        }
-        elseif($type == AddressType::DELIVERY)
-        {
-            $basketService->setDeliveryAddressId($newAddress->id);
-        }
-        
-        return $newAddress;
-    }
 
     /**
      * Update an address
@@ -466,15 +463,37 @@ class CustomerService
      * @param int $addressId
      * @param int $type
      */
-	public function deleteAddress(int $addressId, int $type)
+	public function deleteAddress(int $addressId, int $type = 0)
 	{
+        /**
+         * @var BasketService $basketService
+         */
+        $basketService = pluginApp(BasketService::class);
+	    
         if($this->getContactId() > 0)
         {
             $this->contactAddressRepository->deleteAddress($addressId, $this->getContactId(), $type);
+            
+            if($type == AddressType::BILLING)
+            {
+                $basketService->setBillingAddressId(0);
+            }
+            elseif($type == AddressType::DELIVERY)
+            {
+                $basketService->setDeliveryAddressId(-99);
+            }
         }
         else
         {
             $this->addressRepository->deleteAddress($addressId);
+            if($addressId == $basketService->getBillingAddressId())
+            {
+                $basketService->setBillingAddressId(0);
+            }
+            elseif($addressId == $basketService->getDeliveryAddressId())
+            {
+                $basketService->setDeliveryAddressId(-99);
+            }
         }
 	}
 

@@ -130,9 +130,10 @@ class OrderService
      * @param int $orderId
      * @return LocalizedOrder
      */
-	public function findOrderById(int $orderId):LocalizedOrder
+	public function findOrderById(int $orderId, $type = 1):LocalizedOrder //TODO constant
 	{
-        $order = $this->orderRepository->findOrderById($orderId);
+	    $with = ['typeId' => $type];
+        $order = $this->orderRepository->findOrderById($orderId, $with);
 		return LocalizedOrder::wrap( $order, "de" );
 	}
 	
@@ -188,6 +189,10 @@ class OrderService
      */
     public function getOrdersForContact(int $contactId, int $page = 1, int $items = 50, array $filters = []):PaginatedResult
     {
+        if(!count($filters) || !isset($filters['typeId']))
+        {
+            $filters['typeId'] = 1; //TODO use constants
+        }
         $this->orderRepository->setFilters($filters);
 
         $orders = $this->orderRepository->allOrdersByContact(
