@@ -62,25 +62,26 @@ class CustomerAddressResource extends ApiResource
 	{
 	    $address = null;
 	    
-	    $addressId = $this->request->get('addressId', 0);
+	    $address = $this->request->all();
+	    $addressId = $address['id'];
 		$type = $this->getAddressType();
 		
-		if($type === 0)
+		if(is_null($type))
 		{
 			$this->response->error(0, "Missing type id.");
 			return $this->response->create(null, ResponseCode::BAD_REQUEST);
 		}
   
-		if((int)$addressId > 0)
+		if(!is_null($addressId) && (int)$addressId > 0)
         {
-            $address = $this->customerService->updateAddress((int)$addressId, $this->request->all(), (int)$type);
+            $newAddress = $this->customerService->updateAddress((int)$addressId, $address, (int)$type);
         }
         else
         {
-		    $address = $this->customerService->createAddress($this->request->all(), $type);
+		    $newAddress = $this->customerService->createAddress($address, $type);
         }
         
-		return $this->response->create($address, ResponseCode::CREATED);
+		return $this->response->create($newAddress, ResponseCode::CREATED);
 	}
 
     /**
@@ -125,7 +126,7 @@ class CustomerAddressResource extends ApiResource
 	public function destroy(string $addressId):Response
 	{
 		$type = $this->getAddressType();
-		if($type === 0)
+		if(is_null($type))
 		{
 			$this->response->error(0, "Missing type id.");
 			return $this->response->create(null, ResponseCode::BAD_REQUEST);
