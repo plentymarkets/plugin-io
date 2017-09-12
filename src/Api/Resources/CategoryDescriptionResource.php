@@ -39,7 +39,7 @@ class CategoryDescriptionResource extends ApiResource
         $categoryService = pluginApp(CategoryService::class);
         $sessionStorageService = pluginApp(SessionStorageService::class);
 
-        $response = $categoryService->get($categoryId, $sessionStorageService->getLang());
+        $response = $categoryService->get($categoryId, $sessionStorageService->getLang())->details[0]->description;
 
         return $this->response->create($response, ResponseCode::OK);
     }
