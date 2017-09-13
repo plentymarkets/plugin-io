@@ -62,7 +62,8 @@
       "contact"               : "/contact",
       "item"                  : "Item routes",
       "category"              : "Category routes",
-      "wish-list"             : "/wish-list"
+      "wish-list"             : "/wish-list",
+      "order-return"          : "/order-return"
     },
     "default"                       : "all"
   }

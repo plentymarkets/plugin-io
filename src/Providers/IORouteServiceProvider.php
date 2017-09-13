@@ -153,6 +153,11 @@ class IORouteServiceProvider extends RouteServiceProvider
             $router->get('wish-list', 'IO\Controllers\ItemWishListController@showWishList');
         }
 
+        if( in_array('order-return', $enabledRoutes) || in_array("all", $enabledRoutes))
+        {
+            $router->get('order-returns/{orderId}', 'IO\Controllers\OrderReturnController@showOrderReturn');
+        }
+
         if( (in_array("contact", $enabledRoutes) || in_array("all", $enabledRoutes) )
              && strlen($templateConfigService->get('contact.shop_mail')) > 0 
              && $templateConfigService->get('contact.shop_mail') != "your@email.com")
