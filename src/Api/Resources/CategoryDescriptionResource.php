@@ -2,6 +2,7 @@
 namespace IO\Api\Resources;
 use Plenty\Plugin\Http\Response;
 use Plenty\Plugin\Http\Request;
+use Plenty\Modules\Category\Models\Category;
 use IO\Api\ApiResource;
 use IO\Api\ApiResponse;
 use IO\Api\ResponseCode;
@@ -10,6 +11,7 @@ use IO\Services\ItemLoader\Loaders\CategoryItems;
 use IO\Services\ItemLoader\Loaders\Facets;
 use IO\Services\CategoryService;
 use IO\Services\SessionStorageService;
+
 /**
  * Class CategoryDescriptionResource
  * @package IO\Api\Resources
