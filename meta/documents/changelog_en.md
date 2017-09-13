@@ -1,5 +1,12 @@
 # Release Notes for IO
 
+## v1.4.6 (2017-09-13) <a href="https://github.com/plentymarkets/plugin-io/compare/1.4.5...1.4.6" target="_blank"><b>Overview of all changes</b></a>
+
+### Added
+
+- The search by variation number has been implemented.
+- Due to an error the online store wasn’t displayed correctly when the data base table for the wish list was missing. This has been fixed.
+
 ## v1.4.5 (2017-09-06)
 
 ### Fixed
