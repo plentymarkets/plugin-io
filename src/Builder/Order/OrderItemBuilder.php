@@ -45,9 +45,15 @@ class OrderItemBuilder
 	{
 		$currentLanguage = pluginApp(SessionStorageService::class)->getLang();
 		$orderItems      = [];
-		foreach($basket->basketItems as $basketItem)
+        $maxVatRate      = 0;
+
+        foreach($basket->basketItems as $basketItem)
 		{
-			//$basketItemName = $items[$basketItem->variationId]->itemDescription->name1;
+            if($maxVatRate < $basketItem->vat)
+            {
+                $maxVatRate = $basketItem->vat;
+            }
+
 			$basketItemName = '';
 			foreach($items as $item)
 			{
@@ -64,11 +70,11 @@ class OrderItemBuilder
 		// add shipping costs
         $shippingCosts = [
             "typeId"        => OrderItemType::SHIPPING_COSTS,
-            "referrerId"    => $basket->basketItems->first()->referrerId,
+            "referrerId"    => (float) $basket->basketItems->first()->referrerId,
             "quantity"      => 1,
             "orderItemName" => "shipping costs",
             "countryVatId"  => $this->vatService->getCountryVatId(),
-            "vatRate"       => 0, // FIXME get vat rate for shipping costs
+            "vatRate"       => $maxVatRate,
             "amounts"       => [
                 [
                     "currency"              => $this->checkoutService->getCurrency(),
@@ -83,11 +89,11 @@ class OrderItemBuilder
 
 		$paymentSurcharge = [
 			"typeId"        => OrderItemType::PAYMENT_SURCHARGE,
-			"referrerId"    => $basket->basketItems->first()->referrerId,
+			"referrerId"    => (float) $basket->basketItems->first()->referrerId,
 			"quantity"      => 1,
 			"orderItemName" => "payment surcharge",
 			"countryVatId"  => $this->vatService->getCountryVatId(),
-			"vatRate"       => 0, // FIXME get vat rate for shipping costs
+			"vatRate"       => $maxVatRate,
 			"amounts"       => [
 				[
 					"currency"           => $this->checkoutService->getCurrency(),
