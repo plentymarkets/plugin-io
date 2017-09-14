@@ -18,7 +18,7 @@ class OrderReturnController extends LayoutController
     {
         $configRepo = pluginApp(ConfigRepository::class);
         $enabledRoutes = explode(", ",  $configRepo->get("IO.routing.enabled_routes") );
-        if(in_array('order-returns', $enabledRoutes)) {}
+        if(in_array('order-return', $enabledRoutes)) {}
         
         return $this->renderTemplate(
 			"tpl.order.return"
