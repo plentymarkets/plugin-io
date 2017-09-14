@@ -22,7 +22,7 @@ class OrderReturnController extends LayoutController
         $orderData = [];
 
         $enabledRoutes = explode(", ",  $configRepo->get("IO.routing.enabled_routes") );
-        if(in_array('order-return', $enabledRoutes))
+        if( in_array('order-return', $enabledRoutes) || in_array("all", $enabledRoutes))
         {
             $orderData = $orderService->findOrderById($orderId);
         }
