@@ -1,5 +1,12 @@
 # Release Notes für IO
 
+## v1.4.6 (2017-09-13) <a href="https://github.com/plentymarkets/plugin-io/compare/1.4.5...1.4.6" target="_blank"><b>Übersicht aller Änderungen</b></a>
+
+### Hinzugefügt
+
+- Die Suche nach Variantennummern wurde implementiert.
+- Durch einen Fehler wurde der Webshop bei fehlender Datenbanktabelle für die Wunschliste nicht richtig geladen. Dies wurde behoben.
+
 ## v1.4.5 (2017-09-06)
 
 ### Behoben
