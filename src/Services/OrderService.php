@@ -78,7 +78,7 @@ class OrderService
         }
         
 		$order = pluginApp(OrderBuilder::class)->prepare(OrderType::ORDER)
-		                            ->fromBasket() //TODO: Add shipping costs & payment surcharge as OrderItem
+		                            ->fromBasket()
 		                            ->withContactId($customerService->getContactId())
 		                            ->withAddressId($checkoutService->getBillingAddressId(), AddressType::BILLING)
 		                            ->withAddressId($checkoutService->getDeliveryAddressId(), AddressType::DELIVERY)

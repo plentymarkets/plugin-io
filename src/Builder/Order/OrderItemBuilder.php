@@ -70,7 +70,7 @@ class OrderItemBuilder
 		// add shipping costs
         $shippingCosts = [
             "typeId"        => OrderItemType::SHIPPING_COSTS,
-            "referrerId"    => (float) $basket->basketItems->first()->referrerId,
+            "referrerId"    => $basket->basketItems->first()->referrerId,
             "quantity"      => 1,
             "orderItemName" => "shipping costs",
             "countryVatId"  => $this->vatService->getCountryVatId(),
@@ -89,7 +89,7 @@ class OrderItemBuilder
 
 		$paymentSurcharge = [
 			"typeId"        => OrderItemType::PAYMENT_SURCHARGE,
-			"referrerId"    => (float) $basket->basketItems->first()->referrerId,
+			"referrerId"    => $basket->basketItems->first()->referrerId,
 			"quantity"      => 1,
 			"orderItemName" => "payment surcharge",
 			"countryVatId"  => $this->vatService->getCountryVatId(),
