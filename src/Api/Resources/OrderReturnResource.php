@@ -22,9 +22,9 @@ class OrderReturnResource extends ApiResource
     public function store():Response
     {
         $orderId = $this->request->get('orderId', 0);
-        $itemIds = $this->request->get('variationIds', []);
+        $variationIds = $this->request->get('variationIds', []);
         
-        $this->orderService->createOrderReturn($orderId, $itemIds);
+        $this->orderService->createOrderReturn($orderId, $variationIds);
         
         return $this->response->create([], ResponseCode::OK);
     }
