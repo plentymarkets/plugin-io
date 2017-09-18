@@ -506,12 +506,21 @@ class CustomerService
      */
 	public function getOrders(int $page = 1, int $items = 10, array $filters = [])
 	{
-		return pluginApp(OrderService::class)->getOrdersForContact(
-		    $this->getContactId(),
-            $page,
-            $items,
-            $filters
-        );
+		$orders = [];
+        
+        try
+        {
+            $orders = pluginApp(OrderService::class)->getOrdersForContact(
+                $this->getContactId(),
+                $page,
+                $items,
+                $filters
+            );
+        }
+        catch(\Exception $e)
+        {}
+
+        return $orders;
 	}
 
     /**
