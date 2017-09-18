@@ -2,6 +2,7 @@
 
 namespace IO\Services;
 
+use IO\Builder\Order\OrderType;
 use IO\Models\LocalizedOrder;
 use IO\Validators\Customer\ContactValidator;
 use IO\Validators\Customer\AddressValidator;
@@ -494,6 +495,18 @@ class CustomerService
             $filters
         );
 	}
+	
+	public function getReturns(int $page = 1, int $items = 10, array $filters = [])
+    {
+        $filters['orderType'] = OrderType::RETURNS;
+        
+        return pluginApp(OrderService::class)->getOrdersForContact(
+            $this->getContactId(),
+            $page,
+            $items,
+            $filters
+        );
+    }
 
     /**
      * Get the last order created by the current contact

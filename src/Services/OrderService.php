@@ -78,7 +78,7 @@ class OrderService
         }
         
 		$order = pluginApp(OrderBuilder::class)->prepare(OrderType::ORDER)
-		                            ->fromBasket() //TODO: Add shipping costs & payment surcharge as OrderItem
+		                            ->fromBasket()
 		                            ->withContactId($customerService->getContactId())
 		                            ->withAddressId($checkoutService->getBillingAddressId(), AddressType::BILLING)
 		                            ->withAddressId($checkoutService->getDeliveryAddressId(), AddressType::DELIVERY)
@@ -188,6 +188,11 @@ class OrderService
      */
     public function getOrdersForContact(int $contactId, int $page = 1, int $items = 50, array $filters = []):PaginatedResult
     {
+        if(!isset($filters['orderType']))
+        {
+            $filters['orderType'] = OrderType::ORDER;
+        }
+        
         $this->orderRepository->setFilters($filters);
 
         $orders = $this->orderRepository->allOrdersByContact(
@@ -243,10 +248,24 @@ class OrderService
         return $orderPropertyRepo->findByOrderId($orderId, $typeId);
     }
     
-    public function createOrderReturn($orderId, $orderItems = [])
+    public function createOrderReturn($orderId, $items = [])
     {
         $order = $this->orderRepository->findOrderById($orderId)->toArray();
-        $order['typeId'] = 3; //TODO constant
+        
+        foreach($order['orderItems'] as $key => $orderItem)
+        {
+            if(array_key_exists($orderItem['itemVariationId'], $items))
+            {
+                $returnQuantity = (int)$items[$orderItem['itemVariationId']];
+                $order['orderItems'][$key]['quantity'] = $returnQuantity;
+            }
+            else
+            {
+                unset($order['orderItems'][$key]);
+            }
+        }
+        
+        $order['typeId'] = OrderType::RETURNS;
         return $this->orderRepository->createOrder($order);
     }
     
