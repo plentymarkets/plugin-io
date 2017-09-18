@@ -94,17 +94,9 @@ class LocalizedOrder extends ModelWrapper
                 
                 $instance->itemURLs[$orderItem->itemVariationId] = $itemUrl;
 
-                try
-                {
-                    $itemImage = $itemService->getVariationImage($orderItem->itemVariationId);
-                    $instance->itemImages[$orderItem->itemVariationId] = $itemImage;
-
-                }catch(\Exception $exception)
-                {
-                    $instance->itemImages[$orderItem->itemVariationId] = '';
-                }
+                $itemImage = $itemService->getVariationImage($orderItem->itemVariationId);
+                $instance->itemImages[$orderItem->itemVariationId] = $itemImage;
             }
-
         }
 
         return $instance;
