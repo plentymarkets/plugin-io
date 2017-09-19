@@ -24,9 +24,9 @@ class ExternalContent extends AbstractFunction
     /**
      * Return the content retrieved from external url
      * @param string $url
-     * @return string
+     * @return array
      */
-    public function getExternalContent(string $url):string
+    public function getExternalContent(string $url):array
     {
         $options = array(
             CURLOPT_URL => $url,
@@ -45,6 +45,6 @@ class ExternalContent extends AbstractFunction
         $content = curl_exec($ch);
         curl_close($ch);
         
-        return $content;
+        return json_decode($content, true);
     }
 }
