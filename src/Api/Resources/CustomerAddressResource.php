@@ -107,11 +107,11 @@ class CustomerAddressResource extends ApiResource
         {
             if($type == AddressType::BILLING)
             {
-                $basketService->setBillingAddressId($addressId);
+                $basketService->setBillingAddressId((int)$addressId);
             }
             elseif($type == AddressType::DELIVERY)
             {
-                $basketService->setDeliveryAddressId($addressId);
+                $basketService->setDeliveryAddressId((int)$addressId);
             }
         }
         

@@ -24,7 +24,7 @@ class ItemWishListController extends LayoutController
          */
         $configRepo = pluginApp(ConfigRepository::class);
         $enabledRoutes = explode(", ",  $configRepo->get("IO.routing.enabled_routes") );
-        if(in_array('wish-list', $enabledRoutes))
+        if(in_array('wish-list', $enabledRoutes) || in_array("all", $enabledRoutes))
         {
             $itemWishList = $itemWishListService->getItemWishList();
         }
