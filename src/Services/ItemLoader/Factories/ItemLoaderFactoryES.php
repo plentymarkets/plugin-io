@@ -8,6 +8,10 @@ use IO\Services\ItemLoader\Contracts\ItemLoaderPaginationContract;
 use IO\Services\ItemLoader\Contracts\ItemLoaderSortingContract;
 use IO\Services\ItemWishListService;
 use IO\Services\SalesPriceService;
+use IO\Services\SessionStorageService;
+use Plenty\Legacy\Services\Item\Variation\SalesPriceService as BasePriceService;
+use Plenty\Modules\Item\Unit\Contracts\UnitRepositoryContract;
+use Plenty\Modules\Item\Unit\Contracts\UnitNameRepositoryContract;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Search\Document\DocumentSearch;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Sorting\SortingInterface;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Source\IncludeSource;
@@ -301,7 +305,43 @@ class ItemLoaderFactoryES implements ItemLoaderFactory
                         $variation['data']['calculatedPrices']['default'] = $salesPrice;
                         $variation['data']['calculatedPrices']['formatted']['defaultPrice'] = $numberFormatFilter->formatMonetary($salesPrice->price, $salesPrice->currency);
                         $variation['data']['calculatedPrices']['formatted']['defaultUnitPrice'] = $numberFormatFilter->formatMonetary($salesPrice->unitPrice, $salesPrice->currency);
+    
+                        /**
+                         * @var BasePriceService $basePriceService
+                         */
+                        $basePriceService = pluginApp(BasePriceService::class);
+                        
+                        $lot = $variation['data']['unit']['content'];
+                        $unit = $variation['data']['unit']['unitOfMeasurement'];
+    
+                        $basePriceString = '';
+                        if($lot > 0 && strlen($unit))
+                        {
+                            $basePrice = [];
+                            list($basePrice['lot'], $basePrice['price'], $basePrice['unitKey']) = $basePriceService->getUnitPrice($lot, $salesPrice->price, $unit);
+    
+                            /**
+                             * @var UnitRepositoryContract $unitRepository
+                             */
+                            $unitRepository = pluginApp(UnitRepositoryContract::class);
+                            $unitRepository->setFilters(['unitOfMeasurement' => $basePrice['unitKey']]);
+                            $unitData = $unitRepository->all(['*'], 1, 1);
+                            $unitId = $unitData->getResult()->first()->id;
+    
+                            /**
+                             * @var UnitNameRepositoryContract $unitNameRepository
+                             */
+                            $unitNameRepository = pluginApp(UnitNameRepositoryContract::class);
+                            $unitName = $unitNameRepository->findOne($unitId, pluginApp(SessionStorageService::class)->getLang())->name;
+    
+                            $basePriceString = $numberFormatFilter->formatMonetary($basePrice['price'], $salesPrice->currency).' / '.($basePrice['lot'] > 1 ? $basePrice['lot'].' ' : '').$unitName;
+    
+                            
+                        }
+    
+                        $variation['data']['calculatedPrices']['formatted']['basePrice'] = $basePriceString;
                     }
+                    
                     
                     $rrp = $salesPriceService->getSalesPriceForVariation($variation['data']['variation']['id'], 'rrp');
                     if($rrp instanceof SalesPriceSearchResponse)
