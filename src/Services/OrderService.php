@@ -258,6 +258,9 @@ class OrderService
             {
                 $returnQuantity = (int)$items[$orderItem['itemVariationId']];
                 $order['orderItems'][$key]['quantity'] = $returnQuantity;
+    
+                unset($order['orderItems'][$key]['id']);
+                unset($order['orderItems'][$key]['orderId']);
             }
             else
             {
