@@ -1,5 +1,13 @@
 # Release Notes for IO
 
+## v1.4.7 (2017-09-20) <a href="https://github.com/plentymarkets/plugin-io/compare/1.4.6...1.4.7" target="_blank"><b>Overview of all changes</b></a>
+
+### Fixed
+
+- Due to an error the unit price wasn’t displayed correctly. This has been fixed.
+- Due to an error the payment method wasn’t always selected correctly in the checkout. This has been fixed.
+- Due to an error the addresses weren’t always selected correctly in the checkout. This has been fixed.
+
 ## v1.4.6 (2017-09-13) <a href="https://github.com/plentymarkets/plugin-io/compare/1.4.5...1.4.6" target="_blank"><b>Overview of all changes</b></a>
 
 ### Added
