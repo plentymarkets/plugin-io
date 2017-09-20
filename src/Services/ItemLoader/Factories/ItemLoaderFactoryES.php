@@ -19,6 +19,7 @@ use Plenty\Modules\Item\Search\Contracts\VariationElasticSearchSearchRepositoryC
 use Plenty\Modules\Item\Search\Contracts\VariationElasticSearchMultiSearchRepositoryContract;
 use Plenty\Modules\Item\SalesPrice\Models\SalesPriceSearchResponse;
 use Plenty\Plugin\ConfigRepository;
+use Plenty\Modules\Authorization\Services\AuthHelper;
 
 /**
  * Created by ptopczewski, 09.01.17 08:35
@@ -324,8 +325,17 @@ class ItemLoaderFactoryES implements ItemLoaderFactory
                              * @var UnitRepositoryContract $unitRepository
                              */
                             $unitRepository = pluginApp(UnitRepositoryContract::class);
-                            $unitRepository->setFilters(['unitOfMeasurement' => $basePrice['unitKey']]);
-                            $unitData = $unitRepository->all(['*'], 1, 1);
+    
+                            /** @var AuthHelper $authHelper */
+                            $authHelper = pluginApp(AuthHelper::class);
+    
+                            $unitData = $authHelper->processUnguarded( function() use ($unitRepository, $basePrice)
+                            {
+                                $unitRepository->setFilters(['unitOfMeasurement' => $basePrice['unitKey']]);
+                                return $unitRepository->all(['*'], 1, 1);
+                            });
+                            
+                            
                             $unitId = $unitData->getResult()->first()->id;
     
                             /**

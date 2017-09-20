@@ -16,7 +16,6 @@ use IO\Builder\Order\OrderOptionSubType;
 use IO\Builder\Order\AddressType;
 use Plenty\Repositories\Models\PaginatedResult;
 use IO\Constants\SessionStorageKeys;
-use Plenty\Modules\Authorization\Services\AuthHelper;
 use Plenty\Plugin\Http\Response;
 
 /**
