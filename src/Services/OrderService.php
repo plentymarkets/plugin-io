@@ -259,6 +259,11 @@ class OrderService
                 $returnQuantity = (int)$items[$orderItem['itemVariationId']];
                 $order['orderItems'][$key]['quantity'] = $returnQuantity;
     
+                $order['orderItems'][$key]['references'][] = [
+                  'referenceOrderItemId' =>   $order['orderItems'][$key]['id'],
+                    'referenceType' => 'parent'
+                ];
+                
                 unset($order['orderItems'][$key]['id']);
                 unset($order['orderItems'][$key]['orderId']);
             }
@@ -269,6 +274,14 @@ class OrderService
         }
         
         $order['typeId'] = OrderType::RETURNS;
+        $order['orderReferences'][] = [
+            'referenceOrderId' => $order['id'],
+            'referenceType' => 'parent'
+        ];
+        
+        unset($order['id']);
+        unset($order['statusId']);
+        
         return $this->orderRepository->createOrder($order);
     }
     
