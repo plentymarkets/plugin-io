@@ -357,7 +357,12 @@ class ItemService
                 }
             }
 
-            return $variationImage['url'];
+            if(!is_null($variationImage['url']))
+            {
+                return $variationImage['url'];
+            }
+
+            return '';
         }
 
         return '';

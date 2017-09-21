@@ -34,8 +34,7 @@ class OrderBuilder
 			$plentyId = $this->app->getPlentyId();
 		}
 		
-		$instance = $this->app->make(
-			OrderBuilderQuery::class,
+		$instance = $this->app->make(OrderBuilderQuery::class,
 			[
 				"app"           => $this->app,
 				"basketService" => $this->basketService,
