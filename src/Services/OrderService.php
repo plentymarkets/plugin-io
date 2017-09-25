@@ -16,7 +16,6 @@ use IO\Builder\Order\OrderOptionSubType;
 use IO\Builder\Order\AddressType;
 use Plenty\Repositories\Models\PaginatedResult;
 use IO\Constants\SessionStorageKeys;
-use Plenty\Modules\Authorization\Services\AuthHelper;
 use Plenty\Plugin\Http\Response;
 
 /**
@@ -78,7 +77,7 @@ class OrderService
         }
         
 		$order = pluginApp(OrderBuilder::class)->prepare(OrderType::ORDER)
-		                            ->fromBasket() //TODO: Add shipping costs & payment surcharge as OrderItem
+		                            ->fromBasket()
 		                            ->withContactId($customerService->getContactId())
 		                            ->withAddressId($checkoutService->getBillingAddressId(), AddressType::BILLING)
 		                            ->withAddressId($checkoutService->getDeliveryAddressId(), AddressType::DELIVERY)
