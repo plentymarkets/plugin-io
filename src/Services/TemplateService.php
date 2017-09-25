@@ -2,6 +2,8 @@
 
 namespace IO\Services;
 
+use Plenty\Plugin\Templates\Twig;
+
 /**
  * Class TemplateService
  * @package IO\Services
@@ -71,5 +73,21 @@ class TemplateService
     public function isCategory():bool
     {
         return TemplateService::$currentTemplate == "tpl.category.item";
+    }
+    
+    public function renderTemplate($template, $params)
+    {
+        $renderedTemplate = '';
+    
+        if (strlen($template))
+        {
+            /**
+             * @var Twig $twig
+             */
+            $twig             = pluginApp(Twig::class);
+            $renderedTemplate = $twig->render($template, $params);
+        }
+        
+        return $renderedTemplate;
     }
 }
