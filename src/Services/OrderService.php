@@ -271,15 +271,26 @@ class OrderService
                 unset($order['orderItems'][$key]);
             }
         }
-        
+    
+        /**
+         * @var TemplateConfigService $templateConfigService
+         */
+        $templateConfigService = pluginApp(TemplateConfigService::class);
+        $returnStatus = $templateConfigService->get('my_account.order_return_initial_status', '');
+        if(!strlen($returnStatus) || (float)$returnStatus <= 0)
+        {
+            $returnStatus = 9.0;
+        }
+    
+        $order['statusId'] = (float)$returnStatus;
         $order['typeId'] = OrderType::RETURNS;
+        
         $order['orderReferences'][] = [
             'referenceOrderId' => $order['id'],
             'referenceType' => 'parent'
         ];
         
         unset($order['id']);
-        unset($order['statusId']);
         
         return $this->orderRepository->createOrder($order);
     }
