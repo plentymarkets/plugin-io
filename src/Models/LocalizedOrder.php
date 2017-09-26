@@ -85,20 +85,28 @@ class LocalizedOrder extends ModelWrapper
         $urlFilter = pluginApp(URLFilter::class);
         $itemService = pluginApp(ItemService::class);
 
-        foreach( $order->orderItems as $orderItem )
+        foreach( $order->orderItems as $key => $orderItem )
         {
-            if( $orderItem->itemVariationId !== 0 )
+            if($orderItem->typeId == 1 || $orderItem->typeId == 3 || $orderItem->typeId == 9)
             {
-                $itemUrl = '';
-                if((INT)$orderItem->itemVariationId > 0)
-                {
-                    $itemUrl = $urlFilter->buildVariationURL($orderItem->itemVariationId, true);
-                }
                 
-                $instance->itemURLs[$orderItem->itemVariationId] = $itemUrl;
-
-                $itemImage = $itemService->getVariationImage($orderItem->itemVariationId);
-                $instance->itemImages[$orderItem->itemVariationId] = $itemImage;
+                if( $orderItem->itemVariationId !== 0 )
+                {
+                    $itemUrl = '';
+                    if((INT)$orderItem->itemVariationId > 0)
+                    {
+                        $itemUrl = $urlFilter->buildVariationURL($orderItem->itemVariationId, true);
+                    }
+    
+                    $instance->itemURLs[$orderItem->itemVariationId] = $itemUrl;
+    
+                    $itemImage = $itemService->getVariationImage($orderItem->itemVariationId);
+                    $instance->itemImages[$orderItem->itemVariationId] = $itemImage;
+                }
+            }
+            else
+            {
+                unset($order->orderItems[$key]);
             }
         }
         
