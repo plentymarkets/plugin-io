@@ -2,21 +2,23 @@
 
 namespace IO\Services;
 
-use IO\Constants\OrderPaymentStatus;
-use IO\Models\LocalizedOrder;
 use Plenty\Modules\Frontend\PaymentMethod\Contracts\FrontendPaymentMethodRepositoryContract;
 use Plenty\Modules\Order\ContactWish\Contracts\ContactWishRepositoryContract;
 use Plenty\Modules\Order\Contracts\OrderRepositoryContract;
 use Plenty\Modules\Order\Property\Contracts\OrderPropertyRepositoryContract;
 use Plenty\Modules\Order\Property\Models\OrderPropertyType;
 use Plenty\Modules\Payment\Method\Contracts\PaymentMethodRepositoryContract;
+use Plenty\Repositories\Models\PaginatedResult;
+use Plenty\Plugin\Http\Response;
+use IO\Constants\OrderPaymentStatus;
+use IO\Models\LocalizedOrder;
 use IO\Builder\Order\OrderBuilder;
 use IO\Builder\Order\OrderType;
 use IO\Builder\Order\OrderOptionSubType;
 use IO\Builder\Order\AddressType;
-use Plenty\Repositories\Models\PaginatedResult;
 use IO\Constants\SessionStorageKeys;
-use Plenty\Plugin\Http\Response;
+use IO\Services\WebstoreConfigurationService;
+use Plenty\Modules\Order\Models\Order;
 
 /**
  * Class OrderService
@@ -247,52 +249,108 @@ class OrderService
         return $orderPropertyRepo->findByOrderId($orderId, $typeId);
     }
     
+    public function isReturnActive()
+    {
+        /**
+         * @var WebstoreConfigurationService $webstoreConfigService
+         */
+        $webstoreConfigService = pluginApp(WebstoreConfigurationService::class);
+        $webstoreConfig = $webstoreConfigService->getWebstoreConfig();
+        if($webstoreConfig->retoureMethod === 0)
+        {
+            return true;
+        }
+        
+        return false;
+    }
+    
+    public function isOrderReturnable(Order $order)
+    {
+        $returnActive = $this->isReturnActive();
+        
+        if($returnActive)
+        {
+            $shippingDateSet = false;
+            $createdDateUnix = 0;
+    
+            foreach($order->dates as $date)
+            {
+                if($date->typeId == 5 && strlen($date->date))
+                {
+                    $shippingDateSet = true;
+                }
+                elseif($date->typeId == 2 && strlen($date->date))
+                {
+                    $createdDateUnix = $date->date->timestamp;
+                }
+            }
+    
+            /**
+             * @var TemplateConfigService $templateConfigService
+             */
+            $templateConfigService = pluginApp(TemplateConfigService::class);
+            $returnTime = (int)$templateConfigService->get('my_account.order_return_days', 14);
+    
+            if( $shippingDateSet && ($createdDateUnix > 0 && $returnTime > 0) && (time() < ($createdDateUnix + ($returnTime * 24 * 60 * 60))) )
+            {
+                return true;
+            }
+        }
+        
+        return false;
+    }
+    
     public function createOrderReturn($orderId, $items = [])
     {
         $order = $this->orderRepository->findOrderById($orderId)->toArray();
         
-        foreach($order['orderItems'] as $key => $orderItem)
+        if($this->isReturnActive())
         {
-            if(array_key_exists($orderItem['itemVariationId'], $items))
+            foreach($order['orderItems'] as $key => $orderItem)
             {
-                $returnQuantity = (int)$items[$orderItem['itemVariationId']];
-                $order['orderItems'][$key]['quantity'] = $returnQuantity;
-    
-                $order['orderItems'][$key]['references'][] = [
-                  'referenceOrderItemId' =>   $order['orderItems'][$key]['id'],
-                    'referenceType' => 'parent'
-                ];
-                
-                unset($order['orderItems'][$key]['id']);
-                unset($order['orderItems'][$key]['orderId']);
+                if(array_key_exists($orderItem['itemVariationId'], $items))
+                {
+                    $returnQuantity = (int)$items[$orderItem['itemVariationId']];
+                    $order['orderItems'][$key]['quantity'] = $returnQuantity;
+            
+                    $order['orderItems'][$key]['references'][] = [
+                        'referenceOrderItemId' =>   $order['orderItems'][$key]['id'],
+                        'referenceType' => 'parent'
+                    ];
+            
+                    unset($order['orderItems'][$key]['id']);
+                    unset($order['orderItems'][$key]['orderId']);
+                }
+                else
+                {
+                    unset($order['orderItems'][$key]);
+                }
             }
-            else
+    
+            /**
+             * @var TemplateConfigService $templateConfigService
+             */
+            $templateConfigService = pluginApp(TemplateConfigService::class);
+            $returnStatus = $templateConfigService->get('my_account.order_return_initial_status', '');
+            if(!strlen($returnStatus) || (float)$returnStatus <= 0)
             {
-                unset($order['orderItems'][$key]);
+                $returnStatus = 9.0;
             }
-        }
     
-        /**
-         * @var TemplateConfigService $templateConfigService
-         */
-        $templateConfigService = pluginApp(TemplateConfigService::class);
-        $returnStatus = $templateConfigService->get('my_account.order_return_initial_status', '');
-        if(!strlen($returnStatus) || (float)$returnStatus <= 0)
-        {
-            $returnStatus = 9.0;
-        }
+            $order['statusId'] = (float)$returnStatus;
+            $order['typeId'] = OrderType::RETURNS;
     
-        $order['statusId'] = (float)$returnStatus;
-        $order['typeId'] = OrderType::RETURNS;
+            $order['orderReferences'][] = [
+                'referenceOrderId' => $order['id'],
+                'referenceType' => 'parent'
+            ];
+    
+            unset($order['id']);
+    
+            return $this->orderRepository->createOrder($order);
+        }
         
-        $order['orderReferences'][] = [
-            'referenceOrderId' => $order['id'],
-            'referenceType' => 'parent'
-        ];
-        
-        unset($order['id']);
-        
-        return $this->orderRepository->createOrder($order);
+        return $order;
     }
     
     /**

@@ -2,6 +2,7 @@
 
 namespace IO\Models;
 
+use IO\Builder\Order\OrderType;
 use Plenty\Modules\Order\Models\Order;
 use Plenty\Modules\Order\Status\Models\OrderStatusName;
 use Plenty\Modules\Frontend\PaymentMethod\Contracts\FrontendPaymentMethodRepositoryContract;
@@ -9,6 +10,7 @@ use Plenty\Modules\Frontend\PaymentMethod\Contracts\FrontendPaymentMethodReposit
 use Plenty\Modules\Order\Shipping\Contracts\ParcelServicePresetRepositoryContract;
 use IO\Extensions\Filters\URLFilter;
 use IO\Services\ItemService;
+use IO\Services\OrderService;
 
 class LocalizedOrder extends ModelWrapper
 {
@@ -29,6 +31,7 @@ class LocalizedOrder extends ModelWrapper
 
     public $itemURLs = [];
     public $itemImages = [];
+    public $isReturnable = false;
 
     /**
      * @param Order $order
@@ -98,6 +101,12 @@ class LocalizedOrder extends ModelWrapper
                 $instance->itemImages[$orderItem->itemVariationId] = $itemImage;
             }
         }
+        
+        if($order->typeId == OrderType::ORDER)
+        {
+            $orderService = pluginApp(OrderService::class);
+            $instance->isReturnable = $orderService->isOrderReturnable($order);
+        }
 
         return $instance;
     }
@@ -115,7 +124,8 @@ class LocalizedOrder extends ModelWrapper
             "paymentMethodName"     => $this->paymentMethodName,
             "paymentMethodIcon"     => $this->paymentMethodIcon,
             "itemURLs"              => $this->itemURLs,
-            "itemImages"            => $this->itemImages
+            "itemImages"            => $this->itemImages,
+            "isReturnable"          => $this->isReturnable
         ];
 
         $data["order"]["billingAddress"] = $this->order->billingAddress->toArray();
