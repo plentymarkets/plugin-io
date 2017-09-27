@@ -1,6 +1,7 @@
 <?php //strict
 namespace IO\Controllers;
 
+use Plenty\Plugin\Http\Response;
 use IO\Guards\AuthGuard;
 use IO\Helper\TemplateContainer;
 use IO\Services\CustomerService;
@@ -30,4 +31,9 @@ class RegisterController extends LayoutController
 			]
 		);
 	}
+	
+	public function redirectRegister()
+    {
+        return pluginApp(Response::class)->redirectTo('register');
+    }
 }

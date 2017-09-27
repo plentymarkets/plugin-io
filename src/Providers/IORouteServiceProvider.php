@@ -104,6 +104,7 @@ class IORouteServiceProvider extends RouteServiceProvider
         {
             //Register page route
             $router->get('register', 'IO\Controllers\RegisterController@showRegister');
+            $router->get('registration', 'IO\Controllers\RegisterController@redirectRegister');
         }
 
 		if ( in_array("place-order", $enabledRoutes) || in_array("all", $enabledRoutes) )
