@@ -26,22 +26,22 @@ class OrderReturnController extends LayoutController
 
         $configRepo = pluginApp(ConfigRepository::class);
         $orderService = pluginApp(OrderService::class);
+        
         $orderData = [];
-
+        $template = 'tpl.order.return';
+        
         $enabledRoutes = explode(", ",  $configRepo->get("IO.routing.enabled_routes") );
         if( in_array('order-return', $enabledRoutes) || in_array("all", $enabledRoutes))
         {
             try
             {
-                $orderData = $orderService->findOrderById($orderId);
-                $template = 'tpl.order.return';
+                $orderData = $orderService->findOrderById($orderId, true);
             }
             catch (\Exception $e)
             {
                 $orderData = [];
                 $template = 'tpl.page-not-found';
             }
-            
         }
         
         return $this->renderTemplate(

@@ -131,10 +131,16 @@ class OrderService
      * @param int $orderId
      * @return LocalizedOrder
      */
-	public function findOrderById(int $orderId):LocalizedOrder
+	public function findOrderById(int $orderId, $removeReturnItems = false):LocalizedOrder
 	{
-        $order = $this->orderRepository->findOrderById($orderId);
-		return LocalizedOrder::wrap( $order, "de" );
+        $order = LocalizedOrder::wrap($this->orderRepository->findOrderById($orderId), 'de');
+        
+        if($removeReturnItems)
+        {
+            $order = $this->removeReturnItemsFromOrder($order);
+        }
+        
+		return $order;
 	}
 	
 	public function findOrderByAccessKey($orderId, $orderAccessKey)
@@ -351,6 +357,78 @@ class OrderService
         }
         
         return $order;
+    }
+    
+    private function removeReturnItemsFromOrder($order)
+    {
+        $newOrder = $order;
+        $order = $order->order;
+        $orderId = $order->id;
+
+        $returnFilters = [
+            'orderType' => OrderType::RETURNS,
+            'referenceOrderId' => $orderId
+        ];
+        
+        $allReturns = $this->getOrdersForContact(pluginApp(CustomerService::class)->getContactId(), 1, 50, $returnFilters)->getResult();
+        
+        $returnItems = [];
+        $newOrderItems = [];
+        
+        if(count($allReturns))
+        {
+            foreach($allReturns as $returnKey => $return)
+            {
+                $return = $return['order'];
+                foreach($return['orderReferences'] as $reference)
+                {
+                    if($reference['referenceType'] == 'parent' && $reference['referenceOrderId'] == $orderId)
+                    {
+                        foreach($return['orderItems'] as $returnItem)
+                        {
+                            if(in_array($returnItem['itemVariationId'], $returnItems))
+                            {
+                                $returnItems[$returnItem['itemVariationId']] += $returnItem['quantity'];
+                            }
+                            else
+                            {
+                                $returnItems[$returnItem['itemVariationId']] = $returnItem['quantity'];
+                            }
+                        }
+                    }
+                }
+            }
+            
+            if(count($returnItems))
+            {
+                foreach($order->orderItems as $key => $orderItem)
+                {
+                    if(array_key_exists($orderItem['itemVariationId'], $returnItems))
+                    {
+                        $newQuantity = $orderItem['quantity'] - $returnItems[$orderItem['itemVariationId']];
+                    }
+                    else
+                    {
+                        $newQuantity = $orderItem['quantity'];
+                    }
+    
+                    if($newQuantity > 0)
+                    {
+                        $orderItem['quantity'] = $newQuantity;
+                        $newOrderItems[] = $orderItem;
+                    }
+                }
+            }
+        }
+        
+        if(count($newOrderItems))
+        {
+            $order->orderItems = $newOrderItems;
+        }
+        
+        $newOrder->order = $order;
+        
+        return $newOrder;
     }
     
     /**
