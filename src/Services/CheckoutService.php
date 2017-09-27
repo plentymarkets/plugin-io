@@ -126,7 +126,7 @@ class CheckoutService
      * Get the ID of the current payment method
      * @return int
      */
-    public function getMethodOfPaymentId(): int
+    public function getMethodOfPaymentId()
     {
         $methodOfPaymentID = (int)$this->checkout->getPaymentMethodId();
         
@@ -144,7 +144,10 @@ class CheckoutService
         if ($methodOfPaymentID === null || !$methodOfPaymentValid)
         {
             $methodOfPaymentID   = $methodOfPaymentList[0]->id;
-            $this->setMethodOfPaymentId($methodOfPaymentID);
+            if(!is_null($methodOfPaymentID))
+            {
+                $this->setMethodOfPaymentId($methodOfPaymentID);
+            }
         }
         
         return $methodOfPaymentID;
