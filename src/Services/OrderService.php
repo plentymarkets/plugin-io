@@ -262,7 +262,7 @@ class OrderService
          */
         $webstoreConfigService = pluginApp(WebstoreConfigurationService::class);
         $webstoreConfig = $webstoreConfigService->getWebstoreConfig();
-        if((int)$webstoreConfig->data['retoureMethod'] == 0)
+        if((int)$webstoreConfig->retoureMethod == 0)
         {
             return true;
         }
