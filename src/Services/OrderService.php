@@ -262,7 +262,7 @@ class OrderService
          */
         $webstoreConfigService = pluginApp(WebstoreConfigurationService::class);
         $webstoreConfig = $webstoreConfigService->getWebstoreConfig();
-        if($webstoreConfig->retoureMethod === 0)
+        if((int)$webstoreConfig->data['retoureMethod'] == 0)
         {
             return true;
         }
@@ -308,7 +308,9 @@ class OrderService
     
     public function createOrderReturn($orderId, $items = [])
     {
-        $order = $this->orderRepository->findOrderById($orderId)->toArray();
+        $order = $this->orderRepository->findOrderById($orderId);
+        $order = $this->removeReturnItemsFromOrder(LocalizedOrder::wrap($order, 'de'));
+        $order = $order->order->toArray();
         
         if($this->isReturnActive())
         {
@@ -317,15 +319,22 @@ class OrderService
                 if(array_key_exists($orderItem['itemVariationId'], $items))
                 {
                     $returnQuantity = (int)$items[$orderItem['itemVariationId']];
+                    
+                    if($returnQuantity > $order['orderItems'][$key]['quantity'])
+                    {
+                        $returnQuantity = $order['orderItems'][$key]['quantity'];
+                    }
+                    
                     $order['orderItems'][$key]['quantity'] = $returnQuantity;
-            
+
                     $order['orderItems'][$key]['references'][] = [
                         'referenceOrderItemId' =>   $order['orderItems'][$key]['id'],
                         'referenceType' => 'parent'
                     ];
-            
+
                     unset($order['orderItems'][$key]['id']);
                     unset($order['orderItems'][$key]['orderId']);
+                    
                 }
                 else
                 {
