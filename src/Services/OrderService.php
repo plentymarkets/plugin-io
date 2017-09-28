@@ -131,7 +131,7 @@ class OrderService
      * @param int $orderId
      * @return LocalizedOrder
      */
-	public function findOrderById(int $orderId, $removeReturnItems = false):LocalizedOrder
+	public function findOrderById(int $orderId, $removeReturnItems = false, $wrap = true):LocalizedOrder
 	{
         if($removeReturnItems)
         {
@@ -142,7 +142,15 @@ class OrderService
             $order = $this->orderRepository->findOrderById($orderId);
         }
         
-		return LocalizedOrder::wrap($order, 'de');
+        if($wrap)
+        {
+            return LocalizedOrder::wrap($order, 'de');
+        }
+        else
+        {
+            return $order;
+        }
+		
 	}
 	
 	public function findOrderByAccessKey($orderId, $orderAccessKey)
@@ -453,7 +461,6 @@ class OrderService
      *
      * @param int $currentPaymentMethodId
      * @param null $orderId
-     * @return \Illuminate\Support\Collection
      */
     public function getPaymentMethodListForSwitch($currentPaymentMethodId = 0, $orderId = null)
     {
@@ -504,10 +511,10 @@ class OrderService
         {
             $currentPaymentMethodId = 0;
         
-            $order = $this->findOrderById($orderId);
+            $order = $this->findOrderById($orderId, false, false);
         
             $newOrderProperties = [];
-            $orderProperties = $order->order->properties;
+            $orderProperties = $order->properties;
         
             if(count($orderProperties))
             {
