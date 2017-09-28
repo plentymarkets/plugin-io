@@ -133,14 +133,16 @@ class OrderService
      */
 	public function findOrderById(int $orderId, $removeReturnItems = false):LocalizedOrder
 	{
-        $order = LocalizedOrder::wrap($this->orderRepository->findOrderById($orderId), 'de');
-        
         if($removeReturnItems)
         {
-            $order = $this->removeReturnItemsFromOrder($order);
+            $order = $this->removeReturnItemsFromOrder($this->orderRepository->findOrderById($orderId));
+        }
+        else
+        {
+            $order = $this->orderRepository->findOrderById($orderId);
         }
         
-		return $order;
+		return LocalizedOrder::wrap($order, 'de');
 	}
 	
 	public function findOrderByAccessKey($orderId, $orderAccessKey)
@@ -193,7 +195,7 @@ class OrderService
      * @param array $filters
      * @return PaginatedResult
      */
-    public function getOrdersForContact(int $contactId, int $page = 1, int $items = 50, array $filters = []):PaginatedResult
+    public function getOrdersForContact(int $contactId, int $page = 1, int $items = 50, array $filters = [], $wrapped = true):PaginatedResult
     {
         if(!isset($filters['orderType']))
         {
@@ -208,7 +210,14 @@ class OrderService
             $items
         );
 
-        return LocalizedOrder::wrapPaginated( $orders, "de" );
+        if($wrapped)
+        {
+            return LocalizedOrder::wrapPaginated( $orders, "de" );
+        }
+        else
+        {
+            return $orders;
+        }
     }
 
     /**
@@ -276,6 +285,12 @@ class OrderService
         
         if($returnActive)
         {
+            $orderWithoutReturnItems = $this->removeReturnItemsFromOrder($order);
+            if(!count($orderWithoutReturnItems->orderItems))
+            {
+                return false;
+            }
+            
             $shippingDateSet = false;
             $createdDateUnix = 0;
     
@@ -370,8 +385,6 @@ class OrderService
     
     private function removeReturnItemsFromOrder($order)
     {
-        $newOrder = $order;
-        $order = $order->order;
         $orderId = $order->id;
 
         $returnFilters = [
@@ -379,7 +392,7 @@ class OrderService
             'referenceOrderId' => $orderId
         ];
         
-        $allReturns = $this->getOrdersForContact(pluginApp(CustomerService::class)->getContactId(), 1, 50, $returnFilters)->getResult();
+        $allReturns = $this->getOrdersForContact(pluginApp(CustomerService::class)->getContactId(), 1, 50, $returnFilters, false)->getResult();
         
         $returnItems = [];
         $newOrderItems = [];
@@ -388,7 +401,7 @@ class OrderService
         {
             foreach($allReturns as $returnKey => $return)
             {
-                $return = $return['order'];
+                //$return = $return['order'];
                 foreach($return['orderReferences'] as $reference)
                 {
                     if($reference['referenceType'] == 'parent' && $reference['referenceOrderId'] == $orderId)
@@ -432,13 +445,7 @@ class OrderService
             }
         }
         
-        $newOrder->order = $order;
-        if(!count($newOrder->order->orderItems))
-        {
-            $newOrder->isReturnable = false;
-        }
-        
-        return $newOrder;
+        return $order;
     }
     
     /**
