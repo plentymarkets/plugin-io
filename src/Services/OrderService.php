@@ -10,6 +10,8 @@ use Plenty\Modules\Order\Property\Models\OrderPropertyType;
 use Plenty\Modules\Payment\Method\Contracts\PaymentMethodRepositoryContract;
 use Plenty\Repositories\Models\PaginatedResult;
 use Plenty\Plugin\Http\Response;
+use Plenty\Modules\Order\Models\Order;
+use Plenty\Plugin\ConfigRepository;
 use IO\Constants\OrderPaymentStatus;
 use IO\Models\LocalizedOrder;
 use IO\Builder\Order\OrderBuilder;
@@ -18,7 +20,7 @@ use IO\Builder\Order\OrderOptionSubType;
 use IO\Builder\Order\AddressType;
 use IO\Constants\SessionStorageKeys;
 use IO\Services\WebstoreConfigurationService;
-use Plenty\Modules\Order\Models\Order;
+
 
 /**
  * Class OrderService
@@ -293,6 +295,16 @@ class OrderService
         
         if($returnActive)
         {
+            /**
+             * @var ConfigRepository $config
+             */
+            $config = pluginApp(ConfigRepository::class);
+            $enabledRoutes = explode(', ',  $config->get('IO.routing.enabled_routes') );
+            if ( !in_array('order-return', $enabledRoutes) && !in_array('all', $enabledRoutes) )
+            {
+                return false;
+            }
+            
             $orderWithoutReturnItems = $this->removeReturnItemsFromOrder($order);
             if(!count($orderWithoutReturnItems->orderItems))
             {
