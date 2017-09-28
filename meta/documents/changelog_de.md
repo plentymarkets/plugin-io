@@ -1,5 +1,13 @@
 # Release Notes für IO
 
+## v1.4.7 (2017-09-13) <a href="https://github.com/plentymarkets/plugin-io/compare/1.4.6...1.4.7" target="_blank"><b>Übersicht aller Änderungen</b></a>
+
+### Behoben
+
+- Ein Fehler führte dazu, dass die Grundpreisangabe nicht richtig funktionierte. Dies wurde behoben.
+- Ein Fehler führte dazu, dass die Zahlungsart in der Kaufabwicklung manchmal nicht richtig ausgewählt wurde. Dies wurde behoben.
+- Ein Fehler führte dazu, dass die Adressen in der Kaufabwicklung manchmal nicht richtig ausgewählt wurden. Dies wurde behoben.
+
 ## v1.4.6 (2017-09-13) <a href="https://github.com/plentymarkets/plugin-io/compare/1.4.5...1.4.6" target="_blank"><b>Übersicht aller Änderungen</b></a>
 
 ### Hinzugefügt
