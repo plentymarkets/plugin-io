@@ -78,8 +78,14 @@ class LocalizedOrder extends ModelWrapper
         }
 
         $frontentPaymentRepository = pluginApp( FrontendPaymentMethodRepositoryContract::class );
-        $instance->paymentMethodName = $frontentPaymentRepository->getPaymentMethodNameById( $order->methodOfPaymentId, $lang );
-        $instance->paymentMethodIcon = $frontentPaymentRepository->getPaymentMethodIconById( $order->methodOfPaymentId, $lang );
+        
+        try
+        {
+            $instance->paymentMethodName = $frontentPaymentRepository->getPaymentMethodNameById( $order->methodOfPaymentId, $lang );
+            $instance->paymentMethodIcon = $frontentPaymentRepository->getPaymentMethodIconById( $order->methodOfPaymentId, $lang );
+        }
+        catch(\Exception $e)
+        {}
 
 
         $urlFilter = pluginApp(URLFilter::class);
