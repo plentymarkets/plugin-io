@@ -395,7 +395,7 @@ class OrderService
                     {
                         foreach($return['orderItems'] as $returnItem)
                         {
-                            if(in_array($returnItem['itemVariationId'], $returnItems))
+                            if(array_key_exists($returnItem['itemVariationId'], $returnItems))
                             {
                                 $returnItems[$returnItem['itemVariationId']] += $returnItem['quantity'];
                             }
@@ -427,15 +427,16 @@ class OrderService
                         $newOrderItems[] = $orderItem;
                     }
                 }
+                
+                $order->orderItems = $newOrderItems;
             }
         }
         
-        if(count($newOrderItems))
-        {
-            $order->orderItems = $newOrderItems;
-        }
-        
         $newOrder->order = $order;
+        if(!count($newOrder->order->orderItems))
+        {
+            $newOrder->isReturnable = false;
+        }
         
         return $newOrder;
     }
