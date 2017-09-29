@@ -115,12 +115,6 @@ class LocalizedOrder extends ModelWrapper
                 unset($order->orderItems[$key]);
             }
         }
-        
-        if($order->typeId == OrderType::ORDER)
-        {
-            $orderService = pluginApp(OrderService::class);
-            $instance->isReturnable = $orderService->isOrderReturnable($order);
-        }
 
         return $instance;
     }

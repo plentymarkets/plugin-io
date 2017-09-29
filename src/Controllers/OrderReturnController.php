@@ -25,6 +25,10 @@ class OrderReturnController extends LayoutController
         }
 
         $configRepo = pluginApp(ConfigRepository::class);
+    
+        /**
+         * @var OrderService $orderService
+         */
         $orderService = pluginApp(OrderService::class);
         
         $orderData = [];
@@ -36,6 +40,12 @@ class OrderReturnController extends LayoutController
             try
             {
                 $orderData = $orderService->findOrderById($orderId, true);
+                if(!count($orderData->order->orderItems))
+                {
+                    $orderData = [];
+                    $template = 'tpl.page-not-found';
+                }
+                
             }
             catch (\Exception $e)
             {
