@@ -2,6 +2,7 @@
 
 namespace IO\Models;
 
+use IO\Builder\Order\OrderType;
 use Plenty\Modules\Order\Models\Order;
 use Plenty\Modules\Order\Status\Models\OrderStatusName;
 use Plenty\Modules\Frontend\PaymentMethod\Contracts\FrontendPaymentMethodRepositoryContract;
@@ -9,6 +10,7 @@ use Plenty\Modules\Frontend\PaymentMethod\Contracts\FrontendPaymentMethodReposit
 use Plenty\Modules\Order\Shipping\Contracts\ParcelServicePresetRepositoryContract;
 use IO\Extensions\Filters\URLFilter;
 use IO\Services\ItemService;
+use IO\Services\OrderService;
 
 class LocalizedOrder extends ModelWrapper
 {
@@ -29,6 +31,7 @@ class LocalizedOrder extends ModelWrapper
 
     public $itemURLs = [];
     public $itemImages = [];
+    public $isReturnable = false;
 
     /**
      * @param Order $order
@@ -75,27 +78,41 @@ class LocalizedOrder extends ModelWrapper
         }
 
         $frontentPaymentRepository = pluginApp( FrontendPaymentMethodRepositoryContract::class );
-        $instance->paymentMethodName = $frontentPaymentRepository->getPaymentMethodNameById( $order->methodOfPaymentId, $lang );
-        $instance->paymentMethodIcon = $frontentPaymentRepository->getPaymentMethodIconById( $order->methodOfPaymentId, $lang );
+        
+        try
+        {
+            $instance->paymentMethodName = $frontentPaymentRepository->getPaymentMethodNameById( $order->methodOfPaymentId, $lang );
+            $instance->paymentMethodIcon = $frontentPaymentRepository->getPaymentMethodIconById( $order->methodOfPaymentId, $lang );
+        }
+        catch(\Exception $e)
+        {}
 
 
         $urlFilter = pluginApp(URLFilter::class);
         $itemService = pluginApp(ItemService::class);
 
-        foreach( $order->orderItems as $orderItem )
+        foreach( $order->orderItems as $key => $orderItem )
         {
-            if( $orderItem->itemVariationId !== 0 )
+            if($orderItem->typeId == 1 || $orderItem->typeId == 3 || $orderItem->typeId == 9)
             {
-                $itemUrl = '';
-                if((INT)$orderItem->itemVariationId > 0)
-                {
-                    $itemUrl = $urlFilter->buildVariationURL($orderItem->itemVariationId, true);
-                }
                 
-                $instance->itemURLs[$orderItem->itemVariationId] = $itemUrl;
-
-                $itemImage = $itemService->getVariationImage($orderItem->itemVariationId);
-                $instance->itemImages[$orderItem->itemVariationId] = $itemImage;
+                if( $orderItem->itemVariationId !== 0 )
+                {
+                    $itemUrl = '';
+                    if((INT)$orderItem->itemVariationId > 0)
+                    {
+                        $itemUrl = $urlFilter->buildVariationURL($orderItem->itemVariationId, true);
+                    }
+    
+                    $instance->itemURLs[$orderItem->itemVariationId] = $itemUrl;
+    
+                    $itemImage = $itemService->getVariationImage($orderItem->itemVariationId);
+                    $instance->itemImages[$orderItem->itemVariationId] = $itemImage;
+                }
+            }
+            else
+            {
+                unset($order->orderItems[$key]);
             }
         }
 
@@ -115,7 +132,8 @@ class LocalizedOrder extends ModelWrapper
             "paymentMethodName"     => $this->paymentMethodName,
             "paymentMethodIcon"     => $this->paymentMethodIcon,
             "itemURLs"              => $this->itemURLs,
-            "itemImages"            => $this->itemImages
+            "itemImages"            => $this->itemImages,
+            "isReturnable"          => $this->isReturnable
         ];
 
         $data["order"]["billingAddress"] = $this->order->billingAddress->toArray();

@@ -2,21 +2,25 @@
 
 namespace IO\Services;
 
-use IO\Constants\OrderPaymentStatus;
-use IO\Models\LocalizedOrder;
 use Plenty\Modules\Frontend\PaymentMethod\Contracts\FrontendPaymentMethodRepositoryContract;
 use Plenty\Modules\Order\ContactWish\Contracts\ContactWishRepositoryContract;
 use Plenty\Modules\Order\Contracts\OrderRepositoryContract;
 use Plenty\Modules\Order\Property\Contracts\OrderPropertyRepositoryContract;
 use Plenty\Modules\Order\Property\Models\OrderPropertyType;
 use Plenty\Modules\Payment\Method\Contracts\PaymentMethodRepositoryContract;
+use Plenty\Repositories\Models\PaginatedResult;
+use Plenty\Plugin\Http\Response;
+use Plenty\Modules\Order\Models\Order;
+use Plenty\Plugin\ConfigRepository;
+use IO\Constants\OrderPaymentStatus;
+use IO\Models\LocalizedOrder;
 use IO\Builder\Order\OrderBuilder;
 use IO\Builder\Order\OrderType;
 use IO\Builder\Order\OrderOptionSubType;
 use IO\Builder\Order\AddressType;
-use Plenty\Repositories\Models\PaginatedResult;
 use IO\Constants\SessionStorageKeys;
-use Plenty\Plugin\Http\Response;
+use IO\Services\WebstoreConfigurationService;
+
 
 /**
  * Class OrderService
@@ -123,16 +127,31 @@ class OrderService
         $paymentRepository = pluginApp( PaymentMethodRepositoryContract::class );
         return $paymentRepository->executePayment( $paymentId, $orderId );
     }
-
+    
     /**
      * Find an order by ID
      * @param int $orderId
-     * @return LocalizedOrder
+     * @param bool $removeReturnItems
+     * @param bool $wrap
+     * @return LocalizedOrder|mixed|Order
      */
-	public function findOrderById(int $orderId):LocalizedOrder
+	public function findOrderById(int $orderId, $removeReturnItems = false, $wrap = true)
 	{
-        $order = $this->orderRepository->findOrderById($orderId);
-		return LocalizedOrder::wrap( $order, "de" );
+        if($removeReturnItems)
+        {
+            $order = $this->removeReturnItemsFromOrder($this->orderRepository->findOrderById($orderId));
+        }
+        else
+        {
+            $order = $this->orderRepository->findOrderById($orderId);
+        }
+        
+        if($wrap)
+        {
+            return LocalizedOrder::wrap($order, 'de');
+        }
+        
+        return $order;
 	}
 	
 	public function findOrderByAccessKey($orderId, $orderAccessKey)
@@ -176,17 +195,23 @@ class OrderService
     
         return LocalizedOrder::wrap($order, 'de');
     }
-
+    
     /**
      * Get a list of orders for a contact
      * @param int $contactId
      * @param int $page
      * @param int $items
      * @param array $filters
+     * @param bool $wrapped
      * @return PaginatedResult
      */
-    public function getOrdersForContact(int $contactId, int $page = 1, int $items = 50, array $filters = []):PaginatedResult
+    public function getOrdersForContact(int $contactId, int $page = 1, int $items = 50, array $filters = [], $wrapped = true)
     {
+        if(!isset($filters['orderType']))
+        {
+            $filters['orderType'] = OrderType::ORDER;
+        }
+        
         $this->orderRepository->setFilters($filters);
 
         $orders = $this->orderRepository->allOrdersByContact(
@@ -195,13 +220,28 @@ class OrderService
             $items
         );
 
-        return LocalizedOrder::wrapPaginated( $orders, "de" );
+        if($wrapped)
+        {
+            $orders = LocalizedOrder::wrapPaginated( $orders, "de" );
+    
+            $o = $orders->getResult();
+            foreach($orders->getResult() as $key => $order)
+            {
+                $order = $order->order;
+                if($order->typeId == OrderType::ORDER)
+                {
+                    $o[$key]->isReturnable = $this->isOrderReturnable($order);
+                }
+            }
+            $orders->setResult($o);
+        }
+        
+        return $orders;
     }
 
     /**
      * Get the last order created by the current contact
      * @param int $contactId
-     * @return LocalizedOrder
      */
     public function getLatestOrderForContact( int $contactId )
     {
@@ -242,12 +282,217 @@ class OrderService
         return $orderPropertyRepo->findByOrderId($orderId, $typeId);
     }
     
+    public function isReturnActive()
+    {
+        /**
+         * @var WebstoreConfigurationService $webstoreConfigService
+         */
+        $webstoreConfigService = pluginApp(WebstoreConfigurationService::class);
+        $webstoreConfig = $webstoreConfigService->getWebstoreConfig();
+        if((int)$webstoreConfig->retoureMethod == 0)
+        {
+            return true;
+        }
+        
+        return false;
+    }
+    
+    public function isOrderReturnable(Order $order)
+    {
+        $returnActive = $this->isReturnActive();
+        
+        if($returnActive)
+        {
+            /**
+             * @var ConfigRepository $config
+             */
+            $config = pluginApp(ConfigRepository::class);
+            $enabledRoutes = explode(', ',  $config->get('IO.routing.enabled_routes') );
+            if ( !in_array('order-return', $enabledRoutes) && !in_array('all', $enabledRoutes) )
+            {
+                return false;
+            }
+            
+            $orderWithoutReturnItems = $this->removeReturnItemsFromOrder($order);
+            if(!count($orderWithoutReturnItems->orderItems))
+            {
+                return false;
+            }
+            
+            $shippingDateSet = false;
+            $createdDateUnix = 0;
+    
+            foreach($order->dates as $date)
+            {
+                if($date->typeId == 5 && strlen($date->date))
+                {
+                    $shippingDateSet = true;
+                }
+                elseif($date->typeId == 2 && strlen($date->date))
+                {
+                    $createdDateUnix = $date->date->timestamp;
+                }
+            }
+    
+            /**
+             * @var TemplateConfigService $templateConfigService
+             */
+            $templateConfigService = pluginApp(TemplateConfigService::class);
+            $returnTime = (int)$templateConfigService->get('my_account.order_return_days', 14);
+    
+            if( $shippingDateSet && ($createdDateUnix > 0 && $returnTime > 0) && (time() < ($createdDateUnix + ($returnTime * 24 * 60 * 60))) )
+            {
+                return true;
+            }
+        }
+        
+        return false;
+    }
+    
+    public function createOrderReturn($orderId, $items = [])
+    {
+        $order = $this->orderRepository->findOrderById($orderId);
+        $order = $this->removeReturnItemsFromOrder($order);
+        $order = $order->toArray();
+        
+        if($this->isReturnActive())
+        {
+            foreach($order['orderItems'] as $key => $orderItem)
+            {
+                if(array_key_exists($orderItem['itemVariationId'], $items))
+                {
+                    $returnQuantity = (int)$items[$orderItem['itemVariationId']];
+                    
+                    if($returnQuantity > $order['orderItems'][$key]['quantity'])
+                    {
+                        $returnQuantity = $order['orderItems'][$key]['quantity'];
+                    }
+                    
+                    $order['orderItems'][$key]['quantity'] = $returnQuantity;
+
+                    $order['orderItems'][$key]['references'][] = [
+                        'referenceOrderItemId' =>   $order['orderItems'][$key]['id'],
+                        'referenceType' => 'parent'
+                    ];
+
+                    unset($order['orderItems'][$key]['id']);
+                    unset($order['orderItems'][$key]['orderId']);
+                    
+                }
+                else
+                {
+                    unset($order['orderItems'][$key]);
+                }
+            }
+    
+            /**
+             * @var TemplateConfigService $templateConfigService
+             */
+            $templateConfigService = pluginApp(TemplateConfigService::class);
+            $returnStatus = $templateConfigService->get('my_account.order_return_initial_status', '');
+            if(!strlen($returnStatus) || (float)$returnStatus <= 0)
+            {
+                $returnStatus = 9.0;
+            }
+    
+            $order['statusId'] = (float)$returnStatus;
+            $order['typeId'] = OrderType::RETURNS;
+    
+            $order['orderReferences'][] = [
+                'referenceOrderId' => $order['id'],
+                'referenceType' => 'parent'
+            ];
+    
+            unset($order['id']);
+    
+            return $this->orderRepository->createOrder($order);
+        }
+        
+        return $order;
+    }
+    
+    private function removeReturnItemsFromOrder($order)
+    {
+        $orderId = $order->id;
+
+        $returnFilters = [
+            'orderType' => OrderType::RETURNS,
+            'referenceOrderId' => $orderId
+        ];
+        
+        $allReturns = $this->getOrdersForContact(pluginApp(CustomerService::class)->getContactId(), 1, 50, $returnFilters, false)->getResult();
+        
+        $returnItems = [];
+        $newOrderItems = [];
+        
+        if(count($allReturns))
+        {
+            foreach($allReturns as $returnKey => $return)
+            {
+                //$return = $return['order'];
+                foreach($return['orderReferences'] as $reference)
+                {
+                    if($reference['referenceType'] == 'parent' && $reference['referenceOrderId'] == $orderId)
+                    {
+                        foreach($return['orderItems'] as $returnItem)
+                        {
+                            if(array_key_exists($returnItem['itemVariationId'], $returnItems))
+                            {
+                                $returnItems[$returnItem['itemVariationId']] += $returnItem['quantity'];
+                            }
+                            else
+                            {
+                                $returnItems[$returnItem['itemVariationId']] = $returnItem['quantity'];
+                            }
+                        }
+                    }
+                }
+            }
+            
+            if(count($returnItems))
+            {
+                foreach($order->orderItems as $key => $orderItem)
+                {
+                    if(array_key_exists($orderItem['itemVariationId'], $returnItems))
+                    {
+                        $newQuantity = $orderItem['quantity'] - $returnItems[$orderItem['itemVariationId']];
+                    }
+                    else
+                    {
+                        $newQuantity = $orderItem['quantity'];
+                    }
+    
+                    if($newQuantity > 0 && ($orderItem->typeId == 1 || $orderItem->typeId == 3 || $orderItem->typeId == 9))
+                    {
+                        $orderItem['quantity'] = $newQuantity;
+                        $newOrderItems[] = $orderItem;
+                    }
+                }
+                
+                $order->orderItems = $newOrderItems;
+            }
+            else
+            {
+                foreach($order->orderItems as $key => $orderItem)
+                {
+                    if($orderItem->typeId == 1 || $orderItem->typeId == 3 || $orderItem->typeId == 9)
+                    {
+                        $newOrderItems[] = $orderItem;
+                    }
+                }
+    
+                $order->orderItems = $newOrderItems;
+            }
+        }
+        
+        return $order;
+    }
+    
     /**
      * List all payment methods available for switch in MyAccount
      *
      * @param int $currentPaymentMethodId
      * @param null $orderId
-     * @return \Illuminate\Support\Collection
      */
     public function getPaymentMethodListForSwitch($currentPaymentMethodId = 0, $orderId = null)
     {
@@ -286,22 +531,23 @@ class OrderService
 		}
 		return $this->frontendPaymentMethodRepository->getPaymentMethodSwitchFromById($paymentMethodId, $orderId);
 	}
-
+    
     
     /**
-     * @param int $orderId
-     * @param int $paymentMethodId
+     * @param $orderId
+     * @param $paymentMethodId
+     * @return LocalizedOrder|null
      */
     public function switchPaymentMethodForOrder($orderId, $paymentMethodId)
     {
         if((int)$orderId > 0)
         {
             $currentPaymentMethodId = 0;
-        
-            $order = $this->findOrderById($orderId);
+            
+            $order = $this->orderRepository->findOrderById($orderId);
         
             $newOrderProperties = [];
-            $orderProperties = $order->order->properties;
+            $orderProperties = $order->properties;
         
             if(count($orderProperties))
             {
