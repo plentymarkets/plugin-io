@@ -301,12 +301,48 @@ class ItemLoaderFactoryES implements ItemLoaderFactory
                     $numberFormatFilter = pluginApp(NumberFormatFilter::class);
                     
                     $salesPrice = $salesPriceService->getSalesPriceForVariation($variation['data']['variation']['id'], 'default', $quantity);
+                    $graduated = $salesPriceService->getAllSalesPricesForVariation($variation['data']['variation']['id'], 'default');
+                    
+                    $graduatedPrices = [];
+                    
+                    if(is_array($graduated) && count($graduated))
+                    {
+                        foreach($graduated as $gpKey => $gp)
+                        {
+                            if($gp instanceof SalesPriceSearchResponse)
+                            {
+                                if($gp->salesPriceId == $salesPrice->salesPriceId)
+                                {
+                                    unset($graduated[$gpKey]);
+                                }
+                            }
+                        }
+                        
+                        $graduatedPrices = $graduated;
+                    }
+    
                     if($salesPrice instanceof SalesPriceSearchResponse)
                     {
                         $variation['data']['calculatedPrices']['default'] = $salesPrice;
                         $variation['data']['calculatedPrices']['formatted']['defaultPrice'] = $numberFormatFilter->formatMonetary($salesPrice->price, $salesPrice->currency);
                         $variation['data']['calculatedPrices']['formatted']['defaultUnitPrice'] = $numberFormatFilter->formatMonetary($salesPrice->unitPrice, $salesPrice->currency);
     
+                        $variation['data']['calculatedPrices']['graduatedPrices'] = [];
+                        if(count($graduatedPrices))
+                        {
+                            foreach($graduatedPrices as $graduatedPrice)
+                            {
+                                if($graduatedPrice instanceof SalesPriceSearchResponse)
+                                {
+                                    $variation['data']['calculatedPrices']['graduatedPrices'][] = [
+                                        'minimumOrderQuantity' => (int)$graduatedPrice->minimumOrderQuantity,
+                                        'price'                => (float)$graduatedPrice->price,
+                                        'formatted'            => $numberFormatFilter->formatMonetary($graduatedPrice->price, $graduatedPrice->currency)
+                                    ];
+                                }
+                            }
+                        }
+                        
                         /**
                          * @var BasePriceService $basePriceService
                          */
