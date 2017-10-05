@@ -1,6 +1,6 @@
 # Release Notes für IO
 
-## v1.5.x (TBA)
+## v1.5.1 (2017-10-05)
 
 ### Behoben
 
