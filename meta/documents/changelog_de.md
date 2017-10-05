@@ -1,5 +1,11 @@
 # Release Notes für IO
 
+## v1.5.1 (2017-10-05) <a href="https://github.com/plentymarkets/plugin-io/compare/1.5.0...1.5.1" target="_blank"><b>Übersicht aller Änderungen</b></a>
+
+### Behoben
+
+- Die Kontaktformular-Route ist nun immer korrekt verfügbar, wenn sie in der IO-Konfiguration aktiviert wurde.
+
 ## v1.5.0 (2017-09-28) <a href="https://github.com/plentymarkets/plugin-io/compare/1.4.7...1.5.0" target="_blank"><b>Übersicht aller Änderungen</b></a>
 
 ### Hinzugefügt
