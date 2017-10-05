@@ -1,5 +1,11 @@
 # Release Notes for IO
 
+## v1.5.1 (2017-10-05) <a href="https://github.com/plentymarkets/plugin-io/compare/1.5.0...1.5.1" target="_blank"><b>Overview of all changes</b></a>
+
+### Fixed
+
+- The contact card route is now always correctly available once activated in the IO configuration.
+
 ## v1.5.0 (2017-09-28) <a href="https://github.com/plentymarkets/plugin-io/compare/1.4.7...1.5.0" target="_blank"><b>Overview of all changes</b></a>
 
 ### Added
