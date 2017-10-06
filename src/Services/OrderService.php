@@ -405,14 +405,14 @@ class OrderService
     
             unset($order['id']);
     
-            $createdOrder = $this->orderRepository->createOrder($order);
+            $createdReturn = $this->orderRepository->createOrder($order);
 
             if(!is_null($returnNote) && strlen($returnNote))
             {
-                $this->saveOrderContactWish($createdOrder->id, $returnNote);
+                $this->saveOrderContactWish($createdReturn->id, $returnNote);
             }
 
-            return $createdOrder;
+            return $createdReturn;
         }
         
         return $order;
