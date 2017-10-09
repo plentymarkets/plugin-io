@@ -15,12 +15,14 @@ use IO\Builder\Order\AddressType;
 use Plenty\Modules\Account\Address\Models\Address;
 use Plenty\Modules\Authorization\Services\AuthHelper;
 use IO\Helper\UserSession;
+use Plenty\Modules\Frontend\Events\FrontendCustomerAddressChanged;
 use Plenty\Modules\Order\Contracts\OrderRepositoryContract;
 use IO\Services\SessionStorageService;
 use IO\Constants\SessionStorageKeys;
 use IO\Services\OrderService;
 use IO\Services\NotificationService;
 use IO\Services\CustomerPasswordResetService;
+use Plenty\Plugin\Events\Dispatcher;
 
 /**
  * Class CustomerService
@@ -455,11 +457,19 @@ class CustomerService
         if((int)$this->getContactId() > 0)
         {
             $addressData['options'] = $this->buildAddressEmailOptions([], false, $addressData);
-            return $this->contactAddressRepository->updateAddress($addressData, $addressId, $this->getContactId(), $type);
+            $newAddress = $this->contactAddressRepository->updateAddress($addressData, $addressId, $this->getContactId(), $type);
+        } else {
+            //case for guests
+            $addressData['options'] = $this->buildAddressEmailOptions([], true, $addressData);
+            $newAddress = $this->addressRepository->updateAddress($addressData, $addressId);
         }
-        //case for guests
-        $addressData['options'] = $this->buildAddressEmailOptions([], true, $addressData);
-        return $this->addressRepository->updateAddress($addressData, $addressId);
+
+        //fire public event
+        /** @var Dispatcher $pluginEventDispatcher */
+        $pluginEventDispatcher = pluginApp(Dispatcher::class);
+        $pluginEventDispatcher->fire(FrontendCustomerAddressChanged::class);
+
+        return $newAddress;
     }
 
     /**
