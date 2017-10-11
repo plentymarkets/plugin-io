@@ -144,6 +144,12 @@ class CheckoutService
         if ($methodOfPaymentID === null || !$methodOfPaymentValid)
         {
             $methodOfPaymentID   = $methodOfPaymentList[0]->id;
+
+            if(is_null($methodOfPaymentID))
+            {
+                $methodOfPaymentID = 0;
+            }
+
             $this->setMethodOfPaymentId($methodOfPaymentID);
         }
         
