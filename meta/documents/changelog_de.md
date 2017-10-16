@@ -1,5 +1,17 @@
 # Release Notes für IO
 
+## v1.6.0 (2017-10-16) <a href="https://github.com/plentymarkets/plugin-io/compare/1.5.1...1.6.0" target="_blank"><b>Übersicht aller Änderungen</b></a>
+
+### Hinzugefügt
+
+- Staffelpreise wurden integriert.
+
+#### Behoben
+
+- Durch einen Fehler wurde die falsche Zahlungsart am Auftrag gespeichert, wenn mit einer Zahlungsart mit Express-Checkout bezahlt wurde. Dies wurde behoben.
+- Beim Aktualisieren einer Adresse wird nun auch das Event `FrontendCustomerAddressChanged`gefeuert.
+- Beim Anlegen einer Retoure wird nun ein neues Datum erzeugt und nicht das Auftragsdatum für die Retoure verwendet.
+
 ## v1.5.1 (2017-10-05) <a href="https://github.com/plentymarkets/plugin-io/compare/1.5.0...1.5.1" target="_blank"><b>Übersicht aller Änderungen</b></a>
 
 ### Behoben

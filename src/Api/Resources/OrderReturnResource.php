@@ -23,8 +23,9 @@ class OrderReturnResource extends ApiResource
     {
         $orderId = $this->request->get('orderId', 0);
         $variationIds = $this->request->get('variationIds', []);
+        $returnNote = $this->request->get('returnNote', '');
         
-        $this->orderService->createOrderReturn($orderId, $variationIds);
+        $this->orderService->createOrderReturn($orderId, $variationIds, $returnNote);
         
         return $this->response->create([], ResponseCode::OK);
     }

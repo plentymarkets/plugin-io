@@ -1,5 +1,17 @@
 # Release Notes for IO
 
+## v1.6.0 (2017-10-16) <a href="https://github.com/plentymarkets/plugin-io/compare/1.5.1...1.6.0" target="_blank"><b>Overview of all changes</b></a>
+
+### Added
+
+- Graduated prices have been integrated.
+
+#### Fixed
+
+- Due to an error the wrong payment method has been saved for an order when paying the order with a payment method using the express checkout. This has been fixed.
+- When updating an address, the `FrontendCustomerAddressChanged`event is triggered.
+- When creating a return, a new date will be created instead of using the order date for the return.
+
 ## v1.5.1 (2017-10-05) <a href="https://github.com/plentymarkets/plugin-io/compare/1.5.0...1.5.1" target="_blank"><b>Overview of all changes</b></a>
 
 ### Fixed
