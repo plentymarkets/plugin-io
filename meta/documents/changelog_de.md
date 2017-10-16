@@ -4,13 +4,13 @@
 
 ### Hinzugefügt
 
-- Staffelpreise
+- Staffelpreise wurden integriert.
 
 #### Behoben
 
-- Fehler behoben, bei dem die Falsche Zahlungsart am Auftrag gespeichert wurde, wenn mit einer Zahlungsart mit Express-Checkout bezahlt wurde.
-- Beim Updaten einer Adresse wird nun auch Das Event `FrontendCustomerAddressChanged`gefeuert.
-- Beim Anlegen einer Retoure wird nun ein neues Datum erzeugt und nicht das vom Auftrag für die Retoure verwendet.
+- Durch einen Fehler wurde die falsche Zahlungsart am Auftrag gespeichert, wenn mit einer Zahlungsart mit Express-Checkout bezahlt wurde. Dies wurde behoben.
+- Beim Aktualisieren einer Adresse wird nun auch das Event `FrontendCustomerAddressChanged`gefeuert.
+- Beim Anlegen einer Retoure wird nun ein neues Datum erzeugt und nicht das Auftragsdatum für die Retoure verwendet.
 
 ## v1.5.1 (2017-10-05) <a href="https://github.com/plentymarkets/plugin-io/compare/1.5.0...1.5.1" target="_blank"><b>Übersicht aller Änderungen</b></a>
 
