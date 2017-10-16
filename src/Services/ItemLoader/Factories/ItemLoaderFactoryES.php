@@ -301,7 +301,13 @@ class ItemLoaderFactoryES implements ItemLoaderFactory
                     $numberFormatFilter = pluginApp(NumberFormatFilter::class);
                     
                     $salesPrice = $salesPriceService->getSalesPriceForVariation($variation['data']['variation']['id'], 'default', $quantity);
-                    $graduated = $salesPriceService->getAllSalesPricesForVariation($variation['data']['variation']['id'], 'default');
+                    
+                    $graduated = [];
+                    
+                    if(count($variation['data']['salesPrices']) > 1)
+                    {
+                        $graduated = $salesPriceService->getAllSalesPricesForVariation($variation['data']['variation']['id'], 'default');
+                    }
                     
                     $graduatedPrices = [];
                     

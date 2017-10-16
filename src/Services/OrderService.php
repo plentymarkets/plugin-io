@@ -349,7 +349,7 @@ class OrderService
         return false;
     }
     
-    public function createOrderReturn($orderId, $items = [])
+    public function createOrderReturn($orderId, $items = [], $returnNote = '')
     {
         $order = $this->orderRepository->findOrderById($orderId);
         $order = $this->removeReturnItemsFromOrder($order);
@@ -404,8 +404,16 @@ class OrderService
             ];
     
             unset($order['id']);
+            unset($order['dates']);
     
-            return $this->orderRepository->createOrder($order);
+            $createdReturn = $this->orderRepository->createOrder($order);
+
+            if(!is_null($returnNote) && strlen($returnNote))
+            {
+                $this->saveOrderContactWish($createdReturn->id, $returnNote);
+            }
+
+            return $createdReturn;
         }
         
         return $order;
