@@ -403,7 +403,7 @@ class OrderService
                 'referenceType' => 'parent'
             ];
     
-            unset($order['id']);
+            unset($order['id']); 
     
             $createdReturn = $this->orderRepository->createOrder($order);
 
