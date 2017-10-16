@@ -572,7 +572,7 @@ class OrderService
         
             if($paymentMethodId !== $currentPaymentMethodId)
             {
-                if($this->frontendPaymentMethodRepository->getPaymentMethodSwitchFromById($currentPaymentMethodId, $orderId) && $this->frontendPaymentMethodRepository->getPaymentMethodSwitchToById($paymentMethodId))
+                if($this->frontendPaymentMethodRepository->getPaymentMethodSwitchableFromById($currentPaymentMethodId, $orderId) && $this->frontendPaymentMethodRepository->getPaymentMethodSwitchableToById($paymentMethodId))
                 {
                     $order = $this->orderRepository->updateOrder(['properties' => $newOrderProperties], $orderId);
                     if(!is_null($order))
