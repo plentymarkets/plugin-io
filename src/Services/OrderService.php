@@ -404,6 +404,7 @@ class OrderService
             ];
     
             unset($order['id']);
+            unset($order['dates']);
     
             $createdReturn = $this->orderRepository->createOrder($order);
 
