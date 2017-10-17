@@ -19,7 +19,7 @@ use IO\Builder\Order\OrderType;
 use IO\Builder\Order\OrderOptionSubType;
 use IO\Builder\Order\AddressType;
 use IO\Constants\SessionStorageKeys;
-use IO\Services\WebstoreConfigurationService;
+use IO\Services\TemplateConfigService;
 
 
 /**
@@ -285,11 +285,12 @@ class OrderService
     public function isReturnActive()
     {
         /**
-         * @var WebstoreConfigurationService $webstoreConfigService
+         * @var TemplateConfigService $templateConfigService
          */
-        $webstoreConfigService = pluginApp(WebstoreConfigurationService::class);
-        $webstoreConfig = $webstoreConfigService->getWebstoreConfig();
-        if((int)$webstoreConfig->retoureMethod == 0)
+        $templateConfigService = pluginApp(TemplateConfigService::class);
+        $returnsActive = $templateConfigService->get('my_account.order_return_active', 'false');
+        
+        if($returnsActive == 'true')
         {
             return true;
         }

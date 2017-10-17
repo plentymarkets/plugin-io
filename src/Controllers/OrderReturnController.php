@@ -35,7 +35,7 @@ class OrderReturnController extends LayoutController
         $template = 'tpl.order.return';
         
         $enabledRoutes = explode(", ",  $configRepo->get("IO.routing.enabled_routes") );
-        if( in_array('order-return', $enabledRoutes) || in_array("all", $enabledRoutes))
+        if( (in_array('order-return', $enabledRoutes) || in_array("all", $enabledRoutes)) && $orderService->isReturnActive() )
         {
             try
             {
@@ -52,6 +52,11 @@ class OrderReturnController extends LayoutController
                 $orderData = [];
                 $template = 'tpl.page-not-found';
             }
+        }
+        else
+        {
+            $orderData = [];
+            $template = 'tpl.page-not-found';
         }
         
         return $this->renderTemplate(
