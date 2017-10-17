@@ -126,12 +126,14 @@ class CheckoutService
      * Get the ID of the current payment method
      * @return int
      */
-    public function getMethodOfPaymentId(): int
+    public function getMethodOfPaymentId()
     {
         $methodOfPaymentID = (int)$this->checkout->getPaymentMethodId();
-        
+
         $methodOfPaymentList = $this->getMethodOfPaymentList();
-        
+        $methodOfPaymentExpressCheckoutList = $this->getMethodOfPaymentExpressCheckoutList();
+        $methodOfPaymentList = array_merge($methodOfPaymentList, $methodOfPaymentExpressCheckoutList);
+
         $methodOfPaymentValid = false;
         foreach($methodOfPaymentList as $methodOfPayment)
         {
@@ -145,14 +147,12 @@ class CheckoutService
         {
             $methodOfPaymentID   = $methodOfPaymentList[0]->id;
 
-            if(is_null($methodOfPaymentID))
+            if(!is_null($methodOfPaymentID))
             {
-                $methodOfPaymentID = 0;
+                $this->setMethodOfPaymentId($methodOfPaymentID);
             }
-
-            $this->setMethodOfPaymentId($methodOfPaymentID);
         }
-        
+
         return $methodOfPaymentID;
     }
 
@@ -204,6 +204,15 @@ class CheckoutService
     public function getMethodOfPaymentList(): array
     {
         return $this->frontendPaymentMethodRepository->getCurrentPaymentMethodsList();
+    }
+
+    /**
+     * List all payment methods available for express checkout
+     * @return array
+     */
+    public function getMethodOfPaymentExpressCheckoutList(): array
+    {
+        return $this->frontendPaymentMethodRepository->getCurrentPaymentMethodsForExpressCheckout();
     }
 
     /**

@@ -98,8 +98,44 @@ class SalesPriceService
         /**
          * @var SalesPriceSearchRequest $salesPriceSearchRequest
          */
-        $salesPriceSearchRequest = pluginApp(SalesPriceSearchRequest::class);
+        $salesPriceSearchRequest = $this->getSearchRequest($variationId, $type, $quantity);
+        
+        /**
+         * @var SalesPriceSearchResponse $salesPrice
+         */
+        $salesPrice = $this->salesPriceSearchRepo->search($salesPriceSearchRequest);
 
+        return $salesPrice;
+    }
+    
+    /**
+     * @param int $variationId
+     * @param string $type
+     * @param int $quantity
+     * @return array
+     */
+    public function getAllSalesPricesForVariation(int $variationId, $type = 'default')
+    {
+        /**
+         * @var SalesPriceSearchRequest $salesPriceSearchRequest
+         */
+        $salesPriceSearchRequest = $this->getSearchRequest($variationId, $type, -1);
+    
+        /**
+         * @var array $salesPrices
+         */
+        $salesPrices = $this->salesPriceSearchRepo->searchAll($salesPriceSearchRequest);
+        
+        return $salesPrices;
+    }
+    
+    private  function getSearchRequest(int $variationId, $type, int $quantity)
+    {
+        /**
+         * @var SalesPriceSearchRequest $salesPriceSearchRequest
+         */
+        $salesPriceSearchRequest = pluginApp(SalesPriceSearchRequest::class);
+    
         $salesPriceSearchRequest->variationId     = $variationId;
         $salesPriceSearchRequest->accountId       = 0;
         $salesPriceSearchRequest->accountType     = $this->singleAccess;
@@ -110,12 +146,7 @@ class SalesPriceService
         $salesPriceSearchRequest->quantity        = $quantity;
         $salesPriceSearchRequest->referrerId      = 1; //TODO set to real referrer
         $salesPriceSearchRequest->type            = $type;
-
-        /**
-         * @var SalesPriceSearchResponse $salesPrice
-         */
-        $salesPrice = $this->salesPriceSearchRepo->search($salesPriceSearchRequest);
-
-        return $salesPrice;
+        
+        return $salesPriceSearchRequest;
     }
 }

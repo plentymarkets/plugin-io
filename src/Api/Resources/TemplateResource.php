@@ -45,7 +45,8 @@ class TemplateResource extends ApiResource
             }
         }
 
-        if (strlen($template)) {
+        if (strlen($template))
+        {
             /**
              * @var Twig $twig
              */

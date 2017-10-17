@@ -1,5 +1,35 @@
 # Release Notes for IO
 
+## v1.6.0 (2017-10-16) <a href="https://github.com/plentymarkets/plugin-io/compare/1.5.1...1.6.0" target="_blank"><b>Overview of all changes</b></a>
+
+### Added
+
+- Graduated prices have been integrated.
+
+#### Fixed
+
+- Due to an error the wrong payment method has been saved for an order when paying the order with a payment method using the express checkout. This has been fixed.
+- When updating an address, the `FrontendCustomerAddressChanged`event is triggered.
+- When creating a return, a new date will be created instead of using the order date for the return.
+
+## v1.5.1 (2017-10-05) <a href="https://github.com/plentymarkets/plugin-io/compare/1.5.0...1.5.1" target="_blank"><b>Overview of all changes</b></a>
+
+### Fixed
+
+- The contact card route is now always correctly available once activated in the IO configuration.
+
+## v1.5.0 (2017-09-28) <a href="https://github.com/plentymarkets/plugin-io/compare/1.4.7...1.5.0" target="_blank"><b>Overview of all changes</b></a>
+
+### Added
+
+- The logic for returning items of an order has been added.
+- A method has been added in the `RegisterController`. This allows the use of the Ceres checkout with the old **order process** and the **individual shopping cart** of Callisto.
+
+### Fixed
+
+- Due to an error, the order overview could not be loaded when an order with an old payment method was saved. This has been fixed.
+- Due to a randomly occurring error, the checkout could not be opened when ordering as a guest. This has been fixed.
+
 ## v1.4.7 (2017-09-20) <a href="https://github.com/plentymarkets/plugin-io/compare/1.4.6...1.4.7" target="_blank"><b>Overview of all changes</b></a>
 
 ### Fixed

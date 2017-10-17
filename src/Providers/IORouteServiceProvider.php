@@ -38,6 +38,8 @@ class IORouteServiceProvider extends RouteServiceProvider
             $api->resource('io/checkout/paymentId', 'CheckoutSetPaymentResource');
             $api->resource('io/checkout/shippingId', 'CheckoutSetShippingIdResource');
             $api->resource('io/order/contactWish', 'OrderContactWishResource');
+            $api->resource('io/order/return', 'OrderReturnResource');
+            $api->resource('io/order/template', 'OrderTemplateResource');
             $api->get('io/checkout', 'CheckoutResource@index');
             $api->post('io/checkout', 'CheckoutResource@store');
             $api->put('io/checkout', 'CheckoutResource@update');
@@ -51,6 +53,7 @@ class IORouteServiceProvider extends RouteServiceProvider
             $api->resource('io/customer/password_reset', 'CustomerPasswordResetResource');
             $api->resource('io/customer/contact/mail', 'ContactMailResource');
             $api->resource('io/customer/bank_data', 'ContactBankResource');
+            $api->resource('io/customer/order/return', 'CustomerOrderReturnResource');
             $api->resource('io/variations', 'VariationResource');
             $api->resource('io/item/availability', 'AvailabilityResource');
             $api->resource('io/item/condition', 'ItemConditionResource');
@@ -106,6 +109,7 @@ class IORouteServiceProvider extends RouteServiceProvider
         {
             //Register page route
             $router->get('register', 'IO\Controllers\RegisterController@showRegister');
+            $router->get('registration', 'IO\Controllers\RegisterController@redirectRegister');
         }
 
 		if ( in_array("place-order", $enabledRoutes) || in_array("all", $enabledRoutes) )
@@ -155,9 +159,12 @@ class IORouteServiceProvider extends RouteServiceProvider
             $router->get('wish-list', 'IO\Controllers\ItemWishListController@showWishList');
         }
 
-        if( (in_array("contact", $enabledRoutes) || in_array("all", $enabledRoutes) )
-             && strlen($templateConfigService->get('contact.shop_mail')) > 0 
-             && $templateConfigService->get('contact.shop_mail') != "your@email.com")
+        if( in_array('order-return', $enabledRoutes) || in_array("all", $enabledRoutes))
+        {
+            $router->get('returns/{orderId}', 'IO\Controllers\OrderReturnController@showOrderReturn');
+        }
+
+        if( (in_array("contact", $enabledRoutes) || in_array("all", $enabledRoutes) ) )
         {
             //contact
             $router->get('contact', 'IO\Controllers\ContactController@showContact');
