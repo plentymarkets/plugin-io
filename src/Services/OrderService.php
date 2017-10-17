@@ -288,7 +288,7 @@ class OrderService
          * @var TemplateConfigService $templateConfigService
          */
         $templateConfigService = pluginApp(TemplateConfigService::class);
-        $returnsActive = $templateConfigService->get('my_account.order_return_active', 'false');
+        $returnsActive = $templateConfigService->get('my_account.order_return_active', 'true');
         
         if($returnsActive == 'true')
         {
