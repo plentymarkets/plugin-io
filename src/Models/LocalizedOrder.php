@@ -50,32 +50,37 @@ class LocalizedOrder extends ModelWrapper
         $instance = pluginApp( self::class );
         $instance->order = $order;
 
-        //$statusRepository = pluginApp(StatusRepositoryContract::class);
-        $instance->status = []; //$statusRepository->findStatusNameById( $order->statusId, $lang );
-
+        $instance->status = [];
+    
+        /**
+         * @var ParcelServicePresetRepositoryContract $parcelServicePresetRepository
+         */
         $parcelServicePresetRepository = pluginApp(ParcelServicePresetRepositoryContract::class);
-        if($parcelServicePresetRepository instanceof ParcelServicePresetRepositoryContract)
+        
+        try
         {
-            
-        }
-        $shippingProfile = $parcelServicePresetRepository->getPresetById( $order->shippingProfileId );
-        foreach( $shippingProfile->parcelServicePresetNames as $name )
-        {
-            if( $name->lang === $lang )
+            $shippingProfile = $parcelServicePresetRepository->getPresetById( $order->shippingProfileId );
+            foreach( $shippingProfile->parcelServicePresetNames as $name )
             {
-                $instance->shippingProfileName = $name->name;
-                break;
+                if( $name->lang === $lang )
+                {
+                    $instance->shippingProfileName = $name->name;
+                    break;
+                }
+            }
+    
+            foreach( $shippingProfile->parcelServiceNames as $name )
+            {
+                if( $name->lang === $lang )
+                {
+                    $instance->shippingProvider = $name->name;
+                    break;
+                }
             }
         }
-
-        foreach( $shippingProfile->parcelServiceNames as $name )
-        {
-            if( $name->lang === $lang )
-            {
-                $instance->shippingProvider = $name->name;
-                break;
-            }
-        }
+        catch(\Exception $e)
+        {}
+        
 
         $frontentPaymentRepository = pluginApp( FrontendPaymentMethodRepositoryContract::class );
         

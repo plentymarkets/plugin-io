@@ -1,5 +1,16 @@
 # Release Notes for IO
 
+## v1.6.1 (2017-10-19) <a href="https://github.com/plentymarkets/plugin-io/compare/1.6.0...1.6.1" target="_blank"><b>Overview of all changes</b></a>
+
+
+### Changed
+
+- The setting **Allow returns** is now carried out in the configuration of the plugin **Ceres**.
+
+### Fixed
+
+- Due to an error, the order overview could not be loaded when an order with an old shipping profile was saved. This has been fixed.
+
 ## v1.6.0 (2017-10-16) <a href="https://github.com/plentymarkets/plugin-io/compare/1.5.1...1.6.0" target="_blank"><b>Overview of all changes</b></a>
 
 ### Added
