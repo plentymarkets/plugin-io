@@ -2,9 +2,13 @@
 
 ## v1.6.1 (2017-10-19) <a href="https://github.com/plentymarkets/plugin-io/compare/1.6.0...1.6.1" target="_blank"><b>Übersicht aller Änderungen</b></a>
 
+### Geändert
+
+- Die Einstellung **Retoure aktivieren** erfolgt nun über die Konfiguration des Plugins **Ceres**.
+
 ### Behoben
 
-- Ein Fehler führte dazu, dass die Auftragsübersicht nicht geladen werden konnte, wenn ein Auftrag mit einer alten Versandart vorhanden war. Dies wurde behoben.
+- Ein Fehler führte dazu, dass die Auftragsübersicht nicht geladen werden konnte, wenn ein Auftrag mit einem alten Versandprofil vorhanden war. Dies wurde behoben.
 
 
 ## v1.6.0 (2017-10-16) <a href="https://github.com/plentymarkets/plugin-io/compare/1.5.1...1.6.0" target="_blank"><b>Übersicht aller Änderungen</b></a>
