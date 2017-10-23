@@ -403,6 +403,16 @@ class CustomerService
                     'value'  => $addressData['telephone']
                 ];
             }
+            
+            if(isset($addressData['address2']) && (strtoupper($addressData['address1']) == 'PACKSTATION' || strtoupper($addressData['address1']) == 'POSTFILIALE') && isset($addressData['address3']))
+            {
+                $options[] =
+                [
+                    'typeId' => 6,
+                    'value' => $addressData['address3']
+                ];
+            }
+            
         }
         
         return $options;
@@ -458,11 +468,30 @@ class CustomerService
         {
             $addressData['options'] = $this->buildAddressEmailOptions([], false, $addressData);
             $newAddress = $this->contactAddressRepository->updateAddress($addressData, $addressId, $this->getContactId(), $type);
-        } else {
+    
+            if(($newAddress->address1 !== 'PACKSTATION' && $newAddress->address1 !== 'POSTFILIALE') && !is_null($newAddress->getOption(6)))
+            {
+                $options = $newAddress->options->toArray();
+                foreach($options as $key => $option)
+                {
+                    if($option['typeId'] == 6)
+                    {
+                        unset($options[$key]);
+                    }
+                }
+                
+                $newAddress->options = $options;
+                $newAddress = $this->contactAddressRepository->updateAddress($newAddress, $addressId, $this->getContactId(), $type);
+            }
+        }
+        else
+        {
             //case for guests
             $addressData['options'] = $this->buildAddressEmailOptions([], true, $addressData);
             $newAddress = $this->addressRepository->updateAddress($addressData, $addressId);
         }
+        
+        
 
         //fire public event
         /** @var Dispatcher $pluginEventDispatcher */
