@@ -506,7 +506,18 @@ class CustomerService
         );
 	}
 	
-	public function getReturns(int $page = 1, int $items = 10, array $filters = [])
+	public function hasReturns()
+    {
+        $returns = $this->getReturns(1, 1, [], false);
+        if(count($returns->getResult()))
+        {
+            return true;
+        }
+        
+        return false;
+    }
+	
+	public function getReturns(int $page = 1, int $items = 10, array $filters = [], $wrapped = true)
     {
         $filters['orderType'] = OrderType::RETURNS;
         
@@ -514,7 +525,8 @@ class CustomerService
             $this->getContactId(),
             $page,
             $items,
-            $filters
+            $filters,
+            $wrapped
         );
     }
 
