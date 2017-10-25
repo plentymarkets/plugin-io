@@ -403,6 +403,16 @@ class CustomerService
                     'value'  => $addressData['telephone']
                 ];
             }
+            
+            if(isset($addressData['address2']) && (strtoupper($addressData['address1']) == 'PACKSTATION' || strtoupper($addressData['address1']) == 'POSTFILIALE') && isset($addressData['address3']))
+            {
+                $options[] =
+                [
+                    'typeId' => 6,
+                    'value' => $addressData['address3']
+                ];
+            }
+            
         }
         
         return $options;
@@ -458,11 +468,15 @@ class CustomerService
         {
             $addressData['options'] = $this->buildAddressEmailOptions([], false, $addressData);
             $newAddress = $this->contactAddressRepository->updateAddress($addressData, $addressId, $this->getContactId(), $type);
-        } else {
+        }
+        else
+        {
             //case for guests
             $addressData['options'] = $this->buildAddressEmailOptions([], true, $addressData);
             $newAddress = $this->addressRepository->updateAddress($addressData, $addressId);
         }
+        
+        
 
         //fire public event
         /** @var Dispatcher $pluginEventDispatcher */
