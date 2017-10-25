@@ -1,5 +1,12 @@
 # Release Notes für IO
 
+## v1.6.2 (2017-10-25)
+
+### Hinzugefügt
+
+- Adressen können als Packstationen oder Postfilialen gespeichert werden.
+- Im Customer Service wurde die Funktion `hasReturns` hinzugefügt, um anzuzeigen, ob der Kunde Retouren hat.
+
 ## v1.6.1 (2017-10-19) <a href="https://github.com/plentymarkets/plugin-io/compare/1.6.0...1.6.1" target="_blank"><b>Übersicht aller Änderungen</b></a>
 
 ### Geändert

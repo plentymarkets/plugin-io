@@ -1,5 +1,12 @@
 # Release Notes for IO
 
+## v1.6.2 (2017-10-25)
+
+### Added
+
+- Addresses can be saved as a "DHL Packstation" or post office.
+- In the Customer Service, the function `hasReturns` was added to show if the customer has any returns.
+
 ## v1.6.1 (2017-10-19) <a href="https://github.com/plentymarkets/plugin-io/compare/1.6.0...1.6.1" target="_blank"><b>Overview of all changes</b></a>
 
 
