@@ -468,21 +468,6 @@ class CustomerService
         {
             $addressData['options'] = $this->buildAddressEmailOptions([], false, $addressData);
             $newAddress = $this->contactAddressRepository->updateAddress($addressData, $addressId, $this->getContactId(), $type);
-    
-            if(($newAddress->address1 !== 'PACKSTATION' && $newAddress->address1 !== 'POSTFILIALE') && !is_null($newAddress->getOption(6)))
-            {
-                $options = $newAddress->options->toArray();
-                foreach($options as $key => $option)
-                {
-                    if($option['typeId'] == 6)
-                    {
-                        unset($options[$key]);
-                    }
-                }
-                
-                $newAddress->options = $options;
-                $newAddress = $this->contactAddressRepository->updateAddress($newAddress, $addressId, $this->getContactId(), $type);
-            }
         }
         else
         {
