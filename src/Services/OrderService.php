@@ -238,10 +238,11 @@ class OrderService
         
         return $orders;
     }
-
+    
     /**
      * Get the last order created by the current contact
      * @param int $contactId
+     * @return LocalizedOrder|null
      */
     public function getLatestOrderForContact( int $contactId )
     {
