@@ -13,7 +13,7 @@ use IO\Services\CheckoutService;
  * Class ShippingCountryIdResource
  * @package IO\Api\Resources
  */
-class ShippingCountryIdResource extends ApiResource
+class ShippingCountryResource extends ApiResource
 {
 	/**
 	 * @var CheckoutService
@@ -38,7 +38,7 @@ class ShippingCountryIdResource extends ApiResource
      */
 	public function store():Response
 	{
-		$shippingCountryId = (int)$this->request->get("shippingCountryId");
+		$shippingCountryId = (int)$this->request->get('shippingCountryId', 0);
 		$this->checkoutService->setShippingCountryId($shippingCountryId);
 
 		return $this->response->create($shippingCountryId, ResponseCode::OK);
