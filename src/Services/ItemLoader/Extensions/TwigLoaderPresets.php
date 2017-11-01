@@ -1,5 +1,6 @@
 <?php
 namespace IO\Services\ItemLoader\Extensions;
+
 use IO\Services\ItemLoader\Loaders\CategoryItems;
 use IO\Services\ItemLoader\Loaders\CrossSellingItems;
 use IO\Services\ItemLoader\Loaders\LastSeenItemList;
@@ -9,6 +10,7 @@ use IO\Services\ItemLoader\Loaders\SingleItem;
 use IO\Services\ItemLoader\Loaders\SingleItemAttributes;
 use IO\Services\ItemLoader\Loaders\Items;
 use IO\Services\ItemLoader\Loaders\TagItems;
+use IO\Services\ItemLoader\Services\ItemListService;
 use Plenty\Plugin\Templates\Extensions\Twig_Extension;
 
 /**
@@ -33,17 +35,17 @@ class TwigLoaderPresets extends Twig_Extension
 	 */
 	public function getGlobals():array
 	{
+        /**
+         * @var ItemListService $itemListService
+         */
+	    $itemListService = pluginApp(ItemListService::class);
+        $singleItemLoaderClasses = $itemListService->getLoaderClassListForSingleItem();
+	    
 		return [
 			"itemLoaderPresets" => [
 				
 				"singleItem" => [
-				    "single" => [
-                        SingleItem::class,
-                        SingleItemAttributes::class,
-                    ],
-                    "multi" => [
-                        'crossSellingItemsList' => CrossSellingItems::class
-                    ]
+				    $singleItemLoaderClasses
 				],
 			    
 			    "categoryList" => [

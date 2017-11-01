@@ -168,6 +168,17 @@ class ItemLoaderFactoryES implements ItemLoaderFactory
         {
             foreach($loaderClasses as $identifier => $loaderClass)
             {
+                if(is_array($loaderClass))
+                {
+                    $additionalOptions = $loaderClass[1];
+                    $loaderClass = $loaderClass[0];
+                    
+                    if(is_array($additionalOptions) && count($additionalOptions))
+                    {
+                        $options = array_merge($options, $additionalOptions);
+                    }
+                }
+                
                 /** @var ItemLoaderContract $loader */
                 $loader = pluginApp($loaderClass);
                 
@@ -239,16 +250,20 @@ class ItemLoaderFactoryES implements ItemLoaderFactory
                 
                 if($type == 'multi')
                 {
-                    $e = explode('\\', $loaderClass);
-                    $identifier = $e[count($e)-1];
                     if(!in_array($identifier, $identifiers))
                     {
                         $identifiers[] = $identifier;
                     }
+    
+                    if(!is_null($search))
+                    {
+                        $elasticSearchRepo->addSearch($search);
+                        $search = null;
+                    }
                 }
             }
             
-            if(!is_null($search))
+            if($type == 'single' && !is_null($search))
             {
                 $elasticSearchRepo->addSearch($search);
                 $search = null;
