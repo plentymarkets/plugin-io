@@ -6,6 +6,7 @@ use IO\Services\ItemLoader\Contracts\ItemLoaderContract;
 use IO\Services\ItemLoader\Contracts\ItemLoaderFactory;
 use IO\Services\ItemLoader\Contracts\ItemLoaderPaginationContract;
 use IO\Services\ItemLoader\Contracts\ItemLoaderSortingContract;
+use IO\Services\ItemLoader\Services\FacetExtensionContainer;
 use IO\Services\ItemWishListService;
 use IO\Services\SalesPriceService;
 use IO\Services\SessionStorageService;
@@ -29,6 +30,20 @@ use Plenty\Modules\Authorization\Services\AuthHelper;
 class ItemLoaderFactoryES implements ItemLoaderFactory
 {
     /**
+     * @var FacetExtensionContainer
+     */
+    private $facetExtensionContainer;
+
+    /**
+     * ItemLoaderFactoryES constructor.
+     * @param FacetExtensionContainer $facetExtensionContainer
+     */
+    public function __construct(FacetExtensionContainer $facetExtensionContainer)
+    {
+        $this->facetExtensionContainer = $facetExtensionContainer;
+    }
+
+    /**
      * @param array $loaderClassList
      * @param array $resultFields
      * @param array $options
@@ -37,7 +52,7 @@ class ItemLoaderFactoryES implements ItemLoaderFactory
     public function runSearch($loaderClassList, $resultFields,  $options = [])
     {
         $result = [];
-        
+
         $isMultiSearch = false;
         if(isset($loaderClassList['multi']) && count($loaderClassList['multi']))
         {
@@ -48,7 +63,7 @@ class ItemLoaderFactoryES implements ItemLoaderFactory
             $classList['single'] = $loaderClassList;
             $loaderClassList = $classList;
         }
-        
+
         if($isMultiSearch)
         {
             $result = $this->buildMultiSearch($loaderClassList, $resultFields, $options);
@@ -57,25 +72,25 @@ class ItemLoaderFactoryES implements ItemLoaderFactory
         {
             $result = $this->buildSingleSearch($loaderClassList['single'], $resultFields, $options);
         }
-        
+
         $result = $this->attachPrices($result, $options);
         $result = $this->attachItemWishList($result);
 
         return $result;
     }
-    
+
     private function buildSingleSearch($loaderClassList, $resultFields, $options = [])
     {
         /** @var VariationElasticSearchSearchRepositoryContract $elasticSearchRepo */
         $elasticSearchRepo = pluginApp(VariationElasticSearchSearchRepositoryContract::class);
-        
+
         $search = null;
-        
+
         foreach($loaderClassList as $loaderClass)
         {
             /** @var ItemLoaderContract $loader */
             $loader = pluginApp($loaderClass);
-            
+
             if($loader instanceof ItemLoaderContract)
             {
                 if(!$search instanceof DocumentSearch)
@@ -83,13 +98,13 @@ class ItemLoaderFactoryES implements ItemLoaderFactory
                     //search, filter
                     $search = $loader->getSearch();
                 }
-                
+
                 foreach($loader->getFilterStack($options) as $filter)
                 {
                     $search->addFilter($filter);
                 }
             }
-            
+
             //sorting
             if($loader instanceof ItemLoaderSortingContract)
             {
@@ -100,7 +115,7 @@ class ItemLoaderFactoryES implements ItemLoaderFactory
                     $search->setSorting($sorting);
                 }
             }
-            
+
             if($loader instanceof ItemLoaderPaginationContract)
             {
                 if($search instanceof DocumentSearch)
@@ -109,30 +124,30 @@ class ItemLoaderFactoryES implements ItemLoaderFactory
                     $search->setPage($loader->getCurrentPage($options), $loader->getItemsPerPage($options));
                 }
             }
-            
+
             /** @var IncludeSource $source */
             $source = pluginApp(IncludeSource::class);
-            
+
             $currentFields = $resultFields;
             if(array_key_exists($loaderClass, $currentFields))
             {
                 $currentFields = $currentFields[$loaderClass];
             }
-            
+
             $fieldsFound = false;
             foreach($currentFields as $fieldName)
             {
                 $source->activateList([$fieldName]);
                 $fieldsFound = true;
             }
-            
+
             if(!$fieldsFound)
             {
                 $source->activateAll();
             }
-            
+
             $search->addSource($source);
-            
+
             $aggregations = $loader->getAggregations();
             if(count($aggregations))
             {
@@ -142,35 +157,38 @@ class ItemLoaderFactoryES implements ItemLoaderFactory
                 }
             }
         }
-        
+
         if(!is_null($search))
         {
             $elasticSearchRepo->addSearch($search);
         }
-        
+
         $result = $elasticSearchRepo->execute();
+        foreach ($this->facetExtensionContainer->getFacetExtensions() as $facetExtension) {
+            $result = $facetExtension->mergeIntoFacetsList($result);
+        }
 
         return $result;
     }
-    
+
     private function buildMultiSearch($loaderClassList, $resultFields, $options = [])
     {
         /**
          * @var VariationElasticSearchMultiSearchRepositoryContract $elasticSearchRepo
          */
         $elasticSearchRepo = pluginApp(VariationElasticSearchMultiSearchRepositoryContract::class);
-        
+
         $search = null;
-        
+
         $identifiers = [];
-        
+
         foreach($loaderClassList as $type => $loaderClasses)
         {
             foreach($loaderClasses as $identifier => $loaderClass)
             {
                 /** @var ItemLoaderContract $loader */
                 $loader = pluginApp($loaderClass);
-                
+
                 if($loader instanceof ItemLoaderContract)
                 {
                     if(!$search instanceof DocumentSearch)
@@ -178,13 +196,13 @@ class ItemLoaderFactoryES implements ItemLoaderFactory
                         //search, filter
                         $search = $loader->getSearch();
                     }
-                    
+
                     foreach($loader->getFilterStack($options) as $filter)
                     {
                         $search->addFilter($filter);
                     }
                 }
-                
+
                 //sorting
                 if($loader instanceof ItemLoaderSortingContract)
                 {
@@ -195,7 +213,7 @@ class ItemLoaderFactoryES implements ItemLoaderFactory
                         $search->setSorting($sorting);
                     }
                 }
-                
+
                 if($loader instanceof ItemLoaderPaginationContract)
                 {
                     if($search instanceof DocumentSearch)
@@ -204,30 +222,30 @@ class ItemLoaderFactoryES implements ItemLoaderFactory
                         $search->setPage($loader->getCurrentPage($options), $loader->getItemsPerPage($options));
                     }
                 }
-                
+
                 /** @var IncludeSource $source */
                 $source = pluginApp(IncludeSource::class);
-                
+
                 $currentFields = $resultFields;
                 if(array_key_exists($loaderClass, $currentFields))
                 {
                     $currentFields = $currentFields[$loaderClass];
                 }
-                
+
                 $fieldsFound = false;
                 foreach($currentFields as $fieldName)
                 {
                     $source->activateList([$fieldName]);
                     $fieldsFound = true;
                 }
-                
+
                 if(!$fieldsFound)
                 {
                     $source->activateAll();
                 }
-                
+
                 $search->addSource($source);
-                
+
                 $aggregations = $loader->getAggregations();
                 if(count($aggregations))
                 {
@@ -236,7 +254,7 @@ class ItemLoaderFactoryES implements ItemLoaderFactory
                         $search->addAggregation($aggregation);
                     }
                 }
-                
+
                 if($type == 'multi')
                 {
                     $e = explode('\\', $loaderClass);
@@ -247,16 +265,16 @@ class ItemLoaderFactoryES implements ItemLoaderFactory
                     }
                 }
             }
-            
+
             if(!is_null($search))
             {
                 $elasticSearchRepo->addSearch($search);
                 $search = null;
             }
         }
-        
+
         $rawResult = $elasticSearchRepo->execute();
-        
+
         $result = [];
         foreach($rawResult as $key => $list)
         {
@@ -275,10 +293,10 @@ class ItemLoaderFactoryES implements ItemLoaderFactory
 
             }
         }
-        
+
         return $result;
     }
-    
+
     private function attachPrices($result, $options = [])
     {
         if(count($result['documents']))
@@ -287,7 +305,7 @@ class ItemLoaderFactoryES implements ItemLoaderFactory
              * @var SalesPriceService $salesPriceService
              */
             $salesPriceService = pluginApp(SalesPriceService::class);
-            
+
             foreach($result['documents'] as $key => $variation)
             {
                 if((int)$variation['data']['variation']['id'] > 0)
@@ -297,20 +315,20 @@ class ItemLoaderFactoryES implements ItemLoaderFactory
                     {
                         $quantity = (int)$options['basketVariationQuantities'][$variation['data']['variation']['id']];
                     }
-                    
+
                     $numberFormatFilter = pluginApp(NumberFormatFilter::class);
-                    
+
                     $salesPrice = $salesPriceService->getSalesPriceForVariation($variation['data']['variation']['id'], 'default', $quantity);
-                    
+
                     $graduated = [];
-                    
+
                     if(count($variation['data']['salesPrices']) > 1)
                     {
                         $graduated = $salesPriceService->getAllSalesPricesForVariation($variation['data']['variation']['id'], 'default');
                     }
-                    
+
                     $graduatedPrices = [];
-                    
+
                     if(is_array($graduated) && count($graduated))
                     {
                         foreach($graduated as $gpKey => $gp)
@@ -323,16 +341,16 @@ class ItemLoaderFactoryES implements ItemLoaderFactory
                                 }
                             }
                         }
-                        
+
                         $graduatedPrices = $graduated;
                     }
-    
+
                     if($salesPrice instanceof SalesPriceSearchResponse)
                     {
                         $variation['data']['calculatedPrices']['default'] = $salesPrice;
                         $variation['data']['calculatedPrices']['formatted']['defaultPrice'] = $numberFormatFilter->formatMonetary($salesPrice->price, $salesPrice->currency);
                         $variation['data']['calculatedPrices']['formatted']['defaultUnitPrice'] = $numberFormatFilter->formatMonetary($salesPrice->unitPrice, $salesPrice->currency);
-    
+
                         $variation['data']['calculatedPrices']['graduatedPrices'] = [];
                         if(count($graduatedPrices))
                         {
@@ -348,53 +366,53 @@ class ItemLoaderFactoryES implements ItemLoaderFactory
                                 }
                             }
                         }
-                        
+
                         /**
                          * @var BasePriceService $basePriceService
                          */
                         $basePriceService = pluginApp(BasePriceService::class);
-                        
+
                         $lot = $variation['data']['unit']['content'];
                         $unit = $variation['data']['unit']['unitOfMeasurement'];
-    
+
                         $basePriceString = '';
                         if($lot > 0 && strlen($unit))
                         {
                             $basePrice = [];
                             list($basePrice['lot'], $basePrice['price'], $basePrice['unitKey']) = $basePriceService->getUnitPrice($lot, $salesPrice->price, $unit);
-    
+
                             /**
                              * @var UnitRepositoryContract $unitRepository
                              */
                             $unitRepository = pluginApp(UnitRepositoryContract::class);
-    
+
                             /** @var AuthHelper $authHelper */
                             $authHelper = pluginApp(AuthHelper::class);
-    
+
                             $unitData = $authHelper->processUnguarded( function() use ($unitRepository, $basePrice)
                             {
                                 $unitRepository->setFilters(['unitOfMeasurement' => $basePrice['unitKey']]);
                                 return $unitRepository->all(['*'], 1, 1);
                             });
-                            
-                            
+
+
                             $unitId = $unitData->getResult()->first()->id;
-    
+
                             /**
                              * @var UnitNameRepositoryContract $unitNameRepository
                              */
                             $unitNameRepository = pluginApp(UnitNameRepositoryContract::class);
                             $unitName = $unitNameRepository->findOne($unitId, pluginApp(SessionStorageService::class)->getLang())->name;
-    
+
                             $basePriceString = $numberFormatFilter->formatMonetary($basePrice['price'], $salesPrice->currency).' / '.($basePrice['lot'] > 1 ? $basePrice['lot'].' ' : '').$unitName;
-    
-                            
+
+
                         }
-    
+
                         $variation['data']['calculatedPrices']['formatted']['basePrice'] = $basePriceString;
                     }
-                    
-                    
+
+
                     $rrp = $salesPriceService->getSalesPriceForVariation($variation['data']['variation']['id'], 'rrp');
                     if($rrp instanceof SalesPriceSearchResponse)
                     {
@@ -402,18 +420,18 @@ class ItemLoaderFactoryES implements ItemLoaderFactory
                         $variation['data']['calculatedPrices']['formatted']['rrpPrice'] = $numberFormatFilter->formatMonetary($rrp->price, $rrp->currency);
                         $variation['data']['calculatedPrices']['formatted']['rrpUnitPrice'] = $numberFormatFilter->formatMonetary($rrp->unitPrice, $rrp->currency);
                     }
-                    
+
                     $specialOffer = $salesPriceService->getSalesPriceForVariation($variation['data']['variation']['id'], 'specialOffer');
                     if($specialOffer instanceof SalesPriceSearchResponse)
                     {
                         $variation['data']['calculatedPrices']['specialOffer'] = $specialOffer;
                     }
-                    
+
                     $result['documents'][$key] = $variation;
                 }
             }
         }
-        
+
         return $result;
     }
 
@@ -425,7 +443,7 @@ class ItemLoaderFactoryES implements ItemLoaderFactory
          */
         $configRepo = pluginApp(ConfigRepository::class);
         $enabledRoutes = explode(", ",  $configRepo->get("IO.routing.enabled_routes") );
-       
+
         if(in_array('wish-list', $enabledRoutes) && count($result['documents']))
         {
             /**
