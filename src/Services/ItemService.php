@@ -34,6 +34,7 @@ use Plenty\Modules\Item\Search\Filter\SearchFilter;
 use Plenty\Modules\Item\Search\Filter\VariationBaseFilter;
 use Plenty\Plugin\Application;
 use IO\Services\TemplateConfigService;
+use Plenty\Plugin\Events\Dispatcher;
 
 
 /**
@@ -56,6 +57,11 @@ class ItemService
 	 * SessionStorageService
 	 */
 	private $sessionStorage;
+
+    /**
+     * @var array
+     */
+	private $additionalItemSortingMap = [];
 
 	/**
 	 * ItemService constructor.
@@ -801,6 +807,24 @@ class ItemService
 
 		return $elasticSearchRepo->execute();
 	}
+
+    /**
+     *
+     */
+	public function getAdditionalItemSorting(){
+	    /** @var Dispatcher $dispatcher */
+	    $dispatcher = pluginApp(Dispatcher::class);
+	    $dispatcher->fire('IO.initAdditionalSorting', [$this]);
+	    return $this->additionalItemSortingMap;
+    }
+
+    /**
+     * @param string $key
+     * @param string $translationKey
+     */
+    public function addAdditionalItemSorting($key, $translationKey){
+        $this->additionalItemSortingMap[$key] = $translationKey;
+    }
     
     /**
      * @param string $searchString

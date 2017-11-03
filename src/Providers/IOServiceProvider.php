@@ -9,6 +9,7 @@ use IO\Services\ContentCaching\ContentCachingProvider;
 use IO\Services\ItemLoader\Contracts\ItemLoaderFactory;
 use IO\Services\ItemLoader\Extensions\TwigLoaderPresets;
 use IO\Services\ItemLoader\Factories\ItemLoaderFactoryES;
+use IO\Services\ItemLoader\Services\FacetExtensionContainer;
 use IO\Services\NotificationService;
 use Plenty\Plugin\ServiceProvider;
 use Plenty\Plugin\Templates\Twig;
@@ -38,9 +39,10 @@ class IOServiceProvider extends ServiceProvider
 
         $this->getApplication()->singleton(NotificationService::class);
 
+
         //TODO check ES ready state
         $this->getApplication()->bind(ItemLoaderFactory::class, ItemLoaderFactoryES::class);
-
+        $this->getApplication()->singleton(FacetExtensionContainer::class);
     }
 
     /**
