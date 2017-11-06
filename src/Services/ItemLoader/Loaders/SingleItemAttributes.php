@@ -2,6 +2,7 @@
 namespace IO\Services\ItemLoader\Loaders;
 
 use IO\Services\SessionStorageService;
+use IO\Services\PriceDetectService;
 use IO\Services\ItemLoader\Contracts\ItemLoaderContract;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Query\Type\TypeInterface;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Search\SearchInterface;
@@ -12,6 +13,7 @@ use Plenty\Modules\Item\Search\Aggregations\AttributeValueListAggregationProcess
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Processor\DocumentProcessor;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Search\Document\DocumentSearch;
 use Plenty\Plugin\Application;
+use Plenty\Modules\Item\Search\Filter\SalesPriceFilter;
 
 /**
  * Created by ptopczewski, 06.01.17 14:44
@@ -56,6 +58,20 @@ class SingleItemAttributes implements ItemLoaderContract
 	 */
 	public function getFilterStack($options = [])
 	{
-		return [];
+        /**
+         * @var PriceDetectService $priceDetectService
+         */
+        $priceDetectService = pluginApp(PriceDetectService::class);
+        $priceIds = $priceDetectService->getPriceIdsForCustomer();
+        
+        /**
+         * @var SalesPriceFilter $priceFilter
+         */
+        $priceFilter = pluginApp(SalesPriceFilter::class);
+        $priceFilter->hasAtLeastOnePrice($priceIds);
+	    
+		return [
+		    $priceFilter
+        ];
 	}
 }

@@ -4,6 +4,7 @@ namespace IO\Services\ItemLoader\Loaders;
 use IO\Services\SessionStorageService;
 use IO\Services\ItemLoader\Contracts\ItemLoaderContract;
 use IO\Services\TemplateConfigService;
+use IO\Services\PriceDetectService;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Processor\DocumentProcessor;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Query\Type\TypeInterface;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Search\Document\DocumentSearch;
@@ -13,6 +14,7 @@ use Plenty\Modules\Item\Search\Mutators\ImageMutator;
 use Plenty\Modules\Item\Search\Filter\ClientFilter;
 use Plenty\Modules\Item\Search\Filter\VariationBaseFilter;
 use Plenty\Modules\Item\Search\Filter\TextFilter;
+use Plenty\Modules\Item\Search\Filter\SalesPriceFilter;
 use Plenty\Plugin\Application;
 
 /**
@@ -113,11 +115,24 @@ class SingleItem implements ItemLoaderContract
             
             $textFilter->hasNameInLanguage($textFilterLanguage, $textFilterType);
         }
+        
+        /**
+         * @var PriceDetectService $priceDetectService
+         */
+        $priceDetectService = pluginApp(PriceDetectService::class);
+        $priceIds = $priceDetectService->getPriceIdsForCustomer();
+        
+        /**
+         * @var SalesPriceFilter $priceFilter
+         */
+        $priceFilter = pluginApp(SalesPriceFilter::class);
+        $priceFilter->hasAtLeastOnePrice($priceIds);
 
 		return [
 			$clientFilter,
 		    $variationFilter,
-            $textFilter
+            $textFilter,
+            $priceFilter
 		];
 	}
 }
