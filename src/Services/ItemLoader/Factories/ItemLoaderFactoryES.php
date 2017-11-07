@@ -376,7 +376,7 @@ class ItemLoaderFactoryES implements ItemLoaderFactory
                         $unit = $variation['data']['unit']['unitOfMeasurement'];
 
                         $basePriceString = '';
-                        if($lot > 0 && strlen($unit))
+                        if($variation['data']['variation']['mayShowUnitPrice'] == true && $lot > 0 && strlen($unit))
                         {
                             $basePrice = [];
                             list($basePrice['lot'], $basePrice['price'], $basePrice['unitKey']) = $basePriceService->getUnitPrice($lot, $salesPrice->price, $unit);
@@ -405,8 +405,6 @@ class ItemLoaderFactoryES implements ItemLoaderFactory
                             $unitName = $unitNameRepository->findOne($unitId, pluginApp(SessionStorageService::class)->getLang())->name;
 
                             $basePriceString = $numberFormatFilter->formatMonetary($basePrice['price'], $salesPrice->currency).' / '.($basePrice['lot'] > 1 ? $basePrice['lot'].' ' : '').$unitName;
-
-
                         }
 
                         $variation['data']['calculatedPrices']['formatted']['basePrice'] = $basePriceString;
