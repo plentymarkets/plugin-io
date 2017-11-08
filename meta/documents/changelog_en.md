@@ -1,5 +1,16 @@
 # Release Notes for IO
 
+## v1.7.0 (2017-11-08) <a href="https://github.com/plentymarkets/plugin-io/compare/1.6.2...1.7.0" target="_blank"><b>Overview of all changes</b></a>
+
+### Added
+
+- Customer classes are now taken into consideration when displaying item data in the online store.
+- Plugins can now add new values to extend the item sorting in the online store. For further information about this, refer to <a href="https://developers.plentymarkets.com/dev-doc/cookbook#item-sorting" target="_blank">plentyDevelopers</a>.
+
+### Fixed
+
+- The variation setting for unite prices **Show unit price** is now taken into account. When deactivating this setting, the unit price is not displayed in the online store.
+
 ## v1.6.2 (2017-10-25) <a href="https://github.com/plentymarkets/plugin-io/compare/1.6.1...1.6.2" target="_blank"><b>Overview of all changes</b></a>
 
 ### Added

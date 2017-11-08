@@ -1,5 +1,16 @@
 # Release Notes für IO
 
+## v1.7.0 (2017-11-08) <a href="https://github.com/plentymarkets/plugin-io/compare/1.6.2...1.7.0" target="_blank"><b>Übersicht aller Änderungen</b></a>
+
+### Hinzugefügt
+
+- Kundenklassen werden nun bei der Anzeige von Artikeldaten berücksichtigt.
+- Plugins können nun die Artikelsortierung des Webshops durch eigene Einträge erweitern. Weitere Informationen dazu unter <a href="https://developers.plentymarkets.com/dev-doc/cookbook#item-sorting" target="_blank">plentyDevelopers</a>.
+
+### Behoben
+
+- Die Einstellung an der Variante für die Grundpreisangabe **Grundpreis anzeigen** wird nun berücksichtigt. Wenn diese Einstellung deaktiviert ist, wird der Grundpreis im Webshop nicht angezeigt.
+
 ## v1.6.2 (2017-10-25) <a href="https://github.com/plentymarkets/plugin-io/compare/1.6.1...1.6.2" target="_blank"><b>Übersicht aller Änderungen</b></a>
 
 ### Hinzugefügt
