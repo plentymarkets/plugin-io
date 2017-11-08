@@ -361,7 +361,7 @@ class ItemLoaderFactoryES implements ItemLoaderFactory
                                     $variation['data']['calculatedPrices']['graduatedPrices'][] = [
                                         'minimumOrderQuantity' => (int)$graduatedPrice->minimumOrderQuantity,
                                         'price'                => (float)$graduatedPrice->price,
-                                        'formatted'            => $numberFormatFilter->formatMonetary($graduatedPrice->price, $graduatedPrice->currency)
+                                        'formatted'            => $numberFormatFilter->formatMonetary($graduatedPrice->unitPrice, $graduatedPrice->currency)
                                     ];
                                 }
                             }
