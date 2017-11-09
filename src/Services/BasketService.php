@@ -285,7 +285,7 @@ class BasketService
         }
 
         $items = pluginApp(ItemLoaderService::class)
-            ->loadForTemplate($template, [BasketItems::class], ['variationIds' => $basketItemVariationIds, 'basketVariationQuantities' => $basketVariationQuantities]);
+            ->loadForTemplate($template, [BasketItems::class], ['variationIds' => $basketItemVariationIds, 'basketVariationQuantities' => $basketVariationQuantities, 'items' => count($basketItemVariationIds), 'page' => 1]);
 
         $result = array();
         foreach ($items['documents'] as $item) {
