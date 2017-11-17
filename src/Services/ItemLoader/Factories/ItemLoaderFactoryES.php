@@ -331,6 +331,22 @@ class ItemLoaderFactoryES implements ItemLoaderFactory
 
                     if(is_array($graduated) && count($graduated))
                     {
+                        $graduatedMinQuantities = array();
+                        foreach($graduated as $gpKey => $gp)
+                        {
+                            if ($gp instanceof SalesPriceSearchResponse)
+                            {
+                                // check if graduated price for current minimum order quantity has already been added.
+                                // => priority of prices with same minimum order quantity is based on the position of the price defined by user
+                                if ( !in_array( $gp->minimumOrderQuantity, $graduatedMinQuantities ) )
+                                {
+                                    $graduatedMinQuantities[] = $gp->minimumOrderQuantity;
+                                    $graduatedPrices[] = $gp;
+                                }
+                            }
+                        }
+
+                        /*
                         foreach($graduated as $gpKey => $gp)
                         {
                             if($gp instanceof SalesPriceSearchResponse)
@@ -341,8 +357,9 @@ class ItemLoaderFactoryES implements ItemLoaderFactory
                                 }
                             }
                         }
+                        */
 
-                        $graduatedPrices = $graduated;
+                        //$graduatedPrices = $graduated;
                     }
 
                     if($salesPrice instanceof SalesPriceSearchResponse)
