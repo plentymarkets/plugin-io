@@ -232,6 +232,21 @@ class CustomerService
 		return null;
 	}
 
+	public function getContactClassId()
+    {
+        $contact = $this->getContact();
+        if ( $contact !== null && $contact->classId !== null )
+        {
+            return $contact->classId;
+        }
+        else
+        {
+            /** @var WebstoreConfigurationService $webstoreConfigService */
+            $webstoreConfigService = pluginApp(WebstoreConfigurationService::class);
+            return $webstoreConfigService->getWebstoreConfig()->defaultCustomerClassId;
+        }
+    }
+
     /**
      * Update a contact
      * @param array $contactData

@@ -19,5 +19,5 @@ class ItemColumnsParams
 	const ORDER_BY       = "order_by";
 	const LIMIT          = "limit";
 	const OFFSET         = "offset";
-	const CUSTOMER_CLASS = "customerClass";
+	const CUSTOMER_CLASS = "customerClassId";
 }
