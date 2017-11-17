@@ -35,6 +35,8 @@ class IORouteServiceProvider extends RouteServiceProvider
             $api->post('io/order', 'OrderResource@store');
 			$api->get('io/order/paymentMethods', 'OrderPaymentResource@paymentMethodListForSwitch');
             $api->resource('io/order/payment', 'OrderPaymentResource');
+            $api->resource('io/checkout/paymentId', 'CheckoutSetPaymentResource');
+            $api->resource('io/checkout/shippingId', 'CheckoutSetShippingIdResource');
             $api->resource('io/order/contactWish', 'OrderContactWishResource');
             $api->resource('io/order/return', 'OrderReturnResource');
             $api->resource('io/order/template', 'OrderTemplateResource');
@@ -64,6 +66,7 @@ class IORouteServiceProvider extends RouteServiceProvider
             $api->resource('io/localization/language', 'LanguageResource');
             $api->resource('io/itemWishList', 'ItemWishListResource');
             $api->resource('io/cache/reset_template_cache', 'ResetTemplateCacheResource');
+            $api->resource('io/shipping/country', 'ShippingCountryResource@store');
 		});
 
 		$enabledRoutes = explode(", ",  $config->get("IO.routing.enabled_routes") );
