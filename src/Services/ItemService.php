@@ -455,6 +455,7 @@ class ItemService
 			$params        = $paramsBuilder
 				->withParam(ItemColumnsParams::LANGUAGE, $this->sessionStorage->getLang())
 				->withParam(ItemColumnsParams::PLENTY_ID, $this->app->getPlentyId())
+                ->withParam(ItemColumnsParams::CUSTOMER_CLASS, pluginApp(CustomerService::class)->getContact()->classId)
 				->build();
 
 			$recordList = $this->itemRepository->search($columns, $filter, $params);
@@ -513,6 +514,7 @@ class ItemService
             ->withParam(ItemColumnsParams::TYPE, 'virtual')
             ->withParam(ItemColumnsParams::LANGUAGE, $this->sessionStorage->getLang())
             ->withParam(ItemColumnsParams::PLENTY_ID, $this->app->getPlentyId())
+            ->withParam(ItemColumnsParams::CUSTOMER_CLASS, pluginApp(CustomerService::class)->getContact()->classId)
             ->build();
 
         $record = $this->itemRepository->search($columns, $filter, $params)->current();
@@ -559,6 +561,7 @@ class ItemService
 			$params        = $paramsBuilder
 				->withParam(ItemColumnsParams::LANGUAGE, $this->sessionStorage->getLang())
 				->withParam(ItemColumnsParams::PLENTY_ID, $this->app->getPlentyId())
+                ->withParam(ItemColumnsParams::CUSTOMER_CLASS, pluginApp(CustomerService::class)->getContact()->classId)
 				->build();
 
 			$recordList = $this->itemRepository->search($columns, $filter, $params);
@@ -609,7 +612,7 @@ class ItemService
 			->withParam(ItemColumnsParams::LANGUAGE, $this->sessionStorage->getLang())
 			->withParam(ItemColumnsParams::PLENTY_ID, $this->app->getPlentyId())
 			->build();
-
+   
 		$record = $this->itemRepository->search($columns, $filter, $params)->current();
 		return $record;
 	}
