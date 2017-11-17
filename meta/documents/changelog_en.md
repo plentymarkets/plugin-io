@@ -1,5 +1,13 @@
 # Release Notes for IO
 
+## v1.7.1 (2017-11-17) <a href="https://github.com/plentymarkets/plugin-io/compare/1.7.0...1.7.1" target="_blank"><b>Overview of all changes</b></a>
+
+### Fixed
+
+- The position of a sales price is now taken into account in the front end to ensure the correct display of prices in the online store.
+- The minimum order quantity saved for a customer class is now also taken into account.
+- Variations that are not linked to the current customer class of the customer, will not be displayed in the variation selection of the single item view.
+
 ## v1.7.0 (2017-11-08) <a href="https://github.com/plentymarkets/plugin-io/compare/1.6.2...1.7.0" target="_blank"><b>Overview of all changes</b></a>
 
 ### Added

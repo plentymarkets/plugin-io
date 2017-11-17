@@ -4,8 +4,9 @@
 
 ### Behoben
 
-- Die Position von Verkauspreisen wird jetzt berücksichtigt um Fehlverhalten im Shop zu vermeiden.
+- Die Position von Verkauspreisen wird jetzt berücksichtigt, um sicherzustellen, dass Preise im Webshop richtig dargestellt werden.
 - Die Mindestbestellmenge, die an einer Kundenklasse hinterlegt ist, wird jetzt berücksichtigt.
+- Varianten, die für die aktuelle Kundenklasse eines Kunden nicht verknüpft sind, werden in der Variantenauswahl der Artikelansicht ausgeblendet.
 
 ## v1.7.0 (2017-11-08) <a href="https://github.com/plentymarkets/plugin-io/compare/1.6.2...1.7.0" target="_blank"><b>Übersicht aller Änderungen</b></a>
 
