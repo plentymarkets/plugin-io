@@ -1093,4 +1093,9 @@ class ItemFilterBuilder
 			"mandatoryOnePlentyId" => $mandatoryOnePlentyId
 		]);
 	}
+
+    public function variationHasRetailPrice():ItemFilterBuilder
+    {
+        return $this->hasFilter("variationBase.hasRetailPrice?");
+    }
 }

@@ -10,6 +10,7 @@ use IO\Services\ItemLoader\Services\FacetExtensionContainer;
 use IO\Services\ItemWishListService;
 use IO\Services\SalesPriceService;
 use IO\Services\SessionStorageService;
+use IO\Services\CustomerService;
 use Plenty\Legacy\Services\Item\Variation\SalesPriceService as BasePriceService;
 use Plenty\Modules\Item\Unit\Contracts\UnitRepositoryContract;
 use Plenty\Modules\Item\Unit\Contracts\UnitNameRepositoryContract;
@@ -301,6 +302,10 @@ class ItemLoaderFactoryES implements ItemLoaderFactory
     {
         if(count($result['documents']))
         {
+            /** @var CustomerService $customerService */
+            $customerService = pluginApp(CustomerService::class);
+            $customerClassMinimumOrderQuantity = $customerService->getContactClassMinimumOrderQuantity();
+            
             /**
              * @var SalesPriceService $salesPriceService
              */
@@ -310,6 +315,11 @@ class ItemLoaderFactoryES implements ItemLoaderFactory
             {
                 if((int)$variation['data']['variation']['id'] > 0)
                 {
+                    if((int)$customerClassMinimumOrderQuantity > 0)
+                    {
+                        $variation['data']['variation']['minimumOrderQuantity'] = $customerClassMinimumOrderQuantity;
+                    }
+                    
                     $quantity = 1;
                     if(isset($options['basketVariationQuantities'][$variation['data']['variation']['id']]) && (int)$options['basketVariationQuantities'][$variation['data']['variation']['id']] > 0)
                     {
@@ -331,6 +341,22 @@ class ItemLoaderFactoryES implements ItemLoaderFactory
 
                     if(is_array($graduated) && count($graduated))
                     {
+                        $graduatedMinQuantities = array();
+                        foreach($graduated as $gpKey => $gp)
+                        {
+                            if ($gp instanceof SalesPriceSearchResponse)
+                            {
+                                // check if graduated price for current minimum order quantity has already been added.
+                                // => priority of prices with same minimum order quantity is based on the position of the price defined by user
+                                if ( !in_array( $gp->minimumOrderQuantity, $graduatedMinQuantities ) )
+                                {
+                                    $graduatedMinQuantities[] = $gp->minimumOrderQuantity;
+                                    $graduatedPrices[] = $gp;
+                                }
+                            }
+                        }
+
+                        /*
                         foreach($graduated as $gpKey => $gp)
                         {
                             if($gp instanceof SalesPriceSearchResponse)
@@ -341,8 +367,9 @@ class ItemLoaderFactoryES implements ItemLoaderFactory
                                 }
                             }
                         }
+                        */
 
-                        $graduatedPrices = $graduated;
+                        //$graduatedPrices = $graduated;
                     }
 
                     if($salesPrice instanceof SalesPriceSearchResponse)

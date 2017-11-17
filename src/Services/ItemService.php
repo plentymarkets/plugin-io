@@ -5,6 +5,7 @@ use IO\Builder\Item\Fields\ItemCrossSellingFields;
 use IO\Builder\Item\Fields\ItemDescriptionFields;
 use IO\Builder\Item\Fields\VariationAttributeValueFields;
 use IO\Builder\Item\Fields\VariationBaseFields;
+use IO\Builder\Item\Fields\VariationRetailPriceFields;
 use IO\Builder\Item\Fields\VariationStockFields;
 use IO\Builder\Item\ItemColumnBuilder;
 use IO\Builder\Item\ItemFilterBuilder;
@@ -455,6 +456,7 @@ class ItemService
 			$params        = $paramsBuilder
 				->withParam(ItemColumnsParams::LANGUAGE, $this->sessionStorage->getLang())
 				->withParam(ItemColumnsParams::PLENTY_ID, $this->app->getPlentyId())
+                ->withParam(ItemColumnsParams::CUSTOMER_CLASS, pluginApp(CustomerService::class)->getContact()->classId)
 				->build();
 
 			$recordList = $this->itemRepository->search($columns, $filter, $params);
@@ -499,12 +501,16 @@ class ItemService
             ->withVariationBase([
                 VariationBaseFields::LIMIT_ORDER_BY_STOCK_SELECT
             ])
+            ->withVariationRetailPrice([
+                VariationRetailPriceFields::BASE_PRICE
+            ])
             ->build();
 
         /** @var ItemFilterBuilder $filterBuilder */
         $filterBuilder = pluginApp(ItemFilterBuilder::class);
         $filter        = $filterBuilder
             ->variationHasId([$variationId])
+            ->variationHasRetailPrice()
             ->build();
 
         /** @var ItemParamsBuilder $paramsBuilder */
@@ -513,6 +519,7 @@ class ItemService
             ->withParam(ItemColumnsParams::TYPE, 'virtual')
             ->withParam(ItemColumnsParams::LANGUAGE, $this->sessionStorage->getLang())
             ->withParam(ItemColumnsParams::PLENTY_ID, $this->app->getPlentyId())
+            ->withParam(ItemColumnsParams::CUSTOMER_CLASS, pluginApp(CustomerService::class)->getContactClassId())
             ->build();
 
         $record = $this->itemRepository->search($columns, $filter, $params)->current();
@@ -542,6 +549,9 @@ class ItemService
 					                    VariationBaseFields::PACKING_UNITS,
 					                    VariationBaseFields::CUSTOM_NUMBER
 				                    ])
+                ->withVariationRetailPrice([
+                    VariationRetailPriceFields::BASE_PRICE
+                ])
 				->withVariationAttributeValueList([
 					                                  VariationAttributeValueFields::ATTRIBUTE_ID,
 					                                  VariationAttributeValueFields::ATTRIBUTE_VALUE_ID
@@ -551,6 +561,7 @@ class ItemService
 			$filterBuilder = pluginApp(ItemFilterBuilder::class);
 			$filter        = $filterBuilder
 				->hasId([$itemId])
+                ->variationHasRetailPrice()
                 ->variationIsActive()
                 ->build();
 
@@ -559,6 +570,7 @@ class ItemService
 			$params        = $paramsBuilder
 				->withParam(ItemColumnsParams::LANGUAGE, $this->sessionStorage->getLang())
 				->withParam(ItemColumnsParams::PLENTY_ID, $this->app->getPlentyId())
+                ->withParam(ItemColumnsParams::CUSTOMER_CLASS, pluginApp(CustomerService::class)->getContactClassId())
 				->build();
 
 			$recordList = $this->itemRepository->search($columns, $filter, $params);
@@ -609,7 +621,7 @@ class ItemService
 			->withParam(ItemColumnsParams::LANGUAGE, $this->sessionStorage->getLang())
 			->withParam(ItemColumnsParams::PLENTY_ID, $this->app->getPlentyId())
 			->build();
-
+   
 		$record = $this->itemRepository->search($columns, $filter, $params)->current();
 		return $record;
 	}
