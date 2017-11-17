@@ -10,6 +10,7 @@ use IO\Services\ItemLoader\Services\FacetExtensionContainer;
 use IO\Services\ItemWishListService;
 use IO\Services\SalesPriceService;
 use IO\Services\SessionStorageService;
+use IO\Services\CustomerService;
 use Plenty\Legacy\Services\Item\Variation\SalesPriceService as BasePriceService;
 use Plenty\Modules\Item\Unit\Contracts\UnitRepositoryContract;
 use Plenty\Modules\Item\Unit\Contracts\UnitNameRepositoryContract;
@@ -301,6 +302,10 @@ class ItemLoaderFactoryES implements ItemLoaderFactory
     {
         if(count($result['documents']))
         {
+            /** @var CustomerService $customerService */
+            $customerService = pluginApp(CustomerService::class);
+            $customerClassMinimumOrderQuantity = $customerService->getContactClassMinimumOrderQuantity();
+            
             /**
              * @var SalesPriceService $salesPriceService
              */
@@ -310,6 +315,11 @@ class ItemLoaderFactoryES implements ItemLoaderFactory
             {
                 if((int)$variation['data']['variation']['id'] > 0)
                 {
+                    if((int)$customerClassMinimumOrderQuantity > 0)
+                    {
+                        $variation['data']['variation']['minimumOrderQuantity'] = $customerClassMinimumOrderQuantity;
+                    }
+                    
                     $quantity = 1;
                     if(isset($options['basketVariationQuantities'][$variation['data']['variation']['id']]) && (int)$options['basketVariationQuantities'][$variation['data']['variation']['id']] > 0)
                     {

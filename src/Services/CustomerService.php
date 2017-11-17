@@ -23,6 +23,8 @@ use IO\Services\OrderService;
 use IO\Services\NotificationService;
 use IO\Services\CustomerPasswordResetService;
 use Plenty\Plugin\Events\Dispatcher;
+use Plenty\Modules\Account\Contact\Contracts\ContactClassRepositoryContract;
+
 
 /**
  * Class CustomerService
@@ -82,6 +84,43 @@ class CustomerService
 		}
 		return $this->userSession->getCurrentContactId();
 	}
+	
+	public function getContactClassData($contactClassId)
+    {
+        /** @var ContactClassRepositoryContract $contactClassRepo */
+        $contactClassRepo = pluginApp(ContactClassRepositoryContract::class);
+    
+        /** @var AuthHelper $authHelper */
+        $authHelper = pluginApp(AuthHelper::class);
+    
+        $contactClass = $authHelper->processUnguarded( function() use ($contactClassRepo, $contactClassId)
+        {
+            return $contactClassRepo->findContactClassDataById($contactClassId);
+        });
+        
+        return $contactClass;
+    }
+    
+    public function getContactClassMinimumOrderQuantity()
+    {
+        $contact = $this->getContact();
+    
+        if($contact instanceof Contact)
+        {
+            $contactClassId = $contact->classId;
+        
+            $contactClass = $this->getContactClassData($contactClassId);
+        
+            if( is_array($contactClass) && count($contactClass) && isset($contactClass['minItemQuantity']))
+            {
+                return (int)$contactClass['minItemQuantity'];
+            }
+        
+            return 0;
+        }
+    
+        return 0;
+    }
 
     /**
      * Create a contact with addresses if specified
