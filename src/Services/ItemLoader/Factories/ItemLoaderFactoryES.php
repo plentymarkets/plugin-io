@@ -387,7 +387,7 @@ class ItemLoaderFactoryES implements ItemLoaderFactory
                                 {
                                     $variation['data']['calculatedPrices']['graduatedPrices'][] = [
                                         'minimumOrderQuantity' => (int)$graduatedPrice->minimumOrderQuantity,
-                                        'price'                => (float)$graduatedPrice->price,
+                                        'price'                => (float)$graduatedPrice->unitPrice,
                                         'formatted'            => $numberFormatFilter->formatMonetary($graduatedPrice->unitPrice, $graduatedPrice->currency)
                                     ];
                                 }
@@ -406,7 +406,7 @@ class ItemLoaderFactoryES implements ItemLoaderFactory
                         if($variation['data']['variation']['mayShowUnitPrice'] == true && $lot > 0 && strlen($unit))
                         {
                             $basePrice = [];
-                            list($basePrice['lot'], $basePrice['price'], $basePrice['unitKey']) = $basePriceService->getUnitPrice($lot, $salesPrice->price, $unit);
+                            list($basePrice['lot'], $basePrice['price'], $basePrice['unitKey']) = $basePriceService->getUnitPrice($lot, $salesPrice->unitPrice, $unit);
 
                             /**
                              * @var UnitRepositoryContract $unitRepository
