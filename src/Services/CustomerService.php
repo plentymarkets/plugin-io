@@ -7,12 +7,14 @@ use IO\Models\LocalizedOrder;
 use IO\Validators\Customer\ContactValidator;
 use IO\Validators\Customer\AddressValidator;
 use Plenty\Modules\Account\Address\Models\AddressOption;
+use Plenty\Modules\Account\Contact\Contracts\ContactAccountRepositoryContract;
 use Plenty\Modules\Account\Contact\Contracts\ContactRepositoryContract;
 use Plenty\Modules\Account\Contact\Contracts\ContactAddressRepositoryContract;
 use Plenty\Modules\Account\Address\Contracts\AddressRepositoryContract;
 use Plenty\Modules\Account\Contact\Models\Contact;
 use IO\Builder\Order\AddressType;
 use Plenty\Modules\Account\Address\Models\Address;
+use Plenty\Modules\Account\Models\Account;
 use Plenty\Modules\Authorization\Services\AuthHelper;
 use IO\Helper\UserSession;
 use Plenty\Modules\Frontend\Events\FrontendCustomerAddressChanged;
@@ -32,6 +34,11 @@ use Plenty\Modules\Account\Contact\Contracts\ContactClassRepositoryContract;
  */
 class CustomerService
 {
+    /**
+     * @var ContactAccountRepositoryContract $accountRepository
+     */
+    private $accountRepository;
+    
 	/**
 	 * @var ContactRepositoryContract
 	 */
@@ -52,20 +59,23 @@ class CustomerService
 	 * @var UserSession
 	 */
 	private $userSession = null;
-
+    
     /**
      * CustomerService constructor.
+     * @param ContactAccountRepositoryContract $accountRepository
      * @param ContactRepositoryContract $contactRepository
      * @param ContactAddressRepositoryContract $contactAddressRepository
      * @param AddressRepositoryContract $addressRepository
      * @param \IO\Services\SessionStorageService $sessionStorage
      */
 	public function __construct(
+        ContactAccountRepositoryContract $accountRepository,
 		ContactRepositoryContract $contactRepository,
 		ContactAddressRepositoryContract $contactAddressRepository,
         AddressRepositoryContract $addressRepository,
         SessionStorageService $sessionStorage)
 	{
+	    $this->accountRepository        = $accountRepository;
 		$this->contactRepository        = $contactRepository;
 		$this->contactAddressRepository = $contactAddressRepository;
         $this->addressRepository        = $addressRepository;
@@ -197,6 +207,46 @@ class CustomerService
 		return $contact;
 	}
 
+	public function createAccount($accountData)
+    {
+        /** @var AuthHelper $authHelper */
+        $authHelper = pluginApp(AuthHelper::class);
+        $contactId = $this->getContactId();
+        $accountRepo = $this->accountRepository;
+        
+        $account = $authHelper->processUnguarded( function() use ($accountData, $contactId, $accountRepo)
+        {
+            return $accountRepo->createAccount($accountData, (int)$contactId);
+        });
+        
+        if($account instanceof Account && (int)$account->id > 0)
+        {
+            /** @var TemplateConfigService $templateConfigService */
+            $templateConfigService = pluginApp(TemplateConfigService::class);
+            $classId = (int)$templateConfigService->get('global.standard_contact_class_b2b');
+            
+            if(is_null($classId) || (int)$classId <= 0)
+            {
+                $classId = $this->getDefaultContactClassId();
+            }
+    
+            if(!is_null($classId) && (int)$classId > 0)
+            {
+                $this->updateContact([
+                                         'classId' => $classId
+                                     ]);
+            }
+        }
+    }
+    
+    private function mapAddressDatatoAccount($addressData)
+    {
+        return [
+            'companyName' => $addressData['name1'],
+            'taxIdNumber' => (isset($addressData['vatNumber']) && !is_null($addressData['vatNumber']) ? $addressData['vatNumber'] : ''),
+        ];
+    }
+	
     /**
      * Create a new contact
      * @param array $contactData
@@ -241,10 +291,15 @@ class CustomerService
         }
         else
         {
-            /** @var WebstoreConfigurationService $webstoreConfigService */
-            $webstoreConfigService = pluginApp(WebstoreConfigurationService::class);
-            return $webstoreConfigService->getWebstoreConfig()->defaultCustomerClassId;
+            return $this->getDefaultContactClassId();
         }
+    }
+    
+    private function getDefaultContactClassId()
+    {
+        /** @var WebstoreConfigurationService $webstoreConfigService */
+        $webstoreConfigService = pluginApp(WebstoreConfigurationService::class);
+        return $webstoreConfigService->getWebstoreConfig()->defaultCustomerClassId;
     }
 
     /**
@@ -396,6 +451,11 @@ class CustomerService
         {
             $addressData['options'] = $this->buildAddressEmailOptions([], false, $addressData);
             $newAddress = $this->contactAddressRepository->createAddress($addressData, $this->getContactId(), $type);
+            
+            if($type == AddressType::BILLING && isset($addressData['name1']) && strlen($addressData['name1']))
+            {
+                $this->createAccount($this->mapAddressDatatoAccount($addressData));
+            }
         }
 		else
         {
@@ -519,6 +579,11 @@ class CustomerService
         {
             $addressData['options'] = $this->buildAddressEmailOptions([], false, $addressData);
             $newAddress = $this->contactAddressRepository->updateAddress($addressData, $addressId, $this->getContactId(), $type);
+    
+            if($type == AddressType::BILLING && isset($addressData['name1']) && strlen($addressData['name1']))
+            {
+                $this->createAccount($this->mapAddressDatatoAccount($addressData));
+            }
         }
         else
         {
