@@ -239,7 +239,7 @@ class CustomerService
         }
     }
     
-    private function mapAddressDatatoAccount($addressData)
+    private function mapAddressDataToAccount($addressData)
     {
         return [
             'companyName' => $addressData['name1'],
@@ -454,7 +454,7 @@ class CustomerService
             
             if($type == AddressType::BILLING && isset($addressData['name1']) && strlen($addressData['name1']))
             {
-                $this->createAccount($this->mapAddressDatatoAccount($addressData));
+                $this->createAccount($this->mapAddressDataToAccount($addressData));
             }
         }
 		else
@@ -581,7 +581,7 @@ class CustomerService
     
             if($type == AddressType::BILLING && isset($addressData['name1']) && strlen($addressData['name1']))
             {
-                $this->createAccount($this->mapAddressDatatoAccount($addressData));
+                $this->createAccount($this->mapAddressDataToAccount($addressData));
             }
             elseif($type == AddressType::BILLING && (!isset($addressData['name1']) || !strlen($addressData['name1'])))
             {
