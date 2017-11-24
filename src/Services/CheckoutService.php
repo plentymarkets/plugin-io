@@ -3,17 +3,20 @@
 namespace IO\Services;
 
 use IO\Builder\Order\AddressType;
+use IO\Helper\LanguageMap;
 use Plenty\Modules\Basket\Events\Basket\AfterBasketChanged;
 use Plenty\Modules\Frontend\Events\ValidateCheckoutEvent;
 use Plenty\Modules\Frontend\PaymentMethod\Contracts\FrontendPaymentMethodRepositoryContract;
 use Plenty\Modules\Frontend\Contracts\Checkout;
 use Plenty\Modules\Basket\Contracts\BasketRepositoryContract;
 use Plenty\Modules\Frontend\Session\Storage\Contracts\FrontendSessionStorageFactoryContract;
+use Plenty\Modules\Order\Currency\Contracts\CurrencyRepositoryContract;
 use Plenty\Modules\Payment\Events\Checkout\GetPaymentMethodContent;
 use Plenty\Modules\Payment\Method\Contracts\PaymentMethodRepositoryContract;
 use Plenty\Modules\Order\Shipping\Contracts\ParcelServicePresetRepositoryContract;
 use IO\Constants\SessionStorageKeys;
 use IO\Services\BasketService;
+use Plenty\Plugin\ConfigRepository;
 use Plenty\Plugin\Events\Dispatcher;
 use Plenty\Plugin\Translation\Translator;
 
@@ -75,6 +78,7 @@ class CheckoutService
     {
         return [
             "currency" => $this->getCurrency(),
+            "currencyList" => $this->getCurrencyList(),
             "methodOfPaymentId" => $this->getMethodOfPaymentId(),
             "methodOfPaymentList" => $this->getMethodOfPaymentList(),
             "shippingCountryId" => $this->getShippingCountryId(),
@@ -120,6 +124,76 @@ class CheckoutService
     public function setCurrency(string $currency)
     {
         $this->sessionStorage->getPlugin()->setValue(SessionStorageKeys::CURRENCY, $currency);
+        $this->checkout->setCurrency($currency);
+    }
+
+    public function getCurrencyList()
+    {
+        /** @var CurrencyRepositoryContract $currencyRepository */
+        $currencyRepository = pluginApp( CurrencyRepositoryContract::class );
+
+        $currencyList = [];
+        $locale = LanguageMap::getLocale();
+
+        foreach( $currencyRepository->getCurrencyList() as $currency )
+        {
+            $formatter = numfmt_create(
+                $locale . "@currency=" . $currency->currency,
+                \NumberFormatter::CURRENCY
+            );
+            $currencyList[] = [
+                "name" => $currency->currency,
+                "symbol" => $formatter->getSymbol( \NumberFormatter::CURRENCY_SYMBOL )
+            ];
+        }
+        return $currencyList;
+    }
+
+
+    public function getCurrencyData()
+    {
+        $currency = $this->getCurrency();
+        $locale = LanguageMap::getLocale();
+
+        $formatter = numfmt_create(
+            $locale . "@currency=" . $currency,
+            \NumberFormatter::CURRENCY
+        );
+
+        return [
+            "name" => $currency,
+            "symbol" => $formatter->getSymbol( \NumberFormatter::CURRENCY_SYMBOL )
+        ];
+    }
+
+    public function getCurrencyPattern()
+    {
+        $currency = $this->getCurrency();
+        $locale = LanguageMap::getLocale();
+        $configRepository = pluginApp( ConfigRepository::class );
+
+        $formatter = numfmt_create(
+            $locale . "@currency=" . $currency,
+            \NumberFormatter::CURRENCY
+        );
+
+        if($configRepository->get('IO.format.use_locale_currency_format') === "0")
+        {
+            $formatter->setSymbol(
+                \NumberFormatter::MONETARY_SEPARATOR_SYMBOL,
+                $configRepository->get('IO.format.separator_decimal')
+            );
+            $formatter->setSymbol(
+                \NumberFormatter::MONETARY_GROUPING_SEPARATOR_SYMBOL,
+                $configRepository->get('IO.format.separator_thousands')
+            );
+        }
+
+        return [
+            "separator_decimal" => $formatter->getSymbol(\NumberFormatter::MONETARY_SEPARATOR_SYMBOL),
+            "separator_thousands" => $formatter->getSymbol(\NumberFormatter::MONETARY_GROUPING_SEPARATOR_SYMBOL),
+            "pattern" => $formatter->getPattern()
+        ];
     }
 
     /**
