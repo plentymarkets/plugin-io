@@ -578,12 +578,21 @@ class CustomerService
         if((int)$this->getContactId() > 0)
         {
             $addressData['options'] = $this->buildAddressEmailOptions([], false, $addressData);
-            $newAddress = $this->contactAddressRepository->updateAddress($addressData, $addressId, $this->getContactId(), $type);
     
             if($type == AddressType::BILLING && isset($addressData['name1']) && strlen($addressData['name1']))
             {
                 $this->createAccount($this->mapAddressDatatoAccount($addressData));
             }
+            elseif($type == AddressType::BILLING && (!isset($addressData['name1']) || !strlen($addressData['name1'])))
+            {
+                $existingAddress = $this->getAddress($addressId, AddressType::BILLING);
+                if($existingAddress instanceof Address && strlen($existingAddress->name1))
+                {
+                    $addressData['name1'] = $existingAddress->name1;
+                }
+            }
+            
+            $newAddress = $this->contactAddressRepository->updateAddress($addressData, $addressId, $this->getContactId(), $type);
         }
         else
         {
