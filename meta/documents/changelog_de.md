@@ -1,4 +1,7 @@
 # Release Notes für IO
+## Unreleased
+### Hinzugefügt
+- Über zusätzliche Twig-Funktionen können Skripte und Styles von externen Plugins angefordert werden, um diese an geeigneter Stelle auszugeben.
 
 ## v1.7.2 (2017-11-22) <a href="https://github.com/plentymarkets/plugin-io/compare/1.7.1...1.7.2" target="_blank"><b>Übersicht aller Änderungen</b></a>
 
