@@ -4,6 +4,7 @@ namespace IO\Services;
 
 use Plenty\Modules\Account\Contact\Models\Contact;
 use Plenty\Modules\Item\SalesPrice\Contracts\SalesPriceSearchRepositoryContract;
+use Plenty\Modules\Item\SalesPrice\Models\SalesPrice;
 use Plenty\Modules\Item\SalesPrice\Models\SalesPriceSearchRequest;
 use Plenty\Modules\Item\SalesPrice\Models\SalesPriceSearchResponse;
 use Plenty\Plugin\Application;
@@ -106,18 +107,7 @@ class SalesPriceService
         $salesPrice = $this->salesPriceSearchRepo->search($salesPriceSearchRequest);
 
 
-        $salesPrice->price                      = $salesPrice->price * $salesPrice->conversionFactor;
-        $salesPrice->priceNet                   = $salesPrice->priceNet * $salesPrice->conversionFactor;
-        $salesPrice->basePrice                  = $salesPrice->basePrice * $salesPrice->conversionFactor;
-        $salesPrice->basePriceNet               = $salesPrice->basePriceNet * $salesPrice->conversionFactor;
-        $salesPrice->unitPrice                  = $salesPrice->unitPrice * $salesPrice->conversionFactor;
-        $salesPrice->unitPriceNet               = $salesPrice->unitPriceNet * $salesPrice->conversionFactor;
-        $salesPrice->customerClassDiscount      = $salesPrice->customerClassDiscount * $salesPrice->conversionFactor;
-        $salesPrice->customerClassDiscountNet   = $salesPrice->customerClassDiscountNet * $salesPrice->conversionFactor;
-        $salesPrice->categoryDiscount           = $salesPrice->categoryDiscount * $salesPrice->conversionFactor;
-        $salesPrice->categoryDiscountNet        = $salesPrice->categoryDiscountNet * $salesPrice->conversionFactor;
-
-        return $salesPrice;
+        return $this->applyCurrencyConversion($salesPrice);
     }
     
     /**
@@ -137,8 +127,30 @@ class SalesPriceService
          * @var array $salesPrices
          */
         $salesPrices = $this->salesPriceSearchRepo->searchAll($salesPriceSearchRequest);
+
+        $convertedSalesPrices = [];
+        foreach( $salesPrices as $salesPrice )
+        {
+            $convertedSalesPrices[] = $this->applyCurrencyConversion( $salesPrice );
+        }
         
-        return $salesPrices;
+        return $convertedSalesPrices;
+    }
+
+    public function applyCurrencyConversion( SalesPriceSearchResponse $salesPrice ): SalesPriceSearchResponse
+    {
+        $salesPrice->price                      = $salesPrice->price * $salesPrice->conversionFactor;
+        $salesPrice->priceNet                   = $salesPrice->priceNet * $salesPrice->conversionFactor;
+        $salesPrice->basePrice                  = $salesPrice->basePrice * $salesPrice->conversionFactor;
+        $salesPrice->basePriceNet               = $salesPrice->basePriceNet * $salesPrice->conversionFactor;
+        $salesPrice->unitPrice                  = $salesPrice->unitPrice * $salesPrice->conversionFactor;
+        $salesPrice->unitPriceNet               = $salesPrice->unitPriceNet * $salesPrice->conversionFactor;
+        $salesPrice->customerClassDiscount      = $salesPrice->customerClassDiscount * $salesPrice->conversionFactor;
+        $salesPrice->customerClassDiscountNet   = $salesPrice->customerClassDiscountNet * $salesPrice->conversionFactor;
+        $salesPrice->categoryDiscount           = $salesPrice->categoryDiscount * $salesPrice->conversionFactor;
+        $salesPrice->categoryDiscountNet        = $salesPrice->categoryDiscountNet * $salesPrice->conversionFactor;
+
+        return $salesPrice;
     }
     
     private  function getSearchRequest(int $variationId, $type, int $quantity)
