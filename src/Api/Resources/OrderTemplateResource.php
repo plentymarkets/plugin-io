@@ -3,6 +3,7 @@
 namespace IO\Api\Resources;
 
 use IO\Models\LocalizedOrder;
+use IO\Services\OrderTotalsService;
 use Plenty\Plugin\Templates\Twig;
 use Plenty\Plugin\Http\Response;
 use Plenty\Plugin\Http\Request;
@@ -60,7 +61,10 @@ class OrderTemplateResource extends ApiResource
             $order = $this->orderRepository->findOrderById($orderId);
             if($order instanceof Order)
             {
-                $renderedTemplate = $this->templateService->renderTemplate($template, ['orderData' => LocalizedOrder::wrap($order, 'de')]);
+                $renderedTemplate = $this->templateService->renderTemplate($template, [
+                    'orderData' => LocalizedOrder::wrap($order, 'de'),
+                    'totals' => pluginApp(OrderTotalsService::class)->getAllTotals($order),
+                ]);
             }
         }
         
