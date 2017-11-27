@@ -223,7 +223,7 @@ class CustomerService
         {
             /** @var TemplateConfigService $templateConfigService */
             $templateConfigService = pluginApp(TemplateConfigService::class);
-            $classId = (int)$templateConfigService->get('global.standard_contact_class_b2b');
+            $classId = (int)$templateConfigService->get('global.default_contact_class_b2b');
             
             if(is_null($classId) || (int)$classId <= 0)
             {
