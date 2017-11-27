@@ -12,8 +12,18 @@ use IO\Builder\Order\OrderItemType;
 use Plenty\Modules\Order\Models\Order;
 use Plenty\Modules\Order\Models\OrderItem;
 
+/**
+ * Calculate order totals
+ * @package IO\Services
+ */
 class OrderTotalsService
 {
+    /**
+     * Get all order totals which are relevant for the OrderDetails-modal
+     *
+     * @param Order $order
+     * @return array
+     */
     public function getAllTotals(Order $order)
     {
         $itemSumGross = 0;
