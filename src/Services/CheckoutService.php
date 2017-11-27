@@ -14,6 +14,7 @@ use Plenty\Modules\Payment\Method\Contracts\PaymentMethodRepositoryContract;
 use Plenty\Modules\Order\Shipping\Contracts\ParcelServicePresetRepositoryContract;
 use IO\Constants\SessionStorageKeys;
 use IO\Services\BasketService;
+use Plenty\Plugin\Application;
 use Plenty\Plugin\Events\Dispatcher;
 use Plenty\Plugin\Translation\Translator;
 
@@ -252,7 +253,11 @@ class CheckoutService
         $parcelServicePresetRepo = pluginApp(ParcelServicePresetRepositoryContract::class);
 
         $contact = $this->customerService->getContact();
-        $list    = $parcelServicePresetRepo->getLastWeightedPresetCombinations($this->basketRepository->load(), $contact->classId);
+        $params  = [
+            'countryId'  => $this->getShippingCountryId(),
+            'webstoreId' => pluginApp(Application::class)->getWebstoreId(),
+        ];
+        $list    = $parcelServicePresetRepo->getLastWeightedPresetCombinations($this->basketRepository->load(), $contact->classId, $params);
 
         if ($showNetPrice) {
             /** @var BasketService $basketService */
