@@ -74,14 +74,14 @@ class AuthenticationService
      */
 	public function logout()
 	{
+        $this->contactAuthRepository->logout();
+
         /**
          * @var BasketService $basketService
          */
         $basketService = pluginApp(BasketService::class);
         $basketService->setBillingAddressId(0);
         $basketService->setDeliveryAddressId(0);
-        
-		$this->contactAuthRepository->logout();
 	}
 	
 	private function checkPasswordResetExpiration($contactId)
