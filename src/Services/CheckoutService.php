@@ -124,6 +124,7 @@ class CheckoutService
     public function setCurrency(string $currency)
     {
         $this->sessionStorage->getPlugin()->setValue(SessionStorageKeys::CURRENCY, $currency);
+        $this->basketRepository->save(['currency' => $currency]);
         $this->checkout->setCurrency($currency);
     }
 
