@@ -271,7 +271,11 @@ class BasketService
     public function updateBasketItem(int $basketItemId, array $data): array
     {
         $data['id'] = $basketItemId;
-        $this->basketItemRepository->updateBasketItem($basketItemId, $data);
+        try {
+            $this->basketItemRepository->updateBasketItem($basketItemId, $data);
+        } catch (\Exception $e) {
+            return ["code" => $e->getCode()];
+        }
         return $this->getBasketItemsForTemplate();
     }
 
