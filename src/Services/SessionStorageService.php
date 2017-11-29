@@ -3,6 +3,7 @@
 namespace IO\Services;
 
 use Plenty\Modules\Frontend\Session\Storage\Contracts\FrontendSessionStorageFactoryContract;
+use Plenty\Modules\Frontend\Session\Storage\Models\Customer;
 
 /**
  * Class SessionStorageService
@@ -59,4 +60,12 @@ class SessionStorageService
 
 		return $lang;
 	}
+
+    /**
+     * @return Customer
+     */
+	public function getCustomer()
+    {
+        return $this->sessionStorage->getCustomer();
+    }
 }
