@@ -83,6 +83,12 @@ class BasketItemResource extends ApiResource
 	{
         $this->basketService->setTemplate($this->request->get('template', ''));
 		$basketItems = $this->basketService->updateBasketItem((int)$selector, $this->request->all());
+
+        if(array_key_exists("code", $basketItems))
+        {
+            return $this->response->create(["exceptionCode" => $basketItems["code"]], ResponseCode::BAD_REQUEST);
+        }
+
 		return $this->response->create($basketItems, ResponseCode::OK);
 	}
 
