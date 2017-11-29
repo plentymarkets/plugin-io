@@ -20,6 +20,7 @@ use IO\Builder\Order\OrderOptionSubType;
 use IO\Builder\Order\AddressType;
 use IO\Constants\SessionStorageKeys;
 use IO\Services\TemplateConfigService;
+use Plenty\Modules\Authorization\Services\AuthHelper;
 
 
 /**
@@ -524,7 +525,15 @@ class OrderService
 		}
 		if($orderId != null)
 		{
-			$order = $this->orderRepository->findOrderById($orderId);
+            /** @var AuthHelper $authHelper */
+            $authHelper = pluginApp(AuthHelper::class);
+            $orderRepo = $this->orderRepository;
+            
+            $order = $authHelper->processUnguarded( function() use ($orderId, $orderRepo)
+            {
+                return $orderRepo->findOrderById($orderId);
+            });
+			
 			if ($order->paymentStatus !== OrderPaymentStatus::UNPAID)
 			{
 				// order was paid
@@ -553,8 +562,15 @@ class OrderService
         if((int)$orderId > 0)
         {
             $currentPaymentMethodId = 0;
-            
-            $order = $this->orderRepository->findOrderById($orderId);
+    
+            /** @var AuthHelper $authHelper */
+            $authHelper = pluginApp(AuthHelper::class);
+            $orderRepo = $this->orderRepository;
+    
+            $order = $authHelper->processUnguarded( function() use ($orderId, $orderRepo)
+            {
+                return $orderRepo->findOrderById($orderId);
+            });
         
             $newOrderProperties = [];
             $orderProperties = $order->properties;
@@ -576,7 +592,11 @@ class OrderService
             {
                 if($this->frontendPaymentMethodRepository->getPaymentMethodSwitchableFromById($currentPaymentMethodId, $orderId) && $this->frontendPaymentMethodRepository->getPaymentMethodSwitchableToById($paymentMethodId))
                 {
-                    $order = $this->orderRepository->updateOrder(['properties' => $newOrderProperties], $orderId);
+                    $order = $authHelper->processUnguarded( function() use ($orderId, $newOrderProperties, $orderRepo)
+                    {
+                        return $orderRepo->updateOrder(['properties' => $newOrderProperties], $orderId);
+                    });
+                    
                     if(!is_null($order))
                     {
                         return LocalizedOrder::wrap( $order, "de" );
