@@ -1,7 +1,24 @@
 # Release Notes für IO
-## Unreleased
+
+## v2.0.0 (2017-11-30) <a href="https://github.com/plentymarkets/plugin-io/compare/1.7.2...2.0.0" target="_blank"><b>Übersicht aller Änderungen</b></a>
+
 ### Hinzugefügt
 - Über zusätzliche Twig-Funktionen können Skripte und Styles von externen Plugins angefordert werden, um diese an geeigneter Stelle auszugeben.
+- Neue Rest-Route `io/checkout/paymentId` zum Setzen der Zahlungsart wurde hinzugefügt.
+- Neue Rest-Route `io/checkout/shippingId` zum Setzen der Versandart wurde hinzugefügt.
+- Wenn ein Firmenkunde sich im Shop registriert, wird nun zusätzlich ein Account angelegt.
+- Eine Middleware, um auf den Wechsel der Währung im Shop reagieren zu können.
+- Umrechnung von Preisen, wenn die Währung geändert wird.
+- Logik für die Berechnung der Auftragssummen (ausgelagert von Ceres Twig Macro).
+- Zahlungsarten können nun auch als Gast auf der Auftragsbestätigungsseite geändert werden.
+- Aufträge können nun auch als Gast nachträglich bezahlt werden.
+- Wenn beim Hinzufügen von Artikeln zum Warenkorb Fehler auftreten, wird nun eine enstprechende Fehlermeldung ausgegeben. 
+
+### Behoben
+- Fehler behoben, der dazu führen konnte, dass der Mein Konto Bereich nicht geladen werden konnte, wenn beim Laden der Aufträge eines Kunden Fehler auftraten.
+- Fehler behoben, bei dem die Route für die wishlist nicht aktiv war, obwohl es in der Konfiguration eingestellt ist.
+- Fehler bei der Anzeige von Preisen mit verschiedenen Mehrwertsteuersätzen behoben.
+- Nach dem Logout werden nun entsprechende Events ausgelöst, damit z.b. der Warenkorb auf die neuen Gegebenheiten reagieren kann.
 
 ## v1.7.2 (2017-11-22) <a href="https://github.com/plentymarkets/plugin-io/compare/1.7.1...1.7.2" target="_blank"><b>Übersicht aller Änderungen</b></a>
 
