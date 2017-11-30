@@ -1,5 +1,28 @@
 # Release Notes for IO
 
+## v2.0.0 (2017-11-30) <a href="https://github.com/plentymarkets/plugin-io/compare/1.7.2...2.0.0" target="_blank"><b>Overview of all changes</b></a>
+
+### Added
+
+- The Twig functions `get_additional_styles()` und `get_additional_scripts()` allow external plugins get styles and scripts and output them at the respective location.
+- A new REST route `io/checkout/paymentId` for setting the payment method has been added.
+- A new REST route `io/checkout/shippingId` for seeting the shipping method has been added.
+- An **Account** will be created in plentymarkets when a B2B customer signs up in the online store.
+- A middleware has been added for reacting to changes of the currency in the online store.
+- Prices will now be converted when the currency is changed.
+- The logic for calculating order sums has been added (previously this logic was contained in a Twig macro in Ceres).
+- A customer that ordered as a guest may now change the payment method on the order confirmation page if enabled.
+- A customer that ordered as a guest can now pay an order subsequently, e.g. when the payment method changes.
+- An error message has been added that will be displayed when an error occurs during adding items to the shopping cart. 
+
+### Fixed
+
+- Due to an error the **My Account** area could not be loaded when loading the orders of a customer.
+- Due to an error the route `/wishlist` for the wish list hasn't been active even though it has been activated in the configuration. This has been fixed.
+- Due to an error prices with different VAT rated haven't been displayed correctly. This has been fixed.
+- Multiple events are now triggered after loggint out of the online store for, e.g. updating the shopping cart.
+- An order for which returns are not allowed cannot be accessed directly using the `/returns` route anymore.
+
 ## v1.7.2 (2017-11-22) <a href="https://github.com/plentymarkets/plugin-io/compare/1.7.1...1.7.2" target="_blank"><b>Overview of all changes</b></a>
 
 ### Fixed
