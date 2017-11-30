@@ -15,6 +15,10 @@ use IO\Services\OrderService;
 class LocalizedOrder extends ModelWrapper
 {
     /**
+     * The OrderItem types that will be wrapped. All other OrderItems will be stripped from the order.
+     */
+    const WRAPPED_ORDERITEM_TYPES = [1, 3, 6, 9];
+    /**
      * @var Order
      */
     public $order = null;
@@ -98,7 +102,7 @@ class LocalizedOrder extends ModelWrapper
 
         foreach( $order->orderItems as $key => $orderItem )
         {
-            if($orderItem->typeId == 1 || $orderItem->typeId == 3 || $orderItem->typeId == 9)
+            if(in_array($orderItem->typeId, self::WRAPPED_ORDERITEM_TYPES))
             {
                 
                 if( $orderItem->itemVariationId !== 0 )

@@ -17,6 +17,7 @@ use Plenty\Modules\Order\Shipping\Contracts\ParcelServicePresetRepositoryContrac
 use IO\Constants\SessionStorageKeys;
 use IO\Services\BasketService;
 use Plenty\Plugin\ConfigRepository;
+use Plenty\Plugin\Application;
 use Plenty\Plugin\Events\Dispatcher;
 use Plenty\Plugin\Translation\Translator;
 
@@ -318,8 +319,35 @@ class CheckoutService
      */
     public function getShippingProfileList()
     {
+        /** @var SessionStorageService $sessionService */
+        $sessionService = pluginApp(SessionStorageService::class);
+        $showNetPrice   = $sessionService->getCustomer()->showNetPrice;
+
+        /** @var ParcelServicePresetRepositoryContract $parcelServicePresetRepo */
+        $parcelServicePresetRepo = pluginApp(ParcelServicePresetRepositoryContract::class);
+
         $contact = $this->customerService->getContact();
-        return pluginApp(ParcelServicePresetRepositoryContract::class)->getLastWeightedPresetCombinations($this->basketRepository->load(), $contact->classId);
+        $params  = [
+            'countryId'  => $this->getShippingCountryId(),
+            'webstoreId' => pluginApp(Application::class)->getWebstoreId(),
+        ];
+        $list    = $parcelServicePresetRepo->getLastWeightedPresetCombinations($this->basketRepository->load(), $contact->classId, $params);
+
+        if ($showNetPrice) {
+            /** @var BasketService $basketService */
+            $basketService = pluginApp(BasketService::class);
+            $maxVatValue   = $basketService->getMaxVatValue();
+
+            if (is_array($list)) {
+                foreach ($list as $key => $shippingProfile) {
+                    if (isset($shippingProfile['shippingAmount'])) {
+                        $list[$key]['shippingAmount'] = (100.0 * $shippingProfile['shippingAmount']) / (100.0 + $maxVatValue);
+                    }
+                }
+            }
+        }
+
+        return $list;
     }
 
     /**
