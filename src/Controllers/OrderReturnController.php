@@ -2,6 +2,8 @@
 namespace IO\Controllers;
 
 use IO\Helper\TemplateContainer;
+use Plenty\Modules\Order\Contracts\OrderRepositoryContract;
+use Plenty\Modules\Order\Models\Order;
 use Plenty\Plugin\ConfigRepository;
 use IO\Services\CustomerService;
 use IO\Services\OrderService;
@@ -40,7 +42,11 @@ class OrderReturnController extends LayoutController
             try
             {
                 $orderData = $orderService->findOrderById($orderId, true);
-                if(!count($orderData->order->orderItems))
+//                $unwrappedOrder = $orderService->findOrderById($orderId, false, false);
+
+                /** @var OrderRepositoryContract $orderRepo */
+                $orderRepo = pluginApp(OrderRepositoryContract::class);
+                if(!count($orderData->order->orderItems) || !$orderService->isOrderReturnable( $orderRepo->findOrderById($orderId) ))
                 {
                     $orderData = [];
                     $template = 'tpl.page-not-found';

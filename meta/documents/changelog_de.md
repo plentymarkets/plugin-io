@@ -1,7 +1,27 @@
 # Release Notes für IO
-## Unreleased
+
+## v2.0.0 (2017-11-30) <a href="https://github.com/plentymarkets/plugin-io/compare/1.7.2...2.0.0" target="_blank"><b>Übersicht aller Änderungen</b></a>
+
 ### Hinzugefügt
-- Über zusätzliche Twig-Funktionen können Skripte und Styles von externen Plugins angefordert werden, um diese an geeigneter Stelle auszugeben.
+
+- Über die Twig-Funktionen `get_additional_styles()` und `get_additional_scripts()` können Skripte und Styles von externen Plugins angefordert werden, um diese an geeigneter Stelle auszugeben.
+- Neue REST-Route `io/checkout/paymentId` zum Setzen der Zahlungsart wurde hinzugefügt.
+- Neue REST-Route `io/checkout/shippingId` zum Setzen der Versandart wurde hinzugefügt.
+- Ein **Account** wird in plentymarkets angelegt, wenn sich ein B2B-Kunde im Webshop registriert.
+- Eine Middleware wurde hinzugefügt, um auf den Wechsel der Währung im Shop reagieren zu können.
+- Preise werden nun umgerechnet, wenn die Währung geändert wird.
+- Logik für die Berechnung der Auftragssummen (vorher wurde dies über ein Twig-Macro in Ceres realisiert).
+- Zahlungsarten können nun auch bei Gastbestellungen auf der Auftragsbestätigungsseite geändert werden.
+- Aufträge können nun auch bei Gastbestellungen nachträglich bezahlt werden, z.B. wenn die Zahlungsart geändert wird.
+- Eine Fehlermeldung wurde hinzugefügt, die angezeigt wird, wenn beim Hinzufügen von Artikeln zum Warenkorb Fehler auftreten. 
+, 
+### Behoben
+
+- Durch einen Fehler konnte der **Mein Konto**-Bereich nicht geladen werden, wenn die Aufträge eines Kunden geladen wurden. Dies wurde behoben.
+- Durch einen Fehler war die Route für die Wunschliste `wishlist` nicht aktiv, obwohl die Route in der Konfiguration aktiviert wurde. Dies wurde behoben.
+- Durch einen Fehler wurdnen Preise mit verschiedenen Mehrwertsteuersätzen nicht korrekt angezeigt. Dies wurde behoben.
+- Nach dem Logout werden nun entsprechende Events ausgelöst, damit z.B. der Warenkorb auf die neuen Gegebenheiten reagieren kann.
+- Ein Auftrag, für den keine Retoure möglich ist, kann nun nicht mehr bei direktem Aufruf der Route `/returns` aufgerufen werden.
 
 ## v1.7.2 (2017-11-22) <a href="https://github.com/plentymarkets/plugin-io/compare/1.7.1...1.7.2" target="_blank"><b>Übersicht aller Änderungen</b></a>
 
