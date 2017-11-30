@@ -19,6 +19,7 @@
 - Fehler behoben, bei dem die Route für die wishlist nicht aktiv war, obwohl es in der Konfiguration eingestellt ist.
 - Fehler bei der Anzeige von Preisen mit verschiedenen Mehrwertsteuersätzen behoben.
 - Nach dem Logout werden nun entsprechende Events ausgelöst, damit z.b. der Warenkorb auf die neuen Gegebenheiten reagieren kann.
+- Ein Auftrag, für den keine Retoure möglich ist, kann nun nicht mehr bei direktem Aufruf der /returns Route aufgerufen werden.
 
 ## v1.7.2 (2017-11-22) <a href="https://github.com/plentymarkets/plugin-io/compare/1.7.1...1.7.2" target="_blank"><b>Übersicht aller Änderungen</b></a>
 

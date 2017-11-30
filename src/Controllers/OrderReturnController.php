@@ -40,7 +40,7 @@ class OrderReturnController extends LayoutController
             try
             {
                 $orderData = $orderService->findOrderById($orderId, true);
-                if(!count($orderData->order->orderItems))
+                if(!count($orderData->order->orderItems) || !$orderService->isOrderReturnable($orderService->findOrderById($orderId, false, false)))
                 {
                     $orderData = [];
                     $template = 'tpl.page-not-found';
