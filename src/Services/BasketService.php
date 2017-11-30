@@ -84,7 +84,9 @@ class BasketService
      */
     public function getBasket(): Basket
     {
-        return pluginApp(BasketRepositoryContract::class)->load();
+        $basket = pluginApp(BasketRepositoryContract::class)->load();
+        $basket->currency = pluginApp(CheckoutService::class)->getCurrency();
+        return $basket;
     }
 
     /**

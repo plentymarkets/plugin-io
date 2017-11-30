@@ -2,6 +2,8 @@
 
 namespace IO\Extensions\Filters;
 
+use IO\Helper\LanguageMap;
+use IO\Services\TemplateConfigService;
 use Plenty\Plugin\ConfigRepository;
 use IO\Extensions\AbstractFilter;
 
@@ -91,21 +93,23 @@ class NumberFormatFilter extends AbstractFilter
      * Format the given value to currency
      * @param $value
      * @param $currencyISO
-     * @param bool $useCurrencySymbol
      * @return string
      */
-    public function formatMonetary($value, $currencyISO, $useCurrencySymbol = true ):string
+    public function formatMonetary($value, $currencyISO):string
     {
         if(!is_null($value) && !is_null($currencyISO) && strlen($currencyISO))
         {
             $value = $this->trimNewlines($value);
             $currencyISO = $this->trimNewlines($currencyISO);
 
-            $locale            = 'de_DE';
+            $locale            = LanguageMap::getLocale();
 
             $formatter = numfmt_create($locale, \NumberFormatter::CURRENCY);
 
-            if($useCurrencySymbol)
+            /** @var TemplateConfigService $templateConfigService */
+            $templateConfigService = pluginApp( TemplateConfigService::class );
+
+            if( $templateConfigService->get('currency.format') === 'symbol' )
             {
                 $formatter->setTextAttribute(\NumberFormatter::CURRENCY_CODE, $currencyISO);
             }

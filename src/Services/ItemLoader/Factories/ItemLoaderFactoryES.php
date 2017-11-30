@@ -2,6 +2,7 @@
 namespace IO\Services\ItemLoader\Factories;
 
 use IO\Extensions\Filters\NumberFormatFilter;
+use IO\Services\CheckoutService;
 use IO\Services\ItemLoader\Contracts\ItemLoaderContract;
 use IO\Services\ItemLoader\Contracts\ItemLoaderFactory;
 use IO\Services\ItemLoader\Contracts\ItemLoaderPaginationContract;
@@ -22,6 +23,7 @@ use Plenty\Modules\Item\Search\Contracts\VariationElasticSearchMultiSearchReposi
 use Plenty\Modules\Item\SalesPrice\Models\SalesPriceSearchResponse;
 use Plenty\Plugin\ConfigRepository;
 use Plenty\Modules\Authorization\Services\AuthHelper;
+use Zend\Db\Sql\Ddl\Constraint\Check;
 
 /**
  * Created by ptopczewski, 09.01.17 08:35
@@ -304,12 +306,18 @@ class ItemLoaderFactoryES implements ItemLoaderFactory
         {
             /** @var CustomerService $customerService */
             $customerService = pluginApp(CustomerService::class);
+
+            /** @var CheckoutService $checkoutService */
+            $checkoutService = pluginApp(CheckoutService::class);
+
             $customerClassMinimumOrderQuantity = $customerService->getContactClassMinimumOrderQuantity();
             
             /**
              * @var SalesPriceService $salesPriceService
              */
             $salesPriceService = pluginApp(SalesPriceService::class);
+            $salesPriceService->setClassId( $customerService->getContactClassId() );
+            $salesPriceService->setCurrency( $checkoutService->getCurrency() );
 
             foreach($result['documents'] as $key => $variation)
             {
