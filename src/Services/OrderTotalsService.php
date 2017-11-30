@@ -32,14 +32,16 @@ class OrderTotalsService
         $shippingNet = 0;
         $vats = [];
         $couponValue = 0;
-        $totalNet = $order->amounts[0]->netTotal;
-        $totalGross = $order->amounts[0]->grossTotal;
-        $currency = $order->amounts[0]->currency;
+        $amountId = $this->getCustomerAmountId($order->amounts);
+        $totalNet = $order->amounts[$amountId]->netTotal;
+        $totalGross = $order->amounts[$amountId]->grossTotal;
+        $currency = $order->amounts[$amountId]->currency;
 
         $orderItems = $order->orderItems;
         foreach ($orderItems as $item) {
+            $itemAmountId = $this->getCustomerAmountId($item->amounts);
             /** @var OrderItem $item */
-            $firstAmount = $item->amounts[0];
+            $firstAmount = $item->amounts[$itemAmountId];
 
             switch ($item->typeId) {
                 case OrderItemType::VARIATION:
@@ -77,5 +79,18 @@ class OrderTotalsService
             'totalNet',
             'currency'
         );
+    }
+
+    private function getCustomerAmountId( $amounts )
+    {
+        foreach( $amounts as $index => $amount )
+        {
+            if ( !$amount->isSystemCurrency )
+            {
+                return $index;
+            }
+        }
+
+        return 0;
     }
 }
