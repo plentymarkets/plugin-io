@@ -30,7 +30,11 @@ class ShuffleFilter extends AbstractFilter
 
     public function shuffle( array $arrayToShuffle ):array
     {
-        shuffle($arrayToShuffle);
-        return $arrayToShuffle;
+        if(is_array($arrayToShuffle) && count($arrayToShuffle))
+        {
+            return shuffle($arrayToShuffle);
+        }
+
+        return [];
     }
 }
