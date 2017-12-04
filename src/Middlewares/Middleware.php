@@ -2,13 +2,15 @@
 
 namespace IO\Middlewares;
 
-use IO\Controllers\StaticPagesController;
 use Plenty\Plugin\Http\Request;
 use Plenty\Plugin\Http\Response;
+use Plenty\Modules\Frontend\Contracts\Checkout;
+use IO\Controllers\StaticPagesController;
 use IO\Services\CheckoutService;
 
 class Middleware extends \Plenty\Plugin\Middleware
 {
+    private $checkoutService = null;
 
     public function before(Request $request )
     {
@@ -20,6 +22,13 @@ class Middleware extends \Plenty\Plugin\Middleware
             $checkoutService->setCurrency( $currency );
         }
 
+        $referrerId = $request->get('referrerId', null);
+        if(!is_null($referrerId))
+        {
+            /** @var Checkout $checkout */
+            $checkout = pluginApp(Checkout::class);
+            $checkout->setBasketReferrerId($referrerId);
+        }
     }
 
     public function after(Request $request, Response $response):Response

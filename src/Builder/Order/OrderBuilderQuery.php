@@ -193,6 +193,12 @@ class OrderBuilderQuery
 		$this->withRelation(ReferenceType::CONTACT, $customerId, RelationType::RECEIVER);
 		return $this;
 	}
+	
+	public function withReferrerId($referrerId)
+    {
+        $this->order['referrerId'] = (float)$referrerId;
+        return $this;
+    }
 
     /**
      * Add an order option to the order
