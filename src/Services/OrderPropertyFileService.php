@@ -20,7 +20,8 @@ class OrderPropertyFileService
     {
         if(!is_null($fileData))
         {
-            return $this->storageRepository->uploadObject('plentymarkets-documents', 'order_property_files/'.$this->app->getPlentyId().'/'.sha1(microtime(true)), $fileData);
+            return $this->storageRepository->uploadFile('plentymarkets-documents', 'order_property_files/'.sha1(microtime(true)).'/'.$fileData['name'], $fileData['tmp_name']);
+            //return $this->storageRepository->uploadObject('plentymarkets-documents', 'order_property_files/'.$this->app->getPlentyId().'/'.sha1(microtime(true)), $fileData);
         }
         
         return null;
