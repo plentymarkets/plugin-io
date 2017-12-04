@@ -40,6 +40,7 @@ class IORouteServiceProvider extends RouteServiceProvider
             $api->resource('io/order/contactWish', 'OrderContactWishResource');
             $api->resource('io/order/return', 'OrderReturnResource');
             $api->resource('io/order/template', 'OrderTemplateResource');
+            $api->resource('io/order/property/file', 'OrderPropertyFileResource');
             $api->get('io/checkout', 'CheckoutResource@index');
             $api->post('io/checkout', 'CheckoutResource@store');
             $api->put('io/checkout', 'CheckoutResource@update');
