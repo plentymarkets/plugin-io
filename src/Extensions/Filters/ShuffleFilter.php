@@ -28,13 +28,15 @@ class ShuffleFilter extends AbstractFilter
         ];
     }
 
-    public function shuffle( array $arrayToShuffle ):array
+    public function shuffle( $arrayToShuffle ):array
     {
         if(is_array($arrayToShuffle) && count($arrayToShuffle))
         {
-            return shuffle($arrayToShuffle);
+            shuffle($arrayToShuffle);
+            
+            return $arrayToShuffle;
         }
-
+        
         return [];
     }
 }
