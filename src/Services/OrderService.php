@@ -90,7 +90,6 @@ class OrderService
 		                            ->withAddressId($checkoutService->getDeliveryAddressId(), AddressType::DELIVERY)
 		                            ->withOrderProperty(OrderPropertyType::PAYMENT_METHOD, OrderOptionSubType::MAIN_VALUE, $checkoutService->getMethodOfPaymentId())
                                     ->withOrderProperty(OrderPropertyType::SHIPPING_PROFILE, OrderOptionSubType::MAIN_VALUE, $checkoutService->getShippingProfileId())
-                                    ->withReferrerId($basket->referrerId)
 		                            ->done();
         
 		$order = $this->orderRepository->createOrder($order, $couponCode);

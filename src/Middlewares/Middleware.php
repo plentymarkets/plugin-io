@@ -22,7 +22,7 @@ class Middleware extends \Plenty\Plugin\Middleware
             $checkoutService->setCurrency( $currency );
         }
 
-        $referrerId = $request->get('referrerId', null);
+        $referrerId = $request->get('ReferrerID', null);
         if(!is_null($referrerId))
         {
             /** @var Checkout $checkout */

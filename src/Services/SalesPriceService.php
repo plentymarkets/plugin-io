@@ -8,6 +8,9 @@ use Plenty\Modules\Item\SalesPrice\Models\SalesPrice;
 use Plenty\Modules\Item\SalesPrice\Models\SalesPriceSearchRequest;
 use Plenty\Modules\Item\SalesPrice\Models\SalesPriceSearchResponse;
 use Plenty\Plugin\Application;
+use IO\Services\CustomerService;
+use IO\Services\CheckoutService;
+use IO\Services\BasketService;
 
 class SalesPriceService
 {
@@ -15,12 +18,14 @@ class SalesPriceService
     private $salesPriceSearchRepo;
     private $customerService;
     private $checkoutService;
+    private $basketService;
 
     private $classId = null;
     private $singleAccess = null;
     private $currency = null;
     private $plentyId = null;
     private $shippingCountryId = null;
+    private $referrerId = null;
 
     /**
      * SalesPriceService constructor.
@@ -33,13 +38,15 @@ class SalesPriceService
         Application $app,
         SalesPriceSearchRepositoryContract $salesPriceSearchRepo,
         CustomerService $customerService,
-        CheckoutService $checkoutService
+        CheckoutService $checkoutService,
+        BasketService $basketService
     )
     {
         $this->app                  = $app;
         $this->salesPriceSearchRepo = $salesPriceSearchRepo;
         $this->customerService      = $customerService;
         $this->checkoutService      = $checkoutService;
+        $this->basketService        = $basketService;
 
         $this->init();
     }
@@ -86,6 +93,7 @@ class SalesPriceService
         $this->currency          = $this->checkoutService->getCurrency();
         $this->shippingCountryId = $this->checkoutService->getShippingCountryId();
         $this->plentyId          = $this->app->getPlentyId();
+        $this->referrerId        = $this->basketService->getBasket()->referrerId;
     }
 
     /**
@@ -168,7 +176,7 @@ class SalesPriceService
         $salesPriceSearchRequest->customerClassId = $this->classId;
         $salesPriceSearchRequest->plentyId        = $this->plentyId;
         $salesPriceSearchRequest->quantity        = $quantity;
-        $salesPriceSearchRequest->referrerId      = 1; //TODO set to real referrer
+        $salesPriceSearchRequest->referrerId      = $this->referrerId;
         $salesPriceSearchRequest->type            = $type;
         
         return $salesPriceSearchRequest;
