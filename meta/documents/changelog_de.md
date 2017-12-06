@@ -1,5 +1,11 @@
 # Release Notes für IO
 
+## v2.0.1 (2017-12-06) <a href="https://github.com/plentymarkets/plugin-io/compare/2.0.0...2.0.1" target="_blank"><b>Übersicht aller Änderungen</b></a>
+
+### Behoben
+
+- Ein Fehler wurde Behoben durch den die Startseite nicht angezeigt wurde.
+
 ## v2.0.0 (2017-11-30) <a href="https://github.com/plentymarkets/plugin-io/compare/1.7.2...2.0.0" target="_blank"><b>Übersicht aller Änderungen</b></a>
 
 ### Hinzugefügt
