@@ -12,14 +12,44 @@ class TemplateService
 {
     public static $currentTemplate = "";
 
-    public function __construct()
+    /** @var WebstoreConfigurationService $webstoreConfigService */
+    private $webstoreConfigService;
+
+    public function __construct( WebstoreConfigurationService $webstoreConfigService )
     {
-        
+        $this->webstoreConfigService = $webstoreConfigService;
     }
 
-    public function getCanonicalUrl():string
+    public function getCanonicalUrl( $lang = "de" ):string
     {
-        return "";
+        $activeLanguages = $this->webstoreConfigService->getActiveLanguageList();
+        $prefix = $this->webstoreConfigService->getWebstoreConfig()->domainSsl;
+
+        if ( in_array( $lang, $activeLanguages ) )
+        {
+            $prefix .=  "/".$lang;
+
+            switch( TemplateService::$currentTemplate )
+            {
+                case 'tpl.item':
+                    break;
+                case 'tpl.category.item':
+                    /** @var CategoryService $categoryService */
+                    $categoryService = pluginApp( CategoryService::class );
+                    $category = $categoryService->getCurrentCategory();
+
+                    if( strlen( $category->details[0]->canonicalLink ) > 0 )
+                    {
+                        return $category->details[0]->canonicalLink;
+                    }
+
+                    return $prefix . $categoryService->getURL( $category, $lang );
+            }
+
+            return $prefix;
+        }
+
+        return null;
     }
 
     public function getCurrentTemplate():string
