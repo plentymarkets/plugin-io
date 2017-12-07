@@ -17,6 +17,11 @@ class TemplateService
         
     }
 
+    public function getCanonicalUrl():string
+    {
+        return "";
+    }
+
     public function getCurrentTemplate():string
     {
         return TemplateService::$currentTemplate;
