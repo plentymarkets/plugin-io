@@ -20,7 +20,7 @@ class TemplateService
         $this->webstoreConfigService = $webstoreConfigService;
     }
 
-    public function getCanonicalUrl( $lang = "de" ):string
+    public function getCanonicalUrl( $lang = "de" )
     {
         $activeLanguages = $this->webstoreConfigService->getActiveLanguageList();
         $prefix = $this->webstoreConfigService->getWebstoreConfig()->domainSsl;

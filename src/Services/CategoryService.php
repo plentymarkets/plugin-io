@@ -136,7 +136,12 @@ class CategoryService
 		return "/" . $this->categoryRepository->getUrl($category->id, $lang);
 	}
 
-	public function getDetails($category, $lang):CategoryDetails
+    /**
+     * @param $category
+     * @param $lang
+     * @return CategoryDetails|null
+     */
+	public function getDetails($category, $lang)
     {
         /** @var CategoryDetails $catDetail */
         foreach( $category->details as $catDetail )
