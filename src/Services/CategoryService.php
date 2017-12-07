@@ -4,6 +4,7 @@ namespace IO\Services;
 
 use Plenty\Modules\Category\Models\Category;
 use Plenty\Modules\Category\Contracts\CategoryRepositoryContract;
+use Plenty\Modules\Category\Models\CategoryDetails;
 use Plenty\Repositories\Models\PaginatedResult;
 
 use IO\Services\SessionStorageService;
@@ -134,6 +135,21 @@ class CategoryService
 		}
 		return "/" . $this->categoryRepository->getUrl($category->id, $lang);
 	}
+
+	public function getDetails($category, $lang):CategoryDetails
+    {
+        /** @var CategoryDetails $catDetail */
+        foreach( $category->details as $catDetail )
+        {
+            if ( $catDetail->lang == $lang )
+            {
+                return $catDetail;
+            }
+        }
+
+        return null;
+    }
+
 
 	/**
 	 * Check whether a category is referenced by the current route

@@ -37,10 +37,15 @@ class TemplateService
                     /** @var CategoryService $categoryService */
                     $categoryService = pluginApp( CategoryService::class );
                     $category = $categoryService->getCurrentCategory();
-
-                    if( strlen( $category->details[0]->canonicalLink ) > 0 )
+                    $categoryDetails = $categoryService->getDetails( $category, $lang );
+                    if ( $categoryDetails === null )
                     {
-                        return $category->details[0]->canonicalLink;
+                        return null;
+                    }
+
+                    if( strlen( $categoryDetails->canonicalLink ) > 0 )
+                    {
+                        return $categoryDetails->canonicalLink;
                     }
 
                     return $prefix . $categoryService->getURL( $category, $lang );
