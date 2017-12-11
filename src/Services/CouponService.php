@@ -3,6 +3,7 @@
 namespace IO\Services;
 
 use Plenty\Modules\Basket\Contracts\BasketRepositoryContract;
+use Plenty\Modules\Frontend\Coupon\Contracts\FrontendCouponRepositoryContract;
 
 class CouponService
 {
@@ -17,7 +18,7 @@ class CouponService
          * @var BasketRepositoryContract $basket
          */
         $basket = pluginApp(BasketRepositoryContract::class);
-        return $basket->save(['couponCode' => $couponCode]);
+        return $basket->setCouponCode($couponCode);
     }
     
     public function removeCoupon()
@@ -26,6 +27,6 @@ class CouponService
          * @var BasketRepositoryContract $basket
          */
         $basket = pluginApp(BasketRepositoryContract::class);
-        return $basket->save(['couponCode' => '']);
+        return $basket->removeCouponCode();
     }
 }
