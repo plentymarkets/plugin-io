@@ -1,5 +1,6 @@
 <?php
 namespace IO\Services\ItemLoader\Extensions;
+
 use IO\Services\ItemLoader\Loaders\CategoryItems;
 use IO\Services\ItemLoader\Loaders\CrossSellingItems;
 use IO\Services\ItemLoader\Loaders\LastSeenItemList;
@@ -48,8 +49,10 @@ class TwigLoaderPresets extends Twig_Extension
 			    
 			    "categoryList" => [
 			        "single" => [
-                        CategoryItems::class,
-                        Facets::class
+                        CategoryItems::class
+                    ],
+                    "multi" => [
+                        'facets' => Facets::class
                     ]
 			    ],
                 "search" => [

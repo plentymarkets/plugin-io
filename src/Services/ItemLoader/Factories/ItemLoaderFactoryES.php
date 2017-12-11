@@ -165,7 +165,7 @@ class ItemLoaderFactoryES implements ItemLoaderFactory
         {
             $elasticSearchRepo->addSearch($search);
         }
-
+        
         $result = $elasticSearchRepo->execute();
         foreach ($this->facetExtensionContainer->getFacetExtensions() as $facetExtension) {
             $result = $facetExtension->mergeIntoFacetsList($result);
@@ -267,15 +267,15 @@ class ItemLoaderFactoryES implements ItemLoaderFactory
                         $identifiers[] = $identifier;
                     }
                 }
-            }
-
-            if(!is_null($search))
-            {
-                $elasticSearchRepo->addSearch($search);
-                $search = null;
+    
+                if(!is_null($search))
+                {
+                    $elasticSearchRepo->addSearch($search);
+                    $search = null;
+                }
             }
         }
-
+        
         $rawResult = $elasticSearchRepo->execute();
 
         $result = [];

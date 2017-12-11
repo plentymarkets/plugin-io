@@ -23,6 +23,8 @@ use Plenty\Modules\Item\Search\Filter\VariationBaseFilter;
 use Plenty\Modules\Item\Search\Filter\TextFilter;
 use Plenty\Plugin\Application;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Sorting\SortingInterface;
+use Plenty\Modules\Cloud\ElasticSearch\Lib\Collapse\BaseCollapse;
+
 
 /**
  * Created by ptopczewski, 09.01.17 11:15
@@ -40,11 +42,17 @@ class CategoryItems implements ItemLoaderContract, ItemLoaderPaginationContract,
         $imageMutator = pluginApp(ImageMutator::class);
         $imageMutator->addClient(pluginApp(Application::class)->getPlentyId());
         
+        $collapse = new BaseCollapse('ids.itemId');
+        
         $documentProcessor = pluginApp(DocumentProcessor::class);
         $documentProcessor->addMutator($languageMutator);
         $documentProcessor->addMutator($imageMutator);
         
-        return pluginApp(DocumentSearch::class, [$documentProcessor]);
+        $documentSearch = pluginApp(DocumentSearch::class, [$documentProcessor]);
+        $documentSearch->setCollapse($collapse);
+        $documentSearch->setName('search');
+        
+        return $documentSearch;
 	}
     
     /**
@@ -71,14 +79,14 @@ class CategoryItems implements ItemLoaderContract, ItemLoaderPaginationContract,
 		$variationFilter->isActive();
         $variationFilter->isHiddenInCategoryList(false);
 
-		if(isset($options['variationShowType']) && $options['variationShowType'] == 'main')
+		/*if(isset($options['variationShowType']) && $options['variationShowType'] == 'main')
         {
             $variationFilter->isMain();
         }
         elseif(isset($options['variationShowType']) && $options['variationShowType'] == 'child')
         {
             $variationFilter->isChild();
-        }
+        }*/
         
 		/** @var CategoryFilter $categoryFilter */
 		$categoryFilter = pluginApp(CategoryFilter::class);

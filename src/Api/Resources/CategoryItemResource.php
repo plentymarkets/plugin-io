@@ -39,7 +39,7 @@ class CategoryItemResource extends ApiResource
         if((int)$categoryId > 0)
         {
             $response = pluginApp(ItemLoaderService::class)
-                ->loadForTemplate($template, [CategoryItems::class, Facets::class], [
+                ->loadForTemplate($template, ['single' => [CategoryItems::class], 'multi' => [Facets::class]], [
                     'categoryId'        => $this->request->get('categoryId', 1),
                     'page'              => $this->request->get('page', 1),
                     'items'             => $this->request->get('items', 20),

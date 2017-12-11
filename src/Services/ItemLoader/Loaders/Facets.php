@@ -1,9 +1,11 @@
 <?php
+
 namespace IO\Services\ItemLoader\Loaders;
 
 use IO\Builder\Facet\FacetBuilder;
 use IO\Services\ItemLoader\Contracts\FacetExtension;
 use IO\Services\ItemLoader\Contracts\ItemLoaderContract;
+use IO\Services\ItemLoader\Contracts\ItemLoaderPaginationContract;
 use IO\Services\ItemLoader\Services\FacetExtensionContainer;
 use IO\Services\SessionStorageService;
 use IO\Services\PriceDetectService;
@@ -19,13 +21,14 @@ use Plenty\Modules\Item\Search\Mutators\ImageMutator;
 use Plenty\Plugin\Application;
 use Plenty\Plugin\Http\Request;
 use Plenty\Modules\Item\Search\Filter\SalesPriceFilter;
+use Plenty\Modules\Item\Search\Helper\SearchHelper;
 
 /**
  * Created by ptopczewski, 06.01.17 14:44
  * Class SingleItemAttributes
  * @package IO\Services\ItemLoader\Loaders
  */
-class Facets implements ItemLoaderContract
+class Facets implements ItemLoaderContract, ItemLoaderPaginationContract
 {
     /**
      * @var FacetExtensionContainer
@@ -46,15 +49,27 @@ class Facets implements ItemLoaderContract
      */
     public function getSearch()
     {
-        $languageMutator = pluginApp(LanguageMutator::class, ["languages" => [pluginApp(SessionStorageService::class)->getLang()]]);
+        $plentyId = pluginApp(Application::class)->getPlentyId();
+        $lang = pluginApp(SessionStorageService::class)->getLang();
+        
+        $languageMutator = pluginApp(LanguageMutator::class, ["languages" => [$lang]]);
         $imageMutator    = pluginApp(ImageMutator::class);
-        $imageMutator->addClient(pluginApp(Application::class)->getPlentyId());
-
-        $documentProcessor = pluginApp(DocumentProcessor::class);
+        $imageMutator->addClient($plentyId);
+    
+        /** @var SearchHelper $searchHelper */
+        $searchHelper = pluginApp(SearchHelper::class, [[], $plentyId, 'item', $lang]);
+        $facetSearch = $searchHelper->getFacetSearch();
+        $facetSearch->setName('facets');
+        
+        
+        
+        return $facetSearch;
+        
+        /*$documentProcessor = pluginApp(DocumentProcessor::class);
         $documentProcessor->addMutator($languageMutator);
         $documentProcessor->addMutator($imageMutator);
 
-        return pluginApp(DocumentSearch::class, [$documentProcessor]);
+        return pluginApp(DocumentSearch::class, [$documentProcessor]);*/
     }
 
     /**
@@ -62,7 +77,7 @@ class Facets implements ItemLoaderContract
      */
     public function getAggregations()
     {
-        $facetProcessor = pluginApp(FacetAggregationProcessor::class);
+        /*$facetProcessor = pluginApp(FacetAggregationProcessor::class);
         $facetSearch    = pluginApp(FacetAggregation::class, [$facetProcessor]);
 
         $aggregations = [$facetSearch];
@@ -74,6 +89,9 @@ class Facets implements ItemLoaderContract
         }
 
         return $aggregations;
+        */
+        
+        return [];
     }
 
     /**
@@ -136,5 +154,23 @@ class Facets implements ItemLoaderContract
         $filters[] = $priceFilter;
 
         return $filters;
+    }
+    
+    /**
+     * @param array $options
+     * @return int
+     */
+    public function getCurrentPage($options = [])
+    {
+        return 1;
+    }
+    
+    /**
+     * @param array $options
+     * @return int
+     */
+    public function getItemsPerPage($options = [])
+    {
+        return 100;
     }
 }
