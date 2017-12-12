@@ -3,7 +3,6 @@
 namespace IO\Services;
 
 use Plenty\Modules\Basket\Contracts\BasketRepositoryContract;
-use Plenty\Modules\Frontend\Coupon\Contracts\FrontendCouponRepositoryContract;
 
 class CouponService
 {
