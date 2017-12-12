@@ -12,51 +12,6 @@ class TemplateService
 {
     public static $currentTemplate = "";
 
-    /** @var WebstoreConfigurationService $webstoreConfigService */
-    private $webstoreConfigService;
-
-    public function __construct( WebstoreConfigurationService $webstoreConfigService )
-    {
-        $this->webstoreConfigService = $webstoreConfigService;
-    }
-
-    public function getCanonicalUrl( $lang = "de" )
-    {
-        $activeLanguages = $this->webstoreConfigService->getActiveLanguageList();
-        $prefix = $this->webstoreConfigService->getWebstoreConfig()->domainSsl;
-
-        if ( in_array( $lang, $activeLanguages ) )
-        {
-            $prefix .=  "/".$lang;
-
-            switch( TemplateService::$currentTemplate )
-            {
-                case 'tpl.item':
-                    break;
-                case 'tpl.category.item':
-                    /** @var CategoryService $categoryService */
-                    $categoryService = pluginApp( CategoryService::class );
-                    $category = $categoryService->getCurrentCategory();
-                    $categoryDetails = $categoryService->getDetails( $category, $lang );
-                    if ( $categoryDetails === null )
-                    {
-                        return null;
-                    }
-
-                    if( strlen( $categoryDetails->canonicalLink ) > 0 )
-                    {
-                        return $categoryDetails->canonicalLink;
-                    }
-
-                    return $prefix . $categoryService->getURL( $category, $lang );
-            }
-
-            return $prefix;
-        }
-
-        return null;
-    }
-
     public function getCurrentTemplate():string
     {
         return TemplateService::$currentTemplate;

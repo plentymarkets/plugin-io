@@ -44,7 +44,7 @@ class CategoryService
 	 * @var array
 	 */
 	private $currentCategoryTree = [];
-	
+
 	private $currentItem = [];
 
     /**
@@ -143,6 +143,11 @@ class CategoryService
      */
 	public function getDetails($category, $lang)
     {
+        if ( $category === null )
+        {
+            return null;
+        }
+
         /** @var CategoryDetails $catDetail */
         foreach( $category->details as $catDetail )
         {
@@ -288,9 +293,14 @@ class CategoryService
 
         return $hierarchy;
     }
-    
-    public function setCurrentItem($itemNames)
+
+    public function setCurrentItem($item)
     {
-        $this->currentItem = $itemNames;
+        $this->currentItem = $item;
+    }
+
+    public function getCurrentItem()
+    {
+        return $this->currentItem;
     }
 }

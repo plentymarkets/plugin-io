@@ -12,6 +12,7 @@ use IO\Services\ItemWishListService;
 use IO\Services\SalesPriceService;
 use IO\Services\SessionStorageService;
 use IO\Services\CustomerService;
+use IO\Services\UrlService;
 use Plenty\Legacy\Services\Item\Variation\SalesPriceService as BasePriceService;
 use Plenty\Modules\Item\Unit\Contracts\UnitRepositoryContract;
 use Plenty\Modules\Item\Unit\Contracts\UnitNameRepositoryContract;
@@ -78,6 +79,7 @@ class ItemLoaderFactoryES implements ItemLoaderFactory
 
         $result = $this->attachPrices($result, $options);
         $result = $this->attachItemWishList($result);
+        $result = $this->attachURLs($result);
 
         return $result;
     }
@@ -258,21 +260,21 @@ class ItemLoaderFactoryES implements ItemLoaderFactory
                     }
                 }
 
-                if($type == 'multi')
-                {
+//                if($type == 'multi')
+//                {
                     $e = explode('\\', $loaderClass);
                     $identifier = $e[count($e)-1];
                     if(!in_array($identifier, $identifiers))
                     {
                         $identifiers[] = $identifier;
                     }
-                }
-            }
+//                }
 
-            if(!is_null($search))
-            {
-                $elasticSearchRepo->addSearch($search);
-                $search = null;
+                if(!is_null($search))
+                {
+                    $elasticSearchRepo->addSearch($search);
+                    $search = null;
+                }
             }
         }
 
@@ -290,9 +292,9 @@ class ItemLoaderFactoryES implements ItemLoaderFactory
             }
             else
             {
-                $result[$identifiers[$key-1]] = $this->attachPrices($list);
-                $list = $result[$identifiers[$key-1]];
-                $result[$identifiers[$key-1]] = $this->attachItemWishList($list);
+                $result[$identifiers[$key]] = $this->attachPrices($list);
+                $list = $result[$identifiers[$key]];
+                $result[$identifiers[$key]] = $this->attachItemWishList($list);
 
             }
         }
@@ -492,6 +494,28 @@ class ItemLoaderFactoryES implements ItemLoaderFactory
                 }
             }
         }
+        return $result;
+    }
+
+    private function attachURLs($result)
+    {
+        if ( count( $result ) && count( $result['ItemURLs'] ) )
+        {
+            foreach( $result['documents'] as $key => $variation )
+            {
+                UrlService::prepareItemUrlMap( $result['ItemURLs']['documents'][$key]['data'] );
+                /** @var UrlService $urlService */
+                $urlService = pluginApp( UrlService::class );
+
+                if ( strlen($variation['data']['texts']['urlPath']) <= 0 )
+                {
+                    $result['documents'][$key]['data']['texts']['urlPath'] = $urlService
+                        ->getVariationURL( $variation['data']['item']['id'], $variation['data']['variation']['id'] )
+                        ->toRelativeUrl();
+                }
+            }
+        }
+
         return $result;
     }
 }
