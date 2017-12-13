@@ -17,6 +17,8 @@ use IO\Builder\Order\AddressType;
  */
 class CustomerAddressResource extends ApiResource
 {
+    const ADDRESS_NOT_SET = -99;
+
 	/**
 	 * @var CustomerService
 	 */
@@ -103,7 +105,7 @@ class CustomerAddressResource extends ApiResource
          */
 		$basketService = pluginApp(BasketService::class);
   
-		if((int)$addressId > 0)
+		if((int)$addressId > 0 || (int)$addressId == static::ADDRESS_NOT_SET)
         {
             if($type == AddressType::BILLING)
             {
