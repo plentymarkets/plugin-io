@@ -4,12 +4,12 @@
 
 ### Hinzugefügt
 
-- Beim Laden von Zahlungsarten wird nun zusätzlich das Flag 'isSelectable' mitgegeben.
+- Beim Laden von Zahlungsarten wird nun zusätzlich das Flag `isSelectable` mitgegeben.
 
 ### Behoben
 
 - Auftragsherkünfte werden nun beim Laden von Artikeln und bei der Preisberechnung berücksichtigt.
-- Diverse Fehler beim behandeln von Gutscheincodes wurden behoben.
+- Diverse Fehler beim Behandeln von Gutschein-Codes wurden behoben.
 
 ## v2.0.1 (2017-12-06) <a href="https://github.com/plentymarkets/plugin-io/compare/2.0.0...2.0.1" target="_blank"><b>Übersicht aller Änderungen</b></a>
 
