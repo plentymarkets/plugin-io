@@ -22,7 +22,8 @@ use Plenty\Modules\Item\Search\Filter\SalesPriceFilter;
  */
 class SingleItemAttributes implements ItemLoaderContract
 {
-
+    private $options = [];
+    
 	/**
 	 * @return SearchInterface
 	 */
@@ -74,4 +75,9 @@ class SingleItemAttributes implements ItemLoaderContract
 		    $priceFilter
         ];
 	}
+    
+    public function setOptions($options = [])
+    {
+        $this->options = $options;
+    }
 }

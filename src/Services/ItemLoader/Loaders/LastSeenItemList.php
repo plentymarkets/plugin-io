@@ -24,6 +24,8 @@ use Plenty\Plugin\Application;
  */
 class LastSeenItemList implements ItemLoaderContract
 {
+    private $options = [];
+    
     /**
      * @return SearchInterface
      */
@@ -77,5 +79,10 @@ class LastSeenItemList implements ItemLoaderContract
             $clientFilter,
             $variationFilter
         ];
+    }
+    
+    public function setOptions($options = [])
+    {
+        $this->options = $options;
     }
 }

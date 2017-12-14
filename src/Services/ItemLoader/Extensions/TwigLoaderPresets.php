@@ -39,11 +39,11 @@ class TwigLoaderPresets extends Twig_Extension
 				
 				"singleItem" => [
 				    "single" => [
-                        SingleItem::class,
-                        SingleItemAttributes::class,
+                        SingleItem::class
                     ],
                     "multi" => [
-                        'crossSellingItemsList' => CrossSellingItems::class
+                        'crossSellingItemsList' => CrossSellingItems::class,
+                        'singleItemAttributes' => SingleItemAttributes::class
                     ]
 				],
 			    
@@ -57,8 +57,10 @@ class TwigLoaderPresets extends Twig_Extension
 			    ],
                 "search" => [
                     "single" => [
-                        SearchItems::class,
-                        Facets::class
+                        SearchItems::class
+                    ],
+                    "multi" => [
+                        'facets' => Facets::class
                     ]
                 ],
                 "lastSeenItemsList" => [

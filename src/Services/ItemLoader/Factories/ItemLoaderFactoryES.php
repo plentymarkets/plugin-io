@@ -7,12 +7,15 @@ use IO\Services\ItemLoader\Contracts\ItemLoaderContract;
 use IO\Services\ItemLoader\Contracts\ItemLoaderFactory;
 use IO\Services\ItemLoader\Contracts\ItemLoaderPaginationContract;
 use IO\Services\ItemLoader\Contracts\ItemLoaderSortingContract;
+use IO\Services\ItemLoader\Loaders\Facets;
 use IO\Services\ItemLoader\Services\FacetExtensionContainer;
 use IO\Services\ItemWishListService;
 use IO\Services\SalesPriceService;
 use IO\Services\SessionStorageService;
 use IO\Services\CustomerService;
 use Plenty\Legacy\Services\Item\Variation\SalesPriceService as BasePriceService;
+use Plenty\Modules\Cloud\ElasticSearch\Lib\Search\SearchGroup;
+use Plenty\Modules\Item\Search\Filter\FacetFilter;
 use Plenty\Modules\Item\Unit\Contracts\UnitRepositoryContract;
 use Plenty\Modules\Item\Unit\Contracts\UnitNameRepositoryContract;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Search\Document\DocumentSearch;
@@ -23,7 +26,6 @@ use Plenty\Modules\Item\Search\Contracts\VariationElasticSearchMultiSearchReposi
 use Plenty\Modules\Item\SalesPrice\Models\SalesPriceSearchResponse;
 use Plenty\Plugin\ConfigRepository;
 use Plenty\Modules\Authorization\Services\AuthHelper;
-use Zend\Db\Sql\Ddl\Constraint\Check;
 
 /**
  * Created by ptopczewski, 09.01.17 08:35
@@ -96,6 +98,8 @@ class ItemLoaderFactoryES implements ItemLoaderFactory
 
             if($loader instanceof ItemLoaderContract)
             {
+                $loader->setOptions($options);
+                
                 if(!$search instanceof DocumentSearch)
                 {
                     //search, filter
@@ -184,7 +188,10 @@ class ItemLoaderFactoryES implements ItemLoaderFactory
         $search = null;
 
         $identifiers = [];
-
+    
+        /** @var SearchGroup $searchGroup */
+        //$searchGroup = pluginApp(SearchGroup::class);
+        //$filters = [];
         foreach($loaderClassList as $type => $loaderClasses)
         {
             foreach($loaderClasses as $identifier => $loaderClass)
@@ -194,15 +201,20 @@ class ItemLoaderFactoryES implements ItemLoaderFactory
 
                 if($loader instanceof ItemLoaderContract)
                 {
+                    $loader->setOptions($options);
                     if(!$search instanceof DocumentSearch)
                     {
                         //search, filter
                         $search = $loader->getSearch();
+                        //$searchGroup->addSearch($search);
                     }
 
                     foreach($loader->getFilterStack($options) as $filter)
                     {
                         $search->addFilter($filter);
+                        
+                        //$searchGroup->addFilter($filter);
+                        //$filters[] = $filter;
                     }
                 }
 
@@ -254,6 +266,7 @@ class ItemLoaderFactoryES implements ItemLoaderFactory
                 {
                     foreach($aggregations as $aggregation)
                     {
+                        $aggregation->setPage(1, 20);
                         $search->addAggregation($aggregation);
                     }
                 }
@@ -276,6 +289,14 @@ class ItemLoaderFactoryES implements ItemLoaderFactory
             }
         }
         
+        /*if(count($filters))
+        {
+            foreach($filters as $filter)
+            {
+                $searchGroup->addFilter($filter);
+            }
+        }*/
+        
         $rawResult = $elasticSearchRepo->execute();
 
         $result = [];
@@ -295,6 +316,10 @@ class ItemLoaderFactoryES implements ItemLoaderFactory
                 $result[$identifiers[$key-1]] = $this->attachItemWishList($list);
 
             }
+        }
+    
+        foreach ($this->facetExtensionContainer->getFacetExtensions() as $facetExtension) {
+            $result = $facetExtension->mergeIntoFacetsList($result);
         }
 
         return $result;

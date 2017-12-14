@@ -25,6 +25,8 @@ use Plenty\Modules\Item\Search\Filter\SalesPriceFilter;
  */
 class CrossSellingItems implements ItemLoaderContract
 {
+    private $options = [];
+    
     /**
      * @return SearchInterface
      */
@@ -153,5 +155,10 @@ class CrossSellingItems implements ItemLoaderContract
     public function getItemsPerPage($options = [])
     {
         return ( (INT)$options['items'] > 0 ? (INT)$options['items'] : 20 );
+    }
+    
+    public function setOptions($options = [])
+    {
+        $this->options = $options;
     }
 }
