@@ -90,5 +90,6 @@ class BasketItems implements ItemLoaderContract, ItemLoaderPaginationContract
     public function setOptions($options = [])
     {
         $this->options = $options;
+        return $options;
     }
 }

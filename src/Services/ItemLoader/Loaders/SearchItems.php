@@ -35,6 +35,14 @@ class SearchItems implements ItemLoaderContract, ItemLoaderPaginationContract, I
 {
     private $options = [];
     
+    /** @var  WebshopFilterBuilder */
+    private $webshopFilterBuilder;
+    
+    public function __construct(WebshopFilterBuilder $webshopFilterBuilder)
+    {
+        $this->webshopFilterBuilder = $webshopFilterBuilder;
+    }
+    
     /**
      * @return SearchInterface
      */
@@ -43,17 +51,20 @@ class SearchItems implements ItemLoaderContract, ItemLoaderPaginationContract, I
         $languageMutator = pluginApp(LanguageMutator::class, ["languages" => [pluginApp(SessionStorageService::class)->getLang()]]);
         $imageMutator = pluginApp(ImageMutator::class);
         $imageMutator->addClient(pluginApp(Application::class)->getPlentyId());
-    
-        $collapse =  pluginApp(BaseCollapse::class, ['ids.itemId']);
-    
+        
         $documentProcessor = pluginApp(DocumentProcessor::class);
         $documentProcessor->addMutator($languageMutator);
         $documentProcessor->addMutator($imageMutator);
     
         $documentSearch = pluginApp(DocumentSearch::class, [$documentProcessor]);
-        $documentSearch->setCollapse($collapse);
         $documentSearch->setName('search');
-    
+        
+        $collapse = $this->webshopFilterBuilder->getCollapseForCombinedVariations($this->options);
+        if($collapse instanceof BaseCollapse)
+        {
+            $documentSearch->setCollapse($collapse);
+        }
+        
         return $documentSearch;
     }
     
@@ -82,15 +93,6 @@ class SearchItems implements ItemLoaderContract, ItemLoaderPaginationContract, I
      */
     public function getFilterStack($options = [])
     {
-        /*if(isset($options['variationShowType']) && $options['variationShowType'] == 'main')
-        {
-            $variationFilter->isMain();
-        }
-        elseif(isset($options['variationShowType']) && $options['variationShowType'] == 'child')
-        {
-            $variationFilter->isChild();
-        }*/
-    
         $lang = pluginApp(SessionStorageService::class)->getLang();
         
         $filters = [];
@@ -115,10 +117,8 @@ class SearchItems implements ItemLoaderContract, ItemLoaderPaginationContract, I
             
             $filters[] = $searchFilter;
         }
-    
-        /** @var WebshopFilterBuilder $webshopFilterBuilder */
-        $webshopFilterBuilder = pluginApp(WebshopFilterBuilder::class);
-        $defaultFilters = $webshopFilterBuilder->getFilters($options);
+        
+        $defaultFilters = $this->webshopFilterBuilder->getFilters($options);
         $filters = array_merge( $filters, $defaultFilters );
     
         /** @var FacetFilterBuilder $facetHelper */
@@ -176,6 +176,8 @@ class SearchItems implements ItemLoaderContract, ItemLoaderPaginationContract, I
     
     public function setOptions($options = [])
     {
+        $options['useVariationShowType'] = true;
         $this->options = $options;
+        return $options;
     }
 }

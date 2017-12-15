@@ -50,7 +50,7 @@ class CategoryItemResource extends ApiResource
                     'items'             => $this->request->get('items', 20),
                     'sorting'           => $this->request->get('sorting', ''),
                     'facets'            => $this->request->get('facets', ''),
-                    'variationShowType' => $this->request->get('variationShowType', 'all'),
+                    'variationShowType' => $this->request->get('variationShowType', ''),
                 ]);
             
             return $this->response->create($response, ResponseCode::OK);

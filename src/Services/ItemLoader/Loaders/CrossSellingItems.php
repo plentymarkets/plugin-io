@@ -72,8 +72,11 @@ class CrossSellingItems implements ItemLoaderContract
         /**
          * @var CrossSellingFilter $crossSellingFilter
          */
-        $crossSellingFilter = pluginApp(CrossSellingFilter::class, [$options['crossSellingItemId']]);
-        $crossSellingFilter->hasRelation($crossSellingService->getType());
+        if(isset($options['crossSellingItemId']) && (int)$options['crossSellingItemId'] > 0)
+        {
+            $crossSellingFilter = pluginApp(CrossSellingFilter::class, [$options['crossSellingItemId']]);
+            $crossSellingFilter->hasRelation($crossSellingService->getType());
+        }
         
         $sessionLang = pluginApp(SessionStorageService::class)->getLang();
         
@@ -130,13 +133,19 @@ class CrossSellingItems implements ItemLoaderContract
         $priceFilter = pluginApp(SalesPriceFilter::class);
         $priceFilter->hasAtLeastOnePrice($priceIds);
         
-        return [
+        $filters = [
             $clientFilter,
             $variationFilter,
-            $crossSellingFilter,
             $textFilter,
             $priceFilter
         ];
+        
+        if($crossSellingFilter instanceof CrossSellingFilter)
+        {
+            $filters[] = $crossSellingFilter;
+        }
+        
+        return $filters;
     }
     
     /**
@@ -160,5 +169,6 @@ class CrossSellingItems implements ItemLoaderContract
     public function setOptions($options = [])
     {
         $this->options = $options;
+        return $options;
     }
 }

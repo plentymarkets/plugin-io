@@ -178,5 +178,6 @@ class TagItems implements ItemLoaderContract, ItemLoaderPaginationContract, Item
     public function setOptions($options = [])
     {
         $this->options = $options;
+        return $options;
     }
 }

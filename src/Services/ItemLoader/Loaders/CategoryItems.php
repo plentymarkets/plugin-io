@@ -39,6 +39,14 @@ class CategoryItems implements ItemLoaderContract, ItemLoaderPaginationContract,
 {
     private $options = [];
     
+    /** @var  WebshopFilterBuilder */
+    private $webshopFilterBuilder;
+    
+    public function __construct(WebshopFilterBuilder $webshopFilterBuilder)
+    {
+        $this->webshopFilterBuilder = $webshopFilterBuilder;
+    }
+    
 	/**
 	 * @return SearchInterface
 	 */
@@ -48,15 +56,18 @@ class CategoryItems implements ItemLoaderContract, ItemLoaderPaginationContract,
         $imageMutator = pluginApp(ImageMutator::class);
         $imageMutator->addClient(pluginApp(Application::class)->getPlentyId());
         
-        $collapse =  pluginApp(BaseCollapse::class, ['ids.itemId']);
-        
         $documentProcessor = pluginApp(DocumentProcessor::class);
         $documentProcessor->addMutator($languageMutator);
         $documentProcessor->addMutator($imageMutator);
         
         $documentSearch = pluginApp(DocumentSearch::class, [$documentProcessor]);
-        $documentSearch->setCollapse($collapse);
         $documentSearch->setName('search');
+        
+        $collapse = $this->webshopFilterBuilder->getCollapseForCombinedVariations($this->options);
+        if($collapse instanceof BaseCollapse)
+        {
+            $documentSearch->setCollapse($collapse);
+        }
         
         return $documentSearch;
 	}
@@ -88,15 +99,6 @@ class CategoryItems implements ItemLoaderContract, ItemLoaderPaginationContract,
 	 */
 	public function getFilterStack($options = [])
 	{
-		/*if(isset($options['variationShowType']) && $options['variationShowType'] == 'main')
-        {
-            $variationFilter->isMain();
-        }
-        elseif(isset($options['variationShowType']) && $options['variationShowType'] == 'child')
-        {
-            $variationFilter->isChild();
-        }*/
-        
 		$filters = [];
 		
 		/** @var CategoryFilter $categoryFilter */
@@ -104,9 +106,7 @@ class CategoryItems implements ItemLoaderContract, ItemLoaderPaginationContract,
 		$categoryFilter->isInCategory($options['categoryId']);
 		$filters[] = $categoryFilter;
         
-        /** @var WebshopFilterBuilder $webshopFilterBuilder */
-        $webshopFilterBuilder = pluginApp(WebshopFilterBuilder::class);
-        $defaultFilters = $webshopFilterBuilder->getFilters($options);
+        $defaultFilters = $this->webshopFilterBuilder->getFilters($options);
         $filters = array_merge( $filters, $defaultFilters );
 		
         /** @var FacetFilterBuilder $facetHelper */
@@ -158,6 +158,8 @@ class CategoryItems implements ItemLoaderContract, ItemLoaderPaginationContract,
     
     public function setOptions($options = [])
     {
+        $options['useVariationShowType'] = true;
         $this->options = $options;
+        return $options;
     }
 }

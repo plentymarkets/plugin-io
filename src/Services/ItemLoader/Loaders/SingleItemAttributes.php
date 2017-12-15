@@ -79,5 +79,6 @@ class SingleItemAttributes implements ItemLoaderContract
     public function setOptions($options = [])
     {
         $this->options = $options;
+        return $options;
     }
 }

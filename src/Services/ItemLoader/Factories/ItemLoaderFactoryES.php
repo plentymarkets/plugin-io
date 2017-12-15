@@ -7,15 +7,12 @@ use IO\Services\ItemLoader\Contracts\ItemLoaderContract;
 use IO\Services\ItemLoader\Contracts\ItemLoaderFactory;
 use IO\Services\ItemLoader\Contracts\ItemLoaderPaginationContract;
 use IO\Services\ItemLoader\Contracts\ItemLoaderSortingContract;
-use IO\Services\ItemLoader\Loaders\Facets;
 use IO\Services\ItemLoader\Services\FacetExtensionContainer;
 use IO\Services\ItemWishListService;
 use IO\Services\SalesPriceService;
 use IO\Services\SessionStorageService;
 use IO\Services\CustomerService;
 use Plenty\Legacy\Services\Item\Variation\SalesPriceService as BasePriceService;
-use Plenty\Modules\Cloud\ElasticSearch\Lib\Search\SearchGroup;
-use Plenty\Modules\Item\Search\Filter\FacetFilter;
 use Plenty\Modules\Item\Unit\Contracts\UnitRepositoryContract;
 use Plenty\Modules\Item\Unit\Contracts\UnitNameRepositoryContract;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Search\Document\DocumentSearch;
@@ -98,8 +95,7 @@ class ItemLoaderFactoryES implements ItemLoaderFactory
 
             if($loader instanceof ItemLoaderContract)
             {
-                $loader->setOptions($options);
-                
+                $options = $loader->setOptions($options);
                 if(!$search instanceof DocumentSearch)
                 {
                     //search, filter
@@ -188,10 +184,7 @@ class ItemLoaderFactoryES implements ItemLoaderFactory
         $search = null;
 
         $identifiers = [];
-    
-        /** @var SearchGroup $searchGroup */
-        //$searchGroup = pluginApp(SearchGroup::class);
-        //$filters = [];
+        
         foreach($loaderClassList as $type => $loaderClasses)
         {
             foreach($loaderClasses as $identifier => $loaderClass)
@@ -201,20 +194,15 @@ class ItemLoaderFactoryES implements ItemLoaderFactory
 
                 if($loader instanceof ItemLoaderContract)
                 {
-                    $loader->setOptions($options);
+                    $options = $loader->setOptions($options);
                     if(!$search instanceof DocumentSearch)
                     {
-                        //search, filter
                         $search = $loader->getSearch();
-                        //$searchGroup->addSearch($search);
                     }
 
                     foreach($loader->getFilterStack($options) as $filter)
                     {
                         $search->addFilter($filter);
-                        
-                        //$searchGroup->addFilter($filter);
-                        //$filters[] = $filter;
                     }
                 }
 
@@ -266,7 +254,6 @@ class ItemLoaderFactoryES implements ItemLoaderFactory
                 {
                     foreach($aggregations as $aggregation)
                     {
-                        $aggregation->setPage(1, 20);
                         $search->addAggregation($aggregation);
                     }
                 }
@@ -288,14 +275,6 @@ class ItemLoaderFactoryES implements ItemLoaderFactory
                 }
             }
         }
-        
-        /*if(count($filters))
-        {
-            foreach($filters as $filter)
-            {
-                $searchGroup->addFilter($filter);
-            }
-        }*/
         
         $rawResult = $elasticSearchRepo->execute();
 
