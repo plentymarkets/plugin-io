@@ -23,7 +23,6 @@ use Plenty\Modules\Item\Search\Contracts\VariationElasticSearchMultiSearchReposi
 use Plenty\Modules\Item\SalesPrice\Models\SalesPriceSearchResponse;
 use Plenty\Plugin\ConfigRepository;
 use Plenty\Modules\Authorization\Services\AuthHelper;
-use Zend\Db\Sql\Ddl\Constraint\Check;
 
 /**
  * Created by ptopczewski, 09.01.17 08:35
@@ -96,6 +95,7 @@ class ItemLoaderFactoryES implements ItemLoaderFactory
 
             if($loader instanceof ItemLoaderContract)
             {
+                $options = $loader->setOptions($options);
                 if(!$search instanceof DocumentSearch)
                 {
                     //search, filter
@@ -165,7 +165,7 @@ class ItemLoaderFactoryES implements ItemLoaderFactory
         {
             $elasticSearchRepo->addSearch($search);
         }
-
+        
         $result = $elasticSearchRepo->execute();
         foreach ($this->facetExtensionContainer->getFacetExtensions() as $facetExtension) {
             $result = $facetExtension->mergeIntoFacetsList($result);
@@ -184,7 +184,7 @@ class ItemLoaderFactoryES implements ItemLoaderFactory
         $search = null;
 
         $identifiers = [];
-
+        
         foreach($loaderClassList as $type => $loaderClasses)
         {
             foreach($loaderClasses as $identifier => $loaderClass)
@@ -194,9 +194,9 @@ class ItemLoaderFactoryES implements ItemLoaderFactory
 
                 if($loader instanceof ItemLoaderContract)
                 {
+                    $options = $loader->setOptions($options);
                     if(!$search instanceof DocumentSearch)
                     {
-                        //search, filter
                         $search = $loader->getSearch();
                     }
 
@@ -267,15 +267,15 @@ class ItemLoaderFactoryES implements ItemLoaderFactory
                         $identifiers[] = $identifier;
                     }
                 }
-            }
-
-            if(!is_null($search))
-            {
-                $elasticSearchRepo->addSearch($search);
-                $search = null;
+    
+                if(!is_null($search))
+                {
+                    $elasticSearchRepo->addSearch($search);
+                    $search = null;
+                }
             }
         }
-
+        
         $rawResult = $elasticSearchRepo->execute();
 
         $result = [];
@@ -295,6 +295,10 @@ class ItemLoaderFactoryES implements ItemLoaderFactory
                 $result[$identifiers[$key-1]] = $this->attachItemWishList($list);
 
             }
+        }
+    
+        foreach ($this->facetExtensionContainer->getFacetExtensions() as $facetExtension) {
+            $result = $facetExtension->mergeIntoFacetsList($result);
         }
 
         return $result;

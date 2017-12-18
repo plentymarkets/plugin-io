@@ -2,6 +2,7 @@
 
 namespace IO\Api\Resources;
 
+use IO\Services\ItemLoader\Extensions\TwigLoaderPresets;
 use Plenty\Plugin\Http\Response;
 use Plenty\Plugin\Http\Request;
 use IO\Api\ApiResource;
@@ -38,14 +39,18 @@ class ItemSearchResource extends ApiResource
         
         if(strlen($searchString))
         {
+            /** @var TwigLoaderPresets $twigLoaderPresets */
+            $twigLoaderPresets = pluginApp(TwigLoaderPresets::class);
+            $presets = $twigLoaderPresets->getGlobals();
+            
             $response = pluginApp(ItemLoaderService::class)
-                ->loadForTemplate($template, [SearchItems::class, Facets::class], [
+                ->loadForTemplate($template, $presets['itemLoaderPresets']['search'], [
                     'query'             => $searchString,
                     'page'              => $this->request->get('page', 1),
                     'items'             => $this->request->get('items', 20),
                     'sorting'           => $this->request->get('sorting', 'itemName'),
                     'facets'            => $this->request->get('facets', ''),
-                    'variationShowType' => $this->request->get('variationShowType', 'all'),
+                    'variationShowType' => $this->request->get('variationShowType', ''),
                 ]);
     
             return $this->response->create($response, ResponseCode::OK);

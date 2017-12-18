@@ -24,6 +24,8 @@ use Plenty\Plugin\Application;
  */
 class SingleItem implements ItemLoaderContract
 {
+    private $options = [];
+    
 	/**
 	 * @return SearchInterface
 	 */
@@ -135,4 +137,10 @@ class SingleItem implements ItemLoaderContract
             $priceFilter
 		];
 	}
+    
+    public function setOptions($options = [])
+    {
+        $this->options = $options;
+        return $options;
+    }
 }
