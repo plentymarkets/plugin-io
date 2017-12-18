@@ -308,6 +308,7 @@ class CheckoutService
             $paymentData['description'] = $this->frontendPaymentMethodRepository->getPaymentMethodDescription($paymentMethod, $lang);
             $paymentData['sourceUrl']   = $this->frontendPaymentMethodRepository->getPaymentMethodSourceUrl($paymentMethod);
             $paymentData['key']         = $paymentMethod->pluginKey;
+            $paymentData['isSelectable']= $this->frontendPaymentMethodRepository->getPaymentMethodIsSelectable($paymentMethod);
             $paymentDataList[]          = $paymentData;
         }
         return $paymentDataList;

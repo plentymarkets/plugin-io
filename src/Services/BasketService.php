@@ -215,7 +215,8 @@ class BasketService
         if (isset($data['basketItemOrderParams']) && is_array($data['basketItemOrderParams'])) {
             list($data['basketItemOrderParams'], $data['totalOrderParamsMarkup']) = $this->parseBasketItemOrderParams($data['basketItemOrderParams']);
         }
-
+    
+        $data['referrerId'] = $this->getBasket()->referrerId;
         $basketItem = $this->findExistingOneByData($data);
 
         try {
