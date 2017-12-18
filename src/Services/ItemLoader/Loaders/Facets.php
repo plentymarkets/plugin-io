@@ -34,7 +34,7 @@ use Plenty\Modules\Item\Search\Helper\SearchHelper;
  * Class SingleItemAttributes
  * @package IO\Services\ItemLoader\Loaders
  */
-class Facets implements ItemLoaderContract, ItemLoaderPaginationContract
+class Facets implements ItemLoaderContract
 {
     private $options = [];
     
@@ -62,7 +62,6 @@ class Facets implements ItemLoaderContract, ItemLoaderPaginationContract
     
         $filters = $this->getFacetValues($this->options);
         $facetValues = $filters['facetValues'];
-        $activeFilters = $filters['activeFilters'];
         
         /** @var SearchHelper $searchHelper */
         $searchHelper = pluginApp(SearchHelper::class, [$facetValues, $plentyId, 'item', $lang]);
@@ -71,26 +70,6 @@ class Facets implements ItemLoaderContract, ItemLoaderPaginationContract
         
         return $facetSearch;
     }
-
-    /**
-     * @return array
-     */
-    /*public function getAggregations()
-    {
-        //$facetProcessor = pluginApp(FacetAggregationProcessor::class);
-        //$facetSearch    = pluginApp(FacetAggregation::class, [$facetProcessor]);
-
-        //$aggregations = [$facetSearch];
-
-        $aggregations = [];
-        foreach ($this->facetExtensionContainer->getFacetExtensions() as $facetExtension) {
-            if ($facetExtension instanceof FacetExtension) {
-                $aggregations[] = $facetExtension->getAggregation();
-            }
-        }
-
-        return $aggregations;
-    }*/
     
     public function getAggregations()
     {
@@ -103,40 +82,6 @@ class Facets implements ItemLoaderContract, ItemLoaderPaginationContract
      */
     public function getFilterStack($options = [])
     {
-        
-        /*$additionalFilters = [];
-        if(!empty($activeFilters))
-        {
-            foreach ($this->facetExtensionContainer->getFacetExtensions() as $facetExtension)
-            {
-                if ($facetExtension instanceof FacetExtension)
-                {
-                    $filter = $facetExtension->extractFilterParams($activeFilters);
-                    if(!is_null($filter))
-                    {
-                        $additionalFilters[] = $filter;
-                    }
-                }
-            }
-        }*/
-
-
-        //$filters = [];
-        
-        /*if (count($facetValues)) {
-
-            /**
-             * @var FacetFilter $facetFilter
-             */
-            /*$facetFilter = pluginApp(FacetFilter::class);
-            $facetFilter->hasEachFacet($facetValues);
-
-            $filters[] = $facetFilter;
-        }*/
-    
-        //$filters[] = $facetFilter;
-        //$filters = array_merge($filters, $additionalFilters);
-        
         $filters = [];
     
         /** @var WebshopFilterBuilder $webshopFilterBuilder */
@@ -175,24 +120,6 @@ class Facets implements ItemLoaderContract, ItemLoaderPaginationContract
         }
         
         return $filters;
-    }
-    
-    /**
-     * @param array $options
-     * @return int
-     */
-    public function getCurrentPage($options = [])
-    {
-        return 1;
-    }
-    
-    /**
-     * @param array $options
-     * @return int
-     */
-    public function getItemsPerPage($options = [])
-    {
-        return 100;
     }
     
     private function getFacetValues($options)
