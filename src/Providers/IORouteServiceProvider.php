@@ -177,6 +177,11 @@ class IORouteServiceProvider extends RouteServiceProvider
             $router->get('password-reset/{contactId}/{hash}', 'IO\Controllers\CustomerPasswordResetController@showReset');
         }
         
+        if( in_array("order-property-file", $enabledRoutes) || in_array("all", $enabledRoutes) )
+        {
+            $router->get('order-property-file/tmp/{hash}/{filename}', 'IO\Controllers\OrderPropertyFileController@showFile');
+        }
+        
 		/*
 		 * ITEM ROUTES
 		 */
