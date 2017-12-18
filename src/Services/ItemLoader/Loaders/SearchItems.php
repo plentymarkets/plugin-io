@@ -11,8 +11,6 @@ use IO\Services\ItemLoader\Services\FacetExtensionContainer;
 use IO\Services\SessionStorageService;
 use IO\Builder\Sorting\SortingBuilder;
 use IO\Services\ItemLoader\Contracts\ItemLoaderSortingContract;
-use IO\Services\TemplateConfigService;
-use IO\Services\PriceDetectService;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Collapse\BaseCollapse;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Processor\DocumentProcessor;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Query\Type\TypeInterface;
@@ -22,14 +20,9 @@ use Plenty\Modules\Cloud\ElasticSearch\Lib\Sorting\SingleSorting;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Source\Mutator\BuiltIn\LanguageMutator;
 use Plenty\Modules\Item\Search\Mutators\ImageMutator;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Sorting\MultipleSorting;
-use Plenty\Modules\Cloud\ElasticSearch\Lib\Sorting\SortingInterface;
-use Plenty\Modules\Item\Search\Filter\ClientFilter;
-use Plenty\Modules\Item\Search\Filter\VariationBaseFilter;
 use Plenty\Modules\Item\Search\Filter\SearchFilter;
-use Plenty\Modules\Item\Search\Filter\TextFilter;
 use Plenty\Plugin\Application;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\ElasticSearch;
-use Plenty\Modules\Item\Search\Filter\SalesPriceFilter;
 
 class SearchItems implements ItemLoaderContract, ItemLoaderPaginationContract, ItemLoaderSortingContract
 {

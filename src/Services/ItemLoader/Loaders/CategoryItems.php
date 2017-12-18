@@ -11,23 +11,14 @@ use IO\Services\ItemLoader\Contracts\ItemLoaderContract;
 use IO\Services\ItemLoader\Contracts\ItemLoaderPaginationContract;
 use IO\Services\ItemLoader\Contracts\ItemLoaderSortingContract;
 use IO\Builder\Sorting\SortingBuilder;
-use IO\Services\TemplateConfigService;
-use IO\Services\PriceDetectService;
-use Plenty\Modules\Cloud\ElasticSearch\Lib\ElasticSearch;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Processor\DocumentProcessor;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Query\Type\TypeInterface;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Search\Document\DocumentSearch;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Search\SearchInterface;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Source\Mutator\BuiltIn\LanguageMutator;
-use Plenty\Modules\Item\Search\Filter\SalesPriceFilter;
-use Plenty\Modules\Item\Search\Helper\FacetHelper;
 use Plenty\Modules\Item\Search\Mutators\ImageMutator;
 use Plenty\Modules\Item\Search\Filter\CategoryFilter;
-use Plenty\Modules\Item\Search\Filter\ClientFilter;
-use Plenty\Modules\Item\Search\Filter\VariationBaseFilter;
-use Plenty\Modules\Item\Search\Filter\TextFilter;
 use Plenty\Plugin\Application;
-use Plenty\Modules\Cloud\ElasticSearch\Lib\Sorting\SortingInterface;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Collapse\BaseCollapse;
 
 /**
