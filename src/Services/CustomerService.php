@@ -2,6 +2,7 @@
 
 namespace IO\Services;
 
+use IO\Api\Resources\CustomerAddressResource;
 use IO\Builder\Order\OrderType;
 use IO\Models\LocalizedOrder;
 use IO\Validators\Customer\ContactValidator;
@@ -633,7 +634,7 @@ class CustomerService
             }
             elseif($type == AddressType::DELIVERY)
             {
-                $basketService->setDeliveryAddressId(-99);
+                $basketService->setDeliveryAddressId(CustomerAddressResource::ADDRESS_NOT_SET);
             }
         }
         else
@@ -645,7 +646,7 @@ class CustomerService
             }
             elseif($addressId == $basketService->getDeliveryAddressId())
             {
-                $basketService->setDeliveryAddressId(-99);
+                $basketService->setDeliveryAddressId(CustomerAddressResource::ADDRESS_NOT_SET);
             }
         }
 	}
