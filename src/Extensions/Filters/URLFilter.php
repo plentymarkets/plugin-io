@@ -19,18 +19,14 @@ class URLFilter extends AbstractFilter
 	 */
 	private $itemService;
 
-	/** @var TemplateConfigService $templateConfigService */
-	private $templateConfigService;
-
     /**
      * URLFilter constructor.
      * @param ItemService $itemService
      */
-	public function __construct(ItemService $itemService, TemplateConfigService $templateConfigService )
+	public function __construct(ItemService $itemService )
 	{
 		parent::__construct();
 		$this->itemService = $itemService;
-		$this->templateConfigService = $templateConfigService;
 	}
 
     /**
