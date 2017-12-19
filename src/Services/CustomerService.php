@@ -263,7 +263,10 @@ class CustomerService
         }
         catch(\Exception $e)
         {
-            $contact = 'Die angegebene E-Mail-Adresse existiert bereits';
+            $contact = [
+                            'code'      => 1,
+                            'message'   => 'email already exists'
+                       ];
         }
 		
 		return $contact;
