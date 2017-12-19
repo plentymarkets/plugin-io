@@ -5,7 +5,8 @@ namespace IO\Extensions\Filters;
 use IO\Extensions\AbstractFilter;
 use IO\Services\ItemService;
 use IO\Services\TemplateConfigService;
-use IO\Services\UrlBuilder\Variation;
+use IO\Services\UrlBuilder\ItemUrlBuilder;
+use IO\Services\UrlBuilder\VariationUrlBuilder;
 use IO\Services\UrlService;
 
 /**
@@ -52,18 +53,27 @@ class URLFilter extends AbstractFilter
         $itemId = $itemData['item']['id'];
         $variationId = $itemData['variation']['id'];
 
-        if ( $itemId === null || $itemId <= 0 || $variationId === null || $variationId <= 0 )
+        if ( $itemId === null || $itemId <= 0 )
         {
             return "";
         }
 
-        /** @var Variation $variationUrlBuilder */
-        $variationUrlBuilder = pluginApp( Variation::class );
-	    $url = $variationUrlBuilder->buildUrl( $itemId, $variationId );
+        if ( $variationId === null || $variationId <= 0 )
+        {
+            /** @var ItemUrlBuilder $itemUrlBuilder */
+            $itemUrlBuilder = pluginApp( ItemUrlBuilder::class );
+            return $itemUrlBuilder->buildUrl( $itemId )->toRelativeUrl();
+        }
+        else
+        {
+            /** @var VariationUrlBuilder $variationUrlBuilder */
+            $variationUrlBuilder = pluginApp( VariationUrlBuilder::class );
+            $url = $variationUrlBuilder->buildUrl( $itemId, $variationId );
 
-        return $url->append(
-            $variationUrlBuilder->getSuffix( $itemId, $variationId )
-        )->toRelativeUrl();
+            return $url->append(
+                $variationUrlBuilder->getSuffix( $itemId, $variationId )
+            )->toRelativeUrl();
+        }
 	}
 
     /**

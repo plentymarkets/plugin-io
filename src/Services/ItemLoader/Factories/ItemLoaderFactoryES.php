@@ -12,7 +12,7 @@ use IO\Services\ItemWishListService;
 use IO\Services\SalesPriceService;
 use IO\Services\SessionStorageService;
 use IO\Services\CustomerService;
-use IO\Services\UrlBuilder\Variation;
+use IO\Services\UrlBuilder\VariationUrlBuilder;
 use IO\Services\UrlService;
 use Plenty\Legacy\Services\Item\Variation\SalesPriceService as BasePriceService;
 use Plenty\Modules\Item\Unit\Contracts\UnitRepositoryContract;
@@ -514,12 +514,12 @@ class ItemLoaderFactoryES implements ItemLoaderFactory
     {
         if ( count( $result ) && count( $result['ItemURLs'] ) )
         {
-            /** @var Variation $itemUrlBuilder */
-            $itemUrlBuilder = pluginApp( Variation::class );
+            /** @var VariationUrlBuilder $itemUrlBuilder */
+            $itemUrlBuilder = pluginApp( VariationUrlBuilder::class );
             $itemUrlDocuments = $result['ItemURLs']['documents'];
             foreach( $itemUrlDocuments as $key => $urlDocument )
             {
-                Variation::fillItemUrl( $urlDocument['data'] );
+                VariationUrlBuilder::fillItemUrl( $urlDocument['data'] );
                 $document = $result['documents'][$key];
                 if ( count( $document )
                     && count( $document['data']['texts'] )

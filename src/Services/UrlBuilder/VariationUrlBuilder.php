@@ -11,7 +11,7 @@ use IO\Services\TemplateConfigService;
 use Plenty\Modules\Authorization\Services\AuthHelper;
 use Plenty\Modules\Item\VariationDescription\Contracts\VariationDescriptionRepositoryContract;
 
-class Variation
+class VariationUrlBuilder
 {
     public static $urlPathMap;
 
@@ -80,8 +80,8 @@ class Variation
             $itemUrl = null;
             if ( $itemData['defaultCategory'] > 0 )
             {
-                /** @var Category $categoryUrlBuilder */
-                $categoryUrlBuilder = pluginApp( Category::class );
+                /** @var CategoryUrlBuilder $categoryUrlBuilder */
+                $categoryUrlBuilder = pluginApp( CategoryUrlBuilder::class );
                 $itemUrl = $categoryUrlBuilder
                     ->buildUrl( $itemData['defaultCategory'], $lang )
                     ->join( $itemName4Url );

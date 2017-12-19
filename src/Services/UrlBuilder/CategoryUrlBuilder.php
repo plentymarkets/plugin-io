@@ -5,7 +5,7 @@ namespace IO\Services\UrlBuilder;
 use IO\Services\CategoryService;
 use IO\Services\SessionStorageService;
 
-class Category
+class CategoryUrlBuilder
 {
     public function buildUrl( int $categoryId, string $lang = null ): UrlQuery
     {

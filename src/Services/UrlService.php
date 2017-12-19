@@ -3,9 +3,9 @@
 namespace IO\Services;
 
 use IO\Helper\ShopUrl;
-use IO\Services\UrlBuilder\Category;
+use IO\Services\UrlBuilder\CategoryUrlBuilder;
 use IO\Services\UrlBuilder\UrlQuery;
-use IO\Services\UrlBuilder\Variation;
+use IO\Services\UrlBuilder\VariationUrlBuilder;
 use Plenty\Modules\Authorization\Services\AuthHelper;
 use Plenty\Modules\Item\VariationDescription\Contracts\VariationDescriptionRepositoryContract;
 use Plenty\Plugin\Application;
@@ -20,8 +20,8 @@ class UrlService
      */
     public function getCategoryURL( $categoryId, $lang = null )
     {
-        /** @var Category $categoryUrlBuilder */
-        $categoryUrlBuilder = pluginApp( Category::class );
+        /** @var CategoryUrlBuilder $categoryUrlBuilder */
+        $categoryUrlBuilder = pluginApp( CategoryUrlBuilder::class );
         return $categoryUrlBuilder->buildUrl( $categoryId, $lang );
     }
 
@@ -34,8 +34,8 @@ class UrlService
      */
     public function getVariationURL( $itemId, $variationId, $lang = null )
     {
-        /** @var Variation $variationUrlBuilder */
-        $variationUrlBuilder = pluginApp( Variation::class );
+        /** @var VariationUrlBuilder $variationUrlBuilder */
+        $variationUrlBuilder = pluginApp( VariationUrlBuilder::class );
         return $variationUrlBuilder
             ->buildUrl( $itemId, $variationId, $lang )
             ->append(
