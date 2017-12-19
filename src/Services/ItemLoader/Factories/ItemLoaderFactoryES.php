@@ -12,6 +12,7 @@ use IO\Services\ItemWishListService;
 use IO\Services\SalesPriceService;
 use IO\Services\SessionStorageService;
 use IO\Services\CustomerService;
+use IO\Services\UrlBuilder\Variation;
 use IO\Services\UrlService;
 use Plenty\Legacy\Services\Item\Variation\SalesPriceService as BasePriceService;
 use Plenty\Modules\Item\Unit\Contracts\UnitRepositoryContract;
@@ -24,7 +25,6 @@ use Plenty\Modules\Item\Search\Contracts\VariationElasticSearchMultiSearchReposi
 use Plenty\Modules\Item\SalesPrice\Models\SalesPriceSearchResponse;
 use Plenty\Plugin\ConfigRepository;
 use Plenty\Modules\Authorization\Services\AuthHelper;
-use Zend\Db\Sql\Ddl\Constraint\Check;
 
 /**
  * Created by ptopczewski, 09.01.17 08:35
@@ -98,6 +98,7 @@ class ItemLoaderFactoryES implements ItemLoaderFactory
 
             if($loader instanceof ItemLoaderContract)
             {
+                $options = $loader->setOptions($options);
                 if(!$search instanceof DocumentSearch)
                 {
                     //search, filter
@@ -138,6 +139,10 @@ class ItemLoaderFactoryES implements ItemLoaderFactory
             {
                 $currentFields = $currentFields[$loaderClass];
             }
+            else
+            {
+                $currentFields = $loader->getResultFields( $resultFields );
+            }
 
             $fieldsFound = false;
             foreach($currentFields as $fieldName)
@@ -167,7 +172,7 @@ class ItemLoaderFactoryES implements ItemLoaderFactory
         {
             $elasticSearchRepo->addSearch($search);
         }
-
+        
         $result = $elasticSearchRepo->execute();
         foreach ($this->facetExtensionContainer->getFacetExtensions() as $facetExtension) {
             $result = $facetExtension->mergeIntoFacetsList($result);
@@ -186,7 +191,7 @@ class ItemLoaderFactoryES implements ItemLoaderFactory
         $search = null;
 
         $identifiers = [];
-
+        
         foreach($loaderClassList as $type => $loaderClasses)
         {
             foreach($loaderClasses as $identifier => $loaderClass)
@@ -196,9 +201,9 @@ class ItemLoaderFactoryES implements ItemLoaderFactory
 
                 if($loader instanceof ItemLoaderContract)
                 {
+                    $options = $loader->setOptions($options);
                     if(!$search instanceof DocumentSearch)
                     {
-                        //search, filter
                         $search = $loader->getSearch();
                     }
 
@@ -236,6 +241,10 @@ class ItemLoaderFactoryES implements ItemLoaderFactory
                 {
                     $currentFields = $currentFields[$loaderClass];
                 }
+                else
+                {
+                    $currentFields = $loader->getResultFields( $resultFields );
+                }
 
                 $fieldsFound = false;
                 foreach($currentFields as $fieldName)
@@ -260,16 +269,16 @@ class ItemLoaderFactoryES implements ItemLoaderFactory
                     }
                 }
 
-//                if($type == 'multi')
-//                {
+                if($type == 'multi')
+                {
                     $e = explode('\\', $loaderClass);
                     $identifier = $e[count($e)-1];
                     if(!in_array($identifier, $identifiers))
                     {
                         $identifiers[] = $identifier;
                     }
-//                }
-
+                }
+    
                 if(!is_null($search))
                 {
                     $elasticSearchRepo->addSearch($search);
@@ -277,7 +286,7 @@ class ItemLoaderFactoryES implements ItemLoaderFactory
                 }
             }
         }
-
+        
         $rawResult = $elasticSearchRepo->execute();
 
         $result = [];
@@ -292,11 +301,15 @@ class ItemLoaderFactoryES implements ItemLoaderFactory
             }
             else
             {
-                $result[$identifiers[$key]] = $this->attachPrices($list);
-                $list = $result[$identifiers[$key]];
-                $result[$identifiers[$key]] = $this->attachItemWishList($list);
+                $result[$identifiers[$key-1]] = $this->attachPrices($list);
+                $list = $result[$identifiers[$key-1]];
+                $result[$identifiers[$key-1]] = $this->attachItemWishList($list);
 
             }
+        }
+    
+        foreach ($this->facetExtensionContainer->getFacetExtensions() as $facetExtension) {
+            $result = $facetExtension->mergeIntoFacetsList($result);
         }
 
         return $result;
@@ -501,18 +514,25 @@ class ItemLoaderFactoryES implements ItemLoaderFactory
     {
         if ( count( $result ) && count( $result['ItemURLs'] ) )
         {
-            foreach( $result['documents'] as $key => $variation )
+            /** @var Variation $itemUrlBuilder */
+            $itemUrlBuilder = pluginApp( Variation::class );
+            $itemUrlDocuments = $result['ItemURLs']['documents'];
+            foreach( $itemUrlDocuments as $key => $urlDocument )
             {
-                UrlService::prepareItemUrlMap( $result['ItemURLs']['documents'][$key]['data'] );
-                /** @var UrlService $urlService */
-                $urlService = pluginApp( UrlService::class );
-
-                if ( strlen($variation['data']['texts']['urlPath']) <= 0 )
+                Variation::fillItemUrl( $urlDocument['data'] );
+                $document = $result['documents'][$key];
+                if ( count( $document )
+                    && count( $document['data']['texts'] )
+                    && strlen( $document['data']['texts']['urlPath'] ) <= 0 )
                 {
-                    $result['documents'][$key]['data']['texts']['urlPath'] = $urlService
-                        ->getVariationURL( $variation['data']['item']['id'], $variation['data']['variation']['id'] )
-                        ->toRelativeUrl();
+                    // attach generated item url if not defined
+                    $itemUrl = $itemUrlBuilder->buildUrl(
+                        $urlDocument['data']['item']['id'],
+                        $urlDocument['data']['variation']['id']
+                    )->getPath();
+                    $result['documents'][$key]['data']['texts']['urlPath'] = $itemUrl;
                 }
+
             }
         }
 

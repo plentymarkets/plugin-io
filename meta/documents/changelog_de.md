@@ -1,5 +1,22 @@
 # Release Notes für IO
 
+## v2.0.2 (2017-12-13) <a href="https://github.com/plentymarkets/plugin-io/compare/2.0.1...2.0.2" target="_blank"><b>Übersicht aller Änderungen</b></a>
+
+### Hinzugefügt
+
+- Beim Laden von Zahlungsarten wird nun zusätzlich das Flag `isSelectable` mitgegeben.
+
+### Behoben
+
+- Auftragsherkünfte werden nun beim Laden von Artikeln und bei der Preisberechnung berücksichtigt.
+- Diverse Fehler beim Behandeln von Gutschein-Codes wurden behoben.
+
+## v2.0.1 (2017-12-06) <a href="https://github.com/plentymarkets/plugin-io/compare/2.0.0...2.0.1" target="_blank"><b>Übersicht aller Änderungen</b></a>
+
+### Behoben
+
+- Durch einen Fehler wurde die Standard-Startseite nicht richtig angezeigt. Dies wurde behoben.
+
 ## v2.0.0 (2017-11-30) <a href="https://github.com/plentymarkets/plugin-io/compare/1.7.2...2.0.0" target="_blank"><b>Übersicht aller Änderungen</b></a>
 
 ### Hinzugefügt

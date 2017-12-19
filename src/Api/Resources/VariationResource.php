@@ -2,6 +2,7 @@
 
 namespace IO\Api\Resources;
 
+use IO\Services\ItemLoader\Extensions\TwigLoaderPresets;
 use Plenty\Plugin\Http\Request;
 use Plenty\Plugin\Http\Response;
 use IO\Api\ApiResource;
@@ -39,7 +40,10 @@ class VariationResource extends ApiResource
         
         if(strlen($template))
         {
-            $variations = pluginApp(ItemLoaderService::class)->loadForTemplate($template, [Items::class], ['variationIds' => $variationIds]);
+            /** @var TwigLoaderPresets $loaderPresets */
+            $loaderPresets = pluginApp(TwigLoaderPresets::class);
+            $presets = $loaderPresets->getGlobals();
+            $variations = pluginApp(ItemLoaderService::class)->loadForTemplate($template, $presets['itemLoaderPresets']['singleItem'], ['variationIds' => $variationIds]);
         }
 
         return $this->response->create($variations, ResponseCode::OK);
@@ -57,7 +61,10 @@ class VariationResource extends ApiResource
         $template = $this->request->get('template', '');
         if(strlen($template))
         {
-            $variation = pluginApp(ItemLoaderService::class)->loadForTemplate($template, [SingleItem::class, SingleItemAttributes::class], ['variationId' => (int)$variationId]);
+            /** @var TwigLoaderPresets $loaderPresets */
+            $loaderPresets = pluginApp(TwigLoaderPresets::class);
+            $presets = $loaderPresets->getGlobals();
+            $variation = pluginApp(ItemLoaderService::class)->loadForTemplate($template, $presets['itemLoaderPresets']['singleItem'], ['variationId' => (int)$variationId]);
         }
         
         return $this->response->create($variation, ResponseCode::OK);

@@ -75,10 +75,12 @@ class OrderService
         $checkoutService = pluginApp(CheckoutService::class);
         $customerService = pluginApp(CustomerService::class);
         
+        $basket = $this->basketService->getBasket();
+        
         $couponCode = null;
-        if(strlen($this->basketService->getBasket()->couponCode))
+        if(strlen($basket->couponCode))
         {
-            $couponCode = $this->basketService->getBasket()->couponCode;
+            $couponCode = $basket->couponCode;
         }
         
 		$order = pluginApp(OrderBuilder::class)->prepare(OrderType::ORDER)

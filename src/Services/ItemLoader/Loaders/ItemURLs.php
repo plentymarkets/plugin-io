@@ -12,6 +12,8 @@ use Plenty\Modules\Cloud\ElasticSearch\Lib\Source\Mutator\BuiltIn\LanguageMutato
 
 class ItemURLs implements ItemLoaderContract
 {
+    private $options;
+
     /**
      * @return SearchInterface
      */
@@ -45,6 +47,27 @@ class ItemURLs implements ItemLoaderContract
      */
     public function getFilterStack($options = [])
     {
-        return pluginApp(SingleItem::class)->getFilterStack($options);
+        return pluginApp(SingleItem::class)->getFilterStack($this->options);
+    }
+
+    /**
+     * @param array $options
+     */
+    public function setOptions($options = [])
+    {
+        $this->options = $options;
+    }
+
+    /**
+     * @param array $defaultResultFields
+     * @return array
+     */
+    public function getResultFields($defaultResultFields)
+    {
+        return [
+            'item.id',
+            'variation.id',
+            'texts.*',
+            'defaultCategories'];
     }
 }

@@ -25,6 +25,8 @@ use Plenty\Modules\Item\Search\Filter\SalesPriceFilter;
  */
 class CrossSellingItems implements ItemLoaderContract
 {
+    private $options = [];
+    
     /**
      * @return SearchInterface
      */
@@ -70,8 +72,11 @@ class CrossSellingItems implements ItemLoaderContract
         /**
          * @var CrossSellingFilter $crossSellingFilter
          */
-        $crossSellingFilter = pluginApp(CrossSellingFilter::class, [$options['crossSellingItemId']]);
-        $crossSellingFilter->hasRelation($crossSellingService->getType());
+        if(isset($options['crossSellingItemId']) && (int)$options['crossSellingItemId'] > 0)
+        {
+            $crossSellingFilter = pluginApp(CrossSellingFilter::class, [$options['crossSellingItemId']]);
+            $crossSellingFilter->hasRelation($crossSellingService->getType());
+        }
         
         $sessionLang = pluginApp(SessionStorageService::class)->getLang();
         
@@ -128,13 +133,19 @@ class CrossSellingItems implements ItemLoaderContract
         $priceFilter = pluginApp(SalesPriceFilter::class);
         $priceFilter->hasAtLeastOnePrice($priceIds);
         
-        return [
+        $filters = [
             $clientFilter,
             $variationFilter,
-            $crossSellingFilter,
             $textFilter,
             $priceFilter
         ];
+        
+        if($crossSellingFilter instanceof CrossSellingFilter)
+        {
+            $filters[] = $crossSellingFilter;
+        }
+        
+        return $filters;
     }
     
     /**
@@ -153,5 +164,20 @@ class CrossSellingItems implements ItemLoaderContract
     public function getItemsPerPage($options = [])
     {
         return ( (INT)$options['items'] > 0 ? (INT)$options['items'] : 20 );
+    }
+    
+    public function setOptions($options = [])
+    {
+        $this->options = $options;
+        return $options;
+    }
+
+    /**
+     * @param array $defaultResultFields
+     * @return array
+     */
+    public function getResultFields($defaultResultFields)
+    {
+        return $defaultResultFields;
     }
 }

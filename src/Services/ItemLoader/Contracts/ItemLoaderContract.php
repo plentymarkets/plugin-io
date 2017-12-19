@@ -25,4 +25,15 @@ interface ItemLoaderContract
 	 * @return TypeInterface[]
 	 */
 	public function getFilterStack($options = []);
+    
+    /**
+     * @param array $options
+     */
+	public function setOptions($options = []);
+
+    /**
+     * @param array $defaultResultFields
+     * @return array
+     */
+	public function getResultFields($defaultResultFields);
 }

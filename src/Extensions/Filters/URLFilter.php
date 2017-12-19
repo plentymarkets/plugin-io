@@ -5,6 +5,7 @@ namespace IO\Extensions\Filters;
 use IO\Extensions\AbstractFilter;
 use IO\Services\ItemService;
 use IO\Services\TemplateConfigService;
+use IO\Services\UrlBuilder\Variation;
 use IO\Services\UrlService;
 
 /**
@@ -55,18 +56,18 @@ class URLFilter extends AbstractFilter
         $itemId = $itemData['item']['id'];
         $variationId = $itemData['variation']['id'];
 
-        UrlService::prepareItemUrlMap( $itemData );
-
-	    /** @var UrlService $urlService */
-	    $urlService = pluginApp(UrlService::class);
-	    $url = $urlService->getVariationURL( $itemId, $variationId )->toRelativeUrl();
-
-	    if( !$withVariationId && $this->templateConfigService->get('global.enableOldUrlPattern') === "false" )
+        if ( $itemId === null || $itemId <= 0 || $variationId === null || $variationId <= 0 )
         {
-            $url = substr( $url, 0, strlen($url) - strlen("_" . $variationId ));
+            return "";
         }
 
-        return $url;
+        /** @var Variation $variationUrlBuilder */
+        $variationUrlBuilder = pluginApp( Variation::class );
+	    $url = $variationUrlBuilder->buildUrl( $itemId, $variationId );
+
+        return $url->append(
+            $variationUrlBuilder->getSuffix( $itemId, $variationId )
+        )->toRelativeUrl();
 	}
 
     /**

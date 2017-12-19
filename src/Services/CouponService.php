@@ -17,7 +17,7 @@ class CouponService
          * @var BasketRepositoryContract $basket
          */
         $basket = pluginApp(BasketRepositoryContract::class);
-        return $basket->save(['couponCode' => $couponCode]);
+        return $basket->setCouponCode($couponCode);
     }
     
     public function removeCoupon()
@@ -26,6 +26,6 @@ class CouponService
          * @var BasketRepositoryContract $basket
          */
         $basket = pluginApp(BasketRepositoryContract::class);
-        return $basket->save(['couponCode' => '']);
+        return $basket->removeCouponCode();
     }
 }
