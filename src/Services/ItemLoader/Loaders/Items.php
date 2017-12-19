@@ -24,6 +24,8 @@ use Plenty\Plugin\Application;
  */
 class Items implements ItemLoaderContract
 {
+    private $options = [];
+    
     /**
      * @return SearchInterface
      */
@@ -120,5 +122,11 @@ class Items implements ItemLoaderContract
             $variationFilter,
             $textFilter
         ];
+    }
+    
+    public function setOptions($options = [])
+    {
+        $this->options = $options;
+        return $options;
     }
 }

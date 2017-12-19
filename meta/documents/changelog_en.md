@@ -1,5 +1,22 @@
 # Release Notes for IO
 
+## v2.0.2 (2017-12-13) <a href="https://github.com/plentymarkets/plugin-io/compare/2.0.1...2.0.2" target="_blank"><b>Overview of all changes</b></a>
+
+### Added
+
+- The additional flag `isSelectable` is sent when loading payment methods.
+
+### Fixed
+
+- Order referrers will now be taken into consideration when loading items or calculating prices.
+- Various errors concerning the handling of coupon codes have been fixed.
+
+## v2.0.1 (2017-12-06) <a href="https://github.com/plentymarkets/plugin-io/compare/2.0.0...2.0.1" target="_blank"><b>Overview of all changes</b></a>
+
+### Fixed
+
+- Due to an error the default homepage wasn't displayed correctly. This has been fixed.
+
 ## v2.0.0 (2017-11-30) <a href="https://github.com/plentymarkets/plugin-io/compare/1.7.2...2.0.0" target="_blank"><b>Overview of all changes</b></a>
 
 ### Added

@@ -1,1 +1,0 @@
-git checkout development && git pull origin development && git checkout beta && git pull origin beta && git merge development && git push -u origin beta && git checkout stable && git pull origin stable && git merge beta && git push -u origin stable

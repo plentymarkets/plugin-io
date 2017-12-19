@@ -6,13 +6,6 @@ use Plenty\Modules\Category\Models\Category;
 use Plenty\Modules\Category\Contracts\CategoryRepositoryContract;
 use Plenty\Repositories\Models\PaginatedResult;
 
-use IO\Services\SessionStorageService;
-use IO\Services\WebstoreConfigurationService;
-use IO\Services\ItemService;
-use IO\Helper\CategoryMap;
-use IO\Helper\CategoryKey;
-use IO\Builder\Category\CategoryParamsBuilder;
-
 /**
  * Class CategoryService
  * @package IO\Services

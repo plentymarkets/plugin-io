@@ -4,6 +4,7 @@ namespace IO\Controllers;
 use IO\Helper\CategoryKey;
 use IO\Services\CategoryService;
 use IO\Services\ItemLastSeenService;
+use IO\Services\ItemLoader\Extensions\TwigLoaderPresets;
 use IO\Services\ItemLoader\Loaders\CrossSellingItems;
 use IO\Services\ItemService;
 use IO\Services\ItemLoader\Loaders\SingleItem;
@@ -53,10 +54,14 @@ class ItemController extends ItemLoaderController
         $attributeNameMap = $itemService->getAttributeNameMap($itemId);
 
         $templateContainer = $this->buildTemplateContainer("tpl.item", $loaderOptions);
-
+        
+        /** @var TwigLoaderPresets $loaderPresets */
+        $loaderPresets = pluginApp(TwigLoaderPresets::class);
+        $presets = $loaderPresets->getGlobals();
+        
         /** @var ItemLoaderService $loaderService */
         $loaderService = $templateContainer->getTemplateData()['itemLoader'];
-        $loaderService->setLoaderClassList(["single" => [SingleItem::class, SingleItemAttributes::class], "multi" => [CrossSellingItems::class]]);
+        $loaderService->setLoaderClassList($presets['itemLoaderPresets']['singleItem']);
 
         $itemResult = $loaderService->load();
 
