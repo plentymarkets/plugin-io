@@ -76,51 +76,53 @@ class VariationUrlBuilder
                 }
             }
 
-            $itemName4Url = StringUtils::string4URL( $itemData['name'] );
-            $itemUrl = null;
-            if ( $itemData['defaultCategory'] > 0 )
+            $itemUrl = $this->buildUrlQuery( null, $lang );
+            if ( count( $itemData ) && strlen( $itemData['name'] ) )
             {
-                /** @var CategoryUrlBuilder $categoryUrlBuilder */
-                $categoryUrlBuilder = pluginApp( CategoryUrlBuilder::class );
-                $itemUrl = $categoryUrlBuilder
-                    ->buildUrl( $itemData['defaultCategory'], $lang )
-                    ->join( $itemName4Url );
-            }
-            else
-            {
-                $itemUrl = $this->buildUrlQuery( $itemName4Url, $lang );
-            }
-
-            /** @var AuthHelper $authHelper */
-            $authHelper = pluginApp( AuthHelper::class );
-
-            $authHelper->processUnguarded(
-                function() use ( $variationId, $lang, $itemUrl  ) {
-                    /** @var VariationDescriptionRepositoryContract $variationDescriptionRepository */
-                    $variationDescriptionRepository = pluginApp( VariationDescriptionRepositoryContract::class );
-
-                    $variationDescriptionRepository->update(
-                        [
-                            'urlPath' => $itemUrl->getPath()
-                        ],
-                        $variationId,
-                        $lang
-                    );
+                $itemName4Url = StringUtils::string4URL($itemData['name']);
+                if ($itemData['defaultCategory'] > 0)
+                {
+                    /** @var CategoryUrlBuilder $categoryUrlBuilder */
+                    $categoryUrlBuilder = pluginApp(CategoryUrlBuilder::class);
+                    $itemUrl = $categoryUrlBuilder
+                        ->buildUrl($itemData['defaultCategory'], $lang)
+                        ->join($itemName4Url);
                 }
-            );
-            self::$urlPathMap[$itemId][$variationId][$lang] = [
-                'urlPath' => $itemUrl->getPath(),
-            ];
+                else
+                    {
+                    $itemUrl = $this->buildUrlQuery($itemName4Url, $lang);
+                }
 
-            self::$urlPathMap[$itemId][$variationId][$lang] = [
-                'urlPath'           => $itemUrl->getPath(),
-                'name'              => $itemData['name'],
-                'defaultCategory'   => $itemData['defaultCategory']
-            ];
+                /** @var AuthHelper $authHelper */
+                $authHelper = pluginApp(AuthHelper::class);
 
-            return $itemUrl;
+                $authHelper->processUnguarded(
+                    function () use ($variationId, $lang, $itemUrl) {
+                        /** @var VariationDescriptionRepositoryContract $variationDescriptionRepository */
+                        $variationDescriptionRepository = pluginApp(VariationDescriptionRepositoryContract::class);
+
+                        $variationDescriptionRepository->update(
+                            [
+                                'urlPath' => $itemUrl->getPath()
+                            ],
+                            $variationId,
+                            $lang
+                        );
+                    }
+                );
+                self::$urlPathMap[$itemId][$variationId][$lang] = [
+                    'urlPath' => $itemUrl->getPath(),
+                ];
+
+                self::$urlPathMap[$itemId][$variationId][$lang] = [
+                    'urlPath' => $itemUrl->getPath(),
+                    'name' => $itemData['name'],
+                    'defaultCategory' => $itemData['defaultCategory']
+                ];
+            }
         }
 
+        return $itemUrl;
     }
 
     public function getSuffix( $itemId, $variationId )

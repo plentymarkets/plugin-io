@@ -36,17 +36,22 @@ class UrlService
     {
         /** @var VariationUrlBuilder $variationUrlBuilder */
         $variationUrlBuilder = pluginApp( VariationUrlBuilder::class );
-        return $variationUrlBuilder
-            ->buildUrl( $itemId, $variationId, $lang )
-            ->append(
+        $variationUrl = $variationUrlBuilder->buildUrl( $itemId, $variationId, $lang );
+
+        if ( $variationUrl->getPath() !== null )
+        {
+            $variationUrl->append(
                 $variationUrlBuilder->getSuffix( $itemId, $variationId )
             );
+        }
+
+        return $variationUrl;
     }
 
     /**
      * Get canonical url for current page
      * @param string|null   $lang
-     * @return UrlQuery|null
+     * @return string|null
      */
     public function getCanonicalURL( $lang = null )
     {
@@ -58,7 +63,8 @@ class UrlService
             if ( count($currentItem) > 0 )
             {
                 return $this
-                    ->getVariationURL( $currentItem['item']['id'], $currentItem['variation']['id'], $lang );
+                    ->getVariationURL( $currentItem['item']['id'], $currentItem['variation']['id'], $lang )
+                    ->toAbsoluteUrl( $lang !== null );
             }
 
             return null;
@@ -70,14 +76,17 @@ class UrlService
 
             if ( $currentCategory !== null )
             {
-                return $this->getCategoryURL( $currentCategory->id, $lang );
+                return $this
+                    ->getCategoryURL( $currentCategory->id, $lang )
+                    ->toAbsoluteUrl( $lang !== null );
             }
             return null;
         }
 
         if ( TemplateService::$currentTemplate === 'tpl.home' )
         {
-            return pluginApp( UrlQuery::class, ['path' => "", 'lang' => $lang]);
+            return pluginApp( UrlQuery::class, ['path' => "", 'lang' => $lang])
+                ->toAbsoluteUrl( $lang !== null );
         }
 
         return null;
@@ -94,7 +103,7 @@ class UrlService
 
         if ( $defaultUrl !== null )
         {
-            $result["x-default"] = $defaultUrl->toAbsoluteUrl();
+            $result["x-default"] = $defaultUrl;
         }
 
         /** @var WebstoreConfigurationService $webstoreConfigService */
@@ -104,7 +113,7 @@ class UrlService
             $url = $this->getCanonicalURL( $language );
             if ( $url !== null )
             {
-                $result[$language] = $url->toAbsoluteUrl(true);
+                $result[$language] = $url;
             }
         }
 

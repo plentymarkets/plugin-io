@@ -118,13 +118,13 @@ class CategoryService
 	 * Return the URL for a given category ID.
 	 * @param Category $category the category to get the URL for
 	 * @param string $lang the language to get the URL for
-	 * @return string
+	 * @return string|null
 	 */
-	public function getURL($category, string $lang = "de"):string
+	public function getURL($category, string $lang = "de")
 	{
 		if(!$category instanceof Category || $category->details[0] === null)
 		{
-			return "ERR";
+			return null;
 		}
 		return "/" . $this->categoryRepository->getUrl($category->id, $lang);
 	}

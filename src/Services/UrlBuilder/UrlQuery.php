@@ -11,20 +11,22 @@ class UrlQuery
     private $path;
     private $lang;
 
-    public function __construct( string $path = "", string $lang = null )
+    public function __construct( $path = null, $lang = null )
     {
         $this->domain = pluginApp(WebstoreConfigurationService::class )->getWebstoreConfig()->domainSsl;
         $this->path = $path;
 
-        if ( substr( $this->path, 0, 1 ) !== "/" )
+        if ( $path !== null )
         {
-            $this->path = "/" . $this->path;
+            if (substr($this->path, 0, 1) !== "/") {
+                $this->path = "/" . $this->path;
+            }
+
+            if (substr($this->path, strlen($this->path) - 1, 1) === "/") {
+                $this->path = substr($this->path, 0, strlen($this->path) - 1);
+            }
         }
 
-        if ( substr( $this->path, strlen($this->path)-1, 1 ) === "/" )
-        {
-            $this->path = substr( $this->path, 0, strlen($this->path)-1 );
-        }
 
         if ( $lang === null )
         {
@@ -85,6 +87,11 @@ class UrlQuery
 
     public function getPath( bool $includeLanguage = false )
     {
+        if ( $this->path === null )
+        {
+            return null;
+        }
+
         return substr( $this->toRelativeUrl( $includeLanguage ), 1 );
     }
 }
