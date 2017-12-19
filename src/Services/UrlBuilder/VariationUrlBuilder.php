@@ -54,30 +54,31 @@ class VariationUrlBuilder
      */
     public function buildUrl(int $itemId, int $variationId, string $lang = null ): UrlQuery
     {
+        $itemUrl = $this->buildUrlQuery( null, $lang );
+
         if ( $lang === null )
         {
             $lang = pluginApp( SessionStorageService::class )->getLang();
         }
 
+        if ( count( self::$urlPathMap[$itemId][$variationId] ) <= 0 )
+        {
+            $this->searchItem( $itemId, $variationId, $lang );
+
+        }
+
         $itemData = self::$urlPathMap[$itemId][$variationId][$lang];
 
-        if ( $itemData !== null && $itemData['urlPath'] !== null && strlen( $itemData['urlPath'] ) )
+        if ( count( $itemData ) )
         {
-            return $this->buildUrlQuery( $itemData['urlPath'], $lang );
-        }
-        else
-        {
-            if ( $itemData === null )
+            if ( strlen( $itemData['urlPath'] ) )
             {
-                $itemData = $this->searchItem( $itemId, $variationId, $lang );
-                if ( strlen($itemData['urlPath']) )
-                {
-                    return $this->buildUrlQuery( $itemData['urlPath'], $lang );
-                }
+                // url is set on item
+                return $this->buildUrlQuery( $itemData['urlPath'], $lang );
             }
 
-            $itemUrl = $this->buildUrlQuery( null, $lang );
-            if ( count( $itemData ) && strlen( $itemData['name'] ) )
+            // generate url
+            if ( strlen($itemData['name']) )
             {
                 $itemName4Url = StringUtils::string4URL($itemData['name']);
                 if ($itemData['defaultCategory'] > 0)
@@ -89,36 +90,32 @@ class VariationUrlBuilder
                         ->join($itemName4Url);
                 }
                 else
-                    {
+                {
                     $itemUrl = $this->buildUrlQuery($itemName4Url, $lang);
                 }
 
-                /** @var AuthHelper $authHelper */
-                $authHelper = pluginApp(AuthHelper::class);
+                if ( strlen($itemUrl->getPath()) )
+                {
+                    /** @var AuthHelper $authHelper */
+                    $authHelper = pluginApp(AuthHelper::class);
 
-                $authHelper->processUnguarded(
-                    function () use ($variationId, $lang, $itemUrl) {
-                        /** @var VariationDescriptionRepositoryContract $variationDescriptionRepository */
-                        $variationDescriptionRepository = pluginApp(VariationDescriptionRepositoryContract::class);
+                    $authHelper->processUnguarded(
+                        function () use ($variationId, $lang, $itemUrl) {
+                            /** @var VariationDescriptionRepositoryContract $variationDescriptionRepository */
+                            $variationDescriptionRepository = pluginApp(VariationDescriptionRepositoryContract::class);
 
-                        $variationDescriptionRepository->update(
-                            [
-                                'urlPath' => $itemUrl->getPath()
-                            ],
-                            $variationId,
-                            $lang
-                        );
-                    }
-                );
-                self::$urlPathMap[$itemId][$variationId][$lang] = [
-                    'urlPath' => $itemUrl->getPath(),
-                ];
+                            $variationDescriptionRepository->update(
+                                [
+                                    'urlPath' => $itemUrl->getPath()
+                                ],
+                                $variationId,
+                                $lang
+                            );
+                        }
+                    );
 
-                self::$urlPathMap[$itemId][$variationId][$lang] = [
-                    'urlPath' => $itemUrl->getPath(),
-                    'name' => $itemData['name'],
-                    'defaultCategory' => $itemData['defaultCategory']
-                ];
+                    self::$urlPathMap[$itemId][$variationId][$lang]['urlPath'] = $itemUrl->getPath();
+                }
             }
         }
 
