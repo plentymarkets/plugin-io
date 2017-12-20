@@ -153,4 +153,13 @@ class CategoryItems implements ItemLoaderContract, ItemLoaderPaginationContract,
         $this->options = $options;
         return $options;
     }
+
+    /**
+     * @param array $defaultResultFields
+     * @return array
+     */
+    public function getResultFields($defaultResultFields)
+    {
+        return $defaultResultFields;
+    }
 }

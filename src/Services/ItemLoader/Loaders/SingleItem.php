@@ -31,7 +31,12 @@ class SingleItem implements ItemLoaderContract
 	 */
 	public function getSearch()
 	{
-        $languageMutator = pluginApp(LanguageMutator::class, ["languages" => [pluginApp(SessionStorageService::class)->getLang()]]);
+        $sessionLang =  $this->options['lang'];
+        if ( $sessionLang === null )
+        {
+            $sessionLang = pluginApp(SessionStorageService::class)->getLang();
+        }
+        $languageMutator = pluginApp(LanguageMutator::class, ["languages" => [$sessionLang]]);
         $imageMutator = pluginApp(ImageMutator::class);
         $imageMutator->addClient(pluginApp(Application::class)->getPlentyId());
         
@@ -75,7 +80,11 @@ class SingleItem implements ItemLoaderContract
             $variationFilter->hasId($options['variationId']);
         }
         
-        $sessionLang = pluginApp(SessionStorageService::class)->getLang();
+        $sessionLang =  $options['lang'];
+		if ( $sessionLang === null )
+		{
+		    $sessionLang = pluginApp(SessionStorageService::class)->getLang();
+        }
         
         $langMap = [
             'de' => TextFilter::LANG_DE,
@@ -142,5 +151,14 @@ class SingleItem implements ItemLoaderContract
     {
         $this->options = $options;
         return $options;
+    }
+
+    /**
+     * @param array $defaultResultFields
+     * @return array
+     */
+    public function getResultFields($defaultResultFields)
+    {
+        return $defaultResultFields;
     }
 }

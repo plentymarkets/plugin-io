@@ -30,4 +30,10 @@ interface ItemLoaderContract
      * @param array $options
      */
 	public function setOptions($options = []);
+
+    /**
+     * @param array $defaultResultFields
+     * @return array
+     */
+	public function getResultFields($defaultResultFields);
 }

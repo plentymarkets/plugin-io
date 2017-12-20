@@ -180,4 +180,13 @@ class TagItems implements ItemLoaderContract, ItemLoaderPaginationContract, Item
         $this->options = $options;
         return $options;
     }
+
+    /**
+     * @param array $defaultResultFields
+     * @return array
+     */
+    public function getResultFields($defaultResultFields)
+    {
+        return $defaultResultFields;
+    }
 }
