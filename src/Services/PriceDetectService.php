@@ -75,10 +75,10 @@ class PriceDetectService
         $contact = $this->customerService->getContact();
         
         if ($contact instanceof Contact) {
-            $this->classId      = $contact->classId;
             $this->singleAccess = $contact->singleAccess;
         }
-        
+
+        $this->classId           = $this->customerService->getContactClassId();
         $this->currency          = $this->checkoutService->getCurrency();
         $this->shippingCountryId = $this->checkoutService->getShippingCountryId();
         $this->plentyId          = $this->app->getPlentyId();
