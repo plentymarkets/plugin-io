@@ -2,6 +2,7 @@
 
 namespace IO\Builder\Order;
 
+use IO\Services\OrderPropertyFileService;
 use IO\Services\SessionStorageService;
 use Plenty\Modules\Basket\Models\Basket;
 use Plenty\Modules\Basket\Models\BasketItem;
@@ -107,8 +108,17 @@ class OrderItemBuilder
         $basketItemProperties = [];
         if(count($basketItem['basketItemOrderParams']))
         {
+            /** @var OrderPropertyFileService $orderPropertyFileService */
+            $orderPropertyFileService = pluginApp(OrderPropertyFileService::class);
+            
             foreach($basketItem['basketItemOrderParams'] as $property)
             {
+                if($property['type'] == 'file')
+                {
+                    $newFileURL = $orderPropertyFileService->copyFromTemp($property['value']);
+                    $property['value'] = $newFileURL;
+                }
+                
                 $basketItemProperty = [
                     'propertyId' => $property['propertyId'],
                     'value'      => $property['value']
