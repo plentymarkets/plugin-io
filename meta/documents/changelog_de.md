@@ -4,7 +4,7 @@
 
 ### Hinzugefügt
 
-- Übersetzbare Fehlermeldung bei der Registrierung für den Fall, dass die Emailadresse bereits existiert.
+- Übersetzbare Fehlermeldung bei der Registrierung für den Fall, dass die E-Mail-Adresse bereits existiert.
 
 ### Behoben
 

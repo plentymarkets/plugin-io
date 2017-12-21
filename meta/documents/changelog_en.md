@@ -1,5 +1,16 @@
 # Release Notes for IO
 
+## v2.0.3 (2017-12-21) <a href="https://github.com/plentymarkets/plugin-io/compare/2.0.2...2.0.3" target="_blank"><b>Overview of all changes</b></a>
+
+### Added
+
+- Translatable error message for registration in case the email address already exists.
+
+### Fixed
+
+- Delivery address can now be set back to "Delivery address equals invoice address".
+- Fixed error for item visibility in spite of link to customer class.
+
 ## v2.0.2 (2017-12-13) <a href="https://github.com/plentymarkets/plugin-io/compare/2.0.1...2.0.2" target="_blank"><b>Overview of all changes</b></a>
 
 ### Added
