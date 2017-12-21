@@ -323,7 +323,7 @@ class ItemLoaderFactoryES implements ItemLoaderFactory
             {
                 if((int)$variation['data']['variation']['id'] > 0)
                 {
-                    if((int)$customerClassMinimumOrderQuantity > 0)
+                    if((int)$customerClassMinimumOrderQuantity > $variation['data']['variation']['minimumOrderQuantity'])
                     {
                         $variation['data']['variation']['minimumOrderQuantity'] = $customerClassMinimumOrderQuantity;
                     }
