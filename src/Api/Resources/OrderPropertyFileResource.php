@@ -2,12 +2,12 @@
 
 namespace IO\Api\Resources;
 
+use Plenty\Modules\Frontend\Services\OrderPropertyFileService;
 use Plenty\Plugin\Http\Response;
 use Plenty\Plugin\Http\Request;
 use IO\Api\ApiResource;
 use IO\Api\ApiResponse;
 use IO\Api\ResponseCode;
-use IO\Services\OrderPropertyFileService;
 
 /**
  * Class OrderPropertyFileResource

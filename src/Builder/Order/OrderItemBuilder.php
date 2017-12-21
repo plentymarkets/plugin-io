@@ -2,12 +2,10 @@
 
 namespace IO\Builder\Order;
 
-use IO\Services\OrderPropertyFileService;
-use IO\Services\SessionStorageService;
 use Plenty\Modules\Basket\Models\Basket;
-use Plenty\Modules\Basket\Models\BasketItem;
 use IO\Services\CheckoutService;
 use Plenty\Modules\Frontend\PaymentMethod\Contracts\FrontendPaymentMethodRepositoryContract;
+use Plenty\Modules\Frontend\Services\OrderPropertyFileService;
 use Plenty\Modules\Frontend\Services\VatService;
 
 /**
@@ -115,8 +113,7 @@ class OrderItemBuilder
             {
                 if($property['type'] == 'file')
                 {
-                    $newFileURL = $orderPropertyFileService->copyFromTemp($property['value']);
-                    $property['value'] = $newFileURL;
+                    $orderPropertyFileService->copyBasketFileToOrder($property['value']);
                 }
                 
                 $basketItemProperty = [
