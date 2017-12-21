@@ -113,7 +113,8 @@ class OrderItemBuilder
             {
                 if($property['type'] == 'file')
                 {
-                    $orderPropertyFileService->copyBasketFileToOrder($property['value']);
+                    $file = $orderPropertyFileService->copyBasketFileToOrder($property['value']);
+                    $property['value'] = $file;
                 }
                 
                 $basketItemProperty = [
