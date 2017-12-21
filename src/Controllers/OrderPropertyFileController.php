@@ -13,7 +13,7 @@ class OrderPropertyFileController extends LayoutController
         {
             /** @var OrderPropertyFileService $orderPropertyFileService */
             $orderPropertyFileService = pluginApp(OrderPropertyFileService::class);
-            $url = $orderPropertyFileService->getFileURL($filename);
+            $url = $orderPropertyFileService->getFileURL($hash . '/' . $filename);
             
             return pluginApp(Response::class)->redirectTo($url);
         }
