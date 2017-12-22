@@ -26,9 +26,7 @@ class OrderPropertyFileResource extends ApiResource
     
     public function store():Response
     {
-        $fileData = $_FILES['fileData'];
-        //$fileData = $this->request->get('fileData', null);
-        $file = $this->orderPropertyFileService->uploadFile($fileData);
+        $file = $this->orderPropertyFileService->uploadFile($_FILES['fileData']);
         return $this->response->create($file, ResponseCode::OK);
     }
 }
