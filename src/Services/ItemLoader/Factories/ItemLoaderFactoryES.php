@@ -12,6 +12,8 @@ use IO\Services\ItemWishListService;
 use IO\Services\SalesPriceService;
 use IO\Services\SessionStorageService;
 use IO\Services\CustomerService;
+use IO\Services\UrlBuilder\VariationUrlBuilder;
+use IO\Services\UrlService;
 use Plenty\Legacy\Services\Item\Variation\SalesPriceService as BasePriceService;
 use Plenty\Modules\Item\Unit\Contracts\UnitRepositoryContract;
 use Plenty\Modules\Item\Unit\Contracts\UnitNameRepositoryContract;
@@ -77,6 +79,7 @@ class ItemLoaderFactoryES implements ItemLoaderFactory
 
         $result = $this->attachPrices($result, $options);
         $result = $this->attachItemWishList($result);
+        $result = $this->attachURLs($result);
 
         return $result;
     }
@@ -135,6 +138,10 @@ class ItemLoaderFactoryES implements ItemLoaderFactory
             if(array_key_exists($loaderClass, $currentFields))
             {
                 $currentFields = $currentFields[$loaderClass];
+            }
+            else
+            {
+                $currentFields = $loader->getResultFields( $resultFields );
             }
 
             $fieldsFound = false;
@@ -234,6 +241,10 @@ class ItemLoaderFactoryES implements ItemLoaderFactory
                 {
                     $currentFields = $currentFields[$loaderClass];
                 }
+                else
+                {
+                    $currentFields = $loader->getResultFields( $resultFields );
+                }
 
                 $fieldsFound = false;
                 foreach($currentFields as $fieldName)
@@ -327,7 +338,7 @@ class ItemLoaderFactoryES implements ItemLoaderFactory
             {
                 if((int)$variation['data']['variation']['id'] > 0)
                 {
-                    if((int)$customerClassMinimumOrderQuantity > 0)
+                    if((int)$customerClassMinimumOrderQuantity > $variation['data']['variation']['minimumOrderQuantity'])
                     {
                         $variation['data']['variation']['minimumOrderQuantity'] = $customerClassMinimumOrderQuantity;
                     }
@@ -496,6 +507,35 @@ class ItemLoaderFactoryES implements ItemLoaderFactory
                 }
             }
         }
+        return $result;
+    }
+
+    private function attachURLs($result)
+    {
+        if ( count( $result ) && count( $result['ItemURLs'] ) )
+        {
+            /** @var VariationUrlBuilder $itemUrlBuilder */
+            $itemUrlBuilder = pluginApp( VariationUrlBuilder::class );
+            $itemUrlDocuments = $result['ItemURLs']['documents'];
+            foreach( $itemUrlDocuments as $key => $urlDocument )
+            {
+                VariationUrlBuilder::fillItemUrl( $urlDocument['data'] );
+                $document = $result['documents'][$key];
+                if ( count( $document )
+                    && count( $document['data']['texts'] )
+                    && strlen( $document['data']['texts']['urlPath'] ) <= 0 )
+                {
+                    // attach generated item url if not defined
+                    $itemUrl = $itemUrlBuilder->buildUrl(
+                        $urlDocument['data']['item']['id'],
+                        $urlDocument['data']['variation']['id']
+                    )->getPath();
+                    $result['documents'][$key]['data']['texts']['urlPath'] = $itemUrl;
+                }
+
+            }
+        }
+
         return $result;
     }
 }

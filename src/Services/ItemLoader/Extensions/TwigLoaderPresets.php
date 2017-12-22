@@ -1,8 +1,10 @@
 <?php
 namespace IO\Services\ItemLoader\Extensions;
 
+use IO\Services\ItemLoader\Loaders\BasketItems;
 use IO\Services\ItemLoader\Loaders\CategoryItems;
 use IO\Services\ItemLoader\Loaders\CrossSellingItems;
+use IO\Services\ItemLoader\Loaders\ItemURLs;
 use IO\Services\ItemLoader\Loaders\LastSeenItemList;
 use IO\Services\ItemLoader\Loaders\SearchItems;
 use IO\Services\ItemLoader\Loaders\Facets;
@@ -43,16 +45,18 @@ class TwigLoaderPresets extends Twig_Extension
                     ],
                     "multi" => [
                         'crossSellingItemsList' => CrossSellingItems::class,
-                        'singleItemAttributes' => SingleItemAttributes::class
+                        'singleItemAttributes' => SingleItemAttributes::class,
+                        'itemURLs' => ItemURLs::class
                     ]
 				],
-			    
+
 			    "categoryList" => [
 			        "single" => [
                         CategoryItems::class
                     ],
                     "multi" => [
-                        'facets' => Facets::class
+                        'facets' => Facets::class,
+                        'itemURLs' => ItemURLs::class
                     ]
 			    ],
                 "search" => [
@@ -60,12 +64,16 @@ class TwigLoaderPresets extends Twig_Extension
                         SearchItems::class
                     ],
                     "multi" => [
-                        'facets' => Facets::class
+                        'facets' => Facets::class,
+                        'itemURLs' => ItemURLs::class
                     ]
                 ],
                 "lastSeenItemsList" => [
                     "single" => [
                         LastSeenItemList::class
+                    ],
+                    "multi" => [
+                        'itemURLs' => ItemURLs::class
                     ]
                 ],
                 "items" => [
@@ -76,11 +84,25 @@ class TwigLoaderPresets extends Twig_Extension
                 "crossSellingItemsList" => [
                     "single" => [
                         CrossSellingItems::class
+                    ],
+                    "multi" => [
+                        'itemURLs' => ItemURLs::class
                     ]
                 ],
                 "tagList" => [
                     "single" => [
                         TagItems::class
+                    ],
+                    "multi" => [
+                        'itemURLs' => ItemURLs::class
+                    ]
+                ],
+                "basketItems" => [
+                    "single" => [
+                        BasketItems::class
+                    ],
+                    "multi" => [
+                        'itemURLs' => ItemURLs::class
                     ]
                 ]
 			]

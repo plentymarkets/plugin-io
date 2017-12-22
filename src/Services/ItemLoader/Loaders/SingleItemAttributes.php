@@ -81,4 +81,13 @@ class SingleItemAttributes implements ItemLoaderContract
         $this->options = $options;
         return $options;
     }
+
+    /**
+     * @param array $defaultResultFields
+     * @return array
+     */
+    public function getResultFields($defaultResultFields)
+    {
+        return $defaultResultFields;
+    }
 }

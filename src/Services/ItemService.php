@@ -14,6 +14,7 @@ use IO\Builder\Item\Params\ItemColumnsParams;
 use IO\Constants\CrossSellingType;
 use IO\Constants\ItemConditionTexts;
 use IO\Constants\Language;
+use IO\Services\ItemLoader\Loaders\ItemURLs;
 use IO\Services\ItemLoader\Services\ItemLoaderService;
 use IO\Services\ItemLoader\Loaders\Items;
 use IO\Extensions\Filters\ItemImagesFilter;
@@ -597,6 +598,7 @@ class ItemService
 	 * Get the item URL
 	 * @param int $itemId
 	 * @return Record
+     * @deprecated Use UrlService instead
 	 */
 	public function getItemURL(int $itemId):Record
 	{
@@ -734,7 +736,7 @@ class ItemService
 	{
 		return ItemConditionTexts::$itemConditionTexts[$conditionId];
 	}
-	
+
 	/**
 	 * @param int $limit
 	 * @param int $categoryId
