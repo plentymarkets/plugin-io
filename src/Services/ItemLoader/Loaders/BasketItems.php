@@ -17,6 +17,8 @@ use Plenty\Plugin\Application;
 
 class BasketItems implements ItemLoaderContract, ItemLoaderPaginationContract
 {
+    private $options = [];
+    
     /**
      * @return SearchInterface
      */
@@ -83,5 +85,20 @@ class BasketItems implements ItemLoaderContract, ItemLoaderPaginationContract
     public function getItemsPerPage($options = [])
     {
         return (INT)$options['items'];
+    }
+    
+    public function setOptions($options = [])
+    {
+        $this->options = $options;
+        return $options;
+    }
+
+    /**
+     * @param array $defaultResultFields
+     * @return array
+     */
+    public function getResultFields($defaultResultFields)
+    {
+        return $defaultResultFields;
     }
 }

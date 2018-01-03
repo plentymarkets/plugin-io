@@ -44,7 +44,7 @@ class ItemSearchAutocompleteResource extends ApiResource
                     'autocomplete'      => true,
                     'page'              => 1,
                     'items'             => 20,
-                    'variationShowType' => $this->request->get('variationShowType', 'all'),
+                    'variationShowType' => $this->request->get('variationShowType', ''),
                 ]);
             
             return $this->response->create($response, ResponseCode::OK);

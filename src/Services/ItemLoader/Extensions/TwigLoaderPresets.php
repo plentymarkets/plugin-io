@@ -1,7 +1,10 @@
 <?php
 namespace IO\Services\ItemLoader\Extensions;
+
+use IO\Services\ItemLoader\Loaders\BasketItems;
 use IO\Services\ItemLoader\Loaders\CategoryItems;
 use IO\Services\ItemLoader\Loaders\CrossSellingItems;
+use IO\Services\ItemLoader\Loaders\ItemURLs;
 use IO\Services\ItemLoader\Loaders\LastSeenItemList;
 use IO\Services\ItemLoader\Loaders\SearchItems;
 use IO\Services\ItemLoader\Loaders\Facets;
@@ -38,29 +41,39 @@ class TwigLoaderPresets extends Twig_Extension
 				
 				"singleItem" => [
 				    "single" => [
-                        SingleItem::class,
-                        SingleItemAttributes::class,
+                        SingleItem::class
                     ],
                     "multi" => [
-                        'crossSellingItemsList' => CrossSellingItems::class
+                        'crossSellingItemsList' => CrossSellingItems::class,
+                        'singleItemAttributes' => SingleItemAttributes::class,
+                        'itemURLs' => ItemURLs::class
                     ]
 				],
-			    
+
 			    "categoryList" => [
 			        "single" => [
-                        CategoryItems::class,
-                        Facets::class
+                        CategoryItems::class
+                    ],
+                    "multi" => [
+                        'facets' => Facets::class,
+                        'itemURLs' => ItemURLs::class
                     ]
 			    ],
                 "search" => [
                     "single" => [
-                        SearchItems::class,
-                        Facets::class
+                        SearchItems::class
+                    ],
+                    "multi" => [
+                        'facets' => Facets::class,
+                        'itemURLs' => ItemURLs::class
                     ]
                 ],
                 "lastSeenItemsList" => [
                     "single" => [
                         LastSeenItemList::class
+                    ],
+                    "multi" => [
+                        'itemURLs' => ItemURLs::class
                     ]
                 ],
                 "items" => [
@@ -71,11 +84,25 @@ class TwigLoaderPresets extends Twig_Extension
                 "crossSellingItemsList" => [
                     "single" => [
                         CrossSellingItems::class
+                    ],
+                    "multi" => [
+                        'itemURLs' => ItemURLs::class
                     ]
                 ],
                 "tagList" => [
                     "single" => [
                         TagItems::class
+                    ],
+                    "multi" => [
+                        'itemURLs' => ItemURLs::class
+                    ]
+                ],
+                "basketItems" => [
+                    "single" => [
+                        BasketItems::class
+                    ],
+                    "multi" => [
+                        'itemURLs' => ItemURLs::class
                     ]
                 ]
 			]

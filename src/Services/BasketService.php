@@ -2,6 +2,7 @@
 
 namespace IO\Services;
 
+use IO\Services\ItemLoader\Extensions\TwigLoaderPresets;
 use IO\Services\ItemLoader\Loaders\BasketItems;
 use IO\Services\ItemLoader\Services\ItemLoaderService;
 use Plenty\Modules\Accounting\Vat\Models\VatRate;
@@ -331,8 +332,18 @@ class BasketService
             $orderProperties[$basketItem->variationId]           = $basketItem->basketItemOrderParams;
         }
 
+        /** @var TwigLoaderPresets $loaderPresets */
+        $loaderPresets = pluginApp(TwigLoaderPresets::class);
+        $presets = $loaderPresets->getGlobals();
         $items = pluginApp(ItemLoaderService::class)
-            ->loadForTemplate($template, [BasketItems::class], ['variationIds' => $basketItemVariationIds, 'basketVariationQuantities' => $basketVariationQuantities, 'items' => count($basketItemVariationIds), 'page' => 1]);
+            ->loadForTemplate(
+                $template,
+                $presets['itemLoaderPresets']['basketItems'],
+                [
+                    'variationIds' => $basketItemVariationIds,
+                    'basketVariationQuantities' => $basketVariationQuantities,
+                    'items' => count($basketItemVariationIds), 'page' => 1
+                ]);
 
         $result = array();
         foreach ($items['documents'] as $item) {
