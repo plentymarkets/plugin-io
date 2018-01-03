@@ -30,6 +30,8 @@ use Plenty\Modules\Item\Search\Filter\SalesPriceFilter;
  */
 class TagItems implements ItemLoaderContract, ItemLoaderPaginationContract, ItemLoaderSortingContract
 {
+    private $options = [];
+    
     /**
      * @return SearchInterface
      */
@@ -171,5 +173,20 @@ class TagItems implements ItemLoaderContract, ItemLoaderPaginationContract, Item
         }
         
         return $sortingInterface;
+    }
+    
+    public function setOptions($options = [])
+    {
+        $this->options = $options;
+        return $options;
+    }
+
+    /**
+     * @param array $defaultResultFields
+     * @return array
+     */
+    public function getResultFields($defaultResultFields)
+    {
+        return $defaultResultFields;
     }
 }

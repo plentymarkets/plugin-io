@@ -4,12 +4,15 @@ namespace IO\Controllers;
 use IO\Helper\CategoryKey;
 use IO\Services\CategoryService;
 use IO\Services\ItemLastSeenService;
+use IO\Services\ItemLoader\Extensions\TwigLoaderPresets;
 use IO\Services\ItemLoader\Loaders\CrossSellingItems;
+use IO\Services\ItemLoader\Loaders\ItemURLs;
 use IO\Services\ItemService;
 use IO\Services\ItemLoader\Loaders\SingleItem;
 use IO\Services\ItemLoader\Loaders\SingleItemAttributes;
 use IO\Services\ItemLoader\Services\ItemLoaderService;
 use IO\Services\SessionStorageService;
+use IO\Services\UrlService;
 use Plenty\Modules\Category\Contracts\CategoryRepositoryContract;
 use Plenty\Modules\Category\Models\Category;
 use Plenty\Plugin\Application;
@@ -53,10 +56,15 @@ class ItemController extends ItemLoaderController
         $attributeNameMap = $itemService->getAttributeNameMap($itemId);
 
         $templateContainer = $this->buildTemplateContainer("tpl.item", $loaderOptions);
-
+        
+        /** @var TwigLoaderPresets $loaderPresets */
+        $loaderPresets = pluginApp(TwigLoaderPresets::class);
+        $presets = $loaderPresets->getGlobals();
+        
         /** @var ItemLoaderService $loaderService */
         $loaderService = $templateContainer->getTemplateData()['itemLoader'];
-        $loaderService->setLoaderClassList(["single" => [SingleItem::class, SingleItemAttributes::class], "multi" => [CrossSellingItems::class]]);
+        $loaderService->setLoaderClassList($presets['itemLoaderPresets']['singleItem']);
+
 
         $itemResult = $loaderService->load();
 
@@ -75,13 +83,7 @@ class ItemController extends ItemLoaderController
         }
         else
         {
-            $itemNames = [
-                'name1' => $itemResult['documents'][0]['data']['texts']['name1'],
-                'name2' => $itemResult['documents'][0]['data']['texts']['name2'],
-                'name3' => $itemResult['documents'][0]['data']['texts']['name3']
-            ];
-
-            $this->setCategory($itemResult['documents'][0]['data']['defaultCategories'], $itemNames);
+            $this->setCategory($itemResult['ItemURLs']['documents'][0]['data']);
 
             $resultVariationId = $itemResult['documents'][0]['data']['variation']['id'];
 
@@ -136,8 +138,10 @@ class ItemController extends ItemLoaderController
         return $this->showItem("", (int)$itemId, 0);
     }
     
-    private function setCategory($defaultCategories, $itemNames)
+    private function setCategory($item)
     {
+        $defaultCategories = $item['defaultCategories'];
+
         if(count($defaultCategories))
         {
             $currentCategoryId = 0;
@@ -161,7 +165,7 @@ class ItemController extends ItemLoaderController
                  */
                 $categoryService = pluginApp(CategoryService::class);
                 $categoryService->setCurrentCategory($currentCategory);
-                $categoryService->setCurrentItem($itemNames);
+                $categoryService->setCurrentItem($item);
             }
         }
     }

@@ -4,14 +4,8 @@ namespace IO\Services;
 
 use Plenty\Modules\Category\Models\Category;
 use Plenty\Modules\Category\Contracts\CategoryRepositoryContract;
+use Plenty\Modules\Category\Models\CategoryDetails;
 use Plenty\Repositories\Models\PaginatedResult;
-
-use IO\Services\SessionStorageService;
-use IO\Services\WebstoreConfigurationService;
-use IO\Services\ItemService;
-use IO\Helper\CategoryMap;
-use IO\Helper\CategoryKey;
-use IO\Builder\Category\CategoryParamsBuilder;
 
 /**
  * Class CategoryService
@@ -43,7 +37,7 @@ class CategoryService
 	 * @var array
 	 */
 	private $currentCategoryTree = [];
-	
+
 	private $currentItem = [];
 
     /**
@@ -124,16 +118,41 @@ class CategoryService
 	 * Return the URL for a given category ID.
 	 * @param Category $category the category to get the URL for
 	 * @param string $lang the language to get the URL for
-	 * @return string
+	 * @return string|null
 	 */
-	public function getURL($category, string $lang = "de"):string
+	public function getURL($category, string $lang = "de")
 	{
 		if(!$category instanceof Category || $category->details[0] === null)
 		{
-			return "ERR";
+			return null;
 		}
 		return "/" . $this->categoryRepository->getUrl($category->id, $lang);
 	}
+
+    /**
+     * @param $category
+     * @param $lang
+     * @return CategoryDetails|null
+     */
+	public function getDetails($category, $lang)
+    {
+        if ( $category === null )
+        {
+            return null;
+        }
+
+        /** @var CategoryDetails $catDetail */
+        foreach( $category->details as $catDetail )
+        {
+            if ( $catDetail->lang == $lang )
+            {
+                return $catDetail;
+            }
+        }
+
+        return null;
+    }
+
 
 	/**
 	 * Check whether a category is referenced by the current route
@@ -267,9 +286,14 @@ class CategoryService
 
         return $hierarchy;
     }
-    
-    public function setCurrentItem($itemNames)
+
+    public function setCurrentItem($item)
     {
-        $this->currentItem = $itemNames;
+        $this->currentItem = $item;
+    }
+
+    public function getCurrentItem()
+    {
+        return $this->currentItem;
     }
 }

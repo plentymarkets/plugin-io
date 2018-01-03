@@ -110,7 +110,7 @@ class LocalizedOrder extends ModelWrapper
                     $itemUrl = '';
                     if((INT)$orderItem->itemVariationId > 0)
                     {
-                        $itemUrl = $urlFilter->buildVariationURL($orderItem->itemVariationId, true);
+                        $itemUrl = $urlFilter->buildVariationURL($orderItem->itemVariationId);
                     }
     
                     $instance->itemURLs[$orderItem->itemVariationId] = $itemUrl;

@@ -4,6 +4,10 @@ namespace IO\Extensions\Filters;
 
 use IO\Extensions\AbstractFilter;
 use IO\Services\ItemService;
+use IO\Services\TemplateConfigService;
+use IO\Services\UrlBuilder\ItemUrlBuilder;
+use IO\Services\UrlBuilder\VariationUrlBuilder;
+use IO\Services\UrlService;
 
 /**
  * Class URLFilter
@@ -20,7 +24,7 @@ class URLFilter extends AbstractFilter
      * URLFilter constructor.
      * @param ItemService $itemService
      */
-	public function __construct(ItemService $itemService)
+	public function __construct(ItemService $itemService )
 	{
 		parent::__construct();
 		$this->itemService = $itemService;
@@ -40,44 +44,48 @@ class URLFilter extends AbstractFilter
 
     /**
      * Build the URL for the item by item ID or variation ID
-     * @param int $itemId
-     * @param int $variationId
-     * @param bool $withItemName
+     * @param $itemData
+     * @param bool $withVariationId
      * @return string
      */
 	public function buildItemURL($itemData, $withVariationId = true):string
 	{
-        $itemURL = '';
-        
         $itemId = $itemData['item']['id'];
         $variationId = $itemData['variation']['id'];
-        $urlContent = $itemData['texts']['urlPath'];
-        
-        if((int)$itemId > 0)
+
+        if ( $itemId === null || $itemId <= 0 )
         {
-            $itemURL .= '/';
-            if(strlen($urlContent))
-            {
-                $itemURL .= $urlContent.'_'.$itemId;
-            }
-            else
-            {
-                $itemURL .= $itemId;
-            }
-            
-            if($withVariationId && $variationId > 0)
-            {
-                $itemURL .= '_' . $variationId;
-            }
+            return "";
         }
-        
-        return $itemURL;
+
+        if ( $variationId === null || $variationId <= 0 )
+        {
+            /** @var ItemUrlBuilder $itemUrlBuilder */
+            $itemUrlBuilder = pluginApp( ItemUrlBuilder::class );
+            return $itemUrlBuilder->buildUrl( $itemId )->toRelativeUrl();
+        }
+        else
+        {
+            /** @var VariationUrlBuilder $variationUrlBuilder */
+            $variationUrlBuilder = pluginApp( VariationUrlBuilder::class );
+            $url = $variationUrlBuilder->buildUrl( $itemId, $variationId );
+
+            return $url->append(
+                $variationUrlBuilder->getSuffix( $itemId, $variationId )
+            )->toRelativeUrl();
+        }
 	}
-    
-    public function buildVariationURL($variationId = 0, bool $withItemName = false):string
+
+    /**
+     * @param int $variationId
+     * @return string
+     *
+     * @deprecated
+     */
+    public function buildVariationURL($variationId = 0):string
     {
         $variation = $this->itemService->getVariation( $variationId );
-        return $this->buildItemURL( $variation['documents'][0]['data'] );
+        return $this->buildItemURL( $variation['documents'][0]['data'], true );
     }
     
 }
