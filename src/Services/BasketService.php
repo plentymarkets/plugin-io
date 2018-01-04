@@ -3,7 +3,6 @@
 namespace IO\Services;
 
 use IO\Services\ItemLoader\Extensions\TwigLoaderPresets;
-use IO\Services\ItemLoader\Loaders\BasketItems;
 use IO\Services\ItemLoader\Services\ItemLoaderService;
 use Plenty\Modules\Accounting\Vat\Models\VatRate;
 use Plenty\Modules\Basket\Contracts\BasketRepositoryContract;
@@ -122,12 +121,10 @@ class BasketService
         $basketItems        = $this->getBasketItemsRaw();
         $basketItemData     = $this->getBasketItemData($basketItems);
         $showNetPrice       = $this->sessionStorage->getCustomer()->showNetPrice;
-        $numberFormatFilter = pluginApp(NumberFormatFilter::class);
-        $currency           = $this->getBasket()->currency;
 
         foreach ($basketItems as $basketItem) {
             if ($showNetPrice) {
-                $basketItem->price = $numberFormatFilter->formatMonetary($basketItem->price * 100 / (100.0 + $basketItem->vat), $currency);
+                $basketItem->price = round($basketItem->price * 100 / (100.0 + $basketItem->vat), 2);
             }
 
             array_push(
@@ -156,7 +153,7 @@ class BasketService
 
         foreach ($basketItems as $basketItem) {
             if ($showNetPrice) {
-                $basePrice = $basketItemData[$basketItem->variationId]['data']['calculatedPrices']['formatted']['basePrice'];
+                $basePrice = $basketItemData[$basketItem->variationId]['data']['calculatedPrices']['default']->basePrice;
                 $basePrice = $basePrice * 100 / (100.0 + $basketItem->vat);
 
                 $basketItemData[$basketItem->variationId]['data']['calculatedPrices']['default']->basePrice     = $basePrice;
@@ -216,7 +213,7 @@ class BasketService
         if (isset($data['basketItemOrderParams']) && is_array($data['basketItemOrderParams'])) {
             list($data['basketItemOrderParams'], $data['totalOrderParamsMarkup']) = $this->parseBasketItemOrderParams($data['basketItemOrderParams']);
         }
-    
+
         $data['referrerId'] = $this->getBasket()->referrerId;
         $basketItem = $this->findExistingOneByData($data);
 
