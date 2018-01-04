@@ -1,5 +1,15 @@
 # Release Notes for IO
 
+## v2.1.0 (2018-01-04) <a href="https://github.com/plentymarkets/plugin-io/compare/2.0.3...2.0.10" target="_blank"><b>Overview of all changes</b></a>
+
+### Added
+
+- URLs for items and categories can now be generated in the respective language.
+
+### Fixed
+
+- Due to an error, readable URLs for new items could not be generated. This has been fixed.
+
 ## v2.0.3 (2017-12-21) <a href="https://github.com/plentymarkets/plugin-io/compare/2.0.2...2.0.3" target="_blank"><b>Overview of all changes</b></a>
 
 ### Added

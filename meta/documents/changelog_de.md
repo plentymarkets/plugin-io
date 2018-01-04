@@ -1,12 +1,22 @@
 # Release Notes für IO
 
-## v2.1.0 (2017-12-21) <a href="https://github.com/plentymarkets/plugin-io/compare/2.0.2...2.0.3" target="_blank"><b>Übersicht aller Änderungen</b></a>
+## v2.1.0 (2018-01-04) <a href="https://github.com/plentymarkets/plugin-io/compare/2.0.3...2.0.10" target="_blank"><b>Übersicht aller Änderungen</b></a>
+
+### Hinzugefügt
+
+- URLs für Artikel und Kategorien können nun sprachabhängig generiert werden.
+
+### Behoben
+
+- Ein Fehler führte dazu, dass für neue Artikel keine lesbaren URLs erzeugt wurden. Dies wurde behoben.
+
+## v2.0.3 (2017-12-21) <a href="https://github.com/plentymarkets/plugin-io/compare/2.0.2...2.0.3" target="_blank"><b>Übersicht aller Änderungen</b></a>
 
 ### Hinzugefügt
 
 - Übersetzbare Fehlermeldung bei der Registrierung für den Fall, dass die E-Mail-Adresse bereits existiert.
 - Neue Gruppierungsmöglichkeit für Artikellisten.
-- Sprachabhängige Generierung von URLs für Artikel und Kategorien
+
 
 ### Geändert
 
@@ -16,7 +26,7 @@
 
 - Fehler behoben, bei dem die Lieferadresse nicht zurück auf "Lieferadresse gleich Rechnungsadresse" gesetzt werden konnte.
 - Fehler behoben, durch den Artikel trotz Verknüpfung mit Kundenklassen sichtbar waren.
-- Fehler behoben, durch den für neue Artikel keine lesbaren URLs erzeugt wurden.
+
 
 ## v2.0.2 (2017-12-13) <a href="https://github.com/plentymarkets/plugin-io/compare/2.0.1...2.0.2" target="_blank"><b>Übersicht aller Änderungen</b></a>
 
