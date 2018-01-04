@@ -6,7 +6,7 @@
 
 - Übersetzbare Fehlermeldung bei der Registrierung für den Fall, dass die E-Mail-Adresse bereits existiert.
 - Neue Gruppierungsmöglichkeit für Artikellisten.
-- Artikel-URLS (Felix)
+- Sprachabhängige Generierung von URLs für Artikel und Kategorien
 
 ### Geändert
 
@@ -15,7 +15,8 @@
 ### Behoben
 
 - Fehler behoben, bei dem die Lieferadresse nicht zurück auf "Lieferadresse gleich Rechnungsadresse" gesetzt werden konnte.
-- Fehler behoben, durch den Artikel trotz Verknüpfung mit Kundenklasse sichtbar waren.
+- Fehler behoben, durch den Artikel trotz Verknüpfung mit Kundenklassen sichtbar waren.
+- Fehler behoben, durch den für neue Artikel keine lesbaren URLs erzeugt wurden.
 
 ## v2.0.2 (2017-12-13) <a href="https://github.com/plentymarkets/plugin-io/compare/2.0.1...2.0.2" target="_blank"><b>Übersicht aller Änderungen</b></a>
 
