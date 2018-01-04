@@ -281,7 +281,8 @@ class CategoryService
     
         if(count($this->currentItem))
         {
-            array_push( $hierarchy, $this->currentItem );
+            $lang = pluginApp( SessionStorageService::class )->getLang();
+            array_push( $hierarchy, $this->currentItem['texts'][$lang] );
         }
 
         return $hierarchy;
