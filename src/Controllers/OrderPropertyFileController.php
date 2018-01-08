@@ -7,18 +7,20 @@ use Plenty\Plugin\Http\Response;
 
 class OrderPropertyFileController extends LayoutController
 {
-    public function showFile1(string $hash1, string $filename)
+    public function showTempFile(string $hash, string $filename)
     {
-        if(strlen($hash1) && strlen($filename))
+        if(strlen($hash) && strlen($filename))
         {
             /** @var OrderPropertyFileService $orderPropertyFileService */
             $orderPropertyFileService = pluginApp(OrderPropertyFileService::class);
             
-            $key = $hash1.'/'.$filename;
-            
+            $key = $hash.'/'.$filename;
             $url = $orderPropertyFileService->getFileURL($key);
             
-            return pluginApp(Response::class)->redirectTo($url);
+            if(!is_null($url) && strlen($url))
+            {
+                return pluginApp(Response::class)->redirectTo($url);
+            }
         }
     
         return $this->renderTemplate(
@@ -29,7 +31,7 @@ class OrderPropertyFileController extends LayoutController
         );
     }
     
-    public function showFile2(string $hash1, string $hash2 = '', string $filename)
+    public function showFile(string $hash1, string $hash2 = '', string $filename)
     {
         if(strlen($hash1) && strlen($filename))
         {
@@ -44,8 +46,11 @@ class OrderPropertyFileController extends LayoutController
             $key .= $filename;
             
             $url = $orderPropertyFileService->getFileURL($key);
-            
-            return pluginApp(Response::class)->redirectTo($url);
+    
+            if(!is_null($url) && strlen($url))
+            {
+                return pluginApp(Response::class)->redirectTo($url);
+            }
         }
         
         return $this->renderTemplate(

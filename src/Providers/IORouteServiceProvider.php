@@ -179,8 +179,8 @@ class IORouteServiceProvider extends RouteServiceProvider
         
         if( in_array("order-property-file", $enabledRoutes) || in_array("all", $enabledRoutes) )
         {
-            $router->get('order-property-file/{hash1}/{filename}', 'IO\Controllers\OrderPropertyFileController@showFile1');
-            $router->get('order-property-file/{hash1}/{hash2}/{filename}', 'IO\Controllers\OrderPropertyFileController@showFile2');
+            $router->get('order-property-file/{hash1}/{filename}', 'IO\Controllers\OrderPropertyFileController@showTempFile');
+            $router->get('order-property-file/{hash1}/{hash2}/{filename}', 'IO\Controllers\OrderPropertyFileController@showFile');
         }
         
 		/*
