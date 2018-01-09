@@ -1,6 +1,13 @@
 # Release Notes for IO
 
-## v2.1.0 (2018-01-04) <a href="https://github.com/plentymarkets/plugin-io/compare/2.0.3...2.0.10" target="_blank"><b>Overview of all changes</b></a>
+## v2.1.1 (2018-01-09) <a href="https://github.com/plentymarkets/plugin-io/compare/2.1.0...2.1.1" target="_blank"><b>Overview of all changes</b></a>
+
+### Fixed
+
+- When ordering as a guest, the address will now be removed from the session after placing the order.
+- Due to an error, wrong item URLs have been generated when only one language has been activated for the online store. This has been fixed.
+
+## v2.1.0 (2018-01-04) <a href="https://github.com/plentymarkets/plugin-io/compare/2.0.3...2.1.0" target="_blank"><b>Overview of all changes</b></a>
 
 ### Added
 
