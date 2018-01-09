@@ -1,6 +1,13 @@
 # Release Notes für IO
 
-## v2.1.0 (2018-01-04) <a href="https://github.com/plentymarkets/plugin-io/compare/2.0.3...2.0.10" target="_blank"><b>Übersicht aller Änderungen</b></a>
+## v2.1.1 (2018-01-09) <a href="https://github.com/plentymarkets/plugin-io/compare/2.1.0...2.1.1" target="_blank"><b>Übersicht aller Änderungen</b></a>
+
+### Behoben
+
+- Bei einer Gastbestellung wird nun nach dem Abschließen des Auftrags die Adresse aus der Session entfernt.
+- Fehler behoben, bei dem falsche Artikel-URLs generiert wurden, wenn im Webshop nur eine Sprache aktiv war.
+
+## v2.1.0 (2018-01-04) <a href="https://github.com/plentymarkets/plugin-io/compare/2.0.3...2.1.0" target="_blank"><b>Übersicht aller Änderungen</b></a>
 
 ### Hinzugefügt
 
