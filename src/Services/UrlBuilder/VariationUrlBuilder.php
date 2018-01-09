@@ -36,13 +36,24 @@ class VariationUrlBuilder
 
         $usedName = $itemNameFields[$usedItemName];
 
-        foreach( $itemData['texts'] as $lang => $texts )
+        if( isset($itemData['texts']['lang']) && strlen($itemData['texts']['lang']) )
         {
-            self::$urlPathMap[$itemId][$variationId][$lang] = [
-                'urlPath'           => $texts['urlPath'],
-                'name'              => $texts[$usedName],
+            self::$urlPathMap[$itemId][$variationId][$itemData['texts']['lang']] = [
+                'urlPath'           => $itemData['texts']['urlPath'],
+                'name'              => $itemData['texts'][$usedName],
                 'defaultCategory'   => $defaultCategory
             ];
+        }
+        else
+        {
+            foreach( $itemData['texts'] as $lang => $texts )
+            {
+                self::$urlPathMap[$itemId][$variationId][$lang] = [
+                    'urlPath'           => $texts['urlPath'],
+                    'name'              => $texts[$usedName],
+                    'defaultCategory'   => $defaultCategory
+                ];
+            }
         }
     }
 
