@@ -714,4 +714,18 @@ class CustomerService
             $this->getContactId()
         );
 	}
+	
+	public function resetGuestAddresses()
+    {
+        if($this->getContactId() <= 0)
+        {
+            /**
+             * @var BasketService $basketService
+             */
+            $basketService = pluginApp(BasketService::class);
+            
+            $basketService->setBillingAddressId(0);
+            $basketService->setDeliveryAddressId(0);
+        }
+    }
 }

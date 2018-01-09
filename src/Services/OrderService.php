@@ -72,7 +72,10 @@ class OrderService
      */
 	public function placeOrder():LocalizedOrder
 	{
+	    /** @var CheckoutService $checkoutService */
         $checkoutService = pluginApp(CheckoutService::class);
+        
+        /** @var CustomerService $customerService */
         $customerService = pluginApp(CustomerService::class);
         
         $basket = $this->basketService->getBasket();
@@ -102,6 +105,8 @@ class OrderService
 
         // reset basket after order was created
         $this->basketService->resetBasket();
+        $customerService->resetGuestAddresses();
+        
         
         return LocalizedOrder::wrap( $order, "de" );
 	}
