@@ -41,7 +41,6 @@ class Middleware extends \Plenty\Plugin\Middleware
                 $controller->showPageNotFound(),
                 404
             );
-            $response->send();
             return $response;
         }
 
