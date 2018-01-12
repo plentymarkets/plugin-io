@@ -147,6 +147,9 @@ class CustomerService
          */
         $basketService = pluginApp(BasketService::class);
         
+        $newBillingAddress = null;
+        $newDeliveryAddress = null;
+        
         $guestBillingAddress = null;
         //$guestBillingAddressId = $this->sessionStorage->getSessionValue(SessionStorageKeys::BILLING_ADDRESS_ID);
         $guestBillingAddressId = $basketService->getBillingAddressId();
@@ -202,6 +205,11 @@ class CustomerService
                 $newDeliveryAddress = $this->createAddress($deliveryAddressData, AddressType::DELIVERY);
                 //$this->sessionStorage->setSessionValue(SessionStorageKeys::DELIVERY_ADDRESS_ID, $newDeliveryAddress->id);
                 $basketService->setDeliveryAddressId($newDeliveryAddress->id);
+            }
+    
+            if($newBillingAddress instanceof Address)
+            {
+                $contact = $this->updateContactWithAddressData($newBillingAddress);
             }
         }
         
@@ -320,6 +328,23 @@ class CustomerService
 
 		return null;
 	}
+	
+	private function updateContactWithAddressData($address)
+    {
+        $contactData = [];
+        $contact = null;
+        
+        if($address instanceof Address)
+        {
+            $contactData['gender'] = $address->gender;
+            $contactData['firstName'] = $address->name2;
+            $contactData['lastName'] = $address->name3;
+    
+            $contact = $this->updateContact($contactData);
+        }
+        
+        return $contact;
+    }
 	
 	public function updatePassword($newPassword, $contactId = 0, $hash='')
     {
@@ -459,6 +484,12 @@ class CustomerService
             if($type == AddressType::BILLING && isset($addressData['name1']) && strlen($addressData['name1']))
             {
                 $this->createAccount($this->mapAddressDataToAccount($addressData));
+            }
+            
+            $existingContact = $this->getContact();
+            if($type == AddressType::BILLING && !strlen($existingContact->firstName) && !strlen($existingContact->lastName))
+            {
+                $this->updateContactWithAddressData($newAddress);
             }
         }
 		else
