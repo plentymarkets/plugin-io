@@ -23,7 +23,7 @@ class VariationPriceList
     private $variationId = 0;
 
     /** @var float $minimumOrderQuantity */
-    public $minimumOrderQuantity = 0;
+    public $minimumOrderQuantity = 0.0;
 
     private $prices = [];
 
