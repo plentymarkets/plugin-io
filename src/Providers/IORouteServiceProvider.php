@@ -71,6 +71,7 @@ class IORouteServiceProvider extends RouteServiceProvider
 
 		$enabledRoutes = explode(", ",  $config->get("IO.routing.enabled_routes") );
 
+		$router->get('translations/{namespace}/{group}/{lang}', 'IO\Controllers\TranslationController@loadTranslations');
 		/*
 		 * STATIC ROUTES
 		 */
