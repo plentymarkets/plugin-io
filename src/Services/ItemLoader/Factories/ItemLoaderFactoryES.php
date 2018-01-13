@@ -317,37 +317,30 @@ class ItemLoaderFactoryES implements ItemLoaderFactory
             {
                 if ( (int)$variation['data']['variation']['id'] > 0 )
                 {
-                    $variationId = $variation['data']['variation']['id'];
-                    $quantity = $variation['data']['variation']['minimumOrderQuantity'];
-                    if ( $quantity === null )
+                    $variationId        = $variation['data']['variation']['id'];
+                    $minimumQuantity    = $variation['data']['variation']['minimumOrderQuantity'];
+                    if ( $minimumQuantity === null )
                     {
                         // mimimum order quantity is not defined => get smallest possible quantity depending on interval order quantity
                         if ( $variation['data']['variation']['intervalOrderQuantity'] !== null )
                         {
-                            $quantity = $variation['data']['variation']['intervalOrderQuantity'];
+                            $minimumQuantity = $variation['data']['variation']['intervalOrderQuantity'];
                         }
                         else
                         {
                             // no interval quantity defined => minimum order quantity should be 1
-                            $quantity = 1;
+                            $minimumQuantity = 1;
                         }
                     }
 
-                    if ( (float)$customerClassMinimumOrderQuantity > $quantity )
+                    if ( (float)$customerClassMinimumOrderQuantity > $minimumQuantity )
                     {
                         // minimum order quantity is overridden by contact class
-                        $quantity = $customerClassMinimumOrderQuantity;
+                        $minimumQuantity = $customerClassMinimumOrderQuantity;
                     }
 
                     // assign generated minimum quantity
-                    $variation['data']['variation']['minimumOrderQuantity'] = $quantity;
-
-                    if ( isset($options['basketVariationQuantities'][$variationId])
-                        && (float)$options['basketVariationQuantities'][$variationId] > 0 )
-                    {
-                        // override quantity by options
-                        $quantity = (float)$options['basketVariationQuantities'][$variationId];
-                    }
+                    $variation['data']['variation']['minimumOrderQuantity'] = $minimumQuantity;
 
                     if ( $variation['data']['variation']['maximumOrderQuantity'] <= 0 )
                     {
@@ -365,11 +358,23 @@ class ItemLoaderFactoryES implements ItemLoaderFactory
                     }
 
 
-                    $priceList = VariationPriceList::create($variationId, $quantity, $maximumOrderQuantity);
+                    $priceList = VariationPriceList::create( $variationId, $minimumQuantity, $maximumOrderQuantity, $lot, $unit );
 
                     // assign minimum order quantity from price list (may be recalculated depending on available graduated prices)
                     $variation['data']['variation']['minimumOrderQuantity'] = $priceList->minimumOrderQuantity;
-                    $variation['data']['calculatedPrices'] = $priceList->toArray($lot, $unit);
+
+
+                    $quantity = $priceList->minimumOrderQuantity;
+                    if ( isset($options['basketVariationQuantities'][$variationId])
+                        && (float)$options['basketVariationQuantities'][$variationId] > 0 )
+                    {
+                        // override quantity by options
+                        $quantity = (float)$options['basketVariationQuantities'][$variationId];
+                    }
+
+                    // TODO: keep calculatedPrices
+//                    $variation['data']['calculatedPrices'] = $priceList->getCalculatedPrices( $quantity );
+                    $variation['data']['prices'] = $priceList->toArray( $quantity );
 
 
                     $result['documents'][$key] = $variation;

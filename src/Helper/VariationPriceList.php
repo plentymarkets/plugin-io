@@ -19,11 +19,22 @@ use Plenty\Plugin\Application;
 
 class VariationPriceList
 {
+    const TYPE_DEFAULT          = 'default';
+    const TYPE_RRP              = 'rrp';
+    const TYPE_SPECIAL_OFFER    = 'specialOffer';
+
     /** @var int $variationId */
-    private $variationId = 0;
+    public $variationId = 0;
 
     /** @var float $minimumOrderQuantity */
     public $minimumOrderQuantity = 0.0;
+
+    /** @var float $maximumOrderQuantity */
+    public $maximumOrderQuantity = null;
+
+    public $lot;
+
+    public $unit;
 
     private $prices = [];
 
@@ -35,7 +46,7 @@ class VariationPriceList
         $this->numberFormatFilter = $numberFormatFilter;
     }
 
-    public static function create( int $variationId, $minimumOrderQuantity = 0, $maximumOrderQuantity = null )
+    public static function create( int $variationId, $minimumOrderQuantity = 0, $maximumOrderQuantity = null, $lot = 0, $unit = null )
     {
         if ( $minimumOrderQuantity === null )
         {
@@ -44,9 +55,8 @@ class VariationPriceList
 
         /** @var VariationPriceList $instance */
         $instance = pluginApp( VariationPriceList::class);
-        $instance->init( $variationId, $minimumOrderQuantity, $maximumOrderQuantity, 'default' );
-        $instance->init( $variationId, $minimumOrderQuantity, $maximumOrderQuantity, 'rrp' );
-        $instance->init( $variationId, $minimumOrderQuantity, $maximumOrderQuantity, 'specialOffer' );
+
+        $instance->init( $variationId, $minimumOrderQuantity, $maximumOrderQuantity, $lot, $unit );
 
         // check if default price for minimum order quantity exists
         if ( $instance->findPriceForQuantity( $minimumOrderQuantity ) === null )
@@ -65,51 +75,49 @@ class VariationPriceList
         return $instance;
     }
 
-    public function findPriceForQuantity( float $quantity, $type = 'default' )
+    public function findPriceForQuantity( float $quantity, $type = self::TYPE_DEFAULT )
     {
         $result = null;
+        $minimumOrderQuantity = -1.0;
         if ( array_key_exists( $type, $this->prices ) )
         {
             foreach($this->prices[$type] as $price )
             {
-                if ( $price instanceof SalesPriceSearchResponse && (float) $price->minimumOrderQuantity <= $quantity )
+                if ( $price instanceof SalesPriceSearchResponse && (float)$price->minimumOrderQuantity <= $quantity && (float)$price->minimumOrderQuantity > $minimumOrderQuantity)
                 {
                     $result = $price;
+                    $minimumOrderQuantity = (float)$price->minimumOrderQuantity;
                 }
             }
         }
         return $result;
     }
 
-    public function getGraduatedPrices()
+    public function getGraduatedPrices( $showNetPrice = false )
     {
         $graduatedPrices = [];
 
-        foreach($this->prices['default'] as $price )
+        foreach($this->prices[self::TYPE_DEFAULT] as $price )
         {
             if($price instanceof SalesPriceSearchResponse)
             {
-                $graduatedPrices[] = [
-                    'minimumOrderQuantity'  => (float) $price->minimumOrderQuantity,
-                    'price'                 => (float) $price->unitPrice,
-                    'formatted'             => $this->numberFormatFilter->formatMonetary( $price->unitPrice, $price->currency )
-                ];
+                $graduatedPrices[] = $this->preparePrice( $price, $showNetPrice );
             }
         }
 
         return $graduatedPrices;
     }
 
-    public function getBasePrice( $lot, $unit, $salesPrice, $lang = null )
+    public function getBasePrice( $unitPrice, $currency, $lang = null )
     {
         /** @var SalesPriceService $basePriceService */
         $basePriceService = pluginApp( SalesPriceService::class );
         $basePriceString = '';
 
-        if ( $lot > 0 && strlen($unit) > 0 )
+        if ( $this->lot > 0 && strlen($this->unit) > 0 )
         {
             $basePrice = [];
-            list( $basePrice['lot'], $basePrice['price'], $basePrice['unitKey'] ) = $basePriceService->getUnitPrice($lot, $salesPrice->unitPrice, $unit);
+            list( $basePrice['lot'], $basePrice['price'], $basePrice['unitKey'] ) = $basePriceService->getUnitPrice($this->lot, $unitPrice, $this->unit);
 
             /**
              * @var UnitRepositoryContract $unitRepository
@@ -136,52 +144,121 @@ class VariationPriceList
             }
             $unitName = $unitNameRepository->findOne($unitId, $lang)->name;
 
-            $basePriceString = $this->numberFormatFilter->formatMonetary($basePrice['price'], $salesPrice->currency).' / '.($basePrice['lot'] > 1 ? $basePrice['lot'].' ' : '').$unitName;
+            $basePriceString = $this->numberFormatFilter->formatMonetary($basePrice['price'], $currency).' / '.($basePrice['lot'] > 1 ? $basePrice['lot'].' ' : '').$unitName;
         }
 
         return $basePriceString;
     }
 
-    public function toArray( $lot = 0, $unit = null )
+    public function toArray( $quantity = null )
     {
-        $defaultPrice = $this->findPriceForQuantity( $this->minimumOrderQuantity );
-        $rrp = $this->findPriceForQuantity( $this->minimumOrderQuantity, 'rrp');
-        $specialOffer = $this->findPriceForQuantity( $this->minimumOrderQuantity, 'specialOffer');
+        if ( $quantity === null )
+        {
+            $quantity = $this->minimumOrderQuantity;
+        }
+
+        /** @var CustomerService $customerService */
+        $customerService = pluginApp( CustomerService::class );
+        $showNetPrice = $customerService->showNetPrices();
+
+        $defaultPrice   = $this->findPriceForQuantity( $quantity );
+        $rrp            = $this->findPriceForQuantity( $quantity, self::TYPE_RRP );
+        $specialOffer   = $this->findPriceForQuantity( $quantity, self::TYPE_SPECIAL_OFFER );
+
+        return [
+            'default'           => $this->preparePrice( $defaultPrice, $showNetPrice ),
+            'rrp'               => $this->preparePrice( $rrp, $showNetPrice ),
+            'specialOffer'      => $this->preparePrice( $specialOffer, $showNetPrice ),
+            'graduatedPrices'   => $this->getGraduatedPrices( $showNetPrice )
+        ];
+    }
+
+    public function getCalculatedPrices( $quantity = null )
+    {
+        if ( $quantity === null )
+        {
+            $quantity = $this->minimumOrderQuantity;
+        }
+
+        $defaultPrice   = $this->findPriceForQuantity( $quantity );
+        $rrp            = $this->findPriceForQuantity( $quantity, self::TYPE_RRP );
+        $specialOffer   = $this->findPriceForQuantity( $quantity, self::TYPE_SPECIAL_OFFER );
+        $graduatedPrices= [];
+
+        foreach($this->prices[self::TYPE_DEFAULT] as $price )
+        {
+            if($price instanceof SalesPriceSearchResponse)
+            {
+                $graduatedPrices[] = [
+                    'minimumOrderQuantity'  => (float) $price->minimumOrderQuantity,
+                    'price'                 => (float) $price->unitPrice,
+                    'formatted'             => $this->numberFormatFilter->formatMonetary( $price->unitPrice, $price->currency )
+                ];
+
+            }
+        }
 
         return [
             'default' => $defaultPrice,
             'formatted' => [
-                'basePrice' => $this->getBasePrice( $lot, $unit, $defaultPrice ),
+                'basePrice' => $this->getBasePrice( $defaultPrice->unitPrice, $defaultPrice->currency ),
                 'defaultPrice' => $this->numberFormatFilter->formatMonetary( $defaultPrice->price, $defaultPrice->currency ),
                 'defaultUnitPrice' => $this->numberFormatFilter->formatMonetary( $defaultPrice->unitPrice, $defaultPrice->currency ),
                 'rrpPrice' => $this->numberFormatFilter->formatMonetary( $rrp->price, $rrp->currency ),
                 'rrpUnitPrice' => $this->numberFormatFilter->formatMonetary( $rrp->unitPrice, $rrp->currency )
             ],
-            'graduatedPrices' => $this->getGraduatedPrices(),
+            'graduatedPrices' => $graduatedPrices,
             'rrp' => $rrp,
             'specialOffer' => $specialOffer
         ];
     }
 
-    private function init( int $variationId, float $minimumOrderQuantity, $maximumOrderQuantity, $type )
+    private function init( $variationId, $minimumOrderQuantity, $maximumOrderQuantity, $lot, $unit )
     {
-        $this->variationId = $variationId;
+        $this->variationId          = $variationId;
         $this->minimumOrderQuantity = $minimumOrderQuantity;
+        $this->maximumOrderQuantity = $maximumOrderQuantity;
+        $this->lot                  = $lot;
+        $this->unit                 = $unit;
 
-        $salesPriceSearchRequest = $this->getSearchRequest( $variationId, $type, -1 );
+        /** @var SalesPriceSearchRepositoryContract $priceSearchRepo */
+        $priceSearchRepo = pluginApp( SalesPriceSearchRepositoryContract::class );
 
-        /** @var SalesPriceSearchRepositoryContract $salesPriceSearchRepo */
-        $salesPriceSearchRepo = pluginApp( SalesPriceSearchRepositoryContract::class );
+        // prepare search request
+        $priceSearchRequest = $this->getSearchRequest( $this->variationId, self::TYPE_DEFAULT, -1 );
 
-        $salesPrices = $salesPriceSearchRepo->searchAll( $salesPriceSearchRequest );
+        // search default prices
+        $this->fetchPrices(
+            $priceSearchRepo->searchAll( $priceSearchRequest ),
+            self::TYPE_DEFAULT
+        );
 
+        // search recommended retail prices
+        $priceSearchRequest->type = self::TYPE_RRP;
+        $this->fetchPrices(
+            $priceSearchRepo->searchAll( $priceSearchRequest ),
+            self::TYPE_RRP
+        );
+
+        // search special offer prices
+        $priceSearchRequest->type = self::TYPE_SPECIAL_OFFER;
+        $this->fetchPrices(
+            $priceSearchRepo->searchAll( $priceSearchRequest ),
+            self::TYPE_SPECIAL_OFFER
+        );
+
+
+    }
+
+    private function fetchPrices( $prices, $type )
+    {
         $quantities = [];
         $this->prices[$type] = [];
-        foreach( $salesPrices as $price )
+        foreach( $prices as $price )
         {
             if ( $price instanceof SalesPriceSearchResponse
                 && !in_array( $price->minimumOrderQuantity, $quantities )
-                && ($maximumOrderQuantity === null || $price->minimumOrderQuantity <= $maximumOrderQuantity))
+                && ($this->maximumOrderQuantity === null || $price->minimumOrderQuantity <= $this->maximumOrderQuantity))
             {
                 $this->prices[$type][] = $price;
                 $quantities[] = $price->minimumOrderQuantity;
@@ -189,7 +266,7 @@ class VariationPriceList
         }
     }
 
-    private function getSearchRequest( int $variationId, string $type = 'default', float $quantity = 0 )
+    private function getSearchRequest( int $variationId, string $type = self::TYPE_DEFAULT, float $quantity = 0 )
     {
         /** @var SalesPriceSearchRequest $salesPriceSearchRequest */
         $salesPriceSearchRequest = pluginApp(SalesPriceSearchRequest::class);
@@ -223,5 +300,40 @@ class VariationPriceList
         $salesPriceSearchRequest->plentyId = $app->getPlentyId();
 
         return $salesPriceSearchRequest;
+    }
+
+    private function preparePrice( $price, $showNetPrice = false )
+    {
+        if ( $price === null )
+        {
+            return null;
+        }
+
+        return [
+            'price'                 => [
+                'value'     => $showNetPrice ? $price->priceNet : $price->price,
+                'formatted' => $this->numberFormatFilter->formatMonetary( $showNetPrice ? $price->priceNet : $price->price, $price->currency )
+            ],
+            'unitPrice'             => [
+                'value'     => $showNetPrice ? $price->unitPriceNet : $price->unitPrice,
+                'formatted' => $this->numberFormatFilter->formatMonetary( $showNetPrice ? $price->unitPriceNet : $price->unitPrice, $price->currency )
+            ],
+            'basePrice'             => $this->getBasePrice( $showNetPrice ? $price->unitPriceNet : $price->unitPrice, $price->currency ),
+            'minimumOrderQuantity'  => (float) $price->minimumOrderQuantity,
+            'contactClassDiscount'  => [
+                'percent'   => $price->customerClassDiscountPercent,
+                'amount'    => $showNetPrice ? $price->customerClassDiscountNet : $price->customerClassDiscount
+            ],
+            'categoryDiscount'      => [
+                'percent'   => $price->categoryDiscountPercent,
+                'amount'    => $showNetPrice ? $price->categoryDiscountNet : $price->categoryDiscount
+            ],
+            'currency'              => $price->currency,
+            'vat'                   => [
+                'id'        => $price->vatId,
+                'value'     => $price->vatValue
+            ],
+            'data'                  => $price
+        ];
     }
 }
