@@ -99,13 +99,22 @@ class CategoryService
 	 * @param string $lang The language to get the category
 	 * @return Category
 	 */
-	public function get($catID = 0, string $lang = "de")
+	public function get($catID = 0, $lang = null)
 	{
+	    if ( $lang === null )
+        {
+            $lang = $this->sessionStorageService->getLang();
+        }
 		return $this->categoryRepository->get($catID, $lang);
 	}
 
-	public function getChildren($categoryId, $lang = "de")
+	public function getChildren($categoryId, $lang = null)
     {
+        if ( $lang === null )
+        {
+            $lang = $this->sessionStorageService->getLang();
+        }
+
         if($categoryId > 0)
         {
             return $this->categoryRepository->getChildren($categoryId, $lang);
@@ -120,8 +129,13 @@ class CategoryService
 	 * @param string $lang the language to get the URL for
 	 * @return string|null
 	 */
-	public function getURL($category, string $lang = "de")
+	public function getURL($category, $lang = null)
 	{
+        if ( $lang === null )
+        {
+            $lang = $this->sessionStorageService->getLang();
+        }
+
 		if(!$category instanceof Category || $category->details[0] === null)
 		{
 			return null;
@@ -232,8 +246,13 @@ class CategoryService
      * @param int|null $maxLevel The deepest category level to load
      * @return array
      */
-    public function getNavigationTree(string $type = "all", string $lang = "de", int $maxLevel = 2):array
+    public function getNavigationTree(string $type = "all", string $lang = null, int $maxLevel = 2):array
     {
+        if ( $lang === null )
+        {
+            $lang = $this->sessionStorageService->getLang();
+        }
+
         return $this->categoryRepository->getLinklistTree($type, $lang, $this->webstoreConfig->getWebstoreConfig()->webstoreId, $maxLevel);
     }
 
@@ -243,8 +262,12 @@ class CategoryService
      * @param string $lang The language to get sitemap list for
      * @return array
      */
-    public function getNavigationList(string $type = "all", string $lang = "de"):array
+    public function getNavigationList(string $type = "all", string $lang = null):array
     {
+        if ( $lang === null )
+        {
+            $lang = $this->sessionStorageService->getLang();
+        }
 		return $this->categoryRepository->getLinklistList($type, $lang, $this->webstoreConfig->getWebstoreConfig()->webstoreId);
     }
 
