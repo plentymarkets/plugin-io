@@ -333,6 +333,7 @@ class VariationPriceList
                 'id'        => $price->vatId,
                 'value'     => $price->vatValue
             ],
+            'isNet'                 => $showNetPrice,
             'data'                  => $price
         ];
     }
