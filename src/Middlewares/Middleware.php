@@ -37,9 +37,11 @@ class Middleware extends \Plenty\Plugin\Middleware
             /** @var StaticPagesController $controller */
             $controller = pluginApp(StaticPagesController::class);
 
-            return $response->make(
-                $controller->showPageNotFound()
+            $response = $response->make(
+                $controller->showPageNotFound(),
+                404
             );
+            return $response;
         }
 
         return $response;
