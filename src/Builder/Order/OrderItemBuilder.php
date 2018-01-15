@@ -118,7 +118,7 @@ class OrderItemBuilder
             }
         }
         
-		$priceOriginal = $basketItem['variation']['data']['calculatedPrices']['default']['basePrice'];
+		$priceOriginal = $basketItem['variation']['data']['prices']['default']['data']['basePrice'];
 
         $attributeTotalMarkup = 0;
 		if(isset($basketItem['attributeTotalMarkup']))

@@ -1,5 +1,10 @@
 # Release Notes für IO
 
+## v2.1.2 (unknown)
+
+### Behoben
+- Bei der Berechnung von Preisen werden Brutto-/ Nettopreise korrekt berücksichtigt
+
 ## v2.1.1 (2018-01-09) <a href="https://github.com/plentymarkets/plugin-io/compare/2.1.0...2.1.1" target="_blank"><b>Übersicht aller Änderungen</b></a>
 
 ### Behoben

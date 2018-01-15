@@ -111,6 +111,31 @@ class CustomerService
         
         return $contactClass;
     }
+
+    public function showNetPrices()
+    {
+        $customerShowNet = false;
+        /** @var SessionStorageService $sessionStorageService */
+        $sessionStorageService = pluginApp( SessionStorageService::class );
+        $customer = $sessionStorageService->getCustomer();
+        if ( $customer !== null )
+        {
+            $customerShowNet = $customer->showNetPrice;
+        }
+
+        $contactClassShowNet = false;
+        $contactClassId = $this->getContactClassId();
+        if ( $contactClassId !== null )
+        {
+            $contactClass = $this->getContactClassData( $contactClassId );
+            if ( $contactClass !== null )
+            {
+                $contactClassShowNet = $contactClass['showNetPrice'];
+            }
+        }
+
+        return $customerShowNet || $contactClassShowNet;
+    }
     
     public function getContactClassMinimumOrderQuantity()
     {
