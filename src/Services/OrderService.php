@@ -384,12 +384,6 @@ class OrderService
                         'referenceOrderItemId' =>   $order['orderItems'][$key]['id'],
                         'referenceType' => 'parent'
                     ];
-    
-                    //TODO remove after fix from team order!
-                    if(is_null($order['orderItems'][$key]['attributeValues']))
-                    {
-                        $order['orderItems'][$key]['attributeValues'] = '';
-                    }
                     
                     unset($order['orderItems'][$key]['id']);
                     unset($order['orderItems'][$key]['orderId']);
