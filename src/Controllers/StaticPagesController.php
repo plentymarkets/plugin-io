@@ -24,6 +24,20 @@ class StaticPagesController extends LayoutController
     }
 
     /**
+     * Prepare and render the data for the cancellation form page
+     * @return string
+     */
+    public function showCancellationForm():string
+    {
+        return $this->renderTemplate(
+            "tpl.cancellation-form",
+            [
+                "object" => ""
+            ]
+        );
+    }
+
+    /**
      * Prepare and render the data for the legal disclosure page
      * @return string
      */
