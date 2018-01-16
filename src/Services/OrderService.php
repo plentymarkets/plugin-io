@@ -369,7 +369,7 @@ class OrderService
         {
             foreach($order['orderItems'] as $key => $orderItem)
             {
-                if(array_key_exists($orderItem['itemVariationId'], $items))
+                if(array_key_exists($orderItem['itemVariationId'], $items) && (int)$items[$orderItem['itemVariationId']] > 0)
                 {
                     $returnQuantity = (int)$items[$orderItem['itemVariationId']];
                     
@@ -384,10 +384,9 @@ class OrderService
                         'referenceOrderItemId' =>   $order['orderItems'][$key]['id'],
                         'referenceType' => 'parent'
                     ];
-
+                    
                     unset($order['orderItems'][$key]['id']);
                     unset($order['orderItems'][$key]['orderId']);
-                    
                 }
                 else
                 {
@@ -447,7 +446,6 @@ class OrderService
         {
             foreach($allReturns as $returnKey => $return)
             {
-                //$return = $return['order'];
                 foreach($return['orderReferences'] as $reference)
                 {
                     if($reference['referenceType'] == 'parent' && $reference['referenceOrderId'] == $orderId)
@@ -484,6 +482,10 @@ class OrderService
                     {
                         $orderItem['quantity'] = $newQuantity;
                         $newOrderItems[] = $orderItem;
+                    }
+                    else
+                    {
+                        $orderItem->quantity = 0;
                     }
                 }
                 
