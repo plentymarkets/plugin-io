@@ -23,8 +23,11 @@ class ResourceContainer
         return $this->scriptTemplates;
     }
 
-    public function addScriptTemplate( string $path )
+    public function addScriptTemplate( string $path, array $params = [] )
     {
-        $this->scriptTemplates[] = $path;
+        $this->scriptTemplates[] = [
+            'path' => $path, 
+            'params' => $params
+        ];
     }
 }
