@@ -13,9 +13,12 @@ class ResourceContainer
         return $this->styleTemplates;
     }
 
-    public function addStyleTemplate( string $path )
+    public function addStyleTemplate( string $path, array $params = [] )
     {
-        $this->styleTemplates[] = $path;
+        $this->styleTemplates[] = [
+            'path' => $path,
+            'params' => $params
+        ];
     }
 
     public function getScriptTemplates():array
