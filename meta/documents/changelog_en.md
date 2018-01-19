@@ -1,5 +1,15 @@
 # Release Notes for IO
 
+## v2.1.2 (2018-01-22) <a href="https://github.com/plentymarkets/plugin-io/compare/2.1.1...2.1.2" target="_blank"><b>Overview of all changes</b></a>
+
+### Added
+
+- A security prompt has been added which prevents customers from returning items multiple times.
+
+### Fixed
+
+- Due to an error too many items have been displayed in the wish list. This has been fixed.
+
 ## v2.1.1 (2018-01-09) <a href="https://github.com/plentymarkets/plugin-io/compare/2.1.0...2.1.1" target="_blank"><b>Overview of all changes</b></a>
 
 ### Fixed
