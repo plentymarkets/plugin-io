@@ -192,6 +192,7 @@ class ItemLoaderFactoryES implements ItemLoaderFactory
 
                 if($loader instanceof ItemLoaderContract)
                 {
+                    $options['loaderClassList'] = $loaderClassList;
                     $options = $loader->setOptions($options);
                     if(!$search instanceof DocumentSearch)
                     {
