@@ -1,30 +1,21 @@
 <?php
 namespace IO\Services\ItemLoader\Factories;
 
-use IO\Extensions\Filters\NumberFormatFilter;
-use IO\Services\CheckoutService;
+use IO\Helper\VariationPriceList;
 use IO\Services\ItemLoader\Contracts\ItemLoaderContract;
 use IO\Services\ItemLoader\Contracts\ItemLoaderFactory;
 use IO\Services\ItemLoader\Contracts\ItemLoaderPaginationContract;
 use IO\Services\ItemLoader\Contracts\ItemLoaderSortingContract;
 use IO\Services\ItemLoader\Services\FacetExtensionContainer;
 use IO\Services\ItemWishListService;
-use IO\Services\SalesPriceService;
-use IO\Services\SessionStorageService;
 use IO\Services\CustomerService;
 use IO\Services\UrlBuilder\VariationUrlBuilder;
-use IO\Services\UrlService;
-use Plenty\Legacy\Services\Item\Variation\SalesPriceService as BasePriceService;
-use Plenty\Modules\Item\Unit\Contracts\UnitRepositoryContract;
-use Plenty\Modules\Item\Unit\Contracts\UnitNameRepositoryContract;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Search\Document\DocumentSearch;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Sorting\SortingInterface;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Source\IncludeSource;
 use Plenty\Modules\Item\Search\Contracts\VariationElasticSearchSearchRepositoryContract;
 use Plenty\Modules\Item\Search\Contracts\VariationElasticSearchMultiSearchRepositoryContract;
-use Plenty\Modules\Item\SalesPrice\Models\SalesPriceSearchResponse;
 use Plenty\Plugin\ConfigRepository;
-use Plenty\Modules\Authorization\Services\AuthHelper;
 
 /**
  * Created by ptopczewski, 09.01.17 08:35
@@ -317,163 +308,73 @@ class ItemLoaderFactoryES implements ItemLoaderFactory
 
     private function attachPrices($result, $options = [])
     {
-        if(count($result['documents']))
-        {
+        if(count($result['documents'])) {
             /** @var CustomerService $customerService */
             $customerService = pluginApp(CustomerService::class);
-
-            /** @var CheckoutService $checkoutService */
-            $checkoutService = pluginApp(CheckoutService::class);
-
             $customerClassMinimumOrderQuantity = $customerService->getContactClassMinimumOrderQuantity();
-            
-            /**
-             * @var SalesPriceService $salesPriceService
-             */
-            $salesPriceService = pluginApp(SalesPriceService::class);
-            $salesPriceService->setClassId( $customerService->getContactClassId() );
-            $salesPriceService->setCurrency( $checkoutService->getCurrency() );
 
-            foreach($result['documents'] as $key => $variation)
+            foreach ( $result['documents'] as $key => $variation )
             {
-                if((int)$variation['data']['variation']['id'] > 0)
+                if ( (int)$variation['data']['variation']['id'] > 0 )
                 {
-                    if((int)$customerClassMinimumOrderQuantity > $variation['data']['variation']['minimumOrderQuantity'])
+                    $variationId        = $variation['data']['variation']['id'];
+                    $minimumQuantity    = $variation['data']['variation']['minimumOrderQuantity'];
+                    if ( $minimumQuantity === null )
                     {
-                        $variation['data']['variation']['minimumOrderQuantity'] = $customerClassMinimumOrderQuantity;
-                    }
-                    
-                    $quantity = 1;
-                    if(isset($options['basketVariationQuantities'][$variation['data']['variation']['id']]) && (int)$options['basketVariationQuantities'][$variation['data']['variation']['id']] > 0)
-                    {
-                        $quantity = (int)$options['basketVariationQuantities'][$variation['data']['variation']['id']];
-                    }
-
-                    $numberFormatFilter = pluginApp(NumberFormatFilter::class);
-
-                    $salesPrice = $salesPriceService->getSalesPriceForVariation($variation['data']['variation']['id'], 'default', $quantity);
-
-                    $graduated = [];
-
-                    if(count($variation['data']['salesPrices']) > 1)
-                    {
-                        $graduated = $salesPriceService->getAllSalesPricesForVariation($variation['data']['variation']['id'], 'default');
-                    }
-
-                    $graduatedPrices = [];
-
-                    if(is_array($graduated) && count($graduated))
-                    {
-                        $graduatedMinQuantities = array();
-                        foreach($graduated as $gpKey => $gp)
+                        // mimimum order quantity is not defined => get smallest possible quantity depending on interval order quantity
+                        if ( $variation['data']['variation']['intervalOrderQuantity'] !== null )
                         {
-                            if ($gp instanceof SalesPriceSearchResponse)
-                            {
-                                // check if graduated price for current minimum order quantity has already been added.
-                                // => priority of prices with same minimum order quantity is based on the position of the price defined by user
-                                if ( !in_array( $gp->minimumOrderQuantity, $graduatedMinQuantities ) )
-                                {
-                                    $graduatedMinQuantities[] = $gp->minimumOrderQuantity;
-                                    $graduatedPrices[] = $gp;
-                                }
-                            }
+                            $minimumQuantity = $variation['data']['variation']['intervalOrderQuantity'];
                         }
-
-                        /*
-                        foreach($graduated as $gpKey => $gp)
+                        else
                         {
-                            if($gp instanceof SalesPriceSearchResponse)
-                            {
-                                if($gp->salesPriceId == $salesPrice->salesPriceId)
-                                {
-                                    unset($graduated[$gpKey]);
-                                }
-                            }
+                            // no interval quantity defined => minimum order quantity should be 1
+                            $minimumQuantity = 1;
                         }
-                        */
-
-                        //$graduatedPrices = $graduated;
                     }
 
-                    if($salesPrice instanceof SalesPriceSearchResponse)
+                    if ( (float)$customerClassMinimumOrderQuantity > $minimumQuantity )
                     {
-                        $variation['data']['calculatedPrices']['default'] = $salesPrice;
-                        $variation['data']['calculatedPrices']['formatted']['defaultPrice'] = $numberFormatFilter->formatMonetary($salesPrice->price, $salesPrice->currency);
-                        $variation['data']['calculatedPrices']['formatted']['defaultUnitPrice'] = $numberFormatFilter->formatMonetary($salesPrice->unitPrice, $salesPrice->currency);
+                        // minimum order quantity is overridden by contact class
+                        $minimumQuantity = $customerClassMinimumOrderQuantity;
+                    }
 
-                        $variation['data']['calculatedPrices']['graduatedPrices'] = [];
-                        if(count($graduatedPrices))
-                        {
-                            foreach($graduatedPrices as $graduatedPrice)
-                            {
-                                if($graduatedPrice instanceof SalesPriceSearchResponse)
-                                {
-                                    $variation['data']['calculatedPrices']['graduatedPrices'][] = [
-                                        'minimumOrderQuantity' => (int)$graduatedPrice->minimumOrderQuantity,
-                                        'price'                => (float)$graduatedPrice->unitPrice,
-                                        'formatted'            => $numberFormatFilter->formatMonetary($graduatedPrice->unitPrice, $graduatedPrice->currency)
-                                    ];
-                                }
-                            }
-                        }
+                    // assign generated minimum quantity
+                    $variation['data']['variation']['minimumOrderQuantity'] = $minimumQuantity;
 
-                        /**
-                         * @var BasePriceService $basePriceService
-                         */
-                        $basePriceService = pluginApp(BasePriceService::class);
+                    if ( $variation['data']['variation']['maximumOrderQuantity'] <= 0 )
+                    {
+                        // remove invalid maximum order quantity
+                        $variation['data']['variation']['maximumOrderQuantity'] = null;
+                    }
+                    $maximumOrderQuantity = $variation['data']['variation']['maximumOrderQuantity'];
 
+                    $lot = 0;
+                    $unit = null;
+                    if ( $variation['data']['variation']['mayShowUnitPrice'] )
+                    {
                         $lot = $variation['data']['unit']['content'];
                         $unit = $variation['data']['unit']['unitOfMeasurement'];
-
-                        $basePriceString = '';
-                        if($variation['data']['variation']['mayShowUnitPrice'] == true && $lot > 0 && strlen($unit))
-                        {
-                            $basePrice = [];
-                            list($basePrice['lot'], $basePrice['price'], $basePrice['unitKey']) = $basePriceService->getUnitPrice($lot, $salesPrice->unitPrice, $unit);
-
-                            /**
-                             * @var UnitRepositoryContract $unitRepository
-                             */
-                            $unitRepository = pluginApp(UnitRepositoryContract::class);
-
-                            /** @var AuthHelper $authHelper */
-                            $authHelper = pluginApp(AuthHelper::class);
-
-                            $unitData = $authHelper->processUnguarded( function() use ($unitRepository, $basePrice)
-                            {
-                                $unitRepository->setFilters(['unitOfMeasurement' => $basePrice['unitKey']]);
-                                return $unitRepository->all(['*'], 1, 1);
-                            });
-
-
-                            $unitId = $unitData->getResult()->first()->id;
-
-                            /**
-                             * @var UnitNameRepositoryContract $unitNameRepository
-                             */
-                            $unitNameRepository = pluginApp(UnitNameRepositoryContract::class);
-                            $unitName = $unitNameRepository->findOne($unitId, pluginApp(SessionStorageService::class)->getLang())->name;
-
-                            $basePriceString = $numberFormatFilter->formatMonetary($basePrice['price'], $salesPrice->currency).' / '.($basePrice['lot'] > 1 ? $basePrice['lot'].' ' : '').$unitName;
-                        }
-
-                        $variation['data']['calculatedPrices']['formatted']['basePrice'] = $basePriceString;
                     }
 
 
-                    $rrp = $salesPriceService->getSalesPriceForVariation($variation['data']['variation']['id'], 'rrp');
-                    if($rrp instanceof SalesPriceSearchResponse)
+                    $priceList = VariationPriceList::create( $variationId, $minimumQuantity, $maximumOrderQuantity, $lot, $unit );
+
+                    // assign minimum order quantity from price list (may be recalculated depending on available graduated prices)
+                    $variation['data']['variation']['minimumOrderQuantity'] = $priceList->minimumOrderQuantity;
+
+
+                    $quantity = $priceList->minimumOrderQuantity;
+                    if ( isset($options['basketVariationQuantities'][$variationId])
+                        && (float)$options['basketVariationQuantities'][$variationId] > 0 )
                     {
-                        $variation['data']['calculatedPrices']['rrp'] = $rrp;
-                        $variation['data']['calculatedPrices']['formatted']['rrpPrice'] = $numberFormatFilter->formatMonetary($rrp->price, $rrp->currency);
-                        $variation['data']['calculatedPrices']['formatted']['rrpUnitPrice'] = $numberFormatFilter->formatMonetary($rrp->unitPrice, $rrp->currency);
+                        // override quantity by options
+                        $quantity = (float)$options['basketVariationQuantities'][$variationId];
                     }
 
-                    $specialOffer = $salesPriceService->getSalesPriceForVariation($variation['data']['variation']['id'], 'specialOffer');
-                    if($specialOffer instanceof SalesPriceSearchResponse)
-                    {
-                        $variation['data']['calculatedPrices']['specialOffer'] = $specialOffer;
-                    }
+                    $variation['data']['calculatedPrices'] = $priceList->getCalculatedPrices( $quantity );
+                    $variation['data']['prices'] = $priceList->toArray( $quantity );
+
 
                     $result['documents'][$key] = $variation;
                 }
