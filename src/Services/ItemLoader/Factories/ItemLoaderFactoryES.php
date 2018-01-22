@@ -220,7 +220,7 @@ class ItemLoaderFactoryES implements ItemLoaderFactory
                 {
                     /** @var ItemLoaderSortingContract $loader */
                     $sorting = $loader->getSorting($options);
-                    if($sorting instanceof SortingInterface)
+                    if($sorting instanceof SortingInterface && $sorting !== null )
                     {
                         $search->setSorting($sorting);
                     }
