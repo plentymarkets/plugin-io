@@ -1,5 +1,15 @@
 # Release Notes für IO
 
+## v2.1.2 (2018-01-22) <a href="https://github.com/plentymarkets/plugin-io/compare/2.1.1...2.1.2" target="_blank"><b>Übersicht aller Änderungen</b></a>
+
+### Hinzugefügt
+
+- Es wurde eine Sicherheitsabfrage hinzugefügt, die verhindert, dass Artikel mehrfach retourniert werden können.
+
+### Behoben
+
+- Ein Fehler führte dazu, dass zu viele Artikel in der Wunschliste vorhanden sind. Dies wurde behoben.
+
 ## v2.1.1 (2018-01-09) <a href="https://github.com/plentymarkets/plugin-io/compare/2.1.0...2.1.1" target="_blank"><b>Übersicht aller Änderungen</b></a>
 
 ### Behoben
