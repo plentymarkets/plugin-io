@@ -85,6 +85,8 @@ class ItemURLs implements ItemLoaderContract, ItemLoaderPaginationContract, Item
         {
             return $primaryLoader->getCurrentPage( $this->options );
         }
+
+        return 1;
     }
 
     /**
@@ -98,6 +100,8 @@ class ItemURLs implements ItemLoaderContract, ItemLoaderPaginationContract, Item
         {
             return $primaryLoader->getItemsPerPage( $this->options );
         }
+
+        return 1;
     }
 
     /**
@@ -107,11 +111,14 @@ class ItemURLs implements ItemLoaderContract, ItemLoaderPaginationContract, Item
     public function getSorting($options = [])
     {
         $primaryLoader = $this->getPrimaryLoader();
-        if ( $primaryLoader instanceof ItemLoaderSortingContract )
+        if ($primaryLoader instanceof ItemLoaderSortingContract)
         {
-            return $primaryLoader->getSorting( $this->options );
+            return $primaryLoader->getSorting($this->options);
         }
+
+        return null;
     }
+
 
     private function getPrimaryLoader()
     {
