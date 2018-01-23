@@ -1,5 +1,12 @@
 # Release Notes für IO
 
+## v2.1.3 (2018-01-23) <a href="https://github.com/plentymarkets/plugin-io/compare/2.1.2...2.1.3" target="_blank"><b>Übersicht aller Änderungen</b></a>
+
+### Behoben
+
+- Durch einen Fehler wurde die 404-Seite nicht korrekt dargestellt. Dies wurde behoben.
+- Durch einen Fehler wurden unnötige Artikelabfragen durchgeführt. Dies wurde behoben.
+
 ## v2.1.2 (2018-01-22) <a href="https://github.com/plentymarkets/plugin-io/compare/2.1.1...2.1.2" target="_blank"><b>Übersicht aller Änderungen</b></a>
 
 ### Hinzugefügt
