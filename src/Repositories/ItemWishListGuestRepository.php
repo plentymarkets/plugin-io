@@ -34,7 +34,12 @@ class ItemWishListGuestRepository
     public function getItemWishList()
     {
         $wishList = $this->getItemWishListForAllPlentyIds();
-        $variationIds = array_keys($wishList[$this->plentyId]);
+        
+        $variationIds = [];
+        if(is_array($wishList) && count($wishList))
+        {
+            $variationIds = array_keys($wishList[$this->plentyId]);
+        }
     
         if(is_null($variationIds))
         {

@@ -2,10 +2,12 @@
 
 namespace IO\Services;
 
+use IO\Migrations\CategoryMigration_0_0_1;
 use Plenty\Modules\Category\Models\Category;
 use Plenty\Modules\Category\Contracts\CategoryRepositoryContract;
 use Plenty\Modules\Category\Models\CategoryDetails;
 use Plenty\Repositories\Models\PaginatedResult;
+use Plenty\Plugin\ConfigRepository;
 
 /**
  * Class CategoryService
@@ -142,6 +144,11 @@ class CategoryService
 		}
 		return "/" . $this->categoryRepository->getUrl($category->id, $lang);
 	}
+	
+	public function getURLById($categoryId)
+    {
+        return $this->categoryRepository->getUrl($categoryId, $this->sessionStorageService->getLang());
+    }
 
     /**
      * @param $category
@@ -319,5 +326,13 @@ class CategoryService
     public function getCurrentItem()
     {
         return $this->currentItem;
+    }
+    
+    public function runMigration()
+    {
+        /** @var CategoryMigration_0_0_1 $mig */
+        $mig = pluginApp(CategoryMigration_0_0_1::class);
+        $mig->run();
+        return true;
     }
 }

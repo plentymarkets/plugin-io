@@ -15,10 +15,12 @@ class StaticPagesController extends LayoutController
      */
     public function showCancellationRights():string
     {
+        $fallbackContent = '{% extends getPartial(\'page-design\') %}';
+        
         return $this->renderTemplate(
             "tpl.cancellation-rights",
             [
-                "object" => ""
+                "fallbackContent" => $fallbackContent
             ]
         );
     }
@@ -43,10 +45,16 @@ class StaticPagesController extends LayoutController
      */
     public function showLegalDisclosure():string
     {
+        $fallbackContent = '{% extends getPartial(\'page-design\') %}';
+        $pageBodyStart = '{% block PageBody %}';
+        $pageBodyEnd = '{% endblock %}';
+        
         return $this->renderTemplate(
             "tpl.legal-disclosure",
             [
-                "object" => ""
+                "fallbackContent" => $fallbackContent,
+                "pageBodyStart" => $pageBodyStart,
+                "pageBodyEnd" => $pageBodyEnd
             ]
         );
     }
