@@ -133,11 +133,17 @@ class VariationUrlBuilder
         return $itemUrl;
     }
 
-    public function getSuffix( $itemId, $variationId )
+    public function getSuffix( $itemId, $variationId, $withVariationId = true )
     {
         $templateConfigService = pluginApp( TemplateConfigService::class );
         $enableOldUrlPattern = $templateConfigService->get('global.enableOldUrlPattern') === "true";
-        return $enableOldUrlPattern ? "/a-" . $itemId : "_" . $itemId . "_" . $variationId;
+
+        if($withVariationId)
+        {
+            return $enableOldUrlPattern ? "/a-" . $itemId : "_" . $itemId . "_" . $variationId;
+        }
+
+        return $enableOldUrlPattern ? "/a-" . $itemId : "_" . $itemId;
     }
 
     private function searchItem( $itemId, $variationId, $lang )
