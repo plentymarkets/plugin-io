@@ -26,7 +26,8 @@ class ItemNameFilter extends AbstractFilter
     public function getFilters():array
     {
         return [
-            "itemName" => "itemName"
+            "itemName" => "itemName",
+            "newItemName" => "newItemName"
         ];
     }
 
@@ -60,4 +61,36 @@ class ItemNameFilter extends AbstractFilter
         return $showName;
     }
 
+    public function newItemName( $itemData, string $configName, string $considerVariationName )
+    {
+        $itemTexts = $itemData['texts'];
+        $variationName = $itemData['variation']['name'];
+
+        if ($considerVariationName == 'variationName' && $variationName)
+        {
+            return $variationName;
+        }
+
+        $showName = '';
+
+        if ($configName == '1' && $itemTexts['name2'] != '')
+        {
+            $showName = $itemTexts['name2'];
+        }
+        elseif ($configName == '2' && $itemTexts['name3'] != '')
+        {
+            $showName = $itemTexts['name3'];
+        }
+        else
+        {
+            $showName = $itemTexts['name1'];
+        }
+
+        if ($considerVariationName == 'variationName' && $variationName)
+        {
+            $showName .= ' ' . $variationName;
+        }
+
+        return $showName;
+    }
 }
