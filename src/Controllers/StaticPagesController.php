@@ -1,7 +1,6 @@
 <?php //strict
-namespace IO\Controllers;
 
-use IO\Helper\TemplateContainer;
+namespace IO\Controllers;
 
 /**
  * Class HomepageController
@@ -15,12 +14,13 @@ class StaticPagesController extends LayoutController
      */
     public function showCancellationRights():string
     {
-        $fallbackContent = '{% extends getPartial(\'page-design\') %}';
-        
         return $this->renderTemplate(
             "tpl.cancellation-rights",
             [
-                "fallbackContent" => $fallbackContent
+                "metaDescriptionKey" => "description_cancellation_rights",
+                "metaRobotsKey"      => "robots_cancellation_rights",
+                "pageTitle"          => "generalCancellationRightNoShy",
+                "contentTemplate"    => "Ceres::StaticPages.StaticPagesContent.CancellationRightsContent"
             ]
         );
     }
@@ -34,7 +34,10 @@ class StaticPagesController extends LayoutController
         return $this->renderTemplate(
             "tpl.cancellation-form",
             [
-                "object" => ""
+                "metaDescriptionKey" => "description_cancellation_form",
+                "metaRobotsKey"      => "robots_cancellation_form",
+                "pageTitle"          => "generalCancellationFormNoShy",
+                "contentTemplate"    => "Ceres::StaticPages.StaticPagesContent.CancellationFormContent"
             ]
         );
     }
@@ -45,16 +48,13 @@ class StaticPagesController extends LayoutController
      */
     public function showLegalDisclosure():string
     {
-        $fallbackContent = '{% extends getPartial(\'page-design\') %}';
-        $pageBodyStart = '{% block PageBody %}';
-        $pageBodyEnd = '{% endblock %}';
-        
         return $this->renderTemplate(
             "tpl.legal-disclosure",
             [
-                "fallbackContent" => $fallbackContent,
-                "pageBodyStart" => $pageBodyStart,
-                "pageBodyEnd" => $pageBodyEnd
+                "metaDescriptionKey" => "description_legal_disclosure",
+                "metaRobotsKey"      => "robots_legal_disclosure",
+                "pageTitle"          => "generalLegalDisclosure",
+                "contentTemplate"    => "Ceres::StaticPages.StaticPagesContent.LegalDisclosureContent"
             ]
         );
     }
@@ -68,7 +68,10 @@ class StaticPagesController extends LayoutController
         return $this->renderTemplate(
             "tpl.privacy-policy",
             [
-                "object" => ""
+                "metaDescriptionKey" => "description_privacy_policy",
+                "metaRobotsKey"      => "robots_privacy_policy",
+                "pageTitle"          => "generalPrivacyPolicyNoShy",
+                "contentTemplate"    => "Ceres::StaticPages.StaticPagesContent.PrivacyPolicyContent"
             ]
         );
     }
@@ -82,7 +85,10 @@ class StaticPagesController extends LayoutController
         return $this->renderTemplate(
             "tpl.terms-conditions",
             [
-                "object" => ""
+                "metaDescriptionKey" => "description_terms_and_conditions",
+                "metaRobotsKey"      => "robots_terms_and_conditions",
+                "pageTitle"          => "generalGtc",
+                "contentTemplate"    => "Ceres::StaticPages.StaticPagesContent.TermsAndConditionsContent"
             ]
         );
     }
