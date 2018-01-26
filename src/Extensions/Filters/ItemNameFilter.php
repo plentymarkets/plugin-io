@@ -3,6 +3,7 @@
 namespace IO\Extensions\Filters;
 
 use IO\Extensions\AbstractFilter;
+use IO\Services\TemplateConfigService;
 use Plenty\Modules\Item\DataLayer\Models\ItemDescription;
 
 /**
@@ -11,11 +12,18 @@ use Plenty\Modules\Item\DataLayer\Models\ItemDescription;
  */
 class ItemNameFilter extends AbstractFilter
 {
+    private $defaultConfigItemName;
+    private $defaultConfigConsiderVariationName;
     /**
      * ItemNameFilter constructor.
      */
     public function __construct()
     {
+        /** @var TemplateConfigService $configService */
+        $configService = pluginApp( TemplateConfigService::class );
+        $this->defaultConfigItemName = $configService->get('item.name');
+        $this->defaultConfigConsiderVariationName = $configService->get('item.considerVariationName');
+
         parent::__construct();
     }
 
@@ -61,8 +69,18 @@ class ItemNameFilter extends AbstractFilter
         return $showName;
     }
 
-    public function newItemName( $itemData, string $configName, string $considerVariationName )
+    public function newItemName( $itemData, $configName = null, $considerVariationName = null )
     {
+        if ( $configName === null )
+        {
+            $configName = $this->defaultConfigItemName;
+        }
+
+        if ( $considerVariationName === null )
+        {
+            $considerVariationName = $this->defaultConfigConsiderVariationName;
+        }
+
         $itemTexts = $itemData['texts'];
         $variationName = $itemData['variation']['name'];
 
