@@ -104,7 +104,7 @@ class ItemNameFilter extends AbstractFilter
             $showName = $itemTexts['name1'];
         }
 
-        if ($considerVariationName == 'variationName' && $variationName)
+        if ($considerVariationName == 'itemNameVariationName' && $variationName)
         {
             $showName .= ' ' . $variationName;
         }
