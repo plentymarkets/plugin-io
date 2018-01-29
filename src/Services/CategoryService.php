@@ -327,12 +327,4 @@ class CategoryService
     {
         return $this->currentItem;
     }
-    
-    public function runMigration()
-    {
-        /** @var CategoryMigration_0_0_1 $mig */
-        $mig = pluginApp(CategoryMigration_0_0_1::class);
-        $mig->run();
-        return true;
-    }
 }
