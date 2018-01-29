@@ -34,42 +34,18 @@ class ItemNameFilter extends AbstractFilter
     public function getFilters():array
     {
         return [
-            "itemName" => "itemName",
-            "newItemName" => "newItemName"
+            "itemName" => "itemName"
         ];
     }
 
     /**
      * Build the item name from the configuration
-     * @param array $itemTexts
+     * @param object $itemData
      * @param string $configName
+     * @param string $considerVariationName
      * @return string
      */
-    public function itemName( $itemTexts, string $configName )
-    {
-        $showName = '';
-
-        if($configName == '0' && $itemTexts['name1'] != '')
-        {
-            $showName = $itemTexts['name1'];
-        }
-        elseif($configName == '1' && $itemTexts['name2'] != '')
-        {
-            $showName = $itemTexts['name2'];
-        }
-        elseif($configName == '2' && $itemTexts['name3'] != '')
-        {
-            $showName = $itemTexts['name3'];
-        }
-        else
-        {
-            $showName = $itemTexts['name1'];
-        }
-
-        return $showName;
-    }
-
-    public function newItemName( $itemData, $configName = null, $considerVariationName = null )
+    public function itemName( $itemData, $configName = null, $considerVariationName = null )
     {
         if ( $configName === null )
         {
