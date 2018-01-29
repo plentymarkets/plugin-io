@@ -13,7 +13,7 @@ use Plenty\Modules\Item\DataLayer\Models\ItemDescription;
 class ItemNameFilter extends AbstractFilter
 {
     private $defaultConfigItemName;
-    private $defaultConfigConsiderVariationName;
+    private $defaultConfigItemDisplayName;
     /**
      * ItemNameFilter constructor.
      */
@@ -22,7 +22,7 @@ class ItemNameFilter extends AbstractFilter
         /** @var TemplateConfigService $configService */
         $configService = pluginApp( TemplateConfigService::class );
         $this->defaultConfigItemName = $configService->get('item.name');
-        $this->defaultConfigConsiderVariationName = $configService->get('item.considerVariationName');
+        $this->defaultConfigItemDisplayName = $configService->get('item.displayName');
 
         parent::__construct();
     }
@@ -42,25 +42,25 @@ class ItemNameFilter extends AbstractFilter
      * Build the item name from the configuration
      * @param object $itemData
      * @param string $configName
-     * @param string $considerVariationName
+     * @param string $displayName
      * @return string
      */
-    public function itemName( $itemData, $configName = null, $considerVariationName = null )
+    public function itemName( $itemData, $configName = null, $displayName = null )
     {
         if ( $configName === null )
         {
             $configName = $this->defaultConfigItemName;
         }
 
-        if ( $considerVariationName === null )
+        if ( $displayName === null )
         {
-            $considerVariationName = $this->defaultConfigConsiderVariationName;
+            $displayName = $this->defaultConfigItemDisplayName;
         }
 
         $itemTexts = $itemData['texts'];
         $variationName = $itemData['variation']['name'];
 
-        if ($considerVariationName == 'variationName' && $variationName)
+        if ($displayName == 'variationName' && $variationName)
         {
             return $variationName;
         }
@@ -80,7 +80,7 @@ class ItemNameFilter extends AbstractFilter
             $showName = $itemTexts['name1'];
         }
 
-        if ($considerVariationName == 'itemNameVariationName' && $variationName)
+        if ($displayName == 'itemNameVariationName' && $variationName)
         {
             $showName .= ' ' . $variationName;
         }
