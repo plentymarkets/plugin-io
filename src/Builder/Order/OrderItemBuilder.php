@@ -146,7 +146,7 @@ class OrderItemBuilder
 			"referrerId"        => $basketItem['referrerId'],
 			"itemVariationId"   => $basketItem['variationId'],
 			"quantity"          => $basketItem['quantity'],
-			"orderItemName"     => $this->itemNameFilter->newItemName( $basketItem['variation']['data'] ),
+			"orderItemName"     => $this->itemNameFilter->itemName( $basketItem['variation']['data'] ),
 			"shippingProfileId" => $basketItem['shippingProfileId'],
 			"countryVatId"      => $this->vatService->getCountryVatId(),
 			"vatRate"           => $basketItem['vat'],
