@@ -60,18 +60,18 @@ class ItemNameFilter extends AbstractFilter
         $itemTexts = $itemData['texts'];
         $variationName = $itemData['variation']['name'];
 
-        if ($displayName == 'variationName' && $variationName)
+        if ($displayName === 'variationName' && strlen($variationName))
         {
             return $variationName;
         }
 
         $showName = '';
 
-        if ($configName == '1' && $itemTexts['name2'] != '')
+        if ($configName === '1' && strlen($itemTexts['name2']))
         {
             $showName = $itemTexts['name2'];
         }
-        elseif ($configName == '2' && $itemTexts['name3'] != '')
+        elseif ($configName === '2' && strlen($itemTexts['name3']))
         {
             $showName = $itemTexts['name3'];
         }
@@ -80,7 +80,7 @@ class ItemNameFilter extends AbstractFilter
             $showName = $itemTexts['name1'];
         }
 
-        if ($displayName == 'itemNameVariationName' && $variationName)
+        if ($displayName === 'itemNameVariationName' && strlen($variationName))
         {
             $showName .= ' ' . $variationName;
         }
