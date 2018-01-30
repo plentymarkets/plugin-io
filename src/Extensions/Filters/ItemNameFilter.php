@@ -3,6 +3,7 @@
 namespace IO\Extensions\Filters;
 
 use IO\Extensions\AbstractFilter;
+use IO\Services\TemplateConfigService;
 use Plenty\Modules\Item\DataLayer\Models\ItemDescription;
 
 /**
@@ -11,11 +12,18 @@ use Plenty\Modules\Item\DataLayer\Models\ItemDescription;
  */
 class ItemNameFilter extends AbstractFilter
 {
+    private $defaultConfigItemName;
+    private $defaultConfigItemDisplayName;
     /**
      * ItemNameFilter constructor.
      */
     public function __construct()
     {
+        /** @var TemplateConfigService $configService */
+        $configService = pluginApp( TemplateConfigService::class );
+        $this->defaultConfigItemName = $configService->get('item.name');
+        $this->defaultConfigItemDisplayName = $configService->get('item.displayName');
+
         parent::__construct();
     }
 
@@ -32,23 +40,38 @@ class ItemNameFilter extends AbstractFilter
 
     /**
      * Build the item name from the configuration
-     * @param array $itemTexts
+     * @param object $itemData
      * @param string $configName
+     * @param string $displayName
      * @return string
      */
-    public function itemName( $itemTexts, string $configName )
+    public function itemName( $itemData, $configName = null, $displayName = null )
     {
+        if ( $configName === null )
+        {
+            $configName = $this->defaultConfigItemName;
+        }
+
+        if ( $displayName === null )
+        {
+            $displayName = $this->defaultConfigItemDisplayName;
+        }
+
+        $itemTexts = $itemData['texts'];
+        $variationName = $itemData['variation']['name'];
+
+        if ($displayName === 'variationName' && strlen($variationName))
+        {
+            return $variationName;
+        }
+
         $showName = '';
 
-        if($configName == '0' && $itemTexts['name1'] != '')
-        {
-            $showName = $itemTexts['name1'];
-        }
-        elseif($configName == '1' && $itemTexts['name2'] != '')
+        if ($configName === '1' && strlen($itemTexts['name2']))
         {
             $showName = $itemTexts['name2'];
         }
-        elseif($configName == '2' && $itemTexts['name3'] != '')
+        elseif ($configName === '2' && strlen($itemTexts['name3']))
         {
             $showName = $itemTexts['name3'];
         }
@@ -57,7 +80,11 @@ class ItemNameFilter extends AbstractFilter
             $showName = $itemTexts['name1'];
         }
 
+        if ($displayName === 'itemNameVariationName' && strlen($variationName))
+        {
+            $showName .= ' ' . $variationName;
+        }
+
         return $showName;
     }
-
 }
