@@ -36,19 +36,113 @@ class CategoryPagesMigrationService
     public function __construct()
     {
     }
-    
+
+    /**
+     * @param $template
+     * @param $categoryNames
+     * @param null $parentCategoryId
+     * @throws \ErrorException
+     * @throws \Plenty\Exceptions\ValidationException
+     * @throws \Twig_Error_Loader
+     * @throws \Twig_Error_Runtime
+     * @throws \Twig_Error_Syntax
+     */
+    public function createContentCategoryFromTwig($templateNames, $categoryNames, $parentCategoryId = null  )
+    {
+        $plentyId = pluginApp( Application::class )->getPlentyId();
+
+        /** @var CategoryRepositoryContract $categoryRepository */
+        $categoryRepository = pluginApp( CategoryRepositoryContract::class );
+
+        $categoryLevel = 0;
+        if ( $parentCategoryId !== null )
+        {
+            $parentCategory = $categoryRepository->get( $parentCategoryId );
+            $categoryLevel = $parentCategory->level + 1;
+        }
+
+        $details = [];
+        foreach ($categoryNames as $lang => $name)
+        {
+            $details[] = [
+                'plentyId'  => $plentyId,
+                'lang'      => $lang,
+                'name'      => $name,
+            ];
+        }
+
+        $categoryData = [
+            'parentCategoryId'  => $parentCategoryId,
+            'type'              => 'content',
+            'level'             => $categoryLevel,
+            'details'           => $details,
+            'clients'           => [
+                ['plentyId'  => $plentyId]
+            ]
+        ];
+        $newCategory = $categoryRepository->createCategory( $categoryData );
+
+        /** @var Twig $twig */
+        $twig = pluginApp(Twig::class);
+
+        if ( is_array($templateNames) )
+        {
+            foreach( $templateNames as $lang => $templateName )
+            {
+                $this->storeCategoryTemplate(
+                    $twig->render( "IO::TwigSourceRenderer", ['template' => $templateName] ),
+                    $newCategory->id,
+                    $lang
+                );
+            }
+        }
+        else
+        {
+            foreach ($categoryNames as $lang => $name)
+            {
+                $this->storeCategoryTemplate(
+                    $twig->render("IO::TwigSourceRenderer", ['template' => $templateNames]),
+                    $newCategory->id,
+                    $lang
+                );
+            }
+        }
+
+    }
+
+    private function storeCategoryTemplate( $template, $categoryId, $lang )
+    {
+        /** @var CategoryTemplateRepositoryContract $categoryTemplateRepository */
+        $categoryTemplateRepository = pluginApp(CategoryTemplateRepositoryContract::class);
+
+        /** @var WebstoreConfigurationService $webstoreConfigService */
+        $webstoreConfigService = pluginApp(WebstoreConfigurationService::class);
+
+        $categoryTemplateRepository->storeCategoryTemplateContent(
+            $template,
+            $categoryId,
+            $lang,
+            $webstoreConfigService->getWebstoreConfig()->webstoreId
+        );
+    }
+
     public function createCategoryPages($version)
     {
         /** @var Application $app */
         $app = pluginApp(Application::class);
+
         /** @var WebstoreConfigurationService $webstoreConfigService */
         $webstoreConfigService = pluginApp(WebstoreConfigurationService::class);
+
         /** @var CategoryRepositoryContract $categoryRepo */
         $categoryRepo = pluginApp(CategoryRepositoryContract::class);
+
         /** @var CategoryTemplateRepositoryContract $categoryTemplateRepo */
         $categoryTemplateRepo = pluginApp(CategoryTemplateRepositoryContract::class);
+
         /** @var Twig $twig */
         $twig = pluginApp(Twig::class);
+
         /** @var ConfigRepository $configRepository */
         $configRepository = pluginApp(ConfigRepository::class);
         
