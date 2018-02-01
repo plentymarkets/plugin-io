@@ -124,10 +124,6 @@ class OrderItemBuilder
 		if(isset($basketItem['attributeTotalMarkup']))
 		{
             $attributeTotalMarkup = $basketItem['attributeTotalMarkup'];
-			if($attributeTotalMarkup != 0)
-			{
-				$priceOriginal -= $attributeTotalMarkup;
-			}
         }
         
         $rebate = 0;
@@ -149,11 +145,11 @@ class OrderItemBuilder
             "orderProperties"   => $basketItemProperties,
 			"amounts"           => [
 				[
-					"currency"           => $this->checkoutService->getCurrency(),
-					"priceOriginalGross" => $priceOriginal,
-                    "surcharge" => $attributeTotalMarkup,
-					"rebate"	=> $rebate,
-					"isPercentage" => 1
+					"currency"              => $this->checkoutService->getCurrency(),
+					"priceOriginalGross"    => $priceOriginal,
+                    "surcharge"             => $attributeTotalMarkup,
+					"rebate"	            => $rebate,
+					"isPercentage"          => 1
 				]
 			]
 		];
