@@ -15,6 +15,7 @@ use Plenty\Modules\Cloud\ElasticSearch\Lib\Sorting\SortingInterface;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Source\IncludeSource;
 use Plenty\Modules\Item\Search\Contracts\VariationElasticSearchSearchRepositoryContract;
 use Plenty\Modules\Item\Search\Contracts\VariationElasticSearchMultiSearchRepositoryContract;
+use Plenty\Modules\Item\Search\Filter\SearchFilter;
 use Plenty\Plugin\ConfigRepository;
 
 /**
@@ -98,7 +99,14 @@ class ItemLoaderFactoryES implements ItemLoaderFactory
 
                 foreach($loader->getFilterStack($options) as $filter)
                 {
-                    $search->addFilter($filter);
+                    if($filter instanceof SearchFilter)
+                    {
+                        $search->addQuery($filter);
+                    }
+                    else
+                    {
+                        $search->addFilter($filter);
+                    }
                 }
             }
 
@@ -202,7 +210,14 @@ class ItemLoaderFactoryES implements ItemLoaderFactory
 
                     foreach($loader->getFilterStack($options) as $filter)
                     {
-                        $search->addFilter($filter);
+                        if($filter instanceof SearchFilter)
+                        {
+                            $search->addQuery($filter);
+                        }
+                        else
+                        {
+                            $search->addFilter($filter);
+                        }
                     }
                 }
 
