@@ -79,6 +79,10 @@ class SingleItem implements ItemLoaderContract
         {
             $variationFilter->hasId($options['variationId']);
         }
+        else
+        {
+            $variationFilter->isMain();
+        }
         
         $sessionLang =  $options['lang'];
 		if ( $sessionLang === null )
