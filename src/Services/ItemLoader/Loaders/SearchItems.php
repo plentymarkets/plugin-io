@@ -18,6 +18,8 @@ use Plenty\Modules\Cloud\ElasticSearch\Lib\Search\Document\DocumentSearch;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Search\SearchInterface;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Sorting\SingleSorting;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Source\Mutator\BuiltIn\LanguageMutator;
+use Plenty\Modules\Item\Search\Aggregations\ItemCardinalityAggregation;
+use Plenty\Modules\Item\Search\Aggregations\ItemCardinalityAggregationProcessor;
 use Plenty\Modules\Item\Search\Mutators\ImageMutator;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Sorting\MultipleSorting;
 use Plenty\Modules\Item\Search\Filter\SearchFilter;
@@ -56,6 +58,8 @@ class SearchItems implements ItemLoaderContract, ItemLoaderPaginationContract, I
         if($collapse instanceof BaseCollapse)
         {
             $documentSearch->setCollapse($collapse);
+            $counterAggreation = pluginApp(ItemCardinalityAggregation::class, [pluginApp(ItemCardinalityAggregationProcessor::class)]);
+            $documentSearch->addAggregation($counterAggreation);
         }
         
         return $documentSearch;
