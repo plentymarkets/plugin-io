@@ -7,6 +7,7 @@ use IO\Helper\TemplateContainer;
 use IO\Services\CategoryService;
 use IO\Services\TemplateService;
 use Plenty\Modules\Category\Contracts\CategoryRepositoryContract;
+use Plenty\Modules\Category\Models\Category;
 use Plenty\Plugin\Application;
 use Plenty\Plugin\Controller;
 use Plenty\Plugin\Events\Dispatcher;
@@ -89,12 +90,13 @@ abstract class LayoutController extends Controller
 		return $templateContainer;
 	}
 
-	/**
-	 * Render the category data
-	 * @param $category
-	 * @return string
-	 */
-	protected function renderCategory($category):string
+    /**
+     * Render the category data
+     * @param Category  $category
+     * @param string    $fallbackTemplate
+     * @return string
+     */
+	protected function renderCategory($category, $fallbackTemplate = null):string
 	{
 		if($category === null)
 		{
@@ -113,7 +115,8 @@ abstract class LayoutController extends Controller
 		return $this->renderTemplate(
 			"tpl.category." . $category->type,
 			[
-				"category" => $category
+				"category"          => $category,
+                "fallbackTemplate"  => $fallbackTemplate
 			]
 		);
 	}
