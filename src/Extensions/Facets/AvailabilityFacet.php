@@ -33,7 +33,7 @@ class AvailabilityFacet implements FacetExtension
      * @return AggregationInterface|AvailabilityAggregation
      * @throws \ErrorException
      */
-    public function getAggregation()
+    public function getAggregation():AggregationInterface
     {
         /** @var AvailabilityAggregationProcessor $availabilityProcessor */
         $availabilityProcessor = pluginApp(AvailabilityAggregationProcessor::class);
