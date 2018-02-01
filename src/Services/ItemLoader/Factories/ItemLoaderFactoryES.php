@@ -154,7 +154,10 @@ class ItemLoaderFactoryES implements ItemLoaderFactory
             {
                 foreach($aggregations as $aggregation)
                 {
-                    $search->addAggregation($aggregation);
+                    if(!is_null($aggregation))
+                    {
+                        $search->addAggregation($aggregation);
+                    }
                 }
             }
         }
@@ -258,7 +261,10 @@ class ItemLoaderFactoryES implements ItemLoaderFactory
                 {
                     foreach($aggregations as $aggregation)
                     {
-                        $search->addAggregation($aggregation);
+                        if(!is_null($aggregation))
+                        {
+                            $search->addAggregation($aggregation);
+                        }
                     }
                 }
 
