@@ -2,6 +2,7 @@
 namespace IO\Services\ItemLoader\Factories;
 
 use IO\Extensions\Filters\NumberFormatFilter;
+use IO\Helper\DefaultSearchResult;
 use IO\Services\CheckoutService;
 use IO\Services\ItemLoader\Contracts\ItemLoaderContract;
 use IO\Services\ItemLoader\Contracts\ItemLoaderFactory;
@@ -77,6 +78,11 @@ class ItemLoaderFactoryES implements ItemLoaderFactory
             $result = $this->buildSingleSearch($loaderClassList['single'], $resultFields, $options);
         }
 
+        $result = $this->normalizeResult($result);
+        if ( array_key_exists( 'CrossSellingItems', $result ) )
+        {
+            $result['CrossSellingItems'] = $this->normalizeResult( $result['CrossSellingItems'] );
+        }
         $result = $this->attachPrices($result, $options);
         $result = $this->attachItemWishList($result);
         $result = $this->attachURLs($result);
@@ -535,6 +541,19 @@ class ItemLoaderFactoryES implements ItemLoaderFactory
                     $result['documents'][$key]['data']['texts']['urlPath'] = $itemUrl;
                 }
 
+            }
+        }
+
+        return $result;
+    }
+
+    private function normalizeResult($result)
+    {
+        if( count($result['documents']) )
+        {
+            foreach($result['documents'] as $key => $variation)
+            {
+                $result['documents'][$key]['data'] = DefaultSearchResult::merge( $variation['data'] );
             }
         }
 
