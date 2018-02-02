@@ -79,10 +79,6 @@ class ItemLoaderFactoryES implements ItemLoaderFactory
         }
 
         $result = $this->normalizeResult($result);
-        if ( array_key_exists( 'CrossSellingItems', $result ) )
-        {
-            $result['CrossSellingItems'] = $this->normalizeResult( $result['CrossSellingItems'] );
-        }
         $result = $this->attachPrices($result, $options);
         $result = $this->attachItemWishList($result);
         $result = $this->attachURLs($result);
@@ -309,9 +305,14 @@ class ItemLoaderFactoryES implements ItemLoaderFactory
             }
             else
             {
-                $result[$identifiers[$key-1]] = $this->attachPrices($list);
-                $list = $result[$identifiers[$key-1]];
-                $result[$identifiers[$key-1]] = $this->attachItemWishList($list);
+                $identifier = $identifiers[$key-1];
+                $result[$identifier] = $this->attachPrices($list);
+                if ( $identifier !== "Facets" )
+                {
+                    $result[$identifier] = $this->normalizeResult( $list );
+                }
+                $list = $result[$identifier];
+                $result[$identifier] = $this->attachItemWishList($list);
 
             }
         }
