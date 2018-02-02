@@ -1,6 +1,9 @@
 <?php
 namespace IO\Services\ItemLoader\Factories;
 
+use IO\Extensions\Filters\NumberFormatFilter;
+use IO\Helper\DefaultSearchResult;
+use IO\Services\CheckoutService;
 use IO\Helper\VariationPriceList;
 use IO\Services\ItemLoader\Contracts\ItemLoaderContract;
 use IO\Services\ItemLoader\Contracts\ItemLoaderFactory;
@@ -69,6 +72,7 @@ class ItemLoaderFactoryES implements ItemLoaderFactory
             $result = $this->buildSingleSearch($loaderClassList['single'], $resultFields, $options);
         }
 
+        $result = $this->normalizeResult($result);
         $result = $this->attachPrices($result, $options);
         $result = $this->attachItemWishList($result);
         $result = $this->attachURLs($result);
@@ -309,9 +313,14 @@ class ItemLoaderFactoryES implements ItemLoaderFactory
             }
             else
             {
-                $result[$identifiers[$key-1]] = $this->attachPrices($list);
-                $list = $result[$identifiers[$key-1]];
-                $result[$identifiers[$key-1]] = $this->attachItemWishList($list);
+                $identifier = $identifiers[$key-1];
+                $result[$identifier] = $this->attachPrices($list);
+                if ( $identifier !== "Facets" )
+                {
+                    $result[$identifier] = $this->normalizeResult( $list );
+                }
+                $list = $result[$identifier];
+                $result[$identifier] = $this->attachItemWishList($list);
 
             }
         }
@@ -451,6 +460,19 @@ class ItemLoaderFactoryES implements ItemLoaderFactory
                     $result['documents'][$key]['data']['texts']['urlPath'] = $itemUrl;
                 }
 
+            }
+        }
+
+        return $result;
+    }
+
+    private function normalizeResult($result)
+    {
+        if( count($result['documents']) )
+        {
+            foreach($result['documents'] as $key => $variation)
+            {
+                $result['documents'][$key]['data'] = DefaultSearchResult::merge( $variation['data'] );
             }
         }
 
