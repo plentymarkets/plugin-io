@@ -23,7 +23,7 @@ class SortingBuilder
         }
         else if($sortingString == "item.score")
         {
-            $singleSortingInterface = pluginApp(SingleSorting::class,['_score', 'ASC']);
+            $singleSortingInterface = pluginApp(SingleSorting::class,['_score', 'DESC']);
         }
         else
         {
@@ -50,7 +50,7 @@ class SortingBuilder
             //SingleSort
             if($usedSortingPrioritySearch1 == 'item.score')
             {
-                $sortingInterface = pluginApp(SingleSorting::class,['_score', 'ASC']);
+                $sortingInterface = pluginApp(SingleSorting::class,['_score', 'DESC']);
             }
             else
             {
@@ -64,7 +64,7 @@ class SortingBuilder
 
             if($usedSortingPrioritySearch1 == 'item.score')
             {
-                $singleSortingInterface = pluginApp(SingleSorting::class,['_score', 'ASC']);
+                $singleSortingInterface = pluginApp(SingleSorting::class,['_score', 'DESC']);
             }
             else
             {
@@ -76,7 +76,7 @@ class SortingBuilder
             {
                 if($usedSortingPrioritySearch2 == 'item.score')
                 {
-                    $singleSortingInterface = pluginApp(SingleSorting::class,['_score', 'ASC']);
+                    $singleSortingInterface = pluginApp(SingleSorting::class,['_score', 'DESC']);
                 }
                 else
                 {
@@ -88,7 +88,7 @@ class SortingBuilder
             {
                 if($usedSortingPrioritySearch3 == 'item.score')
                 {
-                    $singleSortingInterface = pluginApp(SingleSorting::class,['_score', 'ASC']);
+                    $singleSortingInterface = pluginApp(SingleSorting::class,['_score', 'DESC']);
                 }
                 else
                 {
