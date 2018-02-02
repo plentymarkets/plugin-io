@@ -161,7 +161,7 @@ class SearchItems implements ItemLoaderContract, ItemLoaderPaginationContract, I
 
                 if($sortingInterface instanceof MultipleSorting)
                 {
-                    $singleSortingInterface = pluginApp(SingleSorting::class,['_score', 'ASC']);
+                    $singleSortingInterface = pluginApp(SingleSorting::class,['_score', 'DESC']);
 
                     $sortingInterface->addSorting($singleSortingInterface);
                 }
