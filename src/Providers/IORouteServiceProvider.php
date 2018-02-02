@@ -139,6 +139,11 @@ class IORouteServiceProvider extends RouteServiceProvider
             $router->get('cancellation-rights', 'IO\Controllers\StaticPagesController@showCancellationRights');
         }
 
+        if ( in_array("cancellation-form", $enabledRoutes) || in_array("all", $enabledRoutes) ) {
+            //cancellation rights page
+            $router->get('cancellation-form', 'IO\Controllers\StaticPagesController@showCancellationForm');
+        }
+
         if ( in_array("legal-disclosure", $enabledRoutes) || in_array("all", $enabledRoutes) ) {
             //legal disclosure page
             $router->get('legal-disclosure', 'IO\Controllers\StaticPagesController@showLegalDisclosure');
