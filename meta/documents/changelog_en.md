@@ -1,5 +1,13 @@
 # Release Notes for IO
 
+## v2.1.4 (2018-02-02) <a href="https://github.com/plentymarkets/plugin-io/compare/2.1.4...2.1.5" target="_blank"><b>Overview of all changes</b></a>
+
+### Fixed
+
+- Due to an error the pagination wasn't displayed correctly when using the setting Show varations by type: Dynamically. This has been fixed.
+- Due to an error item data was not displayed in a consistent way. This has been fixed.
+- Due to an error surcharges for order properties weren't calculated correctly. This has been fixed.
+
 ## v2.1.4 (2018-01-29) <a href="https://github.com/plentymarkets/plugin-io/compare/2.1.3...2.1.4" target="_blank"><b>Overview of all changes</b></a>
 
 - Due to an error URLs without the **Variation ID** parameter weren't displayed correctly. This has been fixed.
