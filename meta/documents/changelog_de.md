@@ -1,5 +1,16 @@
 # Release Notes für IO
 
+## v2.2.0 (2018-02-05) <a href="https://github.com/plentymarkets/plugin-io/compare/2.1.5...2.2.0" target="_blank"><b>Übersicht aller Änderungen</b></a>
+
+### Hinzugefügt
+- `IO.Resources.Import` kann jetzt Parameter entgegennehmen. Beispielsweise können so beim Generieren und Einbinden eines Skripts eigene Werte aus der Plugin-Konfiguration übergeben werden, die beim Rendern des Skripts berücksichtigt werden.
+- Inhalte von **.properties**-Dateien können jetzt geladen werden.
+
+### Behoben
+
+- Durch einen Fehler wurde die Fehlerseite mit HTTP-Statuscode 200 ausgegeben. Dies wurde behoben.
+- Durch einen Fehler wurde die Relevanz eines Artikels bei der Artikelsuche und -sortierung nicht richtig berücksichtigt. Dies wurde behoben.
+
 ## v2.1.5 (2018-02-02) <a href="https://github.com/plentymarkets/plugin-io/compare/2.1.4...2.1.5" target="_blank"><b>Übersicht aller Änderungen</b></a>
 
 - Ein Fehler führte dazu, dass die Paginierung bei verwendeter Einstellung **Show variations by type: Dynamically** nicht korrekt dargestellt wurde. Dies wurde behoben.
