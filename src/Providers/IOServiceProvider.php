@@ -2,6 +2,7 @@
 
 namespace IO\Providers;
 
+use IO\Extensions\Facets\AvailabilityFacet;
 use IO\Extensions\TwigIOExtension;
 use IO\Extensions\TwigServiceProvider;
 use IO\Middlewares\Middleware;
@@ -11,6 +12,8 @@ use IO\Services\ItemLoader\Extensions\TwigLoaderPresets;
 use IO\Services\ItemLoader\Factories\ItemLoaderFactoryES;
 use IO\Services\ItemLoader\Services\FacetExtensionContainer;
 use IO\Services\NotificationService;
+use IO\Services\TemplateConfigService;
+use Plenty\Plugin\Events\Dispatcher;
 use Plenty\Plugin\ServiceProvider;
 use Plenty\Plugin\Templates\Twig;
 
@@ -44,16 +47,26 @@ class IOServiceProvider extends ServiceProvider
         $this->getApplication()->bind(ItemLoaderFactory::class, ItemLoaderFactoryES::class);
         $this->getApplication()->singleton(FacetExtensionContainer::class);
     }
-
+    
     /**
      * boot twig extensions and services
      * @param Twig $twig
+     * @param Dispatcher $dispatcher
+     * @param TemplateConfigService $templateConfigService
      */
-    public function boot(Twig $twig)
+    public function boot(Twig $twig, Dispatcher $dispatcher, TemplateConfigService $templateConfigService)
     {
         $twig->addExtension(TwigServiceProvider::class);
         $twig->addExtension(TwigIOExtension::class);
         $twig->addExtension('Twig_Extensions_Extension_Intl');
         $twig->addExtension(TwigLoaderPresets::class);
+    
+        //add availability facet extension if active in template config
+        if($templateConfigService->get('filter.availabilityFilterActive') == 'true')
+        {
+            $dispatcher->listen('IO.initFacetExtensions', function (FacetExtensionContainer $facetExtensionContainer) {
+                $facetExtensionContainer->addFacetExtension(pluginApp(AvailabilityFacet::class));
+            });
+        }
     }
 }
