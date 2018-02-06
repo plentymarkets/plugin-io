@@ -50,14 +50,18 @@ class WebstoreConfigurationService
 	 */
     public function getActiveLanguageList()
 	{
-        $languages = $this->getWebstoreConfig()->languageList;
+        $activeLanguages = [];
         
-        if(!is_array($languages) && strlen($languages))
+        /** @var TemplateConfigService $templateConfigService */
+        $templateConfigService = pluginApp(TemplateConfigService::class);
+        $languages = $templateConfigService->get('language.active_languages');
+        
+        if(!is_null($languages) && strlen($languages))
         {
-            $languages = explode(', ', $languages);
+            $activeLanguages = explode(', ', $languages);
         }
         
-		return $languages;
+		return $activeLanguages;
 	}
 
 	/**
