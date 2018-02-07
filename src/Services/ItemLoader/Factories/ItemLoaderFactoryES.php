@@ -314,13 +314,12 @@ class ItemLoaderFactoryES implements ItemLoaderFactory
             else
             {
                 $identifier = $identifiers[$key-1];
-                $result[$identifier] = $this->attachPrices($list);
+                $result[$identifier] = $this->attachPrices($result[$identifier]);
                 if ( $identifier !== "Facets" )
                 {
-                    $result[$identifier] = $this->normalizeResult( $list );
+                    $result[$identifier] = $this->normalizeResult( $result[$identifier] );
                 }
-                $list = $result[$identifier];
-                $result[$identifier] = $this->attachItemWishList($list);
+                $result[$identifier] = $this->attachItemWishList( $result[$identifier] );
 
             }
         }
