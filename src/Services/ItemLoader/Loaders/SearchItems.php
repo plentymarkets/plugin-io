@@ -109,7 +109,6 @@ class SearchItems implements ItemLoaderContract, ItemLoaderPaginationContract, I
             else
             {
                 $searchFilter->setSearchString($options['query'], $lang, $searchType, ElasticSearch::OR_OPERATOR);
-                $searchFilter->setVariationNumber($options['query']);
             }
             
             $filters[] = $searchFilter;
