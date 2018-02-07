@@ -1,5 +1,16 @@
 # Release Notes for IO
 
+## v2.2.1 (2018-02-07) <a href="https://github.com/plentymarkets/plugin-io/compare/2.2.0...2.2.1" target="_blank"><b>Overview of all changes</b></a>
+
+### Changed
+
+- The sorting order of search results has been improved.
+- The list of active languages will no longer be loaded from the `WebstoreConfigurationRepositoryContract`. This list will now be loaded from the configuration of the respective template plugin instead.
+
+### Fixed
+
+- Due to an error the prices of cross selling items weren't calculated correctly. This has been fixed.
+
 ## v2.2.0 (2018-02-05) <a href="https://github.com/plentymarkets/plugin-io/compare/2.1.5...2.2.0" target="_blank"><b>Overview of all changes</b></a>
 
 ### Added
