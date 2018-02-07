@@ -16,9 +16,12 @@ use Plenty\Modules\Item\SalesPrice\Models\SalesPriceSearchResponse;
 use Plenty\Modules\Item\Unit\Contracts\UnitNameRepositoryContract;
 use Plenty\Modules\Item\Unit\Contracts\UnitRepositoryContract;
 use Plenty\Plugin\Application;
+use Plenty\Plugin\CachingRepository;
 
 class VariationPriceList
 {
+    use MemoryCache;
+
     const TYPE_DEFAULT          = 'default';
     const TYPE_RRP              = 'rrp';
     const TYPE_SPECIAL_OFFER    = 'specialOffer';
@@ -41,9 +44,13 @@ class VariationPriceList
     /** @var NumberFormatFilter $numberFormatFilter */
     private $numberFormatFilter;
 
-    public function __construct( NumberFormatFilter $numberFormatFilter )
+    /** @var CachingRepository $cachingRepository */
+    private $cachingRepository;
+
+    public function __construct( NumberFormatFilter $numberFormatFilter, CachingRepository $cachingRepository )
     {
         $this->numberFormatFilter = $numberFormatFilter;
+        $this->cachingRepository = $cachingRepository;
     }
 
     public static function create( int $variationId, $minimumOrderQuantity = 0, $maximumOrderQuantity = null, $lot = 0, $unit = null )
@@ -119,35 +126,49 @@ class VariationPriceList
             $basePrice = [];
             list( $basePrice['lot'], $basePrice['price'], $basePrice['unitKey'] ) = $basePriceService->getUnitPrice($this->lot, $unitPrice, $this->unit);
 
-            /**
-             * @var UnitRepositoryContract $unitRepository
-             */
-            $unitRepository = pluginApp(UnitRepositoryContract::class);
-
-            /** @var AuthHelper $authHelper */
-            $authHelper = pluginApp(AuthHelper::class);
-
-            $unitData = $authHelper->processUnguarded( function() use ($unitRepository, $basePrice)
-            {
-                $unitRepository->setFilters(['unitOfMeasurement' => $basePrice['unitKey']]);
-                return $unitRepository->all(['*'], 1, 1);
-            });
-
-
-            $unitId = $unitData->getResult()->first()->id;
-
-            /** @var UnitNameRepositoryContract $unitNameRepository */
-            $unitNameRepository = pluginApp(UnitNameRepositoryContract::class);
-            if ( $lang === null )
-            {
-                $lang = pluginApp(SessionStorageService::class)->getLang();
-            }
-            $unitName = $unitNameRepository->findOne($unitId, $lang)->name;
+            $unitName = $this->getUnitName( $basePrice['unitKey'], $lang );
 
             $basePriceString = $this->numberFormatFilter->formatMonetary($basePrice['price'], $currency).' / '.($basePrice['lot'] > 1 ? $basePrice['lot'].' ' : '').$unitName;
         }
 
         return $basePriceString;
+    }
+
+    private function getUnitName( $unitKey, $lang = null )
+    {
+        if ( $lang === null )
+        {
+            $lang = pluginApp(SessionStorageService::class)->getLang();
+        }
+
+        return $this->cachingRepository->remember(
+            "unitName.$unitKey.$lang",
+            60,
+            function() use ($unitKey, $lang)
+            {
+                /**
+                 * @var UnitRepositoryContract $unitRepository
+                 */
+                $unitRepository = pluginApp(UnitRepositoryContract::class);
+
+                /** @var AuthHelper $authHelper */
+                $authHelper = pluginApp(AuthHelper::class);
+
+                $unitData = $authHelper->processUnguarded( function() use ($unitRepository, $unitKey)
+                {
+                    $unitRepository->setFilters(['unitOfMeasurement' => $unitKey]);
+                    return $unitRepository->all(['*'], 1, 1);
+                });
+
+
+                $unitId = $unitData->getResult()->first()->id;
+
+                /** @var UnitNameRepositoryContract $unitNameRepository */
+                $unitNameRepository = pluginApp(UnitNameRepositoryContract::class);
+
+                return $unitNameRepository->findOne($unitId, $lang)->name;
+            }
+        );
     }
 
     public function toArray( $quantity = null )
@@ -269,36 +290,45 @@ class VariationPriceList
     private function getSearchRequest( int $variationId, string $type = self::TYPE_DEFAULT, float $quantity = 0 )
     {
         /** @var SalesPriceSearchRequest $salesPriceSearchRequest */
-        $salesPriceSearchRequest = pluginApp(SalesPriceSearchRequest::class);
+        $salesPriceSearchRequest = $this->fromMemoryCache(
+            "salesPriceRequest",
+            function()
+            {
+                /** @var SalesPriceSearchRequest $salesPriceSearchRequest */
+                $salesPriceSearchRequest = pluginApp(SalesPriceSearchRequest::class);
+                $salesPriceSearchRequest->accountId   = 0;
+
+                /** @var CustomerService $customerService */
+                $customerService = pluginApp( CustomerService::class );
+                $contact = $customerService->getContact();
+
+                if ( $contact instanceof Contact )
+                {
+                    $salesPriceSearchRequest->accountType = $contact->singleAccess;
+                }
+                $salesPriceSearchRequest->customerClassId = $customerService->getContactClassId();
+
+                /** @var CheckoutService $checkoutService */
+                $checkoutService = pluginApp( CheckoutService::class );
+
+                $salesPriceSearchRequest->countryId = $checkoutService->getShippingCountryId();
+                $salesPriceSearchRequest->currency  = $checkoutService->getCurrency();
+
+                /** @var BasketService $basketService */
+                $basketService = pluginApp( BasketService::class );
+                $salesPriceSearchRequest->referrerId = $basketService->getBasket()->referrerId;
+
+                /** @var Application $app */
+                $app = pluginApp( Application::class );
+                $salesPriceSearchRequest->plentyId = $app->getPlentyId();
+
+                return $salesPriceSearchRequest;
+            }
+        );
+
         $salesPriceSearchRequest->variationId = $variationId;
-        $salesPriceSearchRequest->accountId   = 0;
         $salesPriceSearchRequest->quantity    = $quantity;
         $salesPriceSearchRequest->type        = $type;
-
-        /** @var CustomerService $customerService */
-        $customerService = pluginApp( CustomerService::class );
-        $contact = $customerService->getContact();
-
-        if ( $contact instanceof Contact )
-        {
-            $salesPriceSearchRequest->accountType = $contact->singleAccess;
-        }
-        $salesPriceSearchRequest->customerClassId = $customerService->getContactClassId();
-
-        /** @var CheckoutService $checkoutService */
-        $checkoutService = pluginApp( CheckoutService::class );
-
-        $salesPriceSearchRequest->countryId = $checkoutService->getShippingCountryId();
-        $salesPriceSearchRequest->currency  = $checkoutService->getCurrency();
-
-        /** @var BasketService $basketService */
-        $basketService = pluginApp( BasketService::class );
-        $salesPriceSearchRequest->referrerId = $basketService->getBasket()->referrerId;
-
-        /** @var Application $app */
-        $app = pluginApp( Application::class );
-        $salesPriceSearchRequest->plentyId = $app->getPlentyId();
-
         return $salesPriceSearchRequest;
     }
 
