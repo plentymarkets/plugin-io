@@ -8,12 +8,16 @@ trait MemoryCache
 
     protected function fromMemoryCache( $key, \Closure $callack )
     {
-        $cacheKey = self::class . "::" . $key;
-        if ( !array_key_exists( $cacheKey, self::$cache ) )
+        if (!array_key_exists(self::class, self::$cache))
         {
-            self::$cache[$cacheKey] = $callack->call($this);
+            self::$cache[self::class] = [];
         }
 
-        return self::$cache[$cacheKey];
+        if ( !array_key_exists( $key, self::$cache[self::class] ) )
+        {
+            self::$cache[self::class][$key] = $callack->call($this);
+        }
+
+        return self::$cache[self::class][$key];
     }
 }

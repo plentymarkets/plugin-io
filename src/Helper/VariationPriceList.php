@@ -7,6 +7,7 @@ use IO\Services\BasketService;
 use IO\Services\CheckoutService;
 use IO\Services\CustomerService;
 use IO\Services\SessionStorageService;
+use IO\Services\UnitService;
 use Plenty\Legacy\Services\Item\Variation\SalesPriceService;
 use Plenty\Modules\Account\Contact\Models\Contact;
 use Plenty\Modules\Authorization\Services\AuthHelper;
@@ -44,13 +45,13 @@ class VariationPriceList
     /** @var NumberFormatFilter $numberFormatFilter */
     private $numberFormatFilter;
 
-    /** @var CachingRepository $cachingRepository */
-    private $cachingRepository;
+    /** @var UnitService $unitService */
+    private $unitService;
 
-    public function __construct( NumberFormatFilter $numberFormatFilter, CachingRepository $cachingRepository )
+    public function __construct( NumberFormatFilter $numberFormatFilter, UnitService $unitService )
     {
         $this->numberFormatFilter = $numberFormatFilter;
-        $this->cachingRepository = $cachingRepository;
+        $this->unitService = $unitService;
     }
 
     public static function create( int $variationId, $minimumOrderQuantity = 0, $maximumOrderQuantity = null, $lot = 0, $unit = null )
@@ -126,49 +127,12 @@ class VariationPriceList
             $basePrice = [];
             list( $basePrice['lot'], $basePrice['price'], $basePrice['unitKey'] ) = $basePriceService->getUnitPrice($this->lot, $unitPrice, $this->unit);
 
-            $unitName = $this->getUnitName( $basePrice['unitKey'], $lang );
+            $unitName = $this->unitService->getUnitNameByKey( $basePrice['unitKey'], $lang );
 
             $basePriceString = $this->numberFormatFilter->formatMonetary($basePrice['price'], $currency).' / '.($basePrice['lot'] > 1 ? $basePrice['lot'].' ' : '').$unitName;
         }
 
         return $basePriceString;
-    }
-
-    private function getUnitName( $unitKey, $lang = null )
-    {
-        if ( $lang === null )
-        {
-            $lang = pluginApp(SessionStorageService::class)->getLang();
-        }
-
-        return $this->cachingRepository->remember(
-            "unitName.$unitKey.$lang",
-            60,
-            function() use ($unitKey, $lang)
-            {
-                /**
-                 * @var UnitRepositoryContract $unitRepository
-                 */
-                $unitRepository = pluginApp(UnitRepositoryContract::class);
-
-                /** @var AuthHelper $authHelper */
-                $authHelper = pluginApp(AuthHelper::class);
-
-                $unitData = $authHelper->processUnguarded( function() use ($unitRepository, $unitKey)
-                {
-                    $unitRepository->setFilters(['unitOfMeasurement' => $unitKey]);
-                    return $unitRepository->all(['*'], 1, 1);
-                });
-
-
-                $unitId = $unitData->getResult()->first()->id;
-
-                /** @var UnitNameRepositoryContract $unitNameRepository */
-                $unitNameRepository = pluginApp(UnitNameRepositoryContract::class);
-
-                return $unitNameRepository->findOne($unitId, $lang)->name;
-            }
-        );
     }
 
     public function toArray( $quantity = null )
