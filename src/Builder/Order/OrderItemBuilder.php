@@ -2,6 +2,7 @@
 
 namespace IO\Builder\Order;
 
+use IO\Extensions\Filters\ItemNameFilter;
 use IO\Services\SessionStorageService;
 use Plenty\Modules\Basket\Models\Basket;
 use Plenty\Modules\Basket\Models\BasketItem;
@@ -25,14 +26,18 @@ class OrderItemBuilder
      */
 	private $vatService;
 
+	/** @var ItemNameFilter */
+	private $itemNameFilter;
+
 	/**
 	 * OrderItemBuilder constructor.
 	 * @param CheckoutService $checkoutService
 	 */
-	public function __construct(CheckoutService $checkoutService, VatService $vatService)
+	public function __construct(CheckoutService $checkoutService, VatService $vatService, ItemNameFilter $itemNameFilter)
 	{
 		$this->checkoutService = $checkoutService;
 		$this->vatService = $vatService;
+		$this->itemNameFilter = $itemNameFilter;
 	}
 
 	/**
@@ -124,10 +129,6 @@ class OrderItemBuilder
 		if(isset($basketItem['attributeTotalMarkup']))
 		{
             $attributeTotalMarkup = $basketItem['attributeTotalMarkup'];
-			if($attributeTotalMarkup != 0)
-			{
-				$priceOriginal -= $attributeTotalMarkup;
-			}
         }
         
         $rebate = 0;
@@ -135,13 +136,13 @@ class OrderItemBuilder
 		{
 			$rebate = $basketItem['rebate'];
 		}
-	    
+
 		return [
 			"typeId"            => OrderItemType::VARIATION,
 			"referrerId"        => $basketItem['referrerId'],
 			"itemVariationId"   => $basketItem['variationId'],
 			"quantity"          => $basketItem['quantity'],
-			"orderItemName"     => $basketItem['variation']['data']['texts']['name1'],
+			"orderItemName"     => $this->itemNameFilter->itemName( $basketItem['variation']['data'] ),
 			"shippingProfileId" => $basketItem['shippingProfileId'],
 			"countryVatId"      => $this->vatService->getCountryVatId(),
 			"vatRate"           => $basketItem['vat'],
@@ -149,11 +150,11 @@ class OrderItemBuilder
             "orderProperties"   => $basketItemProperties,
 			"amounts"           => [
 				[
-					"currency"           => $this->checkoutService->getCurrency(),
-					"priceOriginalGross" => $priceOriginal,
-                    "surcharge" => $attributeTotalMarkup,
-					"rebate"	=> $rebate,
-					"isPercentage" => 1
+					"currency"              => $this->checkoutService->getCurrency(),
+					"priceOriginalGross"    => $priceOriginal,
+                    "surcharge"             => $attributeTotalMarkup,
+					"rebate"	            => $rebate,
+					"isPercentage"          => 1
 				]
 			]
 		];

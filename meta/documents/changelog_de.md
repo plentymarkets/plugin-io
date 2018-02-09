@@ -1,5 +1,39 @@
 # Release Notes für IO
 
+## v2.2.1 (2018-02-07) <a href="https://github.com/plentymarkets/plugin-io/compare/2.2.0...2.2.1" target="_blank"><b>Übersicht aller Änderungen</b></a>
+
+### Geändert
+
+- Die Sortierung der Suchergebnisse wurde verbessert.
+- Die Liste der aktiven Sprachen wird nun nicht mehr aus dem `WebstoreConfigurationRepositoryContract` geladen, sondern aus der Konfiguration des zugehörigen Template-Plugins.
+
+### Behoben
+
+- Durch einen Fehler wurden die Preise von Cross-Selling-Artikeln nicht berechnet. Dies wurde behoben.
+
+## v2.2.0 (2018-02-05) <a href="https://github.com/plentymarkets/plugin-io/compare/2.1.5...2.2.0" target="_blank"><b>Übersicht aller Änderungen</b></a>
+
+### Hinzugefügt
+- `IO.Resources.Import` kann jetzt Parameter entgegennehmen. Beispielsweise können so beim Generieren und Einbinden eines Skripts eigene Werte aus der Plugin-Konfiguration übergeben werden, die beim Rendern des Skripts berücksichtigt werden.
+- Inhalte von **.properties**-Dateien können jetzt geladen werden.
+
+### Behoben
+
+- Durch einen Fehler wurde die Fehlerseite mit HTTP-Statuscode 200 ausgegeben. Dies wurde behoben.
+- Durch einen Fehler wurde die Relevanz eines Artikels bei der Artikelsuche und -sortierung nicht richtig berücksichtigt. Dies wurde behoben.
+
+## v2.1.5 (2018-02-02) <a href="https://github.com/plentymarkets/plugin-io/compare/2.1.4...2.1.5" target="_blank"><b>Übersicht aller Änderungen</b></a>
+
+- Ein Fehler führte dazu, dass die Paginierung bei verwendeter Einstellung **Show variations by type: Dynamically** nicht korrekt dargestellt wurde. Dies wurde behoben.
+- Durch einen Fehler wurden Artikeldaten nicht einheitlich ausgeliefert. Dieser wurde behoben.
+- Durch einen Fehler wurden Aufpreise für Bestellmerkmale nicht richtig berechnet. Dies wurde behoben.
+
+### Behoben
+
+## v2.1.4 (2018-01-29) <a href="https://github.com/plentymarkets/plugin-io/compare/2.1.3...2.1.4" target="_blank"><b>Übersicht aller Änderungen</b></a>
+
+- Ein Fehler führte dazu, dass URLs ohne den Parameter **Varianten-ID** nicht korrekt ausgegeben wurden. Dies wurde behoben.
+
 ## v2.1.3 (2018-01-23) <a href="https://github.com/plentymarkets/plugin-io/compare/2.1.2...2.1.3" target="_blank"><b>Übersicht aller Änderungen</b></a>
 
 ### Behoben

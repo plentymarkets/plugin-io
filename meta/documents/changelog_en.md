@@ -1,5 +1,40 @@
 # Release Notes for IO
 
+## v2.2.1 (2018-02-07) <a href="https://github.com/plentymarkets/plugin-io/compare/2.2.0...2.2.1" target="_blank"><b>Overview of all changes</b></a>
+
+### Changed
+
+- The sorting order of search results has been improved.
+- The list of active languages will no longer be loaded from the `WebstoreConfigurationRepositoryContract`. This list will now be loaded from the configuration of the respective template plugin instead.
+
+### Fixed
+
+- Due to an error the prices of cross selling items weren't calculated correctly. This has been fixed.
+
+## v2.2.0 (2018-02-05) <a href="https://github.com/plentymarkets/plugin-io/compare/2.1.5...2.2.0" target="_blank"><b>Overview of all changes</b></a>
+
+### Added
+
+- `IO.Resources.Import` can now receive parameters. For example, when generating and integrating a script own values saved in the plugin configuration can now be transferred and taken into account when rendering the script.
+- The content of **.properties** files can now be loaded.
+
+### Fixed
+
+- Due to an error the error page was transmitted with a 200 status code. This has been fixed.
+- Due to an error the relevance of an item wasn't correctly taken into account when searching for items and sorting items by relevance. This has been fixed.
+
+## v2.1.5 (2018-02-02) <a href="https://github.com/plentymarkets/plugin-io/compare/2.1.4...2.1.5" target="_blank"><b>Overview of all changes</b></a>
+
+### Fixed
+
+- Due to an error the pagination wasn't displayed correctly when using the setting Show varations by type: Dynamically. This has been fixed.
+- Due to an error item data was not displayed in a consistent way. This has been fixed.
+- Due to an error surcharges for order properties weren't calculated correctly. This has been fixed.
+
+## v2.1.4 (2018-01-29) <a href="https://github.com/plentymarkets/plugin-io/compare/2.1.3...2.1.4" target="_blank"><b>Overview of all changes</b></a>
+
+- Due to an error URLs without the **Variation ID** parameter weren't displayed correctly. This has been fixed.
+
 ## v2.1.3 (2018-01-23) <a href="https://github.com/plentymarkets/plugin-io/compare/2.1.2...2.1.3" target="_blank"><b>Overview of all changes</b></a>
 
 ### Fixed

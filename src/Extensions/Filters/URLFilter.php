@@ -71,7 +71,7 @@ class URLFilter extends AbstractFilter
             $url = $variationUrlBuilder->buildUrl( $itemId, $variationId );
 
             return $url->append(
-                $variationUrlBuilder->getSuffix( $itemId, $variationId )
+                $variationUrlBuilder->getSuffix( $itemId, $variationId, $withVariationId )
             )->toRelativeUrl();
         }
 	}

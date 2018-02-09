@@ -7,6 +7,7 @@ use IO\Services\CountryService;
 use IO\Services\WebstoreConfigurationService;
 use IO\Services\CheckoutService;
 use Plenty\Modules\Frontend\Services\LocaleService;
+use Plenty\Plugin\Data\Contracts\Resources;
 
 class LocalizationService
 {
@@ -46,5 +47,18 @@ class LocalizationService
     {
         $localeService = pluginApp(LocaleService::class);
         $localeService->setLanguage($newLanguage, $fireEvent);
+    }
+
+    public function getTranslations( string $plugin, string $group, $lang = null )
+    {
+        if ( $lang === null )
+        {
+            $lang = pluginApp(SessionStorageService::class)->getLang();
+        }
+
+        /** @var Resources $resource */
+        $resource = pluginApp( Resources::class );
+
+        return $resource->load( "$plugin::lang/$lang/$group" )->getData();
     }
 }
