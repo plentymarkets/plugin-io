@@ -11,7 +11,7 @@ use Plenty\Plugin\Templates\Twig;
 
 class CategoryPagesMigrationService
 {
-    public function createCategoryFromTwig($templateNames, $categoryNames, $parentCategoryId = null, $configKey = null, $additionalDetails = array() )
+    public function createCategoryFromTwig($templateNames, $categoryNames, $parentCategoryId = null, $additionalDetails = array() )
     {
         $plentyId = pluginApp( Application::class )->getPlentyId();
 
@@ -81,12 +81,6 @@ class CategoryPagesMigrationService
                 );
             }
         }
-
-        if ( $configKey !== null )
-        {
-            $this->writeConfigValue( $configKey, $newCategory->id );
-        }
-
     }
 
     private function storeCategoryTemplate( $template, $categoryId, $lang )
@@ -103,10 +97,5 @@ class CategoryPagesMigrationService
             $lang,
             $webstoreConfigService->getWebstoreConfig()->webstoreId
         );
-    }
-
-    private function writeConfigValue( $key, $value )
-    {
-        // TODO: store config value
     }
 }

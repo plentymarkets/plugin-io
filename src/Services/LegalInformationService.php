@@ -16,14 +16,6 @@ class LegalInformationService
     
     private $plentyId;
     
-    private $pageKeys = [
-        'terms_and_conditions' => '/gtc',
-        'cancellation_rights'  => '/cancellation-rights',
-        'privacy_policy'       => '/privacy-policy',
-        'legal_disclosure'     => '/legal-disclosure',
-        'cancellation_form'    => '/cancellation-form'
-    ];
-    
     public function __construct(LegalInformationRepositoryContract $legalInformationRepo, Application $app, SessionStorageService $sessionStorage)
     {
         $this->legalInformationRepo = $legalInformationRepo;
@@ -54,47 +46,5 @@ class LegalInformationService
     public function getWithdrawalForm():LegalInformation
     {
         return $this->legalInformationRepo->find($this->plentyId, $this->lang, LegalInformation::TYPE_WITHDRAWAL_FORM);
-    }
-    
-    public function getLegalPageURL($key)
-    {
-        $url = '';
-        if(strlen($key))
-        {
-            /** @var TemplateConfigService $templateConfigService */
-            $templateConfigService = pluginApp(TemplateConfigService::class);
-            $categoryId = $templateConfigService->get('pages.'.$key, null);
-            
-            if(!is_null($categoryId) && (int)$categoryId > 0)
-            {
-                /** @var CategoryService $categoryService */
-                $categoryService = pluginApp(CategoryService::class);
-                $categoryURL = $categoryService->getURLById((int)$categoryId);
-                if(strlen($categoryURL))
-                {
-                    $url = '/'.$categoryURL;
-                }
-                else
-                {
-                    $url = $this->getLegalFallbackURL($key);
-                }
-            }
-            else
-            {
-                $url = $this->getLegalFallbackURL($key);
-            }
-        }
-        
-        return $url;
-    }
-    
-    private function getLegalFallbackURL($key)
-    {
-        if(array_key_exists($key, $this->pageKeys))
-        {
-            return $this->pageKeys[$key];
-        }
-        
-        return '';
     }
 }
