@@ -60,7 +60,7 @@ class TemplateContainer
 	/**
 	 * Get the template data to pass to current template.
 	 */
-	public function getTemplateData():array
+	public function getTemplateData()
 	{
 		return $this->templateData;
 	}

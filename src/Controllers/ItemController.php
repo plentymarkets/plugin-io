@@ -70,15 +70,6 @@ class ItemController extends ItemLoaderController
 
         if(empty($itemResult['documents']))
         {
-            // If item not found, render the error category
-            $itemNotFoundCategory = $this->categoryRepo->get(
-                $this->categoryMap->getID(CategoryKey::ITEM_NOT_FOUND)
-            );
-
-            if($itemNotFoundCategory instanceof Category)
-            {
-                return $this->renderCategory($itemNotFoundCategory);
-            }
             return '';
         }
         else

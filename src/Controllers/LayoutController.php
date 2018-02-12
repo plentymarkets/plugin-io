@@ -1,7 +1,6 @@
 <?php
 namespace IO\Controllers;
 
-use IO\Helper\CategoryKey;
 use IO\Helper\CategoryMap;
 use IO\Helper\TemplateContainer;
 use IO\Services\CategoryService;
@@ -90,35 +89,6 @@ abstract class LayoutController extends Controller
 	}
 
 	/**
-	 * Render the category data
-	 * @param $category
-	 * @return string
-	 */
-	protected function renderCategory($category):string
-	{
-		if($category === null)
-		{
-			$category = $this->categoryRepo->get(
-				(int)$this->categoryMap->getID(CategoryKey::PAGE_NOT_FOUND)
-			);
-		}
-
-		if($category === null)
-		{
-            return '';
-		}
-
-		$this->categoryService->setCurrentCategory($category);
-
-		return $this->renderTemplate(
-			"tpl.category." . $category->type,
-			[
-				"category" => $category
-			]
-		);
-	}
-
-	/**
 	 * Abort handling current route and pass request to the plentymarkets system
 	 * @param int $code
 	 * @param string $message
@@ -138,7 +108,7 @@ abstract class LayoutController extends Controller
 	 * @param array $templateData
 	 * @return TemplateContainer
 	 */
-	protected function buildTemplateContainer(string $templateEvent, array $templateData = []):TemplateContainer
+	protected function buildTemplateContainer(string $templateEvent, $templateData = []):TemplateContainer
 	{
 		/** @var TemplateContainer $templateContainer */
 		$templateContainer = pluginApp(TemplateContainer::class);
@@ -151,13 +121,6 @@ abstract class LayoutController extends Controller
 			$templateData
 		]);
 		
-		if($templateContainer->hasTemplate())
-		{
-			TemplateService::$currentTemplate = $templateEvent;
-			
-			// Prepare the global data only if the template is available
-			$this->prepareTemplateData($templateContainer, $templateData);
-		}
 		return $templateContainer;
 	}
 
@@ -169,18 +132,14 @@ abstract class LayoutController extends Controller
 	 * @param array $templateData Additional template data from concrete controller
 	 * @return string
 	 */
-	protected function renderTemplate(string $templateEvent, array $templateData = []):string
+	protected function renderTemplate(string $templateEvent, $templateData = []):string
 	{
 		$templateContainer = $this->buildTemplateContainer($templateEvent, $templateData);
 		
 		if($templateContainer->hasTemplate())
 		{
 			TemplateService::$currentTemplate = $templateEvent;
-
-			// Prepare the global data only if the template is available
-			$this->prepareTemplateData($templateContainer, $templateData);
-
-
+			
 			// Render the received plugin
 			return $this->renderTemplateContainer($templateContainer);
 		}
@@ -199,7 +158,7 @@ abstract class LayoutController extends Controller
 		// Render the received plugin
 		return $this->twig->render(
 			$templateContainer->getTemplate(),
-			$templateContainer->getTemplateData()
+            $templateContainer->getTemplateData()
 		);
 	}
 

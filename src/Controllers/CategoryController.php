@@ -1,11 +1,6 @@
 <?php //strict
+
 namespace IO\Controllers;
-
-use Plenty\Modules\Category\Contracts\CategoryRepositoryContract;
-use Plenty\Modules\Item\DataLayer\Contracts\ItemDataLayerRepositoryContract;
-use Plenty\Modules\Category\Models\Category;
-
-use IO\Helper\CategoryKey;
 
 /**
  * Class CategoryController
@@ -13,7 +8,6 @@ use IO\Helper\CategoryKey;
  */
 class CategoryController extends LayoutController
 {
-
 	/**
 	 * Prepare and render the data for categories
 	 * @param string $lvl1 Level 1 of category url. Will be null at root page
@@ -32,20 +26,22 @@ class CategoryController extends LayoutController
 		$lvl5 = null,
 		$lvl6 = null):string
 	{
-		// Get the current category
-		if($lvl1 === null)
-		{
-			// Get the start page ID from the layout plugin config
-			$currentCategory = $this->categoryRepo->get(
-				$this->categoryMap->getID(CategoryKey::HOME)
-			);
-		}
-		else
-		{
-			$currentCategory = $this->categoryRepo->findCategoryByUrl($lvl1, $lvl2, $lvl3, $lvl4, $lvl5, $lvl6);
-		}
+		
+	    $category = $this->categoryRepo->findCategoryByUrl($lvl1, $lvl2, $lvl3, $lvl4, $lvl5, $lvl6);
         
-        return $this->renderCategory($currentCategory);
+        if($category === null)
+        {
+            return '';
+        }
+        
+        $this->categoryService->setCurrentCategory($category);
+        
+        return $this->renderTemplate(
+            "tpl.category." . $category->type,
+            [
+                'category' => $category
+            ]
+        );
 	}
 
 }
