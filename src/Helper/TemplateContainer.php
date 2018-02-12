@@ -15,9 +15,9 @@ class TemplateContainer
 	private $template = null;
 	
 	/**
-	 * @var array
+	 * @var mixed
 	 */
-	private $templateData = [];
+	private $templateData;
 
 	/**
 	 * @var string
@@ -67,10 +67,10 @@ class TemplateContainer
 	
 	/**
 	 * Override template data used by LayoutController when rendering a template for current request.
-	 * @param array|null $customData
+	 * @param mixed $customData
 	 * @return TemplateContainer
 	 */
-	public function setTemplateData( $customData = null):TemplateContainer
+	public function setTemplateData( $customData ):TemplateContainer
 	{
 		if($customData !== null)
 		{
@@ -105,7 +105,7 @@ class TemplateContainer
 	 */
 	public function withData($data, string $identifier):TemplateContainer
 	{
-		$this->templateData[$identifier] = $data;
+		//$this->templateData[$identifier] = $data;
 		return $this;
 	}
 }
