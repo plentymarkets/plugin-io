@@ -66,7 +66,15 @@ class BasketService
         $basket = $this->getBasket()->toArray();
 
         $basket["itemQuantity"] = $this->getBasketQuantity();
-        $basket["totalVats"] = $this->getTotalVats();
+
+        if ( $basket["itemQuantity"] > 0 )
+        {
+            $basket["totalVats"] = $this->getTotalVats();
+        }
+        else
+        {
+            $basket["totalVats"] = [];
+        }
 
 
         if ($this->sessionStorage->getCustomer()->showNetPrice) {
