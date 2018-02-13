@@ -128,7 +128,7 @@ abstract class LayoutController extends Controller
             TemplateService::$currentTemplate = $templateEvent;
             
             // Prepare the global data only if the template is available
-            $this->prepareTemplateData($templateContainer, $templateData);
+            //$this->prepareTemplateData($templateContainer, $templateData);
         }
         
         
@@ -156,7 +156,7 @@ abstract class LayoutController extends Controller
 			TemplateService::$currentTemplate = $templateEvent;
             
             // Prepare the global data only if the template is available
-            $this->prepareTemplateData($templateContainer, $templateData);
+            //$this->prepareTemplateData($templateContainer, $templateData);
             
             // Render the received plugin
 			return $this->renderTemplateContainer($templateContainer);
