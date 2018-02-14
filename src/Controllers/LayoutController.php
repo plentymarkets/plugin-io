@@ -149,14 +149,12 @@ abstract class LayoutController extends Controller
      */
 	protected function renderTemplate(string $templateEvent, $templateData = []):string
 	{
+        TemplateService::$currentTemplate = $templateEvent;
 		$templateContainer = $this->buildTemplateContainer($templateEvent, $templateData);
 		
 		if($templateContainer->hasTemplate())
 		{
 			TemplateService::$currentTemplate = $templateEvent;
-            
-            // Prepare the global data only if the template is available
-            //$this->prepareTemplateData($templateContainer, $templateData);
             
             // Render the received plugin
 			return $this->renderTemplateContainer($templateContainer);
@@ -176,10 +174,20 @@ abstract class LayoutController extends Controller
      */
 	protected function renderTemplateContainer(TemplateContainer $templateContainer)
 	{
+	    $templateData = [];
+	    if ( $templateContainer->getTemplateData() instanceof \Closure )
+        {
+            $callback = $templateContainer->getTemplateData();
+            $templateData = $callback->call($this);
+        }
+        else
+        {
+            $templateData = $templateContainer->getTemplateData();
+        }
 		// Render the received plugin
 		return $this->twig->render(
 			$templateContainer->getTemplate(),
-			$templateContainer->getTemplateData()
+			$templateData
 		);
 	}
 
