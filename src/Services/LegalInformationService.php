@@ -42,7 +42,7 @@ class LegalInformationService
     {
         return $this->legalInformationRepo->find($this->plentyId, $this->lang, LegalInformation::TYPE_LEGAL_DISCLOSURE);
     }
-    
+
     public function getWithdrawalForm():LegalInformation
     {
         return $this->legalInformationRepo->find($this->plentyId, $this->lang, LegalInformation::TYPE_WITHDRAWAL_FORM);
