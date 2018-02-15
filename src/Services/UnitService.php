@@ -21,6 +21,8 @@ class UnitService
 	 */
 	private $unitNameRepository;
 
+	private $defaultLang;
+
     /**
      * UnitService constructor.
      * @param UnitNameRepositoryContract $unitRepository
@@ -28,6 +30,7 @@ class UnitService
 	public function __construct(UnitNameRepositoryContract $unitRepository)
 	{
 		$this->unitNameRepository = $unitRepository;
+		$this->defaultLang = pluginApp(SessionStorageService::class)->getLang();
 	}
 
     /**
@@ -45,7 +48,7 @@ class UnitService
     {
         if ( $lang === null )
         {
-            $lang = pluginApp(SessionStorageService::class)->getLang();
+            $lang = $this->defaultLang;
         }
 
         return $this->fromMemoryCache(
