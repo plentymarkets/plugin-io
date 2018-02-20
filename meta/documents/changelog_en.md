@@ -1,5 +1,15 @@
 # Release Notes for IO
 
+## v2.3.0 (2018-02-19) <a href="https://github.com/plentymarkets/plugin-io/compare/2.2.2...2.3.0" target="_blank"><b>Overview of all changes</b></a>
+
+### changed
+
+- The filter `itemName` is now able to display the variation name or a combination of item name and variation name in accordance with the Ceres configuration.
+
+### Fixed
+
+- Due to an error item URLs weren't generated correctly. This has been fixed.
+
 ## v2.2.2 (2018-02-12) <a href="https://github.com/plentymarkets/plugin-io/compare/2.2.1...2.2.2" target="_blank"><b>Overview of all changes</b></a>
 
 ### Fixed
@@ -116,7 +126,7 @@
 - The logic for calculating order sums has been added (previously this logic was contained in a Twig macro in Ceres).
 - A customer that ordered as a guest may now change the payment method on the order confirmation page if enabled.
 - A customer that ordered as a guest can now pay an order subsequently, e.g. when the payment method changes.
-- An error message has been added that will be displayed when an error occurs during adding items to the shopping cart. 
+- An error message has been added that will be displayed when an error occurs during adding items to the shopping cart.
 
 ### Fixed
 
@@ -265,7 +275,7 @@
 ### Added
 
 - The logic and the route `/wish-list` has been added to display a wish list in the online store. **Note:** In order for the migration of the data base table to run correctly, the standard client must be activated and the plugin deployed. After deployment the standard client can be deactivated.
-- The logic and the route `/contact` has been added to display a contact page in the online store. 
+- The logic and the route `/contact` has been added to display a contact page in the online store.
 - The `ContactMailService` has been added to process the sending of customer requests via the contact page of the online store.
 - A method has been added in the `BasketService` to get the quantity of items in the shopping cart.
 - The `NotificationService` has been extended to correctly display error messages in the front-end.
@@ -442,13 +452,13 @@
 
 - Filter functionality via facets
 - Rendered Twig templates can now be retrieved via REST
-- New Twig functions: `trimNewLines` and `formatDateTime` 
+- New Twig functions: `trimNewLines` and `formatDateTime`
 - New method in the **CategoryService**: `getChildren()`
 to get all subcategories
 
 ### Changed
 
-- Routing was updated and extended: Old store URLs can now be processed and displayed in **Ceres**. The URL structure was optimised from `/{itemName}/{itemId}/{variationId}` to `/{category}/{subcategory}/.../{itemName}-{itemId}-{variationId}` 
+- Routing was updated and extended: Old store URLs can now be processed and displayed in **Ceres**. The URL structure was optimised from `/{itemName}/{itemId}/{variationId}` to `/{category}/{subcategory}/.../{itemName}-{itemId}-{variationId}`
 
 ## v1.0.2 (2017-03-06)
 

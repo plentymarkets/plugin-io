@@ -80,33 +80,7 @@ class TwigServiceProvider extends Twig_Extension
     public function getGlobals():array
     {
         return [
-            "services" => [
-                "availability"      => pluginApp( AvailabilityService::class ),
-                "basket"            => pluginApp( BasketService::class ),
-                "category"          => pluginApp( CategoryService::class ),
-                "checkout"          => pluginApp( CheckoutService::class ),
-                "country"           => pluginApp( CountryService::class ),
-                "customer"          => pluginApp( CustomerService::class ),
-                "item"              => pluginApp( ItemService::class ),
-                "itemLoader"        => pluginApp( ItemLoaderService::class ),
-                "order"             => pluginApp( OrderService::class ),
-                "sessionStorage"    => pluginApp( SessionStorageService::class ),
-                "unit"              => pluginApp( UnitService::class),
-                "contactBank"       => pluginApp( ContactBankService::class ),
-                "template"          => pluginApp( TemplateService::class),
-                "notifications"     => pluginApp( NotificationService::class ),
-                "webstoreConfig"    => pluginApp( WebstoreConfigurationService::class),
-                "localization"      => pluginApp( LocalizationService::class ),
-                "coupon"            => pluginApp( CouponService::class ),
-                "legalInformation"  => pluginApp( LegalInformationService::class ),
-                "salesPrice"        => pluginApp( SalesPriceService::class ),
-                "lastSeen"          => pluginApp( ItemLastSeenService::class ),
-                "crossSelling"      => pluginApp( ItemCrossSellingService::class ),
-                "wishList"          => pluginApp( ItemWishListService::class ),
-                "contactMail"       => pluginApp( ContactMailService::class),
-                "totalsService"     => pluginApp( OrderTotalsService::class),
-                "url"               => pluginApp( UrlService::class )
-            ]
+            "services" => pluginApp( TwigServiceContainer::class )
         ];
     }
 }

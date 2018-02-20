@@ -1,5 +1,16 @@
 # Release Notes für IO
 
+## v2.3.0 (2018-02-19) <a href="https://github.com/plentymarkets/plugin-io/compare/2.2.2...2.3.0" target="_blank"><b>Übersicht aller Änderungen</b></a>
+
+### Geändert
+
+- Der Filter `itemName` kann nun anhand der Ceres-Konfiguration ebenfalls den Variantennamen oder eine Kombination aus Artikelnamen und Variantennamen anzeigen.
+
+### Behoben
+
+- Durch einen Fehler wurden Artikel-URLs nicht korrekt generiert. Dies wurde behoben.
+
+
 ## v2.2.2 (2018-02-12) <a href="https://github.com/plentymarkets/plugin-io/compare/2.2.1...2.2.2" target="_blank"><b>Übersicht aller Änderungen</b></a>
 
 ### Behoben
@@ -246,7 +257,7 @@
 
 ### Entfernt
 
-- Die ungenutzte Route `/guest` und der `GuestController` wurden entfernt. 
+- Die ungenutzte Route `/guest` und der `GuestController` wurden entfernt.
 
 ## v1.4.2 (2017-08-23)
 
@@ -275,7 +286,7 @@
 ### Hinzugefügt
 
 - Die Logik und die Route `/wish-list`, um eine Wunschliste im Webshop anzuzeigen, wurde hinzugefügt. **Hinweis:** Für die Migration der Datenbanktabelle muss der Standard-Mandant aktiviert sein und das Plugin bereitgestellt werden. Nach der Bereitstellung kann der Standard-Mandant deaktiviert werden.
-- Die Logik und die Route `/contact`, um die Kontaktseite im Webshop anzuzeigen, wurde hinzugefügt. 
+- Die Logik und die Route `/contact`, um die Kontaktseite im Webshop anzuzeigen, wurde hinzugefügt.
 - Der `ContactMailService` wurde hinzugefügt und steuert das Versenden von Kontaktanfragen über den Webshop.
 - Im `BasketService` wurde eine Methode hinzugefügt, um die Anzahl der Artikel im Warenkorb auszugeben.
 - Der `NotificationService` wurde erweitert, um Fehlermeldungen im Frontend richtig auszugeben.
@@ -382,7 +393,7 @@
 
 ### Behoben
 
-- Es wurde ein Fehler behoben, der dazu führte, dass manchmal keine Standardlieferland gesetzt wurde. 
+- Es wurde ein Fehler behoben, der dazu führte, dass manchmal keine Standardlieferland gesetzt wurde.
 
 ## v1.2.4 (2017-06-02)
 
@@ -453,13 +464,13 @@
 
 - Filtermöglichkeit über Facetten
 - Abruf von gerenderten Twig-Templates über REST
-- Neue Twig-Funktionen: `trimNewLines` und `formatDateTime` 
+- Neue Twig-Funktionen: `trimNewLines` und `formatDateTime`
 - Neue Funktion im **CategoryService**: `getChildren()`
 um Unterkategorien zu erhalten
 
 ### Geändert
 
-- Aktualisierung und Erweiterung des Routings: Alte Shop-URLs können verarbeitet und in **Ceres** angezeigt werden. Die URL-Struktur wurde zudem optimiert von `/{itemName}/{itemId}/{variationId}` zu `/{category}/{subcategory}/.../{itemName}-{itemId}-{variationId}` 
+- Aktualisierung und Erweiterung des Routings: Alte Shop-URLs können verarbeitet und in **Ceres** angezeigt werden. Die URL-Struktur wurde zudem optimiert von `/{itemName}/{itemId}/{variationId}` zu `/{category}/{subcategory}/.../{itemName}-{itemId}-{variationId}`
 
 ## v1.0.2 (2017-03-06)
 

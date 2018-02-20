@@ -36,6 +36,7 @@ class OrderTotalsService
         $totalNet = $order->amounts[$amountId]->netTotal;
         $totalGross = $order->amounts[$amountId]->grossTotal;
         $currency = $order->amounts[$amountId]->currency;
+        $isNet = $order->amounts[$amountId]->isNet;
 
         $orderItems = $order->orderItems;
         foreach ($orderItems as $item) {
@@ -66,6 +67,13 @@ class OrderTotalsService
                 'rate' => $vat->vatRate,
                 'value' => $vat->value
             ];
+        }
+
+        if ( $isNet )
+        {
+            $itemSumGross   = $itemSumNet;
+            $shippingGross  = $shippingNet;
+            $totalGross     = $totalNet;
         }
 
         return compact(
