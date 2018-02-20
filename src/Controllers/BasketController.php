@@ -17,7 +17,7 @@ class BasketController extends LayoutController
      */
 	public function showBasket(BasketService $basketService):string
 	{
-		$basket = $basketService->getBasket()->toArray();
+		$basket = $basketService->getBasketForTemplate();
 
 		return $this->renderTemplate(
 		    'tpl.basket',

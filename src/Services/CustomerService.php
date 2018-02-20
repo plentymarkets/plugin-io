@@ -682,8 +682,25 @@ class CustomerService
             $addressData['options'] = $this->buildAddressEmailOptions([], true, $addressData);
             $newAddress = $this->addressRepository->updateAddress($addressData, $addressId);
         }
-        
-        
+    
+        /** @var AuthHelper $authHelper */
+        $authHelper = pluginApp(AuthHelper::class);
+    
+        $authHelper->processUnguarded( function() use ($type, $newAddress)
+        {
+            /**
+             * @var BasketService $basketService
+             */
+            $basketService = pluginApp(BasketService::class);
+            if($type == AddressType::BILLING)
+            {
+                $basketService->setBillingAddressId($newAddress->id);
+            }
+            elseif($type == AddressType::DELIVERY)
+            {
+                $basketService->setDeliveryAddressId($newAddress->id);
+            }
+        });
 
         //fire public event
         /** @var Dispatcher $pluginEventDispatcher */
