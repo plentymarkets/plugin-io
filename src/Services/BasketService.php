@@ -3,7 +3,6 @@
 namespace IO\Services;
 
 use IO\Services\ItemLoader\Extensions\TwigLoaderPresets;
-use IO\Services\ItemLoader\Loaders\BasketItems;
 use IO\Services\ItemLoader\Services\ItemLoaderService;
 use Plenty\Modules\Accounting\Vat\Models\VatRate;
 use Plenty\Modules\Basket\Contracts\BasketRepositoryContract;
@@ -67,7 +66,15 @@ class BasketService
         $basket = $this->getBasket()->toArray();
 
         $basket["itemQuantity"] = $this->getBasketQuantity();
-        $basket["totalVats"] = $this->getTotalVats();
+
+        if ( $basket["itemQuantity"] > 0 )
+        {
+            $basket["totalVats"] = $this->getTotalVats();
+        }
+        else
+        {
+            $basket["totalVats"] = [];
+        }
 
 
         if ($this->sessionStorage->getCustomer()->showNetPrice) {
@@ -122,12 +129,10 @@ class BasketService
         $basketItems        = $this->getBasketItemsRaw();
         $basketItemData     = $this->getBasketItemData($basketItems);
         $showNetPrice       = $this->sessionStorage->getCustomer()->showNetPrice;
-        $numberFormatFilter = pluginApp(NumberFormatFilter::class);
-        $currency           = $this->getBasket()->currency;
 
         foreach ($basketItems as $basketItem) {
             if ($showNetPrice) {
-                $basketItem->price = $numberFormatFilter->formatMonetary($basketItem->price * 100 / (100.0 + $basketItem->vat), $currency);
+                $basketItem->price = round($basketItem->price * 100 / (100.0 + $basketItem->vat), 2);
             }
 
             array_push(
@@ -147,27 +152,10 @@ class BasketService
 
         $result = array();
 
-        $numberFormatFilter = pluginApp(NumberFormatFilter::class);
-
         $basketItems    = $this->getBasketItemsRaw();
         $basketItemData = $this->getBasketItemData($basketItems, $template);
-        $showNetPrice   = $this->sessionStorage->getCustomer()->showNetPrice;
-        $currency       = $this->getBasket()->currency;
 
         foreach ($basketItems as $basketItem) {
-            if ($showNetPrice) {
-                $basePrice = $basketItemData[$basketItem->variationId]['data']['calculatedPrices']['formatted']['basePrice'];
-                $basePrice = $basePrice * 100 / (100.0 + $basketItem->vat);
-
-                $basketItemData[$basketItem->variationId]['data']['calculatedPrices']['default']->basePrice     = $basePrice;
-                $basketItemData[$basketItem->variationId]['data']['calculatedPrices']['formatted']['basePrice'] = $numberFormatFilter->formatMonetary($basePrice,
-                    $currency);
-
-                $priceNet = $basketItem->price * 100 / (100.0 + $basketItem->vat);
-
-                $basketItemData[$basketItem->variationId]['data']['calculatedPrices']['default']->unitPrice = $priceNet;
-                $basketItemData[$basketItem->variationId]['data']['calculatedPrices']['default']->price     = $priceNet;
-            }
             array_push(
                 $result,
                 $this->addVariationData($basketItem, $basketItemData[$basketItem->variationId])
@@ -216,7 +204,7 @@ class BasketService
         if (isset($data['basketItemOrderParams']) && is_array($data['basketItemOrderParams'])) {
             list($data['basketItemOrderParams'], $data['totalOrderParamsMarkup']) = $this->parseBasketItemOrderParams($data['basketItemOrderParams']);
         }
-    
+
         $data['referrerId'] = $this->getBasket()->referrerId;
         $basketItem = $this->findExistingOneByData($data);
 
@@ -350,18 +338,6 @@ class BasketService
             $variationId                                     = $item['data']['variation']['id'];
             $result[$variationId]                            = $item;
             $result[$variationId]['data']['orderProperties'] = $orderProperties[$variationId];
-        }
-
-        foreach ($basketItems as $basketItem) {
-            $priceNet = $basketItem->price * 100 / (100.0 + $basketItem->vat);
-            $price = $basketItem->price;
-            $result[$basketItem->variationId]['data']['calculatedPrices']['default']->unitPrice    = $price;
-            $result[$basketItem->variationId]['data']['calculatedPrices']['default']->price        = $price;
-            $result[$basketItem->variationId]['data']['calculatedPrices']['default']->unitPriceNet = $priceNet;
-            $result[$basketItem->variationId]['data']['calculatedPrices']['default']->priceNet     = $priceNet;
-
-            $result[$basketItem->variationId]['data']['calculatedPrices']['formatted']['defaultPrice']     = $numberFormatFilter->formatMonetary($price, $currency);
-            $result[$basketItem->variationId]['data']['calculatedPrices']['formatted']['defaultUnitPrice'] = $numberFormatFilter->formatMonetary($price, $currency);
         }
 
         return $result;

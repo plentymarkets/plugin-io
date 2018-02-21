@@ -10,8 +10,6 @@ use IO\Services\CheckoutService;
 
 class Middleware extends \Plenty\Plugin\Middleware
 {
-    private $checkoutService = null;
-
     public function before(Request $request )
     {
         $currency = $request->get('currency', null);
@@ -37,9 +35,13 @@ class Middleware extends \Plenty\Plugin\Middleware
             /** @var StaticPagesController $controller */
             $controller = pluginApp(StaticPagesController::class);
 
-            return $response->make(
-                $controller->showPageNotFound()
+            $response = $response->make(
+                $controller->showPageNotFound(),
+                404
             );
+
+            $response->forceStatus(404);
+            return $response;
         }
 
         return $response;

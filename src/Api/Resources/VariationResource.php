@@ -40,10 +40,7 @@ class VariationResource extends ApiResource
         
         if(strlen($template))
         {
-            /** @var TwigLoaderPresets $loaderPresets */
-            $loaderPresets = pluginApp(TwigLoaderPresets::class);
-            $presets = $loaderPresets->getGlobals();
-            $variations = pluginApp(ItemLoaderService::class)->loadForTemplate($template, $presets['itemLoaderPresets']['singleItem'], ['variationIds' => $variationIds]);
+            $variations = pluginApp(ItemLoaderService::class)->loadForTemplate($template, [Items::class], ['variationIds' => $variationIds]);
         }
 
         return $this->response->create($variations, ResponseCode::OK);

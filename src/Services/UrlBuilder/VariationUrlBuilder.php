@@ -36,13 +36,26 @@ class VariationUrlBuilder
 
         $usedName = $itemNameFields[$usedItemName];
 
-        foreach( $itemData['texts'] as $lang => $texts )
+        if( isset($itemData['texts']['lang']) && strlen($itemData['texts']['lang']) )
         {
+            $lang = strtolower($itemData['texts']['lang']);
             self::$urlPathMap[$itemId][$variationId][$lang] = [
-                'urlPath'           => $texts['urlPath'],
-                'name'              => $texts[$usedName],
+                'urlPath'           => $itemData['texts']['urlPath'],
+                'name'              => $itemData['texts'][$usedName],
                 'defaultCategory'   => $defaultCategory
             ];
+        }
+        else
+        {
+            foreach( $itemData['texts'] as $lang => $texts )
+            {
+                $lang = strtolower($lang);
+                self::$urlPathMap[$itemId][$variationId][$lang] = [
+                    'urlPath'           => $texts['urlPath'],
+                    'name'              => $texts[$usedName],
+                    'defaultCategory'   => $defaultCategory
+                ];
+            }
         }
     }
 
@@ -122,11 +135,17 @@ class VariationUrlBuilder
         return $itemUrl;
     }
 
-    public function getSuffix( $itemId, $variationId )
+    public function getSuffix( $itemId, $variationId, $withVariationId = true )
     {
         $templateConfigService = pluginApp( TemplateConfigService::class );
         $enableOldUrlPattern = $templateConfigService->get('global.enableOldUrlPattern') === "true";
-        return $enableOldUrlPattern ? "/a-" . $itemId : "_" . $itemId . "_" . $variationId;
+
+        if($withVariationId)
+        {
+            return $enableOldUrlPattern ? "/a-" . $itemId : "_" . $itemId . "_" . $variationId;
+        }
+
+        return $enableOldUrlPattern ? "/a-" . $itemId : "_" . $itemId;
     }
 
     private function searchItem( $itemId, $variationId, $lang )

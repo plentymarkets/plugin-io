@@ -19,7 +19,7 @@ class BasketController extends LayoutController
 		BasketService $basketService
 	):string
 	{
-		$basket = $basketService->getBasket();
+		$basket = $basketService->getBasketForTemplate();
 
 		return $this->renderTemplate(
 			"tpl.basket",

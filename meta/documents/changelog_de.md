@@ -1,15 +1,107 @@
 # Release Notes für IO
 
+## v2.3.0 (2018-02-19) <a href="https://github.com/plentymarkets/plugin-io/compare/2.2.2...2.3.0" target="_blank"><b>Übersicht aller Änderungen</b></a>
+
+### Geändert
+
+- Der Filter `itemName` kann nun anhand der Ceres-Konfiguration ebenfalls den Variantennamen oder eine Kombination aus Artikelnamen und Variantennamen anzeigen.
+
+### Behoben
+
+- Durch einen Fehler wurden Artikel-URLs nicht korrekt generiert. Dies wurde behoben.
+
+
+## v2.2.2 (2018-02-12) <a href="https://github.com/plentymarkets/plugin-io/compare/2.2.1...2.2.2" target="_blank"><b>Übersicht aller Änderungen</b></a>
+
+### Behoben
+
+- Ein Fehler führte dazu, dass gelegentlich in der Artikelansicht eine 404-Seite angezeigt wurde, wenn man diese ohne Varianten-ID in der URL aufrief. Dies wurde behoben, indem auch in der Artikelansicht die Einstellung **Show variations by type** berücksichtigt wird.
+
+## v2.2.1 (2018-02-07) <a href="https://github.com/plentymarkets/plugin-io/compare/2.2.0...2.2.1" target="_blank"><b>Übersicht aller Änderungen</b></a>
+
+### Geändert
+
+- Die Sortierung der Suchergebnisse wurde verbessert.
+- Die Liste der aktiven Sprachen wird nun nicht mehr aus dem `WebstoreConfigurationRepositoryContract` geladen, sondern aus der Konfiguration des zugehörigen Template-Plugins.
+
+### Behoben
+
+- Durch einen Fehler wurden die Preise von Cross-Selling-Artikeln nicht berechnet. Dies wurde behoben.
+
+## v2.2.0 (2018-02-05) <a href="https://github.com/plentymarkets/plugin-io/compare/2.1.5...2.2.0" target="_blank"><b>Übersicht aller Änderungen</b></a>
+
+### Hinzugefügt
+- `IO.Resources.Import` kann jetzt Parameter entgegennehmen. Beispielsweise können so beim Generieren und Einbinden eines Skripts eigene Werte aus der Plugin-Konfiguration übergeben werden, die beim Rendern des Skripts berücksichtigt werden.
+- Inhalte von **.properties**-Dateien können jetzt geladen werden.
+
+### Behoben
+
+- Durch einen Fehler wurde die Fehlerseite mit HTTP-Statuscode 200 ausgegeben. Dies wurde behoben.
+- Durch einen Fehler wurde die Relevanz eines Artikels bei der Artikelsuche und -sortierung nicht richtig berücksichtigt. Dies wurde behoben.
+
+## v2.1.5 (2018-02-02) <a href="https://github.com/plentymarkets/plugin-io/compare/2.1.4...2.1.5" target="_blank"><b>Übersicht aller Änderungen</b></a>
+
+- Ein Fehler führte dazu, dass die Paginierung bei verwendeter Einstellung **Show variations by type: Dynamically** nicht korrekt dargestellt wurde. Dies wurde behoben.
+- Durch einen Fehler wurden Artikeldaten nicht einheitlich ausgeliefert. Dieser wurde behoben.
+- Durch einen Fehler wurden Aufpreise für Bestellmerkmale nicht richtig berechnet. Dies wurde behoben.
+
+### Behoben
+
+## v2.1.4 (2018-01-29) <a href="https://github.com/plentymarkets/plugin-io/compare/2.1.3...2.1.4" target="_blank"><b>Übersicht aller Änderungen</b></a>
+
+- Ein Fehler führte dazu, dass URLs ohne den Parameter **Varianten-ID** nicht korrekt ausgegeben wurden. Dies wurde behoben.
+
+## v2.1.3 (2018-01-23) <a href="https://github.com/plentymarkets/plugin-io/compare/2.1.2...2.1.3" target="_blank"><b>Übersicht aller Änderungen</b></a>
+
+### Behoben
+
+- Durch einen Fehler wurde die 404-Seite nicht korrekt dargestellt. Dies wurde behoben.
+- Durch einen Fehler wurden unnötige Artikelabfragen durchgeführt. Dies wurde behoben.
+
+## v2.1.2 (2018-01-22) <a href="https://github.com/plentymarkets/plugin-io/compare/2.1.1...2.1.2" target="_blank"><b>Übersicht aller Änderungen</b></a>
+
+### Hinzugefügt
+
+- Es wurde eine Sicherheitsabfrage hinzugefügt, die verhindert, dass Artikel mehrfach retourniert werden können.
+
+### Behoben
+
+- Ein Fehler führte dazu, dass zu viele Artikel in der Wunschliste vorhanden sind. Dies wurde behoben.
+
+## v2.1.1 (2018-01-09) <a href="https://github.com/plentymarkets/plugin-io/compare/2.1.0...2.1.1" target="_blank"><b>Übersicht aller Änderungen</b></a>
+
+### Behoben
+
+- Bei einer Gastbestellung wird nun nach dem Abschließen des Auftrags die Adresse aus der Session entfernt.
+- Ein Fehler führte dazu, dass falsche Artikel-URLs generiert wurden, wenn im Webshop nur eine Sprache aktiv war. Dies wurde behoben.
+
+## v2.1.0 (2018-01-04) <a href="https://github.com/plentymarkets/plugin-io/compare/2.0.3...2.1.0" target="_blank"><b>Übersicht aller Änderungen</b></a>
+
+### Hinzugefügt
+
+- URLs für Artikel und Kategorien können nun sprachabhängig generiert werden.
+
+### Behoben
+
+- Ein Fehler führte dazu, dass für neue Artikel keine lesbaren URLs erzeugt wurden. Dies wurde behoben.
+
 ## v2.0.3 (2017-12-21) <a href="https://github.com/plentymarkets/plugin-io/compare/2.0.2...2.0.3" target="_blank"><b>Übersicht aller Änderungen</b></a>
 
 ### Hinzugefügt
 
 - Übersetzbare Fehlermeldung bei der Registrierung für den Fall, dass die E-Mail-Adresse bereits existiert.
+- Neue Gruppierungsmöglichkeit für Artikellisten.
+
+
+### Geändert
+
+- Die Logik zum Laden der Facetten wurde überarbeitet, sodass alle Facetten unabhängig von der Artikelgruppierung zurückgeliefert werden.
 
 ### Behoben
 
 - Fehler behoben, bei dem die Lieferadresse nicht zurück auf "Lieferadresse gleich Rechnungsadresse" gesetzt werden konnte.
-- Fehler behoben, durch den Artikel trotz Verknüpfung mit Kundenklasse sichtbar waren.
+- Fehler behoben, durch den Artikel trotz Verknüpfung mit Kundenklassen sichtbar waren.
+
 
 ## v2.0.2 (2017-12-13) <a href="https://github.com/plentymarkets/plugin-io/compare/2.0.1...2.0.2" target="_blank"><b>Übersicht aller Änderungen</b></a>
 
@@ -165,7 +257,7 @@
 
 ### Entfernt
 
-- Die ungenutzte Route `/guest` und der `GuestController` wurden entfernt. 
+- Die ungenutzte Route `/guest` und der `GuestController` wurden entfernt.
 
 ## v1.4.2 (2017-08-23)
 
@@ -194,7 +286,7 @@
 ### Hinzugefügt
 
 - Die Logik und die Route `/wish-list`, um eine Wunschliste im Webshop anzuzeigen, wurde hinzugefügt. **Hinweis:** Für die Migration der Datenbanktabelle muss der Standard-Mandant aktiviert sein und das Plugin bereitgestellt werden. Nach der Bereitstellung kann der Standard-Mandant deaktiviert werden.
-- Die Logik und die Route `/contact`, um die Kontaktseite im Webshop anzuzeigen, wurde hinzugefügt. 
+- Die Logik und die Route `/contact`, um die Kontaktseite im Webshop anzuzeigen, wurde hinzugefügt.
 - Der `ContactMailService` wurde hinzugefügt und steuert das Versenden von Kontaktanfragen über den Webshop.
 - Im `BasketService` wurde eine Methode hinzugefügt, um die Anzahl der Artikel im Warenkorb auszugeben.
 - Der `NotificationService` wurde erweitert, um Fehlermeldungen im Frontend richtig auszugeben.
@@ -301,7 +393,7 @@
 
 ### Behoben
 
-- Es wurde ein Fehler behoben, der dazu führte, dass manchmal keine Standardlieferland gesetzt wurde. 
+- Es wurde ein Fehler behoben, der dazu führte, dass manchmal keine Standardlieferland gesetzt wurde.
 
 ## v1.2.4 (2017-06-02)
 
@@ -372,13 +464,13 @@
 
 - Filtermöglichkeit über Facetten
 - Abruf von gerenderten Twig-Templates über REST
-- Neue Twig-Funktionen: `trimNewLines` und `formatDateTime` 
+- Neue Twig-Funktionen: `trimNewLines` und `formatDateTime`
 - Neue Funktion im **CategoryService**: `getChildren()`
 um Unterkategorien zu erhalten
 
 ### Geändert
 
-- Aktualisierung und Erweiterung des Routings: Alte Shop-URLs können verarbeitet und in **Ceres** angezeigt werden. Die URL-Struktur wurde zudem optimiert von `/{itemName}/{itemId}/{variationId}` zu `/{category}/{subcategory}/.../{itemName}-{itemId}-{variationId}` 
+- Aktualisierung und Erweiterung des Routings: Alte Shop-URLs können verarbeitet und in **Ceres** angezeigt werden. Die URL-Struktur wurde zudem optimiert von `/{itemName}/{itemId}/{variationId}` zu `/{category}/{subcategory}/.../{itemName}-{itemId}-{variationId}`
 
 ## v1.0.2 (2017-03-06)
 
