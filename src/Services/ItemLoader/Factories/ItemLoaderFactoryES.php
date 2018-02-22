@@ -76,6 +76,10 @@ class ItemLoaderFactoryES implements ItemLoaderFactory
         $result = $this->attachPrices($result, $options);
         $result = $this->attachItemWishList($result);
         $result = $this->attachURLs($result);
+        if ( array_key_exists('facets', $result ) )
+        {
+            $result['facets'] = $this->filterFacets( $result['facets'] );
+        }
 
         return $result;
     }
@@ -476,5 +480,21 @@ class ItemLoaderFactoryES implements ItemLoaderFactory
         }
 
         return $result;
+    }
+
+    private function filterFacets($facets)
+    {
+        $filteredFacets = [];
+
+        foreach( $facets as $facet )
+        {
+            if ( (int) $facet['count'] >= (int) $facet['minHitCount'] )
+            {
+
+                $facet['values'] = array_slice( $facet['values'], 0, (int) $facet['maxResultCount'] );
+                $filteredFacets[] = $facet;
+            }
+        }
+        return $filteredFacets;
     }
 }
