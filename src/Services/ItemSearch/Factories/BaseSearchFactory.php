@@ -5,6 +5,7 @@ namespace IO\Services\ItemSearch\Factories;
 use IO\Services\ItemLoader\Services\LoadResultFields;
 use IO\Services\ItemSearch\Extensions\ItemSearchExtension;
 use IO\Services\SessionStorageService;
+use IO\Services\TemplateConfigService;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Collapse\BaseCollapse;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Collapse\CollapseInterface;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\ElasticSearch;
@@ -212,6 +213,16 @@ class BaseSearchFactory
         return $this;
     }
 
+    public function sortByMultiple( $sortingList )
+    {
+        foreach( $sortingList as $sorting )
+        {
+            $this->sortBy( $sorting['field'], $sorting['order'] );
+        }
+
+        return $this;
+    }
+
     public function groupBy( $field )
     {
         $collapse = pluginApp( BaseCollapse::class, [$field] );
@@ -229,17 +240,7 @@ class BaseSearchFactory
      */
     public function build()
     {
-        /** @var DocumentProcessor $processor */
-        $processor = pluginApp( DocumentProcessor::class );
-
-        // ADD MUTATORS
-        foreach( $this->mutators as $mutator )
-        {
-            $processor->addMutator( $mutator );
-        }
-
-        /** @var DocumentSearch $search */
-        $search = pluginApp( DocumentSearch::class, [$processor] );
+        $search = $this->prepareSearch();
 
         // ADD FILTERS
         foreach( $this->filters as $filter )
@@ -280,6 +281,23 @@ class BaseSearchFactory
         }
 
         $search->addSource( $source );
+
+        return $search;
+    }
+
+    protected function prepareSearch()
+    {
+        /** @var DocumentProcessor $processor */
+        $processor = pluginApp( DocumentProcessor::class );
+
+        // ADD MUTATORS
+        foreach( $this->mutators as $mutator )
+        {
+            $processor->addMutator( $mutator );
+        }
+
+        /** @var DocumentSearch $search */
+        $search = pluginApp( DocumentSearch::class, [$processor] );
 
         return $search;
     }
