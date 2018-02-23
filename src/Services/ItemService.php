@@ -593,7 +593,7 @@ class ItemService
 					$attributeId                         = $attribute->attributeId;
 					$attributeValueId                    = $attribute->attributeValueId;
 					$attributeList[$attributeId]["name"] = $this->getAttributeName($attributeId);
-					if(!in_array($attributeValueId, $attributeList[$attributeId]["values"]))
+					if(!array_key_exists($attributeValueId, $attributeList[$attributeId]["values"]))
 					{
 						$attributeList[$attributeId]["values"][$attributeValueId] = $this->getAttributeValueName($attributeValueId);
 					}
