@@ -17,7 +17,7 @@ class LocalizedOrder extends ModelWrapper
     /**
      * The OrderItem types that will be wrapped. All other OrderItems will be stripped from the order.
      */
-    const WRAPPED_ORDERITEM_TYPES = [1, 3, 6, 9];
+    const WRAPPED_ORDERITEM_TYPES = [1, 3, 4, 6, 9];
     /**
      * @var Order
      */
