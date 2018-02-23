@@ -3,6 +3,7 @@
 namespace IO\Extensions;
 
 use IO\Extensions\Filters\ItemImagesFilter;
+use IO\Extensions\Functions\AddQueryParameter;
 use Plenty\Plugin\Templates\Extensions\Twig_Extension;
 use Plenty\Plugin\Templates\Factories\TwigFactory;
 use Plenty\Plugin\Http\Request;
@@ -46,6 +47,7 @@ class TwigIOExtension extends Twig_Extension
 		GetBasePrice $getBasePrice,
 		Component $component,
         AdditionalResources $additionalResources,
+        AddQueryParameter $addQueryParameter,
         ItemNameFilter $itemNameFilter,
         ExternalContent $externalContent,
         Partial $partial,
