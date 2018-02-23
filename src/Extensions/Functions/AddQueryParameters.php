@@ -6,7 +6,7 @@ use Plenty\Plugin\Events\Dispatcher;
 use IO\Extensions\AbstractFunction;
 use Plenty\Plugin\Http\Request;
 
-class AddQueryParameter extends AbstractFunction
+class AddQueryParameters extends AbstractFunction
 {
     public function construct()
     {
