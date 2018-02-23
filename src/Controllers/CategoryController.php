@@ -2,6 +2,8 @@
 
 namespace IO\Controllers;
 
+use Plenty\Plugin\Http\Request;
+
 /**
  * Class CategoryController
  * @package IO\Controllers
@@ -26,6 +28,8 @@ class CategoryController extends LayoutController
 		$lvl5 = null,
 		$lvl6 = null):string
 	{
+	    /** @var Request $request */
+	    $request = pluginApp(Request::class);
 		
 	    $category = $this->categoryRepo->findCategoryByUrl($lvl1, $lvl2, $lvl3, $lvl4, $lvl5, $lvl6);
         
@@ -39,7 +43,10 @@ class CategoryController extends LayoutController
         return $this->renderTemplate(
             "tpl.category." . $category->type,
             [
-                'category' => $category
+                'category'      => $category,
+                'sorting'       => $request->get('sorting', null),
+                'itemsPerPage'  => $request->get('items', null),
+                'page'          => $request->get('page', null)
             ]
         );
 	}
