@@ -17,8 +17,6 @@ class OrderReturnConfirmationController extends LayoutController
      */
     public function showOrderReturnConfirmation():string
     {
-        $template = 'tpl.order.return.confirmation';
-        
         /**
          * @var CustomerService $customerService
          */
@@ -32,11 +30,11 @@ class OrderReturnConfirmationController extends LayoutController
         $enabledRoutes = explode(", ",  $configRepo->get("IO.routing.enabled_routes") );
         if( (!in_array('order-return-confirmation', $enabledRoutes) && !in_array('all', $enabledRoutes)) || (int)$customerService->getContactId() <= 0 )
         {
-            $template = 'tpl.page-not-found';
+            return '';
         }
         
         return $this->renderTemplate(
-            $template,
+            'tpl.order.return.confirmation',
             ['data' => '']
         );
     }
