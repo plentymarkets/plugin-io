@@ -27,8 +27,7 @@ class OrderReturnConfirmationController extends LayoutController
          */
         $configRepo = pluginApp(ConfigRepository::class);
         
-        $enabledRoutes = explode(", ",  $configRepo->get("IO.routing.enabled_routes") );
-        if( (!in_array('order-return-confirmation', $enabledRoutes) && !in_array('all', $enabledRoutes)) || (int)$customerService->getContactId() <= 0 )
+        if( (int)$customerService->getContactId() <= 0 )
         {
             return '';
         }
