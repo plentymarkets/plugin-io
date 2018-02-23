@@ -74,6 +74,10 @@ class LastSeenItemList implements ItemLoaderContract
         {
             $variationFilter->hasIds($variationIds);
         }
+        else
+        {
+            $variationFilter->hasIds([]);
+        }
         
         return [
             $clientFilter,

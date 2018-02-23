@@ -64,7 +64,8 @@
       "item"                  : "Item routes",
       "category"              : "Category routes",
       "wish-list"             : "/wish-list",
-      "order-return"          : "/order-return"
+      "order-return"          : "/order-return",
+      "order-return-confirmation": "/order-return-confirmation"
     },
     "default"                       : "all"
   }

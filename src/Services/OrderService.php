@@ -324,7 +324,7 @@ class OrderService
             }
             
             $orderWithoutReturnItems = $this->removeReturnItemsFromOrder($order);
-            if(!count($orderWithoutReturnItems->orderItems))
+            if(!count($orderWithoutReturnItems->returnItems))
             {
                 return false;
             }
@@ -437,7 +437,7 @@ class OrderService
             'referenceOrderId' => $orderId
         ];
         
-        $allReturns = $this->getOrdersForContact(pluginApp(CustomerService::class)->getContactId(), 1, 50, $returnFilters, false)->getResult();
+        $allReturns = $this->getOrdersForContact(pluginApp(CustomerService::class)->getContactId(), 1, 100, $returnFilters, false)->getResult();
         
         $returnItems = [];
         $newOrderItems = [];
@@ -448,7 +448,7 @@ class OrderService
             {
                 foreach($return['orderReferences'] as $reference)
                 {
-                    if($reference['referenceType'] == 'parent' && $reference['referenceOrderId'] == $orderId)
+                    if($reference['referenceType'] == 'parent' && (int)$reference['referenceOrderId'] == $orderId)
                     {
                         foreach($return['orderItems'] as $returnItem)
                         {
@@ -489,7 +489,7 @@ class OrderService
                     }
                 }
                 
-                $order->orderItems = $newOrderItems;
+                $order->returnItems = $newOrderItems;
             }
             else
             {
@@ -500,8 +500,8 @@ class OrderService
                         $newOrderItems[] = $orderItem;
                     }
                 }
-    
-                $order->orderItems = $newOrderItems;
+                
+                $order->returnItems = $newOrderItems;
             }
         }
         
