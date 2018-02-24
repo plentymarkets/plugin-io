@@ -1,29 +1,23 @@
 <?php
+
 namespace IO\Controllers;
 
-use IO\Helper\CategoryKey;
 use IO\Services\CategoryService;
 use IO\Services\ItemLastSeenService;
 use IO\Services\ItemLoader\Extensions\TwigLoaderPresets;
-use IO\Services\ItemLoader\Loaders\CrossSellingItems;
-use IO\Services\ItemLoader\Loaders\ItemURLs;
-use IO\Services\ItemService;
-use IO\Services\ItemLoader\Loaders\SingleItem;
-use IO\Services\ItemLoader\Loaders\SingleItemAttributes;
+use IO\Services\ItemLoader\Services\LoadResultFields;
 use IO\Services\ItemLoader\Services\ItemLoaderService;
 use IO\Services\SessionStorageService;
-use IO\Services\UrlService;
 use Plenty\Modules\Category\Contracts\CategoryRepositoryContract;
-use Plenty\Modules\Category\Models\Category;
 use Plenty\Plugin\Application;
-use Plenty\Plugin\Http\Response;
 
 /**
  * Class ItemController
  * @package IO\Controllers
  */
-class ItemController extends ItemLoaderController
+class ItemController extends LayoutController
 {
+    use LoadResultFields;
 
     /**
      * Prepare and render the item data.
@@ -38,8 +32,9 @@ class ItemController extends ItemLoaderController
 		int $variationId = 0
 	)
 	{
+	    $templateContainer = $this->buildTemplateContainer('tpl.item');
+	    
         $loaderOptions = [];
-        $itemService = pluginApp(ItemService::class);
 
         if((int)$variationId > 0)
         {
@@ -52,33 +47,21 @@ class ItemController extends ItemLoaderController
         
         $loaderOptions['crossSellingItemId'] = $itemId;
 
-        $attributeMap = $itemService->getVariationAttributeMap($itemId);
-        $attributeNameMap = $itemService->getAttributeNameMap($itemId);
-
-        $templateContainer = $this->buildTemplateContainer("tpl.item", $loaderOptions);
-        
         /** @var TwigLoaderPresets $loaderPresets */
         $loaderPresets = pluginApp(TwigLoaderPresets::class);
         $presets = $loaderPresets->getGlobals();
         
         /** @var ItemLoaderService $loaderService */
-        $loaderService = $templateContainer->getTemplateData()['itemLoader'];
-        $loaderService->setLoaderClassList($presets['itemLoaderPresets']['singleItem']);
-
-
-        $itemResult = $loaderService->load();
+        $loaderService = pluginApp(ItemLoaderService::class);
+        
+        $itemResult = $loaderService
+            ->setLoaderClassList($presets['itemLoaderPresets']['singleItem'])
+            ->setOptions($loaderOptions)
+            ->setResultFields($this->loadResultFields($templateContainer->getTemplate()))
+            ->load();
 
         if(empty($itemResult['documents']))
         {
-            // If item not found, render the error category
-            $itemNotFoundCategory = $this->categoryRepo->get(
-                $this->categoryMap->getID(CategoryKey::ITEM_NOT_FOUND)
-            );
-
-            if($itemNotFoundCategory instanceof Category)
-            {
-                return $this->renderCategory($itemNotFoundCategory);
-            }
             return '';
         }
         else
@@ -100,12 +83,13 @@ class ItemController extends ItemLoaderController
                 $itemLastSeenService = pluginApp(ItemLastSeenService::class);
                 $itemLastSeenService->setLastSeenItem($itemResult['documents'][0]['data']['variation']['id']);
             }
-
-            $templateContainer->setTemplateData(
-                array_merge(['item' => $itemResult, 'attributeNameMap' => $attributeNameMap, 'variations' => $attributeMap], $templateContainer->getTemplateData(), ['http_host' => $_SERVER['HTTP_HOST']])
+            
+            return $this->renderTemplate(
+                'tpl.item',
+                [
+                    'item' => $itemResult
+                ]
             );
-
-            return $this->renderTemplateContainer($templateContainer);
         }
 	}
 
