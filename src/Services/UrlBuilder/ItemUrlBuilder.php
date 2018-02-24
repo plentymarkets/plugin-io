@@ -2,8 +2,8 @@
 
 namespace IO\Services\UrlBuilder;
 
-use IO\Services\ItemLoader\Loaders\ItemURLs;
-use IO\Services\ItemLoader\Services\ItemLoaderService;
+use IO\Services\ItemSearch\Factories\VariationSearchFactory;
+use IO\Services\ItemSearch\Services\ItemSearchService;
 use IO\Services\SessionStorageService;
 
 class ItemUrlBuilder
@@ -38,21 +38,17 @@ class ItemUrlBuilder
 
     private function searchItemVariationId( $itemId, $lang )
     {
-        /** @var ItemLoaderService $itemLoader */
-        $itemLoader = pluginApp( ItemLoaderService::class );
-        $result = $itemLoader
-            ->setLoaderClassList([ItemURLs::class])
-            ->setOptions([
-                'itemId' => $itemId,
-                'lang' => $lang
-            ])
-            ->load();
+        /** @var ItemSearchService $itemSearchService */
+        $itemSearchService = pluginApp( ItemSearchService::class );
 
-        if ( count($result['documents']) )
-        {
-            VariationUrlBuilder::fillItemUrl( $result['documents'][0]['data'] );
-            return $result['documents'][0]['data']['variation']['id'];
-        }
+        /** @var VariationSearchFactory $searchFactory */
+        $searchFactory = pluginApp( VariationSearchFactory::class );
+        $searchFactory
+            ->withLanguage( $lang )
+            ->withUrls()
+            ->hasItemId( $itemId );
+
+        $itemSearchService->getResult($searchFactory);
 
         return 0;
     }

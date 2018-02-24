@@ -27,18 +27,19 @@ class VariationList implements SearchPreset
             ->hasPriceForCustomer()
             ->hasVariationIds( $variationIds );
 
-        if ( array_key_exists( 'sorting', $options ) )
+        if ( array_key_exists( 'sorting', $options ) && $options['sorting'] !== null )
         {
             $sorting = SortingHelper::getSearchSorting( $options['sorting'] );
             $searchFactory->sortByMultiple( $sorting );
         }
 
-        if ( array_key_exists('sortingField', $options ) )
+        if ( array_key_exists('sortingField', $options ) && $options['sortingField'] !== null )
         {
             $searchFactory->sortBy( $options['sortingField'], $options['sortingOrder'] );
         }
 
-        if ( in_array('page', $options) && array_key_exists('itemsPerPage', $options ) )
+        if ( array_key_exists('page', $options) && $options['page'] !== null
+            && array_key_exists('itemsPerPage', $options ) && $options['itemsPerPage'] !== null )
         {
             $searchFactory->setPage( $options['page'], $options['itemsPerPage'] );
         }

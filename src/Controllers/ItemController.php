@@ -2,14 +2,10 @@
 
 namespace IO\Controllers;
 
-use IO\Services\CategoryService;
 use IO\Services\ItemLastSeenService;
-use IO\Services\ItemLoader\Extensions\TwigLoaderPresets;
-use IO\Services\ItemLoader\Services\LoadResultFields;
-use IO\Services\ItemLoader\Services\ItemLoaderService;
-use IO\Services\SessionStorageService;
-use Plenty\Modules\Category\Contracts\CategoryRepositoryContract;
-use Plenty\Plugin\Application;
+use IO\Services\ItemSearch\SearchPresets\CrossSellingItems;
+use IO\Services\ItemSearch\SearchPresets\SingleItem;
+use IO\Services\ItemSearch\Services\ItemSearchService;
 
 /**
  * Class ItemController
@@ -17,8 +13,6 @@ use Plenty\Plugin\Application;
  */
 class ItemController extends LayoutController
 {
-    use LoadResultFields;
-
     /**
      * Prepare and render the item data.
      * @param string $slug
@@ -33,32 +27,21 @@ class ItemController extends LayoutController
 	)
 	{
 	    $templateContainer = $this->buildTemplateContainer('tpl.item');
-	    
-        $loaderOptions = [];
 
-        if((int)$variationId > 0)
-        {
-            $loaderOptions['variationId'] = $variationId;
-        }
-        elseif($itemId > 0)
-        {
-            $loaderOptions['itemId'] = $itemId;
-        }
-        
-        $loaderOptions['crossSellingItemId'] = $itemId;
+	    $itemSearchOptions = [
+	        'itemId'        => $itemId,
+            'variationId'   => $variationId,
+            'setCategory'   => true
+        ];
+	    /** @var ItemSearchService $itemSearchService */
+	    $itemSearchService = pluginApp( ItemSearchService::class );
+	    $result = $itemSearchService->getResults([
+	        'item'              => SingleItem::getSearchFactory( $itemSearchOptions ),
+            'crossSellingItems' => CrossSellingItems::getSearchFactory( $itemSearchOptions )
+        ]);
 
-        /** @var TwigLoaderPresets $loaderPresets */
-        $loaderPresets = pluginApp(TwigLoaderPresets::class);
-        $presets = $loaderPresets->getGlobals();
-        
-        /** @var ItemLoaderService $loaderService */
-        $loaderService = pluginApp(ItemLoaderService::class);
-        
-        $itemResult = $loaderService
-            ->setLoaderClassList($presets['itemLoaderPresets']['singleItem'])
-            ->setOptions($loaderOptions)
-            ->setResultFields($this->loadResultFields($templateContainer->getTemplate()))
-            ->load();
+
+	    $itemResult = $result['item'];
 
         if(empty($itemResult['documents']))
         {
@@ -66,8 +49,6 @@ class ItemController extends LayoutController
         }
         else
         {
-            $this->setCategory($itemResult['ItemURLs']['documents'][0]['data']);
-
             $resultVariationId = $itemResult['documents'][0]['data']['variation']['id'];
 
             if((int)$resultVariationId <= 0)
@@ -81,7 +62,7 @@ class ItemController extends LayoutController
                  * @var ItemLastSeenService $itemLastSeenService
                  */
                 $itemLastSeenService = pluginApp(ItemLastSeenService::class);
-                $itemLastSeenService->setLastSeenItem($itemResult['documents'][0]['data']['variation']['id']);
+                $itemLastSeenService->setLastSeenItem( $variationId );
             }
             
             return $this->renderTemplate(
@@ -120,37 +101,5 @@ class ItemController extends LayoutController
         }
         
         return $this->showItem("", (int)$itemId, 0);
-    }
-    
-    private function setCategory($item)
-    {
-        $defaultCategories = $item['defaultCategories'];
-
-        if(count($defaultCategories))
-        {
-            $currentCategoryId = 0;
-            foreach($defaultCategories as $defaultCategory)
-            {
-                if((int)$defaultCategory['plentyId'] == pluginApp(Application::class)->getPlentyId())
-                {
-                    $currentCategoryId = $defaultCategory['id'];
-                }
-            }
-            if((int)$currentCategoryId > 0)
-            {
-                /**
-                 * @var CategoryRepositoryContract $categoryRepo
-                 */
-                $categoryRepo = pluginApp(CategoryRepositoryContract::class);
-                $currentCategory = $categoryRepo->get($currentCategoryId, pluginApp(SessionStorageService::class)->getLang());
-            
-                /**
-                 * @var CategoryService $categoryService
-                 */
-                $categoryService = pluginApp(CategoryService::class);
-                $categoryService->setCurrentCategory($currentCategory);
-                $categoryService->setCurrentItem($item);
-            }
-        }
     }
 }

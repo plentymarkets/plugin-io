@@ -44,6 +44,11 @@ class SingleItem implements SearchPreset
             }
         }
 
+        if ( array_key_exists( 'setCategory', $options ) && $options['setCategory'] === true )
+        {
+            $searchFactory->withCurrentCategory();
+        }
+
         return $searchFactory;
     }
 }

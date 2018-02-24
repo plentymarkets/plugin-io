@@ -9,6 +9,8 @@ use IO\Services\ItemLoader\Services\LoadResultFields;
  * Created by ptopczewski, 09.01.17 09:44
  * Class ItemLoaderController
  * @package IO\Controllers
+ *
+ * @deprecated
  */
 abstract class ItemLoaderController extends LayoutController
 {

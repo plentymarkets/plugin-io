@@ -3,6 +3,9 @@
 namespace IO\Models;
 
 use IO\Builder\Order\OrderType;
+use IO\Extensions\Filters\ItemImagesFilter;
+use IO\Services\ItemSearch\Factories\VariationSearchFactory;
+use IO\Services\ItemSearch\Services\ItemSearchService;
 use Plenty\Modules\Order\Models\Order;
 use Plenty\Modules\Order\Status\Models\OrderStatusName;
 use Plenty\Modules\Frontend\PaymentMethod\Contracts\FrontendPaymentMethodRepositoryContract;
@@ -97,9 +100,13 @@ class LocalizedOrder extends ModelWrapper
         {}
 
 
+        /** @var URLFilter $urlFilter */
         $urlFilter = pluginApp(URLFilter::class);
-        $itemService = pluginApp(ItemService::class);
 
+        /** @var ItemImagesFilter $imageFilter */
+        $imageFilter = pluginApp( ItemImagesFilter::class );
+
+        $orderVariationIds = [];
         foreach( $order->orderItems as $key => $orderItem )
         {
             if(in_array($orderItem->typeId, self::WRAPPED_ORDERITEM_TYPES))
@@ -107,22 +114,32 @@ class LocalizedOrder extends ModelWrapper
                 
                 if( $orderItem->itemVariationId !== 0 )
                 {
-                    $itemUrl = '';
-                    if((INT)$orderItem->itemVariationId > 0)
-                    {
-                        $itemUrl = $urlFilter->buildVariationURL($orderItem->itemVariationId);
-                    }
-    
-                    $instance->itemURLs[$orderItem->itemVariationId] = $itemUrl;
-    
-                    $itemImage = $itemService->getVariationImage($orderItem->itemVariationId);
-                    $instance->itemImages[$orderItem->itemVariationId] = $itemImage;
+                    $orderVariationIds[] = $orderItem->itemVariationId;
                 }
             }
             else
             {
                 unset($order->orderItems[$key]);
             }
+        }
+
+        /** @var ItemSearchService $itemSearchService */
+        $itemSearchService = pluginApp( ItemSearchService::class );
+        /** @var VariationSearchFactory $searchFactory */
+        $searchFactory = pluginApp( VariationSearchFactory::class );
+        $orderVariations = $itemSearchService->getResults(
+            $searchFactory
+                ->withLanguage()
+                ->withImages()
+                ->withUrls()
+                ->hasVariationIds( $orderVariationIds )
+        );
+
+        foreach( $orderVariations['documents'] as $orderVariation )
+        {
+            $variationId = $orderVariation['data']['variation']['id'];
+            $instance->itemURLs[$variationId]   = $urlFilter->buildItemURL( $orderVariation['data'] );
+            $instance->itemImages[$variationId] = $imageFilter->getFirstItemImageUrl( $orderVariation['data']['images'], 'urlPreview' );
         }
 
         return $instance;

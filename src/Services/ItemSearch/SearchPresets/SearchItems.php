@@ -13,6 +13,9 @@ class SearchItems implements SearchPreset
         $facets = $options['facets'];
         $sorting= SortingHelper::getSearchSorting( $options['sorting'] );
 
+        $page           = (int) $options['page'];
+        $itemsPerPage   = (int) $options['itemsPerPage'];
+
 
         /** @var VariationSearchFactory $searchFactory */
         $searchFactory = pluginApp( VariationSearchFactory::class );
@@ -28,6 +31,7 @@ class SearchItems implements SearchPreset
             ->hasPriceForCustomer()
             ->hasFacets( $facets )
             ->sortByMultiple( $sorting )
+            ->setPage( $page, $itemsPerPage )
             ->groupByTemplateConfig();
 
         if ( array_key_exists('autocomplete', $options ) && $options['autocomplete'] === true )

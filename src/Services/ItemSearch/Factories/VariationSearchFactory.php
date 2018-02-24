@@ -4,6 +4,7 @@ namespace IO\Services\ItemSearch\Factories;
 
 use IO\Services\ItemLoader\Contracts\FacetExtension;
 use IO\Services\ItemLoader\Services\FacetExtensionContainer;
+use IO\Services\ItemSearch\Extensions\CurrentCategoryExtension;
 use IO\Services\ItemSearch\Extensions\ItemUrlExtension;
 use IO\Services\ItemSearch\Extensions\PriceSearchExtension;
 use IO\Services\PriceDetectService;
@@ -66,7 +67,7 @@ class VariationSearchFactory extends BaseSearchFactory
     {
         /** @var VariationBaseFilter $variationFilter */
         $variationFilter = $this->createFilter( VariationBaseFilter::class );
-        $variationFilter->hasId( $variationIds );
+        $variationFilter->hasIds( $variationIds );
         return $this;
     }
 
@@ -220,6 +221,10 @@ class VariationSearchFactory extends BaseSearchFactory
             $facetValues = explode(",", $facetValues );
         }
 
+        $facetValues = array_map(function($facetValue) {
+            return (int) $facetValue;
+        }, $facetValues);
+
         /** @var SearchHelper $searchHelper */
         $searchHelper = pluginApp( SearchHelper::class, [$facetValues, $clientId, 'item', $lang] );
         $this->withFilter( $searchHelper->getFacetFilter() );
@@ -327,9 +332,15 @@ class VariationSearchFactory extends BaseSearchFactory
         return $this;
     }
 
-    public function withPrices()
+    public function withPrices( $params = [] )
     {
-        $this->withExtension( PriceSearchExtension::class );
+        $this->withExtension( PriceSearchExtension::class, $params );
+        return $this;
+    }
+
+    public function withCurrentCategory()
+    {
+        $this->withExtension( CurrentCategoryExtension::class );
         return $this;
     }
 }

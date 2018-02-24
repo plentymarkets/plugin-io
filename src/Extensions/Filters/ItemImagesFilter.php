@@ -24,7 +24,9 @@ class ItemImagesFilter extends AbstractFilter
     public function getFilters():array
     {
         return [
-            'itemImages' => 'getItemImages'
+            'itemImages'        => 'getItemImages',
+            'firstItemImage'    => 'getFirstItemImage',
+            'firstItemImageUrl' => 'getFirstItemImageUrl'
         ];
     }
 
@@ -47,5 +49,31 @@ class ItemImagesFilter extends AbstractFilter
         }
 
         return $imageUrls;
+    }
+
+    public function getFirstItemImage( $images, $imageAccessor = 'url' )
+    {
+        $images = $this->getItemImages( $images, $imageAccessor );
+        $itemImage = [];
+        foreach( $images as $image )
+        {
+            if ( !count( $itemImage ) || $itemImage['position'] > $image['position'] )
+            {
+                $itemImage = $image;
+            }
+        }
+
+        return $itemImage;
+    }
+
+    public function getFirstItemImageUrl( $images, $imageAccessor = 'url' )
+    {
+        $itemImage = $this->getFirstItemImage( $images, $imageAccessor );
+        if ( $itemImage !== null && $itemImage['url'] !== null )
+        {
+            return $itemImage['url'];
+        };
+
+        return '';
     }
 }

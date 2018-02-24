@@ -11,32 +11,26 @@ use IO\Builder\Item\ItemColumnBuilder;
 use IO\Builder\Item\ItemFilterBuilder;
 use IO\Builder\Item\ItemParamsBuilder;
 use IO\Builder\Item\Params\ItemColumnsParams;
-use IO\Constants\CrossSellingType;
 use IO\Constants\ItemConditionTexts;
 use IO\Constants\Language;
 use IO\Helper\MemoryCache;
-use IO\Services\ItemLoader\Loaders\ItemURLs;
-use IO\Services\ItemLoader\Services\ItemLoaderService;
-use IO\Services\ItemLoader\Loaders\Items;
 use IO\Extensions\Filters\ItemImagesFilter;
+use IO\Services\ItemSearch\SearchPresets\SingleItem;
+use IO\Services\ItemSearch\Services\ItemSearchService;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\ElasticSearch;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Processor\DocumentProcessor;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Search\Document\DocumentSearch;
-use Plenty\Modules\Cloud\ElasticSearch\Lib\Source\IncludeSource;
 use Plenty\Modules\Item\Attribute\Contracts\AttributeNameRepositoryContract;
 use Plenty\Modules\Item\Attribute\Contracts\AttributeValueNameRepositoryContract;
 use Plenty\Modules\Item\DataLayer\Contracts\ItemDataLayerRepositoryContract;
 use Plenty\Modules\Item\DataLayer\Models\Record;
 use Plenty\Modules\Item\DataLayer\Models\RecordList;
-use Plenty\Modules\Item\Search\Aggregations\AttributeValueListAggregation;
-use Plenty\Modules\Item\Search\Aggregations\AttributeValueListAggregationProcessor;
 use Plenty\Modules\Item\Search\Contracts\VariationElasticSearchSearchRepositoryContract;
 use Plenty\Modules\Item\Search\Filter\CategoryFilter;
 use Plenty\Modules\Item\Search\Filter\ClientFilter;
 use Plenty\Modules\Item\Search\Filter\SearchFilter;
 use Plenty\Modules\Item\Search\Filter\VariationBaseFilter;
 use Plenty\Plugin\Application;
-use IO\Services\TemplateConfigService;
 use Plenty\Plugin\Events\Dispatcher;
 
 
@@ -339,41 +333,25 @@ class ItemService
      * @param int $variationId
      * @param string $imageAccessor
      * @return string
+     *
+     * @deprecated
      */
     public function getVariationImage(int $variationId = 0, string $imageAccessor = 'urlPreview'):string
     {
-        /**
-         * @var ItemLoaderService $itemLoaderService
-         */
-        $itemLoaderService = pluginApp(ItemLoaderService::class);
-        
-        $itemLoaderService
-            ->setLoaderClassList([Items::class])
-            ->setOptions(['variationIds' => [$variationId]])
-            ->setResultFields(['images']);
-        
-        $variation = $itemLoaderService->load();
+        /** @var ItemSearchService $itemSearchService */
+        $itemSearchService = pluginApp( ItemSearchService::class );
+        $variation = $itemSearchService->getResult(
+            SingleItem::getSearchFactory([
+                'variationId' => $variationId
+            ])
+        );
+
 
         if(is_array($variation) && count($variation['documents']))
         {
-            $itemImageFilter = pluginApp(ItemImagesFilter::class);
-            $variationImages = $itemImageFilter->getItemImages($variation['documents'][0]['data']['images'], $imageAccessor);
-            $variationImage = [];
-
-            foreach ($variationImages as $image)
-            {
-                if(!count($variationImage) || $variationImage['position'] > $image['position'])
-                {
-                    $variationImage = $image;
-                }
-            }
-
-            if(!is_null($variationImage['url']))
-            {
-                return $variationImage['url'];
-            }
-
-            return '';
+            /** @var ItemImagesFilter $itemImageFilter */
+            $itemImageFilter = pluginApp( ItemImagesFilter::class );
+            return $itemImageFilter->getFirstItemImageUrl( $variation['documents'][0]['data']['images'], $imageAccessor );
         }
 
         return '';

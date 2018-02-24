@@ -17,7 +17,8 @@ class ItemSearchController extends LayoutController
                 'page'          => $request->get('page', null),
                 'itemsPerPage'  => $request->get('items', null),
                 'query'         => $request->get('query', null),
-                'sorting'       => $request->get('sorting', null)
+                'sorting'       => $request->get('sorting', null),
+                'facets'        => $request->get('facets', '' )
             ]
         );
     }

@@ -91,7 +91,14 @@ class MultiSearchFactory
                 }
             }
 
-            $results[$searchName] = $result;
+            if ( array_key_exists( 'facets', $result ) )
+            {
+                $results[$searchName] = $result['facets'];
+            }
+            else
+            {
+                $results[$searchName] = $result;
+            }
         }
 
         return $results;

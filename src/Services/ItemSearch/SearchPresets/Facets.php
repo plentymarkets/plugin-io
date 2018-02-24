@@ -11,6 +11,7 @@ class Facets implements SearchPreset
         /** @var FacetSearchFactory $searchFactory */
         $searchFactory = FacetSearchFactory::create( $options['facets'] );
         $searchFactory
+            ->withMinimumCount()
             ->isVisibleForClient()
             ->isActive()
             ->isHiddenInCategoryList( false )

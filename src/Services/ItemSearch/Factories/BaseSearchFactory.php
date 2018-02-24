@@ -76,27 +76,30 @@ class BaseSearchFactory
         /** @var BaseSearchFactory $newBuilder */
         $newBuilder = pluginApp( self::class );
 
-        if ( $inheritedProperties === null || in_array(self::INHERIT_MUTATORS, $inheritedProperties ) )
+        if ( $searchBuilder !== null )
         {
-            foreach( $searchBuilder->mutators as $mutator )
+            if ( $inheritedProperties === null || in_array(self::INHERIT_MUTATORS, $inheritedProperties ) )
             {
-                $newBuilder->withMutator( $mutator );
+                foreach( $searchBuilder->mutators as $mutator )
+                {
+                    $newBuilder->withMutator( $mutator );
+                }
             }
-        }
 
-        if ( $inheritedProperties === null || in_array( self::INHERIT_FILTERS, $inheritedProperties ) )
-        {
-            foreach( $searchBuilder->filters as $filter )
+            if ( $inheritedProperties === null || in_array( self::INHERIT_FILTERS, $inheritedProperties ) )
             {
-                $newBuilder->withFilter( $filter );
+                foreach( $searchBuilder->filters as $filter )
+                {
+                    $newBuilder->withFilter( $filter );
+                }
             }
-        }
 
-        if ( $inheritedProperties === null || in_array( self::INHERIT_RESULT_FIELDS, $inheritedProperties ) )
-        {
-            $newBuilder->withResultFields(
-                $searchBuilder->resultFields
-            );
+            if ( $inheritedProperties === null || in_array( self::INHERIT_RESULT_FIELDS, $inheritedProperties ) )
+            {
+                $newBuilder->withResultFields(
+                    $searchBuilder->resultFields
+                );
+            }
         }
 
         return $newBuilder;
@@ -156,7 +159,7 @@ class BaseSearchFactory
         return $this;
     }
 
-    public function withExtension( $extensionClass )
+    public function withExtension( $extensionClass, $extensionParams = [] )
     {
         $this->extensions[] = pluginApp( $extensionClass );
         return $this;
@@ -279,6 +282,13 @@ class BaseSearchFactory
         {
             $source->activateAll();
         }
+
+        if ( $this->sorting !== null )
+        {
+            $search->setSorting( $this->sorting );
+        }
+
+        $search->setPage( $this->page, $this->itemsPerPage );
 
         $search->addSource( $source );
 

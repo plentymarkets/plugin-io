@@ -2,6 +2,7 @@
 
 namespace IO\Services\ItemSearch\Factories;
 
+use IO\Services\ItemSearch\Extensions\FacetFilterExtension;
 use IO\Services\SessionStorageService;
 use Plenty\Modules\Item\Search\Helper\SearchHelper;
 use Plenty\Plugin\Application;
@@ -33,5 +34,10 @@ class FacetSearchFactory extends VariationSearchFactory
         /** @var SearchHelper $searchHelper */
         $searchHelper = pluginApp( SearchHelper::class, [$this->facetValues, $plentyId, 'item', $lang]);
         return $searchHelper->getFacetSearch();
+    }
+
+    public function withMinimumCount()
+    {
+        return $this->withExtension( FacetFilterExtension::class );
     }
 }
