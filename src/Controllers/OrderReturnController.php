@@ -46,7 +46,7 @@ class OrderReturnController extends LayoutController
 
                 /** @var OrderRepositoryContract $orderRepo */
                 $orderRepo = pluginApp(OrderRepositoryContract::class);
-                if(!count($orderData->order->returnItems) || !$orderService->isOrderReturnable( $orderRepo->findOrderById($orderId) ))
+                if(!count($orderData->order->orderItems) || !$orderService->isOrderReturnable( $orderRepo->findOrderById($orderId) ))
                 {
                     $orderData = [];
                     $template = 'tpl.page-not-found';
