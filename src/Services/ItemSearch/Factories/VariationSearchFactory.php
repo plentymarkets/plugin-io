@@ -26,11 +26,23 @@ use Plenty\Modules\Item\Search\Helper\SearchHelper;
 use Plenty\Modules\Item\Search\Mutators\ImageMutator;
 use Plenty\Plugin\Application;
 
+/**
+ * Class VariationSearchFactory
+ *
+ * Concrete factory to build variation searches
+ *
+ * @package IO\Services\ItemSearch\Factories
+ */
 class VariationSearchFactory extends BaseSearchFactory
 {
     //
     // VARIATION BASE FILTERS
     //
+    /**
+     * Filter active variations
+     *
+     * @return $this
+     */
     public function isActive()
     {
         /** @var VariationBaseFilter $variationFilter */
@@ -39,6 +51,13 @@ class VariationSearchFactory extends BaseSearchFactory
         return $this;
     }
 
+    /**
+     * Filter variation by a single item id
+     *
+     * @param int   $itemId   Item id to filter by.
+     *
+     * @return $this
+     */
     public function hasItemId( $itemId )
     {
         /** @var VariationBaseFilter $variationFilter */
@@ -47,6 +66,13 @@ class VariationSearchFactory extends BaseSearchFactory
         return $this;
     }
 
+    /**
+     * Filter variations by multiple item ids
+     *
+     * @param int[]     $itemIds    List of item ids to filter by.
+     *
+     * @return $this
+     */
     public function hasItemIds( $itemIds )
     {
         /** @var VariationBaseFilter $variationFilter */
@@ -55,6 +81,13 @@ class VariationSearchFactory extends BaseSearchFactory
         return $this;
     }
 
+    /**
+     * Filter variation by a single variation id.
+     *
+     * @param int   $variationId    The variation id to filter by.
+     *
+     * @return $this
+     */
     public function hasVariationId( $variationId )
     {
         /** @var VariationBaseFilter $variationFilter */
@@ -63,6 +96,13 @@ class VariationSearchFactory extends BaseSearchFactory
         return $this;
     }
 
+    /**
+     * Filter variations by multiple variation ids.
+     *
+     * @param int[]     $variationIds   List of variation ids to filter by.
+     *
+     * @return $this
+     */
     public function hasVariationIds( $variationIds )
     {
         /** @var VariationBaseFilter $variationFilter */
@@ -71,6 +111,11 @@ class VariationSearchFactory extends BaseSearchFactory
         return $this;
     }
 
+    /**
+     * Filter only main variations
+     *
+     * @return $this
+     */
     public function isMain()
     {
         /** @var VariationBaseFilter $variationFilter */
@@ -79,6 +124,11 @@ class VariationSearchFactory extends BaseSearchFactory
         return $this;
     }
 
+    /**
+     * Filter only child variations
+     *
+     * @return $this
+     */
     public function isChild()
     {
         /** @var VariationBaseFilter $variationFilter */
@@ -87,6 +137,13 @@ class VariationSearchFactory extends BaseSearchFactory
         return $this;
     }
 
+    /**
+     * Filter by visibility in category list.
+     *
+     * @param bool    $isHidden     Visibility in category list to filter by.
+     *
+     * @return $this
+     */
     public function isHiddenInCategoryList( $isHidden = true )
     {
         /** @var VariationBaseFilter $variationFilter */
@@ -98,6 +155,13 @@ class VariationSearchFactory extends BaseSearchFactory
     //
     // CLIENT FILTERS
     //
+    /**
+     * Filter variations by visibility for client
+     *
+     * @param null|int  $clientId   The client id to filter by. If null, default client id on application will be used.
+     *
+     * @return $this
+     */
     public function isVisibleForClient( $clientId = null )
     {
         if ( $clientId === null )
@@ -113,6 +177,14 @@ class VariationSearchFactory extends BaseSearchFactory
     //
     // TEXT FILTERS
     //
+    /**
+     * Filter variations having texts in a given language.
+     *
+     * @param string        $type   The text field to filter by ('hasAny', 'hasName1', 'hasName2', 'hasName3')
+     * @param null|string   $lang   The language to filter by. If null, language defined in session will be used.
+     *
+     * @return $this
+     */
     public function hasNameInLanguage( $type = TextFilter::FILTER_ANY_NAME, $lang = null)
     {
         if ( $lang === null )
@@ -144,6 +216,13 @@ class VariationSearchFactory extends BaseSearchFactory
     //
     // CATEGORY FILTERS
     //
+    /**
+     * Filter variations contained in a category.
+     *
+     * @param int   $categoryId     A category id to filter variations by.
+     *
+     * @return $this
+     */
     public function isInCategory( $categoryId )
     {
         /** @var CategoryFilter $categoryFilter */
@@ -155,7 +234,14 @@ class VariationSearchFactory extends BaseSearchFactory
     //
     // PRICE FILTERS
     //
-    public function hasAtLeastOnePrice( $priceIds = null )
+    /**
+     * Filter variations having at least on price.
+     *
+     * @param int[]     $priceIds   List of price ids to filter variations by
+     *
+     * @return $this
+     */
+    public function hasAtLeastOnePrice( $priceIds )
     {
         /** @var SalesPriceFilter $priceFilter */
         $priceFilter = $this->createFilter( SalesPriceFilter::class );
@@ -163,6 +249,11 @@ class VariationSearchFactory extends BaseSearchFactory
         return $this;
     }
 
+    /**
+     * Filter variations having at least one price accessible by current customer.
+     *
+     * @return $this
+     */
     public function hasPriceForCustomer()
     {
         /** @var PriceDetectService $priceDetectService */
@@ -171,6 +262,13 @@ class VariationSearchFactory extends BaseSearchFactory
         return $this;
     }
 
+    /**
+     * Group results depending on a config value.
+     *
+     * @param string $configKey     The config key containing the grouping method: ('all', 'combined', 'main', 'child')
+     *
+     * @return $this
+     */
     public function groupByTemplateConfig( $configKey = 'item.variation_show_type' )
     {
         /** @var TemplateConfigService $templateConfigService */
@@ -192,6 +290,14 @@ class VariationSearchFactory extends BaseSearchFactory
         return $this;
     }
 
+    /**
+     * Filter variations having a cross selling relation to a given item.
+     *
+     * @param int       $itemId     Item id to filter cross selling items for
+     * @param string    $relation   The relation of cross selling items.
+     *
+     * @return $this
+     */
     public function isCrossSellingItem( $itemId, $relation )
     {
         /** @var CrossSellingFilter $crossSellingFilter */
@@ -204,6 +310,15 @@ class VariationSearchFactory extends BaseSearchFactory
     //
     // FACET FILTERS
     //
+    /**
+     * Filter variations by facets.
+     *
+     * @param string|array   $facetValues   List of facet values. If string is given, it will be exploded by ';'
+     * @param int            $clientId      Client id to filter facets by. If null, default client id from application will be used.
+     * @param string         $lang          Language to filter facets by. If null, active language from session will be used.
+     *
+     * @return $this
+     */
     public function hasFacets( $facetValues, $clientId = null, $lang = null )
     {
         if ( $clientId === null )
@@ -254,6 +369,15 @@ class VariationSearchFactory extends BaseSearchFactory
     //
     // SEARCH
     //
+    /**
+     * Filter variations by given search string.
+     * @param string    $query      The search string to filter variations by
+     * @param string    $lang       The language to apply search on. If null, default language from session will be used
+     * @param string    $searchType Type of the search ('exact', 'fuzzy', 'autocomplete')
+     * @param string    $operator   Operator ot be used for search
+     *
+     * @return $this
+     */
     public function hasSearchString( $query, $lang = null, $searchType = ElasticSearch::SEARCH_TYPE_FUZZY, $operator = ElasticSearch::OR_OPERATOR )
     {
         if ( $lang === null )
@@ -280,6 +404,14 @@ class VariationSearchFactory extends BaseSearchFactory
         return $this;
     }
 
+    /**
+     * Filter variations by searching names
+     *
+     * @param string    $query  The search string
+     * @param string    $lang   Language to apply search on. If null, default language from session will be used.
+     *
+     * @return $this
+     */
     public function hasNameString( $query, $lang = null )
     {
         if ( $lang === null )
@@ -297,6 +429,13 @@ class VariationSearchFactory extends BaseSearchFactory
     //
     // MUTATORS
     //
+    /**
+     * Only request given language.
+     *
+     * @param string    $lang   Language to get texts for. If null, default language from session will be used.
+     *
+     * @return $this
+     */
     public function withLanguage( $lang = null )
     {
         if ( $lang === null )
@@ -309,6 +448,13 @@ class VariationSearchFactory extends BaseSearchFactory
         return $this;
     }
 
+    /**
+     * Include images in result
+     *
+     * @param int   $clientId   The client id to get images for. If null, default client id from application will be used.
+     *
+     * @return $this
+     */
     public function withImages( $clientId = null )
     {
         if ( $clientId === null )
@@ -326,18 +472,36 @@ class VariationSearchFactory extends BaseSearchFactory
     //
     // EXTENSIONS
     //
+    /**
+     * Append URLs to result.
+     * If not URL is stored in item result, a new URL will be generated and written to item data.
+     *
+     * @return $this
+     */
     public function withUrls()
     {
         $this->withExtension( ItemUrlExtension::class );
         return $this;
     }
 
+    /**
+     * Append prices to result.
+     *
+     * @param array $params     Params to be passed to price search.
+     *
+     * @return $this
+     */
     public function withPrices( $params = [] )
     {
         $this->withExtension( PriceSearchExtension::class, $params );
         return $this;
     }
 
+    /**
+     * Set result as current category
+     *
+     * @return $this
+     */
     public function withCurrentCategory()
     {
         $this->withExtension( CurrentCategoryExtension::class );

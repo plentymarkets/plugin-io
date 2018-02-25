@@ -4,6 +4,18 @@ namespace IO\Services\ItemSearch\SearchPresets;
 
 use IO\Services\ItemSearch\Factories\FacetSearchFactory;
 
+/**
+ * Class Facets
+ *
+ * Search preset for facets.
+ * Available options:
+ * - facets:        Values of active facets.
+ * - categoryId:    Category Id to filter variations by.
+ * - query:         Search string to get variations by.
+ * - autocomplete:  Flag indicating if autocomplete search should be used (boolean). Will only be used if 'query' is defined.
+ *
+ * @package IO\Services\ItemSearch\SearchPresets
+ */
 class Facets implements SearchPreset
 {
     public static function getSearchFactory($options)

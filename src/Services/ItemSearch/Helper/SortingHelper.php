@@ -5,8 +5,23 @@ namespace IO\Services\ItemSearch\Helper;
 use IO\Services\ItemSearch\Factories\BaseSearchFactory;
 use IO\Services\TemplateConfigService;
 
+/**
+ * Class SortingHelper
+ *
+ * Generate sorting values from plugin configuration.
+ *
+ * @package IO\Services\ItemSearch\Helper
+ */
 class SortingHelper
 {
+    /**
+     * Get sorting values from plugin configuration
+     *
+     * @param string    $sortingConfig  The configuration value from plugin
+     * @param bool      $isCategory     Get default sorting configuration for category or for search
+     *
+     * @return array
+     */
     public static function getSorting( $sortingConfig = null, $isCategory = true )
     {
         $sortings = [];
@@ -41,11 +56,23 @@ class SortingHelper
         return $sortings;
     }
 
+    /**
+     * Get sorting values for categories from config
+     *
+     * @param string $sortingConfig     The configuration value
+     * @return array
+     */
     public static function getCategorySorting( $sortingConfig = null )
     {
         return self::getSorting( $sortingConfig, true );
     }
 
+    /**
+     * Get sorting values for searches from config
+     *
+     * @param string $sortingConfig     The configuration value
+     * @return array
+     */
     public static function getSearchSorting( $sortingConfig = null )
     {
         return self::getSorting( $sortingConfig, false );

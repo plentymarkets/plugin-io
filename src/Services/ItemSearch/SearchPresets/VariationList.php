@@ -6,6 +6,20 @@ use IO\Services\ItemSearch\Factories\VariationSearchFactory;
 use IO\Services\ItemSearch\Helper\ResultFieldTemplate;
 use IO\Services\ItemSearch\Helper\SortingHelper;
 
+/**
+ * Class VariationList
+ *
+ * Search preset for variation lists.
+ * Available options:
+ * - variationIds:  List of variations to receive.
+ * - sorting:       Configuration value to get sorting for.
+ * - sortingField:  Field to sort items by. Will be appended to sorting list if sorting configuration is defined.
+ * - sortingOrder:  Order to sort items with ('asc', 'desc')
+ * - page:          The current page
+ * - itemsPerPage:  Number of items per page
+ *
+ * @package IO\Services\ItemSearch\SearchPresets
+ */
 class VariationList implements SearchPreset
 {
     public static function getSearchFactory($options)
@@ -17,8 +31,9 @@ class VariationList implements SearchPreset
         }
 
         /** @var VariationSearchFactory $searchFactory */
-        $searchFactory = pluginApp( VariationSearchFactory::class )
-            ->withResultFields(
+        $searchFactory = pluginApp( VariationSearchFactory::class );
+
+        $searchFactory->withResultFields(
                 ResultFieldTemplate::get( ResultFieldTemplate::TEMPLATE_LIST_ITEM )
             );
 

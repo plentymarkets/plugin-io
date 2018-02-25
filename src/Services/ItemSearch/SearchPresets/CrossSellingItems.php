@@ -6,8 +6,21 @@ use IO\Services\ItemCrossSellingService;
 use IO\Services\ItemSearch\Factories\VariationSearchFactory;
 use IO\Services\ItemSearch\Helper\ResultFieldTemplate;
 
+/**
+ * Class CrossSellingItems
+ *
+ * Search preset for cross selling items
+ * Available options:
+ * - itemId:    Id of the item to get cross selling items for
+ * - relation:  The relation to consider when getting cross selling items
+ *
+ * @package IO\Services\ItemSearch\SearchPresets
+ */
 class CrossSellingItems implements SearchPreset
 {
+    /**
+     * @inheritdoc
+     */
     public static function getSearchFactory($options)
     {
         $itemId = $options['itemId'];

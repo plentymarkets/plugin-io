@@ -25,6 +25,13 @@ use Plenty\Modules\Item\Search\Aggregations\ItemCardinalityAggregationProcessor;
 use Plenty\Modules\Item\Search\Filter\SearchFilter;
 use Plenty\Modules\Item\Search\Sort\NameSorting;
 
+/**
+ * Class BaseSearchFactory
+ *
+ * Base factory to build elastic search requests.
+ *
+ * @package IO\Services\ItemSearch\Factories
+ */
 class BaseSearchFactory
 {
     use LoadResultFields;
@@ -32,9 +39,14 @@ class BaseSearchFactory
     const SORTING_ORDER_ASC     = ElasticSearch::SORTING_ORDER_ASC;
     const SORTING_ORDER_DESC    = ElasticSearch::SORTING_ORDER_DESC;
 
-    const INHERIT_MUTATORS      = 'mutators';
+    const INHERIT_AGGREGATIONS  = 'aggregations';
+    const INHERIT_COLLAPSE      = 'collapse';
+    const INHERIT_EXTENSIONS    = 'extensions';
     const INHERIT_FILTERS       = 'filters';
+    const INHERIT_MUTATORS      = 'mutators';
+    const INHERIT_PAGINATION    = 'pagination';
     const INHERIT_RESULT_FIELDS = 'resultFields';
+    const INHERIT_SORTING       = 'sorting';
 
     /** @var AggregationInterface[] */
     private $aggregations = [];
@@ -60,13 +72,17 @@ class BaseSearchFactory
     /** @var MultipleSorting */
     private $sorting = null;
 
+    /** @var int */
     private $page = 1;
 
+    /** @var int */
     private $itemsPerPage = -1;
 
     /**
-     * @param BaseSearchFactory $searchBuilder
-     * @param null|string[]     $inheritedProperties
+     * Create a new factory instance based on properties of an existing factory.
+     *
+     * @param BaseSearchFactory     $searchBuilder          The search factory to inherit properties from.
+     * @param null|array            $inheritedProperties    List of properties to inherit or null to inherit all properties.
      *
      * @return BaseSearchFactory
      * @throws \ErrorException
@@ -78,12 +94,14 @@ class BaseSearchFactory
 
         if ( $searchBuilder !== null )
         {
-            if ( $inheritedProperties === null || in_array(self::INHERIT_MUTATORS, $inheritedProperties ) )
+            if ( $inheritedProperties === null || in_array(self::INHERIT_COLLAPSE, $inheritedProperties ) )
             {
-                foreach( $searchBuilder->mutators as $mutator )
-                {
-                    $newBuilder->withMutator( $mutator );
-                }
+                $newBuilder->collapse = $searchBuilder->collapse;
+            }
+
+            if ( $inheritedProperties === null || in_array(self::INHERIT_EXTENSIONS, $inheritedProperties ) )
+            {
+                $newBuilder->extensions = $searchBuilder->extensions;
             }
 
             if ( $inheritedProperties === null || in_array( self::INHERIT_FILTERS, $inheritedProperties ) )
@@ -94,11 +112,32 @@ class BaseSearchFactory
                 }
             }
 
+            if ( $inheritedProperties === null || in_array(self::INHERIT_MUTATORS, $inheritedProperties ) )
+            {
+                foreach( $searchBuilder->mutators as $mutator )
+                {
+                    $newBuilder->withMutator( $mutator );
+                }
+            }
+
+            if ( $inheritedProperties === null || in_array( self::INHERIT_PAGINATION, $inheritedProperties ) )
+            {
+                $newBuilder->setPage(
+                    $searchBuilder->page,
+                    $searchBuilder->itemsPerPage
+                );
+            }
+
             if ( $inheritedProperties === null || in_array( self::INHERIT_RESULT_FIELDS, $inheritedProperties ) )
             {
                 $newBuilder->withResultFields(
                     $searchBuilder->resultFields
                 );
+            }
+
+            if ( $inheritedProperties === null || in_array( self::INHERIT_SORTING, $inheritedProperties ) )
+            {
+                $newBuilder->sorting = $searchBuilder->sorting;
             }
         }
 
@@ -106,8 +145,11 @@ class BaseSearchFactory
     }
 
     /**
+     * Add a mutator
+     *
      * @param MutatorInterface $mutator
-     * @return BaseSearchFactory
+     *
+     * @return $this
      */
     public function withMutator( $mutator )
     {
@@ -116,6 +158,8 @@ class BaseSearchFactory
     }
 
     /**
+     * Add a filter. Will create a new instance of the filter class if not already created.
+     *
      * @param string    $filterClass
      *
      * @return TypeInterface
@@ -131,6 +175,13 @@ class BaseSearchFactory
         return $this->filterInstances[$filterClass];
     }
 
+    /**
+     * Add a filter. Will override existing filter instances.
+     *
+     * @param TypeInterface $filter
+     *
+     * @return $this
+     */
     public function withFilter( $filter )
     {
         $filterClass = get_class( $filter );
@@ -140,7 +191,10 @@ class BaseSearchFactory
     }
 
     /**
-     * @param string|string[]   $fields
+     * Set fields to be contained in search result.
+     * Can be a string referencing a json file to load or a list of fields.
+     *
+     * @param string|string[]   $fields     Reference to a json file to load fields from or a list of field names.
      *
      * @return BaseSearchFactory
      */
@@ -159,23 +213,50 @@ class BaseSearchFactory
         return $this;
     }
 
+    /**
+     * Add an extension.
+     *
+     * @param string    $extensionClass     Extension class to add.
+     * @param array     $extensionParams    Additional parameters to pass to extensions constructor
+     * @return $this
+     */
     public function withExtension( $extensionClass, $extensionParams = [] )
     {
-        $this->extensions[] = pluginApp( $extensionClass );
+        $this->extensions[] = pluginApp( $extensionClass, $extensionParams );
         return $this;
     }
 
+    /**
+     * Get all registered extensions
+     *
+     * @return ItemSearchExtension[]
+     */
     public function getExtensions()
     {
         return $this->extensions;
     }
 
-    public function withAggregation( $aggregation )
+    /**
+     * Add an aggregation
+     *
+     * @param AggregationInterface $aggregation
+     *
+     * @return $this
+     */
+    public function withAggregation( AggregationInterface $aggregation )
     {
         $this->aggregations[] = $aggregation;
         return $this;
     }
 
+    /**
+     * Set pagination parameters.
+     *
+     * @param int   $page
+     * @param int   $itemsPerPage
+     *
+     * @return $this
+     */
     public function setPage( $page, $itemsPerPage )
     {
         $this->page = $page;
@@ -183,6 +264,14 @@ class BaseSearchFactory
         return $this;
     }
 
+    /**
+     * Add sorting parameters
+     *
+     * @param string    $field      The field to order by
+     * @param string    $order      Direction to order results. Possible values: 'asc' or 'desc'
+     *
+     * @return $this
+     */
     public function sortBy( $field, $order = self::SORTING_ORDER_DESC )
     {
         if ( $this->sorting === null )
@@ -216,6 +305,13 @@ class BaseSearchFactory
         return $this;
     }
 
+    /**
+     * Add multiple sorting parameters
+     *
+     * @param array     $sortingList    List of sorting parameters. Each entry should have a 'field' and an 'order' property.
+     *
+     * @return $this
+     */
     public function sortByMultiple( $sortingList )
     {
         foreach( $sortingList as $sorting )
@@ -226,6 +322,13 @@ class BaseSearchFactory
         return $this;
     }
 
+    /**
+     * Group results by field
+     *
+     * @param string    $field  The field to group properties by.
+     *
+     * @return $this
+     */
     public function groupBy( $field )
     {
         $collapse = pluginApp( BaseCollapse::class, [$field] );
@@ -239,6 +342,8 @@ class BaseSearchFactory
     }
 
     /**
+     * Build the elastic search request.
+     *
      * @return DocumentSearch
      */
     public function build()
@@ -295,6 +400,11 @@ class BaseSearchFactory
         return $search;
     }
 
+    /**
+     * Build the search instance itself. May be overridden by concrete factories.
+     *
+     * @return DocumentSearch
+     */
     protected function prepareSearch()
     {
         /** @var DocumentProcessor $processor */

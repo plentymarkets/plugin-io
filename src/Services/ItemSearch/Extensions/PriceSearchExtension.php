@@ -5,6 +5,13 @@ namespace IO\Services\ItemSearch\Extensions;
 use IO\Helper\VariationPriceList;
 use IO\Services\CustomerService;
 
+/**
+ * Class PriceSearchExtension
+ *
+ * Search and append all prices for each item in search result.
+ *
+ * @package IO\Services\ItemSearch\Extensions
+ */
 class PriceSearchExtension implements ItemSearchExtension
 {
     private $options;

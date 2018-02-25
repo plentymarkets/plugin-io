@@ -7,13 +7,24 @@ use IO\Services\ItemSearch\SearchPresets\SearchPreset;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Search\Document\DocumentSearch;
 use Plenty\Modules\Item\Search\Contracts\VariationElasticSearchMultiSearchRepositoryContract;
 
+/**
+ * Class MultiSearchFactory
+ *
+ * Factory to build an elastic search multisearch request by collecting multiple search factory instances.
+ *
+ * @package IO\Services\ItemSearch\Factories
+ */
 class MultiSearchFactory
 {
+    /** @var array */
     private $searches = [];
 
+    /** @var array */
     private $extensions = [];
 
     /**
+     * Get all registered searches
+     *
      * @return array
      */
     public function getSearches()
@@ -21,14 +32,21 @@ class MultiSearchFactory
         return $this->searches;
     }
 
+    /**
+     * Get all registered extensions
+     *
+     * @return array
+     */
     public function getExtensions()
     {
         return $this->extensions;
     }
 
     /**
-     * @param string            $resultName
-     * @param BaseSearchFactory $searchBuilder
+     * Add a search factory instance to be included in current mutlisearch request.
+     *
+     * @param string            $resultName     An unique name for the search. Results of this search will be accessible by this key.
+     * @param BaseSearchFactory $searchBuilder  A search factory
      *
      * @return MultiSearchFactory
      */
@@ -41,8 +59,10 @@ class MultiSearchFactory
             $search->setName( $resultName );
 
             $secondarySearches = [];
+
             foreach( $searchBuilder->getExtensions() as $i => $extension )
             {
+                // collect secondary searches required by registered extensions
                 $secondarySearch = $extension->getSearch( $searchBuilder );
                 if ( $secondarySearch !== null )
                 {
@@ -51,6 +71,8 @@ class MultiSearchFactory
                 }
             }
 
+            // primary search       = The search itself
+            // secondary searches   = Additional searches required by registered extensions
             $this->searches[$resultName] = [
                 'primary'   => $search,
                 'secondary' => $secondarySearches
@@ -61,6 +83,11 @@ class MultiSearchFactory
         return $this;
     }
 
+    /**
+     * Execute the multisearch and collect results.
+     *
+     * @return array
+     */
     public function getResults()
     {
         /** @var VariationElasticSearchMultiSearchRepositoryContract $searchRepository */
@@ -69,7 +96,10 @@ class MultiSearchFactory
         $primarySearchNames = [];
         foreach( $this->searches as $resultName => $searches )
         {
+            // add all searches (primary & secondary)
             $searchRepository->addSearch( $searches['primary'] );
+
+            // remember primary search names
             $primarySearchNames[] = $resultName;
             foreach( $searches['secondary'] as $secondarySearch )
             {
@@ -77,12 +107,16 @@ class MultiSearchFactory
             }
         }
 
+        // execute multisearch
         $rawResults = $searchRepository->execute();
         $results = [];
 
         foreach( $primarySearchNames as $searchName )
         {
+            // get result of primary search
             $result = $rawResults[$searchName];
+
+            // apply extensions
             foreach( $this->extensions[$searchName] as $i => $extension )
             {
                 if ( $extension instanceof ItemSearchExtension )

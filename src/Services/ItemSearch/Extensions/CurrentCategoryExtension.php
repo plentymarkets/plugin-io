@@ -11,6 +11,13 @@ use Plenty\Modules\Category\Contracts\CategoryRepositoryContract;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Search\Document\DocumentSearch;
 use Plenty\Plugin\Application;
 
+/**
+ * Class CurrentCategoryExtension
+ *
+ * Set current category when loading an item to be displayed in breadcrumbs or navigation templates.
+ *
+ * @package IO\Services\ItemSearch\Extensions
+ */
 class CurrentCategoryExtension implements ItemSearchExtension
 {
     /**
@@ -22,7 +29,11 @@ class CurrentCategoryExtension implements ItemSearchExtension
             $parentSearchBuilder,
             [
                 VariationSearchFactory::INHERIT_FILTERS,
-                VariationSearchFactory::INHERIT_MUTATORS
+                VariationSearchFactory::INHERIT_MUTATORS,
+                VariationSearchFactory::INHERIT_PAGINATION,
+                VariationSearchFactory::INHERIT_COLLAPSE,
+                VariationSearchFactory::INHERIT_AGGREGATIONS,
+                VariationSearchFactory::INHERIT_SORTING
             ])
             ->withResultFields([
                 'item.id',
@@ -33,6 +44,9 @@ class CurrentCategoryExtension implements ItemSearchExtension
             ->build();
     }
 
+    /**
+     * @inheritdoc
+     */
     public function transformResult($baseResult, $extensionResult)
     {
         if ( count( $extensionResult['documents'] ) )

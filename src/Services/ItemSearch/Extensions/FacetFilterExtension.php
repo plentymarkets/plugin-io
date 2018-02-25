@@ -5,11 +5,17 @@ namespace IO\Services\ItemSearch\Extensions;
 use IO\Services\ItemSearch\Factories\BaseSearchFactory;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Search\Document\DocumentSearch;
 
+/**
+ * Class FacetFilterExtension
+ *
+ * Filter facets by configured minimum hit count.
+ *
+ * @package IO\Services\ItemSearch\Extensions
+ */
 class FacetFilterExtension implements ItemSearchExtension
 {
     /**
-     * @param BaseSearchFactory $parentSearchBuilder
-     * @return DocumentSearch
+     * @inheritdoc
      */
     public function getSearch($parentSearchBuilder)
     {
@@ -17,9 +23,7 @@ class FacetFilterExtension implements ItemSearchExtension
     }
 
     /**
-     * @param $baseResult
-     * @param $extensionResult
-     * @return mixed
+     * @inheritdoc
      */
     public function transformResult($baseResult, $extensionResult)
     {

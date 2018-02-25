@@ -6,6 +6,21 @@ use IO\Services\ItemSearch\Factories\VariationSearchFactory;
 use IO\Services\ItemSearch\Helper\ResultFieldTemplate;
 use IO\Services\ItemSearch\Helper\SortingHelper;
 
+/**
+ * Class SearchItems
+ *
+ * Search preset for search items.
+ * Available options:
+ * - query:         The search string
+ * - facets:        Facet values of active facets
+ * - sorting:       Configuration value from plugin config
+ * - page:          The current page
+ * - itemsPerPage:  Number of items per page
+ * - autocomplete:  Flag indicating if autocompletion should be used
+ *
+ *
+ * @package IO\Services\ItemSearch\SearchPresets
+ */
 class SearchItems implements SearchPreset
 {
     public static function getSearchFactory($options)
@@ -19,8 +34,9 @@ class SearchItems implements SearchPreset
 
 
         /** @var VariationSearchFactory $searchFactory */
-        $searchFactory = pluginApp( VariationSearchFactory::class )
-            ->withResultFields(
+        $searchFactory = pluginApp( VariationSearchFactory::class );
+
+        $searchFactory->withResultFields(
                 ResultFieldTemplate::get( ResultFieldTemplate::TEMPLATE_LIST_ITEM )
             );
 

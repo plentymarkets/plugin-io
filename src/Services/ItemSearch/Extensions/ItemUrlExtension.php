@@ -7,6 +7,14 @@ use IO\Services\UrlBuilder\VariationUrlBuilder;
 use IO\Services\WebstoreConfigurationService;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Source\Mutator\BuiltIn\LanguageMutator;
 
+/**
+ * Class ItemUrlExtension
+ *
+ * Check if item data already contains a calculated item url.
+ * Otherwise generate item url and store url for later usage.
+ *
+ * @package IO\Services\ItemSearch\Extensions
+ */
 class ItemUrlExtension implements ItemSearchExtension
 {
     /**
@@ -25,7 +33,11 @@ class ItemUrlExtension implements ItemSearchExtension
         return VariationSearchFactory::inherit(
             $parentSearchBuilder,
             [
-                VariationSearchFactory::INHERIT_FILTERS
+                VariationSearchFactory::INHERIT_FILTERS,
+                VariationSearchFactory::INHERIT_PAGINATION,
+                VariationSearchFactory::INHERIT_COLLAPSE,
+                VariationSearchFactory::INHERIT_AGGREGATIONS,
+                VariationSearchFactory::INHERIT_SORTING
             ])
             ->withResultFields([
                 'item.id',
@@ -37,6 +49,9 @@ class ItemUrlExtension implements ItemSearchExtension
             ->build();
     }
 
+    /**
+     * @inheritdoc
+     */
     public function transformResult($baseResult, $extensionResult)
     {
         /** @var VariationUrlBuilder $itemUrlBuilder */
