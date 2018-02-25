@@ -324,7 +324,7 @@ class OrderService
             }
             
             $orderWithoutReturnItems = $this->removeReturnItemsFromOrder($order);
-            if(!count($orderWithoutReturnItems->returnItems))
+            if(!count($orderWithoutReturnItems->orderItems))
             {
                 return false;
             }
@@ -489,7 +489,8 @@ class OrderService
                     }
                 }
                 
-                $order->returnItems = $newOrderItems;
+                //$order->returnItems = $newOrderItems;
+                $order->orderItems = $newOrderItems;
             }
             else
             {
@@ -501,7 +502,8 @@ class OrderService
                     }
                 }
                 
-                $order->returnItems = $newOrderItems;
+                //$order->returnItems = $newOrderItems;
+                $order->orderItems = $newOrderItems;
             }
         }
         
