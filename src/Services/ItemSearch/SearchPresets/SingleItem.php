@@ -3,6 +3,7 @@
 namespace IO\Services\ItemSearch\SearchPresets;
 
 use IO\Services\ItemSearch\Factories\VariationSearchFactory;
+use IO\Services\ItemSearch\Helper\ResultFieldTemplate;
 use IO\Services\TemplateConfigService;
 
 class SingleItem implements SearchPreset
@@ -10,7 +11,11 @@ class SingleItem implements SearchPreset
     public static function getSearchFactory($options)
     {
         /** @var VariationSearchFactory $searchFactory */
-        $searchFactory = pluginApp( VariationSearchFactory::class );
+        $searchFactory = pluginApp( VariationSearchFactory::class )
+            ->withResultFields(
+                ResultFieldTemplate::get( ResultFieldTemplate::TEMPLATE_SINGLE_ITEM )
+            );
+
         $searchFactory
             ->withLanguage()
             ->withImages()

@@ -3,6 +3,7 @@
 namespace IO\Services\ItemSearch\SearchPresets;
 
 use IO\Services\ItemSearch\Factories\VariationSearchFactory;
+use IO\Services\ItemSearch\Helper\ResultFieldTemplate;
 
 class BasketItems implements SearchPreset
 {
@@ -12,7 +13,11 @@ class BasketItems implements SearchPreset
         $quantities     = $options['variationQuantities'];
 
         /** @var VariationSearchFactory $searchFactory */
-        $searchFactory = pluginApp( VariationSearchFactory::class );
+        $searchFactory = pluginApp( VariationSearchFactory::class )
+            ->withResultFields(
+                ResultFieldTemplate::get( ResultFieldTemplate::TEMPLATE_BASKET_ITEM )
+            );
+
         $searchFactory
             ->withLanguage()
             ->withUrls()

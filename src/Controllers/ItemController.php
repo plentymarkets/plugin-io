@@ -42,6 +42,7 @@ class ItemController extends LayoutController
 
 
 	    $itemResult = $result['item'];
+        $itemResult['CrossSellingItems'] = $result['crossSellingItems'];
 
         if(empty($itemResult['documents']))
         {
@@ -64,7 +65,7 @@ class ItemController extends LayoutController
                 $itemLastSeenService = pluginApp(ItemLastSeenService::class);
                 $itemLastSeenService->setLastSeenItem( $variationId );
             }
-            
+
             return $this->renderTemplate(
                 'tpl.item',
                 [

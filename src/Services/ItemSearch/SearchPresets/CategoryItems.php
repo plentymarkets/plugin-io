@@ -3,6 +3,7 @@
 namespace IO\Services\ItemSearch\SearchPresets;
 
 use IO\Services\ItemSearch\Factories\VariationSearchFactory;
+use IO\Services\ItemSearch\Helper\ResultFieldTemplate;
 use IO\Services\ItemSearch\Helper\SortingHelper;
 
 class CategoryItems implements SearchPreset
@@ -17,7 +18,10 @@ class CategoryItems implements SearchPreset
         $itemsPerPage   = (int) $options['itemsPerPage'];
 
         /** @var VariationSearchFactory $searchFactory */
-        $searchFactory = pluginApp(VariationSearchFactory::class);
+        $searchFactory = pluginApp(VariationSearchFactory::class)
+            ->withResultFields(
+                ResultFieldTemplate::get( ResultFieldTemplate::TEMPLATE_LIST_ITEM )
+            );
 
         $searchFactory
             ->withLanguage()

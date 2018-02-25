@@ -4,6 +4,7 @@ namespace IO\Services\ItemSearch\SearchPresets;
 
 use IO\Services\ItemCrossSellingService;
 use IO\Services\ItemSearch\Factories\VariationSearchFactory;
+use IO\Services\ItemSearch\Helper\ResultFieldTemplate;
 
 class CrossSellingItems implements SearchPreset
 {
@@ -19,7 +20,11 @@ class CrossSellingItems implements SearchPreset
             $relation = $crossSellingService->getType();
         }
         /** @var VariationSearchFactory $searchFactory */
-        $searchFactory = pluginApp( VariationSearchFactory::class );
+        $searchFactory = pluginApp( VariationSearchFactory::class )
+            ->withResultFields(
+                ResultFieldTemplate::get( ResultFieldTemplate::TEMPLATE_LIST_ITEM )
+            );
+
         $searchFactory
             ->withLanguage()
             ->withUrls()

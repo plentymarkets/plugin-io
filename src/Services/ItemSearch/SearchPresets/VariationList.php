@@ -3,6 +3,7 @@
 namespace IO\Services\ItemSearch\SearchPresets;
 
 use IO\Services\ItemSearch\Factories\VariationSearchFactory;
+use IO\Services\ItemSearch\Helper\ResultFieldTemplate;
 use IO\Services\ItemSearch\Helper\SortingHelper;
 
 class VariationList implements SearchPreset
@@ -16,7 +17,11 @@ class VariationList implements SearchPreset
         }
 
         /** @var VariationSearchFactory $searchFactory */
-        $searchFactory = pluginApp( VariationSearchFactory::class );
+        $searchFactory = pluginApp( VariationSearchFactory::class )
+            ->withResultFields(
+                ResultFieldTemplate::get( ResultFieldTemplate::TEMPLATE_LIST_ITEM )
+            );
+
         $searchFactory
             ->withImages()
             ->withPrices()
