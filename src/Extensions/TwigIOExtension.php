@@ -3,6 +3,7 @@
 namespace IO\Extensions;
 
 use IO\Extensions\Filters\ItemImagesFilter;
+use IO\Extensions\Functions\QueryString;
 use Plenty\Plugin\Templates\Extensions\Twig_Extension;
 use Plenty\Plugin\Templates\Factories\TwigFactory;
 use Plenty\Plugin\Http\Request;
@@ -49,6 +50,7 @@ class TwigIOExtension extends Twig_Extension
         ItemNameFilter $itemNameFilter,
         ExternalContent $externalContent,
         Partial $partial,
+        QueryString $queryString,
         ItemImagesFilter $itemImagesFilter,
 		OrderByKeyFilter $orderByKeyFilter,
 		ShuffleFilter $shuffleFilter
