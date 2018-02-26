@@ -1,5 +1,17 @@
 # Release Notes für IO
 
+## v2.3.1 (2018-02-26) <a href="https://github.com/plentymarkets/plugin-io/compare/2.3.0...2.3.1" target="_blank"><b>Overview of all changes</b></a>
+
+### Behoben
+
+- Gutscheinrabatte werden nun auf der Auftragsbestätigungsseite und in den Auftragsdetails im MyAccount-Bereich angezeigt.
+- Die Retourenbestätigungsseite wird nun nach Anlage einer Retoure wieder angezeigt. (Die Route muss in IO config aktiviert sein)
+- Auf der Seite zur Retourenanlage werden nur noch Artikel angezeigt, die auch retourniert werden können. (Keine Versandkosten, Gutscheinpositionen etc.)
+- Durch einen Fehler wurden einzelne Attribute in der Variantenauswahl nicht angezeigt. Dies wurde behoben.
+- Durch einen Fehler wurde die Anzeige von Brutto-/Netto-Preisen für Versandkosten nicht korrekt aktualisiert. Dies wurde behoben.
+- Bei Fehlern in der Versandkostenberechnung wurde keine Fehlermeldung ausgegeben. Dies wurde behoben.
+- In der Last seen Liste werden nun keine zufälligen Artikel mehr angezeigt, wenn vorher noch kein Artikel im Shop angeschaut wurde.
+
 ## v2.3.0 (2018-02-19) <a href="https://github.com/plentymarkets/plugin-io/compare/2.2.2...2.3.0" target="_blank"><b>Übersicht aller Änderungen</b></a>
 
 ### Geändert

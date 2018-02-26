@@ -25,6 +25,8 @@ class LocalizedOrder extends ModelWrapper
      * @var Order
      */
     public $order = null;
+    
+    public $orderData = [];
 
     /**
      * @var OrderStatusName
@@ -150,8 +152,13 @@ class LocalizedOrder extends ModelWrapper
      */
     public function toArray():array
     {
+        $order = $this->order->toArray();
+        if ( count( $this->orderData ) )
+        {
+            $order = $this->orderData;
+        }
         $data = [
-            "order"                 => $this->order->toArray(),
+            "order"                 => $order,
             "status"                => [], //$this->status->toArray(),
             "shippingProvider"      => $this->shippingProvider,
             "shippingProfileName"   => $this->shippingProfileName,
@@ -161,9 +168,6 @@ class LocalizedOrder extends ModelWrapper
             "itemImages"            => $this->itemImages,
             "isReturnable"          => $this->isReturnable
         ];
-
-        $data["order"]["billingAddress"] = $this->order->billingAddress->toArray();
-        $data["order"]["deliveryAddress"] = $this->order->deliveryAddress->toArray();
 
         return $data;
     }
