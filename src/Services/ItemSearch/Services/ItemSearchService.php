@@ -2,6 +2,7 @@
 
 namespace IO\Services\ItemSearch\Services;
 
+use IO\Helper\DefaultSearchResult;
 use IO\Services\ItemSearch\Factories\BaseSearchFactory;
 use IO\Services\ItemSearch\Factories\MultiSearchFactory;
 
@@ -32,7 +33,14 @@ class ItemSearchService
             {
                 $multiSearchFactory->addSearch( $resultName, $search );
             }
-            return $multiSearchFactory->getResults();
+            $results = $multiSearchFactory->getResults();
+
+            foreach( $results as $resultName => $result )
+            {
+                $results[$resultName] = $this->normalizeResult( $result );
+            }
+
+            return $results;
 
         }
         elseif ( $searches instanceof BaseSearchFactory )
@@ -40,7 +48,7 @@ class ItemSearchService
             $multiSearchFactory->addSearch( 'search', $searches );
             $results = $multiSearchFactory->getResults();
 
-            return $results['search'];
+            return $this->normalizeResult( $results['search'] );
         }
 
 
@@ -56,5 +64,18 @@ class ItemSearchService
     public function getResult( $searchFactory )
     {
         return $this->getResults([$searchFactory]);
+    }
+
+    private function normalizeResult($result)
+    {
+        if( count($result['documents']) )
+        {
+            foreach($result['documents'] as $key => $variation)
+            {
+                $result['documents'][$key]['data'] = DefaultSearchResult::merge( $variation['data'] );
+            }
+        }
+
+        return $result;
     }
 }
