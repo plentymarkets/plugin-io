@@ -3,9 +3,8 @@
 namespace IO\Services\UrlBuilder;
 
 use IO\Helper\StringUtils;
-use IO\Services\ItemLoader\Loaders\ItemURLs;
-use IO\Services\ItemLoader\Loaders\SingleItem;
-use IO\Services\ItemLoader\Services\ItemLoaderService;
+use IO\Services\ItemSearch\Factories\VariationSearchFactory;
+use IO\Services\ItemSearch\Services\ItemSearchService;
 use IO\Services\SessionStorageService;
 use IO\Services\TemplateConfigService;
 use Plenty\Modules\Authorization\Services\AuthHelper;
@@ -150,22 +149,18 @@ class VariationUrlBuilder
 
     private function searchItem( $itemId, $variationId, $lang )
     {
-        /** @var ItemLoaderService $itemLoader */
-        $itemLoader = pluginApp( ItemLoaderService::class );
-        $result = $itemLoader
-            ->setLoaderClassList([ItemURLs::class])
-            ->setOptions([
-                'itemId' => $itemId,
-                'variationId' => $variationId,
-                'lang' => $lang
-            ])
-            ->load();
+        /** @var ItemSearchService $itemSearchService */
+        $itemSearchService = pluginApp( ItemSearchService::class );
 
-        if ( count($result['documents']) )
-        {
-            self::fillItemUrl( $result['documents'][0]['data'] );
-            return self::$urlPathMap[$itemId][$variationId][$lang];
-        }
+        /** @var VariationSearchFactory $searchFactory */
+        $searchFactory = pluginApp( VariationSearchFactory::class );
+        $searchFactory
+            ->withLanguage( $lang )
+            ->withUrls()
+            ->hasItemId( $itemId )
+            ->hasVariationId( $variationId );
+
+        $itemSearchService->getResult($searchFactory);
 
         return [];
     }

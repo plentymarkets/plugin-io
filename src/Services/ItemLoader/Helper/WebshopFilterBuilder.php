@@ -41,6 +41,7 @@ class WebshopFilterBuilder implements FilterBuilder
                         {
                             $variationFilter->isMain();
                         }
+
                         elseif($variationShowType == 'child')
                         {
                             $variationFilter->isChild();

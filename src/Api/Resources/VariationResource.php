@@ -2,17 +2,14 @@
 
 namespace IO\Api\Resources;
 
-use IO\Services\ItemLoader\Extensions\TwigLoaderPresets;
+use IO\Services\ItemSearch\SearchPresets\SingleItem;
+use IO\Services\ItemSearch\SearchPresets\VariationList;
+use IO\Services\ItemSearch\Services\ItemSearchService;
 use Plenty\Plugin\Http\Request;
 use Plenty\Plugin\Http\Response;
 use IO\Api\ApiResource;
 use IO\Api\ApiResponse;
 use IO\Api\ResponseCode;
-use IO\Services\ItemLoader\Services\ItemLoaderService;
-use IO\Services\ItemLoader\Loaders\Items;
-use IO\Services\ItemLoader\Loaders\SingleItem;
-use IO\Services\ItemLoader\Loaders\SingleItemAttributes;
-
 /**
  * Class VariationResource
  * @package IO\Api\Resources
@@ -35,12 +32,22 @@ class VariationResource extends ApiResource
     {
         $variations = [];
 
-        $variationIds = $this->request->get('variationIds', []);
         $template = $this->request->get('template', '');
         
         if(strlen($template))
         {
-            $variations = pluginApp(ItemLoaderService::class)->loadForTemplate($template, [Items::class], ['variationIds' => $variationIds]);
+            /** @var ItemSearchService $itemSearchService */
+            $itemSearchService = pluginApp( ItemSearchService::class );
+            $variations = $itemSearchService->getResults(
+                VariationList::getSearchFactory([
+                    'variationIds'  => $this->request->get('variationIds' ),
+                    'sorting'       => $this->request->get( 'sorting' ),
+                    'sortingField'  => $this->request->get( 'sortingField' ),
+                    'sortingOrder'  => $this->request->get( 'sortingOrder' ),
+                    'page'          => $this->request->get( 'page' ),
+                    'itemsPerPage'  => $this->request->get( 'itemsPerPage' )
+                ])
+            );
         }
 
         return $this->response->create($variations, ResponseCode::OK);
@@ -58,10 +65,13 @@ class VariationResource extends ApiResource
         $template = $this->request->get('template', '');
         if(strlen($template))
         {
-            /** @var TwigLoaderPresets $loaderPresets */
-            $loaderPresets = pluginApp(TwigLoaderPresets::class);
-            $presets = $loaderPresets->getGlobals();
-            $variation = pluginApp(ItemLoaderService::class)->loadForTemplate($template, $presets['itemLoaderPresets']['singleItem'], ['variationId' => (int)$variationId]);
+            /** @var ItemSearchService $itemSearchService */
+            $itemSearchService = pluginApp( ItemSearchService::class );
+            $variation = $itemSearchService->getResults(
+                SingleItem::getSearchFactory([
+                    'variationId' => $variationId
+                ])
+            );
         }
         
         return $this->response->create($variation, ResponseCode::OK);

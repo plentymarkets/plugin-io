@@ -46,7 +46,8 @@ class CategoryController extends LayoutController
                 'category'      => $category,
                 'sorting'       => $request->get('sorting', null),
                 'itemsPerPage'  => $request->get('items', null),
-                'page'          => $request->get('page', null)
+                'page'          => $request->get('page', null),
+                'facets'        => $request->get('facets', '')
             ]
         );
 	}

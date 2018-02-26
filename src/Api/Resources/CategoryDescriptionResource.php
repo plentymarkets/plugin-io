@@ -6,9 +6,6 @@ use Plenty\Modules\Category\Models\Category;
 use IO\Api\ApiResource;
 use IO\Api\ApiResponse;
 use IO\Api\ResponseCode;
-use IO\Services\ItemLoader\Services\ItemLoaderService;
-use IO\Services\ItemLoader\Loaders\CategoryItems;
-use IO\Services\ItemLoader\Loaders\Facets;
 use IO\Services\CategoryService;
 use IO\Services\SessionStorageService;
 

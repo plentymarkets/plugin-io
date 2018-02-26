@@ -77,19 +77,6 @@ abstract class LayoutController extends Controller
 	}
 
 	/**
-	 * Prepare global template data which should be available in all templates
-	 * @param TemplateContainer $templateContainer
-	 * @param mixed $customData Data to pass to template from concrete Controller.
-	 * @return TemplateContainer
-	 */
-	protected function prepareTemplateData(TemplateContainer $templateContainer, $customData = null):TemplateContainer
-	{
-		$templateContainer->setTemplateData($customData);
-
-		return $templateContainer;
-	}
-
-	/**
 	 * Abort handling current route and pass request to the plentymarkets system
 	 * @param int $code
 	 * @param string $message

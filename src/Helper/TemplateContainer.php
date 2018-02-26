@@ -15,9 +15,9 @@ class TemplateContainer
 	private $template = null;
 	
 	/**
-	 * @var mixed
+	 * @var array|\Closure
 	 */
-	private $templateData;
+	private $templateData = null;
 
 	/**
 	 * @var string
@@ -70,7 +70,7 @@ class TemplateContainer
 	 * @param mixed $customData
 	 * @return TemplateContainer
 	 */
-	public function setTemplateData( $customData ):TemplateContainer
+	public function setTemplateData( $customData )
 	{
 		if($customData !== null)
 		{
