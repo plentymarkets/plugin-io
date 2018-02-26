@@ -33,7 +33,7 @@ class OrderReturnController extends LayoutController
          */
         $orderService = pluginApp(OrderService::class);
         
-        $orderData = [];
+        $returnOrder = [];
         $template = 'tpl.order.return';
         
         $enabledRoutes = explode(", ",  $configRepo->get("IO.routing.enabled_routes") );
@@ -41,33 +41,31 @@ class OrderReturnController extends LayoutController
         {
             try
             {
-                $orderData = $orderService->findOrderById($orderId, true);
-//                $unwrappedOrder = $orderService->findOrderById($orderId, false, false);
-
+                $order = $orderService->findOrderById($orderId, false, true);
+                $returnOrder = $orderService->getReturnOrder($order);
+    
                 /** @var OrderRepositoryContract $orderRepo */
                 $orderRepo = pluginApp(OrderRepositoryContract::class);
-                if(!count($orderData->order->orderItems) || !$orderService->isOrderReturnable( $orderRepo->findOrderById($orderId) ))
+                
+                if(!count($returnOrder->orderData['orderItems']) || !$orderService->isOrderReturnable($orderRepo->findOrderById($orderId)))
                 {
-                    $orderData = [];
-                    $template = 'tpl.page-not-found';
+                    return '';
                 }
                 
             }
             catch (\Exception $e)
             {
-                $orderData = [];
-                $template = 'tpl.page-not-found';
+                return '';
             }
         }
         else
         {
-            $orderData = [];
-            $template = 'tpl.page-not-found';
+            return '';
         }
         
         return $this->renderTemplate(
-            $template,
-            ['orderData' => $orderData]
+            'tpl.order.return',
+            ['orderData' => $returnOrder]
 		);
     }
 }
