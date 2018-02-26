@@ -57,7 +57,7 @@ class ItemSearchResource extends ApiResource
         }
         else
         {
-            return $this->response->error(1, '');
+            return $this->response->create( null, ResponseCode::BAD_REQUEST );
         }
         
     }
