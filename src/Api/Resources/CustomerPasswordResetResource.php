@@ -33,12 +33,13 @@ class CustomerPasswordResetResource extends ApiResource
     {
         $email = $this->request->get('email', '');
         $template = $this->request->get('template', '');
+        $mailSubject = $this->request->get('subject', '');
         
         /**
          * @var CustomerPasswordResetService $customerPasswordResetService
          */
         $customerPasswordResetService = pluginApp(CustomerPasswordResetService::class);
-        $response = $customerPasswordResetService->resetPassword($email, $template);
+        $response = $customerPasswordResetService->resetPassword($email, $template, $mailSubject);
         return $this->response->create($response, ResponseCode::OK);
     }
     

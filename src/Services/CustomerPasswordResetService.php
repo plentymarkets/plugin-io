@@ -11,6 +11,7 @@ use IO\Services\WebstoreConfigurationService;
 use Plenty\Plugin\Application;
 use Plenty\Plugin\Templates\Twig;
 use Plenty\Modules\Authorization\Services\AuthHelper;
+use Plenty\Plugin\Translation\Translator;
 
 class CustomerPasswordResetService
 {
@@ -25,7 +26,7 @@ class CustomerPasswordResetService
         $this->loadWebstoreConfig();
     }
     
-    public function resetPassword($email, $template)
+    public function resetPassword($email, $template, $mailSubject = 'password reset')
     {
         $contactId = $this->getContactIdbyEmailAddress($email);
         
@@ -60,11 +61,14 @@ class CustomerPasswordResetService
                 }
             }
     
+            /** @var Translator $translator */
+            $translator = pluginApp(Translator::class);
+            
             /**
              * @var MailerContract $mailer
              */
             $mailer = pluginApp(MailerContract::class);
-            $mailer->sendHtml($mailContent, $email, 'password reset');
+            $mailer->sendHtml($mailContent, $email, $translator->trans($mailSubject));
         }
         
         return true;
