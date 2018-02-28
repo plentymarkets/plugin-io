@@ -1,5 +1,11 @@
 # Release Notes for IO
 
+## v2.3.2 (2018-02-28) <a href="https://github.com/plentymarkets/plugin-io/compare/2.3.1...2.3.2" target="_blank"><b>Overview of all changes</b></a>
+
+### Fixed
+
+- The subject of the "Forgot password" email is now received via the REST call parameter "subject" and is sent as a translated version if the parameter is a valid translation key.
+
 ## v2.3.1 (2018-02-26) <a href="https://github.com/plentymarkets/plugin-io/compare/2.3.0...2.3.1" target="_blank"><b>Overview of all changes</b></a>
 
 - Coupon discounts are now displayed on the order confirmation page and in the order details in the MyAccount section.
