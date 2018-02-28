@@ -1,5 +1,11 @@
 # Release Notes für IO
 
+## v2.3.2 (2018-02-28) <a href="https://github.com/plentymarkets/plugin-io/compare/2.3.1...2.3.2" target="_blank"><b>Overview of all changes</b></a>
+
+### Behoben
+
+- Der Betreff der "Passwort vergessen" Email wird nun über den Rest-Call Parameter "subject" entgegengenommen und Übersetzt versendet, sofern der Parameter ein gültiger Translationkey ist.
+
 ## v2.3.1 (2018-02-26) <a href="https://github.com/plentymarkets/plugin-io/compare/2.3.0...2.3.1" target="_blank"><b>Overview of all changes</b></a>
 
 ### Behoben
