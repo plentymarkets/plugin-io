@@ -264,7 +264,7 @@ class CheckoutService
         if ($validateCheckoutEvent instanceof ValidateCheckoutEvent && !empty($validateCheckoutEvent->getErrorKeysList())) {
             $dispatcher = pluginApp(Dispatcher::class);
             if ($dispatcher instanceof Dispatcher) {
-                $dispatcher->fire(AfterBasketChanged::class);
+                $dispatcher->fire(pluginApp(AfterBasketChanged::class), []);
             }
 
             $translator = pluginApp(Translator::class);
