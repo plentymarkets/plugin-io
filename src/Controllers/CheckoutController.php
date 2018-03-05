@@ -36,7 +36,7 @@ class CheckoutController extends LayoutController
             AuthGuard::redirect("/", []);
         }
 
-        $basket = $basketService->getBasket();
+        $basket = $basketService->getBasketForTemplate();
 
         return $this->renderTemplate(
             "tpl.checkout",

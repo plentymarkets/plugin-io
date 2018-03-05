@@ -2,6 +2,7 @@
 
 namespace IO\Services;
 
+use IO\Helper\MemoryCache;
 use Plenty\Modules\Category\Models\Category;
 use Plenty\Modules\Category\Contracts\CategoryRepositoryContract;
 use Plenty\Modules\Category\Models\CategoryDetails;
@@ -13,6 +14,8 @@ use Plenty\Repositories\Models\PaginatedResult;
  */
 class CategoryService
 {
+    use MemoryCache;
+
 	/**
 	 * @var CategoryRepositoryContract
 	 */
@@ -68,6 +71,7 @@ class CategoryService
 	 */
 	public function setCurrentCategory($cat)
 	{
+	    $lang = $this->sessionStorageService->getLang();
 		$this->currentCategory     = null;
 		$this->currentCategoryTree = [];
 
@@ -81,7 +85,7 @@ class CategoryService
 		while($cat !== null)
 		{
 			$this->currentCategoryTree[$cat->level] = $cat;
-			$cat                                    = $this->categoryRepository->get($cat->parentCategoryId, $this->sessionStorageService->getLang());
+			$cat                                    = $this->categoryRepository->get($cat->parentCategoryId, $lang);
 		}
 	}
     
@@ -105,7 +109,14 @@ class CategoryService
         {
             $lang = $this->sessionStorageService->getLang();
         }
-		return $this->categoryRepository->get($catID, $lang);
+        $category = $this->fromMemoryCache(
+            "category.$catID.$lang",
+            function() use ($catID, $lang) {
+                return $this->categoryRepository->get($catID, $lang);
+            }
+        );
+
+	    return $category;
 	}
 
 	public function getChildren($categoryId, $lang = null)
@@ -115,12 +126,19 @@ class CategoryService
             $lang = $this->sessionStorageService->getLang();
         }
 
-        if($categoryId > 0)
-        {
-            return $this->categoryRepository->getChildren($categoryId, $lang);
-        }
-        
-        return null;
+        $children = $this->fromMemoryCache(
+            "categoryChildren.$categoryId.$lang",
+            function() use ($categoryId, $lang) {
+                if($categoryId > 0)
+                {
+                    return $this->categoryRepository->getChildren($categoryId, $lang);
+                }
+
+                return null;
+            }
+        );
+
+        return $children;
     }
 	
 	/**
@@ -136,11 +154,18 @@ class CategoryService
             $lang = $this->sessionStorageService->getLang();
         }
 
-		if(!$category instanceof Category || $category->details[0] === null)
-		{
-			return null;
-		}
-		return "/" . $this->categoryRepository->getUrl($category->id, $lang);
+        $categoryUrl = $this->fromMemoryCache(
+            "categoryUrl.$category->id.$lang",
+            function() use ($category, $lang) {
+                if(!$category instanceof Category || $category->details[0] === null)
+                {
+                    return null;
+                }
+                return "/" . $this->categoryRepository->getUrl($category->id, $lang);
+            }
+        );
+
+        return $categoryUrl;
 	}
 
     /**

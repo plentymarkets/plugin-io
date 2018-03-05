@@ -4,6 +4,7 @@ namespace IO\Services;
 
 use IO\Api\Resources\CustomerAddressResource;
 use IO\Builder\Order\OrderType;
+use IO\Helper\MemoryCache;
 use IO\Models\LocalizedOrder;
 use IO\Validators\Customer\ContactValidator;
 use IO\Validators\Customer\AddressValidator;
@@ -35,6 +36,8 @@ use Plenty\Modules\Account\Contact\Contracts\ContactClassRepositoryContract;
  */
 class CustomerService
 {
+    use MemoryCache;
+
     /**
      * @var ContactAccountRepositoryContract $accountRepository
      */
@@ -98,43 +101,55 @@ class CustomerService
 	
 	public function getContactClassData($contactClassId)
     {
-        /** @var ContactClassRepositoryContract $contactClassRepo */
-        $contactClassRepo = pluginApp(ContactClassRepositoryContract::class);
-    
-        /** @var AuthHelper $authHelper */
-        $authHelper = pluginApp(AuthHelper::class);
-    
-        $contactClass = $authHelper->processUnguarded( function() use ($contactClassRepo, $contactClassId)
-        {
-            return $contactClassRepo->findContactClassDataById($contactClassId);
-        });
-        
-        return $contactClass;
+        return $this->fromMemoryCache(
+            "contactClassData.$contactClassId",
+            function() use ($contactClassId)
+            {
+                /** @var ContactClassRepositoryContract $contactClassRepo */
+                $contactClassRepo = pluginApp(ContactClassRepositoryContract::class);
+
+                /** @var AuthHelper $authHelper */
+                $authHelper = pluginApp(AuthHelper::class);
+
+                $contactClass = $authHelper->processUnguarded( function() use ($contactClassRepo, $contactClassId)
+                {
+                    return $contactClassRepo->findContactClassDataById($contactClassId);
+                });
+
+                return $contactClass;
+            }
+        );
     }
 
     public function showNetPrices()
     {
-        $customerShowNet = false;
-        /** @var SessionStorageService $sessionStorageService */
-        $sessionStorageService = pluginApp( SessionStorageService::class );
-        $customer = $sessionStorageService->getCustomer();
-        if ( $customer !== null )
-        {
-            $customerShowNet = $customer->showNetPrice;
-        }
-
-        $contactClassShowNet = false;
-        $contactClassId = $this->getContactClassId();
-        if ( $contactClassId !== null )
-        {
-            $contactClass = $this->getContactClassData( $contactClassId );
-            if ( $contactClass !== null )
+        return $this->fromMemoryCache(
+            "showNetPrices",
+            function()
             {
-                $contactClassShowNet = $contactClass['showNetPrice'];
-            }
-        }
+                $customerShowNet = false;
+                /** @var SessionStorageService $sessionStorageService */
+                $sessionStorageService = pluginApp( SessionStorageService::class );
+                $customer = $sessionStorageService->getCustomer();
+                if ( $customer !== null )
+                {
+                    $customerShowNet = $customer->showNetPrice;
+                }
 
-        return $customerShowNet || $contactClassShowNet;
+                $contactClassShowNet = false;
+                $contactClassId = $this->getContactClassId();
+                if ( $contactClassId !== null )
+                {
+                    $contactClass = $this->getContactClassData( $contactClassId );
+                    if ( $contactClass !== null )
+                    {
+                        $contactClassShowNet = $contactClass['showNetPrice'];
+                    }
+                }
+
+                return $customerShowNet || $contactClassShowNet;
+            }
+        );
     }
     
     public function getContactClassMinimumOrderQuantity()
@@ -312,9 +327,16 @@ class CustomerService
      */
 	public function getContact()
 	{
-		if($this->getContactId() > 0)
+	    $contactId = $this->getContactId();
+		if($contactId > 0)
 		{
-			return $this->contactRepository->findContactById($this->getContactId());
+			return $this->fromMemoryCache(
+			    "contact.$contactId",
+                function() use ($contactId)
+                {
+                    return $this->contactRepository->findContactById($this->getContactId());
+                }
+            );
 		}
 		return null;
 	}
