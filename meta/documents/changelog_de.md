@@ -1,6 +1,26 @@
 # Release Notes für IO
 
-## v2.3.1 (2018-02-26) <a href="https://github.com/plentymarkets/plugin-io/compare/2.3.0...2.3.1" target="_blank"><b>Overview of all changes</b></a>
+## v2.4.0 (2018-03-06) <a href="https://github.com/plentymarkets/plugin-io/compare/2.3.1...2.3.2" target="_blank"><b>Übersicht aller Änderungen</b></a>
+
+### Hinzugefügt
+
+- Es wurde eine neue Hilfsklasse hinzugefügt, um den Zugriff auf Plugin-Konfigurationen zu erleichtern.
+
+### Geändert
+
+- Für eine bessere Performance werden die globalen Services in Twig erst bei Bedarf instanziiert.
+
+### Behoben
+
+- Durch einen Fehler wurden leere Facetten in den Filtern ausgegeben und die Einstellung **Minimale Trefferanzahl** nicht berücksichtigt. Dies wurde behoben. 
+
+## v2.3.2 (2018-02-28) <a href="https://github.com/plentymarkets/plugin-io/compare/2.3.1...2.3.2" target="_blank"><b>Übersicht aller Änderungen</b></a>
+
+### Behoben
+
+- Der Betreff der "Passwort vergessen" Email wird nun über den Rest-Call Parameter "subject" entgegengenommen und Übersetzt versendet, sofern der Parameter ein gültiger Translationkey ist.
+
+## v2.3.1 (2018-02-26) <a href="https://github.com/plentymarkets/plugin-io/compare/2.3.0...2.3.1" target="_blank"><b>Übersicht aller Änderungen</b></a>
 
 ### Behoben
 

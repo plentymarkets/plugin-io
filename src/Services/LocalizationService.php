@@ -59,6 +59,14 @@ class LocalizationService
         /** @var Resources $resource */
         $resource = pluginApp( Resources::class );
 
-        return $resource->load( "$plugin::lang/$lang/$group" )->getData();
+        try
+        {
+            return $resource->load( "$plugin::lang/$lang/$group" )->getData();
+        }
+        catch( \Exception $e )
+        {
+            // TODO: get fallback language from webstore configuration
+            return $resource->load( "$plugin::lang/en/$group")->getData();
+        }
     }
 }
