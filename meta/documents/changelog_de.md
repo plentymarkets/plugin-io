@@ -1,6 +1,6 @@
 # Release Notes für IO
 
-## v2.4.0 (2018-03-05) <a href="https://github.com/plentymarkets/plugin-io/compare/2.3.1...2.3.2" target="_blank"><b>Übersicht aller Änderungen</b></a>
+## v2.4.0 (2018-03-06) <a href="https://github.com/plentymarkets/plugin-io/compare/2.3.1...2.3.2" target="_blank"><b>Übersicht aller Änderungen</b></a>
 
 ### Hinzugefügt
 
