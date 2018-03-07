@@ -12,6 +12,7 @@ use Plenty\Modules\Basket\Models\BasketItem;
 use Plenty\Modules\Frontend\Contracts\Checkout;
 use IO\Extensions\Filters\NumberFormatFilter;
 use Plenty\Modules\Frontend\Services\VatService;
+use Plenty\Plugin\Translation\Translator;
 
 /**
  * Class BasketService
@@ -420,5 +421,67 @@ class BasketService
         }
 
         return $this->basketItems;
+    }
+    
+    /**
+     * Removes basket items with no names if the language was changed
+     * @param $lang
+     * @throws \ErrorException
+     */
+    public function removeBasketItemsWithoutNameInLanguage($lang)
+    {
+        $basketItems = $this->getBasketItemsRaw();
+    
+        if(count($basketItems))
+        {
+            $basketItemVariationIds    = [];
+            $basketVariationQuantities = [];
+            $basketItemIds = [];
+    
+            foreach($basketItems as $basketItem)
+            {
+                $basketItemVariationIds[]                            = $basketItem->variationId;
+                $basketVariationQuantities[$basketItem->variationId] = $basketItem->quantity;
+                $basketItemIds[$basketItem->variationId] = $basketItem->id;
+            }
+    
+            /** @var ItemSearchService $itemSearchService */
+            $itemSearchService = pluginApp(ItemSearchService::class);
+            $basketItemsResult = $itemSearchService->getResults(
+                BasketItems::getSearchFactory([
+                                                  'variationIds' => $basketItemVariationIds,
+                                                  'quantities' => $basketVariationQuantities,
+                                                  'lang' => $lang
+                                              ])
+            );
+    
+            $showWarning = false;
+            if(count($basketItemsResult['documents']))
+            {
+                foreach($basketItemsResult['documents'] as $basketItemData)
+                {
+                    $basketItemData = $basketItemData['data'];
+                    if(!count($basketItemData['texts']) || (!strlen($basketItemData['texts']['name1']) && !strlen($basketItemData['texts']['name2']) && !strlen($basketItemData['texts']['name3'])))
+                    {
+                        $this->deleteBasketItem($basketItemIds[$basketItemData['variation']['id']]);
+                        $showMessage = true;
+                    }
+                }
+            }
+    
+            if($showWarning)
+            {
+                /** @var TemplateConfigService $templateConfigService */
+                $templateConfigService = pluginApp(TemplateConfigService::class);
+                $templatePluginName = $templateConfigService->getTemplatePluginName();
+    
+                /** @var Translator $translator */
+                $translator = pluginApp(Translator::class);
+                
+                /** @var NotificationService $notificationService */
+                $notificationService = pluginApp(NotificationService::class);
+                $notificationService->warn($translator->trans($templatePluginName.'::Template.basketItemsRemovedForLanguage', [], $lang));
+            }
+        }
     }
 }

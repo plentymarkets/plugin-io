@@ -24,4 +24,9 @@ class TemplateConfigService
         
         return null;
     }
+    
+    public function getTemplatePluginName()
+    {
+        return $this->templatePluginName;
+    }
 }
