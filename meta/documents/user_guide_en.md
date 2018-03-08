@@ -4,16 +4,12 @@
 
 ## Setting up IO in plentymarkets
 
-<<<<<<< HEAD
 The **IO** plugin only needs to be provisioned in plentymarkets. No additional setup is required.
 
 <div class="alert alert-warning" role="alert">
   It is absolutely essential, however, that **IO** is assigned the highest **Plugin position** (e.g. 999) via the **Set position** action in the plugin overview.
 </div>
 
-=======
-The **IO** plugin only needs to be provisioned in plentymarkets. No additional setup is required. It is absolutely essential, however, that **IO** is assigned the highest **plugin position** (e.g. 999) via the **Set position** action in the plugin overview.
->>>>>>> f3abb4fa93c3227f5514382853909c8499a8756b
  **IO** is a required plugin for the **Ceres** template plugin.
 
 <div class="alert alert-danger" role="alert">
