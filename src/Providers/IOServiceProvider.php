@@ -40,8 +40,12 @@ use IO\Services\TemplateService;
 use IO\Services\UnitService;
 use IO\Services\UrlService;
 use IO\Services\WebstoreConfigurationService;
+use Plenty\Modules\Authentication\Events\AfterAccountAuthentication;
+use Plenty\Modules\Authentication\Events\AfterAccountContactLogout;
+use Plenty\Modules\Order\Events\OrderCreated;
 use Plenty\Plugin\ServiceProvider;
 use Plenty\Plugin\Templates\Twig;
+use Plenty\Plugin\Events\Dispatcher;
 
 /**
  * Class IOServiceProvider
@@ -106,12 +110,37 @@ class IOServiceProvider extends ServiceProvider
      * boot twig extensions and services
      * @param Twig $twig
      */
-    public function boot(Twig $twig)
+    public function boot(Twig $twig, Dispatcher $dispatcher)
     {
         $twig->addExtension(TwigServiceProvider::class);
         $twig->addExtension(TwigIOExtension::class);
         $twig->addExtension('Twig_Extensions_Extension_Intl');
         $twig->addExtension(TwigLoaderPresets::class);
+        
+        $dispatcher->listen(AfterAccountAuthentication::class, function($event)
+        {
+            /** @var CustomerService $customerService */
+            $customerService = pluginApp(CustomerService::class);
+            $customerService->resetGuestAddresses();
+        });
+        
+        $dispatcher->listen(AfterAccountContactLogout::class, function($event)
+        {
+            /** @var CheckoutService $checkoutService */
+            $checkoutService = pluginApp(CheckoutService::class);
+            $checkoutService->setDefaultShippingCountryId();
+        });
+    
+        $dispatcher->listen(OrderCreated::class, function($event)
+        {
+            /** @var CustomerService $customerService */
+            $customerService = pluginApp(CustomerService::class);
+            $customerService->resetGuestAddresses();
+        
+            /** @var BasketService $basketService */
+            $basketService = pluginApp(BasketService::class);
+            $basketService->resetBasket();
+        });
     }
 
     private function registerSingletons( $classes )

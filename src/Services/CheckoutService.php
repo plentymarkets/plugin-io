@@ -467,4 +467,13 @@ class CheckoutService
             $basketService->setBillingAddressId($billingAddressId);
         }
     }
+    
+    public function setDefaultShippingCountryId()
+    {
+        /** @var WebstoreConfigurationService $webstoreConfig */
+        $webstoreConfigService = pluginApp(WebstoreConfigurationService::class);
+        $defaultShippingCountryId = $webstoreConfigService->getDefaultShippingCountryId();
+        
+        $this->setShippingCountryId($defaultShippingCountryId);
+    }
 }

@@ -102,11 +102,6 @@ class OrderService
         {
             $this->sessionStorage->setSessionValue(SessionStorageKeys::LATEST_ORDER_ID, $order->id);
         }
-
-        // reset basket after order was created
-        $this->basketService->resetBasket();
-        $customerService->resetGuestAddresses();
-        
         
         return LocalizedOrder::wrap( $order, "de" );
 	}
