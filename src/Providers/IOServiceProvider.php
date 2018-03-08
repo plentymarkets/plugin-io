@@ -115,14 +115,6 @@ class IOServiceProvider extends ServiceProvider
         $twig->addExtension(TwigIOExtension::class);
         $twig->addExtension('Twig_Extensions_Extension_Intl');
         $twig->addExtension(TwigLoaderPresets::class);
-        
-        
-        $dispatcher->listen(OrderCreated::class, function($event)
-        {
-            /** @var CustomerService $customerService */
-            $customerService = pluginApp(CustomerService::class);
-            $
-        });
     }
 
     private function registerSingletons( $classes )
