@@ -1,7 +1,7 @@
 <?php //strict
+
 namespace IO\Controllers;
 
-use IO\Helper\TemplateContainer;
 use IO\Services\BasketService;
 
 /**
@@ -15,17 +15,15 @@ class BasketController extends LayoutController
      * @param BasketService $basketService
      * @return string
      */
-	public function showBasket(
-		BasketService $basketService
-	):string
+	public function showBasket(BasketService $basketService):string
 	{
 		$basket = $basketService->getBasketForTemplate();
 
 		return $this->renderTemplate(
-			"tpl.basket",
+		    'tpl.basket',
 			[
-				"basket" => $basket
-			]
+			    'basket' => $basket
+            ]
 		);
 	}
 }

@@ -170,6 +170,11 @@ class IORouteServiceProvider extends RouteServiceProvider
         {
             $router->get('returns/{orderId}', 'IO\Controllers\OrderReturnController@showOrderReturn');
         }
+        
+        if( in_array('order-return-confirmation', $enabledRoutes) || in_array("all", $enabledRoutes) )
+        {
+            $router->get('return-confirmation', 'IO\Controllers\OrderReturnConfirmationController@showOrderReturnConfirmation');
+        }
 
         if( (in_array("contact", $enabledRoutes) || in_array("all", $enabledRoutes) ) )
         {

@@ -2,8 +2,8 @@
 
 namespace IO\Services;
 
-use IO\Services\ItemLoader\Extensions\TwigLoaderPresets;
-use IO\Services\ItemLoader\Services\ItemLoaderService;
+use IO\Services\ItemSearch\SearchPresets\BasketItems;
+use IO\Services\ItemSearch\Services\ItemSearchService;
 use Plenty\Modules\Accounting\Vat\Models\VatRate;
 use Plenty\Modules\Basket\Contracts\BasketRepositoryContract;
 use Plenty\Modules\Basket\Contracts\BasketItemRepositoryContract;
@@ -109,9 +109,10 @@ class BasketService
     {
         $itemQuantity = 0;
 
-        foreach ($this->getBasketItems() as $item) {
-            if ($item["variationId"] > 0) {
-                $itemQuantity += $item["quantity"];
+        foreach ($this->getBasketItemsRaw() as $item) {
+            if ( $item->variationId > 0 )
+            {
+                $itemQuantity += $item->quantity;
             }
         }
 
@@ -320,18 +321,14 @@ class BasketService
             $orderProperties[$basketItem->variationId]           = $basketItem->basketItemOrderParams;
         }
 
-        /** @var TwigLoaderPresets $loaderPresets */
-        $loaderPresets = pluginApp(TwigLoaderPresets::class);
-        $presets = $loaderPresets->getGlobals();
-        $items = pluginApp(ItemLoaderService::class)
-            ->loadForTemplate(
-                $template,
-                $presets['itemLoaderPresets']['basketItems'],
-                [
-                    'variationIds' => $basketItemVariationIds,
-                    'basketVariationQuantities' => $basketVariationQuantities,
-                    'items' => count($basketItemVariationIds), 'page' => 1
-                ]);
+        /** @var ItemSearchService $itemSearchService */
+        $itemSearchService = pluginApp( ItemSearchService::class );
+        $items = $itemSearchService->getResults(
+            BasketItems::getSearchFactory([
+                'variationIds'  => $basketItemVariationIds,
+                'quantities'    => $basketVariationQuantities
+            ])
+        );
 
         $result = array();
         foreach ($items['documents'] as $item) {

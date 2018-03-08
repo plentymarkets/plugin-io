@@ -4,6 +4,7 @@ namespace IO\Controllers;
 use IO\Helper\TemplateContainer;
 use IO\Services\CustomerService;
 use IO\Services\OrderService;
+use IO\Services\OrderTotalsService;
 use Plenty\Plugin\Http\Response;
 use Plenty\Plugin\Http\Request;
 use IO\Models\LocalizedOrder;
@@ -73,6 +74,7 @@ class ConfirmationController extends LayoutController
                 "tpl.confirmation",
                 [
                     "data" => $order,
+                    "totals" => pluginApp(OrderTotalsService::class)->getAllTotals($order->order),
                     "showAdditionalPaymentInformation" => $showAdditionalPaymentInformation
                 ]
             );

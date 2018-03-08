@@ -2,15 +2,14 @@
 
 namespace IO\Api\Resources;
 
-use IO\Services\ItemLoader\Extensions\TwigLoaderPresets;
+use IO\Services\ItemSearch\SearchPresets\Facets;
+use IO\Services\ItemSearch\SearchPresets\SearchItems;
+use IO\Services\ItemSearch\Services\ItemSearchService;
 use Plenty\Plugin\Http\Response;
 use Plenty\Plugin\Http\Request;
 use IO\Api\ApiResource;
 use IO\Api\ApiResponse;
 use IO\Api\ResponseCode;
-use IO\Services\ItemLoader\Services\ItemLoaderService;
-use IO\Services\ItemLoader\Loaders\SearchItems;
-use IO\Services\ItemLoader\Loaders\Facets;
 
 /**
  * Class ItemSearchResource
@@ -39,25 +38,26 @@ class ItemSearchResource extends ApiResource
         
         if(strlen($searchString))
         {
-            /** @var TwigLoaderPresets $twigLoaderPresets */
-            $twigLoaderPresets = pluginApp(TwigLoaderPresets::class);
-            $presets = $twigLoaderPresets->getGlobals();
-            
-            $response = pluginApp(ItemLoaderService::class)
-                ->loadForTemplate($template, $presets['itemLoaderPresets']['search'], [
-                    'query'             => $searchString,
-                    'page'              => $this->request->get('page', 1),
-                    'items'             => $this->request->get('items', 20),
-                    'sorting'           => $this->request->get('sorting', 'itemName'),
-                    'facets'            => $this->request->get('facets', ''),
-                    'variationShowType' => $this->request->get('variationShowType', ''),
-                ]);
+            $itemListOptions = [
+                'page'          => $this->request->get( 'page', 1 ),
+                'itemsPerPage'  => $this->request->get( 'items', 20 ),
+                'sorting'       => $this->request->get( 'sorting', '' ),
+                'facets'        => $this->request->get( 'facets', '' ),
+                'query'         => $searchString
+            ];
+
+            /** @var ItemSearchService $itemSearchService */
+            $itemSearchService = pluginApp( ItemSearchService::class );
+            $response = $itemSearchService->getResults([
+                'itemList' => SearchItems::getSearchFactory( $itemListOptions ),
+                'facets'   => Facets::getSearchFactory( $itemListOptions )
+            ]);
     
             return $this->response->create($response, ResponseCode::OK);
         }
         else
         {
-            return $this->response->error(1, '');
+            return $this->response->create( null, ResponseCode::BAD_REQUEST );
         }
         
     }

@@ -1,5 +1,35 @@
 # Release Notes for IO
 
+## v2.4.0 (2018-03-06) <a href="https://github.com/plentymarkets/plugin-io/compare/2.3.2...2.4.0" target="_blank"><b>Overview of all changes</b></a>
+
+### Added
+
+- A new auxiliary class has been added in order to facilitate the access to plugin configurations.
+
+### Changed
+
+- In order to improve the performance, global services in Twig are only instantiated when they are required.
+
+### Fixed
+
+- Due to an error filters yielded empty facets and the configuration **Minimum number of hits** was not considered. This has been fixed.
+
+## v2.3.2 (2018-02-28) <a href="https://github.com/plentymarkets/plugin-io/compare/2.3.1...2.3.2" target="_blank"><b>Overview of all changes</b></a>
+
+### Fixed
+
+- The subject of the "Forgot password" email is now received via the REST call parameter "subject" and is sent as a translated version if the parameter is a valid translation key.
+
+## v2.3.1 (2018-02-26) <a href="https://github.com/plentymarkets/plugin-io/compare/2.3.0...2.3.1" target="_blank"><b>Overview of all changes</b></a>
+
+- Coupon discounts are now displayed on the order confirmation page and in the order details in the MyAccount section.
+- After the creation of a return, the return confirmation page will now be displayed again. (The route in IO config has to be active.)
+- The page for the creation of returns now only displays items that can be returned. (No shipping costs, coupon positions, etc.)
+- Due to an error particular attributes were not displayed in the variation selection. This has been fixed.
+- Due to an error the display of gross/net prices for shipping costs was not refreshed correctly. This has been fixed.
+- Errors in the shipping cost calculation didn't yield error messages. This has been fixed.
+- The Last seen list no longer displays random items if no item has been previously viewed in the store.
+
 ## v2.3.0 (2018-02-19) <a href="https://github.com/plentymarkets/plugin-io/compare/2.2.2...2.3.0" target="_blank"><b>Overview of all changes</b></a>
 
 ### changed

@@ -2,13 +2,13 @@
 
 namespace IO\Api\Resources;
 
+use IO\Services\ItemSearch\SearchPresets\SearchItems;
+use IO\Services\ItemSearch\Services\ItemSearchService;
 use Plenty\Plugin\Http\Response;
 use Plenty\Plugin\Http\Request;
 use IO\Api\ApiResource;
 use IO\Api\ApiResponse;
 use IO\Api\ResponseCode;
-use IO\Services\ItemLoader\Services\ItemLoaderService;
-use IO\Services\ItemLoader\Loaders\SearchItems;
 
 /**
  * Class ItemSearchResource
@@ -36,22 +36,21 @@ class ItemSearchAutocompleteResource extends ApiResource
         
         if(strlen($searchString))
         {
-            $template = $this->request->get('template', '');
-            
-            $response = pluginApp(ItemLoaderService::class)
-                ->loadForTemplate($template, [SearchItems::class], [
-                    'query'             => $searchString,
-                    'autocomplete'      => true,
-                    'page'              => 1,
-                    'items'             => 20,
-                    'variationShowType' => $this->request->get('variationShowType', ''),
-                ]);
-            
+            /** @var ItemSearchService $itemSearchService */
+            $itemSearchService = pluginApp( ItemSearchService::class );
+            $response = $itemSearchService->getResults(
+                SearchItems::getSearchFactory([
+                    'query'         => $searchString,
+                    'autocomplete'  => true,
+                    'page'          => 1,
+                    'itemsPerPage'  => 20
+                ])
+            );
             return $this->response->create($response, ResponseCode::OK);
         }
         else
         {
-            return $this->response->error(1, '');
+            return $this->response->create( null, ResponseCode::BAD_REQUEST );
         }
         
     }
