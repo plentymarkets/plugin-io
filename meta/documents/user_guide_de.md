@@ -4,7 +4,13 @@
 
 ## IO in plentymarkets einrichten
 
-Das Plugin **IO** selbst muss nur in plentymarkets bereitgestellt und nicht selbst eingerichtet werden. **IO** ist ein vorausgesetztes Plugin für das Template-Plugin **Ceres**.
+Das Plugin **IO** selbst muss nur in plentymarkets bereitgestellt werden. Hinweise zur Einrichtung von IO finden Sie [hier](https://knowledge.plentymarkets.com/omni-channel/online-shop/ceres-einrichten#10).
+
+<div class="alert alert-warning" role="alert">
+  Bei der Einrichtung von IO ist es zwingend notwendig, dass <b>IO</b> in der Plugin-Übersicht mit der Aktion <b>Position festlegen</b> die höchste Positionsnummer (z.B. 999) zugewiesen wird, damit sämtliche Routen des Webshops korrekt abgerufen werden.
+</div>
+
+**IO** ist ein vorausgesetztes Plugin für das Template-Plugin **Ceres**.
 
 <div class="alert alert-danger" role="alert">
     Wenn Sie das Plugin <b>IO</b> in <b>Productive</b> bereitstellen, ist der alte plentymarkets Webshop nicht mehr erreichbar, da <b>IO</b> die URL des Webshops übernimmt.
