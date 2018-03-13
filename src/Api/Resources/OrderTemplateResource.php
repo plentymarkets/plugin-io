@@ -8,6 +8,7 @@ use Plenty\Plugin\Http\Response;
 use Plenty\Plugin\Http\Request;
 use Plenty\Modules\Order\Models\Order;
 use Plenty\Modules\Order\Contracts\OrderRepositoryContract;
+use IO\Services\OrderTotalsService;
 use IO\Api\ApiResource;
 use IO\Api\ApiResponse;
 use IO\Api\ResponseCode;
@@ -62,6 +63,7 @@ class OrderTemplateResource extends ApiResource
             {
                 $renderedTemplate = $this->templateService->renderTemplate($template, [
                     'orderData' => LocalizedOrder::wrap($order, 'de'),
+                    'totals' => pluginApp(OrderTotalsService::class)->getAllTotals($order)
                 ]);
             }
         }
