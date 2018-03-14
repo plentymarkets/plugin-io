@@ -46,16 +46,17 @@ class PriceSearchExtension implements ItemSearchExtension
                 {
                     $variationId        = $variation['data']['variation']['id'];
                     $minimumQuantity    = $variation['data']['variation']['minimumOrderQuantity'];
-                    if ( $minimumQuantity === null )
+                    if ( $minimumQuantity === null || (float)$minimumQuantity == 0 )
                     {
                         // mimimum order quantity is not defined => get smallest possible quantity depending on interval order quantity
-                        if ( $variation['data']['variation']['intervalOrderQuantity'] !== null )
+                        if ( $variation['data']['variation']['intervalOrderQuantity'] !== null && $variation['data']['variation']['intervalOrderQuantity'] > 0 )
                         {
                             $minimumQuantity = $variation['data']['variation']['intervalOrderQuantity'];
                         }
                         else
                         {
                             // no interval quantity defined => minimum order quantity should be 1
+                            $variation['data']['variation']['intervalOrderQuantity'] = 1;
                             $minimumQuantity = 1;
                         }
                     }
@@ -92,7 +93,6 @@ class PriceSearchExtension implements ItemSearchExtension
 
 
                     $quantity = $priceList->minimumOrderQuantity;
-
 
                     if ( isset($this->options['quantities'][$variationId])
                         && (float)$this->options['quantities'][$variationId] > 0 )
