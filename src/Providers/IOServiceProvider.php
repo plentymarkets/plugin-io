@@ -2,7 +2,7 @@
 
 namespace IO\Providers;
 
-use IO\Api\Resources\CouponResource;
+use IO\Extensions\Sitemap\IOSitemapPattern;
 use IO\Extensions\TwigIOExtension;
 use IO\Extensions\TwigServiceProvider;
 use IO\Middlewares\Middleware;
@@ -40,8 +40,10 @@ use IO\Services\TemplateService;
 use IO\Services\UnitService;
 use IO\Services\UrlService;
 use IO\Services\WebstoreConfigurationService;
+use Plenty\Modules\Plugin\Events\LoadSitemapPattern;
 use Plenty\Plugin\ServiceProvider;
 use Plenty\Plugin\Templates\Twig;
+use Plenty\Plugin\Events\Dispatcher;
 
 /**
  * Class IOServiceProvider
@@ -106,12 +108,14 @@ class IOServiceProvider extends ServiceProvider
      * boot twig extensions and services
      * @param Twig $twig
      */
-    public function boot(Twig $twig)
+    public function boot(Twig $twig, Dispatcher $dispatcher)
     {
         $twig->addExtension(TwigServiceProvider::class);
         $twig->addExtension(TwigIOExtension::class);
         $twig->addExtension('Twig_Extensions_Extension_Intl');
         $twig->addExtension(TwigLoaderPresets::class);
+        
+        $dispatcher->listen(LoadSitemapPattern::class, IOSitemapPattern::class);
     }
 
     private function registerSingletons( $classes )
