@@ -2,7 +2,7 @@
 
 namespace IO\Providers;
 
-use IO\Extensions\SiteMap\IOSitemapPattern;
+use IO\Extensions\Sitemap\IOSitemapPattern;
 use IO\Extensions\TwigIOExtension;
 use IO\Extensions\TwigServiceProvider;
 use IO\Middlewares\Middleware;

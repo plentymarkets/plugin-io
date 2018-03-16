@@ -1,6 +1,6 @@
 <?php
 
-namespace IO\Extensions\SiteMap;
+namespace IO\Extensions\Sitemap;
 
 use IO\Services\TemplateConfigService;
 use Plenty\Modules\Plugin\Contracts\PluginRepositoryContract;
