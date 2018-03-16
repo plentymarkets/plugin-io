@@ -12,7 +12,6 @@ use Plenty\Modules\Basket\Models\BasketItem;
 use Plenty\Modules\Frontend\Contracts\Checkout;
 use IO\Extensions\Filters\NumberFormatFilter;
 use Plenty\Modules\Frontend\Services\VatService;
-use Plenty\Plugin\Translation\Translator;
 
 /**
  * Class BasketService
@@ -464,23 +463,16 @@ class BasketService
                     if(!count($basketItemData['texts']) || (!strlen($basketItemData['texts']['name1']) && !strlen($basketItemData['texts']['name2']) && !strlen($basketItemData['texts']['name3'])))
                     {
                         $this->deleteBasketItem($basketItemIds[$basketItemData['variation']['id']]);
-                        $showMessage = true;
+                        $showWarning = true;
                     }
                 }
             }
     
             if($showWarning)
             {
-                /** @var TemplateConfigService $templateConfigService */
-                $templateConfigService = pluginApp(TemplateConfigService::class);
-                $templatePluginName = $templateConfigService->getTemplatePluginName();
-    
-                /** @var Translator $translator */
-                $translator = pluginApp(Translator::class);
-                
                 /** @var NotificationService $notificationService */
                 $notificationService = pluginApp(NotificationService::class);
-                $notificationService->warn($translator->trans($templatePluginName.'::Template.basketItemsRemovedForLanguage', [], $lang));
+                $notificationService->addNotificationCode('warn', 1);
             }
         }
     }
