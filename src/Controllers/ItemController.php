@@ -26,7 +26,7 @@ class ItemController extends LayoutController
 		int $variationId = 0
 	)
 	{
-	    $templateContainer = $this->buildTemplateContainer('tpl.item');
+//	    $templateContainer = $this->buildTemplateContainer('tpl.item');
 
 	    $itemSearchOptions = [
 	        'itemId'        => $itemId,
