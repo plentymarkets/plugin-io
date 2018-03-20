@@ -36,6 +36,7 @@ class BasketItems implements SearchPreset
             ->withUrls()
             ->withImages()
             ->withPrices(['quantities' => $quantities])
+            ->withDefaultImage()
             ->isVisibleForClient()
             ->isActive()
             ->hasVariationIds( $variationIds )

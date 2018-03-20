@@ -45,6 +45,7 @@ class CategoryItems implements SearchPreset
             ->withImages()
             ->withUrls()
             ->withPrices()
+            ->withDefaultImage()
             ->isInCategory( $categoryId )
             ->isVisibleForClient()
             ->isActive()

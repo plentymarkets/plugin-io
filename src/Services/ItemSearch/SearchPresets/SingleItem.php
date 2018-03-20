@@ -32,6 +32,7 @@ class SingleItem implements SearchPreset
             ->withImages()
             ->withUrls()
             ->withPrices()
+            ->withDefaultImage()
             ->isVisibleForClient()
             ->isActive()
             ->hasNameInLanguage()

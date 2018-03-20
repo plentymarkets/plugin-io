@@ -42,6 +42,7 @@ class CrossSellingItems implements SearchPreset
             ->withLanguage()
             ->withUrls()
             ->withPrices()
+            ->withDefaultImage()
             ->isVisibleForClient()
             ->isActive()
             ->groupByTemplateConfig()
