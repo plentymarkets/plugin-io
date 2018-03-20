@@ -2,11 +2,14 @@
 
 namespace IO\Services\ItemSearch\Extensions;
 
+use IO\Helper\MemoryCache;
 use Plenty\Legacy\Models\Item\ItemImageSettings;
 use Plenty\Modules\Item\ItemImage\Contracts\ItemImageSettingsRepositoryContract;
 
 class ItemDefaultImage implements ItemSearchExtension
 {
+    use MemoryCache;
+
     private $allImagesRequested = false;
     private $itemImagesRequested = false;
     private $variationImagesRequested = false;
@@ -25,9 +28,7 @@ class ItemDefaultImage implements ItemSearchExtension
         $this->itemImagesRequested          = $this->isImageRequested( $resultFields, 'item');
         $this->variationImagesRequested     = $this->isImageRequested( $resultFields, 'variation');
 
-        /** @var ItemImageSettingsRepositoryContract $itemImageSettingsRepository */
-        $itemImageSettingsRepository = pluginApp( ItemImageSettingsRepositoryContract::class );
-        $this->itemImageSettings = $itemImageSettingsRepository->get();
+        $this->loadItemImageSettings();
     }
 
     /**
@@ -108,5 +109,18 @@ class ItemDefaultImage implements ItemSearchExtension
         }
 
         return false;
+    }
+
+    private function loadItemImageSettings()
+    {
+        $this->itemImageSettings = $this->fromMemoryCache(
+            "itemImageSettings",
+            function()
+            {
+                /** @var ItemImageSettingsRepositoryContract $itemImageSettingsRepository */
+                $itemImageSettingsRepository = pluginApp( ItemImageSettingsRepositoryContract::class );
+                return $itemImageSettingsRepository->get();
+            }
+        );
     }
 }
