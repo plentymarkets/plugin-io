@@ -1,5 +1,11 @@
 # Release Notes für IO
 
+## v2.5.1 (2018-03-21) <a href="https://github.com/plentymarkets/plugin-io/compare/2.5.0...2.5.1" target="_blank"><b>Übersicht aller Änderungen</b></a>
+
+### Behoben
+
+- Durch einen Fehler konnte der Warenkorb bei Änderungen nicht aktualisiert werden. Dies wurde behoben.
+
 ## v2.5.0 (2018-03-19) <a href="https://github.com/plentymarkets/plugin-io/compare/2.4.0...2.5.0" target="_blank"><b>Übersicht aller Änderungen</b></a>
 
 ### Hinzugefügt
