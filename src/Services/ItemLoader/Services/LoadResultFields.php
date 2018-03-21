@@ -20,9 +20,9 @@ trait LoadResultFields
 
 		$resourcePath = explode('::', $fullTemplateName);
 		$resourceName = $resourcePath[0] . '::views/' . str_replace('.', '/', $resourcePath[1]);
-		if($resource->exists($resourceName . '.fields'))
+		if($resource->exists($resourceName ))
 		{
-			return $resource->load($resourceName . '.fields')->getData();
+			return $resource->load($resourceName)->getData();
 		}
 		return [];
 	}
