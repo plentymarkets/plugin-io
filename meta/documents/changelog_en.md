@@ -1,5 +1,11 @@
 # Release Notes for IO
 
+## v2.5.1 (2018-03-21) <a href="https://github.com/plentymarkets/plugin-io/compare/2.5.0...2.5.1" target="_blank"><b>Overview of all changes</b></a>
+
+### Fixed
+
+- Due to an error the shopping cart could not be refreshed if changes had been made to it. This has been fixed.
+
 ## v2.5.0 (2018-03-19) <a href="https://github.com/plentymarkets/plugin-io/compare/2.4.0...2.5.0" target="_blank"><b>Overview of all changes</b></a>
 
 - Context classes, which provide data to related Twig templates, have been added.
