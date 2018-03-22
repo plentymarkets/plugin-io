@@ -1,5 +1,6 @@
 <?php
 namespace IO\Helper;
+use IO\Helper\ContextInterface;
 
 /**
  * Container to pass current template between separate layout plugins and this plugin.
@@ -23,6 +24,9 @@ class TemplateContainer
 	 * @var string
 	 */
 	private $templateKey = '';
+
+	/** @var ContextInterface */
+	private $contextClass = null;
 
 	/**
 	 * Set the layout to use for current request.
@@ -97,6 +101,16 @@ class TemplateContainer
 		return $this;
 	}
 
+	public function setContext($contextClass)
+    {
+        $this->contextClass = $contextClass;
+    }
+
+    public function getContext()
+    {
+        return $this->contextClass;
+    }
+
 	/**
 	 * Add additional template data to the existing values.
 	 * @param mixed $data The data to add to map.
@@ -105,7 +119,7 @@ class TemplateContainer
 	 */
 	public function withData($data, string $identifier):TemplateContainer
 	{
-		//$this->templateData[$identifier] = $data;
+		$this->templateData[$identifier] = $data;
 		return $this;
 	}
 }

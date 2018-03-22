@@ -2,7 +2,7 @@
 
 namespace IO\Providers;
 
-use IO\Api\Resources\CouponResource;
+use IO\Extensions\Sitemap\IOSitemapPattern;
 use IO\Extensions\TwigIOExtension;
 use IO\Extensions\TwigServiceProvider;
 use IO\Middlewares\Middleware;
@@ -43,6 +43,7 @@ use IO\Services\WebstoreConfigurationService;
 use Plenty\Modules\Authentication\Events\AfterAccountAuthentication;
 use Plenty\Modules\Authentication\Events\AfterAccountContactLogout;
 use Plenty\Modules\Order\Events\OrderCreated;
+use Plenty\Modules\Plugin\Events\LoadSitemapPattern;
 use Plenty\Plugin\ServiceProvider;
 use Plenty\Plugin\Templates\Twig;
 use Plenty\Plugin\Events\Dispatcher;
@@ -141,6 +142,8 @@ class IOServiceProvider extends ServiceProvider
             $basketService = pluginApp(BasketService::class);
             $basketService->resetBasket();
         });
+
+        $dispatcher->listen(LoadSitemapPattern::class, IOSitemapPattern::class);
     }
 
     private function registerSingletons( $classes )

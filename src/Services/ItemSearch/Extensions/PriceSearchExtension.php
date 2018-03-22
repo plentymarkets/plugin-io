@@ -46,16 +46,17 @@ class PriceSearchExtension implements ItemSearchExtension
                 {
                     $variationId        = $variation['data']['variation']['id'];
                     $minimumQuantity    = $variation['data']['variation']['minimumOrderQuantity'];
-                    if ( $minimumQuantity === null )
+                    if ( (float)$minimumQuantity === 0 )
                     {
                         // mimimum order quantity is not defined => get smallest possible quantity depending on interval order quantity
-                        if ( $variation['data']['variation']['intervalOrderQuantity'] !== null )
+                        if ( (float)$variation['data']['variation']['intervalOrderQuantity'] > 0 )
                         {
                             $minimumQuantity = $variation['data']['variation']['intervalOrderQuantity'];
                         }
                         else
                         {
                             // no interval quantity defined => minimum order quantity should be 1
+                            $variation['data']['variation']['intervalOrderQuantity'] = 1;
                             $minimumQuantity = 1;
                         }
                     }
@@ -69,7 +70,7 @@ class PriceSearchExtension implements ItemSearchExtension
                     // assign generated minimum quantity
                     $variation['data']['variation']['minimumOrderQuantity'] = $minimumQuantity;
 
-                    if ( $variation['data']['variation']['maximumOrderQuantity'] <= 0 )
+                    if ( (float)$variation['data']['variation']['maximumOrderQuantity'] <= 0 )
                     {
                         // remove invalid maximum order quantity
                         $variation['data']['variation']['maximumOrderQuantity'] = null;
@@ -92,7 +93,6 @@ class PriceSearchExtension implements ItemSearchExtension
 
 
                     $quantity = $priceList->minimumOrderQuantity;
-
 
                     if ( isset($this->options['quantities'][$variationId])
                         && (float)$this->options['quantities'][$variationId] > 0 )

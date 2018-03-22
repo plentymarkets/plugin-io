@@ -370,7 +370,13 @@ class CheckoutService
      */
     public function getShippingCountryId()
     {
-        return $this->checkout->getShippingCountryId();
+        $currentShippingCountryId = (int)$this->checkout->getShippingCountryId();
+        if($currentShippingCountryId <= 0)
+        {
+            return pluginApp(WebstoreConfigurationService::class)->getDefaultShippingCountryId();
+        }
+
+        return $currentShippingCountryId;
     }
 
     /**

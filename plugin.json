@@ -1,5 +1,5 @@
 {
-    "version"           : "2.4.0",
+    "version"           : "2.5.1",
     "name"              : "IO",
     "marketplaceName"   : {"de": "IO","en": "IO"},
     "license"           : "AGPL-3.0",
