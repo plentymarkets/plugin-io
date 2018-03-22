@@ -13,6 +13,7 @@ class SessionStorageKeys
 	const CURRENCY                 = "currency";
     const NOTIFICATIONS            = "notifications";
     const LATEST_ORDER_ID          = "latestOrderId";
+    const LAST_ACCESSED_ORDER      = "lastAccessedOrder";
     const GUEST_EMAIL              = "guestEmail";
     const LAST_SEEN_ITEMS          = "lastSeenItems";
     const LAST_SEEN_MAX_COUNT      = "lastSeenMaxCount";

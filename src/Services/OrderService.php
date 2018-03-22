@@ -670,11 +670,14 @@ class OrderService
             {
                 foreach($orderProperties as $key => $orderProperty)
                 {
-                    $newOrderProperties[$key] = $orderProperty;
+                    $newOrderProperties[$key] = [
+                        'typeId' => $orderProperty->typeId,
+                        'value' => (string)$orderProperty->value
+                    ];
                     if($orderProperty->typeId == OrderPropertyType::PAYMENT_METHOD)
                     {
                         $currentPaymentMethodId = (int)$orderProperty->value;
-                        $newOrderProperties[$key]['value'] = (int)$paymentMethodId;
+                        $newOrderProperties[$key]['value'] = (string)$paymentMethodId;
                     }
                 }
             }
