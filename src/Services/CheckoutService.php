@@ -370,7 +370,13 @@ class CheckoutService
      */
     public function getShippingCountryId()
     {
-        return $this->checkout->getShippingCountryId();
+        $currentShippingCountryId = (int)$this->checkout->getShippingCountryId();
+        if($currentShippingCountryId <= 0)
+        {
+            return pluginApp(WebstoreConfigurationService::class)->getDefaultShippingCountryId();
+        }
+
+        return $currentShippingCountryId;
     }
 
     /**
@@ -466,5 +472,14 @@ class CheckoutService
             $basketService = pluginApp(BasketService::class);
             $basketService->setBillingAddressId($billingAddressId);
         }
+    }
+    
+    public function setDefaultShippingCountryId()
+    {
+        /** @var WebstoreConfigurationService $webstoreConfig */
+        $webstoreConfigService = pluginApp(WebstoreConfigurationService::class);
+        $defaultShippingCountryId = $webstoreConfigService->getDefaultShippingCountryId();
+        
+        $this->setShippingCountryId($defaultShippingCountryId);
     }
 }
