@@ -212,7 +212,7 @@ class BasketService
         try {
             if ($basketItem instanceof BasketItem) {
                 $data['id']       = $basketItem->id;
-                $data['quantity'] = (int)$data['quantity'] + $basketItem->quantity;
+                $data['quantity'] = (float)$data['quantity'] + $basketItem->quantity;
                 $this->basketItemRepository->updateBasketItem($basketItem->id, $data);
             } else {
                 $this->basketItemRepository->addBasketItem($data);

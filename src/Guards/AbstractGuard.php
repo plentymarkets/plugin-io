@@ -2,6 +2,8 @@
 
 namespace IO\Guards;
 
+use IO\Services\WebstoreConfigurationService;
+
 /**
  * Class AbstractGuard
  * @package IO\Guards
@@ -67,9 +69,11 @@ abstract class AbstractGuard
             $uri = $_SERVER['REQUEST_URI'];
         }
 
-        $protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off' ? 'https' : 'http';
-
-        return $protocol . "://" . $_SERVER['SERVER_NAME'] . $uri;
+        /** @var WebstoreConfigurationService $webstoreConfigService */
+        $webstoreConfigService = pluginApp(WebstoreConfigurationService::class);
+        $domain = $webstoreConfigService->getWebstoreConfig()->domainSsl;
+        
+        return $domain.$uri;
     }
 
 

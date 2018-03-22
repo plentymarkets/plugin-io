@@ -102,11 +102,6 @@ class OrderService
         {
             $this->sessionStorage->setSessionValue(SessionStorageKeys::LATEST_ORDER_ID, $order->id);
         }
-
-        // reset basket after order was created
-        $this->basketService->resetBasket();
-        $customerService->resetGuestAddresses();
-        
         
         return LocalizedOrder::wrap( $order, "de" );
 	}
@@ -670,11 +665,14 @@ class OrderService
             {
                 foreach($orderProperties as $key => $orderProperty)
                 {
-                    $newOrderProperties[$key] = $orderProperty;
+                    $newOrderProperties[$key] = [
+                        'typeId' => $orderProperty->typeId,
+                        'value' => (string)$orderProperty->value
+                    ];
                     if($orderProperty->typeId == OrderPropertyType::PAYMENT_METHOD)
                     {
                         $currentPaymentMethodId = (int)$orderProperty->value;
-                        $newOrderProperties[$key]['value'] = (int)$paymentMethodId;
+                        $newOrderProperties[$key]['value'] = (string)$paymentMethodId;
                     }
                 }
             }
