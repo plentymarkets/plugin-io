@@ -821,6 +821,8 @@ class CustomerService
             
             $basketService->setBillingAddressId(0);
             $basketService->setDeliveryAddressId(0);
+            
+            $this->sessionStorage->setSessionValue(SessionStorageKeys::GUEST_EMAIL, null);
         }
     }
 }

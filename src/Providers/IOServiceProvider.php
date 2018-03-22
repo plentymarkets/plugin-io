@@ -40,6 +40,9 @@ use IO\Services\TemplateService;
 use IO\Services\UnitService;
 use IO\Services\UrlService;
 use IO\Services\WebstoreConfigurationService;
+use Plenty\Modules\Authentication\Events\AfterAccountAuthentication;
+use Plenty\Modules\Authentication\Events\AfterAccountContactLogout;
+use Plenty\Modules\Order\Events\OrderCreated;
 use Plenty\Modules\Plugin\Events\LoadSitemapPattern;
 use Plenty\Plugin\ServiceProvider;
 use Plenty\Plugin\Templates\Twig;
@@ -115,6 +118,31 @@ class IOServiceProvider extends ServiceProvider
         $twig->addExtension('Twig_Extensions_Extension_Intl');
         $twig->addExtension(TwigLoaderPresets::class);
         
+        $dispatcher->listen(AfterAccountAuthentication::class, function($event)
+        {
+            /** @var CustomerService $customerService */
+            $customerService = pluginApp(CustomerService::class);
+            $customerService->resetGuestAddresses();
+        });
+        
+        $dispatcher->listen(AfterAccountContactLogout::class, function($event)
+        {
+            /** @var CheckoutService $checkoutService */
+            $checkoutService = pluginApp(CheckoutService::class);
+            $checkoutService->setDefaultShippingCountryId();
+        });
+    
+        $dispatcher->listen(OrderCreated::class, function($event)
+        {
+            /** @var CustomerService $customerService */
+            $customerService = pluginApp(CustomerService::class);
+            $customerService->resetGuestAddresses();
+        
+            /** @var BasketService $basketService */
+            $basketService = pluginApp(BasketService::class);
+            $basketService->resetBasket();
+        });
+
         $dispatcher->listen(LoadSitemapPattern::class, IOSitemapPattern::class);
     }
 
