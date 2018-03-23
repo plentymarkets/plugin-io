@@ -50,6 +50,17 @@ class SortingHelper
                 $sortingOrder = BaseSearchFactory::SORTING_ORDER_DESC;
             }
 
+            else if ( $sortingField === 'texts.name' )
+            {
+                $templateConfigService = pluginApp(TemplateConfigService::class);
+                $usedItemName = $templateConfigService->get('item.name');
+                $sortingField = [
+                    'texts.name1',
+                    'texts.name2',
+                    'texts.name3'
+                ][$usedItemName];
+            }
+
             $sortings[] = ['field' => $sortingField, 'order' => $sortingOrder];
         }
 
