@@ -1,5 +1,11 @@
 # Release Notes for IO
 
+## v2.5.2 (2018-03-26) <a href="https://github.com/plentymarkets/plugin-io/compare/2.5.1...2.5.2" target="_blank"><b>Overview of all changes</b></a>
+
+### Fixed
+
+- Due to an error items could not be correctly sorted by name. This has been fixed.
+
 ## v2.5.1 (2018-03-21) <a href="https://github.com/plentymarkets/plugin-io/compare/2.5.0...2.5.1" target="_blank"><b>Overview of all changes</b></a>
 
 ### Fixed
