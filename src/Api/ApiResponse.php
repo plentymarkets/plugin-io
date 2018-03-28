@@ -304,6 +304,7 @@ class ApiResponse
         if ( array_key_exists('AfterBasketChanged', $responseData['events'] ) )
         {
             $responseData['events']['AfterBasketChanged']['basket']  = pluginApp(BasketService::class)->getBasketForTemplate();
+            $responseData['events']['AfterBasketChanged']['basketItems']  = pluginApp(BasketService::class)->getBasketItems();
             $responseData['events']['CheckoutChanged']['checkout']   = pluginApp(CheckoutService::class)->getCheckout();
         }
 

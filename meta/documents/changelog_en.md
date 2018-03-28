@@ -1,10 +1,27 @@
 # Release Notes for IO
 
+## v2.5.2 (2018-03-26) <a href="https://github.com/plentymarkets/plugin-io/compare/2.5.1...2.5.2" target="_blank"><b>Overview of all changes</b></a>
+
+### Fixed
+
+- Due to an error items could not be correctly sorted by name. This has been fixed.
+
+## v2.5.1 (2018-03-21) <a href="https://github.com/plentymarkets/plugin-io/compare/2.5.0...2.5.1" target="_blank"><b>Overview of all changes</b></a>
+
+### Fixed
+
+- Due to an error the shopping cart could not be refreshed if changes had been made to it. This has been fixed.
+
+## v2.5.0 (2018-03-19) <a href="https://github.com/plentymarkets/plugin-io/compare/2.4.0...2.5.0" target="_blank"><b>Overview of all changes</b></a>
+
+- Context classes, which provide data to related Twig templates, have been added.
+- New service classes have been added in order to facilitate the use of ElasticSearch.
+
 ## v2.4.0 (2018-03-06) <a href="https://github.com/plentymarkets/plugin-io/compare/2.3.2...2.4.0" target="_blank"><b>Overview of all changes</b></a>
 
 ### Added
 
-- A new auxiliary class has been added in order to facilitate the access to plugin configurations.
+- A new helper class has been added in order to facilitate the access to plugin configurations.
 
 ### Changed
 
@@ -22,17 +39,19 @@
 
 ## v2.3.1 (2018-02-26) <a href="https://github.com/plentymarkets/plugin-io/compare/2.3.0...2.3.1" target="_blank"><b>Overview of all changes</b></a>
 
-- Coupon discounts are now displayed on the order confirmation page and in the order details in the MyAccount section.
+### Fixed
+
+- Coupon discounts are now displayed on the order confirmation page and in the order details in the My account section.
 - After the creation of a return, the return confirmation page will now be displayed again. (The route in IO config has to be active.)
 - The page for the creation of returns now only displays items that can be returned. (No shipping costs, coupon positions, etc.)
 - Due to an error particular attributes were not displayed in the variation selection. This has been fixed.
 - Due to an error the display of gross/net prices for shipping costs was not refreshed correctly. This has been fixed.
 - Errors in the shipping cost calculation didn't yield error messages. This has been fixed.
-- The Last seen list no longer displays random items if no item has been previously viewed in the store.
+- The last seen list no longer displays random items if no item has been previously viewed in the store.
 
 ## v2.3.0 (2018-02-19) <a href="https://github.com/plentymarkets/plugin-io/compare/2.2.2...2.3.0" target="_blank"><b>Overview of all changes</b></a>
 
-### changed
+### Changed
 
 - The filter `itemName` is now able to display the variation name or a combination of item name and variation name in accordance with the Ceres configuration.
 
