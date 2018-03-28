@@ -2,6 +2,7 @@
 
 namespace IO\Api\Resources;
 
+use Plenty\Exceptions\ValidationException;
 use Plenty\Plugin\Http\Response;
 use Plenty\Plugin\Http\Request;
 use IO\Api\ApiResource;
@@ -34,6 +35,12 @@ class ContactMailResource extends ApiResource
         $contactData = $this->request->get('contactData',[]);
         
         $response = $this->contactMailService->sendMail($mailTemplate, $contactData);
+
+        if($response instanceof ValidationException)
+        {
+
+            return $this->response->create(['validation_errors' => $response->getMessageBag()], ResponseCode::BAD_REQUEST);
+        }
         
         if($response)
         {
