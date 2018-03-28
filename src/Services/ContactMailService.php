@@ -2,6 +2,7 @@
 
 namespace IO\Services;
 
+use Plenty\Exceptions\ValidationException;
 use Plenty\Plugin\Mail\Contracts\MailerContract;
 use Plenty\Plugin\Templates\Twig;
 use IO\Services\TemplateConfigService;
@@ -20,7 +21,13 @@ class ContactMailService
     
     public function sendMail($mailTemplate, $contactData = [])
     {
-        ContactFormValidator::validateOrFail($contactData);
+
+        try{
+            ContactFormValidator::validateOrFail($contactData);
+        } catch (ValidationException $e) {
+            return $e;
+        }
+
     
         /**
          * @var TemplateConfigService $templateConfigService
