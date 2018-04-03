@@ -3,6 +3,7 @@
 namespace IO\Services;
 
 use IO\Helper\MemoryCache;
+use IO\Services\UrlBuilder\UrlQuery;
 use Plenty\Modules\Category\Models\Category;
 use Plenty\Modules\Category\Contracts\CategoryRepositoryContract;
 use Plenty\Modules\Category\Models\CategoryDetails;
@@ -161,7 +162,10 @@ class CategoryService
                 {
                     return null;
                 }
-                return "/" . $this->categoryRepository->getUrl($category->id, $lang);
+                return pluginApp(
+                    UrlQuery::class,
+                    ['path' => $this->categoryRepository->getUrl($category->id, $lang)]
+                )->toRelativeUrl();
             }
         );
 

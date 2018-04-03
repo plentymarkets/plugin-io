@@ -4,6 +4,8 @@ namespace IO\Services\UrlBuilder;
 
 use IO\Services\SessionStorageService;
 use IO\Services\WebstoreConfigurationService;
+use Phan\Config;
+use Plenty\Plugin\ConfigRepository;
 
 class UrlQuery
 {
@@ -80,6 +82,14 @@ class UrlQuery
         if ( $includeLanguage )
         {
             return '/' . $this->lang . $this->path;
+        }
+
+        /** @var ConfigRepository $configRepository */
+        $configRepository = pluginApp(ConfigRepository::class);
+        $useTrailingSlash = $configRepository->get('urlTrailingSlash', 0);
+        if ( $useTrailingSlash === 1 )
+        {
+            return $this->path . "/";
         }
 
         return $this->path;
