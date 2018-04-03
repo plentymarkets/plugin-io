@@ -79,20 +79,16 @@ class UrlQuery
             return null;
         }
 
-        if ( $includeLanguage )
-        {
-            return '/' . $this->lang . $this->path;
-        }
-
         /** @var ConfigRepository $configRepository */
         $configRepository = pluginApp(ConfigRepository::class);
-        $useTrailingSlash = $configRepository->get('urlTrailingSlash', 0);
-        if ( $useTrailingSlash === 1 )
+        $trailingSlash = $configRepository->get('urlTrailingSlash', 0) === 1 ? "/" : "";
+
+        if ( $includeLanguage )
         {
-            return $this->path . "/";
+            return '/' . $this->lang . $this->path . $trailingSlash;
         }
 
-        return $this->path;
+        return $this->path . $trailingSlash;
     }
 
     public function getPath( bool $includeLanguage = false )
