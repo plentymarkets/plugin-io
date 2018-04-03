@@ -23,7 +23,7 @@ class BasketItems implements SearchPreset
     public static function getSearchFactory($options)
     {
         $variationIds   = $options['variationIds'];
-        $quantities     = $options['variationQuantities'];
+        $quantities     = $options['quantities'];
 
         /** @var VariationSearchFactory $searchFactory */
         $searchFactory = pluginApp( VariationSearchFactory::class )
