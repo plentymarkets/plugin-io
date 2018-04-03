@@ -45,6 +45,7 @@ class SearchItems implements SearchPreset
             ->withUrls()
             ->withPrices()
             ->withImages()
+            ->withDefaultImage()
             ->isVisibleForClient()
             ->isActive()
             ->isHiddenInCategoryList( false )
