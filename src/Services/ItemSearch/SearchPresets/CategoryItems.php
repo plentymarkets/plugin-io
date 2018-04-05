@@ -32,6 +32,9 @@ class CategoryItems implements SearchPreset
 
         $page           = (int) $options['page'];
         $itemsPerPage   = (int) $options['itemsPerPage'];
+        
+        $priceMin       = (float) $options['priceMin'];
+        $priceMax       = (float) $options['priceMax'];
 
         /** @var VariationSearchFactory $searchFactory */
         $searchFactory = pluginApp(VariationSearchFactory::class);
@@ -52,6 +55,7 @@ class CategoryItems implements SearchPreset
             ->isHiddenInCategoryList(false)
             ->hasNameInLanguage()
             ->hasPriceForCustomer()
+            ->hasPriceInRange($priceMin, $priceMax)
             ->hasFacets( $facets )
             ->sortByMultiple( $sorting )
             ->setPage( $page, $itemsPerPage )

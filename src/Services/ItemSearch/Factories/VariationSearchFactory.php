@@ -19,6 +19,7 @@ use Plenty\Modules\Item\Search\Aggregations\ItemCardinalityAggregationProcessor;
 use Plenty\Modules\Item\Search\Filter\CategoryFilter;
 use Plenty\Modules\Item\Search\Filter\ClientFilter;
 use Plenty\Modules\Item\Search\Filter\CrossSellingFilter;
+use Plenty\Modules\Item\Search\Filter\PriceFilter;
 use Plenty\Modules\Item\Search\Filter\SalesPriceFilter;
 use Plenty\Modules\Item\Search\Filter\SearchFilter;
 use Plenty\Modules\Item\Search\Filter\TextFilter;
@@ -260,6 +261,18 @@ class VariationSearchFactory extends BaseSearchFactory
         /** @var PriceDetectService $priceDetectService */
         $priceDetectService = pluginApp( PriceDetectService::class );
         $this->hasAtLeastOnePrice( $priceDetectService->getPriceIdsForCustomer() );
+        return $this;
+    }
+    
+    public function hasPriceInRange($priceMin, $priceMax)
+    {
+        if( !( (float)$priceMin == 0 && (float)$priceMax == 0 ) )
+        {
+            /** @var PriceFilter $priceRangeFilter */
+            $priceRangeFilter = $this->createFilter(PriceFilter::class);
+            $priceRangeFilter->between((float)$priceMin, (float)$priceMax);
+        }
+        
         return $this;
     }
 
