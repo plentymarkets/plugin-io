@@ -93,6 +93,7 @@ class OrderService
 		                            ->withAddressId($checkoutService->getDeliveryAddressId(), AddressType::DELIVERY)
 		                            ->withOrderProperty(OrderPropertyType::PAYMENT_METHOD, OrderOptionSubType::MAIN_VALUE, $checkoutService->getMethodOfPaymentId())
                                     ->withOrderProperty(OrderPropertyType::SHIPPING_PROFILE, OrderOptionSubType::MAIN_VALUE, $checkoutService->getShippingProfileId())
+                                    ->withOrderProperty(OrderPropertyType::DOCUMENT_LANGUAGE, OrderOptionSubType::MAIN_VALUE, $this->sessionStorage->getLang())
 		                            ->done();
         
 		$order = $this->orderRepository->createOrder($order, $couponCode);
@@ -103,7 +104,7 @@ class OrderService
             $this->sessionStorage->setSessionValue(SessionStorageKeys::LATEST_ORDER_ID, $order->id);
         }
         
-        return LocalizedOrder::wrap( $order, "de" );
+        return LocalizedOrder::wrap( $order, $this->sessionStorage->getLang() );
 	}
 	
 	private function saveOrderContactWish($orderId, $text = '')
@@ -151,7 +152,7 @@ class OrderService
         
         if($wrap)
         {
-            return LocalizedOrder::wrap($order, 'de');
+            return LocalizedOrder::wrap($order, $this->sessionStorage->getLang());
         }
         
         return $order;
@@ -196,7 +197,7 @@ class OrderService
             }
         }
     
-        return LocalizedOrder::wrap($order, 'de');
+        return LocalizedOrder::wrap($order, $this->sessionStorage->getLang());
     }
     
     /**
@@ -225,7 +226,7 @@ class OrderService
 
         if($wrapped)
         {
-            $orders = LocalizedOrder::wrapPaginated( $orders, "de" );
+            $orders = LocalizedOrder::wrapPaginated( $orders, $this->sessionStorage->getLang() );
     
             $o = $orders->getResult();
             foreach($orders->getResult() as $key => $order)
@@ -260,7 +261,7 @@ class OrderService
         
         if(!is_null($order))
         {
-            return LocalizedOrder::wrap( $order, "de" );
+            return LocalizedOrder::wrap( $order, $this->sessionStorage->getLang() );
         }
         
         return null;
@@ -688,7 +689,7 @@ class OrderService
                     
                     if(!is_null($order))
                     {
-                        return LocalizedOrder::wrap( $order, "de" );
+                        return LocalizedOrder::wrap( $order, $this->sessionStorage->getLang() );
                     }
                 }
             }
