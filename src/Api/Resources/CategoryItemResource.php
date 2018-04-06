@@ -44,8 +44,8 @@ class CategoryItemResource extends ApiResource
                 'sorting'       => $this->request->get( 'sorting', '' ),
                 'facets'        => $this->request->get( 'facets', '' ),
                 'categoryId'    => $this->request->get( 'categoryId', 1 ),
-                'priceMin'      => $this->request->get('price_min', 0),
-                'priceMax'      => $this->request->get('price_max', 0)
+                'priceMin'      => $this->request->get('priceMin', 0),
+                'priceMax'      => $this->request->get('priceMax', 0)
             ];
 
             /** @var ItemSearchService $itemSearchService */
