@@ -675,6 +675,18 @@ class CustomerService
             }
             
             $newAddress = $this->contactAddressRepository->updateAddress($addressData, $addressId, $this->getContactId(), $type);
+
+            if($type == AddressType::BILLING) {
+
+                $firstStoredAddress = $this->contactAddressRepository->findContactAddressByTypeId((int)$this->getContactId(),$type, false);
+
+                if($addressId == $firstStoredAddress->id) {
+                    $this->updateContactWithAddressData($newAddress);
+                }
+            }
+
+
+
         }
         else
         {
