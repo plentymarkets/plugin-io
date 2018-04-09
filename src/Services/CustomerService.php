@@ -386,6 +386,7 @@ class CustomerService
             $contactData['gender'] = $address->gender;
             $contactData['firstName'] = $address->name2;
             $contactData['lastName'] = $address->name3;
+            $contactData['birthdayAt'] = $address->birthday;
     
             $contact = $this->updateContact($contactData);
         }
