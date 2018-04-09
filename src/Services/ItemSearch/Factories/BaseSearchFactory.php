@@ -213,6 +213,11 @@ class BaseSearchFactory
         return $this;
     }
 
+    public function getResultFields()
+    {
+        return $this->resultFields;
+    }
+
     /**
      * Add an extension.
      *

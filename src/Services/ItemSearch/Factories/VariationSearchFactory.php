@@ -5,6 +5,7 @@ namespace IO\Services\ItemSearch\Factories;
 use IO\Services\ItemLoader\Contracts\FacetExtension;
 use IO\Services\ItemLoader\Services\FacetExtensionContainer;
 use IO\Services\ItemSearch\Extensions\CurrentCategoryExtension;
+use IO\Services\ItemSearch\Extensions\ItemDefaultImage;
 use IO\Services\ItemSearch\Extensions\ItemUrlExtension;
 use IO\Services\ItemSearch\Extensions\PriceSearchExtension;
 use IO\Services\PriceDetectService;
@@ -505,6 +506,17 @@ class VariationSearchFactory extends BaseSearchFactory
     public function withCurrentCategory()
     {
         $this->withExtension( CurrentCategoryExtension::class );
+        return $this;
+    }
+
+    /**
+     * Append default item image if images are requested by result fields and item does not have any image
+     *
+     * @return $this
+     */
+    public function withDefaultImage()
+    {
+        $this->withExtension( ItemDefaultImage::class );
         return $this;
     }
 }

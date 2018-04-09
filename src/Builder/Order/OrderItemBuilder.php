@@ -5,9 +5,9 @@ namespace IO\Builder\Order;
 use IO\Extensions\Filters\ItemNameFilter;
 use IO\Services\SessionStorageService;
 use Plenty\Modules\Basket\Models\Basket;
-use Plenty\Modules\Basket\Models\BasketItem;
 use IO\Services\CheckoutService;
 use Plenty\Modules\Frontend\PaymentMethod\Contracts\FrontendPaymentMethodRepositoryContract;
+use Plenty\Modules\Frontend\Services\OrderPropertyFileService;
 use Plenty\Modules\Frontend\Services\VatService;
 
 /**
@@ -112,8 +112,17 @@ class OrderItemBuilder
         $basketItemProperties = [];
         if(count($basketItem['basketItemOrderParams']))
         {
+            /** @var OrderPropertyFileService $orderPropertyFileService */
+            $orderPropertyFileService = pluginApp(OrderPropertyFileService::class);
+            
             foreach($basketItem['basketItemOrderParams'] as $property)
             {
+                if($property['type'] == 'file')
+                {
+                    $file = $orderPropertyFileService->copyBasketFileToOrder($property['value']);
+                    $property['value'] = $file;
+                }
+                
                 $basketItemProperty = [
                     'propertyId' => $property['propertyId'],
                     'value'      => $property['value']

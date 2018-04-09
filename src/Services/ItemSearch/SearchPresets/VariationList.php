@@ -42,6 +42,7 @@ class VariationList implements SearchPreset
             ->withPrices()
             ->withUrls()
             ->withLanguage()
+            ->withDefaultImage()
             ->isVisibleForClient()
             ->isActive()
             ->hasPriceForCustomer()
