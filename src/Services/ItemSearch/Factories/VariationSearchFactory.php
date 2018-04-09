@@ -2,6 +2,7 @@
 
 namespace IO\Services\ItemSearch\Factories;
 
+use IO\Helper\CurrencyConverter;
 use IO\Services\ItemLoader\Contracts\FacetExtension;
 use IO\Services\ItemLoader\Services\FacetExtensionContainer;
 use IO\Services\ItemSearch\Extensions\CurrentCategoryExtension;
@@ -268,9 +269,12 @@ class VariationSearchFactory extends BaseSearchFactory
     {
         if( !( (float)$priceMin == 0 && (float)$priceMax == 0 ) )
         {
+            /** @var CurrencyConverter $currencyConverter */
+            $currencyConverter = pluginApp(CurrencyConverter::class);
+            
             /** @var PriceFilter $priceRangeFilter */
             $priceRangeFilter = $this->createFilter(PriceFilter::class);
-            $priceRangeFilter->between((float)$priceMin, (float)$priceMax);
+            $priceRangeFilter->between($currencyConverter->convertToDefaultCurrency((float)$priceMin), $currencyConverter->convertToDefaultCurrency((float)$priceMax));
         }
         
         return $this;
