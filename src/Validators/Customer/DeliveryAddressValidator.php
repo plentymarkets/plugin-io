@@ -29,7 +29,7 @@ class DeliveryAddressValidator extends Validator
 
         foreach ($this->shownFields as $key => $value)
         {
-            $this->shownFields[$key] = str_replace('billing_address.', '', $value);
+            $this->shownFields[$key] = str_replace('delivery_address.', '', $value);
         }
         
         $this->addString('name2',      true);
@@ -41,7 +41,7 @@ class DeliveryAddressValidator extends Validator
         
         if(count($this->requiredFields))
         {
-            if(self::$addressData->gender == null)
+            if(empty(self::$addressData['gender']))
             {
                 $this->addString('name1',     $this->isRequired('name1'));
             }

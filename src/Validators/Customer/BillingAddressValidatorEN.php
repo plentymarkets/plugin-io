@@ -41,11 +41,12 @@ class BillingAddressValidatorEN extends Validator
         
         if(count($this->requiredFields))
         {
-            if(self::$addressData->gender == null)
+            if(empty(self::$addressData['gender']))
             {
                 $this->addString('name1',     $this->isRequired('name1'));
                 $this->addString('vatNumber', $this->isRequired('vatNumber'));
             }
+
             $this->addString('birthday',  $this->isRequired('birthday'));
             $this->addString('name4',     $this->isRequired('name4'));
             $this->addString('address2',  $this->isRequired('address2'));
