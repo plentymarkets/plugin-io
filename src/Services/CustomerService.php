@@ -757,6 +757,13 @@ class CustomerService
             {
                 $basketService->setDeliveryAddressId(CustomerAddressResource::ADDRESS_NOT_SET);
             }
+
+            $firstStoredAddress = $this->contactAddressRepository->findContactAddressByTypeId((int)$this->getContactId(),$type, false);
+
+            if($firstStoredAddress instanceof Address)
+            {
+                $this->updateContactWithAddressData($firstStoredAddress);
+            }
         }
         else
         {
