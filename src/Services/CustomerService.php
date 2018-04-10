@@ -521,6 +521,11 @@ class CustomerService
         {
             $addressData['stateId'] = null;
         }
+
+        if (isset($addressData['gender']) && empty($addressData['gender']))
+        {
+            $addressData['gender'] = null;
+        }
         
         $newAddress = null;
         
@@ -656,6 +661,11 @@ class CustomerService
         if (isset($addressData['checkedAt']) && empty($addressData['checkedAt']))
         {
             unset($addressData['checkedAt']);
+        }
+
+        if (isset($addressData['gender']) && empty($addressData['gender']))
+        {
+            $addressData['gender'] = null;
         }
 
         if((int)$this->getContactId() > 0)
