@@ -18,10 +18,12 @@ class AddressValidator
         {
             if(self::isEnAddress($addressData['countryId']))
             {
+                BillingAddressValidatorEN::$addressData = $addressData;
                 BillingAddressValidatorEN::validateOrFail($addressData);
             }
             else
             {
+                BillingAddressValidator::$addressData = $addressData;
                 BillingAddressValidator::validateOrFail($addressData);
             }
             
@@ -30,10 +32,12 @@ class AddressValidator
         {
             if(self::isEnAddress($addressData['countryId']))
             {
+                DeliveryAddressValidatorEN::$addressData = $addressData;
                 DeliveryAddressValidatorEN::validateOrFail($addressData);
             }
             else
             {
+                DeliveryAddressValidator::$addressData = $addressData;
                 DeliveryAddressValidator::validateOrFail($addressData);
             }
         }
@@ -41,10 +45,12 @@ class AddressValidator
         {
             if(self::isEnAddress($addressData['countryId']))
             {
+                BillingAddressValidatorEN::$addressData = $addressData;
                 BillingAddressValidatorEN::validateOrFail($addressData);
             }
             else
             {
+                BillingAddressValidator::$addressData = $addressData;
                 BillingAddressValidator::validateOrFail($addressData);
             }
         }
