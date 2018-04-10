@@ -14,11 +14,11 @@ use IO\Services\CustomerService;
  */
 class PriceSearchExtension implements ItemSearchExtension
 {
-    private $options;
+    private $quantities;
 
-    public function __construct( $options = [] )
+    public function __construct( $quantities = [] )
     {
-        $this->options = $options;
+        $this->quantities = $quantities;
     }
 
     /**
@@ -94,11 +94,11 @@ class PriceSearchExtension implements ItemSearchExtension
 
                     $quantity = $priceList->minimumOrderQuantity;
 
-                    if ( isset($this->options['quantities'][$variationId])
-                        && (float)$this->options['quantities'][$variationId] > 0 )
+                    if ( isset($this->quantities[$variationId])
+                        && (float)$this->quantities[$variationId] > 0 )
                     {
                         // override quantity by options
-                        $quantity = (float)$this->options['quantities'][$variationId];
+                        $quantity = (float)$this->quantities[$variationId];
                     }
 
                     $variation['data']['calculatedPrices'] = $priceList->getCalculatedPrices( $quantity );
