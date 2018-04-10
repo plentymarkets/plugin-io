@@ -137,7 +137,7 @@ class VariationUrlBuilder
     public function getSuffix( $itemId, $variationId, $withVariationId = true )
     {
         $templateConfigService = pluginApp( TemplateConfigService::class );
-        $enableOldUrlPattern = $templateConfigService->get('global.enableOldUrlPattern') === "true";
+        $enableOldUrlPattern = $templateConfigService->get('global.enableOldUrlPattern');
 
         if($withVariationId)
         {
