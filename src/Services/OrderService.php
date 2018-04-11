@@ -409,7 +409,8 @@ class OrderService
     
             unset($order['id']);
             unset($order['dates']);
-    
+            unset($order['lockStatus']);
+
             $createdReturn = $this->orderRepository->createOrder($order);
 
             if(!is_null($returnNote) && strlen($returnNote))
