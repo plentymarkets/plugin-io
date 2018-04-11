@@ -278,10 +278,15 @@ class VariationSearchFactory extends BaseSearchFactory
             
             $priceMin = $vatConverter->convertToGross($currencyConverter->convertToDefaultCurrency((float)$priceMin));
             $priceMax = $vatConverter->convertToGross($currencyConverter->convertToDefaultCurrency((float)$priceMax));
+    
+            if((float)$priceMax == 0)
+            {
+                $priceMax = null;
+            }
             
             /** @var PriceFilter $priceRangeFilter */
             $priceRangeFilter = $this->createFilter(PriceFilter::class);
-            $priceRangeFilter->between((float)$priceMin, (float)$priceMax);
+            $priceRangeFilter->between($priceMin, $priceMax);
         }
         
         return $this;
