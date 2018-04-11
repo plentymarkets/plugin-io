@@ -387,7 +387,24 @@ class CustomerService
             $contactData['firstName'] = $address->name2;
             $contactData['lastName'] = $address->name3;
             $contactData['birthdayAt'] = $address->birthday;
-    
+
+            foreach($address['options'] as $key => $option)
+            {
+                // phone number
+                if($option->typeId === 4)
+                {
+                    $contactData['options'] =
+                    [
+                        [
+                            "typeId" => 1,
+                            "subTypeId" => 4,
+                            "priority" => 0,
+                            "value" => $option->value
+                        ]
+                    ];
+                }
+            }
+
             $contact = $this->updateContact($contactData);
         }
         
