@@ -3,6 +3,7 @@
 namespace IO\Services\ItemSearch\Factories;
 
 use IO\Helper\CurrencyConverter;
+use IO\Helper\VatConverter;
 use IO\Services\ItemLoader\Contracts\FacetExtension;
 use IO\Services\ItemLoader\Services\FacetExtensionContainer;
 use IO\Services\ItemSearch\Extensions\CurrentCategoryExtension;
@@ -272,9 +273,15 @@ class VariationSearchFactory extends BaseSearchFactory
             /** @var CurrencyConverter $currencyConverter */
             $currencyConverter = pluginApp(CurrencyConverter::class);
             
+            /** @var VatConverter $vatConverter */
+            $vatConverter = pluginApp(VatConverter::class);
+            
+            $priceMin = $vatConverter->convertToGross($currencyConverter->convertToDefaultCurrency((float)$priceMin));
+            $priceMax = $vatConverter->convertToGross($currencyConverter->convertToDefaultCurrency((float)$priceMax));
+            
             /** @var PriceFilter $priceRangeFilter */
             $priceRangeFilter = $this->createFilter(PriceFilter::class);
-            $priceRangeFilter->between($currencyConverter->convertToDefaultCurrency((float)$priceMin), $currencyConverter->convertToDefaultCurrency((float)$priceMax));
+            $priceRangeFilter->between((float)$priceMin, (float)$priceMax);
         }
         
         return $this;
