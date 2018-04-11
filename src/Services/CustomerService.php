@@ -16,6 +16,7 @@ use Plenty\Modules\Account\Address\Contracts\AddressRepositoryContract;
 use Plenty\Modules\Account\Contact\Models\Contact;
 use IO\Builder\Order\AddressType;
 use Plenty\Modules\Account\Address\Models\Address;
+use Plenty\Modules\Account\Contact\Models\ContactOption;
 use Plenty\Modules\Account\Models\Account;
 use Plenty\Modules\Authorization\Services\AuthHelper;
 use IO\Helper\UserSession;
@@ -375,40 +376,60 @@ class CustomerService
 
 		return null;
 	}
-	
-	private function updateContactWithAddressData($address)
+
+    /**
+     * @param Address $address
+     * @return null|Contact
+     */
+	private function updateContactWithAddressData(Address $address)
     {
         $contactData = [];
         $contact = null;
         
-        if($address instanceof Address)
-        {
-            $contactData['gender'] = $address->gender;
-            $contactData['firstName'] = $address->name2;
-            $contactData['lastName'] = $address->name3;
-            $contactData['birthdayAt'] = $address->birthday;
+        $contactData['gender'] = $address->gender;
+        $contactData['firstName'] = $address->firstName;
+        $contactData['lastName'] = $address->lastName;
+        $contactData['birthdayAt'] = $address->birthday;
+        $contactData['options'] = $this->getContactOptionsFromAddress($address->options);
 
-            foreach($address['options'] as $key => $option)
-            {
-                // phone number
-                if($option->typeId === 4)
-                {
-                    $contactData['options'] =
-                    [
-                        [
-                            "typeId" => 1,
-                            "subTypeId" => 4,
-                            "priority" => 0,
-                            "value" => $option->value
-                        ]
-                    ];
-                }
-            }
+        $contact = $this->updateContact($contactData);
 
-            $contact = $this->updateContact($contactData);
-        }
-        
         return $contact;
+    }
+
+    /**
+     * @param $addressOptions
+     * @return array
+     */
+    private function getContactOptionsFromAddress($addressOptions)
+    {
+        $options = [];
+        $addressToContactOptionsMap =
+        [
+            AddressOption::TYPE_TELEPHONE =>
+            [
+                'typeId' => ContactOption::TYPE_PHONE,
+                'subTypeId' => ContactOption::SUBTYPE_PRIVATE
+            ]
+        ];
+
+        foreach($addressOptions as $key => $addressOption)
+        {
+            $mapItem = $addressToContactOptionsMap[$addressOption->typeId];
+
+            if(!empty($mapItem))
+            {
+                $options[] =
+                [
+                    'typeId' => $mapItem['typeId'],
+                    'subTypeId' => $mapItem['subTypeId'],
+                    'priority' => 0,
+                    'value' => $addressOption->value
+                ];
+            }
+        }
+
+        return $options;
     }
 	
 	public function updatePassword($newPassword, $contactId = 0, $hash='')
