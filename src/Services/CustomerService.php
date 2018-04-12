@@ -785,6 +785,8 @@ class CustomerService
 	    
         if($this->getContactId() > 0)
         {
+            $firstStoredAddress = $this->contactAddressRepository->findContactAddressByTypeId((int)$this->getContactId(),$type, false);
+
             $this->contactAddressRepository->deleteAddress($addressId, $this->getContactId(), $type);
             
             if($type == AddressType::BILLING)
@@ -796,11 +798,14 @@ class CustomerService
                 $basketService->setDeliveryAddressId(CustomerAddressResource::ADDRESS_NOT_SET);
             }
 
-            $firstStoredAddress = $this->contactAddressRepository->findContactAddressByTypeId((int)$this->getContactId(),$type, false);
-
-            if($firstStoredAddress instanceof Address)
+            if($firstStoredAddress instanceof Address && $firstStoredAddress['id'] === $addressId)
             {
-                $this->updateContactWithAddressData($firstStoredAddress);
+                $firstStoredAddress = $this->contactAddressRepository->findContactAddressByTypeId((int)$this->getContactId(),$type, false);
+
+                if($firstStoredAddress instanceof Address)
+                {
+                    $this->updateContactWithAddressData($firstStoredAddress);
+                }
             }
         }
         else
