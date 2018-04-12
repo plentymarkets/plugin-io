@@ -14,21 +14,7 @@ class AddressValidator
 {
     public static function validateOrFail($addressType, $addressData)
     {
-        if($addressType == AddressType::BILLING)
-        {
-            if(self::isEnAddress($addressData['countryId']))
-            {
-                BillingAddressValidatorEN::$addressData = $addressData;
-                BillingAddressValidatorEN::validateOrFail($addressData);
-            }
-            else
-            {
-                BillingAddressValidator::$addressData = $addressData;
-                BillingAddressValidator::validateOrFail($addressData);
-            }
-            
-        }
-        elseif($addressType == AddressType::DELIVERY)
+        if($addressType == AddressType::DELIVERY)
         {
             if(self::isEnAddress($addressData['countryId']))
             {
