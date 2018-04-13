@@ -16,6 +16,8 @@ use IO\Services\ItemSearch\Helper\SortingHelper;
  * - sorting:       Configuration value from plugin config
  * - page:          Current page
  * - itemsPerPage:  Number of items per page
+ * - priceMin:      Minimum price of the variations
+ * - priceMax       Maximum price of the variations
  *
  * @package IO\Services\ItemSearch\SearchPresets
  */

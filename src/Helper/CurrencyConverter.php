@@ -5,6 +5,10 @@ namespace IO\Helper;
 use IO\Services\CheckoutService;
 use Plenty\Modules\Frontend\Contracts\CurrencyExchangeRepositoryContract;
 
+/**
+ * Class CurrencyConverter
+ * @package IO\Helper
+ */
 class CurrencyConverter
 {
     /** @var CurrencyExchangeRepositoryContract $currencyExchcangeRepo */
