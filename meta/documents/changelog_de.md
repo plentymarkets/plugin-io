@@ -1,5 +1,21 @@
 # Release Notes für IO
 
+## v2.7.0 (2018-04-13) <a href="https://github.com/plentymarkets/plugin-io/compare/2.6.0...2.7.0" target="_blank"><b>Übersicht aller Änderungen</b></a>
+
+### Hinzugefügt
+
+- Bei Artikeln ohne Bilder wird jetzt das konfigurierte Platzhalter-Bild im Webshop dargestellt.
+- Bestellmerkmale vom Typ **Datei** können jetzt verarbeitet werden.
+
+### Behoben
+
+- Durch einen Fehler wurden im Warenkorb keine Staffelpreise angezeigt. Dies wurde behoben.
+- Bei Retouren wurde der Sperr-Status nicht vom ursprünglichen Auftrag übernommen. Dies wurde behoben.
+- Durch einen Fehler wurden die Daten beim Speichern und Editieren von Adressen nicht serverseitig validiert. Dies wurde behoben.
+- Durch einen Fehler wurden in der Bestellbestätigung der Auftragsstatus, der Versanddienstleister und die Zahlungsart immer in der Systemsprache angezeigt. Dies wurde behoben.
+- Durch einen Fehler wurde die Rabattstaffel auf den Netto-Warenwert der Kundenklasse bei der Auftragsanlage nicht berücksichtigt. Dies wurde behoben.
+- Für die Standard-Shopsprache wurde die Sprache aus der Canonical URL entfernt.
+
 ## v2.6.0 (2018-04-03) <a href="https://github.com/plentymarkets/plugin-io/compare/2.5.2...2.6.0" target="_blank"><b>Übersicht aller Änderungen</b></a>
 
 ### Hinzugefügt
