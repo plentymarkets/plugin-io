@@ -9,6 +9,8 @@ class DeliveryAddressValidator extends Validator
 {
     private $requiredFields;
     private $shownFields;
+
+    public static $addressData;
     
     public function defineAttributes()
     {
@@ -24,6 +26,11 @@ class DeliveryAddressValidator extends Validator
         {
             $this->requiredFields[$key] = str_replace('delivery_address.', '', $value);
         }
+
+        foreach ($this->shownFields as $key => $value)
+        {
+            $this->shownFields[$key] = str_replace('delivery_address.', '', $value);
+        }
         
         $this->addString('name2',      true);
         $this->addString('name3',      true);
@@ -34,7 +41,11 @@ class DeliveryAddressValidator extends Validator
         
         if(count($this->requiredFields))
         {
-            $this->addString('name1',     $this->isRequired('name1'));
+            if(empty(self::$addressData['gender']))
+            {
+                $this->addString('name1',     $this->isRequired('name1'));
+            }
+
             $this->addString('name4',     $this->isRequired('name4'));
             $this->addString('address3',  $this->isRequired('address3'));
             $this->addString('address4',  $this->isRequired('address4'));
