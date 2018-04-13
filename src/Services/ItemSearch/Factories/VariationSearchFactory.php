@@ -2,6 +2,8 @@
 
 namespace IO\Services\ItemSearch\Factories;
 
+use IO\Helper\CurrencyConverter;
+use IO\Helper\VatConverter;
 use IO\Services\ItemLoader\Contracts\FacetExtension;
 use IO\Services\ItemLoader\Services\FacetExtensionContainer;
 use IO\Services\ItemSearch\Extensions\CurrentCategoryExtension;
@@ -19,6 +21,7 @@ use Plenty\Modules\Item\Search\Aggregations\ItemCardinalityAggregationProcessor;
 use Plenty\Modules\Item\Search\Filter\CategoryFilter;
 use Plenty\Modules\Item\Search\Filter\ClientFilter;
 use Plenty\Modules\Item\Search\Filter\CrossSellingFilter;
+use Plenty\Modules\Item\Search\Filter\PriceFilter;
 use Plenty\Modules\Item\Search\Filter\SalesPriceFilter;
 use Plenty\Modules\Item\Search\Filter\SearchFilter;
 use Plenty\Modules\Item\Search\Filter\TextFilter;
@@ -260,6 +263,32 @@ class VariationSearchFactory extends BaseSearchFactory
         /** @var PriceDetectService $priceDetectService */
         $priceDetectService = pluginApp( PriceDetectService::class );
         $this->hasAtLeastOnePrice( $priceDetectService->getPriceIdsForCustomer() );
+        return $this;
+    }
+    
+    public function hasPriceInRange($priceMin, $priceMax)
+    {
+        if( !( (float)$priceMin == 0 && (float)$priceMax == 0 ) )
+        {
+            /** @var CurrencyConverter $currencyConverter */
+            $currencyConverter = pluginApp(CurrencyConverter::class);
+            
+            /** @var VatConverter $vatConverter */
+            $vatConverter = pluginApp(VatConverter::class);
+            
+            $priceMin = $vatConverter->convertToGross($currencyConverter->convertToDefaultCurrency((float)$priceMin));
+            $priceMax = $vatConverter->convertToGross($currencyConverter->convertToDefaultCurrency((float)$priceMax));
+    
+            if((float)$priceMax == 0)
+            {
+                $priceMax = null;
+            }
+            
+            /** @var PriceFilter $priceRangeFilter */
+            $priceRangeFilter = $this->createFilter(PriceFilter::class);
+            $priceRangeFilter->between($priceMin, $priceMax);
+        }
+        
         return $this;
     }
 
