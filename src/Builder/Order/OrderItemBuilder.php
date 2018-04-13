@@ -149,7 +149,7 @@ class OrderItemBuilder
 		
 		if((float)$basketDiscount > 0)
         {
-            $rebate+= $basketDiscount;
+            $rebate += $basketDiscount;
         }
 
 		return [
@@ -169,7 +169,7 @@ class OrderItemBuilder
 					"priceOriginalGross"    => $priceOriginal,
                     "surcharge"             => $attributeTotalMarkup,
 					"discount"	            => $rebate,
-					"isPercentage"          => 1
+					"isPercentage"          => true
 				]
 			]
 		];
