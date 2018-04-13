@@ -1,5 +1,21 @@
 # Release Notes for IO
 
+## v2.7.0 (2018-04-13) <a href="https://github.com/plentymarkets/plugin-io/compare/2.6.0...2.7.0" target="_blank"><b>Overview of all changes</b></a>
+
+### Added
+
+- For items without image, the preconfigured placeholder image is now displayed in the online store.
+- Order properties of the type **file** can now be processed.
+
+### Fixed
+
+- Due to an error the shopping cart did not display graduated prices. This has been fixed.
+- Returns did not adopt the lock state from the original order. This has been fixed.
+- Due to an error the data was not validated by the server when address data was saved or edited. This has been fixed.
+- Due to an error, the order confirmation always displayed the order status, the shipping service provider and the payment method in the system language. This has been fixed.
+- Due to an error customer class-dependent graduated rebates on gross item value were not considered in the order creation. This has been fixed.
+- The canonical URL for the default language of the online store no longer includes the language.
+
 ## v2.6.0 (2018-04-03) <a href="https://github.com/plentymarkets/plugin-io/compare/2.5.2...2.6.0" target="_blank"><b>Overview of all changes</b></a>
 
 ### Added
