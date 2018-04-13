@@ -58,7 +58,7 @@ class OrderItemBuilder
                 $maxVatRate = $item['vat'];
             }
 
-			array_push($orderItems, $this->basketItemToOrderItem($item));
+			array_push($orderItems, $this->basketItemToOrderItem($item, $basket->basketRebate));
 		}
 
 
@@ -107,7 +107,7 @@ class OrderItemBuilder
 	 * @param array $basketItem
 	 * @return array
 	 */
-	private function basketItemToOrderItem(array $basketItem):array
+	private function basketItemToOrderItem(array $basketItem, $basketDiscount):array
 	{
         $basketItemProperties = [];
         if(count($basketItem['basketItemOrderParams']))
@@ -141,10 +141,16 @@ class OrderItemBuilder
         }
         
         $rebate = 0;
+		
         if(isset($basketItem['rebate']))
 		{
 			$rebate = $basketItem['rebate'];
 		}
+		
+		if((float)$basketDiscount > 0)
+        {
+            $rebate+= $basketDiscount;
+        }
 
 		return [
 			"typeId"            => OrderItemType::VARIATION,
@@ -162,7 +168,7 @@ class OrderItemBuilder
 					"currency"              => $this->checkoutService->getCurrency(),
 					"priceOriginalGross"    => $priceOriginal,
                     "surcharge"             => $attributeTotalMarkup,
-					"rebate"	            => $rebate,
+					"discount"	            => $rebate,
 					"isPercentage"          => 1
 				]
 			]
