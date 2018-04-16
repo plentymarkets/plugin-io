@@ -82,12 +82,9 @@ class UrlService
             $lang = pluginApp( SessionStorageService::class )->getLang();
         }
 
-        $defaultLanguage = pluginApp(WebstoreConfigurationService::class)->getDefaultLanguage();
-
-
         $canonicalUrl = $this->fromMemoryCache(
             "canonicalUrl.$lang",
-            function() use ($lang, $defaultLanguage) {
+            function() use ($lang) {
                 /** @var CategoryService $categoryService */
                 $categoryService = pluginApp( CategoryService::class );
                 if ( TemplateService::$currentTemplate === 'tpl.item' )
@@ -97,7 +94,7 @@ class UrlService
                     {
                         return $this
                             ->getVariationURL( $currentItem['item']['id'], $currentItem['variation']['id'], $lang )
-                            ->toAbsoluteUrl( $lang !== null && $lang !== $defaultLanguage  );
+                            ->toAbsoluteUrl( $lang !== null );
                     }
 
                     return null;
@@ -111,7 +108,7 @@ class UrlService
                     {
                         return $this
                             ->getCategoryURL( $currentCategory->id, $lang )
-                            ->toAbsoluteUrl( $lang !== null && $lang !== $defaultLanguage );
+                            ->toAbsoluteUrl( $lang !== null );
                     }
                     return null;
                 }
@@ -119,7 +116,7 @@ class UrlService
                 if ( TemplateService::$currentTemplate === 'tpl.home' )
                 {
                     return pluginApp( UrlQuery::class, ['path' => "", 'lang' => $lang])
-                        ->toAbsoluteUrl( $lang !== null && $lang !== $defaultLanguage );
+                        ->toAbsoluteUrl( $lang !== null );
                 }
 
                 return null;
