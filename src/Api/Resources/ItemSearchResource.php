@@ -43,7 +43,9 @@ class ItemSearchResource extends ApiResource
                 'itemsPerPage'  => $this->request->get( 'items', 20 ),
                 'sorting'       => $this->request->get( 'sorting', '' ),
                 'facets'        => $this->request->get( 'facets', '' ),
-                'query'         => $searchString
+                'query'         => $searchString,
+                'priceMin'      => $this->request->get('priceMin', 0),
+                'priceMax'      => $this->request->get('priceMax', 0)
             ];
 
             /** @var ItemSearchService $itemSearchService */

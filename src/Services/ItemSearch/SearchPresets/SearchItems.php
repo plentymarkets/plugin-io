@@ -16,6 +16,8 @@ use IO\Services\ItemSearch\Helper\SortingHelper;
  * - sorting:       Configuration value from plugin config
  * - page:          The current page
  * - itemsPerPage:  Number of items per page
+ * - priceMin:      Minimum price of the variations
+ * - priceMax       Maximum price of the variations
  * - autocomplete:  Flag indicating if autocompletion should be used
  *
  *
@@ -31,7 +33,9 @@ class SearchItems implements SearchPreset
 
         $page           = (int) $options['page'];
         $itemsPerPage   = (int) $options['itemsPerPage'];
-
+    
+        $priceMin       = (float) $options['priceMin'];
+        $priceMax       = (float) $options['priceMax'];
 
         /** @var VariationSearchFactory $searchFactory */
         $searchFactory = pluginApp( VariationSearchFactory::class );
@@ -51,6 +55,7 @@ class SearchItems implements SearchPreset
             ->isHiddenInCategoryList( false )
             ->hasNameInLanguage()
             ->hasPriceForCustomer()
+            ->hasPriceInRange($priceMin, $priceMax)
             ->hasFacets( $facets )
             ->sortByMultiple( $sorting )
             ->setPage( $page, $itemsPerPage )
