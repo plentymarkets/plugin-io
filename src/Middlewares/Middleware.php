@@ -5,8 +5,10 @@ namespace IO\Middlewares;
 use Plenty\Plugin\Http\Request;
 use Plenty\Plugin\Http\Response;
 use Plenty\Modules\Frontend\Contracts\Checkout;
+use Plenty\Modules\ContentCache\Contracts\ContentCacheRepositoryContract;
 use IO\Controllers\StaticPagesController;
 use IO\Services\CheckoutService;
+//use Illuminate\Support\Facades\Cache;
 
 class Middleware extends \Plenty\Plugin\Middleware
 {
@@ -43,6 +45,14 @@ class Middleware extends \Plenty\Plugin\Middleware
             $response->forceStatus(404);
             return $response;
         }
+        
+        $cacheKey = $_SERVER['REQUEST_URI'];
+        
+        /** @var ContentCacheRepositoryContract $contentCacheRepo */
+        $contentCacheRepo = pluginApp(ContentCacheRepositoryContract::class);
+        $contentCacheRepo->saveCacheEntry($cacheKey, 'test'.$response->content());
+        
+        //$result = Cache::store('redis_content_cache')->get($cacheKey);
 
         return $response;
     }
