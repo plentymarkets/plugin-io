@@ -45,8 +45,12 @@ class VariationList implements SearchPreset
             ->withDefaultImage()
             ->isVisibleForClient()
             ->isActive()
-            ->hasPriceForCustomer()
-            ->hasVariationIds( $variationIds );
+            ->hasPriceForCustomer();
+
+        if ( count( $variationIds ) )
+        {
+            $searchFactory->hasVariationIds( $variationIds );
+        }
 
         if ( array_key_exists( 'sorting', $options ) && $options['sorting'] !== null )
         {

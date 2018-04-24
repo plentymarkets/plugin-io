@@ -24,6 +24,7 @@ use Plenty\Modules\Item\Search\Filter\CrossSellingFilter;
 use Plenty\Modules\Item\Search\Filter\PriceFilter;
 use Plenty\Modules\Item\Search\Filter\SalesPriceFilter;
 use Plenty\Modules\Item\Search\Filter\SearchFilter;
+use Plenty\Modules\Item\Search\Filter\TagFilter;
 use Plenty\Modules\Item\Search\Filter\TextFilter;
 use Plenty\Modules\Item\Search\Filter\VariationBaseFilter;
 use Plenty\Modules\Item\Search\Helper\SearchHelper;
@@ -289,6 +290,26 @@ class VariationSearchFactory extends BaseSearchFactory
             $priceRangeFilter->between($priceMin, $priceMax);
         }
         
+        return $this;
+    }
+
+    public function hasTag($tagId)
+    {
+        return $this->hasAnyTag([$tagId]);
+    }
+
+    public function hasAnyTag($tagIds)
+    {
+        /** @var TagFilter $tagFilter */
+        $tagFilter = $this->createFilter(TagFilter::class);
+        if ( count($tagIds) === 1 )
+        {
+            $tagFilter->hasTag((int) $tagIds[0]);
+        }
+        else if ( count($tagIds) > 1 )
+        {
+            $tagFilter->hasAnyTag( $tagIds );
+        }
         return $this;
     }
 
