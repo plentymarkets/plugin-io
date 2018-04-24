@@ -14,18 +14,18 @@ class ItemListService
     const TYPE_LAST_SEEN    = 'last_seen';
     const TYPE_TAG          = 'tag_list';
 
-    public function getItemList( $type, $id = null, $sorting = null, $maxItems = 0 )
+    public function getItemList( $type, $id, $sorting, $maxItems )
     {
         /** @var ItemSearchService $searchService */
         $searchService = pluginApp( ItemSearchService::class );
         $searchFactory = null;
 
-        switch ($type)
+        switch ($type['mobileValue'])
         {
             case self::TYPE_CATEGORY:
                 $searchFactory = CategoryItems::getSearchFactory([
-                    'categoryId' => $id,
-                    'sorting'    => $sorting
+                    'categoryId' => $id['mobileValue'],
+                    'sorting'    => $sorting['mobileValue']
                 ]);
                 break;
             case self::TYPE_LAST_SEEN:
@@ -34,14 +34,14 @@ class ItemListService
                 $variationIds = $sessionStorage->getSessionValue(SessionStorageKeys::LAST_SEEN_ITEMS);
 
                 $searchFactory = VariationList::getSearchFactory([
-                    'variationIds'  => $variationIds,
-                    'sorting'       => $sorting
+                    'variationIds'  => $variationIds['mobileValue'],
+                    'sorting'       => $sorting['mobileValue']
                 ]);
                 break;
             case self::TYPE_TAG:
                 $searchFactory = TagItems::getSearchFactory([
-                    'tagIds'    => [$id],
-                    'sorting'   => $sorting
+                    'tagIds'    => [$id]['mobileValue'],
+                    'sorting'   => $sorting['mobileValue']
                 ]);
                 break;
             default:
@@ -50,13 +50,14 @@ class ItemListService
 
         if ( $maxItems > 0 )
         {
-            $searchFactory->setPage(1, $maxItems );
+            $searchFactory->setPage(1, $maxItems['mobileValue'] );
         }
 
         if ( is_null($searchFactory) )
         {
             return null;
         }
+
         return $searchService->getResult( $searchFactory );
     }
 }
