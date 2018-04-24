@@ -13,6 +13,7 @@ use IO\Services\CouponService;
 use IO\Services\CustomerService;
 use IO\Services\ItemCrossSellingService;
 use IO\Services\ItemLastSeenService;
+use IO\Services\ItemListService;
 use IO\Services\ItemLoader\Loaders\LastSeenItemList;
 use IO\Services\ItemLoader\Services\ItemLoaderService;
 use IO\Services\ItemService;
@@ -69,6 +70,11 @@ class TwigServiceContainer
     public function getItemLoader()
     {
         return pluginApp(ItemLoaderService::class );
+    }
+
+    public function getItemList()
+    {
+        return pluginApp( ItemListService::class );
     }
 
     public function getOrder()
