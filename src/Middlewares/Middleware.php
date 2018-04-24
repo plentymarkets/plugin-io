@@ -2,6 +2,8 @@
 
 namespace IO\Middlewares;
 
+use IO\Services\SessionStorageService;
+use IO\Services\WebstoreConfigurationService;
 use Plenty\Plugin\Http\Request;
 use Plenty\Plugin\Http\Response;
 use Plenty\Modules\Frontend\Contracts\Checkout;
@@ -29,6 +31,16 @@ class Middleware extends \Plenty\Plugin\Middleware
             $checkout = pluginApp(Checkout::class);
             $checkout->setBasketReferrerId($referrerId);
         }
+        
+        /** @var SessionStorageService $sessionStorageService */
+        $sessionStorageService = pluginApp(SessionStorageService::class);
+        /** @var WebstoreConfigurationService $webstoreConfigService */
+        $webstoreConfigService = pluginApp(WebstoreConfigurationService::class);
+        
+        if($sessionStorageService->getLang() !== $webstoreConfigService->getDefaultLanguage())
+        {
+            setcookie('ceres_lang', $sessionStorageService->getLang());
+        }
     }
 
     public function after(Request $request, Response $response):Response
@@ -50,7 +62,7 @@ class Middleware extends \Plenty\Plugin\Middleware
         
         /** @var ContentCacheRepositoryContract $contentCacheRepo */
         $contentCacheRepo = pluginApp(ContentCacheRepositoryContract::class);
-        $contentCacheRepo->saveCacheEntry($cacheKey, 'test'.$response->content());
+        $contentCacheRepo->saveCacheEntry($cacheKey, $response->content());
         
         //$result = Cache::store('redis_content_cache')->get($cacheKey);
 
