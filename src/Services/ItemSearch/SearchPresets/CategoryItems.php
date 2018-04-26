@@ -32,11 +32,29 @@ class CategoryItems implements SearchPreset
         $facets         = $options['facets'];
         $sorting        = SortingHelper::getCategorySorting( $options['sorting'] );
 
-        $page           = (int) $options['page'];
-        $itemsPerPage   = (int) $options['itemsPerPage'];
-        
-        $priceMin       = (float) $options['priceMin'];
-        $priceMax       = (float) $options['priceMax'];
+        $page = 1;
+        if ( array_key_exists('page', $options ) )
+        {
+            $page = (int) $options['page'];
+        }
+
+        $itemsPerPage = 20;
+        if ( array_key_exists( 'itemsPerPage', $options ) )
+        {
+            $itemsPerPage = (int) $options['itemsPerPage'];
+        }
+
+        $priceMin = 0;
+        if ( array_key_exists('priceMin', $options) )
+        {
+            $priceMin = (float) $options['priceMin'];
+        }
+
+        $priceMax = 0;
+        if ( array_key_exists('priceMax', $options) )
+        {
+            $priceMax = (float) $options['priceMax'];
+        }
 
         /** @var VariationSearchFactory $searchFactory */
         $searchFactory = pluginApp(VariationSearchFactory::class);
