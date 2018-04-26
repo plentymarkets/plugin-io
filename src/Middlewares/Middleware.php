@@ -2,8 +2,6 @@
 
 namespace IO\Middlewares;
 
-use IO\Services\SessionStorageService;
-use IO\Services\WebstoreConfigurationService;
 use Plenty\Plugin\Http\Request;
 use Plenty\Plugin\Http\Response;
 use Plenty\Modules\Frontend\Contracts\Checkout;
@@ -30,16 +28,6 @@ class Middleware extends \Plenty\Plugin\Middleware
             /** @var Checkout $checkout */
             $checkout = pluginApp(Checkout::class);
             $checkout->setBasketReferrerId($referrerId);
-        }
-        
-        /** @var SessionStorageService $sessionStorageService */
-        $sessionStorageService = pluginApp(SessionStorageService::class);
-        /** @var WebstoreConfigurationService $webstoreConfigService */
-        $webstoreConfigService = pluginApp(WebstoreConfigurationService::class);
-        
-        if($sessionStorageService->getLang() !== $webstoreConfigService->getDefaultLanguage())
-        {
-            setcookie('ceres_lang', $sessionStorageService->getLang());
         }
     }
 
