@@ -25,6 +25,7 @@ use IO\Services\OrderService;
 use IO\Services\OrderTotalsService;
 use IO\Services\SalesPriceService;
 use IO\Services\SessionStorageService;
+use IO\Services\TagService;
 use IO\Services\TemplateService;
 use IO\Services\UnitService;
 use IO\Services\UrlService;
@@ -95,6 +96,11 @@ class TwigServiceContainer
     public function getContactBank()
     {
         return pluginApp( ContactBankService::class );
+    }
+
+    public function getTag()
+    {
+        return pluginApp( TagService::class );
     }
 
     public function getTemplate()
