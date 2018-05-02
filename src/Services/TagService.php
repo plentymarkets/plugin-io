@@ -7,14 +7,12 @@ use Plenty\Modules\Tag\Contracts\TagRepositoryContract;
 
 
 /**
- * Class CustomerService
+ * Class TagService
  * @package IO\Services
  */
 class TagService
 {
-    /**
-     * @var TagRepositoryContract
-     */
+    /** @var TagRepositoryContract */
     private $tagRepository;
 
     /**
