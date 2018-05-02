@@ -48,14 +48,14 @@ class ItemListService
                 break;
         }
 
-        if ( $maxItems > 0 )
-        {
-            $searchFactory->setPage(1, $maxItems );
-        }
-
         if ( is_null($searchFactory) )
         {
             return null;
+        }
+
+        if ( $maxItems > 0 )
+        {
+            $searchFactory->setPage(1, $maxItems );
         }
         return $searchService->getResult( $searchFactory );
     }
