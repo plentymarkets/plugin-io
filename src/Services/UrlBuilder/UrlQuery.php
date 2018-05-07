@@ -4,6 +4,7 @@ namespace IO\Services\UrlBuilder;
 
 use IO\Services\SessionStorageService;
 use IO\Services\WebstoreConfigurationService;
+use Plenty\Plugin\ConfigRepository;
 
 class UrlQuery
 {
@@ -77,12 +78,16 @@ class UrlQuery
             return null;
         }
 
+        /** @var ConfigRepository $configRepository */
+        $configRepository = pluginApp(ConfigRepository::class);
+        $trailingSlash = $configRepository->get('plenty.system.info.urlTrailingSlash', 0) === 1 ? "/" : "";
+
         if ( $includeLanguage )
         {
-            return '/' . $this->lang . $this->path;
+            return '/' . $this->lang . $this->path . $trailingSlash;
         }
 
-        return $this->path;
+        return $this->path . $trailingSlash;
     }
 
     public function getPath( bool $includeLanguage = false )
