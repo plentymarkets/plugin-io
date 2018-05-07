@@ -2,6 +2,7 @@
 
 namespace IO\Controllers;
 
+use IO\Extensions\TwigTemplateContextExtension;
 use IO\Helper\ContextInterface;
 use IO\Helper\ArrayHelper;
 use IO\Helper\CategoryMap;
@@ -112,9 +113,6 @@ abstract class LayoutController extends Controller
 			$templateContainer,
             $controllerData
 		]);
-
-		$contextEvent = 'ctx' . substr($templateEvent, 3);
-		$this->event->fire( 'IO.' . $contextEvent, [$templateContainer]);
         
         return $templateContainer;
 	}
@@ -137,6 +135,7 @@ abstract class LayoutController extends Controller
 		if($templateContainer->hasTemplate())
 		{
 			TemplateService::$currentTemplate = $templateEvent;
+			TemplateService::$currentTemplateData = $controllerData;
             
             // Render the received plugin
 			return $this->renderTemplateContainer($templateContainer, $controllerData);
@@ -167,20 +166,10 @@ abstract class LayoutController extends Controller
 
         $templateData = ArrayHelper::toArray( $templateData );
 
-        $context = pluginApp( $templateContainer->getContext() );
-
-	    if ( $context instanceof ContextInterface )
-        {
-            $context->init( $controllerData );
-            $context = ArrayHelper::toArray( $context );
-        }
-
-        $twigData = array_merge( $context, $templateData );
-
 		// Render the received plugin
 		return $this->twig->render(
 			$templateContainer->getTemplate(),
-            $twigData
+            $templateData
 		);
 	}
 

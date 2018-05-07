@@ -25,7 +25,7 @@ class TemplateContainer
 	 */
 	private $templateKey = '';
 
-	/** @var ContextInterface */
+	/** @var string */
 	private $contextClass = null;
 
 	/**
