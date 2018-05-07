@@ -13,6 +13,7 @@ use IO\Services\CouponService;
 use IO\Services\CustomerService;
 use IO\Services\ItemCrossSellingService;
 use IO\Services\ItemLastSeenService;
+use IO\Services\ItemListService;
 use IO\Services\ItemLoader\Loaders\LastSeenItemList;
 use IO\Services\ItemLoader\Services\ItemLoaderService;
 use IO\Services\ItemService;
@@ -24,6 +25,7 @@ use IO\Services\OrderService;
 use IO\Services\OrderTotalsService;
 use IO\Services\SalesPriceService;
 use IO\Services\SessionStorageService;
+use IO\Services\TagService;
 use IO\Services\TemplateService;
 use IO\Services\UnitService;
 use IO\Services\UrlService;
@@ -71,6 +73,11 @@ class TwigServiceContainer
         return pluginApp(ItemLoaderService::class );
     }
 
+    public function getItemList()
+    {
+        return pluginApp( ItemListService::class );
+    }
+
     public function getOrder()
     {
         return pluginApp( OrderService::class );
@@ -89,6 +96,11 @@ class TwigServiceContainer
     public function getContactBank()
     {
         return pluginApp( ContactBankService::class );
+    }
+
+    public function getTag()
+    {
+        return pluginApp( TagService::class );
     }
 
     public function getTemplate()

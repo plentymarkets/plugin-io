@@ -30,6 +30,7 @@ class SingleItem implements SearchPreset
         $searchFactory
             ->withLanguage()
             ->withImages()
+            ->withPropertyGroups()
             ->withUrls()
             ->withPrices()
             ->withDefaultImage()
