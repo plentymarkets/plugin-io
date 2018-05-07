@@ -12,6 +12,8 @@ class TemplateService
 {
     public static $currentTemplate = "";
 
+    public static $currentTemplateData = [];
+
     public function getCurrentTemplate():string
     {
         return TemplateService::$currentTemplate;
