@@ -1,6 +1,19 @@
 # Release Notes for IO
 
-## v2.7.0 (2018-04-13) <a href="https://github.com/plentymarkets/plugin-io/compare/2.6.0...2.7.0" target="_blank"><b>Overview of all changes</b></a>
+## v2.8.0 (2018-05-07) <a href="https://github.com/plentymarkets/plugin-io/compare/2.6.0...2.7.0" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
+
+### Added
+
+- A new service (TagService) has been added in order to retrieve the name of a tag via its ID.
+- The facet type **price** has been added.
+- The option to include trailing slashes is now considered when generating URLs.
+
+### Fixed
+
+- Due to an error, data from the Ceres GlobalContext could not be loaded if accessed via a route of another plugin. This has been fixed.
+- When using Ceres and IO as a client that is not the main client, category details of the main client were loaded under certain circumstances. This has been fixed.
+
+## v2.7.0 (2018-04-13) <a href="https://github.com/plentymarkets/plugin-io/compare/2.6.0...2.7.0" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
 
 ### Added
 
