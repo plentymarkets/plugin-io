@@ -2,10 +2,12 @@
 
 namespace IO\Services;
 
+use Illuminate\Support\Collection;
 use IO\Helper\MemoryCache;
 use Plenty\Modules\Category\Models\Category;
 use Plenty\Modules\Category\Contracts\CategoryRepositoryContract;
 use Plenty\Modules\Category\Models\CategoryDetails;
+use Plenty\Plugin\Application;
 use Plenty\Repositories\Models\PaginatedResult;
 
 /**
@@ -109,10 +111,27 @@ class CategoryService
         {
             $lang = $this->sessionStorageService->getLang();
         }
+        
         $category = $this->fromMemoryCache(
             "category.$catID.$lang",
             function() use ($catID, $lang) {
-                return $this->categoryRepository->get($catID, $lang);
+                $category = $this->categoryRepository->get($catID, $lang);
+    
+                $currentDetail = [];
+                foreach($category->details as $detail)
+                {
+                    if($detail->plentyId == pluginApp(Application::class)->getPlentyId())
+                    {
+                        $currentDetail = $detail;
+                    }
+                }
+                
+                if(count($currentDetail))
+                {
+                    $category->details = pluginApp(Collection::class, [ [$currentDetail] ]);
+                }
+                
+                return $category;
             }
         );
 
