@@ -1,6 +1,6 @@
 # Release Notes for IO
 
-## v2.8.0 (2018-05-07) <a href="https://github.com/plentymarkets/plugin-io/compare/2.6.0...2.7.0" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
+## v2.8.0 (2018-05-08) <a href="https://github.com/plentymarkets/plugin-io/compare/2.6.0...2.7.0" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
 
 ### Added
 
@@ -27,6 +27,7 @@
 - Due to an error the data was not validated by the server when address data was saved or edited. This has been fixed.
 - Due to an error, the order confirmation always displayed the order status, the shipping service provider and the payment method in the system language. This has been fixed.
 - Due to an error customer class-dependent graduated rebates on gross item value were not considered in the order creation. This has been fixed.
+- Due to an error, a failed login did not issue a notification. This has been fixed.
 
 ## v2.6.0 (2018-04-03) <a href="https://github.com/plentymarkets/plugin-io/compare/2.5.2...2.6.0" target="_blank"><b>Overview of all changes</b></a>
 
