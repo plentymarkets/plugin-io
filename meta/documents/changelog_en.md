@@ -1,6 +1,6 @@
 # Release Notes for IO
 
-## v2.8.0 (2018-05-08) <a href="https://github.com/plentymarkets/plugin-io/compare/2.6.0...2.7.0" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
+## v2.8.0 (2018-05-08) <a href="https://github.com/plentymarkets/plugin-io/compare/2.7.0...2.8.0" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
 
 ### Added
 
