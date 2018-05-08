@@ -41,7 +41,15 @@ class CustomerAuthenticationResource extends ApiResource
 		$email    = $this->request->get('email', '');
 		$password = $this->request->get('password', '');
 
-		$this->authService->login((string)$email, (string)$password);
+		try
+        {
+            $this->authService->login((string)$email, (string)$password);
+        }
+        catch(\Exception $exception)
+        {
+    		$this->response->error( ResponseCode::UNAUTHORIZED, $exception->getMessage() );
+            return $this->response->create(null, ResponseCode::UNAUTHORIZED);
+        }
 
 		return $this->response->create(null, ResponseCode::OK);
 	}
