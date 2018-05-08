@@ -12,6 +12,13 @@ class UrlQuery
     private $path;
     private $lang;
 
+    public static function shouldAppendTrailingSlash()
+    {
+        /** @var ConfigRepository $configRepository */
+        $configRepository = pluginApp(ConfigRepository::class);
+        return $configRepository->get('plenty.system.info.urlTrailingSlash', 0) === 2;
+    }
+
     public function __construct( $path = null, $lang = null )
     {
         $this->domain = pluginApp(WebstoreConfigurationService::class )->getWebstoreConfig()->domainSsl;
@@ -78,9 +85,7 @@ class UrlQuery
             return null;
         }
 
-        /** @var ConfigRepository $configRepository */
-        $configRepository = pluginApp(ConfigRepository::class);
-        $trailingSlash = $configRepository->get('plenty.system.info.urlTrailingSlash', 0) === 1 ? "/" : "";
+        $trailingSlash = self::shouldAppendTrailingSlash() ? "/" : "";
 
         if ( $includeLanguage )
         {
