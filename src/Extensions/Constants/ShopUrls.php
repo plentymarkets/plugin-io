@@ -6,6 +6,8 @@ use IO\Services\UrlBuilder\UrlQuery;
 
 class ShopUrls
 {
+    public $appendTrailingSlash = false;
+    public $trailingSlashSuffix = "";
     public $basket              = "";
     public $cancellationForm    = "";
     public $cancellationRights  = "";
@@ -20,6 +22,9 @@ class ShopUrls
 
     public function __construct()
     {
+        $this->appendTrailingSlash      = UrlQuery::shouldAppendTrailingSlash();
+        $this->trailingSlashSuffix      = $this->appendTrailingSlash ? '/' : '';
+
         $this->basket                   = pluginApp(UrlQuery::class, ['path' => '/basket'] )->toRelativeUrl();
         $this->cancellationForm         = pluginApp(UrlQuery::class, ['path' => '/cancellation-form'] )->toRelativeUrl();
         $this->cancellationRights       = pluginApp(UrlQuery::class, ['path' => '/cancellation-rights'] )->toRelativeUrl();
