@@ -67,7 +67,7 @@ class IORouteServiceProvider extends RouteServiceProvider
             $api->resource('io/localization/language', 'LanguageResource');
             $api->resource('io/itemWishList', 'ItemWishListResource');
             $api->resource('io/cache/reset_template_cache', 'ResetTemplateCacheResource');
-            $api->resource('io/shipping/country', 'ShippingCountryResource@store');
+            $api->resource('io/shipping/country', 'ShippingCountryResource');
 		});
 
 		$enabledRoutes = explode(", ",  $config->get("IO.routing.enabled_routes") );
