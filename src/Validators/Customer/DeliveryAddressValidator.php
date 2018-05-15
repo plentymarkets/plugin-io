@@ -2,6 +2,7 @@
 
 namespace IO\Validators\Customer;
 
+use IO\Services\LocalizationService;
 use Plenty\Validation\Validator;
 use IO\Services\TemplateConfigService;
 
