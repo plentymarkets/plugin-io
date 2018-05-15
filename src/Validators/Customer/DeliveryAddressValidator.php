@@ -46,10 +46,15 @@ class DeliveryAddressValidator extends Validator
                 $this->addString('name1',     $this->isRequired('name1'));
             }
 
+            $localizationService = pluginApp(LocalizationService::class);
+            if ($localizationService->hasCountryStates(self::$addressData['countryId']))
+            {
+                $this->addString('stateId',  $this->isRequired('stateId'));
+            }
+
             $this->addString('name4',     $this->isRequired('name4'));
             $this->addString('address3',  $this->isRequired('address3'));
             $this->addString('address4',  $this->isRequired('address4'));
-            $this->addString('stateId',  $this->isRequired('stateId'));
             $this->addString('title',     $this->isRequired('title'));
             $this->addString('telephone', $this->isRequired('telephone'));
         }

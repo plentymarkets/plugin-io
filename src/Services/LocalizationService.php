@@ -69,4 +69,21 @@ class LocalizationService
             return $resource->load( "$plugin::lang/en/$group")->getData();
         }
     }
+
+    public function hasCountryStates($countryId): bool
+    {
+        $sessionStorage = pluginApp(SessionStorageService::class);
+        $country = pluginApp(CountryService::class);
+        $lang = $sessionStorage->getLang();
+
+        if(is_null($lang) || !strlen($lang))
+        {
+            $lang = 'de';
+        }
+
+        $activeCountries = $country->getActiveCountriesList($lang);
+        $key = array_search($countryId, array_column($activeCountries, 'id'));
+
+        return $activeCountries[$key]->states->isNotEmpty();
+    }
 }
