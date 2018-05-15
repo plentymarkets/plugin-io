@@ -1,5 +1,11 @@
 # Release Notes for IO
 
+## v2.8.1 (2018-05-16) <a href="https://github.com/plentymarkets/plugin-io/compare/2.8.0...2.8.1" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
+
+### Fixed
+
+- Due to an error, addresses could not be created or edited, if no federal states were available for the selected country of delivery. This has been fixed.
+
 ## v2.8.0 (2018-05-08) <a href="https://github.com/plentymarkets/plugin-io/compare/2.7.0...2.8.0" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
 
 ### Added

@@ -1,5 +1,11 @@
 # Release Notes für IO
 
+## v2.8.1 (2018-05-16) <a href="https://github.com/plentymarkets/plugin-io/compare/2.8.0...2.8.1" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
+
+### Behoben
+
+- Durch einen Fehler konnten Adressen nicht angelegt oder geändert werden wenn für das ausgewählte Lieferland keine Bundesländer verfügbar waren. Dies wurde behoben.
+
 ## v2.8.0 (2018-05-08) <a href="https://github.com/plentymarkets/plugin-io/compare/2.7.0...2.8.0" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
 
 ### Hinzugefügt
