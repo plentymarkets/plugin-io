@@ -24,9 +24,9 @@ class ShippingPrivacyHintResource extends ApiResource
     
     public function store():Response
     {
-        $hintAccepted = $this->request->get('hintAccepted', '');
+        $hintAccepted = $this->request->get('hintAccepted', "false");
         $sessionStorage = pluginApp(SessionStorageService::class);
-        $sessionStorage->setSessionValue(SessionStorageKeys::SHIPPING_PRIVACY_HINT_ACCEPTED, $this->request->get('hintAccepted', ''));
+        $sessionStorage->setSessionValue(SessionStorageKeys::SHIPPING_PRIVACY_HINT_ACCEPTED, $hintAccepted);
 
         return $this->response->create($hintAccepted, ResponseCode::CREATED );
     }
