@@ -30,7 +30,7 @@ class OrderAdditionalInformationResource extends ApiResource
         $this->setContactWish();
         $this->setShippingPrivacyHint();
 
-        return $this->response->create("", ResponseCode::CREATED );
+        return $this->response->create('', ResponseCode::CREATED );
     }
 
     private function setContactWish()
