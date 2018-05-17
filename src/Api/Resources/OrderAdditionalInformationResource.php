@@ -47,6 +47,6 @@ class OrderAdditionalInformationResource extends ApiResource
     {
         $this->sessionStorage->setSessionValue(
             SessionStorageKeys::SHIPPING_PRIVACY_HINT_ACCEPTED,
-            $this->request->get('hintAccepted', 'false'));
+            $this->request->get('shippingPrivacyHintAccepted', 'false'));
     }
 }
