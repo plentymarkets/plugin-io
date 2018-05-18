@@ -4,12 +4,20 @@ namespace IO\Services\UrlBuilder;
 
 use IO\Services\SessionStorageService;
 use IO\Services\WebstoreConfigurationService;
+use Plenty\Plugin\ConfigRepository;
 
 class UrlQuery
 {
     private $domain;
     private $path;
     private $lang;
+
+    public static function shouldAppendTrailingSlash()
+    {
+        /** @var ConfigRepository $configRepository */
+        $configRepository = pluginApp(ConfigRepository::class);
+        return $configRepository->get('plenty.system.info.urlTrailingSlash', 0) === 2;
+    }
 
     public function __construct( $path = null, $lang = null )
     {
@@ -77,12 +85,14 @@ class UrlQuery
             return null;
         }
 
+        $trailingSlash = self::shouldAppendTrailingSlash() ? "/" : "";
+
         if ( $includeLanguage )
         {
-            return '/' . $this->lang . $this->path;
+            return '/' . $this->lang . $this->path . $trailingSlash;
         }
 
-        return $this->path;
+        return $this->path . $trailingSlash;
     }
 
     public function getPath( bool $includeLanguage = false )
