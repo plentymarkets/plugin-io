@@ -6,6 +6,7 @@ use IO\Helper\MemoryCache;
 use IO\Services\UrlBuilder\CategoryUrlBuilder;
 use IO\Services\UrlBuilder\UrlQuery;
 use IO\Services\UrlBuilder\VariationUrlBuilder;
+use Plenty\Plugin\Http\Request;
 
 class UrlService
 {
@@ -132,6 +133,15 @@ class UrlService
 
         return $canonicalUrl;
 
+    }
+
+    public function isCanonical()
+    {
+        $requestUri = pluginApp(Request::class)->getRequestUri();
+        $requestUrl = pluginApp( UrlQuery::class, ['path' => $requestUri])->toAbsoluteUrl(true);
+        $canonical = $this->getCanonicalURL();
+
+        return $requestUrl === $canonical;
     }
 
     /**

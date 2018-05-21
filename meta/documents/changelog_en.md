@@ -1,6 +1,25 @@
 # Release Notes for IO
 
-## v2.7.0 (2018-04-13) <a href="https://github.com/plentymarkets/plugin-io/compare/2.6.0...2.7.0" target="_blank"><b>Overview of all changes</b></a>
+## v2.8.1 (2018-05-16) <a href="https://github.com/plentymarkets/plugin-io/compare/2.8.0...2.8.1" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
+
+### Fixed
+
+- Due to an error, addresses could not be created or edited, if no federal states were available for the selected country of delivery. This has been fixed.
+
+## v2.8.0 (2018-05-08) <a href="https://github.com/plentymarkets/plugin-io/compare/2.7.0...2.8.0" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
+
+### Added
+
+- A new service (TagService) has been added in order to retrieve the name of a tag via its ID.
+- The facet type **price** has been added.
+- The option to include trailing slashes is now considered when generating URLs.
+
+### Fixed
+
+- Due to an error, data from the Ceres GlobalContext could not be loaded if accessed via a route of another plugin. This has been fixed.
+- When using Ceres and IO as a client that is not the main client, category details of the main client were loaded under certain circumstances. This has been fixed.
+
+## v2.7.0 (2018-04-13) <a href="https://github.com/plentymarkets/plugin-io/compare/2.6.0...2.7.0" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
 
 ### Added
 
@@ -14,6 +33,7 @@
 - Due to an error the data was not validated by the server when address data was saved or edited. This has been fixed.
 - Due to an error, the order confirmation always displayed the order status, the shipping service provider and the payment method in the system language. This has been fixed.
 - Due to an error customer class-dependent graduated rebates on gross item value were not considered in the order creation. This has been fixed.
+- Due to an error, a failed login did not issue a notification. This has been fixed.
 
 ## v2.6.0 (2018-04-03) <a href="https://github.com/plentymarkets/plugin-io/compare/2.5.2...2.6.0" target="_blank"><b>Overview of all changes</b></a>
 

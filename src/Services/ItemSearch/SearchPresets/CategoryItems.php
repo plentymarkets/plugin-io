@@ -16,6 +16,8 @@ use IO\Services\ItemSearch\Helper\SortingHelper;
  * - sorting:       Configuration value from plugin config
  * - page:          Current page
  * - itemsPerPage:  Number of items per page
+ * - priceMin:      Minimum price of the variations
+ * - priceMax       Maximum price of the variations
  *
  * @package IO\Services\ItemSearch\SearchPresets
  */
@@ -30,8 +32,29 @@ class CategoryItems implements SearchPreset
         $facets         = $options['facets'];
         $sorting        = SortingHelper::getCategorySorting( $options['sorting'] );
 
-        $page           = (int) $options['page'];
-        $itemsPerPage   = (int) $options['itemsPerPage'];
+        $page = 1;
+        if ( array_key_exists('page', $options ) )
+        {
+            $page = (int) $options['page'];
+        }
+
+        $itemsPerPage = 20;
+        if ( array_key_exists( 'itemsPerPage', $options ) )
+        {
+            $itemsPerPage = (int) $options['itemsPerPage'];
+        }
+
+        $priceMin = 0;
+        if ( array_key_exists('priceMin', $options) )
+        {
+            $priceMin = (float) $options['priceMin'];
+        }
+
+        $priceMax = 0;
+        if ( array_key_exists('priceMax', $options) )
+        {
+            $priceMax = (float) $options['priceMax'];
+        }
 
         /** @var VariationSearchFactory $searchFactory */
         $searchFactory = pluginApp(VariationSearchFactory::class);
@@ -52,6 +75,7 @@ class CategoryItems implements SearchPreset
             ->isHiddenInCategoryList(false)
             ->hasNameInLanguage()
             ->hasPriceForCustomer()
+            ->hasPriceInRange($priceMin, $priceMax)
             ->hasFacets( $facets )
             ->sortByMultiple( $sorting )
             ->setPage( $page, $itemsPerPage )

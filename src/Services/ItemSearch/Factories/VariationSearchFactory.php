@@ -2,6 +2,8 @@
 
 namespace IO\Services\ItemSearch\Factories;
 
+use IO\Helper\CurrencyConverter;
+use IO\Helper\VatConverter;
 use IO\Services\ItemLoader\Contracts\FacetExtension;
 use IO\Services\ItemLoader\Services\FacetExtensionContainer;
 use IO\Services\ItemSearch\Extensions\CurrentCategoryExtension;
@@ -19,12 +21,15 @@ use Plenty\Modules\Item\Search\Aggregations\ItemCardinalityAggregationProcessor;
 use Plenty\Modules\Item\Search\Filter\CategoryFilter;
 use Plenty\Modules\Item\Search\Filter\ClientFilter;
 use Plenty\Modules\Item\Search\Filter\CrossSellingFilter;
+use Plenty\Modules\Item\Search\Filter\PriceFilter;
 use Plenty\Modules\Item\Search\Filter\SalesPriceFilter;
 use Plenty\Modules\Item\Search\Filter\SearchFilter;
+use Plenty\Modules\Item\Search\Filter\TagFilter;
 use Plenty\Modules\Item\Search\Filter\TextFilter;
 use Plenty\Modules\Item\Search\Filter\VariationBaseFilter;
 use Plenty\Modules\Item\Search\Helper\SearchHelper;
 use Plenty\Modules\Item\Search\Mutators\ImageMutator;
+use Plenty\Modules\Item\Search\Mutators\VariationPropertyGroupMutator;
 use Plenty\Plugin\Application;
 
 /**
@@ -262,6 +267,52 @@ class VariationSearchFactory extends BaseSearchFactory
         $this->hasAtLeastOnePrice( $priceDetectService->getPriceIdsForCustomer() );
         return $this;
     }
+    
+    public function hasPriceInRange($priceMin, $priceMax)
+    {
+        if( !( (float)$priceMin == 0 && (float)$priceMax == 0 ) )
+        {
+            /** @var CurrencyConverter $currencyConverter */
+            $currencyConverter = pluginApp(CurrencyConverter::class);
+            
+            /** @var VatConverter $vatConverter */
+            $vatConverter = pluginApp(VatConverter::class);
+            
+            $priceMin = $vatConverter->convertToGross($currencyConverter->convertToDefaultCurrency((float)$priceMin));
+            $priceMax = $vatConverter->convertToGross($currencyConverter->convertToDefaultCurrency((float)$priceMax));
+    
+            if((float)$priceMax == 0)
+            {
+                $priceMax = null;
+            }
+            
+            /** @var PriceFilter $priceRangeFilter */
+            $priceRangeFilter = $this->createFilter(PriceFilter::class);
+            $priceRangeFilter->between($priceMin, $priceMax);
+        }
+        
+        return $this;
+    }
+
+    public function hasTag($tagId)
+    {
+        return $this->hasAnyTag([$tagId]);
+    }
+
+    public function hasAnyTag($tagIds)
+    {
+        /** @var TagFilter $tagFilter */
+        $tagFilter = $this->createFilter(TagFilter::class);
+        if ( count($tagIds) === 1 )
+        {
+            $tagFilter->hasTag((int) $tagIds[0]);
+        }
+        else if ( count($tagIds) > 1 )
+        {
+            $tagFilter->hasAnyTag( $tagIds );
+        }
+        return $this;
+    }
 
     /**
      * Group results depending on a config value.
@@ -467,6 +518,14 @@ class VariationSearchFactory extends BaseSearchFactory
         $imageMutator->addClient( $clientId );
         $this->withMutator( $imageMutator );
 
+        return $this;
+    }
+    
+    public function withPropertyGroups()
+    {
+        $propertyGroupMutator = pluginApp(VariationPropertyGroupMutator::class);
+        $this->withMutator($propertyGroupMutator);
+        
         return $this;
     }
 

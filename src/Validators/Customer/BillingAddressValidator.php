@@ -2,6 +2,7 @@
 
 namespace IO\Validators\Customer;
 
+use IO\Services\LocalizationService;
 use Plenty\Validation\Validator;
 use IO\Services\TemplateConfigService;
 
@@ -47,11 +48,16 @@ class BillingAddressValidator extends Validator
                 $this->addString('vatNumber', $this->isRequired('vatNumber'));
             }
 
+            $localizationService = pluginApp(LocalizationService::class);
+            if ($localizationService->hasCountryStates(self::$addressData['countryId']))
+            {
+                $this->addString('stateId',  $this->isRequired('stateId'));
+            }
+
             $this->addString('birthday',  $this->isRequired('birthday'));
             $this->addString('name4',     $this->isRequired('name4'));
             $this->addString('address3',  $this->isRequired('address3'));
             $this->addString('address4',  $this->isRequired('address4'));
-            $this->addString('stateId',  $this->isRequired('stateId'));
             $this->addString('title', $this->isRequired('title'));
             $this->addString('telephone', $this->isRequired('telephone'));
         }

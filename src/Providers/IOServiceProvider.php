@@ -5,6 +5,7 @@ namespace IO\Providers;
 use IO\Extensions\Sitemap\IOSitemapPattern;
 use IO\Extensions\TwigIOExtension;
 use IO\Extensions\TwigServiceProvider;
+use IO\Extensions\TwigTemplateContextExtension;
 use IO\Middlewares\Middleware;
 use IO\Services\AuthenticationService;
 use IO\Services\AvailabilityService;
@@ -115,6 +116,7 @@ class IOServiceProvider extends ServiceProvider
     {
         $twig->addExtension(TwigServiceProvider::class);
         $twig->addExtension(TwigIOExtension::class);
+        $twig->addExtension(TwigTemplateContextExtension::class);
         $twig->addExtension('Twig_Extensions_Extension_Intl');
         $twig->addExtension(TwigLoaderPresets::class);
         
