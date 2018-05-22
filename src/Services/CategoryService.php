@@ -191,6 +191,11 @@ class CategoryService
         return $categoryUrl;
 	}
 
+	public function getURLById($categoryId, $lang = null)
+    {
+        return $this->getURL($this->get($categoryId), $lang);
+    }
+
     /**
      * @param $category
      * @param $lang
