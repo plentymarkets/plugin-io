@@ -347,11 +347,11 @@ class ItemService
         );
 
 
-        if(is_array($variation) && count($variation['documents']))
+        if(is_array($variation) && count($variation[0]['documents']))
         {
             /** @var ItemImagesFilter $itemImageFilter */
             $itemImageFilter = pluginApp( ItemImagesFilter::class );
-            return $itemImageFilter->getFirstItemImageUrl( $variation['documents'][0]['data']['images'], $imageAccessor );
+            return $itemImageFilter->getFirstItemImageUrl( $variation[0]['documents'][0]['data']['images'], $imageAccessor );
         }
 
         return '';
