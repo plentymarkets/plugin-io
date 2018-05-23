@@ -7,6 +7,10 @@
 - Es wurde die Methode **getURLById** im CategoryService hinzugefügt, welche die URL einer Kategorie ausgibt.
 - Die Route **io/order/additional_information** wurde hinzugefügt, um zusätzliche Auftragsinformationen hinzufügen und ändern zu können.
 
+### Behoben
+
+- Die an der Kategorie hinterlegten Canonical URLs wurden nicht benutzt. Diese werden nun berücksichtigt.
+
 ## v2.8.1 (2018-05-16) <a href="https://github.com/plentymarkets/plugin-io/compare/2.8.0...2.8.1" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
 
 ### Behoben
