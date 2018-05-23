@@ -2,6 +2,7 @@
 
 namespace IO\Middlewares;
 
+use IO\Api\ResponseCode;
 use Plenty\Plugin\Http\Request;
 use Plenty\Plugin\Http\Response;
 use Plenty\Modules\Frontend\Contracts\Checkout;
@@ -46,14 +47,20 @@ class Middleware extends \Plenty\Plugin\Middleware
             return $response;
         }
         
-        $cacheKey = $_SERVER['REQUEST_URI'];
-        
         /** @var ContentCacheRepositoryContract $contentCacheRepo */
         $contentCacheRepo = pluginApp(ContentCacheRepositoryContract::class);
-        $contentCacheRepo->saveCacheEntry($cacheKey, $response->content());
         
-        //$result = Cache::store('redis_content_cache')->get($cacheKey);
-
+        $contentCacheRepo->saveCacheEntry($_SERVER['REQUEST_URI'], $response->content());
+        
+        $responseContent = $response->content();
+        $response = $response->make(
+            $responseContent,
+            ResponseCode::OK,
+           ['plenty_cache' => $contentCacheRepo->setCacheCookie($_SERVER['REQUEST_URI'])]
+        );
+    
+        //$response->header('plenty_cache', $contentCacheRepo->setCacheCookie($_SERVER['REQUEST_URI']));
+        
         return $response;
     }
 }

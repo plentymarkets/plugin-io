@@ -8,6 +8,7 @@ use IO\Api\ApiResource;
 use IO\Api\ApiResponse;
 use IO\Api\ResponseCode;
 use IO\Services\AuthenticationService;
+use Plenty\Modules\ContentCache\Contracts\ContentCacheRepositoryContract;
 
 /**
  * Class CustomerAuthenticationResource
@@ -51,7 +52,9 @@ class CustomerAuthenticationResource extends ApiResource
             return $this->response->create(null, ResponseCode::UNAUTHORIZED);
         }
 
-		return $this->response->create(null, ResponseCode::OK);
+        /** @var ContentCacheRepositoryContract $contentCacheRepo */
+        $contentCacheRepo = pluginApp(ContentCacheRepositoryContract::class);
+		return $this->response->create(null, ResponseCode::OK, ['plenty_cache' => $contentCacheRepo->setCacheCookie($_SERVER['REQUEST_URI'])]);
 	}
 
 }
