@@ -107,6 +107,13 @@ class UrlService
 
                     if ( $currentCategory !== null )
                     {
+                        $categoryDetails = $categoryService->getDetails( $currentCategory, $lang );
+
+                        if($categoryDetails !== null && strlen($categoryDetails->canonicalLink) > 0)
+                        {
+                            return $categoryDetails->canonicalLink;
+                        }
+
                         return $this
                             ->getCategoryURL( $currentCategory->id, $lang )
                             ->toAbsoluteUrl( $lang !== null );
