@@ -20,18 +20,10 @@ class CategoryUrlBuilder
 
         if ( $category !== null )
         {
-            $categoryDetails = $categoryService->getDetails( $category, $lang );
-            if ( $categoryDetails !== null && strlen( $categoryDetails->canonicalLink ) > 0 )
-            {
-                return $this->buildUrlQuery( $categoryDetails->canonicalLink, $lang );
-            }
-            else
-            {
-                return $this->buildUrlQuery(
-                    $categoryService->getURL( $category, $lang ),
-                    $lang
-                );
-            }
+            return $this->buildUrlQuery(
+                $categoryService->getURL( $category, $lang ),
+                $lang
+            );
         }
     }
 
