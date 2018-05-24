@@ -10,6 +10,7 @@
 ### Behoben
 
 - Die an der Kategorie hinterlegten Canonical URLs wurden nicht benutzt. Diese werden nun berücksichtigt.
+- Durch einen Fehler wurden keine Bilder-URLs von der Funktion ItemService.getVariationImage() zurückgegeben. Dies wurde behoben.
 
 ## v2.8.1 (2018-05-16) <a href="https://github.com/plentymarkets/plugin-io/compare/2.8.0...2.8.1" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
 
