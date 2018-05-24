@@ -10,6 +10,7 @@
 ### Fixed
 
 - The canonical URLs stored on the category level were not properly utilised. This has been fixed.
+- Due to an error, the function ItemService.getVariationImage() did not return image URLs. This has been fixed.
 
 ## v2.8.1 (2018-05-16) <a href="https://github.com/plentymarkets/plugin-io/compare/2.8.0...2.8.1" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
 
