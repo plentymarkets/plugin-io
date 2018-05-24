@@ -9,7 +9,9 @@ use IO\Services\CheckoutService;
 use Plenty\Modules\Frontend\PaymentMethod\Contracts\FrontendPaymentMethodRepositoryContract;
 use Plenty\Modules\Frontend\Services\OrderPropertyFileService;
 use Plenty\Modules\Frontend\Services\VatService;
-
+use Plenty\Modules\Accounting\Vat\Contracts\VatRepositoryContract;
+use Plenty\Modules\System\Contracts\WebstoreRepositoryContract;
+use Plenty\Modules\Accounting\Vat\Models\Vat;
 /**
  * Class OrderItemBuilder
  * @package IO\Builder\Order
@@ -29,15 +31,32 @@ class OrderItemBuilder
 	/** @var ItemNameFilter */
 	private $itemNameFilter;
 
-	/**
-	 * OrderItemBuilder constructor.
-	 * @param CheckoutService $checkoutService
-	 */
-	public function __construct(CheckoutService $checkoutService, VatService $vatService, ItemNameFilter $itemNameFilter)
+    /**
+     * @var VatRepositoryContract
+     */
+    private $vatRepository;
+
+    /**
+     * @var WebstoreRepositoryContract
+     */
+    private $webstoreRepository;
+
+    /**
+     * OrderItemBuilder constructor.
+     *
+     * @param CheckoutService $checkoutService
+     * @param VatService $vatService
+     * @param ItemNameFilter $itemNameFilter
+     * @param WebstoreRepositoryContract $webstoreRepository
+     * @param VatRepositoryContract $vatRepository
+     */
+	public function __construct(CheckoutService $checkoutService, VatService $vatService, ItemNameFilter $itemNameFilter, WebstoreRepositoryContract $webstoreRepository, VatRepositoryContract $vatRepository)
 	{
 		$this->checkoutService = $checkoutService;
 		$this->vatService = $vatService;
-		$this->itemNameFilter = $itemNameFilter;
+        $this->webstoreRepository = $webstoreRepository;
+        $this->vatRepository = $vatRepository;
+        $this->itemNameFilter = $itemNameFilter;
 	}
 
 	/**
@@ -70,6 +89,7 @@ class OrderItemBuilder
             "orderItemName" => "shipping costs",
             "countryVatId"  => $this->vatService->getCountryVatId(),
             "vatRate"       => $maxVatRate,
+            'vatField'      => $this->getVatField($this->vatService->getVat(), $maxVatRate),
             "amounts"       => [
                 [
                     "currency"              => $this->checkoutService->getCurrency(),
@@ -89,7 +109,8 @@ class OrderItemBuilder
 			"orderItemName" => "payment surcharge",
 			"countryVatId"  => $this->vatService->getCountryVatId(),
 			"vatRate"       => $maxVatRate,
-			"amounts"       => [
+            'vatField'      => $this->getVatField($this->vatService->getVat(), $maxVatRate),
+            "amounts"       => [
 				[
 					"currency"           => $this->checkoutService->getCurrency(),
 					"priceOriginalGross" => $paymentFee
@@ -161,7 +182,7 @@ class OrderItemBuilder
 			"shippingProfileId" => $basketItem['shippingProfileId'],
 			"countryVatId"      => $this->vatService->getCountryVatId(),
 			"vatRate"           => $basketItem['vat'],
-			//"vatField"			=> $basketItem->vatField,// TODO
+            "vatField"			=> $this->getVatField($this->vatService->getVat(), $basketItem['vat']),
             "orderProperties"   => $basketItemProperties,
 			"amounts"           => [
 				[
@@ -175,4 +196,36 @@ class OrderItemBuilder
 		];
 	}
 
+    /**
+     * Get the vat field for the given vat rate.
+     *
+     * @param Vat   $vat		The country VAT instance.
+     * @param float $vatRate	The vat rate.
+     *
+     * @return int
+     */
+    public function getVatField(Vat $vat, $vatRate)
+    {
+        $vatRateArray = $vat->vatRates;
+        switch($vatRate)
+        {
+            case $vatRateArray[0]->vatRate:
+                return 0;
+            case $vatRateArray[1]->vatRate:
+                return 1;
+            case $vatRateArray[2]->vatRate:
+                return 2;
+            case $vatRateArray[3]->vatRate:
+                return 3;
+            default:
+                if($vat->isStandard)
+                {
+                    return 0;
+                }
+        }
+        $storeId = $vat->location->clientId;
+        $plentyId = (int)$this->webstoreRepository->findById($storeId)->storeIdentifier;
+        $standardVat = $this->vatRepository->getStandardVat($plentyId);
+        return $this->getVatField($standardVat, $vatRate);
+    }
 }
