@@ -54,7 +54,7 @@ class CustomerAuthenticationResource extends ApiResource
 
         /** @var ContentCacheRepositoryContract $contentCacheRepo */
         $contentCacheRepo = pluginApp(ContentCacheRepositoryContract::class);
-		return $this->response->create(null, ResponseCode::OK, ['plenty_cache' => $contentCacheRepo->setCacheCookie($_SERVER['REQUEST_URI'])]);
+		return $this->response->create(null, ResponseCode::OK, ['plenty_cache' => $contentCacheRepo->setCacheCookie()]);
 	}
 
 }
