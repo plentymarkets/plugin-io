@@ -2,18 +2,16 @@
 
 namespace IO\Models;
 
-use IO\Builder\Order\OrderType;
 use IO\Extensions\Filters\ItemImagesFilter;
+use IO\Services\CustomerService;
 use IO\Services\ItemSearch\Factories\VariationSearchFactory;
 use IO\Services\ItemSearch\Services\ItemSearchService;
+use Plenty\Modules\Account\Contact\Contracts\ContactRepositoryContract;
 use Plenty\Modules\Order\Models\Order;
 use Plenty\Modules\Order\Status\Models\OrderStatusName;
 use Plenty\Modules\Frontend\PaymentMethod\Contracts\FrontendPaymentMethodRepositoryContract;
-//use Plenty\Modules\Order\Status\Contracts\StatusRepositoryContract;
 use Plenty\Modules\Order\Shipping\Contracts\ParcelServicePresetRepositoryContract;
 use IO\Extensions\Filters\URLFilter;
-use IO\Services\ItemService;
-use IO\Services\OrderService;
 
 class LocalizedOrder extends ModelWrapper
 {
@@ -41,6 +39,8 @@ class LocalizedOrder extends ModelWrapper
     public $itemURLs = [];
     public $itemImages = [];
     public $isReturnable = false;
+
+    public $highlightNetPrices = false;
 
     /**
      * @param Order $order
@@ -139,10 +139,12 @@ class LocalizedOrder extends ModelWrapper
 
         foreach( $orderVariations['documents'] as $orderVariation )
         {
-            $variationId = $orderVariation['data']['variation']['id'];
+            $variationId =  $orderVariation['data']['variation']['id'];
             $instance->itemURLs[$variationId]   = $urlFilter->buildItemURL( $orderVariation['data'] );
             $instance->itemImages[$variationId] = $imageFilter->getFirstItemImageUrl( $orderVariation['data']['images'], 'urlPreview' );
         }
+
+        $instance->hightlightNetPrices();
 
         return $instance;
     }
@@ -172,5 +174,49 @@ class LocalizedOrder extends ModelWrapper
         ];
 
         return $data;
+    }
+
+    private function hightlightNetPrices()
+    {
+        $isOrderNet = $this->order->amounts[0]->isNet;
+
+        $orderContactId = 0;
+        foreach ($this->order->getRelationsAttribute() as $relation)
+        {
+            if ($relation['referenceType'] == 'contact' && (int)$relation['referenceId'] > 0)
+            {
+                $orderContactId = $relation['referenceId'];
+            }
+        }
+
+        /** @var CustomerService $customerService */
+        $customerService = pluginApp(CustomerService::class);
+
+        $showNet = $customerService->showNetPricesByContactId($orderContactId);
+
+        return 1;
+
+
+//        if ($orderContactId > 0)
+//        {
+//            /** @var ContactRepositoryContract $contactRepository */
+//            $contactRepository = pluginApp(ContactRepositoryContract::class);
+//
+//            $contactClassId = $contactRepository->findContactById($orderContactId)->classId;
+//
+//            /** @var CustomerService $customerService */
+//            $customerService = pluginApp(CustomerService::class);
+//
+//            $contactClassShowNetPrice = $customerService->getContactClassData($contactClassId)["showNetPrice"];
+//        }
+//        else
+//        {
+//            /** @var CustomerService $customerService */
+//            $customerService = pluginApp(CustomerService::class);
+//
+//            $customerService->get
+//        }
+//
+//        return 1;
     }
 }

@@ -57,6 +57,10 @@ class CustomerService
      */
     private $addressRepository;
     /**
+     * @var ContactClassRepositoryContract
+     */
+    private $contactClassRepository;
+    /**
      * @var SessionStorageService
      */
     private $sessionStorage;
@@ -64,7 +68,7 @@ class CustomerService
 	 * @var UserSession
 	 */
 	private $userSession = null;
-    
+
     /**
      * CustomerService constructor.
      * @param ContactAccountRepositoryContract $accountRepository
@@ -78,12 +82,14 @@ class CustomerService
 		ContactRepositoryContract $contactRepository,
 		ContactAddressRepositoryContract $contactAddressRepository,
         AddressRepositoryContract $addressRepository,
+        ContactClassRepositoryContract $contactClassRepository,
         SessionStorageService $sessionStorage)
 	{
 	    $this->accountRepository        = $accountRepository;
 		$this->contactRepository        = $contactRepository;
 		$this->contactAddressRepository = $contactAddressRepository;
         $this->addressRepository        = $addressRepository;
+        $this->contactClassRepository   = $contactClassRepository;
         $this->sessionStorage           = $sessionStorage;
 	}
 
@@ -149,6 +155,48 @@ class CustomerService
                 }
 
                 return $customerShowNet || $contactClassShowNet;
+            }
+        );
+    }
+
+    public function showNetPricesByContactId(int $contactId)
+    {
+        return $this->fromMemoryCache("showNetPrices.$contactId",
+            function() use ($contactId)
+            {
+                /** @var AuthHelper $authHelper */
+                $authHelper = pluginApp(AuthHelper::class);
+
+                if ($contactId > 0)
+                {
+                    $contact = $authHelper->processUnguarded( function() use ($contactId)
+                    {
+                        return $this->contactRepository->findContactById($contactId);
+                    });
+
+                    if ($contact !== null)
+                    {
+                        $contactClass = $this->getContactClassData($contact->classId);
+
+                        if ($contactClass !== null)
+                        {
+                            return $contactClass['showNetPrice'];
+                        }
+                    }
+                }
+                else
+                {
+                    $contactClassId = $this->getDefaultContactClassId();
+                    $contactClass = $this->getContactClassData($contactClassId);
+
+                    if ($contactClass !== null)
+                    {
+                        return $contactClass['showNetPrice'];
+                    }
+                }
+
+
+                return false;
             }
         );
     }
