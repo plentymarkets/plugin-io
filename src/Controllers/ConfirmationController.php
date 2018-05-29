@@ -89,6 +89,10 @@ class ConfirmationController extends LayoutController
                 ]
             );
         }
+        elseif(!$order instanceof LocalizedOrder && !is_null($order))
+        {
+            return $order;
+        }
         else
         {
             return $this->renderTemplate(
