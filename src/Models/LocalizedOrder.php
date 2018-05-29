@@ -144,8 +144,6 @@ class LocalizedOrder extends ModelWrapper
             $instance->itemImages[$variationId] = $imageFilter->getFirstItemImageUrl( $orderVariation['data']['images'], 'urlPreview' );
         }
 
-        $instance->hightlightNetPrices();
-
         return $instance;
     }
 
@@ -170,13 +168,14 @@ class LocalizedOrder extends ModelWrapper
             "paymentMethodIcon"     => $this->paymentMethodIcon,
             "itemURLs"              => $this->itemURLs,
             "itemImages"            => $this->itemImages,
-            "isReturnable"          => $this->isReturnable
+            "isReturnable"          => $this->isReturnable,
+            "highlightNetPrices"    => $this->highlightNetPrices()
         ];
 
         return $data;
     }
 
-    private function hightlightNetPrices()
+    private function highlightNetPrices()
     {
         $isOrderNet = $this->order->amounts[0]->isNet;
 
@@ -194,29 +193,6 @@ class LocalizedOrder extends ModelWrapper
 
         $showNet = $customerService->showNetPricesByContactId($orderContactId);
 
-        return 1;
-
-
-//        if ($orderContactId > 0)
-//        {
-//            /** @var ContactRepositoryContract $contactRepository */
-//            $contactRepository = pluginApp(ContactRepositoryContract::class);
-//
-//            $contactClassId = $contactRepository->findContactById($orderContactId)->classId;
-//
-//            /** @var CustomerService $customerService */
-//            $customerService = pluginApp(CustomerService::class);
-//
-//            $contactClassShowNetPrice = $customerService->getContactClassData($contactClassId)["showNetPrice"];
-//        }
-//        else
-//        {
-//            /** @var CustomerService $customerService */
-//            $customerService = pluginApp(CustomerService::class);
-//
-//            $customerService->get
-//        }
-//
-//        return 1;
+        return $showNet || $isOrderNet;
     }
 }

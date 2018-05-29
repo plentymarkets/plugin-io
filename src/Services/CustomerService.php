@@ -195,7 +195,6 @@ class CustomerService
                     }
                 }
 
-
                 return false;
             }
         );
