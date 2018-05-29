@@ -144,6 +144,8 @@ class LocalizedOrder extends ModelWrapper
             $instance->itemImages[$variationId] = $imageFilter->getFirstItemImageUrl( $orderVariation['data']['images'], 'urlPreview' );
         }
 
+        $instance->highlightNetPrices = $instance->highlightNetPrices();
+
         return $instance;
     }
 
@@ -169,7 +171,7 @@ class LocalizedOrder extends ModelWrapper
             "itemURLs"              => $this->itemURLs,
             "itemImages"            => $this->itemImages,
             "isReturnable"          => $this->isReturnable,
-            "highlightNetPrices"    => $this->highlightNetPrices()
+            "highlightNetPrices"    => $this->highlightNetPrices
         ];
 
         return $data;
