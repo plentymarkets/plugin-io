@@ -3,14 +3,11 @@
 namespace IO\Middlewares;
 
 use IO\Api\ResponseCode;
-use IO\Helper\ContentCacheHelper;
 use Plenty\Plugin\Http\Request;
 use Plenty\Plugin\Http\Response;
 use Plenty\Modules\Frontend\Contracts\Checkout;
-use Plenty\Modules\ContentCache\Contracts\ContentCacheRepositoryContract;
 use IO\Controllers\StaticPagesController;
 use IO\Services\CheckoutService;
-//use Illuminate\Support\Facades\Cache;
 
 class Middleware extends \Plenty\Plugin\Middleware
 {
@@ -41,10 +38,10 @@ class Middleware extends \Plenty\Plugin\Middleware
 
             $response = $response->make(
                 $controller->showPageNotFound(),
-                404
+                ResponseCode::NOT_FOUND
             );
 
-            $response->forceStatus(404);
+            $response->forceStatus(ResponseCode::NOT_FOUND);
             return $response;
         }
         
