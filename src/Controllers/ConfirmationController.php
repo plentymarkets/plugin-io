@@ -95,7 +95,8 @@ class ConfirmationController extends LayoutController
                 "tpl.page-not-found",
                 [
                     "data" => ""
-                ]
+                ],
+                false
             );
         }
     }

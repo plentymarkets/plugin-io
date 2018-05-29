@@ -42,7 +42,8 @@ class CheckoutController extends LayoutController
             "tpl.checkout",
             [
                 "basket" => $basket
-            ]
+            ],
+            false
         );
     }
 }

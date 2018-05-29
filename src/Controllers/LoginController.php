@@ -27,7 +27,8 @@ class LoginController extends LayoutController
 			"tpl.login",
 			[
 				"login" => ""
-			]
+			],
+            false
 		);
 	}
 }

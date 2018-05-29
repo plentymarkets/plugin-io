@@ -23,7 +23,8 @@ class BasketController extends LayoutController
 		    'tpl.basket',
 			[
 			    'basket' => $basket
-            ]
+            ],
+            false
 		);
 	}
 }

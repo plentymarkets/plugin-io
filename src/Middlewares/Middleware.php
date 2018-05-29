@@ -48,28 +48,6 @@ class Middleware extends \Plenty\Plugin\Middleware
             return $response;
         }
         
-        /** @var ContentCacheRepositoryContract $contentCacheRepo */
-        $contentCacheRepo = pluginApp(ContentCacheRepositoryContract::class);
-        
-        /** @var ContentCacheHelper $contentCacheHelper */
-        $contentCacheHelper = pluginApp(ContentCacheHelper::class);
-        if(!$contentCacheHelper->isBlacklisted($_SERVER['SCRIPT_URL']))
-        {
-            try
-            {
-                $contentCacheRepo->saveCacheEntry($_SERVER['SCRIPT_URL'], $response->content());
-            }
-            catch(\Exception $e)
-            {}
-        }
-        
-        $responseContent = $response->content();
-        $response = $response->make(
-            $responseContent,
-            ResponseCode::OK,
-           ['plenty_cache' => $contentCacheRepo->setCacheCookie()]
-        );
-        
         return $response;
     }
 }

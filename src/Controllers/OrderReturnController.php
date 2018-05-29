@@ -65,7 +65,8 @@ class OrderReturnController extends LayoutController
         
         return $this->renderTemplate(
             'tpl.order.return',
-            ['orderData' => $returnOrder]
+            ['orderData' => $returnOrder],
+            false
 		);
     }
 }
