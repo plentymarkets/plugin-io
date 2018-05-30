@@ -88,7 +88,7 @@ class OrderService
 
         $isShippingPrivacyHintAccepted = $this->sessionStorage->getSessionValue(SessionStorageKeys::SHIPPING_PRIVACY_HINT_ACCEPTED);
 
-        if(is_null($isShippingPrivacyHintAccepted) || strlen($isShippingPrivacyHintAccepted))
+        if(is_null($isShippingPrivacyHintAccepted) || !strlen($isShippingPrivacyHintAccepted))
         {
             $isShippingPrivacyHintAccepted = 'false';
         }
