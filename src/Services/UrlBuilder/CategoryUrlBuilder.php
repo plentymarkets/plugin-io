@@ -25,6 +25,8 @@ class CategoryUrlBuilder
                 $lang
             );
         }
+
+        return $this->buildUrlQuery( '', $lang );
     }
 
     private function buildUrlQuery( $path, $lang ): UrlQuery
