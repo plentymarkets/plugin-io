@@ -25,6 +25,7 @@ use Plenty\Modules\Frontend\Events\FrontendShippingProfileChanged;
 use Plenty\Modules\Basket\Events\Basket\AfterBasketChanged;
 use Plenty\Modules\Basket\Events\Basket\AfterBasketCreate;
 use Plenty\Plugin\Events\Dispatcher;
+use IO\Services\CustomerService;
 
 /**
  * Class ApiResponse
@@ -77,7 +78,7 @@ class ApiResponse
             // FIX: Set basket and checkout data after "showNetPrice" has been recalculated
             // showNetPrice does not have been recalculated at this point
             $this->eventData["AfterBasketChanged"] = [
-                "basket" => null
+				"basket" => null
             ];
             $this->eventData['CheckoutChanged'] = [
                 'checkout' => null
@@ -304,6 +305,7 @@ class ApiResponse
         if ( array_key_exists('AfterBasketChanged', $responseData['events'] ) )
         {
             $responseData['events']['AfterBasketChanged']['basket']  = pluginApp(BasketService::class)->getBasketForTemplate();
+            $responseData['events']['AfterBasketChanged']['showNetPrices']  = pluginApp(CustomerService::class)->showNetPrices();
             $responseData['events']['AfterBasketChanged']['basketItems']  = pluginApp(BasketService::class)->getBasketItems();
             $responseData['events']['CheckoutChanged']['checkout']   = pluginApp(CheckoutService::class)->getCheckout();
         }
