@@ -4,9 +4,12 @@ namespace IO\Services\UrlBuilder;
 
 use IO\Services\CategoryService;
 use IO\Services\SessionStorageService;
+use Plenty\Plugin\Log\Loggable;
 
 class CategoryUrlBuilder
 {
+    use Loggable;
+
     public function buildUrl( int $categoryId, string $lang = null ): UrlQuery
     {
         if ( $lang === null )
@@ -26,6 +29,13 @@ class CategoryUrlBuilder
             );
         }
 
+        $this->getLogger('CategoryUrlBuilder')->error(
+            'Cannot find category.',
+            [
+                'categoryId' => $categoryId,
+                'lang'       => $lang
+            ]
+        );
         return $this->buildUrlQuery( '', $lang );
     }
 
