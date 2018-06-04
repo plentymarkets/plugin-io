@@ -1,5 +1,11 @@
 # Release Notes für IO
 
+## v2.9.1 (2018-06-04) <a href="https://github.com/plentymarkets/plugin-io/compare/2.9.0...2.9.1" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
+
+# Behoben
+
+- Verweise auf nicht existierende Kategorien konnte zu Anzeigefehlern im Webshop führen. Dies wurde behoben.
+
 ## v2.9.0 (2018-05-24) <a href="https://github.com/plentymarkets/plugin-io/compare/2.8.1...2.9.0" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
 
 ### Hinzugefügt
