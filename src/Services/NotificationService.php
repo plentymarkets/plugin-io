@@ -31,7 +31,7 @@ class NotificationService
      */
     public function getNotifications($clear = true):array
     {
-        $notifications = json_decode($this->sessionStorageService->getSessionValue(SessionStorageKeys::NOTIFICATIONS));
+        $notifications = json_decode($this->sessionStorageService->getSessionValue(SessionStorageKeys::NOTIFICATIONS), true);
 
         if ($notifications == null || !is_array($notifications))
         {
@@ -55,53 +55,58 @@ class NotificationService
     {
         $notifications = $this->getNotifications(false);
 
-        array_push($notifications, array(
+        array_push($notifications, [
             'message' => $message,
             'type' => $type,
             'code' => $code
-        ));
+        ]);
 
         $this->sessionStorageService->setSessionValue(SessionStorageKeys::NOTIFICATIONS, json_encode($notifications));
     }
 
     /**
      * @param string $message
+     * @param int $code
      */
-    public function log(string $message)
+    public function log(string $message, $code = 0)
     {
-        $this->addNotification($message, LogLevel::LOG);
+        $this->addNotification($message, LogLevel::LOG, $code);
     }
 
     /**
      * @param string $message
+     * @param int $code
      */
-    public function info(string $message)
+    public function info(string $message, $code = 0)
     {
-        $this->addNotification($message, LogLevel::INFO);
+        $this->addNotification($message, LogLevel::INFO, $code);
     }
 
     /**
      * @param string $message
+     * @param int $code
      */
-    public function warn(string $message)
+    public function warn(string $message, $code = 0)
     {
-        $this->addNotification($message, LogLevel::WARN);
+        $this->addNotification($message, LogLevel::WARN, $code);
     }
 
     /**
      * @param string $message
+     * @param int $code
      */
-    public function error(string $message)
+    public function error(string $message, $code = 0)
     {
-        $this->addNotification($message, LogLevel::ERROR);
+        $this->addNotification($message, LogLevel::ERROR, $code);
     }
 
     /**
      * @param string $message
+     * @param int $code
      */
-    public function success(string $message)
+    public function success(string $message, $code = 0)
     {
-        $this->addNotification($message, LogLevel::SUCCESS);
+        $this->addNotification($message, LogLevel::SUCCESS, $code);
     }
 
     /**
