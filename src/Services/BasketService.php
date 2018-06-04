@@ -319,6 +319,17 @@ class BasketService
      */
     public function deleteBasketItem(int $basketItemId): array
     {
+        $basket = $this->getBasket();
+        $basketItem = $this->getBasketItem($basketItemId);
+
+        $campaign = $this->couponCampaignRepository->findByCouponCode($basket->couponCode);
+
+        if($campaign instanceof CouponCampaign && $campaign->minOrderValue > ($basket->basketAmount - ($basketItem['price'] * $basketItem['quantity'])))
+        {
+            //TODO add notification
+            $this->basketRepository->removeCouponCode();
+        }
+
         $this->basketItemRepository->removeBasketItem($basketItemId);
         return $this->getBasketItemsForTemplate();
     }

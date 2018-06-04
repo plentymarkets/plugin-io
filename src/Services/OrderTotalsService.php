@@ -79,16 +79,13 @@ class OrderTotalsService
             $totalGross     = $totalNet;
         }
 
-        if(strlen($couponType) > 0)
+        if($couponType == OrderItemType::GIFT_CARD)
         {
-            if($couponType == OrderItemType::GIFT_CARD)
-            {
-                $couponType = 'sales';
-                $openAmount = $totalGross + $couponValue;
-            }elseif($couponType == OrderItemType::PROMOTIONAL_COUPON)
-            {
-                $couponType = 'promotional';
-            }
+            $couponType = 'sales';
+            $openAmount = $totalGross + $couponValue;
+        }elseif($couponType == OrderItemType::PROMOTIONAL_COUPON)
+        {
+            $couponType = 'promotional';
         }
 
         return compact(
