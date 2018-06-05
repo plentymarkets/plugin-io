@@ -3,6 +3,8 @@
 namespace IO\Models;
 
 use IO\Builder\Order\OrderType;
+use IO\Builder\Order\OrderItemType;
+
 use IO\Extensions\Filters\ItemImagesFilter;
 use IO\Services\ItemSearch\Factories\VariationSearchFactory;
 use IO\Services\ItemSearch\Services\ItemSearchService;
@@ -20,7 +22,13 @@ class LocalizedOrder extends ModelWrapper
     /**
      * The OrderItem types that will be wrapped. All other OrderItems will be stripped from the order.
      */
-    const WRAPPED_ORDERITEM_TYPES = [1, 3, 4, 6, 9];
+    const WRAPPED_ORDERITEM_TYPES = [
+        OrderItemType::VARIATION,
+        OrderItemType::BUNDLE_COMPONENT,
+        OrderItemType::PROMOTIONAL_COUPON,
+        OrderItemType::GIFT_CARD,
+        OrderItemType::SHIPPING_COSTS,
+        OrderItemType::UNASSIGNED_VARIATION];
     /**
      * @var Order
      */
