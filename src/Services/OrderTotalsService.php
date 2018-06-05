@@ -32,6 +32,8 @@ class OrderTotalsService
         $shippingNet = 0;
         $vats = [];
         $couponValue = 0;
+        $openAmount = 0;
+        $couponType = '';
         $amountId = $this->getCustomerAmountId($order->amounts);
         $totalNet = $order->amounts[$amountId]->netTotal;
         $totalGross = $order->amounts[$amountId]->grossTotal;
@@ -55,6 +57,7 @@ class OrderTotalsService
                     break;
                 case OrderItemType::PROMOTIONAL_COUPON:
                 case OrderItemType::GIFT_CARD:
+                    $couponType = $item->typeId;
                     $couponValue += $firstAmount->priceGross;
                     break;
                 default:
@@ -76,6 +79,15 @@ class OrderTotalsService
             $totalGross     = $totalNet;
         }
 
+        if($couponType == OrderItemType::GIFT_CARD)
+        {
+            $couponType = 'sales';
+            $openAmount = $totalGross + $couponValue;
+        }elseif($couponType == OrderItemType::PROMOTIONAL_COUPON)
+        {
+            $couponType = 'promotional';
+        }
+
         return compact(
             'itemSumGross',
             'itemSumNet',
@@ -83,6 +95,8 @@ class OrderTotalsService
             'shippingNet',
             'vats',
             'couponValue',
+            'openAmount',
+            'couponType',
             'totalGross',
             'totalNet',
             'currency'
