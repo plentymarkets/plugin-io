@@ -14,7 +14,7 @@ use Plenty\Modules\Basket\Models\BasketItem;
 use Plenty\Modules\Frontend\Contracts\Checkout;
 use IO\Extensions\Filters\NumberFormatFilter;
 use Plenty\Modules\Frontend\Services\VatService;
-
+use IO\Services\NotificationService;
 /**
  * Class BasketService
  * @package IO\Services
@@ -326,8 +326,11 @@ class BasketService
 
         if($campaign instanceof CouponCampaign && $campaign->minOrderValue > ($basket->basketAmount - ($basketItem['price'] * $basketItem['quantity'])))
         {
-            //TODO add notification
             $this->basketRepository->removeCouponCode();
+
+            /** @var NotificationService $notificationService */
+            $notificationService = pluginApp(NotificationService::class);
+            $notificationService->info('CouponValidation',301);
         }
 
         $this->basketItemRepository->removeBasketItem($basketItemId);
