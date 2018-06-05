@@ -322,15 +322,18 @@ class BasketService
         $basket = $this->getBasket();
         $basketItem = $this->getBasketItem($basketItemId);
 
-        $campaign = $this->couponCampaignRepository->findByCouponCode($basket->couponCode);
-
-        if($campaign instanceof CouponCampaign && $campaign->minOrderValue > ($basket->basketAmount - ($basketItem['price'] * $basketItem['quantity'])))
+        if(strlen($basket->couponCode) > 0)
         {
-            $this->basketRepository->removeCouponCode();
+            $campaign = $this->couponCampaignRepository->findByCouponCode($basket->couponCode);
 
-            /** @var NotificationService $notificationService */
-            $notificationService = pluginApp(NotificationService::class);
-            $notificationService->info('CouponValidation',301);
+            if($campaign instanceof CouponCampaign && $campaign->minOrderValue > ($basket->basketAmount - ($basketItem['price'] * $basketItem['quantity'])))
+            {
+                $this->basketRepository->removeCouponCode();
+
+                /** @var NotificationService $notificationService */
+                $notificationService = pluginApp(NotificationService::class);
+                $notificationService->info('CouponValidation',301);
+            }
         }
 
         $this->basketItemRepository->removeBasketItem($basketItemId);
