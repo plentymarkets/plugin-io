@@ -329,7 +329,9 @@ class BasketService
         {
             $campaign = $this->couponCampaignRepository->findByCouponCode($basket->couponCode);
 
-            if($campaign instanceof CouponCampaign && $campaign->minOrderValue > ($basket->basketAmount - ($basketItem['price'] * $basketItem['quantity'])))
+            // $basket->basketAmount is basket amount minus coupon value
+            // $basket->couponDiscount is negative
+            if($campaign instanceof CouponCampaign && $campaign->minOrderValue > (( $basket->basketAmount - $basket->couponDiscount ) - ($basketItem['price'] * $basketItem['quantity'])))
             {
                 $this->basketRepository->removeCouponCode();
 
