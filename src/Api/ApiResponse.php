@@ -2,6 +2,7 @@
 
 namespace IO\Api;
 
+use Clockwork\Request\Log;
 use IO\Constants\LogLevel;
 use IO\Services\BasketService;
 use IO\Services\CheckoutService;
@@ -290,29 +291,29 @@ class ApiResponse
             $notifications = $this->notificationService->getNotifications();
         }
 
-        if ( is_null($type) )
+        if ( !is_null($notifications[LogLevel::ERROR]) )
         {
-            $data = $this->appendNotifications( $data, LogLevel::ERROR, $notifications );
-            $data = $this->appendNotifications( $data, LogLevel::WARN, $notifications );
-            $data = $this->appendNotifications( $data, LogLevel::INFO, $notifications );
-            $data = $this->appendNotifications( $data, LogLevel::SUCCESS, $notifications );
-            $data = $this->appendNotifications( $data, LogLevel::LOG, $notifications );
+            $data[LogLevel::ERROR] = $notifications[LogLevel::ERROR];
         }
-        else
-        {
-            $typedNotifications = [];
-            foreach( $notifications as $notification )
-            {
-                if ( $notification['type'] === $type )
-                {
-                    $typedNotifications[] = $notification;
-                }
-            }
 
-            if ( count( $typedNotifications ) )
-            {
-                $data[$type] = $typedNotifications;
-            }
+        if ( !is_null($notifications[LogLevel::WARN]) )
+        {
+            $data[LogLevel::WARN] = $notifications[LogLevel::WARN];
+        }
+
+        if ( !is_null($notifications[LogLevel::INFO]) )
+        {
+            $data[LogLevel::INFO] = $notifications[LogLevel::INFO];
+        }
+
+        if ( !is_null($notifications[LogLevel::SUCCESS]) )
+        {
+            $data[LogLevel::SUCCESS] = $notifications[LogLevel::SUCCESS];
+        }
+
+        if ( !is_null($notifications[LogLevel::ERROR]) )
+        {
+            $data[LogLevel::LOG] = $notifications[LogLevel::LOG];
         }
 
         return $data;
