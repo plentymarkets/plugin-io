@@ -109,7 +109,7 @@ class BasketService
      */
     public function checkCoupon($basket): array
     {
-        if(isset($basket['couponCode']) && strlen($basket['coupon']) > 0)
+        if(isset($basket['couponCode']) && strlen($basket['couponCode']) > 0)
         {
             $campaign = $this->couponCampaignRepository->findByCouponCode($basket['couponCode']);
 
