@@ -2,7 +2,6 @@
 
 namespace IO\Api;
 
-use Clockwork\Request\Log;
 use IO\Constants\LogLevel;
 use IO\Services\BasketService;
 use IO\Services\CheckoutService;
