@@ -4,6 +4,7 @@ namespace IO\Services\ItemSearch\Extensions;
 
 use IO\Helper\VariationPriceList;
 use IO\Services\CustomerService;
+use Plenty\Legacy\Repositories\Frontend\CurrencyExchangeRepository;
 
 /**
  * Class PriceSearchExtension
@@ -105,11 +106,38 @@ class PriceSearchExtension implements ItemSearchExtension
                     $variation['data']['prices'] = $priceList->toArray( $quantity );
 
 
+                    if ( array_key_exists('properties', $variation['data']) )
+                    {
+                        $variation['data']['properties'] = $this->convertPropertySurcharges(
+                            $variation['data']['properties'],
+                            $priceList
+                        );
+                    }
+
                     $baseResult['documents'][$key] = $variation;
                 }
             }
         }
 
         return $baseResult;
+    }
+
+    /**
+     * @param array                 $properties
+     * @param VariationPriceList    $priceList
+     * @return array
+     */
+    private function convertPropertySurcharges( $properties, $priceList )
+    {
+        $result = [];
+
+        foreach( $properties as $property )
+        {
+            $property['surcharge'] = $priceList->convertPrice( $property['surcharge'] );
+            $property['property']['surcharge'] = $priceList->convertPrice( $property['property']['surcharge'] );
+            $result[] = $property;
+        }
+
+        return $result;
     }
 }

@@ -48,10 +48,16 @@ class VariationPriceList
     /** @var UnitService $unitService */
     private $unitService;
 
+    private $showNetPrice = false;
+
+    /** @var SalesPriceSearchResponse */
+    private $defaultPrice;
+
     public function __construct( NumberFormatFilter $numberFormatFilter, UnitService $unitService )
     {
         $this->numberFormatFilter = $numberFormatFilter;
         $this->unitService = $unitService;
+        $this->showNetPrice = pluginApp( CustomerService::class )->showNetPrices();
     }
 
     public static function create( int $variationId, $minimumOrderQuantity = 0, $maximumOrderQuantity = null, $lot = 0, $unit = null )
@@ -142,19 +148,15 @@ class VariationPriceList
             $quantity = $this->minimumOrderQuantity;
         }
 
-        /** @var CustomerService $customerService */
-        $customerService = pluginApp( CustomerService::class );
-        $showNetPrice = $customerService->showNetPrices();
-
         $defaultPrice   = $this->findPriceForQuantity( $quantity );
         $rrp            = $this->findPriceForQuantity( $quantity, self::TYPE_RRP );
         $specialOffer   = $this->findPriceForQuantity( $quantity, self::TYPE_SPECIAL_OFFER );
 
         return [
-            'default'           => $this->preparePrice( $defaultPrice, $showNetPrice ),
-            'rrp'               => $this->preparePrice( $rrp, $showNetPrice ),
-            'specialOffer'      => $this->preparePrice( $specialOffer, $showNetPrice ),
-            'graduatedPrices'   => $this->getGraduatedPrices( $showNetPrice )
+            'default'           => $this->preparePrice( $defaultPrice, $this->showNetPrice ),
+            'rrp'               => $this->preparePrice( $rrp, $this->showNetPrice ),
+            'specialOffer'      => $this->preparePrice( $specialOffer, $this->showNetPrice ),
+            'graduatedPrices'   => $this->getGraduatedPrices( $this->showNetPrice )
         ];
     }
 
@@ -196,6 +198,28 @@ class VariationPriceList
             'rrp' => $rrp,
             'specialOffer' => $specialOffer
         ];
+    }
+
+    public function convertPrice( $value )
+    {
+        $defaultPrice = $this->getDefaultPrice();
+        $value = $value * $defaultPrice->conversionFactor;
+        if ( $this->showNetPrice )
+        {
+            $value = $value / (1 + ($defaultPrice->vatValue / 100));
+        }
+
+        return $value;
+    }
+
+    public function getDefaultPrice()
+    {
+        if ( is_null($this->defaultPrice) )
+        {
+            $this->defaultPrice = $this->findPriceForQuantity($this->minimumOrderQuantity);
+        }
+
+        return $this->defaultPrice;
     }
 
     private function init( $variationId, $minimumOrderQuantity, $maximumOrderQuantity, $lot, $unit )
