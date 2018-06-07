@@ -200,15 +200,27 @@ class VariationPriceList
         ];
     }
 
-    public function convertPrice( $value )
+    public function convertCurrency( $value )
     {
         $defaultPrice = $this->getDefaultPrice();
-        $value = $value * $defaultPrice->conversionFactor;
-        if ( $this->showNetPrice )
+        return $value * $defaultPrice->conversionFactor;
+    }
+
+    public function convertGrossNet( $value, $isNet = false )
+    {
+        $defaultPrice = $this->getDefaultPrice();
+        if ( $this->showNetPrice && !$isNet )
         {
-            $value = $value / (1 + ($defaultPrice->vatValue / 100));
+            // convert from gross to net
+            return $value / (1 + ($defaultPrice->vatValue / 100));
+        }
+        else if ( !$this->showNetPrice && $isNet )
+        {
+            // convert from net to gross
+            return $value * (1 + ($defaultPrice->vatValue / 100));
         }
 
+        // no conversion
         return $value;
     }
 

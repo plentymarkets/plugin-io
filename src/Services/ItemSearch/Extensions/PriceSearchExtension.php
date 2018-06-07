@@ -133,8 +133,18 @@ class PriceSearchExtension implements ItemSearchExtension
 
         foreach( $properties as $property )
         {
-            $property['surcharge'] = $priceList->convertPrice( $property['surcharge'] );
-            $property['property']['surcharge'] = $priceList->convertPrice( $property['property']['surcharge'] );
+            if ( $property['group']['isSurchargePercental'] )
+            {
+                $defaultPrice = $priceList->getDefaultPrice();
+                $property['surcharge'] = $defaultPrice->unitPrice * ($property['surcharge'] / 100);
+                $property['property']['surcharge'] = $defaultPrice->unitPrice * ($property['property']['surcharge'] / 100);
+            }
+
+            $property['surcharge'] = $priceList->convertGrossNet( $property['surcharge'] );
+            $property['property']['surcharge'] = $priceList->convertGrossNet( $property['property']['surcharge'] );
+            $property['surcharge'] = $priceList->convertCurrency( $property['surcharge'] );
+            $property['property']['surcharge'] = $priceList->convertCurrency( $property['property']['surcharge'] );
+
             $result[] = $property;
         }
 
