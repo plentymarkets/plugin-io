@@ -713,29 +713,4 @@ class OrderService
     
         return null;
     }
-
-    public function showNetPricesByOrder(array $order)
-    {
-        $orderContactId = 0;
-        foreach ($order["relations"] as $relation)
-        {
-            if ($relation['referenceType'] == 'contact' && (int)$relation['referenceId'] > 0)
-            {
-                $orderContactId = $relation['referenceId'];
-            }
-        }
-
-        if($orderContactId > 0)
-        {
-            $contact = $this->fromMemoryCache(
-                "contact.$orderContactId",
-                function() use ($orderContactId)
-                {
-                    return $this->contactRepository->findContactById($this->getContactId());
-                }
-            );
-        }
-
-        return $order;
-    }
 }
