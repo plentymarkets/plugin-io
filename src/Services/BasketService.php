@@ -7,12 +7,14 @@ use IO\Services\ItemSearch\Services\ItemSearchService;
 use Plenty\Modules\Accounting\Vat\Models\VatRate;
 use Plenty\Modules\Basket\Contracts\BasketRepositoryContract;
 use Plenty\Modules\Basket\Contracts\BasketItemRepositoryContract;
+use Plenty\Modules\Order\Coupon\Campaign\Contracts\CouponCampaignRepositoryContract;
+use Plenty\Modules\Order\Coupon\Campaign\Models\CouponCampaign;
 use Plenty\Modules\Basket\Models\Basket;
 use Plenty\Modules\Basket\Models\BasketItem;
 use Plenty\Modules\Frontend\Contracts\Checkout;
 use IO\Extensions\Filters\NumberFormatFilter;
 use Plenty\Modules\Frontend\Services\VatService;
-
+use IO\Services\NotificationService;
 /**
  * Class BasketService
  * @package IO\Services
@@ -23,6 +25,16 @@ class BasketService
      * @var BasketItemRepositoryContract
      */
     private $basketItemRepository;
+
+    /**
+     * @var BasketRepositoryContract
+     */
+    private $basketRepository;
+
+    /**
+     * @var CouponCampaignRepositoryContract
+     */
+    private $couponCampaignRepository;
 
     /**
      * @var Checkout
@@ -48,12 +60,15 @@ class BasketService
      * @param Checkout $checkout
      * @param VatService $vatService
      */
-    public function __construct(BasketItemRepositoryContract $basketItemRepository, Checkout $checkout, VatService $vatService, SessionStorageService $sessionStorage)
+    public function __construct(BasketItemRepositoryContract $basketItemRepository, Checkout $checkout, VatService $vatService, SessionStorageService $sessionStorage, CouponCampaignRepositoryContract $couponCampaignRepository, BasketRepositoryContract $basketRepository)
     {
         $this->basketItemRepository = $basketItemRepository;
         $this->checkout             = $checkout;
         $this->vatService           = $vatService;
         $this->sessionStorage       = $sessionStorage;
+        $this->couponCampaignRepository = $couponCampaignRepository;
+        $this->basketRepository = $basketRepository;
+
     }
 
     public function setTemplate(string $template)
@@ -83,8 +98,36 @@ class BasketService
             $basket["shippingAmount"] = $basket["shippingAmountNet"];
         }
 
+        $basket = $this->checkCoupon($basket);
+
         return $basket;
     }
+
+    /**
+     * @param $basket
+     * @return array
+     */
+    public function checkCoupon($basket): array
+    {
+        if(isset($basket['couponCode']) && strlen($basket['couponCode']) > 0)
+        {
+            $campaign = $this->couponCampaignRepository->findByCouponCode($basket['couponCode']);
+
+            if($campaign instanceof CouponCampaign)
+            {
+                if($campaign->couponType == CouponCampaign::COUPON_TYPE_SALES)
+                {
+                    $basket['openAmount']       = $basket['basketAmount'];
+                    $basket["basketAmount"]     -= $basket['couponDiscount'];
+                    $basket["basketAmountNet"]  -= $basket['couponDiscount'];
+
+                }
+                $basket['couponCampaignType'] = $campaign->couponType;
+            }
+        }
+        return $basket;
+    }
+
 
     /**
      * Return the basket as an array
@@ -279,6 +322,25 @@ class BasketService
      */
     public function deleteBasketItem(int $basketItemId): array
     {
+        $basket = $this->getBasket();
+        $basketItem = $this->getBasketItem($basketItemId);
+
+        if(strlen($basket->couponCode) > 0)
+        {
+            $campaign = $this->couponCampaignRepository->findByCouponCode($basket->couponCode);
+
+            // $basket->basketAmount is basket amount minus coupon value
+            // $basket->couponDiscount is negative
+            if($campaign instanceof CouponCampaign && $campaign->minOrderValue > (( $basket->basketAmount - $basket->couponDiscount ) - ($basketItem['price'] * $basketItem['quantity'])))
+            {
+                $this->basketRepository->removeCouponCode();
+
+                /** @var NotificationService $notificationService */
+                $notificationService = pluginApp(NotificationService::class);
+                $notificationService->info('CouponValidation',301);
+            }
+        }
+
         $this->basketItemRepository->removeBasketItem($basketItemId);
         return $this->getBasketItemsForTemplate();
     }
@@ -342,6 +404,7 @@ class BasketService
 
     public function resetBasket()
     {
+        $this->basketRepository->removeCouponCode();
         $basketItems = $this->getBasketItemsRaw();
         foreach ($basketItems as $basketItem) {
             $this->basketItemRepository->removeBasketItem($basketItem->id);

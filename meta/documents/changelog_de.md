@@ -1,5 +1,13 @@
 # Release Notes für IO
 
+## v2.9.1 (2018-06-05) <a href="https://github.com/plentymarkets/plugin-io/compare/2.9.0...2.9.1" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
+
+# Behoben
+
+- Verweise auf nicht existierende Kategorien konnte zu Anzeigefehlern im Webshop führen. Dies wurde behoben.
+- Es kam zu Problemen wenn ein Gutschein mit Mindestbestellwert eingelöst wurde während gleichzeitig ein Artikel aus dem Warenkorb entfernt und damit der Mindestbestellwert nicht mehr erreicht wurde. Dies wurde behoben.
+- Es kam zu falschen Darstellungen von Summen, wenn ein Aktionsgutschein eingelöst wurde, während Artikel mit unterschiedlichen Mehrwertsteuersätzen im Warenkorb lagen. Dies wurde behoben.
+
 ## v2.9.0 (2018-05-24) <a href="https://github.com/plentymarkets/plugin-io/compare/2.8.1...2.9.0" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
 
 ### Hinzugefügt
