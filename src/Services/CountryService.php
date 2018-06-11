@@ -30,11 +30,12 @@ class CountryService
     /**
      * CountryService constructor.
      * @param CountryRepositoryContract $countryRepository
+     * @param SessionStorageService $sessionStorageService
      */
 	public function __construct(CountryRepositoryContract $countryRepository, SessionStorageService $sessionStorageService)
 	{
-        $this->countryRepository = $countryRepository;
-        $this->sessionStorageService = $sessionStorageService;
+		$this->countryRepository = $countryRepository;
+		$this->sessionStorageService = $sessionStorageService;
 	}
 
     /**
