@@ -1,5 +1,25 @@
 # Release Notes für IO
 
+## v2.10.0 (2018-06-11) <a href="https://github.com/plentymarkets/plugin-io/compare/2.9.1...2.10.0" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
+
+### Hinzugefügt
+
+- Die IO Konfiguration ist nun mehrsprachig.
+- Das Ereignis "AfterBasketChanged" wurde um das Feld "showNetPrices" ergänzt. Dieses Feld bestimmt, ob in der Kaufabwicklung und im Warenkorb Netto- oder Bruttosummen hervorgehoben werden.
+- Die Daten eines Auftrags auf der Bestellbestätigungsseite wurden um das Feld "highlightNetPrices" ergänzt. Dieses Feld bestimmt, ob Netto- oder Bruttosummen hervorgehoben angezeigt werden.
+
+### Geändert
+
+- Die Schnittstellen zum Ausgeben von (Fehler-)Meldungen wurden verbessert.
+
+### Behoben
+
+- Durch einen Fehler führte der Link in der E-Mail einer Bestellbestätigung zu einer 404 Seite, wenn die Option "Weiterleitung zur Login-Seite durch den Link in der Bestellbestätigung" aktiv war. Dies wurde behoben.
+- Durch einen Fehler wurden die Versandkosten nicht in die gewählte Währung umgerechnet. Dies wurde behoben.
+- Durch einen Fehler wurden die Lieferländer im Adressformular immer auf Deutsch angezeigt. Dies wurde behoben.
+- Durch einen Fehler wurden beim Wechsel der Währung Aufpreise für Bestellmerkmale nicht umgerechnet. Dies wurde behoben.
+- Durch einen Fehler wurden Aufpreise für Bestellmerkmale immer brutto angezeigt. Dies wurde behoben.
+
 ## v2.9.1 (2018-06-05) <a href="https://github.com/plentymarkets/plugin-io/compare/2.9.0...2.9.1" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
 
 # Behoben
