@@ -27,6 +27,7 @@ use Plenty\Modules\Frontend\Events\FrontendShippingProfileChanged;
 use Plenty\Modules\Basket\Events\Basket\AfterBasketChanged;
 use Plenty\Modules\Basket\Events\Basket\AfterBasketCreate;
 use Plenty\Plugin\Events\Dispatcher;
+use IO\Services\CustomerService;
 
 /**
  * Class ApiResponse
@@ -82,7 +83,7 @@ class ApiResponse
             // FIX: Set basket and checkout data after "showNetPrice" has been recalculated
             // showNetPrice does not have been recalculated at this point
             $this->eventData["AfterBasketChanged"] = [
-                "basket" => null
+				"basket" => null
             ];
             $this->eventData['CheckoutChanged'] = [
                 'checkout' => null
@@ -269,6 +270,7 @@ class ApiResponse
         if ( array_key_exists('AfterBasketChanged', $responseData['events'] ) )
         {
             $responseData['events']['AfterBasketChanged']['basket']  = pluginApp(BasketService::class)->getBasketForTemplate();
+            $responseData['events']['AfterBasketChanged']['showNetPrices']  = pluginApp(CustomerService::class)->showNetPrices();
             $responseData['events']['AfterBasketChanged']['basketItems']  = pluginApp(BasketService::class)->getBasketItems();
             $responseData['events']['CheckoutChanged']['checkout']   = pluginApp(CheckoutService::class)->getCheckout();
         }
@@ -290,29 +292,29 @@ class ApiResponse
             $notifications = $this->notificationService->getNotifications();
         }
 
-        if ( is_null($type) )
+        if ( !is_null($notifications[LogLevel::ERROR]) )
         {
-            $data = $this->appendNotifications( $data, LogLevel::ERROR, $notifications );
-            $data = $this->appendNotifications( $data, LogLevel::WARN, $notifications );
-            $data = $this->appendNotifications( $data, LogLevel::INFO, $notifications );
-            $data = $this->appendNotifications( $data, LogLevel::SUCCESS, $notifications );
-            $data = $this->appendNotifications( $data, LogLevel::LOG, $notifications );
+            $data[LogLevel::ERROR] = $notifications[LogLevel::ERROR];
         }
-        else
-        {
-            $typedNotifications = [];
-            foreach( $notifications as $notification )
-            {
-                if ( $notification['type'] === $type )
-                {
-                    $typedNotifications[] = $notification;
-                }
-            }
 
-            if ( count( $typedNotifications ) )
-            {
-                $data[$type] = $typedNotifications;
-            }
+        if ( !is_null($notifications[LogLevel::WARN]) )
+        {
+            $data[LogLevel::WARN] = $notifications[LogLevel::WARN];
+        }
+
+        if ( !is_null($notifications[LogLevel::INFO]) )
+        {
+            $data[LogLevel::INFO] = $notifications[LogLevel::INFO];
+        }
+
+        if ( !is_null($notifications[LogLevel::SUCCESS]) )
+        {
+            $data[LogLevel::SUCCESS] = $notifications[LogLevel::SUCCESS];
+        }
+
+        if ( !is_null($notifications[LogLevel::ERROR]) )
+        {
+            $data[LogLevel::LOG] = $notifications[LogLevel::LOG];
         }
 
         return $data;

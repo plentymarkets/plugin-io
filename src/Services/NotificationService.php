@@ -33,9 +33,15 @@ class NotificationService
     {
         $notifications = json_decode($this->sessionStorageService->getSessionValue(SessionStorageKeys::NOTIFICATIONS), true);
 
-        if ($notifications == null || !is_array($notifications))
+        if ($notifications == null || !is_array($notifications) || !count($notifications) )
         {
-            $notifications = array();
+            $notifications = [
+                "error"     => null,
+                "warn"      => null,
+                "info"      => null,
+                "success"   => null,
+                "log"       => null
+            ];
         }
 
         if ($clear)
@@ -54,12 +60,26 @@ class NotificationService
     private function addNotification(string $message, string $type, int $code = 0)
     {
         $notifications = $this->getNotifications(false);
+        if ( !array_key_exists($type, $notifications) )
+        {
+            $type = LogLevel::ERROR;
+        }
 
-        array_push($notifications, [
-            'message' => $message,
-            'type' => $type,
-            'code' => $code
-        ]);
+        $notification = [
+            'message'       => $message,
+            'code'          => $code,
+            'stackTrace'    => []
+        ];
+        $lastNotification = $notifications[$type];
+
+        if ( !is_null($lastNotification) )
+        {
+            $notification['stackTrace'] = $lastNotification['stackTrace'];
+            $lastNotification['stackTrace'] = [];
+            array_push( $notification['stackTrace'], $lastNotification );
+        }
+
+        $notifications[$type] = $notification;
 
         $this->sessionStorageService->setSessionValue(SessionStorageKeys::NOTIFICATIONS, json_encode($notifications));
     }
