@@ -2,6 +2,7 @@
 
 namespace IO\Middlewares;
 
+use Plenty\Modules\Authentication\Contracts\ContactAuthenticationRepositoryContract;
 use Plenty\Plugin\Http\Request;
 use Plenty\Plugin\Http\Response;
 use Plenty\Modules\Frontend\Contracts\Checkout;
@@ -12,6 +13,14 @@ class Middleware extends \Plenty\Plugin\Middleware
 {
     public function before(Request $request )
     {
+        $loginToken = $request->get('token', '');
+        if(strlen($loginToken))
+        {
+            /** @var ContactAuthenticationRepositoryContract $authRepo */
+            $authRepo = pluginApp(ContactAuthenticationRepositoryContract::class);
+            $authRepo->authenticateWithToken($loginToken);
+        }
+        
         $currency = $request->get('currency', null);
         if ( $currency != null )
         {
