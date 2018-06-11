@@ -6,6 +6,7 @@ use IO\Builder\Order\AddressType;
 use IO\Helper\LanguageMap;
 use IO\Helper\MemoryCache;
 use Plenty\Modules\Basket\Events\Basket\AfterBasketChanged;
+use Plenty\Modules\Frontend\Contracts\CurrencyExchangeRepositoryContract;
 use Plenty\Modules\Frontend\Events\ValidateCheckoutEvent;
 use Plenty\Modules\Frontend\PaymentMethod\Contracts\FrontendPaymentMethodRepositoryContract;
 use Plenty\Modules\Frontend\Contracts\Checkout;
@@ -53,25 +54,50 @@ class CheckoutService
     private $customerService;
 
     /**
+     * @var ParcelServicePresetRepositoryContract
+     */
+    private $parcelServicePresetRepo;
+
+    /**
+     * @var CurrencyExchangeRepositoryContract
+     */
+    private $currencyExchangeRepo;
+
+    /**
+     * @var BasketService
+     */
+    private $basketService;
+
+    /**
      * CheckoutService constructor.
      * @param FrontendPaymentMethodRepositoryContract $frontendPaymentMethodRepository
      * @param Checkout $checkout
      * @param BasketRepositoryContract $basketRepository
      * @param FrontendSessionStorageFactoryContract $sessionStorage
      * @param CustomerService $customerService
+     * @param ParcelServicePresetRepositoryContract $parcelServicePresetRepo
+     * @param CurrencyExchangeRepositoryContract $currencyExchangeRepo
+     * @param BasketService $basketService
      */
     public function __construct(
         FrontendPaymentMethodRepositoryContract $frontendPaymentMethodRepository,
         Checkout $checkout,
         BasketRepositoryContract $basketRepository,
         FrontendSessionStorageFactoryContract $sessionStorage,
-        CustomerService $customerService)
+        CustomerService $customerService,
+        ParcelServicePresetRepositoryContract $parcelServicePresetRepo,
+        CurrencyExchangeRepositoryContract $currencyExchangeRepo,
+        BasketService $basketService)
     {
         $this->frontendPaymentMethodRepository = $frontendPaymentMethodRepository;
         $this->checkout                        = $checkout;
         $this->basketRepository                = $basketRepository;
         $this->sessionStorage                  = $sessionStorage;
         $this->customerService                 = $customerService;
+        $this->parcelServicePresetRepo         = $parcelServicePresetRepo;
+        $this->currencyExchangeRepo            = $currencyExchangeRepo;
+        $this->basketService                   = $basketService;
+
     }
 
     /**
@@ -337,25 +363,34 @@ class CheckoutService
         $sessionService = pluginApp(SessionStorageService::class);
         $showNetPrice   = $sessionService->getCustomer()->showNetPrice;
 
-        /** @var ParcelServicePresetRepositoryContract $parcelServicePresetRepo */
-        $parcelServicePresetRepo = pluginApp(ParcelServicePresetRepositoryContract::class);
 
         $contact = $this->customerService->getContact();
         $params  = [
             'countryId'  => $this->getShippingCountryId(),
             'webstoreId' => pluginApp(Application::class)->getWebstoreId(),
         ];
-        $list    = $parcelServicePresetRepo->getLastWeightedPresetCombinations($this->basketRepository->load(), $contact->classId, $params);
+        $list    = $this->parcelServicePresetRepo->getLastWeightedPresetCombinations($this->basketRepository->load(), $contact->classId, $params);
 
         if ($showNetPrice) {
-            /** @var BasketService $basketService */
-            $basketService = pluginApp(BasketService::class);
-            $maxVatValue   = $basketService->getMaxVatValue();
+
+            $maxVatValue   = $this->basketService->getMaxVatValue();
 
             if (is_array($list)) {
                 foreach ($list as $key => $shippingProfile) {
                     if (isset($shippingProfile['shippingAmount'])) {
                         $list[$key]['shippingAmount'] = (100.0 * $shippingProfile['shippingAmount']) / (100.0 + $maxVatValue);
+                    }
+                }
+            }
+        }
+
+        $basket = $this->basketService->getBasket();
+        if($basket->currency !== $this->currencyExchangeRepo->getDefaultCurrency())
+        {
+            if (is_array($list)) {
+                foreach ($list as $key => $shippingProfile) {
+                    if (isset($shippingProfile['shippingAmount'])) {
+                        $list[$key]['shippingAmount'] = $this->currencyExchangeRepo->convertFromDefaultCurrency($basket->currency, $list[$key]['shippingAmount']);
                     }
                 }
             }
@@ -413,11 +448,7 @@ class CheckoutService
      */
     public function getDeliveryAddressId()
     {
-        /**
-         * @var BasketService $basketService
-         */
-        $basketService = pluginApp(BasketService::class);
-        return (int)$basketService->getDeliveryAddressId();
+        return (int)$this->basketService->getDeliveryAddressId();
     }
 
     /**
@@ -426,11 +457,7 @@ class CheckoutService
      */
     public function setDeliveryAddressId($deliveryAddressId)
     {
-        /**
-         * @var BasketService $basketService
-         */
-        $basketService = pluginApp(BasketService::class);
-        $basketService->setDeliveryAddressId($deliveryAddressId);
+        $this->basketService->setDeliveryAddressId($deliveryAddressId);
     }
 
     /**
@@ -439,12 +466,8 @@ class CheckoutService
      */
     public function getBillingAddressId()
     {
-        /**
-         * @var BasketService $basketService
-         */
-        $basketService = pluginApp(BasketService::class);
 
-        $billingAddressId = $basketService->getBillingAddressId();
+        $billingAddressId = $this->basketService->getBillingAddressId();
 
         if (is_null($billingAddressId) || (int)$billingAddressId <= 0)
         {
@@ -466,20 +489,16 @@ class CheckoutService
     public function setBillingAddressId($billingAddressId)
     {
         if ((int)$billingAddressId > 0) {
-            /**
-             * @var BasketService $basketService
-             */
-            $basketService = pluginApp(BasketService::class);
-            $basketService->setBillingAddressId($billingAddressId);
+            $this->basketService->setBillingAddressId($billingAddressId);
         }
     }
-    
+
     public function setDefaultShippingCountryId()
     {
         /** @var WebstoreConfigurationService $webstoreConfig */
         $webstoreConfigService = pluginApp(WebstoreConfigurationService::class);
         $defaultShippingCountryId = $webstoreConfigService->getDefaultShippingCountryId();
-        
+
         $this->setShippingCountryId($defaultShippingCountryId);
     }
 }
