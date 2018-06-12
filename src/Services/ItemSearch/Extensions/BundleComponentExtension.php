@@ -48,7 +48,7 @@ class BundleComponentExtension implements ItemSearchExtension
             $document = $baseResult['documents'][$key];
             if ( count( $extensionDocument )
                 && count( $extensionDocument['data']['variation'] )
-                && $extensionDocument['data']['variation']['bundleType'] = 'bundle' )
+                && $extensionDocument['data']['variation']['bundleType'] === 'bundle' )
             {
 
                 /** @var AuthHelper $authHelper */
