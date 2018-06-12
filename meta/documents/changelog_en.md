@@ -4,9 +4,9 @@
 
 ### Added
 
-- The IO configuration is now multilingual.
-- The event "AfterBasketChanged" has been expanded by the field "showNetPrices". This field determines whether gross or net sums are highlighted in the checkout and the shopping cart.
-- The order data on the order confirmation page has been extended by the field "highlightNetPrices". This field determines whether net or gross sums are highlighted.
+- The IO configuration has been translated into German.
+- The event `AfterBasketChanged` has been expanded by the field `showNetPrices`. This field determines whether gross or net sums are highlighted in the checkout and the shopping cart.
+- The order data on the order confirmation page has been extended by the field `highlightNetPrices`. This field determines whether net or gross sums are highlighted.
 
 ### Changed
 
