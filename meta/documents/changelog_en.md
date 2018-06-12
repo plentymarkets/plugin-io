@@ -1,5 +1,25 @@
 # Release Notes for IO
 
+## v2.10.0 (2018-06-11) <a href="https://github.com/plentymarkets/plugin-io/compare/2.9.1...2.10.0" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
+
+### Added
+
+- The IO configuration has been translated into German.
+- The event `AfterBasketChanged` has been expanded by the field `showNetPrices`. This field determines whether gross or net sums are highlighted in the checkout and the shopping cart.
+- The order data on the order confirmation page has been extended by the field `highlightNetPrices`. This field determines whether net or gross sums are highlighted.
+
+### Changed
+
+- The interfaces for issuing (error-)messages have been improved.
+
+### Fixed
+
+- Due to an error, the link in the order confirmation e-mail forwarded to a 404 page if the option "Forward to login page after clicking the link in order confirmation" was active. This has been fixed.
+- Due to an error, the shipping costs were not converted to the selected currency. This has been fixed.
+- Due to an error, delivery countries in the address form were always displayed in German. This has been fixed.
+- Due to an error, surcharges for order properties were not converted when the currency was changed. This has been fixed.
+- Due to an error, surcharges for order properties were always displayed as gross prices. This has been fixed.
+
 ## v2.9.1 (2018-06-05) <a href="https://github.com/plentymarkets/plugin-io/compare/2.9.0...2.9.1" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
 
 ### Fixed
