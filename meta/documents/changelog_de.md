@@ -4,9 +4,9 @@
 
 ### Hinzugefügt
 
-- Die IO Konfiguration ist nun mehrsprachig.
-- Das Ereignis "AfterBasketChanged" wurde um das Feld "showNetPrices" ergänzt. Dieses Feld bestimmt, ob in der Kaufabwicklung und im Warenkorb Netto- oder Bruttosummen hervorgehoben werden.
-- Die Daten eines Auftrags auf der Bestellbestätigungsseite wurden um das Feld "highlightNetPrices" ergänzt. Dieses Feld bestimmt, ob Netto- oder Bruttosummen hervorgehoben angezeigt werden.
+- Die IO-Konfiguration wurde ins Deutsche übersetzt.
+- Das Ereignis `AfterBasketChanged` wurde um das Feld `showNetPrices` ergänzt. Dieses Feld bestimmt, ob in der Kaufabwicklung und im Warenkorb Netto- oder Bruttosummen hervorgehoben werden.
+- Die Daten eines Auftrags auf der Bestellbestätigungsseite wurden um das Feld `highlightNetPrices` ergänzt. Dieses Feld bestimmt, ob Netto- oder Bruttosummen hervorgehoben werden.
 
 ### Geändert
 
@@ -14,7 +14,7 @@
 
 ### Behoben
 
-- Durch einen Fehler führte der Link in der E-Mail einer Bestellbestätigung zu einer 404 Seite, wenn die Option "Weiterleitung zur Login-Seite durch den Link in der Bestellbestätigung" aktiv war. Dies wurde behoben.
+- Durch einen Fehler führte der Link in der E-Mail einer Bestellbestätigung zu einer 404-Seite, wenn die Option "Weiterleitung zur Login-Seite durch den Link in der Bestellbestätigung" aktiv war. Dies wurde behoben.
 - Durch einen Fehler wurden die Versandkosten nicht in die gewählte Währung umgerechnet. Dies wurde behoben.
 - Durch einen Fehler wurden die Lieferländer im Adressformular immer auf Deutsch angezeigt. Dies wurde behoben.
 - Durch einen Fehler wurden beim Wechsel der Währung Aufpreise für Bestellmerkmale nicht umgerechnet. Dies wurde behoben.
