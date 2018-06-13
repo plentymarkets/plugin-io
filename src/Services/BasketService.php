@@ -90,14 +90,7 @@ class BasketService
         {
             $basket["totalVats"] = [];
         }
-
-
-        if ($this->sessionStorage->getCustomer()->showNetPrice) {
-            $basket["itemSum"]        = $basket["itemSumNet"];
-            $basket["basketAmount"]   = $basket["basketAmountNet"];
-            $basket["shippingAmount"] = $basket["shippingAmountNet"];
-        }
-
+        
         $basket = $this->checkCoupon($basket);
 
         return $basket;
