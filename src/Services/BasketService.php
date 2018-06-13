@@ -90,7 +90,15 @@ class BasketService
         {
             $basket["totalVats"] = [];
         }
-        
+
+
+        if (count($basket['totalVats']) <= 0)
+        {
+            $basket["itemSum"]        = $basket["itemSumNet"];
+            $basket["basketAmount"]   = $basket["basketAmountNet"];
+            $basket["shippingAmount"] = $basket["shippingAmountNet"];
+        }
+
         $basket = $this->checkCoupon($basket);
 
         return $basket;
