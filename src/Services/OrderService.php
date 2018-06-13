@@ -2,6 +2,7 @@
 
 namespace IO\Services;
 
+use Plenty\Modules\Account\Address\Contracts\AddressRepositoryContract;
 use Plenty\Modules\Frontend\PaymentMethod\Contracts\FrontendPaymentMethodRepositoryContract;
 use Plenty\Modules\Order\ContactWish\Contracts\ContactWishRepositoryContract;
 use Plenty\Modules\Order\Contracts\OrderRepositoryContract;
@@ -46,6 +47,10 @@ class OrderService
      * @var FrontendPaymentMethodRepositoryContract
      */
     private $frontendPaymentMethodRepository;
+    /**
+     * @var AddressRepositoryContract
+     */
+    private $addressRepository;
     
     /**
      * OrderService constructor.
@@ -57,13 +62,15 @@ class OrderService
 		OrderRepositoryContract $orderRepository,
 		BasketService $basketService,
         SessionStorageService $sessionStorage,
-        FrontendPaymentMethodRepositoryContract $frontendPaymentMethodRepository
+        FrontendPaymentMethodRepositoryContract $frontendPaymentMethodRepository,
+        AddressRepositoryContract $addressRepository
 	)
 	{
 		$this->orderRepository = $orderRepository;
 		$this->basketService   = $basketService;
         $this->sessionStorage  = $sessionStorage;
         $this->frontendPaymentMethodRepository = $frontendPaymentMethodRepository;
+        $this->addressRepository = $addressRepository;
 	}
 
     /**
@@ -85,6 +92,13 @@ class OrderService
         {
             $couponCode = $basket->couponCode;
         }
+
+        $isShippingPrivacyHintAccepted = $this->sessionStorage->getSessionValue(SessionStorageKeys::SHIPPING_PRIVACY_HINT_ACCEPTED);
+
+        if(is_null($isShippingPrivacyHintAccepted) || !strlen($isShippingPrivacyHintAccepted))
+        {
+            $isShippingPrivacyHintAccepted = 'false';
+        }
         
 		$order = pluginApp(OrderBuilder::class)->prepare(OrderType::ORDER)
 		                            ->fromBasket()
@@ -94,10 +108,11 @@ class OrderService
 		                            ->withOrderProperty(OrderPropertyType::PAYMENT_METHOD, OrderOptionSubType::MAIN_VALUE, $checkoutService->getMethodOfPaymentId())
                                     ->withOrderProperty(OrderPropertyType::SHIPPING_PROFILE, OrderOptionSubType::MAIN_VALUE, $checkoutService->getShippingProfileId())
                                     ->withOrderProperty(OrderPropertyType::DOCUMENT_LANGUAGE, OrderOptionSubType::MAIN_VALUE, $this->sessionStorage->getLang())
+                                    ->withOrderProperty(OrderPropertyType::SHIPPING_PRIVACY_HINT_ACCEPTED, OrderOptionSubType::MAIN_VALUE, $isShippingPrivacyHintAccepted)
 		                            ->done();
         
 		$order = $this->orderRepository->createOrder($order, $couponCode);
-		$this->saveOrderContactWish($order->id, $this->sessionStorage->getSessionValue(SessionStorageKeys::ORDER_CONTACT_WISH));
+        $this->saveOrderContactWish($order->id, $this->sessionStorage->getSessionValue(SessionStorageKeys::ORDER_CONTACT_WISH));
         
         if($customerService->getContactId() <= 0)
         {

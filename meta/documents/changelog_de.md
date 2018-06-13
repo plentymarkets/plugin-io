@@ -1,5 +1,45 @@
 # Release Notes für IO
 
+## v2.10.0 (2018-06-12) <a href="https://github.com/plentymarkets/plugin-io/compare/2.9.1...2.10.0" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
+
+### Hinzugefügt
+
+- Die IO-Konfiguration wurde ins Deutsche übersetzt.
+- Das Ereignis `AfterBasketChanged` wurde um das Feld `showNetPrices` ergänzt. Dieses Feld bestimmt, ob in der Kaufabwicklung und im Warenkorb Netto- oder Bruttosummen hervorgehoben werden.
+- Die Daten eines Auftrags auf der Bestellbestätigungsseite wurden um das Feld `highlightNetPrices` ergänzt. Dieses Feld bestimmt, ob Netto- oder Bruttosummen hervorgehoben werden.
+
+### Geändert
+
+- Die Schnittstellen zum Ausgeben von (Fehler-)Meldungen wurden verbessert.
+
+### Behoben
+
+- Durch einen Fehler führte der Link in der E-Mail einer Bestellbestätigung zu einer 404-Seite, wenn die Option "Weiterleitung zur Login-Seite durch den Link in der Bestellbestätigung" aktiv war. Dies wurde behoben.
+- Durch einen Fehler wurden die Versandkosten nicht in die gewählte Währung umgerechnet. Dies wurde behoben.
+- Durch einen Fehler wurden die Lieferländer im Adressformular immer auf Deutsch angezeigt. Dies wurde behoben.
+- Durch einen Fehler wurden beim Wechsel der Währung Aufpreise für Bestellmerkmale nicht umgerechnet. Dies wurde behoben.
+- Durch einen Fehler wurden Aufpreise für Bestellmerkmale immer brutto angezeigt. Dies wurde behoben.
+
+## v2.9.1 (2018-06-05) <a href="https://github.com/plentymarkets/plugin-io/compare/2.9.0...2.9.1" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
+
+# Behoben
+
+- Verweise auf nicht existierende Kategorien konnte zu Anzeigefehlern im Webshop führen. Dies wurde behoben.
+- Es kam zu Problemen wenn ein Gutschein mit Mindestbestellwert eingelöst wurde während gleichzeitig ein Artikel aus dem Warenkorb entfernt und damit der Mindestbestellwert nicht mehr erreicht wurde. Dies wurde behoben.
+- Es kam zu falschen Darstellungen von Summen, wenn ein Aktionsgutschein eingelöst wurde, während Artikel mit unterschiedlichen Mehrwertsteuersätzen im Warenkorb lagen. Dies wurde behoben.
+
+## v2.9.0 (2018-05-24) <a href="https://github.com/plentymarkets/plugin-io/compare/2.8.1...2.9.0" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
+
+### Hinzugefügt
+
+- Es wurde die Methode **getURLById** im CategoryService hinzugefügt, welche die URL einer Kategorie ausgibt.
+- Die Route **io/order/additional_information** wurde hinzugefügt, um zusätzliche Auftragsinformationen hinzufügen und ändern zu können.
+
+### Behoben
+
+- Die an der Kategorie hinterlegten Canonical URLs wurden nicht benutzt. Diese werden nun berücksichtigt.
+- Durch einen Fehler wurden keine Bilder-URLs von der Funktion ItemService.getVariationImage() zurückgegeben. Dies wurde behoben.
+
 ## v2.8.1 (2018-05-16) <a href="https://github.com/plentymarkets/plugin-io/compare/2.8.0...2.8.1" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
 
 ### Behoben

@@ -3,24 +3,30 @@
 namespace IO\Models;
 
 use IO\Builder\Order\OrderType;
+use IO\Builder\Order\OrderItemType;
 use IO\Extensions\Filters\ItemImagesFilter;
+use IO\Services\CustomerService;
 use IO\Services\ItemSearch\Factories\VariationSearchFactory;
 use IO\Services\ItemSearch\Services\ItemSearchService;
+use Plenty\Modules\Account\Contact\Contracts\ContactRepositoryContract;
 use Plenty\Modules\Order\Models\Order;
 use Plenty\Modules\Order\Status\Models\OrderStatusName;
 use Plenty\Modules\Frontend\PaymentMethod\Contracts\FrontendPaymentMethodRepositoryContract;
-//use Plenty\Modules\Order\Status\Contracts\StatusRepositoryContract;
 use Plenty\Modules\Order\Shipping\Contracts\ParcelServicePresetRepositoryContract;
 use IO\Extensions\Filters\URLFilter;
-use IO\Services\ItemService;
-use IO\Services\OrderService;
 
 class LocalizedOrder extends ModelWrapper
 {
     /**
      * The OrderItem types that will be wrapped. All other OrderItems will be stripped from the order.
      */
-    const WRAPPED_ORDERITEM_TYPES = [1, 3, 4, 6, 9];
+    const WRAPPED_ORDERITEM_TYPES = [
+        OrderItemType::VARIATION,
+        OrderItemType::BUNDLE_COMPONENT,
+        OrderItemType::PROMOTIONAL_COUPON,
+        OrderItemType::GIFT_CARD,
+        OrderItemType::SHIPPING_COSTS,
+        OrderItemType::UNASSIGNED_VARIATION];
     /**
      * @var Order
      */
@@ -41,6 +47,8 @@ class LocalizedOrder extends ModelWrapper
     public $itemURLs = [];
     public $itemImages = [];
     public $isReturnable = false;
+
+    public $highlightNetPrices = false;
 
     /**
      * @param Order $order
@@ -139,10 +147,12 @@ class LocalizedOrder extends ModelWrapper
 
         foreach( $orderVariations['documents'] as $orderVariation )
         {
-            $variationId = $orderVariation['data']['variation']['id'];
+            $variationId =  $orderVariation['data']['variation']['id'];
             $instance->itemURLs[$variationId]   = $urlFilter->buildItemURL( $orderVariation['data'] );
             $instance->itemImages[$variationId] = $imageFilter->getFirstItemImageUrl( $orderVariation['data']['images'], 'urlPreview' );
         }
+
+        $instance->highlightNetPrices = $instance->highlightNetPrices();
 
         return $instance;
     }
@@ -168,9 +178,31 @@ class LocalizedOrder extends ModelWrapper
             "paymentMethodIcon"     => $this->paymentMethodIcon,
             "itemURLs"              => $this->itemURLs,
             "itemImages"            => $this->itemImages,
-            "isReturnable"          => $this->isReturnable
+            "isReturnable"          => $this->isReturnable,
+            "highlightNetPrices"    => $this->highlightNetPrices
         ];
 
         return $data;
+    }
+
+    private function highlightNetPrices()
+    {
+        $isOrderNet = $this->order->amounts[0]->isNet;
+
+        $orderContactId = 0;
+        foreach ($this->order->relations as $relation)
+        {
+            if ($relation['referenceType'] == 'contact' && (int)$relation['referenceId'] > 0)
+            {
+                $orderContactId = $relation['referenceId'];
+            }
+        }
+
+        /** @var CustomerService $customerService */
+        $customerService = pluginApp(CustomerService::class);
+
+        $showNet = $customerService->showNetPricesByContactId($orderContactId);
+
+        return $showNet || $isOrderNet;
     }
 }

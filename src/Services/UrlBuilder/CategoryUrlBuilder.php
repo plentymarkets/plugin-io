@@ -4,9 +4,12 @@ namespace IO\Services\UrlBuilder;
 
 use IO\Services\CategoryService;
 use IO\Services\SessionStorageService;
+use Plenty\Plugin\Log\Loggable;
 
 class CategoryUrlBuilder
 {
+    use Loggable;
+
     public function buildUrl( int $categoryId, string $lang = null ): UrlQuery
     {
         if ( $lang === null )
@@ -20,19 +23,20 @@ class CategoryUrlBuilder
 
         if ( $category !== null )
         {
-            $categoryDetails = $categoryService->getDetails( $category, $lang );
-            if ( $categoryDetails !== null && strlen( $categoryDetails->canonicalLink ) > 0 )
-            {
-                return $this->buildUrlQuery( $categoryDetails->canonicalLink, $lang );
-            }
-            else
-            {
-                return $this->buildUrlQuery(
-                    $categoryService->getURL( $category, $lang ),
-                    $lang
-                );
-            }
+            return $this->buildUrlQuery(
+                $categoryService->getURL( $category, $lang ),
+                $lang
+            );
         }
+
+        $this->getLogger('CategoryUrlBuilder')->error(
+            'Cannot find category.',
+            [
+                'categoryId' => $categoryId,
+                'lang'       => $lang
+            ]
+        );
+        return $this->buildUrlQuery( '', $lang );
     }
 
     private function buildUrlQuery( $path, $lang ): UrlQuery
