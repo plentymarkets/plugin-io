@@ -2,6 +2,7 @@
 
 namespace IO\Services;
 
+use Plenty\Modules\Account\Address\Contracts\AddressRepositoryContract;
 use Plenty\Modules\Frontend\PaymentMethod\Contracts\FrontendPaymentMethodRepositoryContract;
 use Plenty\Modules\Order\ContactWish\Contracts\ContactWishRepositoryContract;
 use Plenty\Modules\Order\Contracts\OrderRepositoryContract;
@@ -46,6 +47,10 @@ class OrderService
      * @var FrontendPaymentMethodRepositoryContract
      */
     private $frontendPaymentMethodRepository;
+    /**
+     * @var AddressRepositoryContract
+     */
+    private $addressRepository;
     
     /**
      * OrderService constructor.
@@ -57,13 +62,15 @@ class OrderService
 		OrderRepositoryContract $orderRepository,
 		BasketService $basketService,
         SessionStorageService $sessionStorage,
-        FrontendPaymentMethodRepositoryContract $frontendPaymentMethodRepository
+        FrontendPaymentMethodRepositoryContract $frontendPaymentMethodRepository,
+        AddressRepositoryContract $addressRepository
 	)
 	{
 		$this->orderRepository = $orderRepository;
 		$this->basketService   = $basketService;
         $this->sessionStorage  = $sessionStorage;
         $this->frontendPaymentMethodRepository = $frontendPaymentMethodRepository;
+        $this->addressRepository = $addressRepository;
 	}
 
     /**
