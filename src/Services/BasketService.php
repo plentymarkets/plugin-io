@@ -92,7 +92,8 @@ class BasketService
         }
 
 
-        if ($this->sessionStorage->getCustomer()->showNetPrice) {
+        if (count($basket['totalVats']) <= 0)
+        {
             $basket["itemSum"]        = $basket["itemSumNet"];
             $basket["basketAmount"]   = $basket["basketAmountNet"];
             $basket["shippingAmount"] = $basket["shippingAmountNet"];
