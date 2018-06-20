@@ -93,7 +93,7 @@ class ItemNameFilter extends AbstractFilter
             $showName = $variationName;
         }
 
-        if($bundleType)
+        if($bundleType === "bundle")
         {
             $showName = $this->translationService->trans('Template.itemBundleName', ['itemName' => $showName]);
         }
