@@ -244,7 +244,6 @@ class BasketService
      */
     public function addBasketItem(array $data): array
     {
-
         if (isset($data['basketItemOrderParams']) && is_array($data['basketItemOrderParams'])) {
             list($data['basketItemOrderParams'], $data['totalOrderParamsMarkup']) = $this->parseBasketItemOrderParams($data['basketItemOrderParams']);
         }
@@ -265,6 +264,23 @@ class BasketService
         }
 
         return $this->getBasketItemsForTemplate();
+    }
+
+    /**
+     * Add multiple items to the basket
+     * @param array $basketItems
+     * @return array
+     */
+    public function addBasketItems(array $basketItems): array
+    {
+        $basketItemsForTemplate = [];
+
+        foreach($basketItems as $basketItem)
+        {
+            $basketItemsForTemplate = $this->addBasketItem($basketItem);
+        }
+
+        return $basketItemsForTemplate;
     }
 
     /**
