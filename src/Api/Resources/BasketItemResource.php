@@ -59,25 +59,6 @@ class BasketItemResource extends ApiResource
 
 		return $this->response->create($basketItems, ResponseCode::CREATED);
     }
-    
-    // Post
-    /**
-     * Add multiple items to the basket
-     * @return Response
-     */
-    public function addBasketItems():Response
-    {
-        $this->basketService->setTemplate($this->request->get('template', ''));
-
-        $basketItems = $this->basketService->addBasketItems($this->request->all());
-
-        if(array_key_exists("code", $basketItems))
-        {
-            return $this->response->create(["exceptionCode" => $basketItems["code"]], ResponseCode::BAD_REQUEST);
-        }
-
-		return $this->response->create($basketItems, ResponseCode::CREATED);
-    }
 
 	// Get
     /**

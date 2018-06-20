@@ -15,6 +15,7 @@ use Plenty\Modules\Frontend\Contracts\Checkout;
 use IO\Extensions\Filters\NumberFormatFilter;
 use Plenty\Modules\Frontend\Services\VatService;
 use IO\Services\NotificationService;
+use IO\Services\ItemSearch\Factories\VariationSearchFactory;
 /**
  * Class BasketService
  * @package IO\Services
@@ -244,6 +245,48 @@ class BasketService
      */
     public function addBasketItem(array $data): array
     {
+        /** @var ItemSearchService $itemSearchService */
+        $itemSearchService = pluginApp( ItemSearchService::class );
+
+        /** @var VariationSearchFactory $searchFactory */
+        $searchFactory = pluginApp( VariationSearchFactory::class );
+
+        /** @var WebstoreConfigurationService $webstoreConfigService */
+        $webstoreConfigService = pluginApp(WebstoreConfigurationService::class);
+
+        $item = $itemSearchService->getResults(
+            $searchFactory
+                ->withBundleComponents()
+                ->hasVariationId( $data['variationId'] )
+        );
+
+        if( $item['documents']['0']['data']['variation']['bundleType'] === 'bundle' &&
+            $webstoreConfigService->getWebstoreConfig()->dontSplitItemBundle === 0)
+        {
+            foreach ($item['documents']['0']['data']['bundleComponents'] as $bundleComponent)
+            {
+                $basketData['variationId']  = $bundleComponent['data']['variation']['id'];
+                $basketData['quantity']     = $bundleComponent['quantity'];
+                $basketData['template']     = $data['template'];
+
+                $this->addDataToBasket($basketData);
+            }
+        }
+        else
+        {
+            $this->addDataToBasket($data);
+        }
+
+        return $this->getBasketItemsForTemplate();
+    }
+
+    /**
+     * Add the given data to the basket
+     * @param $data
+     * @return array
+     */
+    private function addDataToBasket($data)
+    {
         if (isset($data['basketItemOrderParams']) && is_array($data['basketItemOrderParams'])) {
             list($data['basketItemOrderParams'], $data['totalOrderParamsMarkup']) = $this->parseBasketItemOrderParams($data['basketItemOrderParams']);
         }
@@ -262,25 +305,6 @@ class BasketService
         } catch (\Exception $e) {
             return ["code" => $e->getCode()];
         }
-
-        return $this->getBasketItemsForTemplate();
-    }
-
-    /**
-     * Add multiple items to the basket
-     * @param array $basketItems
-     * @return array
-     */
-    public function addBasketItems(array $basketItems): array
-    {
-        $basketItemsForTemplate = [];
-
-        foreach($basketItems as $basketItem)
-        {
-            $basketItemsForTemplate = $this->addBasketItem($basketItem);
-        }
-
-        return $basketItemsForTemplate;
     }
 
     /**
