@@ -16,6 +16,7 @@ use IO\Extensions\Filters\NumberFormatFilter;
 use Plenty\Modules\Frontend\Services\VatService;
 use IO\Services\NotificationService;
 use IO\Services\ItemSearch\Factories\VariationSearchFactory;
+
 /**
  * Class BasketService
  * @package IO\Services
@@ -263,6 +264,11 @@ class BasketService
         if( $item['documents']['0']['data']['variation']['bundleType'] === 'bundle' &&
             $webstoreConfigService->getWebstoreConfig()->dontSplitItemBundle === 0)
         {
+            /** @var NotificationService $notificationService */
+            $notificationService = pluginApp(NotificationService::class);
+
+            $notificationService->warn('Item bundle split', 5);
+
             foreach ($item['documents']['0']['data']['bundleComponents'] as $bundleComponent)
             {
                 $basketData['variationId']  = $bundleComponent['data']['variation']['id'];
