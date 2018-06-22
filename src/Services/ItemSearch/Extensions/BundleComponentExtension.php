@@ -26,7 +26,8 @@ class BundleComponentExtension implements ItemSearchExtension
                 VariationSearchFactory::INHERIT_SORTING
             ])
             ->withResultFields([
-                'variation.bundleType'
+                'variation.bundleType',
+                'variation.id'
             ])
             ->build();
     }
@@ -45,7 +46,7 @@ class BundleComponentExtension implements ItemSearchExtension
 
         foreach( $extensionResult['documents'] as $key => $extensionDocument )
         {
-            $document = $baseResult['documents'][$key];
+            $document = $extensionResult['documents'][$key];
             if ( count( $extensionDocument )
                 && count( $extensionDocument['data']['variation'] )
                 && $extensionDocument['data']['variation']['bundleType'] === 'bundle' )
@@ -72,14 +73,14 @@ class BundleComponentExtension implements ItemSearchExtension
 
                 /** @var ItemSearchService $itemSearchService */
                 $itemSearchService = pluginApp( ItemSearchService::class );
-                $bundleVariations  = $baseResult['documents'][$key]['data']['bundleComponents'] = $itemSearchService->getResult(
+                $bundleVariations  = $itemSearchService->getResult(
                     BasketItems::getSearchFactory([
                         'variationIds' => $bundleVariationIds
                     ])
                 );
 
                 $bundleComponents = [];
-                foreach( $bundleVariations[0]['documents'] as $bundleVariation )
+                foreach( $bundleVariations['documents'] as $bundleVariation )
                 {
                     $bundleComponents[] = [
                         'quantity'  => $bundleQuantities[$bundleVariation['id']],
