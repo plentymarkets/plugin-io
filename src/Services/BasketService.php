@@ -246,36 +246,43 @@ class BasketService
      */
     public function addBasketItem(array $data): array
     {
-        /** @var ItemSearchService $itemSearchService */
-        $itemSearchService = pluginApp( ItemSearchService::class );
-
-        /** @var VariationSearchFactory $searchFactory */
-        $searchFactory = pluginApp( VariationSearchFactory::class );
-
         /** @var WebstoreConfigurationService $webstoreConfigService */
         $webstoreConfigService = pluginApp(WebstoreConfigurationService::class);
 
-        $item = $itemSearchService->getResults(
-            $searchFactory
-                ->withBundleComponents()
-                ->hasVariationId( $data['variationId'] )
-        );
-
-        if( $item['documents']['0']['data']['variation']['bundleType'] === 'bundle' &&
-            $webstoreConfigService->getWebstoreConfig()->dontSplitItemBundle === 0)
+        if($webstoreConfigService->getWebstoreConfig()->dontSplitItemBundle === 0)
         {
-            /** @var NotificationService $notificationService */
-            $notificationService = pluginApp(NotificationService::class);
+            /** @var ItemSearchService $itemSearchService */
+            $itemSearchService = pluginApp( ItemSearchService::class );
 
-            $notificationService->warn('Item bundle split', 5);
+            /** @var VariationSearchFactory $searchFactory */
+            $searchFactory = pluginApp( VariationSearchFactory::class );
 
-            foreach ($item['documents']['0']['data']['bundleComponents'] as $bundleComponent)
+            $item = $itemSearchService->getResult(
+                $searchFactory
+                    ->hasVariationId( $data['variationId'] )
+                    ->withBundleComponents()
+                    ->withResultFields([
+                        'variation.bundleType'
+                    ])
+            );
+
+            if($item['documents']['0']['data']['variation']['bundleType'] === 'bundle')
             {
-                $basketData['variationId']  = $bundleComponent['data']['variation']['id'];
-                $basketData['quantity']     = $bundleComponent['quantity'];
-                $basketData['template']     = $data['template'];
+                /** @var NotificationService $notificationService */
+                $notificationService = pluginApp(NotificationService::class);
 
-                $this->addDataToBasket($basketData);
+                $notificationService->warn('Item bundle split', 5);
+
+                foreach ($item['documents']['0']['data']['bundleComponents'] as $bundleComponent)
+                {
+                    $basketData = [];
+
+                    $basketData['variationId']  = $bundleComponent['data']['variation']['id'];
+                    $basketData['quantity']     = $bundleComponent['quantity'];
+                    $basketData['template']     = $data['template'];
+
+                    $this->addDataToBasket($basketData);
+                }
             }
         }
         else
