@@ -22,6 +22,7 @@ use IO\Builder\Order\AddressType;
 use IO\Constants\SessionStorageKeys;
 use IO\Services\TemplateConfigService;
 use Plenty\Modules\Authorization\Services\AuthHelper;
+use IO\Services\UrlService;
 
 
 /**
@@ -51,7 +52,10 @@ class OrderService
      * @var AddressRepositoryContract
      */
     private $addressRepository;
-    
+    /**
+     * @var UrlService
+     */
+    private $urlService;
     /**
      * OrderService constructor.
      * @param OrderRepositoryContract $orderRepository
@@ -63,7 +67,8 @@ class OrderService
 		BasketService $basketService,
         SessionStorageService $sessionStorage,
         FrontendPaymentMethodRepositoryContract $frontendPaymentMethodRepository,
-        AddressRepositoryContract $addressRepository
+        AddressRepositoryContract $addressRepository,
+        UrlService $urlService
 	)
 	{
 		$this->orderRepository = $orderRepository;
@@ -71,6 +76,7 @@ class OrderService
         $this->sessionStorage  = $sessionStorage;
         $this->frontendPaymentMethodRepository = $frontendPaymentMethodRepository;
         $this->addressRepository = $addressRepository;
+        $this->urlService = $urlService;
 	}
 
     /**
@@ -203,7 +209,8 @@ class OrderService
             {
                 if ((int)$customerService->getContactId() <= 0)
                 {
-                    return pluginApp(Response::class)->redirectTo('login?backlink=confirmation/' . $orderId . '/' . $orderAccessKey);
+
+                    return $this->urlService->redirectTo('login?backlink=confirmation/' . $orderId . '/' . $orderAccessKey);
                 }
                 elseif ((int)$orderContactId !== (int)$customerService->getContactId())
                 {

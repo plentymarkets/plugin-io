@@ -19,105 +19,105 @@ class CategoryService
 {
     use MemoryCache;
 
-	/**
-	 * @var CategoryRepositoryContract
-	 */
-	private $categoryRepository;
+    /**
+     * @var CategoryRepositoryContract
+     */
+    private $categoryRepository;
 
-	/**
-	 * @var WebstoreConfigurationService
-	 */
-	private $webstoreConfig;
+    /**
+     * @var WebstoreConfigurationService
+     */
+    private $webstoreConfig;
 
     /**
      * @var SessionStorageService
      */
     private $sessionStorageService;
 
-	// is set from controllers
-	/**
-	 * @var Category
-	 */
-	private $currentCategory = null;
-	/**
-	 * @var array
-	 */
-	private $currentCategoryTree = [];
+    // is set from controllers
+    /**
+     * @var Category
+     */
+    private $currentCategory = null;
+    /**
+     * @var array
+     */
+    private $currentCategoryTree = [];
 
-	private $currentItem = [];
+    private $currentItem = [];
 
     /**
      * CategoryService constructor.
      * @param CategoryRepositoryContract $category
      */
-	 public function __construct(CategoryRepositoryContract $categoryRepository, WebstoreConfigurationService $webstoreConfig, SessionStorageService $sessionStorageService)
-	{
-		$this->categoryRepository    = $categoryRepository;
-		$this->webstoreConfig 		 = $webstoreConfig;
+    public function __construct(CategoryRepositoryContract $categoryRepository, WebstoreConfigurationService $webstoreConfig, SessionStorageService $sessionStorageService)
+    {
+        $this->categoryRepository    = $categoryRepository;
+        $this->webstoreConfig 		 = $webstoreConfig;
         $this->sessionStorageService = $sessionStorageService;
-	}
+    }
 
-	/**
-	 * Set the current category by ID.
-	 * @param int $catID The id of the current category
-	 */
-	public function setCurrentCategoryID(int $catID = 0)
-	{
-		$this->setCurrentCategory(
-			$this->categoryRepository->get($catID, $this->sessionStorageService->getLang())
-		);
-	}
+    /**
+     * Set the current category by ID.
+     * @param int $catID The id of the current category
+     */
+    public function setCurrentCategoryID(int $catID = 0)
+    {
+        $this->setCurrentCategory(
+            $this->categoryRepository->get($catID, $this->sessionStorageService->getLang())
+        );
+    }
 
-	/**
-	 * Set the current category by ID.
-	 * @param Category $cat The current category
-	 */
-	public function setCurrentCategory($cat)
-	{
-	    $lang = $this->sessionStorageService->getLang();
-		$this->currentCategory     = null;
-		$this->currentCategoryTree = [];
+    /**
+     * Set the current category by ID.
+     * @param Category $cat The current category
+     */
+    public function setCurrentCategory($cat)
+    {
+        $lang = $this->sessionStorageService->getLang();
+        $this->currentCategory     = null;
+        $this->currentCategoryTree = [];
 
-		if($cat === null)
-		{
-			return;
-		}
+        if($cat === null)
+        {
+            return;
+        }
 
-		// List parent/open categories
-		$this->currentCategory = $cat;
-		while($cat !== null)
-		{
-			$this->currentCategoryTree[$cat->level] = $cat;
-			$cat                                    = $this->categoryRepository->get($cat->parentCategoryId, $lang);
-		}
-	}
-    
+        // List parent/open categories
+        $this->currentCategory = $cat;
+        while($cat !== null)
+        {
+            $this->currentCategoryTree[$cat->level] = $cat;
+            $cat                                    = $this->categoryRepository->get($cat->parentCategoryId, $lang);
+        }
+    }
+
     /**
      * @return Category
      */
-	public function getCurrentCategory()
+    public function getCurrentCategory()
     {
         return $this->currentCategory;
     }
 
-	/**
-	 * Get a category by ID
-	 * @param int $catID The category ID
-	 * @param string $lang The language to get the category
-	 * @return Category
-	 */
-	public function get($catID = 0, $lang = null)
-	{
-	    if ( $lang === null )
+    /**
+     * Get a category by ID
+     * @param int $catID The category ID
+     * @param string $lang The language to get the category
+     * @return Category
+     */
+    public function get($catID = 0, $lang = null)
+    {
+        if ( $lang === null )
         {
             $lang = $this->sessionStorageService->getLang();
         }
-        
+
         $category = $this->fromMemoryCache(
             "category.$catID.$lang",
             function() use ($catID, $lang) {
                 $category = $this->categoryRepository->get($catID, $lang);
-    
+
                 $currentDetail = [];
                 foreach($category->details as $detail)
                 {
@@ -126,20 +126,20 @@ class CategoryService
                         $currentDetail = $detail;
                     }
                 }
-                
+
                 if(count($currentDetail))
                 {
                     $category->details = pluginApp(Collection::class, [ [$currentDetail] ]);
                 }
-                
+
                 return $category;
             }
         );
 
-	    return $category;
-	}
+        return $category;
+    }
 
-	public function getChildren($categoryId, $lang = null)
+    public function getChildren($categoryId, $lang = null)
     {
         if ( $lang === null )
         {
@@ -160,15 +160,16 @@ class CategoryService
 
         return $children;
     }
-	
-	/**
-	 * Return the URL for a given category ID.
-	 * @param Category $category the category to get the URL for
-	 * @param string $lang the language to get the URL for
-	 * @return string|null
-	 */
-	public function getURL($category, $lang = null)
-	{
+
+    /**
+     * Return the URL for a given category ID.
+     * @param Category $category the category to get the URL for
+     * @param string $lang the language to get the URL for
+     * @return string|null
+     */
+    public function getURL($category, $lang = null)
+    {
+        $defaultLanguage = $this->webstoreConfig->getDefaultLanguage();
         if ( $lang === null )
         {
             $lang = $this->sessionStorageService->getLang();
@@ -176,24 +177,29 @@ class CategoryService
 
         $categoryUrl = $this->fromMemoryCache(
             "categoryUrl.$category->id.$lang",
-            function() use ($category, $lang) {
+            function() use ($category, $lang, $defaultLanguage) {
                 if(!$category instanceof Category || $category->details[0] === null)
                 {
                     return null;
                 }
-                return pluginApp(
+                $categoryURL = pluginApp(
                     UrlQuery::class,
-                    ['path' => $this->categoryRepository->getUrl($category->id, $lang)]
-                )->toRelativeUrl();
+                    ['path' => $this->categoryRepository->getUrl($category->id, $lang), 'lang' => $lang]
+                );
+                return $categoryURL->toRelativeUrl($lang !== $defaultLanguage);
             }
         );
 
         return $categoryUrl;
-	}
+    }
 
-	public function getURLById($categoryId, $lang = null)
+    public function getURLById($categoryId, $lang = null)
     {
-        return $this->getURL($this->get($categoryId), $lang);
+        if ( $lang === null )
+        {
+            $lang = $this->sessionStorageService->getLang();
+        }
+        return $this->getURL($this->get($categoryId, $lang), $lang);
     }
 
     /**
@@ -201,7 +207,7 @@ class CategoryService
      * @param $lang
      * @return CategoryDetails|null
      */
-	public function getDetails($category, $lang)
+    public function getDetails($category, $lang)
     {
         if ( $category === null )
         {
@@ -221,51 +227,51 @@ class CategoryService
     }
 
 
-	/**
-	 * Check whether a category is referenced by the current route
-	 * @param int $catID The ID for the category to check
-	 * @return bool
-	 */
-	public function isCurrent(Category $category):bool
-	{
-		if($this->currentCategory === null)
-		{
-			return false;
-		}
-		return $this->currentCategory->id === $category->id;
-	}
+    /**
+     * Check whether a category is referenced by the current route
+     * @param int $catID The ID for the category to check
+     * @return bool
+     */
+    public function isCurrent(Category $category):bool
+    {
+        if($this->currentCategory === null)
+        {
+            return false;
+        }
+        return $this->currentCategory->id === $category->id;
+    }
 
-	/**
-	 * Check whether any child of a category is referenced by the current route
-	 * @param Category $category The category to check
-	 * @return bool
-	 */
-	public function isOpen(Category $category):bool
-	{
-		if($this->currentCategory === null)
-		{
-			return false;
-		}
+    /**
+     * Check whether any child of a category is referenced by the current route
+     * @param Category $category The category to check
+     * @return bool
+     */
+    public function isOpen(Category $category):bool
+    {
+        if($this->currentCategory === null)
+        {
+            return false;
+        }
 
-		foreach($this->currentCategoryTree as $lvl => $categoryBranch)
-		{
-			if($categoryBranch->id === $category->id)
-			{
-				return true;
-			}
-		}
-		return false;
-	}
+        foreach($this->currentCategoryTree as $lvl => $categoryBranch)
+        {
+            if($categoryBranch->id === $category->id)
+            {
+                return true;
+            }
+        }
+        return false;
+    }
 
-	/**
-	 * Check whether a category or any of its children is referenced by the current route
-	 * @param Category $category The category to check
-	 * @return bool
-	 */
-	public function isActive(Category $category = null):bool
-	{
+    /**
+     * Check whether a category or any of its children is referenced by the current route
+     * @param Category $category The category to check
+     * @return bool
+     */
+    public function isActive(Category $category = null):bool
+    {
         return $category !== null && ($this->isCurrent($category) || $this->isOpen($category));
-	}
+    }
 
     /**
      * @param Category $category
@@ -284,7 +290,7 @@ class CategoryService
         {
             return null;
         }
-    
+
         /**
          * @var ItemService $itemService
          */
@@ -321,7 +327,7 @@ class CategoryService
         {
             $lang = $this->sessionStorageService->getLang();
         }
-		return $this->categoryRepository->getLinklistList($type, $lang, $this->webstoreConfig->getWebstoreConfig()->webstoreId);
+        return $this->categoryRepository->getLinklistList($type, $lang, $this->webstoreConfig->getWebstoreConfig()->webstoreId);
     }
 
     /**
@@ -330,7 +336,7 @@ class CategoryService
      * @param bool  $bottomUp   Set true to order result from bottom (deepest category) to top (= level 1)
      * @return array            The parents of the category
      */
-	public function getHierarchy( int $catID = 0, bool $bottomUp = false ):array
+    public function getHierarchy( int $catID = 0, bool $bottomUp = false ):array
     {
         if( $catID > 0 )
         {
@@ -354,7 +360,7 @@ class CategoryService
         {
             $hierarchy = array_reverse( $hierarchy );
         }
-    
+
         if(count($this->currentItem))
         {
             $lang = pluginApp( SessionStorageService::class )->getLang();
