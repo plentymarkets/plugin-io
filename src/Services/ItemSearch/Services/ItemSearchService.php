@@ -63,7 +63,7 @@ class ItemSearchService
      */
     public function getResult( $searchFactory )
     {
-        return $this->getResults([$searchFactory]);
+        return $this->getResults([$searchFactory])[0];
     }
 
     private function normalizeResult($result)
