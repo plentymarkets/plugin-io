@@ -2,6 +2,7 @@
 
 namespace IO\Services\ItemSearch\SearchPresets;
 
+use IO\Services\ItemSearch\Extensions\ContentCacheVariationLinkExtension;
 use IO\Services\ItemSearch\Factories\VariationSearchFactory;
 
 /**
@@ -24,7 +25,9 @@ class TagItems extends VariationList
         }
         /** @var VariationSearchFactory $factory */
         $factory = parent::getSearchFactory($options);
-        $factory->hasAnyTag($tagIds);
+        $factory
+            ->hasAnyTag($tagIds)
+            ->withExtension(ContentCacheVariationLinkExtension::class);
 
         return $factory;
     }

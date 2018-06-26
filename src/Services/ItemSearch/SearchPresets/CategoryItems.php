@@ -2,6 +2,7 @@
 
 namespace IO\Services\ItemSearch\SearchPresets;
 
+use IO\Services\ItemSearch\Extensions\ContentCacheVariationLinkExtension;
 use IO\Services\ItemSearch\Factories\VariationSearchFactory;
 use IO\Services\ItemSearch\Helper\ResultFieldTemplate;
 use IO\Services\ItemSearch\Helper\SortingHelper;
@@ -79,7 +80,8 @@ class CategoryItems implements SearchPreset
             ->hasFacets( $facets )
             ->sortByMultiple( $sorting )
             ->setPage( $page, $itemsPerPage )
-            ->groupByTemplateConfig();
+            ->groupByTemplateConfig()
+            ->withExtension(ContentCacheVariationLinkExtension::class);
 
         return $searchFactory;
     }

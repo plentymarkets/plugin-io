@@ -2,6 +2,7 @@
 
 namespace IO\Services\ItemSearch\SearchPresets;
 
+use IO\Services\ItemSearch\Extensions\ContentCacheVariationLinkExtension;
 use IO\Services\ItemSearch\Factories\VariationSearchFactory;
 use IO\Services\ItemSearch\Helper\ResultFieldTemplate;
 use IO\Services\TemplateConfigService;
@@ -37,7 +38,8 @@ class SingleItem implements SearchPreset
             ->isVisibleForClient()
             ->isActive()
             ->hasNameInLanguage()
-            ->hasPriceForCustomer();
+            ->hasPriceForCustomer()
+            ->withExtension(ContentCacheVariationLinkExtension::class);
 
         if(array_key_exists('itemId', $options) && $options['itemId'] != 0)
         {

@@ -3,6 +3,7 @@
 namespace IO\Services\ItemSearch\SearchPresets;
 
 use IO\Services\ItemCrossSellingService;
+use IO\Services\ItemSearch\Extensions\ContentCacheVariationLinkExtension;
 use IO\Services\ItemSearch\Factories\VariationSearchFactory;
 use IO\Services\ItemSearch\Helper\ResultFieldTemplate;
 
@@ -48,7 +49,8 @@ class CrossSellingItems implements SearchPreset
             ->groupByTemplateConfig()
             ->isCrossSellingItem( $itemId, $relation )
             ->hasNameInLanguage()
-            ->hasPriceForCustomer();
+            ->hasPriceForCustomer()
+            ->withExtension(ContentCacheVariationLinkExtension::class);;
 
         return $searchFactory;
     }
