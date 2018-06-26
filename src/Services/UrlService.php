@@ -208,33 +208,23 @@ class UrlService
         return $languageUrls;
     }
 
+
     /**
      * Get language specific homepage url
      * @return string
      */
     public function getHomepageURL()
     {
-        $url = "/";
-
-        if($this->webstoreConfigurationService->getDefaultLanguage() !== $this->sessionStorage->getLang())
-        {
-            $url .= $this->sessionStorage->getLang();
-            $url .= UrlQuery::shouldAppendTrailingSlash() ? '/' : '';
-        }
-        return $url;
+        return pluginApp(UrlQuery::class,
+            ['path' => '/'])->toRelativeUrl($this->webstoreConfigurationService->getDefaultLanguage() !== $this->sessionStorage->getLang());
     }
-
 
     public function redirectTo($redirectURL)
     {
-        $url = $this->getHomepageURL();
 
-        if(substr($url, -1) !== '/')
-        {
-            $url .= '/';
-        }
-        $url .= $redirectURL;
-        $url .= UrlQuery::shouldAppendTrailingSlash() ? '/' : '';
+        $url = pluginApp( UrlQuery::class, ['path' => $this->getHomepageURL()])
+            ->join($redirectURL)
+            ->toRelativeUrl($this->webstoreConfigurationService->getDefaultLanguage() !== $this->sessionStorage->getLang());
 
         return pluginApp(Response::class)->redirectTo($url);
     }
