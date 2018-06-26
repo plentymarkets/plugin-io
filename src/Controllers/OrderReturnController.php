@@ -8,6 +8,7 @@ use Plenty\Plugin\ConfigRepository;
 use IO\Services\CustomerService;
 use IO\Services\OrderService;
 use IO\Guards\AuthGuard;
+use IO\Services\UrlBuilder\UrlQuery;
 
 /**
  * Class OrderReturnController
@@ -23,7 +24,15 @@ class OrderReturnController extends LayoutController
     {
         if($customerService->getContactId() <= 0)
         {
-            AuthGuard::redirect("/login", ["backlink" => AuthGuard::getUrl()]);
+            $url = $this->urlService->getHomepageURL();
+            if(substr($url, -1) !== '/')
+            {
+                $url .= '/';
+            }
+            $url .= 'login';
+            $url .= UrlQuery::shouldAppendTrailingSlash() ? '/' : '';
+
+            AuthGuard::redirect($url, ["backlink" => AuthGuard::getUrl()]);
         }
 
         $configRepo = pluginApp(ConfigRepository::class);

@@ -4,6 +4,7 @@ namespace IO\Controllers;
 use IO\Helper\TemplateContainer;
 use IO\Services\CustomerService;
 use IO\Services\OrderService;
+use IO\Services\UrlService;
 use Plenty\Plugin\Http\Response;
 use Plenty\Plugin\Http\Request;
 
@@ -21,7 +22,7 @@ class ConfirmationEmailController extends LayoutController
     {
         if(strlen($orderAccessKey) && (int)$orderId > 0)
         {
-            return pluginApp(Response::class)->redirectTo('confirmation/'.$orderId.'/'.$orderAccessKey);
+            return $this->urlService->redirectTo('confirmation/'.$orderId.'/'.$orderAccessKey);
         }
         
         return $this->renderTemplate(
