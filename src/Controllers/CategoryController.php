@@ -2,6 +2,7 @@
 
 namespace IO\Controllers;
 
+use IO\Services\SessionStorageService;
 use Plenty\Plugin\Http\Request;
 
 /**
@@ -30,10 +31,10 @@ class CategoryController extends LayoutController
 	{
 	    /** @var Request $request */
 	    $request = pluginApp(Request::class);
-		
-	    $category = $this->categoryRepo->findCategoryByUrl($lvl1, $lvl2, $lvl3, $lvl4, $lvl5, $lvl6);
+        $sessionService  = pluginApp(SessionStorageService::class);
+        $category = $this->categoryRepo->findCategoryByUrl($lvl1, $lvl2, $lvl3, $lvl4, $lvl5, $lvl6);
         
-        if($category === null)
+        if($category === null || $category->details->first()->lang != $sessionService->getLang())
         {
             return '';
         }
