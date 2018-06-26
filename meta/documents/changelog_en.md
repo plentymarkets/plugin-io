@@ -1,5 +1,11 @@
 # Release Notes for IO
 
+## v2.10.1 (2018-06-26) <a href="https://github.com/plentymarkets/plugin-io/compare/2.10.0...2.10.1" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
+
+### Fixed
+
+- The country code has been removed from the URLs of the standard language. The country code is part of the URLs for all other languages.
+
 ## v2.10.0 (2018-06-12) <a href="https://github.com/plentymarkets/plugin-io/compare/2.9.1...2.10.0" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
 
 ### Added

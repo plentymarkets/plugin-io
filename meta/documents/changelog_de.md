@@ -1,5 +1,12 @@
 # Release Notes für IO
 
+## v2.10.1 (2018-06-26) <a href="https://github.com/plentymarkets/plugin-io/compare/2.10.0...2.10.1" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
+
+### Behoben
+
+- Für die Standardsprache wurde das Länderkürzel in der URL entfernt. Andere Sprachen werden mit Länderkürzeln in der URL erreicht.
+- Durch einen Fehler wurde die Mehrwertsteuer nicht im Warenkorb berechnet, wenn aufgrund einer Kundenklasse Netto-Preise dargestellt wurden. Dies wurde behoben.
+
 ## v2.10.0 (2018-06-12) <a href="https://github.com/plentymarkets/plugin-io/compare/2.9.1...2.10.0" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
 
 ### Hinzugefügt
