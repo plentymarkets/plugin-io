@@ -5,6 +5,7 @@
 ### Fixed
 
 - The country code has been removed from the URLs of the standard language. The country code is part of the URLs for all other languages.
+- Due to an error, the VAT was not calculated in the shopping cart, if net prices were displayed because of a customer class. This has been fixed.
 
 ## v2.10.0 (2018-06-12) <a href="https://github.com/plentymarkets/plugin-io/compare/2.9.1...2.10.0" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
 
