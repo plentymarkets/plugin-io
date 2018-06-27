@@ -30,7 +30,7 @@ class UrlQuery
                 $this->path = "/" . $this->path;
             }
 
-            if (substr($this->path, strlen($this->path) - 1, 1) === "/") {
+            if (substr($this->path, strlen($this->path) - 1, 1) === "/" && strlen($this->path) > 1) {
                 $this->path = substr($this->path, 0, strlen($this->path) - 1);
             }
         }
