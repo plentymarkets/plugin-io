@@ -30,6 +30,7 @@ use Plenty\Modules\Item\Search\Filter\CategoryFilter;
 use Plenty\Modules\Item\Search\Filter\ClientFilter;
 use Plenty\Modules\Item\Search\Filter\SearchFilter;
 use Plenty\Modules\Item\Search\Filter\VariationBaseFilter;
+use Plenty\Modules\RestDocumentation\Export\Postman\Models\Item;
 use Plenty\Plugin\Application;
 use Plenty\Plugin\Events\Dispatcher;
 
@@ -171,32 +172,10 @@ class ItemService
 	 */
 	public function getVariation(int $variationId = 0):array
 	{
-		$documentProcessor = pluginApp(DocumentProcessor::class);
-		$documentSearch    = pluginApp(DocumentSearch::class, [$documentProcessor]);
+	    /** @var ItemSearchService $itemSearchService */
+	    $itemSearchService = pluginApp(ItemSearchService::class);
 
-		//$attributeProcessor = pluginApp(AttributeValueListAggregationProcessor::class);
-		//$attributeSearch    = pluginApp(AttributeValueListAggregation::class, [$attributeProcessor]);
-
-
-		/** @var VariationElasticSearchSearchRepositoryContract $elasticSearchRepo */
-		$elasticSearchRepo = pluginApp(VariationElasticSearchSearchRepositoryContract::class);
-		$elasticSearchRepo->addSearch($documentSearch);
-		//$elasticSearchRepo->addSearch($attributeSearch);
-
-		/** @var ClientFilter $clientFilter */
-		$clientFilter = pluginApp(ClientFilter::class);
-		$clientFilter->isVisibleForClient($this->app->getPlentyId());
-
-		/** @var VariationBaseFilter $variationFilter */
-		$variationFilter = pluginApp(VariationBaseFilter::class);
-		$variationFilter->isActive();
-		$variationFilter->hasId($variationId);
-
-		$documentSearch
-			->addFilter($clientFilter)
-			->addFilter($variationFilter);
-
-		return $elasticSearchRepo->execute();
+        return $itemSearchService->getResult(SingleItem::getSearchFactory(['variationId' => $variationId]));
 	}
 
 	/**
