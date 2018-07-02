@@ -3,6 +3,7 @@ namespace IO\Controllers;
 
 use IO\Services\NotificationService;
 use IO\Services\OrderService;
+use IO\Services\UrlBuilder\UrlQuery;
 use Plenty\Plugin\Http\Response;
 use Plenty\Plugin\Http\Request;
 
@@ -30,7 +31,11 @@ class PlaceOrderController extends LayoutController
         try
         {
             $orderData = $orderService->placeOrder();
-            return $this->urlService->redirectTo( "execute-payment/" . $orderData->order->id . (strlen($redirectParam) ? "/?redirectParam=" . $redirectParam : '') );
+            $url = "execute-payment/" . $orderData->order->id;
+            $url .= UrlQuery::shouldAppendTrailingSlash() ? '/' : '';
+            $url .= strlen($redirectParam) ? "?redirectParam=" . $redirectParam : '';
+
+            return $this->urlService->redirectTo($url);
         }
         catch (\Exception $exception)
         {
