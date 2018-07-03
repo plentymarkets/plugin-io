@@ -32,7 +32,6 @@ class CheckoutController extends LayoutController
          */
         $sessionStorage = pluginApp(SessionStorageService::class);
 
-        $includeLang = $sessionStorage->getLang() !== $webstoreConfigurationService->getDefaultLanguage();
         $url = $this->urlService->getHomepageURL();
         if( $sessionStorage->getSessionValue(SessionStorageKeys::GUEST_EMAIL) == null &&
             $customerService->getContactId() <= 0)
