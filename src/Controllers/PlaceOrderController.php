@@ -3,6 +3,7 @@ namespace IO\Controllers;
 
 use IO\Services\NotificationService;
 use IO\Services\OrderService;
+use IO\Services\UrlBuilder\UrlQuery;
 use Plenty\Plugin\Http\Response;
 use Plenty\Plugin\Http\Request;
 
@@ -30,13 +31,17 @@ class PlaceOrderController extends LayoutController
         try
         {
             $orderData = $orderService->placeOrder();
-            return $response->redirectTo( "execute-payment/" . $orderData->order->id . (strlen($redirectParam) ? "/?redirectParam=" . $redirectParam : '') );
+            $url = "execute-payment/" . $orderData->order->id;
+            $url .= UrlQuery::shouldAppendTrailingSlash() ? '/' : '';
+            $url .= strlen($redirectParam) ? "?redirectParam=" . $redirectParam : '';
+
+            return $this->urlService->redirectTo($url);
         }
         catch (\Exception $exception)
         {
             // TODO get better error text
             $notificationService->error($exception->getMessage());
-            return $response->redirectTo("checkout");
+            return $this->urlService->redirectTo("checkout");
         }
     }
 
@@ -50,7 +55,7 @@ class PlaceOrderController extends LayoutController
         if( $orderData == null )
         {
             $notificationService->error("Order (". $orderId .") not found!");
-            return $response->redirectTo("checkout");
+            return $this->urlService->redirectTo("checkout");
         }
 
         if( $paymentId < 0 )
@@ -65,7 +70,7 @@ class PlaceOrderController extends LayoutController
             $paymentResult = $orderService->executePayment($orderId, $paymentId);
             if ($paymentResult["type"] === "redirectUrl")
             {
-                return $response->redirectTo($paymentResult["value"]);
+                return $this->urlService->redirectTo($paymentResult["value"]);
             }
             elseif ($paymentResult["type"] === "error")
             {
@@ -82,9 +87,9 @@ class PlaceOrderController extends LayoutController
         // in case of failure, the order should have been marked as "not payed"
         if( strlen($redirectParam) )
         {
-            return $response->redirectTo($redirectParam);
+            return $this->urlService->redirectTo($redirectParam);
         }
 
-        return $response->redirectTo("confirmation");
+        return $this->urlService->redirectTo("confirmation");
     }
 }

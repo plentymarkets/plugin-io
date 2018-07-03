@@ -9,6 +9,7 @@ use IO\Helper\CategoryMap;
 use IO\Helper\TemplateContainer;
 use IO\Services\CategoryService;
 use IO\Services\TemplateService;
+use IO\Services\UrlService;
 use Plenty\Modules\Category\Contracts\CategoryRepositoryContract;
 use Plenty\Modules\ContentCache\Contracts\ContentCacheRepositoryContract;
 use Plenty\Plugin\Application;
@@ -56,6 +57,11 @@ abstract class LayoutController extends Controller
 	 */
 	protected $categoryService;
 
+    /**
+     * @var UrlService $urlService
+     */
+	protected $urlService;
+
 	/**
 	 * @var bool
 	 */
@@ -70,7 +76,7 @@ abstract class LayoutController extends Controller
 	 * @param CategoryMap $categoryMap
 	 * @param CategoryService $categoryService
 	 */
-	public function __construct(Application $app, Twig $twig, Dispatcher $event, CategoryRepositoryContract $categoryRepo, CategoryMap $categoryMap, CategoryService $categoryService)
+	public function __construct(Application $app, Twig $twig, Dispatcher $event, CategoryRepositoryContract $categoryRepo, CategoryMap $categoryMap, CategoryService $categoryService, UrlService $urlService)
 	{
 	    parent::__construct();
 		$this->app             = $app;
@@ -79,6 +85,7 @@ abstract class LayoutController extends Controller
 		$this->categoryRepo    = $categoryRepo;
 		$this->categoryMap     = $categoryMap;
 		$this->categoryService = $categoryService;
+		$this->urlService      = $urlService;
 	}
 
 	/**
