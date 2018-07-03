@@ -90,4 +90,10 @@ class CustomerResource extends ApiResource
         
         return $this->index();
 	}
+
+	public function showNetPrices():Response
+    {
+        $showNetPrices = $this->customerService->showNetPrices();
+        return $this->response->create($showNetPrices, ResponseCode::OK);
+    }
 }
