@@ -118,7 +118,7 @@ class VariationUrlBuilder
 
                             $variationDescriptionRepository->update(
                                 [
-                                    'urlPath' => $itemUrl->getPath()
+                                    'urlPath' => rtrim($itemUrl->getPath(), '/')
                                 ],
                                 $variationId,
                                 $lang
