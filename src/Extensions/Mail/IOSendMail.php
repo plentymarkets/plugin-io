@@ -27,7 +27,7 @@ class IOSendMail
         {
             switch($template)
             {
-                case 'reset_pw':
+                case PluginSendMailService::PASSWORD_RESET:
                     /**
                      * @var CustomerPasswordResetService $customerPasswordResetService
                      */
