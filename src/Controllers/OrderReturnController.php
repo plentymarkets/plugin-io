@@ -55,6 +55,45 @@ class OrderReturnController extends LayoutController
     
                 /** @var OrderRepositoryContract $orderRepo */
                 $orderRepo = pluginApp(OrderRepositoryContract::class);
+
+                $bundleComponentsToAdd = [];
+                $bundleMainComponents = [];
+
+                $newOrderItems = [];
+
+                foreach($returnOrder->orderData['orderItems'] as $orderItem)
+                {
+                    if($orderItem['bundleType'] === 'bundle_item' && count($orderItem['references']) > 0)
+                    {
+                        $bundleComponentsToAdd[$orderItem['references'][0]['referenceOrderItemId']][] = $orderItem;
+                    }
+                    elseif(strpos($orderItem['orderItemName'], 'BUNDLE'))
+                    {
+                        $bundleMainComponents[$orderItem['id']] = $orderItem;
+                    }
+                    else
+                    {
+                        $newOrderItems[] = $orderItem;
+                    }
+                }
+
+                foreach($bundleComponentsToAdd as $key => $bundleComponent)
+                {
+                    $refOrderItem = $bundleMainComponents[$key];
+                    $refOrderItem['bundleType'] = "bundle";
+
+                    foreach($bundleComponent as $bundleChild)
+                    {
+                        $refOrderItem['bundleComponents'][] = $bundleChild;
+                    }
+
+                    $newOrderItems[] = $refOrderItem;
+                }
+
+                if(count($newOrderItems) > 0)
+                {
+                    $returnOrder->orderData['orderItems'] = $newOrderItems;
+                }
                 
                 if(!count($returnOrder->orderData['orderItems']) || !$orderService->isOrderReturnable($orderRepo->findOrderById($orderId)))
                 {
