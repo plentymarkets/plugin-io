@@ -221,11 +221,13 @@ class UrlService
 
     public function redirectTo($redirectURL)
     {
+        if(strpos($redirectURL, 'http') !== 0 && strpos($redirectURL, 'https') !== 0)
+        {
+            $redirectURL = pluginApp( UrlQuery::class, ['path' => $this->getHomepageURL()])
+                ->join($redirectURL)
+                ->toRelativeUrl($this->webstoreConfigurationService->getDefaultLanguage() !== $this->sessionStorage->getLang());
+        }
 
-        $url = pluginApp( UrlQuery::class, ['path' => $this->getHomepageURL()])
-            ->join($redirectURL)
-            ->toRelativeUrl($this->webstoreConfigurationService->getDefaultLanguage() !== $this->sessionStorage->getLang());
-
-        return pluginApp(Response::class)->redirectTo($url);
+        return pluginApp(Response::class)->redirectTo($redirectURL);
     }
 }
