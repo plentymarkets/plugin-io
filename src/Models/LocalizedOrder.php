@@ -147,13 +147,20 @@ class LocalizedOrder extends ModelWrapper
                 ->hasVariationIds( $orderVariationIds )
         );
 
-        foreach( $orderVariations['documents'] as $key => $orderVariation )
+        foreach( $orderVariations['documents'] as $orderVariation )
         {
             $variationId =  $orderVariation['data']['variation']['id'];
             $instance->itemURLs[$variationId]   = $urlFilter->buildItemURL( $orderVariation['data'] );
             $instance->itemImages[$variationId] = $imageFilter->getFirstItemImageUrl( $orderVariation['data']['images'], 'urlPreview' );
-            $instance->order->relations['orderItems'][$key]['bundleComponents'] = $orderVariation['data']['bundleComponents'];
-            $instance->order->relations['orderItems'][$key]['bundleType'] = $orderVariation['data']['variation']['bundleType'];
+
+            foreach( $instance->order->relations['orderItems'] as $orderItem)
+            {
+                if($orderItem['itemVariationId'] == $orderVariation['data']['variation']['id'])
+                {
+                    $orderItem['bundleComponents'] = $orderVariation['data']['bundleComponents'];
+                    $orderItem['bundleType'] = $orderVariation['data']['variation']['bundleType'];
+                }
+            }
         }
 
         $instance->highlightNetPrices = $instance->highlightNetPrices();
