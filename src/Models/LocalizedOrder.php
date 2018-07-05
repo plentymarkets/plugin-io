@@ -22,6 +22,7 @@ class LocalizedOrder extends ModelWrapper
      */
     const WRAPPED_ORDERITEM_TYPES = [
         OrderItemType::VARIATION,
+        OrderItemType::ITEM_BUNDLE,
         OrderItemType::BUNDLE_COMPONENT,
         OrderItemType::PROMOTIONAL_COUPON,
         OrderItemType::GIFT_CARD,
@@ -119,7 +120,7 @@ class LocalizedOrder extends ModelWrapper
         $orderVariationIds = [];
         foreach( $order->orderItems as $key => $orderItem )
         {
-            if(in_array($orderItem->typeId, self::WRAPPED_ORDERITEM_TYPES))
+            if(in_array((int)$orderItem->typeId, self::WRAPPED_ORDERITEM_TYPES))
             {
                 
                 if( $orderItem->itemVariationId !== 0 )
