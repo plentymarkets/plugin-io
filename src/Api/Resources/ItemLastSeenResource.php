@@ -2,18 +2,13 @@
 
 namespace IO\Api\Resources;
 
-use IO\Services\ItemLoader\Loaders\ItemURLs;
-use IO\Services\ItemLoader\Loaders\LastSeenItemList;
-use IO\Services\ItemSearch\SearchPresets\Facets;
-use IO\Services\ItemSearch\SearchPresets\SearchItems;
-use IO\Services\ItemSearch\Services\ItemSearchService;
-use Plenty\Plugin\Http\Response;
-use Plenty\Plugin\Http\Request;
 use IO\Api\ApiResource;
 use IO\Api\ApiResponse;
 use IO\Api\ResponseCode;
-use IO\Services\ItemLoader\Services\ItemLoaderService;
 use IO\Services\ItemLastSeenService;
+use IO\Services\ItemListService;
+use Plenty\Plugin\Http\Request;
+use Plenty\Plugin\Http\Response;
 
 /**
  * Class ItemLastSeenResource
@@ -30,40 +25,25 @@ class ItemLastSeenResource extends ApiResource
     {
         parent::__construct($request, $response);
     }
-    
+
     /**
      * Return last seen items
      * @return Response
      */
     public function index():Response
     {
-        $templateName = $this->request->get('templateName');
-        $options = $this->request->get('options');
-        
-        $lastSeenItems = pluginApp(ItemLoaderService::class)->loadForTemplate($templateName, [
-            "single" => [
-                LastSeenItemList::class
-            ],
-            "multi" => [
-                'itemURLs' => ItemURLs::class
-            ]
-        ], $options);
-        
+        $items = $this->request->get("items", 4);
+        $lastSeenItems = pluginApp(ItemListService::class)->getItemList(ItemListService::TYPE_LAST_SEEN, null, null, $items);
+
         return $this->response->create($lastSeenItems, ResponseCode::OK);
     }
 
-    /**
-     * @param string $selector
-     * @return Response
-     */
-    public function update(string $selector):Response
+    public function update(string $variationId):Response
     {
-        $variationId = $this->request->get('variationId');
-
         if((int)$variationId > 0)
         {
             $itemLastSeenService = pluginApp(ItemLastSeenService::class);
-            $itemLastSeenService->setLastSeenItem( $variationId );
+            $itemLastSeenService->setLastSeenItem((int)$variationId);
         }
 
         return $this->response->create("", ResponseCode::OK);
