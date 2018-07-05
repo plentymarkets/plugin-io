@@ -581,7 +581,7 @@ class OrderService
                     $newQuantity = $orderItem['quantity'];
                 }
             
-                if($newQuantity > 0 && ($orderItem['typeId'] == 1 || $orderItem['typeId'] == 3 || $orderItem['typeId'] == 9))
+                if($newQuantity > 0 && ($orderItem['typeId'] == 1 || $orderItem['typeId'] == 2 || $orderItem['typeId'] == 3 || $orderItem['typeId'] == 9))
                 {
                     $orderItem['quantity'] = $newQuantity;
                     $newOrderItems[] = $orderItem;
@@ -596,7 +596,7 @@ class OrderService
         {
             foreach($order['orderItems'] as $key => $orderItem)
             {
-                if($orderItem['typeId'] == 1 || $orderItem['typeId'] == 3 || $orderItem['typeId'] == 9)
+                if($orderItem['typeId'] == 1 || $orderItem['typeId'] == 2 || $orderItem['typeId'] == 3 || $orderItem['typeId'] == 9)
                 {
                     $newOrderItems[] = $orderItem;
                 }
