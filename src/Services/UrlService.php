@@ -221,7 +221,7 @@ class UrlService
 
     public function redirectTo($redirectURL)
     {
-        if(strpos($redirectURL, 'http') !== 0 && strpos($redirectURL, 'https') !== 0)
+        if(strpos($redirectURL, 'http:') !== 0 && strpos($redirectURL, 'https:') !== 0)
         {
             $redirectURL = pluginApp( UrlQuery::class, ['path' => $this->getHomepageURL()])
                 ->join($redirectURL)
