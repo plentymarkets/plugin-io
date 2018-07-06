@@ -1,7 +1,6 @@
 <?php //strict
 namespace IO\Controllers;
 
-use IO\Helper\TemplateContainer;
 use IO\Services\UrlService;
 use Plenty\Plugin\Http\Request;
 use Plenty\Plugin\Http\Response;

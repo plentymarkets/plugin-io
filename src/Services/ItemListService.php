@@ -41,10 +41,13 @@ class ItemListService
                     $sessionStorage = pluginApp(SessionStorageService::class);
                     $variationIds = $sessionStorage->getSessionValue(SessionStorageKeys::LAST_SEEN_ITEMS);
 
-                    $searchFactory = VariationList::getSearchFactory([
-                        'variationIds'  => $variationIds,
-                        'sorting'       => $sorting
-                    ]);
+                    if ( !is_null($variationIds) && count($variationIds) > 0 )
+                    {
+                        $searchFactory = VariationList::getSearchFactory([
+                            'variationIds'  => $variationIds,
+                            'sorting'       => $sorting
+                        ]);
+                    }
                     break;
                 case self::TYPE_TAG:
                     $searchFactory = TagItems::getSearchFactory([
