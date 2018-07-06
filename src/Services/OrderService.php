@@ -346,6 +346,35 @@ class OrderService
             {
                 return false;
             }
+
+            $newOrderItems = [];
+
+            foreach($orderWithoutReturnItems->orderItems as $orderItem)
+            {
+                if($orderItem['bundleType'] !== 'bundle_item' && count($orderItem['references']) === 0)
+                {
+                    $newOrderItems[] = $orderItem;
+                }
+            }
+
+            if(empty($newOrderItems))
+            {
+                return false;
+            }
+            else
+            {
+                $newItemsExist = false;
+
+                foreach($newOrderItems as $newOrderItem)
+                {
+                    if($newOrderItem['quantity'] > 0)
+                    {
+                        $newItemsExist = true;
+                    }
+                }
+
+                return $newItemsExist;
+            }
             
             $shippingDateSet = false;
             $createdDateUnix = 0;
@@ -515,7 +544,7 @@ class OrderService
             {
                 foreach($order->orderItems as $key => $orderItem)
                 {
-                    if($orderItem->typeId == 1 || $orderItem->typeId == 3 || $orderItem->typeId == 9)
+                    if($orderItem->typeId == 1 || $orderItem->typeId == 2 || $orderItem->typeId == 3 || $orderItem->typeId == 9)
                     {
                         $newOrderItems[] = $orderItem;
                     }
