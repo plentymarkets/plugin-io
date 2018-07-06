@@ -370,14 +370,10 @@ class OrderService
                 }
             }
 
-            if(empty($newOrderItems))
-            {
-                return false;
-            }
-            else
-            {
-                $newItemsExist = false;
+            $newItemsExist = false;
 
+            if(count($newOrderItems) > 0)
+            {
                 foreach($newOrderItems as $newOrderItem)
                 {
                     if($newOrderItem['quantity'] > 0)
@@ -385,8 +381,6 @@ class OrderService
                         $newItemsExist = true;
                     }
                 }
-
-                return $newItemsExist;
             }
             
             $shippingDateSet = false;
@@ -410,7 +404,7 @@ class OrderService
             $templateConfigService = pluginApp(TemplateConfigService::class);
             $returnTime = (int)$templateConfigService->get('my_account.order_return_days', 14);
     
-            if( $shippingDateSet && ($createdDateUnix > 0 && $returnTime > 0) && (time() < ($createdDateUnix + ($returnTime * 24 * 60 * 60))) )
+            if( $shippingDateSet && ($createdDateUnix > 0 && $returnTime > 0) && (time() < ($createdDateUnix + ($returnTime * 24 * 60 * 60))) && $newItemsExist )
             {
                 return true;
             }
