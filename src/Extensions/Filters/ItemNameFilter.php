@@ -4,7 +4,6 @@ namespace IO\Extensions\Filters;
 
 use IO\Extensions\AbstractFilter;
 use IO\Services\TemplateConfigService;
-use IO\Services\TemplateTranslationService;
 
 /**
  * Class ItemNameFilter
@@ -15,9 +14,6 @@ class ItemNameFilter extends AbstractFilter
     private $defaultConfigItemName;
     private $defaultConfigItemDisplayName;
 
-    /** @var TemplateTranslationService $translationService */
-    private $translationService;
-
     /**
      * ItemNameFilter constructor.
      */
@@ -25,8 +21,6 @@ class ItemNameFilter extends AbstractFilter
     {
         /** @var TemplateConfigService $configService */
         $configService = pluginApp( TemplateConfigService::class );
-
-        $this->translationService = pluginApp(TemplateTranslationService::class);
 
         $this->defaultConfigItemName = $configService->get('item.name');
         $this->defaultConfigItemDisplayName = $configService->get('item.displayName');
@@ -64,7 +58,6 @@ class ItemNameFilter extends AbstractFilter
             $displayName = $this->defaultConfigItemDisplayName;
         }
 
-        $bundleType = $itemData['variation']['bundleType'];
         $itemTexts = $itemData['texts'];
         $variationName = $itemData['variation']['name'];
 
@@ -91,11 +84,6 @@ class ItemNameFilter extends AbstractFilter
         if ($displayName === 'variationName' && strlen($variationName))
         {
             $showName = $variationName;
-        }
-
-        if($bundleType === "bundle")
-        {
-            $showName = $this->translationService->trans('Template.itemBundleName', ['itemName' => $showName]);
         }
 
         return $showName;
