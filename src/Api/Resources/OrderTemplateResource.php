@@ -3,7 +3,6 @@
 namespace IO\Api\Resources;
 
 use IO\Models\LocalizedOrder;
-use Plenty\Modules\Frontend\Session\Facades\SessionStorage;
 use Plenty\Plugin\Templates\Twig;
 use Plenty\Plugin\Http\Response;
 use Plenty\Plugin\Http\Request;

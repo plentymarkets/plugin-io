@@ -31,7 +31,6 @@ use Plenty\Modules\Item\Search\Filter\CategoryFilter;
 use Plenty\Modules\Item\Search\Filter\ClientFilter;
 use Plenty\Modules\Item\Search\Filter\SearchFilter;
 use Plenty\Modules\Item\Search\Filter\VariationBaseFilter;
-use Plenty\Modules\RestDocumentation\Export\Postman\Models\Item;
 use Plenty\Plugin\Application;
 use Plenty\Plugin\Events\Dispatcher;
 

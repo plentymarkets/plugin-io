@@ -23,6 +23,7 @@ use IO\Constants\SessionStorageKeys;
 use IO\Services\TemplateConfigService;
 use Plenty\Modules\Authorization\Services\AuthHelper;
 use IO\Services\UrlService;
+use IO\Builder\Order\OrderItemType;
 
 
 /**
@@ -56,6 +57,18 @@ class OrderService
      * @var UrlService
      */
     private $urlService;
+
+    /**
+     * The OrderItem types that will be wrapped. All other OrderItems will be stripped from the order.
+     */
+    const WRAPPED_ORDERITEM_TYPES =
+    [
+        OrderItemType::VARIATION,
+        OrderItemType::ITEM_BUNDLE,
+        OrderItemType::BUNDLE_COMPONENT,
+        OrderItemType::UNASSIGNED_VARIATION
+    ];
+
     /**
      * OrderService constructor.
      * @param OrderRepositoryContract $orderRepository
@@ -526,7 +539,7 @@ class OrderService
                         $newQuantity = $orderItem['quantity'];
                     }
     
-                    if($newQuantity > 0 && ($orderItem->typeId == 1 || $orderItem->typeId == 3 || $orderItem->typeId == 9))
+                    if($newQuantity > 0 && in_array((int)$orderItem->typeId, self::WRAPPED_ORDERITEM_TYPES))
                     {
                         $orderItem['quantity'] = $newQuantity;
                         $newOrderItems[] = $orderItem;
@@ -544,7 +557,7 @@ class OrderService
             {
                 foreach($order->orderItems as $key => $orderItem)
                 {
-                    if($orderItem->typeId == 1 || $orderItem->typeId == 2 || $orderItem->typeId == 3 || $orderItem->typeId == 9)
+                    if(in_array((int)$orderItem->typeId, self::WRAPPED_ORDERITEM_TYPES))
                     {
                         $newOrderItems[] = $orderItem;
                     }
@@ -610,7 +623,7 @@ class OrderService
                     $newQuantity = $orderItem['quantity'];
                 }
             
-                if($newQuantity > 0 && ($orderItem['typeId'] == 1 || $orderItem['typeId'] == 2 || $orderItem['typeId'] == 3 || $orderItem['typeId'] == 9))
+                if($newQuantity > 0 && in_array((int)$orderItem['typeId'], self::WRAPPED_ORDERITEM_TYPES))
                 {
                     $orderItem['quantity'] = $newQuantity;
                     $newOrderItems[] = $orderItem;
@@ -625,7 +638,7 @@ class OrderService
         {
             foreach($order['orderItems'] as $key => $orderItem)
             {
-                if($orderItem['typeId'] == 1 || $orderItem['typeId'] == 2 || $orderItem['typeId'] == 3 || $orderItem['typeId'] == 9)
+                if(in_array((int)$orderItem['typeId'], self::WRAPPED_ORDERITEM_TYPES))
                 {
                     $newOrderItems[] = $orderItem;
                 }
