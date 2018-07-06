@@ -13,6 +13,8 @@ use Plenty\Modules\Item\VariationDescription\Contracts\VariationDescriptionRepos
 class VariationUrlBuilder
 {
     public static $urlPathMap;
+    public static $requestedItems;
+
 
     public static function fillItemUrl( $itemData )
     {
@@ -149,19 +151,22 @@ class VariationUrlBuilder
 
     private function searchItem( $itemId, $variationId, $lang )
     {
-        /** @var ItemSearchService $itemSearchService */
-        $itemSearchService = pluginApp( ItemSearchService::class );
+        if(!isset(self::$requestedItems[$itemId][$variationId][$lang]))
+        {
+            /** @var ItemSearchService $itemSearchService */
+            $itemSearchService = pluginApp( ItemSearchService::class );
 
-        /** @var VariationSearchFactory $searchFactory */
-        $searchFactory = pluginApp( VariationSearchFactory::class );
-        $searchFactory
-            ->withLanguage( $lang )
-            ->withUrls()
-            ->hasItemId( $itemId )
-            ->hasVariationId( $variationId );
+            /** @var VariationSearchFactory $searchFactory */
+            $searchFactory = pluginApp( VariationSearchFactory::class );
+            $searchFactory
+                ->withLanguage( $lang )
+                ->withUrls()
+                ->hasItemId( $itemId )
+                ->hasVariationId( $variationId );
 
-        $itemSearchService->getResult($searchFactory);
-
+            $itemSearchService->getResult($searchFactory);
+            self::$requestedItems[$itemId][$variationId][] = $lang;
+        }
         return [];
     }
 
