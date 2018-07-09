@@ -151,8 +151,9 @@ class VariationUrlBuilder
 
     private function searchItem( $itemId, $variationId, $lang )
     {
-        if(!isset(self::$requestedItems[$itemId][$variationId][$lang]))
+        if(!is_array(self::$requestedItems[$itemId][$variationId]) || !in_array($lang, self::$requestedItems[$itemId][$variationId]))
         {
+            self::$requestedItems[$itemId][$variationId][] = $lang;
             /** @var ItemSearchService $itemSearchService */
             $itemSearchService = pluginApp( ItemSearchService::class );
 
@@ -165,7 +166,6 @@ class VariationUrlBuilder
                 ->hasVariationId( $variationId );
 
             $itemSearchService->getResult($searchFactory);
-            self::$requestedItems[$itemId][$variationId][] = $lang;
         }
         return [];
     }
