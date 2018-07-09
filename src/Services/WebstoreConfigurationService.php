@@ -60,6 +60,11 @@ class WebstoreConfigurationService
         {
             $activeLanguages = explode(', ', $languages);
         }
+
+        if(!in_array($this->webstoreConfig->defaultLanguage, $activeLanguages))
+        {
+            $activeLanguages[] = $this->webstoreConfig->defaultLanguage;
+        }
         
 		return $activeLanguages;
 	}
