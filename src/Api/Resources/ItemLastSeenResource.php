@@ -46,6 +46,6 @@ class ItemLastSeenResource extends ApiResource
             $itemLastSeenService->setLastSeenItem((int)$variationId);
         }
 
-        return $this->response->create("", ResponseCode::OK);
+        return $this->index();
     }
 }
