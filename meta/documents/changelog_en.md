@@ -1,5 +1,29 @@
 # Release Notes for IO
 
+## v2.12.0 (2018-07-10) <a href="https://github.com/plentymarkets/plugin-io/compare/2.11.0...2.12.0" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
+
+### Added
+
+- Rendered contents are cached in order to improve loading times of the online store. An additional module in the plentymarkets tariff is necessary to use this functionality.
+- Item bundles can now be displayed in the online store.
+
+### Changed
+
+- User-specific data, such as the shopping cart, login information and wish list, is now loaded later.
+- The list of last seen items is now loaded later.
+- The route "/rest/io/customer" no longer returns customer addresses. The route "io/customer/address" is now used for this purpose.
+
+### Fixed
+
+- Due to an error, the links to the homepage were not working properly. This has been fixed.
+- Variations in item lists of the type **tags** were not grouped in accordance with the plugin settings. This has been fixed.
+- If no URL route had been stored for an item while the option **Trailing slash after URLs** was active at the same time, the URL route was not generated properly. This behaviour has been fixed.
+- Forwarding to absolute URLs led to errors. This behaviour has been fixed.
+- Various faulty links have been fixed.
+- The existence of multiple plugin sets sometimes led to the sitemap not being generated in accordance with the Ceres pattern. This behaviour has been fixed.
+- Under certain circumstances, categories were displayed even if they had not been linked to a client. This behaviour has been fixed.
+- If a content category was saved for all languages, the issue could arise that the online store displayed a 404 error page.
+
 ## v2.11.0 (2018-06-26) <a href="https://github.com/plentymarkets/plugin-io/compare/2.10.0...2.11.0" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
 
 ### Fixed
