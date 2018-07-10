@@ -50,22 +50,6 @@ class ItemController extends LayoutController
         }
         else
         {
-            $resultVariationId = $itemResult['documents'][0]['data']['variation']['id'];
-
-            if((int)$resultVariationId <= 0)
-            {
-                $resultVariationId = $variationId;
-            }
-
-            if((int)$resultVariationId > 0)
-            {
-                /**
-                 * @var ItemLastSeenService $itemLastSeenService
-                 */
-                $itemLastSeenService = pluginApp(ItemLastSeenService::class);
-                $itemLastSeenService->setLastSeenItem( $variationId );
-            }
-
             return $this->renderTemplate(
                 'tpl.item',
                 [

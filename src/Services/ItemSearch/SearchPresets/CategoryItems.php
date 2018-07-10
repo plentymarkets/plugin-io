@@ -79,7 +79,8 @@ class CategoryItems implements SearchPreset
             ->hasFacets( $facets )
             ->sortByMultiple( $sorting )
             ->setPage( $page, $itemsPerPage )
-            ->groupByTemplateConfig();
+            ->groupByTemplateConfig()
+            ->withLinkToContent();
 
         return $searchFactory;
     }

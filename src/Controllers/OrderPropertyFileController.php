@@ -19,7 +19,8 @@ class OrderPropertyFileController extends LayoutController
             "tpl.page-not-found",
             [
                 "data" => ''
-            ]
+            ],
+            false
         );
     }
     
@@ -40,7 +41,8 @@ class OrderPropertyFileController extends LayoutController
             "tpl.page-not-found",
             [
                 "data" => ''
-            ]
+            ],
+            false
         );
     }
 

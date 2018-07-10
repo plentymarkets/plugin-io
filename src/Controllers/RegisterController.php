@@ -30,7 +30,8 @@ class RegisterController extends LayoutController
 			"tpl.register",
 			[
 				"register" => ""
-			]
+			],
+            false
 		);
 	}
 
