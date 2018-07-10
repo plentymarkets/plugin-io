@@ -13,6 +13,7 @@ class ItemListService
     const TYPE_CATEGORY     = 'category';
     const TYPE_LAST_SEEN    = 'last_seen';
     const TYPE_TAG          = 'tag_list';
+    const TYPE_RANDOM       = 'random';
 
     public function getItemList( $type, $id = null, $sorting = null, $maxItems = 0 )
     {
@@ -41,15 +42,24 @@ class ItemListService
                     $sessionStorage = pluginApp(SessionStorageService::class);
                     $variationIds = $sessionStorage->getSessionValue(SessionStorageKeys::LAST_SEEN_ITEMS);
 
-                    $searchFactory = VariationList::getSearchFactory([
-                        'variationIds'  => $variationIds,
-                        'sorting'       => $sorting
-                    ]);
+                    if ( !is_null($variationIds) && count($variationIds) > 0 )
+                    {
+                        $searchFactory = VariationList::getSearchFactory([
+                            'variationIds'      => $variationIds,
+                            'sorting'           => $sorting,
+                            'excludeFromCache'  => true
+                        ]);
+                    }
                     break;
                 case self::TYPE_TAG:
                     $searchFactory = TagItems::getSearchFactory([
                         'tagIds'    => [$id],
                         'sorting'   => $sorting
+                    ]);
+                    break;
+                case self::TYPE_RANDOM:
+                    $searchFactory = VariationList::getSearchFactory([
+                        'sorting'       => $sorting
                     ]);
                     break;
                 default:

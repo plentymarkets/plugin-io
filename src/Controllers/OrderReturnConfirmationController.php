@@ -34,7 +34,8 @@ class OrderReturnConfirmationController extends LayoutController
         
         return $this->renderTemplate(
             'tpl.order.return.confirmation',
-            ['data' => '']
+            ['data' => ''],
+            false
         );
     }
 }

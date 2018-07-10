@@ -11,6 +11,7 @@ use IO\Services\CategoryService;
 use IO\Services\TemplateService;
 use IO\Services\UrlService;
 use Plenty\Modules\Category\Contracts\CategoryRepositoryContract;
+use Plenty\Modules\ContentCache\Contracts\ContentCacheRepositoryContract;
 use Plenty\Plugin\Application;
 use Plenty\Plugin\Controller;
 use Plenty\Plugin\Events\Dispatcher;
@@ -123,18 +124,20 @@ abstract class LayoutController extends Controller
         
         return $templateContainer;
 	}
-    
+
     /**
      * Emit an event to layout plugin to receive twig-template to use for current request.
      * Add global template data to custom data from specific controller.
      * Will pass request to the plentymarkets system if no template is provided by the layout plugin.
      *
-     * @param string    $templateEvent
-     * @param mixed     $controllerData
+     * @param string $templateEvent
+     * @param mixed $controllerData
+     * @param bool $cacheContent
      *
      * @return string
+     * @throws \ErrorException
      */
-	protected function renderTemplate(string $templateEvent, $controllerData = []):string
+	protected function renderTemplate(string $templateEvent, $controllerData = [], $cacheContent = true):string
 	{
         TemplateService::$currentTemplate = $templateEvent;
 		$templateContainer = $this->buildTemplateContainer($templateEvent, $controllerData);
@@ -143,7 +146,15 @@ abstract class LayoutController extends Controller
 		{
 			TemplateService::$currentTemplate = $templateEvent;
 			TemplateService::$currentTemplateData = $controllerData;
-            
+
+			// activate content cache
+            if ( $cacheContent )
+            {
+                /** @var ContentCacheRepositoryContract $cacheRepository */
+                $cacheRepository = pluginApp(ContentCacheRepositoryContract::class);
+                $cacheRepository->enableCacheForResponse();
+            }
+
             // Render the received plugin
 			return $this->renderTemplateContainer($templateContainer, $controllerData);
 		}

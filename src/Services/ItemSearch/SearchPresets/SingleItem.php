@@ -38,7 +38,8 @@ class SingleItem implements SearchPreset
             ->isVisibleForClient()
             ->isActive()
             ->hasNameInLanguage()
-            ->hasPriceForCustomer();
+            ->hasPriceForCustomer()
+            ->withLinkToContent();
 
         if(array_key_exists('itemId', $options) && $options['itemId'] != 0)
         {
