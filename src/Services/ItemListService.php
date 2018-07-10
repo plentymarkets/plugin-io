@@ -13,6 +13,7 @@ class ItemListService
     const TYPE_CATEGORY     = 'category';
     const TYPE_LAST_SEEN    = 'last_seen';
     const TYPE_TAG          = 'tag_list';
+    const TYPE_RANDOM       = 'random';
 
     public function getItemList( $type, $id = null, $sorting = null, $maxItems = 0 )
     {
@@ -53,6 +54,11 @@ class ItemListService
                     $searchFactory = TagItems::getSearchFactory([
                         'tagIds'    => [$id],
                         'sorting'   => $sorting
+                    ]);
+                    break;
+                case self::TYPE_RANDOM:
+                    $searchFactory = VariationList::getSearchFactory([
+                        'sorting'       => $sorting
                     ]);
                     break;
                 default:
