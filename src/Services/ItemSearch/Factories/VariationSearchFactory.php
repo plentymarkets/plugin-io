@@ -553,9 +553,11 @@ class VariationSearchFactory extends BaseSearchFactory
      *
      * @return $this
      */
-    public function withPrices( $params = [] )
+    public function withPrices( $quantities = [] )
     {
-        $this->withExtension( PriceSearchExtension::class, $params );
+        $this->withExtension( PriceSearchExtension::class, [
+            'quantities' => $quantities
+        ]);
         return $this;
     }
 
