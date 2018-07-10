@@ -4,10 +4,12 @@ namespace IO\Extensions\Filters;
 
 use IO\Extensions\AbstractFilter;
 use IO\Services\ItemService;
+use IO\Services\SessionStorageService;
 use IO\Services\TemplateConfigService;
 use IO\Services\UrlBuilder\ItemUrlBuilder;
 use IO\Services\UrlBuilder\VariationUrlBuilder;
 use IO\Services\UrlService;
+use IO\Services\WebstoreConfigurationService;
 
 /**
  * Class URLFilter
@@ -15,32 +17,44 @@ use IO\Services\UrlService;
  */
 class URLFilter extends AbstractFilter
 {
-	/**
-	 * @var ItemService
-	 */
-	private $itemService;
+    /**
+     * @var ItemService
+     */
+    private $itemService;
+
+    /**
+     * @var SessionStorageService $sessionStorageService
+     */
+    private $sessionStorageService;
+
+    /**
+     * @var WebstoreConfigurationService $webstoreConfigurationService
+     */
+    private $webstoreConfigurationService;
 
     /**
      * URLFilter constructor.
      * @param ItemService $itemService
      */
-	public function __construct(ItemService $itemService )
-	{
-		parent::__construct();
-		$this->itemService = $itemService;
-	}
+    public function __construct(ItemService $itemService )
+    {
+        parent::__construct();
+        $this->itemService = $itemService;
+        $this->sessionStorageService = pluginApp(SessionStorageService::class);
+        $this->webstoreConfigurationService = pluginApp(WebstoreConfigurationService::class);
+    }
 
     /**
      * Return the available filter methods
      * @return array
      */
-	public function getFilters():array
-	{
-		return [
-			"itemURL" => "buildItemURL",
+    public function getFilters():array
+    {
+        return [
+            "itemURL" => "buildItemURL",
             "variationURL" => "buildVariationURL"
-		];
-	}
+        ];
+    }
 
     /**
      * Build the URL for the item by item ID or variation ID
@@ -48,8 +62,8 @@ class URLFilter extends AbstractFilter
      * @param bool $withVariationId
      * @return string
      */
-	public function buildItemURL($itemData, $withVariationId = true):string
-	{
+    public function buildItemURL($itemData, $withVariationId = true):string
+    {
         $itemId = $itemData['item']['id'];
         $variationId = $itemData['variation']['id'];
 
@@ -58,11 +72,12 @@ class URLFilter extends AbstractFilter
             return "";
         }
 
+        $includeLanguage = pluginApp(SessionStorageService::class)->getLang() !== pluginApp(WebstoreConfigurationService::class)->getDefaultLanguage();
         if ( $variationId === null || $variationId <= 0 )
         {
             /** @var ItemUrlBuilder $itemUrlBuilder */
             $itemUrlBuilder = pluginApp( ItemUrlBuilder::class );
-            return $itemUrlBuilder->buildUrl( $itemId )->toRelativeUrl();
+            return $itemUrlBuilder->buildUrl( $itemId )->toRelativeUrl($includeLanguage);
         }
         else
         {
@@ -72,9 +87,9 @@ class URLFilter extends AbstractFilter
 
             return $url->append(
                 $variationUrlBuilder->getSuffix( $itemId, $variationId, $withVariationId )
-            )->toRelativeUrl();
+            )->toRelativeUrl($includeLanguage);
         }
-	}
+    }
 
     /**
      * @param int $variationId
@@ -87,5 +102,5 @@ class URLFilter extends AbstractFilter
         $variation = $this->itemService->getVariation( $variationId );
         return $this->buildItemURL( $variation['documents'][0]['data'], true );
     }
-    
+
 }

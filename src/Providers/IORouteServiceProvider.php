@@ -30,7 +30,7 @@ class IORouteServiceProvider extends RouteServiceProvider
 		$api->version(['v1'], ['namespace' => 'IO\Api\Resources'], function ($api)
 		{
 			$api->get('io/basket', 'BasketResource@index');
-			$api->resource('io/basket/items', 'BasketItemResource');
+            $api->resource('io/basket/items', 'BasketItemResource');
             $api->get('io/order', 'OrderResource@index');
             $api->post('io/order', 'OrderResource@store');
 			$api->get('io/order/paymentMethods', 'OrderPaymentResource@paymentMethodListForSwitch');
@@ -59,6 +59,7 @@ class IORouteServiceProvider extends RouteServiceProvider
             $api->resource('io/variations', 'VariationResource');
             $api->resource('io/item/availability', 'AvailabilityResource');
             $api->resource('io/item/condition', 'ItemConditionResource');
+            $api->resource('io/item/last_seen', 'ItemLastSeenResource');
             $api->get('io/item/search', 'ItemSearchResource@index');
             $api->get('io/item/search/autocomplete', 'ItemSearchAutocompleteResource@index');
 			$api->resource('io/coupon', 'CouponResource');

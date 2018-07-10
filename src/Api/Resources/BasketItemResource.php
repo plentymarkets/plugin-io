@@ -58,7 +58,7 @@ class BasketItemResource extends ApiResource
         }
 
 		return $this->response->create($basketItems, ResponseCode::CREATED);
-	}
+    }
 
 	// Get
     /**

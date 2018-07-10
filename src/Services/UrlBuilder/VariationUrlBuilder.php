@@ -13,6 +13,8 @@ use Plenty\Modules\Item\VariationDescription\Contracts\VariationDescriptionRepos
 class VariationUrlBuilder
 {
     public static $urlPathMap;
+    public static $requestedItems;
+
 
     public static function fillItemUrl( $itemData )
     {
@@ -118,7 +120,7 @@ class VariationUrlBuilder
 
                             $variationDescriptionRepository->update(
                                 [
-                                    'urlPath' => $itemUrl->getPath()
+                                    'urlPath' => rtrim($itemUrl->getPath(), '/')
                                 ],
                                 $variationId,
                                 $lang
@@ -149,19 +151,22 @@ class VariationUrlBuilder
 
     private function searchItem( $itemId, $variationId, $lang )
     {
-        /** @var ItemSearchService $itemSearchService */
-        $itemSearchService = pluginApp( ItemSearchService::class );
+        if(!is_array(self::$requestedItems[$itemId][$variationId]) || !in_array($lang, self::$requestedItems[$itemId][$variationId]))
+        {
+            self::$requestedItems[$itemId][$variationId][] = $lang;
+            /** @var ItemSearchService $itemSearchService */
+            $itemSearchService = pluginApp( ItemSearchService::class );
 
-        /** @var VariationSearchFactory $searchFactory */
-        $searchFactory = pluginApp( VariationSearchFactory::class );
-        $searchFactory
-            ->withLanguage( $lang )
-            ->withUrls()
-            ->hasItemId( $itemId )
-            ->hasVariationId( $variationId );
+            /** @var VariationSearchFactory $searchFactory */
+            $searchFactory = pluginApp( VariationSearchFactory::class );
+            $searchFactory
+                ->withLanguage( $lang )
+                ->withUrls()
+                ->hasItemId( $itemId )
+                ->hasVariationId( $variationId );
 
-        $itemSearchService->getResult($searchFactory);
-
+            $itemSearchService->getResult($searchFactory);
+        }
         return [];
     }
 
