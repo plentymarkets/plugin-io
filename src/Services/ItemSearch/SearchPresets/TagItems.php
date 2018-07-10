@@ -26,8 +26,7 @@ class TagItems extends VariationList
         /** @var VariationSearchFactory $factory */
         $factory = parent::getSearchFactory($options)
             ->hasAnyTag($tagIds)
-            ->groupByTemplateConfig()
-            ->withExtension(ContentCacheVariationLinkExtension::class);
+            ->groupByTemplateConfig();
 
         return $factory;
     }

@@ -11,12 +11,13 @@ use IO\Services\ItemSearch\Helper\SortingHelper;
  *
  * Search preset for variation lists.
  * Available options:
- * - variationIds:  List of variations to receive.
- * - sorting:       Configuration value to get sorting for.
- * - sortingField:  Field to sort items by. Will be appended to sorting list if sorting configuration is defined.
- * - sortingOrder:  Order to sort items with ('asc', 'desc')
- * - page:          The current page
- * - itemsPerPage:  Number of items per page
+ * - variationIds:      List of variations to receive.
+ * - sorting:           Configuration value to get sorting for.
+ * - sortingField:      Field to sort items by. Will be appended to sorting list if sorting configuration is defined.
+ * - sortingOrder:      Order to sort items with ('asc', 'desc')
+ * - page:              The current page
+ * - itemsPerPage:      Number of items per page
+ * - excludeFromCache:  Set to true if results should not be linked to response
  *
  * @package IO\Services\ItemSearch\SearchPresets
  */
@@ -46,6 +47,11 @@ class VariationList implements SearchPreset
             ->isVisibleForClient()
             ->isActive()
             ->hasPriceForCustomer();
+
+        if ( !array_key_exists('excludeFromCache', $options) || $options['excludeFromCache'] === false )
+        {
+            $searchFactory->withLinkToContent();
+        }
 
         if ( count( $variationIds ) )
         {

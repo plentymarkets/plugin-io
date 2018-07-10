@@ -45,8 +45,9 @@ class ItemListService
                     if ( !is_null($variationIds) && count($variationIds) > 0 )
                     {
                         $searchFactory = VariationList::getSearchFactory([
-                            'variationIds'  => $variationIds,
-                            'sorting'       => $sorting
+                            'variationIds'      => $variationIds,
+                            'sorting'           => $sorting,
+                            'excludeFromCache'  => true
                         ]);
                     }
                     break;
