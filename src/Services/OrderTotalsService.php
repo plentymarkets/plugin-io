@@ -32,6 +32,7 @@ class OrderTotalsService
         $shippingNet = 0;
         $vats = [];
         $couponValue = 0;
+        $couponCode = '';
         $openAmount = 0;
         $couponType = '';
         $amountId = $this->getCustomerAmountId($order->amounts);
@@ -59,6 +60,8 @@ class OrderTotalsService
                 case OrderItemType::GIFT_CARD:
                     $couponType = $item->typeId;
                     $couponValue += $firstAmount->priceGross;
+                    $itemNameArray = explode(' ', $item->orderItemName);
+                    $couponCode =  isset($itemNameArray[2]) ? $itemNameArray[2] : '';
                     break;
                 default:
                     // noop
@@ -97,6 +100,7 @@ class OrderTotalsService
             'couponValue',
             'openAmount',
             'couponType',
+            'couponCode',
             'totalGross',
             'totalNet',
             'currency'
