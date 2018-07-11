@@ -2,6 +2,7 @@
 
 namespace IO\Services\ItemSearch\SearchPresets;
 
+use IO\Services\ItemSearch\Extensions\ContentCacheVariationLinkExtension;
 use IO\Services\ItemSearch\Factories\VariationSearchFactory;
 
 /**

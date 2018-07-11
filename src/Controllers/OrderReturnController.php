@@ -55,6 +55,21 @@ class OrderReturnController extends LayoutController
     
                 /** @var OrderRepositoryContract $orderRepo */
                 $orderRepo = pluginApp(OrderRepositoryContract::class);
+
+                $newOrderItems = [];
+
+                foreach($returnOrder->orderData['orderItems'] as $orderItem)
+                {
+                    if($orderItem['bundleType'] !== 'bundle_item' && count($orderItem['references']) === 0)
+                    {
+                        $newOrderItems[] = $orderItem;
+                    }
+                }
+
+                if(count($newOrderItems) > 0)
+                {
+                    $returnOrder->orderData['orderItems'] = $newOrderItems;
+                }
                 
                 if(!count($returnOrder->orderData['orderItems']) || !$orderService->isOrderReturnable($orderRepo->findOrderById($orderId)))
                 {
@@ -74,7 +89,8 @@ class OrderReturnController extends LayoutController
         
         return $this->renderTemplate(
             'tpl.order.return',
-            ['orderData' => $returnOrder]
+            ['orderData' => $returnOrder],
+            false
 		);
     }
 }

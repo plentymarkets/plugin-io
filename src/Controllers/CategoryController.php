@@ -3,6 +3,9 @@
 namespace IO\Controllers;
 
 use IO\Services\SessionStorageService;
+use IO\Services\WebstoreConfigurationService;
+use Plenty\Modules\Category\Models\CategoryDetails;
+use Plenty\Modules\Category\Models\CategoryClient;
 use Plenty\Plugin\Http\Request;
 
 /**
@@ -31,10 +34,18 @@ class CategoryController extends LayoutController
 	{
 	    /** @var Request $request */
 	    $request = pluginApp(Request::class);
+
+	    /** @var SessionStorageService $sessionService */
         $sessionService  = pluginApp(SessionStorageService::class);
+
+        /** @var WebstoreConfigurationService $webstoreService */
+        $webstoreService = pluginApp(WebstoreConfigurationService::class);
+
         $category = $this->categoryRepo->findCategoryByUrl($lvl1, $lvl2, $lvl3, $lvl4, $lvl5, $lvl6);
-        
-        if($category === null || $category->details->first()->lang != $sessionService->getLang())
+
+        if($category === null
+            || !($category->clients->where('plenty_webstore_category_link_webstore_id', $webstoreService->getWebstoreConfig()->webstoreId)->first() instanceof CategoryClient)
+            || !($category->details->where('lang', $sessionService->getLang())->first() instanceof CategoryDetails))
         {
             return '';
         }

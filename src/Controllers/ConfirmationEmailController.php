@@ -29,7 +29,8 @@ class ConfirmationEmailController extends LayoutController
             "tpl.confirmation",
             [
                 "data" => ''
-            ]
+            ],
+            false
         );
     }
 }

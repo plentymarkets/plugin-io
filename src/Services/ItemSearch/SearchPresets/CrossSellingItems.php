@@ -48,7 +48,8 @@ class CrossSellingItems implements SearchPreset
             ->groupByTemplateConfig()
             ->isCrossSellingItem( $itemId, $relation )
             ->hasNameInLanguage()
-            ->hasPriceForCustomer();
+            ->hasPriceForCustomer()
+            ->withLinkToContent();
 
         return $searchFactory;
     }

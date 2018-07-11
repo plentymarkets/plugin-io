@@ -6,6 +6,8 @@ use IO\Helper\CurrencyConverter;
 use IO\Helper\VatConverter;
 use IO\Services\ItemLoader\Contracts\FacetExtension;
 use IO\Services\ItemLoader\Services\FacetExtensionContainer;
+use IO\Services\ItemSearch\Extensions\BundleComponentExtension;
+use IO\Services\ItemSearch\Extensions\ContentCacheVariationLinkExtension;
 use IO\Services\ItemSearch\Extensions\CurrentCategoryExtension;
 use IO\Services\ItemSearch\Extensions\ItemDefaultImage;
 use IO\Services\ItemSearch\Extensions\ItemUrlExtension;
@@ -551,9 +553,11 @@ class VariationSearchFactory extends BaseSearchFactory
      *
      * @return $this
      */
-    public function withPrices( $params = [] )
+    public function withPrices( $quantities = [] )
     {
-        $this->withExtension( PriceSearchExtension::class, $params );
+        $this->withExtension( PriceSearchExtension::class, [
+            'quantities' => $quantities
+        ]);
         return $this;
     }
 
@@ -576,6 +580,18 @@ class VariationSearchFactory extends BaseSearchFactory
     public function withDefaultImage()
     {
         $this->withExtension( ItemDefaultImage::class );
+        return $this;
+    }
+
+    public function withBundleComponents()
+    {
+        $this->withExtension( BundleComponentExtension::class );
+        return $this;
+    }
+
+    public function withLinkToContent()
+    {
+        $this->withExtension( ContentCacheVariationLinkExtension::class );
         return $this;
     }
 }

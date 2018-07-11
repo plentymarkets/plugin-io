@@ -33,7 +33,8 @@ class ItemWishListController extends LayoutController
 			"tpl.wish-list",
 			[
                 "wishList" => ( is_array($itemWishList) ? $itemWishList : [] )
-			]
+			],
+            false
 		);
     }
 }

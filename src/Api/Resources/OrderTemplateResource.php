@@ -13,6 +13,7 @@ use IO\Api\ApiResource;
 use IO\Api\ApiResponse;
 use IO\Api\ResponseCode;
 use IO\Services\TemplateService;
+use IO\Services\SessionStorageService;
 
 /**
  * Class OrderTemplateResource
@@ -51,6 +52,9 @@ class OrderTemplateResource extends ApiResource
      */
     public function index():Response
     {
+        /** @var SessionStorageService $sessionStorageService */
+        $sessionStorageService = pluginApp(SessionStorageService::class);
+
         $renderedTemplate = '';
         
         $template = $this->request->get('template', '');
@@ -62,7 +66,7 @@ class OrderTemplateResource extends ApiResource
             if($order instanceof Order)
             {
                 $renderedTemplate = $this->templateService->renderTemplate($template, [
-                    'orderData' => LocalizedOrder::wrap($order, 'de'),
+                    'orderData' => LocalizedOrder::wrap($order, $sessionStorageService->getLang()),
                     'totals' => pluginApp(OrderTotalsService::class)->getAllTotals($order)
                 ]);
             }
