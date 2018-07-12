@@ -2,6 +2,7 @@
 
 namespace IO\Providers;
 
+use IO\Extensions\Mail\IOSendMail;
 use IO\Extensions\Sitemap\IOSitemapPattern;
 use IO\Extensions\TwigIOExtension;
 use IO\Extensions\TwigServiceProvider;
@@ -45,6 +46,7 @@ use Plenty\Modules\Authentication\Events\AfterAccountAuthentication;
 use Plenty\Modules\Authentication\Events\AfterAccountContactLogout;
 use Plenty\Modules\Order\Events\OrderCreated;
 use Plenty\Modules\Plugin\Events\LoadSitemapPattern;
+use Plenty\Modules\Plugin\Events\PluginSendMail;
 use Plenty\Plugin\ServiceProvider;
 use Plenty\Plugin\Templates\Twig;
 use Plenty\Plugin\Events\Dispatcher;
@@ -146,6 +148,7 @@ class IOServiceProvider extends ServiceProvider
         });
 
         $dispatcher->listen(LoadSitemapPattern::class, IOSitemapPattern::class);
+        $dispatcher->listen(PluginSendMail::class, IOSendMail::class);
     }
 
     private function registerSingletons( $classes )
