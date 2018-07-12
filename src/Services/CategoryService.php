@@ -303,16 +303,17 @@ class CategoryService
      * @param string   $type     Only return categories of given type
      * @param string   $lang     The language to get sitemap tree for
      * @param int|null $maxLevel The deepest category level to load
+     * @param int $customerClassId The customer class id to get tree
      * @return array
      */
-    public function getNavigationTree(string $type = "all", string $lang = null, int $maxLevel = 2):array
+    public function getNavigationTree(string $type = "all", string $lang = null, int $maxLevel = 2, int $customerClassId = 0):array
     {
         if ( $lang === null )
         {
             $lang = $this->sessionStorageService->getLang();
         }
 
-        return $this->categoryRepository->getLinklistTree($type, $lang, $this->webstoreConfig->getWebstoreConfig()->webstoreId, $maxLevel);
+        return $this->categoryRepository->getLinklistTree($type, $lang, $this->webstoreConfig->getWebstoreConfig()->webstoreId, $maxLevel, $customerClassId);
     }
 
     /**
