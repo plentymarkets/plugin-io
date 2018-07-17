@@ -61,7 +61,7 @@ class OrderTotalsService
                     $couponType = $item->typeId;
                     $couponValue += $firstAmount->priceGross;
                     $itemNameArray = explode(' ', $item->orderItemName);
-                    $couponCode =  isset($itemNameArray[2]) ? $itemNameArray[2] : '';
+                    $couponCode =  end($itemNameArray);
                     break;
                 default:
                     // noop
