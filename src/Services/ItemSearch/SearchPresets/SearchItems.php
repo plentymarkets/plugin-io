@@ -58,9 +58,19 @@ class SearchItems implements SearchPreset
         /** @var VariationSearchFactory $searchFactory */
         $searchFactory = pluginApp( VariationSearchFactory::class );
 
-        $searchFactory->withResultFields(
+
+
+        if ( array_key_exists('autocomplete', $options ) && $options['autocomplete'] === true )
+        {
+            $searchFactory->withResultFields(
+                ResultFieldTemplate::get( ResultFieldTemplate::TEMPLATE_AUTOCOMPLETE_ITEM_LIST )
+            );        }
+        else
+        {
+            $searchFactory->withResultFields(
                 ResultFieldTemplate::get( ResultFieldTemplate::TEMPLATE_LIST_ITEM )
             );
+        }
 
         $searchFactory
             ->withLanguage()
@@ -79,14 +89,8 @@ class SearchItems implements SearchPreset
             ->setPage( $page, $itemsPerPage )
             ->groupByTemplateConfig();
 
-        if ( array_key_exists('autocomplete', $options ) && $options['autocomplete'] === true )
-        {
-            $searchFactory->hasNameString( $query );
-        }
-        else
-        {
-            $searchFactory->hasSearchString( $query );
-        }
+        $searchFactory->hasNameString($query);
+        $searchFactory->hasSearchString( $query );
 
         return $searchFactory;
     }
