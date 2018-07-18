@@ -67,24 +67,26 @@ class SearchItems implements SearchPreset
             );        }
         else
         {
+            $searchFactory
+                ->withDefaultImage()
+                ->withImages()
+                ->withPrices()
+                ->hasPriceInRange($priceMin, $priceMax)
+                ->hasFacets( $facets );
+
             $searchFactory->withResultFields(
                 ResultFieldTemplate::get( ResultFieldTemplate::TEMPLATE_LIST_ITEM )
             );
         }
 
         $searchFactory
-            ->withLanguage()
             ->withUrls()
-            ->withPrices()
-            ->withImages()
-            ->withDefaultImage()
+            ->withLanguage()
+            ->hasPriceForCustomer()
+            ->hasNameInLanguage()
+            ->isHiddenInCategoryList( false )
             ->isVisibleForClient()
             ->isActive()
-            ->isHiddenInCategoryList( false )
-            ->hasNameInLanguage()
-            ->hasPriceForCustomer()
-            ->hasPriceInRange($priceMin, $priceMax)
-            ->hasFacets( $facets )
             ->sortByMultiple( $sorting )
             ->setPage( $page, $itemsPerPage )
             ->groupByTemplateConfig();
