@@ -1,5 +1,20 @@
 # Release Notes für IO
 
+## v2.13.0 (2018-07-23) <a href="https://github.com/plentymarkets/plugin-io/compare/2.12.0...2.13.0" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
+
+### Hinzugefügt
+
+- Die in Ceres hinterlegte "Passwort vergessen"-E-Mail-Vorlage kann nun über das Backend verschickt werden.
+- Der Gutschein-Code wird jetzt zusätzlich aus dem OrderTotalsService bereitgestellt.
+
+### Geändert
+
+- Der Grundpreis wurde für die Stückzahl 1 nicht ausgegeben. Dies wurde behoben. Die Anzeige des Grundpreises wird nun ausschließlich durch den an der Variante hinterlegten Wert bestimmt.
+
+### Behoben
+
+- In der Navigation wurden alle Kategorien ausgegeben. Dieses Verhalten wurde behoben, sodass jetzt unterschiedliche Navigationen abhängig von Kundenklassen ausgegeben werden können.
+
 ## v2.12.0 (2018-07-10) <a href="https://github.com/plentymarkets/plugin-io/compare/2.11.0...2.12.0" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
 
 ### Hinzugefügt
