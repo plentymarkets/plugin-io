@@ -55,7 +55,7 @@ class UrlQuery
 
     public function join( $path ): UrlQuery
     {
-        if ( substr( $path, 0, 1 ) !== "/" )
+        if ( substr( $path, 0, 1 ) !== "/" && substr( $this->path, strlen($this->path)-1, 1 ) !== "/" )
         {
             $path = "/" . $path;
         }
@@ -87,9 +87,12 @@ class UrlQuery
 
         $trailingSlash = self::shouldAppendTrailingSlash() ? "/" : "";
 
-        if ( $includeLanguage )
+        if ( $includeLanguage && strpos($this->path, $this->lang) !== 1)
         {
             return '/' . $this->lang . $this->path . $trailingSlash;
+        }elseif(strlen($this->path) == 0)
+        {
+            return '/';
         }
 
         return $this->path . $trailingSlash;

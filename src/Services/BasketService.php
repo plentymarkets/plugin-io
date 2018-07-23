@@ -15,6 +15,8 @@ use Plenty\Modules\Frontend\Contracts\Checkout;
 use IO\Extensions\Filters\NumberFormatFilter;
 use Plenty\Modules\Frontend\Services\VatService;
 use IO\Services\NotificationService;
+use IO\Services\ItemSearch\Factories\VariationSearchFactory;
+
 /**
  * Class BasketService
  * @package IO\Services
@@ -92,7 +94,8 @@ class BasketService
         }
 
 
-        if ($this->sessionStorage->getCustomer()->showNetPrice) {
+        if (count($basket['totalVats']) <= 0)
+        {
             $basket["itemSum"]        = $basket["itemSumNet"];
             $basket["basketAmount"]   = $basket["basketAmountNet"];
             $basket["shippingAmount"] = $basket["shippingAmountNet"];
@@ -244,7 +247,60 @@ class BasketService
      */
     public function addBasketItem(array $data): array
     {
+        /** @var WebstoreConfigurationService $webstoreConfigService */
+        $webstoreConfigService = pluginApp(WebstoreConfigurationService::class);
 
+        if($webstoreConfigService->getWebstoreConfig()->dontSplitItemBundle === 0)
+        {
+            /** @var ItemSearchService $itemSearchService */
+            $itemSearchService = pluginApp( ItemSearchService::class );
+
+            /** @var VariationSearchFactory $searchFactory */
+            $searchFactory = pluginApp( VariationSearchFactory::class );
+
+            $item = $itemSearchService->getResult(
+                $searchFactory
+                    ->hasVariationId( $data['variationId'] )
+                    ->withBundleComponents()
+                    ->withResultFields([
+                        'variation.bundleType'
+                    ])
+            );
+
+            if($item['documents']['0']['data']['variation']['bundleType'] === 'bundle')
+            {
+                /** @var NotificationService $notificationService */
+                $notificationService = pluginApp(NotificationService::class);
+
+                $notificationService->warn('Item bundle split', 5);
+
+                foreach ($item['documents']['0']['data']['bundleComponents'] as $bundleComponent)
+                {
+                    $basketData = [];
+
+                    $basketData['variationId']  = $bundleComponent['data']['variation']['id'];
+                    $basketData['quantity']     = $bundleComponent['quantity'];
+                    $basketData['template']     = $data['template'];
+
+                    $this->addDataToBasket($basketData);
+                }
+            }
+        }
+        else
+        {
+            $this->addDataToBasket($data);
+        }
+
+        return $this->getBasketItemsForTemplate();
+    }
+
+    /**
+     * Add the given data to the basket
+     * @param $data
+     * @return array
+     */
+    private function addDataToBasket($data)
+    {
         if (isset($data['basketItemOrderParams']) && is_array($data['basketItemOrderParams'])) {
             list($data['basketItemOrderParams'], $data['totalOrderParamsMarkup']) = $this->parseBasketItemOrderParams($data['basketItemOrderParams']);
         }
@@ -263,8 +319,6 @@ class BasketService
         } catch (\Exception $e) {
             return ["code" => $e->getCode()];
         }
-
-        return $this->getBasketItemsForTemplate();
     }
 
     /**

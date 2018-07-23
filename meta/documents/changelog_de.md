@@ -1,5 +1,56 @@
 # Release Notes für IO
 
+## v2.12.0 (2018-07-10) <a href="https://github.com/plentymarkets/plugin-io/compare/2.11.0...2.12.0" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
+
+### Hinzugefügt
+
+- Gerenderte Inhalte werden gecached, um die Ladezeit des Shops zu verbessern. Für diese Funktion ist ein zusätzliches Modul im plentymarkets Tarif erforderlich.
+- Artikelpakete können jetzt im Webshop dargestellt werden.
+
+### Geändert
+
+- Benutzerspezifische Daten wie Warenkorb, Anmeldeinformationen und Wunschliste werden jetzt nachträglich geladen.
+- Die Liste der zuletzt gesehenen Artikel wird jetzt nachträglich geladen.
+- Die Route "/rest/io/customer" gibt nun keine Addressen mehr zurück. Hierfür wird nun die Route "io/customer/address" verwendet.
+
+### Behoben
+
+- Die Verlinkungen auf die Startseite funktionierten in der Standardsprache nicht richtig. Dieser Fehler wurde behoben.
+- In Artikellisten mit Tags wurden Varianten nicht entsprechend der Plugin-Einstellungen gruppiert. Dies wurde behoben.
+- Wenn für einen Artikel kein URL-Pfad hinterlegt wurde und zeitgleich die Option **Slash (/) am Ende von URLs* aktiviert war, wurde der URL-Pfad falsch generiert. Dieses Verhalten wurde behoben.
+- Die Weiterleitung auf absolute URLs führte zu Fehlern. Dieses Verhalten wurde behoben.
+- Es wurden diverse fehlerhafte Verlinkungen behoben.
+- Es kam vor, dass die Sitemap bei mehreren Plugin Sets nicht anhand des Ceres-Musters generiert wurde. Dieses Verhalten wurde behoben.
+- Unter bestimmten Umständen wurden Kategorien im Webshop angezeigt, die nicht mit dem Mandanten verknüpft waren. Dieses Verhalten wurde behoben.
+- Wenn eine Kategorie vom Typ Content in allen Sprachen gespeichert wurde, konnte es passieren, dass sich die 404 Fehlerseite im Webshop öffnet. Dies wurde behoben.
+
+## v2.11.0 (2018-06-26) <a href="https://github.com/plentymarkets/plugin-io/compare/2.10.0...2.11.0" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
+
+### Behoben
+
+- Für die Standardsprache wurde das Länderkürzel in der URL entfernt. Andere Sprachen werden mit Länderkürzeln in der URL erreicht.
+- Durch einen Fehler wurde die Mehrwertsteuer nicht im Warenkorb berechnet, wenn aufgrund einer Kundenklasse Netto-Preise dargestellt wurden. Dies wurde behoben.
+
+## v2.10.0 (2018-06-12) <a href="https://github.com/plentymarkets/plugin-io/compare/2.9.1...2.10.0" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
+
+### Hinzugefügt
+
+- Die IO-Konfiguration wurde ins Deutsche übersetzt.
+- Das Ereignis `AfterBasketChanged` wurde um das Feld `showNetPrices` ergänzt. Dieses Feld bestimmt, ob in der Kaufabwicklung und im Warenkorb Netto- oder Bruttosummen hervorgehoben werden.
+- Die Daten eines Auftrags auf der Bestellbestätigungsseite wurden um das Feld `highlightNetPrices` ergänzt. Dieses Feld bestimmt, ob Netto- oder Bruttosummen hervorgehoben werden.
+
+### Geändert
+
+- Die Schnittstellen zum Ausgeben von (Fehler-)Meldungen wurden verbessert.
+
+### Behoben
+
+- Durch einen Fehler führte der Link in der E-Mail einer Bestellbestätigung zu einer 404-Seite, wenn die Option "Weiterleitung zur Login-Seite durch den Link in der Bestellbestätigung" aktiv war. Dies wurde behoben.
+- Durch einen Fehler wurden die Versandkosten nicht in die gewählte Währung umgerechnet. Dies wurde behoben.
+- Durch einen Fehler wurden die Lieferländer im Adressformular immer auf Deutsch angezeigt. Dies wurde behoben.
+- Durch einen Fehler wurden beim Wechsel der Währung Aufpreise für Bestellmerkmale nicht umgerechnet. Dies wurde behoben.
+- Durch einen Fehler wurden Aufpreise für Bestellmerkmale immer brutto angezeigt. Dies wurde behoben.
+
 ## v2.9.1 (2018-06-05) <a href="https://github.com/plentymarkets/plugin-io/compare/2.9.0...2.9.1" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
 
 # Behoben

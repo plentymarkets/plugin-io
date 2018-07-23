@@ -2,12 +2,16 @@
 
 namespace IO\Middlewares;
 
-use Plenty\Modules\Authentication\Contracts\ContactAuthenticationRepositoryContract;
+use IO\Api\ResponseCode;
+use IO\Services\WebstoreConfigurationService;
+use IO\Controllers\StaticPagesController;
+use IO\Services\CheckoutService;
+use IO\Services\LocalizationService;
+use IO\Services\SessionStorageService;
 use Plenty\Plugin\Http\Request;
 use Plenty\Plugin\Http\Response;
 use Plenty\Modules\Frontend\Contracts\Checkout;
-use IO\Controllers\StaticPagesController;
-use IO\Services\CheckoutService;
+use Plenty\Modules\Authentication\Contracts\ContactAuthenticationRepositoryContract;
 
 class Middleware extends \Plenty\Plugin\Middleware
 {
@@ -21,6 +25,22 @@ class Middleware extends \Plenty\Plugin\Middleware
             $authRepo->authenticateWithToken($loginToken);
         }
         
+        $splittedURL     = explode('/', $request->get('plentyMarkets'));
+        $lang            = $splittedURL[0];
+        $webstoreService = pluginApp(WebstoreConfigurationService::class);
+        $webstoreConfig  = $webstoreService->getWebstoreConfig();
+
+        if ($lang == null || strlen($lang) != 2 || !in_array($lang, $webstoreConfig->languageList))
+        {
+            $sessionService  = pluginApp(SessionStorageService::class);
+
+            if($sessionService->getLang() != $webstoreConfig->defaultLanguage)
+            {
+                $service = pluginApp(LocalizationService::class);
+                $service->setLanguage($webstoreConfig->defaultLanguage);
+            }
+        }
+
         $currency = $request->get('currency', null);
         if ( $currency != null )
         {
@@ -46,13 +66,13 @@ class Middleware extends \Plenty\Plugin\Middleware
 
             $response = $response->make(
                 $controller->showPageNotFound(),
-                404
+                ResponseCode::NOT_FOUND
             );
 
-            $response->forceStatus(404);
+            $response->forceStatus(ResponseCode::NOT_FOUND);
             return $response;
         }
-
+        
         return $response;
     }
 }

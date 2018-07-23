@@ -4,18 +4,16 @@ namespace IO\Models;
 
 use IO\Builder\Order\OrderType;
 use IO\Builder\Order\OrderItemType;
-
 use IO\Extensions\Filters\ItemImagesFilter;
+use IO\Services\CustomerService;
 use IO\Services\ItemSearch\Factories\VariationSearchFactory;
 use IO\Services\ItemSearch\Services\ItemSearchService;
+use Plenty\Modules\Account\Contact\Contracts\ContactRepositoryContract;
 use Plenty\Modules\Order\Models\Order;
 use Plenty\Modules\Order\Status\Models\OrderStatusName;
 use Plenty\Modules\Frontend\PaymentMethod\Contracts\FrontendPaymentMethodRepositoryContract;
-//use Plenty\Modules\Order\Status\Contracts\StatusRepositoryContract;
 use Plenty\Modules\Order\Shipping\Contracts\ParcelServicePresetRepositoryContract;
 use IO\Extensions\Filters\URLFilter;
-use IO\Services\ItemService;
-use IO\Services\OrderService;
 
 class LocalizedOrder extends ModelWrapper
 {
@@ -24,6 +22,7 @@ class LocalizedOrder extends ModelWrapper
      */
     const WRAPPED_ORDERITEM_TYPES = [
         OrderItemType::VARIATION,
+        OrderItemType::ITEM_BUNDLE,
         OrderItemType::BUNDLE_COMPONENT,
         OrderItemType::PROMOTIONAL_COUPON,
         OrderItemType::GIFT_CARD,
@@ -49,6 +48,8 @@ class LocalizedOrder extends ModelWrapper
     public $itemURLs = [];
     public $itemImages = [];
     public $isReturnable = false;
+
+    public $highlightNetPrices = false;
 
     /**
      * @param Order $order
@@ -119,7 +120,7 @@ class LocalizedOrder extends ModelWrapper
         $orderVariationIds = [];
         foreach( $order->orderItems as $key => $orderItem )
         {
-            if(in_array($orderItem->typeId, self::WRAPPED_ORDERITEM_TYPES))
+            if(in_array((int)$orderItem->typeId, self::WRAPPED_ORDERITEM_TYPES))
             {
                 
                 if( $orderItem->itemVariationId !== 0 )
@@ -142,15 +143,27 @@ class LocalizedOrder extends ModelWrapper
                 ->withLanguage()
                 ->withImages()
                 ->withUrls()
+                ->withBundleComponents()
                 ->hasVariationIds( $orderVariationIds )
         );
 
         foreach( $orderVariations['documents'] as $orderVariation )
         {
-            $variationId = $orderVariation['data']['variation']['id'];
+            $variationId =  $orderVariation['data']['variation']['id'];
             $instance->itemURLs[$variationId]   = $urlFilter->buildItemURL( $orderVariation['data'] );
             $instance->itemImages[$variationId] = $imageFilter->getFirstItemImageUrl( $orderVariation['data']['images'], 'urlPreview' );
+
+            foreach( $instance->order->relations['orderItems'] as $orderItem)
+            {
+                if($orderItem['itemVariationId'] == $orderVariation['data']['variation']['id'])
+                {
+                    $orderItem['bundleComponents'] = $orderVariation['data']['bundleComponents'];
+                    $orderItem['bundleType'] = $orderVariation['data']['variation']['bundleType'];
+                }
+            }
         }
+
+        $instance->highlightNetPrices = $instance->highlightNetPrices();
 
         return $instance;
     }
@@ -176,9 +189,31 @@ class LocalizedOrder extends ModelWrapper
             "paymentMethodIcon"     => $this->paymentMethodIcon,
             "itemURLs"              => $this->itemURLs,
             "itemImages"            => $this->itemImages,
-            "isReturnable"          => $this->isReturnable
+            "isReturnable"          => $this->isReturnable,
+            "highlightNetPrices"    => $this->highlightNetPrices
         ];
 
         return $data;
+    }
+
+    private function highlightNetPrices()
+    {
+        $isOrderNet = $this->order->amounts[0]->isNet;
+
+        $orderContactId = 0;
+        foreach ($this->order->relations as $relation)
+        {
+            if ($relation['referenceType'] == 'contact' && (int)$relation['referenceId'] > 0)
+            {
+                $orderContactId = $relation['referenceId'];
+            }
+        }
+
+        /** @var CustomerService $customerService */
+        $customerService = pluginApp(CustomerService::class);
+
+        $showNet = $customerService->showNetPricesByContactId($orderContactId);
+
+        return $showNet || $isOrderNet;
     }
 }

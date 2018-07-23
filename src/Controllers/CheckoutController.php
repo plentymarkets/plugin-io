@@ -5,6 +5,8 @@ use IO\Constants\SessionStorageKeys;
 use IO\Services\BasketService;
 use IO\Services\CustomerService;
 use IO\Services\SessionStorageService;
+use IO\Services\UrlBuilder\UrlQuery;
+use IO\Services\WebstoreConfigurationService;
 use Plenty\Modules\Basket\Contracts\BasketItemRepositoryContract;
 use IO\Guards\AuthGuard;
 
@@ -19,21 +21,33 @@ class CheckoutController extends LayoutController
      * @param BasketService $basketService
      * @param CustomerService $customerService
      * @param BasketItemRepositoryContract $basketItemRepository
+     * @param WebstoreConfigurationService $webstoreConfigurationService;
      * @return string
      */
-    public function showCheckout(BasketService $basketService,  CustomerService $customerService, BasketItemRepositoryContract $basketItemRepository): string
+    public function showCheckout(BasketService $basketService,  CustomerService $customerService, BasketItemRepositoryContract $basketItemRepository, WebstoreConfigurationService $webstoreConfigurationService): string
     {
         $basketItems = $basketItemRepository->all();
+        /**
+         * @var SessionStorageService $sessionStorage
+         */
         $sessionStorage = pluginApp(SessionStorageService::class);
 
+        $url = $this->urlService->getHomepageURL();
         if( $sessionStorage->getSessionValue(SessionStorageKeys::GUEST_EMAIL) == null &&
             $customerService->getContactId() <= 0)
         {
-            AuthGuard::redirect("/login", ["backlink" => AuthGuard::getUrl()]);
+            if(substr($url, -1) !== '/')
+            {
+                $url .= '/';
+            }
+            $url .= 'login';
+            $url .= UrlQuery::shouldAppendTrailingSlash() ? '/' : '';
+
+            AuthGuard::redirect($url, ["backlink" => AuthGuard::getUrl()]);
         }
         else if(!count($basketItems))
         {
-            AuthGuard::redirect("/", []);
+            AuthGuard::redirect($url, []);
         }
 
         $basket = $basketService->getBasketForTemplate();
@@ -42,7 +56,8 @@ class CheckoutController extends LayoutController
             "tpl.checkout",
             [
                 "basket" => $basket
-            ]
+            ],
+            false
         );
     }
 }

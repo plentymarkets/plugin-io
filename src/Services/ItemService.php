@@ -16,6 +16,7 @@ use IO\Constants\Language;
 use IO\Helper\MemoryCache;
 use IO\Extensions\Filters\ItemImagesFilter;
 use IO\Services\ItemSearch\SearchPresets\SingleItem;
+use IO\Services\ItemSearch\SearchPresets\VariationList;
 use IO\Services\ItemSearch\Services\ItemSearchService;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\ElasticSearch;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Processor\DocumentProcessor;
@@ -171,32 +172,10 @@ class ItemService
 	 */
 	public function getVariation(int $variationId = 0):array
 	{
-		$documentProcessor = pluginApp(DocumentProcessor::class);
-		$documentSearch    = pluginApp(DocumentSearch::class, [$documentProcessor]);
+	    /** @var ItemSearchService $itemSearchService */
+	    $itemSearchService = pluginApp(ItemSearchService::class);
 
-		//$attributeProcessor = pluginApp(AttributeValueListAggregationProcessor::class);
-		//$attributeSearch    = pluginApp(AttributeValueListAggregation::class, [$attributeProcessor]);
-
-
-		/** @var VariationElasticSearchSearchRepositoryContract $elasticSearchRepo */
-		$elasticSearchRepo = pluginApp(VariationElasticSearchSearchRepositoryContract::class);
-		$elasticSearchRepo->addSearch($documentSearch);
-		//$elasticSearchRepo->addSearch($attributeSearch);
-
-		/** @var ClientFilter $clientFilter */
-		$clientFilter = pluginApp(ClientFilter::class);
-		$clientFilter->isVisibleForClient($this->app->getPlentyId());
-
-		/** @var VariationBaseFilter $variationFilter */
-		$variationFilter = pluginApp(VariationBaseFilter::class);
-		$variationFilter->isActive();
-		$variationFilter->hasId($variationId);
-
-		$documentSearch
-			->addFilter($clientFilter)
-			->addFilter($variationFilter);
-
-		return $elasticSearchRepo->execute();
+        return $itemSearchService->getResult(SingleItem::getSearchFactory(['variationId' => $variationId]));
 	}
 
 	/**
@@ -206,27 +185,10 @@ class ItemService
 	 */
 	public function getVariations(array $variationIds):array
 	{
-		$documentProcessor = pluginApp(DocumentProcessor::class);
-		$documentSearch    = pluginApp(DocumentSearch::class, [$documentProcessor]);
+        /** @var ItemSearchService $itemSearchService */
+        $itemSearchService = pluginApp(ItemSearchService::class);
 
-		/** @var VariationElasticSearchSearchRepositoryContract $elasticSearchRepo */
-		$elasticSearchRepo = pluginApp(VariationElasticSearchSearchRepositoryContract::class);
-		$elasticSearchRepo->addSearch($documentSearch);
-
-		/** @var ClientFilter $clientFilter */
-		$clientFilter = pluginApp(ClientFilter::class);
-		$clientFilter->isVisibleForClient($this->app->getPlentyId());
-
-		/** @var VariationBaseFilter $variationFilter */
-		$variationFilter = pluginApp(VariationBaseFilter::class);
-		$variationFilter->isActive();
-		$variationFilter->hasIds($variationIds);
-
-		$documentSearch
-			->addFilter($clientFilter)
-			->addFilter($variationFilter);
-
-		return $elasticSearchRepo->execute();
+        return $itemSearchService->getResult(VariationList::getSearchFactory(['variationIds' => $variationIds]));
 	}
 
     /**
@@ -347,11 +309,11 @@ class ItemService
         );
 
 
-        if(is_array($variation) && count($variation[0]['documents']))
+        if(is_array($variation) && count($variation['documents']))
         {
             /** @var ItemImagesFilter $itemImageFilter */
             $itemImageFilter = pluginApp( ItemImagesFilter::class );
-            return $itemImageFilter->getFirstItemImageUrl( $variation[0]['documents'][0]['data']['images'], $imageAccessor );
+            return $itemImageFilter->getFirstItemImageUrl( $variation['documents'][0]['data']['images'], $imageAccessor );
         }
 
         return '';

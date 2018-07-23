@@ -4,6 +4,7 @@ namespace IO\Services\ItemSearch\Extensions;
 
 use IO\Helper\VariationPriceList;
 use IO\Services\CustomerService;
+use Plenty\Legacy\Repositories\Frontend\CurrencyExchangeRepository;
 
 /**
  * Class PriceSearchExtension
@@ -46,7 +47,7 @@ class PriceSearchExtension implements ItemSearchExtension
                 {
                     $variationId        = $variation['data']['variation']['id'];
                     $minimumQuantity    = $variation['data']['variation']['minimumOrderQuantity'];
-                    if ( (float)$minimumQuantity === 0 )
+                    if ( is_null($minimumQuantity) || (float)$minimumQuantity === 0 )
                     {
                         // mimimum order quantity is not defined => get smallest possible quantity depending on interval order quantity
                         if ( (float)$variation['data']['variation']['intervalOrderQuantity'] > 0 )
@@ -105,11 +106,50 @@ class PriceSearchExtension implements ItemSearchExtension
                     $variation['data']['prices'] = $priceList->toArray( $quantity );
 
 
+                    if ( array_key_exists('properties', $variation['data']) )
+                    {
+                        $variation['data']['properties'] = $this->convertPropertySurcharges(
+                            $variation['data']['properties'],
+                            $priceList
+                        );
+                    }
+
                     $baseResult['documents'][$key] = $variation;
                 }
             }
         }
 
         return $baseResult;
+    }
+
+    /**
+     * @param array                 $properties
+     * @param VariationPriceList    $priceList
+     * @return array
+     */
+    private function convertPropertySurcharges( $properties, $priceList )
+    {
+        $result = [];
+
+        foreach( $properties as $property )
+        {
+            if ( $property['group']['isSurchargePercental'] )
+            {
+                $defaultPrice = $priceList->getDefaultPrice();
+                
+                $property['property']['surcharge'] = $defaultPrice->unitPrice * ($property['property']['surcharge'] / 100);
+                $property['surcharge'] = $defaultPrice->unitPrice * ($property['surcharge'] / 100);
+            }
+    
+            $property['property']['surcharge'] = $priceList->convertGrossNet( $property['property']['surcharge'] );
+            $property['property']['surcharge'] = $priceList->convertCurrency( $property['property']['surcharge'] );
+
+            $property['surcharge'] = $priceList->convertGrossNet( $property['surcharge'] );
+            $property['surcharge'] = $priceList->convertCurrency( $property['surcharge'] );
+
+            $result[] = $property;
+        }
+
+        return $result;
     }
 }

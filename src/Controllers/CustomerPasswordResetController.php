@@ -30,7 +30,8 @@ class CustomerPasswordResetController extends LayoutController
                 [
                     "contactId" => $contactId,
                     "hash"      => $hash
-                ]
+                ],
+                false
             );
         }
         else
@@ -45,7 +46,8 @@ class CustomerPasswordResetController extends LayoutController
                 "tpl.home",
                 [
                     "data" => ""
-                ]
+                ],
+                false
             );
         }
         

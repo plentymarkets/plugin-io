@@ -2,6 +2,7 @@
 
 namespace IO\Services;
 
+use Plenty\Modules\Account\Address\Contracts\AddressRepositoryContract;
 use Plenty\Modules\Frontend\PaymentMethod\Contracts\FrontendPaymentMethodRepositoryContract;
 use Plenty\Modules\Order\ContactWish\Contracts\ContactWishRepositoryContract;
 use Plenty\Modules\Order\Contracts\OrderRepositoryContract;
@@ -21,6 +22,8 @@ use IO\Builder\Order\AddressType;
 use IO\Constants\SessionStorageKeys;
 use IO\Services\TemplateConfigService;
 use Plenty\Modules\Authorization\Services\AuthHelper;
+use IO\Services\UrlService;
+use IO\Builder\Order\OrderItemType;
 
 
 /**
@@ -46,7 +49,26 @@ class OrderService
      * @var FrontendPaymentMethodRepositoryContract
      */
     private $frontendPaymentMethodRepository;
-    
+    /**
+     * @var AddressRepositoryContract
+     */
+    private $addressRepository;
+    /**
+     * @var UrlService
+     */
+    private $urlService;
+
+    /**
+     * The OrderItem types that will be wrapped. All other OrderItems will be stripped from the order.
+     */
+    const WRAPPED_ORDERITEM_TYPES =
+    [
+        OrderItemType::VARIATION,
+        OrderItemType::ITEM_BUNDLE,
+        OrderItemType::BUNDLE_COMPONENT,
+        OrderItemType::UNASSIGNED_VARIATION
+    ];
+
     /**
      * OrderService constructor.
      * @param OrderRepositoryContract $orderRepository
@@ -57,13 +79,17 @@ class OrderService
 		OrderRepositoryContract $orderRepository,
 		BasketService $basketService,
         SessionStorageService $sessionStorage,
-        FrontendPaymentMethodRepositoryContract $frontendPaymentMethodRepository
+        FrontendPaymentMethodRepositoryContract $frontendPaymentMethodRepository,
+        AddressRepositoryContract $addressRepository,
+        UrlService $urlService
 	)
 	{
 		$this->orderRepository = $orderRepository;
 		$this->basketService   = $basketService;
         $this->sessionStorage  = $sessionStorage;
         $this->frontendPaymentMethodRepository = $frontendPaymentMethodRepository;
+        $this->addressRepository = $addressRepository;
+        $this->urlService = $urlService;
 	}
 
     /**
@@ -196,7 +222,8 @@ class OrderService
             {
                 if ((int)$customerService->getContactId() <= 0)
                 {
-                    return pluginApp(Response::class)->redirectTo('login?backlink=confirmation/' . $orderId . '/' . $orderAccessKey);
+
+                    return $this->urlService->redirectTo('login?backlink=confirmation/' . $orderId . '/' . $orderAccessKey);
                 }
                 elseif ((int)$orderContactId !== (int)$customerService->getContactId())
                 {
@@ -332,6 +359,29 @@ class OrderService
             {
                 return false;
             }
+
+            $newOrderItems = [];
+
+            foreach($orderWithoutReturnItems->orderItems as $orderItem)
+            {
+                if($orderItem['bundleType'] !== 'bundle_item' && count($orderItem['references']) === 0)
+                {
+                    $newOrderItems[] = $orderItem;
+                }
+            }
+
+            $newItemsExist = false;
+
+            if(count($newOrderItems) > 0)
+            {
+                foreach($newOrderItems as $newOrderItem)
+                {
+                    if($newOrderItem['quantity'] > 0)
+                    {
+                        $newItemsExist = true;
+                    }
+                }
+            }
             
             $shippingDateSet = false;
             $createdDateUnix = 0;
@@ -354,7 +404,7 @@ class OrderService
             $templateConfigService = pluginApp(TemplateConfigService::class);
             $returnTime = (int)$templateConfigService->get('my_account.order_return_days', 14);
     
-            if( $shippingDateSet && ($createdDateUnix > 0 && $returnTime > 0) && (time() < ($createdDateUnix + ($returnTime * 24 * 60 * 60))) )
+            if( $shippingDateSet && ($createdDateUnix > 0 && $returnTime > 0) && (time() < ($createdDateUnix + ($returnTime * 24 * 60 * 60))) && $newItemsExist )
             {
                 return true;
             }
@@ -483,7 +533,7 @@ class OrderService
                         $newQuantity = $orderItem['quantity'];
                     }
     
-                    if($newQuantity > 0 && ($orderItem->typeId == 1 || $orderItem->typeId == 3 || $orderItem->typeId == 9))
+                    if($newQuantity > 0 && in_array((int)$orderItem->typeId, self::WRAPPED_ORDERITEM_TYPES))
                     {
                         $orderItem['quantity'] = $newQuantity;
                         $newOrderItems[] = $orderItem;
@@ -501,7 +551,7 @@ class OrderService
             {
                 foreach($order->orderItems as $key => $orderItem)
                 {
-                    if($orderItem->typeId == 1 || $orderItem->typeId == 3 || $orderItem->typeId == 9)
+                    if(in_array((int)$orderItem->typeId, self::WRAPPED_ORDERITEM_TYPES))
                     {
                         $newOrderItems[] = $orderItem;
                     }
@@ -567,7 +617,7 @@ class OrderService
                     $newQuantity = $orderItem['quantity'];
                 }
             
-                if($newQuantity > 0 && ($orderItem['typeId'] == 1 || $orderItem['typeId'] == 3 || $orderItem['typeId'] == 9))
+                if($newQuantity > 0 && in_array((int)$orderItem['typeId'], self::WRAPPED_ORDERITEM_TYPES))
                 {
                     $orderItem['quantity'] = $newQuantity;
                     $newOrderItems[] = $orderItem;
@@ -582,7 +632,7 @@ class OrderService
         {
             foreach($order['orderItems'] as $key => $orderItem)
             {
-                if($orderItem['typeId'] == 1 || $orderItem['typeId'] == 3 || $orderItem['typeId'] == 9)
+                if(in_array((int)$orderItem['typeId'], self::WRAPPED_ORDERITEM_TYPES))
                 {
                     $newOrderItems[] = $orderItem;
                 }

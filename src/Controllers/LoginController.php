@@ -20,14 +20,15 @@ class LoginController extends LayoutController
 	{
         if($customerService->getContactId() > 0)
         {
-            AuthGuard::redirect("/", []);
+            AuthGuard::redirect($this->urlService->getHomepageURL(), []);
         }
 
 		return $this->renderTemplate(
 			"tpl.login",
 			[
 				"login" => ""
-			]
+			],
+            false
 		);
 	}
 }
