@@ -1,5 +1,20 @@
 # Release Notes for IO
 
+## v2.13.0 (2018-07-23) <a href="https://github.com/plentymarkets/plugin-io/compare/2.12.0...2.13.0" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
+
+### Added
+
+- The "Forgot password" e-mail template stored in Ceres can now be sent from the backend.
+- The OrderTotalsService now provides the coupon code.
+
+### Changed
+
+- The unit price was not displayed if the number of units was 1. This has ben fixed. The display of the unit price is now exclusively dependent on the setting stored at the variation level.
+
+### Fixed
+
+- The navigation always displayed all categories. This behaviour has been adjusted, so that different navigations can be displayed, depending on different customer classes.
+
 ## v2.12.0 (2018-07-10) <a href="https://github.com/plentymarkets/plugin-io/compare/2.11.0...2.12.0" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
 
 ### Added
