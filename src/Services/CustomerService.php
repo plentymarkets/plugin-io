@@ -352,7 +352,8 @@ class CustomerService
 	public function createContact(array $contactData)
 	{
 	    $contact = null;
-	    $contactData['checkForExistingEmail'] = true;
+        $contactData['checkForExistingEmail'] = true;
+        $contactData['lang'] = $this->sessionStorage->getLang();
 	    
 	    try
         {
