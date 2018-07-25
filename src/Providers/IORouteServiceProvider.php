@@ -130,10 +130,10 @@ class IORouteServiceProvider extends RouteServiceProvider
         if ( in_array("search", $enabledRoutes) || in_array("all", $enabledRoutes) )
         {
             $router->get('search', 'IO\Controllers\ItemSearchController@showSearch');
+            //Callisto Tag route
+            $router->get('tag/{tagName}', 'IO\Controllers\TagController@showTag');
         }
 
-        //Callisto Tag route
-        $router->get('tag/{tagName}', 'IO\Controllers\TagController@showTag');
 
         if ( in_array("home", $enabledRoutes) || in_array("all", $enabledRoutes) ) {
             //homepage route
