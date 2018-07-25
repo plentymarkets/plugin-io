@@ -30,6 +30,7 @@ use Plenty\Modules\Item\Search\Filter\TagFilter;
 use Plenty\Modules\Item\Search\Filter\TextFilter;
 use Plenty\Modules\Item\Search\Filter\VariationBaseFilter;
 use Plenty\Modules\Item\Search\Helper\SearchHelper;
+use Plenty\Modules\Item\Search\Mutators\ImageDomainMutator;
 use Plenty\Modules\Item\Search\Mutators\ImageMutator;
 use Plenty\Modules\Item\Search\Mutators\VariationPropertyGroupMutator;
 use Plenty\Plugin\Application;
@@ -519,6 +520,11 @@ class VariationSearchFactory extends BaseSearchFactory
         $imageMutator = pluginApp(ImageMutator::class);
         $imageMutator->addClient( $clientId );
         $this->withMutator( $imageMutator );
+        
+        /** @var ImageDomainMutator $imageDomainMutator */
+        $imageDomainMutator = pluginApp(ImageDomainMutator::class);
+        $imageDomainMutator->setClient($clientId);
+        $this->withMutator($imageDomainMutator);
 
         return $this;
     }
