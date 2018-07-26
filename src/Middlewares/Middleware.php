@@ -4,6 +4,7 @@ namespace IO\Middlewares;
 
 use IO\Api\ResponseCode;
 use IO\Services\WebstoreConfigurationService;
+use Plenty\Plugin\ConfigRepository;
 use Plenty\Plugin\Http\Request;
 use Plenty\Plugin\Http\Response;
 use Plenty\Modules\Frontend\Contracts\Checkout;
@@ -72,7 +73,11 @@ class Middleware extends \Plenty\Plugin\Middleware
 
     private function checkForCallistoSearchURL(Request $request)
     {
-        if ($request->get('ActionCall') == 'WebActionArticleSearch')
+        $config = pluginApp(ConfigRepository::class);
+        $enabledRoutes = explode(", ",  $config->get("IO.routing.enabled_routes") );
+
+        if ( (in_array("search", $enabledRoutes) || in_array("all", $enabledRoutes)) &&
+             $request->get('ActionCall') == 'WebActionArticleSearch' )
         {
             AuthGuard::redirect('/search', ['query' => $request->get('Params')['SearchParam']]);
         }
