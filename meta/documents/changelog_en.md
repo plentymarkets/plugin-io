@@ -1,6 +1,6 @@
 # Release Notes for IO
 
-## v2.13.0 (2018-07-26) <a href="https://github.com/plentymarkets/plugin-io/compare/2.12.0...2.13.0" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
+## v2.13.0 (2018-07-30) <a href="https://github.com/plentymarkets/plugin-io/compare/2.12.0...2.13.0" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
 
 ### Added
 
@@ -16,6 +16,7 @@
 - The navigation always displayed all categories. This behaviour has been adjusted, so that different navigations can be displayed, depending on different customer classes.
 - The CDN URLs for item images are now loaded client-dependently in the correct manner.
 - Due to an error, the wrong language was stored when a new user was created. This has been fixed.
+- Due to an error, the prices of item bundles were displayed as 0 Euro on the order confirmation page. This has been fixed.
 
 ## v2.12.0 (2018-07-10) <a href="https://github.com/plentymarkets/plugin-io/compare/2.11.0...2.12.0" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
 
