@@ -1,6 +1,6 @@
 # Release Notes für IO
 
-## v2.13.0 (2018-07-23) <a href="https://github.com/plentymarkets/plugin-io/compare/2.12.0...2.13.0" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
+## v2.13.0 (2018-07-30) <a href="https://github.com/plentymarkets/plugin-io/compare/2.12.0...2.13.0" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
 
 ### Hinzugefügt
 
@@ -14,6 +14,9 @@
 ### Behoben
 
 - In der Navigation wurden alle Kategorien ausgegeben. Dieses Verhalten wurde behoben, sodass jetzt unterschiedliche Navigationen abhängig von Kundenklassen ausgegeben werden können.
+- Die CDN-URLs für Artikelbilder werden nun korrekt mandantenabhängig geladen.
+- Durch einen Fehler wurde beim Anlegen eines Benutzers die falsche Sprache übergeben. Dies wurde behoben.
+- Durch einen Fehler wurden Preise von Artikelpaketen auf der Bestellbestätigungsseite als 0 Euro dargestellt. Dies wurde behoben.
 
 ## v2.12.0 (2018-07-10) <a href="https://github.com/plentymarkets/plugin-io/compare/2.11.0...2.12.0" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
 
