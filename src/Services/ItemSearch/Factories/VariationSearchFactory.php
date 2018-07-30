@@ -391,10 +391,6 @@ class VariationSearchFactory extends BaseSearchFactory
             $facetValues = explode(",", $facetValues );
         }
 
-        $facetValues = array_map(function($facetValue) {
-            return (int) $facetValue;
-        }, $facetValues);
-
         /** @var SearchHelper $searchHelper */
         $searchHelper = pluginApp( SearchHelper::class, [$facetValues, $clientId, 'item', $lang] );
         $this->withFilter( $searchHelper->getFacetFilter() );
