@@ -2,6 +2,7 @@
 
 namespace IO\Services\ItemSearch\Factories;
 
+use IO\Services\ItemLoader\Services\FacetExtensionContainer;
 use IO\Services\ItemSearch\Extensions\ItemSearchExtension;
 use IO\Services\ItemSearch\SearchPresets\SearchPreset;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Search\Document\DocumentSearch;
@@ -132,6 +133,25 @@ class MultiSearchFactory
             else
             {
                 $results[$searchName] = $result;
+            }
+        }
+    
+        /** @var FacetExtensionContainer $facetExtensionContainer */
+        $facetExtensionContainer = pluginApp(FacetExtensionContainer::class);
+        $facetExtensions = $facetExtensionContainer->getFacetExtensions();
+    
+        if(isset($results['facets']) && count($facetExtensions))
+        {
+            foreach($results as $searchName => $searchData)
+            {
+                foreach ($facetExtensions as $facetExtension)
+                {
+                    $aggregationName = $facetExtension->getAggregation()->getName();
+                    if(isset($searchData[$aggregationName]))
+                    {
+                        array_unshift($results['facets'], $facetExtension->mergeIntoFacetsList($searchData[$aggregationName]));
+                    }
+                }
             }
         }
 
