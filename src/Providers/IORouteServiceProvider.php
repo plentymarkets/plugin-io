@@ -22,6 +22,8 @@ class IORouteServiceProvider extends RouteServiceProvider
      * Define the map routes to templates or REST resources
      * @param Router $router
      * @param ApiRouter $api
+     * @param ConfigRepository $config
+     * @throws \Plenty\Plugin\Routing\Exceptions\RouteReservedException
      */
 	public function map(Router $router, ApiRouter $api, ConfigRepository $config)
 	{
