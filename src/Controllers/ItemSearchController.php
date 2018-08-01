@@ -2,6 +2,7 @@
 
 namespace IO\Controllers;
 
+use IO\Guards\AuthGuard;
 use Plenty\Plugin\Http\Request;
 
 class ItemSearchController extends LayoutController
@@ -22,5 +23,11 @@ class ItemSearchController extends LayoutController
             ],
             false
         );
+    }
+
+    public function redirectToSearch($query):string
+    {
+        AuthGuard::redirect('/search', ['query' => $query]);
+        return "";
     }
 }

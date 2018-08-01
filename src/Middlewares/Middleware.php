@@ -4,6 +4,7 @@ namespace IO\Middlewares;
 
 use IO\Api\ResponseCode;
 use IO\Services\WebstoreConfigurationService;
+use Plenty\Plugin\ConfigRepository;
 use Plenty\Plugin\Http\Request;
 use Plenty\Plugin\Http\Response;
 use Plenty\Modules\Frontend\Contracts\Checkout;
@@ -11,10 +12,11 @@ use IO\Controllers\StaticPagesController;
 use IO\Services\CheckoutService;
 use IO\Services\LocalizationService;
 use IO\Services\SessionStorageService;
+use IO\Guards\AuthGuard;
 
 class Middleware extends \Plenty\Plugin\Middleware
 {
-    public function before(Request $request )
+    public function before(Request $request)
     {
         $splittedURL     = explode('/', $request->get('plentyMarkets'));
         $lang            = $splittedURL[0];
@@ -32,7 +34,6 @@ class Middleware extends \Plenty\Plugin\Middleware
             }
         }
 
-
         $currency = $request->get('currency', null);
         if ( $currency != null )
         {
@@ -48,6 +49,8 @@ class Middleware extends \Plenty\Plugin\Middleware
             $checkout = pluginApp(Checkout::class);
             $checkout->setBasketReferrerId($referrerId);
         }
+
+        $this->checkForCallistoSearchURL($request);
     }
 
     public function after(Request $request, Response $response):Response
@@ -66,5 +69,17 @@ class Middleware extends \Plenty\Plugin\Middleware
         }
         
         return $response;
+    }
+
+    private function checkForCallistoSearchURL(Request $request)
+    {
+        $config = pluginApp(ConfigRepository::class);
+        $enabledRoutes = explode(", ",  $config->get("IO.routing.enabled_routes") );
+
+        if ( (in_array("search", $enabledRoutes) || in_array("all", $enabledRoutes)) &&
+             $request->get('ActionCall') == 'WebActionArticleSearch' )
+        {
+            AuthGuard::redirect('/search', ['query' => $request->get('Params')['SearchParam']]);
+        }
     }
 }

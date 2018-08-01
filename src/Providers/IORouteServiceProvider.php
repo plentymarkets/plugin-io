@@ -22,6 +22,8 @@ class IORouteServiceProvider extends RouteServiceProvider
      * Define the map routes to templates or REST resources
      * @param Router $router
      * @param ApiRouter $api
+     * @param ConfigRepository $config
+     * @throws \Plenty\Plugin\Routing\Exceptions\RouteReservedException
      */
 	public function map(Router $router, ApiRouter $api, ConfigRepository $config)
 	{
@@ -130,6 +132,8 @@ class IORouteServiceProvider extends RouteServiceProvider
         if ( in_array("search", $enabledRoutes) || in_array("all", $enabledRoutes) )
         {
             $router->get('search', 'IO\Controllers\ItemSearchController@showSearch');
+            //Callisto Tag route
+            $router->get('tag/{tagName}', 'IO\Controllers\ItemSearchController@redirectToSearch');
         }
 
         if ( in_array("home", $enabledRoutes) || in_array("all", $enabledRoutes) ) {
