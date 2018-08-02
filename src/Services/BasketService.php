@@ -7,6 +7,7 @@ use IO\Services\ItemSearch\Services\ItemSearchService;
 use Plenty\Modules\Accounting\Vat\Models\VatRate;
 use Plenty\Modules\Basket\Contracts\BasketRepositoryContract;
 use Plenty\Modules\Basket\Contracts\BasketItemRepositoryContract;
+use Plenty\Modules\Basket\Exceptions\BasketItemCheckException;
 use Plenty\Modules\Order\Coupon\Campaign\Contracts\CouponCampaignRepositoryContract;
 use Plenty\Modules\Order\Coupon\Campaign\Models\CouponCampaign;
 use Plenty\Modules\Basket\Models\Basket;
@@ -288,7 +289,11 @@ class BasketService
         }
         else
         {
-            $this->addDataToBasket($data);
+            $error = $this->addDataToBasket($data);
+            if(array_key_exists("code", $error))
+            {
+                return $error;
+            }
         }
 
         return $this->getBasketItemsForTemplate();
@@ -315,6 +320,10 @@ class BasketService
                 $this->basketItemRepository->updateBasketItem($basketItem->id, $data);
             } else {
                 $this->basketItemRepository->addBasketItem($data);
+            }
+        } catch (BasketItemCheckException $e) {
+            if ($e->getCode() == BasketItemCheckException::NOT_ENOUGH_STOCK_FOR_ITEM) {
+                return ["code" => "6"];
             }
         } catch (\Exception $e) {
             return ["code" => $e->getCode()];
