@@ -149,7 +149,11 @@ class MultiSearchFactory
                     $aggregationName = $facetExtension->getAggregation()->getName();
                     if(isset($searchData[$aggregationName]))
                     {
-                        array_unshift($results['facets'], $facetExtension->mergeIntoFacetsList($searchData[$aggregationName]));
+                        $facetData = $facetExtension->mergeIntoFacetsList($searchData[$aggregationName]);
+                        if(count($facetData))
+                        {
+                            array_unshift($results['facets'], $facetData);
+                        }
                     }
                 }
             }
