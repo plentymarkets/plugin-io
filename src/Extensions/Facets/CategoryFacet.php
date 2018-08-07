@@ -39,6 +39,7 @@ class CategoryFacet implements FacetExtension
             $categoryFacet = [
                 'id' => 'category',
                 'name' => 'Categories',
+                'translationKey' => 'itemFilterCategory',
                 'position' => 0,
                 'values' => [],
                 'minHitCount' => 1,
