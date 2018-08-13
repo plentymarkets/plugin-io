@@ -368,8 +368,6 @@ class CheckoutService
         $vatService = pluginApp(VatService::class);
         $showNetPrice   = $sessionService->getCustomer()->showNetPrice;
 
-
-
         $contact = $this->customerService->getContact();
         $params  = [
             'countryId'  => $this->getShippingCountryId(),
