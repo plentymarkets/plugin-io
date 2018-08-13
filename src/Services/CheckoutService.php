@@ -3,23 +3,24 @@
 namespace IO\Services;
 
 use IO\Builder\Order\AddressType;
+use IO\Constants\SessionStorageKeys;
 use IO\Helper\LanguageMap;
 use IO\Helper\MemoryCache;
+use Plenty\Modules\Accounting\Contracts\AccountingLocationRepositoryContract;
+use Plenty\Modules\Basket\Contracts\BasketRepositoryContract;
 use Plenty\Modules\Basket\Events\Basket\AfterBasketChanged;
+use Plenty\Modules\Frontend\Contracts\Checkout;
 use Plenty\Modules\Frontend\Contracts\CurrencyExchangeRepositoryContract;
 use Plenty\Modules\Frontend\Events\ValidateCheckoutEvent;
 use Plenty\Modules\Frontend\PaymentMethod\Contracts\FrontendPaymentMethodRepositoryContract;
-use Plenty\Modules\Frontend\Contracts\Checkout;
-use Plenty\Modules\Basket\Contracts\BasketRepositoryContract;
+use Plenty\Modules\Frontend\Services\VatService;
 use Plenty\Modules\Frontend\Session\Storage\Contracts\FrontendSessionStorageFactoryContract;
 use Plenty\Modules\Order\Currency\Contracts\CurrencyRepositoryContract;
+use Plenty\Modules\Order\Shipping\Contracts\ParcelServicePresetRepositoryContract;
 use Plenty\Modules\Payment\Events\Checkout\GetPaymentMethodContent;
 use Plenty\Modules\Payment\Method\Contracts\PaymentMethodRepositoryContract;
-use Plenty\Modules\Order\Shipping\Contracts\ParcelServicePresetRepositoryContract;
-use IO\Constants\SessionStorageKeys;
-use IO\Services\BasketService;
-use Plenty\Plugin\ConfigRepository;
 use Plenty\Plugin\Application;
+use Plenty\Plugin\ConfigRepository;
 use Plenty\Plugin\Events\Dispatcher;
 use Plenty\Plugin\Translation\Translator;
 
@@ -361,7 +362,12 @@ class CheckoutService
     {
         /** @var SessionStorageService $sessionService */
         $sessionService = pluginApp(SessionStorageService::class);
+        /** @var AccountingLocationRepositoryContract $accountRepo*/
+        $accountRepo = pluginApp(AccountingLocationRepositoryContract::class);
+        /** @var VatService $vatService*/
+        $vatService = pluginApp(VatService::class);
         $showNetPrice   = $sessionService->getCustomer()->showNetPrice;
+
 
 
         $contact = $this->customerService->getContact();
@@ -371,7 +377,10 @@ class CheckoutService
         ];
         $list    = $this->parcelServicePresetRepo->getLastWeightedPresetCombinations($this->basketRepository->load(), $contact->classId, $params);
 
-        if ($showNetPrice) {
+        $locationId = $vatService->getLocationId($this->getShippingCountryId());
+        $accountSettings = $accountRepo->getSettings($locationId);
+
+        if ($showNetPrice && !(bool)$accountSettings->showShippingVat) {
 
             $maxVatValue   = $this->basketService->getMaxVatValue();
 
