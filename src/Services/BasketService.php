@@ -286,6 +286,10 @@ class BasketService
                     $this->addDataToBasket($basketData);
                 }
             }
+            else
+            {
+                $this->addDataToBasket($data);
+            }
         }
         else
         {
