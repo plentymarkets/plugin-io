@@ -4,6 +4,7 @@ namespace IO\Middlewares;
 
 use IO\Api\ResponseCode;
 use IO\Services\WebstoreConfigurationService;
+use Plenty\Plugin\ConfigRepository;
 use Plenty\Plugin\Http\Request;
 use Plenty\Plugin\Http\Response;
 use Plenty\Modules\Frontend\Contracts\Checkout;
@@ -34,11 +35,19 @@ class Middleware extends \Plenty\Plugin\Middleware
 
 
         $currency = $request->get('currency', null);
+
         if ( $currency != null )
         {
-            /** @var CheckoutService $checkoutService */
-            $checkoutService = pluginApp(CheckoutService::class);
-            $checkoutService->setCurrency( $currency );
+            /** @var ConfigRepository $config */
+            $config = pluginApp(ConfigRepository::class);
+            $enabledCurrencies = explode(', ',  $config->get('Ceres.currency.available_currencies') );
+
+            if(in_array($currency, $enabledCurrencies) || array_pop($enabledCurrencies) == 'all')
+            {
+                /** @var CheckoutService $checkoutService */
+                $checkoutService = pluginApp(CheckoutService::class);
+                $checkoutService->setCurrency( $currency );
+            }
         }
 
         $referrerId = $request->get('ReferrerID', null);
@@ -64,7 +73,7 @@ class Middleware extends \Plenty\Plugin\Middleware
             $response->forceStatus(ResponseCode::NOT_FOUND);
             return $response;
         }
-        
+
         return $response;
     }
 }
