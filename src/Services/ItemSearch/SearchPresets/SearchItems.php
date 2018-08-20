@@ -58,35 +58,41 @@ class SearchItems implements SearchPreset
         /** @var VariationSearchFactory $searchFactory */
         $searchFactory = pluginApp( VariationSearchFactory::class );
 
-        $searchFactory->withResultFields(
+
+
+        if ( array_key_exists('autocomplete', $options ) && $options['autocomplete'] === true )
+        {
+            $searchFactory->withResultFields(
+                ResultFieldTemplate::get( ResultFieldTemplate::TEMPLATE_AUTOCOMPLETE_ITEM_LIST )
+            );        }
+        else
+        {
+            $searchFactory
+                ->withDefaultImage()
+                ->withImages()
+                ->withPrices()
+                ->hasPriceInRange($priceMin, $priceMax)
+                ->hasFacets( $facets );
+
+            $searchFactory->withResultFields(
                 ResultFieldTemplate::get( ResultFieldTemplate::TEMPLATE_LIST_ITEM )
             );
+        }
 
         $searchFactory
-            ->withLanguage()
             ->withUrls()
-            ->withPrices()
-            ->withImages()
-            ->withDefaultImage()
+            ->withLanguage()
+            ->hasPriceForCustomer()
+            ->hasNameInLanguage()
+            ->isHiddenInCategoryList( false )
             ->isVisibleForClient()
             ->isActive()
-            ->isHiddenInCategoryList( false )
-            ->hasNameInLanguage()
-            ->hasPriceForCustomer()
-            ->hasPriceInRange($priceMin, $priceMax)
-            ->hasFacets( $facets )
             ->sortByMultiple( $sorting )
             ->setPage( $page, $itemsPerPage )
             ->groupByTemplateConfig();
 
-        if ( array_key_exists('autocomplete', $options ) && $options['autocomplete'] === true )
-        {
-            $searchFactory->hasNameString( $query );
-        }
-        else
-        {
-            $searchFactory->hasSearchString( $query );
-        }
+        $searchFactory->hasNameString($query);
+        $searchFactory->hasSearchString( $query );
 
         return $searchFactory;
     }
