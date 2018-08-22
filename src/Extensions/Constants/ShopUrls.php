@@ -11,6 +11,7 @@ class ShopUrls
     public $appendTrailingSlash = false;
     public $trailingSlashSuffix = "";
     public $includeLanguage     = false;
+    public $home                = "";
     public $basket              = "";
     public $cancellationForm    = "";
     public $cancellationRights  = "";
@@ -29,6 +30,7 @@ class ShopUrls
         $this->trailingSlashSuffix      = $this->appendTrailingSlash ? '/' : '';
         $this->includeLanguage = pluginApp(SessionStorageService::class)->getLang() !== pluginApp(WebstoreConfigurationService::class)->getDefaultLanguage();
 
+        $this->home                     = pluginApp(UrlQuery::class, ['path' => '/'])->toRelativeUrl($this->includeLanguage);
         $this->basket                   = pluginApp(UrlQuery::class, ['path' => '/basket'] )->toRelativeUrl($this->includeLanguage);
         $this->cancellationForm         = pluginApp(UrlQuery::class, ['path' => '/cancellation-form'] )->toRelativeUrl($this->includeLanguage);
         $this->cancellationRights       = pluginApp(UrlQuery::class, ['path' => '/cancellation-rights'] )->toRelativeUrl($this->includeLanguage);
