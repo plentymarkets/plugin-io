@@ -1,5 +1,27 @@
 # Release Notes für IO
 
+## v2.14.0 (2018-08-21) <a href="https://github.com/plentymarkets/plugin-io/compare/2.13.0...2.14.0" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
+
+### Hinzugefügt
+
+- Kategorien wurden als Filteroptionen bei Suchergebnissen hinzugefügt.
+- Die URL der Callisto-Suche öffnet nun die Suche von Ceres.
+- Die Callisto **/Tag/-URL** leitet nun auf die Suchseite von Ceres.
+- Artikellisten und Suchergebnisse können jetzt zufällig sortiert werden.
+- Es wurde ein neuer Hook hinzugefügt, über welchen auf das Ereignis Plugin-Bau reagiert werden kann. Dadurch wird die Invalidierung des Content Caches für das gebaute Plugin-Set ermöglicht.
+
+### Geändert
+
+- Die Livesuche im Header und die Suchseite wurden aneinander angepasst, sodass sie nun die gleichen Suchergebnisse liefern.
+
+### Behoben
+
+- Es kam zu Fehlern wenn Artikel in den Warenkorb bewegt wurden, wenn dabei Artikelpakete durch Basisartikel ersetzt werden sollten. Dies wurde behoben.
+- Durch einen Fehler konnten Währungen gesetzt werden, die nicht in der Ceres-Konfiguration erlaubt waren. Dies wurde behoben.
+- Ein Fehler wurde behoben, durch den keine aussagekräftige Fehlermeldung ausgegeben wurde, wenn man versucht hat, einen Artikel ohne Warenbestand in den Warenkorb zu legen.
+- Durch einen Fehler wurden Artikel mit mehr als einem konfigurierten Preis nicht angezeigt, wenn die Mindestbestellmenge am Artikel gepflegt war.
+- In Callisto Shops mit eingebundenem Ceres Checkout kam es bei Auftragsanlagen, die Artikel mit Live-Shopping-Preisen beinhalteten, zu Fehlern. Dieses Verhalten wurde behoben.
+
 ## v2.13.0 (2018-07-30) <a href="https://github.com/plentymarkets/plugin-io/compare/2.12.0...2.13.0" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
 
 ### Hinzugefügt
