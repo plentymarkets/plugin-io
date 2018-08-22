@@ -4,7 +4,9 @@ namespace IO\Services;
 
 use IO\Constants\CrossSellingType;
 use IO\Constants\SessionStorageKeys;
+use IO\Services\ItemSearch\Helper\SortingHelper;
 use IO\Services\SessionStorageService;
+use Plenty\Modules\Cloud\ElasticSearch\Lib\ElasticSearch;
 
 /**
  * Class ItemCrossSellingService
@@ -44,5 +46,27 @@ class ItemCrossSellingService
         }
         
         return CrossSellingType::SIMILAR;
+    }
+    
+    public function setSorting($sorting)
+    {
+        if(!strlen($sorting))
+        {
+            $sorting = 'texts.'.SortingHelper::getUsedItemName().'_'.ElasticSearch::SORTING_ORDER_ASC;
+        }
+
+        $this->sessionStorage->setSessionValue(SessionStorageKeys::CROSS_SELLING_SORTING, $sorting);
+    }
+    
+    public function getSorting()
+    {
+        $sorting = $this->sessionStorage->getSessionValue(SessionStorageKeys::CROSS_SELLING_SORTING);
+        
+        if(is_null($sorting) || !strlen($sorting))
+        {
+            $sorting = 'texts.'.SortingHelper::getUsedItemName().'_'.ElasticSearch::SORTING_ORDER_ASC;
+        }
+        
+        return $sorting;
     }
 }

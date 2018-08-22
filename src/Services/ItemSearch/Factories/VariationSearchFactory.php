@@ -429,7 +429,7 @@ class VariationSearchFactory extends BaseSearchFactory
      *
      * @return $this
      */
-    public function hasSearchString( $query, $lang = null, $searchType = ElasticSearch::SEARCH_TYPE_FUZZY, $operator = ElasticSearch::OR_OPERATOR )
+    public function hasSearchString( $query, $lang = null, $searchType = ElasticSearch::SEARCH_TYPE_EXACT, $operator = ElasticSearch::OR_OPERATOR )
     {
         if ( $lang === null )
         {
@@ -440,7 +440,7 @@ class VariationSearchFactory extends BaseSearchFactory
             && $searchType !== ElasticSearch::SEARCH_TYPE_AUTOCOMPLETE
             && $searchType !== ElasticSearch::SEARCH_TYPE_EXACT )
         {
-            $searchType = ElasticSearch::SEARCH_TYPE_FUZZY;
+            $searchType = ElasticSearch::SEARCH_TYPE_EXACT;
         }
 
         if ( $operator !== ElasticSearch::OR_OPERATOR && $operator !== ElasticSearch::AND_OPERATOR )
