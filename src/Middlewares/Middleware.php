@@ -4,6 +4,7 @@ namespace IO\Middlewares;
 
 use IO\Api\ResponseCode;
 use IO\Services\WebstoreConfigurationService;
+
 use Plenty\Plugin\ConfigRepository;
 use Plenty\Plugin\Http\Request;
 use Plenty\Plugin\Http\Response;
@@ -12,12 +13,21 @@ use IO\Controllers\StaticPagesController;
 use IO\Services\CheckoutService;
 use IO\Services\LocalizationService;
 use IO\Services\SessionStorageService;
+use Plenty\Modules\Authentication\Contracts\ContactAuthenticationRepositoryContract;
 use IO\Guards\AuthGuard;
 
 class Middleware extends \Plenty\Plugin\Middleware
 {
     public function before(Request $request)
     {
+        $loginToken = $request->get('token', '');
+        if(strlen($loginToken))
+        {
+            /** @var ContactAuthenticationRepositoryContract $authRepo */
+            $authRepo = pluginApp(ContactAuthenticationRepositoryContract::class);
+            $authRepo->authenticateWithToken($loginToken);
+        }
+        
         $splittedURL     = explode('/', $request->get('plentyMarkets'));
         $lang            = $splittedURL[0];
         $webstoreService = pluginApp(WebstoreConfigurationService::class);
