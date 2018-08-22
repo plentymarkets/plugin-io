@@ -34,8 +34,7 @@ class ItemSearchResource extends ApiResource
     public function index():Response
     {
         $searchString = $this->request->get('query', '');
-        $template = $this->request->get('template', '');
-        
+
         if(strlen($searchString))
         {
             $itemListOptions = [

@@ -30,6 +30,7 @@ use Plenty\Modules\Item\Search\Filter\TagFilter;
 use Plenty\Modules\Item\Search\Filter\TextFilter;
 use Plenty\Modules\Item\Search\Filter\VariationBaseFilter;
 use Plenty\Modules\Item\Search\Helper\SearchHelper;
+use Plenty\Modules\Item\Search\Mutators\ImageDomainMutator;
 use Plenty\Modules\Item\Search\Mutators\ImageMutator;
 use Plenty\Modules\Item\Search\Mutators\VariationPropertyGroupMutator;
 use Plenty\Plugin\Application;
@@ -389,11 +390,7 @@ class VariationSearchFactory extends BaseSearchFactory
         {
             $facetValues = explode(",", $facetValues );
         }
-
-        $facetValues = array_map(function($facetValue) {
-            return (int) $facetValue;
-        }, $facetValues);
-
+        
         /** @var SearchHelper $searchHelper */
         $searchHelper = pluginApp( SearchHelper::class, [$facetValues, $clientId, 'item', $lang] );
         $this->withFilter( $searchHelper->getFacetFilter() );
@@ -432,7 +429,7 @@ class VariationSearchFactory extends BaseSearchFactory
      *
      * @return $this
      */
-    public function hasSearchString( $query, $lang = null, $searchType = ElasticSearch::SEARCH_TYPE_FUZZY, $operator = ElasticSearch::OR_OPERATOR )
+    public function hasSearchString( $query, $lang = null, $searchType = ElasticSearch::SEARCH_TYPE_EXACT, $operator = ElasticSearch::OR_OPERATOR )
     {
         if ( $lang === null )
         {
@@ -443,7 +440,7 @@ class VariationSearchFactory extends BaseSearchFactory
             && $searchType !== ElasticSearch::SEARCH_TYPE_AUTOCOMPLETE
             && $searchType !== ElasticSearch::SEARCH_TYPE_EXACT )
         {
-            $searchType = ElasticSearch::SEARCH_TYPE_FUZZY;
+            $searchType = ElasticSearch::SEARCH_TYPE_EXACT;
         }
 
         if ( $operator !== ElasticSearch::OR_OPERATOR && $operator !== ElasticSearch::AND_OPERATOR )
@@ -519,6 +516,11 @@ class VariationSearchFactory extends BaseSearchFactory
         $imageMutator = pluginApp(ImageMutator::class);
         $imageMutator->addClient( $clientId );
         $this->withMutator( $imageMutator );
+        
+        /** @var ImageDomainMutator $imageDomainMutator */
+        $imageDomainMutator = pluginApp(ImageDomainMutator::class);
+        $imageDomainMutator->setClient($clientId);
+        $this->withMutator($imageDomainMutator);
 
         return $this;
     }

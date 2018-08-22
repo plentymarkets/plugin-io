@@ -352,7 +352,8 @@ class CustomerService
 	public function createContact(array $contactData)
 	{
 	    $contact = null;
-	    $contactData['checkForExistingEmail'] = true;
+        $contactData['checkForExistingEmail'] = true;
+        $contactData['lang'] = $this->sessionStorage->getLang();
 	    
 	    try
         {
@@ -406,7 +407,7 @@ class CustomerService
     {
         /** @var WebstoreConfigurationService $webstoreConfigService */
         $webstoreConfigService = pluginApp(WebstoreConfigurationService::class);
-        return $webstoreConfigService->getWebstoreConfig()->defaultCustomerClassId;
+        return $webstoreConfigService->getWebstoreConfig()->defaultCustomerClassId ?? 0;
     }
 
     /**
