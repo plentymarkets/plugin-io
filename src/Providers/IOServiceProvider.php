@@ -3,6 +3,7 @@
 namespace IO\Providers;
 
 use IO\Extensions\ContentCache\IOAfterBuildPlugins;
+use IO\Extensions\Facets\CategoryFacet;
 use IO\Extensions\Mail\IOSendMail;
 use IO\Extensions\Sitemap\IOSitemapPattern;
 use IO\Extensions\TwigIOExtension;
@@ -152,6 +153,10 @@ class IOServiceProvider extends ServiceProvider
         $dispatcher->listen(LoadSitemapPattern::class, IOSitemapPattern::class);
         $dispatcher->listen(PluginSendMail::class, IOSendMail::class);
         $dispatcher->listen(AfterBuildPlugins::class, IOAfterBuildPlugins::class);
+    
+        $dispatcher->listen('IO.initFacetExtensions', function (FacetExtensionContainer $facetExtensionContainer) {
+            $facetExtensionContainer->addFacetExtension(pluginApp(CategoryFacet::class));
+        });
     }
 
     private function registerSingletons( $classes )
