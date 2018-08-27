@@ -29,6 +29,7 @@ use Plenty\Modules\Item\Search\Filter\SearchFilter;
 use Plenty\Modules\Item\Search\Filter\TagFilter;
 use Plenty\Modules\Item\Search\Filter\TextFilter;
 use Plenty\Modules\Item\Search\Filter\VariationBaseFilter;
+use Plenty\Modules\Item\Search\Filter\PropertyFilter;
 use Plenty\Modules\Item\Search\Helper\SearchHelper;
 use Plenty\Modules\Item\Search\Mutators\ImageDomainMutator;
 use Plenty\Modules\Item\Search\Mutators\ImageMutator;
@@ -117,6 +118,51 @@ class VariationSearchFactory extends BaseSearchFactory
         /** @var VariationBaseFilter $variationFilter */
         $variationFilter = $this->createFilter( VariationBaseFilter::class );
         $variationFilter->hasIds( $variationIds );
+        return $this;
+    }
+
+    /**
+     * Filter variations by multiple availability ids.
+     *
+     * @param int[]   $availabilityIds    List of availability ids to filter by.
+     *
+     * @return $this
+     */
+    public function hasAtLeastOneAvailability( $availabilityIds )
+    {
+        /** @var VariationBaseFilter $variationFilter */
+        $variationFilter = $this->createFilter( VariationBaseFilter::class );
+        $variationFilter->hasAtLeastOneAvailability( $availabilityIds );
+        return $this;
+    }
+
+    /**
+     * Filter variations by multiple availability ids.
+     *
+     * @param int     $supplierId     The supplier id to filter by.
+     *
+     * @return $this
+     */
+    public function hasSupplier( $supplierId )
+    {
+        /** @var VariationBaseFilter $variationFilter */
+        $variationFilter = $this->createFilter( VariationBaseFilter::class );
+        $variationFilter->hasSupplier( $supplierId );
+        return $this;
+    }
+
+    /**
+     * Filter variations by multiple property ids.
+     *
+     * @param int[]     $propertyIds     The property ids to filter by.
+     *
+     * @return $this
+     */
+    public function hasEachProperty( $propertyIds )
+    {
+        /** @var PropertyFilter $propertyFilter */
+        $propertyFilter = $this->createFilter( PropertyFilter::class );
+        $propertyFilter->hasEachProperty( $propertyIds );
         return $this;
     }
 
