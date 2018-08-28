@@ -35,7 +35,7 @@ class TagItems extends VariationList
         $factory = parent::getSearchFactory($options)
             ->hasAnyTag($tagIds)
             ->sortBy($sorting['path'], $sorting['order'])
-            ->groupBy('item.id');
+            ->groupByTemplateConfig();
 
         return $factory;
     }
