@@ -7,6 +7,7 @@ use IO\Helper\MemoryCache;
 use IO\Services\UrlBuilder\UrlQuery;
 use Plenty\Modules\Category\Models\Category;
 use Plenty\Modules\Category\Contracts\CategoryRepositoryContract;
+use Plenty\Modules\Category\Models\CategoryClient;
 use Plenty\Modules\Category\Models\CategoryDetails;
 use Plenty\Plugin\Application;
 use Plenty\Repositories\Models\PaginatedResult;
@@ -369,6 +370,25 @@ class CategoryService
         }
 
         return $hierarchy;
+    }
+
+    public function isVisibleForWebstore( $category, $webstoreId = null, $lang = null )
+    {
+        if ( is_null($lang) )
+        {
+            $lang = pluginApp( SessionStorageService::class )->getLang();
+        }
+
+        if ( is_null($webstoreId) )
+        {
+            /** @var WebstoreConfigurationService $webstoreService */
+            $webstoreService = pluginApp(WebstoreConfigurationService::class);
+            $webstoreId = $webstoreService->getWebstoreConfig()->webstoreId;
+        }
+
+
+        return $category->clients->where('plenty_webstore_category_link_webstore_id', $webstoreId)->first() instanceof CategoryClient
+            && $category->details->where('lang', $lang)->first() instanceof CategoryDetails;
     }
 
     public function setCurrentItem($item)
