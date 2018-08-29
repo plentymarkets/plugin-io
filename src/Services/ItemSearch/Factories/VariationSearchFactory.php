@@ -62,6 +62,19 @@ class VariationSearchFactory extends BaseSearchFactory
     }
 
     /**
+     * Filter inactive variations
+     *
+     * @return $this
+     */
+    public function isInactive()
+    {
+        /** @var VariationBaseFilter $variationFilter */
+        $variationFilter = $this->createFilter( VariationBaseFilter::class );
+        $variationFilter->isInactive();
+        return $this;
+    }
+
+    /**
      * Filter variation by a single item id
      *
      * @param int   $itemId   Item id to filter by.
