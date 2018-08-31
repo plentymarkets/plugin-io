@@ -60,7 +60,6 @@ class OrderTotalsService
                     $itemSumNet += $firstAmount->priceNet * $item->quantity;
                     break;
                 case OrderItemType::SHIPPING_COSTS:
-                    //?correct location id?
                     $locationId = $vatService->getLocationId($item->countryVatId);
                     $accountSettings = $accountRepo->getSettings($locationId);
 
