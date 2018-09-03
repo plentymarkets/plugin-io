@@ -170,7 +170,7 @@ class ItemService
 	 * @param int $variationId
 	 * @return array
 	 */
-	public function getVariation(int $variationId = 0):array
+	public function getVariation(int $variationId = 0)
 	{
 	    /** @var ItemSearchService $itemSearchService */
 	    $itemSearchService = pluginApp(ItemSearchService::class);
