@@ -218,5 +218,24 @@ class OrderBuilderQuery
 		return $this;
 	}
 
-
+    /**
+     * Add order dates to the order
+     *
+     * @param int       $orderDateType
+     * @param string    $date For example date('Y-m-d\TH:i:sP')
+     * @return OrderBuilderQuery
+     */
+    public function withOrderDate(int $orderDateType, string $date)
+    {
+        if($this->order["dates"] === null)
+        {
+            $this->order["dates"] = [];
+        }
+        $option = [
+            "typeId"    => (int)$orderDateType,
+            "date"     => $date
+        ];
+        array_push($this->order["dates"], $option);
+        return $this;
+    }
 }

@@ -20,4 +20,5 @@ class OrderType
 	const MULTI_CREDIT_ORDER = 10;
 	const REORDER            = 11;
 	const PARTIAL_DELIVERY   = 12;
+    const SUBSCRIPTION       = 14;
 }

@@ -20,34 +20,35 @@ class PriceDetectService
     private $currency = null;
     private $plentyId = null;
     private $shippingCountryId = null;
-    
+    private $subscription = null;
+
     /**
      * @var DetectSalesPriceService
      */
     private $detectSalesPriceService;
-    
+
     /**
      * @var CustomerService
      */
     private $customerService;
-    
+
     /**
      * @var Application
      */
     private $app;
-    
+
     /**
      * @var CheckoutService
      */
     private $checkoutService;
-    
+
     /**
      * @var BasketService $basketService
      */
     private $basketService;
-    
+
     private $referrerId;
-    
+
     /**
      * PriceDetectService constructor.
      * @param DetectSalesPriceService $detectSalesPriceService
@@ -56,24 +57,24 @@ class PriceDetectService
      * @param CheckoutService $checkoutService
      */
     public function __construct(DetectSalesPriceService $detectSalesPriceService,
-                                CustomerService $customerService,
-                                Application $app,
-                                CheckoutService $checkoutService,
-                                BasketService $basketService)
+        CustomerService $customerService,
+        Application $app,
+        CheckoutService $checkoutService,
+        BasketService $basketService)
     {
         $this->detectSalesPriceService = $detectSalesPriceService;
         $this->customerService = $customerService;
         $this->app = $app;
         $this->checkoutService = $checkoutService;
         $this->basketService = $basketService;
-        
+
         $this->init();
     }
-    
+
     private function init()
     {
         $contact = $this->customerService->getContact();
-        
+
         if ($contact instanceof Contact) {
             $this->singleAccess = $contact->singleAccess;
         }
@@ -83,8 +84,9 @@ class PriceDetectService
         $this->shippingCountryId = $this->checkoutService->getShippingCountryId();
         $this->plentyId          = $this->app->getPlentyId();
         $this->referrerId        = $this->basketService->getBasket()->referrerId;
+        $this->subscription      = true;
     }
-    
+
     public function getPriceIdsForCustomer()
     {
         $this->detectSalesPriceService
@@ -96,8 +98,9 @@ class PriceDetectService
             ->setOrderReferrer($this->referrerId)
             ->setPlentyId($this->plentyId)
             ->setQuantity(-1)
+            ->setHasInterval($this->subscription)
             ->setType(DetectSalesPriceService::PRICE_TYPE_DEFAULT);
-        
+
         return $this->detectSalesPriceService->detect();
     }
 }

@@ -97,10 +97,27 @@ class VariationPriceList
         {
             foreach($this->prices[$type] as $price )
             {
-                if ( $price instanceof SalesPriceSearchResponse && (float)$price->minimumOrderQuantity <= $quantity && (float)$price->minimumOrderQuantity > $minimumOrderQuantity)
+                if ( $price instanceof SalesPriceSearchResponse && (float)$price->minimumOrderQuantity <= $quantity && (float)$price->minimumOrderQuantity > $minimumOrderQuantity && $price->interval == 'none')
                 {
                     $result = $price;
                     $minimumOrderQuantity = (float)$price->minimumOrderQuantity;
+                }
+            }
+        }
+        return $result;
+    }
+
+    public function findSubscriptionPriceForQuantity(float $quantity  )
+    {
+        $result = null;
+        $minimumOrderQuantity = -1.0;
+        if ( array_key_exists( self::TYPE_DEFAULT, $this->prices ) )
+        {
+            foreach($this->prices[self::TYPE_DEFAULT] as $price )
+            {
+                if ( $price instanceof SalesPriceSearchResponse && ($price->interval != 'none' || $price->interval != null))
+                {
+                    $result[] = $price;
                 }
             }
         }
@@ -151,11 +168,13 @@ class VariationPriceList
         $defaultPrice   = $this->findPriceForQuantity( $quantity );
         $rrp            = $this->findPriceForQuantity( $quantity, self::TYPE_RRP );
         $specialOffer   = $this->findPriceForQuantity( $quantity, self::TYPE_SPECIAL_OFFER );
+        $subscriptionPrice = $this->findSubscriptionPriceForQuantity($quantity);
 
         return [
             'default'           => $this->preparePrice( $defaultPrice, $this->showNetPrice ),
             'rrp'               => $this->preparePrice( $rrp, $this->showNetPrice ),
             'specialOffer'      => $this->preparePrice( $specialOffer, $this->showNetPrice ),
+            'subscription'      => $subscriptionPrice,
             'graduatedPrices'   => $this->getGraduatedPrices( $this->showNetPrice )
         ];
     }
@@ -168,6 +187,7 @@ class VariationPriceList
         }
 
         $defaultPrice   = $this->findPriceForQuantity( $quantity );
+        $subscription   = $this->findSubscriptionPriceForQuantity( $quantity);
         $rrp            = $this->findPriceForQuantity( $quantity, self::TYPE_RRP );
         $specialOffer   = $this->findPriceForQuantity( $quantity, self::TYPE_SPECIAL_OFFER );
         $graduatedPrices= [];
@@ -196,7 +216,8 @@ class VariationPriceList
             ],
             'graduatedPrices' => $graduatedPrices,
             'rrp' => $rrp,
-            'specialOffer' => $specialOffer
+            'specialOffer' => $specialOffer,
+            'subscription' => $subscription
         ];
     }
 
@@ -268,7 +289,7 @@ class VariationPriceList
             self::TYPE_SPECIAL_OFFER
         );
 
-
+        
     }
 
     private function fetchPrices( $prices, $type )
@@ -283,6 +304,10 @@ class VariationPriceList
             {
                 $this->prices[$type][] = $price;
                 $quantities[] = $price->minimumOrderQuantity;
+            }
+            else if ($price instanceof SalesPriceSearchResponse
+                && $price->interval != 'none' || $price->interval != null){
+                $this->prices[$type][] = $price;
             }
         }
     }
