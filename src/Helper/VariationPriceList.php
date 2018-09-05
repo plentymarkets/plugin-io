@@ -26,6 +26,7 @@ class VariationPriceList
     const TYPE_DEFAULT          = 'default';
     const TYPE_RRP              = 'rrp';
     const TYPE_SPECIAL_OFFER    = 'specialOffer';
+    const TYPE_SUBSCRIPTION     = 'subscription';
 
     /** @var int $variationId */
     public $variationId = 0;
@@ -111,9 +112,9 @@ class VariationPriceList
     {
         $result = null;
         $minimumOrderQuantity = -1.0;
-        if ( array_key_exists( self::TYPE_DEFAULT, $this->prices ) )
+        if ( array_key_exists( self::TYPE_SUBSCRIPTION, $this->prices ) )
         {
-            foreach($this->prices[self::TYPE_DEFAULT] as $price )
+            foreach($this->prices[self::TYPE_SUBSCRIPTION] as $price )
             {
                 if ( $price instanceof SalesPriceSearchResponse && ($price->interval != 'none' || $price->interval != null))
                 {
@@ -289,7 +290,16 @@ class VariationPriceList
             self::TYPE_SPECIAL_OFFER
         );
 
-        
+        // check if the customer hast subscription activated
+        if(true) {
+            // search subscription prices
+            $priceSearchRequest->type = self::TYPE_SUBSCRIPTION;
+            $this->fetchPrices(
+                $priceSearchRepo->searchAll( $priceSearchRequest ),
+                self::TYPE_SUBSCRIPTION
+            );
+
+        }
     }
 
     private function fetchPrices( $prices, $type )

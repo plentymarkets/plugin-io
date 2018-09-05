@@ -20,7 +20,6 @@ class PriceDetectService
     private $currency = null;
     private $plentyId = null;
     private $shippingCountryId = null;
-    private $subscription = null;
 
     /**
      * @var DetectSalesPriceService
@@ -84,7 +83,6 @@ class PriceDetectService
         $this->shippingCountryId = $this->checkoutService->getShippingCountryId();
         $this->plentyId          = $this->app->getPlentyId();
         $this->referrerId        = $this->basketService->getBasket()->referrerId;
-        $this->subscription      = true;
     }
 
     public function getPriceIdsForCustomer()
@@ -98,9 +96,20 @@ class PriceDetectService
             ->setOrderReferrer($this->referrerId)
             ->setPlentyId($this->plentyId)
             ->setQuantity(-1)
-            ->setHasInterval($this->subscription)
             ->setType(DetectSalesPriceService::PRICE_TYPE_DEFAULT);
 
-        return $this->detectSalesPriceService->detect();
+        $priceIds = $this->detectSalesPriceService->detect();
+
+        // check if the customer hast subscription activated
+        if (true) {
+            $this->detectSalesPriceService
+                ->setType(DetectSalesPriceService::PRICE_TYPE_SUBSCRIPTION);
+
+            $subscriptionPriceIds = $this->detectSalesPriceService->detect();
+
+            $priceIds = array_merge($priceIds, $subscriptionPriceIds);
+        }
+
+        return $priceIds;
     }
 }
