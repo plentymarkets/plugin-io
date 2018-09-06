@@ -122,6 +122,11 @@ class VariationPriceList
                 }
             }
         }
+
+        usort($result, function ($item1, $item2) {
+            return $item1->priceNet <=> $item2->priceNet;
+        });
+
         return $result;
     }
 
