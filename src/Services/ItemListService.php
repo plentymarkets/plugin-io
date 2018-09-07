@@ -33,7 +33,7 @@ class ItemListService
             {
                 case self::TYPE_CATEGORY:
                     $searchFactory = CategoryItems::getSearchFactory([
-                        'categoryId' => $id,
+                        'categoryId' => is_array( $id ) ? $id[0] : $id,
                         'sorting'    => $sorting
                     ]);
                     break;
@@ -53,7 +53,7 @@ class ItemListService
                     break;
                 case self::TYPE_TAG:
                     $searchFactory = TagItems::getSearchFactory([
-                        'tagIds'    => [$id],
+                        'tagIds'    => is_array( $id ) ? $id : [$id],
                         'sorting'   => $sorting
                     ]);
                     break;
