@@ -67,6 +67,20 @@ class Middleware extends \Plenty\Plugin\Middleware
             $checkout = pluginApp(Checkout::class);
             $checkout->setBasketReferrerId($referrerId);
         }
+        
+        $authString = $request->get('authString', '');
+        $newsletterEmailId = $request->get('newsletterEmailId', 0);
+        
+        if(strlen($authString) && (int)$newsletterEmailId > 0)
+        {
+            AuthGuard::redirect('/newsletter-opt-in/'.$authString.'/'.$newsletterEmailId);
+        }
+        
+        $orderShow = $request->get('OrderShow', '');
+        if(strlen($orderShow) && $orderShow == 'CancelNewsletter')
+        {
+            AuthGuard::redirect('/newsletter-opt-out');
+        }
 
         $this->checkForCallistoSearchURL($request);
     }

@@ -58,6 +58,7 @@ class IORouteServiceProvider extends RouteServiceProvider
             $api->resource('io/customer/contact/mail', 'ContactMailResource');
             $api->resource('io/customer/bank_data', 'ContactBankResource');
             $api->resource('io/customer/order/return', 'CustomerOrderReturnResource');
+            $api->resource('io/customer/newsletter', 'CustomerNewsletterResource');
             $api->resource('io/variations', 'VariationResource');
             $api->resource('io/item/availability', 'AvailabilityResource');
             $api->resource('io/item/condition', 'ItemConditionResource');
@@ -199,9 +200,14 @@ class IORouteServiceProvider extends RouteServiceProvider
             $router->get('order-property-file/{hash1}/{hash2}/{filename}', 'IO\Controllers\OrderPropertyFileController@downloadFile');
         }
         
-		/*
-		 * ITEM ROUTES
-		 */
+        //TODO config
+        $router->get('newsletter-opt-in/{authString}/{newsletterEmailId}', 'IO\Controllers\NewsletterOptInController@showOptInConfirmation');
+        $router->get('newsletter-opt-out', 'IO\Controllers\NewsletterOptOutController@showOptOut');
+        $router->get('newsletter-opt-out-confirmation', 'IO\Controllers\NewsletterOptOutConfirmationController@showOptOutConfirmation');
+        
+        /*
+         * ITEM ROUTES
+         */
         if ( in_array("item", $enabledRoutes) || in_array("all", $enabledRoutes) )
         {
             $router->get('{itemId}_{variationId?}', 'IO\Controllers\ItemController@showItemWithoutName')
