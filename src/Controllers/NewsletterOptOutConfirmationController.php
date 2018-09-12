@@ -22,7 +22,7 @@ class NewsletterOptOutConfirmationController extends LayoutController
         
         /** @var NotificationService $notificationService */
         $notificationService = pluginApp(NotificationService::class);
-        $notificationService->addNotificationCode(LogLevel::SUCCESS, 2);
+        $notificationService->addNotificationCode(LogLevel::SUCCESS, 7);
         
         return pluginApp(Response::class)->redirectTo('/');
     }

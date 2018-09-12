@@ -20,7 +20,19 @@ class CustomerNewsletterService
     {
         if(strlen($email))
         {
-            $this->newsletterRepo->addToNewsletterList($email, $firstName, $lastName);
+            /** @var AuthHelper $authHelper */
+            $authHelper = pluginApp(AuthHelper::class);
+            $newsletterRepo = $this->newsletterRepo;
+    
+            $recipientData = $authHelper->processUnguarded( function() use ($email, $newsletterRepo)
+            {
+                return $newsletterRepo->listRecipients(['*'], 1, 1, ['email' => $email], [])->getResult()->first();
+            });
+            
+            if(!$recipientData instanceof Recipient && !($recipientData instanceof Recipient && $recipientData->email == $email))
+            {
+                $this->newsletterRepo->addToNewsletterList($email, $firstName, $lastName);
+            }
         }
     }
     
