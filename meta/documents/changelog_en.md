@@ -1,5 +1,12 @@
 # Release Notes for IO
 
+## v2.15.0 (2018-09-12) <a href="https://github.com/plentymarkets/plugin-io/compare/2.14.0...2.15.0" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
+
+### Fixed
+
+- The login URL stored at the level of the customer now also works in Ceres.
+- Due to an error the option **Domestic and EU only** of the setting **Show VAT for the shipping costs on the invoice** was not interpreted correctly. This has been fixed.
+
 ## v2.14.0 (2018-08-28) <a href="https://github.com/plentymarkets/plugin-io/compare/2.13.0...2.14.0" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
 
 ### Added
