@@ -7,7 +7,7 @@
       "utility/plugin_helper.php"
     ],
     "psr-4": {
-      "IO": "src/"
+      "IO\\": "src/"
     }
   },
   "autoload-dev": {
