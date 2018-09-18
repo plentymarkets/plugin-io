@@ -113,9 +113,9 @@ class OrderItemBuilder
             "amounts"       => [
                 [
                     "currency"           => $this->checkoutService->getCurrency(),
-					"priceOriginalGross" => $paymentFee
-				]
-			]
+                    "priceOriginalGross" => $paymentFee
+                ]
+            ]
         ];
         array_push($orderItems, $paymentSurcharge);
 
@@ -153,8 +153,12 @@ class OrderItemBuilder
             }
         }
 
-        if($basketItem['price'] == $basketItem['variation']['data']['prices']['specialOffer']['data']['basePrice' ] ||
+        if(isset($basketItem['price'], $basketItem['variation']['data']['prices']['subscription']) &&
             $this->checkSubscriptionPrice($basketItem['price'], $basketItem['variation']['data']['prices']['subscription']))
+        {
+            $priceOriginal = $basketItem['price'];
+        }
+        else if($basketItem['price'] == $basketItem['variation']['data']['prices']['specialOffer']['data']['basePrice' ])
         {
             $priceOriginal = $basketItem['price'];
         }
@@ -198,9 +202,9 @@ class OrderItemBuilder
                     "priceOriginalGross"    => $priceOriginal,
                     "surcharge"             => $attributeTotalMarkup,
                     "discount"	            => $rebate,
-					"isPercentage"          => true
-				]
-			]
+                    "isPercentage"          => true
+                ]
+            ]
         ];
     }
 
