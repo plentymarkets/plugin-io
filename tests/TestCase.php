@@ -1,6 +1,6 @@
 <?php
 
-namespace Plenty\Modules\Plugin\Tests;
+namespace IO\Tests;
 
 use Tests\BrowserKitTestCase;
 

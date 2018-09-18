@@ -13,8 +13,8 @@
         <testsuite name="unit">
             <directory>./tests/Unit</directory>
         </testsuite>
-        <testsuite name="integration">
-            <directory>./tests/Integration</directory>
+        <testsuite name="feature">
+            <directory>./tests/Feature</directory>
         </testsuite>
         <testsuite name="rest">
             <directory>./tests/Rest</directory>
