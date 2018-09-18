@@ -7,7 +7,7 @@ use Tests\BrowserKitTestCase;
 /**
  * Class TestCase
  */
-class TestCase extends BrowserKitTestCase
+abstract class TestCase extends BrowserKitTestCase
 {
     protected function setUp()
 	{
