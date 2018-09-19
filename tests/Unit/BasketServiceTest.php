@@ -18,7 +18,7 @@ class BasketServiceTest extends TestCase
     protected function setUp()
     {
         parent::setUp();
-        $this->basketService = pluginApp(BasketService::class);
+        $this->basketService = app(BasketService::class);
     }
 
     /** @test */
