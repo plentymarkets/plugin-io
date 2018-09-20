@@ -49,7 +49,7 @@ class SubscriptionService
      * @param string $date Date must be valid w3c formated date time string
      * @return \Plenty\Modules\Order\Models\Order
      */
-    public function setEndDate(int $orderId, string $date)
+    public function setEndDate(int $orderId, string $date = null)
     {
         return $this->orderRepository->updateOrder([
             'dates' => [
