@@ -200,10 +200,16 @@ class IORouteServiceProvider extends RouteServiceProvider
             $router->get('order-property-file/{hash1}/{hash2}/{filename}', 'IO\Controllers\OrderPropertyFileController@downloadFile');
         }
         
-        //TODO config
-        $router->get('newsletter-opt-in/{authString}/{newsletterEmailId}', 'IO\Controllers\NewsletterOptInController@showOptInConfirmation');
-        $router->get('newsletter-opt-out', 'IO\Controllers\NewsletterOptOutController@showOptOut');
-        $router->get('newsletter-opt-out-confirmation', 'IO\Controllers\NewsletterOptOutConfirmationController@showOptOutConfirmation');
+        if( in_array("newsletter-opt-in", $enabledRoutes) || in_array("all", $enabledRoutes) )
+        {
+            $router->get('newsletter/subscribe/{authString}/{newsletterEmailId}', 'IO\Controllers\NewsletterOptInController@showOptInConfirmation');
+        }
+        
+        if( in_array("newsletter-opt-out", $enabledRoutes) || in_array("all", $enabledRoutes) )
+        {
+            $router->get('newsletter/unsubscribe', 'IO\Controllers\NewsletterOptOutController@showOptOut');
+            $router->post('newsletter/unsubscribe', 'IO\Controllers\NewsletterOptOutConfirmationController@showOptOutConfirmation');
+        }
         
         /*
          * ITEM ROUTES

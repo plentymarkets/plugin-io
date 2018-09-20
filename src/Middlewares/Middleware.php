@@ -73,13 +73,13 @@ class Middleware extends \Plenty\Plugin\Middleware
         
         if(strlen($authString) && (int)$newsletterEmailId > 0)
         {
-            AuthGuard::redirect('/newsletter-opt-in/'.$authString.'/'.$newsletterEmailId);
+            AuthGuard::redirect('/newsletter/subscribe/'.$authString.'/'.$newsletterEmailId);
         }
         
         $orderShow = $request->get('OrderShow', '');
         if(strlen($orderShow) && $orderShow == 'CancelNewsletter')
         {
-            AuthGuard::redirect('/newsletter-opt-out');
+            AuthGuard::redirect('/newsletter/unsubscribe');
         }
 
         $this->checkForCallistoSearchURL($request);

@@ -2,7 +2,10 @@
 
 namespace IO\Controllers;
 
+use IO\Constants\LogLevel;
 use IO\Services\CustomerNewsletterService;
+use IO\Services\NotificationService;
+use Plenty\Plugin\Http\Response;
 
 class NewsletterOptInController extends LayoutController
 {
@@ -14,11 +17,11 @@ class NewsletterOptInController extends LayoutController
         
         if($success)
         {
-            return $this->renderTemplate(
-                'tpl.newsletter.opt-in',
-                ['data' => ''],
-                false
-            );
+            /** @var NotificationService $notificationService */
+            $notificationService = pluginApp(NotificationService::class);
+            $notificationService->addNotificationCode(LogLevel::SUCCESS, 8);
+    
+            return pluginApp(Response::class)->redirectTo('/');
         }
     
         return $this->renderTemplate(
