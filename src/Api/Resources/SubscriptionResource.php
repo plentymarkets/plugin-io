@@ -30,7 +30,20 @@ class SubscriptionResource extends ApiResource
     }
 
     /**
-     * Update an order
+     * Set the end date for a subscription order
+     *
+     * @param string $orderId
+     * @return \Plenty\Plugin\Http\Response
+     */
+    public function update(string $orderId): Response
+    {
+        $orderId = (int) $orderId;
+        $order   = pluginApp(SubscriptionService::class)->setEndDate($orderId);
+        return $this->response->create($order, ResponseCode::OK);
+    }
+
+    /**
+     * Set the cancelled on date for a subscription order
      *
      * @param string $orderId
      * @return \Plenty\Plugin\Http\Response
