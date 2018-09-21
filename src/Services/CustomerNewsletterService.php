@@ -2,6 +2,7 @@
 
 namespace IO\Services;
 
+use Illuminate\Http\Request;
 use Plenty\Modules\Account\Newsletter\Contracts\NewsletterRepositoryContract;
 use Plenty\Modules\Account\Newsletter\Models\Recipient;
 use Plenty\Modules\Authorization\Services\AuthHelper;
@@ -68,17 +69,24 @@ class CustomerNewsletterService
         $authHelper = pluginApp(AuthHelper::class);
         $newsletterRepo = $this->newsletterRepo;
         
-        $recipientData = $authHelper->processUnguarded( function() use ($email, $newsletterRepo)
+        $recipientList = $authHelper->processUnguarded( function() use ($email, $newsletterRepo)
         {
-            return $newsletterRepo->listRecipients(['*'], 1, 1, ['email' => $email], [])->getResult()->first();
+            return $newsletterRepo->listRecipients(['*'], 1, 100, ['email' => $email], [])->getResult();
         });
     
-        if($recipientData instanceof Recipient)
+        if(count($recipientList))
         {
-            $authHelper->processUnguarded( function() use ($recipientData, $newsletterRepo)
+            foreach($recipientList as $recipientData)
             {
-                return $this->newsletterRepo->deleteRecipientById($recipientData->id);
-            });
+                if($recipientData instanceof Recipient)
+                {
+                    $authHelper->processUnguarded( function() use ($recipientData, $newsletterRepo)
+                    {
+                        return $this->newsletterRepo->deleteRecipientById($recipientData->id);
+                    });
+                }
+            }
         }
+        
     }
 }
