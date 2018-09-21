@@ -1,10 +1,5 @@
 <?php
 
-	function pluginApp(string $abstract, array $parameters = [])
-	{
-        return app($abstract, $parameters);
-	}
-
 require_once __DIR__ . '/../vendor/autoload.php';
 
 $dotenv = new Dotenv\Dotenv(__DIR__ . '/../');
