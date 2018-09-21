@@ -472,12 +472,15 @@ class OrderService
             unset($order['dates']);
             unset($order['lockStatus']);
 
-            $createdReturn = $this->orderRepository->createOrder($order);
-
             if(!is_null($returnNote) && strlen($returnNote))
             {
-                $this->saveOrderContactWish($createdReturn->id, $returnNote);
+                $order["comments"][] = [
+                    "isVisibleForContact" => true,
+                    "text"                => $returnNote
+                ];
             }
+
+            $createdReturn = $this->orderRepository->createOrder($order);
 
             return $createdReturn;
         }
