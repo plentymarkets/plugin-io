@@ -142,19 +142,6 @@ class OrderService
 
         return LocalizedOrder::wrap( $order, $this->sessionStorage->getLang() );
 	}
-	
-	private function saveOrderContactWish($orderId, $text = '')
-    {
-        if(!is_null($text) && strlen($text))
-        {
-            /**
-             * @var ContactWishRepositoryContract $contactWishRepo
-             */
-            $contactWishRepo = pluginApp(ContactWishRepositoryContract::class);
-            $contactWishRepo->createContactWish($orderId, nl2br($text));
-            $this->sessionStorage->setSessionValue(SessionStorageKeys::ORDER_CONTACT_WISH, null);
-        }
-    }
 
     /**
      * Execute the payment for a given order.
