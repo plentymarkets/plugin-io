@@ -3,9 +3,6 @@
   "description": "Plugin IO",
   "type": "library",
   "autoload": {
-   "files": [
-      "utility/test_helper.php"
-    ],
     "psr-4": {
       "IO\\": "src/"
     }

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <phpunit backupGlobals="false"
          backupStaticAttributes="false"
+         bootstrap="tests/autoload.php"
          colors="true"
          convertErrorsToExceptions="true"
          convertNoticesToExceptions="true"
@@ -20,7 +21,7 @@
         </testsuite>
     </testsuites>
     <php>
-        <env name="APP_ENV" value="production"/>
+        <env name="APP_ENV" value="testing"/>
         <env name="CACHE_DRIVER" value="array"/>
         <env name="DB_CONNECTION" value="mysql-test"/>
         <env name="SESSION_DRIVER" value="array"/>
