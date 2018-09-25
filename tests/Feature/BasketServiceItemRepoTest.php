@@ -2,6 +2,7 @@
 
 namespace IO\Tests\Feature;
 
+use IO\Factories\Item\VariationBaseFactory;
 use IO\Services\ItemSearch\Services\ItemSearchService;
 use Mockery;
 use IO\Tests\TestCase;
@@ -37,7 +38,7 @@ class BasketServiceItemRepoTest extends TestCase
     {
         //Fake Items
 
-        $baseFactory = factory(BaseFactory::class)->create();
+        $baseFactory = factory(VariationBaseFactory::class)->create();
 
         $item1 = ['variationId' => 1037, 'quantity' => 1, 'template' => 'test'];
 
