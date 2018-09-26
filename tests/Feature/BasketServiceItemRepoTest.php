@@ -31,7 +31,7 @@ class BasketServiceItemRepoTest extends TestCase
     public function it_adds_an_item_to_the_basket()
     {
         $variation = $this->variations[0];
-        $item1 = ['variationId' => $variation['id'], 'quantity' => 1, 'template' => ''];
+        $item1 = ['variationId' => $variation['id'], 'quantity' => 1, 'template' => '', 'referrerId' => 1];
 
         $result = $this->basketService->addBasketItem($item1);
 
@@ -44,7 +44,7 @@ class BasketServiceItemRepoTest extends TestCase
     public function it_updates_an_item_in_the_basket()
     {
         $variation = $this->variations[0];
-        $item1 = ['variationId' => $variation['id'], 'quantity' => 1, 'template' => ''];
+        $item1 = ['variationId' => $variation['id'], 'quantity' => 1, 'template' => '', 'referrerId' => 1];
 
         $this->basketService->addBasketItem($item1);
         $result = $this->basketService->addBasketItem($item1);
@@ -58,7 +58,7 @@ class BasketServiceItemRepoTest extends TestCase
     public function it_removes_an_item_from_the_basket()
     {
         $variation = $this->variations[0];
-        $item1 = ['variationId' => $variation['id'], 'quantity' => 1, 'template' => ''];
+        $item1 = ['variationId' => $variation['id'], 'quantity' => 1, 'template' => '', 'referrerId' => 1];
 
         $basketItems = $this->basketService->addBasketItem($item1);
         $result = $this->basketService->deleteBasketItem($basketItems['data'][0]['id']);
