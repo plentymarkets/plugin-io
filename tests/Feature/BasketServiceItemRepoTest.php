@@ -6,6 +6,10 @@ use IO\Services\ItemSearch\Services\ItemSearchService;
 use Mockery;
 use IO\Tests\TestCase;
 use IO\Services\BasketService;
+use Plenty\Legacy\Repositories\ItemDataLayerRepository;
+use Plenty\Modules\Item\DataLayer\Contracts\ItemDataLayerRepositoryContract;
+use Plenty\Modules\Item\Variation\Models\Variation;
+use Plenty\Modules\Item\VariationStock\Models\VariationStock;
 
 /**
  * User: mklaes
@@ -15,14 +19,22 @@ class BasketServiceItemRepoTest extends TestCase
 {
     /** @var BasketService $basketService  */
     protected $basketService;
-    protected $variations = [];
+    protected $variation;
+    protected $variationStock;
 
     protected function setUp()
     {
         parent::setUp();
 
+
+        app()->instance(ItemDataLayerRepositoryContract::class, Mockery::mock(ItemDataLayerRepositoryContract::class));
+
         $this->basketService = pluginApp(BasketService::class);
-        $variations[] = factory(VariationBaseFactory::class)->create();
+        $this->variation = factory(Variation::class)->create();
+        $this->variationStock = factory(VariationStock::class)->make([
+           'varationId' => $this->variation->id,
+           'warehouseId' => $this->variation->mainWarehouseId
+        ]);
 
         // set referrer id in session
     }
@@ -30,7 +42,7 @@ class BasketServiceItemRepoTest extends TestCase
     /** @test */
     public function it_adds_an_item_to_the_basket()
     {
-        $variation = $this->variations[0];
+        $variation = $this->variation;
         $item1 = ['variationId' => $variation['id'], 'quantity' => 1, 'template' => '', 'referrerId' => 1];
 
         $result = $this->basketService->addBasketItem($item1);
