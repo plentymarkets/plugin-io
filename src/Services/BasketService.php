@@ -201,7 +201,7 @@ class BasketService
         $result = array();
 
         $basketItems    = $this->getBasketItemsRaw();
-        $basketItemData = $this->getBaskeatItemData($basketItems, $template);
+        $basketItemData = $this->getBasketItemData($basketItems, $template);
 
         foreach ($basketItems as $basketItem) {
             array_push(
