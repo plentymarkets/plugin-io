@@ -8,6 +8,8 @@ use IO\Services\BasketService;
 use Plenty\Modules\Basket\Exceptions\BasketItemCheckException;
 use Plenty\Modules\Basket\Repositories\BasketItemRepository;
 
+use Plenty\Modules\Basket\Models\BasketItem;
+
 /**
  * User: mklaes
  * Date: 08.08.18
@@ -31,11 +33,16 @@ class BasketServiceTest extends TestCase
         $this->basketService = pluginApp(BasketService::class);
 
 
+
+
     }
 
     /** @test */
     public function it_throw_the_basket_item_check_exception()
     {
+
+        $basketItem = factory(BasketItem::class)->make();
+
 
         //Fake Item
         $item1 = ['variationId' => 1, 'quantity' => 1, 'template' => 'test'];
@@ -44,7 +51,7 @@ class BasketServiceTest extends TestCase
 
         $this->basketItemRepositoryMock->shouldReceive('findExistingOneByData')
             ->once()
-            ->andReturn(null);
+            ->andReturn($basketItem);
 
         $this->basketItemRepositoryMock->shouldReceive('addBasketItem')
             ->andThrow($basketItemCheckException);

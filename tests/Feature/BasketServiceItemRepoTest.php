@@ -2,7 +2,6 @@
 
 namespace IO\Tests\Feature;
 
-use IO\Factories\Item\VariationBaseFactory;
 use IO\Services\ItemSearch\Services\ItemSearchService;
 use Mockery;
 use IO\Tests\TestCase;
