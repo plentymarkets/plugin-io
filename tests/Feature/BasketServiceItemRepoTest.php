@@ -14,54 +14,58 @@ use IO\Services\BasketService;
  */
 class BasketServiceItemRepoTest extends TestCase
 {
-
     /** @var BasketService $basketService  */
     protected $basketService;
-    /** @var ItemSearchService */
-    protected $itemSearchServiceMock;
+    protected $variations = [];
 
     protected function setUp()
     {
         parent::setUp();
 
-        $this->itemSearchServiceMock = Mockery::mock(ItemSearchService::class);
-        app()->instance(ItemSearchService::class, $this->itemSearchServiceMock);
-
-
         $this->basketService = pluginApp(BasketService::class);
+        $variations[] = factory(VariationBaseFactory::class)->create();
 
-
+        // set referrer id in session
     }
 
     /** @test */
-    public function it_fills_the_basket_with_items_and_check_it()
+    public function it_adds_an_item_to_the_basket()
     {
-        //Fake Items
+        $variation = $this->variations[0];
+        $item1 = ['variationId' => $variation['id'], 'quantity' => 1, 'template' => ''];
 
-        $baseFactory = factory(VariationBaseFactory::class)->create();
+        $result = $this->basketService->addBasketItem($item1);
 
-        $item1 = ['variationId' => 1037, 'quantity' => 1, 'template' => 'test'];
-
-
-
-        //never called yet
-        $this->itemSearchServiceMock->shouldReceive('getResults')
-            ->with()
-            ->andReturn(
-                ['documents' =>
-                    ['data' =>
-                        ['variation' => [
-                            'id' => 1
-                        ]]
-                    ]
-                ]);
-
-
-        $this->basketService->addBasketItem($item1);
-//        $this->basketService->getBasketItems();
+        $this->assertEquals($variation['id'], $result['data'][0]['variation']['id']);
+        $this->assertEquals(1, $result['data']['quantity']);
+        $this->assertCount(1, $result['data']);
     }
 
+    /** @test */
+    public function it_updates_an_item_in_the_basket()
+    {
+        $variation = $this->variations[0];
+        $item1 = ['variationId' => $variation['id'], 'quantity' => 1, 'template' => ''];
 
+        $this->basketService->addBasketItem($item1);
+        $result = $this->basketService->addBasketItem($item1);
+
+        $this->assertEquals($variation['id'], $result['data'][0]['variation']['id']);
+        $this->assertEquals(2, $result['data']['quantity']);
+        $this->assertCount(1, $result['data']);
+    }
+
+    /** @test */
+    public function it_removes_an_item_from_the_basket()
+    {
+        $variation = $this->variations[0];
+        $item1 = ['variationId' => $variation['id'], 'quantity' => 1, 'template' => ''];
+
+        $basketItems = $this->basketService->addBasketItem($item1);
+        $result = $this->basketService->deleteBasketItem($basketItems['data'][0]['id']);
+
+        $this->assertEmpty($result['data']);
+    }
 
 
 }
