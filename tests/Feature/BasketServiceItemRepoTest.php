@@ -22,12 +22,14 @@ class BasketServiceItemRepoTest extends TestCase
     protected $variation;
     protected $variationStock;
 
+    protected $itemDataLayerRepoMock;
+
     protected function setUp()
     {
         parent::setUp();
 
-
-        app()->instance(ItemDataLayerRepositoryContract::class, Mockery::mock(ItemDataLayerRepositoryContract::class));
+        // $this->itemDataLayerRepoMock = Mockery::mock(ItemDataLayerRepositoryContract::class);
+        // $this->app->instance(ItemDataLayerRepositoryContract::class , $this->itemDataLayerRepoMock);
 
         $this->basketService = pluginApp(BasketService::class);
         $this->variation = factory(Variation::class)->create();
@@ -46,6 +48,8 @@ class BasketServiceItemRepoTest extends TestCase
         $item1 = ['variationId' => $variation['id'], 'quantity' => 1, 'template' => '', 'referrerId' => 1];
 
         $result = $this->basketService->addBasketItem($item1);
+
+        dd($result);
 
         $this->assertEquals($variation['id'], $result['data'][0]['variation']['id']);
         $this->assertEquals(1, $result['data']['quantity']);
