@@ -54,7 +54,6 @@ class BasketServiceTest extends TestCase
             ->andReturn($basketItem);
 
         $this->basketItemRepositoryMock->shouldReceive('addBasketItem')
-            ->any()
             ->andThrow($basketItemCheckException);
 
         $error = $this->basketService->addBasketItem($item1);
@@ -77,7 +76,6 @@ class BasketServiceTest extends TestCase
             ->andReturn(null);
 
         $this->basketItemRepositoryMock->shouldReceive('addBasketItem')
-            ->any()
             ->andThrow($exception);
 
         $error = $this->basketService->addBasketItem($item1);
