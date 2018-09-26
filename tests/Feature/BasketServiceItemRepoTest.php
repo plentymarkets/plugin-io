@@ -32,10 +32,13 @@ class BasketServiceItemRepoTest extends TestCase
         // $this->app->instance(ItemDataLayerRepositoryContract::class , $this->itemDataLayerRepoMock);
 
         $this->basketService = pluginApp(BasketService::class);
-        $this->variation = factory(Variation::class)->create();
+        $this->variation = factory(Variation::class)->create([
+            'minimumOrderQuantity' => 1.00
+        ]);
         $this->variationStock = factory(VariationStock::class)->make([
            'varationId' => $this->variation->id,
-           'warehouseId' => $this->variation->mainWarehouseId
+           'warehouseId' => $this->variation->mainWarehouseId,
+            'netStock' => 1000
         ]);
 
         // set referrer id in session
@@ -45,7 +48,7 @@ class BasketServiceItemRepoTest extends TestCase
     public function it_adds_an_item_to_the_basket()
     {
         $variation = $this->variation;
-        $item1 = ['variationId' => $variation['id'], 'quantity' => 1, 'template' => '', 'referrerId' => 1];
+        $item1 = ['variationId' => $variation['id'], 'quantity' => 1, 'template' => '', 'referrerId' => 1, 'basketItemOrderParams' => [] ];
 
         $result = $this->basketService->addBasketItem($item1);
 
