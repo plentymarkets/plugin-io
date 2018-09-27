@@ -27,7 +27,7 @@ class CustomerNewsletterService
     
             $recipientData = $authHelper->processUnguarded( function() use ($email, $newsletterRepo)
             {
-                return $newsletterRepo->listRecipients(['*'], 1, 1, ['email' => $email], [])->getResult()->first();
+                return $newsletterRepo->listRecipients(['*'], 1, 1, ['email' => $email], [])->getResult()[0];
             });
             
             if(!$recipientData instanceof Recipient && !($recipientData instanceof Recipient && $recipientData->email == $email))
