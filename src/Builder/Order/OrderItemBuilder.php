@@ -152,8 +152,15 @@ class OrderItemBuilder
                 $basketItemProperties[] = $basketItemProperty;
             }
         }
-        
-		$priceOriginal = $basketItem['variation']['data']['prices']['default']['data']['basePrice'];
+
+        if($basketItem['price'] == $basketItem['variation']['data']['prices']['specialOffer']['data']['basePrice'])
+        {
+            $priceOriginal = $basketItem['price'];
+        }
+        else
+        {
+            $priceOriginal = $basketItem['variation']['data']['prices']['default']['data']['basePrice'];
+        }
 
         $attributeTotalMarkup = 0;
 		if(isset($basketItem['attributeTotalMarkup']))

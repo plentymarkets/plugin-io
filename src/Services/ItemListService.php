@@ -21,50 +21,46 @@ class ItemListService
         $searchService = pluginApp( ItemSearchService::class );
         $searchFactory = null;
 
-        if ( ( is_null($id) || strlen($id) <= 0 ) && $type !== self::TYPE_LAST_SEEN )
+        if ( !$this->isValidId( $id ) && $type !== self::TYPE_LAST_SEEN )
         {
-            $searchFactory = VariationList::getSearchFactory([
-                'sorting' => $sorting
-            ]);
+            $type = self::TYPE_RANDOM;
         }
-        else
-        {
-            switch ($type)
-            {
-                case self::TYPE_CATEGORY:
-                    $searchFactory = CategoryItems::getSearchFactory([
-                        'categoryId' => $id,
-                        'sorting'    => $sorting
-                    ]);
-                    break;
-                case self::TYPE_LAST_SEEN:
-                    /** @var SessionStorageService $sessionStorage */
-                    $sessionStorage = pluginApp(SessionStorageService::class);
-                    $variationIds = $sessionStorage->getSessionValue(SessionStorageKeys::LAST_SEEN_ITEMS);
 
-                    if ( !is_null($variationIds) && count($variationIds) > 0 )
-                    {
-                        $searchFactory = VariationList::getSearchFactory([
-                            'variationIds'      => $variationIds,
-                            'sorting'           => $sorting,
-                            'excludeFromCache'  => true
-                        ]);
-                    }
-                    break;
-                case self::TYPE_TAG:
-                    $searchFactory = TagItems::getSearchFactory([
-                        'tagIds'    => [$id],
-                        'sorting'   => $sorting
-                    ]);
-                    break;
-                case self::TYPE_RANDOM:
+        switch ($type)
+        {
+            case self::TYPE_CATEGORY:
+                $searchFactory = CategoryItems::getSearchFactory([
+                    'categoryId' => is_array( $id ) ? $id[0] : $id,
+                    'sorting'    => $sorting
+                ]);
+                break;
+            case self::TYPE_LAST_SEEN:
+                /** @var SessionStorageService $sessionStorage */
+                $sessionStorage = pluginApp(SessionStorageService::class);
+                $variationIds = $sessionStorage->getSessionValue(SessionStorageKeys::LAST_SEEN_ITEMS);
+
+                if ( !is_null($variationIds) && count($variationIds) > 0 )
+                {
                     $searchFactory = VariationList::getSearchFactory([
-                        'sorting'       => $sorting
+                        'variationIds'      => $variationIds,
+                        'sorting'           => $sorting,
+                        'excludeFromCache'  => true
                     ]);
-                    break;
-                default:
-                    break;
-            }
+                }
+                break;
+            case self::TYPE_TAG:
+                $searchFactory = TagItems::getSearchFactory([
+                    'tagIds'    => is_array( $id ) ? $id : [$id],
+                    'sorting'   => $sorting
+                ]);
+                break;
+            case self::TYPE_RANDOM:
+                $searchFactory = VariationList::getSearchFactory([
+                    'sorting'       => $sorting
+                ]);
+                break;
+            default:
+                break;
         }
 
         if ( is_null($searchFactory) )
@@ -78,4 +74,17 @@ class ItemListService
         }
         return $searchService->getResult( $searchFactory );
     }
+
+    private function isValidId( $id )
+    {
+        if ( is_array( $id ) )
+        {
+            return count( $id ) > 0 && $this->isValidId( $id[0] );
+        }
+        else
+        {
+            return !is_null( $id ) && strlen( $id ) > 0;
+        }
+    }
+
 }

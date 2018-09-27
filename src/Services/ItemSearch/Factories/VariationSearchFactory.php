@@ -29,6 +29,7 @@ use Plenty\Modules\Item\Search\Filter\SearchFilter;
 use Plenty\Modules\Item\Search\Filter\TagFilter;
 use Plenty\Modules\Item\Search\Filter\TextFilter;
 use Plenty\Modules\Item\Search\Filter\VariationBaseFilter;
+use Plenty\Modules\Item\Search\Filter\PropertyFilter;
 use Plenty\Modules\Item\Search\Helper\SearchHelper;
 use Plenty\Modules\Item\Search\Mutators\ImageDomainMutator;
 use Plenty\Modules\Item\Search\Mutators\ImageMutator;
@@ -57,6 +58,19 @@ class VariationSearchFactory extends BaseSearchFactory
         /** @var VariationBaseFilter $variationFilter */
         $variationFilter = $this->createFilter( VariationBaseFilter::class );
         $variationFilter->isActive();
+        return $this;
+    }
+
+    /**
+     * Filter inactive variations
+     *
+     * @return $this
+     */
+    public function isInactive()
+    {
+        /** @var VariationBaseFilter $variationFilter */
+        $variationFilter = $this->createFilter( VariationBaseFilter::class );
+        $variationFilter->isInactive();
         return $this;
     }
 
@@ -117,6 +131,51 @@ class VariationSearchFactory extends BaseSearchFactory
         /** @var VariationBaseFilter $variationFilter */
         $variationFilter = $this->createFilter( VariationBaseFilter::class );
         $variationFilter->hasIds( $variationIds );
+        return $this;
+    }
+
+    /**
+     * Filter variations by multiple availability ids.
+     *
+     * @param int[]   $availabilityIds    List of availability ids to filter by.
+     *
+     * @return $this
+     */
+    public function hasAtLeastOneAvailability( $availabilityIds )
+    {
+        /** @var VariationBaseFilter $variationFilter */
+        $variationFilter = $this->createFilter( VariationBaseFilter::class );
+        $variationFilter->hasAtLeastOneAvailability( $availabilityIds );
+        return $this;
+    }
+
+    /**
+     * Filter variations by multiple availability ids.
+     *
+     * @param int     $supplierId     The supplier id to filter by.
+     *
+     * @return $this
+     */
+    public function hasSupplier( $supplierId )
+    {
+        /** @var VariationBaseFilter $variationFilter */
+        $variationFilter = $this->createFilter( VariationBaseFilter::class );
+        $variationFilter->hasSupplier( $supplierId );
+        return $this;
+    }
+
+    /**
+     * Filter variations by multiple property ids.
+     *
+     * @param int[]     $propertyIds     The property ids to filter by.
+     *
+     * @return $this
+     */
+    public function hasEachProperty( $propertyIds )
+    {
+        /** @var PropertyFilter $propertyFilter */
+        $propertyFilter = $this->createFilter( PropertyFilter::class );
+        $propertyFilter->hasEachProperty( $propertyIds );
         return $this;
     }
 
@@ -390,11 +449,7 @@ class VariationSearchFactory extends BaseSearchFactory
         {
             $facetValues = explode(",", $facetValues );
         }
-
-        $facetValues = array_map(function($facetValue) {
-            return (int) $facetValue;
-        }, $facetValues);
-
+        
         /** @var SearchHelper $searchHelper */
         $searchHelper = pluginApp( SearchHelper::class, [$facetValues, $clientId, 'item', $lang] );
         $this->withFilter( $searchHelper->getFacetFilter() );
@@ -433,7 +488,7 @@ class VariationSearchFactory extends BaseSearchFactory
      *
      * @return $this
      */
-    public function hasSearchString( $query, $lang = null, $searchType = ElasticSearch::SEARCH_TYPE_FUZZY, $operator = ElasticSearch::OR_OPERATOR )
+    public function hasSearchString( $query, $lang = null, $searchType = ElasticSearch::SEARCH_TYPE_EXACT, $operator = ElasticSearch::OR_OPERATOR )
     {
         if ( $lang === null )
         {
@@ -444,7 +499,7 @@ class VariationSearchFactory extends BaseSearchFactory
             && $searchType !== ElasticSearch::SEARCH_TYPE_AUTOCOMPLETE
             && $searchType !== ElasticSearch::SEARCH_TYPE_EXACT )
         {
-            $searchType = ElasticSearch::SEARCH_TYPE_FUZZY;
+            $searchType = ElasticSearch::SEARCH_TYPE_EXACT;
         }
 
         if ( $operator !== ElasticSearch::OR_OPERATOR && $operator !== ElasticSearch::AND_OPERATOR )

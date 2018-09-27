@@ -16,6 +16,7 @@ class ResultFieldTemplate
     const TEMPLATE_LIST_ITEM    = 'IO.ResultFields.ListItem';
     const TEMPLATE_SINGLE_ITEM  = 'IO.ResultFields.SingleItem';
     const TEMPLATE_BASKET_ITEM  = 'IO.ResultFields.BasketItem';
+    const TEMPLATE_AUTOCOMPLETE_ITEM_LIST = 'IO.ResultFields.AutoCompleteListItem';
 
     private $templates = [];
 

@@ -1,5 +1,34 @@
 # Release Notes for IO
 
+## v2.15.0 (2018-09-12) <a href="https://github.com/plentymarkets/plugin-io/compare/2.14.0...2.15.0" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
+
+### Fixed
+
+- The login URL stored at the level of the customer now also works in Ceres.
+- Due to an error the option **Domestic and EU only** of the setting **Show VAT for the shipping costs on the invoice** was not interpreted correctly. This has been fixed.
+
+## v2.14.0 (2018-08-28) <a href="https://github.com/plentymarkets/plugin-io/compare/2.13.0...2.14.0" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
+
+### Added
+
+- Categories have been added as filter options for search results.
+- The URL of the Callisto search now opens the Ceres search.
+- The Callisto /tag/-route now redirects to the Ceres search page.
+- Item lists and search results can now be sorted randomly.
+- A new event hook has been added, which reacts to the building of plugins. This enables the invalidation of the content cache.
+
+### Changed
+
+- The live search in the header and the search page have been synchronised so that they provide the same search results.
+
+### Fixed
+
+- Adding items to the shopping cart led to errors if item bundles were replaced by basic items as a result. This behaviour has been fixed.
+- Due to an error users were able to select currencies that were not enabled in the Ceres configuration. This has been fixed.
+- An error has been fixed that prevented the display of a conclusive error notification when items for which no stock was available had been moved to the shopping cart.
+- Due to an error, items with more than one configured price were not correctly displayed if the minimum order quantity had been set for the items. This has been fixed.
+- Orders that included items with live shopping prices led to errors in Callisto stores with an installed Ceres checkout. This behaviour has been fixed.
+
 ## v2.13.0 (2018-07-30) <a href="https://github.com/plentymarkets/plugin-io/compare/2.12.0...2.13.0" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
 
 ### Added

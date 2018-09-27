@@ -41,9 +41,7 @@ class CategoryController extends LayoutController
         $category = $this->categoryRepo->findCategoryByUrl($lvl1, $lvl2, $lvl3, $lvl4, $lvl5, $lvl6, $webstoreId, $lang);
 
 
-        if($category === null
-            || $category->clients->count() == 0
-            || $category->details->count() == 0)
+        if ($category === null || ($category->clients->count() == 0 || $category->details->count() == 0 && !$this->app->isAdminPreview()))
         {
             return '';
         }
