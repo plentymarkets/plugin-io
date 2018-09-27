@@ -39,7 +39,7 @@ class WebstoreConfigurationService
             /** @var Application $app */
             $app = pluginApp(Application::class);
 
-            $this->webstoreConfig = $webstoreConfig->findByPlentyId($app->getPlentyId());
+            $this->webstoreConfig = $webstoreConfig->findByWebstoreId($app->getWebstoreId());
         }
 
         return $this->webstoreConfig;

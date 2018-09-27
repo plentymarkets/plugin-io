@@ -118,41 +118,30 @@ class OrderService
         {
             $isShippingPrivacyHintAccepted = 'false';
         }
-        
-		$order = pluginApp(OrderBuilder::class)->prepare(OrderType::ORDER)
-		                            ->fromBasket()
-		                            ->withContactId($customerService->getContactId())
-		                            ->withAddressId($checkoutService->getBillingAddressId(), AddressType::BILLING)
-		                            ->withAddressId($checkoutService->getDeliveryAddressId(), AddressType::DELIVERY)
-		                            ->withOrderProperty(OrderPropertyType::PAYMENT_METHOD, OrderOptionSubType::MAIN_VALUE, $checkoutService->getMethodOfPaymentId())
-                                    ->withOrderProperty(OrderPropertyType::SHIPPING_PROFILE, OrderOptionSubType::MAIN_VALUE, $checkoutService->getShippingProfileId())
-                                    ->withOrderProperty(OrderPropertyType::DOCUMENT_LANGUAGE, OrderOptionSubType::MAIN_VALUE, $this->sessionStorage->getLang())
-                                    ->withOrderProperty(OrderPropertyType::SHIPPING_PRIVACY_HINT_ACCEPTED, OrderOptionSubType::MAIN_VALUE, $isShippingPrivacyHintAccepted)
-		                            ->done();
-        
-		$order = $this->orderRepository->createOrder($order, $couponCode);
-        $this->saveOrderContactWish($order->id, $this->sessionStorage->getSessionValue(SessionStorageKeys::ORDER_CONTACT_WISH));
-        
+
+        $order = pluginApp(OrderBuilder::class)->prepare(OrderType::ORDER)
+            ->fromBasket()
+            ->withContactId($customerService->getContactId())
+            ->withAddressId($checkoutService->getBillingAddressId(), AddressType::BILLING)
+            ->withAddressId($checkoutService->getDeliveryAddressId(), AddressType::DELIVERY)
+            ->withOrderProperty(OrderPropertyType::PAYMENT_METHOD, OrderOptionSubType::MAIN_VALUE, $checkoutService->getMethodOfPaymentId())
+            ->withOrderProperty(OrderPropertyType::SHIPPING_PROFILE, OrderOptionSubType::MAIN_VALUE, $checkoutService->getShippingProfileId())
+            ->withOrderProperty(OrderPropertyType::DOCUMENT_LANGUAGE, OrderOptionSubType::MAIN_VALUE, $this->sessionStorage->getLang())
+            ->withOrderProperty(OrderPropertyType::SHIPPING_PRIVACY_HINT_ACCEPTED, OrderOptionSubType::MAIN_VALUE, $isShippingPrivacyHintAccepted)
+            ->withComment(true, $this->sessionStorage->getSessionValue(SessionStorageKeys::ORDER_CONTACT_WISH))
+            ->done();
+
+        $order = $this->orderRepository->createOrder($order, $couponCode);
+
+        $this->sessionStorage->setSessionValue(SessionStorageKeys::ORDER_CONTACT_WISH, null);
+
         if($customerService->getContactId() <= 0)
         {
             $this->sessionStorage->setSessionValue(SessionStorageKeys::LATEST_ORDER_ID, $order->id);
         }
-        
+
         return LocalizedOrder::wrap( $order, $this->sessionStorage->getLang() );
 	}
-	
-	private function saveOrderContactWish($orderId, $text = '')
-    {
-        if(!is_null($text) && strlen($text))
-        {
-            /**
-             * @var ContactWishRepositoryContract $contactWishRepo
-             */
-            $contactWishRepo = pluginApp(ContactWishRepositoryContract::class);
-            $contactWishRepo->createContactWish($orderId, nl2br($text));
-            $this->sessionStorage->setSessionValue(SessionStorageKeys::ORDER_CONTACT_WISH, null);
-        }
-    }
 
     /**
      * Execute the payment for a given order.
@@ -470,12 +459,15 @@ class OrderService
             unset($order['dates']);
             unset($order['lockStatus']);
 
-            $createdReturn = $this->orderRepository->createOrder($order);
-
             if(!is_null($returnNote) && strlen($returnNote))
             {
-                $this->saveOrderContactWish($createdReturn->id, $returnNote);
+                $order["comments"][] = [
+                    "isVisibleForContact" => true,
+                    "text"                => $returnNote
+                ];
             }
+
+            $createdReturn = $this->orderRepository->createOrder($order);
 
             return $createdReturn;
         }

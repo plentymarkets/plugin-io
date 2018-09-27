@@ -24,17 +24,10 @@ class TagItems extends VariationList
         {
             $tagIds = $options['tagIds'];
         }
-    
-        $sorting = $options['sorting'];
-        if ( array_key_exists('sorting', $options ) )
-        {
-            $sorting = SortingHelper::splitPathAndOrder($options['sorting']);
-        }
         
         /** @var VariationSearchFactory $factory */
         $factory = parent::getSearchFactory($options)
             ->hasAnyTag($tagIds)
-            ->sortBy($sorting['path'], $sorting['order'])
             ->groupByTemplateConfig();
 
         return $factory;

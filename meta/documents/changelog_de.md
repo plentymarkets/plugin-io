@@ -1,6 +1,13 @@
 # Release Notes für IO
 
-## v2.14.0 (2018-08-28) <a href="https://github.com/plentymarkets/plugin-io/compare/2.13.0...2.14.0" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
+## v2.15.0 (2018-09-12) <a href="https://github.com/plentymarkets/plugin-io/compare/2.14.0...2.15.0" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
+
+### Behoben
+
+- Die am Kunden hinterlegte Login-URL funktioniert nun auch für Ceres.
+- Durch einen Fehler wurde die Option **Nur Inland und EU** der Einstellung **Umsatzsteuer der Versandkosten auf Rechnung ausweisen** nicht interpretiert. Dies wurde behoben.
+
+## v2.14.0 (2018-08-27) <a href="https://github.com/plentymarkets/plugin-io/compare/2.13.0...2.14.0" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
 
 ### Hinzugefügt
 
