@@ -158,6 +158,18 @@
                           {
                               "value": "order-return-confirmation",
                               "caption": "Config.routingEnabledRoutesPossibleValueOrderReturnConfirmation"
+                          },
+                          {
+                              "value": "newsletter-opt-in",
+                              "caption": "Config.routingEnabledRoutesPossibleValueNewsletterOptIn"
+                          },
+                          {
+                              "value": "newsletter-opt-out",
+                              "caption": "Config.routingEnabledRoutesPossibleValueNewsletterOptOut"
+                          },
+                          {
+                              "value": "newsletter-opt-out-confirmation",
+                              "caption": "Config.routingEnabledRoutesPossibleValueNewsletterOptOutConfirmation"
                           }
                       ]
                   }
