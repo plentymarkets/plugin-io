@@ -3,6 +3,7 @@
 namespace IO\Services;
 
 use Plenty\Plugin\Mail\Contracts\MailerContract;
+use Plenty\Plugin\Mail\Models\ReplyTo;
 use Plenty\Plugin\Templates\Twig;
 use IO\Services\TemplateConfigService;
 use IO\Validators\Customer\ContactFormValidator;
@@ -61,7 +62,15 @@ class ContactMailService
          * @var MailerContract $mailer
          */
         $mailer = pluginApp(MailerContract::class);
-        $mailer->sendHtml($renderedMailTemplate, $recipient, $contactData['subject'], $cc);
+
+        /**
+         * @var ReplyTo $replyTo
+         */
+        $replyTo = pluginApp(ReplyTo::class);
+        $replyTo->mailAddress = $contactData['userMail'];
+        $replyTo->name = $contactData['name'];
+
+        $mailer->sendHtml($renderedMailTemplate, $recipient, $contactData['subject'], $cc, [], $replyTo);
         
         return true;
     }
