@@ -11,6 +11,7 @@ use Plenty\Modules\Cloud\ElasticSearch\Lib\Collapse\CollapseInterface;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\ElasticSearch;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Index\Settings\Analysis\Filter\FilterInterface;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Processor\DocumentProcessor;
+use Plenty\Modules\Cloud\ElasticSearch\Lib\Query\Type\ScoreModifier\RandomScore;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Query\Type\TypeInterface;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Search\Aggregation\AggregationInterface;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Search\Document\DocumentSearch;
@@ -71,6 +72,9 @@ class BaseSearchFactory
 
     /** @var MultipleSorting */
     private $sorting = null;
+    
+    /** @var RandomScore */
+    private $randomScoreModifier = null;
 
     /** @var int */
     private $page = 1;
@@ -213,6 +217,11 @@ class BaseSearchFactory
         return $this;
     }
 
+    public function getResultFields()
+    {
+        return $this->resultFields;
+    }
+
     /**
      * Add an extension.
      *
@@ -274,6 +283,7 @@ class BaseSearchFactory
      */
     public function sortBy( $field, $order = self::SORTING_ORDER_DESC )
     {
+        $field = $this->checkRandomSorting($field);
         if ( $this->sorting === null )
         {
             $this->sorting = pluginApp( MultipleSorting::class );
@@ -362,11 +372,17 @@ class BaseSearchFactory
                 $search->addFilter( $filter );
             }
         }
-
+        
         // ADD COLLAPSE
         if ( $this->collapse instanceof CollapseInterface )
         {
             $search->setCollapse( $this->collapse );
+        }
+    
+        // ADD RANDOM MODIFIER
+        if($this->randomScoreModifier instanceof RandomScore)
+        {
+            $search->setScoreModifier($this->randomScoreModifier);
         }
 
         // ADD AGGREGATIONS
@@ -420,5 +436,20 @@ class BaseSearchFactory
         $search = pluginApp( DocumentSearch::class, [$processor] );
 
         return $search;
+    }
+    
+    private function checkRandomSorting($sortingField)
+    {
+        if($sortingField == 'item.random')
+        {
+            if(!$this->randomScoreModifier instanceof RandomScore)
+            {
+                $this->randomScoreModifier = pluginApp(RandomScore::class);
+            }
+            
+            $sortingField = '_score';
+        }
+        
+        return $sortingField;
     }
 }

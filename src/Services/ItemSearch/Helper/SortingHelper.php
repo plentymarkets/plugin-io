@@ -50,6 +50,11 @@ class SortingHelper
                 $sortingOrder = BaseSearchFactory::SORTING_ORDER_DESC;
             }
 
+            else if ( $sortingField === 'texts.name' )
+            {
+                $sortingField = self::getUsedItemName();
+            }
+
             $sortings[] = ['field' => $sortingField, 'order' => $sortingOrder];
         }
 
@@ -76,5 +81,40 @@ class SortingHelper
     public static function getSearchSorting( $sortingConfig = null )
     {
         return self::getSorting( $sortingConfig, false );
+    }
+    
+    /**
+     * @return string
+     */
+    public static function getUsedItemName()
+    {
+        $templateConfigService = pluginApp(TemplateConfigService::class);
+    
+        $usedItemNameIndex = $templateConfigService->get('item.name');
+        
+        $usedItemName = [
+            'texts.name1',
+            'texts.name2',
+            'texts.name3'
+        ][$usedItemNameIndex];
+        
+        return $usedItemName;
+    }
+    
+    public static function splitPathAndOrder($sorting)
+    {
+        $e = explode('_', $sorting);
+        
+        $sorting = [
+            'path' => $e[0],
+            'order'=> $e[1]
+        ];
+        
+        if($sorting['path'] == 'texts.name')
+        {
+            $sorting['path'] = self::getUsedItemName();
+        }
+        
+        return $sorting;
     }
 }

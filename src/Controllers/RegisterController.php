@@ -1,6 +1,7 @@
 <?php //strict
 namespace IO\Controllers;
 
+use IO\Services\UrlService;
 use Plenty\Plugin\Http\Response;
 use IO\Guards\AuthGuard;
 use IO\Helper\TemplateContainer;
@@ -15,25 +16,30 @@ class RegisterController extends LayoutController
     /**
      * Prepare and render the data for the registration
      * @param CustomerService $customerService
+     * @param UrlService $urlService
      * @return string
      */
-	public function showRegister(CustomerService $customerService): string
+	public function showRegister(CustomerService $customerService, UrlService $urlService): string
 	{
 	    if($customerService->getContactId() > 0)
         {
-            AuthGuard::redirect("/", []);
+            AuthGuard::redirect($urlService->getHomepageURL(), []);
         }
 	
 		return $this->renderTemplate(
 			"tpl.register",
 			[
 				"register" => ""
-			]
+			],
+            false
 		);
 	}
-	
-	public function redirectRegister()
+
+    /**
+     * @param UrlService $urlService
+     */
+	public function redirectRegister(UrlService $urlService)
     {
-        return pluginApp(Response::class)->redirectTo('register');
+        return $urlService->redirectTo('register');
     }
 }

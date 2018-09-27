@@ -8,7 +8,6 @@ class ContactFormValidator extends Validator
 {
     public function defineAttributes()
     {
-        $this->addString('name', true);
         $this->addString('userMail', true);
         $this->addString('subject', true);
         $this->addString('message', true);

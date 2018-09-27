@@ -39,17 +39,8 @@ class CustomerResource extends ApiResource
      */
 	public function index():Response
 	{
-		$customer = null;
-		$contact  = $this->customerService->getContact();
-		if($contact !== null)
-		{
-			$customer = [
-				"contact"   => $contact,
-				"addresses" => $this->customerService->getAddresses()
-			];
-		}
-
-		return $this->response->create($customer, ResponseCode::OK);
+		$contact = $this->customerService->getContact();
+		return $this->response->create($contact, ResponseCode::OK);
 	}
 
     /**

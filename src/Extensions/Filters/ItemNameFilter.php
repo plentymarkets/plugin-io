@@ -4,7 +4,6 @@ namespace IO\Extensions\Filters;
 
 use IO\Extensions\AbstractFilter;
 use IO\Services\TemplateConfigService;
-use Plenty\Modules\Item\DataLayer\Models\ItemDescription;
 
 /**
  * Class ItemNameFilter
@@ -14,6 +13,7 @@ class ItemNameFilter extends AbstractFilter
 {
     private $defaultConfigItemName;
     private $defaultConfigItemDisplayName;
+
     /**
      * ItemNameFilter constructor.
      */
@@ -21,6 +21,7 @@ class ItemNameFilter extends AbstractFilter
     {
         /** @var TemplateConfigService $configService */
         $configService = pluginApp( TemplateConfigService::class );
+
         $this->defaultConfigItemName = $configService->get('item.name');
         $this->defaultConfigItemDisplayName = $configService->get('item.displayName');
 
@@ -60,11 +61,6 @@ class ItemNameFilter extends AbstractFilter
         $itemTexts = $itemData['texts'];
         $variationName = $itemData['variation']['name'];
 
-        if ($displayName === 'variationName' && strlen($variationName))
-        {
-            return $variationName;
-        }
-
         $showName = '';
 
         if ($configName === '1' && strlen($itemTexts['name2']))
@@ -83,6 +79,11 @@ class ItemNameFilter extends AbstractFilter
         if ($displayName === 'itemNameVariationName' && strlen($variationName))
         {
             $showName .= ' ' . $variationName;
+        }
+
+        if ($displayName === 'variationName' && strlen($variationName))
+        {
+            $showName = $variationName;
         }
 
         return $showName;

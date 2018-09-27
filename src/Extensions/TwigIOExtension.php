@@ -2,6 +2,7 @@
 
 namespace IO\Extensions;
 
+use IO\Extensions\Constants\ShopUrls;
 use IO\Extensions\Filters\ItemImagesFilter;
 use IO\Extensions\Functions\QueryString;
 use IO\Extensions\Functions\UniqueId;
@@ -121,7 +122,8 @@ class TwigIOExtension extends Twig_Extension
     public function getGlobals():array
     {
         return [
-            "request" => $this->request
+            "request"   => $this->request,
+            "urls"      => pluginApp( ShopUrls::class )
         ];
     }
 }

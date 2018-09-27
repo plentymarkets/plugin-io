@@ -2,9 +2,13 @@
 
 namespace IO\Providers;
 
+use IO\Extensions\ContentCache\IOAfterBuildPlugins;
+use IO\Extensions\Facets\CategoryFacet;
+use IO\Extensions\Mail\IOSendMail;
 use IO\Extensions\Sitemap\IOSitemapPattern;
 use IO\Extensions\TwigIOExtension;
 use IO\Extensions\TwigServiceProvider;
+use IO\Extensions\TwigTemplateContextExtension;
 use IO\Middlewares\Middleware;
 use IO\Services\AuthenticationService;
 use IO\Services\AvailabilityService;
@@ -44,7 +48,9 @@ use Plenty\Modules\Frontend\Events\FrontendLanguageChanged;
 use Plenty\Modules\Authentication\Events\AfterAccountAuthentication;
 use Plenty\Modules\Authentication\Events\AfterAccountContactLogout;
 use Plenty\Modules\Order\Events\OrderCreated;
+use Plenty\Modules\Plugin\Events\AfterBuildPlugins;
 use Plenty\Modules\Plugin\Events\LoadSitemapPattern;
+use Plenty\Modules\Plugin\Events\PluginSendMail;
 use Plenty\Plugin\ServiceProvider;
 use Plenty\Plugin\Templates\Twig;
 use Plenty\Plugin\Events\Dispatcher;
@@ -116,6 +122,7 @@ class IOServiceProvider extends ServiceProvider
     {
         $twig->addExtension(TwigServiceProvider::class);
         $twig->addExtension(TwigIOExtension::class);
+        $twig->addExtension(TwigTemplateContextExtension::class);
         $twig->addExtension('Twig_Extensions_Extension_Intl');
         $twig->addExtension(TwigLoaderPresets::class);
     
@@ -152,6 +159,12 @@ class IOServiceProvider extends ServiceProvider
         });
 
         $dispatcher->listen(LoadSitemapPattern::class, IOSitemapPattern::class);
+        $dispatcher->listen(PluginSendMail::class, IOSendMail::class);
+        $dispatcher->listen(AfterBuildPlugins::class, IOAfterBuildPlugins::class);
+    
+        $dispatcher->listen('IO.initFacetExtensions', function (FacetExtensionContainer $facetExtensionContainer) {
+            $facetExtensionContainer->addFacetExtension(pluginApp(CategoryFacet::class));
+        });
     }
 
     private function registerSingletons( $classes )

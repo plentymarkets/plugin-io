@@ -9,6 +9,8 @@
 namespace IO\Services;
 
 use IO\Builder\Order\OrderItemType;
+use Plenty\Modules\Accounting\Contracts\AccountingLocationRepositoryContract;
+use Plenty\Modules\Frontend\Services\VatService;
 use Plenty\Modules\Order\Models\Order;
 use Plenty\Modules\Order\Models\OrderItem;
 
@@ -32,6 +34,9 @@ class OrderTotalsService
         $shippingNet = 0;
         $vats = [];
         $couponValue = 0;
+        $couponCode = '';
+        $openAmount = 0;
+        $couponType = '';
         $amountId = $this->getCustomerAmountId($order->amounts);
         $totalNet = $order->amounts[$amountId]->netTotal;
         $totalGross = $order->amounts[$amountId]->grossTotal;
@@ -39,6 +44,10 @@ class OrderTotalsService
         $isNet = $order->amounts[$amountId]->isNet;
 
         $orderItems = $order->orderItems;
+
+        $accountRepo = pluginApp(AccountingLocationRepositoryContract::class);
+        $vatService = pluginApp(VatService::class);
+
         foreach ($orderItems as $item) {
             $itemAmountId = $this->getCustomerAmountId($item->amounts);
             /** @var OrderItem $item */
@@ -46,16 +55,28 @@ class OrderTotalsService
 
             switch ($item->typeId) {
                 case OrderItemType::VARIATION:
+                case OrderItemType::ITEM_BUNDLE:
                     $itemSumGross += $firstAmount->priceGross * $item->quantity;
                     $itemSumNet += $firstAmount->priceNet * $item->quantity;
                     break;
                 case OrderItemType::SHIPPING_COSTS:
+                    $locationId = $vatService->getLocationId($item->countryVatId);
+                    $accountSettings = $accountRepo->getSettings($locationId);
+
                     $shippingGross += $firstAmount->priceGross;
                     $shippingNet += $firstAmount->priceNet;
+
+                    if ((bool)$accountSettings->showShippingVat)
+                    {
+                        $shippingNet = $shippingGross;
+                    }
                     break;
                 case OrderItemType::PROMOTIONAL_COUPON:
                 case OrderItemType::GIFT_CARD:
+                    $couponType = $item->typeId;
                     $couponValue += $firstAmount->priceGross;
+                    $itemNameArray = explode(' ', $item->orderItemName);
+                    $couponCode =  end($itemNameArray);
                     break;
                 default:
                     // noop
@@ -72,8 +93,16 @@ class OrderTotalsService
         if ( $isNet )
         {
             $itemSumGross   = $itemSumNet;
-            $shippingGross  = $shippingNet;
             $totalGross     = $totalNet;
+        }
+
+        if($couponType == OrderItemType::GIFT_CARD)
+        {
+            $couponType = 'sales';
+            $openAmount = $totalGross + $couponValue;
+        }elseif($couponType == OrderItemType::PROMOTIONAL_COUPON)
+        {
+            $couponType = 'promotional';
         }
 
         return compact(
@@ -83,6 +112,9 @@ class OrderTotalsService
             'shippingNet',
             'vats',
             'couponValue',
+            'openAmount',
+            'couponType',
+            'couponCode',
             'totalGross',
             'totalNet',
             'currency'

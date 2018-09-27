@@ -95,7 +95,7 @@ class PriceDetectService
             ->setCustomerClass($this->classId)
             ->setOrderReferrer($this->referrerId)
             ->setPlentyId($this->plentyId)
-            ->setQuantity(1)
+            ->setQuantity(-1)
             ->setType(DetectSalesPriceService::PRICE_TYPE_DEFAULT);
         
         return $this->detectSalesPriceService->detect();

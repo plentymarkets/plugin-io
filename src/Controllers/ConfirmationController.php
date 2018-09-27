@@ -86,8 +86,13 @@ class ConfirmationController extends LayoutController
                     "data" => $order,
                     "totals" => pluginApp(OrderTotalsService::class)->getAllTotals($order->order),
                     "showAdditionalPaymentInformation" => true
-                ]
+                ],
+                false
             );
+        }
+        elseif(!$order instanceof LocalizedOrder && !is_null($order))
+        {
+            return $order;
         }
         else
         {
@@ -95,7 +100,8 @@ class ConfirmationController extends LayoutController
                 "tpl.page-not-found",
                 [
                     "data" => ""
-                ]
+                ],
+                false
             );
         }
     }

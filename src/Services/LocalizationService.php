@@ -26,7 +26,7 @@ class LocalizationService
         $lang = $sessionStorage->getLang();
         if(is_null($lang) || !strlen($lang))
         {
-            $lang = 'de';
+            $lang = $webstoreConfig->getDefaultLanguage();
         }
 
         $currentShippingCountryId = $checkout->getShippingCountryId();
@@ -68,5 +68,23 @@ class LocalizationService
             // TODO: get fallback language from webstore configuration
             return $resource->load( "$plugin::lang/en/$group")->getData();
         }
+    }
+
+    public function hasCountryStates($countryId): bool
+    {
+        $sessionStorage = pluginApp(SessionStorageService::class);
+        $webstoreConfig = pluginApp(WebstoreConfigurationService::class);
+        $country = pluginApp(CountryService::class);
+        $lang = $sessionStorage->getLang();
+
+        if(is_null($lang) || !strlen($lang))
+        {
+            $lang = $webstoreConfig->getDefaultLanguage();
+        }
+
+        $activeCountries = $country->getActiveCountriesList($lang);
+        $key = array_search($countryId, array_column($activeCountries, 'id'));
+
+        return $activeCountries[$key]->states->isNotEmpty();
     }
 }

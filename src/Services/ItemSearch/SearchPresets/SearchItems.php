@@ -16,6 +16,8 @@ use IO\Services\ItemSearch\Helper\SortingHelper;
  * - sorting:       Configuration value from plugin config
  * - page:          The current page
  * - itemsPerPage:  Number of items per page
+ * - priceMin:      Minimum price of the variations
+ * - priceMax       Maximum price of the variations
  * - autocomplete:  Flag indicating if autocompletion should be used
  *
  *
@@ -29,40 +31,68 @@ class SearchItems implements SearchPreset
         $facets = $options['facets'];
         $sorting= SortingHelper::getSearchSorting( $options['sorting'] );
 
-        $page           = (int) $options['page'];
-        $itemsPerPage   = (int) $options['itemsPerPage'];
+        $page = 1;
+        if ( array_key_exists('page', $options ) )
+        {
+            $page = (int) $options['page'];
+        }
 
+        $itemsPerPage = 20;
+        if ( array_key_exists( 'itemsPerPage', $options ) )
+        {
+            $itemsPerPage = (int) $options['itemsPerPage'];
+        }
+
+        $priceMin = 0;
+        if ( array_key_exists('priceMin', $options) )
+        {
+            $priceMin = (float) $options['priceMin'];
+        }
+
+        $priceMax = 0;
+        if ( array_key_exists('priceMax', $options) )
+        {
+            $priceMax = (float) $options['priceMax'];
+        }
 
         /** @var VariationSearchFactory $searchFactory */
         $searchFactory = pluginApp( VariationSearchFactory::class );
 
-        $searchFactory->withResultFields(
+
+
+        if ( array_key_exists('autocomplete', $options ) && $options['autocomplete'] === true )
+        {
+            $searchFactory->withResultFields(
+                ResultFieldTemplate::get( ResultFieldTemplate::TEMPLATE_AUTOCOMPLETE_ITEM_LIST )
+            );        }
+        else
+        {
+            $searchFactory
+                ->withDefaultImage()
+                ->withImages()
+                ->withPrices()
+                ->hasPriceInRange($priceMin, $priceMax)
+                ->hasFacets( $facets );
+
+            $searchFactory->withResultFields(
                 ResultFieldTemplate::get( ResultFieldTemplate::TEMPLATE_LIST_ITEM )
             );
+        }
 
         $searchFactory
-            ->withLanguage()
             ->withUrls()
-            ->withPrices()
-            ->withImages()
+            ->withLanguage()
+            ->hasPriceForCustomer()
+            ->hasNameInLanguage()
+            ->isHiddenInCategoryList( false )
             ->isVisibleForClient()
             ->isActive()
-            ->isHiddenInCategoryList( false )
-            ->hasNameInLanguage()
-            ->hasPriceForCustomer()
-            ->hasFacets( $facets )
             ->sortByMultiple( $sorting )
             ->setPage( $page, $itemsPerPage )
             ->groupByTemplateConfig();
 
-        if ( array_key_exists('autocomplete', $options ) && $options['autocomplete'] === true )
-        {
-            $searchFactory->hasNameString( $query );
-        }
-        else
-        {
-            $searchFactory->hasSearchString( $query );
-        }
+        $searchFactory->hasNameString($query);
+        $searchFactory->hasSearchString( $query );
 
         return $searchFactory;
     }

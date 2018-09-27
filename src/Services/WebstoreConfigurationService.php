@@ -39,7 +39,7 @@ class WebstoreConfigurationService
             /** @var Application $app */
             $app = pluginApp(Application::class);
 
-            $this->webstoreConfig = $webstoreConfig->findByPlentyId($app->getPlentyId());
+            $this->webstoreConfig = $webstoreConfig->findByWebstoreId($app->getWebstoreId());
         }
 
         return $this->webstoreConfig;
@@ -59,6 +59,11 @@ class WebstoreConfigurationService
         if(!is_null($languages) && strlen($languages))
         {
             $activeLanguages = explode(', ', $languages);
+        }
+
+        if(!in_array($this->webstoreConfig->defaultLanguage, $activeLanguages))
+        {
+            $activeLanguages[] = $this->webstoreConfig->defaultLanguage;
         }
         
 		return $activeLanguages;

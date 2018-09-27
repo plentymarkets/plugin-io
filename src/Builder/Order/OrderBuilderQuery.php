@@ -218,5 +218,29 @@ class OrderBuilderQuery
 		return $this;
 	}
 
+    /**
+     * Add a comment to the order. (e.g. customer wish)
+     * @param bool $isVisibleForContact
+     * @param string $text
+     * @return OrderBuilderQuery
+     */
+    public function withComment(bool $isVisibleForContact, $text):OrderBuilderQuery
+    {
+        if(is_string($text) && !empty($text))
+        {
+            if($this->order["comments"] === null)
+            {
+                $this->order["comments"] = [];
+            }
 
+            $comment = [
+                "isVisibleForContact" => $isVisibleForContact,
+                "text"                => $text
+            ];
+
+            array_push($this->order["comments"], $comment);
+        }
+
+        return $this;
+    }
 }

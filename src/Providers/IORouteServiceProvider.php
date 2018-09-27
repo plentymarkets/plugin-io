@@ -22,6 +22,8 @@ class IORouteServiceProvider extends RouteServiceProvider
      * Define the map routes to templates or REST resources
      * @param Router $router
      * @param ApiRouter $api
+     * @param ConfigRepository $config
+     * @throws \Plenty\Plugin\Routing\Exceptions\RouteReservedException
      */
 	public function map(Router $router, ApiRouter $api, ConfigRepository $config)
 	{
@@ -30,7 +32,7 @@ class IORouteServiceProvider extends RouteServiceProvider
 		$api->version(['v1'], ['namespace' => 'IO\Api\Resources'], function ($api)
 		{
 			$api->get('io/basket', 'BasketResource@index');
-			$api->resource('io/basket/items', 'BasketItemResource');
+            $api->resource('io/basket/items', 'BasketItemResource');
             $api->get('io/order', 'OrderResource@index');
             $api->post('io/order', 'OrderResource@store');
 			$api->get('io/order/paymentMethods', 'OrderPaymentResource@paymentMethodListForSwitch');
@@ -38,8 +40,10 @@ class IORouteServiceProvider extends RouteServiceProvider
             $api->resource('io/checkout/paymentId', 'CheckoutSetPaymentResource');
             $api->resource('io/checkout/shippingId', 'CheckoutSetShippingIdResource');
             $api->resource('io/order/contactWish', 'OrderContactWishResource');
+            $api->resource('io/order/additional_information', 'OrderAdditionalInformationResource');
             $api->resource('io/order/return', 'OrderReturnResource');
             $api->resource('io/order/template', 'OrderTemplateResource');
+            $api->resource('io/order/property/file', 'OrderPropertyFileResource');
             $api->get('io/checkout', 'CheckoutResource@index');
             $api->post('io/checkout', 'CheckoutResource@store');
             $api->put('io/checkout', 'CheckoutResource@update');
@@ -57,6 +61,7 @@ class IORouteServiceProvider extends RouteServiceProvider
             $api->resource('io/variations', 'VariationResource');
             $api->resource('io/item/availability', 'AvailabilityResource');
             $api->resource('io/item/condition', 'ItemConditionResource');
+            $api->resource('io/item/last_seen', 'ItemLastSeenResource');
             $api->get('io/item/search', 'ItemSearchResource@index');
             $api->get('io/item/search/autocomplete', 'ItemSearchAutocompleteResource@index');
 			$api->resource('io/coupon', 'CouponResource');
@@ -66,7 +71,7 @@ class IORouteServiceProvider extends RouteServiceProvider
             $api->resource('io/localization/language', 'LanguageResource');
             $api->resource('io/itemWishList', 'ItemWishListResource');
             $api->resource('io/cache/reset_template_cache', 'ResetTemplateCacheResource');
-            $api->resource('io/shipping/country', 'ShippingCountryResource@store');
+            $api->resource('io/shipping/country', 'ShippingCountryResource');
 		});
 
 		$enabledRoutes = explode(", ",  $config->get("IO.routing.enabled_routes") );
@@ -97,7 +102,11 @@ class IORouteServiceProvider extends RouteServiceProvider
         {
             //Confiramtion route
             $router->get('confirmation/{orderId?}/{orderAccessKey?}', 'IO\Controllers\ConfirmationController@showConfirmation');
+
             $router->get('-/akQQ{orderAccessKey}/idQQ{orderId}', 'IO\Controllers\ConfirmationEmailController@showConfirmation');
+            $router->get('_py-/akQQ{orderAccessKey}/idQQ{orderId}', 'IO\Controllers\ConfirmationEmailController@showConfirmation');
+            $router->get('_py_/akQQ{orderAccessKey}/idQQ{orderId}', 'IO\Controllers\ConfirmationEmailController@showConfirmation');
+            $router->get('_plentyShop__/akQQ{orderAccessKey}/idQQ{orderId}', 'IO\Controllers\ConfirmationEmailController@showConfirmation');
         }
 
 		if ( in_array("login", $enabledRoutes) || in_array("all", $enabledRoutes) )
@@ -127,6 +136,8 @@ class IORouteServiceProvider extends RouteServiceProvider
         if ( in_array("search", $enabledRoutes) || in_array("all", $enabledRoutes) )
         {
             $router->get('search', 'IO\Controllers\ItemSearchController@showSearch');
+            //Callisto Tag route
+            $router->get('tag/{tagName}', 'IO\Controllers\ItemSearchController@redirectToSearch');
         }
 
         if ( in_array("home", $enabledRoutes) || in_array("all", $enabledRoutes) ) {
@@ -169,7 +180,7 @@ class IORouteServiceProvider extends RouteServiceProvider
         {
             $router->get('returns/{orderId}', 'IO\Controllers\OrderReturnController@showOrderReturn');
         }
-        
+
         if( in_array('order-return-confirmation', $enabledRoutes) || in_array("all", $enabledRoutes) )
         {
             $router->get('return-confirmation', 'IO\Controllers\OrderReturnConfirmationController@showOrderReturnConfirmation');
@@ -180,12 +191,18 @@ class IORouteServiceProvider extends RouteServiceProvider
             //contact
             $router->get('contact', 'IO\Controllers\ContactController@showContact');
         }
-        
+
         if( in_array("password-reset", $enabledRoutes) || in_array("all", $enabledRoutes) )
         {
             $router->get('password-reset/{contactId}/{hash}', 'IO\Controllers\CustomerPasswordResetController@showReset');
         }
-        
+
+        if( in_array("order-property-file", $enabledRoutes) || in_array("all", $enabledRoutes) )
+        {
+            $router->get('order-property-file/{hash1}/{filename}', 'IO\Controllers\OrderPropertyFileController@downloadTempFile');
+            $router->get('order-property-file/{hash1}/{hash2}/{filename}', 'IO\Controllers\OrderPropertyFileController@downloadFile');
+        }
+
 		/*
 		 * ITEM ROUTES
 		 */
@@ -194,21 +211,21 @@ class IORouteServiceProvider extends RouteServiceProvider
             $router->get('{itemId}_{variationId?}', 'IO\Controllers\ItemController@showItemWithoutName')
                    ->where('itemId', '[0-9]+')
                    ->where('variationId', '[0-9]+');
-            
+
             $router->get('{slug}_{itemId}_{variationId?}', 'IO\Controllers\ItemController@showItem')
                    ->where('slug', '[^_]+')
                    ->where('itemId', '[0-9]+')
                    ->where('variationId', '[0-9]+');
-            
+
             //old webshop routes mapping
             $router->get('{slug}a-{itemId}', 'IO\Controllers\ItemController@showItemOld')
                    ->where('slug', '.*')
                    ->where('itemId', '[0-9]+');
-            
+
             $router->get('a-{itemId}', 'IO\Controllers\ItemController@showItemFromAdmin')
                    ->where('itemId', '[0-9]+');
         }
-        
+
         /*
 		 * CATEGORY ROUTES
 		 */

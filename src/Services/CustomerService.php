@@ -16,6 +16,7 @@ use Plenty\Modules\Account\Address\Contracts\AddressRepositoryContract;
 use Plenty\Modules\Account\Contact\Models\Contact;
 use IO\Builder\Order\AddressType;
 use Plenty\Modules\Account\Address\Models\Address;
+use Plenty\Modules\Account\Contact\Models\ContactOption;
 use Plenty\Modules\Account\Models\Account;
 use Plenty\Modules\Authorization\Services\AuthHelper;
 use IO\Helper\UserSession;
@@ -56,6 +57,10 @@ class CustomerService
      */
     private $addressRepository;
     /**
+     * @var ContactClassRepositoryContract
+     */
+    private $contactClassRepository;
+    /**
      * @var SessionStorageService
      */
     private $sessionStorage;
@@ -63,7 +68,7 @@ class CustomerService
 	 * @var UserSession
 	 */
 	private $userSession = null;
-    
+
     /**
      * CustomerService constructor.
      * @param ContactAccountRepositoryContract $accountRepository
@@ -77,12 +82,14 @@ class CustomerService
 		ContactRepositoryContract $contactRepository,
 		ContactAddressRepositoryContract $contactAddressRepository,
         AddressRepositoryContract $addressRepository,
+        ContactClassRepositoryContract $contactClassRepository,
         SessionStorageService $sessionStorage)
 	{
 	    $this->accountRepository        = $accountRepository;
 		$this->contactRepository        = $contactRepository;
 		$this->contactAddressRepository = $contactAddressRepository;
         $this->addressRepository        = $addressRepository;
+        $this->contactClassRepository   = $contactClassRepository;
         $this->sessionStorage           = $sessionStorage;
 	}
 
@@ -148,6 +155,47 @@ class CustomerService
                 }
 
                 return $customerShowNet || $contactClassShowNet;
+            }
+        );
+    }
+
+    public function showNetPricesByContactId(int $contactId)
+    {
+        return $this->fromMemoryCache("showNetPrices.$contactId",
+            function() use ($contactId)
+            {
+                /** @var AuthHelper $authHelper */
+                $authHelper = pluginApp(AuthHelper::class);
+
+                if ($contactId > 0)
+                {
+                    $contact = $authHelper->processUnguarded( function() use ($contactId)
+                    {
+                        return $this->contactRepository->findContactById($contactId);
+                    });
+
+                    if ($contact !== null)
+                    {
+                        $contactClass = $this->getContactClassData($contact->classId);
+
+                        if ($contactClass !== null)
+                        {
+                            return $contactClass['showNetPrice'];
+                        }
+                    }
+                }
+                else
+                {
+                    $contactClassId = $this->getDefaultContactClassId();
+                    $contactClass = $this->getContactClassData($contactClassId);
+
+                    if ($contactClass !== null)
+                    {
+                        return $contactClass['showNetPrice'];
+                    }
+                }
+
+                return false;
             }
         );
     }
@@ -304,7 +352,8 @@ class CustomerService
 	public function createContact(array $contactData)
 	{
 	    $contact = null;
-	    $contactData['checkForExistingEmail'] = true;
+        $contactData['checkForExistingEmail'] = true;
+        $contactData['lang'] = $this->sessionStorage->getLang();
 	    
 	    try
         {
@@ -358,7 +407,7 @@ class CustomerService
     {
         /** @var WebstoreConfigurationService $webstoreConfigService */
         $webstoreConfigService = pluginApp(WebstoreConfigurationService::class);
-        return $webstoreConfigService->getWebstoreConfig()->defaultCustomerClassId;
+        return $webstoreConfigService->getWebstoreConfig()->defaultCustomerClassId ?? 0;
     }
 
     /**
@@ -375,22 +424,60 @@ class CustomerService
 
 		return null;
 	}
-	
-	private function updateContactWithAddressData($address)
+
+    /**
+     * @param Address $address
+     * @return null|Contact
+     */
+	private function updateContactWithAddressData(Address $address)
     {
         $contactData = [];
         $contact = null;
         
-        if($address instanceof Address)
-        {
-            $contactData['gender'] = $address->gender;
-            $contactData['firstName'] = $address->name2;
-            $contactData['lastName'] = $address->name3;
-    
-            $contact = $this->updateContact($contactData);
-        }
-        
+        $contactData['gender'] = $address->gender;
+        $contactData['firstName'] = $address->firstName;
+        $contactData['lastName'] = $address->lastName;
+        $contactData['birthdayAt'] = $address->birthday;
+        $contactData['options'] = $this->getContactOptionsFromAddress($address->options);
+
+        $contact = $this->updateContact($contactData);
+
         return $contact;
+    }
+
+    /**
+     * @param $addressOptions
+     * @return array
+     */
+    private function getContactOptionsFromAddress($addressOptions)
+    {
+        $options = [];
+        $addressToContactOptionsMap =
+        [
+            AddressOption::TYPE_TELEPHONE =>
+            [
+                'typeId' => ContactOption::TYPE_PHONE,
+                'subTypeId' => ContactOption::SUBTYPE_PRIVATE
+            ]
+        ];
+
+        foreach($addressOptions as $key => $addressOption)
+        {
+            $mapItem = $addressToContactOptionsMap[$addressOption->typeId];
+
+            if(!empty($mapItem))
+            {
+                $options[] =
+                [
+                    'typeId' => $mapItem['typeId'],
+                    'subTypeId' => $mapItem['subTypeId'],
+                    'priority' => 0,
+                    'value' => $addressOption->value
+                ];
+            }
+        }
+
+        return $options;
     }
 	
 	public function updatePassword($newPassword, $contactId = 0, $hash='')
@@ -519,6 +606,11 @@ class CustomerService
         if (isset($addressData['stateId']) && empty($addressData['stateId']))
         {
             $addressData['stateId'] = null;
+        }
+
+        if (isset($addressData['gender']) && empty($addressData['gender']))
+        {
+            $addressData['gender'] = null;
         }
         
         $newAddress = null;
@@ -657,6 +749,11 @@ class CustomerService
             unset($addressData['checkedAt']);
         }
 
+        if (isset($addressData['gender']) && empty($addressData['gender']))
+        {
+            $addressData['gender'] = null;
+        }
+
         if((int)$this->getContactId() > 0)
         {
             $addressData['options'] = $this->buildAddressEmailOptions([], false, $addressData);
@@ -675,6 +772,18 @@ class CustomerService
             }
             
             $newAddress = $this->contactAddressRepository->updateAddress($addressData, $addressId, $this->getContactId(), $type);
+
+            if($type == AddressType::BILLING) {
+
+                $firstStoredAddress = $this->contactAddressRepository->findContactAddressByTypeId((int)$this->getContactId(),$type, false);
+
+                if($addressId == $firstStoredAddress->id) {
+                    $this->updateContactWithAddressData($newAddress);
+                }
+            }
+
+
+
         }
         else
         {
@@ -724,6 +833,8 @@ class CustomerService
 	    
         if($this->getContactId() > 0)
         {
+            $firstStoredAddress = $this->contactAddressRepository->findContactAddressByTypeId((int)$this->getContactId(),$type, false);
+
             $this->contactAddressRepository->deleteAddress($addressId, $this->getContactId(), $type);
             
             if($type == AddressType::BILLING)
@@ -733,6 +844,16 @@ class CustomerService
             elseif($type == AddressType::DELIVERY)
             {
                 $basketService->setDeliveryAddressId(CustomerAddressResource::ADDRESS_NOT_SET);
+            }
+
+            if($firstStoredAddress instanceof Address && $firstStoredAddress->id === $addressId)
+            {
+                $firstStoredAddress = $this->contactAddressRepository->findContactAddressByTypeId((int)$this->getContactId(),$type, false);
+
+                if($firstStoredAddress instanceof Address)
+                {
+                    $this->updateContactWithAddressData($firstStoredAddress);
+                }
             }
         }
         else

@@ -7,11 +7,16 @@ use IO\Services\ItemSearch\Services\ItemSearchService;
 use Plenty\Modules\Accounting\Vat\Models\VatRate;
 use Plenty\Modules\Basket\Contracts\BasketRepositoryContract;
 use Plenty\Modules\Basket\Contracts\BasketItemRepositoryContract;
+use Plenty\Modules\Basket\Exceptions\BasketItemCheckException;
+use Plenty\Modules\Order\Coupon\Campaign\Contracts\CouponCampaignRepositoryContract;
+use Plenty\Modules\Order\Coupon\Campaign\Models\CouponCampaign;
 use Plenty\Modules\Basket\Models\Basket;
 use Plenty\Modules\Basket\Models\BasketItem;
 use Plenty\Modules\Frontend\Contracts\Checkout;
 use IO\Extensions\Filters\NumberFormatFilter;
 use Plenty\Modules\Frontend\Services\VatService;
+use IO\Services\NotificationService;
+use IO\Services\ItemSearch\Factories\VariationSearchFactory;
 
 /**
  * Class BasketService
@@ -23,6 +28,16 @@ class BasketService
      * @var BasketItemRepositoryContract
      */
     private $basketItemRepository;
+
+    /**
+     * @var BasketRepositoryContract
+     */
+    private $basketRepository;
+
+    /**
+     * @var CouponCampaignRepositoryContract
+     */
+    private $couponCampaignRepository;
 
     /**
      * @var Checkout
@@ -48,12 +63,15 @@ class BasketService
      * @param Checkout $checkout
      * @param VatService $vatService
      */
-    public function __construct(BasketItemRepositoryContract $basketItemRepository, Checkout $checkout, VatService $vatService, SessionStorageService $sessionStorage)
+    public function __construct(BasketItemRepositoryContract $basketItemRepository, Checkout $checkout, VatService $vatService, SessionStorageService $sessionStorage, CouponCampaignRepositoryContract $couponCampaignRepository, BasketRepositoryContract $basketRepository)
     {
         $this->basketItemRepository = $basketItemRepository;
         $this->checkout             = $checkout;
         $this->vatService           = $vatService;
         $this->sessionStorage       = $sessionStorage;
+        $this->couponCampaignRepository = $couponCampaignRepository;
+        $this->basketRepository = $basketRepository;
+
     }
 
     public function setTemplate(string $template)
@@ -77,14 +95,43 @@ class BasketService
         }
 
 
-        if ($this->sessionStorage->getCustomer()->showNetPrice) {
+        if (count($basket['totalVats']) <= 0)
+        {
             $basket["itemSum"]        = $basket["itemSumNet"];
             $basket["basketAmount"]   = $basket["basketAmountNet"];
             $basket["shippingAmount"] = $basket["shippingAmountNet"];
         }
 
+        $basket = $this->checkCoupon($basket);
+
         return $basket;
     }
+
+    /**
+     * @param $basket
+     * @return array
+     */
+    public function checkCoupon($basket): array
+    {
+        if(isset($basket['couponCode']) && strlen($basket['couponCode']) > 0)
+        {
+            $campaign = $this->couponCampaignRepository->findByCouponCode($basket['couponCode']);
+
+            if($campaign instanceof CouponCampaign)
+            {
+                if($campaign->couponType == CouponCampaign::COUPON_TYPE_SALES)
+                {
+                    $basket['openAmount']       = $basket['basketAmount'];
+                    $basket["basketAmount"]     -= $basket['couponDiscount'];
+                    $basket["basketAmountNet"]  -= $basket['couponDiscount'];
+
+                }
+                $basket['couponCampaignType'] = $campaign->couponType;
+            }
+        }
+        return $basket;
+    }
+
 
     /**
      * Return the basket as an array
@@ -201,7 +248,68 @@ class BasketService
      */
     public function addBasketItem(array $data): array
     {
+        /** @var WebstoreConfigurationService $webstoreConfigService */
+        $webstoreConfigService = pluginApp(WebstoreConfigurationService::class);
 
+        if($webstoreConfigService->getWebstoreConfig()->dontSplitItemBundle === 0)
+        {
+            /** @var ItemSearchService $itemSearchService */
+            $itemSearchService = pluginApp( ItemSearchService::class );
+
+            /** @var VariationSearchFactory $searchFactory */
+            $searchFactory = pluginApp( VariationSearchFactory::class );
+
+            $item = $itemSearchService->getResult(
+                $searchFactory
+                    ->hasVariationId( $data['variationId'] )
+                    ->withBundleComponents()
+                    ->withResultFields([
+                        'variation.bundleType'
+                    ])
+            );
+
+            if($item['documents']['0']['data']['variation']['bundleType'] === 'bundle')
+            {
+                /** @var NotificationService $notificationService */
+                $notificationService = pluginApp(NotificationService::class);
+
+                $notificationService->warn('Item bundle split', 5);
+
+                foreach ($item['documents']['0']['data']['bundleComponents'] as $bundleComponent)
+                {
+                    $basketData = [];
+
+                    $basketData['variationId']  = $bundleComponent['data']['variation']['id'];
+                    $basketData['quantity']     = $bundleComponent['quantity'];
+                    $basketData['template']     = $data['template'];
+
+                    $this->addDataToBasket($basketData);
+                }
+            }
+            else
+            {
+                $this->addDataToBasket($data);
+            }
+        }
+        else
+        {
+            $error = $this->addDataToBasket($data);
+            if(array_key_exists("code", $error))
+            {
+                return $error;
+            }
+        }
+
+        return $this->getBasketItemsForTemplate();
+    }
+
+    /**
+     * Add the given data to the basket
+     * @param $data
+     * @return array
+     */
+    private function addDataToBasket($data)
+    {
         if (isset($data['basketItemOrderParams']) && is_array($data['basketItemOrderParams'])) {
             list($data['basketItemOrderParams'], $data['totalOrderParamsMarkup']) = $this->parseBasketItemOrderParams($data['basketItemOrderParams']);
         }
@@ -217,11 +325,13 @@ class BasketService
             } else {
                 $this->basketItemRepository->addBasketItem($data);
             }
+        } catch (BasketItemCheckException $e) {
+            if ($e->getCode() == BasketItemCheckException::NOT_ENOUGH_STOCK_FOR_ITEM) {
+                return ["code" => "6"];
+            }
         } catch (\Exception $e) {
             return ["code" => $e->getCode()];
         }
-
-        return $this->getBasketItemsForTemplate();
     }
 
     /**
@@ -279,6 +389,25 @@ class BasketService
      */
     public function deleteBasketItem(int $basketItemId): array
     {
+        $basket = $this->getBasket();
+        $basketItem = $this->getBasketItem($basketItemId);
+
+        if(strlen($basket->couponCode) > 0)
+        {
+            $campaign = $this->couponCampaignRepository->findByCouponCode($basket->couponCode);
+
+            // $basket->basketAmount is basket amount minus coupon value
+            // $basket->couponDiscount is negative
+            if($campaign instanceof CouponCampaign && $campaign->minOrderValue > (( $basket->basketAmount - $basket->couponDiscount ) - ($basketItem['price'] * $basketItem['quantity'])))
+            {
+                $this->basketRepository->removeCouponCode();
+
+                /** @var NotificationService $notificationService */
+                $notificationService = pluginApp(NotificationService::class);
+                $notificationService->info('CouponValidation',301);
+            }
+        }
+
         $this->basketItemRepository->removeBasketItem($basketItemId);
         return $this->getBasketItemsForTemplate();
     }
@@ -342,6 +471,7 @@ class BasketService
 
     public function resetBasket()
     {
+        $this->basketRepository->removeCouponCode();
         $basketItems = $this->getBasketItemsRaw();
         foreach ($basketItems as $basketItem) {
             $this->basketItemRepository->removeBasketItem($basketItem->id);
@@ -421,7 +551,7 @@ class BasketService
 
         return $this->basketItems;
     }
-    
+
     /**
      * Removes basket items with no names if the language was changed
      * @param $lang

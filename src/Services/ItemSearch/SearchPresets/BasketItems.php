@@ -10,8 +10,8 @@ use IO\Services\ItemSearch\Helper\ResultFieldTemplate;
  *
  * Search preset for basket items.
  * Available options:
- * - variationIds:          Ids of basket items to get data for
- * - variationQuantities:   Quantity of each item to be considered when searching prices
+ * - variationIds: Ids of basket items to get data for
+ * - quantities:   Quantity of each item to be considered when searching prices
  *
  * @package IO\Services\ItemSearch\SearchPresets
  */
@@ -23,13 +23,15 @@ class BasketItems implements SearchPreset
     public static function getSearchFactory($options)
     {
         $variationIds   = $options['variationIds'];
-        $quantities     = $options['variationQuantities'];
+
         
         $lang = null;
         if(isset($options['lang']) && strlen($options['lang']))
         {
             $lang = $options['lang'];
         }
+
+        $quantities     = $options['quantities'];
 
         /** @var VariationSearchFactory $searchFactory */
         $searchFactory = pluginApp( VariationSearchFactory::class )
@@ -41,11 +43,17 @@ class BasketItems implements SearchPreset
             ->withLanguage($lang)
             ->withUrls()
             ->withImages()
-            ->withPrices(['quantities' => $quantities])
+            ->withDefaultImage()
+            ->withBundleComponents()
             ->isVisibleForClient()
             ->isActive()
             ->hasVariationIds( $variationIds )
             ->setPage( 1, count( $variationIds ) );
+
+        if ( !is_null($quantities) )
+        {
+            $searchFactory->withPrices($quantities);
+        }
 
         return $searchFactory;
     }

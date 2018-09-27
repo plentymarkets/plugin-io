@@ -1,5 +1,178 @@
 # Release Notes for IO
 
+## v2.15.0 (2018-09-12) <a href="https://github.com/plentymarkets/plugin-io/compare/2.14.0...2.15.0" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
+
+### Fixed
+
+- The login URL stored at the level of the customer now also works in Ceres.
+- Due to an error the option **Domestic and EU only** of the setting **Show VAT for the shipping costs on the invoice** was not interpreted correctly. This has been fixed.
+
+## v2.14.0 (2018-08-28) <a href="https://github.com/plentymarkets/plugin-io/compare/2.13.0...2.14.0" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
+
+### Added
+
+- Categories have been added as filter options for search results.
+- The URL of the Callisto search now opens the Ceres search.
+- The Callisto /tag/-route now redirects to the Ceres search page.
+- Item lists and search results can now be sorted randomly.
+- A new event hook has been added, which reacts to the building of plugins. This enables the invalidation of the content cache.
+
+### Changed
+
+- The live search in the header and the search page have been synchronised so that they provide the same search results.
+
+### Fixed
+
+- Adding items to the shopping cart led to errors if item bundles were replaced by basic items as a result. This behaviour has been fixed.
+- Due to an error users were able to select currencies that were not enabled in the Ceres configuration. This has been fixed.
+- An error has been fixed that prevented the display of a conclusive error notification when items for which no stock was available had been moved to the shopping cart.
+- Due to an error, items with more than one configured price were not correctly displayed if the minimum order quantity had been set for the items. This has been fixed.
+- Orders that included items with live shopping prices led to errors in Callisto stores with an installed Ceres checkout. This behaviour has been fixed.
+
+## v2.13.0 (2018-07-30) <a href="https://github.com/plentymarkets/plugin-io/compare/2.12.0...2.13.0" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
+
+### Added
+
+- The "Forgot password" e-mail template stored in Ceres can now be sent from the backend.
+- The OrderTotalsService now provides the coupon code.
+
+### Changed
+
+- The unit price was not displayed if the number of units was 1. This has ben fixed. The display of the unit price is now exclusively dependent on the setting stored at the variation level.
+
+### Fixed
+
+- The navigation always displayed all categories. This behaviour has been adjusted, so that different navigations can be displayed, depending on different customer classes.
+- The CDN URLs for item images are now loaded client-dependently in the correct manner.
+- Due to an error, the wrong language was stored when a new user was created. This has been fixed.
+- Due to an error, the prices of item bundles were displayed as 0 Euro on the order confirmation page. This has been fixed.
+
+## v2.12.0 (2018-07-10) <a href="https://github.com/plentymarkets/plugin-io/compare/2.11.0...2.12.0" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
+
+### Added
+
+- Rendered contents are cached in order to improve loading times of the online store. An additional module in the plentymarkets tariff is necessary to use this functionality.
+- Item bundles can now be displayed in the online store.
+
+### Changed
+
+- User-specific data, such as the shopping cart, login information and wish list, is now loaded later.
+- The list of last seen items is now loaded later.
+- The route "/rest/io/customer" no longer returns customer addresses. The route "io/customer/address" is now used for this purpose.
+
+### Fixed
+
+- Due to an error, the links to the homepage were not working properly. This has been fixed.
+- Variations in item lists of the type **tags** were not grouped in accordance with the plugin settings. This has been fixed.
+- If no URL route had been stored for an item while the option **Trailing slash after URLs** was active at the same time, the URL route was not generated properly. This behaviour has been fixed.
+- Forwarding to absolute URLs led to errors. This behaviour has been fixed.
+- Various faulty links have been fixed.
+- The existence of multiple plugin sets sometimes led to the sitemap not being generated in accordance with the Ceres pattern. This behaviour has been fixed.
+- Under certain circumstances, categories were displayed even if they had not been linked to a client. This behaviour has been fixed.
+- If a content category was saved for all languages, the issue could arise that the online store displayed a 404 error page.
+
+## v2.11.0 (2018-06-26) <a href="https://github.com/plentymarkets/plugin-io/compare/2.10.0...2.11.0" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
+
+### Fixed
+
+- The country code has been removed from the URLs of the standard language. The country code is part of the URLs for all other languages.
+- Due to an error, the VAT was not calculated in the shopping cart, if net prices were displayed because of a customer class. This has been fixed.
+
+## v2.10.0 (2018-06-12) <a href="https://github.com/plentymarkets/plugin-io/compare/2.9.1...2.10.0" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
+
+### Added
+
+- The IO configuration has been translated into German.
+- The event `AfterBasketChanged` has been expanded by the field `showNetPrices`. This field determines whether gross or net sums are highlighted in the checkout and the shopping cart.
+- The order data on the order confirmation page has been extended by the field `highlightNetPrices`. This field determines whether net or gross sums are highlighted.
+
+### Changed
+
+- The interfaces for issuing (error-)messages have been improved.
+
+### Fixed
+
+- Due to an error, the link in the order confirmation e-mail forwarded to a 404 page if the option "Forward to login page after clicking the link in order confirmation" was active. This has been fixed.
+- Due to an error, the shipping costs were not converted to the selected currency. This has been fixed.
+- Due to an error, delivery countries in the address form were always displayed in German. This has been fixed.
+- Due to an error, surcharges for order properties were not converted when the currency was changed. This has been fixed.
+- Due to an error, surcharges for order properties were always displayed as gross prices. This has been fixed.
+
+## v2.9.1 (2018-06-05) <a href="https://github.com/plentymarkets/plugin-io/compare/2.9.0...2.9.1" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
+
+### Fixed
+
+- References to categories that no longer exist led to errors in the display of the online store. This has been fixed.
+- Due to an error, problems could occur if a coupon with a minimum order value was redeemed while an item was removed from the shopping cart at the same time, thereby lowering the price below the minimum order value. This has been fixed.
+- Redeeming a coupon for special offers could lead to a faulty display of sums if items with different VAT rates were present in the shopping cart. This has been fixed.
+
+## v2.9.0 (2018-05-24) <a href="https://github.com/plentymarkets/plugin-io/compare/2.8.1...2.9.0" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
+
+### Added
+
+- The method **getURLById**, which returns the URL of a category, has been added to the CategoryService.
+- The route **io/order/additional_information** has been added in order to add and edit additional order information.
+
+### Fixed
+
+- The canonical URLs stored on the category level were not properly utilised. This has been fixed.
+- Due to an error, the function ItemService.getVariationImage() did not return image URLs. This has been fixed.
+
+## v2.8.1 (2018-05-16) <a href="https://github.com/plentymarkets/plugin-io/compare/2.8.0...2.8.1" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
+
+### Fixed
+
+- Due to an error, addresses could not be created or edited, if no federal states were available for the selected country of delivery. This has been fixed.
+
+## v2.8.0 (2018-05-08) <a href="https://github.com/plentymarkets/plugin-io/compare/2.7.0...2.8.0" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
+
+### Added
+
+- A new service (TagService) has been added in order to retrieve the name of a tag via its ID.
+- The facet type **price** has been added.
+- The option to include trailing slashes is now considered when generating URLs.
+
+### Fixed
+
+- Due to an error, data from the Ceres GlobalContext could not be loaded if accessed via a route of another plugin. This has been fixed.
+- When using Ceres and IO as a client that is not the main client, category details of the main client were loaded under certain circumstances. This has been fixed.
+
+## v2.7.0 (2018-04-13) <a href="https://github.com/plentymarkets/plugin-io/compare/2.6.0...2.7.0" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
+
+### Added
+
+- For items without image, the preconfigured placeholder image is now displayed in the online store.
+- Order properties of the type **file** can now be processed.
+
+### Fixed
+
+- Due to an error the shopping cart did not display graduated prices. This has been fixed.
+- Returns did not adopt the lock state from the original order. This has been fixed.
+- Due to an error the data was not validated by the server when address data was saved or edited. This has been fixed.
+- Due to an error, the order confirmation always displayed the order status, the shipping service provider and the payment method in the system language. This has been fixed.
+- Due to an error customer class-dependent graduated rebates on gross item value were not considered in the order creation. This has been fixed.
+- Due to an error, a failed login did not issue a notification. This has been fixed.
+
+## v2.6.0 (2018-04-03) <a href="https://github.com/plentymarkets/plugin-io/compare/2.5.2...2.6.0" target="_blank"><b>Overview of all changes</b></a>
+
+### Added
+
+- IO is now able to react to the generation of the sitemap and can provide its own patterns for the creation of URLs.
+
+### Fixed
+
+- Due to an error graduated prices were not displayed in the shopping cart. This has been fixed.
+- The default country of delivery is now selected as the active country of delivery after logging out.
+- After a guest purchase the email address is now deleted from the session, so that it has to be entered again for a new order process.
+- Under certain circumstances the button for changing payment methods was not displayed on the order confirmation page. This has been fixed.
+- Due to an error a purchase via Paypal redirected to a 404 page instead of the order confirmation page. This has been fixed.
+
+## v2.5.2 (2018-03-26) <a href="https://github.com/plentymarkets/plugin-io/compare/2.5.1...2.5.2" target="_blank"><b>Overview of all changes</b></a>
+
+### Fixed
+
+- Due to an error items could not be correctly sorted by name. This has been fixed.
+
 ## v2.5.1 (2018-03-21) <a href="https://github.com/plentymarkets/plugin-io/compare/2.5.0...2.5.1" target="_blank"><b>Overview of all changes</b></a>
 
 ### Fixed

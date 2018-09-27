@@ -2,6 +2,7 @@
 
 namespace IO\Services;
 
+use Plenty\Modules\Account\Address\Contracts\AddressRepositoryContract;
 use Plenty\Modules\Frontend\PaymentMethod\Contracts\FrontendPaymentMethodRepositoryContract;
 use Plenty\Modules\Order\ContactWish\Contracts\ContactWishRepositoryContract;
 use Plenty\Modules\Order\Contracts\OrderRepositoryContract;
@@ -21,6 +22,8 @@ use IO\Builder\Order\AddressType;
 use IO\Constants\SessionStorageKeys;
 use IO\Services\TemplateConfigService;
 use Plenty\Modules\Authorization\Services\AuthHelper;
+use IO\Services\UrlService;
+use IO\Builder\Order\OrderItemType;
 
 
 /**
@@ -46,7 +49,26 @@ class OrderService
      * @var FrontendPaymentMethodRepositoryContract
      */
     private $frontendPaymentMethodRepository;
-    
+    /**
+     * @var AddressRepositoryContract
+     */
+    private $addressRepository;
+    /**
+     * @var UrlService
+     */
+    private $urlService;
+
+    /**
+     * The OrderItem types that will be wrapped. All other OrderItems will be stripped from the order.
+     */
+    const WRAPPED_ORDERITEM_TYPES =
+    [
+        OrderItemType::VARIATION,
+        OrderItemType::ITEM_BUNDLE,
+        OrderItemType::BUNDLE_COMPONENT,
+        OrderItemType::UNASSIGNED_VARIATION
+    ];
+
     /**
      * OrderService constructor.
      * @param OrderRepositoryContract $orderRepository
@@ -57,13 +79,17 @@ class OrderService
 		OrderRepositoryContract $orderRepository,
 		BasketService $basketService,
         SessionStorageService $sessionStorage,
-        FrontendPaymentMethodRepositoryContract $frontendPaymentMethodRepository
+        FrontendPaymentMethodRepositoryContract $frontendPaymentMethodRepository,
+        AddressRepositoryContract $addressRepository,
+        UrlService $urlService
 	)
 	{
 		$this->orderRepository = $orderRepository;
 		$this->basketService   = $basketService;
         $this->sessionStorage  = $sessionStorage;
         $this->frontendPaymentMethodRepository = $frontendPaymentMethodRepository;
+        $this->addressRepository = $addressRepository;
+        $this->urlService = $urlService;
 	}
 
     /**
@@ -85,39 +111,37 @@ class OrderService
         {
             $couponCode = $basket->couponCode;
         }
-        
-		$order = pluginApp(OrderBuilder::class)->prepare(OrderType::ORDER)
-		                            ->fromBasket()
-		                            ->withContactId($customerService->getContactId())
-		                            ->withAddressId($checkoutService->getBillingAddressId(), AddressType::BILLING)
-		                            ->withAddressId($checkoutService->getDeliveryAddressId(), AddressType::DELIVERY)
-		                            ->withOrderProperty(OrderPropertyType::PAYMENT_METHOD, OrderOptionSubType::MAIN_VALUE, $checkoutService->getMethodOfPaymentId())
-                                    ->withOrderProperty(OrderPropertyType::SHIPPING_PROFILE, OrderOptionSubType::MAIN_VALUE, $checkoutService->getShippingProfileId())
-		                            ->done();
-        
-		$order = $this->orderRepository->createOrder($order, $couponCode);
-		$this->saveOrderContactWish($order->id, $this->sessionStorage->getSessionValue(SessionStorageKeys::ORDER_CONTACT_WISH));
-        
+
+        $isShippingPrivacyHintAccepted = $this->sessionStorage->getSessionValue(SessionStorageKeys::SHIPPING_PRIVACY_HINT_ACCEPTED);
+
+        if(is_null($isShippingPrivacyHintAccepted) || !strlen($isShippingPrivacyHintAccepted))
+        {
+            $isShippingPrivacyHintAccepted = 'false';
+        }
+
+        $order = pluginApp(OrderBuilder::class)->prepare(OrderType::ORDER)
+            ->fromBasket()
+            ->withContactId($customerService->getContactId())
+            ->withAddressId($checkoutService->getBillingAddressId(), AddressType::BILLING)
+            ->withAddressId($checkoutService->getDeliveryAddressId(), AddressType::DELIVERY)
+            ->withOrderProperty(OrderPropertyType::PAYMENT_METHOD, OrderOptionSubType::MAIN_VALUE, $checkoutService->getMethodOfPaymentId())
+            ->withOrderProperty(OrderPropertyType::SHIPPING_PROFILE, OrderOptionSubType::MAIN_VALUE, $checkoutService->getShippingProfileId())
+            ->withOrderProperty(OrderPropertyType::DOCUMENT_LANGUAGE, OrderOptionSubType::MAIN_VALUE, $this->sessionStorage->getLang())
+            ->withOrderProperty(OrderPropertyType::SHIPPING_PRIVACY_HINT_ACCEPTED, OrderOptionSubType::MAIN_VALUE, $isShippingPrivacyHintAccepted)
+            ->withComment(true, $this->sessionStorage->getSessionValue(SessionStorageKeys::ORDER_CONTACT_WISH))
+            ->done();
+
+        $order = $this->orderRepository->createOrder($order, $couponCode);
+
+        $this->sessionStorage->setSessionValue(SessionStorageKeys::ORDER_CONTACT_WISH, null);
+
         if($customerService->getContactId() <= 0)
         {
             $this->sessionStorage->setSessionValue(SessionStorageKeys::LATEST_ORDER_ID, $order->id);
         }
-        
-        return LocalizedOrder::wrap( $order, "de" );
+
+        return LocalizedOrder::wrap( $order, $this->sessionStorage->getLang() );
 	}
-	
-	private function saveOrderContactWish($orderId, $text = '')
-    {
-        if(!is_null($text) && strlen($text))
-        {
-            /**
-             * @var ContactWishRepositoryContract $contactWishRepo
-             */
-            $contactWishRepo = pluginApp(ContactWishRepositoryContract::class);
-            $contactWishRepo->createContactWish($orderId, nl2br($text));
-            $this->sessionStorage->setSessionValue(SessionStorageKeys::ORDER_CONTACT_WISH, null);
-        }
-    }
 
     /**
      * Execute the payment for a given order.
@@ -151,7 +175,7 @@ class OrderService
         
         if($wrap)
         {
-            return LocalizedOrder::wrap($order, 'de');
+            return LocalizedOrder::wrap($order, $this->sessionStorage->getLang());
         }
         
         return $order;
@@ -187,7 +211,8 @@ class OrderService
             {
                 if ((int)$customerService->getContactId() <= 0)
                 {
-                    return pluginApp(Response::class)->redirectTo('login?backlink=confirmation/' . $orderId . '/' . $orderAccessKey);
+
+                    return $this->urlService->redirectTo('login?backlink=confirmation/' . $orderId . '/' . $orderAccessKey);
                 }
                 elseif ((int)$orderContactId !== (int)$customerService->getContactId())
                 {
@@ -196,7 +221,7 @@ class OrderService
             }
         }
     
-        return LocalizedOrder::wrap($order, 'de');
+        return LocalizedOrder::wrap($order, $this->sessionStorage->getLang());
     }
     
     /**
@@ -225,7 +250,7 @@ class OrderService
 
         if($wrapped)
         {
-            $orders = LocalizedOrder::wrapPaginated( $orders, "de" );
+            $orders = LocalizedOrder::wrapPaginated( $orders, $this->sessionStorage->getLang() );
     
             $o = $orders->getResult();
             foreach($orders->getResult() as $key => $order)
@@ -260,7 +285,7 @@ class OrderService
         
         if(!is_null($order))
         {
-            return LocalizedOrder::wrap( $order, "de" );
+            return LocalizedOrder::wrap( $order, $this->sessionStorage->getLang() );
         }
         
         return null;
@@ -323,6 +348,29 @@ class OrderService
             {
                 return false;
             }
+
+            $newOrderItems = [];
+
+            foreach($orderWithoutReturnItems->orderItems as $orderItem)
+            {
+                if($orderItem['bundleType'] !== 'bundle_item' && count($orderItem['references']) === 0)
+                {
+                    $newOrderItems[] = $orderItem;
+                }
+            }
+
+            $newItemsExist = false;
+
+            if(count($newOrderItems) > 0)
+            {
+                foreach($newOrderItems as $newOrderItem)
+                {
+                    if($newOrderItem['quantity'] > 0)
+                    {
+                        $newItemsExist = true;
+                    }
+                }
+            }
             
             $shippingDateSet = false;
             $createdDateUnix = 0;
@@ -345,7 +393,7 @@ class OrderService
             $templateConfigService = pluginApp(TemplateConfigService::class);
             $returnTime = (int)$templateConfigService->get('my_account.order_return_days', 14);
     
-            if( $shippingDateSet && ($createdDateUnix > 0 && $returnTime > 0) && (time() < ($createdDateUnix + ($returnTime * 24 * 60 * 60))) )
+            if( $shippingDateSet && ($createdDateUnix > 0 && $returnTime > 0) && (time() < ($createdDateUnix + ($returnTime * 24 * 60 * 60))) && $newItemsExist )
             {
                 return true;
             }
@@ -409,13 +457,17 @@ class OrderService
     
             unset($order['id']);
             unset($order['dates']);
-    
-            $createdReturn = $this->orderRepository->createOrder($order);
+            unset($order['lockStatus']);
 
             if(!is_null($returnNote) && strlen($returnNote))
             {
-                $this->saveOrderContactWish($createdReturn->id, $returnNote);
+                $order["comments"][] = [
+                    "isVisibleForContact" => true,
+                    "text"                => $returnNote
+                ];
             }
+
+            $createdReturn = $this->orderRepository->createOrder($order);
 
             return $createdReturn;
         }
@@ -473,7 +525,7 @@ class OrderService
                         $newQuantity = $orderItem['quantity'];
                     }
     
-                    if($newQuantity > 0 && ($orderItem->typeId == 1 || $orderItem->typeId == 3 || $orderItem->typeId == 9))
+                    if($newQuantity > 0 && in_array((int)$orderItem->typeId, self::WRAPPED_ORDERITEM_TYPES))
                     {
                         $orderItem['quantity'] = $newQuantity;
                         $newOrderItems[] = $orderItem;
@@ -491,7 +543,7 @@ class OrderService
             {
                 foreach($order->orderItems as $key => $orderItem)
                 {
-                    if($orderItem->typeId == 1 || $orderItem->typeId == 3 || $orderItem->typeId == 9)
+                    if(in_array((int)$orderItem->typeId, self::WRAPPED_ORDERITEM_TYPES))
                     {
                         $newOrderItems[] = $orderItem;
                     }
@@ -557,7 +609,7 @@ class OrderService
                     $newQuantity = $orderItem['quantity'];
                 }
             
-                if($newQuantity > 0 && ($orderItem['typeId'] == 1 || $orderItem['typeId'] == 3 || $orderItem['typeId'] == 9))
+                if($newQuantity > 0 && in_array((int)$orderItem['typeId'], self::WRAPPED_ORDERITEM_TYPES))
                 {
                     $orderItem['quantity'] = $newQuantity;
                     $newOrderItems[] = $orderItem;
@@ -572,7 +624,7 @@ class OrderService
         {
             foreach($order['orderItems'] as $key => $orderItem)
             {
-                if($orderItem['typeId'] == 1 || $orderItem['typeId'] == 3 || $orderItem['typeId'] == 9)
+                if(in_array((int)$orderItem['typeId'], self::WRAPPED_ORDERITEM_TYPES))
                 {
                     $newOrderItems[] = $orderItem;
                 }
@@ -688,7 +740,7 @@ class OrderService
                     
                     if(!is_null($order))
                     {
-                        return LocalizedOrder::wrap( $order, "de" );
+                        return LocalizedOrder::wrap( $order, $this->sessionStorage->getLang() );
                     }
                 }
             }

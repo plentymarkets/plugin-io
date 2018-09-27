@@ -2,9 +2,11 @@
 
 namespace IO\Api;
 
+use IO\Constants\LogLevel;
 use IO\Services\BasketService;
 use IO\Services\CheckoutService;
 use IO\Services\LocalizationService;
+use IO\Services\NotificationService;
 use Plenty\Plugin\Http\Response;
 use Plenty\Modules\Account\Events\FrontendUpdateCustomerSettings;
 use Plenty\Modules\Authentication\Events\AfterAccountAuthentication;
@@ -25,6 +27,7 @@ use Plenty\Modules\Frontend\Events\FrontendShippingProfileChanged;
 use Plenty\Modules\Basket\Events\Basket\AfterBasketChanged;
 use Plenty\Modules\Basket\Events\Basket\AfterBasketCreate;
 use Plenty\Plugin\Events\Dispatcher;
+use IO\Services\CustomerService;
 
 /**
  * Class ApiResponse
@@ -45,11 +48,6 @@ class ApiResponse
 	 */
 	private $data = null;
 
-	private $notifications = [
-		"error"   => null,
-		"success" => null,
-		"info"    => null
-	];
 	/**
 	 * @var array
 	 */
@@ -59,25 +57,33 @@ class ApiResponse
      * @var null|Response
      */
     private $response = null;
-    
+
+    /**
+     * @var NotificationService
+     */
+    private $notificationService;
+
     /**
      * ApiResponse constructor.
      * @param Dispatcher $dispatcher
      * @param Response $response
+     * @param NotificationService $notificationService
      */
 	public function __construct(
 	    Dispatcher $dispatcher,
-        Response $response)
+        Response $response,
+        NotificationService $notificationService)
 	{
-		$this->dispatcher = $dispatcher;
-        $this->response = $response;
+		$this->dispatcher           = $dispatcher;
+        $this->response             = $response;
+        $this->notificationService  = $notificationService;
 
 		// Register basket events
         $this->dispatcher->listen( AfterBasketChanged::class, function($event) {
             // FIX: Set basket and checkout data after "showNetPrice" has been recalculated
             // showNetPrice does not have been recalculated at this point
             $this->eventData["AfterBasketChanged"] = [
-                "basket" => null
+				"basket" => null
             ];
             $this->eventData['CheckoutChanged'] = [
                 'checkout' => null
@@ -194,67 +200,41 @@ class ApiResponse
 	}
 
     /**
+     * @deprecated
+     *
      * @param int $code
      * @param null $message
      * @return ApiResponse
      */
 	public function error(int $code, $message = null):ApiResponse
 	{
-		$this->pushNotification("error", $code, $message);
+		$this->notificationService->error( $message, $code );
 		return $this;
 	}
 
     /**
+     * @deprecated
+     *
      * @param int $code
      * @param null $message
      * @return ApiResponse
      */
 	public function success(int $code, $message = null):ApiResponse
 	{
-		$this->pushNotification("success", $code, $message);
+		$this->notificationService->success( $message, $code );
 		return $this;
 	}
 
     /**
+     * @deprecated
+     *
      * @param int $code
      * @param null $message
      * @return ApiResponse
      */
 	public function info(int $code, $message = null):ApiResponse
 	{
-		$this->pushNotification("info", $code, $message);
-		return $this;
-	}
-
-    /**
-     * @param string $context
-     * @param int $code
-     * @param null $message
-     * @return ApiResponse
-     */
-	private function pushNotification(string $context, int $code, $message = null):ApiResponse
-	{
-		if($message === null)
-		{
-			// TODO: get error message from system config
-			$message = "";
-		}
-
-		$notification = [
-			"code"       => $code,
-			"message"    => $message,
-			"stackTrace" => []
-		];
-
-		$head = $this->notifications[$context];
-		if($head !== null)
-		{
-			$notification["stackTrace"] = $head["stackTrace"];
-			$head["stackTrace"]         = [];
-			array_push($notification["stackTrace"], $head);
-		}
-
-		$this->notifications[$context] = $notification;
+		$this->notificationService->info( $message, $code );
 		return $this;
 	}
 
@@ -282,21 +262,7 @@ class ApiResponse
 			$this->header($key, $value);
 		}
 
-		$responseData = [];
-		if($this->notifications["error"] !== null)
-		{
-			$responseData["error"] = $this->notifications["error"];
-		}
-
-		if($this->notifications["success"] !== null)
-		{
-			$responseData["success"] = $this->notifications["success"];
-		}
-
-		if($this->notifications["info"] !== null)
-		{
-			$responseData["info"] = $this->notifications["info"];
-		}
+		$responseData = $this->appendNotifications();
 
 		$responseData["events"] = $this->eventData;
 
@@ -304,6 +270,7 @@ class ApiResponse
         if ( array_key_exists('AfterBasketChanged', $responseData['events'] ) )
         {
             $responseData['events']['AfterBasketChanged']['basket']  = pluginApp(BasketService::class)->getBasketForTemplate();
+            $responseData['events']['AfterBasketChanged']['showNetPrices']  = pluginApp(CustomerService::class)->showNetPrices();
             $responseData['events']['AfterBasketChanged']['basketItems']  = pluginApp(BasketService::class)->getBasketItems();
             $responseData['events']['CheckoutChanged']['checkout']   = pluginApp(CheckoutService::class)->getCheckout();
         }
@@ -312,4 +279,44 @@ class ApiResponse
 
         return $this->response->make(json_encode($responseData), $code, $this->headers);
 	}
+
+	private function appendNotifications( $data = null, $type = null, $notifications = null )
+    {
+        if ( is_null($data) )
+        {
+            $data = [];
+        }
+
+        if ( is_null($notifications) )
+        {
+            $notifications = $this->notificationService->getNotifications();
+        }
+
+        if ( !is_null($notifications[LogLevel::ERROR]) )
+        {
+            $data[LogLevel::ERROR] = $notifications[LogLevel::ERROR];
+        }
+
+        if ( !is_null($notifications[LogLevel::WARN]) )
+        {
+            $data[LogLevel::WARN] = $notifications[LogLevel::WARN];
+        }
+
+        if ( !is_null($notifications[LogLevel::INFO]) )
+        {
+            $data[LogLevel::INFO] = $notifications[LogLevel::INFO];
+        }
+
+        if ( !is_null($notifications[LogLevel::SUCCESS]) )
+        {
+            $data[LogLevel::SUCCESS] = $notifications[LogLevel::SUCCESS];
+        }
+
+        if ( !is_null($notifications[LogLevel::ERROR]) )
+        {
+            $data[LogLevel::LOG] = $notifications[LogLevel::LOG];
+        }
+
+        return $data;
+    }
 }

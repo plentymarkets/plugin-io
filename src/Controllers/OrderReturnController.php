@@ -8,6 +8,7 @@ use Plenty\Plugin\ConfigRepository;
 use IO\Services\CustomerService;
 use IO\Services\OrderService;
 use IO\Guards\AuthGuard;
+use IO\Services\UrlBuilder\UrlQuery;
 
 /**
  * Class OrderReturnController
@@ -23,7 +24,15 @@ class OrderReturnController extends LayoutController
     {
         if($customerService->getContactId() <= 0)
         {
-            AuthGuard::redirect("/login", ["backlink" => AuthGuard::getUrl()]);
+            $url = $this->urlService->getHomepageURL();
+            if(substr($url, -1) !== '/')
+            {
+                $url .= '/';
+            }
+            $url .= 'login';
+            $url .= UrlQuery::shouldAppendTrailingSlash() ? '/' : '';
+
+            AuthGuard::redirect($url, ["backlink" => AuthGuard::getUrl()]);
         }
 
         $configRepo = pluginApp(ConfigRepository::class);
@@ -46,6 +55,21 @@ class OrderReturnController extends LayoutController
     
                 /** @var OrderRepositoryContract $orderRepo */
                 $orderRepo = pluginApp(OrderRepositoryContract::class);
+
+                $newOrderItems = [];
+
+                foreach($returnOrder->orderData['orderItems'] as $orderItem)
+                {
+                    if($orderItem['bundleType'] !== 'bundle_item' && count($orderItem['references']) === 0)
+                    {
+                        $newOrderItems[] = $orderItem;
+                    }
+                }
+
+                if(count($newOrderItems) > 0)
+                {
+                    $returnOrder->orderData['orderItems'] = $newOrderItems;
+                }
                 
                 if(!count($returnOrder->orderData['orderItems']) || !$orderService->isOrderReturnable($orderRepo->findOrderById($orderId)))
                 {
@@ -65,7 +89,8 @@ class OrderReturnController extends LayoutController
         
         return $this->renderTemplate(
             'tpl.order.return',
-            ['orderData' => $returnOrder]
+            ['orderData' => $returnOrder],
+            false
 		);
     }
 }

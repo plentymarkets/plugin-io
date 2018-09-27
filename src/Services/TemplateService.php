@@ -12,6 +12,8 @@ class TemplateService
 {
     public static $currentTemplate = "";
 
+    public static $currentTemplateData = [];
+
     public function getCurrentTemplate():string
     {
         return TemplateService::$currentTemplate;
@@ -67,7 +69,7 @@ class TemplateService
      */
     public function isCategory():bool
     {
-        return TemplateService::$currentTemplate == "tpl.category.item";
+        return TemplateService::$currentTemplate == "tpl.category.item" || TemplateService::$currentTemplate == "tpl.category.content";
     }
     
     public function renderTemplate($template, $params)

@@ -15,7 +15,12 @@ class CountryService
 	/**
 	 * @var CountryRepositoryContract
 	 */
-	private $countryRepository;
+    private $countryRepository;
+    
+    /**
+     * @var SessionStorageService
+     */
+    private $sessionStorageService;
 
     /**
      * @var Country[][]
@@ -25,10 +30,12 @@ class CountryService
     /**
      * CountryService constructor.
      * @param CountryRepositoryContract $countryRepository
+     * @param SessionStorageService $sessionStorageService
      */
-	public function __construct(CountryRepositoryContract $countryRepository)
+	public function __construct(CountryRepositoryContract $countryRepository, SessionStorageService $sessionStorageService)
 	{
 		$this->countryRepository = $countryRepository;
+		$this->sessionStorageService = $sessionStorageService;
 	}
 
     /**
@@ -36,8 +43,13 @@ class CountryService
      * @param string $lang
      * @return Country[]
      */
-    public function getActiveCountriesList($lang = 'de'):array
+    public function getActiveCountriesList($lang = null):array
     {
+        if ( $lang === null )
+        {
+            $lang = $this->sessionStorageService->getLang();
+        }
+
         if (!isset(self::$activeCountries[$lang])) {
             $list = $this->countryRepository->getActiveCountriesList();
 
@@ -92,8 +104,13 @@ class CountryService
      * @param string $lang
      * @return string
      */
-	public function getCountryName(int $countryId, string $lang = "de"):string
+	public function getCountryName(int $countryId, string $lang = null):string
 	{
+        if ( $lang === null )
+        {
+            $lang = $this->sessionStorageService->getLang();
+        }
+
 		$country = $this->countryRepository->getCountryById($countryId);
 		if($country instanceof Country && count($country->names) != 0)
 		{

@@ -2,13 +2,16 @@
 
 namespace IO\Controllers;
 
+use IO\Extensions\TwigTemplateContextExtension;
 use IO\Helper\ContextInterface;
 use IO\Helper\ArrayHelper;
 use IO\Helper\CategoryMap;
 use IO\Helper\TemplateContainer;
 use IO\Services\CategoryService;
 use IO\Services\TemplateService;
+use IO\Services\UrlService;
 use Plenty\Modules\Category\Contracts\CategoryRepositoryContract;
+use Plenty\Modules\ContentCache\Contracts\ContentCacheRepositoryContract;
 use Plenty\Plugin\Application;
 use Plenty\Plugin\Controller;
 use Plenty\Plugin\Events\Dispatcher;
@@ -54,6 +57,11 @@ abstract class LayoutController extends Controller
 	 */
 	protected $categoryService;
 
+    /**
+     * @var UrlService $urlService
+     */
+	protected $urlService;
+
 	/**
 	 * @var bool
 	 */
@@ -68,7 +76,7 @@ abstract class LayoutController extends Controller
 	 * @param CategoryMap $categoryMap
 	 * @param CategoryService $categoryService
 	 */
-	public function __construct(Application $app, Twig $twig, Dispatcher $event, CategoryRepositoryContract $categoryRepo, CategoryMap $categoryMap, CategoryService $categoryService)
+	public function __construct(Application $app, Twig $twig, Dispatcher $event, CategoryRepositoryContract $categoryRepo, CategoryMap $categoryMap, CategoryService $categoryService, UrlService $urlService)
 	{
 	    parent::__construct();
 		$this->app             = $app;
@@ -77,6 +85,7 @@ abstract class LayoutController extends Controller
 		$this->categoryRepo    = $categoryRepo;
 		$this->categoryMap     = $categoryMap;
 		$this->categoryService = $categoryService;
+		$this->urlService      = $urlService;
 	}
 
 	/**
@@ -112,24 +121,23 @@ abstract class LayoutController extends Controller
 			$templateContainer,
             $controllerData
 		]);
-
-		$contextEvent = 'ctx' . substr($templateEvent, 3);
-		$this->event->fire( 'IO.' . $contextEvent, [$templateContainer]);
         
         return $templateContainer;
 	}
-    
+
     /**
      * Emit an event to layout plugin to receive twig-template to use for current request.
      * Add global template data to custom data from specific controller.
      * Will pass request to the plentymarkets system if no template is provided by the layout plugin.
      *
-     * @param string    $templateEvent
-     * @param mixed     $controllerData
+     * @param string $templateEvent
+     * @param mixed $controllerData
+     * @param bool $cacheContent
      *
      * @return string
+     * @throws \ErrorException
      */
-	protected function renderTemplate(string $templateEvent, $controllerData = []):string
+	protected function renderTemplate(string $templateEvent, $controllerData = [], $cacheContent = true):string
 	{
         TemplateService::$currentTemplate = $templateEvent;
 		$templateContainer = $this->buildTemplateContainer($templateEvent, $controllerData);
@@ -137,7 +145,16 @@ abstract class LayoutController extends Controller
 		if($templateContainer->hasTemplate())
 		{
 			TemplateService::$currentTemplate = $templateEvent;
-            
+			TemplateService::$currentTemplateData = $controllerData;
+
+			// activate content cache
+            if ( $cacheContent )
+            {
+                /** @var ContentCacheRepositoryContract $cacheRepository */
+                $cacheRepository = pluginApp(ContentCacheRepositoryContract::class);
+                $cacheRepository->enableCacheForResponse();
+            }
+
             // Render the received plugin
 			return $this->renderTemplateContainer($templateContainer, $controllerData);
 		}
@@ -167,20 +184,10 @@ abstract class LayoutController extends Controller
 
         $templateData = ArrayHelper::toArray( $templateData );
 
-        $context = pluginApp( $templateContainer->getContext() );
-
-	    if ( $context instanceof ContextInterface )
-        {
-            $context->init( $controllerData );
-            $context = ArrayHelper::toArray( $context );
-        }
-
-        $twigData = array_merge( $context, $templateData );
-
 		// Render the received plugin
 		return $this->twig->render(
 			$templateContainer->getTemplate(),
-            $twigData
+            $templateData
 		);
 	}
 
