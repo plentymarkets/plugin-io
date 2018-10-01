@@ -398,12 +398,21 @@ class ItemService
                         ->variationIsActive()
                         ->build();
 
+                    $contactClassId = $this->sessionStorage->getCustomer()->accountContactClassId;
+
+                    /**
+                     * @var BasketService $basketService
+                     */
+                    $basketService = pluginApp(BasketService::class);
+                    $referrerId = $basketService->getBasket()->referrerId;
+
                     /** @var ItemParamsBuilder $paramsBuilder */
                     $paramsBuilder = pluginApp(ItemParamsBuilder::class);
                     $params        = $paramsBuilder
                         ->withParam(ItemColumnsParams::LANGUAGE, $this->sessionStorage->getLang())
                         ->withParam(ItemColumnsParams::PLENTY_ID, $this->app->getPlentyId())
-                        ->withParam(ItemColumnsParams::CUSTOMER_CLASS, pluginApp(CustomerService::class)->getContact()->classId)
+                        ->withParam(ItemColumnsParams::CUSTOMER_CLASS, $contactClassId)
+                        ->withParam(ItemColumnsParams::REFERRER_ID, $referrerId)
                         ->build();
 
                     $recordList = $this->itemRepository->search($columns, $filter, $params);
@@ -516,13 +525,22 @@ class ItemService
                 ->variationIsActive()
                 ->build();
 
-			/** @var ItemParamsBuilder $paramsBuilder */
-			$paramsBuilder = pluginApp(ItemParamsBuilder::class);
-			$params        = $paramsBuilder
-				->withParam(ItemColumnsParams::LANGUAGE, $this->sessionStorage->getLang())
-				->withParam(ItemColumnsParams::PLENTY_ID, $this->app->getPlentyId())
-                ->withParam(ItemColumnsParams::CUSTOMER_CLASS, pluginApp(CustomerService::class)->getContactClassId())
-				->build();
+            $contactClassId = $this->sessionStorage->getCustomer()->accountContactClassId;
+
+            /**
+             * @var BasketService $basketService
+             */
+            $basketService = pluginApp(BasketService::class);
+            $referrerId = $basketService->getBasket()->referrerId;
+
+            /** @var ItemParamsBuilder $paramsBuilder */
+            $paramsBuilder = pluginApp(ItemParamsBuilder::class);
+            $params        = $paramsBuilder
+                ->withParam(ItemColumnsParams::LANGUAGE, $this->sessionStorage->getLang())
+                ->withParam(ItemColumnsParams::PLENTY_ID, $this->app->getPlentyId())
+                ->withParam(ItemColumnsParams::CUSTOMER_CLASS, $contactClassId)
+                ->withParam(ItemColumnsParams::REFERRER_ID, $referrerId)
+                ->build();
 
 			$recordList = $this->itemRepository->search($columns, $filter, $params);
 
