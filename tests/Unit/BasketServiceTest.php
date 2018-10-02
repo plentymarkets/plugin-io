@@ -31,10 +31,6 @@ class BasketServiceTest extends TestCase
         app()->instance(BasketItemRepository::class, $this->basketItemRepositoryMock);
 
         $this->basketService = pluginApp(BasketService::class);
-
-
-
-
     }
 
     /** @test */
