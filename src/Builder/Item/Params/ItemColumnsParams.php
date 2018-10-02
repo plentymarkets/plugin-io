@@ -20,4 +20,5 @@ class ItemColumnsParams
 	const LIMIT          = "limit";
 	const OFFSET         = "offset";
 	const CUSTOMER_CLASS = "customerClassId";
+    const REFERRER_ID    = "referrerId";
 }
