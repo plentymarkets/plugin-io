@@ -2,9 +2,6 @@
 
 namespace IO\Helper;
 
-
-use Plenty\Data\Model;
-
 class DataFilter
 {
     public function getFilteredData( $data, $resultFields )
@@ -14,10 +11,7 @@ class DataFilter
             return $data;
         }
 
-        if ( $data instanceof Model )
-        {
-            $data = $data->toArray();
-        }
+        $data = ArrayHelper::toArray( $data );
 
         if ( !ArrayHelper::isAssoc($data) )
         {
