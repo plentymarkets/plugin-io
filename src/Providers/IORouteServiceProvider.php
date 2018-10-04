@@ -58,6 +58,7 @@ class IORouteServiceProvider extends RouteServiceProvider
             $api->resource('io/customer/contact/mail', 'ContactMailResource');
             $api->resource('io/customer/bank_data', 'ContactBankResource');
             $api->resource('io/customer/order/return', 'CustomerOrderReturnResource');
+            $api->resource('io/customer/newsletter', 'CustomerNewsletterResource');
             $api->resource('io/variations', 'VariationResource');
             $api->resource('io/item/availability', 'AvailabilityResource');
             $api->resource('io/item/condition', 'ItemConditionResource');
@@ -202,10 +203,21 @@ class IORouteServiceProvider extends RouteServiceProvider
             $router->get('order-property-file/{hash1}/{filename}', 'IO\Controllers\OrderPropertyFileController@downloadTempFile');
             $router->get('order-property-file/{hash1}/{hash2}/{filename}', 'IO\Controllers\OrderPropertyFileController@downloadFile');
         }
-
-		/*
-		 * ITEM ROUTES
-		 */
+        
+        if( in_array("newsletter-opt-in", $enabledRoutes) || in_array("all", $enabledRoutes) )
+        {
+            $router->get('newsletter/subscribe/{authString}/{newsletterEmailId}', 'IO\Controllers\NewsletterOptInController@showOptInConfirmation');
+        }
+        
+        if( in_array("newsletter-opt-out", $enabledRoutes) || in_array("all", $enabledRoutes) )
+        {
+            $router->get('newsletter/unsubscribe', 'IO\Controllers\NewsletterOptOutController@showOptOut');
+            $router->post('newsletter/unsubscribe', 'IO\Controllers\NewsletterOptOutConfirmationController@showOptOutConfirmation');
+        }
+        
+        /*
+         * ITEM ROUTES
+         */
         if ( in_array("item", $enabledRoutes) || in_array("all", $enabledRoutes) )
         {
             $router->get('{itemId}_{variationId?}', 'IO\Controllers\ItemController@showItemWithoutName')
@@ -227,8 +239,8 @@ class IORouteServiceProvider extends RouteServiceProvider
         }
 
         /*
-		 * CATEGORY ROUTES
-		 */
+		     * CATEGORY ROUTES
+		     */
         if ( in_array("category", $enabledRoutes) || in_array("all", $enabledRoutes) )
         {
             $router->get('{level1?}/{level2?}/{level3?}/{level4?}/{level5?}/{level6?}', 'IO\Controllers\CategoryController@showCategory');
