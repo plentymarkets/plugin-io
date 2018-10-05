@@ -89,7 +89,8 @@ class StaticPagesController extends LayoutController
             "tpl.page-not-found",
             [
                 "object" => ""
-            ]
+            ],
+            false
         );
     }
 }

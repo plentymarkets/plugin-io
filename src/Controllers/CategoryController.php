@@ -2,9 +2,11 @@
 
 namespace IO\Controllers;
 
+use IO\Api\ResponseCode;
 use IO\Services\SessionStorageService;
 use Plenty\Plugin\Application;
 use Plenty\Plugin\Http\Request;
+use Plenty\Plugin\Http\Response;
 
 /**
  * Class CategoryController
@@ -28,7 +30,7 @@ class CategoryController extends LayoutController
         $lvl3 = null,
         $lvl4 = null,
         $lvl5 = null,
-        $lvl6 = null):string
+        $lvl6 = null)
     {
         /** @var Request $request */
         $request = pluginApp(Request::class);
@@ -43,7 +45,11 @@ class CategoryController extends LayoutController
 
         if ($category === null || ($category->clients->count() == 0 || $category->details->count() == 0 && !$this->app->isAdminPreview()))
         {
-            return '';
+            /** @var Response $response */
+            $response = pluginApp(Response::class);
+            $response->forceStatus(ResponseCode::NOT_FOUND);
+
+            return $response;
         }
 
         $this->categoryService->setCurrentCategory($category);
