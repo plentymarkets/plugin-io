@@ -29,12 +29,6 @@ class ItemWishListGuestRepositoryTest extends TestCase {
         $this->sessionStorageMock = Mockery::mock(SessionStorageService::class);
         app()->instance(SessionStorageService::class, $this->sessionStorageMock);
 
-        $this->sessionStorageMock
-            ->shouldReceive('setSessionValue')
-            ->with(SessionStorageKeys::GUEST_WISHLIST, Mockery::any())
-            ->once()
-            ->andReturn(null);
-
         $this->appMock = Mockery::mock(Application::class);
         $this->appMock->shouldReceive('getPlentyId')->andReturn(1);
         app()->instance(Application::class, $this->appMock);
@@ -48,6 +42,12 @@ class ItemWishListGuestRepositoryTest extends TestCase {
         $this->sessionStorageMock
             ->shouldReceive('getSessionValue')
             ->with(SessionStorageKeys::GUEST_WISHLIST)
+            ->andReturn(null);
+
+        $this->sessionStorageMock
+            ->shouldReceive('setSessionValue')
+            ->with(SessionStorageKeys::GUEST_WISHLIST, Mockery::any())
+            ->once()
             ->andReturn(null);
 
         $wishListEntry = $this->wishListGuestRepository->addItemWishListEntry(1000);
@@ -66,6 +66,12 @@ class ItemWishListGuestRepositoryTest extends TestCase {
             ->with(SessionStorageKeys::GUEST_WISHLIST)
             ->andReturn('{"1":{"1001":{"id":null,"contactId":0,"plentyId":"1","variationId":1001,"quantity":0,"createdAt":"2018-10-04 15:27:02"}}}');
 
+        $this->sessionStorageMock
+            ->shouldReceive('setSessionValue')
+            ->with(SessionStorageKeys::GUEST_WISHLIST, Mockery::any())
+            ->once()
+            ->andReturn(null);
+
         $wishListEntry = $this->wishListGuestRepository->addItemWishListEntry(1000);
 
         $this->assertInstanceOf(ItemWishList::class, $wishListEntry);
@@ -81,6 +87,12 @@ class ItemWishListGuestRepositoryTest extends TestCase {
             ->shouldReceive('getSessionValue')
             ->with(SessionStorageKeys::GUEST_WISHLIST)
             ->andReturn('{"1":{"1000":{"id":null,"contactId":0,"plentyId":"1","variationId":1000,"quantity":1,"createdAt":"2018-10-04 15:27:02"}}}');
+
+        $this->sessionStorageMock
+            ->shouldReceive('setSessionValue')
+            ->with(SessionStorageKeys::GUEST_WISHLIST, Mockery::any())
+            ->once()
+            ->andReturn(null);
 
         $wishListEntry = $this->wishListGuestRepository->addItemWishListEntry(1000);
 
@@ -98,6 +110,12 @@ class ItemWishListGuestRepositoryTest extends TestCase {
             ->with(SessionStorageKeys::GUEST_WISHLIST)
             ->andReturn('{"1":{"1000":{"id":null,"contactId":0,"plentyId":"1","variationId":1000,"quantity":1,"createdAt":"2018-10-04 15:27:02"}}}');
 
+        $this->sessionStorageMock
+            ->shouldReceive('setSessionValue')
+            ->with(SessionStorageKeys::GUEST_WISHLIST, Mockery::any())
+            ->once()
+            ->andReturn(null);
+
         $response = $this->wishListGuestRepository->removeItemWishListEntry(1000);
 
         $this->assertTrue($response);
@@ -111,8 +129,13 @@ class ItemWishListGuestRepositoryTest extends TestCase {
             ->with(SessionStorageKeys::GUEST_WISHLIST)
             ->andReturn(null);
 
+        $this->sessionStorageMock
+            ->shouldReceive('setSessionValue')
+            ->with(SessionStorageKeys::GUEST_WISHLIST, Mockery::any())
+            ->andReturn(null);
+
         $response = $this->wishListGuestRepository->removeItemWishListEntry(1000);
 
-        $this->assertTrue($response);
+        $this->assertFalse($response);
     }
 }
