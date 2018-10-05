@@ -2,6 +2,7 @@
 
 namespace IO\Controllers;
 
+use IO\Api\ResponseCode;
 use IO\Constants\LogLevel;
 use IO\Services\CustomerNewsletterService;
 use IO\Services\NotificationService;
@@ -23,11 +24,11 @@ class NewsletterOptInController extends LayoutController
     
             return pluginApp(Response::class)->redirectTo('/');
         }
-    
-        return $this->renderTemplate(
-            'tpl.page-not-found',
-            ['data' => ''],
-            false
-        );
+
+        /** @var Response $response */
+        $response = pluginApp(Response::class);
+        $response->forceStatus(ResponseCode::NOT_FOUND);
+
+        return $response;
     }
 }

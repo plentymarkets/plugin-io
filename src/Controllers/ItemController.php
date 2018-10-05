@@ -2,10 +2,11 @@
 
 namespace IO\Controllers;
 
-use IO\Services\ItemLastSeenService;
+use IO\Api\ResponseCode;
 use IO\Services\ItemSearch\SearchPresets\CrossSellingItems;
 use IO\Services\ItemSearch\SearchPresets\SingleItem;
 use IO\Services\ItemSearch\Services\ItemSearchService;
+use Plenty\Plugin\Http\Response;
 
 /**
  * Class ItemController
@@ -20,33 +21,35 @@ class ItemController extends LayoutController
      * @param int $variationId
      * @return string
      */
-	public function showItem(
-		string $slug = "",
-		int $itemId = 0,
-		int $variationId = 0
-	)
-	{
-//	    $templateContainer = $this->buildTemplateContainer('tpl.item');
-
-	    $itemSearchOptions = [
-	        'itemId'        => $itemId,
+    public function showItem(
+        string $slug = "",
+        int $itemId = 0,
+        int $variationId = 0
+    )
+    {
+        $itemSearchOptions = [
+            'itemId'        => $itemId,
             'variationId'   => $variationId,
             'setCategory'   => true
         ];
-	    /** @var ItemSearchService $itemSearchService */
-	    $itemSearchService = pluginApp( ItemSearchService::class );
-	    $result = $itemSearchService->getResults([
-	        'item'              => SingleItem::getSearchFactory( $itemSearchOptions ),
+        /** @var ItemSearchService $itemSearchService */
+        $itemSearchService = pluginApp( ItemSearchService::class );
+        $result = $itemSearchService->getResults([
+            'item'              => SingleItem::getSearchFactory( $itemSearchOptions ),
             'crossSellingItems' => CrossSellingItems::getSearchFactory( $itemSearchOptions )
         ]);
 
 
-	    $itemResult = $result['item'];
+        $itemResult = $result['item'];
         $itemResult['CrossSellingItems'] = $result['crossSellingItems'];
 
         if(empty($itemResult['documents']))
         {
-            return '';
+            /** @var Response $response */
+            $response = pluginApp(Response::class);
+            $response->forceStatus(ResponseCode::NOT_FOUND);
+
+            return $response;
         }
         else
         {
@@ -64,7 +67,7 @@ class ItemController extends LayoutController
 	 * @param int $variationId
 	 * @return string
 	 */
-	public function showItemWithoutName(int $itemId, $variationId = 0):string
+	public function showItemWithoutName(int $itemId, $variationId = 0)
 	{
 		return $this->showItem("", $itemId, $variationId);
 	}
@@ -73,7 +76,7 @@ class ItemController extends LayoutController
 	 * @param int $itemId
 	 * @return string
 	 */
-	public function showItemFromAdmin(int $itemId):string
+	public function showItemFromAdmin(int $itemId)
 	{
 		return $this->showItem("", $itemId, 0);
 	}
