@@ -156,6 +156,7 @@ class ItemWishListTest extends TestCase
     {
         $variationId = 1;
         $quantity = 1;
+        $whishListItem = null;
 
         $customerServiceMock = Mockery::mock(CustomerService::class);
         $customerServiceMock->shouldReceive('getContactId')->andReturn(0);
@@ -167,7 +168,11 @@ class ItemWishListTest extends TestCase
         $response = $this->wishListService->removeItemWishListEntry($variationId);
 
         $wishList = json_decode($this->sessionStorage->getSessionValue(SessionStorageKeys::GUEST_WISHLIST), true);
-        $whishListItem = $wishList[$this->plentyId][$variationId];
+
+        if (array_key_exists($variationId, $wishList[$this->plentyId]))
+        {
+            $whishListItem = $wishList[$this->plentyId][$variationId];
+        }
 
         $this->assertNotNull($wishList[$this->plentyId]);
         $this->assertNull($whishListItem);
@@ -178,7 +183,6 @@ class ItemWishListTest extends TestCase
     public function it_removes_an_item_from_the_wish_list_as_guest_which_is_not_in_the_wish_list()
     {
         $variationId = 1;
-        $quantity = 1;
 
         $customerServiceMock = Mockery::mock(CustomerService::class);
         $customerServiceMock->shouldReceive('getContactId')->andReturn(0);
