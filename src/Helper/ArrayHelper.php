@@ -21,4 +21,14 @@ class ArrayHelper
 
         return $mixed;
     }
+
+    public static function isAssoc( $mixed )
+    {
+        if ( !is_array( $mixed ) )
+        {
+            return false;
+        }
+
+        return array_keys( $mixed ) !== range(0, count( $mixed ) - 1);
+    }
 }
