@@ -3,6 +3,7 @@
 namespace IO\Middlewares;
 
 use IO\Api\ResponseCode;
+use IO\Services\TemplateService;
 use IO\Services\WebstoreConfigurationService;
 
 use Plenty\Plugin\ConfigRepository;
@@ -57,6 +58,12 @@ class Middleware extends \Plenty\Plugin\Middleware
                 /** @var CheckoutService $checkoutService */
                 $checkoutService = pluginApp(CheckoutService::class);
                 $checkoutService->setCurrency( $currency );
+            }
+            else
+            {
+                /** @var TemplateService $templateService */
+                $templateService = pluginApp(TemplateService::class);
+                $templateService->forceNoIndex(true);
             }
         }
 
