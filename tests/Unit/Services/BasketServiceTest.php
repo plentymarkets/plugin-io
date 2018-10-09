@@ -61,7 +61,6 @@ class BasketServiceTest extends TestCase
     /** @test */
     public function it_throw_an_exception_with_sample_error_code()
     {
-
         //Fake Item
         $item1 = ['variationId' => 1, 'quantity' => 1, 'template' => 'test'];
         $errorCode = 404;
@@ -78,6 +77,4 @@ class BasketServiceTest extends TestCase
 
         $this->assertEquals($errorCode, $error['code']);
     }
-
-
 }

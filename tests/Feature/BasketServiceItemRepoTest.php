@@ -2,6 +2,7 @@
 
 namespace IO\Tests\Feature;
 
+use IO\Services\ItemSearch\SearchPresets\BasketItems;
 use IO\Services\ItemSearch\Services\ItemSearchService;
 use Mockery;
 use IO\Tests\TestCase;
@@ -23,6 +24,8 @@ class BasketServiceItemRepoTest extends TestCase
     protected $variationStock;
 
     protected $itemDataLayerRepoMock;
+    /** @var ItemSearchService $itemSearchServiceMock  */
+    protected $itemSearchServiceMock;
 
     protected function setUp()
     {
@@ -30,6 +33,9 @@ class BasketServiceItemRepoTest extends TestCase
 
         // $this->itemDataLayerRepoMock = Mockery::mock(ItemDataLayerRepositoryContract::class);
         // $this->app->instance(ItemDataLayerRepositoryContract::class , $this->itemDataLayerRepoMock);
+
+        $this->itemSearchServiceMock = Mockery::mock(ItemSearchService::class);
+        app()->instance(ItemSearchService::class, $this->itemSearchServiceMock);
 
         $this->basketService = pluginApp(BasketService::class);
         $this->variation = factory(Variation::class)->create([
@@ -49,6 +55,11 @@ class BasketServiceItemRepoTest extends TestCase
     {
         $variation = $this->variation;
         $item1 = ['variationId' => $variation['id'], 'quantity' => 1, 'template' => '', 'referrerId' => 1, 'basketItemOrderParams' => [] ];
+
+        $this->itemSearchServiceMock
+            ->shouldReceive('getResults')
+            ->with(Mockery::any())//BasketItems::getSearchFactory(['variationIds' => [$variationId],'quantities' => [$variationId => 1]])
+            ->andReturn($this->getTestJsonData());
 
         $result = $this->basketService->addBasketItem($item1);
 
@@ -81,5 +92,18 @@ class BasketServiceItemRepoTest extends TestCase
         $result = $this->basketService->deleteBasketItem($basketItems['data'][0]['id']);
 
         $this->assertEmpty($result['data']);
+    }
+
+    /**
+     * helper method to get the item search result json
+     * @return mixed
+     */
+    public function getTestJsonData()
+    {
+        $file = __DIR__ . "/../Fixtures/complete_basket_response.json";
+        return json_decode(
+            file_get_contents($file),
+            true
+        );
     }
 }
