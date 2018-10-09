@@ -2,14 +2,13 @@
 
 namespace IO\Tests\Unit;
 
-use Mockery\MockInterface;
-use IO\Tests\TestCase;
+use Tests\SimpleTestCase;
 
 /**
  * User: mklaes
  * Date: 08.08.18
  */
-class HelloWorldTest extends TestCase
+class HelloWorldTest extends SimpleTestCase
 {
     protected function setUp()
     {

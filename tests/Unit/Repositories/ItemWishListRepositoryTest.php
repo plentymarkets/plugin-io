@@ -1,11 +1,11 @@
 <?php
 
+use IO\DBModels\ItemWishList;
 use IO\Repositories\ItemWishListRepository;
 use IO\Services\CustomerService;
-use IO\Tests\TestCase;
-use IO\DBModels\ItemWishList;
 use Plenty\Modules\Plugin\DataBase\Contracts\DataBase;
 use Plenty\Modules\Plugin\DataBase\Contracts\Query;
+use Tests\SimpleTestCase;
 
 /**
  * Created by PhpStorm.
@@ -13,7 +13,7 @@ use Plenty\Modules\Plugin\DataBase\Contracts\Query;
  * Date: 02.10.18
  * Time: 15:39
  */
-class ItemWishListRepositoryTest extends TestCase
+class ItemWishListRepositoryTest extends SimpleTestCase
 {
     /**
      * @var ItemWishListRepository $itemWishListRepository

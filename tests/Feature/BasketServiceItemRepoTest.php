@@ -52,8 +52,6 @@ class BasketServiceItemRepoTest extends TestCase
 
         $result = $this->basketService->addBasketItem($item1);
 
-        dd($result);
-
         $this->assertEquals($variation['id'], $result['data'][0]['variation']['id']);
         $this->assertEquals(1, $result['data']['quantity']);
         $this->assertCount(1, $result['data']);
@@ -84,6 +82,4 @@ class BasketServiceItemRepoTest extends TestCase
 
         $this->assertEmpty($result['data']);
     }
-
-
 }

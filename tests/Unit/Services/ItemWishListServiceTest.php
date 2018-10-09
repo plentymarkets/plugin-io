@@ -7,12 +7,13 @@ use IO\Services\CustomerService;
 use IO\Services\ItemWishListService;
 use IO\Services\SessionStorageService;
 use IO\Tests\TestCase;
+use Tests\SimpleTestCase;
 
 /**
  * User: lukasmatzen
  * Date: 02.10.18
  */
-class ItemWishListServiceTest extends TestCase
+class ItemWishListServiceTest extends SimpleTestCase
 {
     /** @var ItemWishListService $wishListService */
     protected $wishListService;

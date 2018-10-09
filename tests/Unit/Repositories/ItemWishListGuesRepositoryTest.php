@@ -4,14 +4,14 @@ use IO\Constants\SessionStorageKeys;
 use IO\DBModels\ItemWishList;
 use IO\Repositories\ItemWishListGuestRepository;
 use IO\Services\SessionStorageService;
-use IO\Tests\TestCase;
 use Plenty\Plugin\Application;
+use Tests\SimpleTestCase;
 
 /**
  * User: lukasmatzen
  * Date: 02.10.18
  */
-class ItemWishListGuestRepositoryTest extends TestCase {
+class ItemWishListGuestRepositoryTest extends SimpleTestCase {
 
     /** @var SessionStorageService $sessionStorageMock */
     protected $sessionStorageMock;
