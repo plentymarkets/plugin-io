@@ -67,9 +67,9 @@ class BasketServiceItemRepoTest extends TestCase
 
         $result = $this->basketService->addBasketItem($item1);
 
-        $this->assertEquals($variation['id'], $result['data'][0]['variation']['id']);
-        $this->assertEquals(1, $result['data']['quantity']);
-        $this->assertCount(1, $result['data']);
+        $this->assertEquals($variation->id, $result[0]['variationId']);
+        $this->assertEquals(1, $result[0]['quantity']);
+        $this->assertCount(1, $result);
     }
 
     /** @test */
@@ -81,9 +81,9 @@ class BasketServiceItemRepoTest extends TestCase
         $this->basketService->addBasketItem($item1);
         $result = $this->basketService->addBasketItem($item1);
 
-        $this->assertEquals($variation['id'], $result['data'][0]['variation']['id']);
-        $this->assertEquals(2, $result['data']['quantity']);
-        $this->assertCount(1, $result['data']);
+        $this->assertEquals($variation->id, $result[0]['variationId']);
+        $this->assertEquals(2, $result[0]['quantity']);
+        $this->assertCount(1, $result);
     }
 
     /** @test */
@@ -95,7 +95,7 @@ class BasketServiceItemRepoTest extends TestCase
         $basketItems = $this->basketService->addBasketItem($item1);
         $result = $this->basketService->deleteBasketItem($basketItems['data'][0]['id']);
 
-        $this->assertEmpty($result['data']);
+        $this->assertEmpty($result);
     }
 
     /**
