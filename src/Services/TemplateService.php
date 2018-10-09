@@ -14,6 +14,18 @@ class TemplateService
 
     public static $currentTemplateData = [];
 
+    public $forceNoIndex = false;
+
+    public function forceNoIndex($forceNoIndex)
+    {
+        $this->forceNoIndex = $forceNoIndex;
+    }
+
+    public function isNoIndexForced()
+    {
+        return $this->forceNoIndex;
+    }
+
     public function getCurrentTemplate():string
     {
         return TemplateService::$currentTemplate;
