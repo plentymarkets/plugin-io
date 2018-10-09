@@ -314,7 +314,11 @@ class BasketService
             list($data['basketItemOrderParams'], $data['totalOrderParamsMarkup']) = $this->parseBasketItemOrderParams($data['basketItemOrderParams']);
         }
 
-        $data['referrerId'] = $data['referrerId'] ? $data['referrerId'] : $this->getBasket()->referrerId;
+        if(!isset($data['referrerId']))
+        {
+            $data['referrerId'] = $this->getBasket()->referrerId;
+        }
+
         $basketItem = $this->findExistingOneByData($data);
 
         try {
