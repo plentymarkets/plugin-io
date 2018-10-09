@@ -17,6 +17,7 @@ use Plenty\Modules\Item\Search\Filter\CategoryFilter;
 use Plenty\Modules\Item\Search\Filter\ClientFilter;
 use Plenty\Modules\Item\Search\Filter\VariationBaseFilter;
 use Plenty\Plugin\Application;
+use Plenty\Plugin\CachingRepository;
 
 /**
  * Class LastSeenItemsList
@@ -65,10 +66,10 @@ class LastSeenItemList implements ItemLoaderContract
         $variationFilter->isActive();
     
         /**
-         * @var SessionStorageService $sessionStorage
+         * @var CachingRepository $cachingRepository
          */
-        $sessionStorage = pluginApp(SessionStorageService::class);
-        $variationIds = $sessionStorage->getSessionValue(SessionStorageKeys::LAST_SEEN_ITEMS);
+        $cachingRepository = pluginApp(CachingRepository::class);
+        $variationIds = $cachingRepository->get(SessionStorageKeys::LAST_SEEN_ITEMS);
         
         if(is_array($variationIds) && count($variationIds))
         {
