@@ -56,10 +56,14 @@ class BasketServiceItemRepoTest extends TestCase
         $variation = $this->variation;
         $item1 = ['variationId' => $variation['id'], 'quantity' => 1, 'template' => '', 'referrerId' => 1, 'basketItemOrderParams' => [] ];
 
+
+        $esMockData = $this->getTestJsonData();
+        $esMockData['documents'][0]['id'] = $variation['id'];
+
         $this->itemSearchServiceMock
             ->shouldReceive('getResults')
             ->with(Mockery::any())//BasketItems::getSearchFactory(['variationIds' => [$variationId],'quantities' => [$variationId => 1]])
-            ->andReturn($this->getTestJsonData());
+            ->andReturn($esMockData);
 
         $result = $this->basketService->addBasketItem($item1);
 
