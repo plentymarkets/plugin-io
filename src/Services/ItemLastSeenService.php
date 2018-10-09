@@ -3,7 +3,7 @@
 namespace IO\Services;
 
 use IO\Constants\SessionStorageKeys;
-use IO\Services\SessionStorageService;
+use Plenty\Plugin\CachingRepository;
 
 /**
  * Class ItemLastSeenService
@@ -12,15 +12,15 @@ use IO\Services\SessionStorageService;
 class ItemLastSeenService
 {
     const MAX_COUNT = 9;
-    private $sessionStorage;
+    private $cachingRepository;
     
     /**
      * ItemLastSeenService constructor.
-     * @param \IO\Services\SessionStorageService $sessionStorage
+     * @param CachingRepository $cachingRepository
      */
-    public function __construct(SessionStorageService $sessionStorage)
+    public function __construct(CachingRepository $cachingRepository)
     {
-        $this->sessionStorage = $sessionStorage;
+        $this->cachingRepository = $cachingRepository;
     }
     
     /**
@@ -28,7 +28,7 @@ class ItemLastSeenService
      */
     public function setLastSeenMaxCount(int $maxCount)
     {
-        $this->sessionStorage->setSessionValue(SessionStorageKeys::LAST_SEEN_MAX_COUNT, $maxCount);
+        $this->cachingRepository->put(SessionStorageKeys::LAST_SEEN_MAX_COUNT, $maxCount, 60);
     }
     
     /**
@@ -36,13 +36,13 @@ class ItemLastSeenService
      */
     public function setLastSeenItem(int $variationId)
     {
-        $maxCount = $this->sessionStorage->getSessionValue(SessionStorageKeys::LAST_SEEN_MAX_COUNT);
+        $maxCount = $this->cachingRepository->get(SessionStorageKeys::LAST_SEEN_MAX_COUNT);
         if(is_null($maxCount))
         {
             $maxCount = self::MAX_COUNT;
         }
-        
-        $lastSeenItems = $this->sessionStorage->getSessionValue(SessionStorageKeys::LAST_SEEN_ITEMS);
+
+        $lastSeenItems = $this->cachingRepository->get(SessionStorageKeys::LAST_SEEN_ITEMS);
     
         if(is_null($lastSeenItems))
         {
@@ -57,7 +57,7 @@ class ItemLastSeenService
             }
             
             array_unshift($lastSeenItems, $variationId);
-            $this->sessionStorage->setSessionValue(SessionStorageKeys::LAST_SEEN_ITEMS, $lastSeenItems);
+            $this->cachingRepository->put(SessionStorageKeys::LAST_SEEN_ITEMS, $lastSeenItems,60);
         }
     }
 }
