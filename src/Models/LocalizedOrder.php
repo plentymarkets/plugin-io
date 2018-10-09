@@ -79,7 +79,7 @@ class LocalizedOrder extends ModelWrapper
         try
         {
             $shippingProfile = $parcelServicePresetRepository->getPresetById( $order->shippingProfileId );
-            $instance->shippingProfileId = $order->shippingProfileId;
+            $instance->shippingProfileId = (int)$order->shippingProfileId;
             foreach( $shippingProfile->parcelServicePresetNames as $name )
             {
                 if( $name->lang === $lang )
