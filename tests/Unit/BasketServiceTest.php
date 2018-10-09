@@ -9,6 +9,7 @@ use Plenty\Modules\Basket\Exceptions\BasketItemCheckException;
 use Plenty\Modules\Basket\Repositories\BasketItemRepository;
 
 use Plenty\Modules\Basket\Models\BasketItem;
+use Plenty\Modules\Basket\Models\Basket;
 
 /**
  * User: mklaes
