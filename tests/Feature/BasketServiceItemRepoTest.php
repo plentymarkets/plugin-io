@@ -6,6 +6,7 @@ use IO\Services\ItemSearch\Services\ItemSearchService;
 use Mockery;
 use IO\Tests\TestCase;
 use IO\Services\BasketService;
+use Plenty\Modules\Basket\Hooks\BasketItem\CheckNewItemQuantity;
 use Plenty\Modules\Item\DataLayer\Contracts\ItemDataLayerRepositoryContract;
 use Plenty\Modules\Item\DataLayer\Models\Record;
 use Plenty\Modules\Item\DataLayer\Models\RecordList;
@@ -40,6 +41,10 @@ class BasketServiceItemRepoTest extends TestCase
        $checkItemStockMockery->shouldReceive('handle')->andReturn();
        app()->instance(CheckItemStock::class, $checkItemStockMockery);
 
+        $checkNewItemQuantityMockery = Mockery::mock(CheckNewItemQuantity::class);
+        $checkNewItemQuantityMockery->shouldReceive('handle')->andReturn();
+        app()->instance(CheckNewItemQuantity::class, $checkNewItemQuantityMockery);
+
 
         $this->itemSearchServiceMock = Mockery::mock(ItemSearchService::class);
         app()->instance(ItemSearchService::class, $this->itemSearchServiceMock);
@@ -48,37 +53,31 @@ class BasketServiceItemRepoTest extends TestCase
         $this->variation = factory(Variation::class)->create([
             'minimumOrderQuantity' => 1.00
         ]);
-        $this->variationStock = factory(VariationStock::class)->make([
-           'warehouseId' => $this->variation->mainWarehouseId,
-            'netStock' => 1000
-        ]);
-
-    }
-
-    /** @test */
-    public function it_adds_an_item_to_the_basket()
-    {
-        $basket = factory(Basket::class)->create();
-
-        $variation = $this->variation;
-        $item1 = ['variationId' => $variation['id'], 'quantity' => 1, 'template' => '', 'basketItemOrderParams' => [] ];
-
-
 
         $esMockData = $this->getTestJsonData();
-        $esMockData['documents'][0]['id'] = $variation['id'];
+        $esMockData['documents'][0]['id'] =  $this->variation['id'];
 
         $this->itemSearchServiceMock
             ->shouldReceive('getResults')
             ->with(Mockery::any())//BasketItems::getSearchFactory(['variationIds' => [$variationId],'quantities' => [$variationId => 1]])
             ->andReturn($esMockData);
 
+        $basket = factory(Basket::class)->create();
         Session::shouldReceive('getId')
             ->andReturn($basket->sessionId);
 
+    }
+
+    /** @test */
+    public function it_adds_an_item_to_the_basket()
+    {
+
+        $item1 = ['variationId' => $this->variation['id'], 'quantity' => 1, 'template' => '', 'basketItemOrderParams' => [] ];
+
+
         $result = $this->basketService->addBasketItem($item1);
 
-        $this->assertEquals($variation->id, $result[0]['variationId']);
+        $this->assertEquals($this->variation['id'], $result[0]['variationId']);
         $this->assertEquals(1, $result[0]['quantity']);
         $this->assertCount(1, $result);
     }
@@ -86,13 +85,12 @@ class BasketServiceItemRepoTest extends TestCase
     /** @test */
     public function it_updates_an_item_in_the_basket()
     {
-        $variation = $this->variations[0];
-        $item1 = ['variationId' => $variation['id'], 'quantity' => 1, 'template' => '', 'referrerId' => 1];
+        $item1 = ['variationId' => $this->variation['id'], 'quantity' => 1, 'template' => ''];
 
         $this->basketService->addBasketItem($item1);
         $result = $this->basketService->addBasketItem($item1);
 
-        $this->assertEquals($variation->id, $result[0]['variationId']);
+        $this->assertEquals($this->variation['id'], $result[0]['variationId']);
         $this->assertEquals(2, $result[0]['quantity']);
         $this->assertCount(1, $result);
     }
@@ -100,11 +98,10 @@ class BasketServiceItemRepoTest extends TestCase
     /** @test */
     public function it_removes_an_item_from_the_basket()
     {
-        $variation = $this->variations[0];
-        $item1 = ['variationId' => $variation['id'], 'quantity' => 1, 'template' => '', 'referrerId' => 1];
+        $item1 = ['variationId' => $this->variation['id'], 'quantity' => 1, 'template' => ''];
 
         $basketItems = $this->basketService->addBasketItem($item1);
-        $result = $this->basketService->deleteBasketItem($basketItems['data'][0]['id']);
+        $result = $this->basketService->deleteBasketItem($basketItems[0]['id']);
 
         $this->assertEmpty($result);
     }
