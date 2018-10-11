@@ -37,10 +37,6 @@ class BasketServiceTest extends TestCase
     /** @test */
     public function it_throw_the_basket_item_check_exception()
     {
-
-        $basketItem = factory(BasketItem::class)->make();
-
-
         //Fake Item
         $item1 = ['variationId' => 1, 'quantity' => 1, 'template' => 'test'];
         $errorCode = 6;
@@ -48,7 +44,7 @@ class BasketServiceTest extends TestCase
 
         $this->basketItemRepositoryMock->shouldReceive('findExistingOneByData')
             ->once()
-            ->andReturn($basketItem);
+            ->andReturn(null);
 
         $this->basketItemRepositoryMock->shouldReceive('addBasketItem')
             ->andThrow($basketItemCheckException);
