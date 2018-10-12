@@ -294,7 +294,7 @@ class BasketService
         else
         {
             $error = $this->addDataToBasket($data);
-            if(array_key_exists("code", $error))
+            if(is_array($error) && array_key_exists("code", $error))
             {
                 return $error;
             }

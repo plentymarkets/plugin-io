@@ -33,6 +33,7 @@
         <!--<const name="LANG" value="de"/>-->
         <const name="TEST_MODE" value="1" />
         <const name="SDOM" value="http://master.plentymarkets.com" />
+        <const name="MULTISHOP" value="0"/>
     </php>
     <filter>
         <whitelist addUncoveredFilesFromWhitelist="true" processUncoveredFilesFromWhitelist="true">

@@ -2,20 +2,18 @@
 
 namespace IO\Tests\Feature;
 
+use IO\Services\ItemSearch\Helper\ResultFieldTemplate;
+use IO\Services\ItemSearch\SearchPresets\BasketItems;
 use IO\Services\ItemSearch\Services\ItemSearchService;
 use Mockery;
 use IO\Tests\TestCase;
 use IO\Services\BasketService;
 use Plenty\Modules\Basket\Hooks\BasketItem\CheckNewItemQuantity;
-use Plenty\Modules\Item\DataLayer\Contracts\ItemDataLayerRepositoryContract;
-use Plenty\Modules\Item\DataLayer\Models\Record;
-use Plenty\Modules\Item\DataLayer\Models\RecordList;
 use Plenty\Modules\Item\Stock\Hooks\CheckItemStock;
 use Plenty\Modules\Item\Variation\Models\Variation;
 use Plenty\Modules\Basket\Models\Basket;
 
 use Illuminate\Support\Facades\Session;
-use Plenty\Modules\Item\VariationStock\Models\VariationStock;
 
 /**
  * User: mklaes
@@ -56,10 +54,22 @@ class BasketServiceItemRepoTest extends TestCase
 
         $esMockData = $this->getTestJsonData();
         $esMockData['documents'][0]['id'] =  $this->variation['id'];
+        $esMockData['documents'][0]['data']['variation']['id'] = $this->variation['id'];
+
+        /**
+         * @var ResultFieldTemplate $resultFieldTemplate
+         */
+        $resultFieldTemplate = pluginApp(ResultFieldTemplate::class);
+        $resultFieldTemplate->setTemplates([ResultFieldTemplate::TEMPLATE_BASKET_ITEM   => 'Ceres::ResultFields.BasketItem']);
+        app()->instance(ResultFieldTemplate::class, $resultFieldTemplate);
+
+        $basketItemsMock = Mockery::mock(BasketItems::class);
+        $basketItemsMock->shouldReceive('getSearchFactory')->with([])->andReturn([]);
+        app()->instance(BasketItems::class, $basketItemsMock);
 
         $this->itemSearchServiceMock
             ->shouldReceive('getResults')
-            ->with(Mockery::any())//BasketItems::getSearchFactory(['variationIds' => [$variationId],'quantities' => [$variationId => 1]])
+            ->with(Mockery::any())
             ->andReturn($esMockData);
 
         $basket = factory(Basket::class)->create();
@@ -71,6 +81,7 @@ class BasketServiceItemRepoTest extends TestCase
     /** @test */
     public function it_adds_an_item_to_the_basket()
     {
+
 
         $item1 = ['variationId' => $this->variation['id'], 'quantity' => 1, 'template' => '', 'basketItemOrderParams' => [] ];
 
