@@ -58,6 +58,7 @@ class IORouteServiceProvider extends RouteServiceProvider
             $api->resource('io/customer/contact/mail', 'ContactMailResource');
             $api->resource('io/customer/bank_data', 'ContactBankResource');
             $api->resource('io/customer/order/return', 'CustomerOrderReturnResource');
+            $api->resource('io/customer/newsletter', 'CustomerNewsletterResource');
             $api->resource('io/variations', 'VariationResource');
             $api->resource('io/item/availability', 'AvailabilityResource');
             $api->resource('io/item/condition', 'ItemConditionResource');
@@ -102,7 +103,11 @@ class IORouteServiceProvider extends RouteServiceProvider
         {
             //Confiramtion route
             $router->get('confirmation/{orderId?}/{orderAccessKey?}', 'IO\Controllers\ConfirmationController@showConfirmation');
+
             $router->get('-/akQQ{orderAccessKey}/idQQ{orderId}', 'IO\Controllers\ConfirmationEmailController@showConfirmation');
+            $router->get('_py-/akQQ{orderAccessKey}/idQQ{orderId}', 'IO\Controllers\ConfirmationEmailController@showConfirmation');
+            $router->get('_py_/akQQ{orderAccessKey}/idQQ{orderId}', 'IO\Controllers\ConfirmationEmailController@showConfirmation');
+            $router->get('_plentyShop__/akQQ{orderAccessKey}/idQQ{orderId}', 'IO\Controllers\ConfirmationEmailController@showConfirmation');
         }
 
 		if ( in_array("login", $enabledRoutes) || in_array("all", $enabledRoutes) )
@@ -176,7 +181,7 @@ class IORouteServiceProvider extends RouteServiceProvider
         {
             $router->get('returns/{orderId}', 'IO\Controllers\OrderReturnController@showOrderReturn');
         }
-        
+
         if( in_array('order-return-confirmation', $enabledRoutes) || in_array("all", $enabledRoutes) )
         {
             $router->get('return-confirmation', 'IO\Controllers\OrderReturnConfirmationController@showOrderReturnConfirmation');
@@ -187,44 +192,55 @@ class IORouteServiceProvider extends RouteServiceProvider
             //contact
             $router->get('contact', 'IO\Controllers\ContactController@showContact');
         }
-        
+
         if( in_array("password-reset", $enabledRoutes) || in_array("all", $enabledRoutes) )
         {
             $router->get('password-reset/{contactId}/{hash}', 'IO\Controllers\CustomerPasswordResetController@showReset');
         }
-        
+
         if( in_array("order-property-file", $enabledRoutes) || in_array("all", $enabledRoutes) )
         {
             $router->get('order-property-file/{hash1}/{filename}', 'IO\Controllers\OrderPropertyFileController@downloadTempFile');
             $router->get('order-property-file/{hash1}/{hash2}/{filename}', 'IO\Controllers\OrderPropertyFileController@downloadFile');
         }
         
-		/*
-		 * ITEM ROUTES
-		 */
+        if( in_array("newsletter-opt-in", $enabledRoutes) || in_array("all", $enabledRoutes) )
+        {
+            $router->get('newsletter/subscribe/{authString}/{newsletterEmailId}', 'IO\Controllers\NewsletterOptInController@showOptInConfirmation');
+        }
+        
+        if( in_array("newsletter-opt-out", $enabledRoutes) || in_array("all", $enabledRoutes) )
+        {
+            $router->get('newsletter/unsubscribe', 'IO\Controllers\NewsletterOptOutController@showOptOut');
+            $router->post('newsletter/unsubscribe', 'IO\Controllers\NewsletterOptOutConfirmationController@showOptOutConfirmation');
+        }
+        
+        /*
+         * ITEM ROUTES
+         */
         if ( in_array("item", $enabledRoutes) || in_array("all", $enabledRoutes) )
         {
             $router->get('{itemId}_{variationId?}', 'IO\Controllers\ItemController@showItemWithoutName')
                    ->where('itemId', '[0-9]+')
                    ->where('variationId', '[0-9]+');
-            
+
             $router->get('{slug}_{itemId}_{variationId?}', 'IO\Controllers\ItemController@showItem')
                    ->where('slug', '[^_]+')
                    ->where('itemId', '[0-9]+')
                    ->where('variationId', '[0-9]+');
-            
+
             //old webshop routes mapping
             $router->get('{slug}a-{itemId}', 'IO\Controllers\ItemController@showItemOld')
                    ->where('slug', '.*')
                    ->where('itemId', '[0-9]+');
-            
+
             $router->get('a-{itemId}', 'IO\Controllers\ItemController@showItemFromAdmin')
                    ->where('itemId', '[0-9]+');
         }
-        
+
         /*
-		 * CATEGORY ROUTES
-		 */
+		     * CATEGORY ROUTES
+		     */
         if ( in_array("category", $enabledRoutes) || in_array("all", $enabledRoutes) )
         {
             $router->get('{level1?}/{level2?}/{level3?}/{level4?}/{level5?}/{level6?}', 'IO\Controllers\CategoryController@showCategory');
