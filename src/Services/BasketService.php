@@ -224,7 +224,7 @@ class BasketService
         if ($basketItem === null) {
             return array();
         }
-        $basketItemData = $this->getBasketItemData($basketItem->toArray());
+        $basketItemData = $this->getBasketItemData([$basketItem]);
         return $this->addVariationData($basketItem, $basketItemData[$basketItem->variationId]);
     }
 

@@ -12,6 +12,8 @@ use Plenty\Modules\Basket\Hooks\BasketItem\CheckNewItemQuantity;
 use Plenty\Modules\Item\Stock\Hooks\CheckItemStock;
 use Plenty\Modules\Item\Variation\Models\Variation;
 use Plenty\Modules\Basket\Models\Basket;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+
 
 use Illuminate\Support\Facades\Session;
 
@@ -21,6 +23,9 @@ use Illuminate\Support\Facades\Session;
  */
 class BasketServiceItemRepoTest extends TestCase
 {
+    use RefreshDatabase;
+
+
     /** @var BasketService $basketService  */
     protected $basketService;
     protected $variation;
@@ -35,45 +40,47 @@ class BasketServiceItemRepoTest extends TestCase
     {
        parent::setUp();
 
+        $this->createApplication();
+
        $checkItemStockMockery = Mockery::mock(CheckItemStock::class);
        $checkItemStockMockery->shouldReceive('handle')->andReturn();
        app()->instance(CheckItemStock::class, $checkItemStockMockery);
 
-        $checkNewItemQuantityMockery = Mockery::mock(CheckNewItemQuantity::class);
-        $checkNewItemQuantityMockery->shouldReceive('handle')->andReturn();
-        app()->instance(CheckNewItemQuantity::class, $checkNewItemQuantityMockery);
+       $checkNewItemQuantityMockery = Mockery::mock(CheckNewItemQuantity::class);
+       $checkNewItemQuantityMockery->shouldReceive('handle')->andReturn();
+       app()->instance(CheckNewItemQuantity::class, $checkNewItemQuantityMockery);
 
 
-        $this->itemSearchServiceMock = Mockery::mock(ItemSearchService::class);
-        app()->instance(ItemSearchService::class, $this->itemSearchServiceMock);
+       $this->itemSearchServiceMock = Mockery::mock(ItemSearchService::class);
+       app()->instance(ItemSearchService::class, $this->itemSearchServiceMock);
 
-        $this->basketService = pluginApp(BasketService::class);
-        $this->variation = factory(Variation::class)->create([
+       $this->basketService = pluginApp(BasketService::class);
+       $this->variation = factory(Variation::class)->create([
             'minimumOrderQuantity' => 1.00
-        ]);
+       ]);
 
-        $esMockData = $this->getTestJsonData();
-        $esMockData['documents'][0]['id'] =  $this->variation['id'];
-        $esMockData['documents'][0]['data']['variation']['id'] = $this->variation['id'];
+       $esMockData = $this->getTestJsonData();
+       $esMockData['documents'][0]['id'] =  $this->variation['id'];
+       $esMockData['documents'][0]['data']['variation']['id'] = $this->variation['id'];
 
-        /**
-         * @var ResultFieldTemplate $resultFieldTemplate
-         */
-        $resultFieldTemplate = pluginApp(ResultFieldTemplate::class);
-        $resultFieldTemplate->setTemplates([ResultFieldTemplate::TEMPLATE_BASKET_ITEM   => 'Ceres::ResultFields.BasketItem']);
-        app()->instance(ResultFieldTemplate::class, $resultFieldTemplate);
+       /**
+       * @var ResultFieldTemplate $resultFieldTemplate
+       */
+       $resultFieldTemplate = pluginApp(ResultFieldTemplate::class);
+       $resultFieldTemplate->setTemplates([ResultFieldTemplate::TEMPLATE_BASKET_ITEM   => 'Ceres::ResultFields.BasketItem']);
+       app()->instance(ResultFieldTemplate::class, $resultFieldTemplate);
 
-        $basketItemsMock = Mockery::mock(BasketItems::class);
-        $basketItemsMock->shouldReceive('getSearchFactory')->with([])->andReturn([]);
-        app()->instance(BasketItems::class, $basketItemsMock);
+       $basketItemsMock = Mockery::mock(BasketItems::class);
+       $basketItemsMock->shouldReceive('getSearchFactory')->with([])->andReturn([]);
+       app()->instance(BasketItems::class, $basketItemsMock);
 
-        $this->itemSearchServiceMock
+       $this->itemSearchServiceMock
             ->shouldReceive('getResults')
             ->with(Mockery::any())
             ->andReturn($esMockData);
 
-        $basket = factory(Basket::class)->create();
-        Session::shouldReceive('getId')
+       $basket = factory(Basket::class)->create();
+       Session::shouldReceive('getId')
             ->andReturn($basket->sessionId);
 
     }
@@ -87,6 +94,7 @@ class BasketServiceItemRepoTest extends TestCase
 
 
         $result = $this->basketService->addBasketItem($item1);
+
 
         $this->assertEquals($this->variation['id'], $result[0]['variationId']);
         $this->assertEquals(1, $result[0]['quantity']);
