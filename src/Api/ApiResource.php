@@ -40,10 +40,10 @@ class ApiResource extends Controller
 		$this->response = $response;
 		$this->request  = $request;
 
-        $originTemplate = $request->get('originTemplate', '');
-        if(strlen($originTemplate))
+        $templateEvent = $request->get('templateEvent', '');
+        if(strlen($templateEvent))
         {
-            TemplateService::$currentTemplate = $originTemplate;
+            TemplateService::$currentTemplate = $templateEvent;
         }
     }
 
