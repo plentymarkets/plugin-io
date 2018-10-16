@@ -375,7 +375,9 @@ class ItemService
                     $columns       = $columnBuilder
                         ->withVariationBase([
                             VariationBaseFields::ID,
-                            VariationBaseFields::ITEM_ID
+                            VariationBaseFields::ITEM_ID,
+                            VariationBaseFields::UNIT_ID,
+                            VariationBaseFields::UNIT_COMBINATION_ID
                         ])
                         ->withItemDescription([
                             ItemDescriptionFields::URL_CONTENT
@@ -429,9 +431,11 @@ class ItemService
                         }
 
                         $data = [
-                            "variationId" => $variation->variationBase->id,
-                            "attributes"  => $variation->variationAttributeValueList,
-                            "url"         => $url
+                            "variationId"       => $variation->variationBase->id,
+                            "attributes"        => $variation->variationAttributeValueList,
+                            "url"               => $url,
+                            "unitId"            => $variation->variationBase->unitId,
+                            "unitCombinationId" => $variation->variationBase->unitCombinationId
                         ];
                         array_push($variations, $data);
                     }
@@ -496,6 +500,7 @@ class ItemService
 	public function getAttributeNameMap($itemId = 0):array
 	{
 		$attributeList = [];
+		$unitList = [];
 
 		if((int)$itemId > 0)
 		{
@@ -507,7 +512,9 @@ class ItemService
 					                    VariationBaseFields::ITEM_ID,
 					                    VariationBaseFields::AVAILABILITY,
 					                    VariationBaseFields::PACKING_UNITS,
-					                    VariationBaseFields::CUSTOM_NUMBER
+					                    VariationBaseFields::CUSTOM_NUMBER,
+                                        VariationBaseFields::UNIT_ID,
+                                        VariationBaseFields::UNIT_COMBINATION_ID
 				                    ])
                 ->withVariationRetailPrice([
                     VariationRetailPriceFields::BASE_PRICE
@@ -556,10 +563,22 @@ class ItemService
 						$attributeList[$attributeId]["values"][$attributeValueId] = $this->getAttributeValueName($attributeValueId);
 					}
 				}
+				
+				$unitId = $variation->variationBase->unitId;
+				$unitCombinationId = $variation->variationBase->unitCombinationId;
+				
+				if(!in_array($unitCombinationId, $unitList[$unitId]))
+                {
+                    $unitList[$unitId]['name'] = $unitId; //TODO name of unit
+                    $unitList[$unitId]['values'][$unitCombinationId] = $unitCombinationId; //TODO name of unit value
+                }
 			}
 		}
 
-		return $attributeList;
+		return [
+		    'attributes' => $attributeList,
+            'units' => $unitList
+        ];
 	}
 
 	/**
