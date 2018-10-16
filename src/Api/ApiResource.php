@@ -2,6 +2,7 @@
 
 namespace IO\Api;
 
+use IO\Services\TemplateService;
 use Plenty\Plugin\Http\Response;
 use Plenty\Plugin\Controller;
 use Plenty\Plugin\Http\Request;
@@ -38,7 +39,13 @@ class ApiResource extends Controller
 	{
 		$this->response = $response;
 		$this->request  = $request;
-	}
+
+        $originTemplate = $request->get('originTemplate', '');
+        if(strlen($originTemplate))
+        {
+            TemplateService::$currentTemplate = $originTemplate;
+        }
+    }
 
 	// Get all
     /**
