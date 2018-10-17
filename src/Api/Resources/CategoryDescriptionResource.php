@@ -24,7 +24,7 @@ class CategoryDescriptionResource extends ApiResource
     {
         parent::__construct($request, $response);
     }
-    
+
     /**
      * Get Category Items
      * @param string $categoryId
@@ -34,16 +34,27 @@ class CategoryDescriptionResource extends ApiResource
     {
         $response = null;
 
+        $description1 = (int)$this->request->get('description1', false);
+        $description2 = (int)$this->request->get('description2', false);
+
         $categoryService = pluginApp(CategoryService::class);
         $sessionStorageService = pluginApp(SessionStorageService::class);
-        
+
         $category = $categoryService->get($categoryId, $sessionStorageService->getLang());
 
         if($category instanceof Category)
         {
-            $response = $category->details[0]->description;
+            if($description1)
+            {
+                $response['description1'] = $category->details[0]->description;
+            }
+
+            if($description2)
+            {
+                $response['description2'] = $category->details[0]->description2;
+            }
         }
-        
+
         return $this->response->create($response, ResponseCode::OK);
     }
 }
