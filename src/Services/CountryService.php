@@ -79,6 +79,16 @@ class CountryService
         return $nameMap;
 	}
 
+
+    /**
+     * Get the ID of the current shipping country
+     * @return int $shippingCountryId
+     */
+  public function getShippingCountryId()
+  {
+    return pluginApp(Checkout::class)->getShippingCountryId();
+  }
+
     /**
      * Set the ID of the current shipping country
      * @param int $shippingCountryId
