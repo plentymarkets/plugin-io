@@ -402,6 +402,7 @@ class ItemService
                     $filter = $filterBuilder
                         ->hasId([$itemId])
                         ->variationIsActive()
+                        ->variationIsVisibleForPlentyId([], [$this->app->getPlentyId()])
                         ->build();
 
                     $contactClassId = $this->sessionStorage->getCustomer()->accountContactClassId;
@@ -419,6 +420,7 @@ class ItemService
                         ->withParam(ItemColumnsParams::PLENTY_ID, $this->app->getPlentyId())
                         ->withParam(ItemColumnsParams::CUSTOMER_CLASS, $contactClassId)
                         ->withParam(ItemColumnsParams::REFERRER_ID, $referrerId)
+                        ->withParam(ItemColumnsParams::AUTOMATIC_CLIENT_VISIBILITY, true)
                         ->build();
 
                     $recordList = $this->itemRepository->search($columns, $filter, $params);
@@ -534,6 +536,7 @@ class ItemService
 				->hasId([$itemId])
                 ->variationHasRetailPrice()
                 ->variationIsActive()
+                ->variationIsVisibleForPlentyId([], [$this->app->getPlentyId()])
                 ->build();
 
             $contactClassId = $this->sessionStorage->getCustomer()->accountContactClassId;
@@ -551,6 +554,7 @@ class ItemService
                 ->withParam(ItemColumnsParams::PLENTY_ID, $this->app->getPlentyId())
                 ->withParam(ItemColumnsParams::CUSTOMER_CLASS, $contactClassId)
                 ->withParam(ItemColumnsParams::REFERRER_ID, $referrerId)
+                ->withParam(ItemColumnsParams::AUTOMATIC_CLIENT_VISIBILITY, true)
                 ->build();
 
 			$recordList = $this->itemRepository->search($columns, $filter, $params);
