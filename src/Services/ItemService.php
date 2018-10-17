@@ -580,10 +580,8 @@ class ItemService
 				$unitId = $variation->variationBase->unitId;
 				$unitCombinationId = $variation->variationBase->unitCombinationId;
 				
-				if(!in_array($unitCombinationId, $unitList[$unitId]))
+				if(!in_array($unitCombinationId, $unitList))
                 {
-                    $unitList[$unitId]['name'] = 'Einheit'; //TODO name of unit
-    
                     $unitData = $authHelper->processUnguarded( function() use ($unitId, $unitNameRepo)
                     {
                         return $unitNameRepo->findOne($unitId, $this->sessionStorage->getLang());
@@ -594,7 +592,7 @@ class ItemService
                         return $unitCombinationRepo->get($unitCombinationId);
                     });
                     
-                    $unitList[$unitId]['values'][$unitCombinationId] = $unitCombinationData->content.' '.$unitData->name;
+                    $unitList[$unitCombinationId] = $unitCombinationData->content.' '.$unitData->name;
                 }
 			}
 		}
