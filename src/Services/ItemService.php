@@ -18,6 +18,7 @@ use IO\Extensions\Filters\ItemImagesFilter;
 use IO\Services\ItemSearch\SearchPresets\SingleItem;
 use IO\Services\ItemSearch\SearchPresets\VariationList;
 use IO\Services\ItemSearch\Services\ItemSearchService;
+use Plenty\Modules\Authorization\Services\AuthHelper;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\ElasticSearch;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Processor\DocumentProcessor;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Search\Document\DocumentSearch;
@@ -31,6 +32,9 @@ use Plenty\Modules\Item\Search\Filter\CategoryFilter;
 use Plenty\Modules\Item\Search\Filter\ClientFilter;
 use Plenty\Modules\Item\Search\Filter\SearchFilter;
 use Plenty\Modules\Item\Search\Filter\VariationBaseFilter;
+use Plenty\Modules\Item\Unit\Contracts\UnitNameRepositoryContract;
+use Plenty\Modules\Item\Unit\Contracts\UnitRepositoryContract;
+use Plenty\Modules\Item\UnitCombination\Contracts\UnitCombinationRepositoryContract;
 use Plenty\Plugin\Application;
 use Plenty\Plugin\Events\Dispatcher;
 
@@ -375,7 +379,9 @@ class ItemService
                     $columns       = $columnBuilder
                         ->withVariationBase([
                             VariationBaseFields::ID,
-                            VariationBaseFields::ITEM_ID
+                            VariationBaseFields::ITEM_ID,
+                            VariationBaseFields::UNIT_ID,
+                            VariationBaseFields::UNIT_COMBINATION_ID
                         ])
                         ->withItemDescription([
                             ItemDescriptionFields::URL_CONTENT
@@ -396,6 +402,7 @@ class ItemService
                     $filter = $filterBuilder
                         ->hasId([$itemId])
                         ->variationIsActive()
+                        ->variationIsVisibleForPlentyId([], [$this->app->getPlentyId()])
                         ->build();
 
                     $contactClassId = $this->sessionStorage->getCustomer()->accountContactClassId;
@@ -413,6 +420,7 @@ class ItemService
                         ->withParam(ItemColumnsParams::PLENTY_ID, $this->app->getPlentyId())
                         ->withParam(ItemColumnsParams::CUSTOMER_CLASS, $contactClassId)
                         ->withParam(ItemColumnsParams::REFERRER_ID, $referrerId)
+                        ->withParam(ItemColumnsParams::AUTOMATIC_CLIENT_VISIBILITY, true)
                         ->build();
 
                     $recordList = $this->itemRepository->search($columns, $filter, $params);
@@ -429,9 +437,11 @@ class ItemService
                         }
 
                         $data = [
-                            "variationId" => $variation->variationBase->id,
-                            "attributes"  => $variation->variationAttributeValueList,
-                            "url"         => $url
+                            "variationId"       => $variation->variationBase->id,
+                            "attributes"        => $variation->variationAttributeValueList,
+                            "url"               => $url,
+                            "unitId"            => $variation->variationBase->unitId,
+                            "unitCombinationId" => $variation->variationBase->unitCombinationId
                         ];
                         array_push($variations, $data);
                     }
@@ -496,6 +506,7 @@ class ItemService
 	public function getAttributeNameMap($itemId = 0):array
 	{
 		$attributeList = [];
+		$unitList = [];
 
 		if((int)$itemId > 0)
 		{
@@ -507,7 +518,9 @@ class ItemService
 					                    VariationBaseFields::ITEM_ID,
 					                    VariationBaseFields::AVAILABILITY,
 					                    VariationBaseFields::PACKING_UNITS,
-					                    VariationBaseFields::CUSTOM_NUMBER
+					                    VariationBaseFields::CUSTOM_NUMBER,
+                                        VariationBaseFields::UNIT_ID,
+                                        VariationBaseFields::UNIT_COMBINATION_ID
 				                    ])
                 ->withVariationRetailPrice([
                     VariationRetailPriceFields::BASE_PRICE
@@ -523,6 +536,7 @@ class ItemService
 				->hasId([$itemId])
                 ->variationHasRetailPrice()
                 ->variationIsActive()
+                ->variationIsVisibleForPlentyId([], [$this->app->getPlentyId()])
                 ->build();
 
             $contactClassId = $this->sessionStorage->getCustomer()->accountContactClassId;
@@ -540,10 +554,20 @@ class ItemService
                 ->withParam(ItemColumnsParams::PLENTY_ID, $this->app->getPlentyId())
                 ->withParam(ItemColumnsParams::CUSTOMER_CLASS, $contactClassId)
                 ->withParam(ItemColumnsParams::REFERRER_ID, $referrerId)
+                ->withParam(ItemColumnsParams::AUTOMATIC_CLIENT_VISIBILITY, true)
                 ->build();
 
 			$recordList = $this->itemRepository->search($columns, $filter, $params);
-
+            
+            /** @var AuthHelper $authHelper */
+            $authHelper = pluginApp(AuthHelper::class);
+            
+            /** @var UnitNameRepositoryContract $unitNameRepo */
+            $unitNameRepo = pluginApp(UnitNameRepositoryContract::class);
+			
+            /** @var UnitCombinationRepositoryContract $unitCombinationRepo */
+            $unitCombinationRepo = pluginApp(UnitCombinationRepositoryContract::class);
+			
 			foreach($recordList as $variation)
 			{
 				foreach($variation->variationAttributeValueList as $attribute)
@@ -556,10 +580,31 @@ class ItemService
 						$attributeList[$attributeId]["values"][$attributeValueId] = $this->getAttributeValueName($attributeValueId);
 					}
 				}
+				
+				$unitId = $variation->variationBase->unitId;
+				$unitCombinationId = $variation->variationBase->unitCombinationId;
+				
+				if(!in_array($unitCombinationId, $unitList))
+                {
+                    $unitData = $authHelper->processUnguarded( function() use ($unitId, $unitNameRepo)
+                    {
+                        return $unitNameRepo->findOne($unitId, $this->sessionStorage->getLang());
+                    });
+                    
+                    $unitCombinationData = $authHelper->processUnguarded( function() use ($unitCombinationId, $unitCombinationRepo)
+                    {
+                        return $unitCombinationRepo->get($unitCombinationId);
+                    });
+                    
+                    $unitList[$unitCombinationId] = $unitCombinationData->content.' '.$unitData->name;
+                }
 			}
 		}
 
-		return $attributeList;
+		return [
+		    'attributes' => $attributeList,
+            'units' => $unitList
+        ];
 	}
 
 	/**
