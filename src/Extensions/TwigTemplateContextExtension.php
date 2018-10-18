@@ -66,30 +66,35 @@ class TwigTemplateContextExtension extends Twig_Extension
      */
     public function getGlobals():array
     {
-        /** @var Dispatcher $dispatcher */
-        $dispatcher = pluginApp(Dispatcher::class);
-        $contextEvent = 'ctx.default';
-        if ( strlen(TemplateService::$currentTemplate) )
-        {
-            $contextEvent = 'ctx' . substr(TemplateService::$currentTemplate, 3);
-        }
+        $request = pluginApp(Request::class);
 
-        /** @var TemplateContainer $templateContainer */
-        $templateContainer = pluginApp(TemplateContainer::class);
-        $dispatcher->fire('IO.' . $contextEvent, [$templateContainer]);
-
-        $contextClass = $templateContainer->getContext();
-        if(strlen($contextClass))
+        if(strpos($request->getUri(), "/rest/") === false)
         {
-            $context = pluginApp( $contextClass );
-            if ( $context instanceof ContextInterface )
+            /** @var Dispatcher $dispatcher */
+            $dispatcher = pluginApp(Dispatcher::class);
+            $contextEvent = 'ctx.default';
+            if ( strlen(TemplateService::$currentTemplate) )
             {
-                $context->init( TemplateService::$currentTemplateData );
+                $contextEvent = 'ctx' . substr(TemplateService::$currentTemplate, 3);
             }
-            
-            return ArrayHelper::toArray( $context );
+
+            /** @var TemplateContainer $templateContainer */
+            $templateContainer = pluginApp(TemplateContainer::class);
+            $dispatcher->fire('IO.' . $contextEvent, [$templateContainer]);
+
+            $contextClass = $templateContainer->getContext();
+            if(strlen($contextClass))
+            {
+                $context = pluginApp( $contextClass );
+                if ( $context instanceof ContextInterface )
+                {
+                    $context->init( TemplateService::$currentTemplateData );
+                }
+
+                return ArrayHelper::toArray( $context );
+            }
         }
-        
+
         return [];
     }
 }
