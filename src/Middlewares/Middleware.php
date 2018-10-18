@@ -3,6 +3,7 @@
 namespace IO\Middlewares;
 
 use IO\Api\ResponseCode;
+use IO\Services\TemplateService;
 use IO\Services\WebstoreConfigurationService;
 
 use Plenty\Plugin\ConfigRepository;
@@ -58,6 +59,12 @@ class Middleware extends \Plenty\Plugin\Middleware
                 $checkoutService = pluginApp(CheckoutService::class);
                 $checkoutService->setCurrency( $currency );
             }
+            else
+            {
+                /** @var TemplateService $templateService */
+                $templateService = pluginApp(TemplateService::class);
+                $templateService->forceNoIndex(true);
+            }
         }
 
         $referrerId = $request->get('ReferrerID', null);
@@ -87,7 +94,7 @@ class Middleware extends \Plenty\Plugin\Middleware
 
     public function after(Request $request, Response $response):Response
     {
-        if ($response->content() == '') {
+        if ($response->status() == ResponseCode::NOT_FOUND) {
             /** @var StaticPagesController $controller */
             $controller = pluginApp(StaticPagesController::class);
 

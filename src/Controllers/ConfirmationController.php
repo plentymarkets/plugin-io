@@ -2,12 +2,14 @@
 
 namespace IO\Controllers;
 
+use IO\Api\ResponseCode;
 use IO\Services\CustomerService;
 use IO\Services\OrderService;
 use IO\Services\OrderTotalsService;
 use IO\Services\SessionStorageService;
 use IO\Constants\SessionStorageKeys;
 use IO\Models\LocalizedOrder;
+use Plenty\Plugin\Http\Response;
 
 /**
  * Class ConfirmationController
@@ -96,13 +98,11 @@ class ConfirmationController extends LayoutController
         }
         else
         {
-            return $this->renderTemplate(
-                "tpl.page-not-found",
-                [
-                    "data" => ""
-                ],
-                false
-            );
+            /** @var Response $response */
+            $response = pluginApp(Response::class);
+            $response->forceStatus(ResponseCode::NOT_FOUND);
+
+            return $response;
         }
     }
 }

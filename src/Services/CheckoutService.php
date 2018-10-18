@@ -368,12 +368,11 @@ class CheckoutService
         $vatService = pluginApp(VatService::class);
         $showNetPrice   = $sessionService->getCustomer()->showNetPrice;
 
-        $contact = $this->customerService->getContact();
         $params  = [
             'countryId'  => $this->getShippingCountryId(),
             'webstoreId' => pluginApp(Application::class)->getWebstoreId(),
         ];
-        $list    = $this->parcelServicePresetRepo->getLastWeightedPresetCombinations($this->basketRepository->load(), $contact->classId, $params);
+        $list    = $this->parcelServicePresetRepo->getLastWeightedPresetCombinations($this->basketRepository->load(), $sessionService->getCustomer()->accountContactClassId, $params);
 
         $locationId = $vatService->getLocationId($this->getShippingCountryId());
         $accountSettings = $accountRepo->getSettings($locationId);

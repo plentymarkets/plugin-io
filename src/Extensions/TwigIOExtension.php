@@ -4,6 +4,7 @@ namespace IO\Extensions;
 
 use IO\Extensions\Constants\ShopUrls;
 use IO\Extensions\Filters\ItemImagesFilter;
+use IO\Extensions\Filters\ResultFieldsFilter;
 use IO\Extensions\Functions\QueryString;
 use IO\Extensions\Functions\UniqueId;
 use Plenty\Plugin\Templates\Extensions\Twig_Extension;
@@ -56,7 +57,8 @@ class TwigIOExtension extends Twig_Extension
         UniqueId $uniqueId,
         ItemImagesFilter $itemImagesFilter,
 		OrderByKeyFilter $orderByKeyFilter,
-		ShuffleFilter $shuffleFilter
+		ShuffleFilter $shuffleFilter,
+        ResultFieldsFilter $resultFieldsFilter
 	)
 	{
 		$this->twig = $twig;

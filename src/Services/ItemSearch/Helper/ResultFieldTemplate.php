@@ -17,6 +17,7 @@ class ResultFieldTemplate
     const TEMPLATE_SINGLE_ITEM  = 'IO.ResultFields.SingleItem';
     const TEMPLATE_BASKET_ITEM  = 'IO.ResultFields.BasketItem';
     const TEMPLATE_AUTOCOMPLETE_ITEM_LIST = 'IO.ResultFields.AutoCompleteListItem';
+    const TEMPLATE_CATEGORY_TREE = 'IO.ResultFields.CategoryTree';
 
     private $templates = [];
 
@@ -25,7 +26,7 @@ class ResultFieldTemplate
      *
      * @param string    $template   Event to be emitted to templates/ themes
      *
-     * @return array
+     * @return string
      */
     public static function get( $template )
     {
