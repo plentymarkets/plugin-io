@@ -363,10 +363,7 @@ class CategoryService
          */
         foreach ( $this->currentCategoryTree as $lvl => $category )
         {
-            if( $category->linklist === 'Y' )
-            {
-                array_push( $hierarchy, $category );
-            }
+            array_push( $hierarchy, $category );
         }
 
         if( $bottomUp === false )
