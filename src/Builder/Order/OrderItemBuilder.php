@@ -4,12 +4,14 @@ namespace IO\Builder\Order;
 
 use IO\Extensions\Filters\ItemNameFilter;
 use IO\Services\SessionStorageService;
+use Plenty\Modules\Authorization\Services\AuthHelper;
 use Plenty\Modules\Basket\Models\Basket;
 use IO\Services\CheckoutService;
 use Plenty\Modules\Frontend\PaymentMethod\Contracts\FrontendPaymentMethodRepositoryContract;
 use Plenty\Modules\Frontend\Services\OrderPropertyFileService;
 use Plenty\Modules\Frontend\Services\VatService;
 use Plenty\Modules\Accounting\Vat\Contracts\VatRepositoryContract;
+use Plenty\Modules\Item\SalesPrice\Contracts\SalesPriceRepositoryContract;
 use Plenty\Modules\System\Contracts\WebstoreRepositoryContract;
 use Plenty\Modules\Accounting\Vat\Models\Vat;
 /**
@@ -165,6 +167,9 @@ class OrderItemBuilder
         else
         {
             $priceOriginal = $basketItem['variation']['data']['prices']['default']['data']['basePrice'];
+            if($priceOriginal == null && $basketItem['unitCombinationId'] > 0) {
+                $priceOriginal = $this->getSubscriptionPriceFromPriceId($basketItem['unitCombinationId']);
+            }
         }
 
         $attributeTotalMarkup = 0;
@@ -255,5 +260,25 @@ class OrderItemBuilder
             }
         }
         return false;
+    }
+
+    /**
+     * @param int $priceId
+     * @return double
+     */
+    private function getSubscriptionPriceFromPriceId(int $priceId)
+    {
+        /** @var SalesPriceRepositoryContract $priceContract */
+        $priceContract = pluginApp(SalesPriceRepositoryContract::class);
+
+        /** @var AuthHelper $authHelper */
+        $authHelper = pluginApp(AuthHelper::class);
+
+        /** @var \Plenty\Modules\Item\SalesPrice\Models\SalesPrice $price */
+        $price = $authHelper->processUnguarded(function () use ($priceContract, $priceId) {
+            return  $priceContract->findById($priceId);
+        });
+
+        return $price->variationSalesPrice()->where('salesPriceId', $price->id)->first()->price;
     }
 }
