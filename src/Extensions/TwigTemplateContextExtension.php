@@ -89,5 +89,7 @@ class TwigTemplateContextExtension extends Twig_Extension
 
             return ArrayHelper::toArray( $context );
         }
+
+        return [];
     }
 }
