@@ -24,7 +24,14 @@ class BasketItems implements SearchPreset
     {
         $variationIds   = $options['variationIds'];
         $quantities     = $options['quantities'];
-
+    
+        $lang = null;
+        if(isset($options['lang']) && strlen($options['lang']))
+        {
+            $lang = $options['lang'];
+        }
+    
+    
         /** @var VariationSearchFactory $searchFactory */
         $searchFactory = pluginApp( VariationSearchFactory::class )
             ->withResultFields(
@@ -32,7 +39,7 @@ class BasketItems implements SearchPreset
             );
 
         $searchFactory
-            ->withLanguage()
+            ->withLanguage($lang)
             ->withUrls()
             ->withImages()
             ->withDefaultImage()

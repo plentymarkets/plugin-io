@@ -46,6 +46,7 @@ use IO\Services\UrlService;
 use IO\Services\WebstoreConfigurationService;
 use Plenty\Modules\Authentication\Events\AfterAccountAuthentication;
 use Plenty\Modules\Authentication\Events\AfterAccountContactLogout;
+use Plenty\Modules\Frontend\Events\FrontendLanguageChanged;
 use Plenty\Modules\Order\Events\OrderCreated;
 use Plenty\Modules\Plugin\Events\AfterBuildPlugins;
 use Plenty\Modules\Plugin\Events\LoadSitemapPattern;
@@ -148,6 +149,13 @@ class IOServiceProvider extends ServiceProvider
             /** @var BasketService $basketService */
             $basketService = pluginApp(BasketService::class);
             $basketService->resetBasket();
+        });
+    
+        $dispatcher->listen(FrontendLanguageChanged::class, function($event) {
+            $lang = $event->getLanguage();
+            /** @var BasketService $basketService */
+            $basketService = pluginApp(BasketService::class);
+            $basketService->removeBasketItemsWithoutNameInLanguage($lang);
         });
 
         $dispatcher->listen(LoadSitemapPattern::class, IOSitemapPattern::class);

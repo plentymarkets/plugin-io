@@ -2,6 +2,7 @@
 
 namespace IO\Services;
 
+use IO\Constants\LogLevel;
 use IO\Services\ItemSearch\SearchPresets\BasketItems;
 use IO\Services\ItemSearch\Services\ItemSearchService;
 use Plenty\Modules\Accounting\Vat\Models\VatRate;
@@ -538,6 +539,60 @@ class BasketService
         }
 
         return $maxVatValue;
+    }
+    
+    /**
+     * Removes basket items with no names if the language was changed
+     * @param $lang
+     */
+    public function removeBasketItemsWithoutNameInLanguage($lang)
+    {
+        $basketItems = $this->getBasketItemsRaw();
+        
+        if(count($basketItems))
+        {
+            $basketItemVariationIds    = [];
+            $basketVariationQuantities = [];
+            $basketItemIds = [];
+            
+            foreach($basketItems as $basketItem)
+            {
+                $basketItemVariationIds[]                            = $basketItem->variationId;
+                $basketVariationQuantities[$basketItem->variationId] = $basketItem->quantity;
+                $basketItemIds[$basketItem->variationId] = $basketItem->id;
+            }
+            
+            /** @var ItemSearchService $itemSearchService */
+            $itemSearchService = pluginApp(ItemSearchService::class);
+            $basketItemsResult = $itemSearchService->getResults(
+                BasketItems::getSearchFactory([
+                                                  'variationIds' => $basketItemVariationIds,
+                                                  'quantities' => $basketVariationQuantities,
+                                                  'lang' => $lang
+                                              ])
+            );
+            
+            $showWarning = false;
+            if(count($basketItemsResult['documents']))
+            {
+                foreach($basketItemsResult['documents'] as $basketItemData)
+                {
+                    $basketItemData = $basketItemData['data'];
+                    if(!count($basketItemData['texts']) || (!strlen($basketItemData['texts']['name1']) && !strlen($basketItemData['texts']['name2']) && !strlen($basketItemData['texts']['name3'])))
+                    {
+                        $this->deleteBasketItem($basketItemIds[$basketItemData['variation']['id']]);
+                        $showWarning = true;
+                    }
+                }
+            }
+            
+            if($showWarning)
+            {
+                /** @var NotificationService $notificationService */
+                $notificationService = pluginApp(NotificationService::class);
+                $notificationService->addNotificationCode(LogLevel::WARN, 9);
+            }
+        }
     }
 
     /**
