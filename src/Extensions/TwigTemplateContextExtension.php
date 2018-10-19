@@ -66,33 +66,28 @@ class TwigTemplateContextExtension extends Twig_Extension
      */
     public function getGlobals():array
     {
-        $request = pluginApp(Request::class);
-
-        if(strpos($request->getUri(), "/rest/") === false)
+        /** @var Dispatcher $dispatcher */
+        $dispatcher = pluginApp(Dispatcher::class);
+        $contextEvent = 'ctx.default';
+        if ( strlen(TemplateService::$currentTemplate) )
         {
-            /** @var Dispatcher $dispatcher */
-            $dispatcher = pluginApp(Dispatcher::class);
-            $contextEvent = 'ctx.default';
-            if ( strlen(TemplateService::$currentTemplate) )
+            $contextEvent = 'ctx' . substr(TemplateService::$currentTemplate, 3);
+        }
+
+        /** @var TemplateContainer $templateContainer */
+        $templateContainer = pluginApp(TemplateContainer::class);
+        $dispatcher->fire('IO.' . $contextEvent, [$templateContainer]);
+
+        $contextClass = $templateContainer->getContext();
+        if(strlen($contextClass))
+        {
+            $context = pluginApp( $contextClass );
+            if ( $context instanceof ContextInterface )
             {
-                $contextEvent = 'ctx' . substr(TemplateService::$currentTemplate, 3);
+                $context->init( TemplateService::$currentTemplateData );
             }
 
-            /** @var TemplateContainer $templateContainer */
-            $templateContainer = pluginApp(TemplateContainer::class);
-            $dispatcher->fire('IO.' . $contextEvent, [$templateContainer]);
-
-            $contextClass = $templateContainer->getContext();
-            if(strlen($contextClass))
-            {
-                $context = pluginApp( $contextClass );
-                if ( $context instanceof ContextInterface )
-                {
-                    $context->init( TemplateService::$currentTemplateData );
-                }
-
-                return ArrayHelper::toArray( $context );
-            }
+            return ArrayHelper::toArray( $context );
         }
 
         return [];
