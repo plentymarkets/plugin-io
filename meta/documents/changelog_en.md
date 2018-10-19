@@ -1,6 +1,6 @@
 # Release Notes for IO
 
-## v2.16.0 (2018-10-18) <a href="https://github.com/plentymarkets/plugin-io/compare/2.15.0...2.16.0" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
+## v2.16.0 (2018-10-22) <a href="https://github.com/plentymarkets/plugin-io/compare/2.15.0...2.16.0" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
 
 ### Added
 
@@ -13,7 +13,7 @@
 - When creating an order or a return, the customer note is now saved prior to the creation. This way, the information is already included in the confirmation e-mail.
 - The LocalizedOrder now includes the ShippingProfileId.
 - The file structures for category navigation have been minimised in order to improve loading times.
-- The function getHierarchy() in the CategoryService now returns all categories and not only those that are displayed in the navigation.
+- The function `getHierarchy()` in the CategoryService now returns all categories and not only those that are displayed in the navigation.
 - In IO it is now possible to read the current template during a REST call.
 
 ### Fixed
