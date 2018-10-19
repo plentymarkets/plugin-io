@@ -1,6 +1,6 @@
 # Release Notes für IO
 
-## v2.16.0 (2018-10-18) <a href="https://github.com/plentymarkets/plugin-io/compare/2.15.0...2.16.0" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
+## v2.16.0 (2018-10-22) <a href="https://github.com/plentymarkets/plugin-io/compare/2.15.0...2.16.0" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
 
 ### Hinzugefügt
 
@@ -13,15 +13,15 @@
 - Beim Anlegen einer Bestellung oder Retoure wird die Kundennotiz nun vor dem Erstellen gespeichert. Hierdurch wird diese Information in der Bestätigungs-E-Mail mitgeschickt.
 - Die LocalizedOrder wurde um die ShippingProfileId erweitert.
 - Die Datenstrukturen für die Kategorie-Navigation wurden minimiert, um die Ladezeit zu verbessern.
-- Die Funktion getHierarchy() im CategoryService gibt nun alle Kategorien zurück und nicht nur solche, die in der Navigation angezeigt werden.
+- Die Funktion `getHierarchy()` im CategoryService gibt nun alle Kategorien zurück und nicht nur solche, die in der Navigation angezeigt werden.
 - In IO ist es nun möglich, während eines REST-Aufrufs das derzeitige Template auszulesen.
 
 ### Behoben
 
-- Durch einen Fehler führte der Link in der Bestellbestätigung zu einer 404 Seite. Dies wurde behoben.
+- Durch einen Fehler führte der Link in der Bestellbestätigung zu einer 404-Seite. Dies wurde behoben.
 - Durch einen Fehler wurden die Kategoriebeschreibungen des Hauptmandanten auch für zusätzliche Mandanten ausgelesen. Dies wurde behoben.
 - Durch einen Fehler wurden in der Varianten-Dropdown-Liste der Artikelansicht auch Varianten angezeigt, für die kein gültiger Verkaufspreis für den Webshop konfiguriert war. Dies wurde behoben.
-- Durch einen Fehler wurden Seitenaufrufe per HEAD-Methode immer also Statuscode 404 zurückgegeben. Dies wurde behoben.
+- Durch einen Fehler wurden Seitenaufrufe per HEAD-Methode immer als Statuscode 404 zurückgegeben. Dies wurde behoben.
 - Es wurden verschiedene SEO-relevante Anpassungen durchgeführt.
 - Durch einen Fehler wurden nicht alle Artikel in die **Zuletzt gesehen**-Artikelliste aufgenommen. Dies wurde behoben.
 - Durch einen Fehler wurden bei Gastbestellungen alle Versandprofile in der Kaufabwicklung angezeigt. Dies wurde behoben.
