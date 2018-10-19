@@ -16,6 +16,7 @@ use Plenty\Modules\Item\SalesPrice\Models\SalesPriceSearchRequest;
 use Plenty\Modules\Item\SalesPrice\Models\SalesPriceSearchResponse;
 use Plenty\Modules\Item\Unit\Contracts\UnitNameRepositoryContract;
 use Plenty\Modules\Item\Unit\Contracts\UnitRepositoryContract;
+use Plenty\Modules\LiveShopping\Contracts\LiveShoppingRepositoryContract;
 use Plenty\Plugin\Application;
 use Plenty\Plugin\CachingRepository;
 
@@ -160,7 +161,7 @@ class VariationPriceList
         ];
     }
 
-    public function getCalculatedPrices( $quantity = null )
+    public function getCalculatedPrices( $quantity = null, $itemId )
     {
         if ( $quantity === null )
         {
@@ -169,8 +170,16 @@ class VariationPriceList
 
         $defaultPrice   = $this->findPriceForQuantity( $quantity );
         $rrp            = $this->findPriceForQuantity( $quantity, self::TYPE_RRP );
-        $specialOffer   = $this->findPriceForQuantity( $quantity, self::TYPE_SPECIAL_OFFER );
         $graduatedPrices= [];
+    
+        /** @var LiveShoppingRepositoryContract $liveShoppingRepo */
+        $liveShoppingRepo = pluginApp(LiveShoppingRepositoryContract::class);
+        
+        $specialOffer = null;
+        if($liveShoppingRepo->itemHasActiveLiveShopping($itemId))
+        {
+            $specialOffer   = $this->findPriceForQuantity( $quantity, self::TYPE_SPECIAL_OFFER );
+        }
 
         foreach($this->prices[self::TYPE_DEFAULT] as $price )
         {

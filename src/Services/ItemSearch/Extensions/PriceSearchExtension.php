@@ -45,6 +45,7 @@ class PriceSearchExtension implements ItemSearchExtension
             {
                 if ( (int)$variation['data']['variation']['id'] > 0 )
                 {
+                    $itemId             = $variation['data']['item']['id'];
                     $variationId        = $variation['data']['variation']['id'];
                     $minimumQuantity    = $variation['data']['variation']['minimumOrderQuantity'];
                     if ( is_null($minimumQuantity) || (float)$minimumQuantity === 0 )
@@ -102,7 +103,7 @@ class PriceSearchExtension implements ItemSearchExtension
                         $quantity = (float)$this->quantities[$variationId];
                     }
 
-                    $variation['data']['calculatedPrices'] = $priceList->getCalculatedPrices( $quantity );
+                    $variation['data']['calculatedPrices'] = $priceList->getCalculatedPrices( $quantity, $itemId );
                     $variation['data']['prices'] = $priceList->toArray( $quantity );
 
 
