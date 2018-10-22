@@ -9,7 +9,7 @@
   },
   "autoload-dev": {
     "psr-4": {
-      "IO\\Tests\\": "Tests/"
+      "IO\\Tests\\": "tests/"
     }
   },
   "require": {
