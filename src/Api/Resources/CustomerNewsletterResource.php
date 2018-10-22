@@ -26,8 +26,9 @@ class CustomerNewsletterResource extends ApiResource
         $email = $this->request->get('email', '');
         $firstName = $this->request->get('firstName', '');
         $lastName = $this->request->get('lastName', '');
+        $emailFolder = $this->request->get('emailFolder', 0);
         
-        $this->newsletterService->saveNewsletterData($email, $firstName, $lastName);
+        $this->newsletterService->saveNewsletterData($email, $emailFolder, $firstName, $lastName);
     
         return $this->response->create($email, ResponseCode::OK);
     }
