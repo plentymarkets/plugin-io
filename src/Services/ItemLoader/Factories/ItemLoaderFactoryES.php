@@ -346,6 +346,7 @@ class ItemLoaderFactoryES implements ItemLoaderFactory
             {
                 if ( (int)$variation['data']['variation']['id'] > 0 )
                 {
+                    $itemId             = $variation['data']['item']['id'];
                     $variationId        = $variation['data']['variation']['id'];
                     $minimumQuantity    = $variation['data']['variation']['minimumOrderQuantity'];
                     if ( $minimumQuantity === null )
@@ -401,7 +402,7 @@ class ItemLoaderFactoryES implements ItemLoaderFactory
                         $quantity = (float)$options['basketVariationQuantities'][$variationId];
                     }
 
-                    $variation['data']['calculatedPrices'] = $priceList->getCalculatedPrices( $quantity );
+                    $variation['data']['calculatedPrices'] = $priceList->getCalculatedPrices( $itemId, $quantity );
                     $variation['data']['prices'] = $priceList->toArray( $quantity );
 
 

@@ -103,7 +103,7 @@ class PriceSearchExtension implements ItemSearchExtension
                         $quantity = (float)$this->quantities[$variationId];
                     }
 
-                    $variation['data']['calculatedPrices'] = $priceList->getCalculatedPrices( $quantity, $itemId );
+                    $variation['data']['calculatedPrices'] = $priceList->getCalculatedPrices( $itemId, $quantity );
                     $variation['data']['prices'] = $priceList->toArray( $quantity );
 
 
