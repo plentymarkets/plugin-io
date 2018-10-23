@@ -401,7 +401,7 @@ class ItemLoaderFactoryES implements ItemLoaderFactory
                         $quantity = (float)$options['basketVariationQuantities'][$variationId];
                     }
 
-                    $variation['data']['calculatedPrices'] = $priceList->getCalculatedPrices( $quantity );
+                    $variation['data']['calculatedPrices'] = $priceList->getCalculatedPrices( null, $quantity );
                     $variation['data']['prices'] = $priceList->toArray( $quantity );
 
 
