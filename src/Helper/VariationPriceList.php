@@ -161,7 +161,7 @@ class VariationPriceList
         ];
     }
 
-    public function getCalculatedPrices( $itemId, $quantity = null )
+    public function getCalculatedPrices( $itemId, $quantity = null)
     {
         if ( $quantity === null )
         {
