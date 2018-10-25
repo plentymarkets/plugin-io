@@ -18,6 +18,7 @@ use Plenty\Modules\Account\Contact\Repositories\ContactAddressRepository;
 use Plenty\Modules\Account\Contact\Repositories\ContactRepository;
 use Plenty\Modules\Account\Models\Account;
 use Plenty\Modules\System\Models\WebstoreConfiguration;
+use Plenty\Plugin\Events\Dispatcher;
 
 class CustomerServiceTest extends TestCase
 {
@@ -41,6 +42,8 @@ class CustomerServiceTest extends TestCase
     protected $sessionStorageServiceMock;
     /** @var WebstoreConfigurationService $webstoreConfigServiceMock */
     protected $webstoreConfigServiceMock;
+    /** @var Dispatcher $dispatcherMock */
+    protected $dispatcherMock;
 
     protected function setUp()
     {
@@ -72,6 +75,9 @@ class CustomerServiceTest extends TestCase
 
         $this->webstoreConfigServiceMock = Mockery::mock(WebstoreConfigurationService::class);
         app()->instance(WebstoreConfigurationService::class, $this->webstoreConfigServiceMock);
+
+        $this->dispatcherMock = Mockery::mock(Dispatcher::class);
+        app()->instance(Dispatcher::class, $this->dispatcherMock);
 
         $this->customerService = pluginApp(CustomerService::class);
     }
@@ -483,5 +489,205 @@ class CustomerServiceTest extends TestCase
 
         $this->assertTrue(true);
 
+    }
+
+    /** @test */
+    public function it_updates_an_existing_address_as_guest_and_delivery_address_type()
+    {
+        $addressId = 100;
+
+        $contactId = 1;
+
+        /** @var Address $address */
+        $address = factory(Address::class)->make([
+            "id" => $addressId
+        ]);
+
+        $this->userSessionMock->shouldReceive('getCurrentContactId')->andReturn(0);
+
+        $address2 = $address->replicate();
+        $address2->name1 = 'update';
+        $address2->id = $addressId;
+
+        $this->addressRepositoryMock->shouldReceive('updateAddress')
+            ->andReturn($address2);
+
+        $this->addressValidatorMock->shouldReceive('validateOrFail')->andReturnNull()->once();
+
+        $this->basketServiceMock
+            ->shouldReceive('setDeliveryAddressId')
+            ->with($addressId)
+            ->andReturn();
+
+        $this->dispatcherMock->shouldReceive('fire')->andReturn();
+
+        /** @var Address $updatedAddress */
+        $updatedAddress = $this->customerService->updateAddress($address->id, $address->toArray(), AddressType::DELIVERY);
+
+        $this->assertNotNull($updatedAddress);
+        $this->assertInstanceOf(Address::class, $updatedAddress);
+        $this->assertEquals($addressId, $updatedAddress->id);
+        $this->assertNotEquals($address->name1, $updatedAddress->name1);
+    }
+
+    /** @test */
+    public function it_updates_an_existing_address_as_contact_and_delivery_address_type()
+    {
+        $addressId = 100;
+
+        $contactId = 1;
+
+        /** @var Address $address */
+        $address = factory(Address::class)->make([
+            "id" => $addressId
+        ]);
+
+        $contact = factory(Contact::class)->make([
+            "id" => $contactId
+        ]);
+
+        $this->contactRepositoryMock->shouldReceive('findContactById')->with($contact->id)->andReturn($contact);
+        $this->userSessionMock->shouldReceive('getCurrentContactId')->andReturn($contactId);
+
+        $address2 = $address->replicate();
+        $address2->name1 = 'update';
+        $address2->id = $addressId;
+
+        $this->contactAddressRepositoryMock->shouldReceive('updateAddress')
+            ->andReturn($address2);
+
+        $this->addressValidatorMock->shouldReceive('validateOrFail')->andReturnNull()->once();
+
+        $this->basketServiceMock
+            ->shouldReceive('setDeliveryAddressId')
+            ->with($addressId)
+            ->andReturn();
+
+        $this->dispatcherMock->shouldReceive('fire')->andReturn();
+
+        /** @var Address $updatedAddress */
+        $updatedAddress = $this->customerService->updateAddress($address->id, $address->toArray(), AddressType::DELIVERY);
+
+        $this->assertNotNull($updatedAddress);
+        $this->assertInstanceOf(Address::class, $updatedAddress);
+        $this->assertEquals($addressId, $updatedAddress->id);
+        $this->assertNotEquals($address->name1, $updatedAddress->name1);
+    }
+
+    /** @test */
+    public function it_updates_an_existing_address_as_contact_and_billing_address_type()
+    {
+        $addressId = 100;
+
+        $contactId = 1;
+        $accountId = 1;
+
+        /** @var Address $address */
+        $address = factory(Address::class)->make([
+            "id" => $addressId
+        ]);
+
+        $contact = factory(Contact::class)->make([
+            "id" => $contactId
+        ]);
+
+        $account = factory(Account::class)->make([
+            "id" => $accountId
+        ]);
+
+        $this->contactRepositoryMock->shouldReceive('findContactById')->with($contact->id)->andReturn($contact);
+        $this->userSessionMock->shouldReceive('getCurrentContactId')->andReturn($contactId);
+
+        $this->contactAccountRepositoryMock->shouldReceive('createAccount')->andReturn($account)->once();
+
+        $address2 = $address->replicate();
+        $address2->name1 = 'update';
+        $address2->id = $addressId;
+
+        $this->contactAddressRepositoryMock->shouldReceive('updateAddress')
+            ->andReturn($address2);
+
+        $this->addressValidatorMock->shouldReceive('validateOrFail')->andReturnNull()->once();
+
+        $this->basketServiceMock
+            ->shouldReceive('setBillingAddressId')
+            ->with($addressId)
+            ->andReturn();
+
+        $this->contactAddressRepositoryMock->shouldReceive('findContactAddressByTypeId')
+            ->with($contactId, AddressType::BILLING, false)
+            ->andReturn($address);
+
+        $this->dispatcherMock->shouldReceive('fire')->andReturn();
+
+        $this->contactRepositoryMock->shouldReceive('updateContact')->andReturn($contact);
+
+        /** @var Address $updatedAddress */
+        $updatedAddress = $this->customerService->updateAddress($address->id, $address->toArray(), AddressType::BILLING);
+
+        $this->assertNotNull($updatedAddress);
+        $this->assertInstanceOf(Address::class, $updatedAddress);
+        $this->assertEquals($addressId, $updatedAddress->id);
+        $this->assertNotEquals($address->name1, $updatedAddress->name1);
+    }
+
+    /** @test */
+    public function it_updates_an_existing_address_as_contact_and_billing_address_type_without_name1()
+    {
+        $addressId = 100;
+
+        $contactId = 1;
+        $accountId = 1;
+
+        /** @var Address $address */
+        $address = factory(Address::class)->make([
+            "id" => $addressId,
+            "name1" => null
+        ]);
+
+        $contact = factory(Contact::class)->make([
+            "id" => $contactId
+        ]);
+
+        $account = factory(Account::class)->make([
+            "id" => $accountId
+        ]);
+
+        $this->contactRepositoryMock->shouldReceive('findContactById')->with($contact->id)->andReturn($contact);
+        $this->userSessionMock->shouldReceive('getCurrentContactId')->andReturn($contactId);
+
+        $address2 = $address->replicate();
+        $address2->name1 = 'update';
+        $address2->id = $addressId;
+
+        $this->contactAddressRepositoryMock->shouldReceive('updateAddress')
+            ->andReturn($address2);
+
+        $this->addressValidatorMock->shouldReceive('validateOrFail')->andReturnNull()->once();
+
+        $this->basketServiceMock
+            ->shouldReceive('setBillingAddressId')
+            ->with($addressId)
+            ->andReturn();
+
+        $this->contactAddressRepositoryMock->shouldReceive('findContactAddressByTypeId')
+            ->with($contactId, AddressType::BILLING, false)
+            ->andReturn($address);
+
+        $this->contactAddressRepositoryMock->shouldReceive('getAddress')
+            ->with($addressId, $contactId, AddressType::BILLING)
+            ->andReturn($address2);
+
+        $this->dispatcherMock->shouldReceive('fire')->andReturn();
+
+        $this->contactRepositoryMock->shouldReceive('updateContact')->andReturn($contact);
+
+        /** @var Address $updatedAddress */
+        $updatedAddress = $this->customerService->updateAddress($address->id, $address->toArray(), AddressType::BILLING);
+
+        $this->assertNotNull($updatedAddress);
+        $this->assertInstanceOf(Address::class, $updatedAddress);
+        $this->assertEquals($addressId, $updatedAddress->id);
+        $this->assertNotEquals($address->name1, $updatedAddress->name1);
     }
 }

@@ -739,7 +739,8 @@ class CustomerService
      */
     public function updateAddress(int $addressId, array $addressData, int $type):Address
     {
-        AddressValidator::validateOrFail($type, $addressData);
+        $addressValidator = pluginApp(AddressValidator::class);
+        $addressValidator->validateOrFail($type, $addressData);
 
         if (isset($addressData['stateId']) && empty($addressData['stateId']))
         {
