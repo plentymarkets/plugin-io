@@ -1,22 +1,23 @@
 <?php
 
 use IO\Api\Resources\CustomerAddressResource;
+use IO\Builder\Order\AddressType;
 use IO\Constants\SessionStorageKeys;
 use IO\Helper\UserSession;
 use IO\Services\BasketService;
 use IO\Services\CustomerService;
 use IO\Services\SessionStorageService;
+use IO\Services\WebstoreConfigurationService;
 use IO\Tests\TestCase;
 use IO\Validators\Customer\AddressValidator;
 use Plenty\Modules\Account\Address\Models\Address;
-use IO\Builder\Order\AddressType;
 use Plenty\Modules\Account\Address\Repositories\AddressRepository;
 use Plenty\Modules\Account\Contact\Contracts\ContactAccountRepositoryContract;
 use Plenty\Modules\Account\Contact\Models\Contact;
 use Plenty\Modules\Account\Contact\Repositories\ContactAddressRepository;
 use Plenty\Modules\Account\Contact\Repositories\ContactRepository;
 use Plenty\Modules\Account\Models\Account;
-use Plenty\Modules\Account\Repositories\AccountRepository;
+use Plenty\Modules\System\Models\WebstoreConfiguration;
 
 class CustomerServiceTest extends TestCase
 {
@@ -38,6 +39,8 @@ class CustomerServiceTest extends TestCase
     protected $contactAccountRepositoryMock;
     /** @var SessionStorageService $sessionStorageServiceMock */
     protected $sessionStorageServiceMock;
+    /** @var WebstoreConfigurationService $webstoreConfigServiceMock */
+    protected $webstoreConfigServiceMock;
 
     protected function setUp()
     {
@@ -66,6 +69,9 @@ class CustomerServiceTest extends TestCase
 
         $this->sessionStorageServiceMock = Mockery::mock(SessionStorageService::class);
         app()->instance(SessionStorageService::class, $this->sessionStorageServiceMock);
+
+        $this->webstoreConfigServiceMock = Mockery::mock(WebstoreConfigurationService::class);
+        app()->instance(WebstoreConfigurationService::class, $this->webstoreConfigServiceMock);
 
         $this->customerService = pluginApp(CustomerService::class);
     }
@@ -103,26 +109,50 @@ class CustomerServiceTest extends TestCase
 
         $this->basketServiceMock->shouldReceive('setBillingAddressId')->with($address->id)->andReturnNull()->once();
 
-        $this->customerService->createAddress($addressArray, AddressType::BILLING);
+        $response = $this->customerService->createAddress($addressArray, AddressType::BILLING);
+
+        $this->assertInstanceOf(Address::class, $response);
+        $this->assertEquals($response->id, $addressId);
 
     }
 
-    /** @test */
-    public function it_creates_a_billing_address_with_company_as_guest()
+    /** @test
+     * @throws \Plenty\Exceptions\ValidationException
+     */
+    public function it_creates_an_delivery_address_as_guest()
     {
+        $addressId = 100;
 
-    }
+        /** @var Address $address */
+        $address = factory(Address::class)->make([
+            'id' => $addressId,
+            'name1' => null
+        ]);
 
-    /** @test */
-    public function it_creates_a_billing_address_with_company_as_logged_in_user()
-    {
+        $addressArray = $address->toArray();
 
-    }
+        $this->addressValidatorMock->shouldReceive('validateOrFail')->andReturnNull()->once();
+        $this->addressValidatorMock->shouldReceive('isEnAddress')->andReturn(false)->once();
 
-    /** @test */
-    public function it_sets_the_contacts_first_and_last_name_from_the_address_that_gets_created()
-    {
+        $this->addressRepositoryMock
+            ->shouldReceive('createAddress')
+            ->andReturn($address)
+            ->once();
 
+        $this->sessionStorageServiceMock
+            ->shouldReceive('getSessionValue')
+            ->with(SessionStorageKeys::GUEST_EMAIL)
+            ->andReturn('test@test.de')
+            ->once();
+
+        $this->userSessionMock->shouldReceive('getCurrentContactId')->andReturn(0);
+
+        $this->basketServiceMock->shouldReceive('setDeliveryAddressId')->with($address->id)->andReturnNull()->once();
+
+        $response = $this->customerService->createAddress($addressArray, AddressType::DELIVERY);
+
+        $this->assertInstanceOf(Address::class, $response);
+        $this->assertEquals($response->id, $addressId);
     }
 
     /** @test
@@ -142,8 +172,6 @@ class CustomerServiceTest extends TestCase
 
         $contact = factory(Contact::class)->create();
 
-        $account = factory(Account::class)->create();
-
         $this->addressValidatorMock->shouldReceive('validateOrFail')->andReturnNull()->once();
         $this->addressValidatorMock->shouldReceive('isEnAddress')->andReturn(false)->once();
 
@@ -153,14 +181,150 @@ class CustomerServiceTest extends TestCase
 
         $this->contactRepositoryMock->shouldReceive('findContactById')->with($contact->id)->andReturn($contact);
 
+        $this->contactAddressRepositoryMock
+            ->shouldReceive('createAddress')
+            ->andReturn($address)
+            ->once();
+
+        $response = $this->customerService->createAddress($addressArray, AddressType::BILLING);
+
+        $this->assertInstanceOf(Address::class, $response);
+        $this->assertEquals($response->id, $addressId);
+    }
+
+    /** @test */
+    public function it_creates_a_billing_address_with_company_as_logged_in_user()
+    {
+        $addressId = 100;
+
+        /** @var Address $address */
+        $address = factory(Address::class)->make([
+            'id' => $addressId
+        ]);
+
+        $addressArray = $address->toArray();
+
+        $contact = factory(Contact::class)->create();
+
+        $account = factory(Account::class)->create();
+
+        $webstoreConfig = factory(WebstoreConfiguration::class)->make();
+
+        $this->addressValidatorMock->shouldReceive('validateOrFail')->andReturnNull()->once();
+        $this->addressValidatorMock->shouldReceive('isEnAddress')->andReturn(false)->once();
+
+        $this->basketServiceMock->shouldReceive('setBillingAddressId')->with($address->id)->andReturnNull()->once();
+
+        $this->userSessionMock->shouldReceive('getCurrentContactId')->andReturn($contact->id);
+
+        $this->contactRepositoryMock->shouldReceive('findContactById')->with($contact->id)->andReturn($contact);
+        $this->contactRepositoryMock->shouldReceive('updateContact')->andReturn($contact)->once();
+
         $this->contactAccountRepositoryMock->shouldReceive('createAccount')->andReturn($account)->once();
+
+        $this->webstoreConfigServiceMock->shouldReceive('getWebstoreConfig')->andReturn($webstoreConfig);
 
         $this->contactAddressRepositoryMock
             ->shouldReceive('createAddress')
             ->andReturn($address)
             ->once();
 
-        $this->customerService->createAddress($addressArray, AddressType::BILLING);
+        $response = $this->customerService->createAddress($addressArray, AddressType::BILLING);
+
+        $this->assertInstanceOf(Address::class, $response);
+        $this->assertEquals($response->id, $addressId);
+    }
+
+    /** @test */
+    public function it_sets_the_contacts_first_and_last_name_from_the_address_that_gets_created()
+    {
+        $addressId = 100;
+
+        /** @var Address $address */
+        $address = factory(Address::class)->make([
+            'id' => $addressId
+        ]);
+
+        $addressArray = $address->toArray();
+
+        $contact = factory(Contact::class)->create([
+            'firstName' => "",
+            'lastName' => ""
+        ]);
+
+        $account = factory(Account::class)->create();
+
+        $webstoreConfig = factory(WebstoreConfiguration::class)->make();
+
+        $this->addressValidatorMock->shouldReceive('validateOrFail')->andReturnNull()->once();
+        $this->addressValidatorMock->shouldReceive('isEnAddress')->andReturn(false)->once();
+
+        $this->basketServiceMock->shouldReceive('setBillingAddressId')->with($address->id)->andReturnNull()->once();
+
+        $this->userSessionMock->shouldReceive('getCurrentContactId')->andReturn($contact->id);
+
+        $this->contactRepositoryMock->shouldReceive('findContactById')->with($contact->id)->andReturn($contact);
+        $this->contactRepositoryMock->shouldReceive('updateContact')->andReturn($contact)->twice();
+
+        $this->contactAccountRepositoryMock->shouldReceive('createAccount')->andReturn($account)->once();
+
+        $this->webstoreConfigServiceMock->shouldReceive('getWebstoreConfig')->andReturn($webstoreConfig);
+
+        $this->contactAddressRepositoryMock
+            ->shouldReceive('createAddress')
+            ->andReturn($address)
+            ->once();
+
+        $response = $this->customerService->createAddress($addressArray, AddressType::BILLING);
+
+        $this->assertInstanceOf(Address::class, $response);
+        $this->assertEquals($response->id, $addressId);
+    }
+
+    /** @test */
+    public function it_updates_the_contact_class_id_while_creating_an_address()
+    {
+        $addressId = 100;
+
+        /** @var Address $address */
+        $address = factory(Address::class)->make([
+            'id' => $addressId
+        ]);
+
+        $addressArray = $address->toArray();
+
+        $contact = factory(Contact::class)->create([
+            'firstName' => "",
+            'lastName' => ""
+        ]);
+
+        $account = factory(Account::class)->create();
+
+        $webstoreConfig = factory(WebstoreConfiguration::class)->make();
+
+        $this->addressValidatorMock->shouldReceive('validateOrFail')->andReturnNull()->once();
+        $this->addressValidatorMock->shouldReceive('isEnAddress')->andReturn(false)->once();
+
+        $this->basketServiceMock->shouldReceive('setBillingAddressId')->with($address->id)->andReturnNull()->once();
+
+        $this->userSessionMock->shouldReceive('getCurrentContactId')->andReturn($contact->id);
+
+        $this->contactRepositoryMock->shouldReceive('findContactById')->with($contact->id)->andReturn($contact);
+        $this->contactRepositoryMock->shouldReceive('updateContact')->andReturn($contact)->twice();
+
+        $this->contactAccountRepositoryMock->shouldReceive('createAccount')->andReturn($account)->once();
+
+        $this->webstoreConfigServiceMock->shouldReceive('getWebstoreConfig')->andReturn($webstoreConfig);
+
+        $this->contactAddressRepositoryMock
+            ->shouldReceive('createAddress')
+            ->andReturn($address)
+            ->once();
+
+        $response = $this->customerService->createAddress($addressArray, AddressType::BILLING);
+
+        $this->assertInstanceOf(Address::class, $response);
+        $this->assertEquals($response->id, $addressId);
     }
 
     /** @test */
@@ -201,9 +365,9 @@ class CustomerServiceTest extends TestCase
 
             $this->customerService->deleteAddress($address->id, AddressType::BILLING);
 
-        }catch (\Exception $exception) {
+        } catch (\Exception $exception) {
 
-            $this->fail('CustomerService failed! - '. $exception->getMessage());
+            $this->fail('CustomerService failed! - ' . $exception->getMessage());
         }
 
 
@@ -256,9 +420,9 @@ class CustomerServiceTest extends TestCase
 
             $this->customerService->deleteAddress($address->id, AddressType::BILLING);
 
-        }catch (\Exception $exception) {
+        } catch (\Exception $exception) {
 
-            $this->fail('CustomerService failed! - '. $exception->getMessage());
+            $this->fail('CustomerService failed! - ' . $exception->getMessage());
         }
 
 
@@ -311,9 +475,9 @@ class CustomerServiceTest extends TestCase
 
             $this->customerService->deleteAddress($address->id, AddressType::DELIVERY);
 
-        }catch (\Exception $exception) {
+        } catch (\Exception $exception) {
 
-            $this->fail('CustomerService failed! - '. $exception->getMessage());
+            $this->fail('CustomerService failed! - ' . $exception->getMessage());
         }
 
 
