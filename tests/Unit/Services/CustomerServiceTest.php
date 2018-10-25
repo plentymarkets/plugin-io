@@ -8,9 +8,12 @@ use IO\Validators\Customer\AddressValidator;
 use Plenty\Modules\Account\Address\Models\Address;
 use Mockery;
 use Plenty\Modules\Account\Address\Repositories\AddressRepository;
+use Plenty\Modules\Account\Contact\Contracts\ContactAccountRepositoryContract;
 use Plenty\Modules\Account\Contact\Models\Contact;
 use Plenty\Modules\Account\Contact\Repositories\ContactAddressRepository;
 use Plenty\Modules\Account\Contact\Repositories\ContactRepository;
+use Plenty\Modules\Account\Models\Account;
+use Plenty\Modules\Account\Repositories\AccountRepository;
 
 class CustomerServiceTest extends TestCase
 {
@@ -28,6 +31,8 @@ class CustomerServiceTest extends TestCase
     protected $contactAddressRepositoryMock;
     /** @var ContactRepository $contactRepositoryMock */
     protected $contactRepositoryMock;
+    /** @var ContactAccountRepositoryContract $contactAccountRepositoryMock */
+    protected $contactAccountRepositoryMock;
 
     protected function setUp()
     {
@@ -50,6 +55,9 @@ class CustomerServiceTest extends TestCase
 
         $this->contactRepositoryMock = Mockery::mock(ContactRepository::class);
         app()->instance(ContactRepository::class, $this->contactRepositoryMock);
+
+        $this->contactAccountRepositoryMock = Mockery::mock(ContactAccountRepositoryContract::class);
+        app()->instance(ContactAccountRepositoryContract::class, $this->contactAccountRepositoryMock);
 
         $this->customerService = pluginApp(CustomerService::class);
     }
@@ -85,17 +93,18 @@ class CustomerServiceTest extends TestCase
 
         $contact = factory(Contact::class)->create();
 
+        $account = factory(Account::class)->create();
+
         $this->addressValidatorMock->shouldReceive('validateOrFail')->andReturnNull()->once();
         $this->addressValidatorMock->shouldReceive('isEnAddress')->andReturn(false)->once();
+
         $this->basketServiceMock->shouldReceive('setBillingAddressId')->with($address->id)->andReturnNull()->once();
+
         $this->userSessionMock->shouldReceive('getCurrentContactId')->andReturn($contact->id);
 
         $this->contactRepositoryMock->shouldReceive('findContactById')->with($contact->id)->andReturn($contact);
 
-//        $this->contactRepository->findContactById($this->getContactId());
-//        ContactRepositoryContract
-
-//        $this->contactRepository->findContactById($this->getContactId());
+        $this->contactAccountRepositoryMock->shouldReceive('createAccount')->andReturn($account)->once();
 
         $this->contactAddressRepositoryMock
             ->shouldReceive('createAddress')

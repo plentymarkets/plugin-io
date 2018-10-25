@@ -23,7 +23,7 @@ use Plenty\Modules\System\Models\WebstoreConfiguration;
 class CheckoutServiceCurrencyTest extends TestCase
 {
 
-    /** @var CheckoutService $basketService  */
+    /** @var CheckoutService $basketService */
     protected $checkoutService;
     /** @var FrontendSessionStorageFactoryContract */
     protected $sessionStorageMock;
