@@ -177,4 +177,114 @@ class CustomerServiceTest extends TestCase
         $this->assertTrue(true);
 
     }
+
+    /** @test */
+    public function it_deletes_an_existing_address_with_contact_and_billing_address_type()
+    {
+        $addressId = 100;
+
+        $contactId = 1;
+
+        /** @var Address $address */
+        $address = factory(Address::class)->make([
+            "id" => $addressId
+        ]);
+
+        $contact = factory(Contact::class)->make([
+            "id" => $contactId
+        ]);
+
+        $this->basketServiceMock
+            ->shouldReceive(
+                [
+                    'getBillingAddressId' => $addressId,
+                    'getDeliveryAddressId' => $addressId
+                ]);
+
+        $this->basketServiceMock
+            ->shouldReceive('setBillingAddressId')
+            ->with(0)
+            ->andReturn();
+
+        $this->userSessionMock->shouldReceive('getCurrentContactId')
+            ->andReturn($contactId);
+
+        $this->contactAddressRepositoryMock->shouldReceive('findContactAddressByTypeId')
+            ->with($contactId, AddressType::BILLING, false)
+            ->andReturn($address);
+
+        $this->contactAddressRepositoryMock->shouldReceive('deleteAddress')
+            ->once();
+
+
+        $this->contactRepositoryMock->shouldReceive('updateContact')->andReturn($contact);
+
+        try {
+
+            $this->customerService->deleteAddress($address->id, AddressType::BILLING);
+
+        }catch (\Exception $exception) {
+
+            $this->fail('CustomerService failed! - '. $exception->getMessage());
+        }
+
+
+        $this->assertTrue(true);
+
+    }
+
+    /** @test */
+    public function it_deletes_an_existing_address_with_contact_and_delivery_address_type()
+    {
+        $addressId = 100;
+
+        $contactId = 1;
+
+        /** @var Address $address */
+        $address = factory(Address::class)->make([
+            "id" => $addressId
+        ]);
+
+        $contact = factory(Contact::class)->make([
+            "id" => $contactId
+        ]);
+
+        $this->basketServiceMock
+            ->shouldReceive(
+                [
+                    'getBillingAddressId' => $addressId,
+                    'getDeliveryAddressId' => $addressId
+                ]);
+
+        $this->basketServiceMock
+            ->shouldReceive('setDeliveryAddressId')
+            ->with(CustomerAddressResource::ADDRESS_NOT_SET)
+            ->andReturn();
+
+        $this->userSessionMock->shouldReceive('getCurrentContactId')
+            ->andReturn($contactId);
+
+        $this->contactAddressRepositoryMock->shouldReceive('findContactAddressByTypeId')
+            ->with($contactId, AddressType::DELIVERY, false)
+            ->andReturn($address);
+
+        $this->contactAddressRepositoryMock->shouldReceive('deleteAddress')
+            ->once();
+
+
+        $this->contactRepositoryMock->shouldReceive('updateContact')->andReturn($contact);
+
+        try {
+
+            $this->customerService->deleteAddress($address->id, AddressType::DELIVERY);
+
+        }catch (\Exception $exception) {
+
+            $this->fail('CustomerService failed! - '. $exception->getMessage());
+        }
+
+
+        $this->assertTrue(true);
+
+    }
 }
