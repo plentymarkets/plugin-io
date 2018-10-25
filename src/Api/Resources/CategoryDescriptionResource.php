@@ -32,7 +32,7 @@ class CategoryDescriptionResource extends ApiResource
      */
     public function show(string $categoryId):Response
     {
-        $response = null;
+        $response = [];
 
         $description1 = (int)$this->request->get('description1', false);
         $description2 = (int)$this->request->get('description2', false);
