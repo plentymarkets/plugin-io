@@ -1,12 +1,13 @@
 <?php
 
+use IO\Api\Resources\CustomerAddressResource;
 use IO\Helper\UserSession;
 use IO\Services\BasketService;
 use IO\Services\CustomerService;
 use IO\Tests\TestCase;
 use IO\Validators\Customer\AddressValidator;
 use Plenty\Modules\Account\Address\Models\Address;
-use Mockery;
+use IO\Builder\Order\AddressType;
 use Plenty\Modules\Account\Address\Repositories\AddressRepository;
 use Plenty\Modules\Account\Contact\Models\Contact;
 use Plenty\Modules\Account\Contact\Repositories\ContactAddressRepository;
@@ -59,7 +60,13 @@ class CustomerServiceTest extends TestCase
      */
     public function it_creates_an_billing_address_as_guest()
     {
-        $address = factory(Address::class)->create();
+        $addressId = 100;
+
+        /** @var Address $address */
+        $address = factory(Address::class)->make([
+            "id" => $addressId
+        ]);
+
         $addressArray = $address->toArray();
 
         $this->addressValidatorMock->shouldReceive('validateOrFail')->andReturnNull()->once();
@@ -70,9 +77,12 @@ class CustomerServiceTest extends TestCase
             ->andReturn($address)
             ->once();
 
+        $this->userSessionMock->shouldReceive('getCurrentContactId')->andReturn(0);
+
         $this->basketServiceMock->shouldReceive('setBillingAddressId')->with($address->id)->andReturnNull()->once();
 
-        $this->customerService->createAddress($addressArray, 1);
+        $this->customerService->createAddress($addressArray, AddressType::BILLING);
+
     }
 
     /** @test
@@ -80,7 +90,13 @@ class CustomerServiceTest extends TestCase
      */
     public function it_creates_an_billing_address_as_logged_in_user()
     {
-        $address = factory(Address::class)->create();
+        $addressId = 100;
+
+        /** @var Address $address */
+        $address = factory(Address::class)->make([
+            "id" => $addressId
+        ]);
+
         $addressArray = $address->toArray();
 
         $contact = factory(Contact::class)->create();
@@ -102,6 +118,54 @@ class CustomerServiceTest extends TestCase
             ->andReturn($address)
             ->once();
 
-        $this->customerService->createAddress($addressArray, 1);
+        $this->customerService->createAddress($addressArray, AddressType::BILLING);
+    }
+
+    /** @test */
+    public function it_deletes_an_existing_address_with_no_contact_id()
+    {
+        $addressId = 100;
+
+        /** @var Address $address */
+        $address = factory(Address::class)->make([
+            "id" => $addressId
+        ]);
+
+        $this->addressRepositoryMock
+            ->shouldReceive('deleteAddress')
+            ->andReturn()
+            ->once();
+
+        $this->basketServiceMock
+            ->shouldReceive(
+                [
+                    'getBillingAddressId' => $addressId,
+                    'getDeliveryAddressId' => $addressId
+                ]);
+
+        $this->basketServiceMock
+            ->shouldReceive('setBillingAddressId')
+            ->with(0)
+            ->andReturn();
+
+        $this->basketServiceMock
+            ->shouldReceive('setDeliveryAddressId')
+            ->with(CustomerAddressResource::ADDRESS_NOT_SET)
+            ->andReturn();
+
+        $this->userSessionMock->shouldReceive('getCurrentContactId')->andReturn(0);
+
+        try {
+
+            $this->customerService->deleteAddress($address->id, AddressType::BILLING);
+
+        }catch (\Exception $exception) {
+
+            $this->fail('CustomerService failed! - '. $exception->getMessage());
+        }
+
+
+        $this->assertTrue(true);
+
     }
 }
