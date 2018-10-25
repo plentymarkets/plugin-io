@@ -34,8 +34,8 @@ class CategoryDescriptionResource extends ApiResource
     {
         $response = [];
 
-        $description1 = (int)$this->request->get('description1', false);
-        $description2 = (int)$this->request->get('description2', false);
+        $description1 = (int)$this->request->get('description1', 0);
+        $description2 = (int)$this->request->get('description2', 0);
 
         $categoryService = pluginApp(CategoryService::class);
         $sessionStorageService = pluginApp(SessionStorageService::class);
