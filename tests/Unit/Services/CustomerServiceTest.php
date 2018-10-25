@@ -1,9 +1,11 @@
 <?php
 
 use IO\Api\Resources\CustomerAddressResource;
+use IO\Constants\SessionStorageKeys;
 use IO\Helper\UserSession;
 use IO\Services\BasketService;
 use IO\Services\CustomerService;
+use IO\Services\SessionStorageService;
 use IO\Tests\TestCase;
 use IO\Validators\Customer\AddressValidator;
 use Plenty\Modules\Account\Address\Models\Address;
@@ -34,6 +36,8 @@ class CustomerServiceTest extends TestCase
     protected $contactRepositoryMock;
     /** @var ContactAccountRepositoryContract $contactAccountRepositoryMock */
     protected $contactAccountRepositoryMock;
+    /** @var SessionStorageService $sessionStorageServiceMock */
+    protected $sessionStorageServiceMock;
 
     protected function setUp()
     {
@@ -60,6 +64,9 @@ class CustomerServiceTest extends TestCase
         $this->contactAccountRepositoryMock = Mockery::mock(ContactAccountRepositoryContract::class);
         app()->instance(ContactAccountRepositoryContract::class, $this->contactAccountRepositoryMock);
 
+        $this->sessionStorageServiceMock = Mockery::mock(SessionStorageService::class);
+        app()->instance(SessionStorageService::class, $this->sessionStorageServiceMock);
+
         $this->customerService = pluginApp(CustomerService::class);
     }
 
@@ -72,7 +79,8 @@ class CustomerServiceTest extends TestCase
 
         /** @var Address $address */
         $address = factory(Address::class)->make([
-            "id" => $addressId
+            'id' => $addressId,
+            'name1' => null
         ]);
 
         $addressArray = $address->toArray();
@@ -85,11 +93,35 @@ class CustomerServiceTest extends TestCase
             ->andReturn($address)
             ->once();
 
+        $this->sessionStorageServiceMock
+            ->shouldReceive('getSessionValue')
+            ->with(SessionStorageKeys::GUEST_EMAIL)
+            ->andReturn('test@test.de')
+            ->once();
+
         $this->userSessionMock->shouldReceive('getCurrentContactId')->andReturn(0);
 
         $this->basketServiceMock->shouldReceive('setBillingAddressId')->with($address->id)->andReturnNull()->once();
 
         $this->customerService->createAddress($addressArray, AddressType::BILLING);
+
+    }
+
+    /** @test */
+    public function it_creates_a_billing_address_with_company_as_guest()
+    {
+
+    }
+
+    /** @test */
+    public function it_creates_a_billing_address_with_company_as_logged_in_user()
+    {
+
+    }
+
+    /** @test */
+    public function it_sets_the_contacts_first_and_last_name_from_the_address_that_gets_created()
+    {
 
     }
 
@@ -102,7 +134,8 @@ class CustomerServiceTest extends TestCase
 
         /** @var Address $address */
         $address = factory(Address::class)->make([
-            "id" => $addressId
+            'id' => $addressId,
+            'name1' => null
         ]);
 
         $addressArray = $address->toArray();
