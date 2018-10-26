@@ -167,6 +167,7 @@ class CustomerServiceTest extends TestCase
     public function it_creates_an_billing_address_as_logged_in_user()
     {
         $addressId = 100;
+        $contactId = 1;
 
         /** @var Address $address */
         $address = factory(Address::class)->make([
@@ -176,7 +177,9 @@ class CustomerServiceTest extends TestCase
 
         $addressArray = $address->toArray();
 
-        $contact = factory(Contact::class)->create();
+        $contact = factory(Contact::class)->make([
+            "id" => $contactId
+        ]);
 
         $this->addressValidatorMock->shouldReceive('validateOrFail')->andReturnNull()->once();
         $this->addressValidatorMock->shouldReceive('isEnAddress')->andReturn(false)->once();
@@ -202,6 +205,8 @@ class CustomerServiceTest extends TestCase
     public function it_creates_a_billing_address_with_company_as_logged_in_user()
     {
         $addressId = 100;
+        $contactId = 1;
+        $accountId = 1;
 
         /** @var Address $address */
         $address = factory(Address::class)->make([
@@ -210,9 +215,13 @@ class CustomerServiceTest extends TestCase
 
         $addressArray = $address->toArray();
 
-        $contact = factory(Contact::class)->create();
+        $contact = factory(Contact::class)->make([
+                "id" => $contactId
+        ]);
 
-        $account = factory(Account::class)->create();
+        $account = factory(Account::class)->make([
+            "id" => $accountId
+        ]);
 
         $webstoreConfig = factory(WebstoreConfiguration::class)->make();
 
@@ -245,6 +254,8 @@ class CustomerServiceTest extends TestCase
     public function it_sets_the_contacts_first_and_last_name_from_the_address_that_gets_created()
     {
         $addressId = 100;
+        $contactId = 1;
+        $accountId = 1;
 
         /** @var Address $address */
         $address = factory(Address::class)->make([
@@ -253,12 +264,16 @@ class CustomerServiceTest extends TestCase
 
         $addressArray = $address->toArray();
 
-        $contact = factory(Contact::class)->create([
+        $contact = factory(Contact::class)->make([
+            'id' => $contactId,
             'firstName' => "",
             'lastName' => ""
         ]);
 
-        $account = factory(Account::class)->create();
+
+        $account = factory(Account::class)->make([
+            "id" => $accountId
+        ]);
 
         $webstoreConfig = factory(WebstoreConfiguration::class)->make();
 
@@ -291,6 +306,8 @@ class CustomerServiceTest extends TestCase
     public function it_updates_the_contact_class_id_while_creating_an_address()
     {
         $addressId = 100;
+        $contactId = 1;
+        $accountId = 1;
 
         /** @var Address $address */
         $address = factory(Address::class)->make([
@@ -299,12 +316,16 @@ class CustomerServiceTest extends TestCase
 
         $addressArray = $address->toArray();
 
-        $contact = factory(Contact::class)->create([
+        $contact = factory(Contact::class)->make([
+            'id' => $contactId,
             'firstName' => "",
             'lastName' => ""
         ]);
 
-        $account = factory(Account::class)->create();
+
+        $account = factory(Account::class)->make([
+            "id" => $accountId
+        ]);
 
         $webstoreConfig = factory(WebstoreConfiguration::class)->make();
 
@@ -521,6 +542,8 @@ class CustomerServiceTest extends TestCase
 
         $this->dispatcherMock->shouldReceive('fire')->andReturn();
 
+        $this->sessionStorageServiceMock->shouldReceive('getSessionValue')->andReturn();
+
         /** @var Address $updatedAddress */
         $updatedAddress = $this->customerService->updateAddress($address->id, $address->toArray(), AddressType::DELIVERY);
 
@@ -594,6 +617,10 @@ class CustomerServiceTest extends TestCase
         $account = factory(Account::class)->make([
             "id" => $accountId
         ]);
+
+        $webstoreConfig = factory(WebstoreConfiguration::class)->make();
+
+        $this->webstoreConfigServiceMock->shouldReceive('getWebstoreConfig')->andReturn($webstoreConfig);
 
         $this->contactRepositoryMock->shouldReceive('findContactById')->with($contact->id)->andReturn($contact);
         $this->userSessionMock->shouldReceive('getCurrentContactId')->andReturn($contactId);
