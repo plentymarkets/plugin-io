@@ -2,6 +2,7 @@
 
 namespace IO\Controllers;
 
+use IO\Api\ResponseCode;
 use Plenty\Modules\Frontend\Services\OrderPropertyFileService;
 use Plenty\Plugin\Http\Response;
 
@@ -14,16 +15,14 @@ class OrderPropertyFileController extends LayoutController
             $key = $hash.'/'.$filename;
             return $this->download($key);
         }
-    
-        return $this->renderTemplate(
-            "tpl.page-not-found",
-            [
-                "data" => ''
-            ],
-            false
-        );
+
+        /** @var Response $response */
+        $response = pluginApp(Response::class);
+        $response->forceStatus(ResponseCode::NOT_FOUND);
+
+        return $response;
     }
-    
+
     public function downloadFile(string $hash1, string $hash2 = '', string $filename)
     {
         if(strlen($hash1) && strlen($filename))
@@ -36,16 +35,14 @@ class OrderPropertyFileController extends LayoutController
             $key .= $filename;
             return $this->download($key);
         }
-        
-        return $this->renderTemplate(
-            "tpl.page-not-found",
-            [
-                "data" => ''
-            ],
-            false
-        );
-    }
 
+        /** @var Response $response */
+        $response = pluginApp(Response::class);
+        $response->forceStatus(ResponseCode::NOT_FOUND);
+
+        return $response;
+    }
+    
     /**
      * @param string $key
      * @param integer $orderId

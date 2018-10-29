@@ -42,6 +42,7 @@ class LocalizedOrder extends ModelWrapper
 
     public $shippingProvider = "";
     public $shippingProfileName = "";
+    public $shippingProfileId = 0;
     public $paymentMethodName = "";
     public $paymentMethodIcon = "";
 
@@ -78,6 +79,7 @@ class LocalizedOrder extends ModelWrapper
         try
         {
             $shippingProfile = $parcelServicePresetRepository->getPresetById( $order->shippingProfileId );
+            $instance->shippingProfileId = (int)$order->shippingProfileId;
             foreach( $shippingProfile->parcelServicePresetNames as $name )
             {
                 if( $name->lang === $lang )
@@ -183,6 +185,7 @@ class LocalizedOrder extends ModelWrapper
         $data = [
             "order"                 => $order,
             "status"                => [], //$this->status->toArray(),
+            "shippingProfileId"     => $this->shippingProfileId,
             "shippingProvider"      => $this->shippingProvider,
             "shippingProfileName"   => $this->shippingProfileName,
             "paymentMethodName"     => $this->paymentMethodName,

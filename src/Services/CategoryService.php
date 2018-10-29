@@ -3,7 +3,10 @@
 namespace IO\Services;
 
 use Illuminate\Support\Collection;
+use IO\Helper\CategoryDataFilter;
 use IO\Helper\MemoryCache;
+use IO\Services\ItemLoader\Services\LoadResultFields;
+use IO\Services\ItemSearch\Helper\ResultFieldTemplate;
 use IO\Services\UrlBuilder\UrlQuery;
 use Plenty\Modules\Category\Models\Category;
 use Plenty\Modules\Category\Contracts\CategoryRepositoryContract;
@@ -19,6 +22,7 @@ use Plenty\Repositories\Models\PaginatedResult;
 class CategoryService
 {
     use MemoryCache;
+    use LoadResultFields;
 
     /**
      * @var CategoryRepositoryContract
@@ -314,7 +318,10 @@ class CategoryService
             $lang = $this->sessionStorageService->getLang();
         }
 
-        return $this->categoryRepository->getLinklistTree($type, $lang, $this->webstoreConfig->getWebstoreConfig()->webstoreId, $maxLevel, $customerClassId);
+        return pluginApp( CategoryDataFilter::class )->applyResultFields(
+            $this->categoryRepository->getLinklistTree($type, $lang, $this->webstoreConfig->getWebstoreConfig()->webstoreId, $maxLevel, $customerClassId),
+            $this->loadResultFields( ResultFieldTemplate::get( ResultFieldTemplate::TEMPLATE_CATEGORY_TREE ) )
+        );
     }
 
     /**
@@ -329,7 +336,11 @@ class CategoryService
         {
             $lang = $this->sessionStorageService->getLang();
         }
-        return $this->categoryRepository->getLinklistList($type, $lang, $this->webstoreConfig->getWebstoreConfig()->webstoreId);
+
+        return pluginApp( CategoryDataFilter::class )->applyResultFields(
+            $this->categoryRepository->getLinklistList($type, $lang, $this->webstoreConfig->getWebstoreConfig()->webstoreId),
+            $this->loadResultFields( ResultFieldTemplate::get( ResultFieldTemplate::TEMPLATE_CATEGORY_TREE ) )
+        );
     }
 
     /**
@@ -352,10 +363,7 @@ class CategoryService
          */
         foreach ( $this->currentCategoryTree as $lvl => $category )
         {
-            if( $category->linklist === 'Y' )
-            {
-                array_push( $hierarchy, $category );
-            }
+            array_push( $hierarchy, $category );
         }
 
         if( $bottomUp === false )

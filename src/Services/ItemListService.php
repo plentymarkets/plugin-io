@@ -7,6 +7,7 @@ use IO\Services\ItemSearch\SearchPresets\CategoryItems;
 use IO\Services\ItemSearch\SearchPresets\TagItems;
 use IO\Services\ItemSearch\SearchPresets\VariationList;
 use IO\Services\ItemSearch\Services\ItemSearchService;
+use Plenty\Plugin\CachingRepository;
 
 class ItemListService
 {
@@ -35,9 +36,9 @@ class ItemListService
                 ]);
                 break;
             case self::TYPE_LAST_SEEN:
-                /** @var SessionStorageService $sessionStorage */
-                $sessionStorage = pluginApp(SessionStorageService::class);
-                $variationIds = $sessionStorage->getSessionValue(SessionStorageKeys::LAST_SEEN_ITEMS);
+                /** @var CachingRepository $cachingRepository */
+                $cachingRepository = pluginApp(CachingRepository::class);
+                $variationIds = $cachingRepository->get(SessionStorageKeys::LAST_SEEN_ITEMS);
 
                 if ( !is_null($variationIds) && count($variationIds) > 0 )
                 {
