@@ -17,7 +17,7 @@ class CustomerNewsletterService
         $this->newsletterRepo = $newsletterRepo;
     }
     
-    public function saveNewsletterData($email, $firstName = '', $lastName='')
+    public function saveNewsletterData($email, $emailFolder, $firstName = '', $lastName='')
     {
         if(strlen($email))
         {
@@ -32,7 +32,7 @@ class CustomerNewsletterService
             
             if(!$recipientData instanceof Recipient && !($recipientData instanceof Recipient && $recipientData->email == $email))
             {
-                $this->newsletterRepo->addToNewsletterList($email, $firstName, $lastName);
+                $this->newsletterRepo->addToNewsletterList($email, $firstName, $lastName, [$emailFolder]);
             }
         }
     }
