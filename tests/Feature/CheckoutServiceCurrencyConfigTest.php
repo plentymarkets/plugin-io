@@ -2,11 +2,11 @@
 
 namespace IO\Tests\Unit;
 
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use IO\Constants\SessionStorageKeys;
 use IO\Services\CheckoutService;
 use IO\Tests\TestCase;
 use Plenty\Modules\Frontend\Session\Storage\Contracts\FrontendSessionStorageFactoryContract;
-use Illuminate\Support\Facades\Session;
 use Plenty\Modules\Plugin\PluginSet\Models\PluginSet;
 use Plenty\Modules\System\Models\Webstore;
 use Plenty\Plugin\ConfigRepository;
@@ -17,6 +17,7 @@ use Plenty\Plugin\ConfigRepository;
  */
 class CheckoutServiceCurrencyConfigTest extends TestCase
 {
+    use RefreshDatabase;
 
     /** @var CheckoutService $basketService */
     protected $checkoutService;
@@ -24,6 +25,7 @@ class CheckoutServiceCurrencyConfigTest extends TestCase
     protected function setUp()
     {
         parent::setUp();
+        $this->createApplication();
 
         $this->checkoutService = pluginApp(CheckoutService::class);
 

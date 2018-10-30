@@ -1,11 +1,12 @@
 <?php
 
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use IO\Constants\SessionStorageKeys;
+use IO\DBModels\ItemWishList;
 use IO\Services\CustomerService;
 use IO\Services\ItemWishListService;
 use IO\Services\SessionStorageService;
 use IO\Tests\TestCase;
-use IO\DBModels\ItemWishList;
 use Plenty\Plugin\Application;
 
 /**
@@ -14,6 +15,7 @@ use Plenty\Plugin\Application;
  */
 class ItemWishListTest extends TestCase
 {
+    use RefreshDatabase;
 
     /** @var ItemWishListService $wishListService */
     protected $wishListService;

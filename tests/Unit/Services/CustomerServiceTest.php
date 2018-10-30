@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use IO\Api\Resources\CustomerAddressResource;
 use IO\Builder\Order\AddressType;
 use IO\Constants\SessionStorageKeys;
@@ -22,6 +23,8 @@ use Plenty\Plugin\Events\Dispatcher;
 
 class CustomerServiceTest extends TestCase
 {
+    use RefreshDatabase;
+
     /** @var CustomerService $customerService */
     protected $customerService;
     /** @var AddressValidator $addressValidatorMock */
