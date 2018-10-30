@@ -12,7 +12,7 @@ use IO\Validators\Customer\DeliveryAddressValidatorEN;
 
 class AddressValidator
 {
-    public static function validateOrFail($addressType, $addressData)
+    public function validateOrFail($addressType, $addressData)
     {
         if($addressType == AddressType::DELIVERY)
         {
@@ -42,7 +42,7 @@ class AddressValidator
         }
     }
     
-    public static function isEnAddress($shippingCountryId)
+    public function isEnAddress($shippingCountryId)
     {
         if($shippingCountryId == ShippingCountry::UNITED_KINGDOM || $shippingCountryId == ShippingCountry::IRELAND)
         {
