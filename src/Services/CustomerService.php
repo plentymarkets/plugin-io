@@ -458,7 +458,15 @@ class CustomerService
             [
                 'typeId' => ContactOption::TYPE_PHONE,
                 'subTypeId' => ContactOption::SUBTYPE_PRIVATE
+            ],
+
+            AddressOption::TYPE_EMAIL =>
+            [
+                'typeId' => ContactOption::TYPE_MAIL,
+                'subTypeId' => ContactOption::SUBTYPE_PRIVATE
             ]
+
+
         ];
 
         foreach($addressOptions as $key => $addressOption)
