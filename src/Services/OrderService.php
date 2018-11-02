@@ -148,62 +148,6 @@ class OrderService
         return LocalizedOrder::wrap( $order, $this->sessionStorage->getLang() );
 	}
 
-	private function createAndAssignDummyPayment(Order $order) {
-
-        /** @var \Plenty\Modules\Payment\Models\Payment $payment */
-        $payment = pluginApp(\Plenty\Modules\Payment\Models\Payment::class);
-
-        $payment->mopId             = 5000; // PLENTY_MOP_MANUAL
-        $payment->transactionType   = \Plenty\Modules\Payment\Models\Payment::TRANSACTION_TYPE_BOOKED_POSTING;
-        $payment->status            = \Plenty\Modules\Payment\Models\Payment::STATUS_APPROVED;
-
-        /** @var \Plenty\Modules\Order\Models\OrderAmount $orderAmount */
-        $orderAmount = $order->amounts->where('isSystemCurrency',false)->first();
-        if(!$orderAmount){
-            /** @var \Plenty\Modules\Order\Models\OrderAmount $orderAmount */
-            $orderAmount = $order->amounts->where('isSystemCurrency',true)->first();
-        }
-
-        $payment->currency          = $orderAmount->currency;
-        $payment->amount            = 0;
-
-        $paymentProperties = [];
-        $paymentProperties[] = $this->getPaymentProperty(\Plenty\Modules\Payment\Models\PaymentProperty::TYPE_BOOKING_TEXT, 'ORDER '.$order->id);
-        $paymentProperties[] = $this->getPaymentProperty(\Plenty\Modules\Payment\Models\PaymentProperty::TYPE_TRANSACTION_ID, time());
-
-        $payment->properties = $paymentProperties;
-        $payment->regenerateHash = true;
-
-        /** @var PaymentRepositoryContract $paymentRepo */
-        $paymentRepo = pluginApp(PaymentRepositoryContract::class);
-        $payment = $paymentRepo->createPayment($payment);
-
-        /** @var \Plenty\Modules\Payment\Contracts\PaymentOrderRelationRepositoryContract $paymentOrderRelationRepo */
-        $paymentOrderRelationRepo = pluginApp(\Plenty\Modules\Payment\Contracts\PaymentOrderRelationRepositoryContract::class);
-        $paymentOrderRelationRepo->createOrderRelation($payment, $order);
-
-
-    }
-
-    /**
-     * Returns a PaymentProperty with the given params
-     *
-     * @param int       $typeId
-     * @param string    $value
-     *
-     * @return \Plenty\Modules\Payment\Models\PaymentProperty PaymentProperty
-     */
-    private function getPaymentProperty(int $typeId, string $value)
-    {
-        /** @var \Plenty\Modules\Payment\Models\PaymentProperty $paymentProperty */
-        $paymentProperty = pluginApp( \Plenty\Modules\Payment\Models\PaymentProperty::class );
-
-        $paymentProperty->typeId = $typeId;
-        $paymentProperty->value = $value;
-
-        return $paymentProperty;
-    }
-
     /**
      * Execute the payment for a given order.
      * @param int $orderId      The order id to execute payment for
@@ -808,5 +752,63 @@ class OrderService
         }
     
         return null;
+    }
+
+    /**
+     * Creates a payment with amount 0 and assigns it to the given order so that the status of the given order with amount 0 is calculated correctly.
+     * @param Order $order
+     */
+    private function createAndAssignDummyPayment(Order $order) {
+
+        /** @var \Plenty\Modules\Payment\Models\Payment $payment */
+        $payment = pluginApp(\Plenty\Modules\Payment\Models\Payment::class);
+
+        $payment->mopId             = 5000; // PLENTY_MOP_MANUAL
+        $payment->transactionType   = \Plenty\Modules\Payment\Models\Payment::TRANSACTION_TYPE_BOOKED_POSTING;
+        $payment->status            = \Plenty\Modules\Payment\Models\Payment::STATUS_APPROVED;
+
+        /** @var \Plenty\Modules\Order\Models\OrderAmount $orderAmount */
+        $orderAmount = $order->amounts->where('isSystemCurrency',false)->first();
+        if(!$orderAmount){
+            /** @var \Plenty\Modules\Order\Models\OrderAmount $orderAmount */
+            $orderAmount = $order->amounts->where('isSystemCurrency',true)->first();
+        }
+
+        $payment->currency          = $orderAmount->currency;
+        $payment->amount            = 0;
+
+        $paymentProperties = [];
+        $paymentProperties[] = $this->getPaymentProperty(\Plenty\Modules\Payment\Models\PaymentProperty::TYPE_BOOKING_TEXT, 'ORDER '.$order->id);
+        $paymentProperties[] = $this->getPaymentProperty(\Plenty\Modules\Payment\Models\PaymentProperty::TYPE_TRANSACTION_ID, time());
+
+        $payment->properties = $paymentProperties;
+        $payment->regenerateHash = true;
+
+        /** @var PaymentRepositoryContract $paymentRepo */
+        $paymentRepo = pluginApp(PaymentRepositoryContract::class);
+        $payment = $paymentRepo->createPayment($payment);
+
+        /** @var \Plenty\Modules\Payment\Contracts\PaymentOrderRelationRepositoryContract $paymentOrderRelationRepo */
+        $paymentOrderRelationRepo = pluginApp(\Plenty\Modules\Payment\Contracts\PaymentOrderRelationRepositoryContract::class);
+        $paymentOrderRelationRepo->createOrderRelation($payment, $order);
+    }
+
+    /**
+     * Returns a PaymentProperty with the given params
+     *
+     * @param int       $typeId
+     * @param string    $value
+     *
+     * @return \Plenty\Modules\Payment\Models\PaymentProperty PaymentProperty
+     */
+    private function getPaymentProperty(int $typeId, string $value)
+    {
+        /** @var \Plenty\Modules\Payment\Models\PaymentProperty $paymentProperty */
+        $paymentProperty = pluginApp( \Plenty\Modules\Payment\Models\PaymentProperty::class );
+
+        $paymentProperty->typeId = $typeId;
+        $paymentProperty->value = $value;
+
+        return $paymentProperty;
     }
 }
