@@ -155,6 +155,7 @@ class OrderService
 
         $payment->mopId             = 5000; // PLENTY_MOP_MANUAL
         $payment->transactionType   = \Plenty\Modules\Payment\Models\Payment::TRANSACTION_TYPE_BOOKED_POSTING;
+        $payment->status            = \Plenty\Modules\Payment\Models\Payment::STATUS_APPROVED;
 
         /** @var \Plenty\Modules\Order\Models\OrderAmount $orderAmount */
         $orderAmount = $order->amounts->where('isSystemCurrency',false)->first();
