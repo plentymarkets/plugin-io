@@ -350,7 +350,7 @@ class VariationSearchFactory extends BaseSearchFactory
             
             /** @var PriceFilter $priceRangeFilter */
             $priceRangeFilter = $this->createFilter(PriceFilter::class);
-            $priceRangeFilter->between($priceMin, $priceMax);
+            $priceRangeFilter->betweenByClient($priceMin, $priceMax, pluginApp(Application::class)->getPlentyId());
         }
         
         return $this;
