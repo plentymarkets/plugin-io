@@ -1,6 +1,6 @@
 <?php
 
-namespace IO\Tests\Unit;
+namespace IO\Tests\Feature;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use IO\Constants\SessionStorageKeys;

@@ -1,5 +1,7 @@
 <?php
 
+namespace IO\Tests\Feature;
+
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use IO\Constants\SessionStorageKeys;
 use IO\DBModels\ItemWishList;
