@@ -5,6 +5,6 @@ $dotenv->load();
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
-define('WORKSPACE', getenv('WORKSPACE') . '/');
-
-require_once WORKSPACE. 'pl/bootstrap/autoload_testing.php';
+if (getenv('TEST_SUITE_DIR')) {
+    require_once getenv('TEST_SUITE_DIR') . '/tests/autoload.php';
+}
