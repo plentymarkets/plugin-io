@@ -6,7 +6,7 @@ trait MemoryCache
 {
     private static $cache = [];
 
-    protected function fromMemoryCache( $key, \Closure $callack )
+    protected function fromMemoryCache($key, \Closure $callack)
     {
         /*
 
@@ -16,17 +16,12 @@ trait MemoryCache
          the core codebase and make it available in the interface.
 
         */
-        if (getenv('APP_ENV') === 'testing') {
-            return $callack->call($this);
-        }
 
-        if (!array_key_exists(self::class, self::$cache))
-        {
+        if (!array_key_exists(self::class, self::$cache)) {
             self::$cache[self::class] = [];
         }
 
-        if ( !array_key_exists( $key, self::$cache[self::class] ) )
-        {
+        if (!array_key_exists($key, self::$cache[self::class])) {
             self::$cache[self::class][$key] = $callack->call($this);
         }
 
