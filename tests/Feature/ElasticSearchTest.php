@@ -26,6 +26,7 @@ class ElasticSearchTest extends TestCase
     public function it_runs_es_mapping()
     {
         $this->esFactory = pluginApp(ElasticSearchResultFactory::class);
-        $this->esFactory->getElasticSearchResult();
+        $result = $this->esFactory->makeWrapped();
+        $this->assertNotNull($result);
     }
 }
