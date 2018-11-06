@@ -8,4 +8,3 @@ if (getenv('TEST_SUITE_DIR')) {
 }
 
 require_once __DIR__ . '/../vendor/autoload.php';
-require_once __DIR__ . '/TestHelper.php';
