@@ -1,5 +1,7 @@
 <?php
 
+namespace IO\Tests\Feature;
+
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use IO\Constants\SessionStorageKeys;
 use IO\DBModels\ItemWishList;
@@ -7,6 +9,7 @@ use IO\Services\CustomerService;
 use IO\Services\ItemWishListService;
 use IO\Services\SessionStorageService;
 use IO\Tests\TestCase;
+use Mockery;
 use Plenty\Plugin\Application;
 
 /**
