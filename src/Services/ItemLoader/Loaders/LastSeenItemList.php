@@ -6,6 +6,7 @@ use IO\Constants\SessionStorageKeys;
 use IO\Services\SessionStorageService;
 use IO\Services\ItemLoader\Contracts\ItemLoaderContract;
 use IO\Builder\Sorting\SortingBuilder;
+use Plenty\Modules\Basket\Contracts\BasketRepositoryContract;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\ElasticSearch;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Processor\DocumentProcessor;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Query\Type\TypeInterface;
@@ -60,17 +61,18 @@ class LastSeenItemList implements ItemLoaderContract
         /** @var ClientFilter $clientFilter */
         $clientFilter = pluginApp(ClientFilter::class);
         $clientFilter->isVisibleForClient(pluginApp(Application::class)->getPlentyId());
-        
+
         /** @var VariationBaseFilter $variationFilter */
         $variationFilter = pluginApp(VariationBaseFilter::class);
         $variationFilter->isActive();
-    
+
         /**
          * @var CachingRepository $cachingRepository
          */
         $cachingRepository = pluginApp(CachingRepository::class);
-        $variationIds = $cachingRepository->get(SessionStorageKeys::LAST_SEEN_ITEMS);
-        
+        $basketRepository = pluginApp(BasketRepositoryContract::class);
+        $variationIds = $cachingRepository->get(SessionStorageKeys::LAST_SEEN_ITEMS . '_' . $basketRepository->load()->id);
+
         if(is_array($variationIds) && count($variationIds))
         {
             $variationFilter->hasIds($variationIds);
