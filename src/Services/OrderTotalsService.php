@@ -13,6 +13,7 @@ use Plenty\Modules\Accounting\Contracts\AccountingLocationRepositoryContract;
 use Plenty\Modules\Frontend\Services\VatService;
 use Plenty\Modules\Order\Models\Order;
 use Plenty\Modules\Order\Models\OrderItem;
+use Plenty\Modules\Order\Shipping\Contracts\EUCountryCodesServiceContract;
 
 /**
  * Calculate order totals
@@ -47,7 +48,10 @@ class OrderTotalsService
 
         $accountRepo = pluginApp(AccountingLocationRepositoryContract::class);
         $vatService = pluginApp(VatService::class);
-
+        /**
+         * @var EUCountryCodesServiceContract $euCountryCodesServiceContract
+         */
+        $euCountryCodesServiceContract = pluginApp(EUCountryCodesServiceContract::class);
         foreach ($orderItems as $item) {
             $itemAmountId = $this->getCustomerAmountId($item->amounts);
             /** @var OrderItem $item */
@@ -66,7 +70,7 @@ class OrderTotalsService
                     $shippingGross += $firstAmount->priceGross;
                     $shippingNet += $firstAmount->priceNet;
 
-                    if ((bool)$accountSettings->showShippingVat)
+                    if ((bool)$accountSettings->showShippingVat && $euCountryCodesServiceContract->isExportDelivery($order->deliveryAddress->countryId, $item->countryVatId))
                     {
                         $shippingNet = $shippingGross;
                     }
