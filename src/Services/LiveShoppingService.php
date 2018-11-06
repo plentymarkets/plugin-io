@@ -26,22 +26,21 @@ class LiveShoppingService
         $liveShoppingRepo = pluginApp(LiveShoppingRepositoryContract::class);
         /** @var LiveShopping $liveShopping */
         $liveShopping = $liveShoppingRepo->getByLiveShoppingId($liveShoppingId);
-    
-        $itemSearchOptions = [
-            'itemId'        => $liveShopping->itemId,
-            'sorting'       => SortingHelper::splitPathAndOrder($sorting)
-        ];
-        /** @var ItemSearchService $itemSearchService */
-        $itemSearchService = pluginApp( ItemSearchService::class );
-        $itemList = $itemSearchService->getResults([
-                                                       LiveShoppingItems::getSearchFactory( $itemSearchOptions )
-                                                   ]);
         
-        $itemList = $this->removeVariationsWithoutLiveShopping($itemList);
+        $liveShoppingItem = [];
+        $liveShoppingData = [];
         
-        $liveShoppingData = $liveShopping->toArray();
-        
-        $liveShoppingItem = array_first($itemList[0]['documents']);
+        if($liveShopping instanceof LiveShopping)
+        {
+            $itemList = $this->getLiveShoppingVariations($liveShopping->itemId, $sorting);
+            
+            if(count($itemList[0]['documents']))
+            {
+                $liveShoppingItem = array_first($itemList[0]['documents']);
+            }
+            
+            $liveShoppingData = $liveShopping->toArray();
+        }
         
         return [
             'item' => $liveShoppingItem['data'],
@@ -49,19 +48,40 @@ class LiveShoppingService
         ];
     }
     
+    public function getLiveShoppingVariations($itemId, $sorting)
+    {
+        $itemSearchOptions = [
+            'itemId'        => $itemId,
+            'sorting'       => SortingHelper::splitPathAndOrder($sorting)
+        ];
+        /** @var ItemSearchService $itemSearchService */
+        $itemSearchService = pluginApp( ItemSearchService::class );
+        $itemList = $itemSearchService->getResults([
+                                                       LiveShoppingItems::getSearchFactory( $itemSearchOptions )
+                                                   ]);
+    
+        return $this->removeVariationsWithoutLiveShopping($itemList);
+    }
+    
     /**
      * @param $itemList
      * @return array
      */
-    private function removeVariationsWithoutLiveShopping($itemList)
+    public function removeVariationsWithoutLiveShopping($itemList)
     {
-        if(count($itemList[0]['documents']))
+        if(count($itemList))
         {
-            foreach($itemList[0]['documents'] as $key => $item)
+            foreach($itemList as $listKey => $list)
             {
-                if(is_null($item['data']['prices']['specialOffer']))
+                if(count($list['documents']))
                 {
-                    unset($itemList[0]['documents'][$key]);
+                    foreach($list['documents'] as $key => $variation)
+                    {
+                        if(is_null($variation['data']['prices']['specialOffer']))
+                        {
+                            unset($itemList[$listKey]['documents'][$key]);
+                        }
+                    }
                 }
             }
         }

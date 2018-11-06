@@ -12,10 +12,19 @@ class LiveShoppingItems implements SearchPreset
     public static function getSearchFactory($options)
     {
         /** @var VariationSearchFactory $searchFactory */
-        $searchFactory = pluginApp( VariationSearchFactory::class )
-            ->withResultFields(
+        $searchFactory = pluginApp( VariationSearchFactory::class );
+        
+        if(isset($options['resultFields']) && count($options['resultFields']))
+        {
+            $searchFactory->withResultFields($options['resultFields']);
+        }
+        else
+        {
+            $searchFactory->withResultFields(
                 ResultFieldTemplate::get( ResultFieldTemplate::TEMPLATE_LIST_ITEM )
             );
+        }
+        
         
         $searchFactory
             ->withLanguage()
@@ -34,6 +43,11 @@ class LiveShoppingItems implements SearchPreset
         if(array_key_exists('itemId', $options) && $options['itemId'] != 0)
         {
             $searchFactory->hasItemId($options['itemId']);
+        }
+    
+        if(array_key_exists('itemIds', $options) && count($options['itemIds']))
+        {
+            $searchFactory->hasItemIds($options['itemIds']);
         }
     
         if(array_key_exists('sorting', $options) && count($options['sorting']))
