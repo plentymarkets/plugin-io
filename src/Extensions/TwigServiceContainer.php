@@ -30,6 +30,7 @@ use IO\Services\TemplateService;
 use IO\Services\UnitService;
 use IO\Services\UrlService;
 use IO\Services\WebstoreConfigurationService;
+use IO\Services\ItemManufacturerService;
 
 class TwigServiceContainer
 {
@@ -166,5 +167,10 @@ class TwigServiceContainer
     public function getUrl()
     {
         return pluginApp( UrlService::class );
+    }
+
+    public function getItemsByManufacturerID()
+    {
+        return pluginApp( ItemManufacturerService::class);
     }
 }
