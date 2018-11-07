@@ -5,7 +5,6 @@ namespace IO\Services;
 use IO\Services\ItemSearch\Helper\SortingHelper;
 use IO\Services\ItemSearch\SearchPresets\LiveShoppingItems;
 use IO\Services\ItemSearch\Services\ItemSearchService;
-use Plenty\Modules\Item\SalesPrice\Models\SalesPrice;
 use Plenty\Modules\LiveShopping\Contracts\LiveShoppingRepositoryContract;
 use Plenty\Modules\LiveShopping\Models\LiveShopping;
 
@@ -36,7 +35,7 @@ class LiveShoppingService
             
             if(count($itemList[0]['documents']))
             {
-                $liveShoppingItem = array_first($itemList[0]['documents']);
+                $liveShoppingItem = array_slice($itemList[0]['documents'], 0, 1);
             }
             
             $liveShoppingData = $liveShopping->toArray();
