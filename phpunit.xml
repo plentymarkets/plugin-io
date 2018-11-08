@@ -27,13 +27,6 @@
         <env name="SESSION_DRIVER" value="array"/>
         <env name="SYMFONY_DEPRECATIONS_HELPER" value="disabled"/>
         <env name="QUEUE_DRIVER" value="sync"/>
-        <!-- for queue tests: <env name="QUEUE_DRIVER" value="s3"/> -->
-
-        <const name="PLENTY_ID" value="1000"/>
-        <!--<const name="LANG" value="de"/>-->
-        <const name="TEST_MODE" value="1" />
-        <const name="SDOM" value="http://master.plentymarkets.com" />
-        <const name="MULTISHOP" value="0"/>
     </php>
     <filter>
         <whitelist addUncoveredFilesFromWhitelist="true" processUncoveredFilesFromWhitelist="true">
