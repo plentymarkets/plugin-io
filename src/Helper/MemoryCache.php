@@ -8,15 +8,6 @@ trait MemoryCache
 
     protected function fromMemoryCache($key, \Closure $callack)
     {
-        /*
-
-         TODO:
-         Make this dirty workaround obsolete by implementing a memory cache without using static stuff.
-         Use the service container and register the class as singleton. Maybe develop a memory cache in
-         the core codebase and make it available in the interface.
-
-        */
-
         if (!array_key_exists(self::class, self::$cache)) {
             self::$cache[self::class] = [];
         }
