@@ -169,7 +169,7 @@ class TwigServiceContainer
         return pluginApp( UrlService::class );
     }
 
-    public function getItemsByManufacturerID()
+    public function getItemManufacturerService()
     {
         return pluginApp( ItemManufacturerService::class);
     }

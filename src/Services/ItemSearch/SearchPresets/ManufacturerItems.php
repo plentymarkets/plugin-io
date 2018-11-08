@@ -5,11 +5,11 @@ namespace IO\Services\ItemSearch\SearchPresets;
 use IO\Services\ItemSearch\Factories\VariationSearchFactory;
 use IO\Services\ItemSearch\Helper\SortingHelper;
 
-class SearchItemManufacturer implements SearchPreset
+class ManufacturerItems implements SearchPreset
 {
     public static function getSearchFactory($options)
     {
-        $sorting = SortingHelper::getCategorySorting( $options['sorting'] );
+        //$sorting = SortingHelper::getCategorySorting( $options['sorting'] );
 
         $page = 1;
         if ( array_key_exists('page', $options ) )
@@ -32,7 +32,7 @@ class SearchItemManufacturer implements SearchPreset
 
         /** @var VariationSearchFactory $searchFactory */
         $searchFactory = pluginApp( VariationSearchFactory::class );
-
+        //->sortByMultiple( $sorting )
         $searchFactory
             ->withLanguage()
             ->withImages()
@@ -45,7 +45,6 @@ class SearchItemManufacturer implements SearchPreset
             ->hasNameInLanguage()
             ->hasPriceForCustomer()
             ->hasManufacturer( $manufacturerId)
-            ->sortByMultiple( $sorting )
             ->setPage( $page, $itemsPerPage )
             ->groupByTemplateConfig()
             ->withLinkToContent();

@@ -176,6 +176,7 @@ class VariationSearchFactory extends BaseSearchFactory
         /** @var VariationBaseFilter $variationFilter */
         $variationFilter = $this->createFilter(VariationBaseFilter::class );
         $variationFilter->hasManufacturer( $manufacturerId );
+        return $this;
     }
 
     /**
