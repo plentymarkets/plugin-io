@@ -3,33 +3,31 @@
 namespace IO\Services;
 
 use IO\Api\Resources\CustomerAddressResource;
-use IO\Builder\Order\OrderType;
-use IO\Helper\MemoryCache;
-use IO\Models\LocalizedOrder;
-use IO\Validators\Customer\ContactValidator;
-use IO\Validators\Customer\AddressValidator;
-use Plenty\Modules\Account\Address\Models\AddressOption;
-use Plenty\Modules\Account\Contact\Contracts\ContactAccountRepositoryContract;
-use Plenty\Modules\Account\Contact\Contracts\ContactRepositoryContract;
-use Plenty\Modules\Account\Contact\Contracts\ContactAddressRepositoryContract;
-use Plenty\Modules\Account\Address\Contracts\AddressRepositoryContract;
-use Plenty\Modules\Account\Contact\Models\Contact;
 use IO\Builder\Order\AddressType;
+use IO\Builder\Order\OrderType;
+use IO\Constants\SessionStorageKeys;
+use IO\Helper\MemoryCache;
+use IO\Helper\UserSession;
+use IO\Models\LocalizedOrder;
+use IO\Validators\Customer\AddressValidator;
+use Plenty\Modules\Account\Address\Contracts\AddressRepositoryContract;
 use Plenty\Modules\Account\Address\Models\Address;
+use Plenty\Modules\Account\Address\Models\AddressOption;
+use Plenty\Modules\Account\Contact\Contracts\ContactAddressRepositoryContract;
+use Plenty\Modules\Account\Contact\Contracts\ContactAccountRepositoryContract;
+use Plenty\Modules\Account\Contact\Contracts\ContactClassRepositoryContract;
+use Plenty\Modules\Account\Contact\Contracts\ContactRepositoryContract;
+use Plenty\Modules\Account\Contact\Models\Contact;
 use Plenty\Modules\Account\Contact\Models\ContactOption;
 use Plenty\Modules\Account\Models\Account;
 use Plenty\Modules\Authorization\Services\AuthHelper;
-use IO\Helper\UserSession;
 use Plenty\Modules\Frontend\Events\FrontendCustomerAddressChanged;
-use Plenty\Modules\Order\Contracts\OrderRepositoryContract;
-use IO\Services\SessionStorageService;
-use IO\Constants\SessionStorageKeys;
-use IO\Services\OrderService;
-use IO\Services\NotificationService;
-use IO\Services\CustomerPasswordResetService;
+use Plenty\Modules\Helper\AutomaticEmail\Contracts\AutomaticEmailContract;
+use Plenty\Modules\Helper\AutomaticEmail\Models\AutomaticEmail;
+use Plenty\Modules\Helper\AutomaticEmail\Models\AutomaticEmailTemplate;
+use Plenty\Modules\Helper\AutomaticEmail\Models\AutomaticEmailContact;
+use Plenty\Plugin\Application;
 use Plenty\Plugin\Events\Dispatcher;
-use Plenty\Modules\Account\Contact\Contracts\ContactClassRepositoryContract;
-
 
 /**
  * Class CustomerService
@@ -69,13 +67,20 @@ class CustomerService
 	 */
 	private $userSession = null;
 
+	/**
+     * @var AutomaticEmailContract
+     */
+    private $automaticEmailRepository;
+
     /**
      * CustomerService constructor.
      * @param ContactAccountRepositoryContract $accountRepository
      * @param ContactRepositoryContract $contactRepository
      * @param ContactAddressRepositoryContract $contactAddressRepository
      * @param AddressRepositoryContract $addressRepository
+     * @param ContactClassRepositoryContract $contactClassRepository
      * @param \IO\Services\SessionStorageService $sessionStorage
+     * @param AutomaticEmailContract $automaticEmailRepositoryContract
      */
 	public function __construct(
         ContactAccountRepositoryContract $accountRepository,
@@ -83,7 +88,8 @@ class CustomerService
 		ContactAddressRepositoryContract $contactAddressRepository,
         AddressRepositoryContract $addressRepository,
         ContactClassRepositoryContract $contactClassRepository,
-        SessionStorageService $sessionStorage)
+        SessionStorageService $sessionStorage,
+        AutomaticEmailContract $automaticEmailRepositoryContract)
 	{
 	    $this->accountRepository        = $accountRepository;
 		$this->contactRepository        = $contactRepository;
@@ -91,6 +97,7 @@ class CustomerService
         $this->addressRepository        = $addressRepository;
         $this->contactClassRepository   = $contactClassRepository;
         $this->sessionStorage           = $sessionStorage;
+        $this->automaticEmailRepository = $automaticEmailRepositoryContract;
 	}
 
     /**
@@ -300,7 +307,20 @@ class CustomerService
                 $contact = $this->updateContactWithAddressData($newBillingAddress);
             }
         }
-        
+
+        if ($contact instanceof Contact && $contact->id > 0) {
+             /**
+             * @var AutomaticEmailContact $emailData
+             */
+            $emailData = pluginApp(Application::class)->make(AutomaticEmailContact::class, ['contactId' => $contact->id, 'clientId' => $contact->webstoreId, 'password' => $contactData['password']]);
+
+            /**
+             * @var AutomaticEmail $email
+             */
+            $email = pluginApp(Application::class)->make(AutomaticEmail::class, ['template' => AutomaticEmailTemplate::CONTACT_REGISTRATION , 'emailData' => $emailData ]);
+            $this->automaticEmailRepository->sendAutomatic($email);
+        }
+
 		return $contact;
 	}
 
@@ -486,14 +506,14 @@ class CustomerService
          * @var CustomerPasswordResetService $customerPasswordResetService
          */
         $customerPasswordResetService = pluginApp(CustomerPasswordResetService::class);
-        
+        $deleteHash = false;
         if((int)$this->getContactId() <= 0 && strlen($hash) && $customerPasswordResetService->checkHash($contactId, $hash))
         {
             /** @var AuthHelper $authHelper */
             $authHelper = pluginApp(AuthHelper::class);
             $contactRepo = $this->contactRepository;
             
-            $result = $authHelper->processUnguarded( function() use ($newPassword, $contactId, $contactRepo)
+            $contact = $authHelper->processUnguarded( function() use ($newPassword, $contactId, $contactRepo)
             {
                 return $contactRepo->updateContact([
                                                         'changeOnlyPassword' => true,
@@ -501,21 +521,35 @@ class CustomerService
                                                    ],
                                                    (int)$contactId);
             });
-            
-            if($result instanceof Contact && (int)$result->id > 0)
-            {
-                $customerPasswordResetService->deleteHash($contactId);
-            }
+            $deleteHash = true;
         }
         else
         {
-            $result = $this->updateContact([
+            $contact = $this->updateContact([
                                                 'changeOnlyPassword' => true,
                                                 'password'           => $newPassword
                                            ]);
         }
-        
-        return $result;
+
+        if ($contact instanceof Contact && $contact->id > 0) {
+
+            if ($deleteHash) {
+                $customerPasswordResetService->deleteHash($contact->id);
+            }
+
+            /**
+             * @var AutomaticEmailContact $emailData
+             */
+            $emailData = pluginApp(Application::class)->make(AutomaticEmailContact::class, ['contactId' => $contact->id, 'clientId' => $contact->webstoreId]);
+
+            /**
+             * @var AutomaticEmail $email
+             */
+            $email = pluginApp(Application::class)->make(AutomaticEmail::class, ['template' => AutomaticEmailTemplate::CONTACT_NEW_PASSWORD_CONFIRMATION , 'emailData' => $emailData ]);
+            $this->automaticEmailRepository->sendAutomatic($email);
+        }
+
+        return $contact;
     }
 
     /**

@@ -3,74 +3,84 @@
 namespace IO\Services;
 
 use IO\DBModels\PasswordReset;
+use IO\Repositories\CustomerPasswordResetRepository;
+use Plenty\Modules\Authorization\Services\AuthHelper;
 use Plenty\Modules\Account\Contact\Contracts\ContactRepositoryContract;
 use Plenty\Modules\Account\Contact\Models\Contact;
-use Plenty\Plugin\Mail\Contracts\MailerContract;
-use IO\Repositories\CustomerPasswordResetRepository;
-use IO\Services\WebstoreConfigurationService;
+use Plenty\Modules\System\Models\WebstoreConfiguration;
 use Plenty\Plugin\Application;
+use Plenty\Modules\Helper\AutomaticEmail\Contracts\AutomaticEmailContract;
+use Plenty\Modules\Helper\AutomaticEmail\Models\AutomaticEmail;
+use Plenty\Modules\Helper\AutomaticEmail\Models\AutomaticEmailTemplate;
+use Plenty\Modules\Helper\AutomaticEmail\Models\AutomaticEmailContact;
+use Plenty\Plugin\Mail\Contracts\MailerContract;
 use Plenty\Plugin\Templates\Twig;
-use Plenty\Modules\Authorization\Services\AuthHelper;
 use Plenty\Plugin\Translation\Translator;
 
 class CustomerPasswordResetService
 {
+    /**
+     * @var CustomerPasswordResetRepository
+     */
     private $customerPasswordResetRepo;
+
+    /**
+     * @var ContactRepositoryContract
+     */
     private $contactRepository;
-    private $webstoreConfig;
-    
-    public function __construct(CustomerPasswordResetRepository $customerPasswordResetRepo, ContactRepositoryContract $contactRepository)
+
+    /**
+     * @var WebstoreConfigurationService
+     */
+    private $webstoreConfigurationService;
+
+	/**
+     * @var AutomaticEmailContract
+     */
+    private $automaticEmailRepository;
+
+    /**
+     * @var WebstoreConfiguration
+     */
+    private $webstoreConfiguration = null;
+
+    public function __construct(
+        CustomerPasswordResetRepository $customerPasswordResetRepo,
+        ContactRepositoryContract $contactRepository,
+        WebstoreConfigurationService $webstoreConfigurationService,
+        AutomaticEmailContract $automaticEmailRepositoryContract)
     {
         $this->customerPasswordResetRepo = $customerPasswordResetRepo;
         $this->contactRepository = $contactRepository;
+        $this->webstoreConfigurationService = $webstoreConfigurationService;
+        $this->automaticEmailRepository = $automaticEmailRepositoryContract;
+
         $this->loadWebstoreConfig();
     }
     
-    public function resetPassword($email, $template, $mailSubject = 'password reset')
+    public function resetPassword($email)
     {
         $contactId = $this->getContactIdbyEmailAddress($email);
         
-        if((int)$contactId > 0)
-        {
-            $hash = $this->generateHash();
-            $this->customerPasswordResetRepo->addEntry($contactId, $email, $hash);
-            $resetURL = $this->buildMailURL($contactId, $hash);
-            
+        if( (int)$contactId > 0) {
             $contact = $this->getContactData($contactId);
-            
-            $mailContent = $resetURL;
-            if(strlen($template) && $contact instanceof Contact)
-            {
-                $mailTemplateParams = [
-                    'firstname' => $contact->firstName,
-                    'lastname'  => $contact->lastName,
-                    'email'     => $email,
-                    'url'       => $resetURL,
-                    'shopname'  => $this->webstoreConfig->name
-                ];
-        
+
+            if ($contact instanceof Contact && $contact->id > 0) {
+                $hash = $this->generateHash();
+                $this->customerPasswordResetRepo->addEntry($contactId, $email, $hash);
+
                 /**
-                 * @var Twig
+                 * @var AutomaticEmailOrder $emailData
                  */
-                $twig = pluginApp(Twig::class);
-                $renderedMailTemplate = $twig->render($template, $mailTemplateParams);
-        
-                if(strlen($renderedMailTemplate))
-                {
-                    $mailContent = $renderedMailTemplate;
-                }
+                $emailData = pluginApp(Application::class)->make(AutomaticEmailContact::class, ['contactId' => $contact->id, 'clientId' => $contact->webstoreId]);
+
+                 /**
+                 * @var AutomaticEmail $email
+                 */
+                $email = pluginApp(Application::class)->make(AutomaticEmail::class, ['template' => AutomaticEmailTemplate::CONTACT_NEW_PASSWORD , 'emailData' => $emailData ]);
+                $this->automaticEmailRepository->sendAutomatic($email);
             }
-    
-            /** @var Translator $translator */
-            $translator = pluginApp(Translator::class);
-            
-            /**
-             * @var MailerContract $mailer
-             */
-            $mailer = pluginApp(MailerContract::class);
-            $mailer->sendHtml($mailContent, $email, $translator->trans($mailSubject));
         }
-        
         return true;
     }
     
@@ -88,7 +98,7 @@ class CustomerPasswordResetService
     
     private function buildMailURL($contactId, $hash)
     {
-        $domain = $this->webstoreConfig->domainSsl;
+        $domain = $this->webstoreConfiguration->domainSsl;
         $url = $domain.'/password-reset/'.$contactId.'/'.$hash;
         
         return $url;
@@ -129,11 +139,7 @@ class CustomerPasswordResetService
     
     private function loadWebstoreConfig()
     {
-        /**
-         * @var WebstoreConfigurationService $webstoreConfigService
-         */
-        $webstoreConfigService = pluginApp(WebstoreConfigurationService::class);
-        $this->webstoreConfig = $webstoreConfigService->getWebstoreConfig();
+        $this->webstoreConfiguration = $this->webstoreConfigurationService->getWebstoreConfig();
     }
     
     private function getContactData($contactId)

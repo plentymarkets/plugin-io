@@ -2,29 +2,29 @@
 
 namespace IO\Services;
 
+use IO\Builder\Order\AddressType;
+use IO\Builder\Order\OrderBuilder;
+use IO\Builder\Order\OrderItemType;
+use IO\Builder\Order\OrderType;
+use IO\Builder\Order\OrderOptionSubType;
+use IO\Constants\OrderPaymentStatus;
+use IO\Constants\SessionStorageKeys;
+use IO\Models\LocalizedOrder;
 use Plenty\Modules\Account\Address\Contracts\AddressRepositoryContract;
+use Plenty\Modules\Authorization\Services\AuthHelper;
 use Plenty\Modules\Frontend\PaymentMethod\Contracts\FrontendPaymentMethodRepositoryContract;
-use Plenty\Modules\Order\ContactWish\Contracts\ContactWishRepositoryContract;
+use Plenty\Modules\Helper\AutomaticEmail\Contracts\AutomaticEmailContract;
+use Plenty\Modules\Helper\AutomaticEmail\Models\AutomaticEmail;
+use Plenty\Modules\Helper\AutomaticEmail\Models\AutomaticEmailOrder;
+use Plenty\Modules\Helper\AutomaticEmail\Models\AutomaticEmailTemplate;
 use Plenty\Modules\Order\Contracts\OrderRepositoryContract;
 use Plenty\Modules\Order\Property\Contracts\OrderPropertyRepositoryContract;
 use Plenty\Modules\Order\Property\Models\OrderPropertyType;
 use Plenty\Modules\Payment\Method\Contracts\PaymentMethodRepositoryContract;
 use Plenty\Repositories\Models\PaginatedResult;
-use Plenty\Plugin\Http\Response;
 use Plenty\Modules\Order\Models\Order;
+use Plenty\Plugin\Application;
 use Plenty\Plugin\ConfigRepository;
-use IO\Constants\OrderPaymentStatus;
-use IO\Models\LocalizedOrder;
-use IO\Builder\Order\OrderBuilder;
-use IO\Builder\Order\OrderType;
-use IO\Builder\Order\OrderOptionSubType;
-use IO\Builder\Order\AddressType;
-use IO\Constants\SessionStorageKeys;
-use IO\Services\TemplateConfigService;
-use Plenty\Modules\Authorization\Services\AuthHelper;
-use IO\Services\UrlService;
-use IO\Builder\Order\OrderItemType;
-
 
 /**
  * Class OrderService
@@ -59,6 +59,11 @@ class OrderService
     private $urlService;
 
     /**
+     * @var AutomaticEmailContract
+     */
+    private $automaticEmailRepository;
+
+    /**
      * The OrderItem types that will be wrapped. All other OrderItems will be stripped from the order.
      */
     const WRAPPED_ORDERITEM_TYPES =
@@ -74,6 +79,10 @@ class OrderService
      * @param OrderRepositoryContract $orderRepository
      * @param BasketService $basketService
      * @param \IO\Services\SessionStorageService $sessionStorage
+     * @param FrontendPaymentMethodRepositoryContract $frontendPaymentMethodRepository
+     * @param AddressRepositoryContract $addressRepository
+     * @param \IO\Services\UrlService $urlService
+     * @param AutomaticEmailContract $automaticEmailRepositoryContract
      */
 	public function __construct(
 		OrderRepositoryContract $orderRepository,
@@ -81,7 +90,8 @@ class OrderService
         SessionStorageService $sessionStorage,
         FrontendPaymentMethodRepositoryContract $frontendPaymentMethodRepository,
         AddressRepositoryContract $addressRepository,
-        UrlService $urlService
+        UrlService $urlService,
+        AutomaticEmailContract $automaticEmailRepositoryContract
 	)
 	{
 		$this->orderRepository = $orderRepository;
@@ -90,6 +100,7 @@ class OrderService
         $this->frontendPaymentMethodRepository = $frontendPaymentMethodRepository;
         $this->addressRepository = $addressRepository;
         $this->urlService = $urlService;
+        $this->automaticEmailRepository = $automaticEmailRepositoryContract;
 	}
 
     /**
@@ -132,6 +143,18 @@ class OrderService
             ->done();
 
         $order = $this->orderRepository->createOrder($order, $couponCode);
+
+        if ($order instanceof Order && $order->id > 0) {
+            /**
+             * @var AutomaticEmailOrder $emailData
+             */
+            $emailData = pluginApp(Application::class)->make(AutomaticEmailOrder::class, ['orderId' => $order->id]);
+            /**
+             * @var AutomaticEmail $email
+             */
+            $email = pluginApp(Application::class)->make(AutomaticEmail::class, ['template' => AutomaticEmailTemplate::SHOP_ORDER , 'emailData' => $emailData ]);
+            $this->automaticEmailRepository->sendAutomatic($email);
+        }
 
         $this->sessionStorage->setSessionValue(SessionStorageKeys::ORDER_CONTACT_WISH, null);
 
