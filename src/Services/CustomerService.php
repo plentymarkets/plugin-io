@@ -26,6 +26,8 @@ use Plenty\Modules\Helper\AutomaticEmail\Contracts\AutomaticEmailContract;
 use Plenty\Modules\Helper\AutomaticEmail\Models\AutomaticEmail;
 use Plenty\Modules\Helper\AutomaticEmail\Models\AutomaticEmailTemplate;
 use Plenty\Modules\Helper\AutomaticEmail\Models\AutomaticEmailContact;
+use Plenty\Modules\System\Contracts\WebstoreConfigurationRepositoryContract;
+use Plenty\Modules\System\Models\WebstoreConfiguration;
 use Plenty\Plugin\Application;
 use Plenty\Plugin\Events\Dispatcher;
 
@@ -309,10 +311,21 @@ class CustomerService
         }
 
         if ($contact instanceof Contact && $contact->id > 0) {
+
+            /**
+             * @var WebstoreConfigurationRepositoryContract $webstoreConfigurationRepository
+             */
+            $webstoreConfigurationRepository = pluginApp(WebstoreConfigurationRepositoryContract::class);
+
+            /**
+             * @var WebstoreConfiguration $webstoreConfig
+             */
+            $webstoreConfiguration = $webstoreConfigurationRepository->findByPlentyId($contact->plentyId);
+
              /**
              * @var AutomaticEmailContact $emailData
              */
-            $emailData = pluginApp(Application::class)->make(AutomaticEmailContact::class, ['contactId' => $contact->id, 'clientId' => $contact->webstoreId, 'password' => $contactData['password']]);
+            $emailData = pluginApp(Application::class)->make(AutomaticEmailContact::class, ['contactId' => $contact->id, 'clientId' => $webstoreConfiguration->webstoreId, 'password' => $contactData['password']]);
 
             /**
              * @var AutomaticEmail $email
@@ -537,10 +550,20 @@ class CustomerService
                 $customerPasswordResetService->deleteHash($contact->id);
             }
 
+             /**
+             * @var WebstoreConfigurationRepositoryContract $webstoreConfigurationRepository
+             */
+            $webstoreConfigurationRepository = pluginApp(WebstoreConfigurationRepositoryContract::class);
+
+            /**
+             * @var WebstoreConfiguration $webstoreConfig
+             */
+            $webstoreConfiguration = $webstoreConfigurationRepository->findByPlentyId($contact->plentyId);
+
             /**
              * @var AutomaticEmailContact $emailData
              */
-            $emailData = pluginApp(Application::class)->make(AutomaticEmailContact::class, ['contactId' => $contact->id, 'clientId' => $contact->webstoreId]);
+            $emailData = pluginApp(Application::class)->make(AutomaticEmailContact::class, ['contactId' => $contact->id, 'clientId' => $webstoreConfiguration->webstoreId]);
 
             /**
              * @var AutomaticEmail $email

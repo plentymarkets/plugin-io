@@ -4,18 +4,16 @@ namespace IO\Services;
 
 use IO\DBModels\PasswordReset;
 use IO\Repositories\CustomerPasswordResetRepository;
-use Plenty\Modules\Authorization\Services\AuthHelper;
 use Plenty\Modules\Account\Contact\Contracts\ContactRepositoryContract;
 use Plenty\Modules\Account\Contact\Models\Contact;
-use Plenty\Modules\System\Models\WebstoreConfiguration;
-use Plenty\Plugin\Application;
+use Plenty\Modules\Authorization\Services\AuthHelper;
 use Plenty\Modules\Helper\AutomaticEmail\Contracts\AutomaticEmailContract;
 use Plenty\Modules\Helper\AutomaticEmail\Models\AutomaticEmail;
 use Plenty\Modules\Helper\AutomaticEmail\Models\AutomaticEmailTemplate;
 use Plenty\Modules\Helper\AutomaticEmail\Models\AutomaticEmailContact;
-use Plenty\Plugin\Mail\Contracts\MailerContract;
-use Plenty\Plugin\Templates\Twig;
-use Plenty\Plugin\Translation\Translator;
+use Plenty\Modules\System\Contracts\WebstoreConfigurationRepositoryContract;
+use Plenty\Modules\System\Models\WebstoreConfiguration;
+use Plenty\Plugin\Application;
 
 class CustomerPasswordResetService
 {
@@ -29,33 +27,19 @@ class CustomerPasswordResetService
      */
     private $contactRepository;
 
-    /**
-     * @var WebstoreConfigurationService
-     */
-    private $webstoreConfigurationService;
-
 	/**
      * @var AutomaticEmailContract
      */
     private $automaticEmailRepository;
 
-    /**
-     * @var WebstoreConfiguration
-     */
-    private $webstoreConfiguration = null;
-
     public function __construct(
         CustomerPasswordResetRepository $customerPasswordResetRepo,
         ContactRepositoryContract $contactRepository,
-        WebstoreConfigurationService $webstoreConfigurationService,
         AutomaticEmailContract $automaticEmailRepositoryContract)
     {
         $this->customerPasswordResetRepo = $customerPasswordResetRepo;
         $this->contactRepository = $contactRepository;
-        $this->webstoreConfigurationService = $webstoreConfigurationService;
         $this->automaticEmailRepository = $automaticEmailRepositoryContract;
-
-        $this->loadWebstoreConfig();
     }
     
     public function resetPassword($email)
@@ -70,9 +54,19 @@ class CustomerPasswordResetService
                 $this->customerPasswordResetRepo->addEntry($contactId, $email, $hash);
 
                 /**
-                 * @var AutomaticEmailOrder $emailData
+                 * @var WebstoreConfigurationRepositoryContract $webstoreConfigurationRepository
                  */
-                $emailData = pluginApp(Application::class)->make(AutomaticEmailContact::class, ['contactId' => $contact->id, 'clientId' => $contact->webstoreId]);
+                $webstoreConfigurationRepository= pluginApp(WebstoreConfigurationRepositoryContract::class);
+
+                /**
+                 * @var WebstoreConfiguration $webstoreConfigugration
+                 */
+                $webstoreConfigugration = $webstoreConfigurationRepository->findByPlentyId($contact->plentyId);
+
+                /**
+                 * @var AutomaticEmailContact $emailData
+                 */
+                $emailData = pluginApp(Application::class)->make(AutomaticEmailContact::class, ['contactId' => $contact->id, 'clientId' => $webstoreConfigugration->webstoreId]);
 
                  /**
                  * @var AutomaticEmail $email
@@ -94,14 +88,6 @@ class CustomerPasswordResetService
     private function generateHash()
     {
         return sha1(microtime(true));
-    }
-    
-    private function buildMailURL($contactId, $hash)
-    {
-        $domain = $this->webstoreConfiguration->domainSsl;
-        $url = $domain.'/password-reset/'.$contactId.'/'.$hash;
-        
-        return $url;
     }
     
     public function checkHash($contactId, $hash)
@@ -135,11 +121,6 @@ class CustomerPasswordResetService
     public function deleteHash($contactId)
     {
         return $this->customerPasswordResetRepo->deleteEntry((int)$contactId);
-    }
-    
-    private function loadWebstoreConfig()
-    {
-        $this->webstoreConfiguration = $this->webstoreConfigurationService->getWebstoreConfig();
     }
     
     private function getContactData($contactId)
