@@ -318,7 +318,7 @@ class CustomerService
             $webstoreConfigurationRepository = pluginApp(WebstoreConfigurationRepositoryContract::class);
 
             /**
-             * @var WebstoreConfiguration $webstoreConfig
+             * @var WebstoreConfiguration $webstoreConfiguration
              */
             $webstoreConfiguration = $webstoreConfigurationRepository->findByPlentyId($contact->plentyId);
 
@@ -556,7 +556,7 @@ class CustomerService
             $webstoreConfigurationRepository = pluginApp(WebstoreConfigurationRepositoryContract::class);
 
             /**
-             * @var WebstoreConfiguration $webstoreConfig
+             * @var WebstoreConfiguration $webstoreConfiguration
              */
             $webstoreConfiguration = $webstoreConfigurationRepository->findByPlentyId($contact->plentyId);
 

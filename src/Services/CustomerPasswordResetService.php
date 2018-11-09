@@ -59,7 +59,7 @@ class CustomerPasswordResetService
                 $webstoreConfigurationRepository= pluginApp(WebstoreConfigurationRepositoryContract::class);
 
                 /**
-                 * @var WebstoreConfiguration $webstoreConfigugration
+                 * @var WebstoreConfiguration $webstoreConfiguration
                  */
                 $webstoreConfigugration = $webstoreConfigurationRepository->findByPlentyId($contact->plentyId);
 
