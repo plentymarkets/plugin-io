@@ -111,18 +111,7 @@ abstract class LayoutController extends Controller
      */
 	protected function buildTemplateContainer(string $templateEvent, $controllerData = []):TemplateContainer
 	{
-		/** @var TemplateContainer $templateContainer */
-		$templateContainer = pluginApp(TemplateContainer::class);
-		$templateContainer->setTemplateKey($templateEvent);
-		
-		// Emit event to receive layout to use.
-		// Add TemplateContainer and template data from specific controller to event's payload
-		$this->event->fire('IO.' . $templateEvent, [
-			$templateContainer,
-            $controllerData
-		]);
-        
-        return $templateContainer;
+        return TemplateContainer::get($templateEvent, $controllerData);
 	}
 
     /**

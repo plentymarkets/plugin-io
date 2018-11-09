@@ -10,67 +10,53 @@ use IO\Validators\Customer\ContactFormValidator;
 
 class ContactMailService
 {
-    private $name = '';
-    private $message = '';
-    private $orderId = '';
-    
     public function __construct()
     {
     
     }
     
-    public function sendMail($mailTemplate, $contactData = [])
+    public function sendMail($mailTemplate, $recipient = null, $subject = "", $cc = [], $replyToData = null, $data = [])
     {
-        ContactFormValidator::validateOrFail($contactData);
-    
-        /**
-         * @var TemplateConfigService $templateConfigService
-         */
-        $templateConfigService = pluginApp(TemplateConfigService::class);
-        $recipient = $templateConfigService->get('contact.shop_mail');
-        
+        if ( is_null( $recipient ) )
+        {
+            /** @var TemplateConfigService $templateConfigService */
+            $templateConfigService = pluginApp(TemplateConfigService::class);
+            $recipient = $templateConfigService->get('contact.shop_mail');
+
+        }
+
         if(!strlen($recipient) || !strlen($mailTemplate))
         {
             return false;
         }
         
-        /**
-         * @var Twig
-         */
+        /** @var Twig */
         $twig = pluginApp(Twig::class);
-    
-        $mailTemplateParams = [];
-        foreach($contactData as $key => $value)
-        {
-            $mailTemplateParams[$key] = nl2br($value);
-        }
         
-        $renderedMailTemplate = $twig->render($mailTemplate, $mailTemplateParams);
+        $mailBody = $twig->render(
+            $mailTemplate,
+            [
+                'data' => $data
+            ]
+        );
         
-        if(!strlen($renderedMailTemplate))
+        if(!strlen($mailBody))
         {
             return false;
         }
         
-        $cc = [];
-        if(isset($contactData['cc']) && $contactData['cc'] == 'true')
-        {
-            $cc[] = $contactData['userMail'];
-        }
-        
-        /**
-         * @var MailerContract $mailer
-         */
+        /** @var MailerContract $mailer */
         $mailer = pluginApp(MailerContract::class);
 
-        /**
-         * @var ReplyTo $replyTo
-         */
-        $replyTo = pluginApp(ReplyTo::class);
-        $replyTo->mailAddress = $contactData['userMail'];
-        $replyTo->name = $contactData['name'];
-
-        $mailer->sendHtml($renderedMailTemplate, $recipient, $contactData['subject'], $cc, [], $replyTo);
+        $replyTo = null;
+        if ( !is_null($replyToData) )
+        {
+            /** @var ReplyTo $replyTo */
+            $replyTo = pluginApp(ReplyTo::class);
+            $replyTo->mailAddress = $replyToData['mailAddress'];
+            $replyTo->name = $replyToData['name'];
+        }
+        $mailer->sendHtml($mailBody, $recipient, $subject, $cc, [], $replyTo);
         
         return true;
     }

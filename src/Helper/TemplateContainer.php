@@ -1,6 +1,6 @@
 <?php
 namespace IO\Helper;
-use IO\Helper\ContextInterface;
+use Plenty\Plugin\Events\Dispatcher;
 
 /**
  * Container to pass current template between separate layout plugins and this plugin.
@@ -9,6 +9,20 @@ use IO\Helper\ContextInterface;
  */
 class TemplateContainer
 {
+    public static function get($templateKey, $data = [])
+    {
+        $container = pluginApp(self::class);
+        $container->setTemplateKey($templateKey);
+
+        /** @var Dispatcher $eventDispatcher */
+        $eventDispatcher = pluginApp(Dispatcher::class);
+        $eventDispatcher->fire('IO.' . $templateKey, [
+            $container,
+            $data
+        ]);
+
+        return $container;
+    }
 
 	/**
 	 * @var string
