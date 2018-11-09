@@ -42,7 +42,7 @@ class LiveShoppingService
         }
         
         return [
-            'item' => $liveShoppingItem['data'],
+            'item' => $liveShoppingItem[0]['data'],
             'liveShopping' => $liveShoppingData
         ];
     }
