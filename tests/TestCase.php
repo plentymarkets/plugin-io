@@ -7,7 +7,7 @@ require_once __DIR__ . '/TestHelper.php';
 use Plenty\Modules\Account\Contact\Models\Contact;
 use Plenty\Modules\Account\Contact\Models\ContactOption;
 use Plenty\Modules\Authentication\Services\AccountAuthenticationProxy;
-use Tests\BrowserKitTestCase;
+use PluginTests\BrowserKitTestCase;
 
 /**
  * Class TestCase
