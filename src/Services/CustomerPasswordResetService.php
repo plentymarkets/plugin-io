@@ -50,8 +50,8 @@ class CustomerPasswordResetService
             $contact = $this->getContactData($contactId);
 
             if ($contact instanceof Contact && $contact->id > 0) {
-                $hash = $this->generateHash();
-                $this->customerPasswordResetRepo->addEntry($contactId, $email, $hash);
+
+                $this->generateHash($contact->id, $email);
 
                 /**
                  * @var WebstoreConfigurationRepositoryContract $webstoreConfigurationRepository
@@ -77,19 +77,21 @@ class CustomerPasswordResetService
         }
         return true;
     }
-    
+
     public function getContactIdbyEmailAddress($email)
     {
         $contactId = $this->contactRepository->getContactIdByEmail($email);
-        
+
         return $contactId;
     }
-    
-    private function generateHash()
+
+    public function generateHash($contactId, $email)
     {
-        return sha1(microtime(true));
+        $hash =  sha1(microtime(true));
+        $this->customerPasswordResetRepo->addEntry($contactId, $email, $hash);
+        return $hash;
     }
-    
+
     public function checkHash($contactId, $hash)
     {
         $existingEntry = $this->customerPasswordResetRepo->findExistingEntry((int)pluginApp(Application::class)->getPlentyID(), (int)$contactId);
@@ -97,10 +99,10 @@ class CustomerPasswordResetService
         {
             return true;
         }
-        
+
         return false;
     }
-    
+
     public function checkHashExpiration($hashTimestamp)
     {
         $expirationDays = 1;
@@ -109,18 +111,31 @@ class CustomerPasswordResetService
         {
             return false;
         }
-    
+
         return true;
     }
-    
+
     public function findExistingHash($contactId)
     {
         return $this->customerPasswordResetRepo->findExistingEntry((int)pluginApp(Application::class)->getPlentyID(), $contactId);
     }
-    
+
     public function deleteHash($contactId)
     {
         return $this->customerPasswordResetRepo->deleteEntry((int)$contactId);
+    }
+
+    public function getLastHashOrCreate($contactId, $email)
+    {
+        $existingPasswordResetEntry = $this->findExistingHash($contactId);
+        if ($existingPasswordResetEntry instanceof PasswordReset) {
+            if (!$this->checkHashExpiration($existingPasswordResetEntry->timestamp)) {
+                $this->deleteHash($contactId);
+            } else {
+                return $existingPasswordResetEntry->hash;
+            }
+        }
+        return $this->generateHash($contactId, $email);
     }
     
     private function getContactData($contactId)
