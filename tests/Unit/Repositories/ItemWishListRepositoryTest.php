@@ -3,9 +3,7 @@
 use IO\DBModels\ItemWishList;
 use IO\Repositories\ItemWishListRepository;
 use IO\Services\CustomerService;
-use Plenty\Modules\Plugin\DataBase\Contracts\DataBase;
-use Plenty\Modules\Plugin\DataBase\Contracts\Query;
-use Tests\SimpleTestCase;
+use PluginTests\SimpleTestCase;
 
 /**
  * Created by PhpStorm.
@@ -31,29 +29,25 @@ class ItemWishListRepositoryTest extends SimpleTestCase
     {
         parent::setUp();
 
-        $this->databaseMock = Mockery::mock(DataBase::class);
+        $this->databaseMock        = $this->mockDatabase();
+        $this->databaseQueryMock   = $this->mockQuery();
         $this->customerServiceMock = Mockery::mock(CustomerService::class);
-        $this->databaseQueryMock = Mockery::mock(Query::class);
 
-
-        app()->instance(DataBase::class, $this->databaseMock);
-        app()->instance(CustomerService::class, $this->customerServiceMock);
-        app()->instance(Query::class, $this->databaseQueryMock);
+        $this->replaceInstanceByMock(CustomerService::class, $this->customerServiceMock);
 
         $this->itemWishListRepository = pluginApp(ItemWishListRepository::class);
 
     }
 
 
-
     private function getItemWishListModel()
     {
-        $wishListEntry = pluginApp(ItemWishList::class);
-        $wishListEntry->contactId = 1;
+        $wishListEntry              = pluginApp(ItemWishList::class);
+        $wishListEntry->contactId   = 1;
         $wishListEntry->variationId = 1;
-        $wishListEntry->plentyId = "1000";
-        $wishListEntry->quantity = "1";
-        $wishListEntry->createdAt = date("Y-m-d H:i:s");
+        $wishListEntry->plentyId    = "1000";
+        $wishListEntry->quantity    = "1";
+        $wishListEntry->createdAt   = date("Y-m-d H:i:s");
 
         return $wishListEntry;
     }
@@ -69,7 +63,8 @@ class ItemWishListRepositoryTest extends SimpleTestCase
         $itemWishListModel = $this->getItemWishListModel();
         $this->databaseMock->shouldReceive('query')->andReturn($this->databaseQueryMock);
         $this->databaseMock->shouldReceive('save')->with(Mockery::any())->andReturn($itemWishListModel);
-        $this->databaseQueryMock->shouldReceive('where')->with(Mockery::any(), Mockery::any(), Mockery::any())->andReturn($this->databaseQueryMock);
+        $this->databaseQueryMock->shouldReceive('where')->with(Mockery::any(), Mockery::any(),
+            Mockery::any())->andReturn($this->databaseQueryMock);
         $this->databaseQueryMock->shouldReceive('get')->andReturn([]);
         $this->customerServiceMock->shouldReceive('getContactId')->andReturn(1);
 
@@ -98,7 +93,8 @@ class ItemWishListRepositoryTest extends SimpleTestCase
         $itemWishListModel = $this->getItemWishListModel();
         $this->databaseMock->shouldReceive('query')->andReturn($this->databaseQueryMock);
         $this->databaseMock->shouldReceive('save')->with(Mockery::any())->andReturn($itemWishListModel);
-        $this->databaseQueryMock->shouldReceive('where')->with(Mockery::any(), Mockery::any(), Mockery::any())->andReturn($this->databaseQueryMock);
+        $this->databaseQueryMock->shouldReceive('where')->with(Mockery::any(), Mockery::any(),
+            Mockery::any())->andReturn($this->databaseQueryMock);
         $this->databaseQueryMock->shouldReceive('get')->andReturn([$itemWishListModel]);
         $this->customerServiceMock->shouldReceive('getContactId')->andReturn(1);
 
@@ -147,7 +143,8 @@ class ItemWishListRepositoryTest extends SimpleTestCase
          */
 
         $this->databaseMock->shouldReceive('query')->andReturn($this->databaseQueryMock);
-        $this->databaseQueryMock->shouldReceive('where')->with(Mockery::any(), Mockery::any(), Mockery::any())->andReturn($this->databaseQueryMock);
+        $this->databaseQueryMock->shouldReceive('where')->with(Mockery::any(), Mockery::any(),
+            Mockery::any())->andReturn($this->databaseQueryMock);
         $this->databaseQueryMock->shouldReceive('get')->andReturn([]);
         $this->customerServiceMock->shouldReceive('getContactId')->andReturn(1);
 
@@ -175,7 +172,8 @@ class ItemWishListRepositoryTest extends SimpleTestCase
 
         $this->databaseMock->shouldReceive('query')->andReturn($this->databaseQueryMock);
         $this->databaseMock->shouldReceive('delete')->andReturn(true);
-        $this->databaseQueryMock->shouldReceive('where')->with(Mockery::any(), Mockery::any(), Mockery::any())->andReturn($this->databaseQueryMock);
+        $this->databaseQueryMock->shouldReceive('where')->with(Mockery::any(), Mockery::any(),
+            Mockery::any())->andReturn($this->databaseQueryMock);
         $this->databaseQueryMock->shouldReceive('get')->andReturn([$itemWishListModel]);
         $this->customerServiceMock->shouldReceive('getContactId')->andReturn(1);
 
@@ -189,7 +187,6 @@ class ItemWishListRepositoryTest extends SimpleTestCase
         $this->assertTrue($response);
 
     }
-
 
 
 }

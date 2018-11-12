@@ -1,5 +1,33 @@
 # Release Notes for IO
 
+## v2.16.0 (2018-10-22) <a href="https://github.com/plentymarkets/plugin-io/compare/2.15.0...2.16.0" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
+
+### Added
+
+- We added a new function `getShippingCountryId`. This functions serves to retrieve the ID of the country of delivery in the checkout.
+- We added the ShopBuilder newsletter widget in Ceres.
+
+### Changed
+
+- The contact form now sends e-mails that include a response address.
+- When creating an order or a return, the customer note is now saved prior to the creation. This way, the information is already included in the confirmation e-mail.
+- The LocalizedOrder now includes the ShippingProfileId.
+- The file structures for category navigation have been minimised in order to improve loading times.
+- The function `getHierarchy()` in the CategoryService now returns all categories and not only those that are displayed in the navigation.
+- In IO it is now possible to read the current template during a REST call.
+
+### Fixed
+
+- Due to an error, the link from the order confirmation forwarded to a 404 page. This has been fixed.
+- Due to an error, the category descriptions of the main client was used for additional clients as well. This has been fixed.
+- Due to an error, the variation drop-down list in the single item view also listed variations for which no valid sales price had been set for the online store. This has been fixed.
+- Due to an error, all shipping profiles were displayed in the checkout of guest orders. This has been fixed.
+- Due to an error, page calls via the HEAD method always returned 404 status codes. This has been fixed.
+- We made several SEO-relevant adjustments.
+- Due to an error, not all relevant items were included in the **Last seen** item list. This has been fixed.
+- We fixed an error, due to which a selection of variations in the single item view was not possible if 2 or more variations consisted of the same combination of attributes or if the variations had to attributes at all. In these cases, the selection is now possible via the content drop-down list.
+- In rare cases, the shipping costs were displayed incorrectly on the order confirmation page. This behaviour has been fixed.
+
 ## v2.15.0 (2018-09-12) <a href="https://github.com/plentymarkets/plugin-io/compare/2.14.0...2.15.0" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
 
 ### Fixed
