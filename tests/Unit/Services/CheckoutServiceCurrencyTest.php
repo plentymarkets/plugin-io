@@ -53,8 +53,7 @@ class CheckoutServiceCurrencyTest extends TestCase
         $this->pluginMock = Mockery::mock(Plugin::class);
         $this->replaceInstanceByMock(Plugin::class, $this->pluginMock);
 
-        $this->webstoreConfigurationMock = Mockery::mock(WebstoreConfiguration::class);
-        $this->replaceInstanceByMock(WebstoreConfiguration::class, $this->webstoreConfigurationMock);
+        $this->webstoreConfigurationMock = $this->mockWebstoreConfiguration();
 
         $this->webstoreConfigServiceMock = Mockery::mock(WebstoreConfigurationService::class);
         $this->replaceInstanceByMock(WebstoreConfigurationService::class, $this->webstoreConfigServiceMock);
@@ -89,16 +88,15 @@ class CheckoutServiceCurrencyTest extends TestCase
     /** @test */
     public function it_returns_the_currency_not_from_session_storage_and_webstore_config()
     {
-
         $webstoreConfiguration = factory(WebstoreConfiguration::class)->make();
 
-        $expectedCurrency = "EUR";
+        $expectedCurrency = $webstoreConfiguration->defaultCurrency;
 
         $this->pluginMock->shouldReceive('getValue')->with(SessionStorageKeys::CURRENCY)->andReturn(null);
         $this->pluginMock->shouldReceive('setValue')->andReturn();
         $this->sessionStorageMock->shouldReceive('getPlugin')->andReturn($this->pluginMock);
 
-        $this->sessionStorageServiceMock->shouldReceive("getLang")->andReturn("de");
+        $this->sessionStorageServiceMock->shouldReceive("getLang")->andReturn($webstoreConfiguration->defaultLanguage);
 
         $this->webstoreConfigServiceMock->shouldReceive('getWebstoreConfig')->andReturn($webstoreConfiguration);
 
@@ -116,7 +114,7 @@ class CheckoutServiceCurrencyTest extends TestCase
     {
 
         $webstoreConfiguration = factory(WebstoreConfiguration::class)->make([
-            "defaultCurrencyList" => ""
+            "defaultCurrencyList" => "",
         ]);
 
         $expectedCurrency = "EUR";
