@@ -15,8 +15,8 @@ use Plenty\Modules\Basket\Models\BasketItem;
 use Plenty\Modules\Frontend\Contracts\Checkout;
 use IO\Extensions\Filters\NumberFormatFilter;
 use Plenty\Modules\Frontend\Services\VatService;
-use IO\Services\NotificationService;
 use IO\Services\ItemSearch\Factories\VariationSearchFactory;
+use IO\Constants\LogLevel;
 
 /**
  * Class BasketService
@@ -202,15 +202,46 @@ class BasketService
 
         $basketItems    = $this->getBasketItemsRaw();
         $basketItemData = $this->getBasketItemData($basketItems, $template);
-
+        $showWarning = [];
         foreach ($basketItems as $basketItem) {
-            array_push(
-                $result,
-                $this->addVariationData($basketItem, $basketItemData[$basketItem->variationId])
-            );
+            if(!array_key_exists($basketItem->variationId, $basketItemData))
+            {
+                $this->deleteBasketItem($basketItem->id);
+                $showWarning[] = 9;
+            }
+            elseif (!$this->hasTexts($basketItemData[$basketItem->variationId]['data']))
+            {
+                $this->deleteBasketItem($basketItem->id);
+                $showWarning[] = 10;
+            }
+            else
+            {
+                array_push(
+                    $result,
+                    $this->addVariationData($basketItem, $basketItemData[$basketItem->variationId])
+                );
+
+            }
         }
 
+        if(count($showWarning) > 0)
+        {
+            $showWarning = array_unique($showWarning);
+
+            foreach($showWarning as $warning)
+            {
+                /** @var NotificationService $notificationService */
+                $notificationService = pluginApp(NotificationService::class);
+                $notificationService->warn(LogLevel::WARN, $warning);
+            }
+
+        }
         return $result;
+    }
+
+    private function hasTexts($basketItemData)
+    {
+        return count($basketItemData['texts']) && (strlen($basketItemData['texts']['name1']) || strlen($basketItemData['texts']['name2']) || !strlen($basketItemData['texts']['name3']));
     }
 
     /**

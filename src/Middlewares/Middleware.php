@@ -3,6 +3,7 @@
 namespace IO\Middlewares;
 
 use IO\Api\ResponseCode;
+use IO\Helper\RouteConfig;
 use IO\Services\TemplateService;
 use IO\Services\WebstoreConfigurationService;
 
@@ -28,7 +29,7 @@ class Middleware extends \Plenty\Plugin\Middleware
             $authRepo = pluginApp(ContactAuthenticationRepositoryContract::class);
             $authRepo->authenticateWithToken($loginToken);
         }
-        
+
         $splittedURL     = explode('/', $request->get('plentyMarkets'));
         $lang            = $splittedURL[0];
         $webstoreService = pluginApp(WebstoreConfigurationService::class);
@@ -93,22 +94,25 @@ class Middleware extends \Plenty\Plugin\Middleware
             $checkout = pluginApp(Checkout::class);
             $checkout->setBasketReferrerId($referrerId);
         }
-        
+
         $authString = $request->get('authString', '');
         $newsletterEmailId = $request->get('newsletterEmailId', 0);
-        
-        if(strlen($authString) && (int)$newsletterEmailId > 0)
+
+        if(strlen($authString) && (int)$newsletterEmailId > 0 && RouteConfig::isActive(RouteConfig::NEWSLETTER_OPT_IN))
         {
             AuthGuard::redirect('/newsletter/subscribe/'.$authString.'/'.$newsletterEmailId);
         }
-        
+
         $orderShow = $request->get('OrderShow', '');
-        if(strlen($orderShow) && $orderShow == 'CancelNewsletter')
+        if(strlen($orderShow) && $orderShow == 'CancelNewsletter' && RouteConfig::isActive(RouteConfig::NEWSLETTER_OPT_OUT))
         {
             AuthGuard::redirect('/newsletter/unsubscribe');
         }
 
-        $this->checkForCallistoSearchURL($request);
+        if ( RouteConfig::isActive(RouteConfig::SEARCH) && $request->get('ActionCall') == 'WebActionArticleSearch' )
+        {
+            AuthGuard::redirect('/search', ['query' => $request->get('Params')['SearchParam']]);
+        }
     }
 
     public function after(Request $request, Response $response):Response
@@ -127,17 +131,5 @@ class Middleware extends \Plenty\Plugin\Middleware
         }
 
         return $response;
-    }
-
-    private function checkForCallistoSearchURL(Request $request)
-    {
-        $config = pluginApp(ConfigRepository::class);
-        $enabledRoutes = explode(", ",  $config->get("IO.routing.enabled_routes") );
-
-        if ( (in_array("search", $enabledRoutes) || in_array("all", $enabledRoutes)) &&
-             $request->get('ActionCall') == 'WebActionArticleSearch' )
-        {
-            AuthGuard::redirect('/search', ['query' => $request->get('Params')['SearchParam']]);
-        }
     }
 }
