@@ -26,10 +26,10 @@ class CheckoutServiceAddressTest extends TestCase
         $this->createApplication();
 
         $this->basketServiceMock = Mockery::mock(BasketService::class);
-        app()->instance(BasketService::class, $this->basketServiceMock);
+        $this->replaceInstanceByMock(BasketService::class, $this->basketServiceMock);
 
         $this->customerServiceMock = Mockery::mock(CustomerService::class);
-        app()->instance(CustomerService::class, $this->customerServiceMock);
+        $this->replaceInstanceByMock(CustomerService::class, $this->customerServiceMock);
 
         $this->checkoutService = pluginApp(CheckoutService::class);
     }

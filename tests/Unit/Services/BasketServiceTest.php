@@ -26,7 +26,7 @@ class BasketServiceTest extends TestCase
         parent::setUp();
 
         $this->basketItemRepositoryMock = Mockery::mock(BasketItemRepository::class);
-        app()->instance(BasketItemRepository::class, $this->basketItemRepositoryMock);
+        $this->replaceInstanceByMock(BasketItemRepository::class, $this->basketItemRepositoryMock);
 
         $this->basketService = pluginApp(BasketService::class);
     }

@@ -36,9 +36,9 @@ class ItemWishListRepositoryTest extends SimpleTestCase
         $this->databaseQueryMock = Mockery::mock(Query::class);
 
 
-        app()->instance(DataBase::class, $this->databaseMock);
-        app()->instance(CustomerService::class, $this->customerServiceMock);
-        app()->instance(Query::class, $this->databaseQueryMock);
+        $this->replaceInstanceByMock(DataBase::class, $this->databaseMock);
+        $this->replaceInstanceByMock(CustomerService::class, $this->customerServiceMock);
+        $this->replaceInstanceByMock(Query::class, $this->databaseQueryMock);
 
         $this->itemWishListRepository = pluginApp(ItemWishListRepository::class);
 

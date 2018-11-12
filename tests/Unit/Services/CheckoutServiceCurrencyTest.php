@@ -48,22 +48,22 @@ class CheckoutServiceCurrencyTest extends TestCase
         $this->createApplication();
 
         $this->sessionStorageMock = Mockery::mock(FrontendSessionStorageFactoryContract::class);
-        app()->instance(FrontendSessionStorageFactoryContract::class, $this->sessionStorageMock);
+        $this->replaceInstanceByMock(FrontendSessionStorageFactoryContract::class, $this->sessionStorageMock);
 
         $this->pluginMock = Mockery::mock(Plugin::class);
-        app()->instance(Plugin::class, $this->pluginMock);
+        $this->replaceInstanceByMock(Plugin::class, $this->pluginMock);
 
         $this->webstoreConfigurationMock = Mockery::mock(WebstoreConfiguration::class);
-        app()->instance(WebstoreConfiguration::class, $this->webstoreConfigurationMock);
+        $this->replaceInstanceByMock(WebstoreConfiguration::class, $this->webstoreConfigurationMock);
 
         $this->webstoreConfigServiceMock = Mockery::mock(WebstoreConfigurationService::class);
-        app()->instance(WebstoreConfigurationService::class, $this->webstoreConfigServiceMock);
+        $this->replaceInstanceByMock(WebstoreConfigurationService::class, $this->webstoreConfigServiceMock);
 
         $this->checkoutMock = Mockery::mock(Checkout::class);
-        app()->instance(Checkout::class, $this->checkoutMock);
+        $this->replaceInstanceByMock(Checkout::class, $this->checkoutMock);
 
         $this->sessionStorageServiceMock = Mockery::mock(SessionStorageService::class);
-        app()->instance(SessionStorageService::class, $this->sessionStorageServiceMock);
+        $this->replaceInstanceByMock(SessionStorageService::class, $this->sessionStorageServiceMock);
 
         $this->checkoutService = pluginApp(CheckoutService::class);
 

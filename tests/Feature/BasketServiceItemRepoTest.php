@@ -44,15 +44,15 @@ class BasketServiceItemRepoTest extends TestCase
 
        $checkItemStockMockery = Mockery::mock(CheckItemStock::class);
        $checkItemStockMockery->shouldReceive('handle')->andReturn();
-       app()->instance(CheckItemStock::class, $checkItemStockMockery);
+       $this->replaceInstanceByMock(CheckItemStock::class, $checkItemStockMockery);
 
        $checkNewItemQuantityMockery = Mockery::mock(CheckNewItemQuantity::class);
        $checkNewItemQuantityMockery->shouldReceive('handle')->andReturn();
-       app()->instance(CheckNewItemQuantity::class, $checkNewItemQuantityMockery);
+       $this->replaceInstanceByMock(CheckNewItemQuantity::class, $checkNewItemQuantityMockery);
 
 
        $this->itemSearchServiceMock = Mockery::mock(ItemSearchService::class);
-       app()->instance(ItemSearchService::class, $this->itemSearchServiceMock);
+       $this->replaceInstanceByMock(ItemSearchService::class, $this->itemSearchServiceMock);
 
        $this->basketService = pluginApp(BasketService::class);
        $this->variation = factory(Variation::class)->create([
@@ -68,11 +68,11 @@ class BasketServiceItemRepoTest extends TestCase
        */
        $resultFieldTemplate = pluginApp(ResultFieldTemplate::class);
        $resultFieldTemplate->setTemplates([ResultFieldTemplate::TEMPLATE_BASKET_ITEM   => 'Ceres::ResultFields.BasketItem']);
-       app()->instance(ResultFieldTemplate::class, $resultFieldTemplate);
+       $this->replaceInstanceByMock(ResultFieldTemplate::class, $resultFieldTemplate);
 
        $basketItemsMock = Mockery::mock(BasketItems::class);
        $basketItemsMock->shouldReceive('getSearchFactory')->with([])->andReturn([]);
-       app()->instance(BasketItems::class, $basketItemsMock);
+       $this->replaceInstanceByMock(BasketItems::class, $basketItemsMock);
 
        $this->itemSearchServiceMock
             ->shouldReceive('getResults')

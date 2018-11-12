@@ -45,7 +45,7 @@ class ItemWishListTest extends TestCase
         $customerServiceMock = Mockery::mock(CustomerService::class);
         $customerServiceMock->shouldReceive('getContactId')->andReturn(1);
 
-        app()->instance(CustomerService::class, $customerServiceMock);
+        $this->replaceInstanceByMock(CustomerService::class, $customerServiceMock);
 
         $this->wishListService = pluginApp(ItemWishListService::class);
 
@@ -69,7 +69,7 @@ class ItemWishListTest extends TestCase
         $customerServiceMock = Mockery::mock(CustomerService::class);
         $customerServiceMock->shouldReceive('getContactId')->andReturn(1);
 
-        app()->instance(CustomerService::class, $customerServiceMock);
+        $this->replaceInstanceByMock(CustomerService::class, $customerServiceMock);
 
         $this->wishListService = pluginApp(ItemWishListService::class);
 
@@ -93,7 +93,7 @@ class ItemWishListTest extends TestCase
         $customerServiceMock = Mockery::mock(CustomerService::class);
         $customerServiceMock->shouldReceive('getContactId')->andReturn(1);
 
-        app()->instance(CustomerService::class, $customerServiceMock);
+        $this->replaceInstanceByMock(CustomerService::class, $customerServiceMock);
 
         $this->wishListService = pluginApp(ItemWishListService::class);
 
@@ -113,7 +113,7 @@ class ItemWishListTest extends TestCase
 
         $customerServiceMock = Mockery::mock(CustomerService::class);
         $customerServiceMock->shouldReceive('getContactId')->andReturn(0);
-        app()->instance(CustomerService::class, $customerServiceMock);
+        $this->replaceInstanceByMock(CustomerService::class, $customerServiceMock);
 
         $this->wishListService = pluginApp(ItemWishListService::class);
 
@@ -138,7 +138,7 @@ class ItemWishListTest extends TestCase
 
         $customerServiceMock = Mockery::mock(CustomerService::class);
         $customerServiceMock->shouldReceive('getContactId')->andReturn(0);
-        app()->instance(CustomerService::class, $customerServiceMock);
+        $this->replaceInstanceByMock(CustomerService::class, $customerServiceMock);
 
         $this->wishListService = pluginApp(ItemWishListService::class);
 
@@ -165,7 +165,7 @@ class ItemWishListTest extends TestCase
 
         $customerServiceMock = Mockery::mock(CustomerService::class);
         $customerServiceMock->shouldReceive('getContactId')->andReturn(0);
-        app()->instance(CustomerService::class, $customerServiceMock);
+        $this->replaceInstanceByMock(CustomerService::class, $customerServiceMock);
 
         $this->wishListService = pluginApp(ItemWishListService::class);
 
@@ -191,7 +191,7 @@ class ItemWishListTest extends TestCase
 
         $customerServiceMock = Mockery::mock(CustomerService::class);
         $customerServiceMock->shouldReceive('getContactId')->andReturn(0);
-        app()->instance(CustomerService::class, $customerServiceMock);
+        $this->replaceInstanceByMock(CustomerService::class, $customerServiceMock);
 
         $this->wishListService = pluginApp(ItemWishListService::class);
 

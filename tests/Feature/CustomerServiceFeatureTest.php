@@ -44,7 +44,10 @@ class CustomerServiceFeatureTest extends TestCase
      */
     public function should_add_a_new_address_as_logged_in_user($addressData, $addressType)
     {
-        $this->performLogin();
+        $email    = $this->fake->email;
+        $password = $this->fake->password;
+        $this->createContact($email, $password);
+        $this->performLogin($email, $password);
         $this->createAddress($addressData, $addressType);
     }
 
@@ -84,7 +87,10 @@ class CustomerServiceFeatureTest extends TestCase
      */
     public function should_delete_an_address_as_logged_in_user($addressData, $addressType)
     {
-        $this->performLogin();
+        $email    = $this->fake->email;
+        $password = $this->fake->password;
+        $this->createContact($email, $password);
+        $this->performLogin($email, $password);
         $this->deleteAddress($addressData, $addressType);
     }
 
@@ -124,13 +130,16 @@ class CustomerServiceFeatureTest extends TestCase
      */
     public function should_update_an_address_as_logged_in_user($addressDataCreate, $addressDataUpdate, $addressType)
     {
-        $this->performLogin();
+        $email    = $this->fake->email;
+        $password = $this->fake->password;
+        $this->createContact($email, $password);
+        $this->performLogin($email, $password);
         $this->updateAddress($addressDataCreate, $addressDataUpdate, $addressType);
     }
 
     private function updateAddress($addressDataCreate, $addressDataUpdate, $addressType)
     {
-        $address = $this->customerService->createAddress($addressDataCreate, $addressType);
+        $address        = $this->customerService->createAddress($addressDataCreate, $addressType);
         $updatedAddress = $this->customerService->updateAddress($address->id, $addressDataUpdate, $addressType);
 
         $this->assertNotNull($updatedAddress);
@@ -151,88 +160,88 @@ class CustomerServiceFeatureTest extends TestCase
             [
                 [
                     // Billing address with company and empty gender and stateId
-                    'gender' => '',
-                    'name1' => $this->fake->company,
-                    'name2' => $this->fake->firstName,
-                    'name3' => $this->fake->lastName,
-                    'name4' => '',
-                    'address1' => $this->fake->streetName,
-                    'address2' => $this->fake->streetAddress,
+                    'gender'     => '',
+                    'name1'      => $this->fake->company,
+                    'name2'      => $this->fake->firstName,
+                    'name3'      => $this->fake->lastName,
+                    'name4'      => '',
+                    'address1'   => $this->fake->streetName,
+                    'address2'   => $this->fake->streetAddress,
                     'postalCode' => $this->fake->postcode,
-                    'town' => $this->fake->city,
-                    'countryId' => 1,
-                    'stateId' => ''
+                    'town'       => $this->fake->city,
+                    'countryId'  => 1,
+                    'stateId'    => '',
                 ],
-                AddressType::BILLING
+                AddressType::BILLING,
             ],
 
             [
                 [
                     // Billing address
-                    'gender' => $this->fake->randomElement($this->genders),
-                    'name1' => '',
-                    'name2' => $this->fake->firstName,
-                    'name3' => $this->fake->lastName,
-                    'name4' => '',
-                    'address1' => $this->fake->streetName,
-                    'address2' => $this->fake->streetAddress,
+                    'gender'     => $this->fake->randomElement($this->genders),
+                    'name1'      => '',
+                    'name2'      => $this->fake->firstName,
+                    'name3'      => $this->fake->lastName,
+                    'name4'      => '',
+                    'address1'   => $this->fake->streetName,
+                    'address2'   => $this->fake->streetAddress,
                     'postalCode' => $this->fake->postcode,
-                    'town' => $this->fake->city,
-                    'countryId' => 1,
-                    'stateId' => ''
+                    'town'       => $this->fake->city,
+                    'countryId'  => 1,
+                    'stateId'    => '',
                 ],
-                AddressType::BILLING
+                AddressType::BILLING,
             ],
 
             [
                 [
                     // Delivery address with company
-                    'gender' => $this->fake->randomElement($this->genders),
-                    'name1' => $this->fake->company,
-                    'name2' => $this->fake->firstName,
-                    'name3' => $this->fake->lastName,
-                    'name4' => '',
-                    'address1' => $this->fake->streetName,
-                    'address2' => $this->fake->streetAddress,
+                    'gender'     => $this->fake->randomElement($this->genders),
+                    'name1'      => $this->fake->company,
+                    'name2'      => $this->fake->firstName,
+                    'name3'      => $this->fake->lastName,
+                    'name4'      => '',
+                    'address1'   => $this->fake->streetName,
+                    'address2'   => $this->fake->streetAddress,
                     'postalCode' => $this->fake->postcode,
-                    'town' => $this->fake->city,
-                    'countryId' => 1
+                    'town'       => $this->fake->city,
+                    'countryId'  => 1,
                 ],
-                AddressType::DELIVERY
+                AddressType::DELIVERY,
             ],
 
             [
                 [
                     // Delivery address to 'Packstation'
-                    'gender' => $this->fake->randomElement($this->genders),
-                    'name1' => $this->fake->company,
-                    'name2' => $this->fake->firstName,
-                    'name3' => $this->fake->lastName,
-                    'name4' => '',
-                    'address1' => 'PACKSTATION',
-                    'address2' => $this->fake->streetAddress,
+                    'gender'     => $this->fake->randomElement($this->genders),
+                    'name1'      => $this->fake->company,
+                    'name2'      => $this->fake->firstName,
+                    'name3'      => $this->fake->lastName,
+                    'name4'      => '',
+                    'address1'   => 'PACKSTATION',
+                    'address2'   => $this->fake->streetAddress,
                     'postalCode' => $this->fake->postcode,
-                    'town' => $this->fake->city,
-                    'countryId' => 1
+                    'town'       => $this->fake->city,
+                    'countryId'  => 1,
                 ],
-                AddressType::DELIVERY
+                AddressType::DELIVERY,
             ],
 
             [
                 [
                     // Delivery address to 'Postfiliale'
-                    'gender' => $this->fake->randomElement($this->genders),
-                    'name1' => $this->fake->company,
-                    'name2' => $this->fake->firstName,
-                    'name3' => $this->fake->lastName,
-                    'name4' => '',
-                    'address1' => 'POSTFILIALE',
-                    'address2' => $this->fake->streetAddress,
+                    'gender'     => $this->fake->randomElement($this->genders),
+                    'name1'      => $this->fake->company,
+                    'name2'      => $this->fake->firstName,
+                    'name3'      => $this->fake->lastName,
+                    'name4'      => '',
+                    'address1'   => 'POSTFILIALE',
+                    'address2'   => $this->fake->streetAddress,
                     'postalCode' => $this->fake->postcode,
-                    'town' => $this->fake->city,
-                    'countryId' => 1
+                    'town'       => $this->fake->city,
+                    'countryId'  => 1,
                 ],
-                AddressType::DELIVERY
+                AddressType::DELIVERY,
             ]
             // TODO Address Options
         ];
@@ -244,36 +253,36 @@ class CustomerServiceFeatureTest extends TestCase
             [
                 [
                     // Billing address with company
-                    'gender' => $this->fake->randomElement($this->genders),
-                    'name1' => $this->fake->company,
-                    'name2' => $this->fake->firstName,
-                    'name3' => $this->fake->lastName,
-                    'name4' => '',
-                    'address1' => $this->fake->streetName,
-                    'address2' => $this->fake->streetAddress,
+                    'gender'     => $this->fake->randomElement($this->genders),
+                    'name1'      => $this->fake->company,
+                    'name2'      => $this->fake->firstName,
+                    'name3'      => $this->fake->lastName,
+                    'name4'      => '',
+                    'address1'   => $this->fake->streetName,
+                    'address2'   => $this->fake->streetAddress,
                     'postalCode' => $this->fake->postcode,
-                    'town' => $this->fake->city,
-                    'countryId' => 1
+                    'town'       => $this->fake->city,
+                    'countryId'  => 1,
                 ],
-                AddressType::BILLING
+                AddressType::BILLING,
             ],
 
             [
                 [
                     // Billing address with company
-                    'gender' => $this->fake->randomElement($this->genders),
-                    'name1' => $this->fake->company,
-                    'name2' => $this->fake->firstName,
-                    'name3' => $this->fake->lastName,
-                    'name4' => '',
-                    'address1' => $this->fake->streetName,
-                    'address2' => $this->fake->streetAddress,
+                    'gender'     => $this->fake->randomElement($this->genders),
+                    'name1'      => $this->fake->company,
+                    'name2'      => $this->fake->firstName,
+                    'name3'      => $this->fake->lastName,
+                    'name4'      => '',
+                    'address1'   => $this->fake->streetName,
+                    'address2'   => $this->fake->streetAddress,
                     'postalCode' => $this->fake->postcode,
-                    'town' => $this->fake->city,
-                    'countryId' => 1
+                    'town'       => $this->fake->city,
+                    'countryId'  => 1,
                 ],
-                AddressType::DELIVERY
-            ]
+                AddressType::DELIVERY,
+            ],
         ];
     }
 
@@ -282,93 +291,93 @@ class CustomerServiceFeatureTest extends TestCase
         return [
             [
                 [
-                    'gender' => $this->fake->randomElement($this->genders),
-                    'name1' => 'change',
-                    'name2' => 'change',
-                    'name3' => 'change',
-                    'name4' => 'change',
-                    'address1' => 'change',
-                    'address2' => 'change',
+                    'gender'     => $this->fake->randomElement($this->genders),
+                    'name1'      => 'change',
+                    'name2'      => 'change',
+                    'name3'      => 'change',
+                    'name4'      => 'change',
+                    'address1'   => 'change',
+                    'address2'   => 'change',
                     'postalCode' => 'change',
-                    'town' => 'change',
-                    'countryId' => 1,
-                    'stateId' => ''
+                    'town'       => 'change',
+                    'countryId'  => 1,
+                    'stateId'    => '',
                 ],
                 [
-                    'gender' => $this->fake->randomElement($this->genders),
-                    'name1' => $this->fake->company,
-                    'name2' => $this->fake->firstName,
-                    'name3' => $this->fake->lastName,
-                    'name4' => '',
-                    'address1' => $this->fake->streetName,
-                    'address2' => $this->fake->streetAddress,
+                    'gender'     => $this->fake->randomElement($this->genders),
+                    'name1'      => $this->fake->company,
+                    'name2'      => $this->fake->firstName,
+                    'name3'      => $this->fake->lastName,
+                    'name4'      => '',
+                    'address1'   => $this->fake->streetName,
+                    'address2'   => $this->fake->streetAddress,
                     'postalCode' => $this->fake->postcode,
-                    'town' => $this->fake->city,
-                    'countryId' => 1,
-                    'stateId' => ''
+                    'town'       => $this->fake->city,
+                    'countryId'  => 1,
+                    'stateId'    => '',
                 ],
-                AddressType::BILLING
+                AddressType::BILLING,
             ],
 
             [
                 [
-                    'gender' => $this->fake->randomElement($this->genders),
-                    'name1' => 'change',
-                    'name2' => 'change',
-                    'name3' => 'change',
-                    'name4' => 'change',
-                    'address1' => 'change',
-                    'address2' => 'change',
+                    'gender'     => $this->fake->randomElement($this->genders),
+                    'name1'      => 'change',
+                    'name2'      => 'change',
+                    'name3'      => 'change',
+                    'name4'      => 'change',
+                    'address1'   => 'change',
+                    'address2'   => 'change',
                     'postalCode' => 'change',
-                    'town' => 'change',
-                    'countryId' => 1,
-                    'stateId' => ''
+                    'town'       => 'change',
+                    'countryId'  => 1,
+                    'stateId'    => '',
                 ],
                 [
-                    'gender' => $this->fake->randomElement($this->genders),
-                    'name1' => $this->fake->company,
-                    'name2' => $this->fake->firstName,
-                    'name3' => $this->fake->lastName,
-                    'name4' => '',
-                    'address1' => 'PACKSTATION',
-                    'address2' => $this->fake->streetAddress,
+                    'gender'     => $this->fake->randomElement($this->genders),
+                    'name1'      => $this->fake->company,
+                    'name2'      => $this->fake->firstName,
+                    'name3'      => $this->fake->lastName,
+                    'name4'      => '',
+                    'address1'   => 'PACKSTATION',
+                    'address2'   => $this->fake->streetAddress,
                     'postalCode' => $this->fake->postcode,
-                    'town' => $this->fake->city,
-                    'countryId' => 1,
-                    'stateId' => ''
+                    'town'       => $this->fake->city,
+                    'countryId'  => 1,
+                    'stateId'    => '',
                 ],
-                AddressType::DELIVERY
+                AddressType::DELIVERY,
             ],
 
             [
                 [
-                    'gender' => $this->fake->randomElement($this->genders),
-                    'name1' => 'change',
-                    'name2' => 'change',
-                    'name3' => 'change',
-                    'name4' => 'change',
-                    'address1' => 'change',
-                    'address2' => 'change',
+                    'gender'     => $this->fake->randomElement($this->genders),
+                    'name1'      => 'change',
+                    'name2'      => 'change',
+                    'name3'      => 'change',
+                    'name4'      => 'change',
+                    'address1'   => 'change',
+                    'address2'   => 'change',
                     'postalCode' => 'change',
-                    'town' => 'change',
-                    'countryId' => 1,
-                    'stateId' => ''
+                    'town'       => 'change',
+                    'countryId'  => 1,
+                    'stateId'    => '',
                 ],
                 [
-                    'gender' => $this->fake->randomElement($this->genders),
-                    'name1' => $this->fake->company,
-                    'name2' => $this->fake->firstName,
-                    'name3' => $this->fake->lastName,
-                    'name4' => '',
-                    'address1' => 'POSTFILIALE',
-                    'address2' => $this->fake->streetAddress,
+                    'gender'     => $this->fake->randomElement($this->genders),
+                    'name1'      => $this->fake->company,
+                    'name2'      => $this->fake->firstName,
+                    'name3'      => $this->fake->lastName,
+                    'name4'      => '',
+                    'address1'   => 'POSTFILIALE',
+                    'address2'   => $this->fake->streetAddress,
                     'postalCode' => $this->fake->postcode,
-                    'town' => $this->fake->city,
-                    'countryId' => 1,
-                    'stateId' => ''
+                    'town'       => $this->fake->city,
+                    'countryId'  => 1,
+                    'stateId'    => '',
                 ],
-                AddressType::DELIVERY
-            ]
+                AddressType::DELIVERY,
+            ],
         ];
     }
 
