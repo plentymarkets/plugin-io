@@ -35,7 +35,7 @@ class CheckoutServiceCurrencyConfigTest extends TestCase
     public function check_method_get_currency_session_storage()
     {
 
-        $expectedCurrency = "USD";
+        $expectedCurrency = $this->fake->currencyCode;
 
         /** @var FrontendSessionStorageFactoryContract $sessionStorage */
         $sessionStorage = pluginApp(FrontendSessionStorageFactoryContract::class);
@@ -61,7 +61,7 @@ class CheckoutServiceCurrencyConfigTest extends TestCase
                 "pluginSetId" => $pluginSet->id
             ]
         );
-        $expectedCurrency = "EUR";
+        $expectedCurrency = $this->fake->currencyCode;
 
         $currency = $this->checkoutService->getCurrency();
 

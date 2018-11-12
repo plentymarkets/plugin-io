@@ -5,7 +5,7 @@ use IO\DBModels\ItemWishList;
 use IO\Repositories\ItemWishListGuestRepository;
 use IO\Services\SessionStorageService;
 use Plenty\Plugin\Application;
-use Tests\SimpleTestCase;
+use PluginTests\SimpleTestCase;
 
 /**
  * User: lukasmatzen

@@ -53,34 +53,34 @@ class CustomerServiceTest extends TestCase
         parent::setUp();
 
         $this->addressValidatorMock = Mockery::mock(AddressValidator::class);
-        app()->instance(AddressValidator::class, $this->addressValidatorMock);
+        $this->replaceInstanceByMock(AddressValidator::class, $this->addressValidatorMock);
 
         $this->addressRepositoryMock = Mockery::mock(AddressRepository::class);
-        app()->instance(AddressRepository::class, $this->addressRepositoryMock);
+        $this->replaceInstanceByMock(AddressRepository::class, $this->addressRepositoryMock);
 
         $this->basketServiceMock = Mockery::mock(BasketService::class);
-        app()->instance(BasketService::class, $this->basketServiceMock);
+        $this->replaceInstanceByMock(BasketService::class, $this->basketServiceMock);
 
         $this->userSessionMock = Mockery::mock(UserSession::class);
-        app()->instance(UserSession::class, $this->userSessionMock);
+        $this->replaceInstanceByMock(UserSession::class, $this->userSessionMock);
 
         $this->contactAddressRepositoryMock = Mockery::mock(ContactAddressRepository::class);
-        app()->instance(ContactAddressRepository::class, $this->contactAddressRepositoryMock);
+        $this->replaceInstanceByMock(ContactAddressRepository::class, $this->contactAddressRepositoryMock);
 
         $this->contactRepositoryMock = Mockery::mock(ContactRepository::class);
-        app()->instance(ContactRepository::class, $this->contactRepositoryMock);
+        $this->replaceInstanceByMock(ContactRepository::class, $this->contactRepositoryMock);
 
         $this->contactAccountRepositoryMock = Mockery::mock(ContactAccountRepositoryContract::class);
-        app()->instance(ContactAccountRepositoryContract::class, $this->contactAccountRepositoryMock);
+        $this->replaceInstanceByMock(ContactAccountRepositoryContract::class, $this->contactAccountRepositoryMock);
 
         $this->sessionStorageServiceMock = Mockery::mock(SessionStorageService::class);
-        app()->instance(SessionStorageService::class, $this->sessionStorageServiceMock);
+        $this->replaceInstanceByMock(SessionStorageService::class, $this->sessionStorageServiceMock);
 
         $this->webstoreConfigServiceMock = Mockery::mock(WebstoreConfigurationService::class);
-        app()->instance(WebstoreConfigurationService::class, $this->webstoreConfigServiceMock);
+        $this->replaceInstanceByMock(WebstoreConfigurationService::class, $this->webstoreConfigServiceMock);
 
         $this->dispatcherMock = Mockery::mock(Dispatcher::class);
-        app()->instance(Dispatcher::class, $this->dispatcherMock);
+        $this->replaceInstanceByMock(Dispatcher::class, $this->dispatcherMock);
 
         $this->customerService = pluginApp(CustomerService::class);
     }
@@ -94,8 +94,8 @@ class CustomerServiceTest extends TestCase
 
         /** @var Address $address */
         $address = factory(Address::class)->make([
-            'id' => $addressId,
-            'name1' => null
+            'id'    => $addressId,
+            'name1' => null,
         ]);
 
         $addressArray = $address->toArray();
@@ -134,8 +134,8 @@ class CustomerServiceTest extends TestCase
 
         /** @var Address $address */
         $address = factory(Address::class)->make([
-            'id' => $addressId,
-            'name1' => null
+            'id'    => $addressId,
+            'name1' => null,
         ]);
 
         $addressArray = $address->toArray();
@@ -174,14 +174,14 @@ class CustomerServiceTest extends TestCase
 
         /** @var Address $address */
         $address = factory(Address::class)->make([
-            'id' => $addressId,
-            'name1' => null
+            'id'    => $addressId,
+            'name1' => null,
         ]);
 
         $addressArray = $address->toArray();
 
         $contact = factory(Contact::class)->make([
-            "id" => $contactId
+            "id" => $contactId,
         ]);
 
         $this->addressValidatorMock->shouldReceive('validateOrFail')->andReturnNull()->once();
@@ -213,17 +213,17 @@ class CustomerServiceTest extends TestCase
 
         /** @var Address $address */
         $address = factory(Address::class)->make([
-            'id' => $addressId
+            'id' => $addressId,
         ]);
 
         $addressArray = $address->toArray();
 
         $contact = factory(Contact::class)->make([
-                "id" => $contactId
+            "id" => $contactId,
         ]);
 
         $account = factory(Account::class)->make([
-            "id" => $accountId
+            "id" => $accountId,
         ]);
 
         $webstoreConfig = factory(WebstoreConfiguration::class)->make();
@@ -262,20 +262,20 @@ class CustomerServiceTest extends TestCase
 
         /** @var Address $address */
         $address = factory(Address::class)->make([
-            'id' => $addressId
+            'id' => $addressId,
         ]);
 
         $addressArray = $address->toArray();
 
         $contact = factory(Contact::class)->make([
-            'id' => $contactId,
+            'id'        => $contactId,
             'firstName' => "",
-            'lastName' => ""
+            'lastName'  => "",
         ]);
 
 
         $account = factory(Account::class)->make([
-            "id" => $accountId
+            "id" => $accountId,
         ]);
 
         $webstoreConfig = factory(WebstoreConfiguration::class)->make();
@@ -314,20 +314,20 @@ class CustomerServiceTest extends TestCase
 
         /** @var Address $address */
         $address = factory(Address::class)->make([
-            'id' => $addressId
+            'id' => $addressId,
         ]);
 
         $addressArray = $address->toArray();
 
         $contact = factory(Contact::class)->make([
-            'id' => $contactId,
+            'id'        => $contactId,
             'firstName' => "",
-            'lastName' => ""
+            'lastName'  => "",
         ]);
 
 
         $account = factory(Account::class)->make([
-            "id" => $accountId
+            "id" => $accountId,
         ]);
 
         $webstoreConfig = factory(WebstoreConfiguration::class)->make();
@@ -364,7 +364,7 @@ class CustomerServiceTest extends TestCase
 
         /** @var Address $address */
         $address = factory(Address::class)->make([
-            "id" => $addressId
+            "id" => $addressId,
         ]);
 
         $this->addressRepositoryMock
@@ -375,8 +375,8 @@ class CustomerServiceTest extends TestCase
         $this->basketServiceMock
             ->shouldReceive(
                 [
-                    'getBillingAddressId' => $addressId,
-                    'getDeliveryAddressId' => $addressId
+                    'getBillingAddressId'  => $addressId,
+                    'getDeliveryAddressId' => $addressId,
                 ]);
 
         $this->basketServiceMock
@@ -414,18 +414,18 @@ class CustomerServiceTest extends TestCase
 
         /** @var Address $address */
         $address = factory(Address::class)->make([
-            "id" => $addressId
+            "id" => $addressId,
         ]);
 
         $contact = factory(Contact::class)->make([
-            "id" => $contactId
+            "id" => $contactId,
         ]);
 
         $this->basketServiceMock
             ->shouldReceive(
                 [
-                    'getBillingAddressId' => $addressId,
-                    'getDeliveryAddressId' => $addressId
+                    'getBillingAddressId'  => $addressId,
+                    'getDeliveryAddressId' => $addressId,
                 ]);
 
         $this->basketServiceMock
@@ -469,18 +469,18 @@ class CustomerServiceTest extends TestCase
 
         /** @var Address $address */
         $address = factory(Address::class)->make([
-            "id" => $addressId
+            "id" => $addressId,
         ]);
 
         $contact = factory(Contact::class)->make([
-            "id" => $contactId
+            "id" => $contactId,
         ]);
 
         $this->basketServiceMock
             ->shouldReceive(
                 [
-                    'getBillingAddressId' => $addressId,
-                    'getDeliveryAddressId' => $addressId
+                    'getBillingAddressId'  => $addressId,
+                    'getDeliveryAddressId' => $addressId,
                 ]);
 
         $this->basketServiceMock
@@ -524,14 +524,14 @@ class CustomerServiceTest extends TestCase
 
         /** @var Address $address */
         $address = factory(Address::class)->make([
-            "id" => $addressId
+            "id" => $addressId,
         ]);
 
         $this->userSessionMock->shouldReceive('getCurrentContactId')->andReturn(0);
 
-        $address2 = $address->replicate();
+        $address2        = $address->replicate();
         $address2->name1 = 'update';
-        $address2->id = $addressId;
+        $address2->id    = $addressId;
 
         $this->addressRepositoryMock->shouldReceive('updateAddress')
             ->andReturn($address2);
@@ -548,7 +548,8 @@ class CustomerServiceTest extends TestCase
         $this->sessionStorageServiceMock->shouldReceive('getSessionValue')->andReturn();
 
         /** @var Address $updatedAddress */
-        $updatedAddress = $this->customerService->updateAddress($address->id, $address->toArray(), AddressType::DELIVERY);
+        $updatedAddress = $this->customerService->updateAddress($address->id, $address->toArray(),
+            AddressType::DELIVERY);
 
         $this->assertNotNull($updatedAddress);
         $this->assertInstanceOf(Address::class, $updatedAddress);
@@ -565,19 +566,19 @@ class CustomerServiceTest extends TestCase
 
         /** @var Address $address */
         $address = factory(Address::class)->make([
-            "id" => $addressId
+            "id" => $addressId,
         ]);
 
         $contact = factory(Contact::class)->make([
-            "id" => $contactId
+            "id" => $contactId,
         ]);
 
         $this->contactRepositoryMock->shouldReceive('findContactById')->with($contact->id)->andReturn($contact);
         $this->userSessionMock->shouldReceive('getCurrentContactId')->andReturn($contactId);
 
-        $address2 = $address->replicate();
+        $address2        = $address->replicate();
         $address2->name1 = 'update';
-        $address2->id = $addressId;
+        $address2->id    = $addressId;
 
         $this->contactAddressRepositoryMock->shouldReceive('updateAddress')
             ->andReturn($address2);
@@ -592,7 +593,8 @@ class CustomerServiceTest extends TestCase
         $this->dispatcherMock->shouldReceive('fire')->andReturn();
 
         /** @var Address $updatedAddress */
-        $updatedAddress = $this->customerService->updateAddress($address->id, $address->toArray(), AddressType::DELIVERY);
+        $updatedAddress = $this->customerService->updateAddress($address->id, $address->toArray(),
+            AddressType::DELIVERY);
 
         $this->assertNotNull($updatedAddress);
         $this->assertInstanceOf(Address::class, $updatedAddress);
@@ -610,15 +612,15 @@ class CustomerServiceTest extends TestCase
 
         /** @var Address $address */
         $address = factory(Address::class)->make([
-            "id" => $addressId
+            "id" => $addressId,
         ]);
 
         $contact = factory(Contact::class)->make([
-            "id" => $contactId
+            "id" => $contactId,
         ]);
 
         $account = factory(Account::class)->make([
-            "id" => $accountId
+            "id" => $accountId,
         ]);
 
         $webstoreConfig = factory(WebstoreConfiguration::class)->make();
@@ -630,9 +632,9 @@ class CustomerServiceTest extends TestCase
 
         $this->contactAccountRepositoryMock->shouldReceive('createAccount')->andReturn($account)->once();
 
-        $address2 = $address->replicate();
+        $address2        = $address->replicate();
         $address2->name1 = 'update';
-        $address2->id = $addressId;
+        $address2->id    = $addressId;
 
         $this->contactAddressRepositoryMock->shouldReceive('updateAddress')
             ->andReturn($address2);
@@ -653,7 +655,8 @@ class CustomerServiceTest extends TestCase
         $this->contactRepositoryMock->shouldReceive('updateContact')->andReturn($contact);
 
         /** @var Address $updatedAddress */
-        $updatedAddress = $this->customerService->updateAddress($address->id, $address->toArray(), AddressType::BILLING);
+        $updatedAddress = $this->customerService->updateAddress($address->id, $address->toArray(),
+            AddressType::BILLING);
 
         $this->assertNotNull($updatedAddress);
         $this->assertInstanceOf(Address::class, $updatedAddress);
@@ -671,24 +674,24 @@ class CustomerServiceTest extends TestCase
 
         /** @var Address $address */
         $address = factory(Address::class)->make([
-            "id" => $addressId,
-            "name1" => null
+            "id"    => $addressId,
+            "name1" => null,
         ]);
 
         $contact = factory(Contact::class)->make([
-            "id" => $contactId
+            "id" => $contactId,
         ]);
 
         $account = factory(Account::class)->make([
-            "id" => $accountId
+            "id" => $accountId,
         ]);
 
         $this->contactRepositoryMock->shouldReceive('findContactById')->with($contact->id)->andReturn($contact);
         $this->userSessionMock->shouldReceive('getCurrentContactId')->andReturn($contactId);
 
-        $address2 = $address->replicate();
+        $address2        = $address->replicate();
         $address2->name1 = 'update';
-        $address2->id = $addressId;
+        $address2->id    = $addressId;
 
         $this->contactAddressRepositoryMock->shouldReceive('updateAddress')
             ->andReturn($address2);
@@ -713,7 +716,8 @@ class CustomerServiceTest extends TestCase
         $this->contactRepositoryMock->shouldReceive('updateContact')->andReturn($contact);
 
         /** @var Address $updatedAddress */
-        $updatedAddress = $this->customerService->updateAddress($address->id, $address->toArray(), AddressType::BILLING);
+        $updatedAddress = $this->customerService->updateAddress($address->id, $address->toArray(),
+            AddressType::BILLING);
 
         $this->assertNotNull($updatedAddress);
         $this->assertInstanceOf(Address::class, $updatedAddress);

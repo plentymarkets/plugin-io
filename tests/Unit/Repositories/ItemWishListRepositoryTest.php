@@ -5,7 +5,7 @@ use IO\Repositories\ItemWishListRepository;
 use IO\Services\CustomerService;
 use Plenty\Modules\Plugin\DataBase\Contracts\DataBase;
 use Plenty\Modules\Plugin\DataBase\Contracts\Query;
-use Tests\SimpleTestCase;
+use PluginTests\SimpleTestCase;
 
 /**
  * Created by PhpStorm.
