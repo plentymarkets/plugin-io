@@ -6,7 +6,7 @@ use IO\Repositories\ItemWishListRepository;
 use IO\Services\CustomerService;
 use IO\Services\ItemWishListService;
 use IO\Services\SessionStorageService;
-use Tests\SimpleTestCase;
+use PluginTests\SimpleTestCase;
 
 /**
  * User: lukasmatzen

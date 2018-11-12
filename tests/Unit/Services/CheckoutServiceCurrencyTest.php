@@ -92,7 +92,7 @@ class CheckoutServiceCurrencyTest extends TestCase
 
         $webstoreConfiguration = factory(WebstoreConfiguration::class)->make();
 
-        $expectedCurrency = $this->fake->currencyCode;
+        $expectedCurrency = "EUR";
 
         $this->pluginMock->shouldReceive('getValue')->with(SessionStorageKeys::CURRENCY)->andReturn(null);
         $this->pluginMock->shouldReceive('setValue')->andReturn();
@@ -119,7 +119,7 @@ class CheckoutServiceCurrencyTest extends TestCase
             "defaultCurrencyList" => ""
         ]);
 
-        $expectedCurrency = $this->fake->currencyCode;
+        $expectedCurrency = "EUR";
 
         $this->pluginMock->shouldReceive('getValue')->with(SessionStorageKeys::CURRENCY)->andReturn(null);
         $this->pluginMock->shouldReceive('setValue')->andReturn();

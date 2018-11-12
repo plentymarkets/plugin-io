@@ -61,7 +61,7 @@ class CheckoutServiceCurrencyConfigTest extends TestCase
                 "pluginSetId" => $pluginSet->id
             ]
         );
-        $expectedCurrency = $this->fake->currencyCode;
+        $expectedCurrency = "EUR";
 
         $currency = $this->checkoutService->getCurrency();
 
