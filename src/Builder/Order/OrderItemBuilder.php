@@ -81,6 +81,12 @@ class OrderItemBuilder
 		}
 
 
+		$shippingAmount = $basket->shippingAmount;
+        if($basket->shippingDeleteByCoupon)
+        {
+            $shippingAmount -= $basket->couponDiscount;
+        }
+
 		// add shipping costs
         $shippingCosts = [
             "typeId"        => OrderItemType::SHIPPING_COSTS,
@@ -93,7 +99,7 @@ class OrderItemBuilder
             "amounts"       => [
                 [
                     "currency"              => $this->checkoutService->getCurrency(),
-                    "priceOriginalGross"    => $basket->shippingAmount
+                    "priceOriginalGross"    => $shippingAmount
                 ]
             ]
         ];

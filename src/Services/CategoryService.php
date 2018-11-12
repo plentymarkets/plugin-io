@@ -144,6 +144,29 @@ class CategoryService
         return $category;
     }
 
+    public function getForPlentyId($catID = 0, $lang = null, $plentyId = null)
+    {
+        $category = $this->get( $catID, $lang );
+        if ( is_null($plentyId) )
+        {
+            $plentyId = pluginApp(Application::class)->getPlentyId();
+        }
+
+        if ( !is_null($category) )
+        {
+            /** @var CategoryClient $categoryClient */
+            foreach ( $category->clients as $categoryClient )
+            {
+                if ( $categoryClient->plentyId === (int)$plentyId )
+                {
+                    return $category;
+                }
+            }
+        }
+
+        return null;
+    }
+
     public function getChildren($categoryId, $lang = null)
     {
         if ( $lang === null )
