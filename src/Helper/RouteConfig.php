@@ -12,7 +12,7 @@ class RouteConfig
     const CONFIRMATION              = "confirmation";
     const LOGIN                     = "login";
     const REGISTER                  = "register";
-    const PLACE_ORDER               = "place_order";
+    const PLACE_ORDER               = "place-order";
     const SEARCH                    = "search";
     const HOME                      = "home";
     const CANCELLATION_RIGHTS       = "cancellation-rights";
