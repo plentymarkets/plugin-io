@@ -166,10 +166,6 @@
                           {
                               "value": "newsletter-opt-out",
                               "caption": "Config.routingEnabledRoutesPossibleValueNewsletterOptOut"
-                          },
-                          {
-                              "value": "newsletter-opt-out-confirmation",
-                              "caption": "Config.routingEnabledRoutesPossibleValueNewsletterOptOutConfirmation"
                           }
                       ]
                   }
