@@ -7,6 +7,7 @@ use IO\Services\ItemSearch\SearchPresets\CategoryItems;
 use IO\Services\ItemSearch\SearchPresets\TagItems;
 use IO\Services\ItemSearch\SearchPresets\VariationList;
 use IO\Services\ItemSearch\Services\ItemSearchService;
+use IO\Services\ItemSearch\SearchPresets\ManufacturerItems;
 use Plenty\Plugin\CachingRepository;
 
 class ItemListService
@@ -15,8 +16,9 @@ class ItemListService
     const TYPE_LAST_SEEN    = 'last_seen';
     const TYPE_TAG          = 'tag_list';
     const TYPE_RANDOM       = 'random';
+    const TYPE_MANUFACTURER = 'manufacturer';
 
-    public function getItemList( $type, $id = null, $sorting = null, $maxItems = 0 )
+    public function getItemList( $type, $id = null, $sorting = null, $maxItems = 0)
     {
         /** @var ItemSearchService $searchService */
         $searchService = pluginApp( ItemSearchService::class );
@@ -58,6 +60,14 @@ class ItemListService
             case self::TYPE_RANDOM:
                 $searchFactory = VariationList::getSearchFactory([
                     'sorting'       => $sorting
+                ]);
+                break;
+            case self::TYPE_MANUFACTURER:
+                $searchFactory = ManufacturerItems::getSearchFactory([
+                    'manufacturerId' => $id,
+                    'page' => 1,
+                    'itemsPerPage' => $maxItems,
+                    'sorting'   => $sorting
                 ]);
                 break;
             default:

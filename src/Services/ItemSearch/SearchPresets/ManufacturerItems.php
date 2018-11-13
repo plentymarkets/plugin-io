@@ -16,6 +16,12 @@ class ManufacturerItems implements SearchPreset
         {
             $page = (int) $options['page'];
         }
+        // TODO default Sorting
+        $sorting = '';
+        if ( array_key_exists('sorting', $options ) )
+        {
+            $sorting =  $options['sorting'];
+        }
 
         $itemsPerPage = 20;
         if ( array_key_exists( 'itemsPerPage', $options ) )
@@ -32,7 +38,7 @@ class ManufacturerItems implements SearchPreset
 
         /** @var VariationSearchFactory $searchFactory */
         $searchFactory = pluginApp( VariationSearchFactory::class );
-        //->sortByMultiple( $sorting )
+
         $searchFactory
             ->withLanguage()
             ->withImages()
@@ -44,6 +50,7 @@ class ManufacturerItems implements SearchPreset
             ->isHiddenInCategoryList(false)
             ->hasNameInLanguage()
             ->hasPriceForCustomer()
+            ->sortByMultiple( $sorting )
             ->hasManufacturer( $manufacturerId)
             ->setPage( $page, $itemsPerPage )
             ->groupByTemplateConfig()
