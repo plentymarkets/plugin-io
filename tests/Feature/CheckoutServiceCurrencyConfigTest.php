@@ -2,6 +2,7 @@
 
 namespace IO\Tests\Feature;
 
+use Faker\Generator;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use IO\Constants\SessionStorageKeys;
 use IO\Services\CheckoutService;
@@ -19,8 +20,11 @@ class CheckoutServiceCurrencyConfigTest extends TestCase
 {
     use RefreshDatabase;
 
-    /** @var CheckoutService $basketService */
+    /** @var CheckoutService $checkoutService */
     protected $checkoutService;
+
+    /** @var Generator $faker */
+    protected $faker;
 
     protected function setUp()
     {
@@ -28,6 +32,7 @@ class CheckoutServiceCurrencyConfigTest extends TestCase
         $this->createApplication();
 
         $this->checkoutService = pluginApp(CheckoutService::class);
+        $this->faker = pluginApp(Generator::class);
 
     }
 
@@ -35,7 +40,7 @@ class CheckoutServiceCurrencyConfigTest extends TestCase
     public function check_method_get_currency_session_storage()
     {
 
-        $expectedCurrency = "USD";
+        $expectedCurrency = $this->faker->currencyCode;
 
         /** @var FrontendSessionStorageFactoryContract $sessionStorage */
         $sessionStorage = pluginApp(FrontendSessionStorageFactoryContract::class);

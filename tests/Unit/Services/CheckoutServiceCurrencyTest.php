@@ -2,6 +2,7 @@
 
 namespace IO\Tests\Unit;
 
+use Faker\Generator;
 use IO\Constants\SessionStorageKeys;
 use IO\Helper\MemoryCache;
 use IO\Services\CheckoutService;
@@ -39,6 +40,8 @@ class CheckoutServiceCurrencyTest extends TestCase
     protected $sessionStorageServiceMock;
     /** @var MemoryCache $memoryCacheMock */
     protected $memoryCacheMock;
+    /** @var Generator $faker */
+    protected $faker;
 
 
     protected function setUp()
@@ -67,13 +70,15 @@ class CheckoutServiceCurrencyTest extends TestCase
 
         $this->checkoutService = pluginApp(CheckoutService::class);
 
+        $this->faker = pluginApp(Generator::class);
+
     }
 
     /** @test */
     public function it_returns_the_currency_from_session_storage()
     {
 
-        $expectedCurrency = "USD";
+        $expectedCurrency = $this->faker->countryCode;
 
         $this->pluginMock->shouldReceive('getValue')->with(SessionStorageKeys::CURRENCY)->andReturn($expectedCurrency);
         $this->sessionStorageMock->shouldReceive('getPlugin')->andReturn($this->pluginMock);

@@ -122,7 +122,7 @@ class ItemWishListGuestRepositoryTest extends SimpleTestCase {
     }
 
     /** @test */
-    public function it_deletes_an_item_from_the_wish_list_wish_is_not_in_it()
+    public function it_deletes_an_item_from_the_wish_list_which_is_not_in_it()
     {
         $this->sessionStorageMock
             ->shouldReceive('getSessionValue')
