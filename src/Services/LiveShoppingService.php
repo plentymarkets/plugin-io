@@ -24,14 +24,21 @@ class LiveShoppingService
         /** @var LiveShoppingRepositoryContract $liveShoppingRepo */
         $liveShoppingRepo = pluginApp(LiveShoppingRepositoryContract::class);
         /** @var LiveShopping $liveShopping */
-        $liveShopping = $liveShoppingRepo->getByLiveShoppingId($liveShoppingId);
+        $liveShopping = $liveShoppingRepo->getLiveShopping($liveShoppingId);
         
         $liveShoppingItem = [];
         $liveShoppingData = [];
         
         if($liveShopping instanceof LiveShopping)
         {
-            $itemList = $this->getLiveShoppingVariations($liveShopping->itemId, $sorting);
+            $removeVariationsWithoutLiveShoppingPrice = true;
+            $currentTime = time();
+            if($liveShopping->fromTime > $currentTime || $liveShopping->toTime < $currentTime)
+            {
+                $removeVariationsWithoutLiveShoppingPrice = false;
+            }
+            
+            $itemList = $this->getLiveShoppingVariations($liveShopping->itemId, $sorting, $removeVariationsWithoutLiveShoppingPrice);
             
             if(count($itemList[0]['documents']))
             {
@@ -47,7 +54,7 @@ class LiveShoppingService
         ];
     }
     
-    public function getLiveShoppingVariations($itemId, $sorting)
+    public function getLiveShoppingVariations($itemId, $sorting, $removeVariationsWithoutLiveShoppingPrice = true)
     {
         $itemSearchOptions = [
             'itemId'        => $itemId,
@@ -58,8 +65,13 @@ class LiveShoppingService
         $itemList = $itemSearchService->getResults([
                                                        LiveShoppingItems::getSearchFactory( $itemSearchOptions )
                                                    ]);
-    
-        return $this->removeVariationsWithoutLiveShopping($itemList);
+        
+        if($removeVariationsWithoutLiveShoppingPrice)
+        {
+            return $this->removeVariationsWithoutLiveShopping($itemList);
+        }
+        
+        return $itemList;
     }
     
     /**
