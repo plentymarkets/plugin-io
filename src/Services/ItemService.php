@@ -397,13 +397,13 @@ class ItemService
                     if(pluginApp(TemplateConfigService::class)->get('item.show_variation_over_dropdown') != 'true')
                     {
                         $filterBuilder
-                            ->variationStockIsSalable()
-                            ->variationIsVisibleForPlentyId([], [$this->app->getPlentyId()]);
+                            ->variationStockIsSalable();
                     }
 
                     $filter = $filterBuilder
                         ->hasId([$itemId])
                         ->variationIsActive()
+                        ->variationIsVisibleForPlentyId([], [$this->app->getPlentyId()])
                         ->build();
 
                     $contactClassId = $this->sessionStorage->getCustomer()->accountContactClassId;
@@ -537,6 +537,7 @@ class ItemService
 				->hasId([$itemId])
                 ->variationHasRetailPrice()
                 ->variationIsActive()
+                ->variationIsVisibleForPlentyId([], [$this->app->getPlentyId()])
                 ->build();
 
             $contactClassId = $this->sessionStorage->getCustomer()->accountContactClassId;
