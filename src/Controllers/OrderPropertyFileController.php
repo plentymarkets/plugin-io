@@ -5,44 +5,53 @@ namespace IO\Controllers;
 use IO\Api\ResponseCode;
 use Plenty\Modules\Frontend\Services\OrderPropertyFileService;
 use Plenty\Plugin\Http\Response;
+use Plenty\Plugin\Http\Request;
 
 class OrderPropertyFileController extends LayoutController
 {
-    public function downloadTempFile(string $hash, string $filename)
+    public function downloadTempFile(string $hash)
     {
-        if(strlen($hash) && strlen($filename))
-        {
+        /** @var Request $request */
+        $request = pluginApp(Request::class);
+        $filename = $request->get('filename', '');
+
+        if (strlen($hash) && strlen($filename)) {
             $key = $hash.'/'.$filename;
-            return $this->download($key);
+            $response = $this->download($key);
         }
 
-        /** @var Response $response */
-        $response = pluginApp(Response::class);
-        $response->forceStatus(ResponseCode::NOT_FOUND);
-
+        if (!$response instanceof Response) {
+            /** @var Response $response */
+            $response = pluginApp(Response::class);
+            $response->forceStatus(ResponseCode::NOT_FOUND);
+        }
         return $response;
     }
 
-    public function downloadFile(string $hash1, string $hash2 = '', string $filename)
+    public function downloadFile(string $hash1, string $hash2 = '')
     {
-        if(strlen($hash1) && strlen($filename))
-        {
+        /** @var Request $request */
+        $request = pluginApp(Request::class);
+        $filename = $request->get('filename', '');
+
+        if (strlen($hash1) && strlen($filename)) {
             $key = $hash1.'/';
             if(strlen($hash2))
             {
                 $key .= $hash2.'/';
             }
             $key .= $filename;
-            return $this->download($key);
+            $response = $this->download($key);
         }
 
-        /** @var Response $response */
-        $response = pluginApp(Response::class);
-        $response->forceStatus(ResponseCode::NOT_FOUND);
-
+        if (!$response instanceof Response) {
+            /** @var Response $response */
+            $response = pluginApp(Response::class);
+            $response->forceStatus(ResponseCode::NOT_FOUND);
+        }
         return $response;
     }
-    
+
     /**
      * @param string $key
      * @param integer $orderId

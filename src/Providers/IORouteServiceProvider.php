@@ -200,9 +200,10 @@ class IORouteServiceProvider extends RouteServiceProvider
 
         if( RouteConfig::isActive(RouteConfig::ORDER_PROPERTY_FILE) )
         {
-            $router->get('order-property-file/{hash1}/{filename}', 'IO\Controllers\OrderPropertyFileController@downloadTempFile');
-            $router->get('order-property-file/{hash1}/{hash2}/{filename}', 'IO\Controllers\OrderPropertyFileController@downloadFile');
+            $router->get('order-property-file/{hash1}', 'IO\Controllers\OrderPropertyFileController@downloadTempFile');
+            $router->get('order-property-file/{hash1}/{hash2}', 'IO\Controllers\OrderPropertyFileController@downloadFile');
         }
+
         
         if( RouteConfig::isActive(RouteConfig::NEWSLETTER_OPT_IN) )
         {
@@ -214,28 +215,28 @@ class IORouteServiceProvider extends RouteServiceProvider
             $router->get('newsletter/unsubscribe', 'IO\Controllers\NewsletterOptOutController@showOptOut');
             $router->post('newsletter/unsubscribe', 'IO\Controllers\NewsletterOptOutConfirmationController@showOptOutConfirmation');
         }
-        
+
         /*
          * ITEM ROUTES
          */
         if ( RouteConfig::isActive(RouteConfig::ITEM) )
         {
             $router->get('{itemId}_{variationId?}', 'IO\Controllers\ItemController@showItemWithoutName')
-                   ->where('itemId', '[0-9]+')
-                   ->where('variationId', '[0-9]+');
+                ->where('itemId', '[0-9]+')
+                ->where('variationId', '[0-9]+');
 
             $router->get('{slug}_{itemId}_{variationId?}', 'IO\Controllers\ItemController@showItem')
-                   ->where('slug', '[^_]+')
-                   ->where('itemId', '[0-9]+')
-                   ->where('variationId', '[0-9]+');
+                ->where('slug', '[^_]+')
+                ->where('itemId', '[0-9]+')
+                ->where('variationId', '[0-9]+');
 
             //old webshop routes mapping
             $router->get('{slug}a-{itemId}', 'IO\Controllers\ItemController@showItemOld')
-                   ->where('slug', '.*')
-                   ->where('itemId', '[0-9]+');
+                ->where('slug', '.*')
+                ->where('itemId', '[0-9]+');
 
             $router->get('a-{itemId}', 'IO\Controllers\ItemController@showItemFromAdmin')
-                   ->where('itemId', '[0-9]+');
+                ->where('itemId', '[0-9]+');
         }
 
         /*

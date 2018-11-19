@@ -396,7 +396,8 @@ class ItemService
 
                     if(pluginApp(TemplateConfigService::class)->get('item.show_variation_over_dropdown') != 'true')
                     {
-                        $filterBuilder->variationStockIsSalable();
+                        $filterBuilder
+                            ->variationStockIsSalable();
                     }
 
                     $filter = $filterBuilder
@@ -558,16 +559,16 @@ class ItemService
                 ->build();
 
 			$recordList = $this->itemRepository->search($columns, $filter, $params);
-            
+
             /** @var AuthHelper $authHelper */
             $authHelper = pluginApp(AuthHelper::class);
-            
+
             /** @var UnitNameRepositoryContract $unitNameRepo */
             $unitNameRepo = pluginApp(UnitNameRepositoryContract::class);
-			
+
             /** @var UnitCombinationRepositoryContract $unitCombinationRepo */
             $unitCombinationRepo = pluginApp(UnitCombinationRepositoryContract::class);
-			
+
 			foreach($recordList as $variation)
 			{
 				foreach($variation->variationAttributeValueList as $attribute)
@@ -580,22 +581,22 @@ class ItemService
 						$attributeList[$attributeId]["values"][$attributeValueId] = $this->getAttributeValueName($attributeValueId);
 					}
 				}
-				
+
 				$unitId = $variation->variationBase->unitId;
 				$unitCombinationId = $variation->variationBase->unitCombinationId;
-				
+
 				if(!in_array($unitCombinationId, $unitList))
                 {
                     $unitData = $authHelper->processUnguarded( function() use ($unitId, $unitNameRepo)
                     {
                         return $unitNameRepo->findOne($unitId, $this->sessionStorage->getLang());
                     });
-                    
+
                     $unitCombinationData = $authHelper->processUnguarded( function() use ($unitCombinationId, $unitCombinationRepo)
                     {
                         return $unitCombinationRepo->get($unitCombinationId);
                     });
-                    
+
                     $unitList[$unitCombinationId] = $unitCombinationData->content.' '.$unitData->name;
                 }
 			}
@@ -636,7 +637,7 @@ class ItemService
 			->withParam(ItemColumnsParams::LANGUAGE, $this->sessionStorage->getLang())
 			->withParam(ItemColumnsParams::PLENTY_ID, $this->app->getPlentyId())
 			->build();
-   
+
 		$record = $this->itemRepository->search($columns, $filter, $params)->current();
 		return $record;
 	}
@@ -697,7 +698,7 @@ class ItemService
 	    return $attributeValueName;
 
 	}
-	
+
 	/**
 	 * Get a list of cross-selling items for the specified item ID
 	 * @param int $itemId
@@ -756,7 +757,7 @@ class ItemService
 
 		return $crossSellingItems;
 	}
-	
+
 	/**
 	 * @param int $conditionId
 	 * @return string
@@ -808,7 +809,7 @@ class ItemService
 		return $this->itemRepository->search($columns, $filter, $params);
 
 	}
-	
+
 	/**
 	 * @param string $searchString
 	 * @param array $params
@@ -822,7 +823,7 @@ class ItemService
          */
         $sessionStorage = pluginApp(SessionStorageService::class);
         $lang = $sessionStorage->getLang();
-        
+
 		$documentProcessor = pluginApp(DocumentProcessor::class);
 		$documentSearch    = pluginApp(DocumentSearch::class, [$documentProcessor]);
 
@@ -868,7 +869,7 @@ class ItemService
     public function addAdditionalItemSorting($key, $translationKey){
         $this->additionalItemSortingMap[$key] = $translationKey;
     }
-    
+
     /**
      * @param string $searchString
      * @return array
@@ -878,32 +879,32 @@ class ItemService
         /** @var IncludeSource $includeSource */
         /*$includeSource = pluginApp(IncludeSource::class);
         $includeSource->activate('test', 'test');
-    
+
         $documentProcessor = pluginApp(DocumentProcessor::class);
         $documentSearch    = pluginApp(DocumentSearch::class, [$documentProcessor]);
-    
+
         /** @var VariationElasticSearchSearchRepositoryContract $elasticSearchRepo */
         /*$elasticSearchRepo = pluginApp(VariationElasticSearchSearchRepositoryContract::class);
         $elasticSearchRepo->addSearch($documentSearch);
-    
+
         /** @var VariationBaseFilter $variationFilter */
         /*$variationFilter = pluginApp(VariationBaseFilter::class);
         $variationFilter->isActive();
-    
+
         /** @var ClientFilter $clientFilter */
         /*$clientFilter = pluginApp(ClientFilter::class);
         $clientFilter->isVisibleForClient($this->app->getPlentyId());
-    
+
         /** @var SearchFilter $searchFilter */
         /*$searchFilter = pluginApp(SearchFilter::class);
         $searchFilter->setSearchString($searchString, ElasticSearch::SEARCH_TYPE_AUTOCOMPLETE);
-    
+
         $documentSearch
             ->addFilter($clientFilter)
             ->addFilter($variationFilter)
             ->addFilter($searchFilter)
             ->addSource($includeSource);
-    
+
         return $elasticSearchRepo->execute();
     }*/
 }
