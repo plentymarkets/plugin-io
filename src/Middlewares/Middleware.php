@@ -47,7 +47,6 @@ class Middleware extends \Plenty\Plugin\Middleware
         }
 
         $currency = $request->get('currency', null);
-
         if ( $currency != null )
         {
             /** @var ConfigRepository $config */
@@ -59,6 +58,26 @@ class Middleware extends \Plenty\Plugin\Middleware
                 /** @var CheckoutService $checkoutService */
                 $checkoutService = pluginApp(CheckoutService::class);
                 $checkoutService->setCurrency( $currency );
+            }
+            else
+            {
+                /** @var TemplateService $templateService */
+                $templateService = pluginApp(TemplateService::class);
+                $templateService->forceNoIndex(true);
+            }
+        }
+
+        $shipToCountry = $request->get('ShipToCountry', null);
+        if ( $shipToCountry != null )
+        {
+            /** @var CountryService $countryService */
+            $countryService = pluginApp(CountryService::class);
+            $country = $countryService->getCountryById( $shipToCountry );
+            if(!is_null($country) && $country->active)
+            {
+                /** @var CheckoutService $checkoutService */
+                $checkoutService = pluginApp(CheckoutService::class);
+                $checkoutService->setShippingCountryId( $shipToCountry );
             }
             else
             {
