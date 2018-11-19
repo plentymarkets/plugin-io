@@ -47,6 +47,9 @@ class Middleware extends \Plenty\Plugin\Middleware
         }
 
         $currency = $request->get('currency', null);
+        $currency = !is_null($currency) ? $currency : $request->get('Currency', null);
+
+
         if ( $currency != null )
         {
             /** @var ConfigRepository $config */
