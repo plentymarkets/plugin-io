@@ -9,6 +9,7 @@ use IO\Services\ItemSearch\SearchPresets\VariationList;
 use IO\Services\ItemSearch\Services\ItemSearchService;
 use IO\Services\ItemSearch\SearchPresets\ManufacturerItems;
 use Plenty\Plugin\CachingRepository;
+use Plenty\Modules\Basket\Contracts\BasketRepositoryContract;
 
 class ItemListService
 {
@@ -40,7 +41,9 @@ class ItemListService
             case self::TYPE_LAST_SEEN:
                 /** @var CachingRepository $cachingRepository */
                 $cachingRepository = pluginApp(CachingRepository::class);
-                $variationIds = $cachingRepository->get(SessionStorageKeys::LAST_SEEN_ITEMS);
+                $basketRepository = pluginApp(BasketRepositoryContract::class);
+
+                $variationIds = $cachingRepository->get(SessionStorageKeys::LAST_SEEN_ITEMS . '_' . $basketRepository->load()->id);
 
                 if ( !is_null($variationIds) && count($variationIds) > 0 )
                 {
