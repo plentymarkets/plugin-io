@@ -344,29 +344,10 @@ class CustomerService
         $contactId = $this->getContactId();
         $accountRepo = $this->accountRepository;
         
-        $account = $authHelper->processUnguarded( function() use ($accountData, $contactId, $accountRepo)
+        return $authHelper->processUnguarded( function() use ($accountData, $contactId, $accountRepo)
         {
             return $accountRepo->createAccount($accountData, (int)$contactId);
         });
-        
-        if($account instanceof Account && (int)$account->id > 0)
-        {
-            /** @var TemplateConfigService $templateConfigService */
-            $templateConfigService = pluginApp(TemplateConfigService::class);
-            $classId = (int)$templateConfigService->get('global.default_contact_class_b2b');
-            
-            if(is_null($classId) || (int)$classId <= 0)
-            {
-                $classId = $this->getDefaultContactClassId();
-            }
-    
-            if(!is_null($classId) && (int)$classId > 0)
-            {
-                $this->updateContact([
-                                         'classId' => $classId
-                                     ]);
-            }
-        }
     }
     
     private function mapAddressDataToAccount($addressData)
@@ -671,15 +652,37 @@ class CustomerService
         }
         
         $newAddress = null;
-        
-        if($this->getContactId() > 0)
+        $contact = $this->getContact();
+        if(!is_null($contact))
         {
             $addressData['options'] = $this->buildAddressEmailOptions([], false, $addressData);
             $newAddress = $this->contactAddressRepository->createAddress($addressData, $this->getContactId(), $type);
             
             if($type == AddressType::BILLING && isset($addressData['name1']) && strlen($addressData['name1']))
             {
-                $this->createAccount($this->mapAddressDataToAccount($addressData));
+                $account = $this->createAccount($this->mapAddressDataToAccount($addressData));
+                if (
+                    $account instanceof Account
+                    && (int)$account->id > 0
+                    && count($contact->addresses) === 1
+                    && $contact->addresses[0]->id === $newAddress->id )
+                {
+                    /** @var TemplateConfigService $templateConfigService */
+                    $templateConfigService = pluginApp(TemplateConfigService::class);
+                    $classId = (int)$templateConfigService->get('global.default_contact_class_b2b');
+
+                    if(is_null($classId) || (int)$classId <= 0)
+                    {
+                        $classId = $this->getDefaultContactClassId();
+                    }
+
+                    if(!is_null($classId) && (int)$classId > 0)
+                    {
+                        $this->updateContact([
+                            'classId' => $classId
+                        ]);
+                    }
+                }
             }
             
             $existingContact = $this->getContact();
