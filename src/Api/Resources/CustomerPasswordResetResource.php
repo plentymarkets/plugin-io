@@ -38,6 +38,12 @@ class CustomerPasswordResetResource extends ApiResource
          */
         $customerPasswordResetService = pluginApp(CustomerPasswordResetService::class);
         $response = $customerPasswordResetService->resetPassword($email);
+
+        if($response === false)
+        {
+            return $this->response->create($response, ResponseCode::BAD_REQUEST);
+        }
+
         return $this->response->create($response, ResponseCode::OK);
     }
     

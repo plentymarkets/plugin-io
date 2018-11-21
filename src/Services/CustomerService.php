@@ -6,6 +6,7 @@ use IO\Api\Resources\CustomerAddressResource;
 use IO\Builder\Order\AddressType;
 use IO\Builder\Order\OrderType;
 use IO\Constants\SessionStorageKeys;
+use IO\Extensions\Mail\SendMail;
 use IO\Helper\MemoryCache;
 use IO\Helper\UserSession;
 use IO\Models\LocalizedOrder;
@@ -22,13 +23,10 @@ use Plenty\Modules\Account\Contact\Models\ContactOption;
 use Plenty\Modules\Account\Models\Account;
 use Plenty\Modules\Authorization\Services\AuthHelper;
 use Plenty\Modules\Frontend\Events\FrontendCustomerAddressChanged;
-use Plenty\Modules\Helper\AutomaticEmail\Contracts\AutomaticEmailContract;
-use Plenty\Modules\Helper\AutomaticEmail\Models\AutomaticEmail;
 use Plenty\Modules\Helper\AutomaticEmail\Models\AutomaticEmailTemplate;
 use Plenty\Modules\Helper\AutomaticEmail\Models\AutomaticEmailContact;
 use Plenty\Modules\System\Contracts\WebstoreConfigurationRepositoryContract;
 use Plenty\Modules\System\Models\WebstoreConfiguration;
-use Plenty\Plugin\Application;
 use Plenty\Plugin\Events\Dispatcher;
 
 /**
@@ -38,12 +36,13 @@ use Plenty\Plugin\Events\Dispatcher;
 class CustomerService
 {
     use MemoryCache;
+    use SendMail;
 
     /**
      * @var ContactAccountRepositoryContract $accountRepository
      */
     private $accountRepository;
-    
+
 	/**
 	 * @var ContactRepositoryContract
 	 */
@@ -69,10 +68,6 @@ class CustomerService
 	 */
 	private $userSession = null;
 
-	/**
-     * @var AutomaticEmailContract
-     */
-    private $automaticEmailRepository;
 
     /**
      * CustomerService constructor.
@@ -82,7 +77,6 @@ class CustomerService
      * @param AddressRepositoryContract $addressRepository
      * @param ContactClassRepositoryContract $contactClassRepository
      * @param \IO\Services\SessionStorageService $sessionStorage
-     * @param AutomaticEmailContract $automaticEmailRepositoryContract
      */
 	public function __construct(
         ContactAccountRepositoryContract $accountRepository,
@@ -90,8 +84,7 @@ class CustomerService
 		ContactAddressRepositoryContract $contactAddressRepository,
         AddressRepositoryContract $addressRepository,
         ContactClassRepositoryContract $contactClassRepository,
-        SessionStorageService $sessionStorage,
-        AutomaticEmailContract $automaticEmailRepositoryContract)
+        SessionStorageService $sessionStorage)
 	{
 	    $this->accountRepository        = $accountRepository;
 		$this->contactRepository        = $contactRepository;
@@ -99,7 +92,6 @@ class CustomerService
         $this->addressRepository        = $addressRepository;
         $this->contactClassRepository   = $contactClassRepository;
         $this->sessionStorage           = $sessionStorage;
-        $this->automaticEmailRepository = $automaticEmailRepositoryContract;
 	}
 
     /**
@@ -322,16 +314,9 @@ class CustomerService
              */
             $webstoreConfiguration = $webstoreConfigurationRepository->findByPlentyId($contact->plentyId);
 
-             /**
-             * @var AutomaticEmailContact $emailData
-             */
-            $emailData = pluginApp(Application::class)->make(AutomaticEmailContact::class, ['contactId' => $contact->id, 'clientId' => $webstoreConfiguration->webstoreId, 'password' => $contactData['password']]);
+            $params = ['contactId' => $contact->id, 'clientId' => $webstoreConfiguration->webstoreId, 'password' => $contactData['password']];
 
-            /**
-             * @var AutomaticEmail $email
-             */
-            $email = pluginApp(Application::class)->make(AutomaticEmail::class, ['template' => AutomaticEmailTemplate::CONTACT_REGISTRATION , 'emailData' => $emailData ]);
-            $this->automaticEmailRepository->sendAutomatic($email);
+            $this->sendMail(AutomaticEmailTemplate::CONTACT_REGISTRATION , AutomaticEmailContact::class, $params);
         }
 
 		return $contact;
@@ -541,16 +526,9 @@ class CustomerService
              */
             $webstoreConfiguration = $webstoreConfigurationRepository->findByPlentyId($contact->plentyId);
 
-            /**
-             * @var AutomaticEmailContact $emailData
-             */
-            $emailData = pluginApp(Application::class)->make(AutomaticEmailContact::class, ['contactId' => $contact->id, 'clientId' => $webstoreConfiguration->webstoreId]);
+            $params = ['contactId' => $contact->id, 'clientId' => $webstoreConfiguration->webstoreId];
 
-            /**
-             * @var AutomaticEmail $email
-             */
-            $email = pluginApp(Application::class)->make(AutomaticEmail::class, ['template' => AutomaticEmailTemplate::CONTACT_NEW_PASSWORD_CONFIRMATION , 'emailData' => $emailData ]);
-            $this->automaticEmailRepository->sendAutomatic($email);
+            $this->sendMail(AutomaticEmailTemplate::CONTACT_NEW_PASSWORD_CONFIRMATION , AutomaticEmailContact::class, $params);
         }
 
         return $contact;

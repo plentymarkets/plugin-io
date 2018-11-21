@@ -3,12 +3,11 @@
 namespace IO\Services;
 
 use IO\DBModels\PasswordReset;
+use IO\Extensions\Mail\SendMail;
 use IO\Repositories\CustomerPasswordResetRepository;
 use Plenty\Modules\Account\Contact\Contracts\ContactRepositoryContract;
 use Plenty\Modules\Account\Contact\Models\Contact;
 use Plenty\Modules\Authorization\Services\AuthHelper;
-use Plenty\Modules\Helper\AutomaticEmail\Contracts\AutomaticEmailContract;
-use Plenty\Modules\Helper\AutomaticEmail\Models\AutomaticEmail;
 use Plenty\Modules\Helper\AutomaticEmail\Models\AutomaticEmailTemplate;
 use Plenty\Modules\Helper\AutomaticEmail\Models\AutomaticEmailContact;
 use Plenty\Modules\System\Contracts\WebstoreConfigurationRepositoryContract;
@@ -17,6 +16,8 @@ use Plenty\Plugin\Application;
 
 class CustomerPasswordResetService
 {
+    use SendMail;
+
     /**
      * @var CustomerPasswordResetRepository
      */
@@ -27,19 +28,12 @@ class CustomerPasswordResetService
      */
     private $contactRepository;
 
-	/**
-     * @var AutomaticEmailContract
-     */
-    private $automaticEmailRepository;
-
     public function __construct(
         CustomerPasswordResetRepository $customerPasswordResetRepo,
-        ContactRepositoryContract $contactRepository,
-        AutomaticEmailContract $automaticEmailRepositoryContract)
+        ContactRepositoryContract $contactRepository)
     {
         $this->customerPasswordResetRepo = $customerPasswordResetRepo;
         $this->contactRepository = $contactRepository;
-        $this->automaticEmailRepository = $automaticEmailRepositoryContract;
     }
     
     public function resetPassword($email)
@@ -63,19 +57,12 @@ class CustomerPasswordResetService
                  */
                 $webstoreConfigugration = $webstoreConfigurationRepository->findByPlentyId($contact->plentyId);
 
-                /**
-                 * @var AutomaticEmailContact $emailData
-                 */
-                $emailData = pluginApp(Application::class)->make(AutomaticEmailContact::class, ['contactId' => $contact->id, 'clientId' => $webstoreConfigugration->webstoreId]);
-
-                 /**
-                 * @var AutomaticEmail $email
-                 */
-                $email = pluginApp(Application::class)->make(AutomaticEmail::class, ['template' => AutomaticEmailTemplate::CONTACT_NEW_PASSWORD , 'emailData' => $emailData ]);
-                $this->automaticEmailRepository->sendAutomatic($email);
+                $params = ['contactId' => $contact->id, 'clientId' => $webstoreConfigugration->webstoreId];
+                $this->sendMail(AutomaticEmailTemplate::CONTACT_NEW_PASSWORD, AutomaticEmailContact::class, $params);
+                return true;
             }
         }
-        return true;
+        return false;
     }
 
     public function getContactIdbyEmailAddress($email)

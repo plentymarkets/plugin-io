@@ -9,6 +9,7 @@ use IO\Builder\Order\OrderType;
 use IO\Builder\Order\OrderOptionSubType;
 use IO\Constants\OrderPaymentStatus;
 use IO\Constants\SessionStorageKeys;
+use IO\Extensions\Mail\SendMail;
 use IO\Models\LocalizedOrder;
 use Plenty\Modules\Account\Address\Contracts\AddressRepositoryContract;
 use Plenty\Modules\Authorization\Services\AuthHelper;
@@ -33,6 +34,7 @@ use Plenty\Plugin\ConfigRepository;
  */
 class OrderService
 {
+    use SendMail;
 	/**
 	 * @var OrderRepositoryContract
 	 */
@@ -59,10 +61,6 @@ class OrderService
      */
     private $urlService;
 
-    /**
-     * @var AutomaticEmailContract
-     */
-    private $automaticEmailRepository;
 
     /**
      * The OrderItem types that will be wrapped. All other OrderItems will be stripped from the order.
@@ -83,7 +81,6 @@ class OrderService
      * @param FrontendPaymentMethodRepositoryContract $frontendPaymentMethodRepository
      * @param AddressRepositoryContract $addressRepository
      * @param \IO\Services\UrlService $urlService
-     * @param AutomaticEmailContract $automaticEmailRepositoryContract
      */
 	public function __construct(
 		OrderRepositoryContract $orderRepository,
@@ -91,9 +88,7 @@ class OrderService
         SessionStorageService $sessionStorage,
         FrontendPaymentMethodRepositoryContract $frontendPaymentMethodRepository,
         AddressRepositoryContract $addressRepository,
-        UrlService $urlService,
-        AutomaticEmailContract $automaticEmailRepositoryContract
-	)
+        UrlService $urlService)
 	{
 		$this->orderRepository = $orderRepository;
 		$this->basketService   = $basketService;
@@ -101,7 +96,6 @@ class OrderService
         $this->frontendPaymentMethodRepository = $frontendPaymentMethodRepository;
         $this->addressRepository = $addressRepository;
         $this->urlService = $urlService;
-        $this->automaticEmailRepository = $automaticEmailRepositoryContract;
 	}
 
     /**
@@ -146,15 +140,8 @@ class OrderService
         $order = $this->orderRepository->createOrder($order, $couponCode);
 
         if ($order instanceof Order && $order->id > 0) {
-            /**
-             * @var AutomaticEmailOrder $emailData
-             */
-            $emailData = pluginApp(Application::class)->make(AutomaticEmailOrder::class, ['orderId' => $order->id]);
-            /**
-             * @var AutomaticEmail $email
-             */
-            $email = pluginApp(Application::class)->make(AutomaticEmail::class, ['template' => AutomaticEmailTemplate::SHOP_ORDER , 'emailData' => $emailData ]);
-            $this->automaticEmailRepository->sendAutomatic($email);
+            $params = ['orderId' => $order->id];
+            $this->sendMail(AutomaticEmailTemplate::SHOP_ORDER ,AutomaticEmailOrder::class, $params);
         }
 
         $this->sessionStorage->setSessionValue(SessionStorageKeys::ORDER_CONTACT_WISH, null);
