@@ -33,7 +33,7 @@ class LiveShoppingService
         {
             $removeVariationsWithoutLiveShoppingPrice = true;
             $currentTime = time();
-            if($liveShopping->fromTime > $currentTime || $liveShopping->toTime < $currentTime)
+            if($liveShopping->fromTime > $currentTime || $liveShopping->toTime < $currentTime || $liveShopping->quantitySold + $liveShopping->quantitySoldReal >= $liveShopping->quantityMax)
             {
                 $removeVariationsWithoutLiveShoppingPrice = false;
             }
