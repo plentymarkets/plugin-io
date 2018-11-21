@@ -31,14 +31,7 @@ class LiveShoppingService
         
         if($liveShopping instanceof LiveShopping)
         {
-            $removeVariationsWithoutLiveShoppingPrice = true;
-            $currentTime = time();
-            if($liveShopping->fromTime > $currentTime || $liveShopping->toTime < $currentTime || $liveShopping->quantitySold + $liveShopping->quantitySoldReal >= $liveShopping->quantityMax)
-            {
-                $removeVariationsWithoutLiveShoppingPrice = false;
-            }
-            
-            $itemList = $this->getLiveShoppingVariations($liveShopping->itemId, $sorting, $removeVariationsWithoutLiveShoppingPrice);
+            $itemList = $this->getLiveShoppingVariations($liveShopping->itemId, $sorting);
             
             if(count($itemList[0]['documents']))
             {
@@ -54,7 +47,7 @@ class LiveShoppingService
         ];
     }
     
-    public function getLiveShoppingVariations($itemId, $sorting, $removeVariationsWithoutLiveShoppingPrice = true)
+    public function getLiveShoppingVariations($itemId, $sorting)
     {
         $itemSearchOptions = [
             'itemId'        => $itemId,
@@ -66,19 +59,15 @@ class LiveShoppingService
                                                        LiveShoppingItems::getSearchFactory( $itemSearchOptions )
                                                    ]);
         
-        if($removeVariationsWithoutLiveShoppingPrice)
-        {
-            return $this->removeVariationsWithoutLiveShopping($itemList);
-        }
-        
-        return $itemList;
+       
+        return $this->filterLiveShoppingVariations($itemList);
     }
     
     /**
      * @param $itemList
      * @return array
      */
-    public function removeVariationsWithoutLiveShopping($itemList)
+    public function filterLiveShoppingVariations($itemList)
     {
         if(count($itemList))
         {
@@ -91,6 +80,7 @@ class LiveShoppingService
                         if(is_null($variation['data']['prices']['specialOffer']))
                         {
                             unset($itemList[$listKey]['documents'][$key]);
+                            $itemList[$listKey]['documents'][] = $variation;
                         }
                     }
                 }
