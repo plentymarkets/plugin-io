@@ -204,12 +204,12 @@ class IORouteServiceProvider extends RouteServiceProvider
             $router->get('order-property-file/{hash1}/{hash2}', 'IO\Controllers\OrderPropertyFileController@downloadFile');
         }
 
-        
+
         if( RouteConfig::isActive(RouteConfig::NEWSLETTER_OPT_IN) )
         {
             $router->get('newsletter/subscribe/{authString}/{newsletterEmailId}', 'IO\Controllers\NewsletterOptInController@showOptInConfirmation');
         }
-        
+
         if( RouteConfig::isActive(RouteConfig::NEWSLETTER_OPT_OUT) )
         {
             $router->get('newsletter/unsubscribe', 'IO\Controllers\NewsletterOptOutController@showOptOut');
@@ -221,11 +221,11 @@ class IORouteServiceProvider extends RouteServiceProvider
          */
         if ( RouteConfig::isActive(RouteConfig::ITEM) )
         {
-            $router->get('{itemId}_{variationId?}', 'IO\Controllers\ItemController@showItemWithoutName')
+            $router->get('{itemId}_{variationId}', 'IO\Controllers\ItemController@showItemWithoutName')
                 ->where('itemId', '[0-9]+')
                 ->where('variationId', '[0-9]+');
 
-            $router->get('{slug}_{itemId}_{variationId?}', 'IO\Controllers\ItemController@showItem')
+            $router->get('{slug}_{itemId}_{variationId}', 'IO\Controllers\ItemController@showItem')
                 ->where('slug', '[^_]+')
                 ->where('itemId', '[0-9]+')
                 ->where('variationId', '[0-9]+');
