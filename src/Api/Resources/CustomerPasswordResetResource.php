@@ -2,12 +2,12 @@
 
 namespace IO\Api\Resources;
 
-use Plenty\Plugin\Http\Request;
-use Plenty\Plugin\Http\Response;
 use IO\Api\ApiResource;
 use IO\Api\ApiResponse;
 use IO\Api\ResponseCode;
 use IO\Services\CustomerPasswordResetService;
+use Plenty\Plugin\Http\Request;
+use Plenty\Plugin\Http\Response;
 
 /**
  * Class CustomerPasswordResetResource
@@ -32,14 +32,18 @@ class CustomerPasswordResetResource extends ApiResource
     public function store():Response
     {
         $email = $this->request->get('email', '');
-        $template = $this->request->get('template', '');
-        $mailSubject = $this->request->get('subject', '');
         
         /**
          * @var CustomerPasswordResetService $customerPasswordResetService
          */
         $customerPasswordResetService = pluginApp(CustomerPasswordResetService::class);
-        $response = $customerPasswordResetService->resetPassword($email, $template, $mailSubject);
+        $response = $customerPasswordResetService->resetPassword($email);
+
+        if($response === false)
+        {
+            return $this->response->create($response, ResponseCode::BAD_REQUEST);
+        }
+
         return $this->response->create($response, ResponseCode::OK);
     }
     
