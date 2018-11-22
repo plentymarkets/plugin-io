@@ -46,6 +46,12 @@ class CustomerPasswordResource extends ApiResource
 		if(strlen($newPassWord) && strlen($newPassWord2) && $newPassWord == $newPassWord2)
 		{
 			$result = $this->customerService->updatePassword($newPassWord, $contactId, $hash);
+
+            if($result === null)
+            {
+                return $this->response->create($result, ResponseCode::BAD_REQUEST);
+            }
+
 			return $this->response->create($result, ResponseCode::OK);
 		}
 		
