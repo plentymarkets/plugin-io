@@ -2,30 +2,31 @@
 
 namespace IO\Services;
 
+use IO\Builder\Order\AddressType;
+use IO\Builder\Order\OrderBuilder;
+use IO\Builder\Order\OrderItemType;
+use IO\Builder\Order\OrderType;
+use IO\Builder\Order\OrderOptionSubType;
+use IO\Constants\OrderPaymentStatus;
+use IO\Constants\SessionStorageKeys;
+use IO\Extensions\Mail\SendMail;
+use IO\Models\LocalizedOrder;
 use Plenty\Modules\Account\Address\Contracts\AddressRepositoryContract;
+use Plenty\Modules\Authorization\Services\AuthHelper;
 use Plenty\Modules\Frontend\PaymentMethod\Contracts\FrontendPaymentMethodRepositoryContract;
-use Plenty\Modules\Order\ContactWish\Contracts\ContactWishRepositoryContract;
+use Plenty\Modules\Helper\AutomaticEmail\Contracts\AutomaticEmailContract;
+use Plenty\Modules\Helper\AutomaticEmail\Models\AutomaticEmail;
+use Plenty\Modules\Helper\AutomaticEmail\Models\AutomaticEmailOrder;
+use Plenty\Modules\Helper\AutomaticEmail\Models\AutomaticEmailTemplate;
 use Plenty\Modules\Order\Contracts\OrderRepositoryContract;
 use Plenty\Modules\Order\Property\Contracts\OrderPropertyRepositoryContract;
 use Plenty\Modules\Order\Property\Models\OrderPropertyType;
 use Plenty\Modules\Payment\Contracts\PaymentRepositoryContract;
 use Plenty\Modules\Payment\Method\Contracts\PaymentMethodRepositoryContract;
 use Plenty\Repositories\Models\PaginatedResult;
-use Plenty\Plugin\Http\Response;
 use Plenty\Modules\Order\Models\Order;
+use Plenty\Plugin\Application;
 use Plenty\Plugin\ConfigRepository;
-use IO\Constants\OrderPaymentStatus;
-use IO\Models\LocalizedOrder;
-use IO\Builder\Order\OrderBuilder;
-use IO\Builder\Order\OrderType;
-use IO\Builder\Order\OrderOptionSubType;
-use IO\Builder\Order\AddressType;
-use IO\Constants\SessionStorageKeys;
-use IO\Services\TemplateConfigService;
-use Plenty\Modules\Authorization\Services\AuthHelper;
-use IO\Services\UrlService;
-use IO\Builder\Order\OrderItemType;
-
 
 /**
  * Class OrderService
@@ -33,6 +34,7 @@ use IO\Builder\Order\OrderItemType;
  */
 class OrderService
 {
+    use SendMail;
 	/**
 	 * @var OrderRepositoryContract
 	 */
@@ -59,6 +61,7 @@ class OrderService
      */
     private $urlService;
 
+
     /**
      * The OrderItem types that will be wrapped. All other OrderItems will be stripped from the order.
      */
@@ -75,6 +78,9 @@ class OrderService
      * @param OrderRepositoryContract $orderRepository
      * @param BasketService $basketService
      * @param \IO\Services\SessionStorageService $sessionStorage
+     * @param FrontendPaymentMethodRepositoryContract $frontendPaymentMethodRepository
+     * @param AddressRepositoryContract $addressRepository
+     * @param \IO\Services\UrlService $urlService
      */
 	public function __construct(
 		OrderRepositoryContract $orderRepository,
@@ -82,8 +88,7 @@ class OrderService
         SessionStorageService $sessionStorage,
         FrontendPaymentMethodRepositoryContract $frontendPaymentMethodRepository,
         AddressRepositoryContract $addressRepository,
-        UrlService $urlService
-	)
+        UrlService $urlService)
 	{
 		$this->orderRepository = $orderRepository;
 		$this->basketService   = $basketService;
@@ -133,6 +138,11 @@ class OrderService
             ->done();
 
         $order = $this->orderRepository->createOrder($order, $couponCode);
+
+        if ($order instanceof Order && $order->id > 0) {
+            $params = ['orderId' => $order->id];
+            $this->sendMail(AutomaticEmailTemplate::SHOP_ORDER ,AutomaticEmailOrder::class, $params);
+        }
 
         $this->sessionStorage->setSessionValue(SessionStorageKeys::ORDER_CONTACT_WISH, null);
 
