@@ -45,6 +45,7 @@ class PriceSearchExtension implements ItemSearchExtension
             {
                 if ( (int)$variation['data']['variation']['id'] > 0 )
                 {
+                    $itemId             = $variation['data']['item']['id'];
                     $variationId        = $variation['data']['variation']['id'];
                     $minimumQuantity    = $variation['data']['variation']['minimumOrderQuantity'];
                     if ( is_null($minimumQuantity) || (float)$minimumQuantity === 0 )
@@ -87,7 +88,7 @@ class PriceSearchExtension implements ItemSearchExtension
                     }
 
 
-                    $priceList = VariationPriceList::create( $variationId, $minimumQuantity, $maximumOrderQuantity, $lot, $unit );
+                    $priceList = VariationPriceList::create( $variationId, $itemId, $minimumQuantity, $maximumOrderQuantity, $lot, $unit );
 
                     // assign minimum order quantity from price list (may be recalculated depending on available graduated prices)
                     $variation['data']['variation']['minimumOrderQuantity'] = $priceList->minimumOrderQuantity;

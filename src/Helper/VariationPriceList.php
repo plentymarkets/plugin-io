@@ -16,6 +16,7 @@ use Plenty\Modules\Item\SalesPrice\Models\SalesPriceSearchRequest;
 use Plenty\Modules\Item\SalesPrice\Models\SalesPriceSearchResponse;
 use Plenty\Modules\Item\Unit\Contracts\UnitNameRepositoryContract;
 use Plenty\Modules\Item\Unit\Contracts\UnitRepositoryContract;
+use Plenty\Modules\LiveShopping\Contracts\LiveShoppingRepositoryContract;
 use Plenty\Plugin\Application;
 use Plenty\Plugin\CachingRepository;
 
@@ -27,6 +28,9 @@ class VariationPriceList
     const TYPE_RRP              = 'rrp';
     const TYPE_SPECIAL_OFFER    = 'specialOffer';
 
+    /** @var int $itemId */
+    public $itemId = 0;
+    
     /** @var int $variationId */
     public $variationId = 0;
 
@@ -47,20 +51,24 @@ class VariationPriceList
 
     /** @var UnitService $unitService */
     private $unitService;
+    
+    /** @var LiveShoppingRepositoryContract $liveShoppingRepo */
+    private $liveShoppingRepo;
 
     private $showNetPrice = false;
 
     /** @var SalesPriceSearchResponse */
     private $defaultPrice;
 
-    public function __construct( NumberFormatFilter $numberFormatFilter, UnitService $unitService )
+    public function __construct( NumberFormatFilter $numberFormatFilter, UnitService $unitService, LiveShoppingRepositoryContract $liveShoppingRepo )
     {
         $this->numberFormatFilter = $numberFormatFilter;
         $this->unitService = $unitService;
         $this->showNetPrice = pluginApp( CustomerService::class )->showNetPrices();
+        $this->liveShoppingRepo = $liveShoppingRepo;
     }
 
-    public static function create( int $variationId, $minimumOrderQuantity = 0, $maximumOrderQuantity = null, $lot = 0, $unit = null )
+    public static function create( int $variationId, int $itemId, $minimumOrderQuantity = 0, $maximumOrderQuantity = null, $lot = 0, $unit = null )
     {
         if ( $minimumOrderQuantity === null )
         {
@@ -70,7 +78,7 @@ class VariationPriceList
         /** @var VariationPriceList $instance */
         $instance = pluginApp( VariationPriceList::class);
 
-        $instance->init( $variationId, $minimumOrderQuantity, $maximumOrderQuantity, $lot, $unit );
+        $instance->init( $variationId, $itemId, $minimumOrderQuantity, $maximumOrderQuantity, $lot, $unit );
 
         // check if default price for minimum order quantity exists
         if ( $instance->findPriceForQuantity( $minimumOrderQuantity ) === null )
@@ -150,8 +158,12 @@ class VariationPriceList
 
         $defaultPrice   = $this->findPriceForQuantity( $quantity );
         $rrp            = $this->findPriceForQuantity( $quantity, self::TYPE_RRP );
-        $specialOffer   = $this->findPriceForQuantity( $quantity, self::TYPE_SPECIAL_OFFER );
-
+    
+        if($this->liveShoppingRepo->itemHasActiveLiveShopping($this->itemId))
+        {
+            $specialOffer   = $this->findPriceForQuantity( $quantity, self::TYPE_SPECIAL_OFFER );
+        }
+        
         return [
             'default'           => $this->preparePrice( $defaultPrice, $this->showNetPrice ),
             'rrp'               => $this->preparePrice( $rrp, $this->showNetPrice ),
@@ -160,7 +172,7 @@ class VariationPriceList
         ];
     }
 
-    public function getCalculatedPrices( $quantity = null )
+    public function getCalculatedPrices( $quantity = null)
     {
         if ( $quantity === null )
         {
@@ -169,8 +181,13 @@ class VariationPriceList
 
         $defaultPrice   = $this->findPriceForQuantity( $quantity );
         $rrp            = $this->findPriceForQuantity( $quantity, self::TYPE_RRP );
-        $specialOffer   = $this->findPriceForQuantity( $quantity, self::TYPE_SPECIAL_OFFER );
         $graduatedPrices= [];
+        
+        $specialOffer = null;
+        if($this->liveShoppingRepo->itemHasActiveLiveShopping($this->itemId))
+        {
+            $specialOffer   = $this->findPriceForQuantity( $quantity, self::TYPE_SPECIAL_OFFER );
+        }
 
         foreach($this->prices[self::TYPE_DEFAULT] as $price )
         {
@@ -234,9 +251,10 @@ class VariationPriceList
         return $this->defaultPrice;
     }
 
-    private function init( $variationId, $minimumOrderQuantity, $maximumOrderQuantity, $lot, $unit )
+    private function init( $variationId, $itemId, $minimumOrderQuantity, $maximumOrderQuantity, $lot, $unit )
     {
         $this->variationId          = $variationId;
+        $this->itemId               = $itemId;
         $this->minimumOrderQuantity = $minimumOrderQuantity;
         $this->maximumOrderQuantity = $maximumOrderQuantity;
         $this->lot                  = $lot;

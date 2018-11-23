@@ -19,6 +19,7 @@ use IO\Services\ItemLoader\Services\ItemLoaderService;
 use IO\Services\ItemService;
 use IO\Services\ItemWishListService;
 use IO\Services\LegalInformationService;
+use IO\Services\LiveShoppingService;
 use IO\Services\LocalizationService;
 use IO\Services\NotificationService;
 use IO\Services\OrderService;
@@ -166,5 +167,10 @@ class TwigServiceContainer
     public function getUrl()
     {
         return pluginApp( UrlService::class );
+    }
+    
+    public function getLiveShopping()
+    {
+        return pluginApp( LiveShoppingService::class );
     }
 }
