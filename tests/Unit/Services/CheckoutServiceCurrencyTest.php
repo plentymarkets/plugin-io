@@ -2,6 +2,7 @@
 
 namespace IO\Tests\Unit;
 
+use Faker\Generator;
 use IO\Constants\SessionStorageKeys;
 use IO\Helper\MemoryCache;
 use IO\Services\CheckoutService;
@@ -39,6 +40,8 @@ class CheckoutServiceCurrencyTest extends TestCase
     protected $sessionStorageServiceMock;
     /** @var MemoryCache $memoryCacheMock */
     protected $memoryCacheMock;
+    /** @var Generator $faker */
+    protected $faker;
 
 
     protected function setUp()
@@ -65,6 +68,8 @@ class CheckoutServiceCurrencyTest extends TestCase
         $this->replaceInstanceByMock(SessionStorageService::class, $this->sessionStorageServiceMock);
 
         $this->checkoutService = pluginApp(CheckoutService::class);
+
+        $this->faker = pluginApp(Generator::class);
 
     }
 
