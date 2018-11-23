@@ -1,5 +1,5 @@
 plentymarkets IO
-
+---
 Copyright © 2017 plentymarkets GmbH
 
 According to our dual licensing model, this program can be used either
