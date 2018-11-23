@@ -22,9 +22,7 @@ class LiveShoppingResource extends ApiResource
     
     public function show(string $liveShoppingId):Response
     {
-        $defaultSorting = 'sorting.price.avg_asc';
-    
-        $sorting = $this->request->get('sorting', $defaultSorting);
+        $sorting = $this->request->get('sorting', null);
         $liveShoppingData = [];
         if((int)$liveShoppingId > 0)
         {

@@ -19,8 +19,13 @@ class LiveShoppingService
      * @param $sorting
      * @return array
      */
-    public function getLiveShoppingData($liveShoppingId, $sorting)
+    public function getLiveShoppingData($liveShoppingId, $sorting = null)
     {
+        if(is_null($sorting))
+        {
+            $sorting = 'sorting.price.avg_asc';
+        }
+        
         /** @var LiveShoppingRepositoryContract $liveShoppingRepo */
         $liveShoppingRepo = pluginApp(LiveShoppingRepositoryContract::class);
         /** @var LiveShopping $liveShopping */
