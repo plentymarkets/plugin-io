@@ -751,6 +751,14 @@ class CustomerService
                     'value'  => $addressData['telephone']
                 ];
             }
+
+            if(isset($addressData['contactPerson']))
+            {
+                $options[] = [
+                    'typeId' => AddressOption::TYPE_CONTACT_PERSON,
+                    'value'  => $addressData['contactPerson']
+                ];
+            }
             
             if(isset($addressData['address2']) && (strtoupper($addressData['address1']) == 'PACKSTATION' || strtoupper($addressData['address1']) == 'POSTFILIALE') && isset($addressData['address3']))
             {
