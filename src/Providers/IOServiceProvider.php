@@ -31,6 +31,7 @@ use IO\Services\ItemLoader\Services\FacetExtensionContainer;
 use IO\Services\ItemService;
 use IO\Services\ItemWishListService;
 use IO\Services\LegalInformationService;
+use IO\Services\LiveShoppingService;
 use IO\Services\LocalizationService;
 use IO\Services\NotificationService;
 use IO\Services\OrderService;
@@ -105,7 +106,8 @@ class IOServiceProvider extends ServiceProvider
             TemplateService::class,
             UnitService::class,
             UrlService::class,
-            WebstoreConfigurationService::class
+            WebstoreConfigurationService::class,
+            LiveShoppingService::class
         ]);
         
         //TODO check ES ready state

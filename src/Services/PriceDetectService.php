@@ -82,7 +82,9 @@ class PriceDetectService
         $this->currency          = $this->checkoutService->getCurrency();
         $this->shippingCountryId = $this->checkoutService->getShippingCountryId();
         $this->plentyId          = $this->app->getPlentyId();
-        $this->referrerId        = $this->basketService->getBasket()->referrerId;
+        
+        $referrerId = (int)$this->basketService->getBasket()->referrerId;
+        $this->referrerId        = ((int)$referrerId > 0 ? $referrerId : 1);
     }
     
     public function getPriceIdsForCustomer()
