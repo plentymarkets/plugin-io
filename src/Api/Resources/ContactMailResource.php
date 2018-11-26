@@ -8,6 +8,8 @@ use IO\Api\ApiResource;
 use IO\Api\ApiResponse;
 use IO\Api\ResponseCode;
 use IO\Services\ContactMailService;
+use Plenty\Plugin\Log\Loggable;
+
 
 /**
  * Class ContactMailResource
@@ -15,8 +17,9 @@ use IO\Services\ContactMailService;
  */
 class ContactMailResource extends ApiResource
 {
+    use Loggable;
     private $contactMailService;
-    
+
     /**
      * ContactMailResource constructor.
      * @param Request $request
@@ -27,14 +30,15 @@ class ContactMailResource extends ApiResource
         parent::__construct($request, $response);
         $this->contactMailService = $contactMailService;
     }
-    
+
     public function store():Response
     {
         $mailTemplate = $this->request->get('template', '');
         $contactData = $this->request->get('contactData',[]);
-        
+        $this->getLogger(__METHOD__)->error("contactData:", $contactData);
+
         $response = $this->contactMailService->sendMail($mailTemplate, $contactData);
-        
+
         if($response)
         {
             return $this->response->create($response, ResponseCode::CREATED);
@@ -43,6 +47,6 @@ class ContactMailResource extends ApiResource
         {
             return $this->response->create($response, ResponseCode::BAD_REQUEST);
         }
-        
+
     }
 }
