@@ -9,6 +9,7 @@ use Mockery;
 use IO\Tests\TestCase;
 use IO\Services\BasketService;
 use Plenty\Modules\Basket\Hooks\BasketItem\CheckNewItemQuantity;
+use Plenty\Modules\Cloud\ElasticSearch\Factories\ElasticSearchResultFactory;
 use Plenty\Modules\Item\Stock\Hooks\CheckItemStock;
 use Plenty\Modules\Item\Variation\Models\Variation;
 use Plenty\Modules\Basket\Models\Basket;
@@ -59,7 +60,9 @@ class BasketServiceItemRepoTest extends TestCase
             'minimumOrderQuantity' => 1.00
        ]);
 
-       $esMockData = $this->getTestJsonData();
+       /** @var ElasticSearchResultFactory $esFactory */
+       $esFactory = pluginApp(ElasticSearchResultFactory::class);
+       $esMockData = $esFactory->makeWrapped();
        $esMockData['documents'][0]['id'] =  $this->variation['id'];
        $esMockData['documents'][0]['data']['variation']['id'] = $this->variation['id'];
 
@@ -123,18 +126,5 @@ class BasketServiceItemRepoTest extends TestCase
         $result = $this->basketService->deleteBasketItem($basketItems[0]['id']);
 
         $this->assertEmpty($result);
-    }
-
-    /**
-     * helper method to get the item search result json
-     * @return mixed
-     */
-    public function getTestJsonData()
-    {
-        $file = __DIR__ . "/../Fixtures/complete_basket_response.json";
-        return json_decode(
-            file_get_contents($file),
-            true
-        );
     }
 }
