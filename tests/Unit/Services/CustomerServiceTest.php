@@ -236,7 +236,6 @@ class CustomerServiceTest extends TestCase
         $this->userSessionMock->shouldReceive('getCurrentContactId')->andReturn($contact->id);
 
         $this->contactRepositoryMock->shouldReceive('findContactById')->with($contact->id)->andReturn($contact);
-        $this->contactRepositoryMock->shouldReceive('updateContact')->andReturn($contact)->once();
 
         $this->contactAccountRepositoryMock->shouldReceive('createAccount')->andReturn($account)->once();
 
@@ -288,7 +287,7 @@ class CustomerServiceTest extends TestCase
         $this->userSessionMock->shouldReceive('getCurrentContactId')->andReturn($contact->id);
 
         $this->contactRepositoryMock->shouldReceive('findContactById')->with($contact->id)->andReturn($contact);
-        $this->contactRepositoryMock->shouldReceive('updateContact')->andReturn($contact)->twice();
+        $this->contactRepositoryMock->shouldReceive('updateContact')->andReturn($contact)->once();
 
         $this->contactAccountRepositoryMock->shouldReceive('createAccount')->andReturn($account)->once();
 
@@ -340,7 +339,7 @@ class CustomerServiceTest extends TestCase
         $this->userSessionMock->shouldReceive('getCurrentContactId')->andReturn($contact->id);
 
         $this->contactRepositoryMock->shouldReceive('findContactById')->with($contact->id)->andReturn($contact);
-        $this->contactRepositoryMock->shouldReceive('updateContact')->andReturn($contact)->twice();
+        $this->contactRepositoryMock->shouldReceive('updateContact')->andReturn($contact)->once();
 
         $this->contactAccountRepositoryMock->shouldReceive('createAccount')->andReturn($account)->once();
 
