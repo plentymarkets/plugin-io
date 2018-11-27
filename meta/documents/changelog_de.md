@@ -1,5 +1,21 @@
 # Release Notes für IO
 
+## v2.17.0 (2018-11-27) <a href="https://github.com/plentymarkets/plugin-io/compare/2.16.1...2.17.0" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
+
+### Hinzugefügt
+
+- Die `CategoryItemResource wurde erweitert, um auch Kategoriebeschreibung 2 ausgeben zu können.
+
+### Geändert
+
+- Um mit bestehenden Callisto-URLs kompatibel zu sein, kann die Währung über den URL-Parameter `Currency` angegeben werden.
+- Um mit bestehenden Callisto-URLs kompatibel zu sein, kann das Lieferland über den URL-Parameter "ShipToCountry" angegeben werden.
+
+### Behoben
+
+- Bei Aufträgen mit Rechnungssumme 0,00€ wurde der Status nicht korrekt angepasst. Das Verhalten wurde behoben.
+- Die Einstellungen zum Aktivieren der Newsletter-Routen wurden bei der Anmeldebestätigung und der Abmeldung von Newsletter nicht berücksichtigt. Dies wurde behoben.
+
 ## v2.16.1 (2018-11-15) <a href="https://github.com/plentymarkets/plugin-io/compare/2.16.0...2.16.1" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
 
 ### Behoben
