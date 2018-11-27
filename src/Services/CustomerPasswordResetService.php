@@ -3,97 +3,82 @@
 namespace IO\Services;
 
 use IO\DBModels\PasswordReset;
+use IO\Extensions\Mail\SendMail;
+use IO\Repositories\CustomerPasswordResetRepository;
 use Plenty\Modules\Account\Contact\Contracts\ContactRepositoryContract;
 use Plenty\Modules\Account\Contact\Models\Contact;
-use Plenty\Plugin\Mail\Contracts\MailerContract;
-use IO\Repositories\CustomerPasswordResetRepository;
-use IO\Services\WebstoreConfigurationService;
-use Plenty\Plugin\Application;
-use Plenty\Plugin\Templates\Twig;
 use Plenty\Modules\Authorization\Services\AuthHelper;
-use Plenty\Plugin\Translation\Translator;
+use Plenty\Modules\Helper\AutomaticEmail\Models\AutomaticEmailTemplate;
+use Plenty\Modules\Helper\AutomaticEmail\Models\AutomaticEmailContact;
+use Plenty\Modules\System\Contracts\WebstoreConfigurationRepositoryContract;
+use Plenty\Modules\System\Models\WebstoreConfiguration;
+use Plenty\Plugin\Application;
 
 class CustomerPasswordResetService
 {
+    use SendMail;
+
+    /**
+     * @var CustomerPasswordResetRepository
+     */
     private $customerPasswordResetRepo;
+
+    /**
+     * @var ContactRepositoryContract
+     */
     private $contactRepository;
-    private $webstoreConfig;
-    
-    public function __construct(CustomerPasswordResetRepository $customerPasswordResetRepo, ContactRepositoryContract $contactRepository)
+
+    public function __construct(
+        CustomerPasswordResetRepository $customerPasswordResetRepo,
+        ContactRepositoryContract $contactRepository)
     {
         $this->customerPasswordResetRepo = $customerPasswordResetRepo;
         $this->contactRepository = $contactRepository;
-        $this->loadWebstoreConfig();
     }
     
-    public function resetPassword($email, $template, $mailSubject = 'password reset')
+    public function resetPassword($email)
     {
         $contactId = $this->getContactIdbyEmailAddress($email);
         
-        if((int)$contactId > 0)
-        {
-            $hash = $this->generateHash();
-            $this->customerPasswordResetRepo->addEntry($contactId, $email, $hash);
-            $resetURL = $this->buildMailURL($contactId, $hash);
-            
+        if( (int)$contactId > 0) {
             $contact = $this->getContactData($contactId);
-            
-            $mailContent = $resetURL;
-            if(strlen($template) && $contact instanceof Contact)
-            {
-                $mailTemplateParams = [
-                    'firstname' => $contact->firstName,
-                    'lastname'  => $contact->lastName,
-                    'email'     => $email,
-                    'url'       => $resetURL,
-                    'shopname'  => $this->webstoreConfig->name
-                ];
-        
+
+            if ($contact instanceof Contact && $contact->id > 0) {
+
+                $this->generateHash($contact->id, $email);
+
                 /**
-                 * @var Twig
+                 * @var WebstoreConfigurationRepositoryContract $webstoreConfigurationRepository
                  */
-                $twig = pluginApp(Twig::class);
-                $renderedMailTemplate = $twig->render($template, $mailTemplateParams);
-        
-                if(strlen($renderedMailTemplate))
-                {
-                    $mailContent = $renderedMailTemplate;
-                }
+                $webstoreConfigurationRepository= pluginApp(WebstoreConfigurationRepositoryContract::class);
+
+                /**
+                 * @var WebstoreConfiguration $webstoreConfiguration
+                 */
+                $webstoreConfigugration = $webstoreConfigurationRepository->findByPlentyId($contact->plentyId);
+
+                $params = ['contactId' => $contact->id, 'clientId' => $webstoreConfigugration->webstoreId];
+                $this->sendMail(AutomaticEmailTemplate::CONTACT_NEW_PASSWORD, AutomaticEmailContact::class, $params);
+                return true;
             }
-    
-            /** @var Translator $translator */
-            $translator = pluginApp(Translator::class);
-            
-            /**
-             * @var MailerContract $mailer
-             */
-            $mailer = pluginApp(MailerContract::class);
-            $mailer->sendHtml($mailContent, $email, $translator->trans($mailSubject));
         }
-        
-        return true;
+        return false;
     }
-    
+
     public function getContactIdbyEmailAddress($email)
     {
         $contactId = $this->contactRepository->getContactIdByEmail($email);
-        
+
         return $contactId;
     }
-    
-    private function generateHash()
+
+    public function generateHash($contactId, $email)
     {
-        return sha1(microtime(true));
+        $hash =  sha1(microtime(true));
+        $this->customerPasswordResetRepo->addEntry($contactId, $email, $hash);
+        return $hash;
     }
-    
-    private function buildMailURL($contactId, $hash)
-    {
-        $domain = $this->webstoreConfig->domainSsl;
-        $url = $domain.'/password-reset/'.$contactId.'/'.$hash;
-        
-        return $url;
-    }
-    
+
     public function checkHash($contactId, $hash)
     {
         $existingEntry = $this->customerPasswordResetRepo->findExistingEntry((int)pluginApp(Application::class)->getPlentyID(), (int)$contactId);
@@ -101,10 +86,10 @@ class CustomerPasswordResetService
         {
             return true;
         }
-        
+
         return false;
     }
-    
+
     public function checkHashExpiration($hashTimestamp)
     {
         $expirationDays = 1;
@@ -113,27 +98,31 @@ class CustomerPasswordResetService
         {
             return false;
         }
-    
+
         return true;
     }
-    
+
     public function findExistingHash($contactId)
     {
         return $this->customerPasswordResetRepo->findExistingEntry((int)pluginApp(Application::class)->getPlentyID(), $contactId);
     }
-    
+
     public function deleteHash($contactId)
     {
         return $this->customerPasswordResetRepo->deleteEntry((int)$contactId);
     }
-    
-    private function loadWebstoreConfig()
+
+    public function getLastHashOrCreate($contactId, $email)
     {
-        /**
-         * @var WebstoreConfigurationService $webstoreConfigService
-         */
-        $webstoreConfigService = pluginApp(WebstoreConfigurationService::class);
-        $this->webstoreConfig = $webstoreConfigService->getWebstoreConfig();
+        $existingPasswordResetEntry = $this->findExistingHash($contactId);
+        if ($existingPasswordResetEntry instanceof PasswordReset) {
+            if (!$this->checkHashExpiration($existingPasswordResetEntry->timestamp)) {
+                $this->deleteHash($contactId);
+            } else {
+                return $existingPasswordResetEntry->hash;
+            }
+        }
+        return $this->generateHash($contactId, $email);
     }
     
     private function getContactData($contactId)

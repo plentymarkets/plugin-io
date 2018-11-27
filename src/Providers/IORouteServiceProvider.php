@@ -2,11 +2,10 @@
 
 namespace IO\Providers;
 
-use Plenty\Plugin\ConfigRepository;
+use IO\Helper\RouteConfig;
 use Plenty\Plugin\RouteServiceProvider;
 use Plenty\Plugin\Routing\Router;
 use Plenty\Plugin\Routing\ApiRouter;
-use IO\Services\TemplateConfigService;
 
 /**
  * Class IORouteServiceProvider
@@ -22,13 +21,10 @@ class IORouteServiceProvider extends RouteServiceProvider
      * Define the map routes to templates or REST resources
      * @param Router $router
      * @param ApiRouter $api
-     * @param ConfigRepository $config
      * @throws \Plenty\Plugin\Routing\Exceptions\RouteReservedException
      */
-	public function map(Router $router, ApiRouter $api, ConfigRepository $config)
+	public function map(Router $router, ApiRouter $api)
 	{
-        $templateConfigService = pluginApp(TemplateConfigService::class);
-
 		$api->version(['v1'], ['namespace' => 'IO\Api\Resources'], function ($api)
 		{
 			$api->get('io/basket', 'BasketResource@index');
@@ -73,33 +69,32 @@ class IORouteServiceProvider extends RouteServiceProvider
             $api->resource('io/itemWishList', 'ItemWishListResource');
             $api->resource('io/cache/reset_template_cache', 'ResetTemplateCacheResource');
             $api->resource('io/shipping/country', 'ShippingCountryResource');
+            $api->resource('io/live-shopping', 'LiveShoppingResource');
 		});
-
-		$enabledRoutes = explode(", ",  $config->get("IO.routing.enabled_routes") );
 
 		/*
 		 * STATIC ROUTES
 		 */
 		//Basket route
-        if ( in_array("basket", $enabledRoutes) || in_array("all", $enabledRoutes) )
+        if ( RouteConfig::isActive(RouteConfig::BASKET) )
         {
             // TODO: get slug from config
             $router->get('basket', 'IO\Controllers\BasketController@showBasket');
         }
 
-        if ( in_array("checkout", $enabledRoutes) || in_array("all", $enabledRoutes) )
+        if ( RouteConfig::isActive(RouteConfig::CHECKOUT) )
         {
             //Checkout-confirm purchase route
             $router->get('checkout', 'IO\Controllers\CheckoutController@showCheckout');
         }
 
-        if ( in_array("my-account", $enabledRoutes) || in_array("all", $enabledRoutes) )
+        if ( RouteConfig::isActive(RouteConfig::MY_ACCOUNT) )
         {
             //My-account route
             $router->get('my-account', 'IO\Controllers\MyAccountController@showMyAccount');
         }
 
-		if ( in_array("confirmation", $enabledRoutes) || in_array("all", $enabledRoutes) )
+		if ( RouteConfig::isActive(RouteConfig::CONFIRMATION) )
         {
             //Confiramtion route
             $router->get('confirmation/{orderId?}/{orderAccessKey?}', 'IO\Controllers\ConfirmationController@showConfirmation');
@@ -110,20 +105,20 @@ class IORouteServiceProvider extends RouteServiceProvider
             $router->get('_plentyShop__/akQQ{orderAccessKey}/idQQ{orderId}', 'IO\Controllers\ConfirmationEmailController@showConfirmation');
         }
 
-		if ( in_array("login", $enabledRoutes) || in_array("all", $enabledRoutes) )
+		if ( RouteConfig::isActive(RouteConfig::LOGIN) )
         {
             //Login page route
             $router->get('login', 'IO\Controllers\LoginController@showLogin');
         }
 
-		if ( in_array("register", $enabledRoutes) || in_array("all", $enabledRoutes) )
+		if ( RouteConfig::isActive(RouteConfig::REGISTER) )
         {
             //Register page route
             $router->get('register', 'IO\Controllers\RegisterController@showRegister');
             $router->get('registration', 'IO\Controllers\RegisterController@redirectRegister');
         }
 
-		if ( in_array("place-order", $enabledRoutes) || in_array("all", $enabledRoutes) )
+		if ( RouteConfig::isActive(RouteConfig::PLACE_ORDER) )
         {
             // PaymentPlugin entry points
             // place the current order and redirect to /execute_payment
@@ -134,114 +129,121 @@ class IORouteServiceProvider extends RouteServiceProvider
                 ->where('orderId', '[0-9]+');
         }
 
-        if ( in_array("search", $enabledRoutes) || in_array("all", $enabledRoutes) )
+        if ( RouteConfig::isActive(RouteConfig::SEARCH) )
         {
             $router->get('search', 'IO\Controllers\ItemSearchController@showSearch');
             //Callisto Tag route
             $router->get('tag/{tagName}', 'IO\Controllers\ItemSearchController@redirectToSearch');
         }
 
-        if ( in_array("home", $enabledRoutes) || in_array("all", $enabledRoutes) ) {
+        if ( RouteConfig::isActive(RouteConfig::HOME) )
+        {
             //homepage route
             $router->get('', 'IO\Controllers\HomepageController@showHomepage');
         }
 
-        if ( in_array("cancellation-rights", $enabledRoutes) || in_array("all", $enabledRoutes) ) {
+        if ( RouteConfig::isActive(RouteConfig::CANCELLATION_RIGHTS) )
+        {
             //cancellation rights page
             $router->get('cancellation-rights', 'IO\Controllers\StaticPagesController@showCancellationRights');
         }
 
-        if ( in_array("cancellation-form", $enabledRoutes) || in_array("all", $enabledRoutes) ) {
+        if ( RouteConfig::isActive(RouteConfig::CANCELLATION_FORM) )
+        {
             //cancellation rights page
             $router->get('cancellation-form', 'IO\Controllers\StaticPagesController@showCancellationForm');
         }
 
-        if ( in_array("legal-disclosure", $enabledRoutes) || in_array("all", $enabledRoutes) ) {
+        if ( RouteConfig::isActive(RouteConfig::LEGAL_DISCLOSURE) )
+        {
             //legal disclosure page
             $router->get('legal-disclosure', 'IO\Controllers\StaticPagesController@showLegalDisclosure');
         }
 
-        if ( in_array("privacy-policy", $enabledRoutes) || in_array("all", $enabledRoutes) ) {
+        if ( RouteConfig::isActive(RouteConfig::PRIVACY_POLICY))
+        {
             //privacy policy page
             $router->get('privacy-policy', 'IO\Controllers\StaticPagesController@showPrivacyPolicy');
         }
 
-        if ( in_array("gtc", $enabledRoutes) || in_array("all", $enabledRoutes) ) {
+        if ( RouteConfig::isActive(RouteConfig::TERMS_CONDITIONS) )
+        {
             //terms and conditions page
             $router->get('gtc', 'IO\Controllers\StaticPagesController@showTermsAndConditions');
         }
 
 
-        if( in_array("wish-list", $enabledRoutes) || in_array("all", $enabledRoutes))
+        if( RouteConfig::isActive(RouteConfig::WISH_LIST) )
         {
             $router->get('wish-list', 'IO\Controllers\ItemWishListController@showWishList');
         }
 
-        if( in_array('order-return', $enabledRoutes) || in_array("all", $enabledRoutes))
+        if( RouteConfig::isActive(RouteConfig::ORDER_RETURN) )
         {
             $router->get('returns/{orderId}', 'IO\Controllers\OrderReturnController@showOrderReturn');
         }
 
-        if( in_array('order-return-confirmation', $enabledRoutes) || in_array("all", $enabledRoutes) )
+        if( RouteConfig::isActive(RouteConfig::ORDER_RETURN_CONFIRMATION) )
         {
             $router->get('return-confirmation', 'IO\Controllers\OrderReturnConfirmationController@showOrderReturnConfirmation');
         }
 
-        if( (in_array("contact", $enabledRoutes) || in_array("all", $enabledRoutes) ) )
+        if( RouteConfig::isActive(RouteConfig::CONTACT) )
         {
             //contact
             $router->get('contact', 'IO\Controllers\ContactController@showContact');
         }
 
-        if( in_array("password-reset", $enabledRoutes) || in_array("all", $enabledRoutes) )
+        if( RouteConfig::isActive(RouteConfig::PASSWORD_RESET) )
         {
             $router->get('password-reset/{contactId}/{hash}', 'IO\Controllers\CustomerPasswordResetController@showReset');
         }
 
-        if( in_array("order-property-file", $enabledRoutes) || in_array("all", $enabledRoutes) )
+        if( RouteConfig::isActive(RouteConfig::ORDER_PROPERTY_FILE) )
         {
-            $router->get('order-property-file/{hash1}/{filename}', 'IO\Controllers\OrderPropertyFileController@downloadTempFile');
-            $router->get('order-property-file/{hash1}/{hash2}/{filename}', 'IO\Controllers\OrderPropertyFileController@downloadFile');
+            $router->get('order-property-file/{hash1}', 'IO\Controllers\OrderPropertyFileController@downloadTempFile');
+            $router->get('order-property-file/{hash1}/{hash2}', 'IO\Controllers\OrderPropertyFileController@downloadFile');
         }
+
         
-        if( in_array("newsletter-opt-in", $enabledRoutes) || in_array("all", $enabledRoutes) )
+        if( RouteConfig::isActive(RouteConfig::NEWSLETTER_OPT_IN) )
         {
             $router->get('newsletter/subscribe/{authString}/{newsletterEmailId}', 'IO\Controllers\NewsletterOptInController@showOptInConfirmation');
         }
         
-        if( in_array("newsletter-opt-out", $enabledRoutes) || in_array("all", $enabledRoutes) )
+        if( RouteConfig::isActive(RouteConfig::NEWSLETTER_OPT_OUT) )
         {
             $router->get('newsletter/unsubscribe', 'IO\Controllers\NewsletterOptOutController@showOptOut');
             $router->post('newsletter/unsubscribe', 'IO\Controllers\NewsletterOptOutConfirmationController@showOptOutConfirmation');
         }
-        
+
         /*
          * ITEM ROUTES
          */
-        if ( in_array("item", $enabledRoutes) || in_array("all", $enabledRoutes) )
+        if ( RouteConfig::isActive(RouteConfig::ITEM) )
         {
             $router->get('{itemId}_{variationId?}', 'IO\Controllers\ItemController@showItemWithoutName')
-                   ->where('itemId', '[0-9]+')
-                   ->where('variationId', '[0-9]+');
+                ->where('itemId', '[0-9]+')
+                ->where('variationId', '[0-9]+');
 
             $router->get('{slug}_{itemId}_{variationId?}', 'IO\Controllers\ItemController@showItem')
-                   ->where('slug', '[^_]+')
-                   ->where('itemId', '[0-9]+')
-                   ->where('variationId', '[0-9]+');
+                ->where('slug', '[^_]+')
+                ->where('itemId', '[0-9]+')
+                ->where('variationId', '[0-9]+');
 
             //old webshop routes mapping
             $router->get('{slug}a-{itemId}', 'IO\Controllers\ItemController@showItemOld')
-                   ->where('slug', '.*')
-                   ->where('itemId', '[0-9]+');
+                ->where('slug', '.*')
+                ->where('itemId', '[0-9]+');
 
             $router->get('a-{itemId}', 'IO\Controllers\ItemController@showItemFromAdmin')
-                   ->where('itemId', '[0-9]+');
+                ->where('itemId', '[0-9]+');
         }
 
         /*
-		     * CATEGORY ROUTES
-		     */
-        if ( in_array("category", $enabledRoutes) || in_array("all", $enabledRoutes) )
+         * CATEGORY ROUTES
+         */
+        if ( RouteConfig::isActive(RouteConfig::CATEGORY) )
         {
             $router->get('{level1?}/{level2?}/{level3?}/{level4?}/{level5?}/{level6?}', 'IO\Controllers\CategoryController@showCategory');
         }

@@ -3,6 +3,7 @@
 namespace IO\Services;
 
 use Illuminate\Support\Collection;
+use IO\Constants\CategoryType;
 use IO\Helper\CategoryDataFilter;
 use IO\Helper\MemoryCache;
 use IO\Services\ItemLoader\Services\LoadResultFields;
@@ -142,6 +143,29 @@ class CategoryService
         );
 
         return $category;
+    }
+
+    public function getForPlentyId($catID = 0, $lang = null, $plentyId = null)
+    {
+        $category = $this->get( $catID, $lang );
+        if ( is_null($plentyId) )
+        {
+            $plentyId = pluginApp(Application::class)->getPlentyId();
+        }
+
+        if ( !is_null($category) )
+        {
+            /** @var CategoryClient $categoryClient */
+            foreach ( $category->clients as $categoryClient )
+            {
+                if ( $categoryClient->plentyId === (int)$plentyId )
+                {
+                    return $category;
+                }
+            }
+        }
+
+        return null;
     }
 
     public function getChildren($categoryId, $lang = null)
@@ -305,42 +329,99 @@ class CategoryService
 
     /**
      * Return the sitemap tree as an array
-     * @param string   $type     Only return categories of given type
-     * @param string   $lang     The language to get sitemap tree for
-     * @param int|null $maxLevel The deepest category level to load
+     * @param string|array   $type     Only return categories of given types
+     * @param string         $lang     The language to get sitemap tree for
+     * @param int|null       $maxLevel The deepest category level to load
      * @param int $customerClassId The customer class id to get tree
      * @return array
      */
-    public function getNavigationTree(string $type = "all", string $lang = null, int $maxLevel = 2, int $customerClassId = 0):array
+    public function getNavigationTree($type = null, string $lang = null, int $maxLevel = 2, int $customerClassId = 0):array
     {
         if ( $lang === null )
         {
             $lang = $this->sessionStorageService->getLang();
         }
 
-        return pluginApp( CategoryDataFilter::class )->applyResultFields(
+        if ( is_null( $type ) )
+        {
+            $type = CategoryType::ALL;
+        }
+
+        $tree = $this->filterCategoriesByTypes(
             $this->categoryRepository->getLinklistTree($type, $lang, $this->webstoreConfig->getWebstoreConfig()->webstoreId, $maxLevel, $customerClassId),
+            $type
+        );
+
+        return pluginApp( CategoryDataFilter::class )->applyResultFields(
+            $tree,
             $this->loadResultFields( ResultFieldTemplate::get( ResultFieldTemplate::TEMPLATE_CATEGORY_TREE ) )
         );
     }
 
     /**
      * Return the sitemap list as an array
-     * @param string $type Only return categories of given type
-     * @param string $lang The language to get sitemap list for
+     * @param string|array  $type Only return categories of given type
+     * @param string        $lang The language to get sitemap list for
      * @return array
      */
-    public function getNavigationList(string $type = "all", string $lang = null):array
+    public function getNavigationList($type = "all", string $lang = null):array
     {
         if ( $lang === null )
         {
             $lang = $this->sessionStorageService->getLang();
         }
 
+        $list = $this->filterCategoriesByTypes(
+            $this->categoryRepository->getLinklistList($type, $lang, $this->webstoreConfig->getWebstoreConfig()->webstoreId)
+        );
+
+
         return pluginApp( CategoryDataFilter::class )->applyResultFields(
-            $this->categoryRepository->getLinklistList($type, $lang, $this->webstoreConfig->getWebstoreConfig()->webstoreId),
+            $list,
             $this->loadResultFields( ResultFieldTemplate::get( ResultFieldTemplate::TEMPLATE_CATEGORY_TREE ) )
         );
+    }
+
+    private function filterCategoriesByTypes( $categoryList = [], $types = CategoryType::ALL )
+    {
+        if ( is_string($types) )
+        {
+            if ( $types === CategoryType::ALL )
+            {
+                $types = [
+                    CategoryType::BLOG,
+                    CategoryType::CONTAINER,
+                    CategoryType::CONTENT,
+                    CategoryType::ITEM
+                ];
+            }
+            else
+            {
+                $types = [$types];
+            }
+        }
+
+        $result = array_filter(
+            $categoryList,
+
+            function($category) use ($types)
+            {
+                return in_array($category->type, $types);
+            }
+        );
+
+        $result = array_map(
+            function($category) use ($types)
+            {
+                /** @var $category Category */
+                $category->children = $this->filterCategoriesByTypes($category->children, $types);
+
+                return $category;
+            },
+            $result
+        );
+
+        return $result;
     }
 
     /**

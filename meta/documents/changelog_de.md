@@ -1,5 +1,13 @@
 # Release Notes für IO
 
+## v2.16.1 (2018-11-15) <a href="https://github.com/plentymarkets/plugin-io/compare/2.16.0...2.16.1" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
+
+### Behoben
+
+- Durch einen Fehler wurden Kategorien, die nicht mit einem Mandant verknüpft waren, als Filteroption in der Artikelsuche ausgegeben. Dies wurde behoben.
+- Bei ungültigen Werten für die Sortierung von Artikeln konnte die Artikelansicht nicht dargestellt werden. Dies wurde behoben.
+- Beim Hinzufügen oder Bearbeiten von Firmenadressen wurde fälschlicherweise die Kundenklasse zurückgesetzt. Dies wurde behoben.
+
 ## v2.16.0 (2018-10-22) <a href="https://github.com/plentymarkets/plugin-io/compare/2.15.0...2.16.0" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
 
 ### Hinzugefügt
