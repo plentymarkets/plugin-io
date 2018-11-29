@@ -348,7 +348,7 @@ class CategoryService
         }
 
         $tree = $this->filterCategoriesByTypes(
-            $this->categoryRepository->getLinklistTree($type, $lang, $this->webstoreConfig->getWebstoreConfig()->webstoreId, $maxLevel, $customerClassId),
+            $this->categoryRepository->getLinklistTree(CategoryType::ALL, $lang, $this->webstoreConfig->getWebstoreConfig()->webstoreId, $maxLevel, $customerClassId),
             $type
         );
 
