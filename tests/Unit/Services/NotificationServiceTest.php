@@ -72,28 +72,4 @@ class NotificationServiceTest extends TestCase
 
         $this->assertEquals($notifications,$this->notificationService->getNotifications(false));
     }
-
-    /** @test */
-    public function it_checks_getNotifications_with_parameter_null()
-    {
-        $notifications = [
-            "error"     => null,
-            "warn"      => null,
-            "info"      => null,
-            "success"   => null,
-            "log"       => null
-        ];
-
-        $this->sessionStorageServiceMock
-            ->shouldReceive("getSessionValue")
-            ->with(SessionStorageKeys::NOTIFICATIONS)
-            ->andReturn(json_encode($notifications));
-
-        $this->sessionStorageServiceMock
-            ->shouldReceive("setSessionValue")
-            ->andReturn();
-
-        $this->assertEquals($notifications,$this->notificationService->getNotifications(null));
-        $this->assertEquals($notifications,$this->notificationService->getNotifications());
-    }
 }

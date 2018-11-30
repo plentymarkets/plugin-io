@@ -1,6 +1,6 @@
 <?php
 
-namespace IO\Tests\Unit;
+namespace IO\Tests\Feature;
 
 use IO\Constants\LogLevel;
 use IO\Constants\SessionStorageKeys;
@@ -76,6 +76,5 @@ class NotificationServiceFeatureTest extends TestCase
             ]
         ];
     }
-
 }
 
