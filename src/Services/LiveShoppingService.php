@@ -47,7 +47,7 @@ class LiveShoppingService
         }
         
         return [
-            'item' => $liveShoppingItem[0]['data'],
+            'item' => !empty($liveShopping) ? $liveShoppingItem[0]['data'] : [],
             'liveShopping' => $liveShoppingData
         ];
     }
