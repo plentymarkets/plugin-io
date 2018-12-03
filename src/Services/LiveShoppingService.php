@@ -44,6 +44,8 @@ class LiveShoppingService
             }
             
             $liveShoppingData = $liveShopping->toArray();
+            $liveShoppingData['quantitySold'] = $liveShoppingData['quantitySold'] + $liveShoppingData['quantitySoldReal'];
+            unset($liveShoppingData['quantitySoldReal']);
         }
         
         return [
