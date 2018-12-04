@@ -222,7 +222,7 @@ class IORouteServiceProvider extends RouteServiceProvider
          */
         if ( RouteConfig::isActive(RouteConfig::ITEM) )
         {
-            $router->get('{itemId}_{variationId}', 'IO\Controllers\ItemController@showItemWithoutName')
+            $router->get('_{itemId}_{variationId}', 'IO\Controllers\ItemController@showItemWithoutName')
                 ->where('itemId', '[0-9]+')
                 ->where('variationId', '[0-9]+');
 
