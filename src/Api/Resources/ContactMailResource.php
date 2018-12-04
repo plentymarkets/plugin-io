@@ -17,7 +17,6 @@ use Plenty\Plugin\Log\Loggable;
  */
 class ContactMailResource extends ApiResource
 {
-    use Loggable;
     private $contactMailService;
 
     /**
@@ -35,7 +34,6 @@ class ContactMailResource extends ApiResource
     {
         $mailTemplate = $this->request->get('template', '');
         $contactData = $this->request->get('contactData',[]);
-        $this->getLogger(__METHOD__)->error("contactData:", $contactData);
 
         $response = $this->contactMailService->sendMail($mailTemplate, $contactData);
 
