@@ -294,6 +294,7 @@ class BaseSearchFactory
             $order = self::SORTING_ORDER_DESC;
         }
 
+        $sortingInterface = null;
         if ( strpos( $field, 'texts.name' ) !== false )
         {
             $sortingInterface = pluginApp(
@@ -305,12 +306,16 @@ class BaseSearchFactory
                 ]
             );
         }
-        else
+        else if ( strlen($field) )
         {
             $sortingInterface = pluginApp( SingleSorting::class, [$field, $order] );
         }
 
-        $this->sorting->addSorting( $sortingInterface );
+        if ( !is_null($sortingInterface) )
+        {
+            $this->sorting->addSorting( $sortingInterface );
+        }
+
 
         return $this;
     }

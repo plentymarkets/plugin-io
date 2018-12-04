@@ -16,6 +16,7 @@ use IO\Extensions\Filters\NumberFormatFilter;
 use IO\Extensions\Filters\OrderByKeyFilter;
 use IO\Extensions\Filters\URLFilter;
 use IO\Extensions\Filters\ItemNameFilter;
+use IO\Extensions\Filters\SpecialOfferFilter;
 use IO\Extensions\Filters\ShuffleFilter;
 
 use IO\Extensions\Functions\GetBasePrice;
@@ -58,7 +59,8 @@ class TwigIOExtension extends Twig_Extension
         ItemImagesFilter $itemImagesFilter,
 		OrderByKeyFilter $orderByKeyFilter,
 		ShuffleFilter $shuffleFilter,
-        ResultFieldsFilter $resultFieldsFilter
+		ResultFieldsFilter $resultFieldsFilter,
+		SpecialOfferFilter $specialOfferFilter
 	)
 	{
 		$this->twig = $twig;
