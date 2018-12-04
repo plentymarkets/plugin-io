@@ -8,7 +8,6 @@ use IO\Api\ApiResource;
 use IO\Api\ApiResponse;
 use IO\Api\ResponseCode;
 use IO\Services\ContactMailService;
-use Plenty\Plugin\Log\Loggable;
 
 
 /**
