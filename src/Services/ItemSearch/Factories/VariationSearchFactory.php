@@ -15,11 +15,8 @@ use IO\Services\ItemSearch\Extensions\PriceSearchExtension;
 use IO\Services\PriceDetectService;
 use IO\Services\SessionStorageService;
 use IO\Services\TemplateConfigService;
-use Plenty\Modules\Cloud\ElasticSearch\Lib\Collapse\BaseCollapse;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\ElasticSearch;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Source\Mutator\BuiltIn\LanguageMutator;
-use Plenty\Modules\Item\Search\Aggregations\ItemCardinalityAggregation;
-use Plenty\Modules\Item\Search\Aggregations\ItemCardinalityAggregationProcessor;
 use Plenty\Modules\Item\Search\Filter\CategoryFilter;
 use Plenty\Modules\Item\Search\Filter\ClientFilter;
 use Plenty\Modules\Item\Search\Filter\CrossSellingFilter;
@@ -405,7 +402,7 @@ class VariationSearchFactory extends BaseSearchFactory
         $variationShowType = $templateConfigService->get($configKey);
         if ($variationShowType === 'combined')
         {
-            $this->groupBy( 'ids.itemId' );
+            $this->groupBy( 'ids.itemAttributeValue' );
         }
         else if ( $variationShowType === 'main' )
         {
