@@ -6,6 +6,7 @@ use IO\Helper\CurrencyConverter;
 use IO\Helper\VatConverter;
 use IO\Services\ItemLoader\Contracts\FacetExtension;
 use IO\Services\ItemLoader\Services\FacetExtensionContainer;
+use IO\Services\ItemSearch\Extensions\AttributeValueExtension;
 use IO\Services\ItemSearch\Extensions\BundleComponentExtension;
 use IO\Services\ItemSearch\Extensions\ContentCacheVariationLinkExtension;
 use IO\Services\ItemSearch\Extensions\CurrentCategoryExtension;
@@ -665,6 +666,12 @@ class VariationSearchFactory extends BaseSearchFactory
     public function withLinkToContent()
     {
         $this->withExtension( ContentCacheVariationLinkExtension::class );
+        return $this;
+    }
+
+    public function withAttributeValues()
+    {
+        $this->withExtension( AttributeValueExtension::class );
         return $this;
     }
 }
