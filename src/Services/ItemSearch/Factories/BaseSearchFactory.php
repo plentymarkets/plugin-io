@@ -25,6 +25,7 @@ use Plenty\Modules\Item\Search\Aggregations\ItemCardinalityAggregation;
 use Plenty\Modules\Item\Search\Aggregations\ItemCardinalityAggregationProcessor;
 use Plenty\Modules\Item\Search\Filter\SearchFilter;
 use Plenty\Modules\Item\Search\Sort\NameSorting;
+use Plenty\Plugin\Application;
 
 /**
  * Class BaseSearchFactory
@@ -308,6 +309,15 @@ class BaseSearchFactory
         }
         else if ( strlen($field) )
         {
+            if ( strpos( $field, 'sorting.price.') !== false )
+            {
+                $field = sprintf(
+                    'sorting.priceByClient.%d.%s',
+                    pluginApp(Application::class)->getPlentyId(),
+                    substr($field, strlen('sorting.price.'))
+                );
+            }
+
             $sortingInterface = pluginApp( SingleSorting::class, [$field, $order] );
         }
 
