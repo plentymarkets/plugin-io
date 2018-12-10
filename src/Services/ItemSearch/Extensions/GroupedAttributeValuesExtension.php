@@ -5,7 +5,7 @@ namespace IO\Services\ItemSearch\Extensions;
 use IO\Services\ItemSearch\Factories\VariationSearchFactory;
 use IO\Services\SessionStorageService;
 
-class AttributeValueExtension implements ItemSearchExtension
+class GroupedAttributeValuesExtension implements ItemSearchExtension
 {
     /**
      * @inheritdoc

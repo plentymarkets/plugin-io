@@ -6,7 +6,7 @@ use IO\Helper\CurrencyConverter;
 use IO\Helper\VatConverter;
 use IO\Services\ItemLoader\Contracts\FacetExtension;
 use IO\Services\ItemLoader\Services\FacetExtensionContainer;
-use IO\Services\ItemSearch\Extensions\AttributeValueExtension;
+use IO\Services\ItemSearch\Extensions\GroupedAttributeValuesExtension;
 use IO\Services\ItemSearch\Extensions\BundleComponentExtension;
 use IO\Services\ItemSearch\Extensions\ContentCacheVariationLinkExtension;
 use IO\Services\ItemSearch\Extensions\CurrentCategoryExtension;
@@ -669,9 +669,9 @@ class VariationSearchFactory extends BaseSearchFactory
         return $this;
     }
 
-    public function withAttributeValues()
+    public function withGroupedAttributeValues()
     {
-        $this->withExtension( AttributeValueExtension::class );
+        $this->withExtension( GroupedAttributeValuesExtension::class );
         return $this;
     }
 }
