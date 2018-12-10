@@ -276,17 +276,32 @@ class VariationSearchFactory extends BaseSearchFactory
         }
 
         $langMap = [
-            'de' => TextFilter::LANG_DE,
-            'en' => TextFilter::LANG_EN,
-            'fr' => TextFilter::LANG_FR,
+            'de' => 'german',
+            'en' => 'english',
+            'fr' => 'french',
+            'bg' => 'bulgarian',
+            'it' => 'italian',
+            'es' => 'spanish',
+            'tr' => 'turkish',
+            'nl' => 'dutch',
+            // 'pl' => '',
+            'pt' => 'portuguese',
+            'nn' => 'norwegian',
+            'ro' => 'romanian',
+            'da' => 'danish',
+            'se' => 'swedish',
+            'cz' => 'czech',
+            'ru' => 'russian',
+            //'sk' => '',
+            //'cn' => '',
+            //'vn' => '',
         ];
 
         if ( array_key_exists( $lang, $langMap ) )
         {
             $lang = $langMap[$lang];
         }
-
-        if ( $lang !== TextFilter::LANG_DE && $lang !== TextFilter::LANG_EN && $lang !== TextFilter::LANG_FR )
+        else
         {
             $lang = TextFilter::LANG_DE;
         }
