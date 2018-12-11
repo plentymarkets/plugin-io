@@ -89,7 +89,8 @@ class SearchItems implements SearchPreset
             ->isActive()
             ->sortByMultiple( $sorting )
             ->setPage( $page, $itemsPerPage )
-            ->groupByTemplateConfig();
+            ->groupByTemplateConfig()
+            ->withGroupedAttributeValues();
 
         $searchFactory->hasNameString($query);
         $searchFactory->hasSearchString( $query );

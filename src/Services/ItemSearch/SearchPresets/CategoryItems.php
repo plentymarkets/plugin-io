@@ -80,7 +80,8 @@ class CategoryItems implements SearchPreset
             ->sortByMultiple( $sorting )
             ->setPage( $page, $itemsPerPage )
             ->groupByTemplateConfig()
-            ->withLinkToContent();
+            ->withLinkToContent()
+            ->withGroupedAttributeValues();
 
         return $searchFactory;
     }
