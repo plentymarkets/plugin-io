@@ -42,10 +42,15 @@ class IOSendMail
                 $customerPasswordResetService = pluginApp(CustomerPasswordResetService::class);
 
                 $contactId = $customerPasswordResetService->getContactIdbyEmailAddress($pluginSendMail->getContactEmail());
-                $pluginSendMailService->addEmailPlaceholder('Link_NewPassword', '?show=forgotPassword&email='.$pluginSendMail->getContactEmail());
+                if ($contactId === null) {
+                    $pluginSendMailService->addEmailPlaceholder('Link_NewPassword', '');
+                    $pluginSendMailService->addEmailPlaceholder('Link_ChangePassword', '');
+                } else {
+                    $pluginSendMailService->addEmailPlaceholder('Link_NewPassword', '?show=forgotPassword&email='.$pluginSendMail->getContactEmail());
+                    $hash = $customerPasswordResetService->getLastHashOrCreate($contactId, $pluginSendMail->getContactEmail());
+                    $pluginSendMailService->addEmailPlaceholder('Link_ChangePassword', 'password-reset/'.$contactId. '/'  . $hash);
+                }
 
-                $hash = $customerPasswordResetService->getLastHashOrCreate($contactId, $pluginSendMail->getContactEmail());
-                $pluginSendMailService->addEmailPlaceholder('Link_ChangePassword', 'password-reset/'.$contactId. '/'  . $hash);
             } else {
                 $pluginSendMailService->addEmailPlaceholder('Link_NewPassword', '');
                 $pluginSendMailService->addEmailPlaceholder('Link_ChangePassword', '');
