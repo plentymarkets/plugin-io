@@ -4,49 +4,89 @@ namespace IO\Helper;
 
 class DataFilter
 {
-    public function getFilteredData( $data, $resultFields )
+    public function getFilteredData( $data, $resultFields, $removeEmpty = false )
     {
-        if ( !count( $resultFields ) || in_array( "*", $resultFields ) )
+        $data = ArrayHelper::toArray( $data );
+        $result = $data;
+
+        if ( count($resultFields) && !in_array("*", $resultFields) )
+        {
+            if ( !ArrayHelper::isAssoc($data) )
+            {
+                $result = [];
+                foreach( $data as $dataEntry )
+                {
+                    $result[] = $this->getFilteredData( $dataEntry, $resultFields );
+                }
+            }
+            else
+            {
+                $result = $this->filterData(
+                    $data,
+                    $this->getPrefixedResultFields( $resultFields )
+                );
+
+                $prefixes = $this->getPrefixes( $resultFields );
+                foreach( $prefixes as $prefix )
+                {
+                    $prefixedFields = $this->getPrefixedResultFields( $resultFields, $prefix );
+                    if ( count( $prefixedFields ) )
+                    {
+                        if ( ArrayHelper::isAssoc($data[$prefix] ) )
+                        {
+                            $result[$prefix] = $this->filterData(
+                                $data[$prefix],
+                                $prefixedFields
+                            );
+                        }
+                        else
+                        {
+                            $result[$prefix] = $this->filterDataList(
+                                $data[$prefix],
+                                $prefixedFields
+                            );
+                        }
+                    }
+                }
+            }
+        }
+
+        if ( $removeEmpty )
+        {
+            return $this->removeEmpty( $result );
+        }
+
+        return $result;
+    }
+
+    /**
+     * @param $data
+     * @return array
+     */
+    private function removeEmpty( $data )
+    {
+        if ( !is_object( $data ) && !is_array( $data ) )
         {
             return $data;
         }
 
-        $data = ArrayHelper::toArray( $data );
-
-        if ( !ArrayHelper::isAssoc($data) )
+        if ( is_object( $data ) )
         {
-            $result = [];
-            foreach( $data as $dataEntry )
-            {
-                $result[] = $this->getFilteredData( $dataEntry, $resultFields );
-            }
-            return $result;
+            $data = ArrayHelper::toArray($data);
         }
 
-        $result = $this->filterData(
-            $data,
-            $this->getPrefixedResultFields( $resultFields )
-        );
-
-        $prefixes = $this->getPrefixes( $resultFields );
-        foreach( $prefixes as $prefix )
+        $result = [];
+        foreach( $data as $key => $value )
         {
-            $prefixedFields = $this->getPrefixedResultFields( $resultFields, $prefix );
-            if ( count( $prefixedFields ) )
+            if ( !empty($value) )
             {
-                if ( ArrayHelper::isAssoc($data[$prefix] ) )
+                if ( is_array($value) )
                 {
-                    $result[$prefix] = $this->filterData(
-                        $data[$prefix],
-                        $prefixedFields
-                    );
+                    $result[$key] = $this->removeEmpty($value);
                 }
                 else
                 {
-                    $result[$prefix] = $this->filterDataList(
-                        $data[$prefix],
-                        $prefixedFields
-                    );
+                    $result[$key] = $value;
                 }
             }
         }

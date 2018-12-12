@@ -22,7 +22,7 @@ class CategoryDataFilter extends DataFilter
             }
             else
             {
-                $resultData = $this->getFilteredData( $categoryData, $resultFields );
+                $resultData = $this->getFilteredData( $categoryData, $resultFields, true );
             }
 
             if ( count( $categoryData["children"] ) )
