@@ -2,17 +2,16 @@
 
 namespace IO\Tests\Unit;
 
-use IO\Providers\IOServiceProvider;
 use IO\Services\ItemSearch\Factories\VariationSearchFactory;
 use IO\Services\ItemSearch\Services\ItemSearchService;
-use IO\Services\ItemService;
 use IO\Tests\TestCase;
-use Mockery;
-use Plenty\Modules\Cloud\ElasticSearch\Lib\Processor\DocumentProcessor;
-use Plenty\Modules\Cloud\ElasticSearch\Lib\Search\Document\DocumentSearch;
-use Plenty\Modules\Item\Search\Filter\PropertyFilter;
+use Plenty\Modules\Item\Search\Filter\CategoryFilter;
+use Plenty\Modules\Item\Search\Filter\ClientFilter;
+use Plenty\Modules\Item\Search\Filter\PriceFilter;
+use Plenty\Modules\Item\Search\Filter\SalesPriceFilter;
+use Plenty\Modules\Item\Search\Filter\TagFilter;
+use Plenty\Modules\Item\Search\Filter\TextFilter;
 use Plenty\Modules\Item\Search\Filter\VariationBaseFilter;
-use Upg\Library\Mns\ProcessorInterface;
 
 
 class VariationSearchFactoryTest extends TestCase
@@ -36,27 +35,172 @@ class VariationSearchFactoryTest extends TestCase
     /**
      * @test
      */
-    public function should_have_the_right_property_filter()
+    public function should_have_the_right_client_filter()
     {
         /**
-         * @var PropertyFilter $propertyFilter
+         * @var ClientFilter $clientFilter
          */
-        $expectedIds = [10,11,12];
+        $expectedClientId = 105;
 
-        $propertyFilter = $this->variationSearchFactory->createFilter(PropertyFilter::class);
+        $clientFilter = $this->variationSearchFactory->createFilter(ClientFilter::class);
 
-        $propertyFilter->hasEachProperty($expectedIds);
+        $clientFilter->isVisibleForClient($expectedClientId);
 
 
-        $settedFilters = $propertyFilter->toArray()['bool']['must'][0]['nested'];
+        $settedFilters = $clientFilter->toArray()['bool']['must'];
 
-        $properties = $settedFilters['query']['bool']['must'];
 
-        foreach ($properties as $key => $property)
+        $this->assertEquals($settedFilters[0]['term']['ids.clients'], $expectedClientId);
+    }
+
+    /**
+     * @test
+     */
+    public function should_have_the_right_text_filter()
+    {
+        /**
+         * @var TextFilter $textFilter
+         */
+
+
+        $textFilter = $this->variationSearchFactory->createFilter(TextFilter::class);
+
+        $textFilter->hasNameInLanguage(TextFilter::LANG_DE, TextFilter::FILTER_NAME_1);
+
+
+        $settedFilters = $textFilter->toArray()['bool']['must'];
+
+
+        $this->assertEquals(key($settedFilters[0]['term']), 'filter.names.'.TextFilter::LANG_DE.'.'.TextFilter::FILTER_NAME_1);
+        $this->assertEquals($settedFilters[0]['term']['filter.names.'.TextFilter::LANG_DE.'.'.TextFilter::FILTER_NAME_1], true);
+    }
+
+    /**
+     * @test
+     */
+    public function should_have_the_right_category_filter()
+    {
+        /**
+         * @var CategoryFilter $categoryFilter
+         */
+        $expectedCategoryId = 100;
+
+        $categoryFilter = $this->variationSearchFactory->createFilter(CategoryFilter::class);
+
+        $categoryFilter->isInCategory($expectedCategoryId);
+
+
+        $settedFilters = $categoryFilter->toArray()['bool']['must'];
+
+
+        $this->assertEquals($settedFilters[0]['term']['ids.categories.all'], $expectedCategoryId);
+    }
+
+    /**
+     * @test
+     */
+    public function should_have_the_right_sales_price_filter()
+    {
+        /**
+         * @var SalesPriceFilter $salesPriceFilter
+         */
+        $expectedPriceIds = [100, 101];
+
+        $salesPriceFilter = $this->variationSearchFactory->createFilter(SalesPriceFilter::class);
+
+        $salesPriceFilter->hasAtLeastOnePrice($expectedPriceIds);
+
+
+        $settedFilters = $salesPriceFilter->toArray()['bool']['must'];
+
+
+        $this->assertEquals($settedFilters[0]['terms']['ids.salesPrices'][0], $expectedPriceIds[0]);
+        $this->assertEquals($settedFilters[0]['terms']['ids.salesPrices'][1], $expectedPriceIds[1]);
+    }
+
+    /**
+     * @test
+     * @dataProvider dataProviderPriceRangeFilter
+     */
+    public function should_have_the_right_price_filter($min, $max)
+    {
+        /**
+         * @var PriceFilter $priceRangeFilter
+         */
+        $expectedClientId = 101;
+
+        $priceRangeFilter = $this->variationSearchFactory->createFilter(PriceFilter::class);
+
+        $priceRangeFilter->betweenByClient($min, $max, $expectedClientId);
+
+
+        $settedFilters = $priceRangeFilter->toArray()['bool']['filter'];
+
+
+        $this->assertEquals(key($settedFilters['range']), 'sorting.priceByClient.'.$expectedClientId.'.avg');
+
+        if($min != null && $max != null)
         {
-            $this->assertEquals($expectedIds[$key], $property['term']['properties.property.id']);
+            $this->assertEquals($settedFilters['range']['sorting.priceByClient.'.$expectedClientId.'.avg']['gte'], $min);
+            $this->assertEquals($settedFilters['range']['sorting.priceByClient.'.$expectedClientId.'.avg']['lte'], $max);
         }
     }
+
+    public function dataProviderPriceRangeFilter()
+    {
+        return [
+            [
+                null,
+                null
+            ],
+            [
+                10,
+                450
+            ]
+        ];
+    }
+
+
+    /**
+     * @test
+     * @dataProvider dataProviderTagFilter
+     */
+    public function should_have_the_right_tag_filter($method, $params)
+    {
+        /**
+         * @var TagFilter $tagFilter
+         */
+        $tagFilter = $this->variationSearchFactory->createFilter(TagFilter::class);
+
+        $tagFilter->{$method}($params);
+
+        $settedFilters = $tagFilter->toArray()['bool']['must'];
+
+        if(!is_array($params))
+        {
+            $this->assertEquals($settedFilters[0]['term']['ids.tags'], $params);
+        } else {
+            $this->assertEquals($settedFilters[0]['terms']['ids.tags'][0], $params[0]);
+            $this->assertEquals($settedFilters[0]['terms']['ids.tags'][1], $params[1]);
+        }
+
+    }
+
+    public function dataProviderTagFilter()
+    {
+        return [
+            [
+                'hasTag',
+                1
+            ],
+            [
+                'hasAnyTag',
+                [10,12]
+            ]
+        ];
+    }
+
+
 
 
     /**
