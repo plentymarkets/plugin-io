@@ -42,11 +42,11 @@ class DefaultSearchResult
         'prices'                    => [
             'default' => [
                 'price' => [
-                    'value' => null,
+                    'value' => 'N / A',
                     'formatted' => 'N / A'
                 ],
                 'unitPrice' => [
-                    'value' => null,
+                    'value' => 'N / A',
                     'formatted' => 'N / A'
                 ],
                 'basePrice' => 'N / A',
