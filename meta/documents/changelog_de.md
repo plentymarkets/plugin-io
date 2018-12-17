@@ -1,5 +1,11 @@
 # Release Notes für IO
 
+## vx.x.x
+
+### Behoben
+
+- Der Plugin-Build-Prozess zeigte eine fehlende Methodendeklaration an, obwohl die Methode vorhanden ist. Es wurde ein Workaround implementiert.
+
 ## v2.17.1 (2018-11-29) <a href="https://github.com/plentymarkets/plugin-io/compare/2.17.0...2.17.1" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
 
 ### Behoben
