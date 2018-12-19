@@ -5,24 +5,20 @@ namespace IO\Services\ItemSearch\Factories;
 use IO\Services\ItemLoader\Services\LoadResultFields;
 use IO\Services\ItemSearch\Extensions\ItemSearchExtension;
 use IO\Services\SessionStorageService;
-use IO\Services\TemplateConfigService;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Collapse\BaseCollapse;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Collapse\CollapseInterface;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\ElasticSearch;
-use Plenty\Modules\Cloud\ElasticSearch\Lib\Index\Settings\Analysis\Filter\FilterInterface;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Processor\DocumentProcessor;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Query\Type\ScoreModifier\RandomScore;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Query\Type\TypeInterface;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Search\Aggregation\AggregationInterface;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Search\Document\DocumentSearch;
-use Plenty\Modules\Cloud\ElasticSearch\Lib\Search\SearchInterface;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Sorting\MultipleSorting;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Sorting\SingleSorting;
-use Plenty\Modules\Cloud\ElasticSearch\Lib\Sorting\SortingInterface;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Source\IncludeSource;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Source\Mutator\MutatorInterface;
-use Plenty\Modules\Item\Search\Aggregations\ItemCardinalityAggregation;
-use Plenty\Modules\Item\Search\Aggregations\ItemCardinalityAggregationProcessor;
+use Plenty\Modules\Item\Search\Aggregations\ItemAttributeValueCardinalityAggregation;
+use Plenty\Modules\Item\Search\Aggregations\ItemAttributeValueCardinalityAggregationProcessor;
 use Plenty\Modules\Item\Search\Filter\SearchFilter;
 use Plenty\Modules\Item\Search\Sort\NameSorting;
 
@@ -349,8 +345,8 @@ class BaseSearchFactory
         $collapse = pluginApp( BaseCollapse::class, [$field] );
         $this->collapse = $collapse;
 
-        $counterAggregationProcessor = pluginApp( ItemCardinalityAggregationProcessor::class );
-        $counterAggregation = pluginApp( ItemCardinalityAggregation::class, [$counterAggregationProcessor] );
+        $counterAggregationProcessor = pluginApp( ItemAttributeValueCardinalityAggregationProcessor::class );
+        $counterAggregation = pluginApp( ItemAttributeValueCardinalityAggregation::class, [$counterAggregationProcessor, $field] );
         $this->withAggregation( $counterAggregation );
 
         return $this;

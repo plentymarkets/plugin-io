@@ -59,7 +59,8 @@ class CrossSellingItems implements SearchPreset
             ->hasNameInLanguage()
             ->hasPriceForCustomer()
             ->sortBy($sorting['path'], $sorting['order'])
-            ->withLinkToContent();
+            ->withLinkToContent()
+            ->withGroupedAttributeValues();
 
         return $searchFactory;
     }
