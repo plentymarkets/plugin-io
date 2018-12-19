@@ -38,17 +38,33 @@ class BillingAddressValidator extends Validator
         $this->addString('postalCode', true);
         $this->addString('town',       true);
 
-        if(empty(self::$addressData['gender']))
+        if($this->isShown('salutation'))
         {
-            $this->addString('name1',         true);
-            $this->addString('contactPerson', true);
+            if($this->isShown('name1') && empty(self::$addressData['gender']))
+            {
+                $this->addString('name1',         true);
+                $this->addString('contactPerson', true);
+            }
+            else
+            {
+                $this->addString('name2',      true);
+                $this->addString('name3',      true);
+            }
         }
         else
         {
-            $this->addString('name2',      true);
-            $this->addString('name3',      true);
+            if($this->isShown('name1'))
+            {
+                $this->addString('name1',         true);
+                $this->addString('contactPerson', true);
+            }
+            else
+            {
+                $this->addString('name2',      true);
+                $this->addString('name3',      true);
+            }
         }
-        
+
         if(count($this->requiredFields))
         {
             if(empty(self::$addressData['gender']))
@@ -74,5 +90,10 @@ class BillingAddressValidator extends Validator
     private function isRequired($fieldName)
     {
         return in_array($fieldName, $this->shownFields) && in_array($fieldName, $this->requiredFields);
+    }
+
+    private function isShown($fieldName)
+    {
+        return in_array($fieldName, $this->shownFields);
     }
 }
