@@ -59,10 +59,7 @@ class FacetResource extends ApiResource
                 $itemListOptions['query'] = $searchString;
             }
 
-            $searchParams = [
-                'facets'   => Facets::getSearchFactory( $itemListOptions )
-            ];
-
+            $searchParams = ['facets' => Facets::getSearchFactory( $itemListOptions )];
             $searchParams['itemList'] = $isCategory ?
                 CategoryItems::getSearchFactory( $itemListOptions ) :
                 SearchItems::getSearchFactory( $itemListOptions );
