@@ -49,11 +49,11 @@ class FacetResource extends ApiResource
 
             if((int)$categoryId > 0)
             {
-                $itemListOptions[] = ['categoryId' => $categoryId];
+                $itemListOptions['categoryId'] = $categoryId;
             }
             else
             {
-                $itemListOptions[] = ['query' => $searchString,];
+                $itemListOptions['query'] = $searchString;
             }
 
             /** @var ItemSearchService $itemSearchService */
