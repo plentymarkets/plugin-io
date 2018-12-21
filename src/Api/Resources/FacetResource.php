@@ -34,12 +34,10 @@ class FacetResource extends ApiResource
      */
     public function index():Response
     {
-        $categoryId   = $this->request->get('categoryId', 0);
+        $categoryId   = (int)$this->request->get('categoryId', 0);
         $searchString = $this->request->get('query', '');
 
-        $isCategory = (int)$categoryId > 0;
-
-        if($isCategory || strlen($searchString))
+        if($categoryId > 0 || strlen($searchString))
         {
             $itemListOptions = [
                 'page'         => 1,
@@ -50,7 +48,7 @@ class FacetResource extends ApiResource
                 'priceMax'     => $this->request->get('priceMax', 0)
             ];
 
-            if($isCategory)
+            if($categoryId > 0)
             {
                 $itemListOptions['categoryId'] = $categoryId;
             }
@@ -59,10 +57,10 @@ class FacetResource extends ApiResource
                 $itemListOptions['query'] = $searchString;
             }
 
-            $searchParams = ['facets' => Facets::getSearchFactory( $itemListOptions )];
-            $searchParams['itemList'] = $isCategory ?
-                CategoryItems::getSearchFactory( $itemListOptions ) :
-                SearchItems::getSearchFactory( $itemListOptions );
+            $searchParams = [
+                'facets'   => Facets::getSearchFactory( $itemListOptions ),
+                'itemList' => $categoryId > 0 ? CategoryItems::getSearchFactory( $itemListOptions ) : SearchItems::getSearchFactory( $itemListOptions )
+            ];
 
             /** @var ItemSearchService $itemSearchService */
             $itemSearchService = pluginApp( ItemSearchService::class );
