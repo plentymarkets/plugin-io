@@ -38,29 +38,21 @@ class BillingAddressValidatorEN extends Validator
 
         if($this->isShown('salutation'))
         {
-            if($this->isShown('name1') && empty(self::$addressData['gender']))
-            {
-                $this->addString('name1',         true);
-                $this->addString('contactPerson', true);
-            }
-            else
-            {
-                $this->addString('name2',      true);
-                $this->addString('name3',      true);
-            }
+            $hasContactPerson = $this->isShown('name1') && empty(self::$addressData['gender']);
+
+            $this->addString('name1', $hasContactPerson);
+            $this->addString('name2', !$hasContactPerson);
+            $this->addString('name3', !$hasContactPerson);
+            $this->addString('contactPerson', $hasContactPerson);
         }
         else
         {
-            if($this->isShown('name1'))
-            {
-                $this->addString('name1',         true);
-                $this->addString('contactPerson', true);
-            }
-            else
-            {
-                $this->addString('name2',      true);
-                $this->addString('name3',      true);
-            }
+            $hasName1 = $this->isShown('name1');
+
+            $this->addString('name1', $hasName1);
+            $this->addString('name2', !$hasName1);
+            $this->addString('name3', !$hasName1);
+            $this->addString('contactPerson', $hasName1);
         }
 
         if(count($this->requiredFields))
