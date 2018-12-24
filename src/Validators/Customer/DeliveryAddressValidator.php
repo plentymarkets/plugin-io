@@ -38,32 +38,13 @@ class DeliveryAddressValidator extends Validator
         $this->addString('postalCode', true);
         $this->addString('town',       true);
 
-        if($this->isShown('salutation'))
-        {
-            if($this->isShown('name1') && empty(self::$addressData['gender']))
-            {
-                $this->addString('name1',         true);
-                $this->addString('contactPerson', true);
-            }
-            else
-            {
-                $this->addString('name2',      true);
-                $this->addString('name3',      true);
-            }
-        }
-        else
-        {
-            if($this->isShown('name1'))
-            {
-                $this->addString('name1',         true);
-                $this->addString('contactPerson', true);
-            }
-            else
-            {
-                $this->addString('name2',      true);
-                $this->addString('name3',      true);
-            }
-        }
+        $hasContactPerson = $this->isShown('salutation') && $this->isShown('name1') && empty(self::$addressData['gender']) || 
+            !$this->isShown('salutation') && $this->isShown('name1');
+
+        $this->addString('name1', $hasContactPerson);
+        $this->addString('name2', !$hasContactPerson);
+        $this->addString('name3', !$hasContactPerson);
+        $this->addString('contactPerson', $hasContactPerson);
         
         if(count($this->requiredFields))
         {
