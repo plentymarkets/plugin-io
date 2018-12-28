@@ -9,6 +9,10 @@ use IO\Services\OrderTotalsService;
 use IO\Services\SessionStorageService;
 use IO\Constants\SessionStorageKeys;
 use IO\Models\LocalizedOrder;
+use IO\Services\TemplateConfigService;
+use Plenty\Modules\Order\Date\Models\OrderDate;
+use Plenty\Modules\Order\Date\Models\OrderDateType;
+use Plenty\Modules\Order\Models\Order;
 use Plenty\Plugin\Http\Response;
 
 /**
@@ -82,15 +86,26 @@ class ConfirmationController extends LayoutController
         
         if(!is_null($order) && $order instanceof LocalizedOrder)
         {
-            return $this->renderTemplate(
-                "tpl.confirmation",
-                [
-                    "data" => $order,
-                    "totals" => pluginApp(OrderTotalsService::class)->getAllTotals($order->order),
-                    "showAdditionalPaymentInformation" => true
-                ],
-                false
-            );
+            if($this->checkValidity($order->order))
+            {
+                return $this->renderTemplate(
+                    "tpl.confirmation",
+                    [
+                        "data" => $order,
+                        "totals" => pluginApp(OrderTotalsService::class)->getAllTotals($order->order),
+                        "showAdditionalPaymentInformation" => true
+                    ],
+                    false
+                );
+            }
+            else
+            {
+                /** @var Response $response */
+                $response = pluginApp(Response::class);
+                $response->forceStatus(ResponseCode::NOT_FOUND);
+    
+                return $response;
+            }
         }
         elseif(!$order instanceof LocalizedOrder && !is_null($order))
         {
@@ -104,5 +119,29 @@ class ConfirmationController extends LayoutController
 
             return $response;
         }
+    }
+    
+    private function checkValidity(Order $order)
+    {
+        /** @var TemplateConfigService $templateConfigService */
+        $templateConfigService = pluginApp(TemplateConfigService::class);
+        $expiration = $templateConfigService->get('my_account.confirmation_link_expiration', 'always');
+        
+        if($expiration !== 'always')
+        {
+            $now = time();
+    
+            $orderDates = $order->dates;
+            $orderCreationDate = $orderDates->filter(function($date){
+                return $date->typeId == OrderDateType::ORDER_ENTRY_AT;
+            })->first()->date->timestamp;
+    
+            if($now > $orderCreationDate + ((int)$expiration * (24 * 60 * 60)))
+            {
+                return false;
+            }
+        }
+        
+        return true;
     }
 }
