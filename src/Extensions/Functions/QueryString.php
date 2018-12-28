@@ -40,8 +40,11 @@ class QueryString extends AbstractFunction
 
         foreach ($queryParameters as $key => $value)
         {
-            $queryParamString .= $queryParamSeparator . urlencode($key) . '=' . urlencode($value);
-            $queryParamSeparator = '&';
+            if (!is_null($value))
+            {
+                $queryParamString .= $queryParamSeparator . urlencode($key) . '=' . urlencode($value);
+                $queryParamSeparator = '&';
+            }
         }
 
         return $queryParamString;
