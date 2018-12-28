@@ -32,19 +32,20 @@ class DeliveryAddressValidatorEN extends Validator
             $this->shownFields[$key] = str_replace('delivery_address.', '', $value);
         }
     
-        $this->addString('name2',      true);
-        $this->addString('name3',      true);
         $this->addString('address1', true);
         $this->addString('postalCode', true);
         $this->addString('town',       true);
+
+        $hasContactPerson = $this->isShown('salutation') && $this->isShown('name1') && empty(self::$addressData['gender']) || 
+            !$this->isShown('salutation') && $this->isShown('name1');
+
+        $this->addString('name1', $hasContactPerson);
+        $this->addString('name2', !$hasContactPerson);
+        $this->addString('name3', !$hasContactPerson);
+        $this->addString('contactPerson', $hasContactPerson);
         
         if(count($this->requiredFields))
         {
-            if(empty(self::$addressData['gender']))
-            {
-                $this->addString('name1',     $this->isRequired('name1'));
-            }
-
             $this->addString('name4',     $this->isRequired('name4'));
             $this->addString('address2',  $this->isRequired('address2'));
             $this->addString('address3',  $this->isRequired('address3'));
@@ -57,5 +58,10 @@ class DeliveryAddressValidatorEN extends Validator
     private function isRequired($fieldName)
     {
         return in_array($fieldName, $this->shownFields) && in_array($fieldName, $this->requiredFields);
+    }
+
+    private function isShown($fieldName)
+    {
+        return in_array($fieldName, $this->shownFields);
     }
 }
