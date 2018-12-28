@@ -140,8 +140,6 @@ class ConfirmationController extends LayoutController
             {
                 return false;
             }
-    
-            return true;
         }
         
         return true;
