@@ -127,25 +127,23 @@ class ConfirmationController extends LayoutController
         $templateConfigService = pluginApp(TemplateConfigService::class);
         $expiration = $templateConfigService->get('my_account.confirmation_link_expiration', 'always');
         
-        if($expiration == 'always')
-        {
-            return true;
-        }
-        else
+        if($expiration !== 'always')
         {
             $now = time();
-            
+    
             $orderDates = $order->dates;
             $orderCreationDate = $orderDates->filter(function($date){
-               return $date->typeId == OrderDateType::ORDER_ENTRY_AT;
+                return $date->typeId == OrderDateType::ORDER_ENTRY_AT;
             })->first()->date->timestamp;
-            
+    
             if($now > $orderCreationDate + ((int)$expiration * (24 * 60 * 60)))
             {
                 return false;
             }
-            
+    
             return true;
         }
+        
+        return true;
     }
 }
