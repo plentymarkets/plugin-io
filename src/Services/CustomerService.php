@@ -714,6 +714,11 @@ class CustomerService
              */
             $sessionStorage = pluginApp(SessionStorageService::class);
             $email = $sessionStorage->getSessionValue(SessionStorageKeys::GUEST_EMAIL);
+            
+            if(!strlen($email))
+            {
+                throw new \Exception('no guest email address found', 11);
+            }
         }
         else
         {
