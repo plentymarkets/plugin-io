@@ -41,22 +41,15 @@ class ItemLastSeenResource extends ApiResource
 
         foreach( $lastSeenItems["documents"] as $item )
         {
-            $jsonItemData = json_encode($item["data"]);
+            $lastSeenContainers[$item["id"]]["beforePrices"] = $twig->renderString(
+                "{% for content in container('Ceres::CategoryItem.BeforePrices', item) %}{{ content.result | raw }}{% endfor %}",
+                ['item' => $item["data"]]
+            );
 
-            $beforePrices = $twig->renderString("{% autoescape false %}{{ container('Ceres::CategoryItem.BeforePrices', " . $jsonItemData . ") | json_encode }}{% endautoescape %}");
-            $afterPrices = $twig->renderString("{% autoescape false %}{{ container('Ceres::CategoryItem.AfterPrices', " . $jsonItemData . ") | json_encode }}{% endautoescape %}");
-
-            $beforePricesContents = json_decode($beforePrices);
-            $afterPricesContents = json_decode($afterPrices);
-
-            foreach ( $beforePricesContents as $beforePricesContent )
-            {
-                $lastSeenContainers[$item["id"]]["beforePrices"][] = $beforePricesContent->result;
-            }
-            foreach ( $afterPricesContents as $afterPricesContent )
-            {
-                $lastSeenContainers[$item["id"]]["afterPrices"][] = $afterPricesContent->result;
-            }
+            $lastSeenContainers[$item["id"]]["afterPrices"] = $twig->renderString(
+                "{% for content in container('Ceres::CategoryItem.AfterPrices', item) %}{{ content.result | raw }}{% endfor %}",
+                ['item' => $item["data"]]
+            );
         }
 
         return $this->response->create(["lastSeenItems" => $lastSeenItems, "containers" => $lastSeenContainers], ResponseCode::OK);
