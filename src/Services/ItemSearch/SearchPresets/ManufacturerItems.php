@@ -9,14 +9,12 @@ class ManufacturerItems implements SearchPreset
 {
     public static function getSearchFactory($options)
     {
-        //$sorting = SortingHelper::getCategorySorting( $options['sorting'] );
-
         $page = 1;
         if ( array_key_exists('page', $options ) )
         {
             $page = (int) $options['page'];
         }
-        // TODO default Sorting
+       
         $sorting = '';
         if ( array_key_exists('sorting', $options ) )
         {
