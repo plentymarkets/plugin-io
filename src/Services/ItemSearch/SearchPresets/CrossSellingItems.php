@@ -27,6 +27,7 @@ class CrossSellingItems implements SearchPreset
         $itemId = $options['itemId'];
         $relation = $options['relation'];
         $sorting = $options['sorting'];
+        $itemsPerPage = $options['itemsPerPage'] ?? 50;
     
         /** @var ItemCrossSellingService $crossSellingService */
         $crossSellingService = pluginApp( ItemCrossSellingService::class );
@@ -61,7 +62,7 @@ class CrossSellingItems implements SearchPreset
             ->sortBy($sorting['path'], $sorting['order'])
             ->withLinkToContent()
             ->withGroupedAttributeValues()
-            ->setPage(1, 50);
+            ->setPage(1, $itemsPerPage);
 
         return $searchFactory;
     }
