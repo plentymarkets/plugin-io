@@ -140,7 +140,10 @@ class OrderService
         $order = $this->orderRepository->createOrder($order, $couponCode);
 
         if ($order instanceof Order && $order->id > 0) {
-            $params = ['orderId' => $order->id];
+            $params = [
+                'orderId' => $order->id,
+                'webstoreId' => pluginApp(Application::class)->getWebstoreId()
+            ];
             $this->sendMail(AutomaticEmailTemplate::SHOP_ORDER ,AutomaticEmailOrder::class, $params);
         }
 
