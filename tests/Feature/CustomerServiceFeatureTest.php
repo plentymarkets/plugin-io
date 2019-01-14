@@ -4,8 +4,10 @@ namespace IO\Tests\Feature;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use IO\Builder\Order\AddressType;
+use IO\Constants\SessionStorageKeys;
 use IO\Services\BasketService;
 use IO\Services\CustomerService;
+use IO\Services\SessionStorageService;
 use IO\Tests\TestCase;
 use Plenty\Modules\Account\Address\Models\Address;
 
@@ -54,6 +56,15 @@ class CustomerServiceFeatureTest extends TestCase
 
     private function createAddress($addressData, $addressType)
     {
+
+        /**
+         * @var $sessionStorage SessionStorageService
+         */
+        $sessionStorage = pluginApp(SessionStorageService::class);
+
+        $sessionStorage->setSessionValue(SessionStorageKeys::GUEST_EMAIL, $this->fake->email);
+
+
         $newAddress = $this->customerService->createAddress($addressData, $addressType);
 
         $this->assertNotNull($newAddress);
@@ -96,6 +107,14 @@ class CustomerServiceFeatureTest extends TestCase
 
     private function deleteAddress($addressData, $addressType)
     {
+
+        /**
+         * @var $sessionStorage SessionStorageService
+         */
+        $sessionStorage = pluginApp(SessionStorageService::class);
+
+        $sessionStorage->setSessionValue(SessionStorageKeys::GUEST_EMAIL, $this->fake->email);
+
         /** @var BasketService $basketService */
         $basketService = pluginApp(BasketService::class);
 
@@ -139,6 +158,14 @@ class CustomerServiceFeatureTest extends TestCase
 
     private function updateAddress($addressDataCreate, $addressDataUpdate, $addressType)
     {
+
+        /**
+         * @var $sessionStorage SessionStorageService
+         */
+        $sessionStorage = pluginApp(SessionStorageService::class);
+
+        $sessionStorage->setSessionValue(SessionStorageKeys::GUEST_EMAIL, $this->fake->email);
+
         $address        = $this->customerService->createAddress($addressDataCreate, $addressType);
         $updatedAddress = $this->customerService->updateAddress($address->id, $addressDataUpdate, $addressType);
 
