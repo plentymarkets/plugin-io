@@ -410,6 +410,11 @@ class BaseSearchFactory
             $search->setSorting( $this->sorting );
         }
 
+        if ( $this->itemsPerPage < 0 )
+        {
+            $this->itemsPerPage = 1000;
+        }
+
         $search->setPage( $this->page, $this->itemsPerPage );
 
         $search->addSource( $source );
