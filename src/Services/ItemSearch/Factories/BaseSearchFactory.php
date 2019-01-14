@@ -312,7 +312,7 @@ class BaseSearchFactory
             if ( strpos( $field, 'sorting.price.') !== false )
             {
                 $field = sprintf(
-                    'sorting.priceByClient.%d.%s',
+                    'sorting.priceByClientDynamic.%d.%s',
                     pluginApp(Application::class)->getPlentyId(),
                     substr($field, strlen('sorting.price.'))
                 );
