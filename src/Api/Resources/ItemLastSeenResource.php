@@ -33,7 +33,7 @@ class ItemLastSeenResource extends ApiResource
      */
     public function index():Response
     {
-        $items = $this->request->get("items", 4);
+        $items = $this->request->get("items", 20);
         $lastSeenItems = pluginApp(ItemListService::class)->getItemList(ItemListService::TYPE_LAST_SEEN, null, null, $items);
         $lastSeenContainers = [];
 
