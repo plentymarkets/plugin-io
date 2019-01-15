@@ -151,7 +151,7 @@ class OrderService
             $this->sessionStorage->setSessionValue(SessionStorageKeys::LATEST_ORDER_ID, $order->id);
         }
 
-        if($order->amounts[0]->invoiceTotal==0) {
+        if( ($order->amounts[0]->invoiceTotal == 0) || ($order->amounts[0]->invoiceTotal == $order->amounts[0]->giftCardAmount) ) {
             $this->createAndAssignDummyPayment($order);
         }
 
