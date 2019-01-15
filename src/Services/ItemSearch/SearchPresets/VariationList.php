@@ -58,7 +58,7 @@ class VariationList implements SearchPreset
             $searchFactory->hasVariationIds( $variationIds );
         }
 
-        if ( array_key_exists( 'sorting', $options ) && $options['sorting'] !== null )
+        if ( array_key_exists( 'sorting', $options ) )
         {
             if ( $options['sorting'] === null )
             {

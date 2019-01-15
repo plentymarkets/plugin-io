@@ -35,12 +35,14 @@ class SortExtension implements ItemSearchExtension
      */
     public function transformResult($baseResult, $extensionResult)
     {
-        return array_sort(
+        usort(
             $baseResult["documents"],
             function($documentA, $documentB)
             {
                 return array_search( $documentA["id"], $this->idList ) - array_search( $documentB["id"], $this->idList );
             }
         );
+
+        return $baseResult;
     }
 }
