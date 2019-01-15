@@ -47,7 +47,7 @@ class ItemListService
                 {
                     $searchFactory = VariationList::getSearchFactory([
                         'variationIds'      => $variationIds,
-                        'sorting'           => $sorting,
+                        'sorting'           => null,
                         'excludeFromCache'  => true
                     ]);
                 }
@@ -76,7 +76,30 @@ class ItemListService
         {
             $searchFactory->setPage(1, $maxItems );
         }
-        return $searchService->getResult( $searchFactory );
+
+        $documents = $searchService->getResult( $searchFactory );
+
+        // keep original sorting of the last seen items
+        if($type === self::TYPE_LAST_SEEN)
+        {
+            $newDocuments = [];
+
+            foreach ($variationIds as $variationId)
+            {
+                foreach ($documents["documents"] as $document)
+                {
+                    if ((int)$document["id"] === $variationId)
+                    {
+                        $newDocuments[] = $document;
+                        break;
+                    }
+                }
+            }
+
+            $documents["documents"] = $newDocuments;
+        }
+
+        return $documents;
     }
 
     private function isValidId( $id )
