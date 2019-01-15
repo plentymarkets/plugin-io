@@ -544,7 +544,19 @@ class CustomerServiceTest extends TestCase
 
         $this->dispatcherMock->shouldReceive('fire')->andReturn();
 
-        $this->sessionStorageServiceMock->shouldReceive('getSessionValue')->andReturn();
+
+        $this->sessionStorageServiceMock
+            ->shouldReceive('getSessionValue')
+            ->andReturnUsing( function ($args) {
+
+                if($args == SessionStorageKeys::GUEST_EMAIL)
+                {
+                    return 'test@test.de';
+                }
+
+                return null;
+
+        });
 
         /** @var Address $updatedAddress */
         $updatedAddress = $this->customerService->updateAddress($address->id, $address->toArray(),

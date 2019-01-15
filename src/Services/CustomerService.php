@@ -27,6 +27,7 @@ use Plenty\Modules\Helper\AutomaticEmail\Models\AutomaticEmailTemplate;
 use Plenty\Modules\Helper\AutomaticEmail\Models\AutomaticEmailContact;
 use Plenty\Modules\System\Contracts\WebstoreConfigurationRepositoryContract;
 use Plenty\Modules\System\Models\WebstoreConfiguration;
+use Plenty\Plugin\Application;
 use Plenty\Plugin\Events\Dispatcher;
 
 /**
@@ -271,7 +272,7 @@ class CustomerService
                 //$this->sessionStorage->setSessionValue(SessionStorageKeys::BILLING_ADDRESS_ID, $newBillingAddress->id);
                 $basketService->setBillingAddressId($newBillingAddress->id);
             }
-
+            
             if($guestDeliveryAddress !== null)
             {
                 $newDeliveryAddress = $this->createAddress(
@@ -281,21 +282,21 @@ class CustomerService
                 //$this->sessionStorage->setSessionValue(SessionStorageKeys::DELIVERY_ADDRESS_ID, $newDeliveryAddress->id);
                 $basketService->setDeliveryAddressId($newDeliveryAddress->id);
             }
-
+    
             if($billingAddressData !== null)
             {
                 $newBillingAddress = $this->createAddress($billingAddressData, AddressType::BILLING);
                 //$this->sessionStorage->setSessionValue(SessionStorageKeys::BILLING_ADDRESS_ID, $newBillingAddress->id);
                 $basketService->setBillingAddressId($newBillingAddress->id);
             }
-
+    
             if($deliveryAddressData !== null)
             {
                 $newDeliveryAddress = $this->createAddress($deliveryAddressData, AddressType::DELIVERY);
                 //$this->sessionStorage->setSessionValue(SessionStorageKeys::DELIVERY_ADDRESS_ID, $newDeliveryAddress->id);
                 $basketService->setDeliveryAddressId($newDeliveryAddress->id);
             }
-
+    
             if($newBillingAddress instanceof Address)
             {
                 $contact = $this->updateContactWithAddressData($newBillingAddress);
@@ -353,6 +354,7 @@ class CustomerService
 	    $contact = null;
         $contactData['checkForExistingEmail'] = true;
         $contactData['lang'] = $this->sessionStorage->getLang();
+	    $contactData['plentyId'] = pluginApp(Application::class)->getPlentyId();
 
 	    try
         {
@@ -714,7 +716,7 @@ class CustomerService
              */
             $sessionStorage = pluginApp(SessionStorageService::class);
             $email = $sessionStorage->getSessionValue(SessionStorageKeys::GUEST_EMAIL);
-            
+
             if(!strlen($email))
             {
                 throw new \Exception('no guest email address found', 11);
@@ -766,6 +768,15 @@ class CustomerService
                     'value'  => $addressData['telephone']
                 ];
             }
+
+            if(isset($addressData['contactPerson']))
+            {
+                $options[] = [
+                    'typeId' => AddressOption::TYPE_CONTACT_PERSON,
+                    'value'  => $addressData['contactPerson']
+                ];
+            }
+
 
             if(isset($addressData['address2']) && (strtoupper($addressData['address1']) == 'PACKSTATION' || strtoupper($addressData['address1']) == 'POSTFILIALE') && isset($addressData['address3']))
             {
