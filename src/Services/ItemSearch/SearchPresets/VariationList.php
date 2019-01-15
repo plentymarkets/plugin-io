@@ -60,8 +60,15 @@ class VariationList implements SearchPreset
 
         if ( array_key_exists( 'sorting', $options ) && $options['sorting'] !== null )
         {
-            $sorting = SortingHelper::getSearchSorting( $options['sorting'] );
-            $searchFactory->sortByMultiple( $sorting );
+            if ( $options['sorting'] === null )
+            {
+                $searchFactory->setOrder( $variationIds );
+            }
+            else
+            {
+                $sorting = SortingHelper::getSearchSorting( $options['sorting'] );
+                $searchFactory->sortByMultiple( $sorting );
+            }
         }
 
         if ( array_key_exists('sortingField', $options ) && $options['sortingField'] !== null )
