@@ -47,7 +47,7 @@ class ItemListService
                 {
                     $searchFactory = VariationList::getSearchFactory([
                         'variationIds'      => $variationIds,
-                        'sorting'           => null,
+                        'sorting'           => $sorting,
                         'excludeFromCache'  => true
                     ]);
                 }
