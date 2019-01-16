@@ -31,8 +31,6 @@ class ItemLastSeenService
      */
     public function setLastSeenItem(int $variationId)
     {
-        $maxCount = self::MAX_COUNT;
-
         $lastSeenItems = $this->cachingRepository->get(SessionStorageKeys::LAST_SEEN_ITEMS . '_' . $this->basketRepository->load()->id);
 
         if(is_null($lastSeenItems))
