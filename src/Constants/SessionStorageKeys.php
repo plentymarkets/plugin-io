@@ -16,7 +16,6 @@ class SessionStorageKeys
     const LAST_ACCESSED_ORDER      = "lastAccessedOrder";
     const GUEST_EMAIL              = "guestEmail";
     const LAST_SEEN_ITEMS          = "lastSeenItems";
-    const LAST_SEEN_MAX_COUNT      = "lastSeenMaxCount";
     const CROSS_SELLING_TYPE       = 'crossSellingType';
     const CROSS_SELLING_SORTING    = 'crossSellingSorting';
     const GUEST_WISHLIST           = 'guestWishList';
