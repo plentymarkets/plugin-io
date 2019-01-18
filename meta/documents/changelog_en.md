@@ -1,5 +1,29 @@
 # Release Notes for IO
 
+## v3.0.0 (2010-01-21) <a href="https://github.com/plentymarkets/plugin-io/compare/2.17.1...3.0.0" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
+
+### Added
+
+- In the preview mode, you can now access items in the online store that would normally be invisible due to their settings (e.g. no price for the online store).
+- The route **io/facet** has been added to enable the reloading of filters on the category and search pages.
+
+### Changed
+
+- The validators for storing addresses have been updated to account for the changes in Ceres that enable the selection of a contact person for B2B addresses.
+- When loading multiple items, the number of items is no longer limited to 10.
+- Instead of referencing Ceres, **Middleware.php** now references the template name saved in the configuration of IO for available currencies. Thanks to <a href="https://github.com/davidisaak" target="_blank" rel="noopener"><b>@davidisaak</b></a> for this change.
+
+### Fixed
+
+- Due to an error, guest accounts could create addresses without specifying an email address. This has been fixed.
+- The validity of the checkout URL can now be specified in the Ceres configuration.
+- The results of `ItemService::getVariations()` will now be returned in the specified order.
+- The automatic sending of emails was not working properly for guest accounts. This has been fixed.
+- The plugin build process showed a missing method declaration even though the method exists. This has been fixed.
+- Due to an error, the correct order status could not be set when using a coupon with a larger value or the exact value of the order. This has been fixed.
+- If more than 10 items were listed in the order confirmation page, not all item images were displayed. This has been fixed.
+- The default client was always saved for newly registered customers. This behaviour has been fixed.
+
 ## v2.17.1 (2018-11-29) <a href="https://github.com/plentymarkets/plugin-io/compare/2.17.0...2.17.1" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
 
 ### Fixed
@@ -14,7 +38,7 @@
 
 ### Changed
 
-- The currency can now be set using the URL parameter "Currency" in order to conform to existing Callisto URLs. 
+- The currency can now be set using the URL parameter "Currency" in order to conform to existing Callisto URLs.
 - The country of delivery can now be set using the URL parameter "ShipToCountry" in order to conform to existing Callisto URLs.
 
 ### Fixed
