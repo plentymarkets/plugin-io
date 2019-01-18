@@ -57,7 +57,7 @@ class Middleware extends \Plenty\Plugin\Middleware
             /** @var ConfigRepository $config */
             $config = pluginApp(ConfigRepository::class);
             $templateConfigService = pluginApp(TemplateConfigService::class);
-            $enabledCurrencies = explode(', ',  $config->get($templateConfigService->templatePluginName . '.currency.available_currencies') );
+            $enabledCurrencies = explode(', ',  $config->get($templateConfigService->get('template.template_plugin_name') . '.currency.available_currencies') );
 
             if(in_array($currency, $enabledCurrencies) || array_pop($enabledCurrencies) == 'all')
             {
