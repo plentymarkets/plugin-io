@@ -19,7 +19,7 @@ class ItemListService
     const TYPE_RANDOM       = 'random';
     const TYPE_MANUFACTURER = 'manufacturer';
 
-    public function getItemList( $type, $id = null, $sorting = null, $maxItems = 0)
+    public function getItemList( $type, $id = null, $sorting = null, $maxItems = 0 )
     {
         /** @var ItemSearchService $searchService */
         $searchService = pluginApp( ItemSearchService::class );

@@ -190,7 +190,7 @@ class VariationSearchFactory extends BaseSearchFactory
     }
 
     /**
-     * Filter variations by multiple availability ids.
+     * Filter manufacturers by id.
      *
      * @param int $manufacturerId To filter by manufacturer
      *
