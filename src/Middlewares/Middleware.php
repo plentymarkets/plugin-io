@@ -7,6 +7,7 @@ use IO\Helper\RouteConfig;
 use IO\Services\CountryService;
 use IO\Services\TemplateService;
 use IO\Services\WebstoreConfigurationService;
+use IO\Services\TemplateConfigService;
 
 use Plenty\Plugin\ConfigRepository;
 use Plenty\Plugin\Http\Request;
@@ -55,7 +56,8 @@ class Middleware extends \Plenty\Plugin\Middleware
         {
             /** @var ConfigRepository $config */
             $config = pluginApp(ConfigRepository::class);
-            $enabledCurrencies = explode(', ',  $config->get($config->get('IO.template.template_plugin_name') . '.currency.available_currencies') );
+            $templateConfigService = pluginApp(TemplateConfigService::class);
+            $enabledCurrencies = explode(', ',  $config->get($templateConfigService->templatePluginName . '.currency.available_currencies') );
 
             if(in_array($currency, $enabledCurrencies) || array_pop($enabledCurrencies) == 'all')
             {
