@@ -3,7 +3,13 @@
 namespace IO\Controllers;
 
 use IO\Api\ResponseCode;
+use IO\Constants\SessionStorageKeys;
+use IO\Extensions\Constants\ShopUrls;
+use IO\Guards\AuthGuard;
+use IO\Helper\RouteConfig;
+use IO\Services\CustomerService;
 use IO\Services\SessionStorageService;
+use Plenty\Modules\Basket\Contracts\BasketItemRepositoryContract;
 use Plenty\Plugin\Application;
 use Plenty\Plugin\Http\Request;
 use Plenty\Plugin\Http\Response;
@@ -54,6 +60,11 @@ class CategoryController extends LayoutController
 
         $this->categoryService->setCurrentCategory($category);
 
+        if ( RouteConfig::getCategoryId( RouteConfig::CHECKOUT ) === $category->id )
+        {
+            return $this->renderCheckoutCategory( $category );
+        }
+
         return $this->renderTemplate(
             "tpl.category." . $category->type,
             [
@@ -65,5 +76,39 @@ class CategoryController extends LayoutController
             ]
         );
 	}
+
+
+	private function renderCheckoutCategory( $category )
+    {
+        /** @var BasketItemRepositoryContract $basketItemRepository */
+        $basketItemRepository = pluginApp(BasketItemRepositoryContract::class);
+
+        /** @var SessionStorageService $sessionStorage */
+        $sessionStorage = pluginApp(SessionStorageService::class);
+
+        /** @var CustomerService $customerService */
+        $customerService = pluginApp(CustomerService::class);
+
+        if( $sessionStorage->getSessionValue(SessionStorageKeys::GUEST_EMAIL) == null
+            && $customerService->getContactId() <= 0)
+        {
+            AuthGuard::redirect(
+                pluginApp(ShopUrls::class)->login,
+                ["backlink" => AuthGuard::getUrl()]
+            );
+        }
+        else if(!count($basketItemRepository->all()))
+        {
+            AuthGuard::redirect(pluginApp(ShopUrls::class)->home, []);
+        }
+
+        return $this->renderTemplate(
+            "tpl.category.checkout",
+            [
+                'category' => $category
+            ],
+            false
+        );
+    }
 
 }
