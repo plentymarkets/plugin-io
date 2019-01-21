@@ -464,7 +464,14 @@ class OrderService
             {
                 $returnStatus = 9.0;
             }
-    
+
+            $order['properties'][] = [
+                "typeId"    => OrderPropertyType::NEW_RETURNS_MY_ACCOUNT,
+                "value"     => "1"
+            ];
+
+
+
             $order['statusId'] = (float)$returnStatus;
             $order['typeId'] = OrderType::RETURNS;
     
