@@ -12,7 +12,7 @@ use Plenty\Modules\Basket\Contracts\BasketRepositoryContract;
  */
 class ItemLastSeenService
 {
-    const MAX_COUNT = 9;
+    const MAX_COUNT = 20;
     private $cachingRepository;
     private $basketRepository;
 
@@ -27,24 +27,10 @@ class ItemLastSeenService
     }
 
     /**
-     * @param int $maxCount
-     */
-    public function setLastSeenMaxCount(int $maxCount)
-    {
-        $this->cachingRepository->put(SessionStorageKeys::LAST_SEEN_MAX_COUNT . '_' . $this->basketRepository->load()->id, $maxCount, 60);
-    }
-
-    /**
      * @param int $variationId
      */
     public function setLastSeenItem(int $variationId)
     {
-        $maxCount = $this->cachingRepository->get(SessionStorageKeys::LAST_SEEN_MAX_COUNT . '_' . $this->basketRepository->load()->id);
-        if(is_null($maxCount))
-        {
-            $maxCount = self::MAX_COUNT;
-        }
-
         $lastSeenItems = $this->cachingRepository->get(SessionStorageKeys::LAST_SEEN_ITEMS . '_' . $this->basketRepository->load()->id);
 
         if(is_null($lastSeenItems))
@@ -54,7 +40,7 @@ class ItemLastSeenService
 
         if(!in_array($variationId, $lastSeenItems))
         {
-            if(count($lastSeenItems) >= $maxCount)
+            if(count($lastSeenItems) >= self::MAX_COUNT)
             {
                 array_pop($lastSeenItems);
             }
