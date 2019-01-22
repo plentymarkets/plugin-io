@@ -10,6 +10,7 @@ use IO\Helper\RouteConfig;
 use IO\Services\CustomerService;
 use IO\Services\SessionStorageService;
 use Plenty\Modules\Basket\Contracts\BasketItemRepositoryContract;
+use Plenty\Modules\ShopBuilder\Helper\ShopBuilderRequest;
 use Plenty\Plugin\Application;
 use Plenty\Plugin\Http\Request;
 use Plenty\Plugin\Http\Response;
@@ -60,9 +61,12 @@ class CategoryController extends LayoutController
 
         $this->categoryService->setCurrentCategory($category);
 
-        if ( RouteConfig::getCategoryId( RouteConfig::CHECKOUT ) === $category->id )
+        /** @var ShopBuilderRequest $shopBuilderRequest */
+        $shopBuilderRequest = pluginApp(ShopBuilderRequest::class);
+
+        if ( RouteConfig::getCategoryId( RouteConfig::CHECKOUT ) === $category->id || !$shopBuilderRequest->getPreviewContentType() === 'checkout')
         {
-            return $this->renderCheckoutCategory( $category );
+            return $this->renderCheckoutCategory( $category, !$shopBuilderRequest->isShopBuilder() );
         }
 
         return $this->renderTemplate(
@@ -78,7 +82,7 @@ class CategoryController extends LayoutController
 	}
 
 
-	private function renderCheckoutCategory( $category )
+	private function renderCheckoutCategory( $category, $isShopBuilderPreview = false )
     {
         /** @var BasketItemRepositoryContract $basketItemRepository */
         $basketItemRepository = pluginApp(BasketItemRepositoryContract::class);
@@ -89,17 +93,20 @@ class CategoryController extends LayoutController
         /** @var CustomerService $customerService */
         $customerService = pluginApp(CustomerService::class);
 
-        if( $sessionStorage->getSessionValue(SessionStorageKeys::GUEST_EMAIL) == null
-            && $customerService->getContactId() <= 0)
+        if ( !$isShopBuilderPreview )
         {
-            AuthGuard::redirect(
-                pluginApp(ShopUrls::class)->login,
-                ["backlink" => AuthGuard::getUrl()]
-            );
-        }
-        else if(!count($basketItemRepository->all()))
-        {
-            AuthGuard::redirect(pluginApp(ShopUrls::class)->home, []);
+            if( $sessionStorage->getSessionValue(SessionStorageKeys::GUEST_EMAIL) == null
+                && $customerService->getContactId() <= 0 )
+            {
+                AuthGuard::redirect(
+                    pluginApp(ShopUrls::class)->login,
+                    ["backlink" => AuthGuard::getUrl()]
+                );
+            }
+            else if(!count($basketItemRepository->all()))
+            {
+                AuthGuard::redirect(pluginApp(ShopUrls::class)->home, []);
+            }
         }
 
         return $this->renderTemplate(
