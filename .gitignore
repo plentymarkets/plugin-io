@@ -1,3 +1,8 @@
 .idea/
 *.iml
 .DS_STORE
+.env
+vendor
+coverage
+composer.phar
+composer.lock
