@@ -34,16 +34,16 @@ class ItemWishListGuestRepository
     public function getItemWishList()
     {
         $wishList = $this->getItemWishListForAllPlentyIds();
-        $variationIds = array_keys($wishList[$this->plentyId]);
-    
-        if(is_null($variationIds))
+        $variationIds = [];
+
+        if(isset($wishList))
         {
-            $variationIds = [];
+            $variationIds = array_keys($wishList[$this->plentyId]);
         }
-    
+
         return $variationIds;
     }
-    
+
     public function getItemWishListWithData()
     {
         $wishList = $this->getItemWishListForAllPlentyIds();
@@ -67,7 +67,6 @@ class ItemWishListGuestRepository
     /**
      * @param int $variationId
      * @return bool
-     * @throws \Exception
      */
     public function isItemInWishList(int $variationId = 0)
     {
@@ -87,7 +86,6 @@ class ItemWishListGuestRepository
      * @param int $variationId
      * @param int $quantity
      * @return mixed
-     * @throws \Exception
      */
     public function addItemWishListEntry(int $variationId, int $quantity = 1)
     {
@@ -97,10 +95,10 @@ class ItemWishListGuestRepository
         $wishListEntry->plentyId = $this->plentyId;
         $wishListEntry->quantity = $quantity;
         $wishListEntry->createdAt = date("Y-m-d H:i:s");
-        
-        $wishList = $this->getItemWishListWithData();
+
         $wishListComplete = $this->getItemWishListForAllPlentyIds();
-        
+        $wishList = $wishListComplete[$this->plentyId];
+
         if($this->isItemInWishList($variationId))
         {
             $wishListEntry->quantity += $wishList[$variationId]['quantity'];
@@ -114,21 +112,20 @@ class ItemWishListGuestRepository
     
     /**
      * @param int $variationId
-     * @return bool
-     * @throws \Exception
+     * @return bool - true if variation was found and deleted. false if no variation was found.
      */
     public function removeItemWishListEntry(int $variationId)
     {
         $wishListComplete = $this->getItemWishListForAllPlentyIds();
         
-        if(array_key_exists($variationId, $wishListComplete[$this->plentyId]))
+        if(isset($wishListComplete) && array_key_exists($variationId, $wishListComplete[$this->plentyId]))
         {
             unset($wishListComplete[$this->plentyId][$variationId]);
+            $this->sessionStorage->setSessionValue(SessionStorageKeys::GUEST_WISHLIST, json_encode($wishListComplete));
+            return true;
         }
-        
-        $this->sessionStorage->setSessionValue(SessionStorageKeys::GUEST_WISHLIST, json_encode($wishListComplete));
-        
-        return true;
+
+        return false;
     }
     
     public function resetItemWishList()

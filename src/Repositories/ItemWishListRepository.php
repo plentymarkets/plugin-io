@@ -118,11 +118,18 @@ class ItemWishListRepository
 
                 $createdWishListEntry = $this->db->save($wishListEntry);
 
-                return pluginApp(ItemWishList::class)->fillByAttributes(json_decode(json_encode($createdWishListEntry), true));
+
+                $newEntry = pluginApp(ItemWishList::class);
+                $newEntry->fillByAttributes(json_decode(json_encode($createdWishListEntry), true));
+
+                return $newEntry;
             }
             else
             {
-                return pluginApp(ItemWishList::class)->fillByAttributes(json_decode(json_encode($wishListModels[0]), true));
+                $newEntry = pluginApp(ItemWishList::class);
+                $newEntry->fillByAttributes(json_decode(json_encode($wishListModels[0]), true));
+
+                return $newEntry;
             }
         }
         else
