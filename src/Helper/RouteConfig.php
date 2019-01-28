@@ -47,6 +47,13 @@ class RouteConfig
     public static function isActive( $route )
     {
         self::getEnabledRoutes();
-        return in_array($route, self::$enabledRoutes) || in_array("all", self::$enabledRoutes);
+        return (in_array($route, self::$enabledRoutes) || in_array("all", self::$enabledRoutes))
+            && self::getCategoryId( $route ) === 0;
+    }
+
+    public static function getCategoryId( $route )
+    {
+        $config = pluginApp(ConfigRepository::class);
+        return (int) $config->get('IO.routing.category_' . $route, 0);
     }
 }

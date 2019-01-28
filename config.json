@@ -64,6 +64,12 @@
       "Config.RoutingTab": {
           "label": "Config.RoutingTab",
           "formFields": {
+              "routing.category_checkout": {
+                  "type": "categoryPicker",
+                  "required": false,
+                  "label": "Config.routingCategoryCheckout",
+                  "options": {}
+              },
               "routing.enabled_routes": {
                   "type": "multiCheckBox",
                   "required": false,

@@ -4,6 +4,7 @@ namespace IO\Services\ItemSearch\Factories;
 
 use IO\Services\ItemLoader\Services\LoadResultFields;
 use IO\Services\ItemSearch\Extensions\ItemSearchExtension;
+use IO\Services\ItemSearch\Extensions\SortExtension;
 use IO\Services\SessionStorageService;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Collapse\BaseCollapse;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Collapse\CollapseInterface;
@@ -21,6 +22,7 @@ use Plenty\Modules\Item\Search\Aggregations\ItemAttributeValueCardinalityAggrega
 use Plenty\Modules\Item\Search\Aggregations\ItemAttributeValueCardinalityAggregationProcessor;
 use Plenty\Modules\Item\Search\Filter\SearchFilter;
 use Plenty\Modules\Item\Search\Sort\NameSorting;
+use Plenty\Plugin\Application;
 
 /**
  * Class BaseSearchFactory
@@ -304,6 +306,15 @@ class BaseSearchFactory
         }
         else if ( strlen($field) )
         {
+            if ( strpos( $field, 'sorting.price.') !== false )
+            {
+                $field = sprintf(
+                    'sorting.priceByClientDynamic.%d.%s',
+                    pluginApp(Application::class)->getPlentyId(),
+                    substr($field, strlen('sorting.price.'))
+                );
+            }
+
             $sortingInterface = pluginApp( SingleSorting::class, [$field, $order] );
         }
 
@@ -331,6 +342,13 @@ class BaseSearchFactory
         }
 
         return $this;
+    }
+
+    public function setOrder( $idList )
+    {
+        return $this->withExtension(SortExtension::class, [
+            'idList' => $idList
+        ]);
     }
 
     /**
@@ -408,6 +426,11 @@ class BaseSearchFactory
         if ( $this->sorting !== null )
         {
             $search->setSorting( $this->sorting );
+        }
+
+        if ( $this->itemsPerPage < 0 )
+        {
+            $this->itemsPerPage = 1000;
         }
 
         $search->setPage( $this->page, $this->itemsPerPage );
