@@ -12,6 +12,7 @@ use IO\Constants\SessionStorageKeys;
 use IO\Extensions\Mail\SendMail;
 use IO\Models\LocalizedOrder;
 use Plenty\Modules\Account\Address\Contracts\AddressRepositoryContract;
+use Plenty\Modules\Account\Address\Models\AddressOption;
 use Plenty\Modules\Authorization\Services\AuthHelper;
 use Plenty\Modules\Frontend\PaymentMethod\Contracts\FrontendPaymentMethodRepositoryContract;
 use Plenty\Modules\Helper\AutomaticEmail\Contracts\AutomaticEmailContract;
@@ -139,6 +140,8 @@ class OrderService
 
         $order = $this->orderRepository->createOrder($order, $couponCode);
 
+
+
         if ($order instanceof Order && $order->id > 0) {
             $params = [
                 'orderId' => $order->id,
@@ -146,6 +149,8 @@ class OrderService
             ];
             $this->sendMail(AutomaticEmailTemplate::SHOP_ORDER ,AutomaticEmailOrder::class, $params);
         }
+
+        $this->subscribeToNewsletter();
 
         $this->sessionStorage->setSessionValue(SessionStorageKeys::ORDER_CONTACT_WISH, null);
 
@@ -160,6 +165,47 @@ class OrderService
 
         return LocalizedOrder::wrap( $order, $this->sessionStorage->getLang() );
 	}
+
+	public function subscribeToNewsletter()
+    {
+        /** @var CheckoutService $checkoutService */
+        $checkoutService = pluginApp(CheckoutService::class);
+
+        /** @var CustomerService $customerService */
+        $customerService = pluginApp(CustomerService::class);
+
+        /** @var CustomerNewsletterService $customerNewsletterService $email */
+        $customerNewsletterService = pluginApp(CustomerNewsletterService::class);
+
+        $email = $customerService->getEmail();
+        $firstName = '';
+        $lastName = '';
+
+        $address = $customerService->getAddress($checkoutService->getBillingAddressId(), AddressType::BILLING);
+
+        // if the address is for a company, the contact person will be store into the last name
+        if (strlen($address->name1))
+        {
+            foreach ($address['options'] as $option)
+            {
+                if ($option['typeId'] === AddressOption::TYPE_CONTACT_PERSON)
+                {
+                    $lastName = $option['value'];
+                }
+            }
+        }
+        else
+        {
+            $firstName = $address->name2;
+            $lastName = $address->name3;
+        }
+
+        $newsletterSubscriptions = $this->sessionStorage->getSessionValue(SessionStorageKeys::NEWSLETTER_SUBSCRIPTIONS);
+
+        $customerNewsletterService->saveMultipleNewsletterData($email, $newsletterSubscriptions, $firstName, $lastName);
+
+        $this->sessionStorage->setSessionValue(SessionStorageKeys::NEWSLETTER_SUBSCRIPTIONS, null);
+    }
 
     /**
      * Execute the payment for a given order.
