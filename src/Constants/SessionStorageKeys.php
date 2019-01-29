@@ -22,4 +22,5 @@ class SessionStorageKeys
     const GUEST_WISHLIST_MIGRATION = 'guestWishListMigration';
     const ORDER_CONTACT_WISH       = 'orderContactWish';
     const SHIPPING_PRIVACY_HINT_ACCEPTED = 'shippingPrivacyHintAccepted';
+    const NEWSLETTER_SUBSCRIPTIONS = 'newsletterSubscriptions';
 }
