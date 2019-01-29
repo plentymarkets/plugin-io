@@ -1,5 +1,29 @@
 # Release Notes für IO
 
+## v3.0.0 (2010-01-21) <a href="https://github.com/plentymarkets/plugin-io/compare/2.17.1...3.0.0" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
+
+### Hinzugefügt
+
+- Artikel, die aufgrund ihrer Einstellungen (z.B. kein Preis für den Webshop) nicht im Shop angezeigt werden würden, werden nun im Vorschaumodus des Webshops angezeigt.
+- Es wurde eine neue Route **io/facet** hinzugefügt, um für Kategorie- und Suchansicht die Filter nachzuladen.
+
+### Geändert
+
+- Die Validatoren zum Speichern einer Adresse wurden angepasst, um mit den Änderungen in Ceres bezüglich der Kontaktperson für Firmenadressen umgehen zu können.
+- Beim Laden von mehreren Artikeln wird die Anzahl an Artikeln nicht mehr auf 10 begrenzt.
+- Die **Middleware.php** referenziert bei der Abfrage auf verfügbare Währungen nicht mehr auf Ceres, sondern auf den in der IO angegebenen Template-Namen. Vielen Dank an <a href="https://github.com/davidisaak" target="_blank" rel="noopener"><b>@davidisaak</b></a> für diese Änderung.
+
+### Behoben
+
+- Durch einen Fehler konnten bei einer Gastbestellung Adressen ohne E-Mail-Adresse angelegt werden. Dies wurde behoben.
+- Die Gültigkeit der Kaufabwicklungs-URL kann nun in der Ceres-Konfiguration festgelegt werden.
+- Die Ergebnisse von `ItemService::getVariations()` werden jetzt in der angegebenen Reihenfolge zurückgegeben.
+- Der automatische E-Mail-Versand war bei Gastzugängen fehlerhaft. Das Verhalten wurde behoben.
+- Der Plugin-Bereitstellungsprozess zeigte eine fehlende Methodendeklaration an, obwohl die Methode vorhanden ist. Dies wurde behoben.
+- Durch einen Fehler konnte der korrekte Auftragsstatus bei Verwendung eines Verkaufsgutscheins mit größerem oder gleichem Wert bezogen auf den Gesamtbetrag des Auftrags nicht gesetzt werden. Dies wurde behoben.
+- Auf der Bestellbestätigungsseite wurden bei mehr als 10 Artikel nicht alle Artikelbilder angezeigt. Das Verhalten wurde behoben.
+- Bei der Registrierung eines neuen Kunden wurde immer der Standardmandant am Datensatz gespeichert. Das Verhalten wurde behoben.
+
 ## v2.17.1 (2018-11-29) <a href="https://github.com/plentymarkets/plugin-io/compare/2.17.0...2.17.1" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
 
 ### Behoben

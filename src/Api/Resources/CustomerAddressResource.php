@@ -3,6 +3,7 @@
 namespace IO\Api\Resources;
 
 use IO\Services\BasketService;
+use IO\Services\NotificationService;
 use Plenty\Plugin\Http\Response;
 use Plenty\Plugin\Http\Request;
 use IO\Api\ApiResource;
@@ -74,13 +75,24 @@ class CustomerAddressResource extends ApiResource
 			return $this->response->create(null, ResponseCode::BAD_REQUEST);
 		}
   
-		if(!is_null($addressId) && (int)$addressId > 0)
+		try
         {
-            $newAddress = $this->customerService->updateAddress((int)$addressId, $address, (int)$type);
+            if(!is_null($addressId) && (int)$addressId > 0)
+            {
+                $newAddress = $this->customerService->updateAddress((int)$addressId, $address, (int)$type);
+            }
+            else
+            {
+                $newAddress = $this->customerService->createAddress($address, $type);
+            }
         }
-        else
+		catch(\Exception $e)
         {
-		    $newAddress = $this->customerService->createAddress($address, $type);
+            /** @var NotificationService $notificationService */
+            $notificationService = pluginApp(NotificationService::class);
+            $notificationService->error('guest email address is empty', $e->getCode());
+            
+            return $this->response->create([], ResponseCode::BAD_REQUEST);
         }
         
 		return $this->response->create($newAddress, ResponseCode::CREATED);

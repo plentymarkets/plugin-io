@@ -43,6 +43,25 @@ use Plenty\Plugin\Application;
  */
 class VariationSearchFactory extends BaseSearchFactory
 {
+    private $isAdminPreview = false;
+    
+    public function __construct()
+    {
+        /** @var Application $app */
+        $app = pluginApp(Application::class);
+        $this->isAdminPreview = $app->isAdminPreview();
+    }
+    
+    /**
+     * @param $isAdminPreview
+     * @return $this
+     */
+    public function setAdminPreview($isAdminPreview)
+    {
+        $this->isAdminPreview = $isAdminPreview;
+        return $this;
+    }
+    
     //
     // VARIATION BASE FILTERS
     //
@@ -53,9 +72,13 @@ class VariationSearchFactory extends BaseSearchFactory
      */
     public function isActive()
     {
-        /** @var VariationBaseFilter $variationFilter */
-        $variationFilter = $this->createFilter( VariationBaseFilter::class );
-        $variationFilter->isActive();
+        if(!$this->isAdminPreview)
+        {
+            /** @var VariationBaseFilter $variationFilter */
+            $variationFilter = $this->createFilter( VariationBaseFilter::class );
+            $variationFilter->isActive();
+        }
+        
         return $this;
     }
 
@@ -66,9 +89,13 @@ class VariationSearchFactory extends BaseSearchFactory
      */
     public function isInactive()
     {
-        /** @var VariationBaseFilter $variationFilter */
-        $variationFilter = $this->createFilter( VariationBaseFilter::class );
-        $variationFilter->isInactive();
+        if(!$this->isAdminPreview)
+        {
+            /** @var VariationBaseFilter $variationFilter */
+            $variationFilter = $this->createFilter( VariationBaseFilter::class );
+            $variationFilter->isInactive();
+        }
+        
         return $this;
     }
 
@@ -212,9 +239,13 @@ class VariationSearchFactory extends BaseSearchFactory
      */
     public function isHiddenInCategoryList( $isHidden = true )
     {
-        /** @var VariationBaseFilter $variationFilter */
-        $variationFilter = $this->createFilter( VariationBaseFilter::class );
-        $variationFilter->isHiddenInCategoryList( $isHidden );
+        if(!$this->isAdminPreview)
+        {
+            /** @var VariationBaseFilter $variationFilter */
+            $variationFilter = $this->createFilter( VariationBaseFilter::class );
+            $variationFilter->isHiddenInCategoryList( $isHidden );
+        }
+        
         return $this;
     }
 
@@ -230,13 +261,17 @@ class VariationSearchFactory extends BaseSearchFactory
      */
     public function isVisibleForClient( $clientId = null )
     {
-        if ( $clientId === null )
+        if(!$this->isAdminPreview)
         {
-            $clientId = pluginApp( Application::class )->getPlentyId();
+            if ( $clientId === null )
+            {
+                $clientId = pluginApp( Application::class )->getPlentyId();
+            }
+            /** @var ClientFilter $clientFilter */
+            $clientFilter = $this->createFilter( ClientFilter::class );
+            $clientFilter->isVisibleForClient( $clientId );
         }
-        /** @var ClientFilter $clientFilter */
-        $clientFilter = $this->createFilter( ClientFilter::class );
-        $clientFilter->isVisibleForClient( $clientId );
+        
         return $this;
     }
 
@@ -253,44 +288,48 @@ class VariationSearchFactory extends BaseSearchFactory
      */
     public function hasNameInLanguage( $type = TextFilter::FILTER_ANY_NAME, $lang = null)
     {
-        if ( $lang === null )
+        if(!$this->isAdminPreview)
         {
-            $lang = pluginApp(SessionStorageService::class)->getLang();
+            if ( $lang === null )
+            {
+                $lang = pluginApp(SessionStorageService::class)->getLang();
+            }
+    
+            $langMap = [
+                'de' => 'german',
+                'en' => 'english',
+                'fr' => 'french',
+                'bg' => 'bulgarian',
+                'it' => 'italian',
+                'es' => 'spanish',
+                'tr' => 'turkish',
+                'nl' => 'dutch',
+                // 'pl' => '',
+                'pt' => 'portuguese',
+                'nn' => 'norwegian',
+                'ro' => 'romanian',
+                'da' => 'danish',
+                'se' => 'swedish',
+                'cz' => 'czech',
+                'ru' => 'russian',
+                //'sk' => '',
+                //'cn' => '',
+                //'vn' => '',
+            ];
+    
+            if ( array_key_exists( $lang, $langMap ) )
+            {
+                $lang = $langMap[$lang];
+            }
+            else
+            {
+                $lang = TextFilter::LANG_DE;
+            }
+            /** @var TextFilter $textFilter */
+            $textFilter = $this->createFilter(TextFilter::class);
+            $textFilter->hasNameInLanguage( $lang, $type );
         }
-
-        $langMap = [
-            'de' => 'german',
-            'en' => 'english',
-            'fr' => 'french',
-            'bg' => 'bulgarian',
-            'it' => 'italian',
-            'es' => 'spanish',
-            'tr' => 'turkish',
-            'nl' => 'dutch',
-            // 'pl' => '',
-            'pt' => 'portuguese',
-            'nn' => 'norwegian',
-            'ro' => 'romanian',
-            'da' => 'danish',
-            'se' => 'swedish',
-            'cz' => 'czech',
-            'ru' => 'russian',
-            //'sk' => '',
-            //'cn' => '',
-            //'vn' => '',
-        ];
-
-        if ( array_key_exists( $lang, $langMap ) )
-        {
-            $lang = $langMap[$lang];
-        }
-        else
-        {
-            $lang = TextFilter::LANG_DE;
-        }
-        /** @var TextFilter $textFilter */
-        $textFilter = $this->createFilter(TextFilter::class);
-        $textFilter->hasNameInLanguage( $lang, $type );
+        
         return $this;
     }
 
@@ -324,9 +363,13 @@ class VariationSearchFactory extends BaseSearchFactory
      */
     public function hasAtLeastOnePrice( $priceIds )
     {
-        /** @var SalesPriceFilter $priceFilter */
-        $priceFilter = $this->createFilter( SalesPriceFilter::class );
-        $priceFilter->hasAtLeastOnePrice( $priceIds );
+        if(!$this->isAdminPreview)
+        {
+            /** @var SalesPriceFilter $priceFilter */
+            $priceFilter = $this->createFilter( SalesPriceFilter::class );
+            $priceFilter->hasAtLeastOnePrice( $priceIds );
+        }
+        
         return $this;
     }
 
@@ -337,9 +380,13 @@ class VariationSearchFactory extends BaseSearchFactory
      */
     public function hasPriceForCustomer()
     {
-        /** @var PriceDetectService $priceDetectService */
-        $priceDetectService = pluginApp( PriceDetectService::class );
-        $this->hasAtLeastOnePrice( $priceDetectService->getPriceIdsForCustomer() );
+        if(!$this->isAdminPreview)
+        {
+            /** @var PriceDetectService $priceDetectService */
+            $priceDetectService = pluginApp( PriceDetectService::class );
+            $this->hasAtLeastOnePrice( $priceDetectService->getPriceIdsForCustomer() );
+        }
+        
         return $this;
     }
     

@@ -27,6 +27,7 @@ use Plenty\Modules\Helper\AutomaticEmail\Models\AutomaticEmailTemplate;
 use Plenty\Modules\Helper\AutomaticEmail\Models\AutomaticEmailContact;
 use Plenty\Modules\System\Contracts\WebstoreConfigurationRepositoryContract;
 use Plenty\Modules\System\Models\WebstoreConfiguration;
+use Plenty\Plugin\Application;
 use Plenty\Plugin\Events\Dispatcher;
 
 /**
@@ -254,7 +255,7 @@ class CustomerService
         {
             $guestDeliveryAddress = $this->addressRepository->findAddressById($guestDeliveryAddressId);
         }
-        
+
         $contact = $this->createContact($contactData);
         
         if(!is_null($contact) && $contact->id > 0)
@@ -353,7 +354,7 @@ class CustomerService
 	    $contact = null;
         $contactData['checkForExistingEmail'] = true;
         $contactData['lang'] = $this->sessionStorage->getLang();
-	    
+	    $contactData['plentyId'] = pluginApp(Application::class)->getPlentyId();
 	    try
         {
             $contact = $this->contactRepository->createContact($contactData);
@@ -704,6 +705,11 @@ class CustomerService
              */
             $sessionStorage = pluginApp(SessionStorageService::class);
             $email = $sessionStorage->getSessionValue(SessionStorageKeys::GUEST_EMAIL);
+            
+            if(!strlen($email))
+            {
+                throw new \Exception('no guest email address found', 11);
+            }
         }
         else
         {
@@ -749,6 +755,14 @@ class CustomerService
                 $options[] = [
                     'typeId' => AddressOption::TYPE_TELEPHONE,
                     'value'  => $addressData['telephone']
+                ];
+            }
+
+            if(isset($addressData['contactPerson']))
+            {
+                $options[] = [
+                    'typeId' => AddressOption::TYPE_CONTACT_PERSON,
+                    'value'  => $addressData['contactPerson']
                 ];
             }
             

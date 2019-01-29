@@ -4,6 +4,7 @@ namespace IO\Api\Resources;
 
 use IO\Services\ItemSearch\SearchPresets\CategoryItems;
 use IO\Services\ItemSearch\SearchPresets\Facets;
+use IO\Services\ItemSearch\SearchPresets\SearchItems;
 use IO\Services\ItemSearch\Services\ItemSearchService;
 use Plenty\Plugin\Http\Response;
 use Plenty\Plugin\Http\Request;
@@ -26,17 +27,17 @@ class FacetResource extends ApiResource
     {
         parent::__construct($request, $response);
     }
-    
+
     /**
      * Get Facets
      * @return Response
      */
     public function index():Response
     {
-        $categoryId   = $this->request->get('categoryId', 0);
+        $categoryId   = (int)$this->request->get('categoryId', 0);
         $searchString = $this->request->get('query', '');
 
-        if((int)$categoryId > 0 || strlen($searchString))
+        if($categoryId > 0 || strlen($searchString))
         {
             $itemListOptions = [
                 'page'         => 1,
@@ -47,21 +48,24 @@ class FacetResource extends ApiResource
                 'priceMax'     => $this->request->get('priceMax', 0)
             ];
 
-            if((int)$categoryId > 0)
+            if($categoryId > 0)
             {
-                $itemListOptions[] = ['categoryId' => $categoryId];
+                $itemListOptions['categoryId'] = $categoryId;
             }
             else
             {
-                $itemListOptions[] = ['query' => $searchString,];
+                $itemListOptions['query'] = $searchString;
             }
+
+            $searchParams = [
+                'facets'   => Facets::getSearchFactory( $itemListOptions ),
+                'itemList' => $categoryId > 0 ? CategoryItems::getSearchFactory( $itemListOptions ) : SearchItems::getSearchFactory( $itemListOptions )
+            ];
 
             /** @var ItemSearchService $itemSearchService */
             $itemSearchService = pluginApp( ItemSearchService::class );
-            $response = $itemSearchService->getResults([
-                'itemList' => CategoryItems::getSearchFactory( $itemListOptions ),
-                'facets'   => Facets::getSearchFactory( $itemListOptions )
-            ]);
+            $response = $itemSearchService->getResults($searchParams);
+
             return $this->response->create($response, ResponseCode::OK);
         }
         else
