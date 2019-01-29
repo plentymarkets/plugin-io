@@ -418,8 +418,8 @@ class CustomerService
      */
 	public function updateContact(array $contactData)
 	{
-		if($this->getContactId() > 0)
-		{
+        if($this->getContactId() > 0)
+        {
 			return $this->contactRepository->updateContact($contactData, $this->getContactId());
 		}
 
@@ -1010,5 +1010,25 @@ class CustomerService
 
             $this->sessionStorage->setSessionValue(SessionStorageKeys::GUEST_EMAIL, null);
         }
+    }
+
+    public function getEmail():string
+    {
+        $contact = $this->getContact();
+        if ($contact instanceof Contact)
+        {
+            $email = $contact->email;
+        }
+        else
+        {
+            $email = $sessionStorage->getSessionValue(SessionStorageKeys::GUEST_EMAIL);
+        }
+
+        if(!strlen($email))
+        {
+            throw new \Exception('no email address found', 11);
+        }
+
+        return $email;
     }
 }
