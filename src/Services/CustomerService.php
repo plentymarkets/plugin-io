@@ -1021,7 +1021,7 @@ class CustomerService
         }
         else
         {
-            $email = $sessionStorage->getSessionValue(SessionStorageKeys::GUEST_EMAIL);
+            $email = $this->sessionStorage->getSessionValue(SessionStorageKeys::GUEST_EMAIL);
         }
 
         if(!strlen($email))

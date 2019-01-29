@@ -186,7 +186,7 @@ class OrderService
         // if the address is for a company, the contact person will be store into the last name
         if (strlen($address->name1))
         {
-            foreach ($address['options'] as $option)
+            foreach ($address->options as $option)
             {
                 if ($option['typeId'] === AddressOption::TYPE_CONTACT_PERSON)
                 {
