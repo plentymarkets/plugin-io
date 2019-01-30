@@ -63,6 +63,9 @@ class OrderService
     /** @var CheckoutService $checkoutService */
     private $checkoutService;
 
+    /** @var CustomerService $customerService */
+    private $customerService;
+
 
     /**
      * The OrderItem types that will be wrapped. All other OrderItems will be stripped from the order.
@@ -84,6 +87,7 @@ class OrderService
      * @param AddressRepositoryContract $addressRepository
      * @param \IO\Services\UrlService $urlService
      * @param \IO\Services\CheckoutService $checkoutService
+     * @param \IO\Services\CustomerService $customerService
      */
 	public function __construct(
 		OrderRepositoryContract $orderRepository,
@@ -92,7 +96,8 @@ class OrderService
         FrontendPaymentMethodRepositoryContract $frontendPaymentMethodRepository,
         AddressRepositoryContract $addressRepository,
         UrlService $urlService,
-        CheckoutService $checkoutService)
+        CheckoutService $checkoutService,
+        CustomerService $customerService)
 	{
 		$this->orderRepository = $orderRepository;
 		$this->basketService   = $basketService;
@@ -101,6 +106,7 @@ class OrderService
         $this->addressRepository = $addressRepository;
         $this->urlService = $urlService;
         $this->checkoutService = $checkoutService;
+        $this->customerService = $customerService;
 	}
 
     /**
@@ -109,9 +115,6 @@ class OrderService
      */
 	public function placeOrder():LocalizedOrder
 	{
-        /** @var CustomerService $customerService */
-        $customerService = pluginApp(CustomerService::class);
-        
         $basket = $this->basketService->getBasket();
         
         $couponCode = null;
@@ -129,7 +132,7 @@ class OrderService
 
         $order = pluginApp(OrderBuilder::class)->prepare(OrderType::ORDER)
             ->fromBasket()
-            ->withContactId($customerService->getContactId())
+            ->withContactId($this->customerService->getContactId())
             ->withAddressId($this->checkoutService->getBillingAddressId(), AddressType::BILLING)
             ->withAddressId($this->checkoutService->getDeliveryAddressId(), AddressType::DELIVERY)
             ->withOrderProperty(OrderPropertyType::PAYMENT_METHOD, OrderOptionSubType::MAIN_VALUE, $this->checkoutService->getMethodOfPaymentId())
@@ -155,7 +158,7 @@ class OrderService
 
         $this->sessionStorage->setSessionValue(SessionStorageKeys::ORDER_CONTACT_WISH, null);
 
-        if($customerService->getContactId() <= 0)
+        if($this->customerService->getContactId() <= 0)
         {
             $this->sessionStorage->setSessionValue(SessionStorageKeys::LATEST_ORDER_ID, $order->id);
         }
@@ -172,12 +175,10 @@ class OrderService
      */
 	public function subscribeToNewsletter()
     {
-        /** @var CustomerService $customerService */
-        $customerService = pluginApp(CustomerService::class);
         /** @var CustomerNewsletterService $customerNewsletterService $email */
         $customerNewsletterService = pluginApp(CustomerNewsletterService::class);
 
-        $email = $customerService->getEmail();
+        $email = $this->customerService->getEmail();
         $newsletterSubscriptions = $this->sessionStorage->getSessionValue(SessionStorageKeys::NEWSLETTER_SUBSCRIPTIONS);
 
         if (count($newsletterSubscriptions) && strlen($email))
@@ -185,7 +186,7 @@ class OrderService
             $firstName = '';
             $lastName = '';
 
-            $address = $customerService->getAddress($this->checkoutService->getBillingAddressId(), AddressType::BILLING);
+            $address = $this->customerService->getAddress($this->checkoutService->getBillingAddressId(), AddressType::BILLING);
 
             // if the address is for a company, the contact person will be store into the last name
             if (strlen($address->name1))
@@ -262,11 +263,6 @@ class OrderService
         
         if($redirectToLogin == 'true')
         {
-            /**
-             * @var CustomerService $customerService
-             */
-            $customerService = pluginApp(CustomerService::class);
-    
             $orderContactId = 0;
             foreach ($order->relations as $relation)
             {
@@ -278,12 +274,12 @@ class OrderService
     
             if ((int)$orderContactId > 0)
             {
-                if ((int)$customerService->getContactId() <= 0)
+                if ((int)$this->customerService->getContactId() <= 0)
                 {
 
                     return $this->urlService->redirectTo('login?backlink=confirmation/' . $orderId . '/' . $orderAccessKey);
                 }
-                elseif ((int)$orderContactId !== (int)$customerService->getContactId())
+                elseif ((int)$orderContactId !== (int)$this->customerService->getContactId())
                 {
                     return null;
                 }
