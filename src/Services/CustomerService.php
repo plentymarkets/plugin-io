@@ -1024,11 +1024,6 @@ class CustomerService
             $email = $this->sessionStorage->getSessionValue(SessionStorageKeys::GUEST_EMAIL);
         }
 
-        if(!strlen($email))
-        {
-            throw new \Exception('no email address found', 11);
-        }
-
         return $email;
     }
 }
