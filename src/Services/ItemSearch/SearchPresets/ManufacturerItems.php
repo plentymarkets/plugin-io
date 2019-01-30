@@ -10,13 +10,13 @@ class ManufacturerItems implements SearchPreset
     public static function getSearchFactory($options)
     {
         $page = 1;
-        if ( array_key_exists('page', $options ) )
+        if ( array_key_exists( 'page', $options ) )
         {
             $page = (int) $options['page'];
         }
        
         $sorting = '';
-        if ( array_key_exists('sorting', $options ) )
+        if ( array_key_exists( 'sorting', $options ) )
         {
             $sorting =  $options['sorting'];
         }
@@ -28,7 +28,7 @@ class ManufacturerItems implements SearchPreset
         }
 
         $manufacturerId = 1;
-        if (array_key_exists('manufacturerId', $options))
+        if (array_key_exists( 'manufacturerId', $options))
         {
             $manufacturerId = (int) $options['manufacturerId'];
         }
@@ -45,11 +45,11 @@ class ManufacturerItems implements SearchPreset
             ->withDefaultImage()
             ->isVisibleForClient()
             ->isActive()
-            ->isHiddenInCategoryList(false)
+            ->isHiddenInCategoryList( false )
             ->hasNameInLanguage()
             ->hasPriceForCustomer()
             ->sortByMultiple( $sorting )
-            ->hasManufacturer( $manufacturerId)
+            ->hasManufacturer( $manufacturerId )
             ->setPage( $page, $itemsPerPage )
             ->groupByTemplateConfig()
             ->withLinkToContent();

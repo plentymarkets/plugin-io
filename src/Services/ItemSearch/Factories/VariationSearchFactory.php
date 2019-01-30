@@ -199,7 +199,7 @@ class VariationSearchFactory extends BaseSearchFactory
     public function hasManufacturer( $manufacturerId )
     {
         /** @var VariationBaseFilter $variationFilter */
-        $variationFilter = $this->createFilter(VariationBaseFilter::class );
+        $variationFilter = $this->createFilter( VariationBaseFilter::class );
         $variationFilter->hasManufacturer( $manufacturerId );
         return $this;
     }
