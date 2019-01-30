@@ -15,8 +15,6 @@ use Plenty\Modules\Account\Address\Contracts\AddressRepositoryContract;
 use Plenty\Modules\Account\Address\Models\AddressOption;
 use Plenty\Modules\Authorization\Services\AuthHelper;
 use Plenty\Modules\Frontend\PaymentMethod\Contracts\FrontendPaymentMethodRepositoryContract;
-use Plenty\Modules\Helper\AutomaticEmail\Contracts\AutomaticEmailContract;
-use Plenty\Modules\Helper\AutomaticEmail\Models\AutomaticEmail;
 use Plenty\Modules\Helper\AutomaticEmail\Models\AutomaticEmailOrder;
 use Plenty\Modules\Helper\AutomaticEmail\Models\AutomaticEmailTemplate;
 use Plenty\Modules\Order\Contracts\OrderRepositoryContract;
@@ -62,6 +60,9 @@ class OrderService
      */
     private $urlService;
 
+    /** @var CheckoutService $checkoutService */
+    private $checkoutService;
+
 
     /**
      * The OrderItem types that will be wrapped. All other OrderItems will be stripped from the order.
@@ -82,6 +83,7 @@ class OrderService
      * @param FrontendPaymentMethodRepositoryContract $frontendPaymentMethodRepository
      * @param AddressRepositoryContract $addressRepository
      * @param \IO\Services\UrlService $urlService
+     * @param \IO\Services\CheckoutService $checkoutService
      */
 	public function __construct(
 		OrderRepositoryContract $orderRepository,
@@ -89,7 +91,8 @@ class OrderService
         SessionStorageService $sessionStorage,
         FrontendPaymentMethodRepositoryContract $frontendPaymentMethodRepository,
         AddressRepositoryContract $addressRepository,
-        UrlService $urlService)
+        UrlService $urlService,
+        CheckoutService $checkoutService)
 	{
 		$this->orderRepository = $orderRepository;
 		$this->basketService   = $basketService;
@@ -97,6 +100,7 @@ class OrderService
         $this->frontendPaymentMethodRepository = $frontendPaymentMethodRepository;
         $this->addressRepository = $addressRepository;
         $this->urlService = $urlService;
+        $this->checkoutService = $checkoutService;
 	}
 
     /**
@@ -105,9 +109,6 @@ class OrderService
      */
 	public function placeOrder():LocalizedOrder
 	{
-	    /** @var CheckoutService $checkoutService */
-        $checkoutService = pluginApp(CheckoutService::class);
-        
         /** @var CustomerService $customerService */
         $customerService = pluginApp(CustomerService::class);
         
@@ -129,10 +130,10 @@ class OrderService
         $order = pluginApp(OrderBuilder::class)->prepare(OrderType::ORDER)
             ->fromBasket()
             ->withContactId($customerService->getContactId())
-            ->withAddressId($checkoutService->getBillingAddressId(), AddressType::BILLING)
-            ->withAddressId($checkoutService->getDeliveryAddressId(), AddressType::DELIVERY)
-            ->withOrderProperty(OrderPropertyType::PAYMENT_METHOD, OrderOptionSubType::MAIN_VALUE, $checkoutService->getMethodOfPaymentId())
-            ->withOrderProperty(OrderPropertyType::SHIPPING_PROFILE, OrderOptionSubType::MAIN_VALUE, $checkoutService->getShippingProfileId())
+            ->withAddressId($this->checkoutService->getBillingAddressId(), AddressType::BILLING)
+            ->withAddressId($this->checkoutService->getDeliveryAddressId(), AddressType::DELIVERY)
+            ->withOrderProperty(OrderPropertyType::PAYMENT_METHOD, OrderOptionSubType::MAIN_VALUE, $this->checkoutService->getMethodOfPaymentId())
+            ->withOrderProperty(OrderPropertyType::SHIPPING_PROFILE, OrderOptionSubType::MAIN_VALUE, $this->checkoutService->getShippingProfileId())
             ->withOrderProperty(OrderPropertyType::DOCUMENT_LANGUAGE, OrderOptionSubType::MAIN_VALUE, $this->sessionStorage->getLang())
             ->withOrderProperty(OrderPropertyType::SHIPPING_PRIVACY_HINT_ACCEPTED, OrderOptionSubType::MAIN_VALUE, $isShippingPrivacyHintAccepted)
             ->withComment(true, $this->sessionStorage->getSessionValue(SessionStorageKeys::ORDER_CONTACT_WISH))
@@ -166,43 +167,47 @@ class OrderService
         return LocalizedOrder::wrap( $order, $this->sessionStorage->getLang() );
 	}
 
+    /**
+     * Subscribe the customer to the newsletter, if stored in the session
+     */
 	public function subscribeToNewsletter()
     {
-        /** @var CheckoutService $checkoutService */
-        $checkoutService = pluginApp(CheckoutService::class);
-
         /** @var CustomerService $customerService */
         $customerService = pluginApp(CustomerService::class);
-
         /** @var CustomerNewsletterService $customerNewsletterService $email */
         $customerNewsletterService = pluginApp(CustomerNewsletterService::class);
 
         $email = $customerService->getEmail();
-        $firstName = '';
-        $lastName = '';
-
-        $address = $customerService->getAddress($checkoutService->getBillingAddressId(), AddressType::BILLING);
-
-        // if the address is for a company, the contact person will be store into the last name
-        if (strlen($address->name1))
-        {
-            foreach ($address->options as $option)
-            {
-                if ($option['typeId'] === AddressOption::TYPE_CONTACT_PERSON)
-                {
-                    $lastName = $option['value'];
-                }
-            }
-        }
-        else
-        {
-            $firstName = $address->name2;
-            $lastName = $address->name3;
-        }
-
         $newsletterSubscriptions = $this->sessionStorage->getSessionValue(SessionStorageKeys::NEWSLETTER_SUBSCRIPTIONS);
 
-        $customerNewsletterService->saveMultipleNewsletterData($email, $newsletterSubscriptions, $firstName, $lastName);
+        if (count($newsletterSubscriptions) && strlen($email))
+        {
+            $firstName = '';
+            $lastName = '';
+
+            $address = $customerService->getAddress($this->checkoutService->getBillingAddressId(), AddressType::BILLING);
+
+            // if the address is for a company, the contact person will be store into the last name
+            if (strlen($address->name1))
+            {
+                foreach ($address->options as $option)
+                {
+                    if ($option['typeId'] === AddressOption::TYPE_CONTACT_PERSON)
+                    {
+                        $lastName = $option['value'];
+
+                        break;
+                    }
+                }
+            }
+            else
+            {
+                $firstName = $address->name2;
+                $lastName = $address->name3;
+            }
+
+            $customerNewsletterService->saveMultipleNewsletterData($email, $newsletterSubscriptions, $firstName, $lastName);
+        }
 
         $this->sessionStorage->setSessionValue(SessionStorageKeys::NEWSLETTER_SUBSCRIPTIONS, null);
     }
