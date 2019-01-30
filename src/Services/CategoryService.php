@@ -352,7 +352,13 @@ class CategoryService
             $type
         );
 
-        return pluginApp( CategoryDataFilter::class )->applyResultFields(
+        /**
+         * pluginApp(CategoryDataFilter::class) creates an instance that could be used directly without temporarily
+         * storing it in a variable. However, our plugin code check does not understand this in this particular case,
+         * so this workaround is necessary.
+         */
+        $categoryDataFilter = pluginApp(CategoryDataFilter::class);
+        return $categoryDataFilter->applyResultFields(
             $tree,
             $this->loadResultFields( ResultFieldTemplate::get( ResultFieldTemplate::TEMPLATE_CATEGORY_TREE ) )
         );

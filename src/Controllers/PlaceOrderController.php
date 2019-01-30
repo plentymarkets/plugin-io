@@ -25,7 +25,6 @@ class PlaceOrderController extends LayoutController
         NotificationService $notificationService,
         Response $response)
     {
-
         $request = pluginApp(Request::class);
         $redirectParam = $request->get('redirectParam', '');
 
@@ -49,6 +48,11 @@ class PlaceOrderController extends LayoutController
         }
         catch (\Exception $exception)
         {
+            if($exception->getCode() === 15)
+            {
+                return $this->urlService->redirectTo("confirmation");
+            }
+
             // TODO get better error text
             $notificationService->error($exception->getMessage());
             return $this->urlService->redirectTo("checkout");

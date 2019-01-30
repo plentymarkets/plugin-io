@@ -4,27 +4,25 @@ namespace IO\Services\ItemSearch\Factories;
 
 use IO\Services\ItemLoader\Services\LoadResultFields;
 use IO\Services\ItemSearch\Extensions\ItemSearchExtension;
+use IO\Services\ItemSearch\Extensions\SortExtension;
 use IO\Services\SessionStorageService;
-use IO\Services\TemplateConfigService;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Collapse\BaseCollapse;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Collapse\CollapseInterface;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\ElasticSearch;
-use Plenty\Modules\Cloud\ElasticSearch\Lib\Index\Settings\Analysis\Filter\FilterInterface;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Processor\DocumentProcessor;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Query\Type\ScoreModifier\RandomScore;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Query\Type\TypeInterface;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Search\Aggregation\AggregationInterface;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Search\Document\DocumentSearch;
-use Plenty\Modules\Cloud\ElasticSearch\Lib\Search\SearchInterface;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Sorting\MultipleSorting;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Sorting\SingleSorting;
-use Plenty\Modules\Cloud\ElasticSearch\Lib\Sorting\SortingInterface;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Source\IncludeSource;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Source\Mutator\MutatorInterface;
-use Plenty\Modules\Item\Search\Aggregations\ItemCardinalityAggregation;
-use Plenty\Modules\Item\Search\Aggregations\ItemCardinalityAggregationProcessor;
+use Plenty\Modules\Item\Search\Aggregations\ItemAttributeValueCardinalityAggregation;
+use Plenty\Modules\Item\Search\Aggregations\ItemAttributeValueCardinalityAggregationProcessor;
 use Plenty\Modules\Item\Search\Filter\SearchFilter;
 use Plenty\Modules\Item\Search\Sort\NameSorting;
+use Plenty\Plugin\Application;
 
 /**
  * Class BaseSearchFactory
@@ -308,6 +306,15 @@ class BaseSearchFactory
         }
         else if ( strlen($field) )
         {
+            if ( strpos( $field, 'sorting.price.') !== false )
+            {
+                $field = sprintf(
+                    'sorting.priceByClientDynamic.%d.%s',
+                    pluginApp(Application::class)->getPlentyId(),
+                    substr($field, strlen('sorting.price.'))
+                );
+            }
+
             $sortingInterface = pluginApp( SingleSorting::class, [$field, $order] );
         }
 
@@ -337,6 +344,13 @@ class BaseSearchFactory
         return $this;
     }
 
+    public function setOrder( $idList )
+    {
+        return $this->withExtension(SortExtension::class, [
+            'idList' => $idList
+        ]);
+    }
+
     /**
      * Group results by field
      *
@@ -349,8 +363,8 @@ class BaseSearchFactory
         $collapse = pluginApp( BaseCollapse::class, [$field] );
         $this->collapse = $collapse;
 
-        $counterAggregationProcessor = pluginApp( ItemCardinalityAggregationProcessor::class );
-        $counterAggregation = pluginApp( ItemCardinalityAggregation::class, [$counterAggregationProcessor] );
+        $counterAggregationProcessor = pluginApp( ItemAttributeValueCardinalityAggregationProcessor::class );
+        $counterAggregation = pluginApp( ItemAttributeValueCardinalityAggregation::class, [$counterAggregationProcessor, $field] );
         $this->withAggregation( $counterAggregation );
 
         return $this;
@@ -412,6 +426,11 @@ class BaseSearchFactory
         if ( $this->sorting !== null )
         {
             $search->setSorting( $this->sorting );
+        }
+
+        if ( $this->itemsPerPage < 0 )
+        {
+            $this->itemsPerPage = 1000;
         }
 
         $search->setPage( $this->page, $this->itemsPerPage );

@@ -140,7 +140,10 @@ class OrderService
         $order = $this->orderRepository->createOrder($order, $couponCode);
 
         if ($order instanceof Order && $order->id > 0) {
-            $params = ['orderId' => $order->id];
+            $params = [
+                'orderId' => $order->id,
+                'webstoreId' => pluginApp(Application::class)->getWebstoreId()
+            ];
             $this->sendMail(AutomaticEmailTemplate::SHOP_ORDER ,AutomaticEmailOrder::class, $params);
         }
 
@@ -151,7 +154,7 @@ class OrderService
             $this->sessionStorage->setSessionValue(SessionStorageKeys::LATEST_ORDER_ID, $order->id);
         }
 
-        if($order->amounts[0]->invoiceTotal==0) {
+        if( ($order->amounts[0]->invoiceTotal == 0) || ($order->amounts[0]->invoiceTotal == $order->amounts[0]->giftCardAmount) ) {
             $this->createAndAssignDummyPayment($order);
         }
 

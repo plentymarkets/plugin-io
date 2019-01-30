@@ -73,10 +73,11 @@ class OrderBuilderQuery
 
 		$items = $this->basketService->getBasketItems();
 
-		if(!is_array($items))
-		{
+		if (!is_array($items)) {
 			throw new \Exception("Error while reading item data from basket");
-		}
+		} elseif (count($items) == 0) {
+            throw new \Exception("Error while create order, no basket items found", 15);
+        }
 
 		$this->withOrderItems(
 			$orderItemBuilder->fromBasket($basket, $items)
