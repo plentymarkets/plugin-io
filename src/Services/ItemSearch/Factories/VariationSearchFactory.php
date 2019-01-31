@@ -190,6 +190,21 @@ class VariationSearchFactory extends BaseSearchFactory
     }
 
     /**
+     * Filter manufacturers by id.
+     *
+     * @param int $manufacturerId To filter by manufacturer
+     *
+     * @return $this
+     */
+    public function hasManufacturer( $manufacturerId )
+    {
+        /** @var VariationBaseFilter $variationFilter */
+        $variationFilter = $this->createFilter( VariationBaseFilter::class );
+        $variationFilter->hasManufacturer( $manufacturerId );
+        return $this;
+    }
+
+    /**
      * Filter variations by multiple property ids.
      *
      * @param int[]     $propertyIds     The property ids to filter by.
@@ -722,3 +737,4 @@ class VariationSearchFactory extends BaseSearchFactory
         return $this;
     }
 }
+
