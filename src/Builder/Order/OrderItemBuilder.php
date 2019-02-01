@@ -3,15 +3,23 @@
 namespace IO\Builder\Order;
 
 use IO\Extensions\Filters\ItemNameFilter;
+use IO\Services\BasketService;
+use IO\Services\NotificationService;
 use IO\Services\SessionStorageService;
+use IO\Events\Basket\BeforeBasketItemToOrderItem;
+use Plenty\Modules\Basket\Exceptions\BasketItemCheckException;
 use Plenty\Modules\Basket\Models\Basket;
 use IO\Services\CheckoutService;
+use Plenty\Modules\Basket\Models\BasketItem;
 use Plenty\Modules\Frontend\PaymentMethod\Contracts\FrontendPaymentMethodRepositoryContract;
 use Plenty\Modules\Frontend\Services\OrderPropertyFileService;
 use Plenty\Modules\Frontend\Services\VatService;
 use Plenty\Modules\Accounting\Vat\Contracts\VatRepositoryContract;
+use Plenty\Modules\Item\Stock\Hooks\CheckItemStock;
 use Plenty\Modules\System\Contracts\WebstoreRepositoryContract;
 use Plenty\Modules\Accounting\Vat\Models\Vat;
+use Plenty\Plugin\Events\Dispatcher;
+
 /**
  * Class OrderItemBuilder
  * @package IO\Builder\Order
@@ -70,17 +78,57 @@ class OrderItemBuilder
 		$orderItems      = [];
         $maxVatRate      = 0;
 
+        $itemsWithoutStock = [];
+        
         foreach($items as $item)
 		{
             if($maxVatRate < $item['vat'])
             {
                 $maxVatRate = $item['vat'];
             }
-
-			array_push($orderItems, $this->basketItemToOrderItem($item, $basket->basketRebate));
+            
+            try
+            {
+                array_push($orderItems, $this->basketItemToOrderItem($item, $basket->basketRebate));
+            }
+			catch(BasketItemCheckException $exception)
+            {
+                $itemsWithoutStock[] = [
+                    'item' => $item,
+                    'stockNet' => $exception->getStockNet()
+                ];
+            }
 		}
 
-
+		if(count($itemsWithoutStock))
+        {
+            /** @var BasketService $basketService */
+            $basketService = pluginApp(BasketService::class);
+            
+            foreach($itemsWithoutStock as $itemWithoutStock)
+            {
+                $updatedItem = array_filter($items, function($filterItem) use ($itemWithoutStock) {
+                    return $filterItem['id'] == $itemWithoutStock['item']['id'];
+                });
+                $updatedItem = $updatedItem[0];
+                
+                $quantity = $itemWithoutStock['stockNet'];
+                
+                if($quantity <= 0)
+                {
+                    $basketService->deleteBasketItem($updatedItem['id']);
+                }
+                else
+                {
+                    $updatedItem['quantity'] = $quantity;
+                    $basketService->updateBasketItem($updatedItem['id'], $updatedItem);
+                }
+                
+            }
+            
+            throw new BasketItemCheckException(BasketItemCheckException::NOT_ENOUGH_STOCK_FOR_ITEM);
+        }
+        
 		$shippingAmount = $basket->shippingAmount;
         if($basket->shippingDeleteByCoupon)
         {
@@ -136,6 +184,14 @@ class OrderItemBuilder
 	 */
 	private function basketItemToOrderItem(array $basketItem, $basketDiscount):array
 	{
+        /** @var BasketItem $checkStockBasketItem */
+        $checkStockBasketItem = pluginApp(BasketItem::class);
+        $checkStockBasketItem->forceFill($basketItem);
+        
+        /** @var Dispatcher $eventDispatcher */
+        $eventDispatcher = pluginApp(Dispatcher::class);
+        $eventDispatcher->fire(pluginApp(BeforeBasketItemToOrderItem::class, [$checkStockBasketItem]));
+	    
         $basketItemProperties = [];
         if(count($basketItem['basketItemOrderParams']))
         {
