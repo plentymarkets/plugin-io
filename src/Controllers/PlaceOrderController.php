@@ -4,7 +4,6 @@ namespace IO\Controllers;
 use IO\Services\NotificationService;
 use IO\Services\OrderService;
 use IO\Services\UrlBuilder\UrlQuery;
-use Plenty\Modules\Basket\Exceptions\BasketItemCheckException;
 use Plenty\Plugin\Http\Response;
 use Plenty\Plugin\Http\Request;
 
@@ -36,15 +35,6 @@ class PlaceOrderController extends LayoutController
             $url .= strlen($redirectParam) ? "?redirectParam=" . $redirectParam : '';
 
             return $this->urlService->redirectTo($url);
-        }
-        catch(BasketItemCheckException $exception)
-        {
-            if ($exception->getCode() == BasketItemCheckException::NOT_ENOUGH_STOCK_FOR_ITEM)
-            {
-                $notificationService->warn('not enough stock for item', 9);
-            }
-            
-            return $this->urlService->redirectTo("checkout");
         }
         catch (\Exception $exception)
         {
