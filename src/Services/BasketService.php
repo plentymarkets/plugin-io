@@ -8,7 +8,6 @@ use Plenty\Modules\Accounting\Vat\Models\VatRate;
 use Plenty\Modules\Basket\Contracts\BasketRepositoryContract;
 use Plenty\Modules\Basket\Contracts\BasketItemRepositoryContract;
 use Plenty\Modules\Basket\Exceptions\BasketItemCheckException;
-use Plenty\Modules\Basket\Exceptions\BasketItemQuantityCheckException;
 use Plenty\Modules\Order\Coupon\Campaign\Contracts\CouponCampaignRepositoryContract;
 use Plenty\Modules\Order\Coupon\Campaign\Models\CouponCampaign;
 use Plenty\Modules\Basket\Models\Basket;
@@ -357,33 +356,10 @@ class BasketService
             } else {
                 $this->basketItemRepository->addBasketItem($data);
             }
-        } catch (BasketItemQuantityCheckException $e) {
-             switch($e->getCode()) {
-                case BasketItemQuantityCheckException::DID_REACH_MAXIMUM_QUANTITY_FOR_ITEM:
-                    $code = 112;
-                    break;
-                case BasketItemQuantityCheckException::DID_REACH_MAXIMUM_QUANTITY_FOR_VARIATION:
-                    $code = 113;
-                    break;
-                case BasketItemQuantityCheckException::DID_NOT_REACH_MINIMUM_QUANTITY_FOR_VARIATION:
-                    $code = 114;
-                    break;
-                default:
-                    $code = 0;
-            }
-            return ["code" => $code];
         } catch (BasketItemCheckException $e) {
-            switch($e->getCode()) {
-                case BasketItemCheckException::VARIATION_NOT_FOUND:
-                    $code = 110;
-                    break;
-                case BasketItemCheckException::NOT_ENOUGH_STOCK_FOR_VARIATION:
-                    $code = 111;
-                    break;
-                default:
-                    $code = 0;
+            if ($e->getCode() == BasketItemCheckException::NOT_ENOUGH_STOCK_FOR_ITEM) {
+                return ["code" => "6"];
             }
-            return ["code" => $code];
         } catch (\Exception $e) {
             return ["code" => $e->getCode()];
         }
