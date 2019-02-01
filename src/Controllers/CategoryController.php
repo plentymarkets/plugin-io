@@ -103,7 +103,7 @@ class CategoryController extends LayoutController
         }
 
         return $this->renderTemplate(
-            "tpl.category.checkout",
+            "tpl.checkout",
             [
                 'category' => $category
             ],
