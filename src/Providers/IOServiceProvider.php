@@ -47,8 +47,6 @@ use IO\Services\UrlService;
 use IO\Services\WebstoreConfigurationService;
 use Plenty\Modules\Authentication\Events\AfterAccountAuthentication;
 use Plenty\Modules\Authentication\Events\AfterAccountContactLogout;
-use IO\Events\Basket\BeforeBasketItemToOrderItem;
-use Plenty\Modules\Item\Stock\Hooks\CheckItemStock;
 use Plenty\Modules\Order\Events\OrderCreated;
 use Plenty\Modules\Plugin\Events\AfterBuildPlugins;
 use Plenty\Modules\Plugin\Events\LoadSitemapPattern;
@@ -135,8 +133,6 @@ class IOServiceProvider extends ServiceProvider
             $customerService = pluginApp(CustomerService::class);
             $customerService->resetGuestAddresses();
         });
-    
-        $dispatcher->listen(BeforeBasketItemToOrderItem::class, CheckItemStock::class);
         
         $dispatcher->listen(AfterAccountContactLogout::class, function($event)
         {
