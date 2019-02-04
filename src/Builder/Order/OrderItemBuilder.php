@@ -107,26 +107,24 @@ class OrderItemBuilder
             
             foreach($itemsWithoutStock as $itemWithoutStock)
             {
-                $updatedItem = array_filter($items, function($filterItem) use ($itemWithoutStock) {
+                $updatedItem = array_shift(array_filter($items, function($filterItem) use ($itemWithoutStock) {
                     return $filterItem['id'] == $itemWithoutStock['item']['id'];
-                });
-                $updatedItem = $updatedItem[0];
-                
+                }));
+         
                 $quantity = $itemWithoutStock['stockNet'];
                 
-                if($quantity <= 0)
+                if($quantity <= 0 && (int)$updatedItem['id'] > 0)
                 {
                     $basketService->deleteBasketItem($updatedItem['id']);
                 }
-                else
+                elseif((int)$updatedItem['id'] > 0)
                 {
                     $updatedItem['quantity'] = $quantity;
                     $basketService->updateBasketItem($updatedItem['id'], $updatedItem);
                 }
-                
             }
             
-            throw new BasketItemCheckException(BasketItemCheckException::NOT_ENOUGH_STOCK_FOR_ITEM);
+            throw pluginApp(BasketItemCheckException::class, [BasketItemCheckException::NOT_ENOUGH_STOCK_FOR_ITEM]);
         }
         
 		$shippingAmount = $basket->shippingAmount;
@@ -186,7 +184,11 @@ class OrderItemBuilder
 	{
         /** @var BasketItem $checkStockBasketItem */
         $checkStockBasketItem = pluginApp(BasketItem::class);
-        $checkStockBasketItem->forceFill($basketItem);
+        $checkStockBasketItem->variationId = $basketItem['variationId'];
+        $checkStockBasketItem->itemId      = $basketItem['itemId'];
+        $checkStockBasketItem->orderRowId  = $basketItem['orderRowId'];
+        $checkStockBasketItem->quantity    = $basketItem['quantity'];
+        $checkStockBasketItem->id          = $basketItem['id'];
         
         /** @var Dispatcher $eventDispatcher */
         $eventDispatcher = pluginApp(Dispatcher::class);
