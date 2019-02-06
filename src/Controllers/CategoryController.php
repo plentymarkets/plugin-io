@@ -66,7 +66,7 @@ class CategoryController extends LayoutController
 
         if ( RouteConfig::getCategoryId( RouteConfig::CHECKOUT ) === $category->id || !$shopBuilderRequest->getPreviewContentType() === 'checkout')
         {
-            return $this->renderCheckoutCategory( $category, !$shopBuilderRequest->isShopBuilder() );
+            return $this->renderCheckoutCategory( $category, $shopBuilderRequest->isShopBuilder() );
         }
 
         return $this->renderTemplate(
