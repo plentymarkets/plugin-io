@@ -36,8 +36,8 @@ class BasketServiceTest extends TestCase
     {
         //Fake Item
         $item1 = ['variationId' => 1, 'quantity' => 1, 'template' => 'test'];
-        $errorCode = 6;
-        $basketItemCheckException = new BasketItemCheckException(BasketItemCheckException::NOT_ENOUGH_STOCK_FOR_ITEM);
+        $errorCode = 111;
+        $basketItemCheckException = new BasketItemCheckException(BasketItemCheckException::NOT_ENOUGH_STOCK_FOR_VARIATION);
 
         $this->basketItemRepositoryMock->shouldReceive('findExistingOneByData')
             ->once()
