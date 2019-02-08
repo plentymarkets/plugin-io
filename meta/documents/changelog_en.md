@@ -1,6 +1,14 @@
 # Release Notes for IO
 
-## v3.0.0 (2010-01-21) <a href="https://github.com/plentymarkets/plugin-io/compare/2.17.1...3.0.0" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
+## v3.0.1 (2019-02-07) <a href="https://github.com/plentymarkets/plugin-io/compare/3.0.0...3.0.1" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
+
+### Fixed
+
+- Due to an error, it was possible that items were oversold in the online store. This has been fixed.
+- Under specific circumstances the configuration of the minimum and maximum number of items and variations could lead to errors when changes were made to items in the shopping cart. This behaviour has been fixed.
+- Due to an error, it was possible that full memory utilisation was reached. This has been fixed.
+
+## v3.0.0 (2019-01-21) <a href="https://github.com/plentymarkets/plugin-io/compare/2.17.1...3.0.0" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
 
 ### Added
 
