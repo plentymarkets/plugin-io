@@ -607,7 +607,8 @@ class CustomerServiceTest extends TestCase
 
         /** @var Address $address */
         $address = factory(Address::class)->make([
-            "id" => $addressId,
+            "id"     => $addressId,
+            "gender" => "male"
         ]);
 
         $contact = factory(Contact::class)->make([
