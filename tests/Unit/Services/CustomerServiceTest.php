@@ -27,8 +27,6 @@ class CustomerServiceTest extends TestCase
 
     /** @var CustomerService $customerService */
     protected $customerService;
-    /** @var AddressValidator $addressValidatorMock */
-    protected $addressValidatorMock;
     /** @var AddressRepository $addressRepositoryMock */
     protected $addressRepositoryMock;
     /** @var BasketService $basketServiceMock */
@@ -48,12 +46,10 @@ class CustomerServiceTest extends TestCase
     /** @var Dispatcher $dispatcherMock */
     protected $dispatcherMock;
 
+
     protected function setUp()
     {
         parent::setUp();
-
-        $this->addressValidatorMock = Mockery::mock('alias:' . AddressValidator::class);
-        $this->replaceInstanceByMock(AddressValidator::class, $this->addressValidatorMock);
 
         $this->addressRepositoryMock = Mockery::mock(AddressRepository::class);
         $this->replaceInstanceByMock(AddressRepository::class, $this->addressRepositoryMock);
@@ -102,8 +98,6 @@ class CustomerServiceTest extends TestCase
 
         $addressArray = $address->toArray();
 
-        $this->addressValidatorMock->shouldReceive('validateOrFail')->andReturnNull()->once();
-
         $this->addressRepositoryMock
             ->shouldReceive('createAddress')
             ->andReturn($address)
@@ -141,8 +135,6 @@ class CustomerServiceTest extends TestCase
         ]);
 
         $addressArray = $address->toArray();
-
-        $this->addressValidatorMock->shouldReceive('validateOrFail')->andReturnNull()->once();
 
         $this->addressRepositoryMock
             ->shouldReceive('createAddress')
@@ -186,8 +178,6 @@ class CustomerServiceTest extends TestCase
             "id" => $contactId,
         ]);
 
-        $this->addressValidatorMock->shouldReceive('validateOrFail')->andReturnNull()->once();
-
         $this->basketServiceMock->shouldReceive('setBillingAddressId')->with($address->id)->andReturnNull()->once();
 
         $this->userSessionMock->shouldReceive('getCurrentContactId')->andReturn($contact->id);
@@ -215,7 +205,7 @@ class CustomerServiceTest extends TestCase
         /** @var Address $address */
         $address = factory(Address::class)->make([
             'id' => $addressId,
-            'gender' => null
+            'gender' => 'male'
         ]);
 
         $addressArray = $address->toArray();
@@ -229,8 +219,6 @@ class CustomerServiceTest extends TestCase
         ]);
 
         $webstoreConfig = factory(WebstoreConfiguration::class)->make();
-
-        $this->addressValidatorMock->shouldReceive('validateOrFail')->andReturnNull()->once();
 
         $this->basketServiceMock->shouldReceive('setBillingAddressId')->with($address->id)->andReturnNull()->once();
 
@@ -283,8 +271,6 @@ class CustomerServiceTest extends TestCase
 
         $webstoreConfig = factory(WebstoreConfiguration::class)->make();
 
-        $this->addressValidatorMock->shouldReceive('validateOrFail')->andReturnNull()->once();
-
         $this->basketServiceMock->shouldReceive('setBillingAddressId')->with($address->id)->andReturnNull()->once();
 
         $this->userSessionMock->shouldReceive('getCurrentContactId')->andReturn($contact->id);
@@ -317,6 +303,7 @@ class CustomerServiceTest extends TestCase
         /** @var Address $address */
         $address = factory(Address::class)->make([
             'id' => $addressId,
+            'gender' => 'male'
         ]);
 
         $addressArray = $address->toArray();
@@ -333,8 +320,6 @@ class CustomerServiceTest extends TestCase
         ]);
 
         $webstoreConfig = factory(WebstoreConfiguration::class)->make();
-
-        $this->addressValidatorMock->shouldReceive('validateOrFail')->andReturnNull()->once();
 
         $this->basketServiceMock->shouldReceive('setBillingAddressId')->with($address->id)->andReturnNull()->once();
 
@@ -537,8 +522,6 @@ class CustomerServiceTest extends TestCase
         $this->addressRepositoryMock->shouldReceive('updateAddress')
             ->andReturn($address2);
 
-        $this->addressValidatorMock->shouldReceive('validateOrFail')->andReturnNull()->once();
-
         $this->basketServiceMock
             ->shouldReceive('setDeliveryAddressId')
             ->with($addressId)
@@ -580,6 +563,7 @@ class CustomerServiceTest extends TestCase
         /** @var Address $address */
         $address = factory(Address::class)->make([
             "id" => $addressId,
+            "gender" => "male"
         ]);
 
         $contact = factory(Contact::class)->make([
@@ -595,8 +579,6 @@ class CustomerServiceTest extends TestCase
 
         $this->contactAddressRepositoryMock->shouldReceive('updateAddress')
             ->andReturn($address2);
-
-        $this->addressValidatorMock->shouldReceive('validateOrFail')->andReturnNull()->once();
 
         $this->basketServiceMock
             ->shouldReceive('setDeliveryAddressId')
@@ -652,8 +634,6 @@ class CustomerServiceTest extends TestCase
         $this->contactAddressRepositoryMock->shouldReceive('updateAddress')
             ->andReturn($address2);
 
-        $this->addressValidatorMock->shouldReceive('validateOrFail')->andReturnNull()->once();
-
         $this->basketServiceMock
             ->shouldReceive('setBillingAddressId')
             ->with($addressId)
@@ -688,7 +668,7 @@ class CustomerServiceTest extends TestCase
         /** @var Address $address */
         $address = factory(Address::class)->make([
             "id"    => $addressId,
-            "name1" => null,
+            "name1" => '',
         ]);
 
         $contact = factory(Contact::class)->make([
@@ -708,8 +688,6 @@ class CustomerServiceTest extends TestCase
 
         $this->contactAddressRepositoryMock->shouldReceive('updateAddress')
             ->andReturn($address2);
-
-        $this->addressValidatorMock->shouldReceive('validateOrFail')->andReturnNull()->once();
 
         $this->basketServiceMock
             ->shouldReceive('setBillingAddressId')
