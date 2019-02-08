@@ -33,12 +33,46 @@ class RouteConfig
 
     private static $enabledRoutes = null;
 
-    private static function getEnabledRoutes()
+    public static function getEnabledRoutes()
     {
         if ( is_null(self::$enabledRoutes) )
         {
             $config = pluginApp(ConfigRepository::class);
-            self::$enabledRoutes = explode(", ",  $config->get("IO.routing.enabled_routes") );
+            $configValue = $config->get("IO.routing.enabled_routes");
+            if ( $configValue === "all" )
+            {
+                self::$enabledRoutes = [
+                    self::HOME,
+                    self::BASKET,
+                    self::CHECKOUT,
+                    self::MY_ACCOUNT,
+                    self::CONFIRMATION,
+                    self::LOGIN,
+                    self::REGISTER,
+                    self::PASSWORD_RESET,
+                    self::SEARCH,
+                    self::PLACE_ORDER,
+                    self::CANCELLATION_RIGHTS,
+                    self::CANCELLATION_FORM,
+                    self::LEGAL_DISCLOSURE,
+                    self::PRIVACY_POLICY,
+                    self::TERMS_CONDITIONS,
+                    self::CONTACT,
+                    self::ITEM,
+                    self::CATEGORY,
+                    self::WISH_LIST,
+                    self::ORDER_RETURN,
+                    self::ORDER_PROPERTY_FILE,
+                    self::ORDER_RETURN_CONFIRMATION,
+                    self::NEWSLETTER_OPT_IN,
+                    self::NEWSLETTER_OPT_OUT
+                ];
+            }
+            else
+            {
+                self::$enabledRoutes = explode(", ",  $configValue );
+            }
+
         }
 
         return self::$enabledRoutes;
@@ -47,7 +81,7 @@ class RouteConfig
     public static function isActive( $route )
     {
         self::getEnabledRoutes();
-        return (in_array($route, self::$enabledRoutes) || in_array("all", self::$enabledRoutes))
+        return in_array($route, self::$enabledRoutes)
             && self::getCategoryId( $route ) === 0;
     }
 
