@@ -413,7 +413,10 @@ class CustomerServiceFeatureTest extends TestCase
     private function assertAddressFieldsAreEqual($address1, $address2)
     {
         foreach ($address1 as $key => $value) {
-            $this->assertEquals($address1[$key], $address2[$key]);
+            // Do not compare 'contactPerson' because it is stored as a address option
+            if ($key !== 'contactPerson') {
+                $this->assertEquals($address1[$key], $address2[$key]);
+            }
         }
     }
 }
