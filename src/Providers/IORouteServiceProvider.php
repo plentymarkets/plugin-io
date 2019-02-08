@@ -205,6 +205,11 @@ class IORouteServiceProvider extends RouteServiceProvider
             $router->get('order-property-file/{hash1}', 'IO\Controllers\OrderPropertyFileController@downloadTempFile');
             $router->get('order-property-file/{hash1}/{hash2}', 'IO\Controllers\OrderPropertyFileController@downloadFile');
         }
+        
+        if( RouteConfig::isActive(RouteConfig::ORDER_DOCUMENT) )
+        {
+            $router->get('order-document/{documentId}', 'IO\Controllers\DocumentController@download');
+        }
 
         
         if( RouteConfig::isActive(RouteConfig::NEWSLETTER_OPT_IN) )
