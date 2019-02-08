@@ -42,7 +42,6 @@ class ShippingCountry
         switch($countryId)
         {
             case self::UNITED_KINGDOM:
-            case self::IRELAND:
                 return self::ADDRESS_FORMAT_EN;
         }
 
