@@ -162,6 +162,10 @@
                               "caption": "Config.routingEnabledRoutesPossibleValueOrderPropertyFile"
                           },
                           {
+                              "value": "order-document",
+                              "caption": "Config.routingEnabledRoutesPossibleValueOrderDocument"
+                          },
+                          {
                               "value": "order-return-confirmation",
                               "caption": "Config.routingEnabledRoutesPossibleValueOrderReturnConfirmation"
                           },

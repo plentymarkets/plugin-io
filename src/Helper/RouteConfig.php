@@ -27,6 +27,7 @@ class RouteConfig
     const WISH_LIST                 = "wish-list";
     const ORDER_RETURN              = "order-return";
     const ORDER_PROPERTY_FILE       = "order-property-file";
+    const ORDER_DOCUMENT            = "order-document";
     const ORDER_RETURN_CONFIRMATION = "order-return-confirmation";
     const NEWSLETTER_OPT_IN         = "newsletter-opt-in";
     const NEWSLETTER_OPT_OUT        = "newsletter-opt-out";
