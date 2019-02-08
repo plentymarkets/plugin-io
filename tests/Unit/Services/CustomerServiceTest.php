@@ -510,7 +510,8 @@ class CustomerServiceTest extends TestCase
 
         /** @var Address $address */
         $address = factory(Address::class)->make([
-            "id" => $addressId,
+            "id"     => $addressId,
+            "gender" => "male"
         ]);
 
         $this->userSessionMock->shouldReceive('getCurrentContactId')->andReturn(0);
