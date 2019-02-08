@@ -52,7 +52,7 @@ class CustomerServiceTest extends TestCase
     {
         parent::setUp();
 
-        $this->addressValidatorMock = Mockery::mock(AddressValidator::class);
+        $this->addressValidatorMock = Mockery::mock('alias:' . AddressValidator::class);
         $this->replaceInstanceByMock(AddressValidator::class, $this->addressValidatorMock);
 
         $this->addressRepositoryMock = Mockery::mock(AddressRepository::class);
@@ -95,7 +95,7 @@ class CustomerServiceTest extends TestCase
         /** @var Address $address */
         $address = factory(Address::class)->make([
             'id'     => $addressId,
-            'name1'  => null,
+            'name1'  => '',
             'gender' => 'male'  // avoid generating a custom company address
         ]);
 
@@ -136,7 +136,7 @@ class CustomerServiceTest extends TestCase
         /** @var Address $address */
         $address = factory(Address::class)->make([
             'id'    => $addressId,
-            'name1' => null,
+            'name1' => '',
             'gender'=> 'male'
         ]);
 
@@ -176,7 +176,7 @@ class CustomerServiceTest extends TestCase
         /** @var Address $address */
         $address = factory(Address::class)->make([
             'id'    => $addressId,
-            'name1' => null,
+            'name1' => '',
             'gender'=> 'male'
         ]);
 
