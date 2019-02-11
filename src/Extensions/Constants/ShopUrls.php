@@ -18,50 +18,109 @@ class ShopUrls
     public $appendTrailingSlash = false;
     public $trailingSlashSuffix = "";
     public $includeLanguage     = false;
-    public $home                = "";
-    public $basket              = "";
-    public $cancellationForm    = "";
-    public $cancellationRights  = "";
-    public $contact             = "";
-    public $legalDisclosure     = "";
-    public $login               = "";
-    public $gtc                 = "";
-    public $myAccount           = "";
-    public $privacyPolicy       = "";
-    public $registration        = "";
-    public $wishList            = "";
 
     public function __construct()
     {
         $this->appendTrailingSlash      = UrlQuery::shouldAppendTrailingSlash();
         $this->trailingSlashSuffix      = $this->appendTrailingSlash ? '/' : '';
         $this->includeLanguage = pluginApp(SessionStorageService::class)->getLang() !== pluginApp(WebstoreConfigurationService::class)->getDefaultLanguage();
+    }
 
-        $this->home                     = pluginApp(UrlQuery::class, ['path' => '/'])->toRelativeUrl($this->includeLanguage);
-        $this->basket                   = pluginApp(UrlQuery::class, ['path' => '/basket'] )->toRelativeUrl($this->includeLanguage);
-        $this->cancellationForm         = pluginApp(UrlQuery::class, ['path' => '/cancellation-form'] )->toRelativeUrl($this->includeLanguage);
-        $this->cancellationRights       = pluginApp(UrlQuery::class, ['path' => '/cancellation-rights'] )->toRelativeUrl($this->includeLanguage);
-        $this->contact                  = pluginApp(UrlQuery::class, ['path' => '/contact'] )->toRelativeUrl($this->includeLanguage);
-        $this->legalDisclosure          = pluginApp(UrlQuery::class, ['path' => '/legal-disclosure'] )->toRelativeUrl($this->includeLanguage);
-        $this->login                    = pluginApp(UrlQuery::class, ['path' => '/login'] )->toRelativeUrl($this->includeLanguage);
-        $this->gtc                      = pluginApp(UrlQuery::class, ['path' => '/gtc'] )->toRelativeUrl($this->includeLanguage);
-        $this->myAccount                = pluginApp(UrlQuery::class, ['path' => '/my-account'] )->toRelativeUrl($this->includeLanguage);
-        $this->privacyPolicy            = pluginApp(UrlQuery::class, ['path' => '/privacy-policy'] )->toRelativeUrl($this->includeLanguage);
-        $this->registration             = pluginApp(UrlQuery::class, ['path' => '/register'] )->toRelativeUrl($this->includeLanguage);
-        $this->wishList                 = pluginApp(UrlQuery::class, ['path' => '/wish-list'] )->toRelativeUrl($this->includeLanguage);
+    public function getBasket()
+    {
+        return $this->getShopUrl(RouteConfig::BASKET);
+    }
 
+    public function getCancellationForm()
+    {
+        return $this->getShopUrl( RouteConfig::CANCELLATION_FORM );
+    }
+
+    public function getCancellationRights()
+    {
+        return $this->getShopUrl(RouteConfig::CANCELLATION_RIGHTS);
     }
 
     public function getCheckout()
     {
-        return $this->fromMemoryCache("checkout", function()
+        return $this->getShopUrl(RouteConfig::CHECKOUT);
+    }
+
+    public function getConfirmation()
+    {
+        return $this->getShopUrl(RouteConfig::CONFIRMATION);
+    }
+
+    public function getContact()
+    {
+        return $this->getShopUrl(RouteConfig::CONTACT);
+    }
+
+    public function getGtc()
+    {
+        return $this->getShopUrl(RouteConfig::TERMS_CONDITIONS);
+    }
+
+    public function getHome()
+    {
+        return $this->getShopUrl(RouteConfig::HOME);
+    }
+
+    public function getLegalDisclosure()
+    {
+        return $this->getShopUrl(RouteConfig::LEGAL_DISCLOSURE);
+    }
+
+    public function getLogin()
+    {
+        return $this->getShopUrl(RouteConfig::LOGIN);
+    }
+
+    public function getMyAccount()
+    {
+        return $this->getShopUrl(RouteConfig::MY_ACCOUNT);
+    }
+
+    public function getPasswordReset()
+    {
+        return $this->getShopUrl(RouteConfig::PASSWORD_RESET);
+    }
+
+    public function getPrivacyPolicy()
+    {
+        return $this->getShopUrl(RouteConfig::PRIVACY_POLICY);
+    }
+
+    public function getRegistration()
+    {
+        return $this->getShopUrl(RouteConfig::REGISTER);
+    }
+
+    public function getSearch()
+    {
+        return $this->getShopUrl(RouteConfig::SEARCH);
+    }
+
+    public function getTermsConditions()
+    {
+        return $this->getShopUrl(RouteConfig::TERMS_CONDITIONS);
+    }
+
+    public function getWishList()
+    {
+        return $this->getShopUrl(RouteConfig::WISH_LIST);
+    }
+
+    private function getShopUrl( $route )
+    {
+        return $this->fromMemoryCache($route, function() use ($route)
         {
-            $checkoutCategoryId = RouteConfig::getCategoryId( RouteConfig::CHECKOUT );
-            if ( $checkoutCategoryId > 0 )
+            $categoryId = RouteConfig::getCategoryId( $route );
+            if ( $categoryId > 0 )
             {
                 /** @var CategoryService $categoryService */
                 $categoryService = pluginApp(CategoryService::class);
-                $category = $categoryService->get( $checkoutCategoryId );
+                $category = $categoryService->get( $categoryId );
 
                 if ( $category !== null )
                 {
@@ -77,7 +136,7 @@ class ShopUrls
                 }
             }
 
-            return pluginApp(UrlQuery::class, ['path' => '/checkout'] )->toRelativeUrl($this->includeLanguage);
+            return pluginApp(UrlQuery::class, ['path' => $route] )->toRelativeUrl($this->includeLanguage);
         });
     }
 }

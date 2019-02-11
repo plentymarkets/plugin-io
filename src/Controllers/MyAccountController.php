@@ -30,7 +30,8 @@ class MyAccountController extends LayoutController
         }
 
 		return $this->renderTemplate(
-		    "tpl.my-account", [
+		    "tpl.my-account",
+            [
                 "category" => $category
             ],
             false );
