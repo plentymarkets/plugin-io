@@ -64,9 +64,18 @@ class CategoryController extends LayoutController
         /** @var ShopBuilderRequest $shopBuilderRequest */
         $shopBuilderRequest = pluginApp(ShopBuilderRequest::class);
 
-        if ( RouteConfig::getCategoryId( RouteConfig::CHECKOUT ) === $category->id || !$shopBuilderRequest->getPreviewContentType() === 'checkout')
+        if ( RouteConfig::getCategoryId( RouteConfig::CHECKOUT ) === $category->id || $shopBuilderRequest->getPreviewContentType() === 'checkout')
         {
-            return $this->renderCheckoutCategory( $category, $shopBuilderRequest->isShopBuilder() );
+            /** @var CheckoutController $checkoutController */
+            $checkoutController = pluginApp(CheckoutController::class);
+            return $checkoutController->showCheckout( $category );
+        }
+
+        if ( RouteConfig::getCategoryId( RouteConfig::MY_ACCOUNT ) === $category->id || $shopBuilderRequest->getPreviewContentType() === 'myaccount')
+        {
+            /** @var MyAccountController $myAccountController */
+            $myAccountController = pluginApp(MyAccountController::class);
+            return $myAccountController->showMyAccount( $category );
         }
 
         return $this->renderTemplate(
@@ -80,42 +89,5 @@ class CategoryController extends LayoutController
             ]
         );
 	}
-
-
-	private function renderCheckoutCategory( $category, $isShopBuilderPreview = false )
-    {
-        /** @var BasketItemRepositoryContract $basketItemRepository */
-        $basketItemRepository = pluginApp(BasketItemRepositoryContract::class);
-
-        /** @var SessionStorageService $sessionStorage */
-        $sessionStorage = pluginApp(SessionStorageService::class);
-
-        /** @var CustomerService $customerService */
-        $customerService = pluginApp(CustomerService::class);
-
-        if ( !$isShopBuilderPreview )
-        {
-            if( $sessionStorage->getSessionValue(SessionStorageKeys::GUEST_EMAIL) == null
-                && $customerService->getContactId() <= 0 )
-            {
-                AuthGuard::redirect(
-                    pluginApp(ShopUrls::class)->login,
-                    ["backlink" => AuthGuard::getUrl()]
-                );
-            }
-            else if(!count($basketItemRepository->all()))
-            {
-                AuthGuard::redirect(pluginApp(ShopUrls::class)->home, []);
-            }
-        }
-
-        return $this->renderTemplate(
-            "tpl.checkout",
-            [
-                'category' => $category
-            ],
-            false
-        );
-    }
 
 }
