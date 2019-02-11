@@ -18,7 +18,7 @@ class CustomerServiceFeatureTest extends TestCase
     /** @var CustomerService $customerService */
     protected $customerService;
 
-    protected $genders = ['male', 'female', null];
+    protected $genders = ['male', 'female'];
 
     protected function setUp()
     {
@@ -198,6 +198,7 @@ class CustomerServiceFeatureTest extends TestCase
                     'town'       => $this->fake->city,
                     'countryId'  => 1,
                     'stateId'    => '',
+                    'contactPerson' => $this->fake->name
                 ],
                 AddressType::BILLING,
             ],
@@ -223,16 +224,17 @@ class CustomerServiceFeatureTest extends TestCase
             [
                 [
                     // Delivery address with company
-                    'gender'     => $this->fake->randomElement($this->genders),
+                    'gender'     => '',
                     'name1'      => $this->fake->company,
                     'name2'      => $this->fake->firstName,
-                    'name3'      => $this->fake->lastName,
+                    'name3'      => '',
                     'name4'      => '',
                     'address1'   => $this->fake->streetName,
                     'address2'   => $this->fake->streetAddress,
                     'postalCode' => $this->fake->postcode,
                     'town'       => $this->fake->city,
                     'countryId'  => 1,
+                    'contactPerson' => $this->fake->name
                 ],
                 AddressType::DELIVERY,
             ],
@@ -411,7 +413,10 @@ class CustomerServiceFeatureTest extends TestCase
     private function assertAddressFieldsAreEqual($address1, $address2)
     {
         foreach ($address1 as $key => $value) {
-            $this->assertEquals($address1[$key], $address2[$key]);
+            // Do not compare 'contactPerson' because it is stored as a address option
+            if ($key !== 'contactPerson') {
+                $this->assertEquals($address1[$key], $address2[$key]);
+            }
         }
     }
 }
