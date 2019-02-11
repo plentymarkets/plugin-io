@@ -6,6 +6,7 @@ use IO\Api\Resources\CustomerAddressResource;
 use IO\Builder\Order\AddressType;
 use IO\Builder\Order\OrderType;
 use IO\Constants\SessionStorageKeys;
+use IO\Constants\ShippingCountry;
 use IO\Extensions\Mail\SendMail;
 use IO\Helper\MemoryCache;
 use IO\Helper\UserSession;
@@ -623,10 +624,9 @@ class CustomerService
      */
 	public function createAddress(array $addressData, int $type):Address
 	{
-	    $addressValidator = pluginApp(AddressValidator::class);
-        $addressValidator->validateOrFail($type, $addressData);
+	    AddressValidator::validateOrFail($addressData);
 
-        if($addressValidator->isEnAddress($addressData['countryId']))
+        if(ShippingCountry::getAddressFormat($addressData['countryId']) === ShippingCountry::ADDRESS_FORMAT_EN)
         {
             $addressData['useAddressLightValidator'] = true;
         }
@@ -801,8 +801,7 @@ class CustomerService
      */
     public function updateAddress(int $addressId, array $addressData, int $type):Address
     {
-        $addressValidator = pluginApp(AddressValidator::class);
-        $addressValidator->validateOrFail($type, $addressData);
+        AddressValidator::validateOrFail($addressData);
 
         if (isset($addressData['stateId']) && empty($addressData['stateId']))
         {
