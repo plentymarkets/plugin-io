@@ -9,6 +9,7 @@ use IO\Builder\Order\OrderType;
 use IO\Builder\Order\OrderOptionSubType;
 use IO\Constants\OrderPaymentStatus;
 use IO\Constants\SessionStorageKeys;
+use IO\Extensions\Constants\ShopUrls;
 use IO\Extensions\Mail\SendMail;
 use IO\Models\LocalizedOrder;
 use Plenty\Modules\Account\Address\Contracts\AddressRepositoryContract;
@@ -277,7 +278,7 @@ class OrderService
                 if ((int)$this->customerService->getContactId() <= 0)
                 {
 
-                    return $this->urlService->redirectTo('login?backlink=confirmation/' . $orderId . '/' . $orderAccessKey);
+                    return $this->urlService->redirectTo(pluginApp(ShopUrls::class)->login . '?backlink=' . pluginApp(ShopUrls::class)->confirmation . '/' . $orderId . '/' . $orderAccessKey);
                 }
                 elseif ((int)$orderContactId !== (int)$this->customerService->getContactId())
                 {
