@@ -8,7 +8,6 @@ use IO\Services\CategoryService;
 use IO\Services\SessionStorageService;
 use IO\Services\UrlBuilder\CategoryUrlBuilder;
 use IO\Services\UrlBuilder\UrlQuery;
-use IO\Services\UrlService;
 use IO\Services\WebstoreConfigurationService;
 
 class ShopUrls
@@ -18,7 +17,25 @@ class ShopUrls
     public $appendTrailingSlash = false;
     public $trailingSlashSuffix = "";
     public $includeLanguage     = false;
+
+    public $basket              = "";
+    public $cancellationForm    = "";
+    public $cancellationRights  = "";
+    public $checkout            = "";
+    public $confirmation        = "";
+    public $contact             = "";
+    public $gtc                 = "";
     public $home                = "";
+    public $legalDisclosure     = "";
+    public $login               = "";
+    public $myAccount           = "";
+    public $passwordReset       = "";
+    public $privacyPolicy       = "";
+    public $registration        = "";
+    public $search              = "";
+    public $termsConditions     = "";
+    public $wishList            = "";
+
 
     public function __construct()
     {
@@ -26,88 +43,25 @@ class ShopUrls
         $this->trailingSlashSuffix      = $this->appendTrailingSlash ? '/' : '';
         $this->includeLanguage = pluginApp(SessionStorageService::class)->getLang() !== pluginApp(WebstoreConfigurationService::class)->getDefaultLanguage();
 
+        $this->basket                   = $this->getShopUrl(RouteConfig::BASKET);
+        $this->cancellationForm         = $this->getShopUrl(RouteConfig::CANCELLATION_FORM);
+        $this->cancellationRights       = $this->getShopUrl(RouteConfig::CANCELLATION_RIGHTS);
+        $this->checkout                 = $this->getShopUrl(RouteConfig::CHECKOUT);
+        $this->confirmation             = $this->getShopUrl(RouteConfig::CONFIRMATION);
+        $this->contact                  = $this->getShopUrl(RouteConfig::CONTACT);
+        $this->gtc                      = $this->getShopUrl(RouteConfig::TERMS_CONDITIONS);
+
         // Homepage URL may not be used from category. Even if linked to category, the homepage url should be "/"
         $this->home                     = pluginApp(UrlQuery::class, ['path' => '/'])->toRelativeUrl($this->includeLanguage);
-    }
-
-    public function getBasket()
-    {
-        return $this->getShopUrl(RouteConfig::BASKET);
-    }
-
-    public function getCancellationForm()
-    {
-        return $this->getShopUrl( RouteConfig::CANCELLATION_FORM );
-    }
-
-    public function getCancellationRights()
-    {
-        return $this->getShopUrl(RouteConfig::CANCELLATION_RIGHTS);
-    }
-
-    public function getCheckout()
-    {
-        return $this->getShopUrl(RouteConfig::CHECKOUT);
-    }
-
-    public function getConfirmation()
-    {
-        return $this->getShopUrl(RouteConfig::CONFIRMATION);
-    }
-
-    public function getContact()
-    {
-        return $this->getShopUrl(RouteConfig::CONTACT);
-    }
-
-    public function getGtc()
-    {
-        return $this->getShopUrl(RouteConfig::TERMS_CONDITIONS);
-    }
-
-    public function getLegalDisclosure()
-    {
-        return $this->getShopUrl(RouteConfig::LEGAL_DISCLOSURE);
-    }
-
-    public function getLogin()
-    {
-        return $this->getShopUrl(RouteConfig::LOGIN);
-    }
-
-    public function getMyAccount()
-    {
-        return $this->getShopUrl(RouteConfig::MY_ACCOUNT);
-    }
-
-    public function getPasswordReset()
-    {
-        return $this->getShopUrl(RouteConfig::PASSWORD_RESET);
-    }
-
-    public function getPrivacyPolicy()
-    {
-        return $this->getShopUrl(RouteConfig::PRIVACY_POLICY);
-    }
-
-    public function getRegistration()
-    {
-        return $this->getShopUrl(RouteConfig::REGISTER);
-    }
-
-    public function getSearch()
-    {
-        return $this->getShopUrl(RouteConfig::SEARCH);
-    }
-
-    public function getTermsConditions()
-    {
-        return $this->getShopUrl(RouteConfig::TERMS_CONDITIONS);
-    }
-
-    public function getWishList()
-    {
-        return $this->getShopUrl(RouteConfig::WISH_LIST);
+        $this->legalDisclosure          = $this->getShopUrl(RouteConfig::LEGAL_DISCLOSURE);
+        $this->login                    = $this->getShopUrl(RouteConfig::LOGIN);
+        $this->myAccount                = $this->getShopUrl(RouteConfig::MY_ACCOUNT);
+        $this->passwordReset            = $this->getShopUrl(RouteConfig::PASSWORD_RESET);
+        $this->privacyPolicy            = $this->getShopUrl(RouteConfig::PRIVACY_POLICY);
+        $this->registration             = $this->getShopUrl(RouteConfig::REGISTER);
+        $this->search                   = $this->getShopUrl(RouteConfig::SEARCH);
+        $this->termsConditions          = $this->getShopUrl(RouteConfig::TERMS_CONDITIONS);
+        $this->wishList                 = $this->getShopUrl(RouteConfig::WISH_LIST);
     }
 
     private function getShopUrl( $route )

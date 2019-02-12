@@ -1,6 +1,7 @@
 <?php //strict
 namespace IO\Controllers;
 
+use IO\Extensions\Constants\ShopUrls;
 use IO\Services\NotificationService;
 use IO\Services\OrderService;
 use IO\Services\UrlBuilder\UrlQuery;
@@ -44,18 +45,18 @@ class PlaceOrderController extends LayoutController
                 $notificationService->warn('not enough stock for item', 9);
             }
             
-            return $this->urlService->redirectTo("checkout");
+            return $this->urlService->redirectTo(pluginApp(ShopUrls::class)->checkout);
         }
         catch (\Exception $exception)
         {
             if($exception->getCode() === 15)
             {
-                return $this->urlService->redirectTo("confirmation");
+                return $this->urlService->redirectTo(pluginApp(ShopUrls::class)->confirmation);
             }
 
             // TODO get better error text
             $notificationService->error($exception->getMessage());
-            return $this->urlService->redirectTo("checkout");
+            return $this->urlService->redirectTo(pluginApp(ShopUrls::class)->checkout);
         }
     }
 
@@ -69,7 +70,7 @@ class PlaceOrderController extends LayoutController
         if( $orderData == null )
         {
             $notificationService->error("Order (". $orderId .") not found!");
-            return $this->urlService->redirectTo("checkout");
+            return $this->urlService->redirectTo(pluginApp(ShopUrls::class)->checkout);
         }
 
         if( $paymentId < 0 )
@@ -104,6 +105,6 @@ class PlaceOrderController extends LayoutController
             return $this->urlService->redirectTo($redirectParam);
         }
 
-        return $this->urlService->redirectTo("confirmation");
+        return $this->urlService->redirectTo(pluginApp(ShopUrls::class)->confirmation);
     }
 }

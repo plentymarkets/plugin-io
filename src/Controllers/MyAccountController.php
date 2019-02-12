@@ -1,6 +1,7 @@
 <?php //strict
 namespace IO\Controllers;
 
+use IO\Extensions\Constants\ShopUrls;
 use IO\Guards\AuthGuard;
 use Plenty\Modules\Category\Models\Category;
 use Plenty\Modules\ShopBuilder\Helper\ShopBuilderRequest;
@@ -26,7 +27,7 @@ class MyAccountController extends LayoutController
         {
             /** @var AuthGuard $guard */
             $guard = pluginApp(AuthGuard::class);
-            $guard->assertOrRedirect( true, "/login" );
+            $guard->assertOrRedirect( true, pluginApp(ShopUrls::class)->login );
         }
 
 		return $this->renderTemplate(

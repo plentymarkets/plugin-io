@@ -1,6 +1,7 @@
 <?php //strict
 namespace IO\Controllers;
 
+use IO\Extensions\Constants\ShopUrls;
 use IO\Services\UrlService;
 use Plenty\Plugin\Http\Request;
 use Plenty\Plugin\Http\Response;
@@ -22,7 +23,7 @@ class HomepageController extends LayoutController
         
         if(strlen($orderAccessKey) && (int)$orderId > 0)
         {
-            return $urlService->redirectTo('confirmation/'.$orderId.'/'.$orderAccessKey);
+            return $urlService->redirectTo(pluginApp(ShopUrls::class)->confirmation . '/'.$orderId.'/'.$orderAccessKey);
         }
         
         return $this->renderTemplate(
