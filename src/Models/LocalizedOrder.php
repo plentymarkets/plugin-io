@@ -105,7 +105,6 @@ class LocalizedOrder extends ModelWrapper
         catch(\Exception $e)
         {}
         
-
         $frontentPaymentRepository = pluginApp( FrontendPaymentMethodRepositoryContract::class );
         
         try
@@ -115,8 +114,24 @@ class LocalizedOrder extends ModelWrapper
         }
         catch(\Exception $e)
         {}
-
-
+    
+    
+        $paymentStatusProperty = $order->properties->firstWhere('typeId', OrderPropertyType::PAYMENT_STATUS);
+        if($paymentStatusProperty instanceof OrderProperty)
+        {
+            $instance->paymentStatus = $paymentStatusProperty->value;
+        }
+    
+        $paymentMethodIdProperty = $order->properties->firstWhere('typeId', OrderPropertyType::PAYMENT_METHOD);
+        if($paymentMethodIdProperty instanceof OrderProperty)
+        {
+            /** @var OrderService $orderService */
+            $orderService = pluginApp(OrderService::class);
+        
+            $instance->allowPaymentMethodSwitchFrom = $orderService->allowPaymentMethodSwitchFrom($paymentMethodIdProperty->value, $order->id);
+            $instance->paymentMethodListForSwitch = $orderService->getPaymentMethodListForSwitch($paymentMethodIdProperty->value, $order->id);
+        }
+        
         /** @var URLFilter $urlFilter */
         $urlFilter = pluginApp(URLFilter::class);
 
@@ -172,22 +187,6 @@ class LocalizedOrder extends ModelWrapper
 
         $instance->highlightNetPrices = $instance->highlightNetPrices();
         
-        $paymentStatusProperty = $order->properties->firstWhere('typeId', OrderPropertyType::PAYMENT_STATUS);
-        if($paymentStatusProperty instanceof OrderProperty)
-        {
-            $instance->paymentStatus = $paymentStatusProperty->value;
-        }
-        
-        $paymentMethodIdProperty = $order->properties->firstWhere('typeId', OrderPropertyType::PAYMENT_METHOD);
-        if($paymentMethodIdProperty instanceof OrderProperty)
-        {
-            /** @var OrderService $orderService */
-            $orderService = pluginApp(OrderService::class);
-    
-            $instance->allowPaymentMethodSwitchFrom = $orderService->allowPaymentMethodSwitchFrom($paymentMethodIdProperty->value, $order->id);
-            $instance->paymentMethodListForSwitch = $orderService->getPaymentMethodListForSwitch($paymentMethodIdProperty->value, $order->id);
-        }
-        
         return $instance;
     }
 
@@ -204,17 +203,20 @@ class LocalizedOrder extends ModelWrapper
             $order = $this->orderData;
         }
         $data = [
-            "order"                 => $order,
-            "status"                => [], //$this->status->toArray(),
-            "shippingProfileId"     => $this->shippingProfileId,
-            "shippingProvider"      => $this->shippingProvider,
-            "shippingProfileName"   => $this->shippingProfileName,
-            "paymentMethodName"     => $this->paymentMethodName,
-            "paymentMethodIcon"     => $this->paymentMethodIcon,
-            "itemURLs"              => $this->itemURLs,
-            "itemImages"            => $this->itemImages,
-            "isReturnable"          => $this->isReturnable,
-            "highlightNetPrices"    => $this->highlightNetPrices
+            "order"                        => $order,
+            "status"                       => [], //$this->status->toArray(),
+            "shippingProfileId"            => $this->shippingProfileId,
+            "shippingProvider"             => $this->shippingProvider,
+            "shippingProfileName"          => $this->shippingProfileName,
+            "paymentMethodName"            => $this->paymentMethodName,
+            "paymentMethodIcon"            => $this->paymentMethodIcon,
+            "paymentStatus"                => $this->paymentStatus,
+            "allowPaymentMethodSwitchFrom" => $this->allowPaymentMethodSwitchFrom,
+            "paymentMethodListForSwitch"   => $this->paymentMethodListForSwitch,
+            "itemURLs"                     => $this->itemURLs,
+            "itemImages"                   => $this->itemImages,
+            "isReturnable"                 => $this->isReturnable,
+            "highlightNetPrices"           => $this->highlightNetPrices
         ];
 
         return $data;
