@@ -2,6 +2,7 @@
 namespace IO\Controllers;
 
 use IO\Constants\SessionStorageKeys;
+use IO\Extensions\Constants\ShopUrls;
 use IO\Services\BasketService;
 use IO\Services\CustomerService;
 use IO\Services\SessionStorageService;
@@ -9,6 +10,8 @@ use IO\Services\UrlBuilder\UrlQuery;
 use IO\Services\WebstoreConfigurationService;
 use Plenty\Modules\Basket\Contracts\BasketItemRepositoryContract;
 use IO\Guards\AuthGuard;
+use Plenty\Modules\Category\Models\Category;
+use Plenty\Modules\ShopBuilder\Helper\ShopBuilderRequest;
 
 /**
  * Class CheckoutController
@@ -18,44 +21,43 @@ class CheckoutController extends LayoutController
 {
     /**
      * Prepare and render the data for the checkout
-     * @param BasketService $basketService
-     * @param CustomerService $customerService
-     * @param BasketItemRepositoryContract $basketItemRepository
-     * @param WebstoreConfigurationService $webstoreConfigurationService;
+     * @param Category $category
      * @return string
      */
-    public function showCheckout(BasketService $basketService,  CustomerService $customerService, BasketItemRepositoryContract $basketItemRepository, WebstoreConfigurationService $webstoreConfigurationService): string
+    public function showCheckout($category = null): string
     {
-        $basketItems = $basketItemRepository->all();
-        /**
-         * @var SessionStorageService $sessionStorage
-         */
+        /** @var BasketItemRepositoryContract $basketItemRepository */
+        $basketItemRepository = pluginApp(BasketItemRepositoryContract::class);
+
+        /** @var SessionStorageService $sessionStorage */
         $sessionStorage = pluginApp(SessionStorageService::class);
 
-        $url = $this->urlService->getHomepageURL();
-        if( $sessionStorage->getSessionValue(SessionStorageKeys::GUEST_EMAIL) == null &&
-            $customerService->getContactId() <= 0)
+        /** @var CustomerService $customerService */
+        $customerService = pluginApp(CustomerService::class);
+
+        /** @var ShopBuilderRequest $shopBuilderRequest */
+        $shopBuilderRequest = pluginApp(ShopBuilderRequest::class);
+
+        if ( !$shopBuilderRequest->isShopBuilder() )
         {
-            if(substr($url, -1) !== '/')
+            if( $sessionStorage->getSessionValue(SessionStorageKeys::GUEST_EMAIL) == null
+                && $customerService->getContactId() <= 0 )
             {
-                $url .= '/';
+                AuthGuard::redirect(
+                    pluginApp(ShopUrls::class)->login,
+                    ["backlink" => AuthGuard::getUrl()]
+                );
             }
-            $url .= 'login';
-            $url .= UrlQuery::shouldAppendTrailingSlash() ? '/' : '';
-
-            AuthGuard::redirect($url, ["backlink" => AuthGuard::getUrl()]);
+            else if(!count($basketItemRepository->all()))
+            {
+                AuthGuard::redirect(pluginApp(ShopUrls::class)->home, []);
+            }
         }
-        else if(!count($basketItems))
-        {
-            AuthGuard::redirect($url, []);
-        }
-
-        $basket = $basketService->getBasketForTemplate();
 
         return $this->renderTemplate(
             "tpl.checkout",
             [
-                "basket" => $basket
+                'category' => $category
             ],
             false
         );
