@@ -8,9 +8,11 @@ use IO\Extensions\Filters\ItemImagesFilter;
 use IO\Services\CustomerService;
 use IO\Services\ItemSearch\Factories\VariationSearchFactory;
 use IO\Services\ItemSearch\Services\ItemSearchService;
+use IO\Services\OrderService;
 use Plenty\Modules\Account\Contact\Contracts\ContactRepositoryContract;
 use Plenty\Modules\Order\Models\Order;
-use Plenty\Modules\Order\Status\Models\OrderStatusName;
+use Plenty\Modules\Order\Property\Models\OrderProperty;
+use Plenty\Modules\Order\Property\Models\OrderPropertyType;
 use Plenty\Modules\Frontend\PaymentMethod\Contracts\FrontendPaymentMethodRepositoryContract;
 use Plenty\Modules\Order\Shipping\Contracts\ParcelServicePresetRepositoryContract;
 use IO\Extensions\Filters\URLFilter;
@@ -34,10 +36,7 @@ class LocalizedOrder extends ModelWrapper
     public $order = null;
     
     public $orderData = [];
-
-    /**
-     * @var OrderStatusName
-     */
+    
     public $status = null;
 
     public $shippingProvider = "";
@@ -45,13 +44,18 @@ class LocalizedOrder extends ModelWrapper
     public $shippingProfileId = 0;
     public $paymentMethodName = "";
     public $paymentMethodIcon = "";
+    public $paymentStatus = '';
 
     public $itemURLs = [];
     public $itemImages = [];
     public $isReturnable = false;
 
     public $highlightNetPrices = false;
-
+    
+    
+    public $allowPaymentMethodSwitchFrom = false;
+    public $paymentMethodListForSwitch = [];
+    
     /**
      * @param Order $order
      * @param array ...$data
@@ -167,7 +171,23 @@ class LocalizedOrder extends ModelWrapper
         }
 
         $instance->highlightNetPrices = $instance->highlightNetPrices();
-
+        
+        $paymentStatusProperty = $order->properties->firstWhere('typeId', OrderPropertyType::PAYMENT_STATUS);
+        if($paymentStatusProperty instanceof OrderProperty)
+        {
+            $instance->paymentStatus = $paymentStatusProperty->value;
+        }
+        
+        $paymentMethodIdProperty = $order->properties->firstWhere('typeId', OrderPropertyType::PAYMENT_METHOD);
+        if($paymentMethodIdProperty instanceof OrderProperty)
+        {
+            /** @var OrderService $orderService */
+            $orderService = pluginApp(OrderService::class);
+    
+            $instance->allowPaymentMethodSwitchFrom = $orderService->allowPaymentMethodSwitchFrom($paymentMethodIdProperty->value, $order->id);
+            $instance->paymentMethodListForSwitch = $orderService->getPaymentMethodListForSwitch($paymentMethodIdProperty->value, $order->id);
+        }
+        
         return $instance;
     }
 
