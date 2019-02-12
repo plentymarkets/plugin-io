@@ -18,12 +18,16 @@ class ShopUrls
     public $appendTrailingSlash = false;
     public $trailingSlashSuffix = "";
     public $includeLanguage     = false;
+    public $home                = "";
 
     public function __construct()
     {
         $this->appendTrailingSlash      = UrlQuery::shouldAppendTrailingSlash();
         $this->trailingSlashSuffix      = $this->appendTrailingSlash ? '/' : '';
         $this->includeLanguage = pluginApp(SessionStorageService::class)->getLang() !== pluginApp(WebstoreConfigurationService::class)->getDefaultLanguage();
+
+        // Homepage URL may not be used from category. Even if linked to category, the homepage url should be "/"
+        $this->home                     = pluginApp(UrlQuery::class, ['path' => '/'])->toRelativeUrl($this->includeLanguage);
     }
 
     public function getBasket()
@@ -59,11 +63,6 @@ class ShopUrls
     public function getGtc()
     {
         return $this->getShopUrl(RouteConfig::TERMS_CONDITIONS);
-    }
-
-    public function getHome()
-    {
-        return $this->getShopUrl(RouteConfig::HOME);
     }
 
     public function getLegalDisclosure()

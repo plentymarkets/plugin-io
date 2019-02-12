@@ -3,13 +3,8 @@
 namespace IO\Controllers;
 
 use IO\Api\ResponseCode;
-use IO\Constants\SessionStorageKeys;
-use IO\Extensions\Constants\ShopUrls;
-use IO\Guards\AuthGuard;
 use IO\Helper\RouteConfig;
-use IO\Services\CustomerService;
 use IO\Services\SessionStorageService;
-use Plenty\Modules\Basket\Contracts\BasketItemRepositoryContract;
 use Plenty\Modules\ShopBuilder\Helper\ShopBuilderRequest;
 use Plenty\Plugin\Application;
 use Plenty\Plugin\Http\Request;

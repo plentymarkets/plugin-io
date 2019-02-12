@@ -44,13 +44,13 @@ class CheckoutController extends LayoutController
                 && $customerService->getContactId() <= 0 )
             {
                 AuthGuard::redirect(
-                    pluginApp(ShopUrls::class)->login,
+                    pluginApp(ShopUrls::class)->getLogin(),
                     ["backlink" => AuthGuard::getUrl()]
                 );
             }
             else if(!count($basketItemRepository->all()))
             {
-                AuthGuard::redirect(pluginApp(ShopUrls::class)->home, []);
+                AuthGuard::redirect(pluginApp(ShopUrls::class)->getHome(), []);
             }
         }
 
