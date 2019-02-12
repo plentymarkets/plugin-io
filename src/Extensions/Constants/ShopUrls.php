@@ -77,12 +77,6 @@ class ShopUrls
 
                 if ( $category !== null )
                 {
-
-                    if($category->details !== null && strlen($category->details[0]->canonicalLink) > 0)
-                    {
-                        return $category->details[0]->canonicalLink;
-                    }
-
                     /** @var CategoryUrlBuilder $categoryUrlBuilder */
                     $categoryUrlBuilder = pluginApp( CategoryUrlBuilder::class );
                     return $categoryUrlBuilder->buildUrl( $category->id )->toRelativeUrl($this->includeLanguage);
