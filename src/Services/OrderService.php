@@ -116,6 +116,8 @@ class OrderService
      */
 	public function placeOrder():LocalizedOrder
 	{
+	    $email = $this->customerService->getEmail();
+	    $billingAddressId = $this->checkoutService->getBillingAddressId();
         $basket = $this->basketService->getBasket();
         
         $couponCode = null;
@@ -155,7 +157,7 @@ class OrderService
             $this->sendMail(AutomaticEmailTemplate::SHOP_ORDER ,AutomaticEmailOrder::class, $params);
         }
 
-        $this->subscribeToNewsletter();
+        $this->subscribeToNewsletter($email, $billingAddressId);
 
         $this->sessionStorage->setSessionValue(SessionStorageKeys::ORDER_CONTACT_WISH, null);
 
@@ -170,24 +172,25 @@ class OrderService
 
         return LocalizedOrder::wrap( $order, $this->sessionStorage->getLang() );
 	}
-
+    
     /**
      * Subscribe the customer to the newsletter, if stored in the session
+     *
+     * @param $email
+     * @param $billingAddressId
      */
-	public function subscribeToNewsletter()
+	public function subscribeToNewsletter($email, $billingAddressId)
     {
         /** @var CustomerNewsletterService $customerNewsletterService $email */
         $customerNewsletterService = pluginApp(CustomerNewsletterService::class);
-
-        $email = $this->customerService->getEmail();
         $newsletterSubscriptions = $this->sessionStorage->getSessionValue(SessionStorageKeys::NEWSLETTER_SUBSCRIPTIONS);
 
         if (count($newsletterSubscriptions) && strlen($email))
         {
             $firstName = '';
             $lastName = '';
-
-            $address = $this->customerService->getAddress($this->checkoutService->getBillingAddressId(), AddressType::BILLING);
+            
+            $address = $this->customerService->getAddress($billingAddressId, AddressType::BILLING);
 
             // if the address is for a company, the contact person will be store into the last name
             if (strlen($address->name1))
