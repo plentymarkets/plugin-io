@@ -9,7 +9,7 @@ class AddressValidator extends Validator
 {
     protected function defineAttributes()
     {
-        $isCompany = empty($this->getAttributeValue('gender')) && !empty($this->getAttributeValue('name2')) && !empty($this->getAttributeValue('name3'));
+        $isCompany = empty($this->getAttributeValue('gender')) && empty($this->getAttributeValue('name2')) && empty($this->getAttributeValue('name3'));
         $addressFormat = ShippingCountry::getAddressFormat($this->getAttributeValue('countryId'));
 
         $this->addString('address1', true);
