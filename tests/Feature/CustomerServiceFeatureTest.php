@@ -226,7 +226,7 @@ class CustomerServiceFeatureTest extends TestCase
                     // Delivery address with company
                     'gender'     => '',
                     'name1'      => $this->fake->company,
-                    'name2'      => $this->fake->firstName,
+                    'name2'      => '',
                     'name3'      => '',
                     'name4'      => '',
                     'address1'   => $this->fake->streetName,
