@@ -453,13 +453,29 @@ class BasketService
 
             // $basket->basketAmount is basket amount minus coupon value
             // $basket->couponDiscount is negative
-            if($campaign instanceof CouponCampaign && $campaign->minOrderValue > (( $basket->basketAmount - $basket->couponDiscount ) - ($basketItem['price'] * $basketItem['quantity'])))
+            if($campaign instanceof CouponCampaign)
             {
-                $this->basketRepository->removeCouponCode();
-
                 /** @var NotificationService $notificationService */
                 $notificationService = pluginApp(NotificationService::class);
-                $notificationService->info('CouponValidation',301);
+                
+                if( ($campaign->minOrderValue > (( $basket->basketAmount - $basket->couponDiscount ) - ($basketItem['price'] * $basketItem['quantity']))) || count($campaignItems) )
+                {
+                    $this->basketRepository->removeCouponCode();
+                    $notificationService->info('CouponValidation',301);
+                }
+    
+                //check if basket item to remove is matching with a coupon campaign and remove coupon if no item with the matching item id of the campaign is left in the basket
+                $campaignItems = $campaign->references->where('referenceType', 'item')->where('value', $basketItem['itemId']);
+                if(count($campaignItems))
+                {
+                    $matchingBasketItems = $basket->basketItems->where('itemId', $basketItem['itemId']);
+                    
+                    if(count($matchingBasketItems) <= 1)
+                    {
+                        $this->basketRepository->removeCouponCode();
+                        $notificationService->info('CouponValidation',302);
+                    }
+                }
             }
         }
 
