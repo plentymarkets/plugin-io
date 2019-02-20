@@ -381,8 +381,10 @@ class CategoryService
             $this->categoryRepository->getLinklistList($type, $lang, $this->webstoreConfig->getWebstoreConfig()->webstoreId)
         );
 
-
-        return pluginApp( CategoryDataFilter::class )->applyResultFields(
+        /** @var CategoryDataFilter $filter */
+        $filter = pluginApp( CategoryDataFilter::class );
+        
+        return $filter->applyResultFields(
             $list,
             $this->loadResultFields( ResultFieldTemplate::get( ResultFieldTemplate::TEMPLATE_CATEGORY_TREE ) )
         );
