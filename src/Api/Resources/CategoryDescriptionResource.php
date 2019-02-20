@@ -1,5 +1,6 @@
 <?php //strict
 namespace IO\Api\Resources;
+use Plenty\Modules\Category\Models\CategoryDetails;
 use Plenty\Plugin\Http\Response;
 use Plenty\Plugin\Http\Request;
 use Plenty\Modules\Category\Models\Category;
@@ -44,14 +45,19 @@ class CategoryDescriptionResource extends ApiResource
 
         if($category instanceof Category)
         {
-            if($description1)
+            $categoryDetails = $categoryService->getDetails($category, $sessionStorageService->getLang());
+    
+            if($categoryDetails instanceof CategoryDetails)
             {
-                $response['description1'] = $category->details[0]->description;
-            }
-
-            if($description2)
-            {
-                $response['description2'] = $category->details[0]->description2;
+                if($description1)
+                {
+                    $response['description1'] = $categoryDetails->description;
+                }
+        
+                if($description2)
+                {
+                    $response['description2'] = $categoryDetails->description2;
+                }
             }
         }
 
