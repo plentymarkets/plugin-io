@@ -458,7 +458,7 @@ class BasketService
                 /** @var NotificationService $notificationService */
                 $notificationService = pluginApp(NotificationService::class);
                 
-                if( ($campaign->minOrderValue > (( $basket->basketAmount - $basket->couponDiscount ) - ($basketItem['price'] * $basketItem['quantity']))) || count($campaignItems) )
+                if($campaign->minOrderValue > (( $basket->basketAmount - $basket->couponDiscount ) - ($basketItem['price'] * $basketItem['quantity'])))
                 {
                     $this->basketRepository->removeCouponCode();
                     $notificationService->info('CouponValidation',301);
