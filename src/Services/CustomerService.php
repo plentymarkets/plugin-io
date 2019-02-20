@@ -1011,7 +1011,7 @@ class CustomerService
         }
     }
 
-    public function getEmail():string
+    public function getEmail()
     {
         $contact = $this->getContact();
         if ($contact instanceof Contact)
@@ -1021,6 +1021,11 @@ class CustomerService
         else
         {
             $email = $this->sessionStorage->getSessionValue(SessionStorageKeys::GUEST_EMAIL);
+        }
+        
+        if(is_null($email))
+        {
+            $email = '';
         }
 
         return $email;
