@@ -7,6 +7,7 @@ use IO\Services\BasketService;
 use IO\Services\CustomerService;
 use IO\Services\SessionStorageService;
 use IO\Services\UrlBuilder\UrlQuery;
+use IO\Services\UrlService;
 use IO\Services\WebstoreConfigurationService;
 use Plenty\Modules\Basket\Contracts\BasketItemRepositoryContract;
 use IO\Guards\AuthGuard;
@@ -60,6 +61,15 @@ class CheckoutController extends LayoutController
                 'category' => $category
             ],
             false
+        );
+    }
+
+    public function redirectCheckoutCategory()
+    {
+        /** @var UrlService $urlService */
+        $urlService = pluginApp(UrlService::class);
+        return $urlService->redirectTo(
+            pluginApp(ShopUrls::class)->checkout
         );
     }
 }
