@@ -37,9 +37,10 @@ class UrlService
      * Get canonical url for a category
      * @param int           $categoryId
      * @param string|null   $lang
+     * @param int | null $webstoreId
      * @return UrlQuery
      */
-    public function getCategoryURL( $categoryId, $lang = null )
+    public function getCategoryURL( $categoryId, $lang = null)
     {
         if ( $lang === null )
         {
@@ -95,9 +96,10 @@ class UrlService
     /**
      * Get canonical url for current page
      * @param string|null   $lang
+     * @param bool $ignoreCanonical
      * @return string|null
      */
-    public function getCanonicalURL( $lang = null )
+    public function getCanonicalURL( $lang = null, $ignoreCanonical = false)
     {
         $defaultLanguage = $this->webstoreConfigurationService->getDefaultLanguage();
 
@@ -107,8 +109,8 @@ class UrlService
         }
 
         $canonicalUrl = $this->fromMemoryCache(
-            "canonicalUrl.$lang",
-            function() use ($lang, $defaultLanguage) {
+            "canonicalUrl.$lang.$ignoreCanonical",
+            function() use ($lang, $defaultLanguage, $ignoreCanonical) {
                 $includeLanguage = $lang !== null && $lang !== $defaultLanguage;
                 /** @var CategoryService $categoryService */
                 $categoryService = pluginApp( CategoryService::class );
@@ -133,7 +135,7 @@ class UrlService
                     {
                         $categoryDetails = $categoryService->getDetails( $currentCategory, $lang );
 
-                        if($categoryDetails !== null && strlen($categoryDetails->canonicalLink) > 0)
+                        if($categoryDetails !== null && strlen($categoryDetails->canonicalLink) > 0 && $ignoreCanonical === false)
                         {
                             return $categoryDetails->canonicalLink;
                         }
