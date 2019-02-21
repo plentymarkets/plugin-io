@@ -69,22 +69,11 @@ class CheckoutController extends LayoutController
 
     public function redirectCheckoutCategory()
     {
-        /** @var CategoryRepositoryContract $categoryRepo */
-        $categoryRepo = pluginApp(CategoryRepositoryContract::class);
-        $category = $categoryRepo->findCategoryByUrl(
-            "checkout",
-            null,
-            null,
-            null,
-            null,
-            null,
-            pluginApp(Application::class)->getWebstoreId(),
-            pluginApp(SessionStorageService::class)->getLang()
-        );
-
-        if (!is_null($category) && $category->id === RouteConfig::getCategoryId(RouteConfig::CHECKOUT) )
+        $categoryController = pluginApp(CategoryController::class);
+        $categoryContent = $categoryController->showCategory("checkout");
+        if ( strlen($categoryContent) )
         {
-            return $this->showCheckout($category);
+            return $categoryContent;
         }
 
         /** @var UrlService $urlService */

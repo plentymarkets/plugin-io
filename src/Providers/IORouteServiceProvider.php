@@ -3,6 +3,7 @@
 namespace IO\Providers;
 
 use IO\Helper\RouteConfig;
+use Plenty\Modules\ShopBuilder\Helper\ShopBuilderRequest;
 use Plenty\Plugin\RouteServiceProvider;
 use Plenty\Plugin\Routing\Router;
 use Plenty\Plugin\Routing\ApiRouter;
@@ -73,6 +74,9 @@ class IORouteServiceProvider extends RouteServiceProvider
             $api->resource('io/facet', 'FacetResource');
 		});
 
+		/** @var ShopBuilderRequest $shopBuilderRequest */
+		$shopBuilderRequest = pluginApp(ShopBuilderRequest::class);
+
 		/*
 		 * STATIC ROUTES
 		 */
@@ -83,14 +87,17 @@ class IORouteServiceProvider extends RouteServiceProvider
             $router->get('basket', 'IO\Controllers\BasketController@showBasket');
         }
 
-        if ( RouteConfig::isActive(RouteConfig::CHECKOUT) )
+        if ( !$shopBuilderRequest->isShopBuilder() )
         {
-            //Checkout-confirm purchase route
-            $router->get('checkout', 'IO\Controllers\CheckoutController@showCheckout');
-        }
-        else if ( RouteConfig::getCategoryId(RouteConfig::CHECKOUT) > 0 )
-        {
-            $router->get('checkout', 'IO\Controllers\CheckoutController@redirectCheckoutCategory');
+            if ( RouteConfig::isActive(RouteConfig::CHECKOUT) )
+            {
+                //Checkout-confirm purchase route
+                $router->get('checkout', 'IO\Controllers\CheckoutController@showCheckout');
+            }
+            else if ( RouteConfig::getCategoryId(RouteConfig::CHECKOUT) > 0 )
+            {
+                $router->get('checkout', 'IO\Controllers\CheckoutController@redirectCheckoutCategory');
+            }
         }
 
         if ( RouteConfig::isActive(RouteConfig::MY_ACCOUNT) )
