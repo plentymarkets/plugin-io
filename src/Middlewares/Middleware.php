@@ -49,7 +49,7 @@ class Middleware extends \Plenty\Plugin\Middleware
                 $templateConfigService = pluginApp(TemplateConfigService::class);
                 $enabledCurrencies = explode(', ',  $templateConfigService->get('currency.available_currencies') );
                 $currency = $webstoreConfig->defaultCurrencyList[$webstoreConfig->defaultLanguage];
-                if(in_array($currency, $enabledCurrencies) || array_pop($enabledCurrencies) == 'all')
+                if(!is_null($currency) && (in_array($currency, $enabledCurrencies) || array_pop($enabledCurrencies) == 'all'))
                 {
                     /** @var CheckoutService $checkoutService */
                     $checkoutService = pluginApp(CheckoutService::class);
