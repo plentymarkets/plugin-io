@@ -3,6 +3,7 @@ namespace IO\Controllers;
 
 use IO\Constants\SessionStorageKeys;
 use IO\Extensions\Constants\ShopUrls;
+use IO\Helper\RouteConfig;
 use IO\Services\BasketService;
 use IO\Services\CustomerService;
 use IO\Services\SessionStorageService;
@@ -11,8 +12,10 @@ use IO\Services\UrlService;
 use IO\Services\WebstoreConfigurationService;
 use Plenty\Modules\Basket\Contracts\BasketItemRepositoryContract;
 use IO\Guards\AuthGuard;
+use Plenty\Modules\Category\Contracts\CategoryRepositoryContract;
 use Plenty\Modules\Category\Models\Category;
 use Plenty\Modules\ShopBuilder\Helper\ShopBuilderRequest;
+use Plenty\Plugin\Application;
 
 /**
  * Class CheckoutController
@@ -66,6 +69,24 @@ class CheckoutController extends LayoutController
 
     public function redirectCheckoutCategory()
     {
+        /** @var CategoryRepositoryContract $categoryRepo */
+        $categoryRepo = pluginApp(CategoryRepositoryContract::class);
+        $category = $categoryRepo->findCategoryByUrl(
+            "checkout",
+            null,
+            null,
+            null,
+            null,
+            null,
+            pluginApp(Application::class)->getWebstoreId(),
+            pluginApp(SessionStorageService::class)->getLang()
+        );
+
+        if (!is_null($category) && $category->id === RouteConfig::getCategoryId(RouteConfig::CHECKOUT) )
+        {
+            return $this->showCheckout($category);
+        }
+
         /** @var UrlService $urlService */
         $urlService = pluginApp(UrlService::class);
         return $urlService->redirectTo(
