@@ -169,7 +169,7 @@ class IOServiceProvider extends ServiceProvider
 
         $dispatcher->listen(FrontendCurrencyChanged::class, function ($event) {
             $sessionStorage = pluginApp( FrontendSessionStorageFactoryContract::class );
-                $sessionStorage->getPlugin()->setValue(SessionStorageKeys::CURRENCY, $event->getCurrency());
+            $sessionStorage->getPlugin()->setValue(SessionStorageKeys::CURRENCY, $event->getCurrency());
         });
     }
 
