@@ -36,7 +36,7 @@ class Middleware extends \Plenty\Plugin\Middleware
         $webstoreService = pluginApp(WebstoreConfigurationService::class);
         $webstoreConfig  = $webstoreService->getWebstoreConfig();
 
-        if ($lang == null || strlen($lang) != 2 || !in_array($lang, $webstoreConfig->languageList))
+        if (($lang == null || strlen($lang) != 2 || !in_array($lang, $webstoreConfig->languageList)) && strpos(end($splittedURL), '.') === false)
         {
             $sessionService  = pluginApp(SessionStorageService::class);
 
@@ -44,6 +44,17 @@ class Middleware extends \Plenty\Plugin\Middleware
             {
                 $service = pluginApp(LocalizationService::class);
                 $service->setLanguage($webstoreConfig->defaultLanguage);
+
+                 /** @var TemplateConfigService $templateConfigService */
+                $templateConfigService = pluginApp(TemplateConfigService::class);
+                $enabledCurrencies = explode(', ',  $templateConfigService->get('currency.available_currencies') );
+                $currency = $webstoreConfig->defaultCurrencyList[$webstoreConfig->defaultLanguage];
+                if(in_array($currency, $enabledCurrencies) || array_pop($enabledCurrencies) == 'all')
+                {
+                    /** @var CheckoutService $checkoutService */
+                    $checkoutService = pluginApp(CheckoutService::class);
+                    $checkoutService->setCurrency( $currency );
+                }
             }
         }
 

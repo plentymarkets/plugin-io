@@ -47,11 +47,7 @@ class CategoryController extends LayoutController
 
         if ($category === null || (($category->clients->count() == 0 || $category->details->count() == 0) && !$this->app->isAdminPreview()))
         {
-            /** @var Response $response */
-            $response = pluginApp(Response::class);
-            $response->forceStatus(ResponseCode::NOT_FOUND);
-
-            return $response;
+            return '';
         }
 
         $this->categoryService->setCurrentCategory($category);
@@ -61,6 +57,8 @@ class CategoryController extends LayoutController
 
         if ( RouteConfig::getCategoryId( RouteConfig::CHECKOUT ) === $category->id || $shopBuilderRequest->getPreviewContentType() === 'checkout')
         {
+            RouteConfig::overrideCategoryId(RouteConfig::CHECKOUT, $category->id);
+
             /** @var CheckoutController $checkoutController */
             $checkoutController = pluginApp(CheckoutController::class);
             return $checkoutController->showCheckout( $category );
@@ -68,6 +66,8 @@ class CategoryController extends LayoutController
 
         if ( RouteConfig::getCategoryId( RouteConfig::MY_ACCOUNT ) === $category->id || $shopBuilderRequest->getPreviewContentType() === 'myaccount')
         {
+            RouteConfig::overrideCategoryId(RouteConfig::MY_ACCOUNT, $category->id);
+
             /** @var MyAccountController $myAccountController */
             $myAccountController = pluginApp(MyAccountController::class);
             return $myAccountController->showMyAccount( $category );
