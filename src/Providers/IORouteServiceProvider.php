@@ -88,6 +88,10 @@ class IORouteServiceProvider extends RouteServiceProvider
             //Checkout-confirm purchase route
             $router->get('checkout', 'IO\Controllers\CheckoutController@showCheckout');
         }
+        else if ( RouteConfig::getCategoryId(RouteConfig::CHECKOUT) > 0 )
+        {
+            $router->get('checkout', 'IO\Controllers\CheckoutController@redirectCheckoutCategory');
+        }
 
         if ( RouteConfig::isActive(RouteConfig::MY_ACCOUNT) )
         {
@@ -204,6 +208,11 @@ class IORouteServiceProvider extends RouteServiceProvider
         {
             $router->get('order-property-file/{hash1}', 'IO\Controllers\OrderPropertyFileController@downloadTempFile');
             $router->get('order-property-file/{hash1}/{hash2}', 'IO\Controllers\OrderPropertyFileController@downloadFile');
+        }
+        
+        if( RouteConfig::isActive(RouteConfig::ORDER_DOCUMENT) )
+        {
+            $router->get('order-document/{documentId}', 'IO\Controllers\DocumentController@download');
         }
 
         

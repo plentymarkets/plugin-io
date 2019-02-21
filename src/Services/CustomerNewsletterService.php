@@ -19,20 +19,25 @@ class CustomerNewsletterService
     
     public function saveNewsletterData($email, $emailFolder, $firstName = '', $lastName='')
     {
+        $this->saveMultipleNewsletterData($email, [$emailFolder], $firstName, $lastName);
+    }
+
+    public function saveMultipleNewsletterData($email, $emailFolders, $firstName = '', $lastName = '')
+    {
         if(strlen($email))
         {
             /** @var AuthHelper $authHelper */
             $authHelper = pluginApp(AuthHelper::class);
             $newsletterRepo = $this->newsletterRepo;
-    
+
             $recipientData = $authHelper->processUnguarded( function() use ($email, $newsletterRepo)
             {
                 return $newsletterRepo->listRecipients(['*'], 1, 1, ['email' => $email], [])->getResult()[0];
             });
-            
+
             if(!$recipientData instanceof Recipient && !($recipientData instanceof Recipient && $recipientData->email == $email))
             {
-                $this->newsletterRepo->addToNewsletterList($email, $firstName, $lastName, [$emailFolder]);
+                $this->newsletterRepo->addToNewsletterList($email, $firstName, $lastName, $emailFolders);
             }
         }
     }

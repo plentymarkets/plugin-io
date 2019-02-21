@@ -3,7 +3,9 @@
 namespace IO\Controllers;
 
 use IO\Api\ResponseCode;
+use IO\Helper\RouteConfig;
 use IO\Services\SessionStorageService;
+use Plenty\Modules\ShopBuilder\Helper\ShopBuilderRequest;
 use Plenty\Plugin\Application;
 use Plenty\Plugin\Http\Request;
 use Plenty\Plugin\Http\Response;
@@ -43,7 +45,7 @@ class CategoryController extends LayoutController
         $category = $this->categoryRepo->findCategoryByUrl($lvl1, $lvl2, $lvl3, $lvl4, $lvl5, $lvl6, $webstoreId, $lang);
 
 
-        if ($category === null || ($category->clients->count() == 0 || $category->details->count() == 0 && !$this->app->isAdminPreview()))
+        if ($category === null || (($category->clients->count() == 0 || $category->details->count() == 0) && !$this->app->isAdminPreview()))
         {
             /** @var Response $response */
             $response = pluginApp(Response::class);
@@ -53,6 +55,23 @@ class CategoryController extends LayoutController
         }
 
         $this->categoryService->setCurrentCategory($category);
+
+        /** @var ShopBuilderRequest $shopBuilderRequest */
+        $shopBuilderRequest = pluginApp(ShopBuilderRequest::class);
+
+        if ( RouteConfig::getCategoryId( RouteConfig::CHECKOUT ) === $category->id || $shopBuilderRequest->getPreviewContentType() === 'checkout')
+        {
+            /** @var CheckoutController $checkoutController */
+            $checkoutController = pluginApp(CheckoutController::class);
+            return $checkoutController->showCheckout( $category );
+        }
+
+        if ( RouteConfig::getCategoryId( RouteConfig::MY_ACCOUNT ) === $category->id || $shopBuilderRequest->getPreviewContentType() === 'myaccount')
+        {
+            /** @var MyAccountController $myAccountController */
+            $myAccountController = pluginApp(MyAccountController::class);
+            return $myAccountController->showMyAccount( $category );
+        }
 
         return $this->renderTemplate(
             "tpl.category." . $category->type,
