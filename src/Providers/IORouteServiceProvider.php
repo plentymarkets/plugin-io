@@ -3,8 +3,6 @@
 namespace IO\Providers;
 
 use IO\Helper\RouteConfig;
-use Plenty\Modules\ShopBuilder\Helper\ShopBuilderRequest;
-use Plenty\Plugin\Http\Request;
 use Plenty\Plugin\RouteServiceProvider;
 use Plenty\Plugin\Routing\Router;
 use Plenty\Plugin\Routing\ApiRouter;
