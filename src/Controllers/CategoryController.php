@@ -57,6 +57,8 @@ class CategoryController extends LayoutController
 
         if ( RouteConfig::getCategoryId( RouteConfig::CHECKOUT ) === $category->id || $shopBuilderRequest->getPreviewContentType() === 'checkout')
         {
+            RouteConfig::overrideCategoryId(RouteConfig::CHECKOUT, $category->id);
+
             /** @var CheckoutController $checkoutController */
             $checkoutController = pluginApp(CheckoutController::class);
             return $checkoutController->showCheckout( $category );
@@ -64,6 +66,8 @@ class CategoryController extends LayoutController
 
         if ( RouteConfig::getCategoryId( RouteConfig::MY_ACCOUNT ) === $category->id || $shopBuilderRequest->getPreviewContentType() === 'myaccount')
         {
+            RouteConfig::overrideCategoryId(RouteConfig::MY_ACCOUNT, $category->id);
+
             /** @var MyAccountController $myAccountController */
             $myAccountController = pluginApp(MyAccountController::class);
             return $myAccountController->showMyAccount( $category );

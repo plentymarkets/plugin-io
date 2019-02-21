@@ -33,6 +33,7 @@ class RouteConfig
     const WISH_LIST                 = "wish-list";
 
     private static $enabledRoutes = null;
+    private static $overrides = [];
 
     public static function getEnabledRoutes()
     {
@@ -88,7 +89,16 @@ class RouteConfig
 
     public static function getCategoryId( $route )
     {
+        if ( array_key_exists( $route, self::$overrides ) )
+        {
+            return self::$overrides[$route];
+        }
         $config = pluginApp(ConfigRepository::class);
         return (int) $config->get('IO.routing.category_' . $route, 0);
+    }
+
+    public static function overrideCategoryId( $route, $categoryId )
+    {
+        self::$overrides[$route] = $categoryId;
     }
 }

@@ -57,6 +57,11 @@ class CheckoutController extends LayoutController
                 AuthGuard::redirect(pluginApp(ShopUrls::class)->home, []);
             }
         }
+        else if ( is_null($category) )
+        {
+            $categoryController = pluginApp(CategoryController::class);
+            return $categoryController->showCategory("checkout");
+        }
 
         return $this->renderTemplate(
             "tpl.checkout",
