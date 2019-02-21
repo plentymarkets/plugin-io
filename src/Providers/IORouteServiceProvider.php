@@ -25,7 +25,7 @@ class IORouteServiceProvider extends RouteServiceProvider
      * @param ApiRouter $api
      * @throws \Plenty\Plugin\Routing\Exceptions\RouteReservedException
      */
-	public function map(Router $router, ApiRouter $api, Request $request)
+	public function map(Router $router, ApiRouter $api)
 	{
 		$api->version(['v1'], ['namespace' => 'IO\Api\Resources'], function ($api)
 		{
