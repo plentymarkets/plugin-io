@@ -64,7 +64,7 @@ class ContactMailResource extends ApiResource
 
     public function verifyRecaptcha( $secret, $token )
     {
-        if ( is_null( $secret ) )
+        if ( !strlen( $secret ) )
         {
             return true;
         }
