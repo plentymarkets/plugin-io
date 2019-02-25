@@ -1,5 +1,25 @@
 # Release Notes für IO
 
+## v3.1.0 (2019-02-25) <a href="https://github.com/plentymarkets/plugin-io/compare/3.0.1...3.1.0" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
+
+### Hinzugefügt
+
+- Es wurde eine Schnittstelle geschaffen, um Nutzer beim Anlegen eines Auftrags zu einem oder mehreren Newslettern anzumelden.
+- Es ist nun möglich, alle Artikel eines Herstellers per ElasticSearch abzufragen.
+
+### Geändert
+
+- Die im Warenkorb befindlichen Artikel enthalten nun zusätzliche Daten über die Gruppen der Varianteneigenschaften.
+- Beim Anlegen einer Retoure wird ein neues Bestellmerkmal angelegt. Dieses dient dazu eine Ereignisaktion ausführen zu können.
+- Vor dem Senden des Kontaktformulars wird das Google reCAPTCHA über den geheimen Webseiten-Schlüssen verifiziert.
+
+### Behoben
+
+- Durch einen Fehler wurde der Plugin-Bau unter gewissen Umständen nicht erfolgreich fertiggestellt. Dies wurde behoben.
+- Durch einen Fehler wurden artikelabhängige Gutscheine nicht entfernt, wenn der betreffende Artikel aus dem Warenkorb entfernt wurde. Dies wurde behoben.
+- Bei zusätzlichen Mandanten kam es zu Fehlern bei der Seitennummerierung von Kategorieseiten. Dieses Verhalten wurde behoben.
+- Durch einen Fehler wurde die Währung beim Wechseln der Sprache nicht korrekt aktualisiert. Dies wurde behoben.
+
 ## v3.0.1 (2019-02-07) <a href="https://github.com/plentymarkets/plugin-io/compare/3.0.0...3.0.1" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
 
 ### Behoben
