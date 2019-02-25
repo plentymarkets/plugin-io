@@ -205,7 +205,7 @@ class LocalizedOrder extends ModelWrapper
         $isOrderNet = $this->order->amounts[0]->isNet;
 
         $orderContactId = 0;
-        foreach ($this->order->relations as $relation)
+        foreach ($this->order->relations['relations'] as $relation)
         {
             if ($relation['referenceType'] == 'contact' && (int)$relation['referenceId'] > 0)
             {
