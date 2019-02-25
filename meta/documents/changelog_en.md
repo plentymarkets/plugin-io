@@ -1,5 +1,25 @@
 # Release Notes for IO
 
+## v3.1.0 (2019-02-25) <a href="https://github.com/plentymarkets/plugin-io/compare/3.0.1...3.1.0" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
+
+### Added
+
+- We integrated an interface that serves to register users for one or more newsletters when placing an order.
+- It is now possible to query all items of a manufacturer via ElasticSearch
+
+### Changed
+
+- Items in the shopping cart now contain additional data about variation property groups.
+- The creation of a return now creates a new order property. This order property serves to execute an event procedure.
+- Prior to the sending of the contact form, the Google reCAPTCHA is verified via the secret site key.
+
+### Fixed
+
+- Due to an error, the plugin was not successfully built under certain circumstances. This has been fixed.
+- Due to an error, item-dependent coupons were not removed if the corresponding item was removed from the shopping cart. This has been fixed.
+- The pagination of category pages was not working properly for additional clients. This behaviour has been fixed.
+- Due to an error, the currency was not updated correctly when the language was changed in the online store. This has been fixed.
+
 ## v3.0.1 (2019-02-07) <a href="https://github.com/plentymarkets/plugin-io/compare/3.0.0...3.0.1" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
 
 ### Fixed
