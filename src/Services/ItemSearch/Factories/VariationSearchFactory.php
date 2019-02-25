@@ -648,9 +648,13 @@ class VariationSearchFactory extends BaseSearchFactory
         }
 
         $imageMutator = pluginApp(ImageMutator::class);
+        /**
+         * @var ImageMutator $imageMutator
+         */
+        $imageMutator->setSorting(ImageMutator::SORT_POSITION);
         $imageMutator->addClient( $clientId );
         $this->withMutator( $imageMutator );
-        
+
         /** @var ImageDomainMutator $imageDomainMutator */
         $imageDomainMutator = pluginApp(ImageDomainMutator::class);
         $imageDomainMutator->setClient($clientId);
