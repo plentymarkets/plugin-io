@@ -64,6 +64,18 @@
       "Config.RoutingTab": {
           "label": "Config.RoutingTab",
           "formFields": {
+              "routing.category_checkout": {
+                  "type": "categoryPicker",
+                  "required": false,
+                  "label": "Config.routingCategoryCheckout",
+                  "options": {}
+              },
+              "routing.category_my-account": {
+                  "type": "categoryPicker",
+                  "required": false,
+                  "label": "Config.routingCategoryMyAccount",
+                  "options": {}
+              },
               "routing.enabled_routes": {
                   "type": "multiCheckBox",
                   "required": false,
@@ -154,6 +166,10 @@
                           {
                               "value": "order-property-file",
                               "caption": "Config.routingEnabledRoutesPossibleValueOrderPropertyFile"
+                          },
+                          {
+                              "value": "order-document",
+                              "caption": "Config.routingEnabledRoutesPossibleValueOrderDocument"
                           },
                           {
                               "value": "order-return-confirmation",

@@ -4,13 +4,14 @@ namespace IO\Services\UrlBuilder;
 
 use IO\Services\CategoryService;
 use IO\Services\SessionStorageService;
+use IO\Services\WebstoreConfigurationService;
 use Plenty\Plugin\Log\Loggable;
 
 class CategoryUrlBuilder
 {
     use Loggable;
 
-    public function buildUrl( int $categoryId, string $lang = null ): UrlQuery
+    public function buildUrl( int $categoryId, string $lang = null, int $webstoreId = null): UrlQuery
     {
         if ( $lang === null )
         {
@@ -23,8 +24,14 @@ class CategoryUrlBuilder
 
         if ( $category !== null )
         {
+            if(is_null($webstoreId)){
+                /** @var WebstoreConfigurationService $webstoreService */
+                $webstoreService = pluginApp(WebstoreConfigurationService::class);
+                $webstoreId = $webstoreService->getWebstoreConfig()->webstoreId;
+            }
+
             return $this->buildUrlQuery(
-                $categoryService->getURL( $category, $lang ),
+                $categoryService->getURL( $category, $lang, $webstoreId ),
                 $lang
             );
         }

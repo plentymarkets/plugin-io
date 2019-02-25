@@ -9,13 +9,13 @@ use IO\Builder\Order\OrderType;
 use IO\Builder\Order\OrderOptionSubType;
 use IO\Constants\OrderPaymentStatus;
 use IO\Constants\SessionStorageKeys;
+use IO\Extensions\Constants\ShopUrls;
 use IO\Extensions\Mail\SendMail;
 use IO\Models\LocalizedOrder;
 use Plenty\Modules\Account\Address\Contracts\AddressRepositoryContract;
+use Plenty\Modules\Account\Address\Models\AddressOption;
 use Plenty\Modules\Authorization\Services\AuthHelper;
 use Plenty\Modules\Frontend\PaymentMethod\Contracts\FrontendPaymentMethodRepositoryContract;
-use Plenty\Modules\Helper\AutomaticEmail\Contracts\AutomaticEmailContract;
-use Plenty\Modules\Helper\AutomaticEmail\Models\AutomaticEmail;
 use Plenty\Modules\Helper\AutomaticEmail\Models\AutomaticEmailOrder;
 use Plenty\Modules\Helper\AutomaticEmail\Models\AutomaticEmailTemplate;
 use Plenty\Modules\Order\Contracts\OrderRepositoryContract;
@@ -61,6 +61,12 @@ class OrderService
      */
     private $urlService;
 
+    /** @var CheckoutService $checkoutService */
+    private $checkoutService;
+
+    /** @var CustomerService $customerService */
+    private $customerService;
+
 
     /**
      * The OrderItem types that will be wrapped. All other OrderItems will be stripped from the order.
@@ -81,6 +87,8 @@ class OrderService
      * @param FrontendPaymentMethodRepositoryContract $frontendPaymentMethodRepository
      * @param AddressRepositoryContract $addressRepository
      * @param \IO\Services\UrlService $urlService
+     * @param \IO\Services\CheckoutService $checkoutService
+     * @param \IO\Services\CustomerService $customerService
      */
 	public function __construct(
 		OrderRepositoryContract $orderRepository,
@@ -88,7 +96,9 @@ class OrderService
         SessionStorageService $sessionStorage,
         FrontendPaymentMethodRepositoryContract $frontendPaymentMethodRepository,
         AddressRepositoryContract $addressRepository,
-        UrlService $urlService)
+        UrlService $urlService,
+        CheckoutService $checkoutService,
+        CustomerService $customerService)
 	{
 		$this->orderRepository = $orderRepository;
 		$this->basketService   = $basketService;
@@ -96,6 +106,8 @@ class OrderService
         $this->frontendPaymentMethodRepository = $frontendPaymentMethodRepository;
         $this->addressRepository = $addressRepository;
         $this->urlService = $urlService;
+        $this->checkoutService = $checkoutService;
+        $this->customerService = $customerService;
 	}
 
     /**
@@ -104,12 +116,8 @@ class OrderService
      */
 	public function placeOrder():LocalizedOrder
 	{
-	    /** @var CheckoutService $checkoutService */
-        $checkoutService = pluginApp(CheckoutService::class);
-        
-        /** @var CustomerService $customerService */
-        $customerService = pluginApp(CustomerService::class);
-        
+	    $email = $this->customerService->getEmail();
+	    $billingAddressId = $this->checkoutService->getBillingAddressId();
         $basket = $this->basketService->getBasket();
         
         $couponCode = null;
@@ -127,17 +135,19 @@ class OrderService
 
         $order = pluginApp(OrderBuilder::class)->prepare(OrderType::ORDER)
             ->fromBasket()
-            ->withContactId($customerService->getContactId())
-            ->withAddressId($checkoutService->getBillingAddressId(), AddressType::BILLING)
-            ->withAddressId($checkoutService->getDeliveryAddressId(), AddressType::DELIVERY)
-            ->withOrderProperty(OrderPropertyType::PAYMENT_METHOD, OrderOptionSubType::MAIN_VALUE, $checkoutService->getMethodOfPaymentId())
-            ->withOrderProperty(OrderPropertyType::SHIPPING_PROFILE, OrderOptionSubType::MAIN_VALUE, $checkoutService->getShippingProfileId())
+            ->withContactId($this->customerService->getContactId())
+            ->withAddressId($this->checkoutService->getBillingAddressId(), AddressType::BILLING)
+            ->withAddressId($this->checkoutService->getDeliveryAddressId(), AddressType::DELIVERY)
+            ->withOrderProperty(OrderPropertyType::PAYMENT_METHOD, OrderOptionSubType::MAIN_VALUE, $this->checkoutService->getMethodOfPaymentId())
+            ->withOrderProperty(OrderPropertyType::SHIPPING_PROFILE, OrderOptionSubType::MAIN_VALUE, $this->checkoutService->getShippingProfileId())
             ->withOrderProperty(OrderPropertyType::DOCUMENT_LANGUAGE, OrderOptionSubType::MAIN_VALUE, $this->sessionStorage->getLang())
             ->withOrderProperty(OrderPropertyType::SHIPPING_PRIVACY_HINT_ACCEPTED, OrderOptionSubType::MAIN_VALUE, $isShippingPrivacyHintAccepted)
             ->withComment(true, $this->sessionStorage->getSessionValue(SessionStorageKeys::ORDER_CONTACT_WISH))
             ->done();
 
         $order = $this->orderRepository->createOrder($order, $couponCode);
+
+
 
         if ($order instanceof Order && $order->id > 0) {
             $params = [
@@ -147,9 +157,11 @@ class OrderService
             $this->sendMail(AutomaticEmailTemplate::SHOP_ORDER ,AutomaticEmailOrder::class, $params);
         }
 
+        $this->subscribeToNewsletter($email, $billingAddressId);
+
         $this->sessionStorage->setSessionValue(SessionStorageKeys::ORDER_CONTACT_WISH, null);
 
-        if($customerService->getContactId() <= 0)
+        if($this->customerService->getContactId() <= 0)
         {
             $this->sessionStorage->setSessionValue(SessionStorageKeys::LATEST_ORDER_ID, $order->id);
         }
@@ -160,6 +172,50 @@ class OrderService
 
         return LocalizedOrder::wrap( $order, $this->sessionStorage->getLang() );
 	}
+    
+    /**
+     * Subscribe the customer to the newsletter, if stored in the session
+     *
+     * @param $email
+     * @param $billingAddressId
+     */
+	public function subscribeToNewsletter($email, $billingAddressId)
+    {
+        /** @var CustomerNewsletterService $customerNewsletterService $email */
+        $customerNewsletterService = pluginApp(CustomerNewsletterService::class);
+        $newsletterSubscriptions = $this->sessionStorage->getSessionValue(SessionStorageKeys::NEWSLETTER_SUBSCRIPTIONS);
+
+        if (count($newsletterSubscriptions) && strlen($email))
+        {
+            $firstName = '';
+            $lastName = '';
+            
+            $address = $this->customerService->getAddress($billingAddressId, AddressType::BILLING);
+
+            // if the address is for a company, the contact person will be store into the last name
+            if (strlen($address->name1))
+            {
+                foreach ($address->options as $option)
+                {
+                    if ($option['typeId'] === AddressOption::TYPE_CONTACT_PERSON)
+                    {
+                        $lastName = $option['value'];
+
+                        break;
+                    }
+                }
+            }
+            else
+            {
+                $firstName = $address->name2;
+                $lastName = $address->name3;
+            }
+
+            $customerNewsletterService->saveMultipleNewsletterData($email, $newsletterSubscriptions, $firstName, $lastName);
+        }
+
+        $this->sessionStorage->setSessionValue(SessionStorageKeys::NEWSLETTER_SUBSCRIPTIONS, null);
+    }
 
     /**
      * Execute the payment for a given order.
@@ -211,11 +267,6 @@ class OrderService
         
         if($redirectToLogin == 'true')
         {
-            /**
-             * @var CustomerService $customerService
-             */
-            $customerService = pluginApp(CustomerService::class);
-    
             $orderContactId = 0;
             foreach ($order->relations as $relation)
             {
@@ -227,12 +278,12 @@ class OrderService
     
             if ((int)$orderContactId > 0)
             {
-                if ((int)$customerService->getContactId() <= 0)
+                if ((int)$this->customerService->getContactId() <= 0)
                 {
 
-                    return $this->urlService->redirectTo('login?backlink=confirmation/' . $orderId . '/' . $orderAccessKey);
+                    return $this->urlService->redirectTo(pluginApp(ShopUrls::class)->login . '?backlink=' . pluginApp(ShopUrls::class)->confirmation . '/' . $orderId . '/' . $orderAccessKey);
                 }
-                elseif ((int)$orderContactId !== (int)$customerService->getContactId())
+                elseif ((int)$orderContactId !== (int)$this->customerService->getContactId())
                 {
                     return null;
                 }
@@ -464,7 +515,14 @@ class OrderService
             {
                 $returnStatus = 9.0;
             }
-    
+
+            $order['properties'][] = [
+                "typeId"    => OrderPropertyType::NEW_RETURNS_MY_ACCOUNT,
+                "value"     => "1"
+            ];
+
+
+
             $order['statusId'] = (float)$returnStatus;
             $order['typeId'] = OrderType::RETURNS;
     
