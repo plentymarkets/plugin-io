@@ -431,6 +431,33 @@ class BasketService
         $data['id'] = $basketItemId;
         try {
             $this->basketItemRepository->updateBasketItem($basketItemId, $data);
+        } catch (BasketItemQuantityCheckException $e) {
+             switch($e->getCode()) {
+                case BasketItemQuantityCheckException::DID_REACH_MAXIMUM_QUANTITY_FOR_ITEM:
+                    $code = 112;
+                    break;
+                case BasketItemQuantityCheckException::DID_REACH_MAXIMUM_QUANTITY_FOR_VARIATION:
+                    $code = 113;
+                    break;
+                case BasketItemQuantityCheckException::DID_NOT_REACH_MINIMUM_QUANTITY_FOR_VARIATION:
+                    $code = 114;
+                    break;
+                default:
+                    $code = 0;
+            }
+            return ["code" => $code];
+        } catch (BasketItemCheckException $e) {
+            switch($e->getCode()) {
+                case BasketItemCheckException::VARIATION_NOT_FOUND:
+                    $code = 110;
+                    break;
+                case BasketItemCheckException::NOT_ENOUGH_STOCK_FOR_VARIATION:
+                    $code = 111;
+                    break;
+                default:
+                    $code = 0;
+            }
+            return ["code" => $code];
         } catch (\Exception $e) {
             return ["code" => $e->getCode()];
         }
