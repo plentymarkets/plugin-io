@@ -370,7 +370,7 @@ class OrderService
                 return [
                     'id'           => $order->id,
                     'total'        => $totals['totalGross'],
-                    'status'       => $order->status,
+                    'status'       => $order->statusName,
                     'creationDate' => $creationDate->toDateTimeString()
                 ];
             });
