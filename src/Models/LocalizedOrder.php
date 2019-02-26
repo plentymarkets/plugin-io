@@ -179,6 +179,8 @@ class LocalizedOrder extends ModelWrapper
         $order = $this->order->toArray();
         $order['billingAddress'] = $this->order->billingAddress->toArray();
         $order['deliveryAddress'] = $this->order->deliveryAddress->toArray();
+        $order['documents'] = $this->order->documents->toArray();
+        
         if ( count( $this->orderData ) )
         {
             $order = $this->orderData;
