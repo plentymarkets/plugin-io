@@ -3,15 +3,19 @@ namespace IO\Controllers;
 
 use IO\Constants\SessionStorageKeys;
 use IO\Extensions\Constants\ShopUrls;
+use IO\Helper\RouteConfig;
 use IO\Services\BasketService;
 use IO\Services\CustomerService;
 use IO\Services\SessionStorageService;
 use IO\Services\UrlBuilder\UrlQuery;
+use IO\Services\UrlService;
 use IO\Services\WebstoreConfigurationService;
 use Plenty\Modules\Basket\Contracts\BasketItemRepositoryContract;
 use IO\Guards\AuthGuard;
+use Plenty\Modules\Category\Contracts\CategoryRepositoryContract;
 use Plenty\Modules\Category\Models\Category;
 use Plenty\Modules\ShopBuilder\Helper\ShopBuilderRequest;
+use Plenty\Plugin\Application;
 
 /**
  * Class CheckoutController
@@ -53,6 +57,11 @@ class CheckoutController extends LayoutController
                 AuthGuard::redirect(pluginApp(ShopUrls::class)->home, []);
             }
         }
+        else if ( is_null($category) )
+        {
+            $categoryController = pluginApp(CategoryController::class);
+            return $categoryController->showCategory("checkout");
+        }
 
         return $this->renderTemplate(
             "tpl.checkout",
@@ -60,6 +69,22 @@ class CheckoutController extends LayoutController
                 'category' => $category
             ],
             false
+        );
+    }
+
+    public function redirectCheckoutCategory()
+    {
+        $categoryController = pluginApp(CategoryController::class);
+        $categoryContent = $categoryController->showCategory("checkout");
+        if ( strlen($categoryContent) )
+        {
+            return $categoryContent;
+        }
+
+        /** @var UrlService $urlService */
+        $urlService = pluginApp(UrlService::class);
+        return $urlService->redirectTo(
+            pluginApp(ShopUrls::class)->checkout
         );
     }
 }

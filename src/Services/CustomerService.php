@@ -606,11 +606,11 @@ class CustomerService
 
             if($type == AddressType::BILLING)
             {
-                return $this->addressRepository->findAddressById($basketService->getBillingAddressId());
+                return $this->addressRepository->findAddressById(((int)$addressId > 0 ? $addressId : $basketService->getBillingAddressId()));
             }
             elseif($type == AddressType::DELIVERY)
             {
-                return $this->addressRepository->findAddressById($basketService->getDeliveryAddressId());
+                return $this->addressRepository->findAddressById(((int)$addressId > 0 ? $addressId : $basketService->getDeliveryAddressId()));
             }
         }
 	}
@@ -1012,7 +1012,7 @@ class CustomerService
         }
     }
 
-    public function getEmail():string
+    public function getEmail()
     {
         $contact = $this->getContact();
         if ($contact instanceof Contact)
@@ -1022,6 +1022,11 @@ class CustomerService
         else
         {
             $email = $this->sessionStorage->getSessionValue(SessionStorageKeys::GUEST_EMAIL);
+        }
+        
+        if(is_null($email))
+        {
+            $email = '';
         }
 
         return $email;

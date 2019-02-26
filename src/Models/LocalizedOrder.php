@@ -198,6 +198,8 @@ class LocalizedOrder extends ModelWrapper
         $order = $this->order->toArray();
         $order['billingAddress'] = $this->order->billingAddress->toArray();
         $order['deliveryAddress'] = $this->order->deliveryAddress->toArray();
+        $order['documents'] = $this->order->documents->toArray();
+        
         if ( count( $this->orderData ) )
         {
             $order = $this->orderData;
@@ -227,7 +229,7 @@ class LocalizedOrder extends ModelWrapper
         $isOrderNet = $this->order->amounts[0]->isNet;
 
         $orderContactId = 0;
-        foreach ($this->order->relations as $relation)
+        foreach ($this->order->relations['relations'] as $relation)
         {
             if ($relation['referenceType'] == 'contact' && (int)$relation['referenceId'] > 0)
             {

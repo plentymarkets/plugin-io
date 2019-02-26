@@ -88,6 +88,10 @@ class IORouteServiceProvider extends RouteServiceProvider
             //Checkout-confirm purchase route
             $router->get('checkout', 'IO\Controllers\CheckoutController@showCheckout');
         }
+        else if ( RouteConfig::getCategoryId(RouteConfig::CHECKOUT) > 0 )
+        {
+            $router->get('checkout', 'IO\Controllers\CheckoutController@redirectCheckoutCategory');
+        }
 
         if ( RouteConfig::isActive(RouteConfig::MY_ACCOUNT) )
         {

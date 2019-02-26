@@ -194,9 +194,10 @@ class CategoryService
      * Return the URL for a given category ID.
      * @param Category $category the category to get the URL for
      * @param string $lang the language to get the URL for
+     * @param int |null $webstoreId
      * @return string|null
      */
-    public function getURL($category, $lang = null)
+    public function getURL($category, $lang = null, $webstoreId = null)
     {
         $defaultLanguage = $this->webstoreConfig->getDefaultLanguage();
         if ( $lang === null )
@@ -205,15 +206,15 @@ class CategoryService
         }
 
         $categoryUrl = $this->fromMemoryCache(
-            "categoryUrl.$category->id.$lang",
-            function() use ($category, $lang, $defaultLanguage) {
+            "categoryUrl.$category->id.$lang.$webstoreId",
+            function() use ($category, $lang, $defaultLanguage, $webstoreId) {
                 if(!$category instanceof Category || $category->details[0] === null)
                 {
                     return null;
                 }
                 $categoryURL = pluginApp(
                     UrlQuery::class,
-                    ['path' => $this->categoryRepository->getUrl($category->id, $lang), 'lang' => $lang]
+                    ['path' => $this->categoryRepository->getUrl($category->id, $lang, false, $webstoreId), 'lang' => $lang]
                 );
                 return $categoryURL->toRelativeUrl($lang !== $defaultLanguage);
             }
@@ -381,8 +382,10 @@ class CategoryService
             $this->categoryRepository->getLinklistList($type, $lang, $this->webstoreConfig->getWebstoreConfig()->webstoreId)
         );
 
+        /** @var CategoryDataFilter $filter */
+        $filter = pluginApp( CategoryDataFilter::class );
 
-        return pluginApp( CategoryDataFilter::class )->applyResultFields(
+        return $filter->applyResultFields(
             $list,
             $this->loadResultFields( ResultFieldTemplate::get( ResultFieldTemplate::TEMPLATE_CATEGORY_TREE ) )
         );

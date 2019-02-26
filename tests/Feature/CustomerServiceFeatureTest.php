@@ -189,8 +189,8 @@ class CustomerServiceFeatureTest extends TestCase
                     // Billing address with company and empty gender and stateId
                     'gender'     => '',
                     'name1'      => $this->fake->company,
-                    'name2'      => $this->fake->firstName,
-                    'name3'      => $this->fake->lastName,
+                    'name2'      => '',
+                    'name3'      => '',
                     'name4'      => '',
                     'address1'   => $this->fake->streetName,
                     'address2'   => $this->fake->streetAddress,
@@ -226,7 +226,7 @@ class CustomerServiceFeatureTest extends TestCase
                     // Delivery address with company
                     'gender'     => '',
                     'name1'      => $this->fake->company,
-                    'name2'      => $this->fake->firstName,
+                    'name2'      => '',
                     'name3'      => '',
                     'name4'      => '',
                     'address1'   => $this->fake->streetName,

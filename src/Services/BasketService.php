@@ -431,6 +431,33 @@ class BasketService
         $data['id'] = $basketItemId;
         try {
             $this->basketItemRepository->updateBasketItem($basketItemId, $data);
+        } catch (BasketItemQuantityCheckException $e) {
+             switch($e->getCode()) {
+                case BasketItemQuantityCheckException::DID_REACH_MAXIMUM_QUANTITY_FOR_ITEM:
+                    $code = 112;
+                    break;
+                case BasketItemQuantityCheckException::DID_REACH_MAXIMUM_QUANTITY_FOR_VARIATION:
+                    $code = 113;
+                    break;
+                case BasketItemQuantityCheckException::DID_NOT_REACH_MINIMUM_QUANTITY_FOR_VARIATION:
+                    $code = 114;
+                    break;
+                default:
+                    $code = 0;
+            }
+            return ["code" => $code];
+        } catch (BasketItemCheckException $e) {
+            switch($e->getCode()) {
+                case BasketItemCheckException::VARIATION_NOT_FOUND:
+                    $code = 110;
+                    break;
+                case BasketItemCheckException::NOT_ENOUGH_STOCK_FOR_VARIATION:
+                    $code = 111;
+                    break;
+                default:
+                    $code = 0;
+            }
+            return ["code" => $code];
         } catch (\Exception $e) {
             return ["code" => $e->getCode()];
         }
@@ -453,13 +480,29 @@ class BasketService
 
             // $basket->basketAmount is basket amount minus coupon value
             // $basket->couponDiscount is negative
-            if($campaign instanceof CouponCampaign && $campaign->minOrderValue > (( $basket->basketAmount - $basket->couponDiscount ) - ($basketItem['price'] * $basketItem['quantity'])))
+            if($campaign instanceof CouponCampaign)
             {
-                $this->basketRepository->removeCouponCode();
-
                 /** @var NotificationService $notificationService */
                 $notificationService = pluginApp(NotificationService::class);
-                $notificationService->info('CouponValidation',301);
+                
+                if($campaign->minOrderValue > (( $basket->basketAmount - $basket->couponDiscount ) - ($basketItem['price'] * $basketItem['quantity'])))
+                {
+                    $this->basketRepository->removeCouponCode();
+                    $notificationService->info('CouponValidation',301);
+                }
+    
+                //check if basket item to remove is matching with a coupon campaign and remove coupon if no item with the matching item id of the campaign is left in the basket
+                $campaignItems = $campaign->references->where('referenceType', 'item')->where('value', $basketItem['itemId']);
+                if(count($campaignItems))
+                {
+                    $matchingBasketItems = $basket->basketItems->where('itemId', $basketItem['itemId']);
+                    
+                    if(count($matchingBasketItems) <= 1)
+                    {
+                        $this->basketRepository->removeCouponCode();
+                        $notificationService->info('CouponValidation',302);
+                    }
+                }
             }
         }
 
