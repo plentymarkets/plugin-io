@@ -8,9 +8,11 @@ use IO\Extensions\Filters\ItemImagesFilter;
 use IO\Services\CustomerService;
 use IO\Services\ItemSearch\Factories\VariationSearchFactory;
 use IO\Services\ItemSearch\Services\ItemSearchService;
+use IO\Services\OrderService;
 use Plenty\Modules\Account\Contact\Contracts\ContactRepositoryContract;
 use Plenty\Modules\Order\Models\Order;
-use Plenty\Modules\Order\Status\Models\OrderStatusName;
+use Plenty\Modules\Order\Property\Models\OrderProperty;
+use Plenty\Modules\Order\Property\Models\OrderPropertyType;
 use Plenty\Modules\Frontend\PaymentMethod\Contracts\FrontendPaymentMethodRepositoryContract;
 use Plenty\Modules\Order\Shipping\Contracts\ParcelServicePresetRepositoryContract;
 use IO\Extensions\Filters\URLFilter;
@@ -34,10 +36,7 @@ class LocalizedOrder extends ModelWrapper
     public $order = null;
     
     public $orderData = [];
-
-    /**
-     * @var OrderStatusName
-     */
+    
     public $status = null;
 
     public $shippingProvider = "";
@@ -45,13 +44,18 @@ class LocalizedOrder extends ModelWrapper
     public $shippingProfileId = 0;
     public $paymentMethodName = "";
     public $paymentMethodIcon = "";
+    public $paymentStatus = '';
 
     public $itemURLs = [];
     public $itemImages = [];
     public $isReturnable = false;
 
     public $highlightNetPrices = false;
-
+    
+    
+    public $allowPaymentMethodSwitchFrom = false;
+    public $paymentMethodListForSwitch = [];
+    
     /**
      * @param Order $order
      * @param array ...$data
@@ -101,7 +105,6 @@ class LocalizedOrder extends ModelWrapper
         catch(\Exception $e)
         {}
         
-
         $frontentPaymentRepository = pluginApp( FrontendPaymentMethodRepositoryContract::class );
         
         try
@@ -111,8 +114,24 @@ class LocalizedOrder extends ModelWrapper
         }
         catch(\Exception $e)
         {}
-
-
+    
+    
+        $paymentStatusProperty = $order->properties->firstWhere('typeId', OrderPropertyType::PAYMENT_STATUS);
+        if($paymentStatusProperty instanceof OrderProperty)
+        {
+            $instance->paymentStatus = $paymentStatusProperty->value;
+        }
+    
+        $paymentMethodIdProperty = $order->properties->firstWhere('typeId', OrderPropertyType::PAYMENT_METHOD);
+        if($paymentMethodIdProperty instanceof OrderProperty)
+        {
+            /** @var OrderService $orderService */
+            $orderService = pluginApp(OrderService::class);
+        
+            $instance->allowPaymentMethodSwitchFrom = $orderService->allowPaymentMethodSwitchFrom($paymentMethodIdProperty->value, $order->id);
+            $instance->paymentMethodListForSwitch = $orderService->getPaymentMethodListForSwitch($paymentMethodIdProperty->value, $order->id);
+        }
+        
         /** @var URLFilter $urlFilter */
         $urlFilter = pluginApp(URLFilter::class);
 
@@ -167,7 +186,7 @@ class LocalizedOrder extends ModelWrapper
         }
 
         $instance->highlightNetPrices = $instance->highlightNetPrices();
-
+        
         return $instance;
     }
 
@@ -186,17 +205,20 @@ class LocalizedOrder extends ModelWrapper
             $order = $this->orderData;
         }
         $data = [
-            "order"                 => $order,
-            "status"                => [], //$this->status->toArray(),
-            "shippingProfileId"     => $this->shippingProfileId,
-            "shippingProvider"      => $this->shippingProvider,
-            "shippingProfileName"   => $this->shippingProfileName,
-            "paymentMethodName"     => $this->paymentMethodName,
-            "paymentMethodIcon"     => $this->paymentMethodIcon,
-            "itemURLs"              => $this->itemURLs,
-            "itemImages"            => $this->itemImages,
-            "isReturnable"          => $this->isReturnable,
-            "highlightNetPrices"    => $this->highlightNetPrices
+            "order"                        => $order,
+            "status"                       => [], //$this->status->toArray(),
+            "shippingProfileId"            => $this->shippingProfileId,
+            "shippingProvider"             => $this->shippingProvider,
+            "shippingProfileName"          => $this->shippingProfileName,
+            "paymentMethodName"            => $this->paymentMethodName,
+            "paymentMethodIcon"            => $this->paymentMethodIcon,
+            "paymentStatus"                => $this->paymentStatus,
+            "allowPaymentMethodSwitchFrom" => $this->allowPaymentMethodSwitchFrom,
+            "paymentMethodListForSwitch"   => $this->paymentMethodListForSwitch,
+            "itemURLs"                     => $this->itemURLs,
+            "itemImages"                   => $this->itemImages,
+            "isReturnable"                 => $this->isReturnable,
+            "highlightNetPrices"           => $this->highlightNetPrices
         ];
 
         return $data;
