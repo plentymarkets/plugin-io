@@ -19,6 +19,8 @@ use Plenty\Modules\Frontend\PaymentMethod\Contracts\FrontendPaymentMethodReposit
 use Plenty\Modules\Helper\AutomaticEmail\Models\AutomaticEmailOrder;
 use Plenty\Modules\Helper\AutomaticEmail\Models\AutomaticEmailTemplate;
 use Plenty\Modules\Order\Contracts\OrderRepositoryContract;
+use Plenty\Modules\Order\Date\Models\OrderDate;
+use Plenty\Modules\Order\Date\Models\OrderDateType;
 use Plenty\Modules\Order\Property\Contracts\OrderPropertyRepositoryContract;
 use Plenty\Modules\Order\Property\Models\OrderPropertyType;
 use Plenty\Modules\Payment\Contracts\PaymentRepositoryContract;
@@ -347,9 +349,24 @@ class OrderService
             $items
         );
         
-        $orders = $orderResult->getResult()->transform(function($order){
+        /** @var OrderTotalsService $orderTotalsService */
+        $orderTotalsService = pluginApp(OrderTotalsService::class);
+        
+        $orders = $orderResult->getResult()->transform(function(Order $order) use ($orderTotalsService) {
+            $totals = $orderTotalsService->getAllTotals($order);
+            
+            $creationDate = '0000-00-00 00:00:00';
+            $creationDateData = $order->dates->firstWhere('typeId', OrderDateType::ORDER_ENTRY_AT);
+            if($creationDateData instanceof OrderDate)
+            {
+                $creationDate = $creationDateData->date;
+            }
+            
             return [
-                'id' => $order->id
+                'id'           => $order->id,
+                'total'        => $totals['totalGross'],
+                'status'       => $order->status,
+                'creationDate' => $creationDate->toDateTimeString()
             ];
         });
         
