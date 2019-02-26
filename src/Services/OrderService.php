@@ -338,39 +338,45 @@ class OrderService
         return $orders;
     }
     
-    public function getOrderOverviewListForMyAccount(int $contactId, int $page = 1, int $items = 50)
+    public function getOrderOverviewListForMyAccount(int $page = 1, int $items = 50)
     {
-        $this->orderRepository->setFilters(['orderType' => OrderType::ORDER]);
+        $orderResult = null;
+        $contactId = $this->customerService->getContactId();
         
-        /** @var PaginatedResult $orderResult */
-        $orderResult = $this->orderRepository->allOrdersByContact(
-            $contactId,
-            $page,
-            $items
-        );
+        if($contactId > 0)
+        {
+            $this->orderRepository->setFilters(['orderType' => OrderType::ORDER]);
+    
+            /** @var PaginatedResult $orderResult */
+            $orderResult = $this->orderRepository->allOrdersByContact(
+                $contactId,
+                $page,
+                $items
+            );
+    
+            /** @var OrderTotalsService $orderTotalsService */
+            $orderTotalsService = pluginApp(OrderTotalsService::class);
+    
+            $orders = $orderResult->getResult()->transform(function(Order $order) use ($orderTotalsService) {
+                $totals = $orderTotalsService->getAllTotals($order);
         
-        /** @var OrderTotalsService $orderTotalsService */
-        $orderTotalsService = pluginApp(OrderTotalsService::class);
+                $creationDate = '0000-00-00 00:00:00';
+                $creationDateData = $order->dates->firstWhere('typeId', OrderDateType::ORDER_ENTRY_AT);
+                if($creationDateData instanceof OrderDate)
+                {
+                    $creationDate = $creationDateData->date;
+                }
         
-        $orders = $orderResult->getResult()->transform(function(Order $order) use ($orderTotalsService) {
-            $totals = $orderTotalsService->getAllTotals($order);
-            
-            $creationDate = '0000-00-00 00:00:00';
-            $creationDateData = $order->dates->firstWhere('typeId', OrderDateType::ORDER_ENTRY_AT);
-            if($creationDateData instanceof OrderDate)
-            {
-                $creationDate = $creationDateData->date;
-            }
-            
-            return [
-                'id'           => $order->id,
-                'total'        => $totals['totalGross'],
-                'status'       => $order->status,
-                'creationDate' => $creationDate->toDateTimeString()
-            ];
-        });
-        
-        $orderResult->setResult($orders);
+                return [
+                    'id'           => $order->id,
+                    'total'        => $totals['totalGross'],
+                    'status'       => $order->status,
+                    'creationDate' => $creationDate->toDateTimeString()
+                ];
+            });
+    
+            $orderResult->setResult($orders);
+        }
         
         return $orderResult;
     }
