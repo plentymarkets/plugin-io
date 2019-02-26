@@ -336,6 +336,28 @@ class OrderService
         return $orders;
     }
     
+    public function getOrderOverviewListForMyAccount(int $contactId, int $page = 1, int $items = 50)
+    {
+        $this->orderRepository->setFilters(['orderType' => OrderType::ORDER]);
+        
+        /** @var PaginatedResult $orderResult */
+        $orderResult = $this->orderRepository->allOrdersByContact(
+            $contactId,
+            $page,
+            $items
+        );
+        
+        $orders = $orderResult->getResult()->transform(function($order){
+            return [
+                'id' => $order->id
+            ];
+        });
+        
+        $orderResult->setResult($orders);
+        
+        return $orderResult;
+    }
+    
     /**
      * Get the last order created by the current contact
      * @param int $contactId
