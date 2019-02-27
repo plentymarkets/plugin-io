@@ -4,6 +4,7 @@ namespace IO\Controllers;
 
 use IO\Api\ResponseCode;
 use IO\Helper\RouteConfig;
+use IO\Guards\AuthGuard;
 use IO\Services\SessionStorageService;
 use Plenty\Modules\ShopBuilder\Helper\ShopBuilderRequest;
 use Plenty\Plugin\Application;
@@ -51,6 +52,10 @@ class CategoryController extends LayoutController
         }
 
         $this->categoryService->setCurrentCategory($category);
+        if ($this->categoryService->isHidden($category->id)) {
+            $guard = pluginApp(AuthGuard::class);
+            $guard->assertOrRedirect( true, '/login');
+        }
 
         /** @var ShopBuilderRequest $shopBuilderRequest */
         $shopBuilderRequest = pluginApp(ShopBuilderRequest::class);
