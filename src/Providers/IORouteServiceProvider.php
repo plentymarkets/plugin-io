@@ -53,7 +53,7 @@ class IORouteServiceProvider extends RouteServiceProvider
             $api->resource('io/customer/password_reset', 'CustomerPasswordResetResource');
             $api->resource('io/customer/contact/mail', 'ContactMailResource');
             $api->resource('io/customer/bank_data', 'ContactBankResource');
-            $api->resource('io/customer/order', 'CustomerOrderResource');
+            $api->get('io/customer/order/list', 'CustomerOrderResource@index');
             $api->resource('io/customer/order/return', 'CustomerOrderReturnResource');
             $api->resource('io/customer/newsletter', 'CustomerNewsletterResource');
             $api->resource('io/variations', 'VariationResource');
