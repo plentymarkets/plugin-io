@@ -356,24 +356,29 @@ class OrderService
     
             /** @var OrderTotalsService $orderTotalsService */
             $orderTotalsService = pluginApp(OrderTotalsService::class);
-    
-            $orders = $orderResult->getResult()->transform(function(Order $order) use ($orderTotalsService) {
-                $totals = $orderTotalsService->getAllTotals($order);
-        
-                $creationDate = '0000-00-00 00:00:00';
-                $creationDateData = $order->dates->firstWhere('typeId', OrderDateType::ORDER_ENTRY_AT);
-                if($creationDateData instanceof OrderDate)
+            
+            $orders = [];
+            foreach($orderResult->getResult() as $order)
+            {
+                if($order instanceof Order)
                 {
-                    $creationDate = $creationDateData->date;
+                    $totals = $orderTotalsService->getAllTotals($order);
+    
+                    $creationDate = '0000-00-00 00:00:00';
+                    $creationDateData = $order->dates->firstWhere('typeId', OrderDateType::ORDER_ENTRY_AT);
+                    if($creationDateData instanceof OrderDate)
+                    {
+                        $creationDate = $creationDateData->date;
+                    }
+    
+                    $orders[] = [
+                        'id'           => $order->id,
+                        'total'        => $totals['totalGross'],
+                        'status'       => $order->statusName,
+                        'creationDate' => $creationDate->toDateTimeString()
+                    ];
                 }
-        
-                return [
-                    'id'           => $order->id,
-                    'total'        => $totals['totalGross'],
-                    'status'       => $order->statusName,
-                    'creationDate' => $creationDate->toDateTimeString()
-                ];
-            });
+            };
     
             $orderResult->setResult($orders);
         }
