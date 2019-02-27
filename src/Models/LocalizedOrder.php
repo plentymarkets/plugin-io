@@ -2,18 +2,23 @@
 
 namespace IO\Models;
 
-use IO\Builder\Order\OrderType;
 use IO\Builder\Order\OrderItemType;
 use IO\Extensions\Filters\ItemImagesFilter;
 use IO\Services\CustomerService;
 use IO\Services\ItemSearch\Factories\VariationSearchFactory;
 use IO\Services\ItemSearch\Services\ItemSearchService;
 use Plenty\Modules\Account\Contact\Contracts\ContactRepositoryContract;
+use IO\Services\OrderService;
+use Plenty\Modules\Authorization\Services\AuthHelper;
 use Plenty\Modules\Order\Models\Order;
 use Plenty\Modules\Order\Status\Models\OrderStatusName;
 use Plenty\Modules\Frontend\PaymentMethod\Contracts\FrontendPaymentMethodRepositoryContract;
 use Plenty\Modules\Order\Shipping\Contracts\ParcelServicePresetRepositoryContract;
 use IO\Extensions\Filters\URLFilter;
+use Plenty\Modules\Order\Shipping\Contracts\ParcelServiceRepositoryContract;
+use Plenty\Modules\Order\Shipping\Package\Contracts\OrderShippingPackageRepositoryContract;
+use Plenty\Modules\Order\Shipping\Package\Models\OrderShippingPackage;
+use Plenty\Modules\Order\Shipping\ParcelService\Models\ParcelService;
 
 class LocalizedOrder extends ModelWrapper
 {
@@ -167,7 +172,61 @@ class LocalizedOrder extends ModelWrapper
         }
 
         $instance->highlightNetPrices = $instance->highlightNetPrices();
-
+    
+        $orderId = $order->id;
+        
+        /** @var OrderShippingPackageRepositoryContract $orderShippingPackagesRepo */
+        $orderShippingPackageRepo = pluginApp(OrderShippingPackageRepositoryContract::class);
+        
+        /** @var AuthHelper $authHelper */
+        $authHelper = pluginApp(AuthHelper::class);
+    
+        $packages = $authHelper->processUnguarded( function() use ($orderId, $orderShippingPackageRepo)
+        {
+            return $orderShippingPackageRepo->listOrderShippingPackages($orderId);
+        });
+    
+        $parcelServiceid = $shippingProfile->parcelServiceId;
+        
+        $trackingUrls = [];
+        if(count($packages))
+        {
+            /** @var ParcelServiceRepositoryContract $parcelServiceRepo */
+            $parcelServiceRepo = pluginApp(ParcelServiceRepositoryContract::class);
+            
+            
+            
+            /** @var OrderShippingPackage $package */
+            foreach($packages as $package)
+            {
+                $parcelService = $authHelper->processUnguarded(function() use ($parcelServiceRepo, $parcelServiceid) {
+                    return $parcelServiceRepo->getParcelServiceById($parcelServiceid);
+                });
+                
+                if($parcelService instanceof ParcelService)
+                {
+                    /*if (!$lang) $lang = LANG;
+                    $trackingUrl = str_replace(	'[PaketNr]',
+                                                   $packagenum,
+                                                   str_replace(	'[PLZ]',
+                                                                   $plz,
+                                                                   str_replace(	'[Lang]',
+                                                                                   $lang,
+                                                                                   $trackingUrl)));
+    
+                    return str_replace(	'$PaketNr',
+                                           $packagenum,
+                                           str_replace(	'$PLZ',
+                                                           $plz,
+                                                           str_replace(	'$Lang',
+                                                                           $lang,
+                                                                           $trackingUrl)));*/
+                    //TODO replace place holders
+                    $trackingUrls[] = $parcelService->trackingUrl.'/'.$package->packageNumber;
+                }
+            }
+        }
+        
         return $instance;
     }
 
