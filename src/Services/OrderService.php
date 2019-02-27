@@ -23,6 +23,7 @@ use Plenty\Modules\Order\Date\Models\OrderDate;
 use Plenty\Modules\Order\Date\Models\OrderDateType;
 use Plenty\Modules\Order\Property\Contracts\OrderPropertyRepositoryContract;
 use Plenty\Modules\Order\Property\Models\OrderPropertyType;
+use Plenty\Modules\Order\Status\Contracts\OrderStatusRepositoryContract;
 use Plenty\Modules\Payment\Contracts\PaymentRepositoryContract;
 use Plenty\Modules\Payment\Method\Contracts\PaymentMethodRepositoryContract;
 use Plenty\Repositories\Models\PaginatedResult;
@@ -366,6 +367,23 @@ class OrderService
     
                     $creationDate = '0000-00-00 00:00:00';
                     $creationDateData = $order->dates->firstWhere('typeId', OrderDateType::ORDER_ENTRY_AT);
+
+                    /** @var AuthHelper $authHelper */
+                    $authHelper = pluginApp(AuthHelper::class);
+                    $orderStatusName = $authHelper->processUnguarded(function() use ($order)
+                    {
+                        /** @var OrderStatusRepositoryContract $orderStatusRepository */
+                        $orderStatusRepository = pluginApp(OrderStatusRepositoryContract::class);
+                        $orderStatus = $orderStatusRepository->get($order->statusId);
+                        if ( !is_null($orderStatus) && $orderStatus->isFrontendVisible )
+                        {
+                            $lang = pluginApp(SessionStorageService::class)->getLang();
+                            return $orderStatus->names->get($lang);
+                        }
+
+                        return "";
+                    });
+
                     if($creationDateData instanceof OrderDate)
                     {
                         $creationDate = $creationDateData->date;
@@ -374,7 +392,7 @@ class OrderService
                     $orders[] = [
                         'id'           => $order->id,
                         'total'        => $totals['totalGross'],
-                        'status'       => $order->statusName,
+                        'status'       => $orderStatusName,
                         'creationDate' => $creationDate->toDateTimeString()
                     ];
                 }
