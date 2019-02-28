@@ -95,7 +95,6 @@ class CategoryService
         }
 
         // List parent/open categories
-        $customerLoggedIn = false;
         $this->currentCategory = $cat;
         while($cat !== null)
         {
