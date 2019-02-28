@@ -7,18 +7,13 @@ use IO\Extensions\Filters\ItemImagesFilter;
 use IO\Services\CustomerService;
 use IO\Services\ItemSearch\Factories\VariationSearchFactory;
 use IO\Services\ItemSearch\Services\ItemSearchService;
-use Plenty\Modules\Account\Contact\Contracts\ContactRepositoryContract;
-use IO\Services\OrderService;
 use Plenty\Modules\Authorization\Services\AuthHelper;
 use Plenty\Modules\Order\Models\Order;
-use Plenty\Modules\Order\Status\Models\OrderStatusName;
 use Plenty\Modules\Frontend\PaymentMethod\Contracts\FrontendPaymentMethodRepositoryContract;
 use Plenty\Modules\Order\Shipping\Contracts\ParcelServicePresetRepositoryContract;
 use IO\Extensions\Filters\URLFilter;
-use Plenty\Modules\Order\Shipping\Contracts\ParcelServiceRepositoryContract;
-use Plenty\Modules\Order\Shipping\Package\Contracts\OrderShippingPackageRepositoryContract;
-use Plenty\Modules\Order\Shipping\Package\Models\OrderShippingPackage;
 use Plenty\Modules\Order\Shipping\ParcelService\Models\ParcelService;
+use Plenty\Modules\Order\Status\Contracts\OrderStatusRepositoryContract;
 
 class LocalizedOrder extends ModelWrapper
 {
@@ -40,11 +35,7 @@ class LocalizedOrder extends ModelWrapper
     
     public $orderData = [];
 
-    /**
-     * @var OrderStatusName
-     */
     public $status = null;
-
     public $shippingProvider = "";
     public $shippingProfileName = "";
     public $shippingProfileId = 0;
@@ -75,8 +66,6 @@ class LocalizedOrder extends ModelWrapper
         $instance = pluginApp( self::class );
         $instance->order = $order;
 
-        $instance->status = [];
-    
         /**
          * @var ParcelServicePresetRepositoryContract $parcelServicePresetRepository
          */
@@ -146,6 +135,21 @@ class LocalizedOrder extends ModelWrapper
         }
         catch(\Exception $e)
         {}
+
+        /** @var AuthHelper $authHelper */
+        $authHelper = pluginApp(AuthHelper::class);
+
+        $orderStatus = $authHelper->processUnguarded( function() use ($order)
+        {
+            /** @var OrderStatusRepositoryContract $orderStatusRepository */
+            $orderStatusRepository = pluginApp(OrderStatusRepositoryContract::class);
+            return $orderStatusRepository->get($order->statusId);
+        });
+
+        if ( !is_null($orderStatus) )
+        {
+            $instance->status = $orderStatus->toArray();
+        }
 
 
         /** @var URLFilter $urlFilter */
@@ -222,7 +226,7 @@ class LocalizedOrder extends ModelWrapper
         }
         $data = [
             "order"                 => $order,
-            "status"                => [], //$this->status->toArray(),
+            "status"                => $this->status,
             "shippingProfileId"     => $this->shippingProfileId,
             "shippingProvider"      => $this->shippingProvider,
             "shippingProfileName"   => $this->shippingProfileName,
