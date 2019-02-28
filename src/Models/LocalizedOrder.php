@@ -48,6 +48,7 @@ class LocalizedOrder extends ModelWrapper
     public $shippingProvider = "";
     public $shippingProfileName = "";
     public $shippingProfileId = 0;
+    public $trackingURL = "";
     public $paymentMethodName = "";
     public $paymentMethodIcon = "";
 
@@ -100,6 +101,35 @@ class LocalizedOrder extends ModelWrapper
                 {
                     $instance->shippingProvider = $name->name;
                     break;
+                }
+            }
+    
+            $parcelService = $shippingProfile->parcelService;
+            if($parcelService instanceof ParcelService)
+            {
+                $trackingURL = $parcelService->trackingUrl;
+                $packageNumber = $order->packagenum;
+                $zip = $order->deliveryAddress->postalCode;
+        
+                if(strlen($trackingURL) && strlen($packageNumber))
+                {
+                    $trackingURL = str_replace('[PaketNr]',
+                                               $packageNumber,
+                                               str_replace('[PLZ]',
+                                                           $zip,
+                                                           str_replace('[Lang]',
+                                                                       $lang,
+                                                                       $trackingURL)));
+            
+                    $trackingURL = str_replace('$PaketNr',
+                                               $packageNumber,
+                                               str_replace('$PLZ',
+                                                           $zip,
+                                                           str_replace('$Lang',
+                                                                       $lang,
+                                                                       $trackingURL)));
+            
+                    $instance->trackingURL = $trackingURL;
                 }
             }
         }
@@ -172,60 +202,6 @@ class LocalizedOrder extends ModelWrapper
         }
 
         $instance->highlightNetPrices = $instance->highlightNetPrices();
-    
-        $orderId = $order->id;
-        
-        /** @var OrderShippingPackageRepositoryContract $orderShippingPackagesRepo */
-        $orderShippingPackageRepo = pluginApp(OrderShippingPackageRepositoryContract::class);
-        
-        /** @var AuthHelper $authHelper */
-        $authHelper = pluginApp(AuthHelper::class);
-    
-        $packages = $authHelper->processUnguarded( function() use ($orderId, $orderShippingPackageRepo)
-        {
-            return $orderShippingPackageRepo->listOrderShippingPackages($orderId);
-        });
-    
-        $parcelServiceid = $shippingProfile->parcelServiceId;
-        
-        $trackingUrls = [];
-        if(count($packages))
-        {
-            /** @var ParcelServiceRepositoryContract $parcelServiceRepo */
-            $parcelServiceRepo = pluginApp(ParcelServiceRepositoryContract::class);
-            
-            
-            
-            /** @var OrderShippingPackage $package */
-            foreach($packages as $package)
-            {
-                $parcelService = $authHelper->processUnguarded(function() use ($parcelServiceRepo, $parcelServiceid) {
-                    return $parcelServiceRepo->getParcelServiceById($parcelServiceid);
-                });
-                
-                if($parcelService instanceof ParcelService)
-                {
-                    /*if (!$lang) $lang = LANG;
-                    $trackingUrl = str_replace(	'[PaketNr]',
-                                                   $packagenum,
-                                                   str_replace(	'[PLZ]',
-                                                                   $plz,
-                                                                   str_replace(	'[Lang]',
-                                                                                   $lang,
-                                                                                   $trackingUrl)));
-    
-                    return str_replace(	'$PaketNr',
-                                           $packagenum,
-                                           str_replace(	'$PLZ',
-                                                           $plz,
-                                                           str_replace(	'$Lang',
-                                                                           $lang,
-                                                                           $trackingUrl)));*/
-                    //TODO replace place holders
-                    $trackingUrls[] = $parcelService->trackingUrl.'/'.$package->packageNumber;
-                }
-            }
-        }
         
         return $instance;
     }
