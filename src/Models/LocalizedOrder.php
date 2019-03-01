@@ -2,13 +2,12 @@
 
 namespace IO\Models;
 
-use IO\Builder\Order\OrderType;
 use IO\Builder\Order\OrderItemType;
 use IO\Extensions\Filters\ItemImagesFilter;
 use IO\Services\CustomerService;
 use IO\Services\ItemSearch\Factories\VariationSearchFactory;
 use IO\Services\ItemSearch\Services\ItemSearchService;
-use Plenty\Modules\Account\Contact\Contracts\ContactRepositoryContract;
+use IO\Services\OrderTotalsService;
 use Plenty\Modules\Authorization\Services\AuthHelper;
 use Plenty\Modules\Order\Models\Order;
 use Plenty\Modules\Frontend\PaymentMethod\Contracts\FrontendPaymentMethodRepositoryContract;
@@ -48,6 +47,7 @@ class LocalizedOrder extends ModelWrapper
     public $isReturnable = false;
 
     public $highlightNetPrices = false;
+    public $totals = [];
 
     /**
      * @param Order $order
@@ -66,6 +66,9 @@ class LocalizedOrder extends ModelWrapper
         $instance = pluginApp( self::class );
         $instance->order = $order;
 
+        $instance->status = [];
+        $instance->totals = pluginApp(OrderTotalsService::class)->getAllTotals($order);
+    
         /**
          * @var ParcelServicePresetRepositoryContract $parcelServicePresetRepository
          */
@@ -198,6 +201,7 @@ class LocalizedOrder extends ModelWrapper
         $data = [
             "order"                 => $order,
             "status"                => $this->status,
+            "totals"                => $this->totals,
             "shippingProfileId"     => $this->shippingProfileId,
             "shippingProvider"      => $this->shippingProvider,
             "shippingProfileName"   => $this->shippingProfileName,
