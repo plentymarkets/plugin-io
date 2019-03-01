@@ -51,7 +51,6 @@ class CustomerPasswordResource extends ApiResource
             /** @var AuthenticationService $authService */
             $authService = pluginApp(AuthenticationService::class);
 
-            /*
             if(!$authService->checkPassword($oldPassword))
             {
                 unset($this->response->eventData['AfterAccountAuthentication']);
@@ -59,7 +58,6 @@ class CustomerPasswordResource extends ApiResource
 
                 return $response;
             }
-            */
 
 			$result = $this->customerService->updatePassword($newPassword, $contactId, $hash);
 
