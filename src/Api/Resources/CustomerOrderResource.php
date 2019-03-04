@@ -23,7 +23,7 @@ class CustomerOrderResource extends ApiResource
     {
         $page = $this->request->get('page', 1);
         $items = $this->request->get('items', 10);
-        $response = $this->orderService->getOrderOverviewListForMyAccount($page, $items);
+        $response = $this->orderService->getOrdersCompact($page, $items);
         
         return $this->response->create($response, ResponseCode::OK);
     }

@@ -339,7 +339,7 @@ class OrderService
         return $orders;
     }
     
-    public function getOrderOverviewListForMyAccount(int $page = 1, int $items = 50)
+    public function getOrdersCompact(int $page = 1, int $items = 50)
     {
         $orderResult = null;
         $contactId = $this->customerService->getContactId();
@@ -355,8 +355,14 @@ class OrderService
                 $items
             );
     
+            /** @var AuthHelper $authHelper */
+            $authHelper = pluginApp(AuthHelper::class);
+    
             /** @var OrderTotalsService $orderTotalsService */
             $orderTotalsService = pluginApp(OrderTotalsService::class);
+    
+            /** @var OrderStatusRepositoryContract $orderStatusRepository */
+            $orderStatusRepository = pluginApp(OrderStatusRepositoryContract::class);
             
             $orders = [];
             foreach($orderResult->getResult() as $order)
@@ -367,13 +373,9 @@ class OrderService
     
                     $creationDate = '0000-00-00 00:00:00';
                     $creationDateData = $order->dates->firstWhere('typeId', OrderDateType::ORDER_ENTRY_AT);
-
-                    /** @var AuthHelper $authHelper */
-                    $authHelper = pluginApp(AuthHelper::class);
-                    $orderStatusName = $authHelper->processUnguarded(function() use ($order)
+                    
+                    $orderStatusName = $authHelper->processUnguarded(function() use ($order, $orderStatusRepository)
                     {
-                        /** @var OrderStatusRepositoryContract $orderStatusRepository */
-                        $orderStatusRepository = pluginApp(OrderStatusRepositoryContract::class);
                         $orderStatus = $orderStatusRepository->get($order->statusId);
                         if ( !is_null($orderStatus) && $orderStatus->isFrontendVisible )
                         {
@@ -381,7 +383,7 @@ class OrderService
                             return $orderStatus->names->get($lang);
                         }
 
-                        return "";
+                        return '';
                     });
 
                     if($creationDateData instanceof OrderDate)
