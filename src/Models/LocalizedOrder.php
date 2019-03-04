@@ -3,6 +3,7 @@
 namespace IO\Models;
 
 use IO\Builder\Order\OrderItemType;
+use IO\Builder\Order\OrderType;
 use IO\Extensions\Filters\ItemImagesFilter;
 use IO\Services\ItemSearch\Factories\VariationSearchFactory;
 use IO\Services\ItemSearch\Services\ItemSearchService;
@@ -194,6 +195,11 @@ class LocalizedOrder extends ModelWrapper
                     $orderItem['bundleType'] = $orderVariation['data']['variation']['bundleType'];
                 }
             }
+        }
+
+        if ($order->typeId == OrderType::ORDER)
+        {
+            $instance->isReturnable = $orderService->isOrderReturnable($order);
         }
 
         /** @var OrderTotalsService $orderTotalsService */
