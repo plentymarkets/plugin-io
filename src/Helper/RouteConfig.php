@@ -2,6 +2,7 @@
 
 namespace IO\Helper;
 
+use Plenty\Modules\ShopBuilder\Helper\ShopBuilderRequest;
 use Plenty\Plugin\ConfigRepository;
 
 class RouteConfig
@@ -41,7 +42,8 @@ class RouteConfig
         {
             $config = pluginApp(ConfigRepository::class);
             $configValue = $config->get("IO.routing.enabled_routes");
-            if ( $configValue === "all" )
+
+            if ( $configValue === "all" || pluginApp(ShopBuilderRequest::class)->isShopBuilder() )
             {
                 self::$enabledRoutes = [
                     self::BASKET,
