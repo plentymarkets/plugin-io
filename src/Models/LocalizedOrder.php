@@ -2,21 +2,20 @@
 
 namespace IO\Models;
 
-use IO\Builder\Order\OrderType;
 use IO\Builder\Order\OrderItemType;
 use IO\Extensions\Filters\ItemImagesFilter;
-use IO\Services\CustomerService;
 use IO\Services\ItemSearch\Factories\VariationSearchFactory;
 use IO\Services\ItemSearch\Services\ItemSearchService;
 use IO\Services\OrderService;
 use IO\Services\OrderTotalsService;
-use Plenty\Modules\Account\Contact\Contracts\ContactRepositoryContract;
+use Plenty\Modules\Authorization\Services\AuthHelper;
 use Plenty\Modules\Order\Models\Order;
 use Plenty\Modules\Order\Property\Models\OrderProperty;
 use Plenty\Modules\Order\Property\Models\OrderPropertyType;
 use Plenty\Modules\Frontend\PaymentMethod\Contracts\FrontendPaymentMethodRepositoryContract;
 use Plenty\Modules\Order\Shipping\Contracts\ParcelServicePresetRepositoryContract;
 use IO\Extensions\Filters\URLFilter;
+use Plenty\Modules\Order\Status\Contracts\OrderStatusRepositoryContract;
 
 class LocalizedOrder extends ModelWrapper
 {
@@ -37,9 +36,8 @@ class LocalizedOrder extends ModelWrapper
     public $order = null;
     
     public $orderData = [];
-    
-    public $status = null;
 
+    public $status = null;
     public $shippingProvider = "";
     public $shippingProfileName = "";
     public $shippingProfileId = 0;
@@ -74,8 +72,6 @@ class LocalizedOrder extends ModelWrapper
         $instance = pluginApp( self::class );
         $instance->order = $order;
 
-        $instance->status = [];
-    
         /**
          * @var ParcelServicePresetRepositoryContract $parcelServicePresetRepository
          */
@@ -116,7 +112,6 @@ class LocalizedOrder extends ModelWrapper
         catch(\Exception $e)
         {}
     
-    
         $paymentStatusProperty = $order->properties->firstWhere('typeId', OrderPropertyType::PAYMENT_STATUS);
         if($paymentStatusProperty instanceof OrderProperty)
         {
@@ -131,6 +126,21 @@ class LocalizedOrder extends ModelWrapper
         
             $instance->allowPaymentMethodSwitchFrom = $orderService->allowPaymentMethodSwitchFrom($paymentMethodIdProperty->value, $order->id);
             $instance->paymentMethodListForSwitch = $orderService->getPaymentMethodListForSwitch($paymentMethodIdProperty->value, $order->id);
+        }
+        
+        /** @var AuthHelper $authHelper */
+        $authHelper = pluginApp(AuthHelper::class);
+
+        $orderStatus = $authHelper->processUnguarded( function() use ($order)
+        {
+            /** @var OrderStatusRepositoryContract $orderStatusRepository */
+            $orderStatusRepository = pluginApp(OrderStatusRepositoryContract::class);
+            return $orderStatusRepository->get($order->statusId);
+        });
+
+        if ( !is_null($orderStatus) )
+        {
+            $instance->status = $orderStatus->toArray();
         }
         
         /** @var URLFilter $urlFilter */
@@ -161,14 +171,14 @@ class LocalizedOrder extends ModelWrapper
         /** @var VariationSearchFactory $searchFactory */
         $searchFactory = pluginApp( VariationSearchFactory::class );
         $searchFactory->setPage(1, count($orderVariationIds));
-        $orderVariations = $itemSearchService->getResults(
+        $orderVariations = $itemSearchService->getResults([
             $searchFactory
                 ->withLanguage()
                 ->withImages()
                 ->withUrls()
                 ->withBundleComponents()
                 ->hasVariationIds( $orderVariationIds )
-        );
+        ]);
 
         foreach( $orderVariations['documents'] as $orderVariation )
         {
@@ -209,7 +219,7 @@ class LocalizedOrder extends ModelWrapper
         }
         $data = [
             "order"                        => $order,
-            "status"                       => [], //$this->status->toArray(),
+            "status"                       => $this->status,
             "shippingProfileId"            => $this->shippingProfileId,
             "shippingProvider"             => $this->shippingProvider,
             "shippingProfileName"          => $this->shippingProfileName,
