@@ -388,10 +388,13 @@ class OrderService
                     {
                         $creationDate = $creationDateData->date;
                     }
-    
+
+                    $highlightNetPrices = $orderTotalsService->highlightNetPrices($order);
+                    $displayTotal = $highlightNetPrices ? $totals['totalNet'] : $totals['totalGross'];
+
                     $orders[] = [
                         'id'           => $order->id,
-                        'total'        => $totals['totalGross'],
+                        'total'        => $displayTotal,
                         'status'       => $orderStatusName,
                         'creationDate' => $creationDate->toDateTimeString()
                     ];
