@@ -9,6 +9,7 @@ use IO\Services\CustomerService;
 use IO\Services\ItemSearch\Factories\VariationSearchFactory;
 use IO\Services\ItemSearch\Services\ItemSearchService;
 use IO\Services\OrderService;
+use IO\Services\OrderTotalsService;
 use Plenty\Modules\Account\Contact\Contracts\ContactRepositoryContract;
 use Plenty\Modules\Order\Models\Order;
 use Plenty\Modules\Order\Property\Models\OrderProperty;
@@ -185,7 +186,9 @@ class LocalizedOrder extends ModelWrapper
             }
         }
 
-        $instance->highlightNetPrices = $instance->highlightNetPrices();
+        /** @var OrderTotalsService $orderTotalsService */
+        $orderTotalsService = pluginApp(OrderTotalsService::class);
+        $instance->highlightNetPrices = $orderTotalsService->highlightNetPrices($instance->order);
         
         return $instance;
     }
@@ -222,26 +225,5 @@ class LocalizedOrder extends ModelWrapper
         ];
 
         return $data;
-    }
-
-    private function highlightNetPrices()
-    {
-        $isOrderNet = $this->order->amounts[0]->isNet;
-
-        $orderContactId = 0;
-        foreach ($this->order->relations['relations'] as $relation)
-        {
-            if ($relation['referenceType'] == 'contact' && (int)$relation['referenceId'] > 0)
-            {
-                $orderContactId = $relation['referenceId'];
-            }
-        }
-
-        /** @var CustomerService $customerService */
-        $customerService = pluginApp(CustomerService::class);
-
-        $showNet = $customerService->showNetPricesByContactId($orderContactId);
-
-        return $showNet || $isOrderNet;
     }
 }
