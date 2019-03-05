@@ -29,7 +29,7 @@ class AddressOptionTypeFilter extends AbstractFilter
         ];
     }
 
-    public function addressOptionType(array $address, int $typeId): string
+    public function addressOptionType($address, int $typeId): string
     {
         if (isset($address) && isset($address['options']))
         {
