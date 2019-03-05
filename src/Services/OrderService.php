@@ -323,17 +323,6 @@ class OrderService
         if($wrapped)
         {
             $orders = LocalizedOrder::wrapPaginated( $orders, $this->sessionStorage->getLang() );
-    
-            $o = $orders->getResult();
-            foreach($orders->getResult() as $key => $order)
-            {
-                $order = $order->order;
-                if($order->typeId == OrderType::ORDER)
-                {
-                    $o[$key]->isReturnable = $this->isOrderReturnable($order);
-                }
-            }
-            $orders->setResult($o);
         }
         
         return $orders;
