@@ -23,7 +23,6 @@ use Plenty\Modules\Order\Date\Models\OrderDate;
 use Plenty\Modules\Order\Date\Models\OrderDateType;
 use Plenty\Modules\Order\Property\Contracts\OrderPropertyRepositoryContract;
 use Plenty\Modules\Order\Property\Models\OrderPropertyType;
-use Plenty\Modules\Order\Status\Contracts\OrderStatusRepositoryContract;
 use Plenty\Modules\Payment\Contracts\PaymentRepositoryContract;
 use Plenty\Modules\Payment\Method\Contracts\PaymentMethodRepositoryContract;
 use Plenty\Repositories\Models\PaginatedResult;
@@ -344,14 +343,11 @@ class OrderService
                 $items
             );
     
-            /** @var AuthHelper $authHelper */
-            $authHelper = pluginApp(AuthHelper::class);
-    
             /** @var OrderTotalsService $orderTotalsService */
             $orderTotalsService = pluginApp(OrderTotalsService::class);
-    
-            /** @var OrderStatusRepositoryContract $orderStatusRepository */
-            $orderStatusRepository = pluginApp(OrderStatusRepositoryContract::class);
+            
+            /** @var OrderStatusService $orderStatusService */
+            $orderStatusService = pluginApp(OrderStatusService::class);
             
             $orders = [];
             foreach($orderResult->getResult() as $order)
@@ -363,17 +359,7 @@ class OrderService
                     $creationDate = '0000-00-00 00:00:00';
                     $creationDateData = $order->dates->firstWhere('typeId', OrderDateType::ORDER_ENTRY_AT);
                     
-                    $orderStatusName = $authHelper->processUnguarded(function() use ($order, $orderStatusRepository)
-                    {
-                        $orderStatus = $orderStatusRepository->get($order->statusId);
-                        if ( !is_null($orderStatus) && $orderStatus->isFrontendVisible )
-                        {
-                            $lang = pluginApp(SessionStorageService::class)->getLang();
-                            return $orderStatus->names->get($lang);
-                        }
-
-                        return '';
-                    });
+                    $orderStatusName = $orderStatusService->getOrderStatus($order->id, $order->statusId);
 
                     if($creationDateData instanceof OrderDate)
                     {
@@ -419,17 +405,6 @@ class OrderService
         }
         
         return null;
-    }
-    
-    /**
-     * Return order status text by status id
-     * @param $statusId
-     * @return string
-     */
-	public function getOrderStatusText($statusId)
-    {
-	    //OrderStatusTexts::$orderStatusTexts[(string)$statusId];
-        return '';
     }
     
     public function getOrderPropertyByOrderId($orderId, $typeId)
