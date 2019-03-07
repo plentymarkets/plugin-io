@@ -172,14 +172,15 @@ class LocalizedOrder extends ModelWrapper
         /** @var VariationSearchFactory $searchFactory */
         $searchFactory = pluginApp( VariationSearchFactory::class );
         $searchFactory->setPage(1, count($orderVariationIds));
-        $orderVariations = $itemSearchService->getResults([
+        $orderVariations = $itemSearchService->getResult(
             $searchFactory
                 ->withLanguage()
                 ->withImages()
+                ->withDefaultImage()
                 ->withUrls()
                 ->withBundleComponents()
                 ->hasVariationIds( $orderVariationIds )
-        ]);
+        );
 
         foreach( $orderVariations['documents'] as $orderVariation )
         {
