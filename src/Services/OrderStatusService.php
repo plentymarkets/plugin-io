@@ -60,9 +60,11 @@ class OrderStatusService
                 $statusHistory = $statusHistoryRepo->getStatusHistoryByOrderId($orderId);
                 if(count($statusHistory))
                 {
-                    $statusHistoryNew = array_map(function($entry) use ($orderStatusRepo) {
-                        return $orderStatusRepo->get($entry['statusId']);
-                    }, $statusHistory->toArray());
+                    $statusHistoryNew = [];
+                    foreach($statusHistory as $entryKey => $entry)
+                    {
+                        $statusHistoryNew[$entryKey] =  $orderStatusRepo->get($entry->statusId);
+                    }
                     
                     if(count($statusHistoryNew))
                     {
