@@ -213,7 +213,7 @@ class IORouteServiceProvider extends RouteServiceProvider
         
         if( RouteConfig::isActive(RouteConfig::ORDER_DOCUMENT) )
         {
-            $router->get('order-document/{documentId}', 'IO\Controllers\DocumentController@download');
+            $router->get('order-document/preview/{documentId}', 'IO\Controllers\DocumentController@preview');
         }
 
         
