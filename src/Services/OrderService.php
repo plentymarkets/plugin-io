@@ -352,6 +352,13 @@ class OrderService
     
             /** @var OrderStatusRepositoryContract $orderStatusRepository */
             $orderStatusRepository = pluginApp(OrderStatusRepositoryContract::class);
+    
+            /** @var OrderTrackingService $orderTrackingService */
+            $orderTrackingService = pluginApp(OrderTrackingService::class);
+    
+            /** @var SessionStorageService $sessionStorageService */
+            $sessionStorageService = pluginApp(SessionStorageService::class);
+            $lang = $sessionStorageService->getLang();
             
             $orders = [];
             foreach($orderResult->getResult() as $order)
@@ -363,12 +370,11 @@ class OrderService
                     $creationDate = '0000-00-00 00:00:00';
                     $creationDateData = $order->dates->firstWhere('typeId', OrderDateType::ORDER_ENTRY_AT);
                     
-                    $orderStatusName = $authHelper->processUnguarded(function() use ($order, $orderStatusRepository)
+                    $orderStatusName = $authHelper->processUnguarded(function() use ($order, $orderStatusRepository, $lang)
                     {
                         $orderStatus = $orderStatusRepository->get($order->statusId);
                         if ( !is_null($orderStatus) && $orderStatus->isFrontendVisible )
                         {
-                            $lang = pluginApp(SessionStorageService::class)->getLang();
                             return $orderStatus->names->get($lang);
                         }
 
@@ -386,7 +392,8 @@ class OrderService
                         'id'           => $order->id,
                         'total'        => $highlightNetPrices ? $totals['totalNet'] : $totals['totalGross'],
                         'status'       => $orderStatusName,
-                        'creationDate' => $creationDate->toDateTimeString()
+                        'creationDate' => $creationDate->toDateTimeString(),
+                        'trackingURL'  => $orderTrackingService->getTrackingURL($order, $lang)
                     ];
                 }
             };

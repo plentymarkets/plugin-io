@@ -9,6 +9,7 @@ use IO\Services\ItemSearch\Factories\VariationSearchFactory;
 use IO\Services\ItemSearch\Services\ItemSearchService;
 use IO\Services\OrderService;
 use IO\Services\OrderTotalsService;
+use IO\Services\OrderTrackingService;
 use Plenty\Modules\Authorization\Services\AuthHelper;
 use Plenty\Modules\Order\Models\Order;
 use Plenty\Modules\Order\Property\Models\OrderProperty;
@@ -16,7 +17,6 @@ use Plenty\Modules\Order\Property\Models\OrderPropertyType;
 use Plenty\Modules\Frontend\PaymentMethod\Contracts\FrontendPaymentMethodRepositoryContract;
 use Plenty\Modules\Order\Shipping\Contracts\ParcelServicePresetRepositoryContract;
 use IO\Extensions\Filters\URLFilter;
-use Plenty\Modules\Order\Shipping\ParcelService\Models\ParcelService;
 use Plenty\Modules\Order\Status\Contracts\OrderStatusRepositoryContract;
 
 class LocalizedOrder extends ModelWrapper
@@ -105,34 +105,9 @@ class LocalizedOrder extends ModelWrapper
                 }
             }
     
-            $parcelService = $shippingProfile->parcelService;
-            if($parcelService instanceof ParcelService)
-            {
-                $trackingURL = $parcelService->trackingUrl;
-                $packageNumber = $order->packagenum;
-                $zip = $order->deliveryAddress->postalCode;
-        
-                if(strlen($trackingURL) && strlen($packageNumber))
-                {
-                    $trackingURL = str_replace('[PaketNr]',
-                                               $packageNumber,
-                                               str_replace('[PLZ]',
-                                                           $zip,
-                                                           str_replace('[Lang]',
-                                                                       $lang,
-                                                                       $trackingURL)));
-            
-                    $trackingURL = str_replace('$PaketNr',
-                                               $packageNumber,
-                                               str_replace('$PLZ',
-                                                           $zip,
-                                                           str_replace('$Lang',
-                                                                       $lang,
-                                                                       $trackingURL)));
-            
-                    $instance->trackingURL = $trackingURL;
-                }
-            }
+            /** @var OrderTrackingService $orderTrackingService */
+            $orderTrackingService = pluginApp(OrderTrackingService::class);
+            $instance->trackingURL = $orderTrackingService->getTrackingURL($order, $lang);
         }
         catch(\Exception $e)
         {}
