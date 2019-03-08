@@ -9,6 +9,7 @@ use IO\Services\ItemSearch\Factories\VariationSearchFactory;
 use IO\Services\ItemSearch\Services\ItemSearchService;
 use IO\Services\OrderService;
 use IO\Services\OrderTotalsService;
+use IO\Services\OrderTrackingService;
 use Plenty\Modules\Authorization\Services\AuthHelper;
 use Plenty\Modules\Order\Models\Order;
 use Plenty\Modules\Order\Property\Models\OrderProperty;
@@ -42,6 +43,7 @@ class LocalizedOrder extends ModelWrapper
     public $shippingProvider = "";
     public $shippingProfileName = "";
     public $shippingProfileId = 0;
+    public $trackingURL = "";
     public $paymentMethodName = "";
     public $paymentMethodIcon = "";
     public $paymentStatus = '';
@@ -102,6 +104,10 @@ class LocalizedOrder extends ModelWrapper
                     break;
                 }
             }
+    
+            /** @var OrderTrackingService $orderTrackingService */
+            $orderTrackingService = pluginApp(OrderTrackingService::class);
+            $instance->trackingURL = $orderTrackingService->getTrackingURL($order, $lang);
         }
         catch(\Exception $e)
         {}

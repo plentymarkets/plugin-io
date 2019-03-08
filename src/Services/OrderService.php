@@ -352,6 +352,13 @@ class OrderService
     
             /** @var OrderStatusRepositoryContract $orderStatusRepository */
             $orderStatusRepository = pluginApp(OrderStatusRepositoryContract::class);
+    
+            /** @var OrderTrackingService $orderTrackingService */
+            $orderTrackingService = pluginApp(OrderTrackingService::class);
+    
+            /** @var SessionStorageService $sessionStorageService */
+            $sessionStorageService = pluginApp(SessionStorageService::class);
+            $lang = $sessionStorageService->getLang();
             
             $orders = [];
             foreach($orderResult->getResult() as $order)
@@ -361,12 +368,11 @@ class OrderService
                     $totals = $orderTotalsService->getAllTotals($order);
                     $highlightNetPrices = $orderTotalsService->highlightNetPrices($order);
                     
-                    $orderStatusName = $authHelper->processUnguarded(function() use ($order, $orderStatusRepository)
+                    $orderStatusName = $authHelper->processUnguarded(function() use ($order, $orderStatusRepository, $lang)
                     {
                         $orderStatus = $orderStatusRepository->get($order->statusId);
                         if ( !is_null($orderStatus) && $orderStatus->isFrontendVisible )
                         {
-                            $lang = pluginApp(SessionStorageService::class)->getLang();
                             return $orderStatus->names->get($lang);
                         }
 
@@ -394,7 +400,8 @@ class OrderService
                         'total'        => $highlightNetPrices ? $totals['totalNet'] : $totals['totalGross'],
                         'status'       => $orderStatusName,
                         'creationDate' => $creationDate,
-                        'shippingDate' => $shippingDate
+                        'shippingDate' => $shippingDate,
+                        'trackingURL'  => $orderTrackingService->getTrackingURL($order, $lang)
                     ];
                 }
             };
