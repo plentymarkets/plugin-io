@@ -53,6 +53,7 @@ class IORouteServiceProvider extends RouteServiceProvider
             $api->resource('io/customer/password_reset', 'CustomerPasswordResetResource');
             $api->resource('io/customer/contact/mail', 'ContactMailResource');
             $api->resource('io/customer/bank_data', 'ContactBankResource');
+            $api->get('io/customer/order/list', 'CustomerOrderResource@index');
             $api->resource('io/customer/order/return', 'CustomerOrderReturnResource');
             $api->resource('io/customer/newsletter', 'CustomerNewsletterResource');
             $api->resource('io/variations', 'VariationResource');
@@ -212,7 +213,7 @@ class IORouteServiceProvider extends RouteServiceProvider
         
         if( RouteConfig::isActive(RouteConfig::ORDER_DOCUMENT) )
         {
-            $router->get('order-document/{documentId}', 'IO\Controllers\DocumentController@download');
+            $router->get('order-document/preview/{documentId}', 'IO\Controllers\DocumentController@preview');
         }
 
         

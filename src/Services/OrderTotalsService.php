@@ -155,4 +155,25 @@ class OrderTotalsService
 
         return 0;
     }
+
+    public function highlightNetPrices(Order $order):bool
+    {
+        $isOrderNet = $order->amounts[0]->isNet;
+
+        $orderContactId = 0;
+        foreach ($order->relations as $relation)
+        {
+            if ($relation['referenceType'] == 'contact' && (int)$relation['referenceId'] > 0)
+            {
+                $orderContactId = $relation['referenceId'];
+            }
+        }
+
+        /** @var CustomerService $customerService */
+        $customerService = pluginApp(CustomerService::class);
+
+        $showNet = $customerService->showNetPricesByContactId($orderContactId);
+
+        return $showNet || $isOrderNet;
+    }
 }
