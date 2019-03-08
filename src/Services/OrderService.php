@@ -366,9 +366,7 @@ class OrderService
                 if($order instanceof Order)
                 {
                     $totals = $orderTotalsService->getAllTotals($order);
-    
-                    $creationDate = '0000-00-00 00:00:00';
-                    $creationDateData = $order->dates->firstWhere('typeId', OrderDateType::ORDER_ENTRY_AT);
+                    $highlightNetPrices = $orderTotalsService->highlightNetPrices($order);
                     
                     $orderStatusName = $authHelper->processUnguarded(function() use ($order, $orderStatusRepository, $lang)
                     {
@@ -380,19 +378,29 @@ class OrderService
 
                         return '';
                     });
-
+    
+                    $creationDate = '';
+                    $creationDateData = $order->dates->firstWhere('typeId', OrderDateType::ORDER_ENTRY_AT);
+    
                     if($creationDateData instanceof OrderDate)
                     {
-                        $creationDate = $creationDateData->date;
+                        $creationDate = $creationDateData->date->toDateTimeString();
                     }
-
-                    $highlightNetPrices = $orderTotalsService->highlightNetPrices($order);
+    
+                    $shippingDate = '';
+                    $shippingDateData = $order->dates->firstWhere('typeId', OrderDateType::ORDER_COMPLETED_ON);
+    
+                    if($shippingDateData instanceof OrderDate)
+                    {
+                        $shippingDate = $shippingDateData->date->toDateTimeString();
+                    }
 
                     $orders[] = [
                         'id'           => $order->id,
                         'total'        => $highlightNetPrices ? $totals['totalNet'] : $totals['totalGross'],
                         'status'       => $orderStatusName,
-                        'creationDate' => $creationDate->toDateTimeString(),
+                        'creationDate' => $creationDate,
+                        'shippingDate' => $shippingDate,
                         'trackingURL'  => $orderTrackingService->getTrackingURL($order, $lang)
                     ];
                 }
