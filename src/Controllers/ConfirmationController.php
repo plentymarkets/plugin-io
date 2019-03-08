@@ -5,7 +5,6 @@ namespace IO\Controllers;
 use IO\Api\ResponseCode;
 use IO\Services\CustomerService;
 use IO\Services\OrderService;
-use IO\Services\OrderTotalsService;
 use IO\Services\SessionStorageService;
 use IO\Constants\SessionStorageKeys;
 use IO\Models\LocalizedOrder;
@@ -92,7 +91,6 @@ class ConfirmationController extends LayoutController
                     "tpl.confirmation",
                     [
                         "data" => $order,
-                        "totals" => pluginApp(OrderTotalsService::class)->getAllTotals($order->order),
                         "showAdditionalPaymentInformation" => true
                     ],
                     false
