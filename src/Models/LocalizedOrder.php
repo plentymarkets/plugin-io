@@ -8,6 +8,7 @@ use IO\Extensions\Filters\ItemImagesFilter;
 use IO\Services\ItemSearch\Factories\VariationSearchFactory;
 use IO\Services\ItemSearch\Services\ItemSearchService;
 use IO\Services\OrderService;
+use IO\Services\OrderStatusService;
 use IO\Services\OrderTotalsService;
 use IO\Services\OrderTrackingService;
 use Plenty\Modules\Authorization\Services\AuthHelper;
@@ -137,21 +138,10 @@ class LocalizedOrder extends ModelWrapper
             $instance->allowPaymentMethodSwitchFrom = $orderService->allowPaymentMethodSwitchFrom($paymentMethodIdProperty->value, $order->id);
             $instance->paymentMethodListForSwitch = $orderService->getPaymentMethodListForSwitch($paymentMethodIdProperty->value, $order->id);
         }
-
-        /** @var AuthHelper $authHelper */
-        $authHelper = pluginApp(AuthHelper::class);
-
-        $orderStatus = $authHelper->processUnguarded( function() use ($order)
-        {
-            /** @var OrderStatusRepositoryContract $orderStatusRepository */
-            $orderStatusRepository = pluginApp(OrderStatusRepositoryContract::class);
-            return $orderStatusRepository->get($order->statusId);
-        });
-
-        if ( !is_null($orderStatus) )
-        {
-            $instance->status = $orderStatus->toArray();
-        }
+        
+        /** @var OrderStatusService $orderStatusService */
+        $orderStatusService = pluginApp(OrderStatusService::class);
+        $instance->status = $orderStatusService->getOrderStatus($order->id, $order->statusId);
 
         /** @var URLFilter $urlFilter */
         $urlFilter = pluginApp(URLFilter::class);
