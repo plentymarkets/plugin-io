@@ -8,7 +8,9 @@ use IO\Extensions\Filters\ItemImagesFilter;
 use IO\Services\ItemSearch\Factories\VariationSearchFactory;
 use IO\Services\ItemSearch\Services\ItemSearchService;
 use IO\Services\OrderService;
+use IO\Services\OrderStatusService;
 use IO\Services\OrderTotalsService;
+use IO\Services\OrderTrackingService;
 use Plenty\Modules\Authorization\Services\AuthHelper;
 use Plenty\Modules\Order\Models\Order;
 use Plenty\Modules\Order\Property\Models\OrderProperty;
@@ -35,13 +37,14 @@ class LocalizedOrder extends ModelWrapper
      * @var Order
      */
     public $order = null;
-    
+
     public $orderData = [];
 
     public $status = null;
     public $shippingProvider = "";
     public $shippingProfileName = "";
     public $shippingProfileId = 0;
+    public $trackingURL = "";
     public $paymentMethodName = "";
     public $paymentMethodIcon = "";
     public $paymentStatus = '';
@@ -51,11 +54,11 @@ class LocalizedOrder extends ModelWrapper
     public $isReturnable = false;
 
     public $highlightNetPrices = false;
-    
-    
+    public $totals = [];
+
     public $allowPaymentMethodSwitchFrom = false;
     public $paymentMethodListForSwitch = [];
-    
+
     /**
      * @param Order $order
      * @param array ...$data
@@ -73,11 +76,14 @@ class LocalizedOrder extends ModelWrapper
         $instance = pluginApp( self::class );
         $instance->order = $order;
 
+        $instance->status = [];
+        $instance->totals = pluginApp(OrderTotalsService::class)->getAllTotals($order);
+
         /**
          * @var ParcelServicePresetRepositoryContract $parcelServicePresetRepository
          */
         $parcelServicePresetRepository = pluginApp(ParcelServicePresetRepositoryContract::class);
-        
+
         try
         {
             $shippingProfile = $parcelServicePresetRepository->getPresetById( $order->shippingProfileId );
@@ -90,7 +96,7 @@ class LocalizedOrder extends ModelWrapper
                     break;
                 }
             }
-    
+
             foreach( $shippingProfile->parcelServiceNames as $name )
             {
                 if( $name->lang === $lang )
@@ -99,12 +105,16 @@ class LocalizedOrder extends ModelWrapper
                     break;
                 }
             }
+    
+            /** @var OrderTrackingService $orderTrackingService */
+            $orderTrackingService = pluginApp(OrderTrackingService::class);
+            $instance->trackingURL = $orderTrackingService->getTrackingURL($order, $lang);
         }
         catch(\Exception $e)
         {}
-        
+
         $frontentPaymentRepository = pluginApp( FrontendPaymentMethodRepositoryContract::class );
-        
+
         try
         {
             $instance->paymentMethodName = $frontentPaymentRepository->getPaymentMethodNameById( $order->methodOfPaymentId, $lang );
@@ -112,38 +122,27 @@ class LocalizedOrder extends ModelWrapper
         }
         catch(\Exception $e)
         {}
-    
+
         $paymentStatusProperty = $order->properties->firstWhere('typeId', OrderPropertyType::PAYMENT_STATUS);
         if($paymentStatusProperty instanceof OrderProperty)
         {
             $instance->paymentStatus = $paymentStatusProperty->value;
         }
-    
+
         $paymentMethodIdProperty = $order->properties->firstWhere('typeId', OrderPropertyType::PAYMENT_METHOD);
         if($paymentMethodIdProperty instanceof OrderProperty)
         {
             /** @var OrderService $orderService */
             $orderService = pluginApp(OrderService::class);
-        
+
             $instance->allowPaymentMethodSwitchFrom = $orderService->allowPaymentMethodSwitchFrom($paymentMethodIdProperty->value, $order->id);
             $instance->paymentMethodListForSwitch = $orderService->getPaymentMethodListForSwitch($paymentMethodIdProperty->value, $order->id);
         }
         
-        /** @var AuthHelper $authHelper */
-        $authHelper = pluginApp(AuthHelper::class);
+        /** @var OrderStatusService $orderStatusService */
+        $orderStatusService = pluginApp(OrderStatusService::class);
+        $instance->status = $orderStatusService->getOrderStatus($order->id, $order->statusId);
 
-        $orderStatus = $authHelper->processUnguarded( function() use ($order)
-        {
-            /** @var OrderStatusRepositoryContract $orderStatusRepository */
-            $orderStatusRepository = pluginApp(OrderStatusRepositoryContract::class);
-            return $orderStatusRepository->get($order->statusId);
-        });
-
-        if ( !is_null($orderStatus) )
-        {
-            $instance->status = $orderStatus->toArray();
-        }
-        
         /** @var URLFilter $urlFilter */
         $urlFilter = pluginApp(URLFilter::class);
 
@@ -155,7 +154,7 @@ class LocalizedOrder extends ModelWrapper
         {
             if(in_array((int)$orderItem->typeId, self::WRAPPED_ORDERITEM_TYPES))
             {
-                
+
                 if( $orderItem->itemVariationId !== 0 )
                 {
                     $orderVariationIds[] = $orderItem->itemVariationId;
@@ -206,7 +205,7 @@ class LocalizedOrder extends ModelWrapper
         /** @var OrderTotalsService $orderTotalsService */
         $orderTotalsService = pluginApp(OrderTotalsService::class);
         $instance->highlightNetPrices = $orderTotalsService->highlightNetPrices($instance->order);
-        
+
         return $instance;
     }
 
@@ -219,7 +218,7 @@ class LocalizedOrder extends ModelWrapper
         $order['billingAddress'] = $this->order->billingAddress->toArray();
         $order['deliveryAddress'] = $this->order->deliveryAddress->toArray();
         $order['documents'] = $this->order->documents->toArray();
-        
+
         if ( count( $this->orderData ) )
         {
             $order = $this->orderData;
@@ -227,6 +226,7 @@ class LocalizedOrder extends ModelWrapper
         $data = [
             "order"                        => $order,
             "status"                       => $this->status,
+            "totals"                => $this->totals,
             "shippingProfileId"            => $this->shippingProfileId,
             "shippingProvider"             => $this->shippingProvider,
             "shippingProfileName"          => $this->shippingProfileName,

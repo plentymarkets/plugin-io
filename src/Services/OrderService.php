@@ -23,7 +23,6 @@ use Plenty\Modules\Order\Date\Models\OrderDate;
 use Plenty\Modules\Order\Date\Models\OrderDateType;
 use Plenty\Modules\Order\Property\Contracts\OrderPropertyRepositoryContract;
 use Plenty\Modules\Order\Property\Models\OrderPropertyType;
-use Plenty\Modules\Order\Status\Contracts\OrderStatusRepositoryContract;
 use Plenty\Modules\Payment\Contracts\PaymentRepositoryContract;
 use Plenty\Modules\Payment\Method\Contracts\PaymentMethodRepositoryContract;
 use Plenty\Repositories\Models\PaginatedResult;
@@ -344,14 +343,18 @@ class OrderService
                 $items
             );
     
-            /** @var AuthHelper $authHelper */
-            $authHelper = pluginApp(AuthHelper::class);
-    
             /** @var OrderTotalsService $orderTotalsService */
             $orderTotalsService = pluginApp(OrderTotalsService::class);
+            
+            /** @var OrderStatusService $orderStatusService */
+            $orderStatusService = pluginApp(OrderStatusService::class);
     
-            /** @var OrderStatusRepositoryContract $orderStatusRepository */
-            $orderStatusRepository = pluginApp(OrderStatusRepositoryContract::class);
+            /** @var OrderTrackingService $orderTrackingService */
+            $orderTrackingService = pluginApp(OrderTrackingService::class);
+    
+            /** @var SessionStorageService $sessionStorageService */
+            $sessionStorageService = pluginApp(SessionStorageService::class);
+            $lang = $sessionStorageService->getLang();
             
             $orders = [];
             foreach($orderResult->getResult() as $order)
@@ -359,34 +362,33 @@ class OrderService
                 if($order instanceof Order)
                 {
                     $totals = $orderTotalsService->getAllTotals($order);
-    
-                    $creationDate = '0000-00-00 00:00:00';
-                    $creationDateData = $order->dates->firstWhere('typeId', OrderDateType::ORDER_ENTRY_AT);
+                    $highlightNetPrices = $orderTotalsService->highlightNetPrices($order);
                     
-                    $orderStatusName = $authHelper->processUnguarded(function() use ($order, $orderStatusRepository)
-                    {
-                        $orderStatus = $orderStatusRepository->get($order->statusId);
-                        if ( !is_null($orderStatus) && $orderStatus->isFrontendVisible )
-                        {
-                            $lang = pluginApp(SessionStorageService::class)->getLang();
-                            return $orderStatus->names->get($lang);
-                        }
-
-                        return '';
-                    });
-
+                    $orderStatusName = $orderStatusService->getOrderStatus($order->id, $order->statusId);
+    
+                    $creationDate = '';
+                    $creationDateData = $order->dates->firstWhere('typeId', OrderDateType::ORDER_ENTRY_AT);
+    
                     if($creationDateData instanceof OrderDate)
                     {
-                        $creationDate = $creationDateData->date;
+                        $creationDate = $creationDateData->date->toDateTimeString();
                     }
-
-                    $highlightNetPrices = $orderTotalsService->highlightNetPrices($order);
+    
+                    $shippingDate = '';
+                    $shippingDateData = $order->dates->firstWhere('typeId', OrderDateType::ORDER_COMPLETED_ON);
+    
+                    if($shippingDateData instanceof OrderDate)
+                    {
+                        $shippingDate = $shippingDateData->date->toDateTimeString();
+                    }
 
                     $orders[] = [
                         'id'           => $order->id,
                         'total'        => $highlightNetPrices ? $totals['totalNet'] : $totals['totalGross'],
                         'status'       => $orderStatusName,
-                        'creationDate' => $creationDate->toDateTimeString()
+                        'creationDate' => $creationDate,
+                        'shippingDate' => $shippingDate,
+                        'trackingURL'  => $orderTrackingService->getTrackingURL($order, $lang)
                     ];
                 }
             };
@@ -419,17 +421,6 @@ class OrderService
         }
         
         return null;
-    }
-    
-    /**
-     * Return order status text by status id
-     * @param $statusId
-     * @return string
-     */
-	public function getOrderStatusText($statusId)
-    {
-	    //OrderStatusTexts::$orderStatusTexts[(string)$statusId];
-        return '';
     }
     
     public function getOrderPropertyByOrderId($orderId, $typeId)
