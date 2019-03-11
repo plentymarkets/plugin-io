@@ -348,6 +348,13 @@ class OrderService
             
             /** @var OrderStatusService $orderStatusService */
             $orderStatusService = pluginApp(OrderStatusService::class);
+    
+            /** @var OrderTrackingService $orderTrackingService */
+            $orderTrackingService = pluginApp(OrderTrackingService::class);
+    
+            /** @var SessionStorageService $sessionStorageService */
+            $sessionStorageService = pluginApp(SessionStorageService::class);
+            $lang = $sessionStorageService->getLang();
             
             $orders = [];
             foreach($orderResult->getResult() as $order)
@@ -355,24 +362,33 @@ class OrderService
                 if($order instanceof Order)
                 {
                     $totals = $orderTotalsService->getAllTotals($order);
-    
-                    $creationDate = '0000-00-00 00:00:00';
-                    $creationDateData = $order->dates->firstWhere('typeId', OrderDateType::ORDER_ENTRY_AT);
+                    $highlightNetPrices = $orderTotalsService->highlightNetPrices($order);
                     
                     $orderStatusName = $orderStatusService->getOrderStatus($order->id, $order->statusId);
-
+    
+                    $creationDate = '';
+                    $creationDateData = $order->dates->firstWhere('typeId', OrderDateType::ORDER_ENTRY_AT);
+    
                     if($creationDateData instanceof OrderDate)
                     {
-                        $creationDate = $creationDateData->date;
+                        $creationDate = $creationDateData->date->toDateTimeString();
                     }
-
-                    $highlightNetPrices = $orderTotalsService->highlightNetPrices($order);
+    
+                    $shippingDate = '';
+                    $shippingDateData = $order->dates->firstWhere('typeId', OrderDateType::ORDER_COMPLETED_ON);
+    
+                    if($shippingDateData instanceof OrderDate)
+                    {
+                        $shippingDate = $shippingDateData->date->toDateTimeString();
+                    }
 
                     $orders[] = [
                         'id'           => $order->id,
                         'total'        => $highlightNetPrices ? $totals['totalNet'] : $totals['totalGross'],
                         'status'       => $orderStatusName,
-                        'creationDate' => $creationDate->toDateTimeString()
+                        'creationDate' => $creationDate,
+                        'shippingDate' => $shippingDate,
+                        'trackingURL'  => $orderTrackingService->getTrackingURL($order, $lang)
                     ];
                 }
             };
