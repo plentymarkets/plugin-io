@@ -47,7 +47,11 @@ class CategoryController extends LayoutController
 
         if ($category === null || (($category->clients->count() == 0 || $category->details->count() == 0) && !$this->app->isAdminPreview()))
         {
-            return '';
+            /** @var Response $response */
+            $response = pluginApp(Response::class);
+            $response->forceStatus(ResponseCode::NOT_FOUND);
+    
+            return $response;
         }
 
         $this->categoryService->setCurrentCategory($category);
