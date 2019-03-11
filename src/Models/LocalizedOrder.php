@@ -2,18 +2,22 @@
 
 namespace IO\Models;
 
-use IO\Builder\Order\OrderType;
 use IO\Builder\Order\OrderItemType;
+use IO\Builder\Order\OrderType;
 use IO\Extensions\Filters\ItemImagesFilter;
-use IO\Services\CustomerService;
 use IO\Services\ItemSearch\Factories\VariationSearchFactory;
 use IO\Services\ItemSearch\Services\ItemSearchService;
-use Plenty\Modules\Account\Contact\Contracts\ContactRepositoryContract;
+use IO\Services\OrderService;
+use IO\Services\OrderTotalsService;
+use IO\Services\OrderTrackingService;
+use Plenty\Modules\Authorization\Services\AuthHelper;
 use Plenty\Modules\Order\Models\Order;
-use Plenty\Modules\Order\Status\Models\OrderStatusName;
+use Plenty\Modules\Order\Property\Models\OrderProperty;
+use Plenty\Modules\Order\Property\Models\OrderPropertyType;
 use Plenty\Modules\Frontend\PaymentMethod\Contracts\FrontendPaymentMethodRepositoryContract;
 use Plenty\Modules\Order\Shipping\Contracts\ParcelServicePresetRepositoryContract;
 use IO\Extensions\Filters\URLFilter;
+use Plenty\Modules\Order\Status\Contracts\OrderStatusRepositoryContract;
 
 class LocalizedOrder extends ModelWrapper
 {
@@ -32,25 +36,27 @@ class LocalizedOrder extends ModelWrapper
      * @var Order
      */
     public $order = null;
-    
+
     public $orderData = [];
 
-    /**
-     * @var OrderStatusName
-     */
     public $status = null;
-
     public $shippingProvider = "";
     public $shippingProfileName = "";
     public $shippingProfileId = 0;
+    public $trackingURL = "";
     public $paymentMethodName = "";
     public $paymentMethodIcon = "";
+    public $paymentStatus = '';
 
     public $itemURLs = [];
     public $itemImages = [];
     public $isReturnable = false;
 
     public $highlightNetPrices = false;
+    public $totals = [];
+
+    public $allowPaymentMethodSwitchFrom = false;
+    public $paymentMethodListForSwitch = [];
 
     /**
      * @param Order $order
@@ -70,12 +76,13 @@ class LocalizedOrder extends ModelWrapper
         $instance->order = $order;
 
         $instance->status = [];
-    
+        $instance->totals = pluginApp(OrderTotalsService::class)->getAllTotals($order);
+
         /**
          * @var ParcelServicePresetRepositoryContract $parcelServicePresetRepository
          */
         $parcelServicePresetRepository = pluginApp(ParcelServicePresetRepositoryContract::class);
-        
+
         try
         {
             $shippingProfile = $parcelServicePresetRepository->getPresetById( $order->shippingProfileId );
@@ -88,7 +95,7 @@ class LocalizedOrder extends ModelWrapper
                     break;
                 }
             }
-    
+
             foreach( $shippingProfile->parcelServiceNames as $name )
             {
                 if( $name->lang === $lang )
@@ -97,13 +104,16 @@ class LocalizedOrder extends ModelWrapper
                     break;
                 }
             }
+    
+            /** @var OrderTrackingService $orderTrackingService */
+            $orderTrackingService = pluginApp(OrderTrackingService::class);
+            $instance->trackingURL = $orderTrackingService->getTrackingURL($order, $lang);
         }
         catch(\Exception $e)
         {}
-        
 
         $frontentPaymentRepository = pluginApp( FrontendPaymentMethodRepositoryContract::class );
-        
+
         try
         {
             $instance->paymentMethodName = $frontentPaymentRepository->getPaymentMethodNameById( $order->methodOfPaymentId, $lang );
@@ -112,6 +122,36 @@ class LocalizedOrder extends ModelWrapper
         catch(\Exception $e)
         {}
 
+        $paymentStatusProperty = $order->properties->firstWhere('typeId', OrderPropertyType::PAYMENT_STATUS);
+        if($paymentStatusProperty instanceof OrderProperty)
+        {
+            $instance->paymentStatus = $paymentStatusProperty->value;
+        }
+
+        $paymentMethodIdProperty = $order->properties->firstWhere('typeId', OrderPropertyType::PAYMENT_METHOD);
+        if($paymentMethodIdProperty instanceof OrderProperty)
+        {
+            /** @var OrderService $orderService */
+            $orderService = pluginApp(OrderService::class);
+
+            $instance->allowPaymentMethodSwitchFrom = $orderService->allowPaymentMethodSwitchFrom($paymentMethodIdProperty->value, $order->id);
+            $instance->paymentMethodListForSwitch = $orderService->getPaymentMethodListForSwitch($paymentMethodIdProperty->value, $order->id);
+        }
+
+        /** @var AuthHelper $authHelper */
+        $authHelper = pluginApp(AuthHelper::class);
+
+        $orderStatus = $authHelper->processUnguarded( function() use ($order)
+        {
+            /** @var OrderStatusRepositoryContract $orderStatusRepository */
+            $orderStatusRepository = pluginApp(OrderStatusRepositoryContract::class);
+            return $orderStatusRepository->get($order->statusId);
+        });
+
+        if ( !is_null($orderStatus) )
+        {
+            $instance->status = $orderStatus->toArray();
+        }
 
         /** @var URLFilter $urlFilter */
         $urlFilter = pluginApp(URLFilter::class);
@@ -124,7 +164,7 @@ class LocalizedOrder extends ModelWrapper
         {
             if(in_array((int)$orderItem->typeId, self::WRAPPED_ORDERITEM_TYPES))
             {
-                
+
                 if( $orderItem->itemVariationId !== 0 )
                 {
                     $orderVariationIds[] = $orderItem->itemVariationId;
@@ -141,10 +181,11 @@ class LocalizedOrder extends ModelWrapper
         /** @var VariationSearchFactory $searchFactory */
         $searchFactory = pluginApp( VariationSearchFactory::class );
         $searchFactory->setPage(1, count($orderVariationIds));
-        $orderVariations = $itemSearchService->getResults(
+        $orderVariations = $itemSearchService->getResult(
             $searchFactory
                 ->withLanguage()
                 ->withImages()
+                ->withDefaultImage()
                 ->withUrls()
                 ->withBundleComponents()
                 ->hasVariationIds( $orderVariationIds )
@@ -166,7 +207,14 @@ class LocalizedOrder extends ModelWrapper
             }
         }
 
-        $instance->highlightNetPrices = $instance->highlightNetPrices();
+        if ($order->typeId == OrderType::ORDER)
+        {
+            $instance->isReturnable = $orderService->isOrderReturnable($order);
+        }
+
+        /** @var OrderTotalsService $orderTotalsService */
+        $orderTotalsService = pluginApp(OrderTotalsService::class);
+        $instance->highlightNetPrices = $orderTotalsService->highlightNetPrices($instance->order);
 
         return $instance;
     }
@@ -180,46 +228,29 @@ class LocalizedOrder extends ModelWrapper
         $order['billingAddress'] = $this->order->billingAddress->toArray();
         $order['deliveryAddress'] = $this->order->deliveryAddress->toArray();
         $order['documents'] = $this->order->documents->toArray();
-        
+
         if ( count( $this->orderData ) )
         {
             $order = $this->orderData;
         }
         $data = [
-            "order"                 => $order,
-            "status"                => [], //$this->status->toArray(),
-            "shippingProfileId"     => $this->shippingProfileId,
-            "shippingProvider"      => $this->shippingProvider,
-            "shippingProfileName"   => $this->shippingProfileName,
-            "paymentMethodName"     => $this->paymentMethodName,
-            "paymentMethodIcon"     => $this->paymentMethodIcon,
-            "itemURLs"              => $this->itemURLs,
-            "itemImages"            => $this->itemImages,
-            "isReturnable"          => $this->isReturnable,
-            "highlightNetPrices"    => $this->highlightNetPrices
+            "order"                        => $order,
+            "status"                       => $this->status,
+            "totals"                => $this->totals,
+            "shippingProfileId"            => $this->shippingProfileId,
+            "shippingProvider"             => $this->shippingProvider,
+            "shippingProfileName"          => $this->shippingProfileName,
+            "paymentMethodName"            => $this->paymentMethodName,
+            "paymentMethodIcon"            => $this->paymentMethodIcon,
+            "paymentStatus"                => $this->paymentStatus,
+            "allowPaymentMethodSwitchFrom" => $this->allowPaymentMethodSwitchFrom,
+            "paymentMethodListForSwitch"   => $this->paymentMethodListForSwitch,
+            "itemURLs"                     => $this->itemURLs,
+            "itemImages"                   => $this->itemImages,
+            "isReturnable"                 => $this->isReturnable,
+            "highlightNetPrices"           => $this->highlightNetPrices
         ];
 
         return $data;
-    }
-
-    private function highlightNetPrices()
-    {
-        $isOrderNet = $this->order->amounts[0]->isNet;
-
-        $orderContactId = 0;
-        foreach ($this->order->relations['relations'] as $relation)
-        {
-            if ($relation['referenceType'] == 'contact' && (int)$relation['referenceId'] > 0)
-            {
-                $orderContactId = $relation['referenceId'];
-            }
-        }
-
-        /** @var CustomerService $customerService */
-        $customerService = pluginApp(CustomerService::class);
-
-        $showNet = $customerService->showNetPricesByContactId($orderContactId);
-
-        return $showNet || $isOrderNet;
     }
 }

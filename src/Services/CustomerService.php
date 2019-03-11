@@ -951,7 +951,8 @@ class CustomerService
                 $this->getContactId(),
                 $page,
                 $items,
-                $filters
+                $filters,
+                true
             );
         }
         catch(\Exception $e)
