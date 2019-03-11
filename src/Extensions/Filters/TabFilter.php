@@ -26,7 +26,6 @@ class TabFilter extends AbstractFilter
     
     public function filterTabs( $string )
     {
-        $newString = preg_replace('/\s+/', ' ', $string);
-        return $newString;
+        return preg_replace('/\s+/', ' ', $string);
     }
 }
