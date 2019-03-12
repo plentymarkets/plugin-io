@@ -36,13 +36,15 @@ use IO\Services\CustomerService;
 class ApiResponse
 {
 	/**
+	 * @var array
+	 */
+	public $eventData = [];
+
+	/**
 	 * @var Dispatcher
 	 */
 	private $dispatcher;
-	/**
-	 * @var array
-	 */
-	private $eventData = [];
+
 	/**
 	 * @var mixed
 	 */
