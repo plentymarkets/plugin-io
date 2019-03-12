@@ -1,5 +1,11 @@
 # Release Notes for IO
 
+## v3.1.1 (2019-03-11) <a href="https://github.com/plentymarkets/plugin-io/compare/3.1.0...3.1.1" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
+
+### Fixed
+
+- Due to an error it was possible that 404 pages weren't displayed correctly. This has been fixed.
+
 ## v3.1.0 (2019-02-25) <a href="https://github.com/plentymarkets/plugin-io/compare/3.0.1...3.1.0" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
 
 ### Added

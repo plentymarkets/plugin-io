@@ -66,7 +66,7 @@ class OrderTemplateResource extends ApiResource
             if($order instanceof Order)
             {
                 $renderedTemplate = $this->templateService->renderTemplate($template, [
-                    'orderData' => LocalizedOrder::wrap($order, $sessionStorageService->getLang()),
+                    'orderData' => LocalizedOrder::wrap($order, $sessionStorageService->getLang())->toArray(),
                     'totals' => pluginApp(OrderTotalsService::class)->getAllTotals($order)
                 ]);
             }
