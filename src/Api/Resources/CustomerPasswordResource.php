@@ -2,6 +2,7 @@
 
 namespace IO\Api\Resources;
 
+use IO\Services\AuthenticationService;
 use Plenty\Plugin\Http\Request;
 use Plenty\Plugin\Http\Response;
 use IO\Api\ApiResource;
@@ -38,14 +39,27 @@ class CustomerPasswordResource extends ApiResource
      */
 	public function store():Response
 	{
-        $newPassWord = $this->request->get('password', '');
-        $newPassWord2 = $this->request->get('password2', '');
+	    $oldPassword = $this->request->get('oldPassword', '');
+        $newPassword = $this->request->get('password', '');
+        $newPassword2 = $this->request->get('password2', '');
 	    $contactId = $this->request->get('contactId', 0);
         $hash = $this->request->get('hash', '');
 	    
-		if(strlen($newPassWord) && strlen($newPassWord2) && $newPassWord == $newPassWord2)
+		if(strlen($oldPassword) && strlen($newPassword) && strlen($newPassword2) && $newPassword == $newPassword2)
 		{
-			$result = $this->customerService->updatePassword($newPassWord, $contactId, $hash);
+
+            /** @var AuthenticationService $authService */
+            $authService = pluginApp(AuthenticationService::class);
+
+            if(!$authService->checkPassword($oldPassword))
+            {
+                unset($this->response->eventData['AfterAccountAuthentication']);
+                $response = $this->response->create("Invalid password", ResponseCode::UNAUTHORIZED);
+
+                return $response;
+            }
+
+			$result = $this->customerService->updatePassword($newPassword, $contactId, $hash);
 
             if($result === null)
             {

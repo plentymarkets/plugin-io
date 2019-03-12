@@ -2,6 +2,7 @@
 
 namespace IO\Services;
 
+use Plenty\Modules\Account\Contact\Models\Contact;
 use Plenty\Modules\Authentication\Contracts\ContactAuthenticationRepositoryContract;
 use IO\Constants\SessionStorageKeys;
 use IO\Services\SessionStorageService;
@@ -83,6 +84,31 @@ class AuthenticationService
         $basketService->setBillingAddressId(0);
         $basketService->setDeliveryAddressId(0);
 	}
+
+	public function checkPassword($password)
+    {
+        /** @var CustomerService $customerService */
+        $customerService = pluginApp(CustomerService::class);
+        $contact = $customerService->getContact();
+        if ($contact instanceof Contact)
+        {
+            try
+            {
+                $this->login(
+                    $contact->email,
+                    $password
+                );
+                return true;
+            }
+            catch( \Exception $e )
+            {
+                return false;
+            }
+        }
+
+        return false;
+    }
+
 	
 	private function checkPasswordResetExpiration($contactId)
     {
