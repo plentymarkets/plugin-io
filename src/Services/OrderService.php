@@ -450,9 +450,7 @@ class OrderService
     
     public function isOrderReturnable(Order $order)
     {
-        $returnActive = $this->isReturnActive();
-        
-        if($returnActive)
+        if($this->customerService->getContactId() > 0 && $this->isReturnActive())
         {
             /**
              * @var ConfigRepository $config
