@@ -3,6 +3,7 @@
 namespace IO\Api\Resources;
 
 use IO\Services\AuthenticationService;
+use IO\Services\CustomerPasswordResetService;
 use Plenty\Plugin\Http\Request;
 use Plenty\Plugin\Http\Response;
 use IO\Api\ApiResource;
@@ -21,16 +22,22 @@ class CustomerPasswordResource extends ApiResource
 	 */
 	private $customerService;
 
+	/**
+	 * @var CustomerPasswordResetService
+	 */
+	private $customerPasswordResetService;
     /**
      * CustomerPasswordResource constructor.
      * @param Request $request
      * @param ApiResponse $response
      * @param CustomerService $customerService
+     * @param CustomerPasswordResetService $customerPasswordResetService
      */
-	public function __construct(Request $request, ApiResponse $response, CustomerService $customerService)
+	public function __construct(Request $request, ApiResponse $response, CustomerService $customerService, CustomerPasswordResetService $customerPasswordResetService)
 	{
 		parent::__construct($request, $response);
 		$this->customerService = $customerService;
+		$this->customerPasswordResetService = $customerPasswordResetService;
 	}
 
     /**
@@ -44,19 +51,25 @@ class CustomerPasswordResource extends ApiResource
         $newPassword2 = $this->request->get('password2', '');
 	    $contactId = $this->request->get('contactId', 0);
         $hash = $this->request->get('hash', '');
-	    
-		if(strlen($oldPassword) && strlen($newPassword) && strlen($newPassword2) && $newPassword == $newPassword2)
+
+		if(strlen($newPassword) && strlen($newPassword2) && $newPassword == $newPassword2)
 		{
 
-            /** @var AuthenticationService $authService */
-            $authService = pluginApp(AuthenticationService::class);
+		    if (!strlen($hash)) {
+		        /** @var AuthenticationService $authService */
+                $authService = pluginApp(AuthenticationService::class);
 
-            if(!$authService->checkPassword($oldPassword))
+                if(!$authService->checkPassword($oldPassword))
+                {
+                    unset($this->response->eventData['AfterAccountAuthentication']);
+                    $response = $this->response->create("Invalid password", ResponseCode::UNAUTHORIZED);
+
+                    return $response;
+                }
+            }
+		    elseif (!$this->customerPasswordResetService->checkHash($contactId, $hash))
             {
-                unset($this->response->eventData['AfterAccountAuthentication']);
-                $response = $this->response->create("Invalid password", ResponseCode::UNAUTHORIZED);
-
-                return $response;
+                return $this->response->create(null, ResponseCode::BAD_REQUEST);
             }
 
 			$result = $this->customerService->updatePassword($newPassword, $contactId, $hash);
@@ -68,7 +81,7 @@ class CustomerPasswordResource extends ApiResource
 
 			return $this->response->create($result, ResponseCode::OK);
 		}
-		
+
 		$this->response->error(4, "Missing password or new passwords are not equal");
 		return $this->response->create(null, ResponseCode::BAD_REQUEST);
 	}
