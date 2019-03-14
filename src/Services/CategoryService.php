@@ -205,6 +205,13 @@ class CategoryService
             $lang = $this->sessionStorageService->getLang();
         }
 
+        if(is_null($webstoreId))
+        {
+            /** @var WebstoreConfigurationService $webstoreService */
+            $webstoreService = pluginApp(WebstoreConfigurationService::class);
+            $webstoreId = $webstoreService->getWebstoreConfig()->webstoreId;
+        }
+
         $categoryUrl = $this->fromMemoryCache(
             "categoryUrl.$category->id.$lang.$webstoreId",
             function() use ($category, $lang, $defaultLanguage, $webstoreId) {

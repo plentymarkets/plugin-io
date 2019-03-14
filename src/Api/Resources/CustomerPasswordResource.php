@@ -70,6 +70,7 @@ class CustomerPasswordResource extends ApiResource
 		    elseif (!$this->customerPasswordResetService->checkHash($contactId, $hash))
             {
                 return $this->response->create(null, ResponseCode::BAD_REQUEST);
+
             }
 
 			$result = $this->customerService->updatePassword($newPassword, $contactId, $hash);
