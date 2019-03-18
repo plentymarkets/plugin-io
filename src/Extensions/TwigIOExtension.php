@@ -18,6 +18,7 @@ use IO\Extensions\Filters\ResultFieldsFilter;
 use IO\Extensions\Filters\ShuffleFilter;
 use IO\Extensions\Filters\SpecialOfferFilter;
 use IO\Extensions\Filters\URLFilter;
+use IO\Extensions\Filters\TabFilter;
 
 use IO\Extensions\Functions\AdditionalResources;
 use IO\Extensions\Functions\Component;
@@ -63,7 +64,8 @@ class TwigIOExtension extends Twig_Extension
 		ShuffleFilter $shuffleFilter,
 		ResultFieldsFilter $resultFieldsFilter,
 		SpecialOfferFilter $specialOfferFilter,
-		AddressOptionTypeFilter $addressOptionTypeFilter
+		AddressOptionTypeFilter $addressOptionTypeFilter,
+        TabFilter $tabFilter
 	)
 	{
 		$this->twig = $twig;
