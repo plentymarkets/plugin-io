@@ -51,6 +51,11 @@ class OrderItemBuilder
     private $webstoreRepository;
 
     /**
+     * @var SessionStorageService
+     */
+    private $sessionStorage;
+
+    /**
      * OrderItemBuilder constructor.
      *
      * @param CheckoutService $checkoutService
@@ -59,13 +64,14 @@ class OrderItemBuilder
      * @param WebstoreRepositoryContract $webstoreRepository
      * @param VatRepositoryContract $vatRepository
      */
-	public function __construct(CheckoutService $checkoutService, VatService $vatService, ItemNameFilter $itemNameFilter, WebstoreRepositoryContract $webstoreRepository, VatRepositoryContract $vatRepository)
+	public function __construct(CheckoutService $checkoutService, VatService $vatService, ItemNameFilter $itemNameFilter, WebstoreRepositoryContract $webstoreRepository, VatRepositoryContract $vatRepository, SessionStorageService $sessionStorage)
 	{
 		$this->checkoutService = $checkoutService;
 		$this->vatService = $vatService;
         $this->webstoreRepository = $webstoreRepository;
         $this->vatRepository = $vatRepository;
         $this->itemNameFilter = $itemNameFilter;
+        $this->sessionStorage = $sessionStorage;
 	}
 
 	/**
@@ -225,18 +231,17 @@ class OrderItemBuilder
         }
 
         $rebate = 0;
-
         if(isset($basketItem['rebate']))
 		{
 			$rebate = $basketItem['rebate'];
 		}
-
 		if((float)$basketDiscount > 0)
         {
             $rebate += $basketDiscount;
         }
 
-        $priceOriginal = $basketItem['price'] - $attributeTotalMarkup;
+		$priceOriginal = $this->sessionStorage->getCustomer()->showNetPrice ? $basketItem['priceGross'] : $basketItem['price'];
+        $priceOriginal -= $attributeTotalMarkup;
 
 
 		$properties = [];
