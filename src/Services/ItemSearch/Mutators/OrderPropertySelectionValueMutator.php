@@ -32,7 +32,10 @@ class OrderPropertySelectionValueMutator extends BaseMutator
                 {
                     foreach($selectionValues as $value)
                     {
-                        $newSelectionValues[$value->id] = $value->name;
+                        $newSelectionValues[$value->id] = [
+                            'name'        => $value->name,
+                            'description' => $value->description
+                        ];
                     }
                 }
                 $data['properties'][$key]['selectionValues'] = $newSelectionValues;
