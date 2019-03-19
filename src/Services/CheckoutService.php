@@ -228,12 +228,17 @@ class CheckoutService
                 \NumberFormatter::MONETARY_GROUPING_SEPARATOR_SYMBOL,
                 $configRepository->get('IO.format.separator_thousands')
             );
+            $formatter->setAttribute(
+                \NumberFormatter::FRACTION_DIGITS,
+                $configRepository->get('IO.format.number_decimals', 2)
+            );
         }
 
         return [
-            "separator_decimal" => $formatter->getSymbol(\NumberFormatter::MONETARY_SEPARATOR_SYMBOL),
+            "separator_decimal"   => $formatter->getSymbol(\NumberFormatter::MONETARY_SEPARATOR_SYMBOL),
             "separator_thousands" => $formatter->getSymbol(\NumberFormatter::MONETARY_GROUPING_SEPARATOR_SYMBOL),
-            "pattern" => $formatter->getPattern()
+            "number_decimals"     => $formatter->getAttribute(\NumberFormatter::FRACTION_DIGITS),
+            "pattern"             => $formatter->getPattern()
         ];
     }
 
