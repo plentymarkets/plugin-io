@@ -38,7 +38,7 @@ class OrderPropertySelectionValueMutator extends BaseMutator
                         ];
                     }
                 }
-                $data['properties'][$key]['selectionValues'] = $newSelectionValues;
+                $data['properties'][$key]['property']['selectionValues'] = $newSelectionValues;
             }
         }
         
