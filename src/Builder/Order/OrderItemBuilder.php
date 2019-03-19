@@ -16,6 +16,7 @@ use Plenty\Modules\Frontend\Services\OrderPropertyFileService;
 use Plenty\Modules\Frontend\Services\VatService;
 use Plenty\Modules\Accounting\Vat\Contracts\VatRepositoryContract;
 use Plenty\Modules\Item\Stock\Hooks\CheckItemStock;
+use Plenty\Modules\Order\Property\Models\OrderPropertyType;
 use Plenty\Modules\System\Contracts\WebstoreRepositoryContract;
 use Plenty\Modules\Accounting\Vat\Models\Vat;
 use Plenty\Plugin\Events\Dispatcher;
@@ -207,23 +208,14 @@ class OrderItemBuilder
                     $file = $orderPropertyFileService->copyBasketFileToOrder($property['value']);
                     $property['value'] = $file;
                 }
-                
+
                 $basketItemProperty = [
                     'propertyId' => $property['propertyId'],
                     'value'      => $property['value']
                 ];
-                
+
                 $basketItemProperties[] = $basketItemProperty;
             }
-        }
-
-        if($basketItem['price'] == $basketItem['variation']['data']['prices']['specialOffer']['data']['basePrice'])
-        {
-            $priceOriginal = $basketItem['price'];
-        }
-        else
-        {
-            $priceOriginal = $basketItem['variation']['data']['prices']['default']['data']['basePrice'];
         }
 
         $attributeTotalMarkup = 0;
@@ -231,17 +223,36 @@ class OrderItemBuilder
 		{
             $attributeTotalMarkup = $basketItem['attributeTotalMarkup'];
         }
-        
+
         $rebate = 0;
-		
+
         if(isset($basketItem['rebate']))
 		{
 			$rebate = $basketItem['rebate'];
 		}
-		
+
 		if((float)$basketDiscount > 0)
         {
             $rebate += $basketDiscount;
+        }
+
+        $priceOriginal = $basketItem['price'] - $attributeTotalMarkup;
+
+
+		$properties = [];
+		if($basketItem['inputLength'] > 0)
+        {
+            $properties[] = [
+                'typeId' => OrderPropertyType::LENGTH,
+                'value' => "{$basketItem['inputLength']}"
+            ];
+        }
+		if($basketItem['inputWidth'] > 0)
+        {
+            $properties[] = [
+                'typeId' => OrderPropertyType::WIDTH,
+                'value' => "{$basketItem['inputWidth']}"
+            ];
         }
 
 		return [
@@ -255,6 +266,7 @@ class OrderItemBuilder
 			"vatRate"           => $basketItem['vat'],
             "vatField"			=> $this->getVatField($this->vatService->getVat(), $basketItem['vat']),
             "orderProperties"   => $basketItemProperties,
+            "properties"        => $properties,
 			"amounts"           => [
 				[
 					"currency"              => $this->checkoutService->getCurrency(),

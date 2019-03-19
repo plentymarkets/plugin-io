@@ -562,6 +562,7 @@ class BasketService
             $variationId                                     = $item['data']['variation']['id'];
             $result[$variationId]                            = $item;
             $result[$variationId]['data']['orderProperties'] = $orderProperties[$variationId];
+            $result[$variationId]['data']['unit']['htmlUnit'] = UnitService::getHTML4Unit($result[$variationId]['data']['unit']['unitOfMeasurement']);
         }
 
         return $result;
