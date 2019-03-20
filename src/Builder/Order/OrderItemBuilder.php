@@ -241,6 +241,10 @@ class OrderItemBuilder
         }
         
         $priceOriginal = $basketItem['price'];
+		if ( $this->sessionStorage->getCustomer()->showNetPrice )
+        {
+            $priceOriginal = $basketItem['price'] * (100.0 + $basketItem['vat']) / 100.0;
+        }
         $priceOriginal -= $attributeTotalMarkup;
         
 		$properties = [];
