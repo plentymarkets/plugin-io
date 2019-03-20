@@ -239,11 +239,10 @@ class OrderItemBuilder
         {
             $rebate += $basketDiscount;
         }
-
-		$priceOriginal = $this->sessionStorage->getCustomer()->showNetPrice ? $basketItem['priceGross'] : $basketItem['price'];
+        
+        $priceOriginal = $basketItem['price'];
         $priceOriginal -= $attributeTotalMarkup;
-
-
+        
 		$properties = [];
 		if($basketItem['inputLength'] > 0)
         {
