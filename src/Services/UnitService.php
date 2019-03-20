@@ -16,12 +16,33 @@ class UnitService
 {
     use MemoryCache;
 
+    const METER				= 1;
+	const DECIMETER			= 2;
+	const CENTIMETER		= 3;
+	const MILLIMETER		= 4;
+
 	/**
 	 * @var UnitNameRepositoryContract
 	 */
 	private $unitNameRepository;
 
 	private $defaultLang;
+
+	/**
+	 *
+	 * @var array
+	 */
+	public static $aMeasureUnits = array(
+		'MTR'=>array('value'=>self::METER,		'code'=>'m'),	//	Meter
+		'MTK'=>array('value'=>self::METER,		'code'=>'m'),	//	Quadratmeter
+		'SDM'=>array('value'=>self::DECIMETER,	'code'=>'dm'),	//	(?) Dezimeter
+		'CMT'=>array('value'=>self::CENTIMETER,	'code'=>'cm'),	//	Zentimeter
+		'SCM'=>array('value'=>self::CENTIMETER,	'code'=>'cm'),	//	Quadratzentimeter (kein Standard)
+		'CMK'=>array('value'=>self::CENTIMETER,	'code'=>'cm'),	//	Quadratzentimeter
+		'MMT'=>array('value'=>self::MILLIMETER,	'code'=>'mm'),	//	Millimeter
+		'MMK'=>array('value'=>self::MILLIMETER,	'code'=>'mm'),	//	Quadratmillimeter
+		'SMM'=>array('value'=>self::MILLIMETER,	'code'=>'mm'),	//	Quadratmillimeter (kein Standard)
+	);
 
     /**
      * UnitService constructor.
@@ -76,4 +97,29 @@ class UnitService
             }
         );
     }
+
+    // copy from PlentyDimension.class.php
+    /**
+	 * Checks if the given string unit is a valid one for the PlentyDimension.
+	 * @param string $sUnit	The unit to be checked
+	 * @return boolean
+	 */
+	public static function isValidUnit($sUnit)
+	{
+		return in_array($sUnit,array_keys(self::$aMeasureUnits));
+	}
+
+	/**
+	 * Returns HTML code for the unit ('m','cm' o'MM')
+	 * @param string $sUnit	One of 'MTK', 'SCM', 'SMM'
+	 * @return string
+	 */
+	public static function getHTML4Unit($sUnit='SMM')
+	{
+		if(!self::isValidUnit($sUnit))
+		{
+			return 'mm';
+		}
+		return self::$aMeasureUnits[$sUnit]['code'];
+	}
 }

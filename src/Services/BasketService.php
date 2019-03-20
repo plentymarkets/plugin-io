@@ -52,9 +52,9 @@ class BasketService
     private $vatService;
 
     /**
-     * @var SessionStorageService
+     * @var CustomerService
      */
-    private $sessionStorage;
+    private $customerService;
 
     private $basketItems;
 
@@ -64,12 +64,18 @@ class BasketService
      * @param Checkout $checkout
      * @param VatService $vatService
      */
-    public function __construct(BasketItemRepositoryContract $basketItemRepository, Checkout $checkout, VatService $vatService, SessionStorageService $sessionStorage, CouponCampaignRepositoryContract $couponCampaignRepository, BasketRepositoryContract $basketRepository)
+    public function __construct(
+        BasketItemRepositoryContract $basketItemRepository,
+        Checkout $checkout,
+        VatService $vatService,
+        CustomerService $customerService,
+        CouponCampaignRepositoryContract $couponCampaignRepository,
+        BasketRepositoryContract $basketRepository)
     {
         $this->basketItemRepository = $basketItemRepository;
         $this->checkout             = $checkout;
         $this->vatService           = $vatService;
-        $this->sessionStorage       = $sessionStorage;
+        $this->customerService      = $customerService;
         $this->couponCampaignRepository = $couponCampaignRepository;
         $this->basketRepository = $basketRepository;
 
@@ -177,7 +183,7 @@ class BasketService
 
         $basketItems        = $this->getBasketItemsRaw();
         $basketItemData     = $this->getBasketItemData($basketItems);
-        $showNetPrice       = $this->sessionStorage->getCustomer()->showNetPrice;
+        $showNetPrice       = $this->customerService->showNetPrices();
 
         foreach ($basketItems as $basketItem) {
             if ($showNetPrice) {
@@ -203,7 +209,9 @@ class BasketService
 
         $basketItems    = $this->getBasketItemsRaw();
         $basketItemData = $this->getBasketItemData($basketItems, $template);
+        $showNetPrice   = $this->customerService->showNetPrices();
         $showWarning = [];
+        
         foreach ($basketItems as $basketItem) {
             if(!array_key_exists($basketItem->variationId, $basketItemData))
             {
@@ -217,11 +225,15 @@ class BasketService
             }
             else
             {
+                if($showNetPrice)
+                {
+                    $basketItem->price = round($basketItem->price * 100 / (100.0 + $basketItem->vat), 2);
+                }
+                
                 array_push(
                     $result,
                     $this->addVariationData($basketItem, $basketItemData[$basketItem->variationId])
                 );
-
             }
         }
 
@@ -562,6 +574,7 @@ class BasketService
             $variationId                                     = $item['data']['variation']['id'];
             $result[$variationId]                            = $item;
             $result[$variationId]['data']['orderProperties'] = $orderProperties[$variationId];
+            $result[$variationId]['data']['unit']['htmlUnit'] = UnitService::getHTML4Unit($result[$variationId]['data']['unit']['unitOfMeasurement']);
         }
 
         return $result;
