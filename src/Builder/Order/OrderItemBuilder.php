@@ -4,8 +4,7 @@ namespace IO\Builder\Order;
 
 use IO\Extensions\Filters\ItemNameFilter;
 use IO\Services\BasketService;
-use IO\Services\NotificationService;
-use IO\Services\SessionStorageService;
+use IO\Services\CustomerService;
 use IO\Events\Basket\BeforeBasketItemToOrderItem;
 use Plenty\Modules\Basket\Exceptions\BasketItemCheckException;
 use Plenty\Modules\Basket\Models\Basket;
@@ -15,7 +14,6 @@ use Plenty\Modules\Frontend\PaymentMethod\Contracts\FrontendPaymentMethodReposit
 use Plenty\Modules\Frontend\Services\OrderPropertyFileService;
 use Plenty\Modules\Frontend\Services\VatService;
 use Plenty\Modules\Accounting\Vat\Contracts\VatRepositoryContract;
-use Plenty\Modules\Item\Stock\Hooks\CheckItemStock;
 use Plenty\Modules\Order\Property\Models\OrderPropertyType;
 use Plenty\Modules\System\Contracts\WebstoreRepositoryContract;
 use Plenty\Modules\Accounting\Vat\Models\Vat;
@@ -51,9 +49,9 @@ class OrderItemBuilder
     private $webstoreRepository;
 
     /**
-     * @var SessionStorageService
+     * @var CustomerService
      */
-    private $sessionStorage;
+    private $customerService;
 
     /**
      * OrderItemBuilder constructor.
@@ -64,14 +62,20 @@ class OrderItemBuilder
      * @param WebstoreRepositoryContract $webstoreRepository
      * @param VatRepositoryContract $vatRepository
      */
-	public function __construct(CheckoutService $checkoutService, VatService $vatService, ItemNameFilter $itemNameFilter, WebstoreRepositoryContract $webstoreRepository, VatRepositoryContract $vatRepository, SessionStorageService $sessionStorage)
+	public function __construct(
+	    CheckoutService $checkoutService,
+        VatService $vatService,
+        ItemNameFilter $itemNameFilter,
+        WebstoreRepositoryContract $webstoreRepository,
+        VatRepositoryContract $vatRepository,
+        CustomerService $customerService)
 	{
 		$this->checkoutService = $checkoutService;
 		$this->vatService = $vatService;
         $this->webstoreRepository = $webstoreRepository;
         $this->vatRepository = $vatRepository;
         $this->itemNameFilter = $itemNameFilter;
-        $this->sessionStorage = $sessionStorage;
+        $this->customerService = $customerService;
 	}
 
 	/**
@@ -241,7 +245,7 @@ class OrderItemBuilder
         }
         
         $priceOriginal = $basketItem['price'];
-		if ( $this->sessionStorage->getCustomer()->showNetPrice )
+		if ( $this->customerService->showNetPrices() )
         {
             $priceOriginal = $basketItem['price'] * (100.0 + $basketItem['vat']) / 100.0;
         }
