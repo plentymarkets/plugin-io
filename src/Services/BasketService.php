@@ -204,7 +204,9 @@ class BasketService
 
         $basketItems    = $this->getBasketItemsRaw();
         $basketItemData = $this->getBasketItemData($basketItems, $template);
+        $showNetPrice       = $this->sessionStorage->getCustomer()->showNetPrice;
         $showWarning = [];
+        
         foreach ($basketItems as $basketItem) {
             if(!array_key_exists($basketItem->variationId, $basketItemData))
             {
@@ -218,11 +220,16 @@ class BasketService
             }
             else
             {
+                if($showNetPrice)
+                {
+                    $basketItem->priceGross = $basketItem->price;
+                    $basketItem->price = round($basketItem->price * 100 / (100.0 + $basketItem->vat), 2);
+                }
+                
                 array_push(
                     $result,
                     $this->addVariationData($basketItem, $basketItemData[$basketItem->variationId])
                 );
-
             }
         }
 
