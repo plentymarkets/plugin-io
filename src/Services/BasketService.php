@@ -181,7 +181,6 @@ class BasketService
 
         foreach ($basketItems as $basketItem) {
             if ($showNetPrice) {
-                $basketItem->priceGross = $basketItem->price;
                 $basketItem->price = round($basketItem->price * 100 / (100.0 + $basketItem->vat), 2);
             }
 
@@ -222,7 +221,6 @@ class BasketService
             {
                 if($showNetPrice)
                 {
-                    $basketItem->priceGross = $basketItem->price;
                     $basketItem->price = round($basketItem->price * 100 / (100.0 + $basketItem->vat), 2);
                 }
                 
