@@ -34,14 +34,10 @@ class ItemController extends LayoutController
         ];
         /** @var ItemSearchService $itemSearchService */
         $itemSearchService = pluginApp( ItemSearchService::class );
-        $result = $itemSearchService->getResults([
-            'item'              => SingleItem::getSearchFactory( $itemSearchOptions ),
-            'crossSellingItems' => CrossSellingItems::getSearchFactory( $itemSearchOptions )
-        ]);
+        $itemResult = $itemSearchService->getResult(
+            SingleItem::getSearchFactory( $itemSearchOptions )
+        );
 
-
-        $itemResult = $result['item'];
-        $itemResult['CrossSellingItems'] = $result['crossSellingItems'];
 
         if(empty($itemResult['documents']))
         {
@@ -60,34 +56,34 @@ class ItemController extends LayoutController
                 ]
             );
         }
-	}
+    }
 
-	/**
-	 * @param int $itemId
-	 * @param int $variationId
-	 * @return string
-	 */
-	public function showItemWithoutName(int $itemId, $variationId = 0)
-	{
-		return $this->showItem("", $itemId, $variationId);
-	}
+    /**
+     * @param int $itemId
+     * @param int $variationId
+     * @return string
+     */
+    public function showItemWithoutName(int $itemId, $variationId = 0)
+    {
+        return $this->showItem("", $itemId, $variationId);
+    }
 
-	/**
-	 * @param int $itemId
-	 * @return string
-	 */
-	public function showItemFromAdmin(int $itemId)
-	{
-		return $this->showItem("", $itemId, 0);
-	}
-    
+    /**
+     * @param int $itemId
+     * @return string
+     */
+    public function showItemFromAdmin(int $itemId)
+    {
+        return $this->showItem("", $itemId, 0);
+    }
+
     public function showItemOld($name = null, $itemId = null)
     {
         if(is_null($itemId))
         {
             $itemId = $name;
         }
-        
+
         return $this->showItem("", (int)$itemId, 0);
     }
 }

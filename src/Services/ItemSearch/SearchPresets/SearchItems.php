@@ -90,7 +90,8 @@ class SearchItems implements SearchPreset
             ->sortByMultiple( $sorting )
             ->setPage( $page, $itemsPerPage )
             ->groupByTemplateConfig()
-            ->withGroupedAttributeValues();
+            ->withGroupedAttributeValues()
+            ->withReducedResults();
 
         $searchFactory->hasNameString($query);
         $searchFactory->hasSearchString( $query );
