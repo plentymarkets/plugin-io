@@ -103,22 +103,33 @@ class CheckoutService
 
     /**
      * Get the relevant data for the checkout
+     * @param bool $retry   Try loading checkout again on failure (e.g. problems during calculating totals)
      * @return array
      */
-    public function getCheckout(): array
+    public function getCheckout($retry = true): array
     {
-        return [
-            "currency" => $this->getCurrency(),
-            "currencyList" => $this->getCurrencyList(),
-            "methodOfPaymentId" => $this->getMethodOfPaymentId(),
-            "methodOfPaymentList" => $this->getMethodOfPaymentList(),
-            "shippingCountryId" => $this->getShippingCountryId(),
-            "shippingProfileId" => $this->getShippingProfileId(),
-            "shippingProfileList" => $this->getShippingProfileList(),
-            "deliveryAddressId" => $this->getDeliveryAddressId(),
-            "billingAddressId" => $this->getBillingAddressId(),
-            "paymentDataList" => $this->getCheckoutPaymentDataList(),
-        ];
+        try
+        {
+            return [
+                "currency" => $this->getCurrency(),
+                "currencyList" => $this->getCurrencyList(),
+                "methodOfPaymentId" => $this->getMethodOfPaymentId(),
+                "methodOfPaymentList" => $this->getMethodOfPaymentList(),
+                "shippingCountryId" => $this->getShippingCountryId(),
+                "shippingProfileId" => $this->getShippingProfileId(),
+                "shippingProfileList" => $this->getShippingProfileList(),
+                "deliveryAddressId" => $this->getDeliveryAddressId(),
+                "billingAddressId" => $this->getBillingAddressId(),
+                "paymentDataList" => $this->getCheckoutPaymentDataList(),
+            ];
+        }
+        catch(\Exception $e)
+        {
+            /** @var NotificationService $notificationService */
+            $notificationService = pluginApp(NotificationService::class);
+            $notificationService->error($e->getMessage(), $e->getCode());
+            return $retry ? $this->getCheckout(false) : null;
+        }
     }
 
     /**
