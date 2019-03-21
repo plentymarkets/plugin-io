@@ -32,6 +32,20 @@ class ContactMailService
         if(!strlen($recipient) || !strlen($mailTemplate))
         {
             return false;
+        }        
+        
+        $bcc = [];
+        $recipientBcc = $templateConfigService->get('contact.shop_mail_bcc');
+        if(!is_null($recipientBcc) && strlen($recipientBcc))
+        {
+            $recipientBcc = explode(',', $recipientBcc);
+            foreach($recipientBcc as $_bccMail)
+            {
+                if($_bccMail != "your@email.com")
+                {
+                    $bcc[] = trim($_bccMail);
+                }
+            }
         }
         
         /**
@@ -57,6 +71,25 @@ class ContactMailService
         {
             $cc[] = $contactData['userMail'];
         }
+
+        $recipientCc = $templateConfigService->get('contact.shop_mail_cc');
+        if(!is_null($recipientCc) && strlen($recipientCc))
+        {
+            $recipientCc = explode(',', $recipientCc);
+            foreach($recipientCc as $_ccMail)
+            {
+                if($_ccMail != "your@email.com")
+                {
+                    $cc[] = trim($_ccMail);
+                }
+            }
+        }        
+
+        $extendSubject = $templateConfigService->get('contact.extend_orderid_to_mail_subject');
+        if($extendSubject == "true" && isset($contactData['orderId']) && strlen($contactData['orderId']))
+        {
+            $contactData['subject'] = $contactData['subject'] . " [OrderId: " . $contactData['orderId'] . "]";
+        }
         
         /**
          * @var MailerContract $mailer
@@ -70,7 +103,7 @@ class ContactMailService
         $replyTo->mailAddress = $contactData['userMail'];
         $replyTo->name = $contactData['name'];
 
-        $mailer->sendHtml($renderedMailTemplate, $recipient, $contactData['subject'], $cc, [], $replyTo);
+        $mailer->sendHtml($renderedMailTemplate, $recipient, $contactData['subject'], $cc, $bcc, $replyTo);
         
         return true;
     }
