@@ -13,6 +13,7 @@ use IO\Services\ItemSearch\Extensions\CurrentCategoryExtension;
 use IO\Services\ItemSearch\Extensions\ItemDefaultImage;
 use IO\Services\ItemSearch\Extensions\ItemUrlExtension;
 use IO\Services\ItemSearch\Extensions\PriceSearchExtension;
+use IO\Services\ItemSearch\Mutators\OrderPropertySelectionValueMutator;
 use IO\Services\PriceDetectService;
 use IO\Services\SessionStorageService;
 use IO\Services\TemplateConfigService;
@@ -667,6 +668,14 @@ class VariationSearchFactory extends BaseSearchFactory
     {
         $propertyGroupMutator = pluginApp(VariationPropertyGroupMutator::class);
         $this->withMutator($propertyGroupMutator);
+        
+        return $this;
+    }
+    
+    public function withOrderPropertySelectionValues()
+    {
+        $orderPropertySelectionValueMutator = pluginApp(OrderPropertySelectionValueMutator::class);
+        $this->withMutator($orderPropertySelectionValueMutator);
         
         return $this;
     }

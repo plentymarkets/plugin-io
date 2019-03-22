@@ -354,11 +354,10 @@ class CategoryService
         {
             $type = CategoryType::ALL;
         }
-
-        $tree = $this->filterCategoriesByTypes(
-            $this->categoryRepository->getLinklistTree(CategoryType::ALL, $lang, $this->webstoreConfig->getWebstoreConfig()->webstoreId, $maxLevel, $customerClassId),
-            $type
-        );
+    
+        $tree = $this->categoryRepository->getArrayTree($type, $lang, $this->webstoreConfig->getWebstoreConfig()->webstoreId, $maxLevel, $customerClassId, function($category) {
+            return $category['linklist'] == 'Y';
+        });
 
         /**
          * pluginApp(CategoryDataFilter::class) creates an instance that could be used directly without temporarily

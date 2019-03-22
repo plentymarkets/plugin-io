@@ -4,8 +4,7 @@ namespace IO\Builder\Order;
 
 use IO\Extensions\Filters\ItemNameFilter;
 use IO\Services\BasketService;
-use IO\Services\NotificationService;
-use IO\Services\SessionStorageService;
+use IO\Services\CustomerService;
 use IO\Events\Basket\BeforeBasketItemToOrderItem;
 use Plenty\Modules\Basket\Exceptions\BasketItemCheckException;
 use Plenty\Modules\Basket\Models\Basket;
@@ -15,7 +14,7 @@ use Plenty\Modules\Frontend\PaymentMethod\Contracts\FrontendPaymentMethodReposit
 use Plenty\Modules\Frontend\Services\OrderPropertyFileService;
 use Plenty\Modules\Frontend\Services\VatService;
 use Plenty\Modules\Accounting\Vat\Contracts\VatRepositoryContract;
-use Plenty\Modules\Item\Stock\Hooks\CheckItemStock;
+use Plenty\Modules\Order\Property\Models\OrderPropertyType;
 use Plenty\Modules\System\Contracts\WebstoreRepositoryContract;
 use Plenty\Modules\Accounting\Vat\Models\Vat;
 use Plenty\Plugin\Events\Dispatcher;
@@ -50,6 +49,11 @@ class OrderItemBuilder
     private $webstoreRepository;
 
     /**
+     * @var CustomerService
+     */
+    private $customerService;
+
+    /**
      * OrderItemBuilder constructor.
      *
      * @param CheckoutService $checkoutService
@@ -58,13 +62,20 @@ class OrderItemBuilder
      * @param WebstoreRepositoryContract $webstoreRepository
      * @param VatRepositoryContract $vatRepository
      */
-	public function __construct(CheckoutService $checkoutService, VatService $vatService, ItemNameFilter $itemNameFilter, WebstoreRepositoryContract $webstoreRepository, VatRepositoryContract $vatRepository)
+	public function __construct(
+	    CheckoutService $checkoutService,
+        VatService $vatService,
+        ItemNameFilter $itemNameFilter,
+        WebstoreRepositoryContract $webstoreRepository,
+        VatRepositoryContract $vatRepository,
+        CustomerService $customerService)
 	{
 		$this->checkoutService = $checkoutService;
 		$this->vatService = $vatService;
         $this->webstoreRepository = $webstoreRepository;
         $this->vatRepository = $vatRepository;
         $this->itemNameFilter = $itemNameFilter;
+        $this->customerService = $customerService;
 	}
 
 	/**
@@ -207,23 +218,14 @@ class OrderItemBuilder
                     $file = $orderPropertyFileService->copyBasketFileToOrder($property['value']);
                     $property['value'] = $file;
                 }
-                
+
                 $basketItemProperty = [
                     'propertyId' => $property['propertyId'],
                     'value'      => $property['value']
                 ];
-                
+
                 $basketItemProperties[] = $basketItemProperty;
             }
-        }
-
-        if($basketItem['price'] == $basketItem['variation']['data']['prices']['specialOffer']['data']['basePrice'])
-        {
-            $priceOriginal = $basketItem['price'];
-        }
-        else
-        {
-            $priceOriginal = $basketItem['variation']['data']['prices']['default']['data']['basePrice'];
         }
 
         $attributeTotalMarkup = 0;
@@ -231,17 +233,38 @@ class OrderItemBuilder
 		{
             $attributeTotalMarkup = $basketItem['attributeTotalMarkup'];
         }
-        
+
         $rebate = 0;
-		
         if(isset($basketItem['rebate']))
 		{
 			$rebate = $basketItem['rebate'];
 		}
-		
 		if((float)$basketDiscount > 0)
         {
             $rebate += $basketDiscount;
+        }
+        
+        $priceOriginal = $basketItem['price'];
+		if ( $this->customerService->showNetPrices() )
+        {
+            $priceOriginal = $basketItem['price'] * (100.0 + $basketItem['vat']) / 100.0;
+        }
+        $priceOriginal -= $attributeTotalMarkup;
+        
+		$properties = [];
+		if($basketItem['inputLength'] > 0)
+        {
+            $properties[] = [
+                'typeId' => OrderPropertyType::LENGTH,
+                'value' => "{$basketItem['inputLength']}"
+            ];
+        }
+		if($basketItem['inputWidth'] > 0)
+        {
+            $properties[] = [
+                'typeId' => OrderPropertyType::WIDTH,
+                'value' => "{$basketItem['inputWidth']}"
+            ];
         }
 
 		return [
@@ -255,6 +278,7 @@ class OrderItemBuilder
 			"vatRate"           => $basketItem['vat'],
             "vatField"			=> $this->getVatField($this->vatService->getVat(), $basketItem['vat']),
             "orderProperties"   => $basketItemProperties,
+            "properties"        => $properties,
 			"amounts"           => [
 				[
 					"currency"              => $this->checkoutService->getCurrency(),
