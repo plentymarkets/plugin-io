@@ -9,6 +9,9 @@ use Plenty\Modules\Cloud\ElasticSearch\Lib\Search\Aggregation\AggregationInterfa
 use Plenty\Modules\Item\Search\Aggregations\CategoryAllTermsAggregation;
 use Plenty\Modules\Item\Search\Aggregations\CategoryProcessor;
 use Plenty\Modules\Item\Search\Filter\CategoryFilter;
+use IO\Helper\UserSession;
+use Plenty\Plugin\Application;
+
 
 class CategoryFacet implements FacetExtension
 {
@@ -24,37 +27,38 @@ class CategoryFacet implements FacetExtension
 
         // FIX Set count to '-1' to get all categories. Categories will be filtered when merging results.
         $categoryAggregation->setSize(-1);
-        
+
         return $categoryAggregation;
     }
-    
+
     public function mergeIntoFacetsList($result): array
     {
         $categoryFacet = [];
-        
+
         /** @var TemplateService $templateService */
         $templateService = pluginApp(TemplateService::class);
-        
+
         /** @var TemplateConfigService $templateConfigService */
         $templateConfigService = pluginApp(TemplateConfigService::class);
-        
+
         if(!$templateService->isCurrentTemplate('tpl.category.item') && $templateConfigService->get('item.show_category_filter') == 'true')
         {
-            /** @var SessionStorageService $sessionStorage */
-            $sessionStorage = pluginApp(SessionStorageService::class);
-            
-            $categoryFacet = [
-                'id' => 'category',
-                'name' => 'Categories',
-                'translationKey' => 'itemFilterCategory',
-                'position' => 0,
-                'values' => [],
-                'minHitCount' => 1,
-                'maxResultCount' => self::MAX_RESULT_COUNT
-            ];
-            
             if(count($result))
             {
+                 /** @var SessionStorageService $sessionStorage */
+                $sessionStorage = pluginApp(SessionStorageService::class);
+
+                $categoryFacet = [
+                    'id' => 'category',
+                    'name' => 'Categories',
+                    'translationKey' => 'itemFilterCategory',
+                    'position' => 0,
+                    'values' => [],
+                    'minHitCount' => 1,
+                    'maxResultCount' => self::MAX_RESULT_COUNT
+                ];
+                $loggedIn = pluginApp(UserSession::class)->isContactLoggedIn();
+
                 /** @var CategoryService $categoryService */
                 $categoryService = pluginApp(CategoryService::class);
 
@@ -62,7 +66,8 @@ class CategoryFacet implements FacetExtension
                 {
                     $category = $categoryService->getForPlentyId($categoryId, $sessionStorage->getLang());
 
-                    if ( !is_null($category) )
+
+                    if ( !is_null($category) && (!$categoryService->isHidden($category->id) || $loggedIn || pluginApp(Application::class)->isAdminPreview()) )
                     {
                         $categoryFacet['values'][] = [
                             'id' => 'category-' . $categoryId,
@@ -78,17 +83,25 @@ class CategoryFacet implements FacetExtension
 
                 }
             }
-            
-            $categoryFacet['count'] = count($categoryFacet['values']);
+
+
+            if(count($categoryFacet['values']) > 0)
+            {
+                $categoryFacet['count'] = count($categoryFacet['values']);
+            }
+            else
+            {
+                $categoryFacet = [];
+            }
         }
-        
+
         return $categoryFacet;
     }
-    
+
     public function extractFilterParams($filtersList)
     {
         $categoryIds = [];
-        
+
         if(count($filtersList))
         {
             foreach ($filtersList as $filter)
