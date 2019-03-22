@@ -21,7 +21,7 @@ class DocumentController extends LayoutController
      * @param Response $response
      * @return Response
      */
-    public function download($documentId, Response $response)
+    public function preview($documentId, Response $response)
     {
         /** @var CustomerService $customerService */
         $customerService = pluginApp(CustomerService::class);

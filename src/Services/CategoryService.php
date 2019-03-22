@@ -210,6 +210,13 @@ class CategoryService
             $lang = $this->sessionStorageService->getLang();
         }
 
+        if(is_null($webstoreId))
+        {
+            /** @var WebstoreConfigurationService $webstoreService */
+            $webstoreService = pluginApp(WebstoreConfigurationService::class);
+            $webstoreId = $webstoreService->getWebstoreConfig()->webstoreId;
+        }
+
         $categoryUrl = $this->fromMemoryCache(
             "categoryUrl.$category->id.$lang.$webstoreId",
             function() use ($category, $lang, $defaultLanguage, $webstoreId) {
@@ -352,11 +359,10 @@ class CategoryService
         {
             $type = CategoryType::ALL;
         }
-
-        $tree = $this->filterCategoriesByTypes(
-            $this->categoryRepository->getLinklistTree(CategoryType::ALL, $lang, $this->webstoreConfig->getWebstoreConfig()->webstoreId, $maxLevel, $customerClassId),
-            $type
-        );
+    
+        $tree = $this->categoryRepository->getArrayTree($type, $lang, $this->webstoreConfig->getWebstoreConfig()->webstoreId, $maxLevel, $customerClassId, function($category) {
+            return $category['linklist'] == 'Y';
+        });
 
         /**
          * pluginApp(CategoryDataFilter::class) creates an instance that could be used directly without temporarily
