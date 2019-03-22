@@ -364,7 +364,7 @@ class CategoryService
             return $category['linklist'] == 'Y';
         });
 
-        if(pluginApp(UserSession::class)->isContactLoggedIn() == false && pluginApp(Application::class)->isAdminPreview() == false)
+        if(pluginApp(UserSession::class)->isContactLoggedIn() === false && pluginApp(Application::class)->isAdminPreview() === false)
         {
             $tree = $this->filterVisibleCategories($tree);
         }
@@ -394,7 +394,7 @@ class CategoryService
             function($category)
             {
                 /** @var $category Category */
-                $category->children = $this->filterVisibleCategories($category->childre);
+                $category->children = $this->filterVisibleCategories($category->children);
 
                 return $category;
             },
