@@ -130,6 +130,7 @@ class NumberFormatFilter extends AbstractFilter
                         $thousands_separator = $this->config->get('IO.format.separator_thousands');
                         $formatter->setSymbol(\NumberFormatter::MONETARY_SEPARATOR_SYMBOL, $decimal_separator);
                         $formatter->setSymbol(\NumberFormatter::MONETARY_GROUPING_SEPARATOR_SYMBOL, $thousands_separator);
+                        $formatter->setAttribute(\NumberFormatter::FRACTION_DIGITS, $this->config->get('IO.format.number_decimals', 2));
                     }
 
                     return $formatter;

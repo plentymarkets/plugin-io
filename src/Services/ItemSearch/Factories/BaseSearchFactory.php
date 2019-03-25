@@ -140,6 +140,7 @@ class BaseSearchFactory
             if ( $inheritedProperties === null || in_array( self::INHERIT_SORTING, $inheritedProperties ) )
             {
                 $newBuilder->sorting = $searchBuilder->sorting;
+                $newBuilder->randomScoreModifier = $searchBuilder->randomScoreModifier;
             }
         }
 
@@ -469,11 +470,12 @@ class BaseSearchFactory
             if(!$this->randomScoreModifier instanceof RandomScore)
             {
                 $this->randomScoreModifier = pluginApp(RandomScore::class);
+                $this->randomScoreModifier->setSeed(time());
             }
-            
+
             $sortingField = '_score';
         }
-        
+
         return $sortingField;
     }
 }

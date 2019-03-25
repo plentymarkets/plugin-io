@@ -103,22 +103,33 @@ class CheckoutService
 
     /**
      * Get the relevant data for the checkout
+     * @param bool $retry   Try loading checkout again on failure (e.g. problems during calculating totals)
      * @return array
      */
-    public function getCheckout(): array
+    public function getCheckout($retry = true): array
     {
-        return [
-            "currency" => $this->getCurrency(),
-            "currencyList" => $this->getCurrencyList(),
-            "methodOfPaymentId" => $this->getMethodOfPaymentId(),
-            "methodOfPaymentList" => $this->getMethodOfPaymentList(),
-            "shippingCountryId" => $this->getShippingCountryId(),
-            "shippingProfileId" => $this->getShippingProfileId(),
-            "shippingProfileList" => $this->getShippingProfileList(),
-            "deliveryAddressId" => $this->getDeliveryAddressId(),
-            "billingAddressId" => $this->getBillingAddressId(),
-            "paymentDataList" => $this->getCheckoutPaymentDataList(),
-        ];
+        try
+        {
+            return [
+                "currency" => $this->getCurrency(),
+                "currencyList" => $this->getCurrencyList(),
+                "methodOfPaymentId" => $this->getMethodOfPaymentId(),
+                "methodOfPaymentList" => $this->getMethodOfPaymentList(),
+                "shippingCountryId" => $this->getShippingCountryId(),
+                "shippingProfileId" => $this->getShippingProfileId(),
+                "shippingProfileList" => $this->getShippingProfileList(),
+                "deliveryAddressId" => $this->getDeliveryAddressId(),
+                "billingAddressId" => $this->getBillingAddressId(),
+                "paymentDataList" => $this->getCheckoutPaymentDataList(),
+            ];
+        }
+        catch(\Exception $e)
+        {
+            /** @var NotificationService $notificationService */
+            $notificationService = pluginApp(NotificationService::class);
+            $notificationService->error($e->getMessage(), $e->getCode());
+            return $retry ? $this->getCheckout(false) : null;
+        }
     }
 
     /**
@@ -228,12 +239,17 @@ class CheckoutService
                 \NumberFormatter::MONETARY_GROUPING_SEPARATOR_SYMBOL,
                 $configRepository->get('IO.format.separator_thousands')
             );
+            $formatter->setAttribute(
+                \NumberFormatter::FRACTION_DIGITS,
+                $configRepository->get('IO.format.number_decimals', 2)
+            );
         }
 
         return [
-            "separator_decimal" => $formatter->getSymbol(\NumberFormatter::MONETARY_SEPARATOR_SYMBOL),
+            "separator_decimal"   => $formatter->getSymbol(\NumberFormatter::MONETARY_SEPARATOR_SYMBOL),
             "separator_thousands" => $formatter->getSymbol(\NumberFormatter::MONETARY_GROUPING_SEPARATOR_SYMBOL),
-            "pattern" => $formatter->getPattern()
+            "number_decimals"     => $formatter->getAttribute(\NumberFormatter::FRACTION_DIGITS),
+            "pattern"             => $formatter->getPattern()
         ];
     }
 
