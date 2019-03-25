@@ -359,11 +359,15 @@ class CategoryService
         {
             $type = CategoryType::ALL;
         }
-    
+
         $tree = $this->categoryRepository->getArrayTree($type, $lang, $this->webstoreConfig->getWebstoreConfig()->webstoreId, $maxLevel, $customerClassId, function($category) {
             return $category['linklist'] == 'Y';
         });
 
+        if(pluginApp(UserSession::class)->isContactLoggedIn() === false && pluginApp(Application::class)->isAdminPreview() === false)
+        {
+            $tree = $this->filterVisibleCategories($tree);
+        }
         /**
          * pluginApp(CategoryDataFilter::class) creates an instance that could be used directly without temporarily
          * storing it in a variable. However, our plugin code check does not understand this in this particular case,
@@ -375,6 +379,31 @@ class CategoryService
             $this->loadResultFields( ResultFieldTemplate::get( ResultFieldTemplate::TEMPLATE_CATEGORY_TREE ) )
         );
     }
+
+    private function filterVisibleCategories( $categoryList = [])
+    {
+        $result = array_filter(
+            $categoryList,
+            function($category)
+            {
+                return $category['right'] !== 'customer';
+            }
+        );
+
+        $result = array_map(
+            function($category)
+            {
+                /** @var $category Category */
+                $category->children = $this->filterVisibleCategories($category->children);
+
+                return $category;
+            },
+            $result
+        );
+
+        return $result;
+    }
+
 
     /**
      * Return the sitemap list as an array
