@@ -13,6 +13,7 @@ use IO\Services\ItemSearch\Extensions\CurrentCategoryExtension;
 use IO\Services\ItemSearch\Extensions\ItemDefaultImage;
 use IO\Services\ItemSearch\Extensions\ItemUrlExtension;
 use IO\Services\ItemSearch\Extensions\PriceSearchExtension;
+use IO\Services\ItemSearch\Extensions\ReduceDataExtension;
 use IO\Services\ItemSearch\Mutators\OrderPropertySelectionValueMutator;
 use IO\Services\PriceDetectService;
 use IO\Services\SessionStorageService;
@@ -747,6 +748,12 @@ class VariationSearchFactory extends BaseSearchFactory
     public function withGroupedAttributeValues()
     {
         $this->withExtension( GroupedAttributeValuesExtension::class );
+        return $this;
+    }
+
+    public function withReducedResults()
+    {
+        $this->withExtension(ReduceDataExtension::class);
         return $this;
     }
 }

@@ -29,7 +29,8 @@ class TagItems extends VariationList
         $factory = parent::getSearchFactory($options)
             ->hasAnyTag($tagIds)
             ->groupByTemplateConfig()
-            ->withGroupedAttributeValues();
+            ->withGroupedAttributeValues()
+            ->withReducedResults();
 
         return $factory;
     }
