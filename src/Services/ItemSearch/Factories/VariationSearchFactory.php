@@ -14,6 +14,7 @@ use IO\Services\ItemSearch\Extensions\ItemDefaultImage;
 use IO\Services\ItemSearch\Extensions\ItemUrlExtension;
 use IO\Services\ItemSearch\Extensions\PriceSearchExtension;
 use IO\Services\ItemSearch\Extensions\ReduceDataExtension;
+use IO\Services\ItemSearch\Mutators\OrderPropertySelectionValueMutator;
 use IO\Services\PriceDetectService;
 use IO\Services\SessionStorageService;
 use IO\Services\TemplateConfigService;
@@ -649,9 +650,13 @@ class VariationSearchFactory extends BaseSearchFactory
         }
 
         $imageMutator = pluginApp(ImageMutator::class);
+        /**
+         * @var ImageMutator $imageMutator
+         */
+        $imageMutator->setSorting(ImageMutator::SORT_POSITION);
         $imageMutator->addClient( $clientId );
         $this->withMutator( $imageMutator );
-        
+
         /** @var ImageDomainMutator $imageDomainMutator */
         $imageDomainMutator = pluginApp(ImageDomainMutator::class);
         $imageDomainMutator->setClient($clientId);
@@ -664,6 +669,14 @@ class VariationSearchFactory extends BaseSearchFactory
     {
         $propertyGroupMutator = pluginApp(VariationPropertyGroupMutator::class);
         $this->withMutator($propertyGroupMutator);
+        
+        return $this;
+    }
+    
+    public function withOrderPropertySelectionValues()
+    {
+        $orderPropertySelectionValueMutator = pluginApp(OrderPropertySelectionValueMutator::class);
+        $this->withMutator($orderPropertySelectionValueMutator);
         
         return $this;
     }

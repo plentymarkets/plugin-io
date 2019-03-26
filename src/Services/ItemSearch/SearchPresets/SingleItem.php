@@ -32,6 +32,7 @@ class SingleItem implements SearchPreset
             ->withLanguage()
             ->withImages()
             ->withPropertyGroups()
+            ->withOrderPropertySelectionValues()
             ->withUrls()
             ->withPrices()
             ->withDefaultImage()

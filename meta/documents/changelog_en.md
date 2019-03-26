@@ -1,5 +1,31 @@
 # Release Notes for IO
 
+## v3.2.0 (2019-03-25) <a href="https://github.com/plentymarkets/plugin-io/compare/3.1.2...3.2.0" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
+
+### Added
+
+- The TWIG filter "addressOptionType" has been added in order to access data pertaining to the address type of an address.
+- We added a new TWIG filter, which makes it possible to remove tabulator spaces from character strings.
+- Ceres now considers the visibility of order statuses as specified in the back end.
+
+### Changed
+
+- It is now required to enter the old password in order to change the password in the MyAccount area.
+- The loading of the category tree has been refactored, resulting in a significantly better performance.
+
+### Fixed
+
+- You can now edit categories in the ShopBuilder, even if their routes are deactivated in the IO settings.
+- Under certain circumstances, grouped attributes were displayed incorrectly in item lists. This has been fixed.
+- Errors in the calculation of shipping costs that stem from restrictions from payment methods and shipping profiles are now intercepted and the shipping costs are displayed correctly.
+- The category option "Visible: After login" is now applicable in Ceres online stores. Categories for which this option is active are only displayed in the navigation after a login. Directly accessing the URL redirects to the login page.
+
+## v3.1.2 (2019-03-20) <a href="https://github.com/plentymarkets/plugin-io/compare/3.1.1...3.1.2" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
+
+### Fixed
+
+- The checkout and shopping cart can now correctly display and process items with measurement inputs for length and width.
+
 ## v3.1.1 (2019-03-11) <a href="https://github.com/plentymarkets/plugin-io/compare/3.1.0...3.1.1" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
 
 ### Fixed

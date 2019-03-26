@@ -4,8 +4,10 @@ namespace IO\Services;
 
 use Illuminate\Support\Collection;
 use IO\Constants\CategoryType;
+use IO\Guards\AuthGuard;
 use IO\Helper\CategoryDataFilter;
 use IO\Helper\MemoryCache;
+use IO\Helper\UserSession;
 use IO\Services\ItemLoader\Services\LoadResultFields;
 use IO\Services\ItemSearch\Helper\ResultFieldTemplate;
 use IO\Services\UrlBuilder\UrlQuery;
@@ -50,17 +52,20 @@ class CategoryService
      */
     private $currentCategoryTree = [];
 
+    private $authGuard;
+
     private $currentItem = [];
 
     /**
      * CategoryService constructor.
      * @param CategoryRepositoryContract $category
      */
-    public function __construct(CategoryRepositoryContract $categoryRepository, WebstoreConfigurationService $webstoreConfig, SessionStorageService $sessionStorageService)
+    public function __construct(CategoryRepositoryContract $categoryRepository, WebstoreConfigurationService $webstoreConfig, SessionStorageService $sessionStorageService, AuthGuard $authGuard)
     {
         $this->categoryRepository    = $categoryRepository;
         $this->webstoreConfig 		 = $webstoreConfig;
         $this->sessionStorageService = $sessionStorageService;
+        $this->authGuard = $authGuard;
     }
 
     /**
@@ -355,11 +360,14 @@ class CategoryService
             $type = CategoryType::ALL;
         }
 
-        $tree = $this->filterCategoriesByTypes(
-            $this->categoryRepository->getLinklistTree(CategoryType::ALL, $lang, $this->webstoreConfig->getWebstoreConfig()->webstoreId, $maxLevel, $customerClassId),
-            $type
-        );
+        $tree = $this->categoryRepository->getArrayTree($type, $lang, $this->webstoreConfig->getWebstoreConfig()->webstoreId, $maxLevel, $customerClassId, function($category) {
+            return $category['linklist'] == 'Y';
+        });
 
+        if(pluginApp(UserSession::class)->isContactLoggedIn() === false && pluginApp(Application::class)->isAdminPreview() === false)
+        {
+            $tree = $this->filterVisibleCategories($tree);
+        }
         /**
          * pluginApp(CategoryDataFilter::class) creates an instance that could be used directly without temporarily
          * storing it in a variable. However, our plugin code check does not understand this in this particular case,
@@ -371,6 +379,31 @@ class CategoryService
             $this->loadResultFields( ResultFieldTemplate::get( ResultFieldTemplate::TEMPLATE_CATEGORY_TREE ) )
         );
     }
+
+    private function filterVisibleCategories( $categoryList = [])
+    {
+        $result = array_filter(
+            $categoryList,
+            function($category)
+            {
+                return $category['right'] !== 'customer';
+            }
+        );
+
+        $result = array_map(
+            function($category)
+            {
+                /** @var $category Category */
+                $category->children = $this->filterVisibleCategories($category->children);
+
+                return $category;
+            },
+            $result
+        );
+
+        return $result;
+    }
+
 
     /**
      * Return the sitemap list as an array
@@ -417,12 +450,13 @@ class CategoryService
             }
         }
 
+        $loggedIn = pluginApp(UserSession::class)->isContactLoggedIn();
         $result = array_filter(
             $categoryList,
 
-            function($category) use ($types)
+            function($category) use ($types, $loggedIn)
             {
-                return in_array($category->type, $types);
+                return in_array($category->type, $types) && ($category->right !== 'customer' || $loggedIn || pluginApp(Application::class)->isAdminPreview());
             }
         );
 
@@ -444,9 +478,10 @@ class CategoryService
      * Returns a list of all parent categories including given category
      * @param int   $catID      The category Id to get the parents for or 0 to use current category
      * @param bool  $bottomUp   Set true to order result from bottom (deepest category) to top (= level 1)
+     * @param bool  $filterCategories Filter categories
      * @return array            The parents of the category
      */
-    public function getHierarchy( int $catID = 0, bool $bottomUp = false ):array
+    public function getHierarchy( int $catID = 0, bool $bottomUp = false, bool $filterCategories = false):array
     {
         if( $catID > 0 )
         {
@@ -454,13 +489,20 @@ class CategoryService
         }
 
         $hierarchy = [];
+        $loggedIn = pluginApp(UserSession::class)->isContactLoggedIn();
 
         /**
          * @var Category $category
          */
         foreach ( $this->currentCategoryTree as $lvl => $category )
         {
-            array_push( $hierarchy, $category );
+            if($filterCategories == false  || $category->right === 'all' || $loggedIn || pluginApp(Application::class)->isAdminPreview())
+            {
+                array_push( $hierarchy, $category );
+            }else
+            {
+                $hierarchy = [];
+            }
         }
 
         if( $bottomUp === false )
@@ -504,5 +546,23 @@ class CategoryService
     public function getCurrentItem()
     {
         return $this->currentItem;
+    }
+
+    public function isHidden($id){
+
+        if(pluginApp(Application::class)->isAdminPreview())
+        {
+            return false;
+        }
+        $isHidden = false;
+        foreach ($this->getHierarchy($id) as $category) {
+            if ($category->right === 'customer')
+            {
+                $isHidden = true;
+                break;
+            }
+        }
+
+        return $isHidden;
     }
 }

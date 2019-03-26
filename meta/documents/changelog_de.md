@@ -1,5 +1,31 @@
 # Release Notes für IO
 
+## v3.2.0 (2019-03-25) <a href="https://github.com/plentymarkets/plugin-io/compare/3.1.2...3.2.0" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
+
+### Hinzugefügt
+
+- Es wurde ein neuer TWIG-Filter **addressOptionType** hinzugefügt, um Daten aus dem Adress-Typ einer Adresse ausgeben zu können.
+- Es wurde ein neuer TWIG-Filter hinzugefügt, welcher es ermöglicht, Tabulator-Abstände aus Zeichenketten zu entfernen.
+- Die im Backend eingestellten Sichtbarkeiten für Auftragsstatus werden nun bei der Ausgabe in Ceres berücksichtigt.
+
+### Geändert
+
+- Zum Ändern des Passworts im Mein-Konto-Bereich ist jetzt die Eingabe des bisherigen Passworts erforderlich.
+- Das Laden des Kategoriebaums wurde überarbeitet und ist nun deutlich performanter.
+
+### Behoben
+
+- Kategorien können ab sofort auch im ShopBuilder bearbeitet werden, wenn die Routen in den Einstellungen deaktiviert sind.
+- In den Artikellisten konnte es zur fehlerhaften Anzeige der gruppierten Attribute kommen. Das Verhalten wurde behoben.
+- Fehler in der Versandkostenberechnung, die durch Einschränkungen an Zahlungsarten und Versandprofilen enstehen, werden nun abgefangen und die Versandkosten im Webshop korrekt ausgegeben.
+- Die Kategorie-Option "Sichtbar: Nach Login" wird nun berücksichtigt. Kategorien, für die diese Option aktiv ist, werden erst nach Login in der Navigation angezeigt. Ein direkter Aufruf der URL leitet auf die Login-Seite.
+
+## v3.1.2 (2019-03-20) <a href="https://github.com/plentymarkets/plugin-io/compare/3.1.1...3.1.2" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
+
+### Behoben
+
+- Checkout und Warenkorb können Wunschmaß-Artikel jetzt korrekt darstellen und verarbeiten.
+
 ## v3.1.1 (2019-03-11) <a href="https://github.com/plentymarkets/plugin-io/compare/3.1.0...3.1.1" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
 
 ### Behoben
