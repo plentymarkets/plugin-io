@@ -5,7 +5,6 @@ namespace IO\Extensions\Basket;
 use IO\Services\CheckoutService;
 use IO\Services\CustomerService;
 use Plenty\Modules\Frontend\Events\FrontendUpdateDeliveryAddress;
-use Plenty\Modules\Order\Shipping\ParcelService\Models\ParcelServicePreset;
 
 class IOFrontendUpdateDeliveryAddress
 {

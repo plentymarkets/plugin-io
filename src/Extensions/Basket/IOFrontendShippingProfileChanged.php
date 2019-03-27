@@ -4,7 +4,6 @@ namespace IO\Extensions\Basket;
 
 use IO\Services\BasketService;
 use IO\Services\CustomerService;
-use IO\Services\NotificationService;
 use Plenty\Modules\Frontend\Events\FrontendShippingProfileChanged;
 use Plenty\Modules\Order\Shipping\Contracts\ParcelServicePresetRepositoryContract;
 use Plenty\Modules\Order\Shipping\ParcelService\Models\ParcelServicePreset;
