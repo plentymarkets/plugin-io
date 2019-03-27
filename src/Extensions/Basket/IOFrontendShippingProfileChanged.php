@@ -4,8 +4,10 @@ namespace IO\Extensions\Basket;
 
 use IO\Services\BasketService;
 use IO\Services\CustomerService;
+use IO\Services\NotificationService;
 use Plenty\Modules\Frontend\Events\FrontendShippingProfileChanged;
 use Plenty\Modules\Order\Shipping\Contracts\ParcelServicePresetRepositoryContract;
+use Plenty\Modules\Order\Shipping\ParcelService\Models\ParcelServicePreset;
 
 class IOFrontendShippingProfileChanged
 {
@@ -17,7 +19,7 @@ class IOFrontendShippingProfileChanged
         $basketService = pluginApp(BasketService::class);
         $deliveryAddressId = $basketService->getDeliveryAddressId();
 
-        if (is_null($deliveryAddressId))
+        if (is_null($deliveryAddressId) || $deliveryAddressId === -99)
         {
             return;
         }
@@ -30,7 +32,7 @@ class IOFrontendShippingProfileChanged
         $parcelServiceRepository = pluginApp(ParcelServicePresetRepositoryContract::class);
         $selectedShippingProfile = $parcelServiceRepository->getPresetById($selectedShippingProfileId);
 
-        if (!is_null($selectedShippingProfile))
+        if ($selectedShippingProfile instanceof ParcelServicePreset)
         {
             $isPostOfficeAndParcelBoxActive = $selectedShippingProfile->isParcelBox && $selectedShippingProfile->isPostOffice;
             $isAddressPostOffice = $selectedDeliveryAddress->address1 === "POSTFILIALE";
@@ -44,8 +46,6 @@ class IOFrontendShippingProfileChanged
                 if ($isUnsupportedPostOffice || $isUnsupportedParcelBox)
                 {
                     $basketService->setDeliveryAddressId(-99);
-
-                    // TODO: dem Nutzer bescheid sagen, dass das Profil geändert wurde.
                 }
             }
         }
