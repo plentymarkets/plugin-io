@@ -3,27 +3,30 @@
 namespace IO\Extensions;
 
 use IO\Extensions\Constants\ShopUrls;
-use IO\Extensions\Filters\ItemImagesFilter;
-use IO\Extensions\Filters\ResultFieldsFilter;
-use IO\Extensions\Functions\QueryString;
-use IO\Extensions\Functions\UniqueId;
+
+use Plenty\Plugin\Http\Request;
 use Plenty\Plugin\Templates\Extensions\Twig_Extension;
 use Plenty\Plugin\Templates\Factories\TwigFactory;
-use Plenty\Plugin\Http\Request;
 
-use IO\Extensions\Filters\PatternFilter;
+use IO\Extensions\Filters\AddressOptionTypeFilter;
+use IO\Extensions\Filters\ItemImagesFilter;
+use IO\Extensions\Filters\ItemNameFilter;
 use IO\Extensions\Filters\NumberFormatFilter;
 use IO\Extensions\Filters\OrderByKeyFilter;
-use IO\Extensions\Filters\URLFilter;
-use IO\Extensions\Filters\ItemNameFilter;
-use IO\Extensions\Filters\SpecialOfferFilter;
+use IO\Extensions\Filters\PatternFilter;
+use IO\Extensions\Filters\ResultFieldsFilter;
 use IO\Extensions\Filters\ShuffleFilter;
+use IO\Extensions\Filters\SpecialOfferFilter;
+use IO\Extensions\Filters\URLFilter;
+use IO\Extensions\Filters\TabFilter;
 
-use IO\Extensions\Functions\GetBasePrice;
+use IO\Extensions\Functions\AdditionalResources;
 use IO\Extensions\Functions\Component;
 use IO\Extensions\Functions\ExternalContent;
+use IO\Extensions\Functions\GetBasePrice;
 use IO\Extensions\Functions\Partial;
-use IO\Extensions\Functions\AdditionalResources;
+use IO\Extensions\Functions\QueryString;
+use IO\Extensions\Functions\UniqueId;
 
 /**
  * Provide services and helper functions to twig engine
@@ -60,7 +63,9 @@ class TwigIOExtension extends Twig_Extension
 		OrderByKeyFilter $orderByKeyFilter,
 		ShuffleFilter $shuffleFilter,
 		ResultFieldsFilter $resultFieldsFilter,
-		SpecialOfferFilter $specialOfferFilter
+		SpecialOfferFilter $specialOfferFilter,
+		AddressOptionTypeFilter $addressOptionTypeFilter,
+        TabFilter $tabFilter
 	)
 	{
 		$this->twig = $twig;

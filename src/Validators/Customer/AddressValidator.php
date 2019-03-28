@@ -2,53 +2,23 @@
 
 namespace IO\Validators\Customer;
 
-use IO\Builder\Order\AddressType;
-use IO\Services\CheckoutService;
 use IO\Constants\ShippingCountry;
-use IO\Validators\Customer\BillingAddressValidator;
-use IO\Validators\Customer\DeliveryAddressValidator;
-use IO\Validators\Customer\BillingAddressValidatorEN;
-use IO\Validators\Customer\DeliveryAddressValidatorEN;
+use Plenty\Validation\Validator;
 
-class AddressValidator
+class AddressValidator extends Validator
 {
-    public function validateOrFail($addressType, $addressData)
+    protected function defineAttributes()
     {
-        if($addressType == AddressType::DELIVERY)
-        {
-            if(self::isEnAddress($addressData['countryId']))
-            {
-                DeliveryAddressValidatorEN::$addressData = $addressData;
-                DeliveryAddressValidatorEN::validateOrFail($addressData);
-            }
-            else
-            {
-                DeliveryAddressValidator::$addressData = $addressData;
-                DeliveryAddressValidator::validateOrFail($addressData);
-            }
-        }
-        else
-        {
-            if(self::isEnAddress($addressData['countryId']))
-            {
-                BillingAddressValidatorEN::$addressData = $addressData;
-                BillingAddressValidatorEN::validateOrFail($addressData);
-            }
-            else
-            {
-                BillingAddressValidator::$addressData = $addressData;
-                BillingAddressValidator::validateOrFail($addressData);
-            }
-        }
-    }
-    
-    public function isEnAddress($shippingCountryId)
-    {
-        if($shippingCountryId == ShippingCountry::UNITED_KINGDOM || $shippingCountryId == ShippingCountry::IRELAND)
-        {
-            return true;
-        }
-        
-        return false;
+        $isCompany = empty($this->getAttributeValue('gender')) && empty($this->getAttributeValue('name2')) && empty($this->getAttributeValue('name3'));
+        $addressFormat = ShippingCountry::getAddressFormat($this->getAttributeValue('countryId'));
+
+        $this->addString('address1', true);
+        $this->addString('address2', $addressFormat === ShippingCountry::ADDRESS_FORMAT_DE);
+        $this->addString('postalCode', true);
+        $this->addString('town', true);
+        $this->addString('name1', $isCompany);
+        $this->addString('name2', !$isCompany);
+        $this->addString('name3', !$isCompany);
+        $this->addString('contactPerson', $isCompany);
     }
 }

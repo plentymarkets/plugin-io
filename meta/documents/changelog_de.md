@@ -1,6 +1,66 @@
 # Release Notes für IO
 
-## v3.0.0 (2010-01-21) <a href="https://github.com/plentymarkets/plugin-io/compare/2.17.1...3.0.0" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
+## v3.2.0 (2019-03-25) <a href="https://github.com/plentymarkets/plugin-io/compare/3.1.2...3.2.0" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
+
+### Hinzugefügt
+
+- Es wurde ein neuer TWIG-Filter **addressOptionType** hinzugefügt, um Daten aus dem Adress-Typ einer Adresse ausgeben zu können.
+- Es wurde ein neuer TWIG-Filter hinzugefügt, welcher es ermöglicht, Tabulator-Abstände aus Zeichenketten zu entfernen.
+- Die im Backend eingestellten Sichtbarkeiten für Auftragsstatus werden nun bei der Ausgabe in Ceres berücksichtigt.
+
+### Geändert
+
+- Zum Ändern des Passworts im Mein-Konto-Bereich ist jetzt die Eingabe des bisherigen Passworts erforderlich.
+- Das Laden des Kategoriebaums wurde überarbeitet und ist nun deutlich performanter.
+
+### Behoben
+
+- Kategorien können ab sofort auch im ShopBuilder bearbeitet werden, wenn die Routen in den Einstellungen deaktiviert sind.
+- In den Artikellisten konnte es zur fehlerhaften Anzeige der gruppierten Attribute kommen. Das Verhalten wurde behoben.
+- Fehler in der Versandkostenberechnung, die durch Einschränkungen an Zahlungsarten und Versandprofilen enstehen, werden nun abgefangen und die Versandkosten im Webshop korrekt ausgegeben.
+- Die Kategorie-Option "Sichtbar: Nach Login" wird nun berücksichtigt. Kategorien, für die diese Option aktiv ist, werden erst nach Login in der Navigation angezeigt. Ein direkter Aufruf der URL leitet auf die Login-Seite.
+
+## v3.1.2 (2019-03-20) <a href="https://github.com/plentymarkets/plugin-io/compare/3.1.1...3.1.2" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
+
+### Behoben
+
+- Checkout und Warenkorb können Wunschmaß-Artikel jetzt korrekt darstellen und verarbeiten.
+
+## v3.1.1 (2019-03-11) <a href="https://github.com/plentymarkets/plugin-io/compare/3.1.0...3.1.1" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
+
+### Behoben
+
+- Durch einen Fehler konnte es dazu kommen, dass 404-Seiten nicht korrekt ausgegeben wurden. Dies wurde behoben.
+
+## v3.1.0 (2019-02-25) <a href="https://github.com/plentymarkets/plugin-io/compare/3.0.1...3.1.0" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
+
+### Hinzugefügt
+
+- Es wurde eine Schnittstelle geschaffen, um Nutzer beim Anlegen eines Auftrags zu einem oder mehreren Newslettern anzumelden.
+- Es ist nun möglich, alle Artikel eines Herstellers per ElasticSearch abzufragen.
+
+### Geändert
+
+- Die im Warenkorb befindlichen Artikel enthalten nun zusätzliche Daten über die Gruppen der Varianteneigenschaften.
+- Beim Anlegen einer Retoure wird ein neues Bestellmerkmal angelegt. Dieses dient dazu eine Ereignisaktion ausführen zu können.
+- Vor dem Senden des Kontaktformulars wird das Google reCAPTCHA über den geheimen Webseiten-Schlüssen verifiziert.
+
+### Behoben
+
+- Durch einen Fehler wurde der Plugin-Bau unter gewissen Umständen nicht erfolgreich fertiggestellt. Dies wurde behoben.
+- Durch einen Fehler wurden artikelabhängige Gutscheine nicht entfernt, wenn der betreffende Artikel aus dem Warenkorb entfernt wurde. Dies wurde behoben.
+- Bei zusätzlichen Mandanten kam es zu Fehlern bei der Seitennummerierung von Kategorieseiten. Dieses Verhalten wurde behoben.
+- Durch einen Fehler wurde die Währung beim Wechseln der Sprache nicht korrekt aktualisiert. Dies wurde behoben.
+
+## v3.0.1 (2019-02-07) <a href="https://github.com/plentymarkets/plugin-io/compare/3.0.0...3.0.1" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
+
+### Behoben
+
+- Durch einen Fehler kam zu Überverkäufen. Dies wurde behoben.
+- Die minimale und maximale Anzahl an Artikeln und Varianten führte teilweise bei Änderungen an Artikeln im Warenkorb zu Fehlern. Dieses Verhalten wurde behoben.
+- Durch einen Fehler konnte es zu Speicherauslastung kommen. Dies wurde behoben.
+
+## v3.0.0 (2019-01-21) <a href="https://github.com/plentymarkets/plugin-io/compare/2.17.1...3.0.0" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
 
 ### Hinzugefügt
 

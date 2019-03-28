@@ -13,7 +13,15 @@ class CategoryDataFilter extends DataFilter
         /** @var Category $category */
         foreach( $categoryList as $category )
         {
-            $categoryData = $category->toArray();
+            if($category instanceof Category)
+            {
+                $categoryData = $category->toArray();
+            }
+            else
+            {
+                $categoryData = $category;
+            }
+            
             $resultData = null;
 
             if ( is_null( $resultFields ) )

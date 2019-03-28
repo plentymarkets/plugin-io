@@ -53,6 +53,7 @@ class IORouteServiceProvider extends RouteServiceProvider
             $api->resource('io/customer/password_reset', 'CustomerPasswordResetResource');
             $api->resource('io/customer/contact/mail', 'ContactMailResource');
             $api->resource('io/customer/bank_data', 'ContactBankResource');
+            $api->get('io/customer/order/list', 'CustomerOrderResource@index');
             $api->resource('io/customer/order/return', 'CustomerOrderReturnResource');
             $api->resource('io/customer/newsletter', 'CustomerNewsletterResource');
             $api->resource('io/variations', 'VariationResource');
@@ -87,6 +88,10 @@ class IORouteServiceProvider extends RouteServiceProvider
         {
             //Checkout-confirm purchase route
             $router->get('checkout', 'IO\Controllers\CheckoutController@showCheckout');
+        }
+        else if ( RouteConfig::getCategoryId(RouteConfig::CHECKOUT) > 0 )
+        {
+            $router->get('checkout', 'IO\Controllers\CheckoutController@redirectCheckoutCategory');
         }
 
         if ( RouteConfig::isActive(RouteConfig::MY_ACCOUNT) )
@@ -204,6 +209,11 @@ class IORouteServiceProvider extends RouteServiceProvider
         {
             $router->get('order-property-file/{hash1}', 'IO\Controllers\OrderPropertyFileController@downloadTempFile');
             $router->get('order-property-file/{hash1}/{hash2}', 'IO\Controllers\OrderPropertyFileController@downloadFile');
+        }
+        
+        if( RouteConfig::isActive(RouteConfig::ORDER_DOCUMENT) )
+        {
+            $router->get('order-document/preview/{documentId}', 'IO\Controllers\DocumentController@preview');
         }
 
         

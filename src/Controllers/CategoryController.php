@@ -3,13 +3,10 @@
 namespace IO\Controllers;
 
 use IO\Api\ResponseCode;
-use IO\Constants\SessionStorageKeys;
-use IO\Extensions\Constants\ShopUrls;
-use IO\Guards\AuthGuard;
 use IO\Helper\RouteConfig;
-use IO\Services\CustomerService;
+use IO\Guards\AuthGuard;
 use IO\Services\SessionStorageService;
-use Plenty\Modules\Basket\Contracts\BasketItemRepositoryContract;
+use Plenty\Modules\ShopBuilder\Helper\ShopBuilderRequest;
 use Plenty\Plugin\Application;
 use Plenty\Plugin\Http\Request;
 use Plenty\Plugin\Http\Response;
@@ -49,20 +46,40 @@ class CategoryController extends LayoutController
         $category = $this->categoryRepo->findCategoryByUrl($lvl1, $lvl2, $lvl3, $lvl4, $lvl5, $lvl6, $webstoreId, $lang);
 
 
-        if ($category === null || ($category->clients->count() == 0 || $category->details->count() == 0 && !$this->app->isAdminPreview()))
+        if ($category === null || (($category->clients->count() == 0 || $category->details->count() == 0) && !$this->app->isAdminPreview()))
         {
             /** @var Response $response */
             $response = pluginApp(Response::class);
             $response->forceStatus(ResponseCode::NOT_FOUND);
-
+    
             return $response;
         }
 
         $this->categoryService->setCurrentCategory($category);
+        if ($this->categoryService->isHidden($category->id)) {
+            $guard = pluginApp(AuthGuard::class);
+            $guard->assertOrRedirect( true, '/login');
+        }
 
-        if ( RouteConfig::getCategoryId( RouteConfig::CHECKOUT ) === $category->id )
+        /** @var ShopBuilderRequest $shopBuilderRequest */
+        $shopBuilderRequest = pluginApp(ShopBuilderRequest::class);
+
+        if ( RouteConfig::getCategoryId( RouteConfig::CHECKOUT ) === $category->id || $shopBuilderRequest->getPreviewContentType() === 'checkout')
         {
-            return $this->renderCheckoutCategory( $category );
+            RouteConfig::overrideCategoryId(RouteConfig::CHECKOUT, $category->id);
+
+            /** @var CheckoutController $checkoutController */
+            $checkoutController = pluginApp(CheckoutController::class);
+            return $checkoutController->showCheckout( $category );
+        }
+
+        if ( RouteConfig::getCategoryId( RouteConfig::MY_ACCOUNT ) === $category->id || $shopBuilderRequest->getPreviewContentType() === 'myaccount')
+        {
+            RouteConfig::overrideCategoryId(RouteConfig::MY_ACCOUNT, $category->id);
+
+            /** @var MyAccountController $myAccountController */
+            $myAccountController = pluginApp(MyAccountController::class);
+            return $myAccountController->showMyAccount( $category );
         }
 
         return $this->renderTemplate(
@@ -76,39 +93,5 @@ class CategoryController extends LayoutController
             ]
         );
 	}
-
-
-	private function renderCheckoutCategory( $category )
-    {
-        /** @var BasketItemRepositoryContract $basketItemRepository */
-        $basketItemRepository = pluginApp(BasketItemRepositoryContract::class);
-
-        /** @var SessionStorageService $sessionStorage */
-        $sessionStorage = pluginApp(SessionStorageService::class);
-
-        /** @var CustomerService $customerService */
-        $customerService = pluginApp(CustomerService::class);
-
-        if( $sessionStorage->getSessionValue(SessionStorageKeys::GUEST_EMAIL) == null
-            && $customerService->getContactId() <= 0)
-        {
-            AuthGuard::redirect(
-                pluginApp(ShopUrls::class)->login,
-                ["backlink" => AuthGuard::getUrl()]
-            );
-        }
-        else if(!count($basketItemRepository->all()))
-        {
-            AuthGuard::redirect(pluginApp(ShopUrls::class)->home, []);
-        }
-
-        return $this->renderTemplate(
-            "tpl.category.checkout",
-            [
-                'category' => $category
-            ],
-            false
-        );
-    }
 
 }

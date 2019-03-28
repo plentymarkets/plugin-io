@@ -6,6 +6,7 @@ use IO\Api\Resources\CustomerAddressResource;
 use IO\Builder\Order\AddressType;
 use IO\Builder\Order\OrderType;
 use IO\Constants\SessionStorageKeys;
+use IO\Constants\ShippingCountry;
 use IO\Extensions\Mail\SendMail;
 use IO\Helper\MemoryCache;
 use IO\Helper\UserSession;
@@ -418,8 +419,8 @@ class CustomerService
      */
 	public function updateContact(array $contactData)
 	{
-		if($this->getContactId() > 0)
-		{
+        if($this->getContactId() > 0)
+        {
 			return $this->contactRepository->updateContact($contactData, $this->getContactId());
 		}
 
@@ -605,11 +606,11 @@ class CustomerService
 
             if($type == AddressType::BILLING)
             {
-                return $this->addressRepository->findAddressById($basketService->getBillingAddressId());
+                return $this->addressRepository->findAddressById(((int)$addressId > 0 ? $addressId : $basketService->getBillingAddressId()));
             }
             elseif($type == AddressType::DELIVERY)
             {
-                return $this->addressRepository->findAddressById($basketService->getDeliveryAddressId());
+                return $this->addressRepository->findAddressById(((int)$addressId > 0 ? $addressId : $basketService->getDeliveryAddressId()));
             }
         }
 	}
@@ -623,10 +624,9 @@ class CustomerService
      */
 	public function createAddress(array $addressData, int $type):Address
 	{
-	    $addressValidator = pluginApp(AddressValidator::class);
-        $addressValidator->validateOrFail($type, $addressData);
+	    AddressValidator::validateOrFail($addressData);
 
-        if($addressValidator->isEnAddress($addressData['countryId']))
+        if(ShippingCountry::getAddressFormat($addressData['countryId']) === ShippingCountry::ADDRESS_FORMAT_EN)
         {
             $addressData['useAddressLightValidator'] = true;
         }
@@ -801,8 +801,7 @@ class CustomerService
      */
     public function updateAddress(int $addressId, array $addressData, int $type):Address
     {
-        $addressValidator = pluginApp(AddressValidator::class);
-        $addressValidator->validateOrFail($type, $addressData);
+        AddressValidator::validateOrFail($addressData);
 
         if (isset($addressData['stateId']) && empty($addressData['stateId']))
         {
@@ -952,7 +951,8 @@ class CustomerService
                 $this->getContactId(),
                 $page,
                 $items,
-                $filters
+                $filters,
+                true
             );
         }
         catch(\Exception $e)
@@ -1010,5 +1010,25 @@ class CustomerService
 
             $this->sessionStorage->setSessionValue(SessionStorageKeys::GUEST_EMAIL, null);
         }
+    }
+
+    public function getEmail()
+    {
+        $contact = $this->getContact();
+        if ($contact instanceof Contact)
+        {
+            $email = $contact->email;
+        }
+        else
+        {
+            $email = $this->sessionStorage->getSessionValue(SessionStorageKeys::GUEST_EMAIL);
+        }
+        
+        if(is_null($email))
+        {
+            $email = '';
+        }
+
+        return $email;
     }
 }

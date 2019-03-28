@@ -35,12 +35,14 @@ class BasketItems implements SearchPreset
             ->withLanguage()
             ->withUrls()
             ->withImages()
+            ->withPropertyGroups()
             ->withDefaultImage()
             ->withBundleComponents()
             ->isVisibleForClient()
             ->isActive()
             ->hasVariationIds( $variationIds )
-            ->setPage( 1, count( $variationIds ) );
+            ->setPage( 1, count( $variationIds ) )
+            ->withReducedResults();
 
         if ( !is_null($quantities) )
         {

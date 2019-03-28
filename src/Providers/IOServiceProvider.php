@@ -2,6 +2,7 @@
 
 namespace IO\Providers;
 
+use IO\Constants\SessionStorageKeys;
 use IO\Extensions\ContentCache\IOAfterBuildPlugins;
 use IO\Extensions\Facets\CategoryFacet;
 use IO\Extensions\Mail\IOSendMail;
@@ -47,6 +48,10 @@ use IO\Services\UrlService;
 use IO\Services\WebstoreConfigurationService;
 use Plenty\Modules\Authentication\Events\AfterAccountAuthentication;
 use Plenty\Modules\Authentication\Events\AfterAccountContactLogout;
+use IO\Events\Basket\BeforeBasketItemToOrderItem;
+use Plenty\Modules\Frontend\Events\FrontendCurrencyChanged;
+use Plenty\Modules\Frontend\Session\Storage\Contracts\FrontendSessionStorageFactoryContract;
+use Plenty\Modules\Item\Stock\Hooks\CheckItemStock;
 use Plenty\Modules\Order\Events\OrderCreated;
 use Plenty\Modules\Plugin\Events\AfterBuildPlugins;
 use Plenty\Modules\Plugin\Events\LoadSitemapPattern;
@@ -133,6 +138,8 @@ class IOServiceProvider extends ServiceProvider
             $customerService = pluginApp(CustomerService::class);
             $customerService->resetGuestAddresses();
         });
+    
+        $dispatcher->listen(BeforeBasketItemToOrderItem::class, CheckItemStock::class);
         
         $dispatcher->listen(AfterAccountContactLogout::class, function($event)
         {
@@ -155,9 +162,14 @@ class IOServiceProvider extends ServiceProvider
         $dispatcher->listen(LoadSitemapPattern::class, IOSitemapPattern::class);
         $dispatcher->listen(PluginSendMail::class, IOSendMail::class);
         $dispatcher->listen(AfterBuildPlugins::class, IOAfterBuildPlugins::class);
-    
+
         $dispatcher->listen('IO.initFacetExtensions', function (FacetExtensionContainer $facetExtensionContainer) {
             $facetExtensionContainer->addFacetExtension(pluginApp(CategoryFacet::class));
+        });
+
+        $dispatcher->listen(FrontendCurrencyChanged::class, function ($event) {
+            $sessionStorage = pluginApp( FrontendSessionStorageFactoryContract::class );
+            $sessionStorage->getPlugin()->setValue(SessionStorageKeys::CURRENCY, $event->getCurrency());
         });
     }
 
