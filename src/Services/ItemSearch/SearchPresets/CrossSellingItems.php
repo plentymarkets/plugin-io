@@ -50,6 +50,7 @@ class CrossSellingItems implements SearchPreset
         $searchFactory
             ->withLanguage()
             ->withUrls()
+            ->withImages()
             ->withPrices()
             ->withDefaultImage()
             ->isVisibleForClient()
