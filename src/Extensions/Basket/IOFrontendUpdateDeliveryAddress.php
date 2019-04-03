@@ -2,6 +2,7 @@
 
 namespace IO\Extensions\Basket;
 
+use Illuminate\Support\Collection;
 use IO\Services\CheckoutService;
 use IO\Services\CustomerService;
 use Plenty\Modules\Frontend\Events\FrontendUpdateDeliveryAddress;
@@ -26,7 +27,8 @@ class IOFrontendUpdateDeliveryAddress
         $selectedDeliveryAddress = $customerService->getAddress($deliveryAddressId, 2);
 
         $shippingProfileList = $checkoutService->getShippingProfileList();
-        $selectedShippingProfile = collect($shippingProfileList)->firstWhere("parcelServicePresetId", $checkoutService->getShippingProfileId());
+        $shippingProfileList = pluginApp(Collection::class, [ $shippingProfileList ]);
+        $selectedShippingProfile = $shippingProfileList->firstWhere("parcelServicePresetId", $checkoutService->getShippingProfileId());
 
         $isPostOfficeAndParcelBoxActive = $selectedShippingProfile["isPostOffice"] && $selectedShippingProfile["isParcelBox"];
         $isAddressPostOffice = $selectedDeliveryAddress->address1 === "POSTFILIALE";
@@ -43,11 +45,11 @@ class IOFrontendUpdateDeliveryAddress
 
                 if ($isUnsupportedPostOffice)
                 {
-                    $profileToSelect = collect($shippingProfileList)->firstWhere("isPostOffice", true);
+                    $profileToSelect = $shippingProfileList->firstWhere("isPostOffice", true);
                 }
                 else
                 {
-                    $profileToSelect = collect($shippingProfileList)->firstWhere("isParcelBox", true);
+                    $profileToSelect = $shippingProfileList->firstWhere("isParcelBox", true);
                 }
 
                 if (!is_null($profileToSelect))
