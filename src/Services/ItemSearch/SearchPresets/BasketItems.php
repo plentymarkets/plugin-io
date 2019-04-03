@@ -41,7 +41,8 @@ class BasketItems implements SearchPreset
             ->isVisibleForClient()
             ->isActive()
             ->hasVariationIds( $variationIds )
-            ->setPage( 1, count( $variationIds ) );
+            ->setPage( 1, count( $variationIds ) )
+            ->withReducedResults();
 
         if ( !is_null($quantities) )
         {
