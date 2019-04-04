@@ -1,6 +1,7 @@
 <?php
 namespace IO\Helper;
 use IO\Helper\ContextInterface;
+use Plenty\Plugin\Log\Loggable;
 
 /**
  * Container to pass current template between separate layout plugins and this plugin.
@@ -9,6 +10,7 @@ use IO\Helper\ContextInterface;
  */
 class TemplateContainer
 {
+    use Loggable;
 
 	/**
 	 * @var string
@@ -36,6 +38,13 @@ class TemplateContainer
 	 */
 	public function setTemplate(string $template):TemplateContainer
 	{
+	    $this->getLogger(__CLASS__)->debug(
+	        "IO::Debug.TemplateContainer_setTemplate",
+            [
+                "templateKey" => $this->templateKey,
+                "template" => $template
+            ]
+        );
 		$this->template = $template;
 		return $this;
 	}
@@ -76,6 +85,13 @@ class TemplateContainer
 	 */
 	public function setTemplateData( $customData )
 	{
+        $this->getLogger(__CLASS__)->debug(
+            "IO::Debug.TemplateContainer_setTemplateData",
+            [
+                "templateKey" => $this->templateKey,
+                "templateData" => $customData
+            ]
+        );
 		if($customData !== null)
 		{
 			$this->templateData = $customData;
@@ -103,6 +119,13 @@ class TemplateContainer
 
 	public function setContext($contextClass)
     {
+        $this->getLogger(__CLASS__)->debug(
+            "IO::Debug.TemplateContainer_setContext",
+            [
+                "templateKey"  => $this->templateKey,
+                "contextClass" => $contextClass
+            ]
+        );
         $this->contextClass = $contextClass;
     }
 
@@ -119,6 +142,16 @@ class TemplateContainer
 	 */
 	public function withData($data, string $identifier):TemplateContainer
 	{
+        $this->getLogger(__CLASS__)->debug(
+            "IO::Debug.TemplateContainer_mergeTemplateData",
+            [
+                "templateKey" => $this->templateKey,
+                "templateData" => [
+                    "key" => $identifier,
+                    "value" => $data
+                ]
+            ]
+        );
 		$this->templateData[$identifier] = $data;
 		return $this;
 	}
