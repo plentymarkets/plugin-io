@@ -6,6 +6,7 @@ use IO\Api\ResponseCode;
 use IO\Helper\RouteConfig;
 use IO\Guards\AuthGuard;
 use IO\Services\SessionStorageService;
+use IO\Services\UrlService;
 use Plenty\Modules\ShopBuilder\Helper\ShopBuilderRequest;
 use Plenty\Plugin\Application;
 use Plenty\Plugin\Http\Request;
@@ -35,23 +36,60 @@ class CategoryController extends LayoutController
         $lvl5 = null,
         $lvl6 = null)
     {
-        /** @var Request $request */
-        $request = pluginApp(Request::class);
-
         /** @var SessionStorageService $sessionService */
         $sessionService  = pluginApp(SessionStorageService::class);
         $lang = $sessionService->getLang();
         $webstoreId = pluginApp(Application::class)->getWebstoreId();
 
-        $category = $this->categoryRepo->findCategoryByUrl($lvl1, $lvl2, $lvl3, $lvl4, $lvl5, $lvl6, $webstoreId, $lang);
+        return $this->renderCategory(
+            $this->categoryRepo->findCategoryByUrl($lvl1, $lvl2, $lvl3, $lvl4, $lvl5, $lvl6, $webstoreId, $lang)
+        );
+	}
 
+	public function showCategoryById($categoryId)
+    {
+        /** @var SessionStorageService $sessionService */
+        $sessionService  = pluginApp(SessionStorageService::class);
+        $lang = $sessionService->getLang();
+
+        return $this->renderCategory(
+            $this->categoryRepo->get( $categoryId, $lang )
+        );
+    }
+
+    public function redirectToCategory( $categoryUrlLevels, $redirectUrl )
+    {
+        // Check if category can be displayed
+        $categoryResponse = $this->showCategory(
+            $categoryUrlLevels[0],
+            $categoryUrlLevels[1],
+            $categoryUrlLevels[2],
+            $categoryUrlLevels[3],
+            $categoryUrlLevels[4],
+            $categoryUrlLevels[5]
+        );
+        if (!($categoryResponse instanceof Response && $categoryResponse->status() == ResponseCode::NOT_FOUND))
+        {
+            // category cannot be displayed. Return 404
+            return $categoryResponse;
+        }
+
+        /** @var UrlService $urlService */
+        $urlService = pluginApp(UrlService::class);
+        return $urlService->redirectTo($redirectUrl);
+    }
+
+	private function renderCategory($category)
+    {
+        /** @var Request $request */
+        $request = pluginApp(Request::class);
 
         if ($category === null || (($category->clients->count() == 0 || $category->details->count() == 0) && !$this->app->isAdminPreview()))
         {
             /** @var Response $response */
             $response = pluginApp(Response::class);
             $response->forceStatus(ResponseCode::NOT_FOUND);
-    
+
             return $response;
         }
 
@@ -92,6 +130,5 @@ class CategoryController extends LayoutController
                 'facets'        => $request->get('facets', '')
             ]
         );
-	}
-
+    }
 }

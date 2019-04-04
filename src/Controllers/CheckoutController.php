@@ -68,21 +68,4 @@ class CheckoutController extends LayoutController
             false
         );
     }
-
-    public function redirectCheckoutCategory()
-    {
-        /** @var CategoryController $categoryController */
-        $categoryController = pluginApp(CategoryController::class);
-        $categoryResponse = $categoryController->showCategory("checkout");
-        if (!($categoryResponse instanceof Response && $categoryResponse->status() == ResponseCode::NOT_FOUND))
-        {
-            return $categoryResponse;
-        }
-
-        /** @var UrlService $urlService */
-        $urlService = pluginApp(UrlService::class);
-        return $urlService->redirectTo(
-            pluginApp(ShopUrls::class)->checkout
-        );
-    }
 }
