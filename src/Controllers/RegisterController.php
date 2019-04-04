@@ -7,6 +7,7 @@ use Plenty\Plugin\Http\Response;
 use IO\Guards\AuthGuard;
 use IO\Helper\TemplateContainer;
 use IO\Services\CustomerService;
+use Plenty\Plugin\Log\Loggable;
 
 /**
  * Class RegisterController
@@ -14,6 +15,8 @@ use IO\Services\CustomerService;
  */
 class RegisterController extends LayoutController
 {
+    use Loggable;
+
     /**
      * Prepare and render the data for the registration
      * @param CustomerService $customerService
@@ -24,6 +27,7 @@ class RegisterController extends LayoutController
 	{
 	    if($customerService->getContactId() > 0)
         {
+            $this->getLogger(__CLASS__)->info("IO::Debug.RegisterController_alreadyLoggedIn");
             AuthGuard::redirect($urlService->getHomepageURL(), []);
         }
 	
