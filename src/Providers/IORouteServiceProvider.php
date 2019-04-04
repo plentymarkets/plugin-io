@@ -2,11 +2,9 @@
 
 namespace IO\Providers;
 
-use Illuminate\Routing\Route;
 use IO\Controllers\CategoryController;
 use IO\Extensions\Constants\ShopUrls;
 use IO\Helper\RouteConfig;
-use IO\Services\CategoryService;
 use Plenty\Plugin\RouteServiceProvider;
 use Plenty\Plugin\Routing\Router;
 use Plenty\Plugin\Routing\ApiRouter;
@@ -273,7 +271,7 @@ class IORouteServiceProvider extends RouteServiceProvider
 
                 if ( RouteConfig::getCategoryId($catKey) > 0 )
                 {
-                    $router->get($catUrl, function() use ($catKey)
+                    $router->get($catUrl, function() use ($catKey, $catUrl)
                     {
                         return pluginApp(CategoryController::class)->showCategoryById(
                             RouteConfig::getCategoryId($catKey)
@@ -285,10 +283,7 @@ class IORouteServiceProvider extends RouteServiceProvider
                     {
                         $router->get($legacyUrl, function() use ($catKey, $catUrl)
                         {
-                            return pluginApp(CategoryController::class)->redirectToCategory(
-                                [$catKey],
-                                $catUrl
-                            );
+                            return pluginApp(CategoryController::class)->redirectToCategory( $catUrl );
                         });
                     }
                 }

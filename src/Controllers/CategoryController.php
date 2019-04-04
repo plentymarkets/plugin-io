@@ -57,16 +57,23 @@ class CategoryController extends LayoutController
         );
     }
 
-    public function redirectToCategory( $categoryUrlLevels, $redirectUrl )
+    public function redirectToCategory( $categoryUrl )
     {
         // Check if category can be displayed
+        $categoryLevels = array_filter(
+            explode("/", $categoryUrl),
+            function($lvl)
+            {
+                return strlen($lvl);
+            }
+        );
         $categoryResponse = $this->showCategory(
-            $categoryUrlLevels[0],
-            $categoryUrlLevels[1],
-            $categoryUrlLevels[2],
-            $categoryUrlLevels[3],
-            $categoryUrlLevels[4],
-            $categoryUrlLevels[5]
+            $categoryLevels[0],
+            $categoryLevels[1],
+            $categoryLevels[2],
+            $categoryLevels[3],
+            $categoryLevels[4],
+            $categoryLevels[5]
         );
         if (!($categoryResponse instanceof Response && $categoryResponse->status() == ResponseCode::NOT_FOUND))
         {
@@ -76,7 +83,7 @@ class CategoryController extends LayoutController
 
         /** @var UrlService $urlService */
         $urlService = pluginApp(UrlService::class);
-        return $urlService->redirectTo($redirectUrl);
+        return $urlService->redirectTo($categoryUrl);
     }
 
 	private function renderCategory($category)
