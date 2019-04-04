@@ -11,6 +11,7 @@ use Plenty\Modules\ShopBuilder\Helper\ShopBuilderRequest;
 use Plenty\Plugin\Application;
 use Plenty\Plugin\Http\Request;
 use Plenty\Plugin\Http\Response;
+use Plenty\Plugin\Log\Loggable;
 
 /**
  * Class CategoryController
@@ -18,6 +19,8 @@ use Plenty\Plugin\Http\Response;
  */
 class CategoryController extends LayoutController
 {
+    use Loggable;
+
     /**
      * Prepare and render the data for categories
      * @param string $lvl1 Level 1 of category url. Will be null at root page
@@ -93,6 +96,16 @@ class CategoryController extends LayoutController
 
         if ($category === null || (($category->clients->count() == 0 || $category->details->count() == 0) && !$this->app->isAdminPreview()))
         {
+            $this->getLogger(__CLASS__)->warning(
+                "IO::Debug.CategoryController_cannotDisplayCategory",
+                [
+                    "category" => $category,
+                    "clientCount" => ($category !== null ? $category->clients->count() : 0),
+                    "detailCount" => ($category !== null ? $category->details->count() : 0),
+                    "isAdminPreview" => $this->app->isAdminPreview()
+                ]
+            );
+
             /** @var Response $response */
             $response = pluginApp(Response::class);
             $response->forceStatus(ResponseCode::NOT_FOUND);
@@ -111,6 +124,13 @@ class CategoryController extends LayoutController
 
         if ( RouteConfig::getCategoryId( RouteConfig::CHECKOUT ) === $category->id || $shopBuilderRequest->getPreviewContentType() === 'checkout')
         {
+            $this->getLogger(__CLASS__)->info(
+                "IO::Debug.CategoryController_showCheckoutCategory",
+                [
+                    "category" => $category,
+                    "previewContentType" => $shopBuilderRequest->getPreviewContentType()
+                ]
+            );
             RouteConfig::overrideCategoryId(RouteConfig::CHECKOUT, $category->id);
 
             /** @var CheckoutController $checkoutController */
@@ -120,6 +140,13 @@ class CategoryController extends LayoutController
 
         if ( RouteConfig::getCategoryId( RouteConfig::MY_ACCOUNT ) === $category->id || $shopBuilderRequest->getPreviewContentType() === 'myaccount')
         {
+            $this->getLogger(__CLASS__)->info(
+                "IO::Debug.CategoryController_showMyAccountCategory",
+                [
+                    "category" => $category,
+                    "previewContentType" => $shopBuilderRequest->getPreviewContentType()
+                ]
+            );
             RouteConfig::overrideCategoryId(RouteConfig::MY_ACCOUNT, $category->id);
 
             /** @var MyAccountController $myAccountController */

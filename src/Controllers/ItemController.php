@@ -7,6 +7,7 @@ use IO\Services\ItemSearch\SearchPresets\CrossSellingItems;
 use IO\Services\ItemSearch\SearchPresets\SingleItem;
 use IO\Services\ItemSearch\Services\ItemSearchService;
 use Plenty\Plugin\Http\Response;
+use Plenty\Plugin\Log\Loggable;
 
 /**
  * Class ItemController
@@ -14,6 +15,7 @@ use Plenty\Plugin\Http\Response;
  */
 class ItemController extends LayoutController
 {
+    use Loggable;
     /**
      * Prepare and render the item data.
      * @param string $slug
@@ -41,6 +43,14 @@ class ItemController extends LayoutController
 
         if(empty($itemResult['documents']))
         {
+            $this->getLogger(__CLASS__)->info(
+                "IO::Debug.ItemController_itemNotFound",
+                [
+                    "slug"          => $slug,
+                    "itemId"        => $itemId,
+                    "variationId"   => $variationId
+                ]
+            );
             /** @var Response $response */
             $response = pluginApp(Response::class);
             $response->forceStatus(ResponseCode::NOT_FOUND);

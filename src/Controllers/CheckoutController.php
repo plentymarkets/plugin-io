@@ -12,6 +12,7 @@ use IO\Guards\AuthGuard;
 use Plenty\Modules\Category\Models\Category;
 use Plenty\Modules\ShopBuilder\Helper\ShopBuilderRequest;
 use Plenty\Plugin\Http\Response;
+use Plenty\Plugin\Log\Loggable;
 
 /**
  * Class CheckoutController
@@ -19,6 +20,8 @@ use Plenty\Plugin\Http\Response;
  */
 class CheckoutController extends LayoutController
 {
+    use Loggable;
+
     /**
      * Prepare and render the data for the checkout
      * @param Category $category
@@ -43,6 +46,7 @@ class CheckoutController extends LayoutController
             if( $sessionStorage->getSessionValue(SessionStorageKeys::GUEST_EMAIL) == null
                 && $customerService->getContactId() <= 0 )
             {
+                $this->getLogger(__CLASS__)->info("IO::Debug.CheckoutController_notLoggedIn");
                 AuthGuard::redirect(
                     pluginApp(ShopUrls::class)->login,
                     ["backlink" => AuthGuard::getUrl()]
@@ -50,6 +54,7 @@ class CheckoutController extends LayoutController
             }
             else if(!count($basketItemRepository->all()))
             {
+                $this->getLogger(__CLASS__)->info("IO::Debug.CheckoutController_emptyBasket");
                 AuthGuard::redirect(pluginApp(ShopUrls::class)->home, []);
             }
         }
