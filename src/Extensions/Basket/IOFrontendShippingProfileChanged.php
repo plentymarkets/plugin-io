@@ -34,19 +34,15 @@ class IOFrontendShippingProfileChanged
 
         if ($selectedShippingProfile instanceof ParcelServicePreset)
         {
-            $isPostOfficeAndParcelBoxActive = $selectedShippingProfile->isParcelBox && $selectedShippingProfile->isPostOffice;
             $isAddressPostOffice = $selectedDeliveryAddress->address1 === "POSTFILIALE";
             $isAddressParcelBox = $selectedDeliveryAddress->address1 === "PACKSTATION";
 
-            if (!$isPostOfficeAndParcelBoxActive && ($isAddressPostOffice || $isAddressParcelBox))
-            {
-                $isUnsupportedPostOffice = $isAddressPostOffice && !$selectedShippingProfile->isPostOffice;
-                $isUnsupportedParcelBox = $isAddressParcelBox && !$selectedShippingProfile->isParcelBox;
+            $isUnsupportedPostOffice = $isAddressPostOffice && !$selectedShippingProfile->isPostOffice;
+            $isUnsupportedParcelBox = $isAddressParcelBox && !$selectedShippingProfile->isParcelBox;
 
-                if ($isUnsupportedPostOffice || $isUnsupportedParcelBox)
-                {
-                    $basketService->setDeliveryAddressId(-99);
-                }
+            if ($isUnsupportedPostOffice || $isUnsupportedParcelBox)
+            {
+                $basketService->setDeliveryAddressId(-99);
             }
         }
     }

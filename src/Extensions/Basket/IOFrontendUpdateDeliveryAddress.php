@@ -30,36 +30,32 @@ class IOFrontendUpdateDeliveryAddress
         $shippingProfileList = pluginApp(Collection::class, [ $shippingProfileList ]);
         $selectedShippingProfile = $shippingProfileList->firstWhere("parcelServicePresetId", $checkoutService->getShippingProfileId());
 
-        $isPostOfficeAndParcelBoxActive = $selectedShippingProfile["isPostOffice"] && $selectedShippingProfile["isParcelBox"];
         $isAddressPostOffice = $selectedDeliveryAddress->address1 === "POSTFILIALE";
         $isAddressParcelBox = $selectedDeliveryAddress->address1 === "PACKSTATION";
 
-        if (!$isPostOfficeAndParcelBoxActive && ($isAddressPostOffice || $isAddressParcelBox))
+        $isUnsupportedPostOffice = $isAddressPostOffice && !$selectedShippingProfile->isPostOffice;
+        $isUnsupportedParcelBox = $isAddressParcelBox && !$selectedShippingProfile->isParcelBox;
+
+        if ($isUnsupportedPostOffice || $isUnsupportedParcelBox)
         {
-            $isUnsupportedPostOffice = $isAddressPostOffice && !$selectedShippingProfile->isPostOffice;
-            $isUnsupportedParcelBox = $isAddressParcelBox && !$selectedShippingProfile->isParcelBox;
+            $profileToSelect = null;
 
-            if ($isUnsupportedPostOffice || $isUnsupportedParcelBox)
+            if ($isUnsupportedPostOffice)
             {
-                $profileToSelect = null;
+                $profileToSelect = $shippingProfileList->firstWhere("isPostOffice", true);
+            }
+            else
+            {
+                $profileToSelect = $shippingProfileList->firstWhere("isParcelBox", true);
+            }
 
-                if ($isUnsupportedPostOffice)
-                {
-                    $profileToSelect = $shippingProfileList->firstWhere("isPostOffice", true);
-                }
-                else
-                {
-                    $profileToSelect = $shippingProfileList->firstWhere("isParcelBox", true);
-                }
-
-                if (!is_null($profileToSelect))
-                {
-                    $checkoutService->setShippingProfileId($profileToSelect["parcelServicePresetId"]);
-                }
-                else
-                {
-                    $checkoutService->setDeliveryAddressId(-99);
-                }
+            if (!is_null($profileToSelect))
+            {
+                $checkoutService->setShippingProfileId($profileToSelect["parcelServicePresetId"]);
+            }
+            else
+            {
+                $checkoutService->setDeliveryAddressId(-99);
             }
         }
     }
