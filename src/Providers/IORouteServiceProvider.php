@@ -2,6 +2,8 @@
 
 namespace IO\Providers;
 
+use IO\Controllers\CategoryController;
+use IO\Extensions\Constants\ShopUrls;
 use IO\Helper\RouteConfig;
 use Plenty\Plugin\RouteServiceProvider;
 use Plenty\Plugin\Routing\Router;
@@ -88,10 +90,6 @@ class IORouteServiceProvider extends RouteServiceProvider
         {
             //Checkout-confirm purchase route
             $router->get('checkout', 'IO\Controllers\CheckoutController@showCheckout');
-        }
-        else if ( RouteConfig::getCategoryId(RouteConfig::CHECKOUT) > 0 )
-        {
-            $router->get('checkout', 'IO\Controllers\CheckoutController@redirectCheckoutCategory');
         }
 
         if ( RouteConfig::isActive(RouteConfig::MY_ACCOUNT) )
@@ -257,6 +255,39 @@ class IORouteServiceProvider extends RouteServiceProvider
         if ( RouteConfig::isActive(RouteConfig::CATEGORY) )
         {
             $router->get('{level1?}/{level2?}/{level3?}/{level4?}/{level5?}/{level6?}', 'IO\Controllers\CategoryController@showCategory');
+        }
+        else
+        {
+            /** @var ShopUrls $shopUrls */
+            $shopUrls = pluginApp(ShopUrls::class);
+            $staticCategories = [
+                [RouteConfig::CHECKOUT, $shopUrls->checkout, "checkout"],
+                [RouteConfig::MY_ACCOUNT, $shopUrls->myAccount, "my-account"]
+            ];
+
+            foreach($staticCategories as $staticCategory)
+            {
+                list($catKey, $catUrl, $legacyUrl) = $staticCategory;
+
+                if ( RouteConfig::getCategoryId($catKey) > 0 )
+                {
+                    $router->get($catUrl, function() use ($catKey, $catUrl)
+                    {
+                        return pluginApp(CategoryController::class)->showCategoryById(
+                            RouteConfig::getCategoryId($catKey)
+                        );
+                    });
+
+
+                    if ( !is_null($legacyUrl) && $catUrl !== "/" . $legacyUrl )
+                    {
+                        $router->get($legacyUrl, function() use ($catKey, $catUrl)
+                        {
+                            return pluginApp(CategoryController::class)->redirectToCategory( $catUrl );
+                        });
+                    }
+                }
+            }
         }
 	}
 }
