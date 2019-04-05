@@ -8,6 +8,7 @@ use IO\Api\ApiResource;
 use IO\Api\ApiResponse;
 use IO\Api\ResponseCode;
 use IO\Services\AuthenticationService;
+use Plenty\Plugin\Log\Loggable;
 
 /**
  * Class CustomerAuthenticationResource
@@ -15,6 +16,8 @@ use IO\Services\AuthenticationService;
  */
 class CustomerAuthenticationResource extends ApiResource
 {
+    use Loggable;
+
 	/**
 	 * @var AuthenticationService
 	 */
@@ -47,6 +50,14 @@ class CustomerAuthenticationResource extends ApiResource
         }
         catch(\Exception $exception)
         {
+            $this->getLogger(__CLASS__)->warning(
+                "IO::Debug.CustomerAuthenticationResource_loginFailed",
+                [
+                    "code" => $exception->getCode(),
+                    "message" => $exception->getMessage(),
+                    "trace" => $exception->getTraceAsString()
+                ]
+            );
     		$this->response->error( ResponseCode::UNAUTHORIZED, $exception->getMessage() );
             return $this->response->create(null, ResponseCode::UNAUTHORIZED);
         }
