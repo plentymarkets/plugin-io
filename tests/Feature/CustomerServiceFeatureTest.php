@@ -18,7 +18,7 @@ class CustomerServiceFeatureTest extends TestCase
     /** @var CustomerService $customerService */
     protected $customerService;
 
-    protected $genders = ['male', 'female'];
+    protected $genders = ['male', 'female', 'diverse'];
 
     protected function setUp()
     {
@@ -414,7 +414,7 @@ class CustomerServiceFeatureTest extends TestCase
     {
         foreach ($address1 as $key => $value) {
             // Do not compare 'contactPerson' because it is stored as a address option
-            if ($key !== 'contactPerson') {
+            if ($key !== 'contactPerson' || ($key !== 'gender' && $address2[$key] == 'company')) {
                 $this->assertEquals($address1[$key], $address2[$key]);
             }
         }
