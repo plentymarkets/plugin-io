@@ -13,6 +13,7 @@ use Plenty\Modules\Order\Date\Models\OrderDate;
 use Plenty\Modules\Order\Date\Models\OrderDateType;
 use Plenty\Modules\Order\Models\Order;
 use Plenty\Plugin\Http\Response;
+use Plenty\Plugin\Log\Loggable;
 
 /**
  * Class ConfirmationController
@@ -20,6 +21,8 @@ use Plenty\Plugin\Http\Response;
  */
 class ConfirmationController extends LayoutController
 {
+    use Loggable;
+
     /**
      * Prepare and render the data for the order confirmation
      * @return string
@@ -43,8 +46,20 @@ class ConfirmationController extends LayoutController
                 $order = $orderService->findOrderByAccessKey($orderId, $orderAccesskey);
             }
             catch(\Exception $e)
-            {}
-            
+            {
+                $this->getLogger(__CLASS__)->warning(
+                    "IO::Debug.ConfirmationController_cannotFindOrderByAccessKey",
+                    [
+                        "orderId" => $orderId,
+                        "orderAccessKey" => $orderAccesskey,
+                        "error" => [
+                            "code" => $e->getCode(),
+                            "message" => $e->getMessage()
+                        ]
+                    ]
+                );
+            }
+
             if(!is_null($order) && $order instanceof LocalizedOrder)
             {
                 $sessionStorageService->setSessionValue(SessionStorageKeys::LAST_ACCESSED_ORDER, ['orderId' => $orderId, 'accessKey' => $orderAccesskey]);
@@ -67,7 +82,19 @@ class ConfirmationController extends LayoutController
                     $order = $customerService->getLatestOrder();
                 }
             }
-            catch(\Exception $e) {}
+            catch(\Exception $e)
+            {
+                $this->getLogger(__CLASS__)->warning(
+                    "IO::Debug.ConfirmationController_cannotFindOrder",
+                    [
+                        "orderId" => $orderId,
+                        "error" => [
+                            "code" => $e->getCode(),
+                            "message" => $e->getMessage()
+                        ]
+                    ]
+                );
+            }
         }
         
         if(is_null($order))
@@ -79,7 +106,20 @@ class ConfirmationController extends LayoutController
                 {
                     $order = $orderService->findOrderByAccessKey($lastAccessedOrder['orderId'], $lastAccessedOrder['accessKey']);
                 }
-                catch(\Exception $e) {}
+                catch(\Exception $e)
+                {
+                    $this->getLogger(__CLASS__)->warning(
+                        "IO::Debug.ConfirmationController_cannotFindLastOrderByAccessKey",
+                        [
+                            "orderId"        => $lastAccessedOrder['orderId'],
+                            "orderAccessKey" => $lastAccessedOrder['accessKey'],
+                            "error" => [
+                                "code"      => $e->getCode(),
+                                "message"   => $e->getMessage()
+                            ]
+                        ]
+                    );
+                }
             }
         }
         
@@ -111,6 +151,7 @@ class ConfirmationController extends LayoutController
         }
         else
         {
+            $this->getLogger(__CLASS__)->warning("IO::Debug.ConfirmationController_orderNotFound");
             /** @var Response $response */
             $response = pluginApp(Response::class);
             $response->forceStatus(ResponseCode::NOT_FOUND);
@@ -136,6 +177,14 @@ class ConfirmationController extends LayoutController
     
             if($now > $orderCreationDate + ((int)$expiration * (24 * 60 * 60)))
             {
+                $this->getLogger(__CLASS__)->warning(
+                    "IO::Debug.ConfirmationController_confirmationLinkExpired",
+                    [
+                        "order"           => $order,
+                        "creationDate"    => $orderCreationDate,
+                        "expiration"      => $expiration
+                    ]
+                );
                 return false;
             }
         }

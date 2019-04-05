@@ -34,19 +34,25 @@ class QueryString extends AbstractFunction
         $queryParameters = $request->all();
         unset($queryParameters['plentyMarkets']);
         $queryParameters = array_replace($queryParameters, $params);
-
-        $queryParamString = '';
-        $queryParamSeparator = '?';
-
-        foreach ($queryParameters as $key => $value)
-        {
-            if (!is_null($value))
-            {
-                $queryParamString .= $queryParamSeparator . urlencode($key) . '=' . urlencode($value);
-                $queryParamSeparator = '&';
-            }
-        }
-
-        return $queryParamString;
+        $queryParameters = $this->createUniqueMultidimensionalArray($queryParameters);
+        
+        return '?' . http_build_query($queryParameters);
     }
+    
+    /**
+     * @param array $array
+     * @return array
+     */
+    private function createUniqueMultidimensionalArray(array $array): array
+	{
+	    $array = array_unique($array, SORT_REGULAR);
+	
+	    foreach ($array as $key => $elem) {
+	        if (is_array($elem)) {
+	            $array[$key] = $this->createUniqueMultidimensionalArray($elem);
+	        }
+	    }
+	
+	    return $array;
+	}
 }
