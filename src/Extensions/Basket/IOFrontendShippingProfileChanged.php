@@ -2,6 +2,7 @@
 
 namespace IO\Extensions\Basket;
 
+use IO\Builder\Order\AddressType;
 use IO\Services\BasketService;
 use IO\Services\CustomerService;
 use Plenty\Modules\Frontend\Events\FrontendShippingProfileChanged;
@@ -25,7 +26,7 @@ class IOFrontendShippingProfileChanged
 
         /** @var CustomerService $customerService */
         $customerService = pluginApp(CustomerService::class);
-        $selectedDeliveryAddress = $customerService->getAddress($deliveryAddressId, 2);
+        $selectedDeliveryAddress = $customerService->getAddress($deliveryAddressId, AddressType::DELIVERY);
 
         /** @var ParcelServicePresetRepositoryContract $parcelServiceRepository */
         $parcelServiceRepository = pluginApp(ParcelServicePresetRepositoryContract::class);
