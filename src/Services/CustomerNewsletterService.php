@@ -35,7 +35,7 @@ class CustomerNewsletterService
                 return $newsletterRepo->listRecipients(['*'], 1, 1, ['email' => $email], [])->getResult()[0];
             });
 
-            if(!$recipientData instanceof Recipient && !($recipientData instanceof Recipient && $recipientData->email == $email))
+            if($recipientData instanceof Recipient && !($recipientData instanceof Recipient && $recipientData->email == $email))
             {
                 $this->newsletterRepo->addToNewsletterList($email, $firstName, $lastName, $emailFolders);
             }
