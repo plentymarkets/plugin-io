@@ -3,6 +3,8 @@
 namespace IO\Providers;
 
 use IO\Constants\SessionStorageKeys;
+use IO\Extensions\Basket\IOFrontendShippingProfileChanged;
+use IO\Extensions\Basket\IOFrontendUpdateDeliveryAddress;
 use IO\Extensions\ContentCache\IOAfterBuildPlugins;
 use IO\Extensions\Facets\CategoryFacet;
 use IO\Extensions\Mail\IOSendMail;
@@ -50,6 +52,8 @@ use Plenty\Modules\Authentication\Events\AfterAccountAuthentication;
 use Plenty\Modules\Authentication\Events\AfterAccountContactLogout;
 use IO\Events\Basket\BeforeBasketItemToOrderItem;
 use Plenty\Modules\Frontend\Events\FrontendCurrencyChanged;
+use Plenty\Modules\Frontend\Events\FrontendShippingProfileChanged;
+use Plenty\Modules\Frontend\Events\FrontendUpdateDeliveryAddress;
 use Plenty\Modules\Frontend\Session\Storage\Contracts\FrontendSessionStorageFactoryContract;
 use Plenty\Modules\Item\Stock\Hooks\CheckItemStock;
 use Plenty\Modules\Order\Events\OrderCreated;
@@ -171,6 +175,9 @@ class IOServiceProvider extends ServiceProvider
             $sessionStorage = pluginApp( FrontendSessionStorageFactoryContract::class );
             $sessionStorage->getPlugin()->setValue(SessionStorageKeys::CURRENCY, $event->getCurrency());
         });
+
+        $dispatcher->listen(FrontendShippingProfileChanged::class, IOFrontendShippingProfileChanged::class);
+        $dispatcher->listen(FrontendUpdateDeliveryAddress::class, IOFrontendUpdateDeliveryAddress::class);
     }
 
     private function registerSingletons( $classes )
