@@ -13,7 +13,7 @@ class IOFrontendUpdateDeliveryAddress
     {
         $deliveryAddressId = $event->getAccountAddressId();
 
-        if (is_null($deliveryAddressId) || $deliveryAddressId === -99)
+        if ($deliveryAddressId == 0 || is_null($deliveryAddressId) || $deliveryAddressId === -99)
         {
             return;
         }
