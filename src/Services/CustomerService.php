@@ -884,7 +884,7 @@ class CustomerService
         /** @var Dispatcher $pluginEventDispatcher */
         $pluginEventDispatcher = pluginApp(Dispatcher::class);
 
-        if($event && ($existingAddress->countryId == $newAddress->countryId && $existingAddress->postalCode !== $newAddress->postalCode))
+        if($event && ($existingAddress->countryId == $newAddress->countryId && array_diff($existingAddress->toArray(), $newAddress->toArray())))
         {
             $pluginEventDispatcher->fire($event);
             $pluginEventDispatcher->fire(pluginApp(AfterBasketChanged::class));
