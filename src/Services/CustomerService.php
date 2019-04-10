@@ -881,9 +881,6 @@ class CustomerService
                     $this->updateContactWithAddressData($newAddress);
                 }
             }
-
-
-
         }
         else
         {
@@ -916,7 +913,9 @@ class CustomerService
         /** @var Dispatcher $pluginEventDispatcher */
         $pluginEventDispatcher = pluginApp(Dispatcher::class);
 
-        if($event && ($existingAddress->countryId == $newAddress->countryId && array_diff($existingAddress->toArray(), $newAddress->toArray())))
+        $addressDiff = array_diff($existingAddress->toArray(), $newAddress->toArray());
+
+        if($event && $existingAddress->countryId == $newAddress->countryId && count($addressDiff) && !(count($addressDiff) === 1 && array_key_exists("updatedAt", $addressDiff)))
         {
             $pluginEventDispatcher->fire($event);
             $pluginEventDispatcher->fire(pluginApp(AfterBasketChanged::class));
