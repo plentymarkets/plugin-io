@@ -812,13 +812,12 @@ class CustomerService
                 ];
             }
 
-
-            if(isset($addressData['address2']) && (strtoupper($addressData['address1']) == 'PACKSTATION' || strtoupper($addressData['address1']) == 'POSTFILIALE') && isset($addressData['address3']))
+            if ((strtoupper($addressData['address1']) == 'PACKSTATION' || strtoupper($addressData['address1']) == 'POSTFILIALE') && isset($addressData['address2']) && isset($addressData['postNumber']))
             {
                 $options[] =
                 [
                     'typeId' => 6,
-                    'value' => $addressData['address3']
+                    'value' => $addressData['postNumber']
                 ];
             }
 
