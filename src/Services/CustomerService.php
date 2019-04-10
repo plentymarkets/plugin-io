@@ -23,7 +23,10 @@ use Plenty\Modules\Account\Contact\Models\Contact;
 use Plenty\Modules\Account\Contact\Models\ContactOption;
 use Plenty\Modules\Account\Models\Account;
 use Plenty\Modules\Authorization\Services\AuthHelper;
+use Plenty\Modules\Basket\Events\Basket\AfterBasketChanged;
 use Plenty\Modules\Frontend\Events\FrontendCustomerAddressChanged;
+use Plenty\Modules\Frontend\Events\FrontendUpdateDeliveryAddress;
+use Plenty\Modules\Frontend\Events\FrontendUpdateInvoiceAddress;
 use Plenty\Modules\Helper\AutomaticEmail\Models\AutomaticEmailTemplate;
 use Plenty\Modules\Helper\AutomaticEmail\Models\AutomaticEmailContact;
 use Plenty\Modules\System\Contracts\WebstoreConfigurationRepositoryContract;
@@ -809,13 +812,12 @@ class CustomerService
                 ];
             }
 
-
-            if(isset($addressData['address2']) && (strtoupper($addressData['address1']) == 'PACKSTATION' || strtoupper($addressData['address1']) == 'POSTFILIALE') && isset($addressData['address3']))
+            if ((strtoupper($addressData['address1']) == 'PACKSTATION' || strtoupper($addressData['address1']) == 'POSTFILIALE') && isset($addressData['address2']) && isset($addressData['postNumber']))
             {
                 $options[] =
                 [
                     'typeId' => 6,
-                    'value' => $addressData['address3']
+                    'value' => $addressData['postNumber']
                 ];
             }
 
@@ -840,6 +842,7 @@ class CustomerService
         
         AddressValidator::validateOrFail($addressData);
 
+        $existingAddress = $this->addressRepository->findAddressById($addressId);
         if (isset($addressData['stateId']) && empty($addressData['stateId']))
         {
             $addressData['stateId'] = null;
@@ -877,9 +880,6 @@ class CustomerService
                     $this->updateContactWithAddressData($newAddress);
                 }
             }
-
-
-
         }
         else
         {
@@ -890,8 +890,8 @@ class CustomerService
 
         /** @var AuthHelper $authHelper */
         $authHelper = pluginApp(AuthHelper::class);
-
-        $authHelper->processUnguarded( function() use ($type, $newAddress)
+        $event = null;
+        $authHelper->processUnguarded( function() use ($type, $newAddress, &$event)
         {
             /**
              * @var BasketService $basketService
@@ -900,16 +900,27 @@ class CustomerService
             if($type == AddressType::BILLING)
             {
                 $basketService->setBillingAddressId($newAddress->id);
+                $event = pluginApp(FrontendUpdateInvoiceAddress::class, [$newAddress->id]);
             }
             elseif($type == AddressType::DELIVERY)
             {
                 $basketService->setDeliveryAddressId($newAddress->id);
+                $event = pluginApp(FrontendUpdateDeliveryAddress::class, [$newAddress->id]);
             }
         });
 
-        //fire public event
         /** @var Dispatcher $pluginEventDispatcher */
         $pluginEventDispatcher = pluginApp(Dispatcher::class);
+
+        $addressDiff = array_diff($existingAddress->toArray(), $newAddress->toArray());
+
+        if($event && $existingAddress->countryId == $newAddress->countryId && count($addressDiff) && !(count($addressDiff) === 1 && array_key_exists("updatedAt", $addressDiff)))
+        {
+            $pluginEventDispatcher->fire($event);
+            $pluginEventDispatcher->fire(pluginApp(AfterBasketChanged::class));
+        }
+
+        //fire public event
         $pluginEventDispatcher->fire(FrontendCustomerAddressChanged::class);
         
         if(is_null($newAddress->gender))
