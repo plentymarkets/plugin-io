@@ -554,7 +554,20 @@ class CustomerService
 	{
         if($this->getContactId() > 0)
         {
-            return $this->contactAddressRepository->getAddresses($this->getContactId(), $type);
+            $addresses = $this->contactAddressRepository->getAddresses($this->getContactId(), $type);
+            
+            if(count($addresses))
+            {
+                foreach($addresses as $key => $address)
+                {
+                    if(is_null($address->gender))
+                    {
+                        $addresses[$key]->gender = 'company';
+                    }
+                }
+            }
+            
+            return $addresses;
         }
         else
         {
@@ -576,6 +589,11 @@ class CustomerService
 
             if($address instanceof Address)
             {
+                if(is_null($address->gender))
+                {
+                    $address->gender = 'company';
+                }
+                
                 return [
                     $address
                 ];
@@ -593,9 +611,11 @@ class CustomerService
      */
 	public function getAddress(int $addressId, int $type):Address
 	{
+	    $address = null;
+	    
         if($this->getContactId() > 0)
         {
-            return $this->contactAddressRepository->getAddress($addressId, $this->getContactId(), $type);
+            $address = $this->contactAddressRepository->getAddress($addressId, $this->getContactId(), $type);
         }
         else
         {
@@ -606,13 +626,20 @@ class CustomerService
 
             if($type == AddressType::BILLING)
             {
-                return $this->addressRepository->findAddressById(((int)$addressId > 0 ? $addressId : $basketService->getBillingAddressId()));
+                $address = $this->addressRepository->findAddressById(((int)$addressId > 0 ? $addressId : $basketService->getBillingAddressId()));
             }
             elseif($type == AddressType::DELIVERY)
             {
-                return $this->addressRepository->findAddressById(((int)$addressId > 0 ? $addressId : $basketService->getDeliveryAddressId()));
+                $address = $this->addressRepository->findAddressById(((int)$addressId > 0 ? $addressId : $basketService->getDeliveryAddressId()));
             }
         }
+        
+        if(is_null($address->gender))
+        {
+            $address->gender = 'company';
+        }
+        
+        return $address;
 	}
 
     /**
@@ -624,6 +651,11 @@ class CustomerService
      */
 	public function createAddress(array $addressData, int $type):Address
 	{
+        if ((isset($addressData['gender']) && empty($addressData['gender'])) || $addressData['gender'] == 'company')
+        {
+            $addressData['gender'] = null;
+        }
+        
 	    AddressValidator::validateOrFail($addressData);
 
         if(ShippingCountry::getAddressFormat($addressData['countryId']) === ShippingCountry::ADDRESS_FORMAT_EN)
@@ -634,11 +666,6 @@ class CustomerService
         if (isset($addressData['stateId']) && empty($addressData['stateId']))
         {
             $addressData['stateId'] = null;
-        }
-
-        if (isset($addressData['gender']) && empty($addressData['gender']))
-        {
-            $addressData['gender'] = null;
         }
 
         $newAddress = null;
@@ -701,6 +728,11 @@ class CustomerService
             elseif($type == AddressType::DELIVERY)
             {
                 $basketService->setDeliveryAddressId($newAddress->id);
+            }
+            
+            if(is_null($newAddress->gender))
+            {
+                $newAddress->gender = 'company';
             }
         }
 
@@ -801,6 +833,11 @@ class CustomerService
      */
     public function updateAddress(int $addressId, array $addressData, int $type):Address
     {
+        if ((isset($addressData['gender']) && empty($addressData['gender'])) || $addressData['gender'] == 'company')
+        {
+            $addressData['gender'] = null;
+        }
+        
         AddressValidator::validateOrFail($addressData);
 
         if (isset($addressData['stateId']) && empty($addressData['stateId']))
@@ -812,12 +849,7 @@ class CustomerService
         {
             unset($addressData['checkedAt']);
         }
-
-        if (isset($addressData['gender']) && empty($addressData['gender']))
-        {
-            $addressData['gender'] = null;
-        }
-
+        
         if((int)$this->getContactId() > 0)
         {
             $addressData['options'] = $this->buildAddressEmailOptions([], false, $addressData);
@@ -879,6 +911,11 @@ class CustomerService
         /** @var Dispatcher $pluginEventDispatcher */
         $pluginEventDispatcher = pluginApp(Dispatcher::class);
         $pluginEventDispatcher->fire(FrontendCustomerAddressChanged::class);
+        
+        if(is_null($newAddress->gender))
+        {
+            $newAddress->gender = 'company';
+        }
 
         return $newAddress;
     }
