@@ -161,7 +161,7 @@ class CheckoutServiceShippingTest extends TestCase
 
         $this->applicationMock->shouldReceive('getWebstoreId')->andReturn(1);
 
-        $this->parcelServiceRepoMock->shouldReceive('getLastWeightedPresetCombinations')->with(Mockery::any(), Mockery::any(), Mockery::any())->andReturn($shippingList);
+        $this->parcelServiceRepoMock->shouldReceive('getLastWeightedPresetCombinations')->with(Mockery::any(), Mockery::any())->andReturn($shippingList);
 
         $this->vatServiceMock->shouldReceive('getLocationId')->andReturn(1);
 
