@@ -900,21 +900,25 @@ class CustomerService
             if($type == AddressType::BILLING)
             {
                 $basketService->setBillingAddressId($newAddress->id);
-                $event = pluginApp(FrontendUpdateInvoiceAddress::class, [$newAddress->id]);
+                $event = pluginApp(
+                    FrontendUpdateInvoiceAddress::class,
+                    ["accountAddressId" => $newAddress->id]
+                );
             }
             elseif($type == AddressType::DELIVERY)
             {
                 $basketService->setDeliveryAddressId($newAddress->id);
-                $event = pluginApp(FrontendUpdateDeliveryAddress::class, [$newAddress->id]);
+                $event = pluginApp(
+                    FrontendUpdateDeliveryAddress::class,
+                    ["accountAddressId" => $newAddress->id]
+                );
             }
         });
 
         /** @var Dispatcher $pluginEventDispatcher */
         $pluginEventDispatcher = pluginApp(Dispatcher::class);
 
-        $addressDiff = array_diff($existingAddress->toArray(), $newAddress->toArray());
-
-        if($event && $existingAddress->countryId == $newAddress->countryId && count($addressDiff) && !(count($addressDiff) === 1 && array_key_exists("updatedAt", $addressDiff)))
+        if($event && $existingAddress->countryId == $newAddress->countryId && count($newAddress->getChanges()) )
         {
             $pluginEventDispatcher->fire($event);
             $pluginEventDispatcher->fire(pluginApp(AfterBasketChanged::class));
