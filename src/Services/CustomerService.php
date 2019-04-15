@@ -918,7 +918,6 @@ class CustomerService
         /** @var Dispatcher $pluginEventDispatcher */
         $pluginEventDispatcher = pluginApp(Dispatcher::class);
 
-//        $addressDiff = ArrayHelper::diff($existingAddress->toArray(), $newAddress->toArray()); //array_diff($existingAddress->toArray(), $newAddress->toArray());
         if($event && $existingAddress->countryId == $newAddress->countryId && count($newAddress->getChanges()) )
         {
             $pluginEventDispatcher->fire($event);
