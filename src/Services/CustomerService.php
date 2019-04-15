@@ -8,7 +8,6 @@ use IO\Builder\Order\OrderType;
 use IO\Constants\SessionStorageKeys;
 use IO\Constants\ShippingCountry;
 use IO\Extensions\Mail\SendMail;
-use IO\Helper\ArrayHelper;
 use IO\Helper\MemoryCache;
 use IO\Helper\UserSession;
 use IO\Models\LocalizedOrder;
@@ -919,12 +918,11 @@ class CustomerService
         /** @var Dispatcher $pluginEventDispatcher */
         $pluginEventDispatcher = pluginApp(Dispatcher::class);
 
-        $addressDiff = ArrayHelper::diff($existingAddress->toArray(), $newAddress->toArray()); //array_diff($existingAddress->toArray(), $newAddress->toArray());
-
-        if($event && $existingAddress->countryId == $newAddress->countryId && count($addressDiff) && !(count($addressDiff) === 1 && array_key_exists("updatedAt", $addressDiff)))
+//        $addressDiff = ArrayHelper::diff($existingAddress->toArray(), $newAddress->toArray()); //array_diff($existingAddress->toArray(), $newAddress->toArray());
+        if($event && $existingAddress->countryId == $newAddress->countryId && count($newAddress->getChanges()) )
         {
             $pluginEventDispatcher->fire($event);
-            $pluginEventDispatcher->fire(AfterBasketChanged::class);
+            $pluginEventDispatcher->fire(pluginApp(AfterBasketChanged::class));
         }
 
         //fire public event
