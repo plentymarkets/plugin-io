@@ -136,6 +136,10 @@ class Middleware extends \Plenty\Plugin\Middleware
         {
             $sessionService->setSessionValue(SessionStorageKeys::READONLY_CHECKOUT, true);
         }
+        else
+        {
+            $sessionService->setSessionValue(SessionStorageKeys::READONLY_CHECKOUT, false);
+        }
     }
 
     public function after(Request $request, Response $response):Response
