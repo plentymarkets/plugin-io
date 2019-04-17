@@ -5,7 +5,7 @@ use Plenty\Modules\Cloud\ElasticSearch\Lib\Search\Aggregation\AggregationInterfa
 
 /**
  * Class FacetExtension
- * @package IO\Services\ItemLoader\Contracts
+ * @package IO\Services\ItemSearch\Contracts
  */
 interface FacetExtension
 {
