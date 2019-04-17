@@ -2,6 +2,7 @@
 
 namespace IO\Services;
 
+use Plenty\Log\Traits\Loggable;
 use Plenty\Modules\Frontend\Contracts\Checkout;
 use Plenty\Modules\Order\Shipping\Contracts\ParcelServicePresetRepositoryContract;
 use Plenty\Modules\Order\Shipping\Countries\Contracts\CountryRepositoryContract;
@@ -14,6 +15,8 @@ use Plenty\Modules\Order\Shipping\ParcelService\Models\ParcelServicePreset;
  */
 class ShippingService
 {
+    use Loggable;
+    
 	/**
 	 * @var Checkout
 	 */
@@ -66,7 +69,25 @@ class ShippingService
         
                 if($parcelServicePreset instanceof ParcelServicePreset)
                 {
-                    $generalSettings = $parcelServicePreset->parcelServiceRegionConstraint->where('shippingRegionId', $country->shippingDestinationId)->first()->constraint->first()->generalSettings;
+                    $generalSettings = [];
+                    
+                    $regionConstraint = $parcelServicePreset->parcelServiceRegionConstraint->where('shippingRegionId', $country->shippingDestinationId)->first();
+                    if(!is_null($regionConstraint))
+                    {
+                        $generalSettings = $regionConstraint->constraint->first()->generalSettings;
+                    }
+                    else
+                    {
+                        $this->getLogger(__CLASS__)->warning(
+                            "IO::Debug.ShippingService_noShippingContraintFound",
+                            [
+                                'country'             => $country->toArray(),
+                                'shippingProfile'     => $shippingProfile,
+                                'parcelServicePreset' => $parcelServicePreset->toArray()
+                            ]
+                        );
+                    }
+                    
                     if(isset($generalSettings['termOfDelivery']) && !is_null($generalSettings['termOfDelivery']) && $generalSettings['termOfDelivery'] !== '')
                     {
                         $maxDeliveryDays[$shippingProfile['parcelServicePresetId']] = $generalSettings['termOfDelivery'];
