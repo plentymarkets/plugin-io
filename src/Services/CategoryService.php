@@ -8,7 +8,7 @@ use IO\Guards\AuthGuard;
 use IO\Helper\CategoryDataFilter;
 use IO\Helper\MemoryCache;
 use IO\Helper\UserSession;
-use IO\Services\ItemLoader\Services\LoadResultFields;
+use IO\Services\ItemSearch\Helper\LoadResultFields;
 use IO\Services\ItemSearch\Helper\ResultFieldTemplate;
 use IO\Services\UrlBuilder\UrlQuery;
 use Plenty\Modules\Category\Models\Category;

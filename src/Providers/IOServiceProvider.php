@@ -26,7 +26,7 @@ use IO\Services\CustomerPasswordResetService;
 use IO\Services\CustomerService;
 use IO\Services\ItemCrossSellingService;
 use IO\Services\ItemLastSeenService;
-use IO\Services\ItemLoader\Services\FacetExtensionContainer;
+use IO\Services\ItemSearch\Helper\FacetExtensionContainer;
 use IO\Services\ItemService;
 use IO\Services\ItemWishListService;
 use IO\Services\LegalInformationService;
