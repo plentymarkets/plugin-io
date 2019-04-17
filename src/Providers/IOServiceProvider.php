@@ -20,16 +20,12 @@ use IO\Services\CategoryService;
 use IO\Services\CheckoutService;
 use IO\Services\ContactBankService;
 use IO\Services\ContactMailService;
-use IO\Services\ContentCaching\ContentCachingProvider;
 use IO\Services\CountryService;
 use IO\Services\CouponService;
 use IO\Services\CustomerPasswordResetService;
 use IO\Services\CustomerService;
 use IO\Services\ItemCrossSellingService;
 use IO\Services\ItemLastSeenService;
-use IO\Services\ItemLoader\Contracts\ItemLoaderFactory;
-use IO\Services\ItemLoader\Extensions\TwigLoaderPresets;
-use IO\Services\ItemLoader\Factories\ItemLoaderFactoryES;
 use IO\Services\ItemLoader\Services\FacetExtensionContainer;
 use IO\Services\ItemService;
 use IO\Services\ItemWishListService;
@@ -75,7 +71,6 @@ class IOServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->getApplication()->register(ContentCachingProvider::class);
         $this->addGlobalMiddleware(Middleware::class);
         $this->getApplication()->register(IORouteServiceProvider::class);
 
@@ -118,9 +113,7 @@ class IOServiceProvider extends ServiceProvider
             WebstoreConfigurationService::class,
             LiveShoppingService::class
         ]);
-        
-        //TODO check ES ready state
-        $this->getApplication()->bind(ItemLoaderFactory::class, ItemLoaderFactoryES::class);
+
         $this->getApplication()->singleton(FacetExtensionContainer::class);
     }
 
@@ -134,8 +127,7 @@ class IOServiceProvider extends ServiceProvider
         $twig->addExtension(TwigIOExtension::class);
         $twig->addExtension(TwigTemplateContextExtension::class);
         $twig->addExtension('Twig_Extensions_Extension_Intl');
-        $twig->addExtension(TwigLoaderPresets::class);
-        
+
         $dispatcher->listen(AfterAccountAuthentication::class, function($event)
         {
             /** @var CustomerService $customerService */

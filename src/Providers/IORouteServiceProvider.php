@@ -70,7 +70,6 @@ class IORouteServiceProvider extends RouteServiceProvider
             $api->resource('io/template', 'TemplateResource');
             $api->resource('io/localization/language', 'LanguageResource');
             $api->resource('io/itemWishList', 'ItemWishListResource');
-            $api->resource('io/cache/reset_template_cache', 'ResetTemplateCacheResource');
             $api->resource('io/shipping/country', 'ShippingCountryResource');
             $api->resource('io/live-shopping', 'LiveShoppingResource');
             $api->resource('io/facet', 'FacetResource');
