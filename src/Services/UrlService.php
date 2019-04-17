@@ -2,6 +2,7 @@
 
 namespace IO\Services;
 
+use IO\Helper\LanguageMap;
 use IO\Helper\MemoryCache;
 use IO\Services\UrlBuilder\CategoryUrlBuilder;
 use IO\Services\UrlBuilder\UrlQuery;
@@ -199,7 +200,8 @@ class UrlService
                     $url = $this->getCanonicalURL( $language );
                     if ( $url !== null )
                     {
-                        $result[$language] = $url;
+                        $languageISO = LanguageMap::getLanguageCode($language);
+                        $result[$languageISO] = $url;
                     }
                 }
 
