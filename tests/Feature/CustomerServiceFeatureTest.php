@@ -10,6 +10,9 @@ use IO\Services\CustomerService;
 use IO\Services\SessionStorageService;
 use IO\Tests\TestCase;
 use Plenty\Modules\Account\Address\Models\Address;
+use Plenty\Modules\Frontend\Services\CheckoutService;
+use \Mockery;
+use Plenty\Plugin\Events\Dispatcher;
 
 class CustomerServiceFeatureTest extends TestCase
 {
@@ -18,6 +21,12 @@ class CustomerServiceFeatureTest extends TestCase
     /** @var CustomerService $customerService */
     protected $customerService;
 
+    /** @var CheckoutService $checkoutService */
+    protected $checkoutService;
+
+    /** @var Dispatcher $dispatcher */
+    protected $dispatcher;
+
     protected $genders = ['male', 'female', 'diverse'];
 
     protected function setUp()
@@ -25,6 +34,11 @@ class CustomerServiceFeatureTest extends TestCase
         parent::setUp();
 
         $this->customerService = pluginApp(CustomerService::class);
+        $this->checkoutService = Mockery::mock(CheckoutService::class);
+        app()->instance(CheckoutService::class, $this->checkoutService);
+
+        $this->dispatcher = Mockery::mock(Dispatcher::class)->makePartial();
+        app()->instance(Dispatcher::class, $this->dispatcher);
     }
 
     /**
@@ -64,6 +78,18 @@ class CustomerServiceFeatureTest extends TestCase
 
         $sessionStorage->setSessionValue(SessionStorageKeys::GUEST_EMAIL, $this->fake->email);
 
+        if ( $addressType === AddressType::BILLING )
+        {
+            $this->checkoutService
+                ->shouldReceive('setCustomerInvoiceAddressId')
+                ->andReturn(null);
+        }
+        else if ( $addressType === AddressType::DELIVERY )
+        {
+            $this->checkoutService
+                ->shouldReceive('setCustomerShippingAddressId')
+                ->andReturn(null);
+        }
 
         $newAddress = $this->customerService->createAddress($addressData, $addressType);
 
@@ -118,6 +144,27 @@ class CustomerServiceFeatureTest extends TestCase
         /** @var BasketService $basketService */
         $basketService = pluginApp(BasketService::class);
 
+        $this->checkoutService
+            ->shouldReceive('getCustomerInvoiceAddressId')
+            ->andReturn(null);
+
+        $this->checkoutService
+            ->shouldReceive('getCustomerShippingAddressId')
+            ->andReturn(null);
+
+        if ( $addressType === AddressType::BILLING )
+        {
+            $this->checkoutService
+                ->shouldReceive('setCustomerInvoiceAddressId')
+                ->andReturn(null);
+        }
+        else if ( $addressType === AddressType::DELIVERY )
+        {
+            $this->checkoutService
+                ->shouldReceive('setCustomerShippingAddressId')
+                ->andReturn(null);
+        }
+
         $address = $this->customerService->createAddress($addressData, $addressType);
         $this->customerService->deleteAddress($address->id, $addressType);
 
@@ -166,13 +213,29 @@ class CustomerServiceFeatureTest extends TestCase
 
         $sessionStorage->setSessionValue(SessionStorageKeys::GUEST_EMAIL, $this->fake->email);
 
+        if ( $addressType === AddressType::BILLING )
+        {
+            $this->checkoutService
+                ->shouldReceive('setCustomerInvoiceAddressId')
+                ->andReturn(null);
+        }
+        else if ( $addressType === AddressType::DELIVERY )
+        {
+            $this->checkoutService
+                ->shouldReceive('setCustomerShippingAddressId')
+                ->andReturn(null);
+        }
+
+        $this->dispatcher->shouldReceive('fire');
+
         $address        = $this->customerService->createAddress($addressDataCreate, $addressType);
+
         $updatedAddress = $this->customerService->updateAddress($address->id, $addressDataUpdate, $addressType);
 
         $this->assertNotNull($updatedAddress);
         $this->assertInstanceOf(Address::class, $updatedAddress);
         $this->assertEquals($address->id, $updatedAddress->id);
-        $this->assertAddressFieldsAreEqual($addressDataUpdate, $updatedAddress);
+        $this->assertAddressFieldsAreEqual($addressDataUpdate, $updatedAddress->toArray());
 
         if ($addressDataUpdate['address1'] == 'POSTFILIALE') {
             $this->assertTrue($updatedAddress->isPostfiliale);

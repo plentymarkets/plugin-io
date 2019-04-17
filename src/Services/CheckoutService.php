@@ -68,6 +68,9 @@ class CheckoutService
      * @var BasketService
      */
     private $basketService;
+    
+    /** @var SessionStorageService */
+    private $sessionStorageService;
 
     /**
      * CheckoutService constructor.
@@ -79,6 +82,7 @@ class CheckoutService
      * @param ParcelServicePresetRepositoryContract $parcelServicePresetRepo
      * @param CurrencyExchangeRepositoryContract $currencyExchangeRepo
      * @param BasketService $basketService
+     * @param SessionStorageService $sessionStorageService
      */
     public function __construct(
         FrontendPaymentMethodRepositoryContract $frontendPaymentMethodRepository,
@@ -88,7 +92,8 @@ class CheckoutService
         CustomerService $customerService,
         ParcelServicePresetRepositoryContract $parcelServicePresetRepo,
         CurrencyExchangeRepositoryContract $currencyExchangeRepo,
-        BasketService $basketService)
+        BasketService $basketService,
+        SessionStorageService $sessionStorageService)
     {
         $this->frontendPaymentMethodRepository = $frontendPaymentMethodRepository;
         $this->checkout                        = $checkout;
@@ -98,7 +103,7 @@ class CheckoutService
         $this->parcelServicePresetRepo         = $parcelServicePresetRepo;
         $this->currencyExchangeRepo            = $currencyExchangeRepo;
         $this->basketService                   = $basketService;
-
+        $this->sessionStorageService           = $sessionStorageService;
     }
 
     /**
@@ -111,16 +116,17 @@ class CheckoutService
         try
         {
             return [
-                "currency" => $this->getCurrency(),
-                "currencyList" => $this->getCurrencyList(),
-                "methodOfPaymentId" => $this->getMethodOfPaymentId(),
+                "currency"            => $this->getCurrency(),
+                "currencyList"        => $this->getCurrencyList(),
+                "methodOfPaymentId"   => $this->getMethodOfPaymentId(),
                 "methodOfPaymentList" => $this->getMethodOfPaymentList(),
-                "shippingCountryId" => $this->getShippingCountryId(),
-                "shippingProfileId" => $this->getShippingProfileId(),
+                "shippingCountryId"   => $this->getShippingCountryId(),
+                "shippingProfileId"   => $this->getShippingProfileId(),
                 "shippingProfileList" => $this->getShippingProfileList(),
-                "deliveryAddressId" => $this->getDeliveryAddressId(),
-                "billingAddressId" => $this->getBillingAddressId(),
-                "paymentDataList" => $this->getCheckoutPaymentDataList(),
+                "deliveryAddressId"   => $this->getDeliveryAddressId(),
+                "billingAddressId"    => $this->getBillingAddressId(),
+                "paymentDataList"     => $this->getCheckoutPaymentDataList(),
+                "readOnly"            => $this->getReadOnlyCheckout()
             ];
         }
         catch(\Exception $e)
@@ -354,7 +360,7 @@ class CheckoutService
     {
         $paymentDataList = array();
         $mopList         = $this->getMethodOfPaymentList();
-        $lang            = pluginApp(SessionStorageService::class)->getLang();
+        $lang            = $this->sessionStorageService->getLang();
         foreach ($mopList as $paymentMethod) {
             $paymentData                = array();
             $paymentData['id']          = $paymentMethod->id;
@@ -376,15 +382,13 @@ class CheckoutService
      */
     public function getShippingProfileList()
     {
-        /** @var SessionStorageService $sessionService */
-        $sessionService = pluginApp(SessionStorageService::class);
         /** @var AccountingLocationRepositoryContract $accountRepo*/
         $accountRepo = pluginApp(AccountingLocationRepositoryContract::class);
         /** @var VatService $vatService*/
         $vatService = pluginApp(VatService::class);
-        $showNetPrice   = $sessionService->getCustomer()->showNetPrice;
+        $showNetPrice   = $this->sessionStorageService->getCustomer()->showNetPrice;
 
-        $list = $this->parcelServicePresetRepo->getLastWeightedPresetCombinations($this->basketRepository->load(), $sessionService->getCustomer()->accountContactClassId);
+        $list = $this->parcelServicePresetRepo->getLastWeightedPresetCombinations($this->basketRepository->load(), $this->sessionStorageService->getCustomer()->accountContactClassId);
 
         $locationId = $vatService->getLocationId($this->getShippingCountryId());
         $accountSettings = $accountRepo->getSettings($locationId);
@@ -518,5 +522,11 @@ class CheckoutService
         $defaultShippingCountryId = $webstoreConfigService->getDefaultShippingCountryId();
 
         $this->setShippingCountryId($defaultShippingCountryId);
+    }
+    
+    private function getReadOnlyCheckout()
+    {
+        $readOnlyCheckout = $this->sessionStorageService->getSessionValue(SessionStorageKeys::READONLY_CHECKOUT);
+        return ( !is_null($readOnlyCheckout) ? $readOnlyCheckout : false );
     }
 }
