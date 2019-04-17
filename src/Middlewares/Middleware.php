@@ -3,6 +3,7 @@
 namespace IO\Middlewares;
 
 use IO\Api\ResponseCode;
+use IO\Constants\SessionStorageKeys;
 use IO\Helper\RouteConfig;
 use IO\Services\CountryService;
 use IO\Services\TemplateService;
@@ -23,6 +24,9 @@ class Middleware extends \Plenty\Plugin\Middleware
 {
     public function before(Request $request)
     {
+        /** @var SessionStorageService $sessionService */
+        $sessionService  = pluginApp(SessionStorageService::class);
+        
         $loginToken = $request->get('token', '');
         if(strlen($loginToken))
         {
@@ -38,8 +42,6 @@ class Middleware extends \Plenty\Plugin\Middleware
 
         if (($lang == null || strlen($lang) != 2 || !in_array($lang, $webstoreConfig->languageList)) && strpos(end($splittedURL), '.') === false)
         {
-            $sessionService  = pluginApp(SessionStorageService::class);
-
             if($sessionService->getLang() != $webstoreConfig->defaultLanguage)
             {
                 $service = pluginApp(LocalizationService::class);
@@ -127,6 +129,16 @@ class Middleware extends \Plenty\Plugin\Middleware
         if ( RouteConfig::isActive(RouteConfig::SEARCH) && $request->get('ActionCall') == 'WebActionArticleSearch' )
         {
             AuthGuard::redirect('/search', ['query' => $request->get('Params')['SearchParam']]);
+        }
+        
+        $readonlyCheckout = $request->get('readonlyCheckout',0);
+        if((int)$readonlyCheckout == 1)
+        {
+            $sessionService->setSessionValue(SessionStorageKeys::READONLY_CHECKOUT, true);
+        }
+        else
+        {
+            $sessionService->setSessionValue(SessionStorageKeys::READONLY_CHECKOUT, false);
         }
     }
 

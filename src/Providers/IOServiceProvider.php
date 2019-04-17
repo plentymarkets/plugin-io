@@ -47,6 +47,7 @@ use IO\Services\WebstoreConfigurationService;
 use Plenty\Modules\Authentication\Events\AfterAccountAuthentication;
 use Plenty\Modules\Authentication\Events\AfterAccountContactLogout;
 use IO\Events\Basket\BeforeBasketItemToOrderItem;
+use Plenty\Modules\Basket\Events\Basket\AfterBasketChanged;
 use Plenty\Modules\Frontend\Events\FrontendCurrencyChanged;
 use Plenty\Modules\Frontend\Events\FrontendShippingProfileChanged;
 use Plenty\Modules\Frontend\Events\FrontendUpdateDeliveryAddress;
@@ -142,6 +143,13 @@ class IOServiceProvider extends ServiceProvider
             /** @var CheckoutService $checkoutService */
             $checkoutService = pluginApp(CheckoutService::class);
             $checkoutService->setDefaultShippingCountryId();
+        });
+    
+        $dispatcher->listen(AfterBasketChanged::class, function($event)
+        {
+            /** @var SessionStorageService $sessionStorageService */
+            $sessionStorageService = pluginApp(SessionStorageService::class);
+            $sessionStorageService->setSessionValue(SessionStorageKeys::READONLY_CHECKOUT, false);
         });
     
         $dispatcher->listen(OrderCreated::class, function($event)
