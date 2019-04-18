@@ -9,12 +9,14 @@ use IO\Services\SessionStorageService;
 use IO\Services\TemplateConfigService;
 use Plenty\Modules\Authorization\Services\AuthHelper;
 use Plenty\Modules\Item\VariationDescription\Contracts\VariationDescriptionRepositoryContract;
+use Plenty\Plugin\Log\Loggable;
 
 class VariationUrlBuilder
 {
+    use Loggable;
+
     public static $urlPathMap;
     public static $requestedItems;
-
 
     public static function fillItemUrl( $itemData )
     {
@@ -77,8 +79,16 @@ class VariationUrlBuilder
 
         if ( count( self::$urlPathMap[$itemId][$variationId] ) <= 0 )
         {
-            $this->searchItem( $itemId, $variationId, $lang );
+            $this->getLogger(__CLASS__)->debug(
+                'IO::Debug.VariationUrlBuilder_searchItem',
+                [
+                    'itemId' => $itemId,
+                    'variationId' => $variationId,
+                    'lang' => $lang
+                ]
+            );
 
+            $this->searchItem( $itemId, $variationId, $lang );
         }
 
         $itemData = self::$urlPathMap[$itemId][$variationId][$lang];
@@ -115,6 +125,15 @@ class VariationUrlBuilder
 
                     $authHelper->processUnguarded(
                         function () use ($variationId, $lang, $itemUrl) {
+                            $this->getLogger(__CLASS__)->debug(
+                                'IO::Debug.VariationUrlBuilder_saveItemUrl',
+                                [
+                                    'url'           => rtrim($itemUrl->getPath(), '/'),
+                                    'variationId'   => $variationId,
+                                    'lang'          => $lang
+                                ]
+                            );
+
                             /** @var VariationDescriptionRepositoryContract $variationDescriptionRepository */
                             $variationDescriptionRepository = pluginApp(VariationDescriptionRepositoryContract::class);
 
@@ -131,6 +150,17 @@ class VariationUrlBuilder
                     self::$urlPathMap[$itemId][$variationId][$lang]['urlPath'] = $itemUrl->getPath();
                 }
             }
+        }
+        else
+        {
+            $this->getLogger(__CLASS__)->error(
+                'IO::Debug.VariationUrlBuilder_variationNotFound',
+                [
+                    'itemId' => $itemId,
+                    'variationId' => $variationId,
+                    'lang' => $lang
+                ]
+            );
         }
 
         return $itemUrl;

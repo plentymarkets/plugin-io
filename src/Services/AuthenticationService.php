@@ -9,6 +9,7 @@ use IO\Services\SessionStorageService;
 use IO\Services\BasketService;
 use IO\DBModels\PasswordReset;
 use IO\Services\CustomerPasswordResetService;
+use Plenty\Plugin\Log\Loggable;
 
 /**
  * Class AuthenticationService
@@ -16,6 +17,8 @@ use IO\Services\CustomerPasswordResetService;
  */
 class AuthenticationService
 {
+    use Loggable;
+
 	/**
 	 * @var ContactAuthenticationRepositoryContract
 	 */
@@ -102,6 +105,12 @@ class AuthenticationService
             }
             catch( \Exception $e )
             {
+                $this->getLogger(__CLASS__)->info(
+                    'IO::Debug.AuthenticationService_invalidPassword',
+                    [
+                        'contactId' => $contact->id
+                    ]
+                );
                 return false;
             }
         }
