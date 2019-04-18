@@ -540,10 +540,14 @@ class CheckoutService
 
     public function setReadOnlyCheckout($readonly)
     {
-        /** @var Dispatcher $dispatcher */
-        $dispatcher = pluginApp(Dispatcher::class);
-        $dispatcher->fire(pluginApp(CheckoutReadonlyChanged::class, ['isReadonly' => $readonly]));
-        $this->sessionStorageService->setSessionValue(SessionStorageKeys::READONLY_CHECKOUT, $readonly);
+        if ( $this->getReadOnlyCheckout() !== $readonly )
+        {
+            /** @var Dispatcher $dispatcher */
+            $dispatcher = pluginApp(Dispatcher::class);
+            $dispatcher->fire(pluginApp(CheckoutReadonlyChanged::class, ['isReadonly' => $readonly]));
+            $this->sessionStorageService->setSessionValue(SessionStorageKeys::READONLY_CHECKOUT, $readonly);
+        }
+
     }
     
     public function getReadOnlyCheckout()
