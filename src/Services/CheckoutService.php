@@ -4,6 +4,7 @@ namespace IO\Services;
 
 use IO\Builder\Order\AddressType;
 use IO\Constants\SessionStorageKeys;
+use IO\Events\Checkout\CheckoutReadonlyChanged;
 use IO\Helper\LanguageMap;
 use IO\Helper\MemoryCache;
 use Plenty\Modules\Accounting\Contracts\AccountingLocationRepositoryContract;
@@ -536,8 +537,16 @@ class CheckoutService
         $shippingService = pluginApp(ShippingService::class);
         return $shippingService->getMaxDeliveryDays();
     }
+
+    public function setReadOnlyCheckout($readonly)
+    {
+        /** @var Dispatcher $dispatcher */
+        $dispatcher = pluginApp(Dispatcher::class);
+        $dispatcher->fire(pluginApp(CheckoutReadonlyChanged::class, ['isReadonly' => $readonly]));
+        $this->sessionStorageService->setSessionValue(SessionStorageKeys::READONLY_CHECKOUT, $readonly);
+    }
     
-    private function getReadOnlyCheckout()
+    public function getReadOnlyCheckout()
     {
         $readOnlyCheckout = $this->sessionStorageService->getSessionValue(SessionStorageKeys::READONLY_CHECKOUT);
         return ( !is_null($readOnlyCheckout) ? $readOnlyCheckout : false );
