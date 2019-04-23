@@ -2,12 +2,12 @@
 
 namespace IO\Services;
 
-use Plenty\Log\Traits\Loggable;
 use Plenty\Modules\Frontend\Contracts\Checkout;
 use Plenty\Modules\Order\Shipping\Contracts\ParcelServicePresetRepositoryContract;
 use Plenty\Modules\Order\Shipping\Countries\Contracts\CountryRepositoryContract;
 use Plenty\Modules\Order\Shipping\Countries\Models\Country;
 use Plenty\Modules\Order\Shipping\ParcelService\Models\ParcelServicePreset;
+use Plenty\Plugin\Log\Loggable;
 
 /**
  * Class ShippingService
