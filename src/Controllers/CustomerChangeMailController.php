@@ -28,7 +28,7 @@ class CustomerChangeMailController extends LayoutController
 
         /** @var UserDataHashService $hashService */
         $hashService = pluginApp(UserDataHashService::class);
-        $hashData = $hashService->find($hash, (int)$contactId);
+        $hashData = $hashService->getData($hash, (int)$contactId);
 
         if(!is_null($hashData))
         {

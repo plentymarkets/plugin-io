@@ -43,7 +43,7 @@ class UserDataHashService
             ->where('contactId', '=', $contactId)
             ->where('plentyId', '=', $plentyId)
             ->where('hash', '=', $hash)
-            ->where('expiresAt', '>', time())
+            ->where('expiresAt', '>', date("Y-m-d H:i:s"))
             ->orWhere('expiresAt', '=', null)
             ->get();
 
@@ -76,7 +76,7 @@ class UserDataHashService
             ->where('contactId', '=', $contactId)
             ->where('plentyId', '=', $plentyId)
             ->where('type', '=', $type )
-            ->where('expiresAt', '>', time())
+            ->where('expiresAt', '>', date("Y-m-d H:i:s"))
             ->orWhere('expiresAt', '=', null)
             ->get();
 

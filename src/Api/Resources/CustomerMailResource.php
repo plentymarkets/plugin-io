@@ -61,7 +61,7 @@ class CustomerMailResource extends ApiResource
         );
 
         // TODO: send confirmation mail to old email address
-        return $userDataHash->hash;
+        return $this->response->create($userDataHash->hash, ResponseCode::OK);
     }
 
     public function update(string $hash):Response
