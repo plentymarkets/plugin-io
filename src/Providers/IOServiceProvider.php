@@ -157,9 +157,9 @@ class IOServiceProvider extends ServiceProvider
     
         $dispatcher->listen(AfterBasketChanged::class, function($event)
         {
-            /** @var SessionStorageService $sessionStorageService */
-            $sessionStorageService = pluginApp(SessionStorageService::class);
-            $sessionStorageService->setSessionValue(SessionStorageKeys::READONLY_CHECKOUT, false);
+            /** @var CheckoutService $checkoutService */
+            $checkoutService = pluginApp(CheckoutService::class);
+            $checkoutService->setReadOnlyCheckout(false);
         });
     
         $dispatcher->listen(OrderCreated::class, function($event)
