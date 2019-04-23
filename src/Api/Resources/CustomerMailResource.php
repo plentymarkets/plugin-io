@@ -53,6 +53,23 @@ class CustomerMailResource extends ApiResource
             return $this->response->create(null, ResponseCode::BAD_REQUEST);
         }
 
+        /** @var AuthHelper $authHelper */
+        $authHelper = pluginApp(AuthHelper::class);
+
+        $emailExists = $authHelper->processUnguarded(function() use ($contact, $newMail)
+        {
+            /** @var ContactRepositoryContract $contactRepository */
+            $contactRepository = pluginApp(ContactRepositoryContract::class);
+            $contactByMail = $contactRepository->getContactIdByEmail($newMail);
+
+            return !is_null($contactByMail);
+        });
+
+        if ( $emailExists )
+        {
+            return $this->response->create(null, ResponseCode::BAD_REQUEST);
+        }
+
         /** @var UserDataHashService $hashService */
         $hashService = pluginApp(UserDataHashService::class);
         $userDataHash = $hashService->create(
@@ -64,33 +81,30 @@ class CustomerMailResource extends ApiResource
         return $this->response->create($userDataHash->hash, ResponseCode::OK);
     }
 
-    public function update(string $hash):Response
+    public function update(string $contactId):Response
     {
+        $password  = $this->request->get('password');
+        $hash      = $this->request->get('hash');
+
+        if(!strlen($password))
+        {
+            return $this->response->create(null, ResponseCode::UNAUTHORIZED);
+        }
+
         /** @var UserDataHashService $hashService */
         $hashService = pluginApp(UserDataHashService::class);
-        $hashData = $hashService->getData( $hash );
+        $hashData = $hashService->getData( $hash, $contactId );
 
         if (is_null($hashData))
         {
             return $this->response->create(null, ResponseCode::NOT_FOUND);
         }
 
-        $password  = $this->request->get('password');
-        $oldMail   = $hashData['oldMail'];
-        $newMail   = $hashData['newMail'];
-        $contactId = 0;
-
-        if(!strlen($password))
-        {
-            unset($this->response->eventData['AfterAccountAuthentication']);
-            return $this->response->create(null, ResponseCode::UNAUTHORIZED);
-        }
-
         try
         {
             /** @var AuthenticationService $authService */
             $authService = pluginApp(AuthenticationService::class);
-            $contactId = $authService->login((string)$oldMail, (string)$password);
+            $authService->loginWithContactId($contactId, (string)$password);
         }
         catch(\Exception $exception)
         {
@@ -110,20 +124,25 @@ class CustomerMailResource extends ApiResource
         {
             /** @var AuthHelper $authHelper */
             $authHelper = pluginApp(AuthHelper::class);
-            $contact = $authHelper->processUnguarded(function() use ($contactId, $newMail)
+            $contact = $authHelper->processUnguarded(function() use ($contactId, $hashData)
             {
                 /** @var ContactRepositoryContract $contactRepository */
                 $contactRepository = pluginApp(ContactRepositoryContract::class);
                 $result = $contactRepository->updateContact([
                     'options' => [
-                        'typeId' => ContactOption::TYPE_MAIL,
-                        'subTypeId' => ContactOption::SUBTYPE_PRIVATE,
-                        'value' => $newMail
+                        [
+                            'typeId'    => ContactOption::TYPE_MAIL,
+                            'subTypeId' => ContactOption::SUBTYPE_PRIVATE,
+                            'value'     => $hashData['newMail'],
+                            'priority'  => 0
+                        ]
                     ]
                 ], $contactId);
 
                 return $result;
             });
+
+            $hashService->delete( $hash );
 
         }
         return $this->response->create($contact, ResponseCode::OK);
