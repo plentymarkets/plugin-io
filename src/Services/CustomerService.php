@@ -549,6 +549,11 @@ class CustomerService
         return $contact;
     }
 
+    public function updateEmailAddress($newAddress, $contactId)
+    {
+
+    }
+
     /**
      * List the addresses of a contact
      * @param null $type
