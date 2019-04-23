@@ -2,9 +2,11 @@
 
 namespace IO\Extensions\Mail;
 
+use IO\DBModels\UserDataHash;
 use IO\Helper\RouteConfig;
-use IO\Services\CustomerPasswordResetService;
 use IO\Services\TemplateConfigService;
+use IO\Services\UserDataHashService;
+use Plenty\Modules\Account\Contact\Contracts\ContactRepositoryContract;
 use Plenty\Modules\Plugin\Events\PluginSendMail;
 use Plenty\Modules\Plugin\Services\PluginSendMailService;
 
@@ -36,18 +38,22 @@ class IOSendMail
             }
 
             if (RouteConfig::isActive(RouteConfig::PASSWORD_RESET)  && strlen($pluginSendMail->getContactEmail())) {
-                /**
-                 * @var CustomerPasswordResetService $customerPasswordResetService
-                 */
-                $customerPasswordResetService = pluginApp(CustomerPasswordResetService::class);
+                /** @var ContactRepositoryContract $contactRepository */
+                $contactRepository = pluginApp(ContactRepositoryContract::class);
+                $contactId = $contactRepository->getContactIdByEmail($pluginSendMail->getContactEmail());
 
-                $contactId = $customerPasswordResetService->getContactIdbyEmailAddress($pluginSendMail->getContactEmail());
                 if ($contactId === null) {
                     $pluginSendMailService->addEmailPlaceholder('Link_NewPassword', '');
                     $pluginSendMailService->addEmailPlaceholder('Link_ChangePassword', '');
                 } else {
+                    /** @var UserDataHashService $hashService */
+                    $hashService = pluginApp(UserDataHashService::class);
                     $pluginSendMailService->addEmailPlaceholder('Link_NewPassword', '?show=forgotPassword&email='.$pluginSendMail->getContactEmail());
-                    $hash = $customerPasswordResetService->getLastHashOrCreate($contactId, $pluginSendMail->getContactEmail());
+                    $hash = $hashService->findHash(UserDataHash::TYPE_RESET_PASSWORD, $contactId);
+                    if (is_null($hash))
+                    {
+                        $hash = $hashService->create(['mail' => $pluginSendMail->getContactEmail()], UserDataHash::TYPE_RESET_PASSWORD, null, $contactId)->hash;
+                    }
                     $pluginSendMailService->addEmailPlaceholder('Link_ChangePassword', 'password-reset/'.$contactId. '/'  . $hash);
                 }
 

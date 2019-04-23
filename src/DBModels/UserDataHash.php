@@ -5,7 +5,7 @@ namespace IO\DBModels;
 use Plenty\Modules\Plugin\DataBase\Contracts\Model;
 
 /**
- * Class PasswordReset
+ * Class UserDataHash
  *
  * @property int    $id
  * @property string $type
@@ -21,6 +21,7 @@ use Plenty\Modules\Plugin\DataBase\Contracts\Model;
 class UserDataHash extends Model
 {
     const TYPE_CHANGE_MAIL = 'change-mail';
+    const TYPE_RESET_PASSWORD = 'reset-password';
 
     public $id;
     public $type;

@@ -53,19 +53,11 @@ class CustomerMailResource extends ApiResource
             return $this->response->create(null, ResponseCode::BAD_REQUEST);
         }
 
-        /** @var AuthHelper $authHelper */
-        $authHelper = pluginApp(AuthHelper::class);
+        /** @var ContactRepositoryContract $contactRepository */
+        $contactRepository = pluginApp(ContactRepositoryContract::class);
+        $contactByMail = $contactRepository->getContactIdByEmail($newMail);
 
-        $emailExists = $authHelper->processUnguarded(function() use ($contact, $newMail)
-        {
-            /** @var ContactRepositoryContract $contactRepository */
-            $contactRepository = pluginApp(ContactRepositoryContract::class);
-            $contactByMail = $contactRepository->getContactIdByEmail($newMail);
-
-            return !is_null($contactByMail);
-        });
-
-        if ( $emailExists )
+        if (!is_null($contactByMail))
         {
             return $this->response->create(null, ResponseCode::BAD_REQUEST);
         }

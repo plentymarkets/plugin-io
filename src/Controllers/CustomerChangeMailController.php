@@ -2,9 +2,7 @@
 namespace IO\Controllers;
 
 use IO\Constants\LogLevel;
-use IO\Helper\TemplateContainer;
 use IO\Services\AuthenticationService;
-use IO\Services\CustomerPasswordResetService;
 use IO\Services\NotificationService;
 use IO\Services\UserDataHashService;
 

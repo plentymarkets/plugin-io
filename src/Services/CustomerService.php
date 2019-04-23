@@ -496,12 +496,15 @@ class CustomerService
 
 	public function updatePassword($newPassword, $contactId = 0, $hash='')
     {
-        /**
-         * @var CustomerPasswordResetService $customerPasswordResetService
-         */
-        $customerPasswordResetService = pluginApp(CustomerPasswordResetService::class);
-        $deleteHash = false;
-        if((int)$this->getContactId() <= 0 && strlen($hash) && $customerPasswordResetService->checkHash($contactId, $hash))
+        /** @var UserDataHashService $hashService */
+        $hashService = pluginApp(UserDataHashService::class);
+        $hashData = $hashService->getData($hash, $contactId);
+
+        if (!strlen($hash) || is_null($hashData))
+        {
+            return null;
+        }
+        if((int)$this->getContactId() <= 0)
         {
             /** @var AuthHelper $authHelper */
             $authHelper = pluginApp(AuthHelper::class);
@@ -515,7 +518,7 @@ class CustomerService
                                                    ],
                                                    (int)$contactId);
             });
-            $deleteHash = true;
+            $hashService->delete($hash);
         }
         else
         {
@@ -525,20 +528,12 @@ class CustomerService
                                            ]);
         }
 
-        if ($contact instanceof Contact && $contact->id > 0) {
-
-            if ($deleteHash) {
-                $customerPasswordResetService->deleteHash($contact->id);
-            }
-
-             /**
-             * @var WebstoreConfigurationRepositoryContract $webstoreConfigurationRepository
-             */
+        if ($contact instanceof Contact && $contact->id > 0)
+        {
+             /** @var WebstoreConfigurationRepositoryContract $webstoreConfigurationRepository */
             $webstoreConfigurationRepository = pluginApp(WebstoreConfigurationRepositoryContract::class);
 
-            /**
-             * @var WebstoreConfiguration $webstoreConfiguration
-             */
+            /** @var WebstoreConfiguration $webstoreConfiguration */
             $webstoreConfiguration = $webstoreConfigurationRepository->findByPlentyId($contact->plentyId);
 
             $params = ['contactId' => $contact->id, 'clientId' => $webstoreConfiguration->webstoreId];
