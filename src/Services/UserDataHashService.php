@@ -10,9 +10,16 @@ class UserDataHashService
 {
     /** @var DataBase */
     private $db;
-    public function __construct(DataBase $dataBase)
+    private $defaultTTL = 0;
+
+    public function __construct(DataBase $dataBase, TemplateConfigService $templateConfigService)
     {
         $this->db = $dataBase;
+        $this->defaultTTL = $templateConfigService->get('global.user_data_hash_max_age', 24);
+        if ( $this->defaultTTL <= 0 )
+        {
+            $this->defaultTTL = null;
+        }
     }
 
     public function find( $hash, $contactId = null, $plentyId = null )
@@ -37,6 +44,7 @@ class UserDataHashService
             ->where('plentyId', '=', $plentyId)
             ->where('hash', '=', $hash)
             ->where('expiresAt', '>', time())
+            ->orWhere('expiresAt', '=', null)
             ->get();
 
         if (count($results))
@@ -67,7 +75,9 @@ class UserDataHashService
         $results = $this->db->query(UserDataHash::class)
             ->where('contactId', '=', $contactId)
             ->where('plentyId', '=', $plentyId)
+            ->where('type', '=', $type )
             ->where('expiresAt', '>', time())
+            ->orWhere('expiresAt', '=', null)
             ->get();
 
         if (count($results))
@@ -89,7 +99,7 @@ class UserDataHashService
         return json_decode($entry->data, true);
     }
 
-    public function create( $data, $type, $ttl = 24, $contactId = null, $plentyId = null )
+    public function create( $data, $type, $ttl = null, $contactId = null, $plentyId = null )
     {
         if ( is_null($plentyId) )
         {
@@ -106,6 +116,10 @@ class UserDataHashService
             return null;
         }
 
+        if ( is_null($ttl) )
+        {
+            $ttl = $this->defaultTTL;
+        }
         $existingEntries = $this->db->query(UserDataHash::class)
             ->where('contactId', '=', $contactId)
             ->where('plentyId', '=', $plentyId)
@@ -125,7 +139,10 @@ class UserDataHashService
         $entry->hash = sha1(microtime(true));
         $entry->data = json_encode( $data );
         $entry->createdAt = date("Y-m-d H:i:s");
-        $entry->expiresAt = date("Y-m-d H:i:s", time() + ($ttl * 60 * 60));
+        if ( $ttl > 0 )
+        {
+            $entry->expiresAt = date("Y-m-d H:i:s", time() + ($ttl * 60 * 60));
+        }
 
         return $this->db->save($entry);
     }
