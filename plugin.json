@@ -1,5 +1,5 @@
 {
-    "version"           : "3.1.2",
+    "version"           : "3.2.0",
     "name"              : "IO",
     "marketplaceName"   : {"de": "IO","en": "IO"},
     "license"           : "AGPL-3.0",
@@ -8,7 +8,7 @@
     "description"       : "Basic php functions for plentymarkets shop designs",
     "shortDescription"  : {"de": "PHP-Grundfunktionen für plentymarkets Template-Plugins","en": "Basic PHP functions for plentymarkets template plugins"},
     "categories"        : ["3885"],
-    "author"            : "plentymarkets GmbH",
+    "author"            : "plentysystems AG",
     "authorIcon"        : "icon_author_xs.png",
     "email"             : "sales@plentymarkets.com",
     "phone"             : "+49 561 98 681 100",

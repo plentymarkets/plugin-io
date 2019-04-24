@@ -19,6 +19,8 @@ use Plenty\Modules\Frontend\PaymentMethod\Contracts\FrontendPaymentMethodReposit
 use Plenty\Modules\Helper\AutomaticEmail\Models\AutomaticEmailOrder;
 use Plenty\Modules\Helper\AutomaticEmail\Models\AutomaticEmailTemplate;
 use Plenty\Modules\Order\Contracts\OrderRepositoryContract;
+use Plenty\Modules\Order\Date\Models\OrderDate;
+use Plenty\Modules\Order\Date\Models\OrderDateType;
 use Plenty\Modules\Order\Property\Contracts\OrderPropertyRepositoryContract;
 use Plenty\Modules\Order\Property\Models\OrderPropertyType;
 use Plenty\Modules\Payment\Contracts\PaymentRepositoryContract;
@@ -320,20 +322,81 @@ class OrderService
         if($wrapped)
         {
             $orders = LocalizedOrder::wrapPaginated( $orders, $this->sessionStorage->getLang() );
-    
-            $o = $orders->getResult();
-            foreach($orders->getResult() as $key => $order)
-            {
-                $order = $order->order;
-                if($order->typeId == OrderType::ORDER)
-                {
-                    $o[$key]->isReturnable = $this->isOrderReturnable($order);
-                }
-            }
-            $orders->setResult($o);
         }
         
         return $orders;
+    }
+    
+    public function getOrdersCompact(int $page = 1, int $items = 50)
+    {
+        $orderResult = null;
+        $contactId = $this->customerService->getContactId();
+        
+        if($contactId > 0)
+        {
+            $this->orderRepository->setFilters(['orderType' => OrderType::ORDER]);
+    
+            /** @var PaginatedResult $orderResult */
+            $orderResult = $this->orderRepository->allOrdersByContact(
+                $contactId,
+                $page,
+                $items
+            );
+    
+            /** @var OrderTotalsService $orderTotalsService */
+            $orderTotalsService = pluginApp(OrderTotalsService::class);
+            
+            /** @var OrderStatusService $orderStatusService */
+            $orderStatusService = pluginApp(OrderStatusService::class);
+    
+            /** @var OrderTrackingService $orderTrackingService */
+            $orderTrackingService = pluginApp(OrderTrackingService::class);
+    
+            /** @var SessionStorageService $sessionStorageService */
+            $sessionStorageService = pluginApp(SessionStorageService::class);
+            $lang = $sessionStorageService->getLang();
+            
+            $orders = [];
+            foreach($orderResult->getResult() as $order)
+            {
+                if($order instanceof Order)
+                {
+                    $totals = $orderTotalsService->getAllTotals($order);
+                    $highlightNetPrices = $orderTotalsService->highlightNetPrices($order);
+                    
+                    $orderStatusName = $orderStatusService->getOrderStatus($order->id, $order->statusId);
+    
+                    $creationDate = '';
+                    $creationDateData = $order->dates->firstWhere('typeId', OrderDateType::ORDER_ENTRY_AT);
+    
+                    if($creationDateData instanceof OrderDate)
+                    {
+                        $creationDate = $creationDateData->date->toDateTimeString();
+                    }
+    
+                    $shippingDate = '';
+                    $shippingDateData = $order->dates->firstWhere('typeId', OrderDateType::ORDER_COMPLETED_ON);
+    
+                    if($shippingDateData instanceof OrderDate)
+                    {
+                        $shippingDate = $shippingDateData->date->toDateTimeString();
+                    }
+
+                    $orders[] = [
+                        'id'           => $order->id,
+                        'total'        => $highlightNetPrices ? $totals['totalNet'] : $totals['totalGross'],
+                        'status'       => $orderStatusName,
+                        'creationDate' => $creationDate,
+                        'shippingDate' => $shippingDate,
+                        'trackingURL'  => $orderTrackingService->getTrackingURL($order, $lang)
+                    ];
+                }
+            };
+    
+            $orderResult->setResult($orders);
+        }
+        
+        return $orderResult;
     }
     
     /**
@@ -358,17 +421,6 @@ class OrderService
         }
         
         return null;
-    }
-    
-    /**
-     * Return order status text by status id
-     * @param $statusId
-     * @return string
-     */
-	public function getOrderStatusText($statusId)
-    {
-	    //OrderStatusTexts::$orderStatusTexts[(string)$statusId];
-        return '';
     }
     
     public function getOrderPropertyByOrderId($orderId, $typeId)
@@ -398,9 +450,7 @@ class OrderService
     
     public function isOrderReturnable(Order $order)
     {
-        $returnActive = $this->isReturnActive();
-        
-        if($returnActive)
+        if($this->customerService->getContactId() > 0 && $this->isReturnActive())
         {
             /**
              * @var ConfigRepository $config
