@@ -500,11 +500,7 @@ class CustomerService
         $hashService = pluginApp(UserDataHashService::class);
         $hashData = $hashService->getData($hash, $contactId);
 
-        if (!strlen($hash) || is_null($hashData))
-        {
-            return null;
-        }
-        if((int)$this->getContactId() <= 0)
+        if((int)$this->getContactId() <= 0 && !is_null($hashData) )
         {
             /** @var AuthHelper $authHelper */
             $authHelper = pluginApp(AuthHelper::class);
