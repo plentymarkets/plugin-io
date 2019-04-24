@@ -11,6 +11,7 @@ class RouteConfig
     const CANCELLATION_RIGHTS       = "cancellation-rights";
     const CANCELLATION_FORM         = "cancellation-form";
     const CATEGORY                  = "category";
+    const CHANGE_MAIL               = "change-mail";
     const CHECKOUT                  = "checkout";
     const CONFIRMATION              = "confirmation";
     const CONTACT                   = "contact";
@@ -50,6 +51,7 @@ class RouteConfig
                     self::CANCELLATION_RIGHTS,
                     self::CANCELLATION_FORM,
                     self::CATEGORY,
+                    self::CHANGE_MAIL,
                     self::CHECKOUT,
                     self::CONFIRMATION,
                     self::CONTACT,
