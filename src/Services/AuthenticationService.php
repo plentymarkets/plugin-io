@@ -48,6 +48,8 @@ class AuthenticationService
      * Perform the login with email and password
      * @param string $email
      * @param string $password
+     *
+     * @return int
      */
 	public function login(string $email, string $password)
 	{
@@ -56,6 +58,7 @@ class AuthenticationService
 		
 		$contactId = $this->customerPasswordResetService->getContactIdbyEmailAddress($email);
         $this->checkPasswordResetExpiration($contactId);
+        return $contactId;
 	}
 
     /**
