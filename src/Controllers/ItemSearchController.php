@@ -2,6 +2,7 @@
 
 namespace IO\Controllers;
 
+use IO\Extensions\Constants\ShopUrls;
 use IO\Guards\AuthGuard;
 use IO\Services\SessionStorageService;
 use IO\Services\WebstoreConfigurationService;
@@ -29,14 +30,10 @@ class ItemSearchController extends LayoutController
 
     public function redirectToSearch($query):string
     {
-        $url = '/search';
-        $webstoreConfigurationService = pluginApp(WebstoreConfigurationService::class);
-        $sessionStorage = pluginApp(SessionStorageService::class);
-        if($webstoreConfigurationService->getDefaultLanguage() !== $sessionStorage->getLang())
-        {
-            $url = '/'.$sessionStorage->getLang() .$url;
-        }
-        AuthGuard::redirect($url, ['query' => $query]);
+
+        $shopUrl = pluginApp(ShopUrls::class);
+
+        AuthGuard::redirect($shopUrl->search, ['query' => $query]);
         return "";
     }
 }
