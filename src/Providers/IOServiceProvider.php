@@ -12,6 +12,7 @@ use IO\Extensions\Sitemap\IOSitemapPattern;
 use IO\Extensions\TwigIOExtension;
 use IO\Extensions\TwigServiceProvider;
 use IO\Extensions\TwigTemplateContextExtension;
+use IO\Jobs\CleanupUserDataHashes;
 use IO\Middlewares\Middleware;
 use IO\Services\AuthenticationService;
 use IO\Services\AvailabilityService;
@@ -22,7 +23,6 @@ use IO\Services\ContactBankService;
 use IO\Services\ContactMailService;
 use IO\Services\CountryService;
 use IO\Services\CouponService;
-use IO\Services\CustomerPasswordResetService;
 use IO\Services\CustomerService;
 use IO\Services\ItemCrossSellingService;
 use IO\Services\ItemLastSeenService;
@@ -48,6 +48,7 @@ use Plenty\Modules\Authentication\Events\AfterAccountAuthentication;
 use Plenty\Modules\Authentication\Events\AfterAccountContactLogout;
 use IO\Events\Basket\BeforeBasketItemToOrderItem;
 use Plenty\Modules\Basket\Events\Basket\AfterBasketChanged;
+use Plenty\Modules\Cron\Services\CronContainer;
 use Plenty\Modules\Frontend\Events\FrontendCurrencyChanged;
 use Plenty\Modules\Frontend\Events\FrontendShippingProfileChanged;
 use Plenty\Modules\Frontend\Events\FrontendUpdateDeliveryAddress;
@@ -92,7 +93,6 @@ class IOServiceProvider extends ServiceProvider
             ContactMailService::class,
             CountryService::class,
             CouponService::class,
-            CustomerPasswordResetService::class,
             CustomerService::class,
             ItemCrossSellingService::class,
             ItemLastSeenService::class,
@@ -122,7 +122,7 @@ class IOServiceProvider extends ServiceProvider
      * boot twig extensions and services
      * @param Twig $twig
      */
-    public function boot(Twig $twig, Dispatcher $dispatcher)
+    public function boot(Twig $twig, Dispatcher $dispatcher, CronContainer $cronContainer)
     {
         $twig->addExtension(TwigServiceProvider::class);
         $twig->addExtension(TwigIOExtension::class);
@@ -147,9 +147,9 @@ class IOServiceProvider extends ServiceProvider
     
         $dispatcher->listen(AfterBasketChanged::class, function($event)
         {
-            /** @var SessionStorageService $sessionStorageService */
-            $sessionStorageService = pluginApp(SessionStorageService::class);
-            $sessionStorageService->setSessionValue(SessionStorageKeys::READONLY_CHECKOUT, false);
+            /** @var CheckoutService $checkoutService */
+            $checkoutService = pluginApp(CheckoutService::class);
+            $checkoutService->setReadOnlyCheckout(false);
         });
     
         $dispatcher->listen(OrderCreated::class, function($event)
@@ -178,6 +178,8 @@ class IOServiceProvider extends ServiceProvider
 
         $dispatcher->listen(FrontendShippingProfileChanged::class, IOFrontendShippingProfileChanged::class);
         $dispatcher->listen(FrontendUpdateDeliveryAddress::class, IOFrontendUpdateDeliveryAddress::class);
+
+        $cronContainer->add(CronContainer::DAILY, CleanupUserDataHashes::class );
     }
 
     private function registerSingletons( $classes )

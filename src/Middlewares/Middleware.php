@@ -4,6 +4,7 @@ namespace IO\Middlewares;
 
 use IO\Api\ResponseCode;
 use IO\Constants\SessionStorageKeys;
+use IO\Controllers\CheckoutController;
 use IO\Helper\RouteConfig;
 use IO\Services\CountryService;
 use IO\Services\TemplateService;
@@ -36,7 +37,7 @@ class Middleware extends \Plenty\Plugin\Middleware
         }
 
         $splittedURL     = explode('/', $request->get('plentyMarkets'));
-        $lang            = $splittedURL[0];
+        $lang            = $request->get('Lang') ?? $splittedURL[0];
         $webstoreService = pluginApp(WebstoreConfigurationService::class);
         $webstoreConfig  = $webstoreService->getWebstoreConfig();
 
@@ -131,15 +132,9 @@ class Middleware extends \Plenty\Plugin\Middleware
             AuthGuard::redirect('/search', ['query' => $request->get('Params')['SearchParam']]);
         }
         
-        $readonlyCheckout = $request->get('readonlyCheckout',0);
-        if((int)$readonlyCheckout == 1)
-        {
-            $sessionService->setSessionValue(SessionStorageKeys::READONLY_CHECKOUT, true);
-        }
-        else
-        {
-            $sessionService->setSessionValue(SessionStorageKeys::READONLY_CHECKOUT, false);
-        }
+        /** @var CheckoutService $checkoutService */
+        $checkoutService = pluginApp(CheckoutService::class);
+        $checkoutService->setReadOnlyCheckout($request->get('readonlyCheckout',0) == 1);
     }
 
     public function after(Request $request, Response $response):Response

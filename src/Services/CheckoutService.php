@@ -4,6 +4,7 @@ namespace IO\Services;
 
 use IO\Builder\Order\AddressType;
 use IO\Constants\SessionStorageKeys;
+use IO\Events\Checkout\CheckoutReadonlyChanged;
 use IO\Helper\LanguageMap;
 use IO\Helper\MemoryCache;
 use Plenty\Modules\Accounting\Contracts\AccountingLocationRepositoryContract;
@@ -19,7 +20,6 @@ use Plenty\Modules\Order\Currency\Contracts\CurrencyRepositoryContract;
 use Plenty\Modules\Order\Shipping\Contracts\ParcelServicePresetRepositoryContract;
 use Plenty\Modules\Payment\Events\Checkout\GetPaymentMethodContent;
 use Plenty\Modules\Payment\Method\Contracts\PaymentMethodRepositoryContract;
-use Plenty\Plugin\Application;
 use Plenty\Plugin\ConfigRepository;
 use Plenty\Plugin\Events\Dispatcher;
 use Plenty\Plugin\Translation\Translator;
@@ -123,9 +123,10 @@ class CheckoutService
                 "shippingCountryId"   => $this->getShippingCountryId(),
                 "shippingProfileId"   => $this->getShippingProfileId(),
                 "shippingProfileList" => $this->getShippingProfileList(),
-                "deliveryAddressId"   => $this->getDeliveryAddressId(),
-                "billingAddressId"    => $this->getBillingAddressId(),
-                "paymentDataList"     => $this->getCheckoutPaymentDataList(),
+                "deliveryAddressId" => $this->getDeliveryAddressId(),
+                "billingAddressId" => $this->getBillingAddressId(),
+                "paymentDataList" => $this->getCheckoutPaymentDataList(),
+                "maxDeliveryDays" => $this->getMaxDeliveryDays(),
                 "readOnly"            => $this->getReadOnlyCheckout()
             ];
         }
@@ -382,43 +383,49 @@ class CheckoutService
      */
     public function getShippingProfileList()
     {
-        /** @var AccountingLocationRepositoryContract $accountRepo*/
-        $accountRepo = pluginApp(AccountingLocationRepositoryContract::class);
-        /** @var VatService $vatService*/
-        $vatService = pluginApp(VatService::class);
-        $showNetPrice   = $this->sessionStorageService->getCustomer()->showNetPrice;
-
-        $list = $this->parcelServicePresetRepo->getLastWeightedPresetCombinations($this->basketRepository->load(), $this->sessionStorageService->getCustomer()->accountContactClassId);
-
-        $locationId = $vatService->getLocationId($this->getShippingCountryId());
-        $accountSettings = $accountRepo->getSettings($locationId);
-
-        if ($showNetPrice && !(bool)$accountSettings->showShippingVat) {
-
-            $maxVatValue   = $this->basketService->getMaxVatValue();
-
-            if (is_array($list)) {
-                foreach ($list as $key => $shippingProfile) {
-                    if (isset($shippingProfile['shippingAmount'])) {
-                        $list[$key]['shippingAmount'] = (100.0 * $shippingProfile['shippingAmount']) / (100.0 + $maxVatValue);
-                    }
-                }
-            }
-        }
-
-        $basket = $this->basketService->getBasket();
-        if($basket->currency !== $this->currencyExchangeRepo->getDefaultCurrency())
+        return $this->fromMemoryCache('shippingProfileList', function()
         {
-            if (is_array($list)) {
-                foreach ($list as $key => $shippingProfile) {
-                    if (isset($shippingProfile['shippingAmount'])) {
-                        $list[$key]['shippingAmount'] = $this->currencyExchangeRepo->convertFromDefaultCurrency($basket->currency, $list[$key]['shippingAmount']);
+            /** @var AccountingLocationRepositoryContract $accountRepo*/
+            $accountRepo = pluginApp(AccountingLocationRepositoryContract::class);
+            /** @var VatService $vatService*/
+            $vatService = pluginApp(VatService::class);
+            $showNetPrice   = $this->sessionStorageService->getCustomer()->showNetPrice;
+        
+            $list = $this->parcelServicePresetRepo->getLastWeightedPresetCombinations($this->basketRepository->load(), $this->sessionStorageService->getCustomer()->accountContactClassId);
+        
+            $locationId = $vatService->getLocationId($this->getShippingCountryId());
+            $accountSettings = $accountRepo->getSettings($locationId);
+        
+            if ($showNetPrice && !(bool)$accountSettings->showShippingVat) {
+    
+                $maxVatValue = $this->basketService->getMaxVatValue();
+    
+                if (is_array($list)) {
+                    foreach ($list as $key => $shippingProfile) {
+                        if (isset($shippingProfile['shippingAmount'])) {
+                            $list[$key]['shippingAmount'] = (100.0 * $shippingProfile['shippingAmount']) / (100.0 + $maxVatValue);
+                        }
+                    }
+                }
+    
+                $basket = $this->basketService->getBasket();
+                if ($basket->currency !== $this->currencyExchangeRepo->getDefaultCurrency())
+                {
+                    if (is_array($list))
+                    {
+                        foreach ($list as $key => $shippingProfile)
+                        {
+                            if (isset($shippingProfile['shippingAmount']))
+                            {
+                                $list[$key]['shippingAmount'] = $this->currencyExchangeRepo->convertFromDefaultCurrency($basket->currency, $list[$key]['shippingAmount']);
+                            }
+                        }
                     }
                 }
             }
-        }
-
-        return $list;
+            
+            return $list;
+        });
     }
 
     /**
@@ -524,7 +531,26 @@ class CheckoutService
         $this->setShippingCountryId($defaultShippingCountryId);
     }
     
-    private function getReadOnlyCheckout()
+    public function getMaxDeliveryDays()
+    {
+        /** @var ShippingService $shippingService */
+        $shippingService = pluginApp(ShippingService::class);
+        return $shippingService->getMaxDeliveryDays();
+    }
+
+    public function setReadOnlyCheckout($readonly)
+    {
+        if ( $this->getReadOnlyCheckout() !== $readonly )
+        {
+            /** @var Dispatcher $dispatcher */
+            $dispatcher = pluginApp(Dispatcher::class);
+            $dispatcher->fire(pluginApp(CheckoutReadonlyChanged::class, ['isReadonly' => $readonly]));
+            $this->sessionStorageService->setSessionValue(SessionStorageKeys::READONLY_CHECKOUT, $readonly);
+        }
+
+    }
+    
+    public function getReadOnlyCheckout()
     {
         $readOnlyCheckout = $this->sessionStorageService->getSessionValue(SessionStorageKeys::READONLY_CHECKOUT);
         return ( !is_null($readOnlyCheckout) ? $readOnlyCheckout : false );

@@ -2,13 +2,13 @@
 
 namespace IO\Migrations;
 
+use IO\DBModels\UserDataHash;
 use Plenty\Modules\Plugin\DataBase\Contracts\Migrate;
-use IO\DBModels\PasswordReset;
 
-class PasswordResetTableMigration_0_0_1
+class UserDataHashTableMigration_0_0_1
 {
     public function run(Migrate $migrate)
     {
-        $migrate->createTable(PasswordReset::class);
+        $migrate->createTable(UserDataHash::class);
     }
 }
