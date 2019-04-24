@@ -110,6 +110,14 @@ class MultiSearchFactory
 
         // execute multisearch
         $rawResults = $searchRepository->execute();
+
+        if ( count($this->searches) === 1 && count($this->searches[$primarySearchNames[0]]['secondary']) === 0 )
+        {
+            $tmp = $rawResults;
+            $rawResults = [];
+            $rawResults[$primarySearchNames[0]] = $tmp;
+        }
+
         $results = [];
 
         foreach( $primarySearchNames as $searchName )
