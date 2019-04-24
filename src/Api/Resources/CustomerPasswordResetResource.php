@@ -15,6 +15,7 @@ use Plenty\Modules\Helper\AutomaticEmail\Models\AutomaticEmailContact;
 use Plenty\Modules\Helper\AutomaticEmail\Models\AutomaticEmailTemplate;
 use Plenty\Modules\System\Contracts\WebstoreConfigurationRepositoryContract;
 use Plenty\Modules\System\Models\WebstoreConfiguration;
+use Plenty\Plugin\Application;
 use Plenty\Plugin\Http\Request;
 use Plenty\Plugin\Http\Response;
 
@@ -69,13 +70,7 @@ class CustomerPasswordResetResource extends ApiResource
             $hashService = pluginApp(UserDataHashService::class);
             $hashService->create(['mail' => $email], UserDataHash::TYPE_RESET_PASSWORD, null, $contact->id);
 
-            /** @var WebstoreConfigurationRepositoryContract $webstoreConfigurationRepository */
-            $webstoreConfigurationRepository= pluginApp(WebstoreConfigurationRepositoryContract::class);
-
-            /** @var WebstoreConfiguration $webstoreConfiguration */
-            $webstoreConfigugration = $webstoreConfigurationRepository->findByPlentyId($contact->plentyId);
-
-            $params = ['contactId' => $contact->id, 'clientId' => $webstoreConfigugration->webstoreId];
+            $params = ['contactId' => $contact->id, 'clientId' => pluginApp(Application::class)->getWebstoreId()];
             $this->sendMail(AutomaticEmailTemplate::CONTACT_NEW_PASSWORD, AutomaticEmailContact::class, $params);
 
             return $this->response->create(true, ResponseCode::OK);

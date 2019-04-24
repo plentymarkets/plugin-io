@@ -19,6 +19,7 @@ use Plenty\Modules\Helper\AutomaticEmail\Models\AutomaticEmailContact;
 use Plenty\Modules\Helper\AutomaticEmail\Models\AutomaticEmailTemplate;
 use Plenty\Modules\System\Contracts\WebstoreConfigurationRepositoryContract;
 use Plenty\Modules\System\Models\WebstoreConfiguration;
+use Plenty\Plugin\Application;
 use Plenty\Plugin\Http\Request;
 use Plenty\Plugin\Http\Response;
 use Plenty\Plugin\Log\Loggable;
@@ -89,7 +90,12 @@ class CustomerMailResource extends ApiResource
         $lang = $sessionService->getLang();
 
         $newEmailLink = $domain . ($lang != $defaultLang ? '/' . $lang : ''). '/change-mail/'. $userDataHash->contactId . '/' . $userDataHash->hash;
-        $params = ['contactId' => $contact->id, 'clientId' => $webstoreConfiguration->webstoreId, 'password' => null, 'newEmailLink' => $newEmailLink];
+        $params = [
+            'contactId' => $contact->id,
+            'clientId' => pluginApp(Application::class)->getWebstoreId(),
+            'password' => null,
+            'newEmailLink' => $newEmailLink
+        ];
 
         $this->sendMail(AutomaticEmailTemplate::CONTACT_NEW_EMAIL , AutomaticEmailContact::class, $params);
 
