@@ -14,6 +14,7 @@ class CleanupUserDataHashes extends CronHandler
         $db = pluginApp(DataBase::class);
         $db->query(UserDataHash::class)
             ->where('expiresAt', '<', date("Y-m-d H:i:s"))
+            ->where('expiresAt', '<>', '')
             ->delete();
     }
 }

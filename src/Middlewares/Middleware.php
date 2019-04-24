@@ -37,7 +37,7 @@ class Middleware extends \Plenty\Plugin\Middleware
         }
 
         $splittedURL     = explode('/', $request->get('plentyMarkets'));
-        $lang            = $splittedURL[0];
+        $lang            = $request->get('Lang') ?? $splittedURL[0];
         $webstoreService = pluginApp(WebstoreConfigurationService::class);
         $webstoreConfig  = $webstoreService->getWebstoreConfig();
 

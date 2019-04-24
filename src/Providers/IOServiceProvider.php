@@ -24,7 +24,6 @@ use IO\Services\ContactMailService;
 use IO\Services\ContentCaching\ContentCachingProvider;
 use IO\Services\CountryService;
 use IO\Services\CouponService;
-use IO\Services\CustomerPasswordResetService;
 use IO\Services\CustomerService;
 use IO\Services\ItemCrossSellingService;
 use IO\Services\ItemLastSeenService;
@@ -99,7 +98,6 @@ class IOServiceProvider extends ServiceProvider
             ContactMailService::class,
             CountryService::class,
             CouponService::class,
-            CustomerPasswordResetService::class,
             CustomerService::class,
             ItemCrossSellingService::class,
             ItemLastSeenService::class,
