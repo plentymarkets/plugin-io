@@ -6,13 +6,19 @@ use IO\Api\ApiResource;
 use IO\Api\ApiResponse;
 use IO\Api\ResponseCode;
 use IO\DBModels\UserDataHash;
+use IO\Extensions\Mail\SendMail;
 use IO\Services\AuthenticationService;
 use IO\Services\CustomerService;
+use IO\Services\SessionStorageService;
 use IO\Services\UserDataHashService;
 use Plenty\Modules\Account\Contact\Contracts\ContactRepositoryContract;
 use Plenty\Modules\Account\Contact\Models\Contact;
 use Plenty\Modules\Account\Contact\Models\ContactOption;
 use Plenty\Modules\Authorization\Services\AuthHelper;
+use Plenty\Modules\Helper\AutomaticEmail\Models\AutomaticEmailContact;
+use Plenty\Modules\Helper\AutomaticEmail\Models\AutomaticEmailTemplate;
+use Plenty\Modules\System\Contracts\WebstoreConfigurationRepositoryContract;
+use Plenty\Modules\System\Models\WebstoreConfiguration;
 use Plenty\Plugin\Http\Request;
 use Plenty\Plugin\Http\Response;
 use Plenty\Plugin\Log\Loggable;
@@ -20,6 +26,7 @@ use Plenty\Plugin\Log\Loggable;
 class CustomerMailResource extends ApiResource
 {
     use Loggable;
+    use SendMail;
 
     /**
      * CustomerMailResource constructor.
@@ -69,8 +76,24 @@ class CustomerMailResource extends ApiResource
             UserDataHash::TYPE_CHANGE_MAIL
         );
 
-        // TODO: send confirmation mail to old email address
-        return $this->response->create($userDataHash->hash, ResponseCode::OK);
+        /** @var WebstoreConfigurationRepositoryContract $webstoreConfigurationRepository */
+        $webstoreConfigurationRepository = pluginApp(WebstoreConfigurationRepositoryContract::class);
+
+        /**  @var WebstoreConfiguration $webstoreConfiguration */
+        $webstoreConfiguration = $webstoreConfigurationRepository->findByPlentyId($contact->plentyId);
+
+        /** @var string $domain */
+        $domain = $webstoreConfiguration->domainSsl;
+        $defaultLang = $webstoreConfiguration->defaultLanguage;
+        $sessionService = pluginApp(SessionStorageService::class);
+        $lang = $sessionService->getLang();
+
+        $newEmailLink = $domain . ($lang != $defaultLang ? '/' . $lang : ''). '/change-mail/'. $userDataHash->contactId . '/' . $userDataHash->hash;
+        $params = ['contactId' => $contact->id, 'clientId' => $webstoreConfiguration->webstoreId, 'password' => null, 'newEmailLink' => $newEmailLink];
+
+        $this->sendMail(AutomaticEmailTemplate::CONTACT_NEW_EMAIL , AutomaticEmailContact::class, $params);
+
+        return $this->response->create(null, ResponseCode::OK);
     }
 
     public function update(string $contactId):Response
