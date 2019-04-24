@@ -84,28 +84,24 @@ class CustomerMailResource extends ApiResource
             UserDataHash::TYPE_CHANGE_MAIL
         );
 
-        /**
-         * @var WebstoreConfigurationRepositoryContract $webstoreConfigurationRepository
-         */
+        /** @var WebstoreConfigurationRepositoryContract $webstoreConfigurationRepository */
         $webstoreConfigurationRepository = pluginApp(WebstoreConfigurationRepositoryContract::class);
 
-        /**
-         * @var WebstoreConfiguration $webstoreConfiguration
-         */
+        /**  @var WebstoreConfiguration $webstoreConfiguration */
         $webstoreConfiguration = $webstoreConfigurationRepository->findByPlentyId($contact->plentyId);
 
-         /** @var string $domain */
-         $domain = $webstoreConfiguration->domainSsl;
-         $defaultLang = $webstoreConfiguration->defaultLanguage;
-         $sessionService = pluginApp(SessionStorageService::class);
-         $lang = $sessionService->getLang();
+        /** @var string $domain */
+        $domain = $webstoreConfiguration->domainSsl;
+        $defaultLang = $webstoreConfiguration->defaultLanguage;
+        $sessionService = pluginApp(SessionStorageService::class);
+        $lang = $sessionService->getLang();
 
-         $newEmailLink = $domain . ($lang != $defaultLang ? '/' . $lang : ''). '/change-mail/'. $userDataHash->contactId . '/' . $userDataHash->hash;
-         $params = ['contactId' => $contact->id, 'clientId' => $webstoreConfiguration->webstoreId, 'password' => null, 'newEmailLink' => $newEmailLink];
+        $newEmailLink = $domain . ($lang != $defaultLang ? '/' . $lang : ''). '/change-mail/'. $userDataHash->contactId . '/' . $userDataHash->hash;
+        $params = ['contactId' => $contact->id, 'clientId' => $webstoreConfiguration->webstoreId, 'password' => null, 'newEmailLink' => $newEmailLink];
 
-         $this->sendMail(AutomaticEmailTemplate::CONTACT_NEW_EMAIL , AutomaticEmailContact::class, $params);
+        $this->sendMail(AutomaticEmailTemplate::CONTACT_NEW_EMAIL , AutomaticEmailContact::class, $params);
 
-         return $this->response->create($userDataHash->hash, ResponseCode::OK);
+        return $this->response->create(null, ResponseCode::OK);
     }
 
     public function update(string $contactId):Response
