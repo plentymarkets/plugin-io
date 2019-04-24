@@ -16,10 +16,6 @@ class UserDataHashService
     {
         $this->db = $dataBase;
         $this->defaultTTL = $templateConfigService->get('global.user_data_hash_max_age', 24);
-        if ( $this->defaultTTL <= 0 )
-        {
-            $this->defaultTTL = null;
-        }
     }
 
     public function find( $hash, $contactId = null, $plentyId = null )
@@ -44,7 +40,7 @@ class UserDataHashService
             ->where('plentyId', '=', $plentyId)
             ->where('hash', '=', $hash)
             ->where('expiresAt', '>', date("Y-m-d H:i:s"))
-            ->orWhere('expiresAt', '=', null)
+            ->orWhere('expiresAt', '=', '')
             ->get();
 
         if (count($results))
@@ -77,7 +73,7 @@ class UserDataHashService
             ->where('plentyId', '=', $plentyId)
             ->where('type', '=', $type )
             ->where('expiresAt', '>', date("Y-m-d H:i:s"))
-            ->orWhere('expiresAt', '=', null)
+            ->orWhere('expiresAt', '=', '')
             ->get();
 
         if (count($results))
@@ -142,6 +138,10 @@ class UserDataHashService
         if ( $ttl > 0 )
         {
             $entry->expiresAt = date("Y-m-d H:i:s", time() + ($ttl * 60 * 60));
+        }
+        else
+        {
+            $entry->expiresAt = '';
         }
 
         return $this->db->save($entry);

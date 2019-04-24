@@ -2,9 +2,8 @@
 namespace IO\Controllers;
 
 use IO\Constants\LogLevel;
-use IO\Helper\TemplateContainer;
-use IO\Services\CustomerPasswordResetService;
 use IO\Services\NotificationService;
+use IO\Services\UserDataHashService;
 
 /**
  * Class CustomerPasswordResetController
@@ -18,12 +17,11 @@ class CustomerPasswordResetController extends LayoutController
      */
     public function showReset($contactId, $hash): string
     {
-        /**
-         * @var CustomerPasswordResetService $customerPasswordResetService
-         */
-        $customerPasswordResetService = pluginApp(CustomerPasswordResetService::class);
+        /** @var UserDataHashService $hashService */
+        $hashService = pluginApp(UserDataHashService::class);
+        $hashData = $hashService->getData($hash, $contactId);
         
-        if($customerPasswordResetService->checkHash((int)$contactId, $hash))
+        if(!is_null($hashData))
         {
             return $this->renderTemplate(
                 "tpl.password-reset",
