@@ -41,7 +41,6 @@ class CustomerMailResource extends ApiResource
 
     public function store():Response
     {
-        $oldMail  = $this->request->get('oldMail', null);
         $newMail  = $this->request->get('newMail', null);
         $newMail2 = $this->request->get('newMail2', null);
 
@@ -53,12 +52,14 @@ class CustomerMailResource extends ApiResource
             return $this->response->create(null, ResponseCode::UNAUTHORIZED );
         }
 
-        if ( $oldMail !== $contact->email
-            || strlen($newMail) <= 0
-            || strlen($newMail2) <= 0
-            || $newMail !== $newMail2 )
+        if ( strlen($newMail) <= 0 || strlen($newMail2) <= 0 || $newMail !== $newMail2 )
         {
             return $this->response->create(null, ResponseCode::BAD_REQUEST);
+        }
+
+        if ( $newMail === $contact->email )
+        {
+            return $this->response->create(null, ResponseCode::NOT_MODIFIED);
         }
 
         /** @var ContactRepositoryContract $contactRepository */
@@ -73,7 +74,7 @@ class CustomerMailResource extends ApiResource
         /** @var UserDataHashService $hashService */
         $hashService = pluginApp(UserDataHashService::class);
         $userDataHash = $hashService->create(
-            ['newMail' => $newMail, 'oldMail' => $oldMail],
+            ['newMail' => $newMail],
             UserDataHash::TYPE_CHANGE_MAIL
         );
 
