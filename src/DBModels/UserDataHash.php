@@ -12,7 +12,7 @@ use Plenty\Modules\Plugin\DataBase\Contracts\Model;
  * @property int    $plentyId
  * @property int    $contactId
  * @property string $hash
- * @property mixed  $data
+ * @property array  $data
  * @property string $createdAt
  * @property string $expiresAt
  *
