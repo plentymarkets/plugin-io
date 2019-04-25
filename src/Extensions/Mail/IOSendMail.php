@@ -52,7 +52,14 @@ class IOSendMail
                     $hash = $hashService->findHash(UserDataHash::TYPE_RESET_PASSWORD, $contactId);
                     if (is_null($hash))
                     {
-                        $hash = $hashService->create(['mail' => $pluginSendMail->getContactEmail()], UserDataHash::TYPE_RESET_PASSWORD, null, $contactId)->hash;
+                        /** @var UserDataHash $hashEntry */
+                        $hashEntry = $hashService->create(
+                            ['mail' => $pluginSendMail->getContactEmail()],
+                            UserDataHash::TYPE_RESET_PASSWORD,
+                            null,
+                            $contactId
+                        );
+                        $hash = $hashEntry->hash;
                     }
                     $pluginSendMailService->addEmailPlaceholder('Link_ChangePassword', 'password-reset/'.$contactId. '/'  . $hash);
                 }
