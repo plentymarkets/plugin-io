@@ -4,6 +4,7 @@ namespace IO\Services;
 
 use IO\DBModels\UserDataHash;
 use Plenty\Modules\Plugin\DataBase\Contracts\DataBase;
+use Plenty\Modules\Plugin\DataBase\Contracts\Model;
 use Plenty\Plugin\Application;
 
 class UserDataHashService
@@ -61,7 +62,8 @@ class UserDataHashService
         if (count($results))
         {
             /** @var UserDataHash $entry */
-            $entry = $results[0];
+            $entry = pluginApp(UserDataHash::class);
+            $entry->fillByAttributes(json_decode(json_encode($results[0]), true));
             return $entry;
         }
 
@@ -127,7 +129,7 @@ class UserDataHashService
             return null;
         }
 
-        return json_decode($entry->data, true);
+        return $entry->data;
     }
 
     /**
@@ -175,12 +177,12 @@ class UserDataHashService
 
         /** @var UserDataHash $entry */
         $entry = pluginApp(UserDataHash::class);
-        $entry->type = $type;
-        $entry->plentyId = $plentyId;
-        $entry->contactId = $contactId;
-        $entry->hash = sha1(microtime(true));
-        $entry->data = json_encode( $data );
-        $entry->createdAt = date("Y-m-d H:i:s");
+        $entry->type        = $type;
+        $entry->plentyId    = $plentyId;
+        $entry->contactId   = $contactId;
+        $entry->hash        = sha1(microtime(true));
+        $entry->data        = json_encode( $data );
+        $entry->createdAt   = date("Y-m-d H:i:s");
         if ( $ttl > 0 )
         {
             $entry->expiresAt = date("Y-m-d H:i:s", time() + ($ttl * 60 * 60));
@@ -190,9 +192,13 @@ class UserDataHashService
             $entry->expiresAt = '';
         }
 
-        /** @var UserDataHash $result */
+        /** @var Model $result */
         $result = $this->db->save($entry);
-        return $result;
+
+        /** @var UserDataHash $createdEntry */
+        $createdEntry = pluginApp(UserDataHash::class);
+        $createdEntry->fillByAttributes(json_decode(json_encode($result), true));
+        return $createdEntry;
     }
 
     /**
