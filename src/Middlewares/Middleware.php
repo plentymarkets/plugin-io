@@ -5,6 +5,7 @@ namespace IO\Middlewares;
 use IO\Api\ResponseCode;
 use IO\Constants\SessionStorageKeys;
 use IO\Controllers\CheckoutController;
+use IO\Extensions\Constants\ShopUrls;
 use IO\Helper\RouteConfig;
 use IO\Services\CountryService;
 use IO\Services\TemplateService;
@@ -27,7 +28,7 @@ class Middleware extends \Plenty\Plugin\Middleware
     {
         /** @var SessionStorageService $sessionService */
         $sessionService  = pluginApp(SessionStorageService::class);
-        
+
         $loginToken = $request->get('token', '');
         if(strlen($loginToken))
         {
@@ -131,10 +132,18 @@ class Middleware extends \Plenty\Plugin\Middleware
         {
             AuthGuard::redirect('/search', ['query' => $request->get('Params')['SearchParam']]);
         }
-        
-        /** @var CheckoutService $checkoutService */
-        $checkoutService = pluginApp(CheckoutService::class);
-        $checkoutService->setReadOnlyCheckout($request->get('readonlyCheckout',0) == 1);
+
+        /** @var ShopUrls $shopUrls */
+        $shopUrls = pluginApp(ShopUrls::class);
+        $requestSource = $request->all()['plentyMarkets'];
+        $checkoutRoute = str_replace("/", "", $shopUrls->checkout);
+
+        if ($request->has('readonlyCheckout') || $requestSource !== $checkoutRoute)
+        {
+            /** @var CheckoutService $checkoutService */
+            $checkoutService = pluginApp(CheckoutService::class);
+            $checkoutService->setReadOnlyCheckout($request->get('readonlyCheckout',0) == 1);
+        }
     }
 
     public function after(Request $request, Response $response):Response
