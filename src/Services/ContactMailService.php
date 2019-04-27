@@ -7,33 +7,32 @@ use Plenty\Plugin\Mail\Models\ReplyTo;
 use Plenty\Plugin\Templates\Twig;
 use IO\Services\TemplateConfigService;
 use IO\Validators\Customer\ContactFormValidator;
+use Plenty\Plugin\Translation\Translator;
 
 class ContactMailService
 {
     private $name = '';
     private $message = '';
     private $orderId = '';
-    
+
     public function __construct()
-    {
-    
-    }
-    
+    { }
+
     public function sendMail($mailTemplate, $contactData = [])
     {
         ContactFormValidator::validateOrFail($contactData);
-    
+
         /**
          * @var TemplateConfigService $templateConfigService
          */
         $templateConfigService = pluginApp(TemplateConfigService::class);
         $recipient = $templateConfigService->get('contact.shop_mail');
-        
+
         if(!strlen($recipient) || !strlen($mailTemplate))
         {
             return false;
-        }        
-        
+        }
+
         $bcc = [];
         $recipientBcc = $templateConfigService->get('contact.shop_mail_bcc');
         if(!is_null($recipientBcc) && strlen($recipientBcc))
@@ -47,25 +46,25 @@ class ContactMailService
                 }
             }
         }
-        
+
         /**
          * @var Twig
          */
         $twig = pluginApp(Twig::class);
-    
+
         $mailTemplateParams = [];
         foreach($contactData as $key => $value)
         {
             $mailTemplateParams[$key] = nl2br($value);
         }
-        
+
         $renderedMailTemplate = $twig->render($mailTemplate, $mailTemplateParams);
-        
+
         if(!strlen($renderedMailTemplate))
         {
             return false;
         }
-        
+
         $cc = [];
         if(isset($contactData['cc']) && $contactData['cc'] == 'true')
         {
@@ -83,14 +82,21 @@ class ContactMailService
                     $cc[] = trim($_ccMail);
                 }
             }
-        }        
+        }
 
         $extendSubject = $templateConfigService->get('contact.extend_orderid_to_mail_subject');
         if($extendSubject == "true" && isset($contactData['orderId']) && strlen($contactData['orderId']))
         {
-            $contactData['subject'] = $contactData['subject'] . " [OrderId: " . $contactData['orderId'] . "]";
+            $translator = pluginApp(Translator::class);
+            $contactData['subject'] = $translator->trans(
+                'Ceres::Template.contactMailSubject',
+                [
+                    'subject' => $contactData['subject'],
+                    'orderId' => $contactData['orderId']
+                ]
+            );
         }
-        
+
         /**
          * @var MailerContract $mailer
          */
@@ -104,7 +110,7 @@ class ContactMailService
         $replyTo->name = $contactData['name'];
 
         $mailer->sendHtml($renderedMailTemplate, $recipient, $contactData['subject'], $cc, $bcc, $replyTo);
-        
+
         return true;
     }
 }
