@@ -135,10 +135,8 @@ class Middleware extends \Plenty\Plugin\Middleware
 
         /** @var ShopUrls $shopUrls */
         $shopUrls = pluginApp(ShopUrls::class);
-        $requestSource = $request->all()['plentyMarkets'];
-        $checkoutRoute = str_replace("/", "", $shopUrls->checkout);
 
-        if ($request->has('readonlyCheckout') || $requestSource !== $checkoutRoute)
+        if ($request->has('readonlyCheckout') || $request->getRequestUri() !== $shopUrls->checkout)
         {
             /** @var CheckoutService $checkoutService */
             $checkoutService = pluginApp(CheckoutService::class);
