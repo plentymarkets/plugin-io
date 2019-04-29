@@ -310,17 +310,7 @@ class CustomerService
 
         if ($contact instanceof Contact && $contact->id > 0) {
 
-            /**
-             * @var WebstoreConfigurationRepositoryContract $webstoreConfigurationRepository
-             */
-            $webstoreConfigurationRepository = pluginApp(WebstoreConfigurationRepositoryContract::class);
-
-            /**
-             * @var WebstoreConfiguration $webstoreConfiguration
-             */
-            $webstoreConfiguration = $webstoreConfigurationRepository->findByPlentyId($contact->plentyId);
-
-            $params = ['contactId' => $contact->id, 'clientId' => $webstoreConfiguration->webstoreId, 'password' => $contactData['password']];
+            $params = ['contactId' => $contact->id, 'clientId' => pluginApp(Application::class)->getWebstoreId(), 'password' => $contactData['password']];
 
             $this->sendMail(AutomaticEmailTemplate::CONTACT_REGISTRATION , AutomaticEmailContact::class, $params);
         }

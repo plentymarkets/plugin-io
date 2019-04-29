@@ -35,7 +35,6 @@ class CustomerChangeMailController extends LayoutController
                 [
                     "contactId" => $contactId,
                     "hash"      => $hash,
-                    "oldMail"   => $hashData['oldMail'],
                     "newMail"   => $hashData['newMail']
                 ],
                 false

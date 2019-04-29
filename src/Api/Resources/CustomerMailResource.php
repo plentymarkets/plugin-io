@@ -19,6 +19,7 @@ use Plenty\Modules\Helper\AutomaticEmail\Models\AutomaticEmailContact;
 use Plenty\Modules\Helper\AutomaticEmail\Models\AutomaticEmailTemplate;
 use Plenty\Modules\System\Contracts\WebstoreConfigurationRepositoryContract;
 use Plenty\Modules\System\Models\WebstoreConfiguration;
+use Plenty\Plugin\Application;
 use Plenty\Plugin\Http\Request;
 use Plenty\Plugin\Http\Response;
 use Plenty\Plugin\Log\Loggable;
@@ -40,7 +41,6 @@ class CustomerMailResource extends ApiResource
 
     public function store():Response
     {
-        $oldMail  = $this->request->get('oldMail', null);
         $newMail  = $this->request->get('newMail', null);
         $newMail2 = $this->request->get('newMail2', null);
 
@@ -52,12 +52,14 @@ class CustomerMailResource extends ApiResource
             return $this->response->create(null, ResponseCode::UNAUTHORIZED );
         }
 
-        if ( $oldMail !== $contact->email
-            || strlen($newMail) <= 0
-            || strlen($newMail2) <= 0
-            || $newMail !== $newMail2 )
+        if ( strlen($newMail) <= 0 || strlen($newMail2) <= 0 || $newMail !== $newMail2 )
         {
             return $this->response->create(null, ResponseCode::BAD_REQUEST);
+        }
+
+        if ( $newMail === $contact->email )
+        {
+            return $this->response->create(null, ResponseCode::NOT_MODIFIED);
         }
 
         /** @var ContactRepositoryContract $contactRepository */
@@ -72,7 +74,7 @@ class CustomerMailResource extends ApiResource
         /** @var UserDataHashService $hashService */
         $hashService = pluginApp(UserDataHashService::class);
         $userDataHash = $hashService->create(
-            ['newMail' => $newMail, 'oldMail' => $oldMail],
+            ['newMail' => $newMail],
             UserDataHash::TYPE_CHANGE_MAIL
         );
 
@@ -89,7 +91,12 @@ class CustomerMailResource extends ApiResource
         $lang = $sessionService->getLang();
 
         $newEmailLink = $domain . ($lang != $defaultLang ? '/' . $lang : ''). '/change-mail/'. $userDataHash->contactId . '/' . $userDataHash->hash;
-        $params = ['contactId' => $contact->id, 'clientId' => $webstoreConfiguration->webstoreId, 'password' => null, 'newEmailLink' => $newEmailLink];
+        $params = [
+            'contactId' => $contact->id,
+            'clientId' => pluginApp(Application::class)->getWebstoreId(),
+            'password' => null,
+            'newEmailLink' => $newEmailLink
+        ];
 
         $this->sendMail(AutomaticEmailTemplate::CONTACT_NEW_EMAIL , AutomaticEmailContact::class, $params);
 

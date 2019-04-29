@@ -24,6 +24,7 @@
     "dependencies"      : [],
     "runOnBuild"        : [
         "IO\\Migrations\\ItemWishListMigration_0_0_1",
-        "IO\\Migrations\\UserDataHashTableMigration_0_0_1"
+        "IO\\Migrations\\UserDataHashTableMigration_0_0_1",
+        "IO\\Migrations\\UserDataHashTableMigration_0_0_2"
     ]
 }

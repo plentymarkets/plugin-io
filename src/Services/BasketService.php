@@ -415,7 +415,7 @@ class BasketService
 
             if (strlen($basketOrderParam['property']['value']) > 0 && isset($basketOrderParam['property']['value'])) {
 
-                $properties[$key]['propertyId'] = $basketOrderParam['property']['names']['propertyId'];
+                $properties[$key]['propertyId'] = $basketOrderParam['property']['id'];
                 $properties[$key]['type']       = $basketOrderParam['property']['valueType'];
                 $properties[$key]['value']      = $basketOrderParam['property']['value'];
                 $properties[$key]['name']       = $basketOrderParam['property']['names']['name'];
