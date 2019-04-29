@@ -1,11 +1,11 @@
 <?php
-namespace IO\Services\ItemLoader\Contracts;
+namespace IO\Services\ItemSearch\Contracts;
 
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Search\Aggregation\AggregationInterface;
 
 /**
  * Class FacetExtension
- * @package IO\Services\ItemLoader\Contracts
+ * @package IO\Services\ItemSearch\Contracts
  */
 interface FacetExtension
 {

@@ -4,7 +4,7 @@ namespace IO\Extensions\Filters;
 
 use IO\Extensions\AbstractFilter;
 use IO\Helper\DataFilter;
-use IO\Services\ItemLoader\Services\LoadResultFields;
+use IO\Services\ItemSearch\Helper\LoadResultFields;
 
 /**
  * Class ResultFieldsFilter

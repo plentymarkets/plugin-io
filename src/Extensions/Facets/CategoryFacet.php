@@ -1,7 +1,7 @@
 <?php
 namespace IO\Extensions\Facets;
 use IO\Services\CategoryService;
-use IO\Services\ItemLoader\Contracts\FacetExtension;
+use IO\Services\ItemSearch\Contracts\FacetExtension;
 use IO\Services\SessionStorageService;
 use IO\Services\TemplateConfigService;
 use IO\Services\TemplateService;

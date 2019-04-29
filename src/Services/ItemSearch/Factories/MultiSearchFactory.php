@@ -2,9 +2,8 @@
 
 namespace IO\Services\ItemSearch\Factories;
 
-use IO\Services\ItemLoader\Services\FacetExtensionContainer;
 use IO\Services\ItemSearch\Extensions\ItemSearchExtension;
-use IO\Services\ItemSearch\SearchPresets\SearchPreset;
+use IO\Services\ItemSearch\Helper\FacetExtensionContainer;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Search\Document\DocumentSearch;
 use Plenty\Modules\Item\Search\Contracts\VariationElasticSearchMultiSearchRepositoryContract;
 
