@@ -1,5 +1,31 @@
 # Release Notes für IO
 
+## v4.0.0 (2019-04-29) <a href="https://github.com/plentymarkets/plugin-io/compare/3.2.0...4.0.0" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
+
+### TODO
+
+- Über den Mein Konto-Bereich ist es angemeldeten Kunden jetzt möglich, ihre E-Mail-Adresse zu ändern. Hierfür müssen Änderungen in den E-Mail-Einstellungen unter **System » Systemeinstellungen » Mandant » Mandant wählen » E-Mail** getätigt werden. Unter **Vorlagen** erstellen Sie hierfür eine neue E-Mail-Vorlage. In dieser Vorlage muss der Platzhalter "$NewCustomerEmail" verwendet werden. Dieser Platzhalter enthält einen Bestätigungslink. Verknüpfen Sie diese Vorlage unter **Automatischer Versand** mit dem Ereignis **Kunde möchte E-Mail-Adresse ändern**.
+- Um das Ändern der E-Mail-Adresse im Mein-Konto-Bereich zu ermöglichen, muss die Route "/change-mail" in den Einstellungen des Plugins IO aktiviert werden.
+
+### Hinzugefügt
+
+- Am Versandprofil wird nun die maximale Lieferzeit angezeigt. Diese wird aus der Verfügbarkeit mit der höchsten Lieferzeit der Artikel im Warenkorb und der Lieferfrist am Versandprofil berechnet.
+- Bei der Registrierung und der Adresseingabe kann nun "Person" als Anrede ausgewählt werden, um eine Anrede für die Geschlechteroption "Divers" bereitzustellen.
+
+### Geändert
+
+- Das Eingabefeld "Ansprechpartner" für Firmenadressen ist nun keine Pflichtangabe mehr.
+- Es wurde Logik von Ceres nach IO ausgelagert, die dafür sorgt, dass keine Adresse ausgewählt sein darf, die den Versand an eine Packstation oder Postfiliale beinhaltet, wenn das ausgewählte Versandprofil dies nicht unterstützt.
+- Beim Speichern einer Adresse, die den Versand an eine Packstation/Postfiliale enthält, wird der Wert für die Postnummer nun aus dem Feld "postNumber" statt "address3" genommen.
+- Alle Klassen des Namespace "IO\Services\ItemLoader" wurden entfernt. Als Alternative werden die Klassen des Namespace "IO\Services\ItemSearch" verwendet.
+
+### Behoben
+
+- Durch einen Fehler wurde die Cross-Selling-Artikelliste in der Artikeleinzelansicht in bestimmten Fällen nicht beim ersten Seitenaufruf geladen. Dies wurde behoben.
+- Durch einen Fehler beinflusste die Sortierung der Kategorie auch die Sortierung einzelner Artikel, wenn für die Einstellung **Varianten nach Typ anzeigen** die Option "dynamisch" gewählt war. Ab sofort wird bei einzelnen Artikeln immer die Variante mit dem niedrigsten Preis angezeigt.
+- Checkout und Mein Konto-Bereich aus dem ShopBuilder können jetzt auch dann dargestellt werden, wenn die Einstellung "Category routes" in IO deaktiviert ist.
+- Es wurde ein Fehler beim Überprüfen von bereits vorhandenen E-Mail-Adressen bei der Newsletter-Registrierung behoben.
+
 ## v3.2.0 (2019-03-25) <a href="https://github.com/plentymarkets/plugin-io/compare/3.1.2...3.2.0" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
 
 ### Hinzugefügt
