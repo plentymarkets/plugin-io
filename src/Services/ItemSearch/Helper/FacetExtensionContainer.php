@@ -1,12 +1,12 @@
 <?php
-namespace IO\Services\ItemLoader\Services;
+namespace IO\Services\ItemSearch\Helper;
 
-use IO\Services\ItemLoader\Contracts\FacetExtension;
+use IO\Services\ItemSearch\Contracts\FacetExtension;
 use Plenty\Plugin\Events\Dispatcher;
 
 /**
  * Class FacetExtensionContainer
- * @package IO\Services\ItemLoader\Services
+ * @package IO\Services\ItemSearch\Helper
  */
 class FacetExtensionContainer
 {
