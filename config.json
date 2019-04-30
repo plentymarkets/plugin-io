@@ -189,6 +189,14 @@
                           }
                       ]
                   }
+              },
+              "routing.render_404": {
+                  "type": "checkBox",
+                  "required": false,
+                  "label": "Config.routing404",
+                  "options": {
+                      "defaultValue": "true"
+                  }
               }
           }
       }

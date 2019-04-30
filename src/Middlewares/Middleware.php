@@ -12,6 +12,8 @@ use IO\Services\TemplateService;
 use IO\Services\WebstoreConfigurationService;
 use IO\Services\TemplateConfigService;
 
+use Plenty\Modules\Plugin\Contracts\ConfigurationRepositoryContract;
+use Plenty\Plugin\ConfigRepository;
 use Plenty\Plugin\Http\Request;
 use Plenty\Plugin\Http\Response;
 use Plenty\Modules\Frontend\Contracts\Checkout;
@@ -147,6 +149,13 @@ class Middleware extends \Plenty\Plugin\Middleware
     public function after(Request $request, Response $response):Response
     {
         if ($response->status() == ResponseCode::NOT_FOUND) {
+            /** @var ConfigRepository $configRepo */
+            $configRepo = pluginApp(ConfigRepository::class);
+
+            if ($configRepo->get('IO.routing.render_404') == false) {
+                return $response;
+            }
+
             /** @var StaticPagesController $controller */
             $controller = pluginApp(StaticPagesController::class);
 
