@@ -320,8 +320,8 @@ class CheckoutService
             $translator = pluginApp(Translator::class);
             if ($translator instanceof Translator) {
                 $errors = [];
-                foreach ($validateCheckoutEvent->getErrorKeysList() as $errorKey) {
-                    $errors[] = $translator->trans($errorKey);
+                foreach ($validateCheckoutEvent->getErrorKeysList() as $errorKey => $data) {
+                    $errors[] = $translator->trans($errorKey, $data);
                 }
 
                 return array(
