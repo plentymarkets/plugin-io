@@ -84,18 +84,14 @@ class ContactMailService
             }
         }
 
-        $extendSubject = $templateConfigService->get('contact.extend_orderid_to_mail_subject');
-        if($extendSubject == "true" && isset($contactData['orderId']) && strlen($contactData['orderId']))
-        {
-            $translator = pluginApp(Translator::class);
-            $contactData['subject'] = $translator->trans(
-                'Ceres::Template.contactMailSubject',
-                [
-                    'subject' => $contactData['subject'],
-                    'orderId' => $contactData['orderId']
-                ]
-            );
-        }
+        $translator = pluginApp(Translator::class);
+        $contactData['subject'] = $translator->trans(
+            'Ceres::Template.contactMailSubject',
+            [
+                'subject' => $contactData['subject'],
+                'orderId' => $contactData['orderId']
+            ]
+        );
 
         /**
          * @var MailerContract $mailer
