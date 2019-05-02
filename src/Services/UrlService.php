@@ -2,6 +2,7 @@
 
 namespace IO\Services;
 
+use IO\Helper\LanguageMap;
 use IO\Helper\MemoryCache;
 use IO\Services\UrlBuilder\CategoryUrlBuilder;
 use IO\Services\UrlBuilder\UrlQuery;
@@ -199,7 +200,8 @@ class UrlService
                     $url = $this->getCanonicalURL( $language );
                     if ( $url !== null )
                     {
-                        $result[$language] = $url;
+                        $languageISO = LanguageMap::getLanguageCode($language);
+                        $result[$languageISO] = $url;
                     }
                 }
 
@@ -225,9 +227,8 @@ class UrlService
     {
         if(strpos($redirectURL, 'http:') !== 0 && strpos($redirectURL, 'https:') !== 0)
         {
-            $redirectURL = pluginApp( UrlQuery::class, ['path' => $this->getHomepageURL()])
-                ->join($redirectURL)
-                ->toRelativeUrl($this->webstoreConfigurationService->getDefaultLanguage() !== $this->sessionStorage->getLang());
+            $redirectURL = pluginApp( UrlQuery::class, ['path' => $redirectURL])
+                ->toRelativeUrl($this->webstoreConfigurationService->getDefaultLanguage() !== $this->sessionStorage->getLang() );
         }
 
         return pluginApp(Response::class)->redirectTo($redirectURL);

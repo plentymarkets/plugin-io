@@ -1,11 +1,12 @@
 <?php
-namespace IO\Services\ItemLoader\Services;
+namespace IO\Services\ItemSearch\Helper;
+
 use Plenty\Plugin\Data\Contracts\Resources;
 
 /**
  * Created by ptopczewski, 09.01.17 11:07
  * Trait LoadResultFields
- * @package IO\Services\ItemLoader\Services
+ * @package IO\Services\ItemSearch\Helper
  */
 trait LoadResultFields
 {

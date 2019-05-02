@@ -4,6 +4,7 @@ namespace IO\Services;
 
 use IO\Constants\SessionStorageKeys;
 use IO\Services\ItemSearch\SearchPresets\CategoryItems;
+use IO\Services\ItemSearch\SearchPresets\CrossSellingItems;
 use IO\Services\ItemSearch\SearchPresets\TagItems;
 use IO\Services\ItemSearch\SearchPresets\VariationList;
 use IO\Services\ItemSearch\Services\ItemSearchService;
@@ -18,6 +19,7 @@ class ItemListService
     const TYPE_TAG          = 'tag_list';
     const TYPE_RANDOM       = 'random';
     const TYPE_MANUFACTURER = 'manufacturer';
+    const TYPE_CROSS_SELLER = 'cross_selling';
 
     public function getItemList( $type, $id = null, $sorting = null, $maxItems = 0 )
     {
@@ -72,6 +74,12 @@ class ItemListService
                     'page' => 1,
                     'itemsPerPage' => $maxItems,
                     'sorting'   => $sorting
+                ]);
+                break;
+            case self::TYPE_CROSS_SELLER:
+                $searchFactory = CrossSellingItems::getSearchFactory([
+                    'itemId' => $id,
+                    'sorting' => $sorting
                 ]);
                 break;
             default:

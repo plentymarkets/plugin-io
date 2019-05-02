@@ -3,6 +3,7 @@
 namespace IO\Guards;
 
 use IO\Services\WebstoreConfigurationService;
+use Plenty\Plugin\Log\Loggable;
 
 /**
  * Class AbstractGuard
@@ -10,6 +11,8 @@ use IO\Services\WebstoreConfigurationService;
  */
 abstract class AbstractGuard
 {
+    use Loggable;
+
     /**
      * Returned value will be compared with asserted value to decide if it should redirect.
      * @return mixed
@@ -25,6 +28,14 @@ abstract class AbstractGuard
     {
         if ( $this->assert() !== $expected )
         {
+            $this->getLogger(__CLASS__)->info(
+                "IO::Debug.AbstractGuard_redirectToLogin",
+                [
+                    "expected" => $expected,
+                    "actual" => $this->assert(),
+                    "backlink" => self::getUrl()
+                ]
+            );
             self::redirect( $redirectUri, ["backlink" => self::getUrl()] );
         }
     }

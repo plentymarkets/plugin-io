@@ -19,6 +19,5 @@ class AddressValidator extends Validator
         $this->addString('name1', $isCompany);
         $this->addString('name2', !$isCompany);
         $this->addString('name3', !$isCompany);
-        $this->addString('contactPerson', $isCompany);
     }
 }

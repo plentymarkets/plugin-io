@@ -116,6 +116,10 @@
                               "caption": "Config.routingEnabledRoutesPossibleValuePasswordReset"
                           },
                           {
+                              "value": "change-mail",
+                              "caption": "Config.routingEnabledRoutesPossibleValueChangeMail"
+                          },
+                          {
                               "value": "search",
                               "caption": "Config.routingEnabledRoutesPossibleValueSearch"
                           },
