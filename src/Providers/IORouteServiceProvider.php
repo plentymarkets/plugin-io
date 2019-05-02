@@ -2,6 +2,8 @@
 
 namespace IO\Providers;
 
+use IO\Controllers\CategoryController;
+use IO\Extensions\Constants\ShopUrls;
 use IO\Helper\RouteConfig;
 use Plenty\Plugin\RouteServiceProvider;
 use Plenty\Plugin\Routing\Router;
@@ -51,6 +53,7 @@ class IORouteServiceProvider extends RouteServiceProvider
 			$api->resource('io/customer/logout', 'CustomerLogoutResource');
 			$api->resource('io/customer/password', 'CustomerPasswordResource');
             $api->resource('io/customer/password_reset', 'CustomerPasswordResetResource');
+            $api->resource('io/customer/mail', 'CustomerMailResource');
             $api->resource('io/customer/contact/mail', 'ContactMailResource');
             $api->resource('io/customer/bank_data', 'ContactBankResource');
             $api->get('io/customer/order/list', 'CustomerOrderResource@index');
@@ -68,7 +71,6 @@ class IORouteServiceProvider extends RouteServiceProvider
             $api->resource('io/template', 'TemplateResource');
             $api->resource('io/localization/language', 'LanguageResource');
             $api->resource('io/itemWishList', 'ItemWishListResource');
-            $api->resource('io/cache/reset_template_cache', 'ResetTemplateCacheResource');
             $api->resource('io/shipping/country', 'ShippingCountryResource');
             $api->resource('io/live-shopping', 'LiveShoppingResource');
             $api->resource('io/facet', 'FacetResource');
@@ -88,10 +90,6 @@ class IORouteServiceProvider extends RouteServiceProvider
         {
             //Checkout-confirm purchase route
             $router->get('checkout', 'IO\Controllers\CheckoutController@showCheckout');
-        }
-        else if ( RouteConfig::getCategoryId(RouteConfig::CHECKOUT) > 0 )
-        {
-            $router->get('checkout', 'IO\Controllers\CheckoutController@redirectCheckoutCategory');
         }
 
         if ( RouteConfig::isActive(RouteConfig::MY_ACCOUNT) )
@@ -205,6 +203,11 @@ class IORouteServiceProvider extends RouteServiceProvider
             $router->get('password-reset/{contactId}/{hash}', 'IO\Controllers\CustomerPasswordResetController@showReset');
         }
 
+        if( RouteConfig::isActive(RouteConfig::CHANGE_MAIL) )
+        {
+            $router->get('change-mail/{contactId}/{hash}', 'IO\Controllers\CustomerChangeMailController@show');
+        }
+
         if( RouteConfig::isActive(RouteConfig::ORDER_PROPERTY_FILE) )
         {
             $router->get('order-property-file/{hash1}', 'IO\Controllers\OrderPropertyFileController@downloadTempFile');
@@ -257,6 +260,39 @@ class IORouteServiceProvider extends RouteServiceProvider
         if ( RouteConfig::isActive(RouteConfig::CATEGORY) )
         {
             $router->get('{level1?}/{level2?}/{level3?}/{level4?}/{level5?}/{level6?}', 'IO\Controllers\CategoryController@showCategory');
+        }
+        else
+        {
+            /** @var ShopUrls $shopUrls */
+            $shopUrls = pluginApp(ShopUrls::class);
+            $staticCategories = [
+                [RouteConfig::CHECKOUT, $shopUrls->checkout, "checkout"],
+                [RouteConfig::MY_ACCOUNT, $shopUrls->myAccount, "my-account"]
+            ];
+
+            foreach($staticCategories as $staticCategory)
+            {
+                list($catKey, $catUrl, $legacyUrl) = $staticCategory;
+
+                if ( RouteConfig::getCategoryId($catKey) > 0 )
+                {
+                    $router->get($catUrl, function() use ($catKey, $catUrl)
+                    {
+                        return pluginApp(CategoryController::class)->showCategoryById(
+                            RouteConfig::getCategoryId($catKey)
+                        );
+                    });
+
+
+                    if ( !is_null($legacyUrl) && $catUrl !== "/" . $legacyUrl )
+                    {
+                        $router->get($legacyUrl, function() use ($catKey, $catUrl)
+                        {
+                            return pluginApp(CategoryController::class)->redirectToCategory( $catUrl );
+                        });
+                    }
+                }
+            }
         }
 	}
 }

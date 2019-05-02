@@ -4,6 +4,7 @@ namespace IO\Controllers;
 use IO\Guards\AuthGuard;
 use IO\Helper\TemplateContainer;
 use IO\Services\CustomerService;
+use Plenty\Plugin\Log\Loggable;
 
 /**
  * Class LoginController
@@ -11,6 +12,8 @@ use IO\Services\CustomerService;
  */
 class LoginController extends LayoutController
 {
+    use Loggable;
+
     /**
      * Prepare and render the data for the login
      * @param CustomerService $customerService
@@ -20,6 +23,7 @@ class LoginController extends LayoutController
 	{
         if($customerService->getContactId() > 0)
         {
+            $this->getLogger(__CLASS__)->info("IO::Debug.LoginController_alreadyLoggedIn");
             AuthGuard::redirect($this->urlService->getHomepageURL(), []);
         }
 

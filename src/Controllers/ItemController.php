@@ -7,6 +7,7 @@ use IO\Services\ItemSearch\SearchPresets\CrossSellingItems;
 use IO\Services\ItemSearch\SearchPresets\SingleItem;
 use IO\Services\ItemSearch\Services\ItemSearchService;
 use Plenty\Plugin\Http\Response;
+use Plenty\Plugin\Log\Loggable;
 
 /**
  * Class ItemController
@@ -14,6 +15,7 @@ use Plenty\Plugin\Http\Response;
  */
 class ItemController extends LayoutController
 {
+    use Loggable;
     /**
      * Prepare and render the item data.
      * @param string $slug
@@ -34,17 +36,21 @@ class ItemController extends LayoutController
         ];
         /** @var ItemSearchService $itemSearchService */
         $itemSearchService = pluginApp( ItemSearchService::class );
-        $result = $itemSearchService->getResults([
-            'item'              => SingleItem::getSearchFactory( $itemSearchOptions ),
-            'crossSellingItems' => CrossSellingItems::getSearchFactory( $itemSearchOptions )
-        ]);
+        $itemResult = $itemSearchService->getResult(
+            SingleItem::getSearchFactory( $itemSearchOptions )
+        );
 
-
-        $itemResult = $result['item'];
-        $itemResult['CrossSellingItems'] = $result['crossSellingItems'];
 
         if(empty($itemResult['documents']))
         {
+            $this->getLogger(__CLASS__)->info(
+                "IO::Debug.ItemController_itemNotFound",
+                [
+                    "slug"          => $slug,
+                    "itemId"        => $itemId,
+                    "variationId"   => $variationId
+                ]
+            );
             /** @var Response $response */
             $response = pluginApp(Response::class);
             $response->forceStatus(ResponseCode::NOT_FOUND);
@@ -60,34 +66,34 @@ class ItemController extends LayoutController
                 ]
             );
         }
-	}
+    }
 
-	/**
-	 * @param int $itemId
-	 * @param int $variationId
-	 * @return string
-	 */
-	public function showItemWithoutName(int $itemId, $variationId = 0)
-	{
-		return $this->showItem("", $itemId, $variationId);
-	}
+    /**
+     * @param int $itemId
+     * @param int $variationId
+     * @return string
+     */
+    public function showItemWithoutName(int $itemId, $variationId = 0)
+    {
+        return $this->showItem("", $itemId, $variationId);
+    }
 
-	/**
-	 * @param int $itemId
-	 * @return string
-	 */
-	public function showItemFromAdmin(int $itemId)
-	{
-		return $this->showItem("", $itemId, 0);
-	}
-    
+    /**
+     * @param int $itemId
+     * @return string
+     */
+    public function showItemFromAdmin(int $itemId)
+    {
+        return $this->showItem("", $itemId, 0);
+    }
+
     public function showItemOld($name = null, $itemId = null)
     {
         if(is_null($itemId))
         {
             $itemId = $name;
         }
-        
+
         return $this->showItem("", (int)$itemId, 0);
     }
 }

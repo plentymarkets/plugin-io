@@ -50,6 +50,7 @@ class CrossSellingItems implements SearchPreset
         $searchFactory
             ->withLanguage()
             ->withUrls()
+            ->withImages()
             ->withPrices()
             ->withDefaultImage()
             ->isVisibleForClient()
@@ -60,7 +61,8 @@ class CrossSellingItems implements SearchPreset
             ->hasPriceForCustomer()
             ->sortBy($sorting['path'], $sorting['order'])
             ->withLinkToContent()
-            ->withGroupedAttributeValues();
+            ->withGroupedAttributeValues()
+            ->withReducedResults();
 
         return $searchFactory;
     }

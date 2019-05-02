@@ -8,6 +8,7 @@ use IO\Services\UrlBuilder\UrlQuery;
 use Plenty\Modules\Basket\Exceptions\BasketItemCheckException;
 use Plenty\Plugin\Http\Response;
 use Plenty\Plugin\Http\Request;
+use Plenty\Plugin\Log\Loggable;
 
 /**
  * Class PlaceOrderController
@@ -15,6 +16,8 @@ use Plenty\Plugin\Http\Request;
  */
 class PlaceOrderController extends LayoutController
 {
+    use Loggable;
+
     /**
      * @param OrderService $orderService
      * @param NotificationService $notificationService
@@ -40,6 +43,13 @@ class PlaceOrderController extends LayoutController
         }
         catch(BasketItemCheckException $exception)
         {
+            $this->getLogger(__CLASS__)->warning(
+                "IO::Debug.PlaceOrderController_cannotPlaceOrder",
+                [
+                    "code" => $exception->getCode(),
+                    "message" => $exception->getMessage()
+                ]
+            );
             if ($exception->getCode() == BasketItemCheckException::NOT_ENOUGH_STOCK_FOR_ITEM)
             {
                 $notificationService->warn('not enough stock for item', 9);
@@ -49,6 +59,14 @@ class PlaceOrderController extends LayoutController
         }
         catch (\Exception $exception)
         {
+            $this->getLogger(__CLASS__)->warning(
+                "IO::Debug.PlaceOrderController_cannotPlaceOrder",
+                [
+                    "code" => $exception->getCode(),
+                    "message" => $exception->getMessage()
+                ]
+            );
+
             if($exception->getCode() === 15)
             {
                 return $this->urlService->redirectTo(pluginApp(ShopUrls::class)->confirmation);
@@ -62,6 +80,14 @@ class PlaceOrderController extends LayoutController
 
     public function executePayment( OrderService $orderService, NotificationService $notificationService, Response $response, int $orderId, int $paymentId = -1 )
     {
+        $this->getLogger(__CLASS__)->debug(
+            "IO::Debug.PlaceOrderController_executePayment",
+            [
+                "orderId" => $orderId,
+                "paymentId" => $paymentId
+            ]
+        );
+
         $request = pluginApp(Request::class);
         $redirectParam = $request->get('redirectParam', '');
 
@@ -69,6 +95,13 @@ class PlaceOrderController extends LayoutController
         $orderData = $orderService->findOrderById( $orderId );
         if( $orderData == null )
         {
+            $this->getLogger(__CLASS__)->warning(
+                "IO::Debug.PlaceOrderController_orderNotDefined",
+                [
+                    "orderId" => $orderId,
+                    "paymentId" => $paymentId
+                ]
+            );
             $notificationService->error("Order (". $orderId .") not found!");
             return $this->urlService->redirectTo(pluginApp(ShopUrls::class)->checkout);
         }
@@ -85,16 +118,35 @@ class PlaceOrderController extends LayoutController
             $paymentResult = $orderService->executePayment($orderId, $paymentId);
             if ($paymentResult["type"] === "redirectUrl")
             {
+                $this->getLogger(__CLASS__)->info(
+                    "IO::Debug.PlaceOrderController_redirectToPaymentResult",
+                    [
+                        "paymentResult" => $paymentResult
+                    ]
+                );
                 return $this->urlService->redirectTo($paymentResult["value"]);
             }
             elseif ($paymentResult["type"] === "error")
             {
+                $this->getLogger(__CLASS__)->warning(
+                    "IO::Debug.PlaceOrderController_errorFromPaymentProvider",
+                    [
+                        "paymentResult" => $paymentResult
+                    ]
+                );
                 // send errors
                 $notificationService->error($paymentResult["value"]);
             }
         }
         catch(\Exception $exception)
         {
+            $this->getLogger(__CLASS__)->warning(
+                "IO::Debug.PlaceOrderController_cannotExecutePayment",
+                [
+                    "code" => $exception->getCode(),
+                    "message" => $exception->getMessage()
+                ]
+            );
             $notificationService->error($exception->getMessage());
         }
 
@@ -102,9 +154,14 @@ class PlaceOrderController extends LayoutController
         // in case of failure, the order should have been marked as "not payed"
         if( strlen($redirectParam) )
         {
+            $this->getLogger(__CLASS__)->info(
+                "IO::Debug.PlaceOrderController_redirectToParam",
+                [
+                    "redirectParam" => $redirectParam
+                ]
+            );
             return $this->urlService->redirectTo($redirectParam);
         }
-
         return $this->urlService->redirectTo(pluginApp(ShopUrls::class)->confirmation);
     }
 }

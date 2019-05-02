@@ -2,13 +2,15 @@
 
 namespace IO\Services\ItemSearch\Factories;
 
-use IO\Services\ItemLoader\Services\LoadResultFields;
 use IO\Services\ItemSearch\Extensions\ItemSearchExtension;
 use IO\Services\ItemSearch\Extensions\SortExtension;
+use IO\Services\ItemSearch\Helper\LoadResultFields;
 use IO\Services\SessionStorageService;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Collapse\BaseCollapse;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Collapse\CollapseInterface;
+use Plenty\Modules\Cloud\ElasticSearch\Lib\Collapse\InnerHit\BaseInnerHit;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\ElasticSearch;
+use Plenty\Modules\Cloud\ElasticSearch\Lib\Processor\DocumentInnerHitsToRootProcessor;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Processor\DocumentProcessor;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Query\Type\ScoreModifier\RandomScore;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Query\Type\TypeInterface;
@@ -17,6 +19,7 @@ use Plenty\Modules\Cloud\ElasticSearch\Lib\Search\Document\DocumentSearch;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Sorting\MultipleSorting;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Sorting\SingleSorting;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Source\IncludeSource;
+use Plenty\Modules\Cloud\ElasticSearch\Lib\Source\IndependentSource;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Source\Mutator\MutatorInterface;
 use Plenty\Modules\Item\Search\Aggregations\ItemAttributeValueCardinalityAggregation;
 use Plenty\Modules\Item\Search\Aggregations\ItemAttributeValueCardinalityAggregationProcessor;
@@ -361,6 +364,7 @@ class BaseSearchFactory
      */
     public function groupBy( $field )
     {
+        /** @var BaseCollapse $collapse */
         $collapse = pluginApp( BaseCollapse::class, [$field] );
         $this->collapse = $collapse;
 
@@ -392,12 +396,6 @@ class BaseSearchFactory
                 $search->addFilter( $filter );
             }
         }
-        
-        // ADD COLLAPSE
-        if ( $this->collapse instanceof CollapseInterface )
-        {
-            $search->setCollapse( $this->collapse );
-        }
     
         // ADD RANDOM MODIFIER
         if($this->randomScoreModifier instanceof RandomScore)
@@ -428,7 +426,7 @@ class BaseSearchFactory
         {
             $search->setSorting( $this->sorting );
         }
-
+        
         if ( $this->itemsPerPage < 0 )
         {
             $this->itemsPerPage = 1000;
@@ -448,18 +446,40 @@ class BaseSearchFactory
      */
     protected function prepareSearch()
     {
-        /** @var DocumentProcessor $processor */
-        $processor = pluginApp( DocumentProcessor::class );
-
+        if($this->collapse instanceof BaseCollapse)
+        {
+            /** @var IndependentSource $source */
+            $source = pluginApp(IndependentSource::class);
+            //$source->activate('variation.id', 'item.id');
+            $source->activate();
+    
+            /** @var BaseInnerHit $innerHit */
+            $innerHit = pluginApp(BaseInnerHit::class, ['cheapest']);
+            $innerHit->setSorting(pluginApp(SingleSorting::class, ['sorting.price.avg', 'asc']));
+            $innerHit->setSource($source);
+            $this->collapse->addInnerHit($innerHit);
+    
+            /** @var DocumentInnerHitsToRootProcessor $docProcessor */
+            $processor = pluginApp(DocumentInnerHitsToRootProcessor::class, [$innerHit->getName()]);
+            $search = pluginApp(DocumentSearch::class, [$processor]);
+    
+            // Group By Item Id
+            $search->setCollapse($this->collapse);
+        }
+        else
+        {
+            /** @var DocumentProcessor $processor */
+            $processor = pluginApp( DocumentProcessor::class );
+            /** @var DocumentSearch $search */
+            $search = pluginApp( DocumentSearch::class, [$processor] );
+        }
+    
         // ADD MUTATORS
         foreach( $this->mutators as $mutator )
         {
             $processor->addMutator( $mutator );
         }
-
-        /** @var DocumentSearch $search */
-        $search = pluginApp( DocumentSearch::class, [$processor] );
-
+        
         return $search;
     }
     

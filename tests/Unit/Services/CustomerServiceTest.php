@@ -520,6 +520,10 @@ class CustomerServiceTest extends TestCase
         $address2->name1 = 'update';
         $address2->id    = $addressId;
 
+        $this->addressRepositoryMock->shouldReceive('findAddressById')
+            ->with($addressId)
+            ->andReturn($address);
+
         $this->addressRepositoryMock->shouldReceive('updateAddress')
             ->andReturn($address2);
 
@@ -578,6 +582,10 @@ class CustomerServiceTest extends TestCase
         $address2->name1 = 'update';
         $address2->id    = $addressId;
 
+        $this->addressRepositoryMock->shouldReceive('findAddressById')
+            ->with($addressId)
+            ->andReturn($address);
+
         $this->contactAddressRepositoryMock->shouldReceive('updateAddress')
             ->andReturn($address2);
 
@@ -632,6 +640,10 @@ class CustomerServiceTest extends TestCase
         $address2        = $address->replicate();
         $address2->name1 = 'update';
         $address2->id    = $addressId;
+
+        $this->addressRepositoryMock->shouldReceive('findAddressById')
+            ->with($addressId)
+            ->andReturn($address);
 
         $this->contactAddressRepositoryMock->shouldReceive('updateAddress')
             ->andReturn($address2);
@@ -688,6 +700,10 @@ class CustomerServiceTest extends TestCase
         $address2        = $address->replicate();
         $address2->name1 = 'update';
         $address2->id    = $addressId;
+
+        $this->addressRepositoryMock->shouldReceive('findAddressById')
+            ->with($addressId)
+            ->andReturn($address);
 
         $this->contactAddressRepositoryMock->shouldReceive('updateAddress')
             ->andReturn($address2);

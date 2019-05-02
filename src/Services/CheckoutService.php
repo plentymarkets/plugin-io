@@ -4,6 +4,7 @@ namespace IO\Services;
 
 use IO\Builder\Order\AddressType;
 use IO\Constants\SessionStorageKeys;
+use IO\Events\Checkout\CheckoutReadonlyChanged;
 use IO\Helper\LanguageMap;
 use IO\Helper\MemoryCache;
 use Plenty\Modules\Accounting\Contracts\AccountingLocationRepositoryContract;
@@ -19,7 +20,6 @@ use Plenty\Modules\Order\Currency\Contracts\CurrencyRepositoryContract;
 use Plenty\Modules\Order\Shipping\Contracts\ParcelServicePresetRepositoryContract;
 use Plenty\Modules\Payment\Events\Checkout\GetPaymentMethodContent;
 use Plenty\Modules\Payment\Method\Contracts\PaymentMethodRepositoryContract;
-use Plenty\Plugin\Application;
 use Plenty\Plugin\ConfigRepository;
 use Plenty\Plugin\Events\Dispatcher;
 use Plenty\Plugin\Translation\Translator;
@@ -68,6 +68,9 @@ class CheckoutService
      * @var BasketService
      */
     private $basketService;
+    
+    /** @var SessionStorageService */
+    private $sessionStorageService;
 
     /**
      * CheckoutService constructor.
@@ -79,6 +82,7 @@ class CheckoutService
      * @param ParcelServicePresetRepositoryContract $parcelServicePresetRepo
      * @param CurrencyExchangeRepositoryContract $currencyExchangeRepo
      * @param BasketService $basketService
+     * @param SessionStorageService $sessionStorageService
      */
     public function __construct(
         FrontendPaymentMethodRepositoryContract $frontendPaymentMethodRepository,
@@ -88,7 +92,8 @@ class CheckoutService
         CustomerService $customerService,
         ParcelServicePresetRepositoryContract $parcelServicePresetRepo,
         CurrencyExchangeRepositoryContract $currencyExchangeRepo,
-        BasketService $basketService)
+        BasketService $basketService,
+        SessionStorageService $sessionStorageService)
     {
         $this->frontendPaymentMethodRepository = $frontendPaymentMethodRepository;
         $this->checkout                        = $checkout;
@@ -98,7 +103,7 @@ class CheckoutService
         $this->parcelServicePresetRepo         = $parcelServicePresetRepo;
         $this->currencyExchangeRepo            = $currencyExchangeRepo;
         $this->basketService                   = $basketService;
-
+        $this->sessionStorageService           = $sessionStorageService;
     }
 
     /**
@@ -111,16 +116,18 @@ class CheckoutService
         try
         {
             return [
-                "currency" => $this->getCurrency(),
-                "currencyList" => $this->getCurrencyList(),
-                "methodOfPaymentId" => $this->getMethodOfPaymentId(),
+                "currency"            => $this->getCurrency(),
+                "currencyList"        => $this->getCurrencyList(),
+                "methodOfPaymentId"   => $this->getMethodOfPaymentId(),
                 "methodOfPaymentList" => $this->getMethodOfPaymentList(),
-                "shippingCountryId" => $this->getShippingCountryId(),
-                "shippingProfileId" => $this->getShippingProfileId(),
+                "shippingCountryId"   => $this->getShippingCountryId(),
+                "shippingProfileId"   => $this->getShippingProfileId(),
                 "shippingProfileList" => $this->getShippingProfileList(),
                 "deliveryAddressId" => $this->getDeliveryAddressId(),
                 "billingAddressId" => $this->getBillingAddressId(),
                 "paymentDataList" => $this->getCheckoutPaymentDataList(),
+                "maxDeliveryDays" => $this->getMaxDeliveryDays(),
+                "readOnly"            => $this->getReadOnlyCheckout()
             ];
         }
         catch(\Exception $e)
@@ -354,7 +361,7 @@ class CheckoutService
     {
         $paymentDataList = array();
         $mopList         = $this->getMethodOfPaymentList();
-        $lang            = pluginApp(SessionStorageService::class)->getLang();
+        $lang            = $this->sessionStorageService->getLang();
         foreach ($mopList as $paymentMethod) {
             $paymentData                = array();
             $paymentData['id']          = $paymentMethod->id;
@@ -376,49 +383,49 @@ class CheckoutService
      */
     public function getShippingProfileList()
     {
-        /** @var SessionStorageService $sessionService */
-        $sessionService = pluginApp(SessionStorageService::class);
-        /** @var AccountingLocationRepositoryContract $accountRepo*/
-        $accountRepo = pluginApp(AccountingLocationRepositoryContract::class);
-        /** @var VatService $vatService*/
-        $vatService = pluginApp(VatService::class);
-        $showNetPrice   = $sessionService->getCustomer()->showNetPrice;
-
-        $params  = [
-            'countryId'  => $this->getShippingCountryId(),
-            'webstoreId' => pluginApp(Application::class)->getWebstoreId(),
-        ];
-        $list    = $this->parcelServicePresetRepo->getLastWeightedPresetCombinations($this->basketRepository->load(), $sessionService->getCustomer()->accountContactClassId, $params);
-
-        $locationId = $vatService->getLocationId($this->getShippingCountryId());
-        $accountSettings = $accountRepo->getSettings($locationId);
-
-        if ($showNetPrice && !(bool)$accountSettings->showShippingVat) {
-
-            $maxVatValue   = $this->basketService->getMaxVatValue();
-
-            if (is_array($list)) {
-                foreach ($list as $key => $shippingProfile) {
-                    if (isset($shippingProfile['shippingAmount'])) {
-                        $list[$key]['shippingAmount'] = (100.0 * $shippingProfile['shippingAmount']) / (100.0 + $maxVatValue);
-                    }
-                }
-            }
-        }
-
-        $basket = $this->basketService->getBasket();
-        if($basket->currency !== $this->currencyExchangeRepo->getDefaultCurrency())
+        return $this->fromMemoryCache('shippingProfileList', function()
         {
-            if (is_array($list)) {
-                foreach ($list as $key => $shippingProfile) {
-                    if (isset($shippingProfile['shippingAmount'])) {
-                        $list[$key]['shippingAmount'] = $this->currencyExchangeRepo->convertFromDefaultCurrency($basket->currency, $list[$key]['shippingAmount']);
+            /** @var AccountingLocationRepositoryContract $accountRepo*/
+            $accountRepo = pluginApp(AccountingLocationRepositoryContract::class);
+            /** @var VatService $vatService*/
+            $vatService = pluginApp(VatService::class);
+            $showNetPrice   = $this->sessionStorageService->getCustomer()->showNetPrice;
+        
+            $list = $this->parcelServicePresetRepo->getLastWeightedPresetCombinations($this->basketRepository->load(), $this->sessionStorageService->getCustomer()->accountContactClassId);
+        
+            $locationId = $vatService->getLocationId($this->getShippingCountryId());
+            $accountSettings = $accountRepo->getSettings($locationId);
+        
+            if ($showNetPrice && !(bool)$accountSettings->showShippingVat) {
+    
+                $maxVatValue = $this->basketService->getMaxVatValue();
+    
+                if (is_array($list)) {
+                    foreach ($list as $key => $shippingProfile) {
+                        if (isset($shippingProfile['shippingAmount'])) {
+                            $list[$key]['shippingAmount'] = (100.0 * $shippingProfile['shippingAmount']) / (100.0 + $maxVatValue);
+                        }
+                    }
+                }
+    
+                $basket = $this->basketService->getBasket();
+                if ($basket->currency !== $this->currencyExchangeRepo->getDefaultCurrency())
+                {
+                    if (is_array($list))
+                    {
+                        foreach ($list as $key => $shippingProfile)
+                        {
+                            if (isset($shippingProfile['shippingAmount']))
+                            {
+                                $list[$key]['shippingAmount'] = $this->currencyExchangeRepo->convertFromDefaultCurrency($basket->currency, $list[$key]['shippingAmount']);
+                            }
+                        }
                     }
                 }
             }
-        }
-
-        return $list;
+            
+            return $list;
+        });
     }
 
     /**
@@ -522,5 +529,30 @@ class CheckoutService
         $defaultShippingCountryId = $webstoreConfigService->getDefaultShippingCountryId();
 
         $this->setShippingCountryId($defaultShippingCountryId);
+    }
+    
+    public function getMaxDeliveryDays()
+    {
+        /** @var ShippingService $shippingService */
+        $shippingService = pluginApp(ShippingService::class);
+        return $shippingService->getMaxDeliveryDays();
+    }
+
+    public function setReadOnlyCheckout($readonly)
+    {
+        if ( $this->getReadOnlyCheckout() !== $readonly )
+        {
+            /** @var Dispatcher $dispatcher */
+            $dispatcher = pluginApp(Dispatcher::class);
+            $dispatcher->fire(pluginApp(CheckoutReadonlyChanged::class, ['isReadonly' => $readonly]));
+            $this->sessionStorageService->setSessionValue(SessionStorageKeys::READONLY_CHECKOUT, $readonly);
+        }
+
+    }
+    
+    public function getReadOnlyCheckout()
+    {
+        $readOnlyCheckout = $this->sessionStorageService->getSessionValue(SessionStorageKeys::READONLY_CHECKOUT);
+        return ( !is_null($readOnlyCheckout) ? $readOnlyCheckout : false );
     }
 }
