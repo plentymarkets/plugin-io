@@ -45,7 +45,7 @@ class CustomerPasswordResource extends ApiResource
 	    $contactId = $this->request->get('contactId', 0);
         $hash = $this->request->get('hash', '');
 
-		if(strlen($newPassword) && strlen($newPassword2) && $newPassword == $newPassword2)
+		if(strlen($newPassword) && strlen($newPassword2) && $newPassword == $newPassword2 && $this->isValidPassword($newPassword))
 		{
 		    if (!strlen($hash))
 		    {
@@ -75,4 +75,12 @@ class CustomerPasswordResource extends ApiResource
 		return $this->response->create(null, ResponseCode::BAD_REQUEST);
 	}
 
+    /**
+     * Checks if the password meets the requirements
+     */
+    static public function isValidPassword($password)
+    {
+        $passwordPattern = '/^(?=.*[A-Za-z])(?=.*\d)\S{8,}$/';
+        return preg_match($passwordPattern,$password);
+    }
 }
