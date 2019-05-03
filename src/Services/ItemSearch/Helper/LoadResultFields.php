@@ -2,7 +2,7 @@
 namespace IO\Services\ItemSearch\Helper;
 
 use Plenty\Plugin\Data\Contracts\Resources;
-use Plenty\Plugin\Log\Loggable;
+use Plenty\Plugin\Log\LoggerFactory;
 
 /**
  * Created by ptopczewski, 09.01.17 11:07
@@ -11,8 +11,6 @@ use Plenty\Plugin\Log\Loggable;
  */
 trait LoadResultFields
 {
-    use Loggable;
-
 	/**
 	 * @param string $fullTemplateName
 	 * @return array
@@ -29,13 +27,16 @@ trait LoadResultFields
 			return $resource->load($resourceName . '.fields')->getData();
 		}
 
-		$this->getLogger(__CLASS__)->warning(
-		    "IO::Debug.LoadResultFields_notFound",
-            [
-                "template"      => $fullTemplateName,
-                "resourceName"  => $resourceName . '.fields'
-            ]
-        );
+        pluginApp(LoggerFactory::class)
+            ->getLogger("IO", __CLASS__)
+            ->warning(
+                "IO::Debug.LoadResultFields_notFound",
+                [
+                    "template"      => $fullTemplateName,
+                    "resourceName"  => $resourceName . '.fields'
+                ]
+            );
+
 		return [];
 	}
 }
