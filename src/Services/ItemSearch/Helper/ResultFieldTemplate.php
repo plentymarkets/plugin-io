@@ -3,6 +3,8 @@
 namespace IO\Services\ItemSearch\Helper;
 
 use Plenty\Plugin\Events\Dispatcher;
+use Plenty\Plugin\Log\Loggable;
+
 
 /**
  * Class ResultFieldTemplate
@@ -13,6 +15,7 @@ use Plenty\Plugin\Events\Dispatcher;
  */
 class ResultFieldTemplate
 {
+    use Loggable;
     const TEMPLATE_LIST_ITEM    = 'IO.ResultFields.ListItem';
     const TEMPLATE_SINGLE_ITEM  = 'IO.ResultFields.SingleItem';
     const TEMPLATE_BASKET_ITEM  = 'IO.ResultFields.BasketItem';
@@ -36,7 +39,7 @@ class ResultFieldTemplate
         /** @var ResultFieldTemplate $container */
         $container = pluginApp( ResultFieldTemplate::class );
         $dispatcher->fire( $template, [$container] );
-
+        $this->getLogger(__METHOD__)->error("get Result", $container->templates[$template]);
         return $container->templates[$template];
     }
 
