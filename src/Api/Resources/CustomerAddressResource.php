@@ -75,24 +75,13 @@ class CustomerAddressResource extends ApiResource
 			return $this->response->create(null, ResponseCode::BAD_REQUEST);
 		}
   
-		try
+        if(!is_null($addressId) && (int)$addressId > 0)
         {
-            if(!is_null($addressId) && (int)$addressId > 0)
-            {
-                $newAddress = $this->customerService->updateAddress((int)$addressId, $address, (int)$type);
-            }
-            else
-            {
-                $newAddress = $this->customerService->createAddress($address, $type);
-            }
+            $newAddress = $this->customerService->updateAddress((int)$addressId, $address, (int)$type);
         }
-		catch(\Exception $e)
+        else
         {
-            /** @var NotificationService $notificationService */
-            $notificationService = pluginApp(NotificationService::class);
-            $notificationService->error('guest email address is empty', $e->getCode());
-            
-            return $this->response->create([], ResponseCode::BAD_REQUEST);
+            $newAddress = $this->customerService->createAddress($address, $type);
         }
         
 		return $this->response->create($newAddress, ResponseCode::CREATED);
