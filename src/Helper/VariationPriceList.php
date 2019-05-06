@@ -148,8 +148,6 @@ class VariationPriceList
             {
                 $basePrice = [];
                 list( $basePrice['lot'], $basePrice['price'], $basePrice['unitKey'] ) = $basePriceService->getUnitPrice($this->lot, $unitPrice, $this->unit);
-                $base =  $this->numberFormatFilter->formatMonetary($basePrice['price'], $currency);
-                $basePrice['baseSinglePrice'] = str_replace(',', '.',preg_replace('/\s/u', '', str_replace($currency, '', $base)));
                 self::$basePrices[$this->lot][$unitPrice][$this->unit] = $basePrice;
             }
 
@@ -382,7 +380,7 @@ class VariationPriceList
             'basePrice'             => $this->getBasePrice( $unitPrice, $price->currency ),
             'baseLot'               => self::$basePrices[$this->lot][$unitPrice][$this->unit]['lot'],
             'baseUnit'              => self::$basePrices[$this->lot][$unitPrice][$this->unit]['unitKey'],
-            'baseSinglePrice'       => self::$basePrices[$this->lot][$unitPrice][$this->unit]['baseSinglePrice'],
+            'baseSinglePrice'       => self::$basePrices[$this->lot][$unitPrice][$this->unit]['price'],
 
             'minimumOrderQuantity'  => (float) $price->minimumOrderQuantity,
             'contactClassDiscount'  => [
