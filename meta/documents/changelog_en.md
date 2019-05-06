@@ -1,5 +1,34 @@
 # Release Notes for IO
 
+## v4.0.0 (2019-05-02) <a href="https://github.com/plentymarkets/plugin-io/compare/3.2.0...4.0.0" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
+
+### TODO
+
+- It is now possible for registered customers to change their email address in the My Account area. To enable this, you need to carry out settings in the **System » System settings » Client » Select client » Email** menu. Create a new template under **Templates**. This template needs to include the variable "$NewCustomerEmail", which contains a confirmation link for the change of the email address. You need to link this template to the **Customer wants to change email address** event under **Automatic**.
+- In order to make it possible for customers to change their email address in the My Account area, you need to activate the route "/change-mail" in the settings of the IO plugin.
+
+### Added
+
+- The shipping profile now displays the maximum delivery time. The maximum delivery time is the sum of the availability with the longest delivery time among items in the shopping cart and the period of delivery specified in the shipping profile.
+- "Mx." is now available as an option in the "Form of address" drop-down list in the registration and the address selection. This option serves to provide a form of address for the gender option "Diverse".
+
+### Changed
+
+- The input field "Contact person" for B2B customers is no longer a required field.
+- The code that ensures that no address containing shipping to a Packstation/post office can be selected if the selected shipping profile does not support this option has been relocated from Ceres to IO.
+- When saving an address that includes shipping to a Packstation/post office, the value for the post number is now taken from the field "postNumber" instead of "address3".
+- All classes of the namespace "IO\Services\ItemLoader" have been removed. The classes of the namespace "IO\Services\ItemSearch" are used as an alternative.
+
+
+### Fixed
+
+- Due to an error, the cross-selling item list in the single item view was not loaded when the page was accessed the first time. This has been fixed.
+- Due to an error, the sorting value for the category also affected the sorting of variations of individual items, as long as the option "dynamically" was selected for the setting **Show variations by type**. As of now, the variation with the lowest price is displayed first.
+- The ShopBuilder checkout and My Account can now be displayed correctly, even if the setting "Category routes" in IO is inactive.
+- We fixed an error that occurred in the context of checking already existing email addresses in the newsletter registration.
+
+
+
 ## v3.2.0 (2019-03-25) <a href="https://github.com/plentymarkets/plugin-io/compare/3.1.2...3.2.0" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
 
 ### Added

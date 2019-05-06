@@ -8,7 +8,7 @@ use IO\Guards\AuthGuard;
 use IO\Helper\CategoryDataFilter;
 use IO\Helper\MemoryCache;
 use IO\Helper\UserSession;
-use IO\Services\ItemLoader\Services\LoadResultFields;
+use IO\Services\ItemSearch\Helper\LoadResultFields;
 use IO\Services\ItemSearch\Helper\ResultFieldTemplate;
 use IO\Services\UrlBuilder\UrlQuery;
 use Plenty\Modules\Category\Models\Category;
@@ -271,33 +271,38 @@ class CategoryService
 
     /**
      * Check whether a category is referenced by the current route
-     * @param int $catID The ID for the category to check
+     * @param mixed $category   The category to check
      * @return bool
      */
-    public function isCurrent(Category $category):bool
+    public function isCurrent($category):bool
     {
         if($this->currentCategory === null)
         {
             return false;
         }
-        return $this->currentCategory->id === $category->id;
+
+        $categoryId = ($category instanceof Category) ? $category->id : $category['id'];
+
+        return $this->currentCategory->id === $categoryId;
     }
 
     /**
      * Check whether any child of a category is referenced by the current route
-     * @param Category $category The category to check
+     * @param mixed $category   The category to check
      * @return bool
      */
-    public function isOpen(Category $category):bool
+    public function isOpen($category):bool
     {
         if($this->currentCategory === null)
         {
             return false;
         }
 
+        $categoryId = ($category instanceof Category) ? $category->id : $category['id'];
+
         foreach($this->currentCategoryTree as $lvl => $categoryBranch)
         {
-            if($categoryBranch->id === $category->id)
+            if($categoryBranch->id === $categoryId)
             {
                 return true;
             }
@@ -307,10 +312,10 @@ class CategoryService
 
     /**
      * Check whether a category or any of its children is referenced by the current route
-     * @param Category $category The category to check
+     * @param mixed $category   The category to check
      * @return bool
      */
-    public function isActive(Category $category = null):bool
+    public function isActive($category = null):bool
     {
         return $category !== null && ($this->isCurrent($category) || $this->isOpen($category));
     }

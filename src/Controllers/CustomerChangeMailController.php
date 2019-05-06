@@ -2,32 +2,40 @@
 namespace IO\Controllers;
 
 use IO\Constants\LogLevel;
+use IO\Services\AuthenticationService;
 use IO\Services\NotificationService;
 use IO\Services\UserDataHashService;
 
 /**
- * Class CustomerPasswordResetController
+ * Class CustomerChangeMailController
  * @package IO\Controllers
  */
-class CustomerPasswordResetController extends LayoutController
+class CustomerChangeMailController extends LayoutController
 {
     /**
-     * Prepare and render the data for the guest registration
+     * @param $contactId
+     * @param $hash
      * @return string
+     * @throws \ErrorException
      */
-    public function showReset($contactId, $hash): string
+    public function show($contactId, $hash): string
     {
+        /** @var AuthenticationService $authService */
+        $authService = pluginApp(AuthenticationService::class);
+        $authService->logout();
+
         /** @var UserDataHashService $hashService */
         $hashService = pluginApp(UserDataHashService::class);
-        $hashData = $hashService->getData($hash, $contactId);
-        
+        $hashData = $hashService->getData($hash, (int)$contactId);
+
         if(!is_null($hashData))
         {
             return $this->renderTemplate(
-                "tpl.password-reset",
+                "tpl.change-mail",
                 [
                     "contactId" => $contactId,
-                    "hash"      => $hash
+                    "hash"      => $hash,
+                    "newMail"   => $hashData['newMail']
                 ],
                 false
             );
@@ -39,7 +47,7 @@ class CustomerPasswordResetController extends LayoutController
              */
             $notificationService = pluginApp(NotificationService::class);
             $notificationService->addNotificationCode(LogLevel::ERROR,3);
-            
+
             return $this->renderTemplate(
                 "tpl.home",
                 [
@@ -48,6 +56,6 @@ class CustomerPasswordResetController extends LayoutController
                 false
             );
         }
-        
+
     }
 }

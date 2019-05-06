@@ -53,6 +53,7 @@ class IORouteServiceProvider extends RouteServiceProvider
 			$api->resource('io/customer/logout', 'CustomerLogoutResource');
 			$api->resource('io/customer/password', 'CustomerPasswordResource');
             $api->resource('io/customer/password_reset', 'CustomerPasswordResetResource');
+            $api->resource('io/customer/mail', 'CustomerMailResource');
             $api->resource('io/customer/contact/mail', 'ContactMailResource');
             $api->resource('io/customer/bank_data', 'ContactBankResource');
             $api->get('io/customer/order/list', 'CustomerOrderResource@index');
@@ -70,7 +71,6 @@ class IORouteServiceProvider extends RouteServiceProvider
             $api->resource('io/template', 'TemplateResource');
             $api->resource('io/localization/language', 'LanguageResource');
             $api->resource('io/itemWishList', 'ItemWishListResource');
-            $api->resource('io/cache/reset_template_cache', 'ResetTemplateCacheResource');
             $api->resource('io/shipping/country', 'ShippingCountryResource');
             $api->resource('io/live-shopping', 'LiveShoppingResource');
             $api->resource('io/facet', 'FacetResource');
@@ -100,7 +100,7 @@ class IORouteServiceProvider extends RouteServiceProvider
 
 		if ( RouteConfig::isActive(RouteConfig::CONFIRMATION) )
         {
-            //Confiramtion route
+            //Confirmation route
             $router->get('confirmation/{orderId?}/{orderAccessKey?}', 'IO\Controllers\ConfirmationController@showConfirmation');
 
             $router->get('-/akQQ{orderAccessKey}/idQQ{orderId}', 'IO\Controllers\ConfirmationEmailController@showConfirmation');
@@ -201,6 +201,11 @@ class IORouteServiceProvider extends RouteServiceProvider
         if( RouteConfig::isActive(RouteConfig::PASSWORD_RESET) )
         {
             $router->get('password-reset/{contactId}/{hash}', 'IO\Controllers\CustomerPasswordResetController@showReset');
+        }
+
+        if( RouteConfig::isActive(RouteConfig::CHANGE_MAIL) )
+        {
+            $router->get('change-mail/{contactId}/{hash}', 'IO\Controllers\CustomerChangeMailController@show');
         }
 
         if( RouteConfig::isActive(RouteConfig::ORDER_PROPERTY_FILE) )

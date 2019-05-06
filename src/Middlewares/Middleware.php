@@ -3,6 +3,7 @@
 namespace IO\Middlewares;
 
 use IO\Api\ResponseCode;
+use IO\Extensions\Constants\ShopUrls;
 use IO\Helper\RouteConfig;
 use IO\Services\CountryService;
 use IO\Services\TemplateService;
@@ -23,6 +24,9 @@ class Middleware extends \Plenty\Plugin\Middleware
 {
     public function before(Request $request)
     {
+        /** @var SessionStorageService $sessionService */
+        $sessionService  = pluginApp(SessionStorageService::class);
+
         $loginToken = $request->get('token', '');
         if(strlen($loginToken))
         {
@@ -32,14 +36,12 @@ class Middleware extends \Plenty\Plugin\Middleware
         }
 
         $splittedURL     = explode('/', $request->get('plentyMarkets'));
-        $lang            = $splittedURL[0];
+        $lang            = $request->get('Lang') ?? $splittedURL[0];
         $webstoreService = pluginApp(WebstoreConfigurationService::class);
         $webstoreConfig  = $webstoreService->getWebstoreConfig();
 
         if (($lang == null || strlen($lang) != 2 || !in_array($lang, $webstoreConfig->languageList)) && strpos(end($splittedURL), '.') === false)
         {
-            $sessionService  = pluginApp(SessionStorageService::class);
-
             if($sessionService->getLang() != $webstoreConfig->defaultLanguage)
             {
                 $service = pluginApp(LocalizationService::class);
@@ -127,6 +129,29 @@ class Middleware extends \Plenty\Plugin\Middleware
         if ( RouteConfig::isActive(RouteConfig::SEARCH) && $request->get('ActionCall') == 'WebActionArticleSearch' )
         {
             AuthGuard::redirect('/search', ['query' => $request->get('Params')['SearchParam']]);
+        }
+
+        /** @var ShopUrls $shopUrls */
+        $shopUrls = pluginApp(ShopUrls::class);
+
+        if ($request->has('readonlyCheckout') || $request->getRequestUri() !== $shopUrls->checkout)
+        {
+            /** @var CheckoutService $checkoutService */
+            $checkoutService = pluginApp(CheckoutService::class);
+            $checkoutService->setReadOnlyCheckout($request->get('readonlyCheckout',0) == 1);
+        }
+
+        // access 'Kaufabwicklungslink'
+        if ( RouteConfig::isActive(RouteConfig::CONFIRMATION) )
+        {
+            $orderId = $request->get('id', 0);
+            $orderAccessKey = $request->get('ak', '');
+
+            if(strlen($orderAccessKey) && (int)$orderId > 0)
+            {
+                $confirmationRoute = $shopUrls->confirmation . '/'.$orderId.'/'.$orderAccessKey;
+                AuthGuard::redirect($confirmationRoute);
+            }
         }
     }
 

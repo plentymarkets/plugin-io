@@ -6,7 +6,7 @@ use IO\Services\SessionStorageService;
 
 class LanguageMap
 {
-    private static $language_map = array(
+    private static $locales = array(
         'de' => 'de_DE',
         'en' => 'en_GB',
         'bg' => 'bg_BG',
@@ -26,19 +26,66 @@ class LanguageMap
         'sk' => 'sk_SK',
         'cn' => 'zh_CN',
         'vn' => 'vi_VN'
+    );
 
+    private static $languages =  array(
+        'de' => 'de',
+        'en' => 'en',
+        'bg' => 'bg',
+        'fr' => 'fr',
+        'it' => 'it',
+        'es' => 'es',
+        'tr' => 'tr',
+        'nl' => 'nl',
+        'pl' => 'pl',
+        'pt' => 'pt',
+        'nn' => 'no',
+        'ro' => 'ro',
+        'da' => 'da',
+        'se' => 'sv',
+        'cz' => 'cs',
+        'ru' => 'ru',
+        'sk' => 'sk',
+        'cn' => 'zh',
+        'vn' => 'vi'
     );
 
     public static function getLocale(): string
     {
         $lang = pluginApp(SessionStorageService::class)->getLang();
-        if ( array_key_exists( $lang, LanguageMap::$language_map ) )
+        if ( array_key_exists( $lang, LanguageMap::$locales ) )
         {
-            return LanguageMap::$language_map[$lang];
+            return LanguageMap::$locales[$lang];
         }
 
         return $lang . '_' . strtoupper( $lang );
     }
 
+    public static function getLanguageCode($countryCode = null)
+    {
+        if ( is_null( $countryCode ) )
+        {
+            $countryCode = pluginApp(SessionStorageService::class)->getLang();
+        }
 
+        return LanguageMap::$languages[$countryCode];
+    }
+
+    public static function getCountryCode($language = null)
+    {
+        if ( is_null( $language ) )
+        {
+            return pluginApp(SessionStorageService::class)->getLang();
+        }
+
+        foreach( LanguageMap::$languages as $countryCode => $languageCode )
+        {
+            if ( $languageCode === $language )
+            {
+                return $countryCode;
+            }
+        }
+
+        return pluginApp(SessionStorageService::class)->getLang();
+    }
 }
