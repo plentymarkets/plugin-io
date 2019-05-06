@@ -25,6 +25,7 @@ use Plenty\Modules\Order\Property\Contracts\OrderPropertyRepositoryContract;
 use Plenty\Modules\Order\Property\Models\OrderPropertyType;
 use Plenty\Modules\Payment\Contracts\PaymentRepositoryContract;
 use Plenty\Modules\Payment\Method\Contracts\PaymentMethodRepositoryContract;
+use Plenty\Plugin\Log\Loggable;
 use Plenty\Repositories\Models\PaginatedResult;
 use Plenty\Modules\Order\Models\Order;
 use Plenty\Plugin\Application;
@@ -37,6 +38,8 @@ use Plenty\Plugin\ConfigRepository;
 class OrderService
 {
     use SendMail;
+    use Loggable;
+
 	/**
 	 * @var OrderRepositoryContract
 	 */
@@ -147,9 +150,22 @@ class OrderService
             ->withComment(true, $this->sessionStorage->getSessionValue(SessionStorageKeys::ORDER_CONTACT_WISH))
             ->done();
 
-        $order = $this->orderRepository->createOrder($order, $couponCode);
+        try
+        {
+            $order = $this->orderRepository->createOrder($order, $couponCode);
+        }
+        catch (\Exception $e)
+        {
+            $this->getLogger(__CLASS__)->error("IO::Debug.OrderService_orderValidationError", [
+                'code' => $e->getCode(),
+                'message' => $e->getMessage()
+            ]);
+        }
 
-
+        $this->getLogger(__CLASS__)->debug('IO::Debug.OrderService_placeOrder', [
+            'order' => $order,
+            'basket' => $basket
+        ]);
 
         if ($order instanceof Order && $order->id > 0) {
             $params = [
@@ -227,8 +243,40 @@ class OrderService
      */
 	public function executePayment( int $orderId, int $paymentId ):array
     {
-        $paymentRepository = pluginApp( PaymentMethodRepositoryContract::class );
-        return $paymentRepository->executePayment( $paymentId, $orderId );
+        $result = [];
+        try
+        {
+            $paymentRepository = pluginApp( PaymentMethodRepositoryContract::class );
+            $result = $paymentRepository->executePayment( $paymentId, $orderId );
+        }
+        catch (\Exception $e)
+        {
+            $this->getLogger(__CLASS__)->error('IO::Debug.OrderService_executePaymentFailed', [
+                'orderId' => $orderId,
+                'paymentId' => $paymentId,
+                'code' => $e->getCode(),
+                'message' => $e->getMessage()
+            ]);
+        }
+
+        if ( $result['type'] === "error" )
+        {
+            $this->getLogger(__CLASS__)->error('IO::Debug.OrderService_executePaymentError', [
+                'orderId' => $orderId,
+                'paymentId' => $paymentId,
+                'response' => $result
+            ]);
+        }
+        else
+        {
+            $this->getLogger(__CLASS__)->debug('IO::Debug.OrderService_executePayment', [
+                'orderId' => $orderId,
+                'paymentId' => $paymentId,
+                'response' => $result
+            ]);
+        }
+
+        return $result;
     }
     
     /**
