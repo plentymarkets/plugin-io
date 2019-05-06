@@ -71,9 +71,16 @@ class CheckoutService
      * @var BasketService
      */
     private $basketService;
-    
-    /** @var SessionStorageService */
+
+    /**
+     * @var SessionStorageService
+     */
     private $sessionStorageService;
+
+    /**
+     * @var WebstoreConfigurationService
+     */
+    private $webstoreConfigurationService;
 
     /**
      * CheckoutService constructor.
@@ -86,6 +93,7 @@ class CheckoutService
      * @param CurrencyExchangeRepositoryContract $currencyExchangeRepo
      * @param BasketService $basketService
      * @param SessionStorageService $sessionStorageService
+     * @param WebstoreConfigurationService $webstoreConfigurationService
      */
     public function __construct(
         FrontendPaymentMethodRepositoryContract $frontendPaymentMethodRepository,
@@ -96,7 +104,8 @@ class CheckoutService
         ParcelServicePresetRepositoryContract $parcelServicePresetRepo,
         CurrencyExchangeRepositoryContract $currencyExchangeRepo,
         BasketService $basketService,
-        SessionStorageService $sessionStorageService)
+        SessionStorageService $sessionStorageService,
+        WebstoreConfigurationService $webstoreConfigurationService)
     {
         $this->frontendPaymentMethodRepository = $frontendPaymentMethodRepository;
         $this->checkout                        = $checkout;
@@ -107,6 +116,7 @@ class CheckoutService
         $this->currencyExchangeRepo            = $currencyExchangeRepo;
         $this->basketService                   = $basketService;
         $this->sessionStorageService           = $sessionStorageService;
+        $this->webstoreConfigurationService    = $webstoreConfigurationService;
     }
 
     /**
@@ -323,8 +333,19 @@ class CheckoutService
             $translator = pluginApp(Translator::class);
             if ($translator instanceof Translator) {
                 $errors = [];
+                $webstoreConfiguration = $this->webstoreConfigurationService->getWebstoreConfig();
                 foreach ($validateCheckoutEvent->getErrorKeysList() as $errorKey) {
-                    $errors[] = $translator->trans($errorKey);
+                    switch($errorKey) {
+                        case 'frontend/checkout/validation.minimum_order_value':
+                            $params = [
+                                'minimumOrderValue' => $webstoreConfiguration->minimumOrderValue,
+                                'currency' => $webstoreConfiguration->defaultCurrency,
+                            ];
+                            $errors[] = $translator->trans('Ceres::Template.errorMinimumOrderValueNotReached', $params);
+                            break;
+                        default:
+                            $errors[] = $translator->trans($errorKey);
+                    }
                 }
 
                 $result = array(
