@@ -36,6 +36,7 @@ class BasketItems implements SearchPreset
             ->withUrls()
             ->withImages()
             ->withPropertyGroups()
+            ->withOrderPropertySelectionValues()
             ->withDefaultImage()
             ->withBundleComponents()
             ->isVisibleForClient()

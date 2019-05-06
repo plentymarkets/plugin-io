@@ -100,7 +100,7 @@ class IORouteServiceProvider extends RouteServiceProvider
 
 		if ( RouteConfig::isActive(RouteConfig::CONFIRMATION) )
         {
-            //Confiramtion route
+            //Confirmation route
             $router->get('confirmation/{orderId?}/{orderAccessKey?}', 'IO\Controllers\ConfirmationController@showConfirmation');
 
             $router->get('-/akQQ{orderAccessKey}/idQQ{orderId}', 'IO\Controllers\ConfirmationEmailController@showConfirmation');

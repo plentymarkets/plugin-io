@@ -10,6 +10,7 @@ use IO\Helper\MemoryCache;
 use Plenty\Modules\Accounting\Contracts\AccountingLocationRepositoryContract;
 use Plenty\Modules\Basket\Contracts\BasketRepositoryContract;
 use Plenty\Modules\Basket\Events\Basket\AfterBasketChanged;
+use Plenty\Modules\Basket\Models\Basket;
 use Plenty\Modules\Frontend\Contracts\Checkout;
 use Plenty\Modules\Frontend\Contracts\CurrencyExchangeRepositoryContract;
 use Plenty\Modules\Frontend\Events\ValidateCheckoutEvent;
@@ -22,6 +23,7 @@ use Plenty\Modules\Payment\Events\Checkout\GetPaymentMethodContent;
 use Plenty\Modules\Payment\Method\Contracts\PaymentMethodRepositoryContract;
 use Plenty\Plugin\ConfigRepository;
 use Plenty\Plugin\Events\Dispatcher;
+use Plenty\Plugin\Log\Loggable;
 use Plenty\Plugin\Translation\Translator;
 
 /**
@@ -31,6 +33,7 @@ use Plenty\Plugin\Translation\Translator;
 class CheckoutService
 {
     use MemoryCache;
+    use Loggable;
 
     /**
      * @var FrontendPaymentMethodRepositoryContract
@@ -68,9 +71,16 @@ class CheckoutService
      * @var BasketService
      */
     private $basketService;
-    
-    /** @var SessionStorageService */
+
+    /**
+     * @var SessionStorageService
+     */
     private $sessionStorageService;
+
+    /**
+     * @var WebstoreConfigurationService
+     */
+    private $webstoreConfigurationService;
 
     /**
      * CheckoutService constructor.
@@ -83,6 +93,7 @@ class CheckoutService
      * @param CurrencyExchangeRepositoryContract $currencyExchangeRepo
      * @param BasketService $basketService
      * @param SessionStorageService $sessionStorageService
+     * @param WebstoreConfigurationService $webstoreConfigurationService
      */
     public function __construct(
         FrontendPaymentMethodRepositoryContract $frontendPaymentMethodRepository,
@@ -93,7 +104,8 @@ class CheckoutService
         ParcelServicePresetRepositoryContract $parcelServicePresetRepo,
         CurrencyExchangeRepositoryContract $currencyExchangeRepo,
         BasketService $basketService,
-        SessionStorageService $sessionStorageService)
+        SessionStorageService $sessionStorageService,
+        WebstoreConfigurationService $webstoreConfigurationService)
     {
         $this->frontendPaymentMethodRepository = $frontendPaymentMethodRepository;
         $this->checkout                        = $checkout;
@@ -104,6 +116,7 @@ class CheckoutService
         $this->currencyExchangeRepo            = $currencyExchangeRepo;
         $this->basketService                   = $basketService;
         $this->sessionStorageService           = $sessionStorageService;
+        $this->webstoreConfigurationService    = $webstoreConfigurationService;
     }
 
     /**
@@ -320,19 +333,48 @@ class CheckoutService
             $translator = pluginApp(Translator::class);
             if ($translator instanceof Translator) {
                 $errors = [];
+                $webstoreConfiguration = $this->webstoreConfigurationService->getWebstoreConfig();
                 foreach ($validateCheckoutEvent->getErrorKeysList() as $errorKey) {
-                    $errors[] = $translator->trans($errorKey);
+                    switch($errorKey) {
+                        case 'frontend/checkout/validation.minimum_order_value':
+                            $params = [
+                                'minimumOrderValue' => $webstoreConfiguration->minimumOrderValue,
+                                'currency' => $webstoreConfiguration->defaultCurrency,
+                            ];
+                            $errors[] = $translator->trans('Ceres::Template.errorMinimumOrderValueNotReached', $params);
+                            break;
+                        default:
+                            $errors[] = $translator->trans($errorKey);
+                    }
                 }
 
-                return array(
+                $result = array(
                     "type" => GetPaymentMethodContent::RETURN_TYPE_ERROR,
                     "value" => implode('<br>', $errors)
                 );
+
+                $this->getLogger(__CLASS__)->error(
+                    "IO::Debug.CheckoutService_preparePaymentFailed",
+                    $result
+                );
+
+                return $result;
             }
         }
 
         $mopId = $this->getMethodOfPaymentId();
-        return pluginApp(PaymentMethodRepositoryContract::class)->preparePaymentMethod($mopId);
+        $result = pluginApp(PaymentMethodRepositoryContract::class)->preparePaymentMethod($mopId);
+        $this->getLogger(__CLASS__)->debug(
+            "IO::Debug.CheckoutService_paymentPrepared",
+            [
+                "type" => $result["type"],
+                "value" => $result["value"],
+                "paymentId" => $mopId,
+                "basket" => pluginApp(BasketService::class)->getBasket()
+            ]
+        );
+
+        return $result;
     }
 
     /**

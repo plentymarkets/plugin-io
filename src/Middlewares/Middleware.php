@@ -3,8 +3,6 @@
 namespace IO\Middlewares;
 
 use IO\Api\ResponseCode;
-use IO\Constants\SessionStorageKeys;
-use IO\Controllers\CheckoutController;
 use IO\Extensions\Constants\ShopUrls;
 use IO\Helper\RouteConfig;
 use IO\Services\CountryService;
@@ -141,6 +139,19 @@ class Middleware extends \Plenty\Plugin\Middleware
             /** @var CheckoutService $checkoutService */
             $checkoutService = pluginApp(CheckoutService::class);
             $checkoutService->setReadOnlyCheckout($request->get('readonlyCheckout',0) == 1);
+        }
+
+        // access 'Kaufabwicklungslink'
+        if ( RouteConfig::isActive(RouteConfig::CONFIRMATION) )
+        {
+            $orderId = $request->get('id', 0);
+            $orderAccessKey = $request->get('ak', '');
+
+            if(strlen($orderAccessKey) && (int)$orderId > 0)
+            {
+                $confirmationRoute = $shopUrls->confirmation . '/'.$orderId.'/'.$orderAccessKey;
+                AuthGuard::redirect($confirmationRoute);
+            }
         }
     }
 
