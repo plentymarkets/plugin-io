@@ -338,7 +338,7 @@ class CheckoutService
                                 'minimumOrderValue' => $webstoreConfiguration->minimumOrderValue,
                                 'currency' => $webstoreConfiguration->defaultCurrency,
                             ];
-                            $errors[] = $translator->trans('Ceres::Template.errorMinimiumOrderValueNotReached', $params);
+                            $errors[] = $translator->trans('Ceres::Template.errorMinimumOrderValueNotReached', $params);
                             break;
                         default:
                             $errors[] = $translator->trans($errorKey);
