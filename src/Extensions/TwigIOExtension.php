@@ -4,6 +4,7 @@ namespace IO\Extensions;
 
 use IO\Extensions\Constants\ShopUrls;
 
+use IO\Extensions\Functions\GetCdnMetadata;
 use Plenty\Plugin\Http\Request;
 use Plenty\Plugin\Templates\Extensions\Twig_Extension;
 use Plenty\Plugin\Templates\Factories\TwigFactory;
@@ -65,7 +66,8 @@ class TwigIOExtension extends Twig_Extension
 		ResultFieldsFilter $resultFieldsFilter,
 		SpecialOfferFilter $specialOfferFilter,
 		AddressOptionTypeFilter $addressOptionTypeFilter,
-        TabFilter $tabFilter
+        TabFilter $tabFilter,
+        GetCdnMetadata $cdnMetadata
 	)
 	{
 		$this->twig = $twig;

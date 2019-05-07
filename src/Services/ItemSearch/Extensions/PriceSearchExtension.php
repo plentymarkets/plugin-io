@@ -4,7 +4,8 @@ namespace IO\Services\ItemSearch\Extensions;
 
 use IO\Helper\VariationPriceList;
 use IO\Services\CustomerService;
-use Plenty\Legacy\Repositories\Frontend\CurrencyExchangeRepository;
+use Plenty\Plugin\Application;
+use Plenty\Plugin\Log\Loggable;
 
 /**
  * Class PriceSearchExtension
@@ -15,6 +16,8 @@ use Plenty\Legacy\Repositories\Frontend\CurrencyExchangeRepository;
  */
 class PriceSearchExtension implements ItemSearchExtension
 {
+    use Loggable;
+
     private $quantities;
 
     public function __construct( $quantities = [] )
@@ -105,6 +108,13 @@ class PriceSearchExtension implements ItemSearchExtension
 
                     $variation['data']['prices'] = $priceList->toArray( $quantity );
 
+                    if ( $variation['data']['prices']['default']['unitPrice']['value'] <= 0 || $variation['data']['prices']['default']['price']['value'] <= 0)
+                    {
+                        $this->getLogger(__CLASS__)->warning('IO::Debug.PriceSearchExtension_freeItemFound', [
+                            'variation' => $variation,
+                            'isAdminPreview' => pluginApp(Application::class)->isAdminPreview()
+                        ]);
+                    }
 
                     if ( array_key_exists('properties', $variation['data']) )
                     {
