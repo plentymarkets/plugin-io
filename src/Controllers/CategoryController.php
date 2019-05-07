@@ -5,6 +5,7 @@ namespace IO\Controllers;
 use IO\Api\ResponseCode;
 use IO\Helper\RouteConfig;
 use IO\Guards\AuthGuard;
+use IO\Services\ItemListService;
 use IO\Services\SessionStorageService;
 use IO\Services\UrlService;
 use Plenty\Modules\ShopBuilder\Helper\ShopBuilderRequest;
@@ -12,6 +13,7 @@ use Plenty\Plugin\Application;
 use Plenty\Plugin\Http\Request;
 use Plenty\Plugin\Http\Response;
 use Plenty\Plugin\Log\Loggable;
+use Zend\Tag\ItemList;
 
 /**
  * Class CategoryController
@@ -44,17 +46,26 @@ class CategoryController extends LayoutController
         $lang = $sessionService->getLang();
         $webstoreId = pluginApp(Application::class)->getWebstoreId();
 
+        $category = $this->categoryRepo->findCategoryByUrl($lvl1, $lvl2, $lvl3, $lvl4, $lvl5, $lvl6, $webstoreId, $lang);
+
         /** @var ShopBuilderRequest $shopBuilderRequest */
         $shopBuilderRequest = pluginApp(ShopBuilderRequest::class);
         if ($shopBuilderRequest->isShopBuilder() && $shopBuilderRequest->getPreviewContentType() === 'singleitem')
         {
+            /** @var ItemListService $itemListService */
+            $itemListService = pluginApp(ItemListService::class);
+            $item = $itemListService->getItemList('category', $category['id'], null, 1);
+
+            $itemId = $item['documents'][0]['data']['ids']['itemId'];
+            $variationId = $item['documents'][0]['data']['variation']['id'];
+
             /** @var ItemController $itemController */
             $itemController = pluginApp(ItemController::class);
-            return $itemController->showItem('', 109, 1007);
+            return $itemController->showItem('', $itemId, $variationId);
         }
 
         return $this->renderCategory(
-            $this->categoryRepo->findCategoryByUrl($lvl1, $lvl2, $lvl3, $lvl4, $lvl5, $lvl6, $webstoreId, $lang)
+            $category
         );
 	}
 
