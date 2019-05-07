@@ -9,32 +9,50 @@ use IO\Services\UserDataHashService;
 use Plenty\Modules\Account\Contact\Contracts\ContactRepositoryContract;
 use Plenty\Modules\Plugin\Events\PluginSendMail;
 use Plenty\Modules\Plugin\Services\PluginSendMailService;
+use Plenty\Plugin\Log\Loggable;
 
 class IOSendMail
 {
+    use Loggable;
+
+    /** @var PluginSendMailService */
+    private $sendMailService;
+
+    private $placeholderList = [];
+
+    public function __construct(PluginSendMailService $sendMailService)
+    {
+        $this->sendMailService = $sendMailService;
+    }
+
     /**
      * @param PluginSendMail $pluginSendMail
      */
     public function handle(PluginSendMail $pluginSendMail)
     {
-        /** @var PluginSendMailService $pluginSendMailService */
-        $pluginSendMailService = pluginApp(PluginSendMailService::class);
-        $pluginSendMailService->setInitialized(true);
+        $this->getLogger(__CLASS__)->debug(
+            "IO::Debug.IOSendMail_handleSendMail",
+            [
+                "template" => $pluginSendMail->getTemplate(),
+                "email" => $pluginSendMail->getContactEmail(),
+                "callFunction" => $pluginSendMail->getCallFunction()
+            ]
+        );
 
         if ($pluginSendMail->getCallFunction() == PluginSendMailService::FUNCTION_COLLECT_PLACEHOLDER) {
 
             if (RouteConfig::isActive(RouteConfig::TERMS_CONDITIONS)) {
-                $pluginSendMailService->addEmailPlaceholder('Link_TermsCondition', 'gtc');
+                $this->setPlaceholderValue('Link_TermsCondition', 'gtc');
             } else {
-                $pluginSendMailService->addEmailPlaceholder('Link_TermsCondition', '');
+                $this->setPlaceholderValue('Link_TermsCondition', '');
             }
 
             $templateConfig = pluginApp(TemplateConfigService::class);
             $enableOldURLPattern = $templateConfig->get('global.enableOldUrlPattern');
             if( RouteConfig::isActive(RouteConfig::ITEM) && (!strlen($enableOldURLPattern) || $enableOldURLPattern == 'false')) {
-                $pluginSendMailService->addEmailPlaceholder('Link_Item', '_{itemId}_{variationId}');
+                $this->setPlaceholderValue('Link_Item', '_{itemId}_{variationId}');
             } else {
-                $pluginSendMailService->addEmailPlaceholder('Link_Item', '');
+                $this->setPlaceholderValue('Link_Item', '');
             }
 
             if (RouteConfig::isActive(RouteConfig::PASSWORD_RESET)  && strlen($pluginSendMail->getContactEmail())) {
@@ -43,12 +61,12 @@ class IOSendMail
                 $contactId = $contactRepository->getContactIdByEmail($pluginSendMail->getContactEmail());
 
                 if ($contactId === null) {
-                    $pluginSendMailService->addEmailPlaceholder('Link_NewPassword', '');
-                    $pluginSendMailService->addEmailPlaceholder('Link_ChangePassword', '');
+                    $this->setPlaceholderValue('Link_NewPassword', '');
+                    $this->setPlaceholderValue('Link_ChangePassword', '');
                 } else {
                     /** @var UserDataHashService $hashService */
                     $hashService = pluginApp(UserDataHashService::class);
-                    $pluginSendMailService->addEmailPlaceholder('Link_NewPassword', '?show=forgotPassword&email='.$pluginSendMail->getContactEmail());
+                    $this->setPlaceholderValue('Link_NewPassword', '?show=forgotPassword&email='.$pluginSendMail->getContactEmail());
                     $hash = $hashService->findHash(UserDataHash::TYPE_RESET_PASSWORD, $contactId);
                     if (is_null($hash))
                     {
@@ -61,13 +79,28 @@ class IOSendMail
                         );
                         $hash = $hashEntry->hash;
                     }
-                    $pluginSendMailService->addEmailPlaceholder('Link_ChangePassword', 'password-reset/'.$contactId. '/'  . $hash);
+                    $this->setPlaceholderValue('Link_ChangePassword', 'password-reset/'.$contactId. '/'  . $hash);
                 }
 
             } else {
-                $pluginSendMailService->addEmailPlaceholder('Link_NewPassword', '');
-                $pluginSendMailService->addEmailPlaceholder('Link_ChangePassword', '');
+                $this->setPlaceholderValue('Link_NewPassword', '');
+                $this->setPlaceholderValue('Link_ChangePassword', '');
             }
+
+            $this->getLogger(__CLASS__)->debug(
+                "IO::Debug.IOSendMail_placeholdersCollected",
+                [
+                    "template" => $pluginSendMail->getTemplate(),
+                    "email" => $pluginSendMail->getContactEmail(),
+                    "placeholder" => $this->placeholderList
+                ]
+            );
         }
+    }
+
+    private function setPlaceholderValue($placeholder, $value)
+    {
+        $this->placeholderList[$placeholder] = $value;
+        $this->sendMailService->addEmailPlaceholder($placeholder, $value);
     }
 }
