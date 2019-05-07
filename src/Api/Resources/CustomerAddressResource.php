@@ -75,15 +75,26 @@ class CustomerAddressResource extends ApiResource
 			return $this->response->create(null, ResponseCode::BAD_REQUEST);
 		}
   
-        if(!is_null($addressId) && (int)$addressId > 0)
+		try
         {
-            $newAddress = $this->customerService->updateAddress((int)$addressId, $address, (int)$type);
+            if(!is_null($addressId) && (int)$addressId > 0)
+            {
+                $newAddress = $this->customerService->updateAddress((int)$addressId, $address, (int)$type);
+            }
+            else
+            {
+                $newAddress = $this->customerService->createAddress($address, $type);
+            }
         }
-        else
+		catch(\Exception $exception)
         {
-            $newAddress = $this->customerService->createAddress($address, $type);
+                /** @var NotificationService $notificationService */
+                $notificationService = pluginApp(NotificationService::class);
+
+                $notificationService->error($this->buildErrorMessages($exception));
+                return $this->response->create([], ResponseCode::BAD_REQUEST);
         }
-        
+
 		return $this->response->create($newAddress, ResponseCode::CREATED);
 	}
 
@@ -140,4 +151,25 @@ class CustomerAddressResource extends ApiResource
 
 		return $this->index();
 	}
+
+	private function buildErrorMessages($exception)
+    {
+        $errorMessage = 'guest email address is empty';
+
+        // checks if the exception has an detailed message and throws the error,
+        // so that ceres can validate it at CreateUpdateAddress.js
+
+        if(method_exists( $exception , 'getMessageBag'))
+        {
+            if(!empty($exception->getMessageBag()))
+            {
+                $errorMessage = '';
+                $messages = $exception->getMessageBag()->getMessages();
+                foreach ($messages as &$message) {
+                    $errorMessage .= '<br>'. $message[0];
+                }
+            }
+        }
+        return $errorMessage;
+    }
 }
