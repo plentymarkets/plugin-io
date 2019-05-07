@@ -91,7 +91,7 @@ class CustomerAddressResource extends ApiResource
                 /** @var NotificationService $notificationService */
                 $notificationService = pluginApp(NotificationService::class);
 
-                $notificationService->error($this->buildErrorMessages($exception));
+                $notificationService->error($this->buildErrorMessages($exception), $exception->getCode());
                 return $this->response->create([], ResponseCode::BAD_REQUEST);
         }
 
@@ -154,7 +154,7 @@ class CustomerAddressResource extends ApiResource
 
 	private function buildErrorMessages($exception)
     {
-        $errorMessage = 'guest email address is empty';
+        $errorMessage = $exception->getMessage();
 
         // checks if the exception has an detailed message and throws the error,
         // so that ceres can validate it at CreateUpdateAddress.js
