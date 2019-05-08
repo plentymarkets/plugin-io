@@ -2,9 +2,9 @@
 
 namespace IO\Services\ItemSearch\Factories\Faker;
 
-use IO\Services\ItemSearch\Contracts\VariationSearchResultFakerContract;
+use IO\Services\ItemSearch\Helper\VariationSearchResultAbstractFaker;
 
-class AttributeNameFaker extends VariationSearchResultFakerContract
+class AttributeNameFaker extends VariationSearchResultAbstractFaker
 {
     public $isList = true;
 
