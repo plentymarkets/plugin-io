@@ -78,18 +78,11 @@ class VariationSearchResultFactory
 
         foreach($result['documents'] as $i => $document)
         {
-            $result['documents'][$i] = $this->fillSearchResult( $document );
+            $this->injectValues($result['documents'][$i], $this->defaultResult );
         }
 
         return $result;
     }
-
-    private function fillSearchResult( $document )
-    {
-        $document['data'] = $this->injectValues( $this->defaultResult, $document['data'] );
-        return $document;
-    }
-
 
     private function setValue( &$object, $field, $value )
     {
@@ -106,21 +99,18 @@ class VariationSearchResultFactory
         }
     }
 
-    private function injectValues( $defaults, $values )
+    private function injectValues( &$object, $defaults )
     {
-        $result = [];
-        foreach($defaults as $defaultKey => $defaultValue)
+        foreach($defaults as $key => $defaultValue)
         {
-            if ( is_array($defaultValue) && is_array($values[$defaultKey]) )
+            if ( is_array($defaultValue) && is_array($object[$key]) )
             {
-                $result[$defaultKey] = $this->injectValues($defaultValue, $values[$defaultKey]);
+                $this->injectValues($object[$key], $defaultValue);
             }
             else
             {
-                $result[$defaultKey] = $defaultValue;
+                $object[$key] = $defaultValue;
             }
         }
-
-        return $result;
     }
 }
