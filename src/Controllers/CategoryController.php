@@ -52,16 +52,9 @@ class CategoryController extends LayoutController
         $shopBuilderRequest = pluginApp(ShopBuilderRequest::class);
         if ($shopBuilderRequest->isShopBuilder() && $shopBuilderRequest->getPreviewContentType() === 'singleitem')
         {
-            /** @var ItemListService $itemListService */
-            $itemListService = pluginApp(ItemListService::class);
-            $item = $itemListService->getItemList('category', $category['id'], null, 1);
-
-            $itemId = $item['documents'][0]['data']['ids']['itemId'];
-            $variationId = $item['documents'][0]['data']['variation']['id'];
-
             /** @var ItemController $itemController */
             $itemController = pluginApp(ItemController::class);
-            return $itemController->showItem('', $itemId, $variationId);
+            return $itemController->showItemForCategory($category);
         }
 
         return $this->renderCategory(
