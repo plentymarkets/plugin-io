@@ -67,6 +67,13 @@ class ItemController extends LayoutController
             );
         }
 
+        /** @var VariationSearchResultFactory $searchResultFactory */
+        $searchResultFactory = pluginApp(VariationSearchResultFactory::class);
+        $itemResult = $searchResultFactory->fillSearchResults(
+            $itemResult,
+            ResultFieldTemplate::get(ResultFieldTemplate::TEMPLATE_SINGLE_ITEM)
+        );
+
         if(empty($itemResult['documents']))
         {
             $this->getLogger(__CLASS__)->info(
