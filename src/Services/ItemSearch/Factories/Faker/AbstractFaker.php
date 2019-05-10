@@ -2,95 +2,57 @@
 
 namespace IO\Services\ItemSearch\Factories\Faker;
 
+use IO\Services\ItemSearch\Factories\Faker\Traits\FakeBoolean;
+use IO\Services\ItemSearch\Factories\Faker\Traits\FakeCountry;
+use IO\Services\ItemSearch\Factories\Faker\Traits\FakeDate;
+use IO\Services\ItemSearch\Factories\Faker\Traits\FakeImage;
+use IO\Services\ItemSearch\Factories\Faker\Traits\FakeLanguage;
+use IO\Services\ItemSearch\Factories\Faker\Traits\FakeNumber;
+use IO\Services\ItemSearch\Factories\Faker\Traits\FakeString;
+use IO\Services\ItemSearch\Factories\Faker\Traits\FakeUnit;
+use IO\Services\ItemSearch\Factories\Faker\Traits\HandleNestedArray;
+use IO\Services\SessionStorageService;
+use Plenty\Plugin\Application;
+
 abstract class AbstractFaker
 {
+    use HandleNestedArray, FakeNumber, FakeString, FakeDate, FakeBoolean, FakeLanguage, FakeImage, FakeCountry, FakeUnit;
+
+    const ES_LANGUAGES = [
+        'de' => 'german',
+        'en' => 'english',
+        'fr' => 'french',
+        'bg' => 'bulgarian',
+        'it' => 'italian',
+        'es' => 'spanish',
+        'tr' => 'turkish',
+        'nl' => 'dutch',
+        'pt' => 'portuguese',
+        'nn' => 'norwegian',
+        'ro' => 'romanian',
+        'da' => 'danish',
+        'se' => 'swedish',
+        'cz' => 'czech',
+        'ru' => 'russian',
+    ];
+
     public $isList = false;
     public $range = [1,2];
 
-    private $uniques = [];
+    protected $lang;
+    protected $esLang;
+    protected $plentyId;
+
+    private static $globals = [];
+
+    public function __construct(SessionStorageService $sessionStorageService, Application $app)
+    {
+        $this->lang     = $sessionStorageService->getLang();
+        $this->esLang   = self::ES_LANGUAGES[$this->lang] ?? 'english';
+        $this->plentyId = $app->getPlentyId();
+    }
 
     public abstract function fill($data);
-
-    protected function merge(&$object, $defaults)
-    {
-        foreach($defaults as $key => $defaultValue)
-        {
-            if ( is_array($defaultValue) && is_array($object[$key]) )
-            {
-                $this->merge($object[$key], $defaultValue);
-            }
-            else
-            {
-                $object[$key] = $defaultValue;
-            }
-        }
-    }
-
-    protected function get($arr, $field)
-    {
-        $path = explode(".", $field);
-        $key = array_shift($path);
-        if (is_null($arr) && array_key_exists($key, $arr) && !is_null($arr[$key]))
-        {
-            if(count($path))
-            {
-                return $this->get($arr[$key], implode(".", $path));
-            }
-        }
-
-        return $arr[$key];
-    }
-
-    protected function isDefined($arr, $field)
-    {
-        $path = explode(".", $field);
-        $key = array_shift($path);
-        if (is_null($arr) && array_key_exists($key, $arr) && !is_null($arr[$key]))
-        {
-            if(count($path))
-            {
-                return $this->isDefined($arr[$key], implode(".", $path));
-            }
-            return true;
-        }
-
-        return false;
-    }
-
-    protected function hasAny($arr, $field, $key, $value)
-    {
-        $list = $this->get($arr, $field) ?? [];
-        foreach($list as $entry)
-        {
-            if ($entry[$key] === $value)
-            {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    protected function number($min = 0, $max = -1)
-    {
-        if ( $max < $min )
-        {
-            $max = 99999;
-        }
-
-        return rand($min, $max);
-    }
-
-    protected function uniqueNumber($min = 0, $max = -1)
-    {
-        return $this->unique(function() use ($min, $max) {
-            return $this->number($min, $max);
-        });
-    }
-
-    protected function boolean()
-    {
-        return rand() % 2 === 0;
-    }
 
     protected function rand($values)
     {
@@ -98,24 +60,18 @@ abstract class AbstractFaker
         return $values[$index];
     }
 
-    protected function timestamp()
+    protected function global($key, $value)
     {
-        return rand(0, time());
-    }
-
-    protected function dateString($format = "Y-m-d H:i:s")
-    {
-        return date($format, $this->timestamp());
-    }
-
-    private function unique(\Closure $generator)
-    {
-        $value = $generator();
-        while(in_array($value, $this->uniques))
+        if ( !array_key_exists($key, self::$globals ) )
         {
-            $value = $generator();
+            self::$globals[$key] = $value;
         }
 
-        return $value;
+        return self::$globals[$key];
+    }
+
+    public static function resetGlobals()
+    {
+        self::$globals = [];
     }
 }

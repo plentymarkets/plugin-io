@@ -2,14 +2,13 @@
 
 namespace IO\Services\ItemSearch\Factories\Faker;
 
-
 class AttributeFaker extends AbstractFaker
 {
     public $isList = true;
 
     public function fill($data)
     {
-        $attributeId  = $this->uniqueNumber();
+        $attributeId  = $this->number();
         $valueId      = $this->number();
         $default = [
             "attributeValueSetId"   => $this->number(),
@@ -26,32 +25,28 @@ class AttributeFaker extends AbstractFaker
 
     private function makeAttribute($attributeId)
     {
+        $attributeName = $this->trans("IO::Faker.attributeName");
         return [
             "id"                            => $attributeId,
-            "backendName"                   => "Ryleigh Wilderman",
+            "backendName"                   => $attributeName,
             "position"                      => $this->number(),
             "isSurchargePercental"          => $this->boolean(),
             "isLinkableToImage"             => $this->boolean(),
-            "amazonAttribute"               => "Dr. Emilia Tremblay",
-            "fruugoAttribute"               => "Ms. Joannie Halvorson MD",
+            "amazonAttribute"               => $attributeName,
+            "fruugoAttribute"               => $attributeName,
             "pixmaniaAttribute"             => $this->number(),
-            "ottoAttribute"                 => "Dr. Abbigail Barrows V",
-            "googleShoppingAttribute"       => "Alexander McLaughlin",
+            "ottoAttribute"                 => $attributeName,
+            "googleShoppingAttribute"       => $attributeName,
             "neckermannAtEpAttribute"       => $this->number(),
-            "typeOfSelectionInOnlineStore"  => "Jeffery Purdy",
+            "typeOfSelectionInOnlineStore"  => $this->rand(["dropdown", "image", "box"]),
             "laRedouteAttribute"            => $this->number(),
             "isGroupable"                   => $this->boolean(),
             "updatedAt"                     => $this->dateString("Y-m-d"),
             "names"                         => [
                 [
                     "attributeId"   => $attributeId,
-                    "lang"          => "Jace Haag",
-                    "name"          => "Fletcher Runolfsdottir"
-                ],
-                [
-                    "attributeId"   => $attributeId,
-                    "lang"          => "Genesis Nolan",
-                    "name"          => "Marguerite Tremblay"
+                    "lang"          => $this->lang,
+                    "name"          => $attributeName
                 ]
             ]
         ];
@@ -59,25 +54,26 @@ class AttributeFaker extends AbstractFaker
 
     private function makeValue($attributeId, $valueId)
     {
+        $valueName = $this->trans("IO::Faker.attributeValueName");
         return [
             "id"                    => $valueId,
             "attributeId"           => $attributeId,
-            "backendName"           => "Mrs. Rosanna Wyman",
+            "backendName"           => $valueName,
             "position"              => $this->number(),
-            "image"                 => "Lupe Considine Jr.",
-            "comment"               => "Jaida Runolfsdottir V",
-            "amazonValue"           => "Prof. Jessika Lueilwitz I",
-            "ottoValue"             => "Dr. Dashawn Baumbach",
-            "neckermannAtEpValue"   => "Nathanael Hauck",
-            "laRedouteValue"        => "Emmitt Mayert I",
-            "tracdelightValue"      => "Margarett Corwin",
-            "percentageDistribution"=> 4312261.8118745,
+            "image"                 => $this->image(100, 100, $valueName),
+            "comment"               => $this->text(1,10),
+            "amazonValue"           => $valueName,
+            "ottoValue"             => $valueName,
+            "neckermannAtEpValue"   => $valueName,
+            "laRedouteValue"        => $valueName,
+            "tracdelightValue"      => $valueName,
+            "percentageDistribution"=> $this->percentage(),
             "updatedAt"             => $this->dateString("Y-m-d"),
             "names"                 => [
                 [
-                    "lang"      => "Linwood Willms",
+                    "lang"      => $this->lang,
                     "valueId"   => $valueId,
-                    "name"      => "Renee Windler II"
+                    "name"      => $valueName
                 ]
             ]
         ];
