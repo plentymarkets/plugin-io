@@ -186,6 +186,10 @@
                           {
                               "value": "newsletter-opt-out",
                               "caption": "Config.routingEnabledRoutesPossibleValueNewsletterOptOut"
+                          },
+                          {
+                              "value": "page-not-found",
+                              "caption": "Config.routingEnabledRoutesPossibleValuePageNotFound"
                           }
                       ]
                   }
