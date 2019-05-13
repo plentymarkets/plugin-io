@@ -136,7 +136,7 @@ class ItemController extends LayoutController
 
         return $this->showItem(
             '',
-            $itemList['documents'][0]['data']['ids']['itemId'],
+            $itemList['documents'][0]['data']['item']['id'],
             $itemList['documents'][0]['data']['variation']['id'],
             $category
         );
