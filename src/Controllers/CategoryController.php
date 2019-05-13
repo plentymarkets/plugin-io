@@ -13,7 +13,6 @@ use Plenty\Plugin\Application;
 use Plenty\Plugin\Http\Request;
 use Plenty\Plugin\Http\Response;
 use Plenty\Plugin\Log\Loggable;
-use Zend\Tag\ItemList;
 
 /**
  * Class CategoryController
