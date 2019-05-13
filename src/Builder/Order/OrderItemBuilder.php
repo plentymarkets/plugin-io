@@ -276,7 +276,7 @@ class OrderItemBuilder
 			"shippingProfileId" => $basketItem['shippingProfileId'],
 			"countryVatId"      => $this->vatService->getCountryVatId(),
 			"vatRate"           => $basketItem['vat'],
-            "vatField"			=> $this->getVatField($this->vatService->getVat(), $basketItem['vat']),
+            "vatField"			=> $basketItem['variation']['data']['variation']['vatId'],
             "orderProperties"   => $basketItemProperties,
             "properties"        => $properties,
 			"amounts"           => [
