@@ -42,14 +42,13 @@ class Middleware extends \Plenty\Plugin\Middleware
         /** @var WebstoreConfigurationService $webstoreService */
         $webstoreService = pluginApp(WebstoreConfigurationService::class);
         $webstoreConfig  = $webstoreService->getWebstoreConfig();
-        $activeLanguages = $webstoreService->getActiveLanguageList();
         $requestLang     = $request->get('Lang', null);
 
-        if(!is_null($requestLang) && in_array($requestLang, $activeLanguages))
+        if(!is_null($requestLang) && in_array($requestLang, $webstoreConfig->languageList))
         {
             $this->setLanguage($requestLang, $webstoreConfig);
         }
-        else if((is_null($splittedURL[0]) || strlen($splittedURL[0]) != 2 || !in_array($splittedURL[0], $activeLanguages)) && strpos(end($splittedURL), '.') === false)
+        else if((is_null($splittedURL[0]) || strlen($splittedURL[0]) != 2 || !in_array($splittedURL[0], $webstoreConfig->languageList)) && strpos(end($splittedURL), '.') === false)
         {
             $this->setLanguage($webstoreConfig->defaultLanguage, $webstoreConfig);
         }
