@@ -36,28 +36,19 @@ class Middleware extends \Plenty\Plugin\Middleware
         }
 
         $splittedURL     = explode('/', $request->get('plentyMarkets'));
-        $lang            = $request->get('Lang') ?? $splittedURL[0];
+
+        /** @var WebstoreConfigurationService $webstoreService */
         $webstoreService = pluginApp(WebstoreConfigurationService::class);
         $webstoreConfig  = $webstoreService->getWebstoreConfig();
+        $requestLang     = $request->get('Lang', null);
 
-        if (($lang == null || strlen($lang) != 2 || !in_array($lang, $webstoreConfig->languageList)) && strpos(end($splittedURL), '.') === false)
+        if(!is_null($requestLang) && in_array($requestLang, $webstoreConfig->languageList))
         {
-            if($sessionService->getLang() != $webstoreConfig->defaultLanguage)
-            {
-                $service = pluginApp(LocalizationService::class);
-                $service->setLanguage($webstoreConfig->defaultLanguage);
-
-                 /** @var TemplateConfigService $templateConfigService */
-                $templateConfigService = pluginApp(TemplateConfigService::class);
-                $enabledCurrencies = explode(', ',  $templateConfigService->get('currency.available_currencies') );
-                $currency = $webstoreConfig->defaultCurrencyList[$webstoreConfig->defaultLanguage];
-                if(!is_null($currency) && (in_array($currency, $enabledCurrencies) || array_pop($enabledCurrencies) == 'all'))
-                {
-                    /** @var CheckoutService $checkoutService */
-                    $checkoutService = pluginApp(CheckoutService::class);
-                    $checkoutService->setCurrency( $currency );
-                }
-            }
+            $this->setLanguage($requestLang, $webstoreConfig);
+        }
+        else if((is_null($splittedURL[0]) || strlen($splittedURL[0]) != 2 || !in_array($splittedURL[0], $webstoreConfig->languageList)) && strpos(end($splittedURL), '.') === false)
+        {
+            $this->setLanguage($webstoreConfig->defaultLanguage, $webstoreConfig);
         }
 
         $currency = $request->get('currency', null);
@@ -171,5 +162,22 @@ class Middleware extends \Plenty\Plugin\Middleware
         }
 
         return $response;
+    }
+
+    private function setLanguage($language, $webstoreConfig)
+    {
+        $service = pluginApp(LocalizationService::class);
+        $service->setLanguage($language);
+
+        /** @var TemplateConfigService $templateConfigService */
+        $templateConfigService = pluginApp(TemplateConfigService::class);
+        $enabledCurrencies = explode(', ',  $templateConfigService->get('currency.available_currencies') );
+        $currency = $webstoreConfig->defaultCurrencyList[$language];
+        if(!is_null($currency) && (in_array($currency, $enabledCurrencies) || array_pop($enabledCurrencies) == 'all'))
+        {
+            /** @var CheckoutService $checkoutService */
+            $checkoutService = pluginApp(CheckoutService::class);
+            $checkoutService->setCurrency( $currency );
+        }
     }
 }
