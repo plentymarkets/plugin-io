@@ -348,8 +348,12 @@ class CustomerService
 	{
 	    $contact = null;
         $contactData['checkForExistingEmail'] = true;
-        $contactData['lang'] = $this->sessionStorage->getLang();
 	    $contactData['plentyId'] = pluginApp(Application::class)->getPlentyId();
+	    
+	    if(!isset($contactData['lang']) || is_null($contactData['lang']))
+        {
+            $contactData['lang'] = $this->sessionStorage->getLang();
+        }
 
 	    try
         {
