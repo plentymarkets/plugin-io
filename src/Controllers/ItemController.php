@@ -128,7 +128,7 @@ class ItemController extends LayoutController
         /** @var ItemListService $itemListService */
         $itemListService = pluginApp(ItemListService::class);
         $itemList = $itemListService->getItemList(ItemListService::TYPE_CATEGORY, $category->id, null, 1);
-        if (!count($itemList['documents']))
+        if (count($itemList['documents']))
         {
             return $this->showItem(
                 '',
