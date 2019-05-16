@@ -1,5 +1,16 @@
 # Release Notes für IO
 
+## v4.0.1 (2019-05-14) <a href="https://github.com/plentymarkets/plugin-io/compare/4.0.0...4.0.1" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
+
+### Geändert
+
+- Für die Methode `createContact()` in der Klasse CustomerService wurde die Möglichkeit ergänzt, eine Kundensprache in den übermittelten Daten mitzugeben, falls nicht die aktuell im Webshop ausgewählte Sprache verwendet werden soll.
+
+### Behoben
+
+- Bei Gastbestellungen konnte es beim Wechsel des Versandprofils zu Fehlern kommen. Dieses Verhalten wurde behoben.
+- Bei Weiterleitungen innerhalb des Webshops wird die Sprache nun korrekt berücksichtigt.
+
 ## v4.0.0 (2019-05-02) <a href="https://github.com/plentymarkets/plugin-io/compare/3.2.0...4.0.0" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
 
 ### TODO
