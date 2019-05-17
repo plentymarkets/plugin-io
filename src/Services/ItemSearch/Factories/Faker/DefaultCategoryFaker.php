@@ -13,7 +13,7 @@ class DefaultCategoryFaker extends AbstractFaker
         $currentCategory = pluginApp(CategoryService::class)->getCurrentCategory();
         $default = [
             "id"                    => !is_null($currentCategory) ? $currentCategory->id : $this->number(),
-            "plentyId"              => $this->plentyId,
+            "plentyId"              => $this->index === 0 ? $this->plentyId : $this->number(),
             "parentCategoryId"      => $this->number(),
             "level"                 => $this->number(0, 5),
             "type"                  => 'item',

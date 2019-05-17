@@ -38,6 +38,8 @@ abstract class AbstractFaker
 
     public $isList = false;
     public $range = [1,2];
+    public $index = 0;
+    public $list = [];
 
     protected $lang;
     protected $esLang;

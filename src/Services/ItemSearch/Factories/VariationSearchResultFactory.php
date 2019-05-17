@@ -142,8 +142,10 @@ class VariationSearchResultFactory
                         $count = max(rand(...$faker->range), count($value));
                         for($i = 0; $i < $count; $i++)
                         {
-                            $listValue = $value[$i];
-                            $result[$i] = $faker->fill($listValue);
+                            $faker->index = $i;
+                            $faker->list  = $result;
+                            $listValue    = $value[$i];
+                            $result[$i]   = $faker->fill($listValue);
                         }
                     }
                     else
