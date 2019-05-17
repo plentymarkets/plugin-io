@@ -123,21 +123,25 @@ class ItemController extends LayoutController
         return $this->showItem("", (int)$itemId, 0);
     }
 
-    public function showItemForCategory($category = null)
+    public function showItemForCategory($category)
     {
-
         /** @var ItemListService $itemListService */
         $itemListService = pluginApp(ItemListService::class);
         $itemList = $itemListService->getItemList(ItemListService::TYPE_CATEGORY, $category->id, null, 1);
-        if (!count($itemList['documents']))
+        if (count($itemList['documents']))
         {
-            $itemList = $itemListService->getItemList(ItemListService::TYPE_RANDOM);
+            return $this->showItem(
+                '',
+                $itemList['documents'][0]['data']['item']['id'],
+                $itemList['documents'][0]['data']['variation']['id'],
+                $category
+            );
         }
 
         return $this->showItem(
             '',
-            $itemList['documents'][0]['data']['ids']['itemId'],
-            $itemList['documents'][0]['data']['variation']['id'],
+            0,
+            0,
             $category
         );
     }
