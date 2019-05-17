@@ -22,6 +22,8 @@ use IO\Guards\AuthGuard;
 
 class Middleware extends \Plenty\Plugin\Middleware
 {
+    public static $FORCE_404 = false;
+    
     public function before(Request $request)
     {
         /** @var SessionStorageService $sessionService */
@@ -148,19 +150,21 @@ class Middleware extends \Plenty\Plugin\Middleware
 
     public function after(Request $request, Response $response):Response
     {
-        if ($response->status() == ResponseCode::NOT_FOUND) {
-            /** @var StaticPagesController $controller */
-            $controller = pluginApp(StaticPagesController::class);
-
-            $response = $response->make(
-                $controller->showPageNotFound(),
-                ResponseCode::NOT_FOUND
-            );
-
-            $response->forceStatus(ResponseCode::NOT_FOUND);
-            return $response;
+        if ($response->status() == ResponseCode::NOT_FOUND)
+        {
+            if(RouteConfig::isActive(RouteConfig::PAGE_NOT_FOUND) || self::$FORCE_404)
+            {
+                /** @var StaticPagesController $controller */
+                $controller = pluginApp(StaticPagesController::class);
+                
+                $response = $response->make(
+                    $controller->showPageNotFound(),
+                    ResponseCode::NOT_FOUND
+                );
+                $response->forceStatus(ResponseCode::NOT_FOUND);
+            }
         }
-
+        
         return $response;
     }
 
