@@ -3,9 +3,15 @@
 namespace IO\Controllers;
 
 use IO\Api\ResponseCode;
+use IO\Services\CategoryService;
+use IO\Services\ItemListService;
+use IO\Services\ItemSearch\Factories\VariationSearchResultFactory;
+use IO\Services\ItemSearch\Helper\ResultFieldTemplate;
 use IO\Services\ItemSearch\SearchPresets\CrossSellingItems;
 use IO\Services\ItemSearch\SearchPresets\SingleItem;
 use IO\Services\ItemSearch\Services\ItemSearchService;
+use Plenty\Modules\Category\Models\Category;
+use Plenty\Modules\ShopBuilder\Helper\ShopBuilderRequest;
 use Plenty\Plugin\Http\Response;
 use Plenty\Plugin\Log\Loggable;
 
@@ -16,23 +22,27 @@ use Plenty\Plugin\Log\Loggable;
 class ItemController extends LayoutController
 {
     use Loggable;
+
     /**
      * Prepare and render the item data.
-     * @param string $slug
-     * @param int $itemId The itemId read from current request url. Will be null if item url does not contain a slug.
-     * @param int $variationId
+     * @param string    $slug
+     * @param int       $itemId         The itemId read from current request url. Will be null if item url does not contain a slug.
+     * @param int       $variationId
+     * @param Category  $category
      * @return string
+     * @throws \ErrorException
      */
     public function showItem(
         string $slug = "",
         int $itemId = 0,
-        int $variationId = 0
+        int $variationId = 0,
+        $category = null
     )
     {
         $itemSearchOptions = [
             'itemId'        => $itemId,
             'variationId'   => $variationId,
-            'setCategory'   => true
+            'setCategory'   => is_null($category)
         ];
         /** @var ItemSearchService $itemSearchService */
         $itemSearchService = pluginApp( ItemSearchService::class );
@@ -40,6 +50,22 @@ class ItemController extends LayoutController
             SingleItem::getSearchFactory( $itemSearchOptions )
         );
 
+        if (!is_null($category))
+        {
+            pluginApp(CategoryService::class)->setCurrentCategory($category);
+        }
+
+        /** @var ShopBuilderRequest $shopBuilderRequest */
+        $shopBuilderRequest = pluginApp(ShopBuilderRequest::class);
+        if ($shopBuilderRequest->isShopBuilder())
+        {
+            /** @var VariationSearchResultFactory $searchResultFactory */
+            $searchResultFactory = pluginApp(VariationSearchResultFactory::class);
+            $itemResult = $searchResultFactory->fillSearchResults(
+                $itemResult,
+                ResultFieldTemplate::get(ResultFieldTemplate::TEMPLATE_SINGLE_ITEM)
+            );
+        }
 
         if(empty($itemResult['documents']))
         {
@@ -95,5 +121,28 @@ class ItemController extends LayoutController
         }
 
         return $this->showItem("", (int)$itemId, 0);
+    }
+
+    public function showItemForCategory($category)
+    {
+        /** @var ItemListService $itemListService */
+        $itemListService = pluginApp(ItemListService::class);
+        $itemList = $itemListService->getItemList(ItemListService::TYPE_CATEGORY, $category->id, null, 1);
+        if (count($itemList['documents']))
+        {
+            return $this->showItem(
+                '',
+                $itemList['documents'][0]['data']['item']['id'],
+                $itemList['documents'][0]['data']['variation']['id'],
+                $category
+            );
+        }
+
+        return $this->showItem(
+            '',
+            0,
+            0,
+            $category
+        );
     }
 }

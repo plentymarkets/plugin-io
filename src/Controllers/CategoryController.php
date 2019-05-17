@@ -5,6 +5,7 @@ namespace IO\Controllers;
 use IO\Api\ResponseCode;
 use IO\Helper\RouteConfig;
 use IO\Guards\AuthGuard;
+use IO\Services\ItemListService;
 use IO\Services\SessionStorageService;
 use IO\Services\UrlService;
 use Plenty\Modules\ShopBuilder\Helper\ShopBuilderRequest;
@@ -44,8 +45,19 @@ class CategoryController extends LayoutController
         $lang = $sessionService->getLang();
         $webstoreId = pluginApp(Application::class)->getWebstoreId();
 
+        $category = $this->categoryRepo->findCategoryByUrl($lvl1, $lvl2, $lvl3, $lvl4, $lvl5, $lvl6, $webstoreId, $lang);
+
+        /** @var ShopBuilderRequest $shopBuilderRequest */
+        $shopBuilderRequest = pluginApp(ShopBuilderRequest::class);
+        if ($shopBuilderRequest->isShopBuilder() && $shopBuilderRequest->getPreviewContentType() === 'singleitem')
+        {
+            /** @var ItemController $itemController */
+            $itemController = pluginApp(ItemController::class);
+            return $itemController->showItemForCategory($category);
+        }
+
         return $this->renderCategory(
-            $this->categoryRepo->findCategoryByUrl($lvl1, $lvl2, $lvl3, $lvl4, $lvl5, $lvl6, $webstoreId, $lang)
+            $category
         );
 	}
 
