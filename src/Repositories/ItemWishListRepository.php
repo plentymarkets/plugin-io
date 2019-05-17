@@ -58,11 +58,12 @@ class ItemWishListRepository
 
          /** @var ItemSearchService $itemSearchService */
         $itemSearchService = pluginApp( ItemSearchService::class );
-        $variations = $itemSearchService->getResults(
-            VariationList::getSearchFactory([
+        $variatonFactory = VariationList::getSearchFactory([
                 'variationIds'  => $tempVariationIds
-                ])
-            );
+                ]);
+        $variatonFactory->withResultFields(['id']);
+        $variations = $itemSearchService->getResults($variatonFactory);
+
         foreach($variations['documents'] as $variation)
         {
             $variationIds[] = $variation['id'];
