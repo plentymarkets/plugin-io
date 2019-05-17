@@ -56,17 +56,20 @@ class ItemWishListRepository
             }
         }
 
-         /** @var ItemSearchService $itemSearchService */
-        $itemSearchService = pluginApp( ItemSearchService::class );
-        $variatonFactory = VariationList::getSearchFactory([
-                'variationIds'  => $tempVariationIds
-                ]);
-        $variatonFactory->withResultFields(['id']);
-        $variations = $itemSearchService->getResults($variatonFactory);
-
-        foreach($variations['documents'] as $variation)
+        if(count($tempVariationIds) > 0)
         {
-            $variationIds[] = $variation['id'];
+            /** @var ItemSearchService $itemSearchService */
+            $itemSearchService = pluginApp( ItemSearchService::class );
+            $variatonFactory = VariationList::getSearchFactory([
+                    'variationIds'  => $tempVariationIds
+                    ]);
+            $variatonFactory->withResultFields(['id']);
+            $variations = $itemSearchService->getResults($variatonFactory);
+
+            foreach($variations['documents'] as $variation)
+            {
+                $variationIds[] = $variation['id'];
+            }
         }
 
 
