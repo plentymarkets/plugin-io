@@ -66,16 +66,13 @@ class PropertySelectionValueNameFilter extends AbstractFilter
             $lang = $this->sessionStorageService->getLang();
         }
 
-        $selectionValueName = $this->fromMemoryCache("selectionValueName.$propertyId.$selectionValueId.$lang", function() use ($propertyId, $selectionValueId, $lang)
+        $selectionValues = $this->fromMemoryCache("selectionValues.$propertyId.$lang", function() use ($propertyId, $lang)
         {
-            $selectionValues = $this->authHelper->processUnguarded(function() use ($propertyId, $lang)
+            return $this->authHelper->processUnguarded(function() use ($propertyId, $lang)
             {
                 return $this->propertySelectionRepository->findByProperty($propertyId, $lang);
             });
-
-            return $selectionValues->firstWhere('id', $selectionValueId)->name;
         });
-
-        return $selectionValueName;
+        return $selectionValues->firstWhere('id', $selectionValueId)->name;
     }
 }
