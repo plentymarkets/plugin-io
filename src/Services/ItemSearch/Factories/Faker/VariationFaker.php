@@ -75,7 +75,7 @@ class VariationFaker extends AbstractFaker
 
     public function makeAvailability()
     {
-        $availabilityId = $this->number();
+        $availabilityId = $this->number(1, 10);
         return [
             "id"            => $availabilityId,
             "icon"          => $this->image(50, 50),
