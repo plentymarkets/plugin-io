@@ -2,18 +2,21 @@
 
 namespace IO\Services\ItemSearch\Factories\Faker;
 
+use IO\Services\CategoryService;
+
 class DefaultCategoryFaker extends AbstractFaker
 {
     public $isList = true;
     
     public function fill($data)
     {
+        $currentCategory = pluginApp(CategoryService::class)->getCurrentCategory();
         $default = [
-            "id"                    => $this->number(),
+            "id"                    => !is_null($currentCategory) ? $currentCategory->id : $this->number(),
             "plentyId"              => $this->plentyId,
             "parentCategoryId"      => $this->number(),
             "level"                 => $this->number(0, 5),
-            "type"                  => $this->rand(['content', 'item', 'container', 'blog']),
+            "type"                  => 'item',
             "linklist"              => $this->boolean(),
             "right"                 => $this->rand(['all', 'customer']),
             "sitemap"               => $this->boolean(),

@@ -63,7 +63,15 @@ class VariationSearchResultFactory
         $entries        = [];
         foreach($resultFields as $resultField)
         {
-            $entry = substr($resultField, 0, strpos($resultField,"."));
+            if (strpos($resultField,"."))
+            {
+                $entry = substr($resultField, 0, strpos($resultField,"."));
+            }
+            else
+            {
+                $entry = $resultField;
+            }
+
             if (!in_array($entry, $entries))
             {
                 $entries[] = $entry;
