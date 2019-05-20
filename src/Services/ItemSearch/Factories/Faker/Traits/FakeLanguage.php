@@ -16,10 +16,18 @@ trait FakeLanguage
         $sessionStorageService = pluginApp(SessionStorageService::class);
         $lang = $sessionStorageService->getLang();
 
-        $languages = $webstoreConfigService->getActiveLanguageList();
-        if(($removeIndex = array_search($lang, $languages)) !== false && $skipActiveLang)
+        $languages = [];
+        foreach($webstoreConfigService->getActiveLanguageList() as $language)
         {
-            array_splice($languages, $removeIndex, 1);
+            if ($language !== $lang || !$skipActiveLang)
+            {
+                $languages[] = $language;
+            }
+        }
+
+        if (!count($languages))
+        {
+            return $lang !== 'en' ? 'en' : 'de';
         }
 
         $index = rand(0, count($languages));
