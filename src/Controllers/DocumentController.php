@@ -3,6 +3,7 @@
 namespace IO\Controllers;
 
 use IO\Api\ResponseCode;
+use IO\Middlewares\Middleware;
 use IO\Services\CustomerService;
 use Plenty\Modules\Cloud\Storage\Models\StorageObject;
 use Plenty\Modules\Document\Contracts\DocumentRepositoryContract;
@@ -65,6 +66,7 @@ class DocumentController extends LayoutController
         {
             //document not found or logged in contact not matching
             $response->forceStatus(ResponseCode::NOT_FOUND);
+            Middleware::$FORCE_404 = true;
         }
         
         return $response;
