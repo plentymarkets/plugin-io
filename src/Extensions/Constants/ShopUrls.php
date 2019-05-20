@@ -9,6 +9,8 @@ use IO\Services\SessionStorageService;
 use IO\Services\UrlBuilder\CategoryUrlBuilder;
 use IO\Services\UrlBuilder\UrlQuery;
 use IO\Services\WebstoreConfigurationService;
+use Plenty\Modules\Frontend\Events\FrontendLanguageChanged;
+use Plenty\Plugin\Events\Dispatcher;
 
 class ShopUrls
 {
@@ -37,11 +39,21 @@ class ShopUrls
     public $wishList            = "";
 
 
-    public function __construct()
+    public function __construct(Dispatcher $dispatcher, SessionStorageService $sessionStorageService)
     {
+        $this->init($sessionStorageService->getLang());
+        $dispatcher->listen(FrontendLanguageChanged::class, function(FrontendLanguageChanged $event)
+        {
+            $this->init($event->getLanguage());
+        });
+    }
+
+    private function init($lang)
+    {
+        $this->resetMemoryCache();
         $this->appendTrailingSlash      = UrlQuery::shouldAppendTrailingSlash();
         $this->trailingSlashSuffix      = $this->appendTrailingSlash ? '/' : '';
-        $this->includeLanguage = pluginApp(SessionStorageService::class)->getLang() !== pluginApp(WebstoreConfigurationService::class)->getDefaultLanguage();
+        $this->includeLanguage          = $lang !== pluginApp(WebstoreConfigurationService::class)->getDefaultLanguage();
 
         $this->basket                   = $this->getShopUrl(RouteConfig::BASKET);
         $this->cancellationForm         = $this->getShopUrl(RouteConfig::CANCELLATION_FORM);

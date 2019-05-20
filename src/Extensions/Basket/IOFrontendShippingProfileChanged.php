@@ -19,7 +19,7 @@ class IOFrontendShippingProfileChanged
         $basketService = pluginApp(BasketService::class);
         $deliveryAddressId = $basketService->getDeliveryAddressId();
 
-        if (is_null($deliveryAddressId) || $deliveryAddressId === -99)
+        if (is_null($deliveryAddressId) || $deliveryAddressId <= 0)
         {
             return;
         }
