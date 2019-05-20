@@ -38,44 +38,53 @@ class OrderTrackingService
     public function getTrackingURL(Order $order, $lang)
     {
         $trackingURL = '';
-        
-        $shippingProfile = $this->parcelServicePresetRepo->getPresetById( $order->shippingProfileId );
-    
-        $parcelService = $shippingProfile->parcelService;
-        if($parcelService instanceof ParcelService)
+
+        try
         {
-            /** @var OrderRepositoryContract $orderRepo */
-            $orderRepo = pluginApp(OrderRepositoryContract::class);
-            $packageNumber = implode(',', $orderRepo->getPackageNumbers($order->id));
-            
-            if(strlen($packageNumber))
+            $shippingProfile = $this->parcelServicePresetRepo->getPresetById( $order->shippingProfileId );
+            $parcelService = $shippingProfile->parcelService;
+            if($parcelService instanceof ParcelService)
             {
-                $trackingURL = $parcelService->trackingUrl;
-    
-    
-                $zip = $order->deliveryAddress->postalCode;
-    
-                if(strlen($trackingURL) && strlen($packageNumber))
+                /** @var OrderRepositoryContract $orderRepo */
+                $orderRepo = pluginApp(OrderRepositoryContract::class);
+                $packageNumber = implode(',', $orderRepo->getPackageNumbers($order->id));
+
+                if(strlen($packageNumber))
                 {
-                    $trackingURL = str_replace('[PaketNr]',
-                                               $packageNumber,
-                                               str_replace('[PLZ]',
-                                                           $zip,
-                                                           str_replace('[Lang]',
-                                                                       $lang,
-                                                                       $trackingURL)));
-        
-                    $trackingURL = str_replace('$PaketNr',
-                                               $packageNumber,
-                                               str_replace('$PLZ',
-                                                           $zip,
-                                                           str_replace('$Lang',
-                                                                       $lang,
-                                                                       $trackingURL)));
+                    $trackingURL = $parcelService->trackingUrl;
+
+
+                    $zip = $order->deliveryAddress->postalCode;
+
+                    if(strlen($trackingURL) && strlen($packageNumber))
+                    {
+                        $trackingURL = str_replace('[PaketNr]',
+                                                   $packageNumber,
+                                                   str_replace('[PLZ]',
+                                                               $zip,
+                                                               str_replace('[Lang]',
+                                                                           $lang,
+                                                                           $trackingURL)));
+
+                        $trackingURL = str_replace('$PaketNr',
+                                                   $packageNumber,
+                                                   str_replace('$PLZ',
+                                                               $zip,
+                                                               str_replace('$Lang',
+                                                                           $lang,
+                                                                           $trackingURL)));
+                    }
                 }
             }
         }
-        
+        catch (\Exception $e)
+        {
+            $this->getLogger(__CLASS__)->error("IO::Debug.OrderTrackingService_getTrackingURL", [
+                'code' => $e->getCode(),
+                'message' => $e->getMessage()
+            ]);
+        }
+
         return $trackingURL;
     }
 }
