@@ -87,7 +87,7 @@ class UrlQuery
 
         $trailingSlash = self::shouldAppendTrailingSlash() ? "/" : "";
 
-        if ( $includeLanguage && strpos($this->path, $this->lang) !== 1)
+        if ( $includeLanguage && strpos($this->path, '/'.$this->lang) !== 1)
         {
             return '/' . $this->lang . $this->path . $trailingSlash;
         }elseif(strlen($this->path) == 0)
