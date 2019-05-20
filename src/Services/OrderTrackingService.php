@@ -6,6 +6,7 @@ use Plenty\Modules\Order\Contracts\OrderRepositoryContract;
 use Plenty\Modules\Order\Models\Order;
 use Plenty\Modules\Order\Shipping\Contracts\ParcelServicePresetRepositoryContract;
 use Plenty\Modules\Order\Shipping\ParcelService\Models\ParcelService;
+use Plenty\Plugin\Log\Loggable;
 
 /**
  * Class OrderTrackingService
@@ -13,12 +14,14 @@ use Plenty\Modules\Order\Shipping\ParcelService\Models\ParcelService;
  */
 class OrderTrackingService
 {
+    use Loggable;
+    
     /** @var OrderRepositoryContract */
     private $orderRepo;
-    
+
     /** @var ParcelServicePresetRepositoryContract */
     private $parcelServicePresetRepo;
-    
+
     /**
      * OrderTrackingService constructor.
      * @param OrderRepositoryContract $orderRepo
