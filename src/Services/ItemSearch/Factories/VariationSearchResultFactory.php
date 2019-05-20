@@ -2,59 +2,85 @@
 
 namespace IO\Services\ItemSearch\Factories;
 
+use IO\Services\ItemSearch\Factories\Faker\AbstractFaker;
+use IO\Services\ItemSearch\Factories\Faker\AttributeFaker;
+use IO\Services\ItemSearch\Factories\Faker\BarcodeFaker;
+use IO\Services\ItemSearch\Factories\Faker\CategoryFaker;
+use IO\Services\ItemSearch\Factories\Faker\CrossSellingFaker;
+use IO\Services\ItemSearch\Factories\Faker\DefaultCategoryFaker;
+use IO\Services\ItemSearch\Factories\Faker\FacetFaker;
+use IO\Services\ItemSearch\Factories\Faker\FilterFaker;
+use IO\Services\ItemSearch\Factories\Faker\IdsFaker;
+use IO\Services\ItemSearch\Factories\Faker\ImageFaker;
+use IO\Services\ItemSearch\Factories\Faker\ItemFaker;
+use IO\Services\ItemSearch\Factories\Faker\PriceFaker;
+use IO\Services\ItemSearch\Factories\Faker\PropertyFaker;
+use IO\Services\ItemSearch\Factories\Faker\SalesPriceFaker;
+use IO\Services\ItemSearch\Factories\Faker\SkuFaker;
+use IO\Services\ItemSearch\Factories\Faker\SortingFaker;
+use IO\Services\ItemSearch\Factories\Faker\StockFaker;
+use IO\Services\ItemSearch\Factories\Faker\TagFaker;
+use IO\Services\ItemSearch\Factories\Faker\TextFaker;
+use IO\Services\ItemSearch\Factories\Faker\UnitFaker;
+use IO\Services\ItemSearch\Factories\Faker\VariationFaker;
+use IO\Services\ItemSearch\Factories\Faker\VariationPropertyFaker;
 use IO\Services\ItemSearch\Helper\LoadResultFields;
-use IO\Services\ItemSearch\Helper\VariationSearchResultAbstractFaker;
-use IO\Services\ItemSearch\Helper\VariationSearchResultMap;
 
 class VariationSearchResultFactory
 {
+    const FAKER_MAP = [
+        "attributes"            => AttributeFaker::class,
+        "barcodes"              => BarcodeFaker::class,
+        "categories"            => CategoryFaker::class,
+        "crossSelling"          => CrossSellingFaker::class,
+        "defaultCategories"     => DefaultCategoryFaker::class,
+        "facets"                => FacetFaker::class,
+        "filter"                => FilterFaker::class,
+        "ids"                   => IdsFaker::class,
+        "images"                => ImageFaker::class,
+        "item"                  => ItemFaker::class,
+        "properties"            => PropertyFaker::class,
+        "salesPrices"           => SalesPriceFaker::class,
+        "skus"                  => SkuFaker::class,
+        "sorting"               => SortingFaker::class,
+        "stock"                 => StockFaker::class,
+        "tags"                  => TagFaker::class,
+        "texts"                 => TextFaker::class,
+        "unit"                  => UnitFaker::class,
+        "variation"             => VariationFaker::class,
+        "variationProperties"   => VariationPropertyFaker::class
+    ];
+
+    const MANDATORY_FAKER_MAP = [
+        "prices"                => PriceFaker::class
+    ];
+
     use LoadResultFields;
 
-    private $resultFields = [];
-    private $defaultResult = [];
-
-    public function fillSearchResults( $result, $resultFieldsTemplate, $numberOfEntries = 1 )
+    public function fillSearchResults( $searchResult, $resultFieldsTemplate, $numberOfEntries = 1 )
     {
-        $this->defaultResult = [];
-        $this->resultFields = $this->loadResultFields($resultFieldsTemplate);
-
-        foreach(VariationSearchResultMap::RESULT_FIELDS as $field => $value)
+        $resultFields   = $this->loadResultFields($resultFieldsTemplate);
+        $entries        = [];
+        foreach($resultFields as $resultField)
         {
-            try
+            if (strpos($resultField,"."))
             {
-                $faker = pluginApp($value);
-                if ( $faker instanceof VariationSearchResultAbstractFaker )
-                {
-                    if ( $faker->isList )
-                    {
-                        $count = rand($faker->listRange[0] ?? 1, $faker->listRange[1] ?? 3);
-                        $defaultValue = [];
-                        for($i = 0; $i < $count; $i++)
-                        {
-                            $defaultValue[] = $faker->generate();
-                        }
-                    }
-                    else
-                    {
-                        $defaultValue = $faker->generate();
-                    }
-                }
-                else
-                {
-                    $defaultValue = $value;
-                }
+                $entry = substr($resultField, 0, strpos($resultField,"."));
             }
-            catch(\Exception $e)
+            else
             {
-                $defaultValue = $value;
+                $entry = $resultField;
             }
 
-            $this->setValue($this->defaultResult, $field, $defaultValue);
+            if (!in_array($entry, $entries))
+            {
+                $entries[] = $entry;
+            }
         }
 
-        if(is_null($result))
+        if(is_null($searchResult))
         {
-            $result = [
+            $searchResult = [
                 'took'      => rand(1, 100),
                 'total'     => $numberOfEntries,
                 'maxScore'  => 0,
@@ -66,9 +92,9 @@ class VariationSearchResultFactory
 
         for($i = 0; $i < $numberOfEntries; $i++)
         {
-            if(empty($result['documents'][$i]))
+            if(empty($searchResult['documents'][$i]))
             {
-                $result['documents'][$i] = [
+                $searchResult['documents'][$i] = [
                     'score' => 0,
                     'id'    => rand(100, 100000),
                     'data'  => []
@@ -76,41 +102,64 @@ class VariationSearchResultFactory
             }
         }
 
-        foreach($result['documents'] as $i => $document)
+        foreach($searchResult['documents'] as $i => $document)
         {
-            $this->injectValues($result['documents'][$i], $this->defaultResult );
+            $searchResult['documents'][$i] = $this->fillDocument($document, $entries);
+        }
+
+        return $searchResult;
+    }
+
+    private function fillDocument($document, $entries)
+    {
+        AbstractFaker::resetGlobals();
+        foreach($entries as $entry)
+        {
+            $fakerClass = self::FAKER_MAP[$entry];
+            $document['data'][$entry] = $this->runFaker($fakerClass, $document['data'][$entry] ?? []);
+        }
+
+        foreach(self::MANDATORY_FAKER_MAP as $entry => $fakerClass)
+        {
+            $document['data'][$entry] = $this->runFaker($fakerClass, $document['data'][$entry] ?? []);
+        }
+
+        return $document;
+    }
+
+    private function runFaker($fakerClass, $value)
+    {
+        $result = [];
+        if(strlen($fakerClass))
+        {
+            try
+            {
+                $faker = pluginApp($fakerClass);
+                if($faker instanceof AbstractFaker)
+                {
+                    if ($faker->isList)
+                    {
+                        $count = max(rand(...$faker->range), count($value));
+                        for($i = 0; $i < $count; $i++)
+                        {
+                            $faker->index = $i;
+                            $faker->list  = $result;
+                            $listValue    = $value[$i];
+                            $result[$i]   = $faker->fill($listValue);
+                        }
+                    }
+                    else
+                    {
+                        $result = $faker->fill($value);
+                    }
+                }
+            }
+            catch(\Exception $e)
+            {
+
+            }
         }
 
         return $result;
-    }
-
-    private function setValue( &$object, $field, $value )
-    {
-        $path = explode(".", $field);
-        $key = array_shift($path);
-
-        if(count($path))
-        {
-            $this->setValue($object[$key], implode(".", $path), $value);
-        }
-        else
-        {
-            $object[$key] = $value;
-        }
-    }
-
-    private function injectValues( &$object, $defaults )
-    {
-        foreach($defaults as $key => $defaultValue)
-        {
-            if ( is_array($defaultValue) && is_array($object[$key]) )
-            {
-                $this->injectValues($object[$key], $defaultValue);
-            }
-            else
-            {
-                $object[$key] = $defaultValue;
-            }
-        }
     }
 }

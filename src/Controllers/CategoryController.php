@@ -5,7 +5,6 @@ namespace IO\Controllers;
 use IO\Api\ResponseCode;
 use IO\Helper\RouteConfig;
 use IO\Guards\AuthGuard;
-use IO\Services\ItemListService;
 use IO\Services\SessionStorageService;
 use IO\Services\UrlService;
 use Plenty\Modules\ShopBuilder\Helper\ShopBuilderRequest;
