@@ -1,5 +1,5 @@
 {
-    "version"           : "4.0.0",
+    "version"           : "4.0.1",
     "name"              : "IO",
     "marketplaceName"   : {"de": "IO","en": "IO"},
     "license"           : "AGPL-3.0",
@@ -25,6 +25,7 @@
     "runOnBuild"        : [
         "IO\\Migrations\\ItemWishListMigration_0_0_1",
         "IO\\Migrations\\UserDataHashTableMigration_0_0_1",
-        "IO\\Migrations\\UserDataHashTableMigration_0_0_2"
+        "IO\\Migrations\\UserDataHashTableMigration_0_0_2",
+        "IO\\Migrations\\PageNotFoundConfigMigration_0_0_1"
     ]
 }
