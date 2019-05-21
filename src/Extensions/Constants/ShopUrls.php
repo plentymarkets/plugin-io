@@ -82,6 +82,11 @@ class ShopUrls
         return $this->getShopUrl(RouteConfig::ORDER_RETURN, "returns", $orderId);
     }
 
+    public function orderPropertyFile($path)
+    {
+        return $this->getShopUrl(RouteConfig::ORDER_PROPERTY_FILE, null, $path);
+    }
+
     private function getShopUrl( $route, $url = null, ...$routeParams )
     {
         return $this->fromMemoryCache($route, function() use ($route, $url, $routeParams)
