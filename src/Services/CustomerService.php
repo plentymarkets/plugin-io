@@ -7,7 +7,7 @@ use IO\Builder\Order\AddressType;
 use IO\Builder\Order\OrderType;
 use IO\Constants\SessionStorageKeys;
 use IO\Constants\ShippingCountry;
-use IO\Extensions\Filters\PropertySelectionValueNameFilter;
+use IO\Extensions\Filters\PropertyNameFilter;
 use IO\Extensions\Mail\SendMail;
 use IO\Helper\ArrayHelper;
 use IO\Helper\MemoryCache;
@@ -1029,8 +1029,8 @@ class CustomerService
             $wrapped
         );
 
-        /** @var PropertySelectionValueNameFilter $selectionValueNameFilter */
-        $selectionValueNameFilter = pluginApp(PropertySelectionValueNameFilter::class);
+        /** @var PropertyNameFilter $propertyNameFilter */
+        $propertyNameFilter = pluginApp(PropertyNameFilter::class);
 
         foreach($returnOrders->getResult() as $returnOrder)
         {
@@ -1038,10 +1038,10 @@ class CustomerService
             {
                 foreach($orderItem->orderProperties as $orderProperty)
                 {
-                    $orderProperty->name = $selectionValueNameFilter->getPropertyName($orderProperty);
+                    $orderProperty->name = $propertyNameFilter->getPropertyName($orderProperty);
                     if($orderProperty->type === 'selection')
                     {
-                        $orderProperty->selectionValueName = $selectionValueNameFilter->getPropertySelectionValueName($orderProperty);
+                        $orderProperty->selectionValueName = $propertyNameFilter->getPropertySelectionValueName($orderProperty);
                     }
                 }
             }

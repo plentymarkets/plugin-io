@@ -2,7 +2,6 @@
 
 namespace IO\Extensions\Filters;
 
-use Illuminate\Database\Eloquent\Collection;
 use IO\Extensions\AbstractFilter;
 use IO\Helper\MemoryCache;
 use IO\Services\SessionStorageService;
@@ -14,7 +13,7 @@ use Plenty\Modules\Item\Property\Contracts\PropertySelectionRepositoryContract;
  * Class PropertySelectionValueNameFilter
  * @package IO\Extensions\Filters
  */
-class PropertySelectionValueNameFilter extends AbstractFilter
+class PropertyNameFilter extends AbstractFilter
 {
     use MemoryCache;
 
