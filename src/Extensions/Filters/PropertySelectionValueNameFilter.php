@@ -7,6 +7,7 @@ use IO\Extensions\AbstractFilter;
 use IO\Helper\MemoryCache;
 use IO\Services\SessionStorageService;
 use Plenty\Modules\Authorization\Services\AuthHelper;
+use Plenty\Modules\Item\Property\Contracts\PropertyRepositoryContract;
 use Plenty\Modules\Item\Property\Contracts\PropertySelectionRepositoryContract;
 
 /**
@@ -20,6 +21,9 @@ class PropertySelectionValueNameFilter extends AbstractFilter
     /** @var AuthHelper $authHelper */
     private $authHelper;
 
+    /** @var PropertyRepositoryContract */
+    private $propertyRepository;
+
     /** @var PropertySelectionRepositoryContract */
     private $propertySelectionRepository;
 
@@ -29,20 +33,17 @@ class PropertySelectionValueNameFilter extends AbstractFilter
     /**
      * PropertySelectionValueNameFilter constructor.
      * @param AuthHelper $authHelper
-     * @param PropertySelectionRepositoryContract $propertyRepository
      * @param SessionStorageService $sessionStorageService
      */
     public function __construct(
         AuthHelper $authHelper,
-        PropertySelectionRepositoryContract $propertyRepository,
         SessionStorageService $sessionStorageService
     )
     {
         parent::__construct();
 
-        $this->authHelper                  = $authHelper;
-        $this->propertySelectionRepository = $propertyRepository;
-        $this->sessionStorageService       = $sessionStorageService;
+        $this->authHelper                   = $authHelper;
+        $this->sessionStorageService        = $sessionStorageService;
     }
 
     /**
@@ -52,8 +53,39 @@ class PropertySelectionValueNameFilter extends AbstractFilter
     public function getFilters():array
     {
         return [
-            "propertySelectionValueName" => "getPropertySelectionValueName"
+            "propertyName"                  => "getPropertyName",
+            "propertySelectionValueName"    => "getPropertySelectionValueName"
         ];
+    }
+
+    public function getPropertyName($property, $lang = null)
+    {
+        if ($lang === null)
+        {
+            $lang = $this->sessionStorageService->getLang();
+        }
+
+        if (is_null($this->propertyRepository))
+        {
+            $this->propertyRepository = pluginApp(PropertyRepositoryContract::class);
+        }
+
+        $propertyId = $property['propertyId'];
+        $propertyNames = $this->fromMemoryCache("propertyName.$propertyId", function() use ($propertyId, $lang)
+        {
+            return $this->authHelper->processUnguarded(function() use ($propertyId)
+            {
+                return $this->propertyRepository->findById($propertyId)->names;
+            });
+        });
+
+        $propertyName = $propertyNames->firstWhere('lang', $lang);
+        if(!is_null($propertyName))
+        {
+            return $propertyName->name;
+        }
+
+        return "";
     }
 
     public function getPropertySelectionValueName($property, $lang = null)
@@ -64,6 +96,11 @@ class PropertySelectionValueNameFilter extends AbstractFilter
         if ($lang === null)
         {
             $lang = $this->sessionStorageService->getLang();
+        }
+
+        if (is_null($this->propertySelectionRepository))
+        {
+            $this->propertySelectionRepository = pluginApp(PropertySelectionRepositoryContract::class);
         }
 
         $selectionValues = $this->fromMemoryCache("selectionValues.$propertyId.$lang", function() use ($propertyId, $lang)

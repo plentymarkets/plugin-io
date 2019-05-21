@@ -1038,6 +1038,7 @@ class CustomerService
             {
                 foreach($orderItem->orderProperties as $orderProperty)
                 {
+                    $orderProperty->name = $selectionValueNameFilter->getPropertyName($orderProperty);
                     if($orderProperty->type === 'selection')
                     {
                         $orderProperty->selectionValueName = $selectionValueNameFilter->getPropertySelectionValueName($orderProperty);
