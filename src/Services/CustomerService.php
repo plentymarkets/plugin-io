@@ -7,6 +7,7 @@ use IO\Builder\Order\AddressType;
 use IO\Builder\Order\OrderType;
 use IO\Constants\SessionStorageKeys;
 use IO\Constants\ShippingCountry;
+use IO\Extensions\Filters\PropertySelectionValueNameFilter;
 use IO\Extensions\Mail\SendMail;
 use IO\Helper\ArrayHelper;
 use IO\Helper\MemoryCache;
@@ -1020,13 +1021,32 @@ class CustomerService
     {
         $filters['orderType'] = OrderType::RETURNS;
 
-        return pluginApp(OrderService::class)->getOrdersForContact(
+        $returnOrders = pluginApp(OrderService::class)->getOrdersForContact(
             $this->getContactId(),
             $page,
             $items,
             $filters,
             $wrapped
         );
+
+        /** @var PropertySelectionValueNameFilter $selectionValueNameFilter */
+        $selectionValueNameFilter = pluginApp(PropertySelectionValueNameFilter::class);
+
+        foreach($returnOrders->getResult() as $returnOrder)
+        {
+            foreach($returnOrder->order->orderItems as $orderItem)
+            {
+                foreach($orderItem->orderProperties as $orderProperty)
+                {
+                    if($orderProperty->type === 'selection')
+                    {
+                        $orderProperty->selectionValueName = $selectionValueNameFilter->getPropertySelectionValueName($orderProperty);
+                    }
+                }
+            }
+        }
+
+        return $returnOrders;
     }
 
     /**
