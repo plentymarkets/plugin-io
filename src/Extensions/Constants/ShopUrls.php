@@ -37,7 +37,7 @@ class ShopUrls
     public $search              = "";
     public $termsConditions     = "";
     public $wishList            = "";
-
+    public $returnConfirmation  = "";
 
     public function __construct(Dispatcher $dispatcher, SessionStorageService $sessionStorageService)
     {
@@ -74,11 +74,17 @@ class ShopUrls
         $this->search                   = $this->getShopUrl(RouteConfig::SEARCH);
         $this->termsConditions          = $this->getShopUrl(RouteConfig::TERMS_CONDITIONS);
         $this->wishList                 = $this->getShopUrl(RouteConfig::WISH_LIST);
+        $this->returnConfirmation       = $this->getShopUrl(RouteConfig::ORDER_RETURN_CONFIRMATION, "return-confirmation");
     }
 
-    private function getShopUrl( $route )
+    public function returns($orderId)
     {
-        return $this->fromMemoryCache($route, function() use ($route)
+        return $this->getShopUrl(RouteConfig::ORDER_RETURN, "returns", $orderId);
+    }
+
+    private function getShopUrl( $route, $url = null, ...$routeParams )
+    {
+        return $this->fromMemoryCache($route, function() use ($route, $url, $routeParams)
         {
             $categoryId = RouteConfig::getCategoryId( $route );
             if ( $categoryId > 0 )
@@ -91,11 +97,29 @@ class ShopUrls
                 {
                     /** @var CategoryUrlBuilder $categoryUrlBuilder */
                     $categoryUrlBuilder = pluginApp( CategoryUrlBuilder::class );
-                    return $categoryUrlBuilder->buildUrl( $category->id )->toRelativeUrl($this->includeLanguage);
+                    return $this->applyParams(
+                        $categoryUrlBuilder->buildUrl( $category->id ),
+                        $routeParams
+                    );
                 }
             }
 
-            return pluginApp(UrlQuery::class, ['path' => $route] )->toRelativeUrl($this->includeLanguage);
+            return $this->applyParams(
+                pluginApp(UrlQuery::class, ['path' => ($url ?? $route)] ),
+                $routeParams
+            );
         });
+    }
+
+    private function applyParams( $url, $routeParams )
+    {
+        $routeParam = array_shift($routeParams);
+        while(!is_null($routeParam))
+        {
+            $url->join($routeParam);
+            $routeParam = array_shift($routeParams);
+        }
+
+        return $url->toRelativeUrl($this->includeLanguage);
     }
 }
