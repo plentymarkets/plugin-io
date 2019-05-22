@@ -2,6 +2,8 @@
 
 namespace IO\Services\ItemSearch\Factories\Faker;
 
+use IO\Helper\ArrayHelper;
+
 class ItemFaker extends AbstractFaker
 {
     public function fill($data)
@@ -65,7 +67,7 @@ class ItemFaker extends AbstractFaker
                 "name"      => $producingCountry->name,
                 "isoCode2"  => $producingCountry->isoCode2,
                 "isoCode3"  => $producingCountry->isoCode3,
-                "names"     => $producingCountry->names->toArray()
+                "names"     => ArrayHelper::toArray($producingCountry->names)
             ],
             "flags"                 => []
         ];
