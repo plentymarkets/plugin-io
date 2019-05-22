@@ -19,5 +19,6 @@ class AddressValidator extends Validator
         $this->addString('name1', $isCompany);
         $this->addString('name2', !$isCompany);
         $this->addString('name3', !$isCompany);
+        $this->addDate('birthday')->date()->dateBefore(date('Y-m-d'));
     }
 }
