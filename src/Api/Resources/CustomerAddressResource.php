@@ -85,14 +85,15 @@ class CustomerAddressResource extends ApiResource
             {
                 $newAddress = $this->customerService->createAddress($address, $type);
             }
+        } 
+        catch(\Plenty\Exceptions\ValidationException $validationException)
+        {
+            throw $validationException;
         }
         catch(\Exception $exception)
         {
-            /** @var NotificationService $notificationService */
-            $notificationService = pluginApp(NotificationService::class);
-
-            $notificationService->error($this->buildErrorMessages($exception), $exception->getCode());
-            return $this->response->create([], ResponseCode::BAD_REQUEST);
+            $this->response->error(0, $exception->getMessage());
+            return $this->response->create($exception, ResponseCode::BAD_REQUEST);
         }
 
         return $this->response->create($newAddress, ResponseCode::CREATED);
@@ -150,32 +151,5 @@ class CustomerAddressResource extends ApiResource
         $this->customerService->deleteAddress($addressId, $type);
 
         return $this->index();
-    }
-
-    /**
-     *  Builds error message
-     *  @param object $exception
-     *  @return string
-     */
-    private function buildErrorMessages($exception)
-    {
-        $errorMessage = $exception->getMessage();
-
-        // checks if the exception has an detailed message and throws the error,
-        // so that ceres can validate it at CreateUpdateAddress.js
-        if($exception instanceof \Plenty\Exceptions\ValidationException)
-        {
-            if(!empty($exception->getMessageBag()))
-            {
-                $errorMessage = '';
-                $messages = $exception->getMessageBag();
-                // cast object to array
-                $messages = json_decode(json_encode($messages), true);
-                foreach ($messages as &$message) {
-                    $errorMessage .= '<br>'. $message[0];
-                }
-            }
-        }
-        return $errorMessage;
     }
 }
