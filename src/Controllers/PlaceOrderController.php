@@ -1,9 +1,11 @@
 <?php //strict
 namespace IO\Controllers;
 
+use IO\Constants\SessionStorageKeys;
 use IO\Extensions\Constants\ShopUrls;
 use IO\Services\NotificationService;
 use IO\Services\OrderService;
+use IO\Services\SessionStorageService;
 use IO\Services\UrlBuilder\UrlQuery;
 use Plenty\Modules\Basket\Exceptions\BasketItemCheckException;
 use Plenty\Plugin\Http\Response;
@@ -16,17 +18,21 @@ use Plenty\Plugin\Log\Loggable;
  */
 class PlaceOrderController extends LayoutController
 {
+    const ORDER_RETRY_LIMIT = 30;
+    
     use Loggable;
 
     /**
      * @param OrderService $orderService
      * @param NotificationService $notificationService
+     * @param SessionStorageService $sessionStorageService
      * @param Response $response
      * @return \Symfony\Component\HttpFoundation\Response
      */
     public function placeOrder(
         OrderService $orderService,
         NotificationService $notificationService,
+        SessionStorageService $sessionStorageService,
         Response $response)
     {
         $request = pluginApp(Request::class);
@@ -34,12 +40,24 @@ class PlaceOrderController extends LayoutController
 
         try
         {
-            $orderData = $orderService->placeOrder();
-            $url = "execute-payment/" . $orderData->order->id;
-            $url .= UrlQuery::shouldAppendTrailingSlash() ? '/' : '';
-            $url .= strlen($redirectParam) ? "?redirectParam=" . $redirectParam : '';
-
-            return $this->urlService->redirectTo($url);
+            $lastCreateOrderTry = $sessionStorageService->getSessionValue(SessionStorageKeys::LAST_CREATE_ORDER_TRY);
+            if (is_null($lastCreateOrderTry) ||
+                ((int)$lastCreateOrderTry > 0 && (int)$lastCreateOrderTry > $lastCreateOrderTry + self::ORDER_RETRY_LIMIT))
+            {
+                $sessionStorageService->setSessionValue(SessionStorageKeys::LAST_CREATE_ORDER_TRY, time());
+                $orderData = $orderService->placeOrder();
+                $url = "execute-payment/" . $orderData->order->id;
+                $url .= UrlQuery::shouldAppendTrailingSlash() ? '/' : '';
+                $url .= strlen($redirectParam) ? "?redirectParam=" . $redirectParam : '';
+                $url .= $sessionStorageService->getSessionValue(SessionStorageKeys::READONLY_CHECKOUT) ? 'readonlyCheckout=1' : '';
+    
+                return $this->urlService->redirectTo($url);
+            }
+            else
+            {
+                throw pluginApp(\Exception::class, ['order retry time not reached', 115]);
+            }
+            
         }
         catch(BasketItemCheckException $exception)
         {
@@ -50,9 +68,13 @@ class PlaceOrderController extends LayoutController
                     "message" => $exception->getMessage()
                 ]
             );
-            if ($exception->getCode() == BasketItemCheckException::NOT_ENOUGH_STOCK_FOR_ITEM)
+            if($exception->getCode() == BasketItemCheckException::NOT_ENOUGH_STOCK_FOR_ITEM)
             {
                 $notificationService->warn('not enough stock for item', 9);
+            }
+            elseif($exception->getCode() == 115)
+            {
+                $notificationService->warn($exception->getMessage(), $exception->getCode());
             }
             
             return $this->urlService->redirectTo(pluginApp(ShopUrls::class)->checkout);
