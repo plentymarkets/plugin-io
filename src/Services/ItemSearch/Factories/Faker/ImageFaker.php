@@ -9,6 +9,11 @@ class ImageFaker extends AbstractFaker
         $itemImages = $this->makeImageList();
         $variationImages = $this->makeImageList();
 
+        if (count($data["all"]))
+        {
+            return $data;
+        }
+
         $default = [
             "all"       => array_merge($itemImages, $variationImages),
             "item"      => $itemImages,

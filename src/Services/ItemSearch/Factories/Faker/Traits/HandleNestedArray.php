@@ -12,7 +12,7 @@ trait HandleNestedArray
             {
                 $this->merge($object[$key], $defaultValue);
             }
-            else
+            else if (is_null($object[$key]))
             {
                 $object[$key] = $defaultValue;
             }

@@ -23,7 +23,7 @@ class PriceFaker extends AbstractFaker
         $default = [
             'default'           => $defaultPrice,
             'rrp'               => $this->makePrice(0),
-            'specialOffer'      => $this->makePrice(0),
+            'specialOffer'      => $this->boolean() ? $this->makePrice(0) : null,
             'graduatedPrices'   => $this->makeGraduatedPrices($defaultPrice)
         ];;
 
