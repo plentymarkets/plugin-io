@@ -42,11 +42,11 @@ class PlaceOrderController extends LayoutController
         try
         {
             //check if an order has already been placed in the last 30 seconds
-            $lastCreateOrderTry = $sessionStorageService->getSessionValue(SessionStorageKeys::LAST_CREATE_ORDER_TRY);
-            if (is_null($lastCreateOrderTry) ||
-                ((int)$lastCreateOrderTry > 0 && time() > ((int)$lastCreateOrderTry + self::ORDER_RETRY_INTERVAL)))
+            $lastPlaceOrderTry = $sessionStorageService->getSessionValue(SessionStorageKeys::LAST_PLACE_ORDER_TRY);
+            if (is_null($lastPlaceOrderTry) ||
+                ((int)$lastPlaceOrderTry > 0 && time() > (int)$lastPlaceOrderTry + self::ORDER_RETRY_INTERVAL))
             {
-                $sessionStorageService->setSessionValue(SessionStorageKeys::LAST_CREATE_ORDER_TRY, time());
+                $sessionStorageService->setSessionValue(SessionStorageKeys::LAST_PLACE_ORDER_TRY, time());
                 $orderData = $orderService->placeOrder();
                 $urlParams = [];
                 $url = "execute-payment/" . $orderData->order->id;
