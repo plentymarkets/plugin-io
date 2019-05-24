@@ -6,12 +6,16 @@ class ImageFaker extends AbstractFaker
 {
     public function fill($data)
     {
-        $itemImages = $this->makeImageList();
-        $variationImages = $this->makeImageList();
+        $itemImages = [];
+        $variationImages = [];
 
-        if (count($data["all"]))
+        if (!count($data["all"]) && count($data["variation"]))
         {
-            return $data;
+            $variationImages = $this->makeImageList($data["variation"]);
+        }
+        else
+        {
+            $itemImages = $this->makeImageList($data["all"]);
         }
 
         $default = [
@@ -24,10 +28,9 @@ class ImageFaker extends AbstractFaker
         return $data;
     }
 
-    public function makeImageList()
+    public function makeImageList($imageList = [])
     {
-        $imageList = [];
-        $imageCount = rand(1, 3);
+        $imageCount = rand(2, 4);
 
         $itemId = $this->global("itemId", $this->number());
         for($i = 0; $i < $imageCount; $i++)
@@ -37,7 +40,7 @@ class ImageFaker extends AbstractFaker
             $height         = rand(200, 500);
             $imageName      = $this->trans("IO::Faker.itemImageName");
             $url            = $this->image($width, $height, $imageName);
-            $imageList[]    = [
+            $default        = [
                 "id"                            => $imageId,
                 "itemId"                        => $itemId,
                 "type"                          => $this->rand(['internal', 'external']),
@@ -74,6 +77,9 @@ class ImageFaker extends AbstractFaker
                     ]
                 ]
             ];
+
+            $imageList[$i] = $imageList[$i] ?? [];
+            $this->merge($imageList[$i], $default);
         }
 
         return $imageList;
