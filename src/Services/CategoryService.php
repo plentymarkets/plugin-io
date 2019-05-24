@@ -220,7 +220,7 @@ class CategoryService
         $categoryUrl = $this->fromMemoryCache(
             "categoryUrl.$category->id.$lang.$webstoreId",
             function() use ($category, $lang, $defaultLanguage, $webstoreId) {
-                if(!$category instanceof Category || $category->details[0] === null)
+                if(!$category instanceof Category || $category->details->first() === null)
                 {
                     return null;
                 }

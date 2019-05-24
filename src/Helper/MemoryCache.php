@@ -19,4 +19,15 @@ trait MemoryCache
         return self::$cache[self::class][$key];
     }
 
+    protected function resetMemoryCache($key = null)
+    {
+        if(is_null($key))
+        {
+            self::$cache[self::class] = [];
+        }
+        else
+        {
+            unset(self::$cache[self::class][$key]);
+        }
+    }
 }

@@ -4,6 +4,7 @@ namespace IO\Extensions;
 
 use IO\Extensions\Constants\ShopUrls;
 
+use IO\Extensions\Filters\PropertyNameFilter;
 use IO\Extensions\Functions\GetCdnMetadata;
 use Plenty\Plugin\Http\Request;
 use Plenty\Plugin\Templates\Extensions\Twig_Extension;
@@ -47,13 +48,13 @@ class TwigIOExtension extends Twig_Extension
     private $request;
 
 	public function __construct(
-		TwigFactory $twig,
+        TwigFactory $twig,
         Request $request,
-		PatternFilter $patternFilter,
-		NumberFormatFilter $numberFormatFilter,
-		URLFilter $urlFilter,
-		GetBasePrice $getBasePrice,
-		Component $component,
+        PatternFilter $patternFilter,
+        NumberFormatFilter $numberFormatFilter,
+        URLFilter $urlFilter,
+        GetBasePrice $getBasePrice,
+        Component $component,
         AdditionalResources $additionalResources,
         ItemNameFilter $itemNameFilter,
         ExternalContent $externalContent,
@@ -61,13 +62,14 @@ class TwigIOExtension extends Twig_Extension
         QueryString $queryString,
         UniqueId $uniqueId,
         ItemImagesFilter $itemImagesFilter,
-		OrderByKeyFilter $orderByKeyFilter,
-		ShuffleFilter $shuffleFilter,
-		ResultFieldsFilter $resultFieldsFilter,
-		SpecialOfferFilter $specialOfferFilter,
-		AddressOptionTypeFilter $addressOptionTypeFilter,
+        OrderByKeyFilter $orderByKeyFilter,
+        ShuffleFilter $shuffleFilter,
+        ResultFieldsFilter $resultFieldsFilter,
+        SpecialOfferFilter $specialOfferFilter,
+        AddressOptionTypeFilter $addressOptionTypeFilter,
         TabFilter $tabFilter,
-        GetCdnMetadata $cdnMetadata
+        GetCdnMetadata $cdnMetadata,
+        PropertyNameFilter $propertySelectionValueNameFilter
 	)
 	{
 		$this->twig = $twig;
