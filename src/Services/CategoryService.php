@@ -381,7 +381,7 @@ class CategoryService
         $categoryDataFilter = pluginApp(CategoryDataFilter::class);
         return $categoryDataFilter->applyResultFields(
             $tree,
-            $this->loadResultFields( ResultFieldTemplate::get( ResultFieldTemplate::TEMPLATE_CATEGORY_TREE ) )
+            ResultFieldTemplate::load( ResultFieldTemplate::TEMPLATE_CATEGORY_TREE )
         );
     }
 
@@ -432,7 +432,7 @@ class CategoryService
 
         return $filter->applyResultFields(
             $list,
-            $this->loadResultFields( ResultFieldTemplate::get( ResultFieldTemplate::TEMPLATE_CATEGORY_TREE ) )
+            ResultFieldTemplate::load( ResultFieldTemplate::TEMPLATE_CATEGORY_TREE )
         );
     }
 

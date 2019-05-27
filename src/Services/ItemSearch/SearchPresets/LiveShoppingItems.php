@@ -21,7 +21,7 @@ class LiveShoppingItems implements SearchPreset
         else
         {
             $searchFactory->withResultFields(
-                ResultFieldTemplate::get( ResultFieldTemplate::TEMPLATE_LIST_ITEM )
+                ResultFieldTemplate::load( ResultFieldTemplate::TEMPLATE_LIST_ITEM )
             );
         }
         
