@@ -44,7 +44,7 @@ class CrossSellingItems implements SearchPreset
         /** @var VariationSearchFactory $searchFactory */
         $searchFactory = pluginApp( VariationSearchFactory::class )
             ->withResultFields(
-                ResultFieldTemplate::get( ResultFieldTemplate::TEMPLATE_LIST_ITEM )
+                ResultFieldTemplate::load( ResultFieldTemplate::TEMPLATE_LIST_ITEM )
             );
 
         $searchFactory

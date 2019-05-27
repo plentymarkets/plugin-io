@@ -63,7 +63,7 @@ class SearchItems implements SearchPreset
         if ( array_key_exists('autocomplete', $options ) && $options['autocomplete'] === true )
         {
             $searchFactory->withResultFields(
-                ResultFieldTemplate::get( ResultFieldTemplate::TEMPLATE_AUTOCOMPLETE_ITEM_LIST )
+                ResultFieldTemplate::load( ResultFieldTemplate::TEMPLATE_AUTOCOMPLETE_ITEM_LIST )
             );        }
         else
         {
@@ -75,7 +75,7 @@ class SearchItems implements SearchPreset
                 ->hasFacets( $facets );
 
             $searchFactory->withResultFields(
-                ResultFieldTemplate::get( ResultFieldTemplate::TEMPLATE_LIST_ITEM )
+                ResultFieldTemplate::load( ResultFieldTemplate::TEMPLATE_LIST_ITEM )
             );
         }
 
