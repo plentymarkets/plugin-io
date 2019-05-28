@@ -88,13 +88,9 @@ class BasketServiceItemRepoTest extends TestCase
     /** @test */
     public function it_adds_an_item_to_the_basket()
     {
-
-
         $item1 = ['variationId' => $this->variation['id'], 'quantity' => 1, 'template' => '', 'basketItemOrderParams' => [] ];
 
-
         $result = $this->basketService->addBasketItem($item1);
-
 
         $this->assertEquals($this->variation['id'], $result[0]['variationId']);
         $this->assertEquals(1, $result[0]['quantity']);
