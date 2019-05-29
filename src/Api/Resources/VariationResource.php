@@ -3,6 +3,7 @@
 namespace IO\Api\Resources;
 
 use IO\Services\ItemSearch\SearchPresets\SingleItem;
+use IO\Services\ItemSearch\SearchPresets\VariationAttributeMap;
 use IO\Services\ItemSearch\SearchPresets\VariationList;
 use IO\Services\ItemSearch\Services\ItemSearchService;
 use Plenty\Plugin\Http\Request;
@@ -60,20 +61,26 @@ class VariationResource extends ApiResource
      */
     public function show( string $variationId ):Response
     {
-        $variation = [];
+        $result = [];
         
         $template = $this->request->get('template', '');
+        
         if(strlen($template))
         {
+            $itemId = $this->request->get('itemId');
+            
             /** @var ItemSearchService $itemSearchService */
             $itemSearchService = pluginApp( ItemSearchService::class );
-            $variation = $itemSearchService->getResults(
-                SingleItem::getSearchFactory([
+            $result = $itemSearchService->getResults([
+                'variation' => SingleItem::getSearchFactory([
                     'variationId' => $variationId
+                ]),
+                'variationAttributeMap' => VariationAttributeMap::getSearchFactory([
+                   'itemId' => 115//$itemId
                 ])
-            );
+            ]);
         }
         
-        return $this->response->create($variation, ResponseCode::OK);
+        return $this->response->create($result, ResponseCode::OK);
     }
 }

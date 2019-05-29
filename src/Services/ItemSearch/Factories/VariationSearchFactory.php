@@ -13,6 +13,7 @@ use IO\Services\ItemSearch\Extensions\ItemDefaultImage;
 use IO\Services\ItemSearch\Extensions\ItemUrlExtension;
 use IO\Services\ItemSearch\Extensions\PriceSearchExtension;
 use IO\Services\ItemSearch\Extensions\ReduceDataExtension;
+use IO\Services\ItemSearch\Extensions\VariationAttributeMapExtension;
 use IO\Services\ItemSearch\Helper\FacetExtensionContainer;
 use IO\Services\ItemSearch\Mutators\OrderPropertySelectionValueMutator;
 use IO\Services\PriceDetectService;
@@ -662,6 +663,13 @@ class VariationSearchFactory extends BaseSearchFactory
         $imageDomainMutator->setClient($clientId);
         $this->withMutator($imageDomainMutator);
 
+        return $this;
+    }
+    
+    public function withAttributes()
+    {
+        $this->withExtension( VariationAttributeMapExtension::class );
+        
         return $this;
     }
     
