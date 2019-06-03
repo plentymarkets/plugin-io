@@ -7,6 +7,7 @@ use Plenty\Modules\Authorization\Services\AuthHelper;
 use Plenty\Modules\Order\Status\Contracts\OrderStatusRepositoryContract;
 use Plenty\Modules\Order\Status\Models\OrderStatus;
 use Plenty\Modules\Order\StatusHistory\Contracts\StatusHistoryRepositoryContract;
+use Plenty\Plugin\Log\Loggable;
 
 /**
  * Class OrderStatusService
@@ -14,15 +15,17 @@ use Plenty\Modules\Order\StatusHistory\Contracts\StatusHistoryRepositoryContract
  */
 class OrderStatusService
 {
+    use Loggable;
+
     /** @var AuthHelper */
     private $authHelper;
-    
+
     /** @var OrderStatusRepositoryContract */
     private $orderStatusRepo;
-    
+
     /** @var StatusHistoryRepositoryContract */
     private $statusHistoryRepo;
-    
+
     /**
      * OrderStatusService constructor.
      * @param AuthHelper $authHelper
@@ -44,11 +47,12 @@ class OrderStatusService
     public function getOrderStatus($orderId, $orderStatusId)
     {
         $lang = pluginApp(SessionStorageService::class)->getLang();
-        
+
         $orderStatusRepo = $this->orderStatusRepo;
         $statusHistoryRepo = $this->statusHistoryRepo;
-        
-        $orderStatus = $this->authHelper->processUnguarded( function() use ($orderId, $orderStatusId, $lang, $orderStatusRepo, $statusHistoryRepo)
+        $logger = $this->getLogger(__CLASS__);
+
+        $orderStatus = $this->authHelper->processUnguarded( function() use ($orderId, $orderStatusId, $lang, $orderStatusRepo, $statusHistoryRepo, $logger)
         {
             $orderStatus = $orderStatusRepo->get($orderStatusId);
             if ( !is_null($orderStatus) && $orderStatus->isFrontendVisible )
@@ -63,9 +67,19 @@ class OrderStatusService
                     $statusHistoryNew = [];
                     foreach($statusHistory as $entryKey => $entry)
                     {
-                        $statusHistoryNew[$entryKey] =  $orderStatusRepo->get($entry->statusId);
+                        try
+                        {
+                            $statusHistoryNew[$entryKey] =  $orderStatusRepo->get($entry->statusId);
+                        }catch(\Exception $e)
+                        {
+                            $logger->error("IO::Debug.OrderStatusService_getOrderSatus", [
+                                'code' => $e->getCode(),
+                                'message' => $e->getMessage()
+                            ]);
+
+                        }
                     }
-                    
+
                     if(count($statusHistoryNew))
                     {
                         for($i = count($statusHistoryNew)-1; $i >= 0; $i--)
