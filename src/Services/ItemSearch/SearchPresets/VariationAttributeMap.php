@@ -18,7 +18,7 @@ class VariationAttributeMap implements SearchPreset
         $searchFactory = pluginApp( VariationSearchFactory::class );
         
         $searchFactory->withResultFields(
-            ResultFieldTemplate::load( ResultFieldTemplate::TEMPLATE_SINGLE_ITEM )
+            ResultFieldTemplate::load( ResultFieldTemplate::TEMPLATE_VARIATION_ATTRIBUTE_MAP )
         );
         
         $searchFactory

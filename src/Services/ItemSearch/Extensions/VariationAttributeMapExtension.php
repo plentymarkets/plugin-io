@@ -58,6 +58,22 @@ class VariationAttributeMapExtension implements ItemSearchExtension
                     }
                 }
             }
+            
+            if(count($newResult['attributes']))
+            {
+                uasort($newResult['attributes'], function($a, $b) {
+                    return $a['position'] <=> $b['position'];
+                });
+                
+                
+                foreach($newResult['attributes'] as $key => $attribute)
+                {
+                    uasort($newResult['attributes'][$key]['values'], function($a, $b) {
+                        return $a['position'] <=> $b['position'];
+                    });
+                }
+                
+            }
         }
         
         return $newResult;

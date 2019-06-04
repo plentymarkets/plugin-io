@@ -20,6 +20,7 @@ class ResultFieldTemplate
     const TEMPLATE_BASKET_ITEM  = 'IO.ResultFields.BasketItem';
     const TEMPLATE_AUTOCOMPLETE_ITEM_LIST = 'IO.ResultFields.AutoCompleteListItem';
     const TEMPLATE_CATEGORY_TREE = 'IO.ResultFields.CategoryTree';
+    const TEMPLATE_VARIATION_ATTRIBUTE_MAP = 'IO.ResultFields.VariationAttributeMap';
 
     private $templates = [];
     private $requiredFields = [];
