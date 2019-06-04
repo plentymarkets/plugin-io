@@ -48,7 +48,7 @@ class Middleware extends \Plenty\Plugin\Middleware
         {
             $this->setLanguage($requestLang, $webstoreConfig);
         }
-        else if((is_null($splittedURL[0]) || strlen($splittedURL[0]) != 2 || !in_array($splittedURL[0], $webstoreConfig->languageList)) && strpos(end($splittedURL), '.') === false)
+        else if((is_null($splittedURL[0]) || strlen($splittedURL[0]) != 2 || !in_array($splittedURL[0], $webstoreConfig->languageList)) && strpos(end($splittedURL), '.') === false && $webstoreConfig->defaultLanguage !== $sessionService->getLang())
         {
             $this->setLanguage($webstoreConfig->defaultLanguage, $webstoreConfig);
         }
@@ -164,7 +164,7 @@ class Middleware extends \Plenty\Plugin\Middleware
                 $response->forceStatus(ResponseCode::NOT_FOUND);
             }
         }
-        
+
         return $response;
     }
 
