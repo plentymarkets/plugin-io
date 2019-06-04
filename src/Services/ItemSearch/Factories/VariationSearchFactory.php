@@ -266,6 +266,15 @@ class VariationSearchFactory extends BaseSearchFactory
         
         return $this;
     }
+    
+    public function isSalable()
+    {
+        /** @var VariationBaseFilter $variationFilter */
+        $variationFilter = $this->createFilter( VariationBaseFilter::class );
+        $variationFilter->isSalable();
+    
+        return $this;
+    }
 
     //
     // CLIENT FILTERS
