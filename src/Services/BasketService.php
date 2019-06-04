@@ -562,8 +562,13 @@ class BasketService
 
         foreach ($basketItems as $basketItem) {
             array_push($basketItemVariationIds, $basketItem->variationId);
-            $basketVariationQuantities[$basketItem->variationId] = $basketItem->quantity;
-            $orderProperties[$basketItem->variationId]           = $basketItem->basketItemOrderParams;
+            if(!isset($basketVariationQuantities[$basketItem->variationId]))
+            {
+                $basketVariationQuantities[$basketItem->variationId] = 0;
+            }
+            $basketVariationQuantities[$basketItem->variationId] += $basketItem->quantity;
+            //load relation
+            $temp = $basketItem->basketItemOrderParams;
         }
 
         /** @var ItemSearchService $itemSearchService */
@@ -579,7 +584,6 @@ class BasketService
         foreach ($items['documents'] as $item) {
             $variationId                                     = $item['data']['variation']['id'];
             $result[$variationId]                            = $item;
-            $result[$variationId]['data']['orderProperties'] = $orderProperties[$variationId];
             $result[$variationId]['data']['unit']['htmlUnit'] = UnitService::getHTML4Unit($result[$variationId]['data']['unit']['unitOfMeasurement']);
         }
 
