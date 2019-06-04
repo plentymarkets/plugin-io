@@ -4,6 +4,7 @@ namespace IO\Services;
 
 use IO\Services\ItemSearch\SearchPresets\BasketItems;
 use IO\Services\ItemSearch\Services\ItemSearchService;
+use Plenty\Modules\Accounting\Vat\Contracts\VatInitContract;
 use Plenty\Modules\Accounting\Vat\Models\VatRate;
 use Plenty\Modules\Basket\Contracts\BasketRepositoryContract;
 use Plenty\Modules\Basket\Contracts\BasketItemRepositoryContract;
@@ -70,7 +71,8 @@ class BasketService
         VatService $vatService,
         CustomerService $customerService,
         CouponCampaignRepositoryContract $couponCampaignRepository,
-        BasketRepositoryContract $basketRepository)
+        BasketRepositoryContract $basketRepository,
+        VatInitContract $vatInitService)
     {
         $this->basketItemRepository = $basketItemRepository;
         $this->checkout             = $checkout;
@@ -79,6 +81,10 @@ class BasketService
         $this->couponCampaignRepository = $couponCampaignRepository;
         $this->basketRepository = $basketRepository;
 
+        if(!$vatInitService->isInitialized())
+        {
+            $vat = $this->vatService->getVat();
+        }
     }
 
     public function setTemplate(string $template)
