@@ -267,6 +267,11 @@ class VariationSearchFactory extends BaseSearchFactory
         return $this;
     }
     
+    /**
+     * Filter variations by isSalable flag
+     *
+     * @return $this
+     */
     public function isSalable()
     {
         /** @var VariationBaseFilter $variationFilter */
@@ -675,6 +680,11 @@ class VariationSearchFactory extends BaseSearchFactory
         return $this;
     }
     
+    /**
+     * Includes VariatonAttributeMap for variation select
+     *
+     * @return $this
+     */
     public function withAttributes()
     {
         $this->withExtension( VariationAttributeMapExtension::class );
