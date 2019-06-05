@@ -54,7 +54,7 @@ use Plenty\Modules\Frontend\Events\FrontendShippingProfileChanged;
 use Plenty\Modules\Frontend\Events\FrontendUpdateDeliveryAddress;
 use Plenty\Modules\Frontend\Session\Storage\Contracts\FrontendSessionStorageFactoryContract;
 use Plenty\Modules\Item\Stock\Hooks\CheckItemStock;
-use Plenty\Modules\Order\Events\OrderCreated;
+use Plenty\Modules\Payment\Events\Checkout\ExecutePayment;
 use Plenty\Modules\Plugin\Events\AfterBuildPlugins;
 use Plenty\Modules\Plugin\Events\LoadSitemapPattern;
 use Plenty\Modules\Plugin\Events\PluginSendMail;
@@ -152,7 +152,7 @@ class IOServiceProvider extends ServiceProvider
             $checkoutService->setReadOnlyCheckout(false);
         });
     
-        $dispatcher->listen(OrderCreated::class, function($event)
+        $dispatcher->listen(ExecutePayment::class, function($event)
         {
             /** @var CustomerService $customerService */
             $customerService = pluginApp(CustomerService::class);

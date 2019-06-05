@@ -148,7 +148,6 @@ class PriceSearchExtension implements ItemSearchExtension
                 $defaultPrice = $priceList->getDefaultPrice();
                 
                 $property['property']['surcharge'] = $defaultPrice->unitPrice * ($property['property']['surcharge'] / 100);
-                $property['surcharge'] = $defaultPrice->unitPrice * ($property['surcharge'] / 100);
             }
     
             $property['property']['surcharge'] = $priceList->convertGrossNet( $property['property']['surcharge'] );
