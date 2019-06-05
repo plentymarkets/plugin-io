@@ -26,7 +26,7 @@ class VariationAttributeMapExtension implements ItemSearchExtension
         {
             foreach( $baseResult['documents'] as $key => $extensionDocument )
             {
-                $variationResult = [
+                $newResult['variations'][$extensionDocument['id']] = [
                     'variationId'       => $extensionDocument['id'],
                     'unitId'            => $extensionDocument['data']['unit']['id'],
                     'unitName'          => $extensionDocument['data']['unit']['names']['name'],
@@ -35,52 +35,37 @@ class VariationAttributeMapExtension implements ItemSearchExtension
                     'isSalable'         => $extensionDocument['data']['filter']['isSalable'],
                     'attributes'        => [],
                 ];
-    
+                
                 if(count($extensionDocument['data']['attributes']))
                 {
                     foreach($extensionDocument['data']['attributes'] as $attribute)
                     {
-                        $variationResult['attributes'][] = [
+                        $newResult['variations'][$extensionDocument['id']]['attributes'][$attribute['attributeId']] = [
                             'attributeId'      => $attribute['attributeId'],
                             'attributeValueId' => $attribute['value']['id']
                         ];
-            
-                        if(!$this->in_array_r($attribute['attributeId'], $newResult['attributes'], 'attributeId'))
+                        
+                        if(!array_key_exists($attribute['attributeId'], $newResult['attributes']))
                         {
-                            $newResult['attributes'][] = [
+                            $newResult['attributes'][$attribute['attributeId']] = [
                                 'attributeId' => $attribute['attributeId'],
-                                'type'     => $attribute['attribute']['typeOfSelectionInOnlineStore'],
-                                'name'     => $attribute['attribute']['names']['name'],
-                                'position' => $attribute['attribute']['position'],
-                                'values'   => [[
-                                    'attributeValueId' => $attribute['value']['id'],
-                                    'position' => $attribute['value']['position'],
-                                    'imageUrl' => $attribute['value']['image'],
-                                    'name'     => $attribute['value']['names']['name']
-                                ]]
+                                'type'        => $attribute['attribute']['typeOfSelectionInOnlineStore'],
+                                'name'        => $attribute['attribute']['names']['name'],
+                                'position'    => $attribute['attribute']['position'],
+                                'values'      => []
                             ];
                         }
-                        else
-                        {
-                            foreach($newResult['attributes'] as $newKey => $newAttribute)
-                            {
-                                if($newAttribute['attributeId'] == $attribute['attributeId'] && !$this->in_array_r($attribute['value']['id'], $newAttribute['values'], 'attributeValueId'))
-                                {
-                                    $newResult['attributes'][$newKey]['values'][] = [
-                                        'attributeValueId' => $attribute['value']['id'],
-                                        'position' => $attribute['value']['position'],
-                                        'imageUrl' => $attribute['value']['image'],
-                                        'name'     => $attribute['value']['names']['name']
-                                    ];
-                                }
-                            }
-                        }
-    
+                        
+                        $newResult['attributes'][$attribute['attributeId']]['values'][$attribute['value']['id']] = [
+                            'attributeValueId' => $attribute['value']['id'],
+                            'position'         => $attribute['value']['position'],
+                            'imageUrl'         => $attribute['value']['image'],
+                            'name'             => $attribute['value']['names']['name']
+                        ];
+                        
+                        $newResult['variations'][$extensionDocument['id']]['attributes'] = array_values($newResult['variations'][$extensionDocument['id']]['attributes']);
                     }
-                    
                 }
-    
-                $newResult['variations'][] = $variationResult;
             }
             
             if(count($newResult['attributes']))
@@ -98,19 +83,8 @@ class VariationAttributeMapExtension implements ItemSearchExtension
             }
         }
         
-        return $newResult;
-    }
-    
-    private function in_array_r($needle, $haystack, $key, $strict = false)
-    {
-        foreach ($haystack as $item)
-        {
-            if (($strict ? $item[$key] === $needle : $item[$key] == $needle) || (is_array($item[$key]) && $this->in_array_r($needle, $item, $key, $strict)))
-            {
-                return true;
-            }
-        }
+        $newResult['variations'] = array_values($newResult['variations']);
         
-        return false;
+        return $newResult;
     }
 }
