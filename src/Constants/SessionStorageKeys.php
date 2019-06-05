@@ -24,4 +24,5 @@ class SessionStorageKeys
     const SHIPPING_PRIVACY_HINT_ACCEPTED = 'shippingPrivacyHintAccepted';
     const NEWSLETTER_SUBSCRIPTIONS       = 'newsletterSubscriptions';
     const READONLY_CHECKOUT              = 'readOnlyCheckout';
+    const LAST_PLACE_ORDER_TRY           = 'lastPlaceOrderTry';
 }
