@@ -85,13 +85,13 @@ class VariationAttributeMapExtension implements ItemSearchExtension
             
             if(count($newResult['attributes']))
             {
-                uasort($newResult['attributes'], function($attribute1, $attribute2) {
+                usort($newResult['attributes'], function($attribute1, $attribute2) {
                     return $attribute1['position'] <=> $attribute2['position'];
                 });
                 
                 foreach($newResult['attributes'] as $attributeKey => $attribute)
                 {
-                    uasort($newResult['attributes'][$attributeKey]['values'], function($attributeValue1, $attributeValue2) {
+                    usort($newResult['attributes'][$attributeKey]['values'], function($attributeValue1, $attributeValue2) {
                         return $attributeValue1['position'] <=> $attributeValue2['position'];
                     });
                 }
