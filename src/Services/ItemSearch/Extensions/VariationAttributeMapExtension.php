@@ -27,7 +27,7 @@ class VariationAttributeMapExtension implements ItemSearchExtension
             foreach( $baseResult['documents'] as $key => $extensionDocument )
             {
                 $variationResult = [
-                    'variationId'       => $baseResult['id'],
+                    'variationId'       => $extensionDocument['id'],
                     'unitId'            => $extensionDocument['data']['unit']['id'],
                     'unitName'          => $extensionDocument['data']['unit']['names']['name'],
                     'unitCombinationId' => $extensionDocument['data']['variation']['unitCombinationId'],
