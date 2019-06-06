@@ -4,6 +4,7 @@ namespace IO\Services;
 
 use IO\Services\ItemSearch\SearchPresets\BasketItems;
 use IO\Services\ItemSearch\Services\ItemSearchService;
+use Plenty\Modules\Accounting\Vat\Contracts\VatInitContract;
 use Plenty\Modules\Accounting\Vat\Models\VatRate;
 use Plenty\Modules\Basket\Contracts\BasketRepositoryContract;
 use Plenty\Modules\Basket\Contracts\BasketItemRepositoryContract;
@@ -70,7 +71,8 @@ class BasketService
         VatService $vatService,
         CustomerService $customerService,
         CouponCampaignRepositoryContract $couponCampaignRepository,
-        BasketRepositoryContract $basketRepository)
+        BasketRepositoryContract $basketRepository,
+        VatInitContract $vatInitService)
     {
         $this->basketItemRepository = $basketItemRepository;
         $this->checkout             = $checkout;
@@ -79,6 +81,10 @@ class BasketService
         $this->couponCampaignRepository = $couponCampaignRepository;
         $this->basketRepository = $basketRepository;
 
+        if(!$vatInitService->isInitialized())
+        {
+            $vat = $this->vatService->getVat();
+        }
     }
 
     public function setTemplate(string $template)
@@ -556,8 +562,13 @@ class BasketService
 
         foreach ($basketItems as $basketItem) {
             array_push($basketItemVariationIds, $basketItem->variationId);
-            $basketVariationQuantities[$basketItem->variationId] = $basketItem->quantity;
-            $orderProperties[$basketItem->variationId]           = $basketItem->basketItemOrderParams;
+            if(!isset($basketVariationQuantities[$basketItem->variationId]))
+            {
+                $basketVariationQuantities[$basketItem->variationId] = 0;
+            }
+            $basketVariationQuantities[$basketItem->variationId] += $basketItem->quantity;
+            //load relation
+            $temp = $basketItem->basketItemOrderParams;
         }
 
         /** @var ItemSearchService $itemSearchService */
@@ -573,7 +584,6 @@ class BasketService
         foreach ($items['documents'] as $item) {
             $variationId                                     = $item['data']['variation']['id'];
             $result[$variationId]                            = $item;
-            $result[$variationId]['data']['orderProperties'] = $orderProperties[$variationId];
             $result[$variationId]['data']['unit']['htmlUnit'] = UnitService::getHTML4Unit($result[$variationId]['data']['unit']['unitOfMeasurement']);
         }
 
