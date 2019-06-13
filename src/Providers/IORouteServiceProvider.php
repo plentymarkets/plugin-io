@@ -246,7 +246,7 @@ class IORouteServiceProvider extends RouteServiceProvider
                 ->where('variationId', '[0-9]+');
 
             //old webshop routes mapping
-            $router->get('{slug}a-{itemId}', 'IO\Controllers\ItemController@showItemOld')
+            $router->get('{slug}/a-{itemId}', 'IO\Controllers\ItemController@showItemOld')
                 ->where('slug', '.*')
                 ->where('itemId', '[0-9]+');
 
