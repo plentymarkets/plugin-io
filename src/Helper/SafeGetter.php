@@ -4,6 +4,16 @@ namespace IO\Helper;
 
 class SafeGetter
 {
+    /**
+     * Get a nested property of an object/array.
+     * Will return null if any nested property is empty.
+     *
+     * @param mixed     $object     The object / array to get the property from
+     * @param string    $path       The path of the property (e.g. "path.to.property").
+     *                              To query list entries you can pass paths like "list.{id, 5}.name".
+     *                              This will query the first list entry having the id '5'
+     * @return mixed
+     */
     public static function get($object, $path)
     {
         $array  = ArrayHelper::toArray($object);
@@ -19,9 +29,14 @@ class SafeGetter
         return $array;
     }
 
-    private static function getField($array, $field)
+    /**
+     * @param array     $array
+     * @param string    $field
+     * @return mixed
+     */
+    private static function getField($array = [], $field = "")
     {
-        if (is_null($array))
+        if (!count($array) || !strlen($field))
         {
             return null;
         }
