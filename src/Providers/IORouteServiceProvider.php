@@ -76,6 +76,9 @@ class IORouteServiceProvider extends RouteServiceProvider
             $api->resource('io/facet', 'FacetResource');
 		});
 
+        /** @var ShopUrls $shopUrls */
+        $shopUrls = pluginApp(ShopUrls::class);
+
 		/*
 		 * STATIC ROUTES
 		 */
@@ -88,14 +91,34 @@ class IORouteServiceProvider extends RouteServiceProvider
 
         if ( RouteConfig::isActive(RouteConfig::CHECKOUT) )
         {
-            //Checkout-confirm purchase route
+            // checkout-route is active and no category is linked
             $router->get('checkout', 'IO\Controllers\CheckoutController@showCheckout');
+        }
+        else if( in_array(RouteConfig::CHECKOUT, RouteConfig::getEnabledRoutes())
+            && RouteConfig::getCategoryId(RouteConfig::CHECKOUT) > 0
+            && $shopUrls->checkout !== '/checkout' )
+        {
+            // checkout-route is activated and category is linked and category url is not '/checkout'
+            $router->get('checkout', function() use ($shopUrls)
+            {
+                return pluginApp(CategoryController::class)->redirectToCategory( $shopUrls->checkout );
+            });
         }
 
         if ( RouteConfig::isActive(RouteConfig::MY_ACCOUNT) )
         {
             //My-account route
             $router->get('my-account', 'IO\Controllers\MyAccountController@showMyAccount');
+        }
+        else if( in_array(RouteConfig::MY_ACCOUNT, RouteConfig::getEnabledRoutes())
+            && RouteConfig::getCategoryId(RouteConfig::MY_ACCOUNT) > 0
+            && $shopUrls->myAccount !== '/my-account' )
+        {
+            // checkout-route is activated and category is linked and category url is not '/my-account'
+            $router->get('my-account', function() use ($shopUrls)
+            {
+                return pluginApp(CategoryController::class)->redirectToCategory( $shopUrls->myAccount );
+            });
         }
 
 		if ( RouteConfig::isActive(RouteConfig::CONFIRMATION) )
@@ -263,36 +286,26 @@ class IORouteServiceProvider extends RouteServiceProvider
         }
         else
         {
-            /** @var ShopUrls $shopUrls */
-            $shopUrls = pluginApp(ShopUrls::class);
-            $staticCategories = [
-                [RouteConfig::CHECKOUT, $shopUrls->checkout, "checkout"],
-                [RouteConfig::MY_ACCOUNT, $shopUrls->myAccount, "my-account"]
-            ];
-
-            foreach($staticCategories as $staticCategory)
+            if ( RouteConfig::getCategoryId(RouteConfig::CHECKOUT) > 0 )
             {
-                list($catKey, $catUrl, $legacyUrl) = $staticCategory;
-
-                if ( RouteConfig::getCategoryId($catKey) > 0 )
+                $router->get($shopUrls->checkout, function() use ($shopUrls)
                 {
-                    $router->get($catUrl, function() use ($catKey, $catUrl)
-                    {
-                        return pluginApp(CategoryController::class)->showCategoryById(
-                            RouteConfig::getCategoryId($catKey)
-                        );
-                    });
-
-
-                    if ( !is_null($legacyUrl) && $catUrl !== "/" . $legacyUrl )
-                    {
-                        $router->get($legacyUrl, function() use ($catKey, $catUrl)
-                        {
-                            return pluginApp(CategoryController::class)->redirectToCategory( $catUrl );
-                        });
-                    }
-                }
+                    return pluginApp(CategoryController::class)->showCategoryById( RouteConfig::getCategoryId(RouteConfig::CHECKOUT) );
+                });
             }
+
+            if ( RouteConfig::getCategoryId(RouteConfig::MY_ACCOUNT) > 0 )
+            {
+                $router->get($shopUrls->myAccount, function() use ($shopUrls)
+                {
+                    return pluginApp(CategoryController::class)->showCategoryById( RouteConfig::getCategoryId(RouteConfig::MY_ACCOUNT) );
+                });
+            }
+        }
+
+        if ( RouteConfig::isActive(RouteConfig::PAGE_NOT_FOUND) )
+        {
+            $router->get('{anything?}', 'IO\Controllers\StaticPagesController@showPageNotFound');
         }
 	}
 }
