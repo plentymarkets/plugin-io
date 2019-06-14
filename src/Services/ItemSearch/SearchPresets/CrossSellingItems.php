@@ -34,7 +34,7 @@ class CrossSellingItems implements SearchPreset
         {
             $categoryService = pluginApp(CategoryService::class);
             $currentItem = $categoryService->getCurrentItem();
-            $itemId = $currentItem['item']['id'];
+            $itemId = $currentItem['item']['id'] ?? 0;
         }
         /** @var ItemCrossSellingService $crossSellingService */
         $crossSellingService = pluginApp( ItemCrossSellingService::class );
