@@ -5,6 +5,7 @@ namespace IO\Services\ItemSearch\Factories;
 use IO\Services\ItemSearch\Factories\Faker\AbstractFaker;
 use IO\Services\ItemSearch\Factories\Faker\AttributeFaker;
 use IO\Services\ItemSearch\Factories\Faker\BarcodeFaker;
+use IO\Services\ItemSearch\Factories\Faker\BundleComponentsFaker;
 use IO\Services\ItemSearch\Factories\Faker\CategoryFaker;
 use IO\Services\ItemSearch\Factories\Faker\CrossSellingFaker;
 use IO\Services\ItemSearch\Factories\Faker\DefaultCategoryFaker;
@@ -31,6 +32,7 @@ class VariationSearchResultFactory
     const FAKER_MAP = [
         "attributes"            => AttributeFaker::class,
         "barcodes"              => BarcodeFaker::class,
+        "bundleComponents"      => BundleComponentsFaker::class,
         "categories"            => CategoryFaker::class,
         "crossSelling"          => CrossSellingFaker::class,
         "defaultCategories"     => DefaultCategoryFaker::class,
