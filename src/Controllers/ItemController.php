@@ -5,6 +5,7 @@ namespace IO\Controllers;
 use IO\Api\ResponseCode;
 use IO\Services\ItemSearch\SearchPresets\CrossSellingItems;
 use IO\Services\ItemSearch\SearchPresets\SingleItem;
+use IO\Services\ItemSearch\SearchPresets\VariationAttributeMap;
 use IO\Services\ItemSearch\Services\ItemSearchService;
 use Plenty\Plugin\Http\Response;
 use Plenty\Plugin\Log\Loggable;
@@ -36,12 +37,13 @@ class ItemController extends LayoutController
         ];
         /** @var ItemSearchService $itemSearchService */
         $itemSearchService = pluginApp( ItemSearchService::class );
-        $itemResult = $itemSearchService->getResult(
-            SingleItem::getSearchFactory( $itemSearchOptions )
-        );
+        $itemResult = $itemSearchService->getResults([
+            'item' => SingleItem::getSearchFactory( $itemSearchOptions ),
+            'variationAttributeMap' => VariationAttributeMap::getSearchFactory( $itemSearchOptions )
+        ]);
 
 
-        if(empty($itemResult['documents']))
+        if(empty($itemResult['item']['documents']))
         {
             $this->getLogger(__CLASS__)->info(
                 "IO::Debug.ItemController_itemNotFound",
@@ -61,9 +63,7 @@ class ItemController extends LayoutController
         {
             return $this->renderTemplate(
                 'tpl.item',
-                [
-                    'item' => $itemResult
-                ]
+                $itemResult
             );
         }
     }
