@@ -81,8 +81,11 @@ class CustomerMailResource extends ApiResource
         /** @var WebstoreConfigurationRepositoryContract $webstoreConfigurationRepository */
         $webstoreConfigurationRepository = pluginApp(WebstoreConfigurationRepositoryContract::class);
 
+
+        $clientId = pluginApp( Application::class )->getPlentyId();
+
         /**  @var WebstoreConfiguration $webstoreConfiguration */
-        $webstoreConfiguration = $webstoreConfigurationRepository->findByPlentyId($contact->plentyId);
+        $webstoreConfiguration = $webstoreConfigurationRepository->findByPlentyId($clientId);
 
         /** @var string $domain */
         $domain = $webstoreConfiguration->domainSsl;
