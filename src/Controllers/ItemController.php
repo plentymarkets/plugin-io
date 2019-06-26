@@ -63,8 +63,8 @@ class ItemController extends LayoutController
         {
             /** @var VariationSearchResultFactory $searchResultFactory */
             $searchResultFactory = pluginApp(VariationSearchResultFactory::class);
-            $itemResult = $searchResultFactory->fillSearchResults(
-                $itemResult,
+            $itemResult['item'] = $searchResultFactory->fillSearchResults(
+                $itemResult['item'],
                 ResultFieldTemplate::get(ResultFieldTemplate::TEMPLATE_SINGLE_ITEM)
             );
         }
