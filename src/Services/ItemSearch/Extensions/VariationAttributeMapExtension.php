@@ -2,6 +2,8 @@
 
 namespace IO\Services\ItemSearch\Extensions;
 
+use IO\Extensions\Filters\NumberFormatFilter;
+
 class VariationAttributeMapExtension implements ItemSearchExtension
 {
     /**
@@ -24,12 +26,15 @@ class VariationAttributeMapExtension implements ItemSearchExtension
         
         if(count($baseResult['documents']))
         {
+            /** @var NumberFormatFilter $numberFormatFilter */
+            $numberFormatFilter = pluginApp(NumberFormatFilter::class);
+            
             foreach( $baseResult['documents'] as $key => $extensionDocument )
             {
                 $newResult['variations'][$extensionDocument['id']] = [
                     'variationId'       => $extensionDocument['id'],
                     'unitId'            => $extensionDocument['data']['unit']['id'],
-                    'unitName'          => $extensionDocument['data']['unit']['names']['name'],
+                    'unitName'          => $numberFormatFilter->formatDecimal($extensionDocument['data']['unit']['content'], (floor($extensionDocument['data']['unit']['content']) !== $extensionDocument['data']['unit']['content'] ? -1 : 0) ).' '.$extensionDocument['data']['unit']['names']['name'],
                     'unitCombinationId' => $extensionDocument['data']['variation']['unitCombinationId'],
                     'url'               => $extensionDocument['data']['texts']['urlPath'].'_'.$extensionDocument['data']['item']['id'].'_'.$extensionDocument['data']['variation']['id'],
                     'isSalable'         => $extensionDocument['data']['filter']['isSalable'],
