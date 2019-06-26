@@ -17,7 +17,8 @@ class SafeGetter
     public static function get($object, $path)
     {
         $array  = ArrayHelper::toArray($object);
-        $fields = explode(".", $path);
+        preg_match_all('/{\s*\S+\s*,\s*\S+\s*}|\w+/m', $path, $fields);
+        $fields = $fields[0];
         $key    = array_shift($fields);
 
         while(!is_null($array) && !is_null($key))
@@ -41,14 +42,14 @@ class SafeGetter
             return null;
         }
 
-        if(preg_match('/^{\s*(\S+)\s*,\s*(\S+)\s*}$/m', $field, $matches) !== false)
+        if(preg_match('/^{\s*(\S+)\s*,\s*(\S+)\s*}$/m', $field, $matches))
         {
             $searchKey = $matches[1];
             $searchValue = $matches[2];
 
             foreach($array as $entry)
             {
-                if($entry[$searchKey]."" === $searchValue)
+                if(self::get($entry, $searchKey).'' === $searchValue)
                 {
                     return $entry;
                 }
