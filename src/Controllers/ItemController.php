@@ -9,6 +9,7 @@ use IO\Services\ItemSearch\Factories\VariationSearchResultFactory;
 use IO\Services\ItemSearch\Helper\ResultFieldTemplate;
 use IO\Services\ItemSearch\SearchPresets\CrossSellingItems;
 use IO\Services\ItemSearch\SearchPresets\SingleItem;
+use IO\Services\ItemSearch\SearchPresets\VariationAttributeMap;
 use IO\Services\ItemSearch\Services\ItemSearchService;
 use Plenty\Modules\Category\Models\Category;
 use Plenty\Modules\ShopBuilder\Helper\ShopBuilderRequest;
@@ -46,9 +47,10 @@ class ItemController extends LayoutController
         ];
         /** @var ItemSearchService $itemSearchService */
         $itemSearchService = pluginApp( ItemSearchService::class );
-        $itemResult = $itemSearchService->getResult(
-            SingleItem::getSearchFactory( $itemSearchOptions )
-        );
+        $itemResult = $itemSearchService->getResults([
+            'item' => SingleItem::getSearchFactory( $itemSearchOptions ),
+            'variationAttributeMap' => VariationAttributeMap::getSearchFactory( $itemSearchOptions )
+        ]);
 
         if (!is_null($category))
         {
@@ -67,7 +69,7 @@ class ItemController extends LayoutController
             );
         }
 
-        if(empty($itemResult['documents']))
+        if(empty($itemResult['item']['documents']))
         {
             $this->getLogger(__CLASS__)->info(
                 "IO::Debug.ItemController_itemNotFound",
@@ -87,9 +89,7 @@ class ItemController extends LayoutController
         {
             return $this->renderTemplate(
                 'tpl.item',
-                [
-                    'item' => $itemResult
-                ]
+                $itemResult
             );
         }
     }
