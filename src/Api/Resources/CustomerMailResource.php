@@ -90,6 +90,7 @@ class CustomerMailResource extends ApiResource
         /** @var string $domain */
         $domain = $webstoreConfiguration->domainSsl;
         $defaultLang = $webstoreConfiguration->defaultLanguage;
+        /** @var SessionStorageService $sessionService */
         $sessionService = pluginApp(SessionStorageService::class);
         $lang = $sessionService->getLang();
 
@@ -98,7 +99,8 @@ class CustomerMailResource extends ApiResource
             'contactId' => $contact->id,
             'clientId' => pluginApp(Application::class)->getWebstoreId(),
             'password' => null,
-            'newEmailLink' => $newEmailLink
+            'newEmailLink' => $newEmailLink,
+            'language' => $sessionService->getLang()
         ];
 
         $this->sendMail(AutomaticEmailTemplate::CONTACT_NEW_EMAIL , AutomaticEmailContact::class, $params);
