@@ -31,6 +31,11 @@ class TemplateService
         return TemplateService::$currentTemplate;
     }
 
+    public function setCurrentTemplate($template)
+    {
+        self::$currentTemplate = $template;
+    }
+
     public function isCurrentTemplate($templateToCheck):bool
     {
         return TemplateService::$currentTemplate == $templateToCheck;

@@ -21,13 +21,13 @@ class ItemListService
     const TYPE_MANUFACTURER = 'manufacturer';
     const TYPE_CROSS_SELLER = 'cross_selling';
 
-    public function getItemList( $type, $id = null, $sorting = null, $maxItems = 0 )
+    public function getItemList( $type, $id = null, $sorting = null, $maxItems = 0, $crossSellingRelationType = null)
     {
         /** @var ItemSearchService $searchService */
         $searchService = pluginApp( ItemSearchService::class );
         $searchFactory = null;
 
-        if ( !$this->isValidId( $id ) && $type !== self::TYPE_LAST_SEEN )
+        if ( !$this->isValidId( $id ) && !(in_array($type, [self::TYPE_LAST_SEEN, self::TYPE_CROSS_SELLER] )))
         {
             $type = self::TYPE_RANDOM;
         }
@@ -79,6 +79,7 @@ class ItemListService
             case self::TYPE_CROSS_SELLER:
                 $searchFactory = CrossSellingItems::getSearchFactory([
                     'itemId' => $id,
+                    'relation' => $crossSellingRelationType,
                     'sorting' => $sorting
                 ]);
                 break;

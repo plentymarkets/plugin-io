@@ -2,6 +2,7 @@
 
 namespace IO\Services\ItemSearch\SearchPresets;
 
+use IO\Services\CategoryService;
 use IO\Services\ItemCrossSellingService;
 use IO\Services\ItemSearch\Factories\VariationSearchFactory;
 use IO\Services\ItemSearch\Helper\ResultFieldTemplate;
@@ -27,7 +28,14 @@ class CrossSellingItems implements SearchPreset
         $itemId = $options['itemId'];
         $relation = $options['relation'];
         $sorting = $options['sorting'];
-    
+
+
+        if(!isset($itemId) || !strlen($itemId))
+        {
+            $categoryService = pluginApp(CategoryService::class);
+            $currentItem = $categoryService->getCurrentItem();
+            $itemId = $currentItem['item']['id'] ?? 0;
+        }
         /** @var ItemCrossSellingService $crossSellingService */
         $crossSellingService = pluginApp( ItemCrossSellingService::class );
 
@@ -35,12 +43,16 @@ class CrossSellingItems implements SearchPreset
         {
             $relation = $crossSellingService->getType();
         }
-        
-        if(is_null($sorting) || !strlen($sorting))
+
+        if(is_null($sorting))
         {
             $sorting = SortingHelper::splitPathAndOrder($crossSellingService->getSorting());
+        }elseif(strlen($sorting))
+        {
+            $sorting = SortingHelper::getSorting($sorting);
         }
-        
+
+
         /** @var VariationSearchFactory $searchFactory */
         $searchFactory = pluginApp( VariationSearchFactory::class )
             ->withResultFields(
