@@ -14,6 +14,7 @@ use IO\Services\ItemSearch\Factories\Faker\FilterFaker;
 use IO\Services\ItemSearch\Factories\Faker\IdsFaker;
 use IO\Services\ItemSearch\Factories\Faker\ImageFaker;
 use IO\Services\ItemSearch\Factories\Faker\ItemFaker;
+use IO\Services\ItemSearch\Factories\Faker\OrderPropertyFaker;
 use IO\Services\ItemSearch\Factories\Faker\PriceFaker;
 use IO\Services\ItemSearch\Factories\Faker\PropertyFaker;
 use IO\Services\ItemSearch\Factories\Faker\SalesPriceFaker;
@@ -41,7 +42,7 @@ class VariationSearchResultFactory
         "ids"                   => IdsFaker::class,
         "images"                => ImageFaker::class,
         "item"                  => ItemFaker::class,
-        "properties"            => PropertyFaker::class,
+        "properties"            => [PropertyFaker::class, OrderPropertyFaker::class],
         "salesPrices"           => SalesPriceFaker::class,
         "skus"                  => SkuFaker::class,
         "sorting"               => SortingFaker::class,
@@ -118,7 +119,26 @@ class VariationSearchResultFactory
         foreach($entries as $entry)
         {
             $fakerClass = self::FAKER_MAP[$entry];
-            $document['data'][$entry] = $this->runFaker($fakerClass, $document['data'][$entry] ?? []);
+            if(is_array($fakerClass))
+            {
+                foreach($fakerClass as $class)
+                {
+                    if(!isset($document['data'][$entry]))
+                    {
+                        $document['data'][$entry] = $this->runFaker($class, $document['data'][$entry] ?? []);
+                    }
+                    else
+                    {
+                        $document['data'][$entry] = array_merge($document['data'][$entry], $this->runFaker($class, []));
+                    }
+                }
+            }
+            else
+            {
+                $document['data'][$entry] = $this->runFaker($fakerClass, $document['data'][$entry] ?? []);
+            }
+            
+            
         }
 
         foreach(self::MANDATORY_FAKER_MAP as $entry => $fakerClass)
