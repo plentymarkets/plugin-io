@@ -2,34 +2,39 @@
 
 namespace IO\Services\ItemSearch\Factories\Faker;
 
-class PropertyFaker extends AbstractFaker
+class OrderPropertyFaker extends AbstractFaker
 {
     public $isList = true;
-
+    
     public function fill($data)
     {
         $propertyId   = $this->number();
-        $groupId      = $this->number();
-        $propertyType = $this->rand(['empty', 'int', 'float', 'selection', 'text', 'file']);
+        $groupId      = null;
+        $propertyType = $this->rand(['int', 'float', 'selection', 'text']);
+        $isOrderProperty = true;
         $default      = [
             "surcharge"     => $this->float(),
-            "valueFloat"    => $propertyType === 'float' ? $this->float() : 0,
-            "valueInt"      => $propertyType === 'int' ? $this->number() : 0,
-            "property"      => $this->makeProperty($propertyId, $propertyType, $groupId),
-            "group"         => $this->makeGroup($groupId),
-            "selection"     => $propertyType === 'selection' ? $this->makeSelection($propertyId) : null,
-            "texts"         => [
+            "property"      => $this->makeProperty($propertyId, $propertyType, $groupId, $isOrderProperty),
+            "group"         => null,
+        ];
+        
+        if($isOrderProperty)
+        {
+            $default["valueFloat"]   = $propertyType === 'float' ? $this->float() : 0;
+            $default["valueInt"]     = $propertyType === 'int' ? $this->number() : 0;
+            $default["selection"]    = $propertyType === 'selection' ? $this->makeSelection($propertyId) : null;
+            $default["texts"]        = [
                 "valueId"   => $this->number(),
                 "lang"      => $this->lang,
                 "value"     => $this->text(0, 20)
-            ]
-        ];
-
+            ];
+        }
+        
         $this->merge($data, $default);
         return $data;
     }
-
-    private function makeProperty($propertyId, $propertyType, $groupId)
+    
+    private function makeProperty($propertyId, $propertyType, $groupId, $isOrderProperty)
     {
         $propertyName = $this->trans("IO::Faker.propertyName");
         return [
@@ -40,7 +45,7 @@ class PropertyFaker extends AbstractFaker
             "backendName"               => $propertyName,
             "valueType"                 => $propertyType,
             "isSearchable"              => $this->boolean(),
-            "isOderProperty"            => false,
+            "isOderProperty"            => $isOrderProperty,
             "isShownOnItemPage"         => true,
             "isShownOnItemList"         => true,
             "isShownAtCheckout"         => $this->boolean(),
@@ -59,28 +64,7 @@ class PropertyFaker extends AbstractFaker
             ]
         ];
     }
-
-    private function makeGroup($groupId)
-    {
-        $groupName = $this->trans("IO::Faker.propertyGroupName");
-        return [
-            "id"                        => $groupId,
-            "backendName"               => $groupName,
-            "isSurchargePercental"      => $this->boolean(),
-            "orderPropertyGroupingType" => $this->rand(['none', 'single', 'multi']),
-            "ottoComponent"             => $this->number(),
-            "updatedAt"                 => $this->dateString(),
-            "names"                     => [
-                [
-                    "propertyGroupId"   => $groupId,
-                    "lang"              => $this->lang,
-                    "name"              => $groupName,
-                    "description"       => $this->text(5, 15)
-                ]
-            ]
-        ];
-    }
-
+    
     private function makeSelection($propertyId)
     {
         return [
