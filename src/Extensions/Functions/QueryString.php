@@ -37,7 +37,7 @@ class QueryString extends AbstractFunction
         $queryParameters = $this->createUniqueMultidimensionalArray($queryParameters);
 
         $queryParameters = http_build_query($queryParameters);
-        return strlen($queryParameters) > 0 ? '?' . http_build_query($queryParameters) : '';
+        return strlen($queryParameters) > 0 ? '?' . $queryParameters : '';
     }
 
     /**
