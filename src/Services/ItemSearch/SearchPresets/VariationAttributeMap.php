@@ -30,12 +30,8 @@ class VariationAttributeMap implements SearchPreset
             ->hasNameInLanguage()
             ->hasPriceForCustomer()
             ->withReducedResults()
-            ->withLinkToContent();
-    
-        if(pluginApp(TemplateConfigService::class)->get('item.show_variation_over_dropdown') != 'true')
-        {
-            $searchFactory->isSalable();
-        }
+            ->withLinkToContent()
+            ->isSalable();
         
         if(array_key_exists('itemId', $options) && $options['itemId'] != 0)
         {
