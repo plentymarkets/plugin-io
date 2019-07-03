@@ -35,10 +35,11 @@ class QueryString extends AbstractFunction
         unset($queryParameters['plentyMarkets']);
         $queryParameters = array_replace($queryParameters, $params);
         $queryParameters = $this->createUniqueMultidimensionalArray($queryParameters);
-        
-        return '?' . http_build_query($queryParameters);
+
+        $queryParameters = http_build_query($queryParameters);
+        return strlen($queryParameters) > 0 ? '?' . $queryParameters : '';
     }
-    
+
     /**
      * @param array $array
      * @return array
