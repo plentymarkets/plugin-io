@@ -2,6 +2,7 @@
 
 namespace IO\Services\ItemSearch\Extensions;
 
+use IO\Extensions\Filters\ItemImagesFilter;
 use IO\Extensions\Filters\NumberFormatFilter;
 
 class VariationAttributeMapExtension implements ItemSearchExtension
@@ -63,10 +64,24 @@ class VariationAttributeMapExtension implements ItemSearchExtension
                             ];
                         }
                         
+                        
+                        
+                        $attributeImageUrl = '';
+                        if(strlen($attribute['value']['image']))
+                        {
+                            $attributeImageUrl = '/images/produkte/grp/'.$attribute['value']['image'];
+                        }
+                        elseif(count($extensionDocument['data']['images']['variation']))
+                        {
+                            /** @var ItemImagesFilter $itemImageFilter */
+                            $itemImageFilter = pluginApp(ItemImagesFilter::class);
+                            $attributeImageUrl = $itemImageFilter->getFirstItemImageUrl($extensionDocument['data']['images'], 'urlPreview');
+                        }
+                        
                         $newResult['attributes'][$attribute['attributeId']]['values'][$attribute['value']['id']] = [
                             'attributeValueId' => $attribute['value']['id'],
                             'position'         => $attribute['value']['position'],
-                            'imageUrl'         => $attribute['value']['image'],
+                            'imageUrl'         => $attributeImageUrl,
                             'name'             => $attribute['value']['names']['name']
                         ];
                         
