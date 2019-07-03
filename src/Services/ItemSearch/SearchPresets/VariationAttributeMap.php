@@ -25,6 +25,7 @@ class VariationAttributeMap implements SearchPreset
             ->withAttributes()
             ->withLanguage()
             ->withUrls()
+            ->withImages()
             ->isVisibleForClient()
             ->isActive()
             ->hasNameInLanguage()

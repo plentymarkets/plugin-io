@@ -63,10 +63,20 @@ class VariationAttributeMapExtension implements ItemSearchExtension
                             ];
                         }
                         
+                        $attributeImageUrl = '';
+                        if(strlen($attribute['value']['image']))
+                        {
+                            $attributeImageUrl = '/images/produkte/grp/'.$attribute['value']['image'];
+                        }
+                        elseif(strlen($extensionDocument['data']['images']['variation'][0]['urlPreview']))
+                        {
+                            $attributeImageUrl = $extensionDocument['data']['images']['variation'][0]['urlPreview'];
+                        }
+                        
                         $newResult['attributes'][$attribute['attributeId']]['values'][$attribute['value']['id']] = [
                             'attributeValueId' => $attribute['value']['id'],
                             'position'         => $attribute['value']['position'],
-                            'imageUrl'         => $attribute['value']['image'],
+                            'imageUrl'         => $attributeImageUrl,
                             'name'             => $attribute['value']['names']['name']
                         ];
                         
