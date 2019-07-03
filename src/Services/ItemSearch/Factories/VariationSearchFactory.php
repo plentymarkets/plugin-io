@@ -14,6 +14,7 @@ use IO\Services\ItemSearch\Extensions\ItemUrlExtension;
 use IO\Services\ItemSearch\Extensions\PriceSearchExtension;
 use IO\Services\ItemSearch\Extensions\ReduceDataExtension;
 use IO\Services\ItemSearch\Extensions\VariationAttributeMapExtension;
+use IO\Services\ItemSearch\Extensions\VariationPropertyExtension;
 use IO\Services\ItemSearch\Helper\FacetExtensionContainer;
 use IO\Services\ItemSearch\Mutators\OrderPropertySelectionValueMutator;
 use IO\Services\PriceDetectService;
@@ -704,6 +705,13 @@ class VariationSearchFactory extends BaseSearchFactory
     {
         $orderPropertySelectionValueMutator = pluginApp(OrderPropertySelectionValueMutator::class);
         $this->withMutator($orderPropertySelectionValueMutator);
+        
+        return $this;
+    }
+    
+    public function withVariationProperties()
+    {
+        $this->withExtension(VariationPropertyExtension::class);
         
         return $this;
     }
