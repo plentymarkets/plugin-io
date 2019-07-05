@@ -50,11 +50,12 @@ use IO\Events\Basket\BeforeBasketItemToOrderItem;
 use Plenty\Modules\Basket\Events\Basket\AfterBasketChanged;
 use Plenty\Modules\Cron\Services\CronContainer;
 use Plenty\Modules\Frontend\Events\FrontendCurrencyChanged;
+use Plenty\Modules\Frontend\Events\FrontendLanguageChanged;
 use Plenty\Modules\Frontend\Events\FrontendShippingProfileChanged;
 use Plenty\Modules\Frontend\Events\FrontendUpdateDeliveryAddress;
 use Plenty\Modules\Frontend\Session\Storage\Contracts\FrontendSessionStorageFactoryContract;
 use Plenty\Modules\Item\Stock\Hooks\CheckItemStock;
-use Plenty\Modules\Order\Events\OrderCreated;
+use Plenty\Modules\Payment\Events\Checkout\ExecutePayment;
 use Plenty\Modules\Plugin\Events\AfterBuildPlugins;
 use Plenty\Modules\Plugin\Events\LoadSitemapPattern;
 use Plenty\Modules\Plugin\Events\PluginSendMail;
@@ -152,7 +153,7 @@ class IOServiceProvider extends ServiceProvider
             $checkoutService->setReadOnlyCheckout(false);
         });
     
-        $dispatcher->listen(OrderCreated::class, function($event)
+        $dispatcher->listen(ExecutePayment::class, function($event)
         {
             /** @var CustomerService $customerService */
             $customerService = pluginApp(CustomerService::class);
@@ -174,6 +175,12 @@ class IOServiceProvider extends ServiceProvider
         $dispatcher->listen(FrontendCurrencyChanged::class, function ($event) {
             $sessionStorage = pluginApp( FrontendSessionStorageFactoryContract::class );
             $sessionStorage->getPlugin()->setValue(SessionStorageKeys::CURRENCY, $event->getCurrency());
+        });
+        
+        $dispatcher->listen(FrontendLanguageChanged::class, function($event) {
+            /** @var BasketService $basketService */
+            $basketService = pluginApp(BasketService::class);
+            $basketService->checkBasketItemsLang();
         });
 
         $dispatcher->listen(FrontendShippingProfileChanged::class, IOFrontendShippingProfileChanged::class);

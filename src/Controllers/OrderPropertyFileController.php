@@ -3,6 +3,7 @@
 namespace IO\Controllers;
 
 use IO\Api\ResponseCode;
+use IO\Middlewares\Middleware;
 use Plenty\Modules\Frontend\Services\OrderPropertyFileService;
 use Plenty\Plugin\Http\Response;
 use Plenty\Plugin\Http\Request;
@@ -24,6 +25,7 @@ class OrderPropertyFileController extends LayoutController
             /** @var Response $response */
             $response = pluginApp(Response::class);
             $response->forceStatus(ResponseCode::NOT_FOUND);
+            Middleware::$FORCE_404 = true;
         }
         return $response;
     }
@@ -48,6 +50,7 @@ class OrderPropertyFileController extends LayoutController
             /** @var Response $response */
             $response = pluginApp(Response::class);
             $response->forceStatus(ResponseCode::NOT_FOUND);
+            Middleware::$FORCE_404 = true;
         }
         return $response;
     }

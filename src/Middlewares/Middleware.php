@@ -3,8 +3,6 @@
 namespace IO\Middlewares;
 
 use IO\Api\ResponseCode;
-use IO\Constants\SessionStorageKeys;
-use IO\Controllers\CheckoutController;
 use IO\Extensions\Constants\ShopUrls;
 use IO\Helper\RouteConfig;
 use IO\Services\CountryService;
@@ -24,6 +22,8 @@ use IO\Guards\AuthGuard;
 
 class Middleware extends \Plenty\Plugin\Middleware
 {
+    public static $FORCE_404 = false;
+    
     public function before(Request $request)
     {
         /** @var SessionStorageService $sessionService */
@@ -48,7 +48,7 @@ class Middleware extends \Plenty\Plugin\Middleware
         {
             $this->setLanguage($requestLang, $webstoreConfig);
         }
-        else if((is_null($splittedURL[0]) || strlen($splittedURL[0]) != 2 || !in_array($splittedURL[0], $webstoreConfig->languageList)) && strpos(end($splittedURL), '.') === false)
+        else if((is_null($splittedURL[0]) || strlen($splittedURL[0]) != 2 || !in_array($splittedURL[0], $webstoreConfig->languageList)) && strpos(end($splittedURL), '.') === false && $webstoreConfig->defaultLanguage !== $sessionService->getLang())
         {
             $this->setLanguage($webstoreConfig->defaultLanguage, $webstoreConfig);
         }
@@ -150,17 +150,19 @@ class Middleware extends \Plenty\Plugin\Middleware
 
     public function after(Request $request, Response $response):Response
     {
-        if ($response->status() == ResponseCode::NOT_FOUND) {
-            /** @var StaticPagesController $controller */
-            $controller = pluginApp(StaticPagesController::class);
-
-            $response = $response->make(
-                $controller->showPageNotFound(),
-                ResponseCode::NOT_FOUND
-            );
-
-            $response->forceStatus(ResponseCode::NOT_FOUND);
-            return $response;
+        if ($response->status() == ResponseCode::NOT_FOUND)
+        {
+            if(RouteConfig::isActive(RouteConfig::PAGE_NOT_FOUND) || self::$FORCE_404)
+            {
+                /** @var StaticPagesController $controller */
+                $controller = pluginApp(StaticPagesController::class);
+                
+                $response = $response->make(
+                    $controller->showPageNotFound(),
+                    ResponseCode::NOT_FOUND
+                );
+                $response->forceStatus(ResponseCode::NOT_FOUND);
+            }
         }
 
         return $response;

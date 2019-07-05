@@ -28,7 +28,7 @@ class BasketItems implements SearchPreset
         /** @var VariationSearchFactory $searchFactory */
         $searchFactory = pluginApp( VariationSearchFactory::class )
             ->withResultFields(
-                ResultFieldTemplate::get( ResultFieldTemplate::TEMPLATE_BASKET_ITEM )
+                ResultFieldTemplate::load( ResultFieldTemplate::TEMPLATE_BASKET_ITEM )
             );
 
         $searchFactory
@@ -36,6 +36,7 @@ class BasketItems implements SearchPreset
             ->withUrls()
             ->withImages()
             ->withPropertyGroups()
+            ->withOrderPropertySelectionValues()
             ->withDefaultImage()
             ->withBundleComponents()
             ->isVisibleForClient()

@@ -18,7 +18,7 @@ class ManufacturerItems implements SearchPreset
         $sorting = '';
         if ( array_key_exists( 'sorting', $options ) )
         {
-            $sorting =  $options['sorting'];
+            $sorting = SortingHelper::getSorting( $options['sorting'] );
         }
 
         $itemsPerPage = 20;

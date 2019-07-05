@@ -28,9 +28,11 @@ class VariationPriceList
     const TYPE_RRP              = 'rrp';
     const TYPE_SPECIAL_OFFER    = 'specialOffer';
 
+    public static $basePrices = [];
+
     /** @var int $itemId */
     public $itemId = 0;
-    
+
     /** @var int $variationId */
     public $variationId = 0;
 
@@ -138,8 +140,16 @@ class VariationPriceList
 
         if ( $this->lot > 0 && strlen($this->unit) > 0 )
         {
-            $basePrice = [];
-            list( $basePrice['lot'], $basePrice['price'], $basePrice['unitKey'] ) = $basePriceService->getUnitPrice($this->lot, $unitPrice, $this->unit);
+            if(isset(self::$basePrices[$this->lot][$unitPrice][$this->unit]))
+            {
+                $basePrice = self::$basePrices[$this->lot][$unitPrice][$this->unit];
+            }
+            else
+            {
+                $basePrice = [];
+                list( $basePrice['lot'], $basePrice['price'], $basePrice['unitKey'] ) = $basePriceService->getUnitPrice($this->lot, $unitPrice, $this->unit);
+                self::$basePrices[$this->lot][$unitPrice][$this->unit] = $basePrice;
+            }
 
             $unitName = $this->unitService->getUnitNameByKey( $basePrice['unitKey'], $lang );
 
@@ -357,16 +367,21 @@ class VariationPriceList
             return null;
         }
 
+        $unitPrice = $showNetPrice ? $price->unitPriceNet : $price->unitPrice;
         return [
             'price'                 => [
                 'value'     => $showNetPrice ? $price->priceNet : $price->price,
                 'formatted' => $this->numberFormatFilter->formatMonetary( $showNetPrice ? $price->priceNet : $price->price, $price->currency )
             ],
             'unitPrice'             => [
-                'value'     => $showNetPrice ? $price->unitPriceNet : $price->unitPrice,
-                'formatted' => $this->numberFormatFilter->formatMonetary( $showNetPrice ? $price->unitPriceNet : $price->unitPrice, $price->currency )
+                'value'     => $unitPrice,
+                'formatted' => $this->numberFormatFilter->formatMonetary( $unitPrice, $price->currency )
             ],
-            'basePrice'             => $this->getBasePrice( $showNetPrice ? $price->unitPriceNet : $price->unitPrice, $price->currency ),
+            'basePrice'             => $this->getBasePrice( $unitPrice, $price->currency ),
+            'baseLot'               => self::$basePrices[$this->lot][$unitPrice][$this->unit]['lot'],
+            'baseUnit'              => self::$basePrices[$this->lot][$unitPrice][$this->unit]['unitKey'],
+            'baseSinglePrice'       => self::$basePrices[$this->lot][$unitPrice][$this->unit]['price'],
+
             'minimumOrderQuantity'  => (float) $price->minimumOrderQuantity,
             'contactClassDiscount'  => [
                 'percent'   => $price->customerClassDiscountPercent,
