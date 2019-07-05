@@ -216,9 +216,36 @@ class BasketService
         $basketItems    = $this->getBasketItemsRaw();
         $basketItemData = $this->getBasketItemData($basketItems, $template);
         $showNetPrice   = $this->customerService->showNetPrices();
-        $showWarning = [];
         
-        foreach ($basketItems as $basketItem) {
+        foreach ($basketItems as $basketItem)
+        {
+            if($showNetPrice)
+            {
+                $basketItem->price = round($basketItem->price * 100 / (100.0 + $basketItem->vat), 2);
+            }
+            
+            array_push(
+                $result,
+                $this->addVariationData($basketItem, $basketItemData[$basketItem->variationId])
+            );
+        }
+        
+        return $result;
+    }
+    
+    public function checkBasketItemsLang($template = '')
+    {
+        if (!strlen($template))
+        {
+            $template = $this->template;
+        }
+    
+        $basketItems    = $this->getBasketItemsRaw();
+        $basketItemData = $this->getBasketItemData($basketItems, $template);
+        $showWarning = [];
+    
+        foreach ($basketItems as $basketItem)
+        {
             if(!array_key_exists($basketItem->variationId, $basketItemData))
             {
                 $this->deleteBasketItem($basketItem->id);
@@ -229,33 +256,20 @@ class BasketService
                 $this->deleteBasketItem($basketItem->id);
                 $showWarning[] = 10;
             }
-            else
-            {
-                if($showNetPrice)
-                {
-                    $basketItem->price = round($basketItem->price * 100 / (100.0 + $basketItem->vat), 2);
-                }
-                
-                array_push(
-                    $result,
-                    $this->addVariationData($basketItem, $basketItemData[$basketItem->variationId])
-                );
-            }
         }
-
+    
         if(count($showWarning) > 0)
         {
             $showWarning = array_unique($showWarning);
-
+        
             foreach($showWarning as $warning)
             {
                 /** @var NotificationService $notificationService */
                 $notificationService = pluginApp(NotificationService::class);
                 $notificationService->warn(LogLevel::WARN, $warning);
             }
-
+        
         }
-        return $result;
     }
 
     private function hasTexts($basketItemData)
