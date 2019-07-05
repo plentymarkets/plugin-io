@@ -74,6 +74,8 @@ class IORouteServiceProvider extends RouteServiceProvider
             $api->resource('io/shipping/country', 'ShippingCountryResource');
             $api->resource('io/live-shopping', 'LiveShoppingResource');
             $api->resource('io/facet', 'FacetResource');
+            $api->resource('io/categorytree', 'CategoryTreeResource');
+
 		});
 
         /** @var ShopUrls $shopUrls */

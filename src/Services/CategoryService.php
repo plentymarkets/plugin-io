@@ -410,6 +410,10 @@ class CategoryService
     }
 
 
+    public function filterPartialCategoryTree($categoryTree, $categoryId)
+    {
+
+    }
     /**
      * Return the sitemap list as an array
      * @param string|array  $type Only return categories of given type
