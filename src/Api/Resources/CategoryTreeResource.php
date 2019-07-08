@@ -49,7 +49,8 @@ class CategoryTreeResource extends ApiResource
 
         if($categoryId > 0)
         {
-            $response = $this->categoryService->filterPartialCategoryTree($response, $categoryId);
+            $dataFields = $this->request->get('dataFields', ['breadcrumbs','parent', 'current', 'children']);
+            $response = $this->categoryService->filterPartialCategoryTree($response, $categoryId, $dataFields);
         }
         return $this->response->create($response, ResponseCode::OK);
     }
