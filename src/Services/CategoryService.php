@@ -419,7 +419,7 @@ class CategoryService
             {
                 if(in_array('breadcrumbs', $dataFields))
                 {
-                    $breadcrumbs[] = $this->filterChildren([$category]);
+                    $breadcrumbs = array_merge($breadcrumbs, $this->filterChildren([$category]));
                     $filteredCategories['breadcrumbs'] = $breadcrumbs;
                 }
 
@@ -450,11 +450,15 @@ class CategoryService
         {
             if(isset($category['children']))
             {
-                $tempBreadcrumbs = $breadcrumbs;
-                $tempBreadcrumbs[] = $this->filterChildren([$category]);
+                $tempBreadcrumbs = array_merge($breadcrumbs, $this->filterChildren([$category]));
 
                 $tempParents = $this->filterChildren($categoryTree,1);
                 $filteredCategories = $this->filterPartialCategoryTree($category['children'], $categoryId, $dataFields, $tempParents, $tempBreadcrumbs, $level++);
+
+                if (count($filteredCategories) > 0)
+                {
+                    break;
+                }
             }
         }
         return $filteredCategories;
