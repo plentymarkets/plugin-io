@@ -168,6 +168,11 @@ class IORouteServiceProvider extends RouteServiceProvider
             //homepage route
             $router->get('', 'IO\Controllers\HomepageController@showHomepage');
         }
+        else if( in_array(RouteConfig::HOME, RouteConfig::getEnabledRoutes())
+            && RouteConfig::getCategoryId(RouteConfig::HOME) > 0)
+        {
+            $router->get('', 'IO\Controllers\HomepageController@showHomepageCategory');
+        }
 
         if ( RouteConfig::isActive(RouteConfig::CANCELLATION_RIGHTS) )
         {
@@ -178,7 +183,7 @@ class IORouteServiceProvider extends RouteServiceProvider
             && RouteConfig::getCategoryId(RouteConfig::CANCELLATION_RIGHTS) > 0
             && $shopUrls->cancellationRights !== '/cancellations-rights' )
         {
-            // checkout-route is activated and category is linked and category url is not '/checkout'
+            // cancellation-rights-route is activated and category is linked and category url is not '/cancellation-rights'
             $router->get('cancellation-rights', function() use ($shopUrls)
             {
                 return pluginApp(CategoryController::class)->redirectToCategory( $shopUrls->cancellationRights );
@@ -187,14 +192,14 @@ class IORouteServiceProvider extends RouteServiceProvider
 
         if ( RouteConfig::isActive(RouteConfig::CANCELLATION_FORM) )
         {
-            //cancellation rights page
+            //cancellation form page
             $router->get('cancellation-form', 'IO\Controllers\StaticPagesController@showCancellationForm');
         }
         else if( in_array(RouteConfig::CANCELLATION_FORM, RouteConfig::getEnabledRoutes())
             && RouteConfig::getCategoryId(RouteConfig::CANCELLATION_FORM) > 0
             && $shopUrls->cancellationForm !== '/cancellation-form' )
         {
-            // checkout-route is activated and category is linked and category url is not '/checkout'
+            // cancellation-form-route is activated and category is linked and category url is not '/cancellation-form'
             $router->get('cancellation-form', function() use ($shopUrls)
             {
                 return pluginApp(CategoryController::class)->redirectToCategory( $shopUrls->cancellationForm );
@@ -210,7 +215,7 @@ class IORouteServiceProvider extends RouteServiceProvider
             && RouteConfig::getCategoryId(RouteConfig::LEGAL_DISCLOSURE) > 0
             && $shopUrls->legalDisclosure !== '/legal-disclosure' )
         {
-            // checkout-route is activated and category is linked and category url is not '/checkout'
+            // legal-disclosure-route is activated and category is linked and category url is not '/legal-disclosure'
             $router->get('legal-disclosure', function() use ($shopUrls)
             {
                 return pluginApp(CategoryController::class)->redirectToCategory( $shopUrls->legalDisclosure );
@@ -226,7 +231,7 @@ class IORouteServiceProvider extends RouteServiceProvider
             && RouteConfig::getCategoryId(RouteConfig::PRIVACY_POLICY) > 0
             && $shopUrls->privacyPolicy !== '/privacy-policy' )
         {
-            // checkout-route is activated and category is linked and category url is not '/checkout'
+            // privacy-policy-route is activated and category is linked and category url is not '/privacy-policy'
             $router->get('privacy-policy', function() use ($shopUrls)
             {
                 return pluginApp(CategoryController::class)->redirectToCategory( $shopUrls->privacyPolicy );
@@ -242,7 +247,7 @@ class IORouteServiceProvider extends RouteServiceProvider
             && RouteConfig::getCategoryId(RouteConfig::TERMS_CONDITIONS) > 0
             && $shopUrls->termsConditions !== '/gtc' )
         {
-            // checkout-route is activated and category is linked and category url is not '/checkout'
+            // gtc-route is activated and category is linked and category url is not '/gtc'
             $router->get('gtc', function() use ($shopUrls)
             {
                 return pluginApp(CategoryController::class)->redirectToCategory( $shopUrls->termsConditions );
