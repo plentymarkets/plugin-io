@@ -76,6 +76,36 @@
                   "label": "Config.routingCategoryMyAccount",
                   "options": {}
               },
+              "routing.category_cancellation-rights": {
+                  "type": "categoryPicker",
+                  "required": false,
+                  "label": "Config.routingCategoryCancellationRights",
+                  "options": {}
+              },
+              "routing.category_cancellation-form": {
+                  "type": "categoryPicker",
+                  "required": false,
+                  "label": "Config.routingCategoryCancellationForm",
+                  "options": {}
+              },
+              "routing.category_legal-disclosure": {
+                  "type": "categoryPicker",
+                  "required": false,
+                  "label": "Config.routingCategoryLegalDisclosure",
+                  "options": {}
+              },
+              "routing.category_privacy-policy": {
+                  "type": "categoryPicker",
+                  "required": false,
+                  "label": "Config.routingCategoryPrivacyPolicy",
+                  "options": {}
+              },
+              "routing.category_gtc": {
+                  "type": "categoryPicker",
+                  "required": false,
+                  "label": "Config.routingCategoryGtc",
+                  "options": {}
+              },
               "routing.enabled_routes": {
                   "type": "multiCheckBox",
                   "required": false,

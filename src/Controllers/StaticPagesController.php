@@ -1,7 +1,7 @@
 <?php //strict
 namespace IO\Controllers;
 
-use IO\Helper\TemplateContainer;
+use IO\Helper\RouteConfig;
 
 /**
  * Class HomepageController
@@ -15,6 +15,12 @@ class StaticPagesController extends LayoutController
      */
     public function showCancellationRights():string
     {
+        /*$shopBuilderCategoryId =  RouteConfig::getCategoryId(RouteConfig::CANCELLATION_RIGHTS);
+        if($shopBuilderCategoryId > 0)
+        {
+            return $this->showShopBuilderCategory($shopBuilderCategoryId);
+        }*/
+        
         return $this->renderTemplate(
             "tpl.cancellation-rights",
             [
@@ -92,5 +98,25 @@ class StaticPagesController extends LayoutController
             ],
             false
         );
+    }
+    
+    /*private function getShopBuilderCategory($type)
+    {
+        return
+    }*/
+    
+    private function showShopBuilderCategory($categoryId)
+    {
+        if($categoryId > 0)
+        {
+            
+            /** @var CategoryController $categoryController */
+            $categoryController = pluginApp(CategoryController::class);
+    
+            return $categoryController->showCategoryById($categoryId);
+            
+            //$categoryController->showCategoryById($categoryId);
+            //return $categoryController->redirectToCategory($categoryUrl);
+        }
     }
 }
