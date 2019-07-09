@@ -341,6 +341,11 @@ class IORouteServiceProvider extends RouteServiceProvider
         }
         else
         {
+            if ( RouteConfig::getCategoryId(RouteConfig::HOME) > 0 )
+            {
+                $router->get('', 'IO\Controllers\HomepageController@showHomepageCategory');
+            }
+            
             if ( RouteConfig::getCategoryId(RouteConfig::CHECKOUT) > 0 )
             {
                 $router->get($shopUrls->checkout, function() use ($shopUrls)
