@@ -46,7 +46,7 @@ class TemplateService
      */
     public function isHome():bool
     {
-        return TemplateService::$currentTemplate == "tpl.home";
+        return TemplateService::$currentTemplate == "tpl.home" || TemplateService::$currentTemplate == "tpl.home.category";
     }
 
     /**
