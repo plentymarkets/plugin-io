@@ -37,7 +37,7 @@ class PageNotFoundConfigMigration_0_0_1
                         if(count($routeSettings))
                         {
                             $routeSettingsValues = explode(', ', $routeSettings['value']);
-                            if(count($routeSettingsValues) && !in_array('page-not-found', $routeSettingsValues))
+                            if(count($routeSettingsValues) && !in_array('page-not-found', $routeSettingsValues) && (in_array('category', $routeSettingsValues) || in_array('all', $routeSettingsValues)))
                             {
                                 $routeSettingsValues[] = 'page-not-found';
                                 $newConfigValues = [
