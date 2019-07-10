@@ -446,7 +446,6 @@ class CategoryService
 
         if(count($filteredCategories) > 0)
         {
-            $filteredCategories['parents'] = $parents;
             return $filteredCategories;
         }
 
@@ -475,6 +474,7 @@ class CategoryService
         {
             if($skipLevel === 0 && isset($category['children']))
             {
+                $category['hasChildren'] = true;
                 unset($category['children']);
                 $cleanedCategories[] = $category;
             }
