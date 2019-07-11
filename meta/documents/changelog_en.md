@@ -1,5 +1,11 @@
 # Release Notes for IO
 
+## v4.1.1 (2019-07-10) <a href="https://github.com/plentymarkets/plugin-io/compare/4.1.0...4.1.1" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
+
+### Fixed
+
+- Due to an error, the IO route “Page not found” in the **Routing** section was also activated for Callisto online stores that use the Ceres checkout. This behaviour has been fixed.
+
 ## v4.1.0 (2019-07-08) <a href="https://github.com/plentymarkets/plugin-io/compare/4.0.1...4.1.0" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
 
 ### Added
