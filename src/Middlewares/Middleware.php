@@ -3,10 +3,13 @@
 namespace IO\Middlewares;
 
 use IO\Api\ResponseCode;
+use IO\Extensions\Constants\ShopUrls;
+use IO\Helper\RouteConfig;
+use IO\Services\CountryService;
 use IO\Services\TemplateService;
 use IO\Services\WebstoreConfigurationService;
+use IO\Services\TemplateConfigService;
 
-use Plenty\Plugin\ConfigRepository;
 use Plenty\Plugin\Http\Request;
 use Plenty\Plugin\Http\Response;
 use Plenty\Modules\Frontend\Contracts\Checkout;
@@ -19,8 +22,13 @@ use IO\Guards\AuthGuard;
 
 class Middleware extends \Plenty\Plugin\Middleware
 {
+    public static $FORCE_404 = false;
+    
     public function before(Request $request)
     {
+        /** @var SessionStorageService $sessionService */
+        $sessionService  = pluginApp(SessionStorageService::class);
+
         $loginToken = $request->get('token', '');
         if(strlen($loginToken))
         {
@@ -28,36 +36,58 @@ class Middleware extends \Plenty\Plugin\Middleware
             $authRepo = pluginApp(ContactAuthenticationRepositoryContract::class);
             $authRepo->authenticateWithToken($loginToken);
         }
-        
+
         $splittedURL     = explode('/', $request->get('plentyMarkets'));
-        $lang            = $splittedURL[0];
+
+        /** @var WebstoreConfigurationService $webstoreService */
         $webstoreService = pluginApp(WebstoreConfigurationService::class);
         $webstoreConfig  = $webstoreService->getWebstoreConfig();
+        $requestLang     = $request->get('Lang', null);
 
-        if ($lang == null || strlen($lang) != 2 || !in_array($lang, $webstoreConfig->languageList))
+        if(!is_null($requestLang) && in_array($requestLang, $webstoreConfig->languageList))
         {
-            $sessionService  = pluginApp(SessionStorageService::class);
-
-            if($sessionService->getLang() != $webstoreConfig->defaultLanguage)
-            {
-                $service = pluginApp(LocalizationService::class);
-                $service->setLanguage($webstoreConfig->defaultLanguage);
-            }
+            $this->setLanguage($requestLang, $webstoreConfig);
+        }
+        else if((is_null($splittedURL[0]) || strlen($splittedURL[0]) != 2 || !in_array($splittedURL[0], $webstoreConfig->languageList)) && strpos(end($splittedURL), '.') === false && $webstoreConfig->defaultLanguage !== $sessionService->getLang())
+        {
+            $this->setLanguage($webstoreConfig->defaultLanguage, $webstoreConfig);
         }
 
         $currency = $request->get('currency', null);
+        $currency = !is_null($currency) ? $currency : $request->get('Currency', null);
+
 
         if ( $currency != null )
         {
-            /** @var ConfigRepository $config */
-            $config = pluginApp(ConfigRepository::class);
-            $enabledCurrencies = explode(', ',  $config->get('Ceres.currency.available_currencies') );
+            /** @var TemplateConfigService $templateConfigService */
+            $templateConfigService = pluginApp(TemplateConfigService::class);
+            $enabledCurrencies = explode(', ',  $templateConfigService->get('currency.available_currencies') );
 
             if(in_array($currency, $enabledCurrencies) || array_pop($enabledCurrencies) == 'all')
             {
                 /** @var CheckoutService $checkoutService */
                 $checkoutService = pluginApp(CheckoutService::class);
                 $checkoutService->setCurrency( $currency );
+            }
+            else
+            {
+                /** @var TemplateService $templateService */
+                $templateService = pluginApp(TemplateService::class);
+                $templateService->forceNoIndex(true);
+            }
+        }
+
+        $shipToCountry = $request->get('ShipToCountry', null);
+        if ( $shipToCountry != null )
+        {
+            /** @var CountryService $countryService */
+            $countryService = pluginApp(CountryService::class);
+            $country = $countryService->getCountryById( $shipToCountry );
+            if(!is_null($country) && $country->active)
+            {
+                /** @var CheckoutService $checkoutService */
+                $checkoutService = pluginApp(CheckoutService::class);
+                $checkoutService->setShippingCountryId( $shipToCountry );
             }
             else
             {
@@ -74,51 +104,84 @@ class Middleware extends \Plenty\Plugin\Middleware
             $checkout = pluginApp(Checkout::class);
             $checkout->setBasketReferrerId($referrerId);
         }
-        
+
         $authString = $request->get('authString', '');
         $newsletterEmailId = $request->get('newsletterEmailId', 0);
-        
-        if(strlen($authString) && (int)$newsletterEmailId > 0)
+
+        if(strlen($authString) && (int)$newsletterEmailId > 0 && RouteConfig::isActive(RouteConfig::NEWSLETTER_OPT_IN))
         {
             AuthGuard::redirect('/newsletter/subscribe/'.$authString.'/'.$newsletterEmailId);
         }
-        
+
         $orderShow = $request->get('OrderShow', '');
-        if(strlen($orderShow) && $orderShow == 'CancelNewsletter')
+        if(strlen($orderShow) && $orderShow == 'CancelNewsletter' && RouteConfig::isActive(RouteConfig::NEWSLETTER_OPT_OUT))
         {
             AuthGuard::redirect('/newsletter/unsubscribe');
         }
 
-        $this->checkForCallistoSearchURL($request);
+        if ( RouteConfig::isActive(RouteConfig::SEARCH) && $request->get('ActionCall') == 'WebActionArticleSearch' )
+        {
+            AuthGuard::redirect('/search', ['query' => $request->get('Params')['SearchParam']]);
+        }
+
+        /** @var ShopUrls $shopUrls */
+        $shopUrls = pluginApp(ShopUrls::class);
+
+        if ($request->has('readonlyCheckout') || $request->getRequestUri() !== $shopUrls->checkout)
+        {
+            /** @var CheckoutService $checkoutService */
+            $checkoutService = pluginApp(CheckoutService::class);
+            $checkoutService->setReadOnlyCheckout($request->get('readonlyCheckout',0) == 1);
+        }
+
+        // access 'Kaufabwicklungslink'
+        if ( RouteConfig::isActive(RouteConfig::CONFIRMATION) )
+        {
+            $orderId = $request->get('id', 0);
+            $orderAccessKey = $request->get('ak', '');
+
+            if(strlen($orderAccessKey) && (int)$orderId > 0)
+            {
+                $confirmationRoute = $shopUrls->confirmation . '/'.$orderId.'/'.$orderAccessKey;
+                AuthGuard::redirect($confirmationRoute);
+            }
+        }
     }
 
     public function after(Request $request, Response $response):Response
     {
-        if ($response->status() == ResponseCode::NOT_FOUND) {
-            /** @var StaticPagesController $controller */
-            $controller = pluginApp(StaticPagesController::class);
-
-            $response = $response->make(
-                $controller->showPageNotFound(),
-                ResponseCode::NOT_FOUND
-            );
-
-            $response->forceStatus(ResponseCode::NOT_FOUND);
-            return $response;
+        if ($response->status() == ResponseCode::NOT_FOUND)
+        {
+            if(RouteConfig::isActive(RouteConfig::PAGE_NOT_FOUND) || self::$FORCE_404)
+            {
+                /** @var StaticPagesController $controller */
+                $controller = pluginApp(StaticPagesController::class);
+                
+                $response = $response->make(
+                    $controller->showPageNotFound(),
+                    ResponseCode::NOT_FOUND
+                );
+                $response->forceStatus(ResponseCode::NOT_FOUND);
+            }
         }
 
         return $response;
     }
 
-    private function checkForCallistoSearchURL(Request $request)
+    private function setLanguage($language, $webstoreConfig)
     {
-        $config = pluginApp(ConfigRepository::class);
-        $enabledRoutes = explode(", ",  $config->get("IO.routing.enabled_routes") );
+        $service = pluginApp(LocalizationService::class);
+        $service->setLanguage($language);
 
-        if ( (in_array("search", $enabledRoutes) || in_array("all", $enabledRoutes)) &&
-             $request->get('ActionCall') == 'WebActionArticleSearch' )
+        /** @var TemplateConfigService $templateConfigService */
+        $templateConfigService = pluginApp(TemplateConfigService::class);
+        $enabledCurrencies = explode(', ',  $templateConfigService->get('currency.available_currencies') );
+        $currency = $webstoreConfig->defaultCurrencyList[$language];
+        if(!is_null($currency) && (in_array($currency, $enabledCurrencies) || array_pop($enabledCurrencies) == 'all'))
         {
-            AuthGuard::redirect('/search', ['query' => $request->get('Params')['SearchParam']]);
+            /** @var CheckoutService $checkoutService */
+            $checkoutService = pluginApp(CheckoutService::class);
+            $checkoutService->setCurrency( $currency );
         }
     }
 }

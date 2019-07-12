@@ -41,7 +41,7 @@ class ApiResource extends Controller
 		$this->request  = $request;
 
         $templateEvent = $request->get('templateEvent', '');
-        if(!isset(TemplateService::$currentTemplate) && strlen($templateEvent))
+        if(empty(TemplateService::$currentTemplate) && strlen($templateEvent))
         {
             TemplateService::$currentTemplate = $templateEvent;
         }

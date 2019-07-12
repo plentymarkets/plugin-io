@@ -3,15 +3,22 @@
 namespace IO\Builder\Order;
 
 use IO\Extensions\Filters\ItemNameFilter;
-use IO\Services\SessionStorageService;
+use IO\Services\BasketService;
+use IO\Services\CustomerService;
+use IO\Events\Basket\BeforeBasketItemToOrderItem;
+use Plenty\Modules\Basket\Exceptions\BasketItemCheckException;
 use Plenty\Modules\Basket\Models\Basket;
 use IO\Services\CheckoutService;
+use Plenty\Modules\Basket\Models\BasketItem;
 use Plenty\Modules\Frontend\PaymentMethod\Contracts\FrontendPaymentMethodRepositoryContract;
 use Plenty\Modules\Frontend\Services\OrderPropertyFileService;
 use Plenty\Modules\Frontend\Services\VatService;
 use Plenty\Modules\Accounting\Vat\Contracts\VatRepositoryContract;
+use Plenty\Modules\Order\Property\Models\OrderPropertyType;
 use Plenty\Modules\System\Contracts\WebstoreRepositoryContract;
 use Plenty\Modules\Accounting\Vat\Models\Vat;
+use Plenty\Plugin\Events\Dispatcher;
+
 /**
  * Class OrderItemBuilder
  * @package IO\Builder\Order
@@ -42,6 +49,11 @@ class OrderItemBuilder
     private $webstoreRepository;
 
     /**
+     * @var CustomerService
+     */
+    private $customerService;
+
+    /**
      * OrderItemBuilder constructor.
      *
      * @param CheckoutService $checkoutService
@@ -50,13 +62,20 @@ class OrderItemBuilder
      * @param WebstoreRepositoryContract $webstoreRepository
      * @param VatRepositoryContract $vatRepository
      */
-	public function __construct(CheckoutService $checkoutService, VatService $vatService, ItemNameFilter $itemNameFilter, WebstoreRepositoryContract $webstoreRepository, VatRepositoryContract $vatRepository)
+	public function __construct(
+	    CheckoutService $checkoutService,
+        VatService $vatService,
+        ItemNameFilter $itemNameFilter,
+        WebstoreRepositoryContract $webstoreRepository,
+        VatRepositoryContract $vatRepository,
+        CustomerService $customerService)
 	{
 		$this->checkoutService = $checkoutService;
 		$this->vatService = $vatService;
         $this->webstoreRepository = $webstoreRepository;
         $this->vatRepository = $vatRepository;
         $this->itemNameFilter = $itemNameFilter;
+        $this->customerService = $customerService;
 	}
 
 	/**
@@ -70,17 +89,55 @@ class OrderItemBuilder
 		$orderItems      = [];
         $maxVatRate      = 0;
 
+        $itemsWithoutStock = [];
+        
         foreach($items as $item)
 		{
             if($maxVatRate < $item['vat'])
             {
                 $maxVatRate = $item['vat'];
             }
-
-			array_push($orderItems, $this->basketItemToOrderItem($item, $basket->basketRebate));
+            
+            try
+            {
+                array_push($orderItems, $this->basketItemToOrderItem($item, $basket->basketRebate));
+            }
+			catch(BasketItemCheckException $exception)
+            {
+                $itemsWithoutStock[] = [
+                    'item' => $item,
+                    'stockNet' => $exception->getStockNet()
+                ];
+            }
 		}
 
-
+		if(count($itemsWithoutStock))
+        {
+            /** @var BasketService $basketService */
+            $basketService = pluginApp(BasketService::class);
+            
+            foreach($itemsWithoutStock as $itemWithoutStock)
+            {
+                $updatedItem = array_shift(array_filter($items, function($filterItem) use ($itemWithoutStock) {
+                    return $filterItem['id'] == $itemWithoutStock['item']['id'];
+                }));
+         
+                $quantity = $itemWithoutStock['stockNet'];
+                
+                if($quantity <= 0 && (int)$updatedItem['id'] > 0)
+                {
+                    $basketService->deleteBasketItem($updatedItem['id']);
+                }
+                elseif((int)$updatedItem['id'] > 0)
+                {
+                    $updatedItem['quantity'] = $quantity;
+                    $basketService->updateBasketItem($updatedItem['id'], $updatedItem);
+                }
+            }
+            
+            throw pluginApp(BasketItemCheckException::class, [BasketItemCheckException::NOT_ENOUGH_STOCK_FOR_ITEM]);
+        }
+        
 		$shippingAmount = $basket->shippingAmount;
         if($basket->shippingDeleteByCoupon)
         {
@@ -136,6 +193,18 @@ class OrderItemBuilder
 	 */
 	private function basketItemToOrderItem(array $basketItem, $basketDiscount):array
 	{
+        /** @var BasketItem $checkStockBasketItem */
+        $checkStockBasketItem = pluginApp(BasketItem::class);
+        $checkStockBasketItem->variationId = $basketItem['variationId'];
+        $checkStockBasketItem->itemId      = $basketItem['itemId'];
+        $checkStockBasketItem->orderRowId  = $basketItem['orderRowId'];
+        $checkStockBasketItem->quantity    = $basketItem['quantity'];
+        $checkStockBasketItem->id          = $basketItem['id'];
+        
+        /** @var Dispatcher $eventDispatcher */
+        $eventDispatcher = pluginApp(Dispatcher::class);
+        $eventDispatcher->fire(pluginApp(BeforeBasketItemToOrderItem::class, [$checkStockBasketItem]));
+	    
         $basketItemProperties = [];
         if(count($basketItem['basketItemOrderParams']))
         {
@@ -149,23 +218,14 @@ class OrderItemBuilder
                     $file = $orderPropertyFileService->copyBasketFileToOrder($property['value']);
                     $property['value'] = $file;
                 }
-                
+
                 $basketItemProperty = [
                     'propertyId' => $property['propertyId'],
                     'value'      => $property['value']
                 ];
-                
+
                 $basketItemProperties[] = $basketItemProperty;
             }
-        }
-
-        if($basketItem['price'] == $basketItem['variation']['data']['prices']['specialOffer']['data']['basePrice'])
-        {
-            $priceOriginal = $basketItem['price'];
-        }
-        else
-        {
-            $priceOriginal = $basketItem['variation']['data']['prices']['default']['data']['basePrice'];
         }
 
         $attributeTotalMarkup = 0;
@@ -173,17 +233,38 @@ class OrderItemBuilder
 		{
             $attributeTotalMarkup = $basketItem['attributeTotalMarkup'];
         }
-        
+
         $rebate = 0;
-		
         if(isset($basketItem['rebate']))
 		{
 			$rebate = $basketItem['rebate'];
 		}
-		
 		if((float)$basketDiscount > 0)
         {
             $rebate += $basketDiscount;
+        }
+        
+        $priceOriginal = $basketItem['price'];
+		if ( $this->customerService->showNetPrices() )
+        {
+            $priceOriginal = $basketItem['price'] * (100.0 + $basketItem['vat']) / 100.0;
+        }
+        $priceOriginal -= $attributeTotalMarkup;
+        
+		$properties = [];
+		if($basketItem['inputLength'] > 0)
+        {
+            $properties[] = [
+                'typeId' => OrderPropertyType::LENGTH,
+                'value' => "{$basketItem['inputLength']}"
+            ];
+        }
+		if($basketItem['inputWidth'] > 0)
+        {
+            $properties[] = [
+                'typeId' => OrderPropertyType::WIDTH,
+                'value' => "{$basketItem['inputWidth']}"
+            ];
         }
 
 		return [
@@ -195,8 +276,9 @@ class OrderItemBuilder
 			"shippingProfileId" => $basketItem['shippingProfileId'],
 			"countryVatId"      => $this->vatService->getCountryVatId(),
 			"vatRate"           => $basketItem['vat'],
-            "vatField"			=> $this->getVatField($this->vatService->getVat(), $basketItem['vat']),
+            "vatField"			=> $basketItem['variation']['data']['variation']['vatId'] ?? $this->getVatField($this->vatService->getVat(), $basketItem['vat']),
             "orderProperties"   => $basketItemProperties,
+            "properties"        => $properties,
 			"amounts"           => [
 				[
 					"currency"              => $this->checkoutService->getCurrency(),

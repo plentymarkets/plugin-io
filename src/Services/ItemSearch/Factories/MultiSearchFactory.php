@@ -2,9 +2,8 @@
 
 namespace IO\Services\ItemSearch\Factories;
 
-use IO\Services\ItemLoader\Services\FacetExtensionContainer;
 use IO\Services\ItemSearch\Extensions\ItemSearchExtension;
-use IO\Services\ItemSearch\SearchPresets\SearchPreset;
+use IO\Services\ItemSearch\Helper\FacetExtensionContainer;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Search\Document\DocumentSearch;
 use Plenty\Modules\Item\Search\Contracts\VariationElasticSearchMultiSearchRepositoryContract;
 
@@ -110,6 +109,14 @@ class MultiSearchFactory
 
         // execute multisearch
         $rawResults = $searchRepository->execute();
+
+        if ( count($this->searches) === 1 && count($this->searches[$primarySearchNames[0]]['secondary']) === 0 )
+        {
+            $tmp = $rawResults;
+            $rawResults = [];
+            $rawResults[$primarySearchNames[0]] = $tmp;
+        }
+
         $results = [];
 
         foreach( $primarySearchNames as $searchName )

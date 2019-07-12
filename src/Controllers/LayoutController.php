@@ -15,6 +15,7 @@ use Plenty\Modules\ContentCache\Contracts\ContentCacheRepositoryContract;
 use Plenty\Plugin\Application;
 use Plenty\Plugin\Controller;
 use Plenty\Plugin\Events\Dispatcher;
+use Plenty\Plugin\Log\Loggable;
 use Plenty\Plugin\Templates\Twig;
 
 /**
@@ -25,6 +26,7 @@ use Plenty\Plugin\Templates\Twig;
  */
 abstract class LayoutController extends Controller
 {
+    use Loggable;
 
 	/**
 	 * @var Application
@@ -96,6 +98,14 @@ abstract class LayoutController extends Controller
 	 */
 	protected function abort(int $code, string $message):string
 	{
+	    $this->getLogger(__CLASS__)->error(
+	        "IO::Debug.LayoutController_requestAborted.",
+            [
+                "code" => $code,
+                "message" => $message
+            ]
+        );
+
 		if($this->debug === false)
 		{
 			$this->app->abort($code, $message);
@@ -139,6 +149,13 @@ abstract class LayoutController extends Controller
 			// activate content cache
             if ( $cacheContent )
             {
+                $this->getLogger(__CLASS__)->info(
+                    "IO::Debug.LayoutController_enableContentCache",
+                    [
+                        "template" => $templateEvent,
+                        "controllerData" => $controllerData,
+                    ]
+                );
                 /** @var ContentCacheRepositoryContract $cacheRepository */
                 $cacheRepository = pluginApp(ContentCacheRepositoryContract::class);
                 $cacheRepository->enableCacheForResponse();
@@ -174,10 +191,24 @@ abstract class LayoutController extends Controller
         $templateData = ArrayHelper::toArray( $templateData );
 
 		// Render the received plugin
-		return $this->twig->render(
-			$templateContainer->getTemplate(),
-            $templateData
-		);
+        try
+        {
+            return $this->twig->render(
+                $templateContainer->getTemplate(),
+                $templateData
+            );
+        }
+        catch(\Exception $e)
+        {
+            $this->getLogger(__CLASS__)->error(
+                "IO::Debug.LayoutController_cannotRenderTwigTemplate",
+                [
+                    "templateKey"   => $templateContainer->getTemplateKey(),
+                    "template"      => $templateContainer->getTemplate(),
+                    "data"          => $templateData
+                ]
+            );
+        }
 	}
 
 }

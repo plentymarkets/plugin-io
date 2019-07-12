@@ -2,6 +2,7 @@
 
 namespace IO\Services;
 
+use IO\Helper\LanguageMap;
 use IO\Helper\MemoryCache;
 use IO\Services\UrlBuilder\CategoryUrlBuilder;
 use IO\Services\UrlBuilder\UrlQuery;
@@ -37,9 +38,10 @@ class UrlService
      * Get canonical url for a category
      * @param int           $categoryId
      * @param string|null   $lang
+     * @param int | null $webstoreId
      * @return UrlQuery
      */
-    public function getCategoryURL( $categoryId, $lang = null )
+    public function getCategoryURL( $categoryId, $lang = null)
     {
         if ( $lang === null )
         {
@@ -95,9 +97,10 @@ class UrlService
     /**
      * Get canonical url for current page
      * @param string|null   $lang
+     * @param bool $ignoreCanonical
      * @return string|null
      */
-    public function getCanonicalURL( $lang = null )
+    public function getCanonicalURL( $lang = null, $ignoreCanonical = false)
     {
         $defaultLanguage = $this->webstoreConfigurationService->getDefaultLanguage();
 
@@ -107,8 +110,8 @@ class UrlService
         }
 
         $canonicalUrl = $this->fromMemoryCache(
-            "canonicalUrl.$lang",
-            function() use ($lang, $defaultLanguage) {
+            "canonicalUrl.$lang.$ignoreCanonical",
+            function() use ($lang, $defaultLanguage, $ignoreCanonical) {
                 $includeLanguage = $lang !== null && $lang !== $defaultLanguage;
                 /** @var CategoryService $categoryService */
                 $categoryService = pluginApp( CategoryService::class );
@@ -133,7 +136,7 @@ class UrlService
                     {
                         $categoryDetails = $categoryService->getDetails( $currentCategory, $lang );
 
-                        if($categoryDetails !== null && strlen($categoryDetails->canonicalLink) > 0)
+                        if($categoryDetails !== null && strlen($categoryDetails->canonicalLink) > 0 && $ignoreCanonical === false)
                         {
                             return $categoryDetails->canonicalLink;
                         }
@@ -145,7 +148,7 @@ class UrlService
                     return null;
                 }
 
-                if ( TemplateService::$currentTemplate === 'tpl.home' )
+                if ( TemplateService::$currentTemplate === 'tpl.home' || TemplateService::$currentTemplate === 'tpl.home.category' )
                 {
                     return pluginApp( UrlQuery::class, ['path' => "", 'lang' => $lang])
                         ->toAbsoluteUrl($includeLanguage);
@@ -197,7 +200,8 @@ class UrlService
                     $url = $this->getCanonicalURL( $language );
                     if ( $url !== null )
                     {
-                        $result[$language] = $url;
+                        $languageISO = LanguageMap::getLanguageCode($language);
+                        $result[$languageISO] = $url;
                     }
                 }
 
@@ -223,9 +227,8 @@ class UrlService
     {
         if(strpos($redirectURL, 'http:') !== 0 && strpos($redirectURL, 'https:') !== 0)
         {
-            $redirectURL = pluginApp( UrlQuery::class, ['path' => $this->getHomepageURL()])
-                ->join($redirectURL)
-                ->toRelativeUrl($this->webstoreConfigurationService->getDefaultLanguage() !== $this->sessionStorage->getLang());
+            $redirectURL = pluginApp( UrlQuery::class, ['path' => $redirectURL])
+                ->toRelativeUrl($this->webstoreConfigurationService->getDefaultLanguage() !== $this->sessionStorage->getLang() );
         }
 
         return pluginApp(Response::class)->redirectTo($redirectURL);

@@ -4,22 +4,25 @@ namespace IO\Services\ItemSearch\Factories;
 
 use IO\Helper\CurrencyConverter;
 use IO\Helper\VatConverter;
-use IO\Services\ItemLoader\Contracts\FacetExtension;
-use IO\Services\ItemLoader\Services\FacetExtensionContainer;
+use IO\Services\ItemSearch\Contracts\FacetExtension;
+use IO\Services\ItemSearch\Extensions\AvailabilityExtension;
+use IO\Services\ItemSearch\Extensions\GroupedAttributeValuesExtension;
 use IO\Services\ItemSearch\Extensions\BundleComponentExtension;
 use IO\Services\ItemSearch\Extensions\ContentCacheVariationLinkExtension;
 use IO\Services\ItemSearch\Extensions\CurrentCategoryExtension;
 use IO\Services\ItemSearch\Extensions\ItemDefaultImage;
 use IO\Services\ItemSearch\Extensions\ItemUrlExtension;
 use IO\Services\ItemSearch\Extensions\PriceSearchExtension;
+use IO\Services\ItemSearch\Extensions\ReduceDataExtension;
+use IO\Services\ItemSearch\Extensions\VariationAttributeMapExtension;
+use IO\Services\ItemSearch\Extensions\VariationPropertyExtension;
+use IO\Services\ItemSearch\Helper\FacetExtensionContainer;
+use IO\Services\ItemSearch\Mutators\OrderPropertySelectionValueMutator;
 use IO\Services\PriceDetectService;
 use IO\Services\SessionStorageService;
 use IO\Services\TemplateConfigService;
-use Plenty\Modules\Cloud\ElasticSearch\Lib\Collapse\BaseCollapse;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\ElasticSearch;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Source\Mutator\BuiltIn\LanguageMutator;
-use Plenty\Modules\Item\Search\Aggregations\ItemCardinalityAggregation;
-use Plenty\Modules\Item\Search\Aggregations\ItemCardinalityAggregationProcessor;
 use Plenty\Modules\Item\Search\Filter\CategoryFilter;
 use Plenty\Modules\Item\Search\Filter\ClientFilter;
 use Plenty\Modules\Item\Search\Filter\CrossSellingFilter;
@@ -45,6 +48,25 @@ use Plenty\Plugin\Application;
  */
 class VariationSearchFactory extends BaseSearchFactory
 {
+    private $isAdminPreview = false;
+    
+    public function __construct()
+    {
+        /** @var Application $app */
+        $app = pluginApp(Application::class);
+        $this->isAdminPreview = $app->isAdminPreview();
+    }
+    
+    /**
+     * @param $isAdminPreview
+     * @return $this
+     */
+    public function setAdminPreview($isAdminPreview)
+    {
+        $this->isAdminPreview = $isAdminPreview;
+        return $this;
+    }
+    
     //
     // VARIATION BASE FILTERS
     //
@@ -55,9 +77,13 @@ class VariationSearchFactory extends BaseSearchFactory
      */
     public function isActive()
     {
-        /** @var VariationBaseFilter $variationFilter */
-        $variationFilter = $this->createFilter( VariationBaseFilter::class );
-        $variationFilter->isActive();
+        if(!$this->isAdminPreview)
+        {
+            /** @var VariationBaseFilter $variationFilter */
+            $variationFilter = $this->createFilter( VariationBaseFilter::class );
+            $variationFilter->isActive();
+        }
+        
         return $this;
     }
 
@@ -68,9 +94,13 @@ class VariationSearchFactory extends BaseSearchFactory
      */
     public function isInactive()
     {
-        /** @var VariationBaseFilter $variationFilter */
-        $variationFilter = $this->createFilter( VariationBaseFilter::class );
-        $variationFilter->isInactive();
+        if(!$this->isAdminPreview)
+        {
+            /** @var VariationBaseFilter $variationFilter */
+            $variationFilter = $this->createFilter( VariationBaseFilter::class );
+            $variationFilter->isInactive();
+        }
+        
         return $this;
     }
 
@@ -165,6 +195,21 @@ class VariationSearchFactory extends BaseSearchFactory
     }
 
     /**
+     * Filter manufacturers by id.
+     *
+     * @param int $manufacturerId To filter by manufacturer
+     *
+     * @return $this
+     */
+    public function hasManufacturer( $manufacturerId )
+    {
+        /** @var VariationBaseFilter $variationFilter */
+        $variationFilter = $this->createFilter( VariationBaseFilter::class );
+        $variationFilter->hasManufacturer( $manufacturerId );
+        return $this;
+    }
+
+    /**
      * Filter variations by multiple property ids.
      *
      * @param int[]     $propertyIds     The property ids to filter by.
@@ -214,9 +259,27 @@ class VariationSearchFactory extends BaseSearchFactory
      */
     public function isHiddenInCategoryList( $isHidden = true )
     {
+        if(!$this->isAdminPreview)
+        {
+            /** @var VariationBaseFilter $variationFilter */
+            $variationFilter = $this->createFilter( VariationBaseFilter::class );
+            $variationFilter->isHiddenInCategoryList( $isHidden );
+        }
+        
+        return $this;
+    }
+    
+    /**
+     * Filter variations by isSalable flag
+     *
+     * @return $this
+     */
+    public function isSalable()
+    {
         /** @var VariationBaseFilter $variationFilter */
         $variationFilter = $this->createFilter( VariationBaseFilter::class );
-        $variationFilter->isHiddenInCategoryList( $isHidden );
+        $variationFilter->isSalable();
+    
         return $this;
     }
 
@@ -232,13 +295,17 @@ class VariationSearchFactory extends BaseSearchFactory
      */
     public function isVisibleForClient( $clientId = null )
     {
-        if ( $clientId === null )
+        if(!$this->isAdminPreview)
         {
-            $clientId = pluginApp( Application::class )->getPlentyId();
+            if ( $clientId === null )
+            {
+                $clientId = pluginApp( Application::class )->getPlentyId();
+            }
+            /** @var ClientFilter $clientFilter */
+            $clientFilter = $this->createFilter( ClientFilter::class );
+            $clientFilter->isVisibleForClient( $clientId );
         }
-        /** @var ClientFilter $clientFilter */
-        $clientFilter = $this->createFilter( ClientFilter::class );
-        $clientFilter->isVisibleForClient( $clientId );
+        
         return $this;
     }
 
@@ -255,29 +322,48 @@ class VariationSearchFactory extends BaseSearchFactory
      */
     public function hasNameInLanguage( $type = TextFilter::FILTER_ANY_NAME, $lang = null)
     {
-        if ( $lang === null )
+        if(!$this->isAdminPreview)
         {
-            $lang = pluginApp(SessionStorageService::class)->getLang();
+            if ( $lang === null )
+            {
+                $lang = pluginApp(SessionStorageService::class)->getLang();
+            }
+    
+            $langMap = [
+                'de' => 'german',
+                'en' => 'english',
+                'fr' => 'french',
+                'bg' => 'bulgarian',
+                'it' => 'italian',
+                'es' => 'spanish',
+                'tr' => 'turkish',
+                'nl' => 'dutch',
+                // 'pl' => '',
+                'pt' => 'portuguese',
+                'nn' => 'norwegian',
+                'ro' => 'romanian',
+                'da' => 'danish',
+                'se' => 'swedish',
+                'cz' => 'czech',
+                'ru' => 'russian',
+                //'sk' => '',
+                //'cn' => '',
+                //'vn' => '',
+            ];
+    
+            if ( array_key_exists( $lang, $langMap ) )
+            {
+                $lang = $langMap[$lang];
+            }
+            else
+            {
+                $lang = TextFilter::LANG_DE;
+            }
+            /** @var TextFilter $textFilter */
+            $textFilter = $this->createFilter(TextFilter::class);
+            $textFilter->hasNameInLanguage( $lang, $type );
         }
-
-        $langMap = [
-            'de' => TextFilter::LANG_DE,
-            'en' => TextFilter::LANG_EN,
-            'fr' => TextFilter::LANG_FR,
-        ];
-
-        if ( array_key_exists( $lang, $langMap ) )
-        {
-            $lang = $langMap[$lang];
-        }
-
-        if ( $lang !== TextFilter::LANG_DE && $lang !== TextFilter::LANG_EN && $lang !== TextFilter::LANG_FR )
-        {
-            $lang = TextFilter::LANG_DE;
-        }
-        /** @var TextFilter $textFilter */
-        $textFilter = $this->createFilter(TextFilter::class);
-        $textFilter->hasNameInLanguage( $lang, $type );
+        
         return $this;
     }
 
@@ -311,9 +397,13 @@ class VariationSearchFactory extends BaseSearchFactory
      */
     public function hasAtLeastOnePrice( $priceIds )
     {
-        /** @var SalesPriceFilter $priceFilter */
-        $priceFilter = $this->createFilter( SalesPriceFilter::class );
-        $priceFilter->hasAtLeastOnePrice( $priceIds );
+        if(!$this->isAdminPreview)
+        {
+            /** @var SalesPriceFilter $priceFilter */
+            $priceFilter = $this->createFilter( SalesPriceFilter::class );
+            $priceFilter->hasAtLeastOnePrice( $priceIds );
+        }
+        
         return $this;
     }
 
@@ -324,9 +414,13 @@ class VariationSearchFactory extends BaseSearchFactory
      */
     public function hasPriceForCustomer()
     {
-        /** @var PriceDetectService $priceDetectService */
-        $priceDetectService = pluginApp( PriceDetectService::class );
-        $this->hasAtLeastOnePrice( $priceDetectService->getPriceIdsForCustomer() );
+        if(!$this->isAdminPreview)
+        {
+            /** @var PriceDetectService $priceDetectService */
+            $priceDetectService = pluginApp( PriceDetectService::class );
+            $this->hasAtLeastOnePrice( $priceDetectService->getPriceIdsForCustomer() );
+        }
+        
         return $this;
     }
     
@@ -390,7 +484,7 @@ class VariationSearchFactory extends BaseSearchFactory
         $variationShowType = $templateConfigService->get($configKey);
         if ($variationShowType === 'combined')
         {
-            $this->groupBy( 'ids.itemId' );
+            $this->groupBy( 'ids.itemAttributeValue' );
         }
         else if ( $variationShowType === 'main' )
         {
@@ -573,9 +667,13 @@ class VariationSearchFactory extends BaseSearchFactory
         }
 
         $imageMutator = pluginApp(ImageMutator::class);
+        /**
+         * @var ImageMutator $imageMutator
+         */
+        $imageMutator->setSorting(ImageMutator::SORT_POSITION);
         $imageMutator->addClient( $clientId );
         $this->withMutator( $imageMutator );
-        
+
         /** @var ImageDomainMutator $imageDomainMutator */
         $imageDomainMutator = pluginApp(ImageDomainMutator::class);
         $imageDomainMutator->setClient($clientId);
@@ -584,10 +682,37 @@ class VariationSearchFactory extends BaseSearchFactory
         return $this;
     }
     
+    /**
+     * Includes VariatonAttributeMap for variation select
+     *
+     * @return $this
+     */
+    public function withAttributes()
+    {
+        $this->withExtension( VariationAttributeMapExtension::class );
+        
+        return $this;
+    }
+    
     public function withPropertyGroups()
     {
         $propertyGroupMutator = pluginApp(VariationPropertyGroupMutator::class);
         $this->withMutator($propertyGroupMutator);
+        
+        return $this;
+    }
+    
+    public function withOrderPropertySelectionValues()
+    {
+        $orderPropertySelectionValueMutator = pluginApp(OrderPropertySelectionValueMutator::class);
+        $this->withMutator($orderPropertySelectionValueMutator);
+        
+        return $this;
+    }
+    
+    public function withVariationProperties()
+    {
+        $this->withExtension(VariationPropertyExtension::class);
         
         return $this;
     }
@@ -655,4 +780,23 @@ class VariationSearchFactory extends BaseSearchFactory
         $this->withExtension( ContentCacheVariationLinkExtension::class );
         return $this;
     }
+
+    public function withGroupedAttributeValues()
+    {
+        $this->withExtension( GroupedAttributeValuesExtension::class );
+        return $this;
+    }
+
+    public function withReducedResults()
+    {
+        $this->withExtension(ReduceDataExtension::class);
+        return $this;
+    }
+    
+    public function withAvailability()
+    {
+        $this->withExtension(AvailabilityExtension::class);
+        return $this;
+    }
 }
+

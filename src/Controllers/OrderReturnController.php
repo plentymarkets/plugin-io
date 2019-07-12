@@ -9,6 +9,7 @@ use IO\Services\CustomerService;
 use IO\Services\OrderService;
 use IO\Guards\AuthGuard;
 use IO\Services\UrlBuilder\UrlQuery;
+use Plenty\Plugin\Log\Loggable;
 
 /**
  * Class OrderReturnController
@@ -16,6 +17,8 @@ use IO\Services\UrlBuilder\UrlQuery;
  */
 class OrderReturnController extends LayoutController
 {
+    use Loggable;
+
     /**
      * Render the order returns view
      * @return string
@@ -73,17 +76,36 @@ class OrderReturnController extends LayoutController
                 
                 if(!count($returnOrder->orderData['orderItems']) || !$orderService->isOrderReturnable($orderRepo->findOrderById($orderId)))
                 {
+                    $this->getLogger(__CLASS__)->info(
+                        "IO::Debug.OrderReturnController_orderNotReturnable",
+                        [
+                            "orderId"           => $orderId,
+                            "returnOrderItems"  => $returnOrder->orderData['orderItems']
+                        ]
+                    );
                     return '';
                 }
                 
             }
             catch (\Exception $e)
             {
+                $this->getLogger(__CLASS__)->warning(
+                    "IO::Debug.OrderReturnController_cannotPrepareReturn",
+                    [
+                        "orderId" => $orderId,
+                        "returnOrder" => $returnOrder !== null ? $returnOrder->orderData : null,
+                        "error" => [
+                            "code" => $e->getCode(),
+                            "message" => $e->getMessage()
+                        ]
+                    ]
+                );
                 return '';
             }
         }
         else
         {
+            $this->getLogger(__CLASS__)->info("IO::Debug.OrderReturnController_orderReturnDisabled");
             return '';
         }
         

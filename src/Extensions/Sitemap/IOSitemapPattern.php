@@ -37,9 +37,14 @@ class IOSitemapPattern
                 'pattern' => '_{itemId}_{variationId?}',
                 'container' => ''
             ];
-
-            $seoSitemapService->setItemPattern($itemPattern);
+        }else
+        {
+            $itemPattern = [
+                'onlyMainVariation' => $templateConfigService->get('item.variation_show_type', 'all') === 'main'
+            ];
         }
+
+        $seoSitemapService->setItemPattern($itemPattern);
 
         /** @var ConfigRepository $configRepository */
         $configRepository = pluginApp(ConfigRepository::class);

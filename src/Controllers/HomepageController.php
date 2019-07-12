@@ -1,9 +1,8 @@
 <?php //strict
 namespace IO\Controllers;
 
-use IO\Services\UrlService;
-use Plenty\Plugin\Http\Request;
-use Plenty\Plugin\Http\Response;
+use IO\Helper\RouteConfig;
+use IO\Services\CategoryService;
 
 /**
  * Class HomepageController
@@ -15,20 +14,26 @@ class HomepageController extends LayoutController
      * Prepare and render the data for the homepage
      * @return string
      */
-    public function showHomepage(Request $request, Response $response, UrlService $urlService)
+    public function showHomepage()
     {
-        $orderId = $request->get('id', 0);
-        $orderAccessKey = $request->get('ak', '');
-        
-        if(strlen($orderAccessKey) && (int)$orderId > 0)
-        {
-            return $urlService->redirectTo('confirmation/'.$orderId.'/'.$orderAccessKey);
-        }
-        
         return $this->renderTemplate(
             "tpl.home",
             [
                 "object" => ""
+            ]
+        );
+    }
+    
+    public function showHomepageCategory()
+    {
+        /** @var CategoryService $categoryService */
+        $categoryService = pluginApp(CategoryService::class);
+        $homepageCategory = $categoryService->get(RouteConfig::getCategoryId(RouteConfig::HOME));
+        
+        return $this->renderTemplate(
+            "tpl.home.category",
+            [
+                "category" => $homepageCategory
             ]
         );
     }

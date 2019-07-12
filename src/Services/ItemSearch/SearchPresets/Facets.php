@@ -29,6 +29,7 @@ class Facets implements SearchPreset
             ->isHiddenInCategoryList( false )
             ->groupByTemplateConfig()
             ->hasNameInLanguage()
+            ->setPage(1,0)
             ->hasPriceForCustomer();
 
         if ( array_key_exists('categoryId', $options ) && (int)$options['categoryId'] > 0 )

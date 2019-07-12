@@ -16,13 +16,18 @@ class ItemCrossSellingService
 {
     private $sessionStorage;
     
+    /** @var TemplateConfigService */
+    private $templateConfigService;
+    
     /**
      * ItemLastSeenService constructor.
-     * @param \IO\Services\SessionStorageService $sessionStorage
+     * @param SessionStorageService $sessionStorage
+     * @param TemplateConfigService $templateConfigService
      */
-    public function __construct(SessionStorageService $sessionStorage)
+    public function __construct(SessionStorageService $sessionStorage, TemplateConfigService $templateConfigService)
     {
         $this->sessionStorage = $sessionStorage;
+        $this->templateConfigService = $templateConfigService;
     }
     
     /**
@@ -38,14 +43,7 @@ class ItemCrossSellingService
     
     public function getType()
     {
-        $type = $this->sessionStorage->getSessionValue(SessionStorageKeys::CROSS_SELLING_TYPE);
-        
-        if(!is_null($type) && strlen($type))
-        {
-            return $type;
-        }
-        
-        return CrossSellingType::SIMILAR;
+        return $this->templateConfigService->get('item.lists.cross_selling_type', 'Similar');
     }
     
     public function setSorting($sorting)
@@ -60,7 +58,7 @@ class ItemCrossSellingService
     
     public function getSorting()
     {
-        $sorting = $this->sessionStorage->getSessionValue(SessionStorageKeys::CROSS_SELLING_SORTING);
+        $sorting = $this->templateConfigService->get('item.lists.cross_selling_sorting');
         
         if(is_null($sorting) || !strlen($sorting))
         {

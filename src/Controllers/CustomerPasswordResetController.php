@@ -2,9 +2,9 @@
 namespace IO\Controllers;
 
 use IO\Constants\LogLevel;
-use IO\Helper\TemplateContainer;
-use IO\Services\CustomerPasswordResetService;
+use IO\Helper\RouteConfig;
 use IO\Services\NotificationService;
+use IO\Services\UserDataHashService;
 
 /**
  * Class CustomerPasswordResetController
@@ -18,12 +18,11 @@ class CustomerPasswordResetController extends LayoutController
      */
     public function showReset($contactId, $hash): string
     {
-        /**
-         * @var CustomerPasswordResetService $customerPasswordResetService
-         */
-        $customerPasswordResetService = pluginApp(CustomerPasswordResetService::class);
+        /** @var UserDataHashService $hashService */
+        $hashService = pluginApp(UserDataHashService::class);
+        $hashData = $hashService->getData($hash, $contactId);
         
-        if($customerPasswordResetService->checkHash((int)$contactId, $hash))
+        if(!is_null($hashData))
         {
             return $this->renderTemplate(
                 "tpl.password-reset",
@@ -41,14 +40,16 @@ class CustomerPasswordResetController extends LayoutController
              */
             $notificationService = pluginApp(NotificationService::class);
             $notificationService->addNotificationCode(LogLevel::ERROR,3);
-            
-            return $this->renderTemplate(
-                "tpl.home",
-                [
-                    "data" => ""
-                ],
-                false
-            );
+    
+            /** @var HomepageController $homepageController */
+            $homepageController = pluginApp(HomepageController::class);
+    
+            if(RouteConfig::getCategoryId(RouteConfig::HOME) > 0)
+            {
+                return $homepageController->showHomepageCategory();
+            }
+    
+            return $homepageController->showHomepage();
         }
         
     }

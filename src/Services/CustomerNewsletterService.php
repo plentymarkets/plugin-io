@@ -19,20 +19,33 @@ class CustomerNewsletterService
     
     public function saveNewsletterData($email, $emailFolder, $firstName = '', $lastName='')
     {
-        if(strlen($email))
+        $this->saveMultipleNewsletterData($email, [$emailFolder], $firstName, $lastName);
+    }
+
+    public function saveMultipleNewsletterData($email, $emailFolders, $firstName = '', $lastName = '')
+    {
+        if(strlen($email) && count($emailFolders))
         {
             /** @var AuthHelper $authHelper */
             $authHelper = pluginApp(AuthHelper::class);
             $newsletterRepo = $this->newsletterRepo;
+
+            foreach($emailFolders as $key => $emailFolder)
+            {
+                $recipientData = $authHelper->processUnguarded( function() use ($email, $emailFolder, $newsletterRepo)
+                {
+                    return $newsletterRepo->listRecipients(['*'], 1, 1, ['email' => $email, 'folderId' => $emailFolder], [])->getResult()[0];
+                });
     
-            $recipientData = $authHelper->processUnguarded( function() use ($email, $newsletterRepo)
+                if($recipientData instanceof Recipient)
+                {
+                    unset($emailFolders[$key]);
+                }
+            }
+    
+            if(count($emailFolders))
             {
-                return $newsletterRepo->listRecipients(['*'], 1, 1, ['email' => $email], [])->getResult()[0];
-            });
-            
-            if(!$recipientData instanceof Recipient && !($recipientData instanceof Recipient && $recipientData->email == $email))
-            {
-                $this->newsletterRepo->addToNewsletterList($email, $firstName, $lastName, [$emailFolder]);
+                $this->newsletterRepo->addToNewsletterList($email, $firstName, $lastName, $emailFolders);
             }
         }
     }

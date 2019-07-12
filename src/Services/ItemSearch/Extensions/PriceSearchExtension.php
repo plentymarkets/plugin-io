@@ -4,7 +4,8 @@ namespace IO\Services\ItemSearch\Extensions;
 
 use IO\Helper\VariationPriceList;
 use IO\Services\CustomerService;
-use Plenty\Legacy\Repositories\Frontend\CurrencyExchangeRepository;
+use Plenty\Plugin\Application;
+use Plenty\Plugin\Log\Loggable;
 
 /**
  * Class PriceSearchExtension
@@ -15,6 +16,8 @@ use Plenty\Legacy\Repositories\Frontend\CurrencyExchangeRepository;
  */
 class PriceSearchExtension implements ItemSearchExtension
 {
+    use Loggable;
+
     private $quantities;
 
     public function __construct( $quantities = [] )
@@ -45,6 +48,7 @@ class PriceSearchExtension implements ItemSearchExtension
             {
                 if ( (int)$variation['data']['variation']['id'] > 0 )
                 {
+                    $itemId             = $variation['data']['item']['id'];
                     $variationId        = $variation['data']['variation']['id'];
                     $minimumQuantity    = $variation['data']['variation']['minimumOrderQuantity'];
                     if ( is_null($minimumQuantity) || (float)$minimumQuantity === 0 )
@@ -87,7 +91,7 @@ class PriceSearchExtension implements ItemSearchExtension
                     }
 
 
-                    $priceList = VariationPriceList::create( $variationId, $minimumQuantity, $maximumOrderQuantity, $lot, $unit );
+                    $priceList = VariationPriceList::create( $variationId, $itemId, $minimumQuantity, $maximumOrderQuantity, $lot, $unit );
 
                     // assign minimum order quantity from price list (may be recalculated depending on available graduated prices)
                     $variation['data']['variation']['minimumOrderQuantity'] = $priceList->minimumOrderQuantity;
@@ -102,9 +106,15 @@ class PriceSearchExtension implements ItemSearchExtension
                         $quantity = (float)$this->quantities[$variationId];
                     }
 
-                    $variation['data']['calculatedPrices'] = $priceList->getCalculatedPrices( $quantity );
                     $variation['data']['prices'] = $priceList->toArray( $quantity );
 
+                    if ( $variation['data']['prices']['default']['unitPrice']['value'] <= 0 || $variation['data']['prices']['default']['price']['value'] <= 0)
+                    {
+                        $this->getLogger(__CLASS__)->warning('IO::Debug.PriceSearchExtension_freeItemFound', [
+                            'variation' => $variation,
+                            'isAdminPreview' => pluginApp(Application::class)->isAdminPreview()
+                        ]);
+                    }
 
                     if ( array_key_exists('properties', $variation['data']) )
                     {
@@ -138,7 +148,6 @@ class PriceSearchExtension implements ItemSearchExtension
                 $defaultPrice = $priceList->getDefaultPrice();
                 
                 $property['property']['surcharge'] = $defaultPrice->unitPrice * ($property['property']['surcharge'] / 100);
-                $property['surcharge'] = $defaultPrice->unitPrice * ($property['surcharge'] / 100);
             }
     
             $property['property']['surcharge'] = $priceList->convertGrossNet( $property['property']['surcharge'] );

@@ -4,10 +4,12 @@ namespace IO\Services;
 
 use IO\Services\ItemSearch\SearchPresets\BasketItems;
 use IO\Services\ItemSearch\Services\ItemSearchService;
+use Plenty\Modules\Accounting\Vat\Contracts\VatInitContract;
 use Plenty\Modules\Accounting\Vat\Models\VatRate;
 use Plenty\Modules\Basket\Contracts\BasketRepositoryContract;
 use Plenty\Modules\Basket\Contracts\BasketItemRepositoryContract;
 use Plenty\Modules\Basket\Exceptions\BasketItemCheckException;
+use Plenty\Modules\Basket\Exceptions\BasketItemQuantityCheckException;
 use Plenty\Modules\Order\Coupon\Campaign\Contracts\CouponCampaignRepositoryContract;
 use Plenty\Modules\Order\Coupon\Campaign\Models\CouponCampaign;
 use Plenty\Modules\Basket\Models\Basket;
@@ -51,9 +53,9 @@ class BasketService
     private $vatService;
 
     /**
-     * @var SessionStorageService
+     * @var CustomerService
      */
-    private $sessionStorage;
+    private $customerService;
 
     private $basketItems;
 
@@ -63,15 +65,26 @@ class BasketService
      * @param Checkout $checkout
      * @param VatService $vatService
      */
-    public function __construct(BasketItemRepositoryContract $basketItemRepository, Checkout $checkout, VatService $vatService, SessionStorageService $sessionStorage, CouponCampaignRepositoryContract $couponCampaignRepository, BasketRepositoryContract $basketRepository)
+    public function __construct(
+        BasketItemRepositoryContract $basketItemRepository,
+        Checkout $checkout,
+        VatService $vatService,
+        CustomerService $customerService,
+        CouponCampaignRepositoryContract $couponCampaignRepository,
+        BasketRepositoryContract $basketRepository,
+        VatInitContract $vatInitService)
     {
         $this->basketItemRepository = $basketItemRepository;
         $this->checkout             = $checkout;
         $this->vatService           = $vatService;
-        $this->sessionStorage       = $sessionStorage;
+        $this->customerService      = $customerService;
         $this->couponCampaignRepository = $couponCampaignRepository;
         $this->basketRepository = $basketRepository;
 
+        if(!$vatInitService->isInitialized())
+        {
+            $vat = $this->vatService->getVat();
+        }
     }
 
     public function setTemplate(string $template)
@@ -176,7 +189,7 @@ class BasketService
 
         $basketItems        = $this->getBasketItemsRaw();
         $basketItemData     = $this->getBasketItemData($basketItems);
-        $showNetPrice       = $this->sessionStorage->getCustomer()->showNetPrice;
+        $showNetPrice       = $this->customerService->showNetPrices();
 
         foreach ($basketItems as $basketItem) {
             if ($showNetPrice) {
@@ -202,8 +215,37 @@ class BasketService
 
         $basketItems    = $this->getBasketItemsRaw();
         $basketItemData = $this->getBasketItemData($basketItems, $template);
+        $showNetPrice   = $this->customerService->showNetPrices();
+        
+        foreach ($basketItems as $basketItem)
+        {
+            if($showNetPrice)
+            {
+                $basketItem->price = round($basketItem->price * 100 / (100.0 + $basketItem->vat), 2);
+            }
+            
+            array_push(
+                $result,
+                $this->addVariationData($basketItem, $basketItemData[$basketItem->variationId])
+            );
+        }
+        
+        return $result;
+    }
+    
+    public function checkBasketItemsLang($template = '')
+    {
+        if (!strlen($template))
+        {
+            $template = $this->template;
+        }
+    
+        $basketItems    = $this->getBasketItemsRaw();
+        $basketItemData = $this->getBasketItemData($basketItems, $template);
         $showWarning = [];
-        foreach ($basketItems as $basketItem) {
+    
+        foreach ($basketItems as $basketItem)
+        {
             if(!array_key_exists($basketItem->variationId, $basketItemData))
             {
                 $this->deleteBasketItem($basketItem->id);
@@ -214,29 +256,20 @@ class BasketService
                 $this->deleteBasketItem($basketItem->id);
                 $showWarning[] = 10;
             }
-            else
-            {
-                array_push(
-                    $result,
-                    $this->addVariationData($basketItem, $basketItemData[$basketItem->variationId])
-                );
-
-            }
         }
-
+    
         if(count($showWarning) > 0)
         {
             $showWarning = array_unique($showWarning);
-
+        
             foreach($showWarning as $warning)
             {
                 /** @var NotificationService $notificationService */
                 $notificationService = pluginApp(NotificationService::class);
                 $notificationService->warn(LogLevel::WARN, $warning);
             }
-
+        
         }
-        return $result;
     }
 
     private function hasTexts($basketItemData)
@@ -255,7 +288,7 @@ class BasketService
         if ($basketItem === null) {
             return array();
         }
-        $basketItemData = $this->getBasketItemData($basketItem->toArray());
+        $basketItemData = $this->getBasketItemData([$basketItem]);
         return $this->addVariationData($basketItem, $basketItemData[$basketItem->variationId]);
     }
 
@@ -325,7 +358,7 @@ class BasketService
         else
         {
             $error = $this->addDataToBasket($data);
-            if(array_key_exists("code", $error))
+            if(is_array($error) && array_key_exists("code", $error))
             {
                 return $error;
             }
@@ -356,10 +389,33 @@ class BasketService
             } else {
                 $this->basketItemRepository->addBasketItem($data);
             }
-        } catch (BasketItemCheckException $e) {
-            if ($e->getCode() == BasketItemCheckException::NOT_ENOUGH_STOCK_FOR_ITEM) {
-                return ["code" => "6"];
+        } catch (BasketItemQuantityCheckException $e) {
+             switch($e->getCode()) {
+                case BasketItemQuantityCheckException::DID_REACH_MAXIMUM_QUANTITY_FOR_ITEM:
+                    $code = 112;
+                    break;
+                case BasketItemQuantityCheckException::DID_REACH_MAXIMUM_QUANTITY_FOR_VARIATION:
+                    $code = 113;
+                    break;
+                case BasketItemQuantityCheckException::DID_NOT_REACH_MINIMUM_QUANTITY_FOR_VARIATION:
+                    $code = 114;
+                    break;
+                default:
+                    $code = 0;
             }
+            return ["code" => $code];
+        } catch (BasketItemCheckException $e) {
+            switch($e->getCode()) {
+                case BasketItemCheckException::VARIATION_NOT_FOUND:
+                    $code = 110;
+                    break;
+                case BasketItemCheckException::NOT_ENOUGH_STOCK_FOR_VARIATION:
+                    $code = 111;
+                    break;
+                default:
+                    $code = 0;
+            }
+            return ["code" => $code];
         } catch (\Exception $e) {
             return ["code" => $e->getCode()];
         }
@@ -379,7 +435,7 @@ class BasketService
 
             if (strlen($basketOrderParam['property']['value']) > 0 && isset($basketOrderParam['property']['value'])) {
 
-                $properties[$key]['propertyId'] = $basketOrderParam['property']['names']['propertyId'];
+                $properties[$key]['propertyId'] = $basketOrderParam['property']['id'];
                 $properties[$key]['type']       = $basketOrderParam['property']['valueType'];
                 $properties[$key]['value']      = $basketOrderParam['property']['value'];
                 $properties[$key]['name']       = $basketOrderParam['property']['names']['name'];
@@ -407,6 +463,33 @@ class BasketService
         $data['id'] = $basketItemId;
         try {
             $this->basketItemRepository->updateBasketItem($basketItemId, $data);
+        } catch (BasketItemQuantityCheckException $e) {
+             switch($e->getCode()) {
+                case BasketItemQuantityCheckException::DID_REACH_MAXIMUM_QUANTITY_FOR_ITEM:
+                    $code = 112;
+                    break;
+                case BasketItemQuantityCheckException::DID_REACH_MAXIMUM_QUANTITY_FOR_VARIATION:
+                    $code = 113;
+                    break;
+                case BasketItemQuantityCheckException::DID_NOT_REACH_MINIMUM_QUANTITY_FOR_VARIATION:
+                    $code = 114;
+                    break;
+                default:
+                    $code = 0;
+            }
+            return ["code" => $code];
+        } catch (BasketItemCheckException $e) {
+            switch($e->getCode()) {
+                case BasketItemCheckException::VARIATION_NOT_FOUND:
+                    $code = 110;
+                    break;
+                case BasketItemCheckException::NOT_ENOUGH_STOCK_FOR_VARIATION:
+                    $code = 111;
+                    break;
+                default:
+                    $code = 0;
+            }
+            return ["code" => $code];
         } catch (\Exception $e) {
             return ["code" => $e->getCode()];
         }
@@ -429,13 +512,29 @@ class BasketService
 
             // $basket->basketAmount is basket amount minus coupon value
             // $basket->couponDiscount is negative
-            if($campaign instanceof CouponCampaign && $campaign->minOrderValue > (( $basket->basketAmount - $basket->couponDiscount ) - ($basketItem['price'] * $basketItem['quantity'])))
+            if($campaign instanceof CouponCampaign)
             {
-                $this->basketRepository->removeCouponCode();
-
                 /** @var NotificationService $notificationService */
                 $notificationService = pluginApp(NotificationService::class);
-                $notificationService->info('CouponValidation',301);
+                
+                if($campaign->minOrderValue > (( $basket->basketAmount - $basket->couponDiscount ) - ($basketItem['price'] * $basketItem['quantity'])))
+                {
+                    $this->basketRepository->removeCouponCode();
+                    $notificationService->info('CouponValidation',301);
+                }
+    
+                //check if basket item to remove is matching with a coupon campaign and remove coupon if no item with the matching item id of the campaign is left in the basket
+                $campaignItems = $campaign->references->where('referenceType', 'item')->where('value', $basketItem['itemId']);
+                if(count($campaignItems))
+                {
+                    $matchingBasketItems = $basket->basketItems->where('itemId', $basketItem['itemId']);
+                    
+                    if(count($matchingBasketItems) <= 1)
+                    {
+                        $this->basketRepository->removeCouponCode();
+                        $notificationService->info('CouponValidation',302);
+                    }
+                }
             }
         }
 
@@ -477,8 +576,13 @@ class BasketService
 
         foreach ($basketItems as $basketItem) {
             array_push($basketItemVariationIds, $basketItem->variationId);
-            $basketVariationQuantities[$basketItem->variationId] = $basketItem->quantity;
-            $orderProperties[$basketItem->variationId]           = $basketItem->basketItemOrderParams;
+            if(!isset($basketVariationQuantities[$basketItem->variationId]))
+            {
+                $basketVariationQuantities[$basketItem->variationId] = 0;
+            }
+            $basketVariationQuantities[$basketItem->variationId] += $basketItem->quantity;
+            //load relation
+            $temp = $basketItem->basketItemOrderParams;
         }
 
         /** @var ItemSearchService $itemSearchService */
@@ -494,7 +598,7 @@ class BasketService
         foreach ($items['documents'] as $item) {
             $variationId                                     = $item['data']['variation']['id'];
             $result[$variationId]                            = $item;
-            $result[$variationId]['data']['orderProperties'] = $orderProperties[$variationId];
+            $result[$variationId]['data']['unit']['htmlUnit'] = UnitService::getHTML4Unit($result[$variationId]['data']['unit']['unitOfMeasurement']);
         }
 
         return $result;

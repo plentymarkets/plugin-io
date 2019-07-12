@@ -14,11 +14,10 @@ use IO\Services\CustomerService;
 use IO\Services\ItemCrossSellingService;
 use IO\Services\ItemLastSeenService;
 use IO\Services\ItemListService;
-use IO\Services\ItemLoader\Loaders\LastSeenItemList;
-use IO\Services\ItemLoader\Services\ItemLoaderService;
 use IO\Services\ItemService;
 use IO\Services\ItemWishListService;
 use IO\Services\LegalInformationService;
+use IO\Services\LiveShoppingService;
 use IO\Services\LocalizationService;
 use IO\Services\NotificationService;
 use IO\Services\OrderService;
@@ -66,11 +65,6 @@ class TwigServiceContainer
     public function getItem()
     {
         return pluginApp( ItemService::class );
-    }
-
-    public function getItemLoader()
-    {
-        return pluginApp(ItemLoaderService::class );
     }
 
     public function getItemList()
@@ -166,5 +160,10 @@ class TwigServiceContainer
     public function getUrl()
     {
         return pluginApp( UrlService::class );
+    }
+    
+    public function getLiveShopping()
+    {
+        return pluginApp( LiveShoppingService::class );
     }
 }
