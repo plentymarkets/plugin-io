@@ -472,25 +472,29 @@ class CategoryService
         $cleanedCategories = [];
         foreach($categories as $category)
         {
-            if(isset($category['details'])) {
+            if(isset($category['details']))
+            {
                 $category = json_decode(json_encode($category));
-                if ($skipLevel === 0 && isset($category->children)) {
+                if ($skipLevel === 0 && isset($category->children))
+                {
                     $detailsExist = false;
-                    foreach ($category->children as $categoryChildren) {
-                        if (isset($categoryChildren->details)) {
+                    foreach ($category->children as $categoryChildren)
+                    {
+                        if (isset($categoryChildren->details))
+                        {
                             $detailsExist = true;
                         }
-                    }//Turn it into an object
+                    }
 
-                    if ($detailsExist) {
+                    if ($detailsExist)
+                    {
                         $category->hasChildren = true;
                     }
                     unset($category->children);
                     $category = json_decode(json_encode($category), true); //Turn it into an array
-
                     $cleanedCategories[] = $category;
-                } elseif ($skipLevel === 1 && isset($category->children)) {
-                    $category = json_decode(json_encode($category)); //Turn it into an object
+                } elseif ($skipLevel === 1 && isset($category->children))
+                {
                     $temp = [];
                     foreach ($category->children as $children) {
                         unset($children['children']);
@@ -500,7 +504,8 @@ class CategoryService
                     $category = json_decode(json_encode($category), true); //Turn it into an array
 
                     $cleanedCategories[] = $category;
-                } else {
+                } else
+                {
                     $category = json_decode(json_encode($category), true); //Turn it into an array
                     $cleanedCategories[] = $category;
                 }
