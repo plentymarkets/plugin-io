@@ -472,21 +472,28 @@ class CategoryService
         $cleanedCategories = [];
         foreach($categories as $category)
         {
-            if($skipLevel === 0 && isset($category['children']))
+            $category = json_decode(json_encode($category)); //Turn it into an object
+            if($skipLevel === 0 && isset($category->children))
             {
-                $category['hasChildren'] = true;
-                unset($category['children']);
+                $category = json_decode(json_encode($category)); //Turn it into an object
+                $category->hasChildren = true;
+                unset($category->children);
+                $category = json_decode(json_encode($category), true); //Turn it into an array
+
                 $cleanedCategories[] = $category;
             }
-            elseif($skipLevel === 1 && isset($category['children']))
+            elseif($skipLevel === 1 && isset($category->children))
             {
+                $category = json_decode(json_encode($category)); //Turn it into an object
                 $temp = [];
-                foreach($category['children'] as $children)
+                foreach($category->children as $children)
                 {
                     unset($children['children']);
                     $temp[] = $children;
                 }
-                $category['children'] = $temp;
+                $category->children = $temp;
+                $category = json_decode(json_encode($category), true); //Turn it into an array
+
                 $cleanedCategories[] = $category;
             }
             else
