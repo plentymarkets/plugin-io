@@ -4,7 +4,7 @@
 
 ### Hinzugefügt
 
-- Wir haben eine neue REST-Route hinzugefügt, um die Kategorien der mobilen Navigation Breakpoint-abhängig zu laden.
+- Wir haben eine neue REST-Route hinzugefügt, um die Kategorien der mobilen Navigation zu laden.
 
 ### Geändert
 
