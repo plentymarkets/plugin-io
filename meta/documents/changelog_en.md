@@ -4,7 +4,7 @@
 
 ### Added
 
-- We added a new REST route for loading the categories of the mobile navigation.
+- We added the new REST route 'rest/io/categorytree' for loading categories of the mobile navigation.
 
 ### Changed
 
