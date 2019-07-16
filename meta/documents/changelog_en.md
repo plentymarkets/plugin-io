@@ -4,7 +4,7 @@
 
 ### Added
 
-- We added a new REST route for loading the categories of the mobile navigation depending on the resolution's breakpoint.
+- We added a new REST route for loading the categories of the mobile navigation.
 
 ### Changed
 
