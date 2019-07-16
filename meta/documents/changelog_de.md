@@ -4,7 +4,7 @@
 
 ### Hinzugefügt
 
-- Wir haben eine neue REST-Route hinzugefügt, um die Kategorien der mobilen Navigation zu laden.
+- Wir haben die neue REST-Route 'rest/io/categorytree' hinzugefügt, um Kategorien der mobilen Navigation zu laden.
 
 ### Geändert
 
