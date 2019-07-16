@@ -2,6 +2,10 @@
 
 ## v4.1.2 (2019-07-16) <a href="https://github.com/plentymarkets/plugin-io/compare/4.1.1...4.1.2" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
 
+### Hinzugefügt
+
+- Wir haben eine neue REST-Route hinzugefügt, um die Kategorien der mobilen Navigation Breakpoint-abhängig zu laden.
+
 ### Geändert
 
 - Attribute von Varianten ohne Bestand werden nun angezeigt, wenn an der Variante die Optionen "Automatisch verfügbar, wenn Netto-WB positiv" und "Automatisch nicht verfügbar, wenn kein Netto-WB" deaktiviert sind.

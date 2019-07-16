@@ -2,6 +2,10 @@
 
 ## v4.1.2 (2019-07-16) <a href="https://github.com/plentymarkets/plugin-io/compare/4.1.1...4.1.2" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
 
+### Added
+
+- We added a new REST route for loading the categories of the mobile navigation depending on the resolution's breakpoint.
+
 ### Changed
 
 - Attributes of variations without stock are now displayed if the options "Available automatically if net stock is positive" and "Not available automatically if net stock is 0 or negative" are deactivated.
