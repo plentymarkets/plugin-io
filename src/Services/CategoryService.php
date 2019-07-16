@@ -410,6 +410,111 @@ class CategoryService
     }
 
 
+    public function filterPartialCategoryTree($categoryTree, $categoryId, $dataFields = [], $parents = [], $breadcrumbs = [], $level = 0)
+    {
+        $filteredCategories = [];
+        foreach($categoryTree as $category)
+        {
+            if($category['id'] === (int)$categoryId)
+            {
+                if(in_array('breadcrumbs', $dataFields))
+                {
+                    $breadcrumbs = array_merge($breadcrumbs, $this->filterChildren([$category]));
+                    $filteredCategories['breadcrumbs'] = $breadcrumbs;
+                }
+
+                if(in_array('parents', $dataFields))
+                {
+                    $filteredCategories['parents'] = $parents;
+                }
+
+                if(in_array('current', $dataFields))
+                {
+                    $filteredCategories['current'] = $this->filterChildren($categoryTree, 0);
+                }
+
+                if(in_array('children', $dataFields))
+                {
+                    foreach($categoryTree as $temp)
+                    {
+                        $filteredCategories['children'][$temp['id']] = $this->filterChildren( $temp['children'] ?? [], 0);
+
+                    }
+                }
+            }
+        }
+
+        if(count($filteredCategories) > 0)
+        {
+            return $filteredCategories;
+        }
+
+        foreach($categoryTree as $category)
+        {
+            if(isset($category['children']))
+            {
+                $tempBreadcrumbs = array_merge($breadcrumbs, $this->filterChildren([$category]));
+
+                $tempParents = $this->filterChildren($categoryTree,0);
+                $filteredCategories = $this->filterPartialCategoryTree($category['children'], $categoryId, $dataFields, $tempParents, $tempBreadcrumbs, $level++);
+
+                if (count($filteredCategories) > 0)
+                {
+                    break;
+                }
+            }
+        }
+        return $filteredCategories;
+    }
+
+    private function filterChildren($categories, $skipLevel = 0)
+    {
+        $cleanedCategories = [];
+        foreach($categories as $category)
+        {
+            if(isset($category['details']))
+            {
+                $category = json_decode(json_encode($category));
+                if ($skipLevel === 0 && isset($category->children))
+                {
+                    $detailsExist = false;
+                    foreach ($category->children as $categoryChildren)
+                    {
+                        if (isset($categoryChildren->details))
+                        {
+                            $detailsExist = true;
+                        }
+                    }
+
+                    if ($detailsExist)
+                    {
+                        $category->hasChildren = true;
+                    }
+                    unset($category->children);
+                    $category = json_decode(json_encode($category), true); //Turn it into an array
+                    $cleanedCategories[] = $category;
+                } elseif ($skipLevel === 1 && isset($category->children))
+                {
+                    $temp = [];
+                    foreach ($category->children as $children) {
+                        unset($children['children']);
+                        $temp[] = $children;
+                    }
+                    $category->children = $temp;
+                    $category = json_decode(json_encode($category), true); //Turn it into an array
+
+                    $cleanedCategories[] = $category;
+                } else
+                {
+                    $category = json_decode(json_encode($category), true); //Turn it into an array
+                    $cleanedCategories[] = $category;
+                }
+            }
+        }
+
+        return $cleanedCategories;
+    }
+
     /**
      * Return the sitemap list as an array
      * @param string|array  $type Only return categories of given type
