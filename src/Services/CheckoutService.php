@@ -425,23 +425,23 @@ class CheckoutService
      */
     public function getShippingProfileList()
     {
-        return $this->fromMemoryCache('shippingProfileList', function()
+        return $this->fromMemoryCache('shippingProfileList_' . $this->getShippingCountryId(), function()
         {
             /** @var AccountingLocationRepositoryContract $accountRepo*/
             $accountRepo = pluginApp(AccountingLocationRepositoryContract::class);
             /** @var VatService $vatService*/
             $vatService = pluginApp(VatService::class);
             $showNetPrice   = $this->sessionStorageService->getCustomer()->showNetPrice;
-        
+
             $list = $this->parcelServicePresetRepo->getLastWeightedPresetCombinations($this->basketRepository->load(), $this->sessionStorageService->getCustomer()->accountContactClassId);
-        
+
             $locationId = $vatService->getLocationId($this->getShippingCountryId());
             $accountSettings = $accountRepo->getSettings($locationId);
-        
+
             if ($showNetPrice && !(bool)$accountSettings->showShippingVat) {
-    
+
                 $maxVatValue = $this->basketService->getMaxVatValue();
-    
+
                 if (is_array($list)) {
                     foreach ($list as $key => $shippingProfile) {
                         if (isset($shippingProfile['shippingAmount'])) {
@@ -449,7 +449,7 @@ class CheckoutService
                         }
                     }
                 }
-    
+
                 $basket = $this->basketService->getBasket();
                 if ($basket->currency !== $this->currencyExchangeRepo->getDefaultCurrency())
                 {
@@ -465,7 +465,7 @@ class CheckoutService
                     }
                 }
             }
-            
+
             return $list;
         });
     }
@@ -572,7 +572,7 @@ class CheckoutService
 
         $this->setShippingCountryId($defaultShippingCountryId);
     }
-    
+
     public function getMaxDeliveryDays()
     {
         /** @var ShippingService $shippingService */
@@ -591,7 +591,7 @@ class CheckoutService
         }
 
     }
-    
+
     public function getReadOnlyCheckout()
     {
         $readOnlyCheckout = $this->sessionStorageService->getSessionValue(SessionStorageKeys::READONLY_CHECKOUT);
