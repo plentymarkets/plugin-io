@@ -44,11 +44,7 @@ class ContactMailResource extends ApiResource
 
         $response = $this->contactMailService->sendMail(
             $mailTemplate,
-            $this->request->get('recipient', null),
-            $this->request->get('subject', ''),
-            $this->request->get('cc', []),
-            $this->request->get('replyTo', null),
-            $this->request->get('mailData',[])
+            $this->request->all()
         );
         
         /*

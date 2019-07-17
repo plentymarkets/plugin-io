@@ -11,14 +11,15 @@ use Plenty\Plugin\Translation\Translator;
 
 class ContactMailService
 {
-    public function sendMail($mailTemplate, $recipient = null, $subject = "", $cc = [], $replyToData = null, $data = [])
+    public function sendMail($mailTemplate, $mailData = [])
     {
+        $recipient = $mailData['recipient'];
+
         if ( is_null( $recipient ) )
         {
             /** @var TemplateConfigService $templateConfigService */
             $templateConfigService = pluginApp(TemplateConfigService::class);
             $recipient = $templateConfigService->get('contact.shop_mail');
-
         }
 
         if(!strlen($recipient) || !strlen($mailTemplate))
@@ -28,11 +29,17 @@ class ContactMailService
         
         /** @var Twig */
         $twig = pluginApp(Twig::class);
+
+        $templateData = [];
+        foreach($mailData['data'] as $key => $value)
+        {
+            $templateData[$key] = nl2br($value);
+        }
         
         $mailBody = $twig->render(
             $mailTemplate,
             [
-                'data' => $data
+                'data' => $templateData
             ]
         );
         
@@ -45,62 +52,24 @@ class ContactMailService
         $mailer = pluginApp(MailerContract::class);
 
         $replyTo = null;
-        if ( !is_null($replyToData) )
+        if ( array_key_exists('replyTo', $mailData) )
         {
             /** @var ReplyTo $replyTo */
             $replyTo = pluginApp(ReplyTo::class);
-            $replyTo->mailAddress = $replyToData['mailAddress'];
-            $replyTo->name = $replyToData['name'];
-        }
-        $mailer->sendHtml($mailBody, $recipient, $subject, $cc, [], $replyTo);
-        
-
-        /*
-        $bcc = [];
-        $recipientBcc = $templateConfigService->get('contact.shop_mail_bcc');
-        if(!is_null($recipientBcc) && strlen($recipientBcc))
-        {
-            $recipientBcc = explode(',', $recipientBcc);
-            foreach($recipientBcc as $_bccMail)
-            {
-                if($_bccMail != "your@email.com")
-                {
-                    $bcc[] = trim($_bccMail);
-                }
-            }
-        }
-
-        $mailTemplateParams = [];
-        foreach($contactData as $key => $value)
-        {
-            $mailTemplateParams[$key] = nl2br($value);
-        }
-
-
-
-        $recipientCc = $templateConfigService->get('contact.shop_mail_cc');
-        if(!is_null($recipientCc) && strlen($recipientCc))
-        {
-            $recipientCc = explode(',', $recipientCc);
-            foreach($recipientCc as $_ccMail)
-            {
-                if($_ccMail != "your@email.com")
-                {
-                    $cc[] = trim($_ccMail);
-                }
-            }
+            $replyTo->mailAddress = $mailData['replyTo']['mail'];
+            $replyTo->name = $mailData['replyTo']['name'];
         }
 
         $translator = pluginApp(Translator::class);
-        $contactData['subject'] = $translator->trans(
+        $subject = $translator->trans(
             'Ceres::Template.contactMailSubject',
             [
-                'subject' => $contactData['subject'],
-                'orderId' => $contactData['orderId']
+                'subject' => $mailData['subject'],
+                'data'    => $mailData['data']
             ]
         );
 
-        */
+        $mailer->sendHtml($mailBody, $recipient, $subject, $mailData['cc'] ?? [], $mailData['bcc'] ?? [], $replyTo);
         return true;
     }
 }
