@@ -56,8 +56,10 @@ class ItemController extends LayoutController
         {
             pluginApp(CategoryService::class)->setCurrentCategory($category);
         }
-        
-        
+
+
+        $start = microtime(true);
+
         $itemSearchOptions = [
             'itemId'        => $itemId,
             'variationId'   => $variationId,
@@ -69,7 +71,13 @@ class ItemController extends LayoutController
             'item' => SingleItem::getSearchFactory( $itemSearchOptions ),
             'variationAttributeMap' => VariationAttributeMap::getSearchFactory( $itemSearchOptions )
         ]);
-        
+
+
+        $end = microtime(true);
+        $executionTime = $end - $start;
+        $this->getLogger('Performance')->error('ES: '. $executionTime . ' Sekunden');
+
+
         /** @var ShopBuilderRequest $shopBuilderRequest */
         $shopBuilderRequest = pluginApp(ShopBuilderRequest::class);
         if ($shopBuilderRequest->isShopBuilder())
@@ -81,80 +89,56 @@ class ItemController extends LayoutController
                 ResultFieldTemplate::get(ResultFieldTemplate::TEMPLATE_SINGLE_ITEM)
             );
         }
-        
+
+        $start = microtime(true);
+
         /** @var VariationDataInterfaceContract $vdi */
         $vdi = app(VariationDataInterfaceContract::class);
-        
+
         /** @var VariationDataInterfaceContext $vdiContext */
         $vdiContext = app(VariationDataInterfaceContext::class);
         $vdiContext->setParts([
             app(VariationBaseAttribute::class)
         ]);
-    
+
         /** @var ClientFilter $clientFilter */
         $clientFilter = app(ClientFilter::class);
         $clientFilter->isVisibleForClient(pluginApp(Application::class)->getPlentyId());
-    
+
         /** @var VariationBaseFilter $variationFilter */
         $variationFilter = app(VariationBaseFilter::class);
         $variationFilter->isActive();
         $variationFilter->hasItemId($itemId);
-        $variationFilter->hasId($variationId);
-    
+
         $lang = pluginApp(SessionStorageService::class)->getLang();
-        if ( $lang === null )
-        {
-            $lang = pluginApp(SessionStorageService::class)->getLang();
-        }
-    
-        $langMap = [
-            'de' => 'german',
-            'en' => 'english',
-            'fr' => 'french',
-            'bg' => 'bulgarian',
-            'it' => 'italian',
-            'es' => 'spanish',
-            'tr' => 'turkish',
-            'nl' => 'dutch',
-            'pt' => 'portuguese',
-            'nn' => 'norwegian',
-            'ro' => 'romanian',
-            'da' => 'danish',
-            'se' => 'swedish',
-            'cz' => 'czech',
-            'ru' => 'russian',
-        ];
-    
-        if ( array_key_exists( $lang, $langMap ) )
-        {
-            $lang = $langMap[$lang];
-        }
-        else
-        {
-            $lang = 'de';
-        }
+
         /** @var TextFilter $textFilter */
         $textFilter = app(TextFilter::class);
         $textFilter->hasNameInLanguage( $lang, TextFilter::FILTER_ANY_NAME );
-    
+
         /** @var PriceDetectService $priceDetectService */
         $priceDetectService = pluginApp( PriceDetectService::class );
         /** @var SalesPriceFilter $priceFilter */
         $priceFilter = app(SalesPriceFilter::class);
         $priceFilter->hasAtLeastOnePrice( $priceDetectService->getPriceIdsForCustomer() );
-        
+
         $vdiContext
             ->addFilter($clientFilter)
             ->addFilter($variationFilter)
             ->addFilter($textFilter)
             ->addFilter($priceFilter);
-        
+
         $vdiResult = $vdi->getResult($vdiContext);
         foreach($vdiResult->get() as $vdiVariation)
         {
             $test = true;
         }
-        
+
+        $end = microtime(true);
+        $executionTime = $end - $start;
+        $this->getLogger('Performance')->error('VDI: '. $executionTime . ' Sekunden');
+
+
         if(empty($itemResult['item']['documents']))
         {
             $this->getLogger(__CLASS__)->info(
