@@ -11,8 +11,20 @@ use IO\Services\ItemSearch\SearchPresets\CrossSellingItems;
 use IO\Services\ItemSearch\SearchPresets\SingleItem;
 use IO\Services\ItemSearch\SearchPresets\VariationAttributeMap;
 use IO\Services\ItemSearch\Services\ItemSearchService;
+use IO\Services\PriceDetectService;
+use IO\Services\SessionStorageService;
 use Plenty\Modules\Category\Models\Category;
+use Plenty\Modules\Pim\SearchService\Filter\ClientFilter;
+use Plenty\Modules\Pim\SearchService\Filter\SalesPriceFilter;
+use Plenty\Modules\Pim\SearchService\Filter\TextFilter;
+use Plenty\Modules\Pim\SearchService\Filter\VariationBaseFilter;
+use Plenty\Modules\Pim\VariationDataInterface\Contracts\VariationDataInterfaceContract;
+use Plenty\Modules\Pim\VariationDataInterface\Model\Attributes\VariationBaseAttribute;
+use Plenty\Modules\Pim\VariationDataInterface\Model\Attributes\VariationCategoryAttribute;
+use Plenty\Modules\Pim\VariationDataInterface\Model\Attributes\VariationSalesPriceAttribute;
+use Plenty\Modules\Pim\VariationDataInterface\Model\VariationDataInterfaceContext;
 use Plenty\Modules\ShopBuilder\Helper\ShopBuilderRequest;
+use Plenty\Plugin\Application;
 use Plenty\Plugin\Http\Response;
 use Plenty\Plugin\Log\Loggable;
 
@@ -40,6 +52,12 @@ class ItemController extends LayoutController
         $category = null
     )
     {
+        if (!is_null($category))
+        {
+            pluginApp(CategoryService::class)->setCurrentCategory($category);
+        }
+        
+        
         $itemSearchOptions = [
             'itemId'        => $itemId,
             'variationId'   => $variationId,
@@ -51,12 +69,7 @@ class ItemController extends LayoutController
             'item' => SingleItem::getSearchFactory( $itemSearchOptions ),
             'variationAttributeMap' => VariationAttributeMap::getSearchFactory( $itemSearchOptions )
         ]);
-
-        if (!is_null($category))
-        {
-            pluginApp(CategoryService::class)->setCurrentCategory($category);
-        }
-
+        
         /** @var ShopBuilderRequest $shopBuilderRequest */
         $shopBuilderRequest = pluginApp(ShopBuilderRequest::class);
         if ($shopBuilderRequest->isShopBuilder())
@@ -68,7 +81,80 @@ class ItemController extends LayoutController
                 ResultFieldTemplate::get(ResultFieldTemplate::TEMPLATE_SINGLE_ITEM)
             );
         }
-
+        
+        /** @var VariationDataInterfaceContract $vdi */
+        $vdi = app(VariationDataInterfaceContract::class);
+        
+        /** @var VariationDataInterfaceContext $vdiContext */
+        $vdiContext = app(VariationDataInterfaceContext::class);
+        $vdiContext->setParts([
+            app(VariationBaseAttribute::class)
+        ]);
+    
+        /** @var ClientFilter $clientFilter */
+        $clientFilter = app(ClientFilter::class);
+        $clientFilter->isVisibleForClient(pluginApp(Application::class)->getPlentyId());
+    
+        /** @var VariationBaseFilter $variationFilter */
+        $variationFilter = app(VariationBaseFilter::class);
+        $variationFilter->isActive();
+        $variationFilter->hasItemId($itemId);
+        $variationFilter->hasId($variationId);
+    
+        $lang = pluginApp(SessionStorageService::class)->getLang();
+        if ( $lang === null )
+        {
+            $lang = pluginApp(SessionStorageService::class)->getLang();
+        }
+    
+        $langMap = [
+            'de' => 'german',
+            'en' => 'english',
+            'fr' => 'french',
+            'bg' => 'bulgarian',
+            'it' => 'italian',
+            'es' => 'spanish',
+            'tr' => 'turkish',
+            'nl' => 'dutch',
+            'pt' => 'portuguese',
+            'nn' => 'norwegian',
+            'ro' => 'romanian',
+            'da' => 'danish',
+            'se' => 'swedish',
+            'cz' => 'czech',
+            'ru' => 'russian',
+        ];
+    
+        if ( array_key_exists( $lang, $langMap ) )
+        {
+            $lang = $langMap[$lang];
+        }
+        else
+        {
+            $lang = 'de';
+        }
+        /** @var TextFilter $textFilter */
+        $textFilter = app(TextFilter::class);
+        $textFilter->hasNameInLanguage( $lang, TextFilter::FILTER_ANY_NAME );
+    
+        /** @var PriceDetectService $priceDetectService */
+        $priceDetectService = pluginApp( PriceDetectService::class );
+        /** @var SalesPriceFilter $priceFilter */
+        $priceFilter = app(SalesPriceFilter::class);
+        $priceFilter->hasAtLeastOnePrice( $priceDetectService->getPriceIdsForCustomer() );
+        
+        $vdiContext
+            ->addFilter($clientFilter)
+            ->addFilter($variationFilter)
+            ->addFilter($textFilter)
+            ->addFilter($priceFilter);
+        
+        $vdiResult = $vdi->getResult($vdiContext);
+        foreach($vdiResult->get() as $vdiVariation)
+        {
+            $test = true;
+        }
+        
         if(empty($itemResult['item']['documents']))
         {
             $this->getLogger(__CLASS__)->info(
