@@ -114,7 +114,7 @@ class IORouteServiceProvider extends RouteServiceProvider
         }
         else if( in_array(RouteConfig::MY_ACCOUNT, RouteConfig::getEnabledRoutes())
             && RouteConfig::getCategoryId(RouteConfig::MY_ACCOUNT) > 0
-            && $shopUrls->equals($shopUrls->myAccount,'/my-account') )
+            && !$shopUrls->equals($shopUrls->myAccount,'/my-account') )
         {
             // checkout-route is activated and category is linked and category url is not '/my-account'
             $router->get('my-account', function() use ($shopUrls)
@@ -183,7 +183,7 @@ class IORouteServiceProvider extends RouteServiceProvider
         }
         else if( in_array(RouteConfig::CANCELLATION_RIGHTS, RouteConfig::getEnabledRoutes())
             && RouteConfig::getCategoryId(RouteConfig::CANCELLATION_RIGHTS) > 0
-            && $shopUrls->equals($shopUrls->cancellationRights,'/cancellations-rights') )
+            && !$shopUrls->equals($shopUrls->cancellationRights,'/cancellations-rights') )
         {
             // cancellation-rights-route is activated and category is linked and category url is not '/cancellation-rights'
             $router->get('cancellation-rights', function() use ($shopUrls)
@@ -199,7 +199,7 @@ class IORouteServiceProvider extends RouteServiceProvider
         }
         else if( in_array(RouteConfig::CANCELLATION_FORM, RouteConfig::getEnabledRoutes())
             && RouteConfig::getCategoryId(RouteConfig::CANCELLATION_FORM) > 0
-            && $shopUrls->equals($shopUrls->cancellationForm,'/cancellation-form') )
+            && !$shopUrls->equals($shopUrls->cancellationForm,'/cancellation-form') )
         {
             // cancellation-form-route is activated and category is linked and category url is not '/cancellation-form'
             $router->get('cancellation-form', function() use ($shopUrls)
@@ -215,7 +215,7 @@ class IORouteServiceProvider extends RouteServiceProvider
         }
         else if( in_array(RouteConfig::LEGAL_DISCLOSURE, RouteConfig::getEnabledRoutes())
             && RouteConfig::getCategoryId(RouteConfig::LEGAL_DISCLOSURE) > 0
-            && $shopUrls->equals($shopUrls->legalDisclosure, '/legal-disclosure') )
+            && !$shopUrls->equals($shopUrls->legalDisclosure, '/legal-disclosure') )
         {
             // legal-disclosure-route is activated and category is linked and category url is not '/legal-disclosure'
             $router->get('legal-disclosure', function() use ($shopUrls)
@@ -231,7 +231,7 @@ class IORouteServiceProvider extends RouteServiceProvider
         }
         else if( in_array(RouteConfig::PRIVACY_POLICY, RouteConfig::getEnabledRoutes())
             && RouteConfig::getCategoryId(RouteConfig::PRIVACY_POLICY) > 0
-            && $shopUrls->equals($shopUrls->privacyPolicy, '/privacy-policy') )
+            && !$shopUrls->equals($shopUrls->privacyPolicy, '/privacy-policy') )
         {
             // privacy-policy-route is activated and category is linked and category url is not '/privacy-policy'
             $router->get('privacy-policy', function() use ($shopUrls)
@@ -247,7 +247,7 @@ class IORouteServiceProvider extends RouteServiceProvider
         }
         else if( in_array(RouteConfig::TERMS_CONDITIONS, RouteConfig::getEnabledRoutes())
             && RouteConfig::getCategoryId(RouteConfig::TERMS_CONDITIONS) > 0
-            && $shopUrls->equals($shopUrls->termsConditions, '/gtc') )
+            && !$shopUrls->equals($shopUrls->termsConditions, '/gtc') )
         {
             // gtc-route is activated and category is linked and category url is not '/gtc'
             $router->get('gtc', function() use ($shopUrls)
