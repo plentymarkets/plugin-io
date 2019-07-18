@@ -425,7 +425,7 @@ class CheckoutService
      */
     public function getShippingProfileList()
     {
-        return $this->fromMemoryCache('shippingProfileList_' . $this->getShippingCountryId(), function()
+        return $this->fromMemoryCache('shippingProfileList.' . $this->getShippingCountryId(), function()
         {
             /** @var AccountingLocationRepositoryContract $accountRepo*/
             $accountRepo = pluginApp(AccountingLocationRepositoryContract::class);
