@@ -2,6 +2,7 @@
 
 namespace IO\Api\Resources;
 
+use IO\Helper\TemplateContainer;
 use IO\Extensions\Functions\ExternalContent;
 use IO\Services\TemplateConfigService;
 use Plenty\Plugin\Http\Response;
@@ -39,6 +40,14 @@ class ContactMailResource extends ApiResource
     
     public function store():Response
     {
+        $mailTemplate = TemplateContainer::get('tpl.mail.contact')->getTemplate();
+
+        $response = $this->contactMailService->sendMail(
+            $mailTemplate,
+            $this->request->all()
+        );
+        
+        /*
         $mailTemplate = $this->request->get('template', '');
         $contactData = $this->request->get('contactData',[]);
         $recaptchaToken = $this->request->get('recaptchaToken', null);
@@ -50,6 +59,7 @@ class ContactMailResource extends ApiResource
         }
 
         $response = $this->contactMailService->sendMail($mailTemplate, $contactData);
+        */
 
         if($response)
         {
