@@ -91,59 +91,7 @@ class ItemController extends LayoutController
             );
         }
 
-        $start = microtime(true);
-
-        /** @var VariationDataInterfaceContract $vdi */
-        $vdi = app(VariationDataInterfaceContract::class);
-
-        /** @var VariationBaseAttribute $basePart */
-        $basePart = app(VariationBaseAttribute::class);
-        $basePart->addLazyLoadParts(VariationBaseAttribute::DESCRIPTION);
-        
-        /** @var VariationDataInterfaceContext $vdiContext */
-        $vdiContext = app(VariationDataInterfaceContext::class);
-        $vdiContext->setParts([
-            $basePart
-        ]);
-
-        /** @var ClientFilter $clientFilter */
-        $clientFilter = app(ClientFilter::class);
-        $clientFilter->isVisibleForClient(pluginApp(Application::class)->getPlentyId());
-
-        /** @var VariationBaseFilter $variationFilter */
-        $variationFilter = app(VariationBaseFilter::class);
-        $variationFilter->isActive();
-        $variationFilter->hasItemId($itemId);
-
-        $lang = pluginApp(SessionStorageService::class)->getLang();
-
-        /** @var TextFilter $textFilter */
-        $textFilter = app(TextFilter::class);
-        $textFilter->hasNameInLanguage( $lang, TextFilter::FILTER_ANY_NAME );
-
-        /** @var PriceDetectService $priceDetectService */
-        $priceDetectService = pluginApp( PriceDetectService::class );
-        /** @var SalesPriceFilter $priceFilter */
-        $priceFilter = app(SalesPriceFilter::class);
-        $priceFilter->hasAtLeastOnePrice( $priceDetectService->getPriceIdsForCustomer() );
-
-        $vdiContext
-            ->addFilter($clientFilter)
-            ->addFilter($variationFilter)
-            ->addFilter($textFilter)
-            ->addFilter($priceFilter);
-
-        $vdiResult = $vdi->getResult($vdiContext);
-        /** @var Variation $vdiVariation */
-        foreach($vdiResult->get() as $vdiVariation)
-        {
-            $texts  = $vdiVariation->base->with()->texts;
-        }
-
-        $end = microtime(true);
-        $executionTime = $end - $start;
-        $this->getLogger('Performance')->error('VDI: '. $executionTime . ' Sekunden');
-
+        $vdiResult = $this->loadItemDataVdi($itemId, $variationId);
 
         if(empty($itemResult['item']['documents']))
         {
@@ -220,5 +168,65 @@ class ItemController extends LayoutController
             0,
             $category
         );
+    }
+    
+    private function loadItemDataVdi($itemId, $variationId)
+    {
+        $start = microtime(true);
+    
+        /** @var VariationDataInterfaceContract $vdi */
+        $vdi = app(VariationDataInterfaceContract::class);
+    
+        /** @var VariationBaseAttribute $basePart */
+        $basePart = app(VariationBaseAttribute::class);
+        $basePart->addLazyLoadParts(VariationBaseAttribute::DESCRIPTION);
+    
+        /** @var VariationDataInterfaceContext $vdiContext */
+        $vdiContext = app(VariationDataInterfaceContext::class);
+        $vdiContext->setParts([
+                                  $basePart
+                              ]);
+    
+        /** @var ClientFilter $clientFilter */
+        $clientFilter = app(ClientFilter::class);
+        $clientFilter->isVisibleForClient(pluginApp(Application::class)->getPlentyId());
+    
+        /** @var VariationBaseFilter $variationFilter */
+        $variationFilter = app(VariationBaseFilter::class);
+        $variationFilter->isActive();
+        $variationFilter->hasItemId($itemId);
+        if($variationId > 0)
+        {
+            $variationFilter->hasId($variationId);
+        }
+    
+        $lang = pluginApp(SessionStorageService::class)->getLang();
+    
+        /** @var TextFilter $textFilter */
+        $textFilter = app(TextFilter::class);
+        $textFilter->hasNameInLanguage( $lang, TextFilter::FILTER_ANY_NAME );
+    
+        /** @var PriceDetectService $priceDetectService */
+        $priceDetectService = pluginApp( PriceDetectService::class );
+        /** @var SalesPriceFilter $priceFilter */
+        $priceFilter = app(SalesPriceFilter::class);
+        $priceFilter->hasAtLeastOnePrice( $priceDetectService->getPriceIdsForCustomer() );
+    
+        $vdiContext
+            ->addFilter($clientFilter)
+            ->addFilter($variationFilter)
+            ->addFilter($textFilter)
+            ->addFilter($priceFilter);
+    
+        $vdiResult = $vdi->getResult($vdiContext);
+        /** @var Variation $vdiVariation */
+        foreach($vdiResult->get() as $vdiVariation)
+        {
+            $texts  = $vdiVariation->base->with()->texts;
+        }
+    
+        $end = microtime(true);
+        $executionTime = $end - $start;
+        $this->getLogger('Performance')->error('VDI: '. $executionTime . ' Sekunden');
     }
 }
