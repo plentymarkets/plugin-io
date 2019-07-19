@@ -3,6 +3,7 @@
 namespace IO\Controllers;
 
 use IO\Api\ResponseCode;
+use IO\Helper\VDIToElasticSearchMapper;
 use IO\Services\CategoryService;
 use IO\Services\ItemListService;
 use IO\Services\ItemSearch\Factories\VariationSearchResultFactory;
@@ -169,33 +170,33 @@ class ItemController extends LayoutController
             $category
         );
     }
-    
+
     private function loadItemDataVdi($itemId, $variationId)
     {
         $start = microtime(true);
-    
+
         /** @var VariationDataInterfaceContract $vdi */
         $vdi = app(VariationDataInterfaceContract::class);
-    
+
         /** @var VariationBaseAttribute $basePart */
         $basePart = app(VariationBaseAttribute::class);
         $basePart->addLazyLoadParts(VariationBaseAttribute::DESCRIPTION);
-        
+
         /** @var VariationSalesPriceAttribute $pricePart */
         $pricePart = app(VariationSalesPriceAttribute::class);
         $pricePart->addLazyLoadParts(VariationSalesPriceAttribute::SALES_PRICE);
-    
+
         /** @var VariationDataInterfaceContext $vdiContext */
         $vdiContext = app(VariationDataInterfaceContext::class);
         $vdiContext->setParts([
                                   $basePart,
                                   $pricePart
                               ]);
-    
+
         /** @var ClientFilter $clientFilter */
         $clientFilter = app(ClientFilter::class);
         $clientFilter->isVisibleForClient(pluginApp(Application::class)->getPlentyId());
-    
+
         /** @var VariationBaseFilter $variationFilter */
         $variationFilter = app(VariationBaseFilter::class);
         $variationFilter->isActive();
@@ -204,33 +205,33 @@ class ItemController extends LayoutController
         {
             $variationFilter->hasId($variationId);
         }
-    
+
         $lang = pluginApp(SessionStorageService::class)->getLang();
-    
+
         /** @var TextFilter $textFilter */
         $textFilter = app(TextFilter::class);
         $textFilter->hasNameInLanguage( $lang, TextFilter::FILTER_ANY_NAME );
-    
+
         /** @var PriceDetectService $priceDetectService */
         $priceDetectService = pluginApp( PriceDetectService::class );
         /** @var SalesPriceFilter $priceFilter */
         $priceFilter = app(SalesPriceFilter::class);
         $priceFilter->hasAtLeastOnePrice( $priceDetectService->getPriceIdsForCustomer() );
-    
+
         $vdiContext
             ->addFilter($clientFilter)
             ->addFilter($variationFilter)
             ->addFilter($textFilter)
             ->addFilter($priceFilter);
-    
+
         $vdiResult = $vdi->getResult($vdiContext);
-        /** @var Variation $vdiVariation */
-        foreach($vdiResult->get() as $vdiVariation)
-        {
-            $texts  = $vdiVariation->base->with()->texts;
-            $prices = $vdiVariation->salesPrices[1]->with()->salesPrice;
-        }
-    
+
+        /**
+         * @var VDIToElasticSearchMapper $mappingHelper
+         */
+        $mappingHelper = pluginApp(VDIToElasticSearchMapper::class);
+        $mappedData = $mappingHelper->map($vdiResult, ResultFieldTemplate::get(ResultFieldTemplate::TEMPLATE_SINGLE_ITEM));
+
         $end = microtime(true);
         $executionTime = $end - $start;
         $this->getLogger('Performance')->error('VDI: '. $executionTime . ' Sekunden');
