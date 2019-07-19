@@ -4,9 +4,13 @@ namespace IO\Services;
 
 use IO\Constants\SessionStorageKeys;
 use IO\Services\ItemSearch\SearchPresets\CategoryItems;
+use IO\Services\ItemSearch\SearchPresets\CrossSellingItems;
 use IO\Services\ItemSearch\SearchPresets\TagItems;
 use IO\Services\ItemSearch\SearchPresets\VariationList;
 use IO\Services\ItemSearch\Services\ItemSearchService;
+use IO\Services\ItemSearch\SearchPresets\ManufacturerItems;
+use Plenty\Plugin\CachingRepository;
+use Plenty\Modules\Basket\Contracts\BasketRepositoryContract;
 
 class ItemListService
 {
@@ -14,14 +18,16 @@ class ItemListService
     const TYPE_LAST_SEEN    = 'last_seen';
     const TYPE_TAG          = 'tag_list';
     const TYPE_RANDOM       = 'random';
+    const TYPE_MANUFACTURER = 'manufacturer';
+    const TYPE_CROSS_SELLER = 'cross_selling';
 
-    public function getItemList( $type, $id = null, $sorting = null, $maxItems = 0 )
+    public function getItemList( $type, $id = null, $sorting = null, $maxItems = 0, $crossSellingRelationType = null)
     {
         /** @var ItemSearchService $searchService */
         $searchService = pluginApp( ItemSearchService::class );
         $searchFactory = null;
 
-        if ( !$this->isValidId( $id ) && $type !== self::TYPE_LAST_SEEN )
+        if ( !$this->isValidId( $id ) && !(in_array($type, [self::TYPE_LAST_SEEN, self::TYPE_CROSS_SELLER] )))
         {
             $type = self::TYPE_RANDOM;
         }
@@ -35,9 +41,12 @@ class ItemListService
                 ]);
                 break;
             case self::TYPE_LAST_SEEN:
-                /** @var SessionStorageService $sessionStorage */
-                $sessionStorage = pluginApp(SessionStorageService::class);
-                $variationIds = $sessionStorage->getSessionValue(SessionStorageKeys::LAST_SEEN_ITEMS);
+                /** @var CachingRepository $cachingRepository */
+                $cachingRepository = pluginApp(CachingRepository::class);
+                $basketRepository = pluginApp(BasketRepositoryContract::class);
+
+                $variationIds = $cachingRepository->get(SessionStorageKeys::LAST_SEEN_ITEMS . '_' . $basketRepository->load()->id);
+                $variationIds = array_slice($variationIds, 0, $maxItems);
 
                 if ( !is_null($variationIds) && count($variationIds) > 0 )
                 {
@@ -57,6 +66,21 @@ class ItemListService
             case self::TYPE_RANDOM:
                 $searchFactory = VariationList::getSearchFactory([
                     'sorting'       => $sorting
+                ]);
+                break;
+            case self::TYPE_MANUFACTURER:
+                $searchFactory = ManufacturerItems::getSearchFactory([
+                    'manufacturerId' => $id,
+                    'page' => 1,
+                    'itemsPerPage' => $maxItems,
+                    'sorting'   => $sorting
+                ]);
+                break;
+            case self::TYPE_CROSS_SELLER:
+                $searchFactory = CrossSellingItems::getSearchFactory([
+                    'itemId' => $id,
+                    'relation' => $crossSellingRelationType,
+                    'sorting' => $sorting
                 ]);
                 break;
             default:

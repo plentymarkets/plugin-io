@@ -2,8 +2,12 @@
 
 namespace IO\Services;
 
+use Plenty\Legacy\Services\Accounting\VatInitService;
 use Plenty\Legacy\Services\Item\Variation\DetectSalesPriceService;
 use Plenty\Modules\Account\Contact\Models\Contact;
+use Plenty\Modules\Accounting\Vat\Contracts\VatInitContract;
+use Plenty\Modules\Frontend\Services\VatService;
+use Plenty\Modules\Frontend\Session\Storage\Contracts\FrontendSessionStorageFactoryContract;
 use Plenty\Plugin\Application;
 use IO\Services\CustomerService;
 use IO\Services\BasketService;
@@ -46,6 +50,16 @@ class PriceDetectService
      */
     private $basketService;
 
+    /**
+     * @var VatService $vatService
+     */
+    private $vatService;
+
+    /**
+     * @var VatInitService $vatService
+     */
+    private $vatInitService;
+
     private $referrerId;
 
     /**
@@ -56,16 +70,20 @@ class PriceDetectService
      * @param CheckoutService $checkoutService
      */
     public function __construct(DetectSalesPriceService $detectSalesPriceService,
-        CustomerService $customerService,
-        Application $app,
-        CheckoutService $checkoutService,
-        BasketService $basketService)
+                                CustomerService $customerService,
+                                Application $app,
+                                CheckoutService $checkoutService,
+                                BasketService $basketService,
+                                VatInitContract $vatInitService,
+                                VatService $vatService)
     {
         $this->detectSalesPriceService = $detectSalesPriceService;
         $this->customerService = $customerService;
         $this->app = $app;
         $this->checkoutService = $checkoutService;
         $this->basketService = $basketService;
+        $this->vatInitService = $vatInitService;
+        $this->vatService = $vatService;
 
         $this->init();
     }
@@ -82,7 +100,14 @@ class PriceDetectService
         $this->currency          = $this->checkoutService->getCurrency();
         $this->shippingCountryId = $this->checkoutService->getShippingCountryId();
         $this->plentyId          = $this->app->getPlentyId();
-        $this->referrerId        = $this->basketService->getBasket()->referrerId;
+
+        $referrerId = (int)$this->basketService->getBasket()->referrerId;
+        $this->referrerId        = ((int)$referrerId > 0 ? $referrerId : 1);
+
+        if(!$this->vatInitService->isInitialized())
+        {
+            $vat = $this->vatService->getVat();
+        }
     }
 
     public function getPriceIdsForCustomer()

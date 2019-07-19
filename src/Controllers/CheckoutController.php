@@ -1,14 +1,18 @@
 <?php //strict
 namespace IO\Controllers;
 
+use IO\Api\ResponseCode;
 use IO\Constants\SessionStorageKeys;
-use IO\Services\BasketService;
+use IO\Extensions\Constants\ShopUrls;
 use IO\Services\CustomerService;
 use IO\Services\SessionStorageService;
-use IO\Services\UrlBuilder\UrlQuery;
-use IO\Services\WebstoreConfigurationService;
+use IO\Services\UrlService;
 use Plenty\Modules\Basket\Contracts\BasketItemRepositoryContract;
 use IO\Guards\AuthGuard;
+use Plenty\Modules\Category\Models\Category;
+use Plenty\Modules\ShopBuilder\Helper\ShopBuilderRequest;
+use Plenty\Plugin\Http\Response;
+use Plenty\Plugin\Log\Loggable;
 
 /**
  * Class CheckoutController
@@ -16,46 +20,55 @@ use IO\Guards\AuthGuard;
  */
 class CheckoutController extends LayoutController
 {
+    use Loggable;
+
     /**
      * Prepare and render the data for the checkout
-     * @param BasketService $basketService
-     * @param CustomerService $customerService
-     * @param BasketItemRepositoryContract $basketItemRepository
-     * @param WebstoreConfigurationService $webstoreConfigurationService;
+     * @param Category $category
      * @return string
      */
-    public function showCheckout(BasketService $basketService,  CustomerService $customerService, BasketItemRepositoryContract $basketItemRepository, WebstoreConfigurationService $webstoreConfigurationService): string
+    public function showCheckout($category = null)
     {
-        $basketItems = $basketItemRepository->all();
-        /**
-         * @var SessionStorageService $sessionStorage
-         */
+        /** @var BasketItemRepositoryContract $basketItemRepository */
+        $basketItemRepository = pluginApp(BasketItemRepositoryContract::class);
+
+        /** @var SessionStorageService $sessionStorage */
         $sessionStorage = pluginApp(SessionStorageService::class);
 
-        $url = $this->urlService->getHomepageURL();
-        if( $sessionStorage->getSessionValue(SessionStorageKeys::GUEST_EMAIL) == null &&
-            $customerService->getContactId() <= 0)
+        /** @var CustomerService $customerService */
+        $customerService = pluginApp(CustomerService::class);
+
+        /** @var ShopBuilderRequest $shopBuilderRequest */
+        $shopBuilderRequest = pluginApp(ShopBuilderRequest::class);
+
+        if ( !$shopBuilderRequest->isShopBuilder() )
         {
-            if(substr($url, -1) !== '/')
+            if( $sessionStorage->getSessionValue(SessionStorageKeys::GUEST_EMAIL) == null
+                && $customerService->getContactId() <= 0 )
             {
-                $url .= '/';
+                $this->getLogger(__CLASS__)->info("IO::Debug.CheckoutController_notLoggedIn");
+                AuthGuard::redirect(
+                    pluginApp(ShopUrls::class)->login,
+                    ["backlink" => AuthGuard::getUrl()]
+                );
             }
-            $url .= 'login';
-            $url .= UrlQuery::shouldAppendTrailingSlash() ? '/' : '';
-
-            AuthGuard::redirect($url, ["backlink" => AuthGuard::getUrl()]);
+            else if(!count($basketItemRepository->all()))
+            {
+                $this->getLogger(__CLASS__)->info("IO::Debug.CheckoutController_emptyBasket");
+                AuthGuard::redirect(pluginApp(ShopUrls::class)->home, []);
+            }
         }
-        else if(!count($basketItems))
+        else if ( is_null($category) )
         {
-            AuthGuard::redirect($url, []);
+            $categoryController = pluginApp(CategoryController::class);
+            return $categoryController->showCategory("checkout");
         }
-
-        $basket = $basketService->getBasketForTemplate();
+        
 
         return $this->renderTemplate(
             "tpl.checkout",
             [
-                "basket" => $basket
+                'category' => $category
             ],
             false
         );

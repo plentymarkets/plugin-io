@@ -1,12 +1,7 @@
 <?php //strict
 namespace IO\Controllers;
 
-use IO\Helper\TemplateContainer;
-use IO\Services\CustomerService;
-use IO\Services\OrderService;
-use IO\Services\UrlService;
-use Plenty\Plugin\Http\Response;
-use Plenty\Plugin\Http\Request;
+use IO\Extensions\Constants\ShopUrls;
 
 /**
  * Class ConfirmationEmailController
@@ -22,7 +17,7 @@ class ConfirmationEmailController extends LayoutController
     {
         if(strlen($orderAccessKey) && (int)$orderId > 0)
         {
-            return $this->urlService->redirectTo('confirmation/'.$orderId.'/'.$orderAccessKey);
+            return $this->urlService->redirectTo(pluginApp(ShopUrls::class)->confirmation . '/'.$orderId.'/'.$orderAccessKey);
         }
         
         return $this->renderTemplate(

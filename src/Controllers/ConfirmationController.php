@@ -2,12 +2,19 @@
 
 namespace IO\Controllers;
 
+use IO\Api\ResponseCode;
+use IO\Middlewares\Middleware;
 use IO\Services\CustomerService;
 use IO\Services\OrderService;
-use IO\Services\OrderTotalsService;
 use IO\Services\SessionStorageService;
 use IO\Constants\SessionStorageKeys;
 use IO\Models\LocalizedOrder;
+use IO\Services\TemplateConfigService;
+use Plenty\Modules\Order\Date\Models\OrderDate;
+use Plenty\Modules\Order\Date\Models\OrderDateType;
+use Plenty\Modules\Order\Models\Order;
+use Plenty\Plugin\Http\Response;
+use Plenty\Plugin\Log\Loggable;
 
 /**
  * Class ConfirmationController
@@ -15,6 +22,8 @@ use IO\Models\LocalizedOrder;
  */
 class ConfirmationController extends LayoutController
 {
+    use Loggable;
+
     /**
      * Prepare and render the data for the order confirmation
      * @return string
@@ -38,8 +47,20 @@ class ConfirmationController extends LayoutController
                 $order = $orderService->findOrderByAccessKey($orderId, $orderAccesskey);
             }
             catch(\Exception $e)
-            {}
-            
+            {
+                $this->getLogger(__CLASS__)->warning(
+                    "IO::Debug.ConfirmationController_cannotFindOrderByAccessKey",
+                    [
+                        "orderId" => $orderId,
+                        "orderAccessKey" => $orderAccesskey,
+                        "error" => [
+                            "code" => $e->getCode(),
+                            "message" => $e->getMessage()
+                        ]
+                    ]
+                );
+            }
+
             if(!is_null($order) && $order instanceof LocalizedOrder)
             {
                 $sessionStorageService->setSessionValue(SessionStorageKeys::LAST_ACCESSED_ORDER, ['orderId' => $orderId, 'accessKey' => $orderAccesskey]);
@@ -62,7 +83,19 @@ class ConfirmationController extends LayoutController
                     $order = $customerService->getLatestOrder();
                 }
             }
-            catch(\Exception $e) {}
+            catch(\Exception $e)
+            {
+                $this->getLogger(__CLASS__)->warning(
+                    "IO::Debug.ConfirmationController_cannotFindOrder",
+                    [
+                        "orderId" => $orderId,
+                        "error" => [
+                            "code" => $e->getCode(),
+                            "message" => $e->getMessage()
+                        ]
+                    ]
+                );
+            }
         }
         
         if(is_null($order))
@@ -74,21 +107,46 @@ class ConfirmationController extends LayoutController
                 {
                     $order = $orderService->findOrderByAccessKey($lastAccessedOrder['orderId'], $lastAccessedOrder['accessKey']);
                 }
-                catch(\Exception $e) {}
+                catch(\Exception $e)
+                {
+                    $this->getLogger(__CLASS__)->warning(
+                        "IO::Debug.ConfirmationController_cannotFindLastOrderByAccessKey",
+                        [
+                            "orderId"        => $lastAccessedOrder['orderId'],
+                            "orderAccessKey" => $lastAccessedOrder['accessKey'],
+                            "error" => [
+                                "code"      => $e->getCode(),
+                                "message"   => $e->getMessage()
+                            ]
+                        ]
+                    );
+                }
             }
         }
         
         if(!is_null($order) && $order instanceof LocalizedOrder)
         {
-            return $this->renderTemplate(
-                "tpl.confirmation",
-                [
-                    "data" => $order,
-                    "totals" => pluginApp(OrderTotalsService::class)->getAllTotals($order->order),
-                    "showAdditionalPaymentInformation" => true
-                ],
-                false
-            );
+            if($this->checkValidity($order->order))
+            {
+                return $this->renderTemplate(
+                    "tpl.confirmation",
+                    [
+                        "data" => $order,
+                        "showAdditionalPaymentInformation" => true
+                    ],
+                    false
+                );
+            }
+            else
+            {
+                /** @var Response $response */
+                $response = pluginApp(Response::class);
+                $response->forceStatus(ResponseCode::NOT_FOUND);
+    
+                Middleware::$FORCE_404 = true;
+    
+                return $response;
+            }
         }
         elseif(!$order instanceof LocalizedOrder && !is_null($order))
         {
@@ -96,13 +154,46 @@ class ConfirmationController extends LayoutController
         }
         else
         {
-            return $this->renderTemplate(
-                "tpl.page-not-found",
-                [
-                    "data" => ""
-                ],
-                false
-            );
+            $this->getLogger(__CLASS__)->warning("IO::Debug.ConfirmationController_orderNotFound");
+            /** @var Response $response */
+            $response = pluginApp(Response::class);
+            $response->forceStatus(ResponseCode::NOT_FOUND);
+    
+            Middleware::$FORCE_404 = true;
+
+            return $response;
         }
+    }
+    
+    private function checkValidity(Order $order)
+    {
+        /** @var TemplateConfigService $templateConfigService */
+        $templateConfigService = pluginApp(TemplateConfigService::class);
+        $expiration = $templateConfigService->get('my_account.confirmation_link_expiration', 'always');
+        
+        if($expiration !== 'always')
+        {
+            $now = time();
+    
+            $orderDates = $order->dates;
+            $orderCreationDate = $orderDates->filter(function($date){
+                return $date->typeId == OrderDateType::ORDER_ENTRY_AT;
+            })->first()->date->timestamp;
+    
+            if($now > $orderCreationDate + ((int)$expiration * (24 * 60 * 60)))
+            {
+                $this->getLogger(__CLASS__)->warning(
+                    "IO::Debug.ConfirmationController_confirmationLinkExpired",
+                    [
+                        "order"           => $order,
+                        "creationDate"    => $orderCreationDate,
+                        "expiration"      => $expiration
+                    ]
+                );
+                return false;
+            }
+        }
+        
+        return true;
     }
 }

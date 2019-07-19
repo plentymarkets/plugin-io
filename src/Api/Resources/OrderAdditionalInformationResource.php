@@ -29,6 +29,7 @@ class OrderAdditionalInformationResource extends ApiResource
     {
         $this->setContactWish();
         $this->setShippingPrivacyHint();
+        $this->setNewsletterSubscriptions();
 
         return $this->response->create('', ResponseCode::CREATED );
     }
@@ -48,5 +49,13 @@ class OrderAdditionalInformationResource extends ApiResource
         $this->sessionStorage->setSessionValue(
             SessionStorageKeys::SHIPPING_PRIVACY_HINT_ACCEPTED,
             $this->request->get('shippingPrivacyHintAccepted', 'false'));
+    }
+
+    private function setNewsletterSubscriptions()
+    {
+        $this->sessionStorage->setSessionValue(
+            SessionStorageKeys::NEWSLETTER_SUBSCRIPTIONS,
+            $this->request->get('newsletterSubscriptions', [])
+        );
     }
 }

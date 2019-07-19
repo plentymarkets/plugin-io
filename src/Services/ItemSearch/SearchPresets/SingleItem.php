@@ -22,24 +22,29 @@ class SingleItem implements SearchPreset
     public static function getSearchFactory($options)
     {
         /** @var VariationSearchFactory $searchFactory */
-        $searchFactory = pluginApp( VariationSearchFactory::class )
-            ->withResultFields(
-                ResultFieldTemplate::get( ResultFieldTemplate::TEMPLATE_SINGLE_ITEM )
-            );
+        $searchFactory = pluginApp( VariationSearchFactory::class );
+        
+        $searchFactory->withResultFields(
+            ResultFieldTemplate::load( ResultFieldTemplate::TEMPLATE_SINGLE_ITEM )
+        );
 
         $searchFactory
             ->withLanguage()
             ->withImages()
             ->withPropertyGroups()
+            ->withOrderPropertySelectionValues()
+            ->withVariationProperties()
             ->withUrls()
             ->withPrices()
             ->withDefaultImage()
             ->withBundleComponents()
+            ->withAvailability()
             ->isVisibleForClient()
             ->isActive()
             ->hasNameInLanguage()
             ->hasPriceForCustomer()
-            ->withLinkToContent();
+            ->withLinkToContent()
+            ->withReducedResults();
 
         if(array_key_exists('itemId', $options) && $options['itemId'] != 0)
         {

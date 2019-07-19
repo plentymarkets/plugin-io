@@ -1,5 +1,6 @@
 <?php //strict
 namespace IO\Api\Resources;
+use Plenty\Modules\Category\Models\CategoryDetails;
 use Plenty\Plugin\Http\Response;
 use Plenty\Plugin\Http\Request;
 use Plenty\Modules\Category\Models\Category;
@@ -24,7 +25,7 @@ class CategoryDescriptionResource extends ApiResource
     {
         parent::__construct($request, $response);
     }
-    
+
     /**
      * Get Category Items
      * @param string $categoryId
@@ -32,18 +33,34 @@ class CategoryDescriptionResource extends ApiResource
      */
     public function show(string $categoryId):Response
     {
-        $response = null;
+        $response = [];
+
+        $description1 = (int)$this->request->get('description1', 0);
+        $description2 = (int)$this->request->get('description2', 0);
 
         $categoryService = pluginApp(CategoryService::class);
         $sessionStorageService = pluginApp(SessionStorageService::class);
-        
+
         $category = $categoryService->get($categoryId, $sessionStorageService->getLang());
 
         if($category instanceof Category)
         {
-            $response = $category->details[0]->description;
-        }
+            $categoryDetails = $categoryService->getDetails($category, $sessionStorageService->getLang());
+    
+            if($categoryDetails instanceof CategoryDetails)
+            {
+                if($description1)
+                {
+                    $response['description1'] = $categoryDetails->description;
+                }
         
+                if($description2)
+                {
+                    $response['description2'] = $categoryDetails->description2;
+                }
+            }
+        }
+
         return $this->response->create($response, ResponseCode::OK);
     }
 }

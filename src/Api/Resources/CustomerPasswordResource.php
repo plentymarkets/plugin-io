@@ -2,6 +2,7 @@
 
 namespace IO\Api\Resources;
 
+use IO\Services\AuthenticationService;
 use Plenty\Plugin\Http\Request;
 use Plenty\Plugin\Http\Response;
 use IO\Api\ApiResource;
@@ -38,19 +39,48 @@ class CustomerPasswordResource extends ApiResource
      */
 	public function store():Response
 	{
-        $newPassWord = $this->request->get('password', '');
-        $newPassWord2 = $this->request->get('password2', '');
+	    $oldPassword = $this->request->get('oldPassword', '');
+        $newPassword = $this->request->get('password', '');
+        $newPassword2 = $this->request->get('password2', '');
 	    $contactId = $this->request->get('contactId', 0);
         $hash = $this->request->get('hash', '');
-	    
-		if(strlen($newPassWord) && strlen($newPassWord2) && $newPassWord == $newPassWord2)
+
+		if(strlen($newPassword) && strlen($newPassword2) && $newPassword == $newPassword2 && $this->isValidPassword($newPassword))
 		{
-			$result = $this->customerService->updatePassword($newPassWord, $contactId, $hash);
+		    if (!strlen($hash))
+		    {
+		        /** @var AuthenticationService $authService */
+                $authService = pluginApp(AuthenticationService::class);
+
+                if(!$authService->checkPassword($oldPassword))
+                {
+                    unset($this->response->eventData['AfterAccountAuthentication']);
+                    $response = $this->response->create("Invalid password", ResponseCode::UNAUTHORIZED);
+
+                    return $response;
+                }
+            }
+
+			$result = $this->customerService->updatePassword($newPassword, $contactId, $hash);
+
+            if($result === null)
+            {
+                return $this->response->create($result, ResponseCode::BAD_REQUEST);
+            }
+
 			return $this->response->create($result, ResponseCode::OK);
 		}
-		
+
 		$this->response->error(4, "Missing password or new passwords are not equal");
 		return $this->response->create(null, ResponseCode::BAD_REQUEST);
 	}
 
+    /**
+     * Checks if the password meets the requirements
+     */
+    static public function isValidPassword($password)
+    {
+        $passwordPattern = '/^(?=.*[A-Za-z])(?=.*\d)\S{8,}$/';
+        return preg_match($passwordPattern,$password);
+    }
 }

@@ -33,4 +33,18 @@ class ShippingCountry
     const POLAND = 23;
     const SWEDEN = 24;
     const SINGAPORE = 25;
+
+    const ADDRESS_FORMAT_DE = 'DE';
+    const ADDRESS_FORMAT_EN = 'EN';
+
+    public static function getAddressFormat($countryId)
+    {
+        switch($countryId)
+        {
+            case self::UNITED_KINGDOM:
+                return self::ADDRESS_FORMAT_EN;
+        }
+
+        return self::ADDRESS_FORMAT_DE;
+    }
 }

@@ -1,6 +1,7 @@
 <?php
 namespace IO\Builder\Order;
 use IO\Services\BasketService;
+use IO\Services\SessionStorageService;
 use Plenty\Modules\Basket\Models\Basket;
 use Plenty\Plugin\Application;
 
@@ -73,10 +74,11 @@ class OrderBuilderQuery
 
 		$items = $this->basketService->getBasketItems();
 
-		if(!is_array($items))
-		{
+		if (!is_array($items)) {
 			throw new \Exception("Error while reading item data from basket");
-		}
+		} elseif (count($items) == 0) {
+            throw new \Exception("Error while create order, no basket items found", 15);
+        }
 
 		$this->withOrderItems(
 			$orderItemBuilder->fromBasket($basket, $items)
@@ -84,6 +86,15 @@ class OrderBuilderQuery
 
 		return $this;
 	}
+
+    /**
+     * Add the lang to the order
+     * @param string $lang
+     */
+	public function withLang(string $lang)
+    {
+        $this->order['lang'] = $lang;
+    }
 
     /**
      * Add the status to the order
@@ -191,6 +202,12 @@ class OrderBuilderQuery
 	public function withContactId(int $customerId):OrderBuilderQuery
 	{
 		$this->withRelation(ReferenceType::CONTACT, $customerId, RelationType::RECEIVER);
+
+		if((int)$customerId <= 0)
+        {
+            $this->withLang(pluginApp(SessionStorageService::class)->getLang());
+        }
+
 		return $this;
 	}
 
@@ -236,6 +253,32 @@ class OrderBuilderQuery
             "date"     => $date
         ];
         array_push($this->order["dates"], $option);
+        return $this;
+    }
+
+    /**
+     * Add a comment to the order. (e.g. customer wish)
+     * @param bool $isVisibleForContact
+     * @param string $text
+     * @return OrderBuilderQuery
+     */
+    public function withComment(bool $isVisibleForContact, $text):OrderBuilderQuery
+    {
+        if(is_string($text) && !empty($text))
+        {
+            if($this->order["comments"] === null)
+            {
+                $this->order["comments"] = [];
+            }
+
+            $comment = [
+                "isVisibleForContact" => $isVisibleForContact,
+                "text"                => $text
+            ];
+
+            array_push($this->order["comments"], $comment);
+        }
+
         return $this;
     }
 }

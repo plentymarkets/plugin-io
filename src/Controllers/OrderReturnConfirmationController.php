@@ -2,8 +2,10 @@
 
 namespace IO\Controllers;
 
-use Plenty\Plugin\ConfigRepository;
+use IO\Api\ResponseCode;
+use IO\Middlewares\Middleware;
 use IO\Services\CustomerService;
+use Plenty\Plugin\Http\Response;
 
 /**
  * Class OrderReturnController
@@ -15,23 +17,23 @@ class OrderReturnConfirmationController extends LayoutController
      * Render the order returns view
      * @return string
      */
-    public function showOrderReturnConfirmation():string
+    public function showOrderReturnConfirmation()
     {
         /**
          * @var CustomerService $customerService
          */
         $customerService = pluginApp(CustomerService::class);
-        
-        /**
-         * @var ConfigRepository $configRepo
-         */
-        $configRepo = pluginApp(ConfigRepository::class);
-        
+
         if( (int)$customerService->getContactId() <= 0 )
         {
-            return '';
+            /** @var Response $response */
+            $response = pluginApp(Response::class);
+            $response->forceStatus(ResponseCode::NOT_FOUND);
+            Middleware::$FORCE_404 = true;
+
+            return $response;
         }
-        
+
         return $this->renderTemplate(
             'tpl.order.return.confirmation',
             ['data' => ''],

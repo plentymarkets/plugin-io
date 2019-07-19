@@ -2,11 +2,12 @@
 
 namespace IO\Providers;
 
-use Plenty\Plugin\ConfigRepository;
+use IO\Controllers\CategoryController;
+use IO\Extensions\Constants\ShopUrls;
+use IO\Helper\RouteConfig;
 use Plenty\Plugin\RouteServiceProvider;
 use Plenty\Plugin\Routing\Router;
 use Plenty\Plugin\Routing\ApiRouter;
-use IO\Services\TemplateConfigService;
 
 /**
  * Class IORouteServiceProvider
@@ -22,13 +23,10 @@ class IORouteServiceProvider extends RouteServiceProvider
      * Define the map routes to templates or REST resources
      * @param Router $router
      * @param ApiRouter $api
-     * @param ConfigRepository $config
      * @throws \Plenty\Plugin\Routing\Exceptions\RouteReservedException
      */
-	public function map(Router $router, ApiRouter $api, ConfigRepository $config)
+	public function map(Router $router, ApiRouter $api)
 	{
-        $templateConfigService = pluginApp(TemplateConfigService::class);
-
 		$api->version(['v1'], ['namespace' => 'IO\Api\Resources'], function ($api)
 		{
 			$api->get('io/basket', 'BasketResource@index');
@@ -56,9 +54,12 @@ class IORouteServiceProvider extends RouteServiceProvider
 			$api->resource('io/customer/logout', 'CustomerLogoutResource');
 			$api->resource('io/customer/password', 'CustomerPasswordResource');
             $api->resource('io/customer/password_reset', 'CustomerPasswordResetResource');
+            $api->resource('io/customer/mail', 'CustomerMailResource');
             $api->resource('io/customer/contact/mail', 'ContactMailResource');
             $api->resource('io/customer/bank_data', 'ContactBankResource');
+            $api->get('io/customer/order/list', 'CustomerOrderResource@index');
             $api->resource('io/customer/order/return', 'CustomerOrderReturnResource');
+            $api->resource('io/customer/newsletter', 'CustomerNewsletterResource');
             $api->resource('io/variations', 'VariationResource');
             $api->resource('io/item/availability', 'AvailabilityResource');
             $api->resource('io/item/condition', 'ItemConditionResource');
@@ -71,55 +72,83 @@ class IORouteServiceProvider extends RouteServiceProvider
             $api->resource('io/template', 'TemplateResource');
             $api->resource('io/localization/language', 'LanguageResource');
             $api->resource('io/itemWishList', 'ItemWishListResource');
-            $api->resource('io/cache/reset_template_cache', 'ResetTemplateCacheResource');
             $api->resource('io/shipping/country', 'ShippingCountryResource');
+            $api->resource('io/live-shopping', 'LiveShoppingResource');
+            $api->resource('io/facet', 'FacetResource');
+            $api->resource('io/categorytree', 'CategoryTreeResource');
+
 		});
 
-		$enabledRoutes = explode(", ",  $config->get("IO.routing.enabled_routes") );
+        /** @var ShopUrls $shopUrls */
+        $shopUrls = pluginApp(ShopUrls::class);
 
 		/*
 		 * STATIC ROUTES
 		 */
 		//Basket route
-        if ( in_array("basket", $enabledRoutes) || in_array("all", $enabledRoutes) )
+        if ( RouteConfig::isActive(RouteConfig::BASKET) )
         {
             // TODO: get slug from config
             $router->get('basket', 'IO\Controllers\BasketController@showBasket');
         }
 
-        if ( in_array("checkout", $enabledRoutes) || in_array("all", $enabledRoutes) )
+        if ( RouteConfig::isActive(RouteConfig::CHECKOUT) )
         {
-            //Checkout-confirm purchase route
+            // checkout-route is active and no category is linked
             $router->get('checkout', 'IO\Controllers\CheckoutController@showCheckout');
         }
+        else if( in_array(RouteConfig::CHECKOUT, RouteConfig::getEnabledRoutes())
+            && RouteConfig::getCategoryId(RouteConfig::CHECKOUT) > 0
+            && $shopUrls->checkout !== '/checkout' )
+        {
+            // checkout-route is activated and category is linked and category url is not '/checkout'
+            $router->get('checkout', function() use ($shopUrls)
+            {
+                return pluginApp(CategoryController::class)->redirectToCategory( $shopUrls->checkout );
+            });
+        }
 
-        if ( in_array("my-account", $enabledRoutes) || in_array("all", $enabledRoutes) )
+        if ( RouteConfig::isActive(RouteConfig::MY_ACCOUNT) )
         {
             //My-account route
             $router->get('my-account', 'IO\Controllers\MyAccountController@showMyAccount');
         }
-
-		if ( in_array("confirmation", $enabledRoutes) || in_array("all", $enabledRoutes) )
+        else if( in_array(RouteConfig::MY_ACCOUNT, RouteConfig::getEnabledRoutes())
+            && RouteConfig::getCategoryId(RouteConfig::MY_ACCOUNT) > 0
+            && $shopUrls->myAccount !== '/my-account' )
         {
-            //Confiramtion route
-            $router->get('confirmation/{orderId?}/{orderAccessKey?}', 'IO\Controllers\ConfirmationController@showConfirmation');
-            $router->get('-/akQQ{orderAccessKey}/idQQ{orderId}', 'IO\Controllers\ConfirmationEmailController@showConfirmation');
+            // checkout-route is activated and category is linked and category url is not '/my-account'
+            $router->get('my-account', function() use ($shopUrls)
+            {
+                return pluginApp(CategoryController::class)->redirectToCategory( $shopUrls->myAccount );
+            });
         }
 
-		if ( in_array("login", $enabledRoutes) || in_array("all", $enabledRoutes) )
+		if ( RouteConfig::isActive(RouteConfig::CONFIRMATION) )
+        {
+            //Confirmation route
+            $router->get('confirmation/{orderId?}/{orderAccessKey?}', 'IO\Controllers\ConfirmationController@showConfirmation');
+
+            $router->get('-/akQQ{orderAccessKey}/idQQ{orderId}', 'IO\Controllers\ConfirmationEmailController@showConfirmation');
+            $router->get('_py-/akQQ{orderAccessKey}/idQQ{orderId}', 'IO\Controllers\ConfirmationEmailController@showConfirmation');
+            $router->get('_py_/akQQ{orderAccessKey}/idQQ{orderId}', 'IO\Controllers\ConfirmationEmailController@showConfirmation');
+            $router->get('_plentyShop__/akQQ{orderAccessKey}/idQQ{orderId}', 'IO\Controllers\ConfirmationEmailController@showConfirmation');
+        }
+
+		if ( RouteConfig::isActive(RouteConfig::LOGIN) )
         {
             //Login page route
             $router->get('login', 'IO\Controllers\LoginController@showLogin');
         }
 
-		if ( in_array("register", $enabledRoutes) || in_array("all", $enabledRoutes) )
+		if ( RouteConfig::isActive(RouteConfig::REGISTER) )
         {
             //Register page route
             $router->get('register', 'IO\Controllers\RegisterController@showRegister');
             $router->get('registration', 'IO\Controllers\RegisterController@redirectRegister');
         }
 
-		if ( in_array("place-order", $enabledRoutes) || in_array("all", $enabledRoutes) )
+		if ( RouteConfig::isActive(RouteConfig::PLACE_ORDER) )
         {
             // PaymentPlugin entry points
             // place the current order and redirect to /execute_payment
@@ -130,105 +159,156 @@ class IORouteServiceProvider extends RouteServiceProvider
                 ->where('orderId', '[0-9]+');
         }
 
-        if ( in_array("search", $enabledRoutes) || in_array("all", $enabledRoutes) )
+        if ( RouteConfig::isActive(RouteConfig::SEARCH) )
         {
             $router->get('search', 'IO\Controllers\ItemSearchController@showSearch');
             //Callisto Tag route
             $router->get('tag/{tagName}', 'IO\Controllers\ItemSearchController@redirectToSearch');
         }
 
-        if ( in_array("home", $enabledRoutes) || in_array("all", $enabledRoutes) ) {
+        if ( RouteConfig::isActive(RouteConfig::HOME) )
+        {
             //homepage route
             $router->get('', 'IO\Controllers\HomepageController@showHomepage');
         }
 
-        if ( in_array("cancellation-rights", $enabledRoutes) || in_array("all", $enabledRoutes) ) {
+        if ( RouteConfig::isActive(RouteConfig::CANCELLATION_RIGHTS) )
+        {
             //cancellation rights page
             $router->get('cancellation-rights', 'IO\Controllers\StaticPagesController@showCancellationRights');
         }
 
-        if ( in_array("cancellation-form", $enabledRoutes) || in_array("all", $enabledRoutes) ) {
+        if ( RouteConfig::isActive(RouteConfig::CANCELLATION_FORM) )
+        {
             //cancellation rights page
             $router->get('cancellation-form', 'IO\Controllers\StaticPagesController@showCancellationForm');
         }
 
-        if ( in_array("legal-disclosure", $enabledRoutes) || in_array("all", $enabledRoutes) ) {
+        if ( RouteConfig::isActive(RouteConfig::LEGAL_DISCLOSURE) )
+        {
             //legal disclosure page
             $router->get('legal-disclosure', 'IO\Controllers\StaticPagesController@showLegalDisclosure');
         }
 
-        if ( in_array("privacy-policy", $enabledRoutes) || in_array("all", $enabledRoutes) ) {
+        if ( RouteConfig::isActive(RouteConfig::PRIVACY_POLICY))
+        {
             //privacy policy page
             $router->get('privacy-policy', 'IO\Controllers\StaticPagesController@showPrivacyPolicy');
         }
 
-        if ( in_array("gtc", $enabledRoutes) || in_array("all", $enabledRoutes) ) {
+        if ( RouteConfig::isActive(RouteConfig::TERMS_CONDITIONS) )
+        {
             //terms and conditions page
             $router->get('gtc', 'IO\Controllers\StaticPagesController@showTermsAndConditions');
         }
 
 
-        if( in_array("wish-list", $enabledRoutes) || in_array("all", $enabledRoutes))
+        if( RouteConfig::isActive(RouteConfig::WISH_LIST) )
         {
             $router->get('wish-list', 'IO\Controllers\ItemWishListController@showWishList');
         }
 
-        if( in_array('order-return', $enabledRoutes) || in_array("all", $enabledRoutes))
+        if( RouteConfig::isActive(RouteConfig::ORDER_RETURN) )
         {
             $router->get('returns/{orderId}', 'IO\Controllers\OrderReturnController@showOrderReturn');
         }
-        
-        if( in_array('order-return-confirmation', $enabledRoutes) || in_array("all", $enabledRoutes) )
+
+        if( RouteConfig::isActive(RouteConfig::ORDER_RETURN_CONFIRMATION) )
         {
             $router->get('return-confirmation', 'IO\Controllers\OrderReturnConfirmationController@showOrderReturnConfirmation');
         }
 
-        if( (in_array("contact", $enabledRoutes) || in_array("all", $enabledRoutes) ) )
+        if( RouteConfig::isActive(RouteConfig::CONTACT) )
         {
             //contact
             $router->get('contact', 'IO\Controllers\ContactController@showContact');
         }
-        
-        if( in_array("password-reset", $enabledRoutes) || in_array("all", $enabledRoutes) )
+
+        if( RouteConfig::isActive(RouteConfig::PASSWORD_RESET) )
         {
             $router->get('password-reset/{contactId}/{hash}', 'IO\Controllers\CustomerPasswordResetController@showReset');
         }
-        
-        if( in_array("order-property-file", $enabledRoutes) || in_array("all", $enabledRoutes) )
+
+        if( RouteConfig::isActive(RouteConfig::CHANGE_MAIL) )
         {
-            $router->get('order-property-file/{hash1}/{filename}', 'IO\Controllers\OrderPropertyFileController@downloadTempFile');
-            $router->get('order-property-file/{hash1}/{hash2}/{filename}', 'IO\Controllers\OrderPropertyFileController@downloadFile');
+            $router->get('change-mail/{contactId}/{hash}', 'IO\Controllers\CustomerChangeMailController@show');
+        }
+
+        if( RouteConfig::isActive(RouteConfig::ORDER_PROPERTY_FILE) )
+        {
+            $router->get('order-property-file/{hash1}', 'IO\Controllers\OrderPropertyFileController@downloadTempFile');
+            $router->get('order-property-file/{hash1}/{hash2}', 'IO\Controllers\OrderPropertyFileController@downloadFile');
         }
         
-		/*
-		 * ITEM ROUTES
-		 */
-        if ( in_array("item", $enabledRoutes) || in_array("all", $enabledRoutes) )
+        if( RouteConfig::isActive(RouteConfig::ORDER_DOCUMENT) )
+        {
+            $router->get('order-document/preview/{documentId}', 'IO\Controllers\DocumentController@preview');
+        }
+
+        
+        if( RouteConfig::isActive(RouteConfig::NEWSLETTER_OPT_IN) )
+        {
+            $router->get('newsletter/subscribe/{authString}/{newsletterEmailId}', 'IO\Controllers\NewsletterOptInController@showOptInConfirmation');
+        }
+        
+        if( RouteConfig::isActive(RouteConfig::NEWSLETTER_OPT_OUT) )
+        {
+            $router->get('newsletter/unsubscribe', 'IO\Controllers\NewsletterOptOutController@showOptOut');
+            $router->post('newsletter/unsubscribe', 'IO\Controllers\NewsletterOptOutConfirmationController@showOptOutConfirmation');
+        }
+
+        /*
+         * ITEM ROUTES
+         */
+        if ( RouteConfig::isActive(RouteConfig::ITEM) )
         {
             $router->get('{itemId}_{variationId?}', 'IO\Controllers\ItemController@showItemWithoutName')
-                   ->where('itemId', '[0-9]+')
-                   ->where('variationId', '[0-9]+');
-            
+                ->where('itemId', '[0-9]+')
+                ->where('variationId', '[0-9]+');
+
             $router->get('{slug}_{itemId}_{variationId?}', 'IO\Controllers\ItemController@showItem')
-                   ->where('slug', '[^_]+')
-                   ->where('itemId', '[0-9]+')
-                   ->where('variationId', '[0-9]+');
-            
+                ->where('slug', '[^_]+')
+                ->where('itemId', '[0-9]+')
+                ->where('variationId', '[0-9]+');
+
             //old webshop routes mapping
-            $router->get('{slug}a-{itemId}', 'IO\Controllers\ItemController@showItemOld')
-                   ->where('slug', '.*')
-                   ->where('itemId', '[0-9]+');
-            
+            $router->get('{slug}/a-{itemId}', 'IO\Controllers\ItemController@showItemOld')
+                ->where('slug', '.*')
+                ->where('itemId', '[0-9]+');
+
             $router->get('a-{itemId}', 'IO\Controllers\ItemController@showItemFromAdmin')
-                   ->where('itemId', '[0-9]+');
+                ->where('itemId', '[0-9]+');
         }
-        
+
         /*
-		 * CATEGORY ROUTES
-		 */
-        if ( in_array("category", $enabledRoutes) || in_array("all", $enabledRoutes) )
+         * CATEGORY ROUTES
+         */
+        if ( RouteConfig::isActive(RouteConfig::CATEGORY) )
         {
             $router->get('{level1?}/{level2?}/{level3?}/{level4?}/{level5?}/{level6?}', 'IO\Controllers\CategoryController@showCategory');
+        }
+        else
+        {
+            if ( RouteConfig::getCategoryId(RouteConfig::CHECKOUT) > 0 )
+            {
+                $router->get($shopUrls->checkout, function() use ($shopUrls)
+                {
+                    return pluginApp(CategoryController::class)->showCategoryById( RouteConfig::getCategoryId(RouteConfig::CHECKOUT) );
+                });
+            }
+
+            if ( RouteConfig::getCategoryId(RouteConfig::MY_ACCOUNT) > 0 )
+            {
+                $router->get($shopUrls->myAccount, function() use ($shopUrls)
+                {
+                    return pluginApp(CategoryController::class)->showCategoryById( RouteConfig::getCategoryId(RouteConfig::MY_ACCOUNT) );
+                });
+            }
+        }
+
+        if ( RouteConfig::isActive(RouteConfig::PAGE_NOT_FOUND) )
+        {
+            $router->get('{anything?}', 'IO\Controllers\StaticPagesController@showPageNotFound');
         }
 	}
 }

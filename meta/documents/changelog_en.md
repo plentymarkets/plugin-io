@@ -1,5 +1,237 @@
 # Release Notes for IO
 
+## v4.1.2 (2019-07-16) <a href="https://github.com/plentymarkets/plugin-io/compare/4.1.1...4.1.2" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
+
+### Added
+
+- We added the new REST route 'rest/io/categorytree' for loading categories of the mobile navigation.
+
+### Changed
+
+- Attributes of variations without stock are now displayed if the options "Available automatically if net stock is positive" and "Not available automatically if net stock is 0 or negative" are deactivated.
+
+## v4.1.1 (2019-07-10) <a href="https://github.com/plentymarkets/plugin-io/compare/4.1.0...4.1.1" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
+
+### Fixed
+
+- Due to an error, the IO route “Page not found” in the **Routing** section was also activated for Callisto online stores that use the Ceres checkout. This behaviour has been fixed.
+
+## v4.1.0 (2019-07-08) <a href="https://github.com/plentymarkets/plugin-io/compare/4.0.1...4.1.0" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
+
+### Added
+
+- Plugins can now specify data fields that are always loaded, independent from the Result Fields template.
+- Meta information of files stored in the new Webspace can now be read within the template via the Twig function `cdn_metadata()`.
+- We added the TWIG filter 'propertySelectionValueName'. This returns the name of a value of an order property of the type **selection**.
+- You can now determine whether the IO 404 page should be displayed in the **routing** tab of the IO configuration.
+
+### Changed
+
+- The variation selection in the single item view has been remodeled on the basis of ElasticSearch technology in order to increase performance.
+- The "Change password" function in the My Account area now validates the password on the side of the server according to our specifications.
+- The error notification that is displayed when the minimum order value is not met has been adjusted and now contains the minimum order value.
+- The setting "Enable selection of variations without stock in variation dropdown" in the Ceres configuration has been marked as "deprecated" and is no longer considered by the variation selection widget.
+
+### Fixed
+
+- The input field for dates is now correctly validated on the server side.
+- Due to an error, clicking the "Order process" button in the order history did not open a link if the homepage was deactivated. This has been fixed.
+- The wish list's quantity indication also counted inactive items. This behaviour has been fixed.
+- Item list widgets for which the option **manufacturer** was active ignored the sorting options. This behaviour has been fixed.
+- Due to an error, URLs of categories were not generated correctly if the category's name began with the same letters as the language code of the currently selected language.
+- The error "Resource not found" could occur in the order overview if the shipping profile specified in the order was no longer available in the system. This behaviour has been fixed.
+- The error "Resource not found" could occur in the order confirmation if the order's status was no system status. This behaviour has been fixed.
+- The labels of order properties are now displayed in the correct language.
+- The calculation of graduated prices for variations with order characteristics could lead to errors. This behaviour has been fixed.
+- The display of gross and net prices in combination with the invoice address's VAT identification number could lead to errors. This behaviour has been fixed.
+- If an error occurs during payment after an order has been completed, the order can only be finalised after a waiting period of 30 seconds. This prevents the creation of duplicate orders that would thereby be invalid.
+- Accessing categories that ended in the URL slug a-XXX would sometimes redirect to a 404 page or a single item view. This behaviour has been fixed.
+- We fixed an error due to which the routes /checkout and /my-account did not redirect to the corresponding ShopBuilder content.
+- The language of emails sent via the online store now corresponds with the currently selected language in the online store.
+- Due to an error, pages would not load if the TWIG function `queryString` was called with an invalid parameter. This has been fixed.
+
+## v4.0.1 (2019-05-14) <a href="https://github.com/plentymarkets/plugin-io/compare/4.0.0...4.0.1" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
+
+### Changed
+
+- The method `createContact()` in the class CustomerService was modified to include the possibility of adding a customer language in the transmitted data if the language that is currently selected in the online store should not be used.
+
+### Fixed
+
+- For orders placed by guest customers, changing the shipping profile could lead to errors. This behaviour has been fixed.
+- Redirects in the online store now correctly consider the language.
+
+## v4.0.0 (2019-05-02) <a href="https://github.com/plentymarkets/plugin-io/compare/3.2.0...4.0.0" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
+
+### TODO
+
+- It is now possible for registered customers to change their email address in the My Account area. To enable this, you need to carry out settings in the **System » System settings » Client » Select client » Email** menu. Create a new template under **Templates**. This template needs to include the variable "$NewCustomerEmail", which contains a confirmation link for the change of the email address. You need to link this template to the **Customer wants to change email address** event under **Automatic**.
+- In order to make it possible for customers to change their email address in the My Account area, you need to activate the route "/change-mail" in the settings of the IO plugin.
+
+### Added
+
+- The shipping profile now displays the maximum delivery time. The maximum delivery time is the sum of the availability with the longest delivery time among items in the shopping cart and the period of delivery specified in the shipping profile.
+- "Mx." is now available as an option in the "Form of address" drop-down list in the registration and the address selection. This option serves to provide a form of address for the gender option "Diverse".
+
+### Changed
+
+- The input field "Contact person" for B2B customers is no longer a required field.
+- The code that ensures that no address containing shipping to a Packstation/post office can be selected if the selected shipping profile does not support this option has been relocated from Ceres to IO.
+- When saving an address that includes shipping to a Packstation/post office, the value for the post number is now taken from the field "postNumber" instead of "address3".
+- All classes of the namespace "IO\Services\ItemLoader" have been removed. The classes of the namespace "IO\Services\ItemSearch" are used as an alternative.
+
+
+### Fixed
+
+- Due to an error, the cross-selling item list in the single item view was not loaded when the page was accessed the first time. This has been fixed.
+- Due to an error, the sorting value for the category also affected the sorting of variations of individual items, as long as the option "dynamically" was selected for the setting **Show variations by type**. As of now, the variation with the lowest price is displayed first.
+- The ShopBuilder checkout and My Account can now be displayed correctly, even if the setting "Category routes" in IO is inactive.
+- We fixed an error that occurred in the context of checking already existing email addresses in the newsletter registration.
+
+
+
+## v3.2.0 (2019-03-25) <a href="https://github.com/plentymarkets/plugin-io/compare/3.1.2...3.2.0" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
+
+### Added
+
+- The TWIG filter "addressOptionType" has been added in order to access data pertaining to the address type of an address.
+- We added a new TWIG filter, which makes it possible to remove tabulator spaces from character strings.
+- Ceres now considers the visibility of order statuses as specified in the back end.
+
+### Changed
+
+- It is now required to enter the old password in order to change the password in the MyAccount area.
+- The loading of the category tree has been refactored, resulting in a significantly better performance.
+
+### Fixed
+
+- You can now edit categories in the ShopBuilder, even if their routes are deactivated in the IO settings.
+- Under certain circumstances, grouped attributes were displayed incorrectly in item lists. This has been fixed.
+- Errors in the calculation of shipping costs that stem from restrictions from payment methods and shipping profiles are now intercepted and the shipping costs are displayed correctly.
+- The category option "Visible: After login" is now applicable in Ceres online stores. Categories for which this option is active are only displayed in the navigation after a login. Directly accessing the URL redirects to the login page.
+
+## v3.1.2 (2019-03-20) <a href="https://github.com/plentymarkets/plugin-io/compare/3.1.1...3.1.2" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
+
+### Fixed
+
+- The checkout and shopping cart can now correctly display and process items with measurement inputs for length and width.
+
+## v3.1.1 (2019-03-11) <a href="https://github.com/plentymarkets/plugin-io/compare/3.1.0...3.1.1" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
+
+### Fixed
+
+- Due to an error it was possible that 404 pages weren't displayed correctly. This has been fixed.
+
+## v3.1.0 (2019-02-25) <a href="https://github.com/plentymarkets/plugin-io/compare/3.0.1...3.1.0" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
+
+### Added
+
+- We integrated an interface that serves to register users for one or more newsletters when placing an order.
+- It is now possible to query all items of a manufacturer via ElasticSearch
+
+### Changed
+
+- Items in the shopping cart now contain additional data about variation property groups.
+- The creation of a return now creates a new order property. This order property serves to execute an event procedure.
+- Prior to the sending of the contact form, the Google reCAPTCHA is verified via the secret site key.
+
+### Fixed
+
+- Due to an error, the plugin was not successfully built under certain circumstances. This has been fixed.
+- Due to an error, item-dependent coupons were not removed if the corresponding item was removed from the shopping cart. This has been fixed.
+- The pagination of category pages was not working properly for additional clients. This behaviour has been fixed.
+- Due to an error, the currency was not updated correctly when the language was changed in the online store. This has been fixed.
+
+## v3.0.1 (2019-02-07) <a href="https://github.com/plentymarkets/plugin-io/compare/3.0.0...3.0.1" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
+
+### Fixed
+
+- Due to an error, it was possible that items were oversold in the online store. This has been fixed.
+- Under specific circumstances the configuration of the minimum and maximum number of items and variations could lead to errors when changes were made to items in the shopping cart. This behaviour has been fixed.
+- Due to an error, it was possible that full memory utilisation was reached. This has been fixed.
+
+## v3.0.0 (2019-01-21) <a href="https://github.com/plentymarkets/plugin-io/compare/2.17.1...3.0.0" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
+
+### Added
+
+- In the preview mode, you can now access items in the online store that would normally be invisible due to their settings (e.g. no price for the online store).
+- The route **io/facet** has been added to enable the reloading of filters on the category and search pages.
+
+### Changed
+
+- The validators for storing addresses have been updated to account for the changes in Ceres that enable the selection of a contact person for B2B addresses.
+- When loading multiple items, the number of items is no longer limited to 10.
+- Instead of referencing Ceres, **Middleware.php** now references the template name saved in the configuration of IO for available currencies. Thanks to <a href="https://github.com/davidisaak" target="_blank" rel="noopener"><b>@davidisaak</b></a> for this change.
+
+### Fixed
+
+- Due to an error, guest accounts could create addresses without specifying an email address. This has been fixed.
+- The validity of the checkout URL can now be specified in the Ceres configuration.
+- The results of `ItemService::getVariations()` will now be returned in the specified order.
+- The automatic sending of emails was not working properly for guest accounts. This has been fixed.
+- The plugin build process showed a missing method declaration even though the method exists. This has been fixed.
+- Due to an error, the correct order status could not be set when using a coupon with a larger value or the exact value of the order. This has been fixed.
+- If more than 10 items were listed in the order confirmation page, not all item images were displayed. This has been fixed.
+- The default client was always saved for newly registered customers. This behaviour has been fixed.
+
+## v2.17.1 (2018-11-29) <a href="https://github.com/plentymarkets/plugin-io/compare/2.17.0...2.17.1" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
+
+### Fixed
+
+- Due to an error, item categories without items were displayed in the navigation tree. This has been fixed.
+
+## v2.17.0 (2018-11-27) <a href="https://github.com/plentymarkets/plugin-io/compare/2.16.1...2.17.0" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
+
+### Added
+
+- We expanded the `CategoryItemResource` in order to output category description 2 as well.
+
+### Changed
+
+- The currency can now be set using the URL parameter "Currency" in order to conform to existing Callisto URLs.
+- The country of delivery can now be set using the URL parameter "ShipToCountry" in order to conform to existing Callisto URLs.
+
+### Fixed
+
+- The status of orders with an invoice amount of 0,00€ was not updated correctly. This behaviour has been fixed.
+- The settings for activating the newsletter routes were not considered in the registration confirmation and the cancellation of the newsletter. This has been fixed.
+
+## v2.16.1 (2018-11-15) <a href="https://github.com/plentymarkets/plugin-io/compare/2.16.0...2.16.1" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
+
+### Fixed
+
+- Due to an error, categories linked to a client were displayed as filter options in the item search. This has been fixed.
+- Under certain circumstances, the single item view could not be displayed due to invalid sorting options. This has been fixed.
+- Due to an error, the customer class was erroneously reset when a B2B company address was added or edited. This has been fixed.
+
+## v2.16.0 (2018-10-22) <a href="https://github.com/plentymarkets/plugin-io/compare/2.15.0...2.16.0" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
+
+### Added
+
+- We added a new function `getShippingCountryId`. This functions serves to retrieve the ID of the country of delivery in the checkout.
+- We added the ShopBuilder newsletter widget in Ceres.
+
+### Changed
+
+- The contact form now sends e-mails that include a response address.
+- When creating an order or a return, the customer note is now saved prior to the creation. This way, the information is already included in the confirmation e-mail.
+- The LocalizedOrder now includes the ShippingProfileId.
+- The file structures for category navigation have been minimised in order to improve loading times.
+- The function `getHierarchy()` in the CategoryService now returns all categories and not only those that are displayed in the navigation.
+- In IO it is now possible to read the current template during a REST call.
+
+### Fixed
+
+- Due to an error, the link from the order confirmation forwarded to a 404 page. This has been fixed.
+- Due to an error, the category descriptions of the main client was used for additional clients as well. This has been fixed.
+- Due to an error, the variation drop-down list in the single item view also listed variations for which no valid sales price had been set for the online store. This has been fixed.
+- Due to an error, all shipping profiles were displayed in the checkout of guest orders. This has been fixed.
+- Due to an error, page calls via the HEAD method always returned 404 status codes. This has been fixed.
+- We made several SEO-relevant adjustments.
+- Due to an error, not all relevant items were included in the **Last seen** item list. This has been fixed.
+- We fixed an error, due to which a selection of variations in the single item view was not possible if 2 or more variations consisted of the same combination of attributes or if the variations had to attributes at all. In these cases, the selection is now possible via the content drop-down list.
+- In rare cases, the shipping costs were displayed incorrectly on the order confirmation page. This behaviour has been fixed.
+
 ## v2.15.0 (2018-09-12) <a href="https://github.com/plentymarkets/plugin-io/compare/2.14.0...2.15.0" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
 
 ### Fixed

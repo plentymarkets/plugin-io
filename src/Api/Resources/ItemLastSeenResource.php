@@ -9,6 +9,7 @@ use IO\Services\ItemLastSeenService;
 use IO\Services\ItemListService;
 use Plenty\Plugin\Http\Request;
 use Plenty\Plugin\Http\Response;
+use Plenty\Plugin\Templates\Twig;
 
 /**
  * Class ItemLastSeenResource
@@ -32,10 +33,26 @@ class ItemLastSeenResource extends ApiResource
      */
     public function index():Response
     {
-        $items = $this->request->get("items", 4);
+        $items = $this->request->get("items", 20);
         $lastSeenItems = pluginApp(ItemListService::class)->getItemList(ItemListService::TYPE_LAST_SEEN, null, null, $items);
+        $lastSeenContainers = [];
 
-        return $this->response->create($lastSeenItems, ResponseCode::OK);
+        $twig = pluginApp(Twig::class);
+
+        foreach( $lastSeenItems["documents"] as $item )
+        {
+            $lastSeenContainers[$item["id"]]["beforePrices"] = $twig->renderString(
+                "{% for content in container('Ceres::CategoryItem.BeforePrices', item) %}{{ content.result | raw }}{% endfor %}",
+                ['item' => $item["data"]]
+            );
+
+            $lastSeenContainers[$item["id"]]["afterPrices"] = $twig->renderString(
+                "{% for content in container('Ceres::CategoryItem.AfterPrices', item) %}{{ content.result | raw }}{% endfor %}",
+                ['item' => $item["data"]]
+            );
+        }
+
+        return $this->response->create(["lastSeenItems" => $lastSeenItems, "containers" => $lastSeenContainers], ResponseCode::OK);
     }
 
     public function update(string $variationId):Response

@@ -16,6 +16,7 @@ use Plenty\Modules\Item\SalesPrice\Models\SalesPriceSearchRequest;
 use Plenty\Modules\Item\SalesPrice\Models\SalesPriceSearchResponse;
 use Plenty\Modules\Item\Unit\Contracts\UnitNameRepositoryContract;
 use Plenty\Modules\Item\Unit\Contracts\UnitRepositoryContract;
+use Plenty\Modules\LiveShopping\Contracts\LiveShoppingRepositoryContract;
 use Plenty\Plugin\Application;
 use Plenty\Plugin\CachingRepository;
 
@@ -27,6 +28,11 @@ class VariationPriceList
     const TYPE_RRP              = 'rrp';
     const TYPE_SPECIAL_OFFER    = 'specialOffer';
     const TYPE_SUBSCRIPTION     = 'subscription';
+
+    public static $basePrices = [];
+
+    /** @var int $itemId */
+    public $itemId = 0;
 
     /** @var int $variationId */
     public $variationId = 0;
@@ -49,19 +55,23 @@ class VariationPriceList
     /** @var UnitService $unitService */
     private $unitService;
 
+    /** @var LiveShoppingRepositoryContract $liveShoppingRepo */
+    private $liveShoppingRepo;
+
     private $showNetPrice = false;
 
     /** @var SalesPriceSearchResponse */
     private $defaultPrice;
 
-    public function __construct( NumberFormatFilter $numberFormatFilter, UnitService $unitService )
+    public function __construct( NumberFormatFilter $numberFormatFilter, UnitService $unitService, LiveShoppingRepositoryContract $liveShoppingRepo )
     {
         $this->numberFormatFilter = $numberFormatFilter;
         $this->unitService = $unitService;
         $this->showNetPrice = pluginApp( CustomerService::class )->showNetPrices();
+        $this->liveShoppingRepo = $liveShoppingRepo;
     }
 
-    public static function create( int $variationId, $minimumOrderQuantity = 0, $maximumOrderQuantity = null, $lot = 0, $unit = null )
+    public static function create( int $variationId, int $itemId, $minimumOrderQuantity = 0, $maximumOrderQuantity = null, $lot = 0, $unit = null )
     {
         if ( $minimumOrderQuantity === null )
         {
@@ -71,7 +81,7 @@ class VariationPriceList
         /** @var VariationPriceList $instance */
         $instance = pluginApp( VariationPriceList::class);
 
-        $instance->init( $variationId, $minimumOrderQuantity, $maximumOrderQuantity, $lot, $unit );
+        $instance->init( $variationId, $itemId, $minimumOrderQuantity, $maximumOrderQuantity, $lot, $unit );
 
         // check if default price for minimum order quantity exists
         if ( $instance->findPriceForQuantity( $minimumOrderQuantity ) === null )
@@ -98,7 +108,7 @@ class VariationPriceList
         {
             foreach($this->prices[$type] as $price )
             {
-                if ( $price instanceof SalesPriceSearchResponse && (float)$price->minimumOrderQuantity <= $quantity && (float)$price->minimumOrderQuantity > $minimumOrderQuantity && $price->interval == 'none')
+                if ( $price instanceof SalesPriceSearchResponse && (float)$price->minimumOrderQuantity <= $quantity && (float)$price->minimumOrderQuantity > $minimumOrderQuantity)
                 {
                     $result = $price;
                     $minimumOrderQuantity = (float)$price->minimumOrderQuantity;
@@ -108,6 +118,10 @@ class VariationPriceList
         return $result;
     }
 
+    /**
+     * @param float $quantity
+     * @return array|null
+     */
     public function findSubscriptionPriceForQuantity(float $quantity  )
     {
         $result = null;
@@ -153,8 +167,16 @@ class VariationPriceList
 
         if ( $this->lot > 0 && strlen($this->unit) > 0 )
         {
-            $basePrice = [];
-            list( $basePrice['lot'], $basePrice['price'], $basePrice['unitKey'] ) = $basePriceService->getUnitPrice($this->lot, $unitPrice, $this->unit);
+            if(isset(self::$basePrices[$this->lot][$unitPrice][$this->unit]))
+            {
+                $basePrice = self::$basePrices[$this->lot][$unitPrice][$this->unit];
+            }
+            else
+            {
+                $basePrice = [];
+                list( $basePrice['lot'], $basePrice['price'], $basePrice['unitKey'] ) = $basePriceService->getUnitPrice($this->lot, $unitPrice, $this->unit);
+                self::$basePrices[$this->lot][$unitPrice][$this->unit] = $basePrice;
+            }
 
             $unitName = $this->unitService->getUnitNameByKey( $basePrice['unitKey'], $lang );
 
@@ -173,7 +195,12 @@ class VariationPriceList
 
         $defaultPrice   = $this->findPriceForQuantity( $quantity );
         $rrp            = $this->findPriceForQuantity( $quantity, self::TYPE_RRP );
-        $specialOffer   = $this->findPriceForQuantity( $quantity, self::TYPE_SPECIAL_OFFER );
+
+        if($this->liveShoppingRepo->itemHasActiveLiveShopping($this->itemId))
+        {
+            $specialOffer   = $this->findPriceForQuantity( $quantity, self::TYPE_SPECIAL_OFFER );
+        }
+
         $subscriptionPrice = $this->findSubscriptionPriceForQuantity($quantity);
 
         return [
@@ -185,7 +212,7 @@ class VariationPriceList
         ];
     }
 
-    public function getCalculatedPrices( $quantity = null )
+    public function getCalculatedPrices( $quantity = null)
     {
         if ( $quantity === null )
         {
@@ -195,8 +222,13 @@ class VariationPriceList
         $defaultPrice   = $this->findPriceForQuantity( $quantity );
         $subscription   = $this->findSubscriptionPriceForQuantity( $quantity);
         $rrp            = $this->findPriceForQuantity( $quantity, self::TYPE_RRP );
-        $specialOffer   = $this->findPriceForQuantity( $quantity, self::TYPE_SPECIAL_OFFER );
         $graduatedPrices= [];
+
+        $specialOffer = null;
+        if($this->liveShoppingRepo->itemHasActiveLiveShopping($this->itemId))
+        {
+            $specialOffer   = $this->findPriceForQuantity( $quantity, self::TYPE_SPECIAL_OFFER );
+        }
 
         foreach($this->prices[self::TYPE_DEFAULT] as $price )
         {
@@ -261,9 +293,10 @@ class VariationPriceList
         return $this->defaultPrice;
     }
 
-    private function init( $variationId, $minimumOrderQuantity, $maximumOrderQuantity, $lot, $unit )
+    private function init( $variationId, $itemId, $minimumOrderQuantity, $maximumOrderQuantity, $lot, $unit )
     {
         $this->variationId          = $variationId;
+        $this->itemId               = $itemId;
         $this->minimumOrderQuantity = $minimumOrderQuantity;
         $this->maximumOrderQuantity = $maximumOrderQuantity;
         $this->lot                  = $lot;
@@ -303,7 +336,6 @@ class VariationPriceList
                 $priceSearchRepo->searchAll( $priceSearchRequest ),
                 self::TYPE_SUBSCRIPTION
             );
-
         }
     }
 
@@ -379,16 +411,21 @@ class VariationPriceList
             return null;
         }
 
+        $unitPrice = $showNetPrice ? $price->unitPriceNet : $price->unitPrice;
         return [
             'price'                 => [
                 'value'     => $showNetPrice ? $price->priceNet : $price->price,
                 'formatted' => $this->numberFormatFilter->formatMonetary( $showNetPrice ? $price->priceNet : $price->price, $price->currency )
             ],
             'unitPrice'             => [
-                'value'     => $showNetPrice ? $price->unitPriceNet : $price->unitPrice,
-                'formatted' => $this->numberFormatFilter->formatMonetary( $showNetPrice ? $price->unitPriceNet : $price->unitPrice, $price->currency )
+                'value'     => $unitPrice,
+                'formatted' => $this->numberFormatFilter->formatMonetary( $unitPrice, $price->currency )
             ],
-            'basePrice'             => $this->getBasePrice( $showNetPrice ? $price->unitPriceNet : $price->unitPrice, $price->currency ),
+            'basePrice'             => $this->getBasePrice( $unitPrice, $price->currency ),
+            'baseLot'               => self::$basePrices[$this->lot][$unitPrice][$this->unit]['lot'],
+            'baseUnit'              => self::$basePrices[$this->lot][$unitPrice][$this->unit]['unitKey'],
+            'baseSinglePrice'       => self::$basePrices[$this->lot][$unitPrice][$this->unit]['price'],
+
             'minimumOrderQuantity'  => (float) $price->minimumOrderQuantity,
             'contactClassDiscount'  => [
                 'percent'   => $price->customerClassDiscountPercent,

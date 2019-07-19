@@ -2,6 +2,8 @@
 
 namespace IO\Repositories;
 
+use IO\Services\ItemSearch\SearchPresets\VariationList;
+use IO\Services\ItemSearch\Services\ItemSearchService;
 use Plenty\Modules\Plugin\DataBase\Contracts\DataBase;
 use Plenty\Modules\Plugin\DataBase\Contracts\Query;
 use IO\Services\CustomerService;
@@ -35,6 +37,7 @@ class ItemWishListRepository
     public function getItemWishList()
     {
         $variationIds = [];
+        $tempVariationIds = [];
         $plentyId = pluginApp(Application::class)->getPlentyID();
 
         /** @var Query $query */
@@ -49,9 +52,27 @@ class ItemWishListRepository
             /** @var ItemWishList $wishListModel */
             foreach($rows as $wishListModel)
             {
-                $variationIds[] = $wishListModel->variationId;
+                $tempVariationIds[] = $wishListModel->variationId;
             }
         }
+
+        if(count($tempVariationIds) > 0)
+        {
+            /** @var ItemSearchService $itemSearchService */
+            $itemSearchService = pluginApp( ItemSearchService::class );
+            $variatonFactory = VariationList::getSearchFactory([
+                    'variationIds'  => $tempVariationIds
+                    ]);
+            $variatonFactory->withResultFields(['id']);
+            $variations = $itemSearchService->getResults($variatonFactory);
+
+            foreach($variations['documents'] as $variation)
+            {
+                $variationIds[] = $variation['id'];
+            }
+        }
+
+
 
         return $variationIds;
     }
@@ -118,11 +139,18 @@ class ItemWishListRepository
 
                 $createdWishListEntry = $this->db->save($wishListEntry);
 
-                return pluginApp(ItemWishList::class)->fillByAttributes(json_decode(json_encode($createdWishListEntry), true));
+
+                $newEntry = pluginApp(ItemWishList::class);
+                $newEntry->fillByAttributes(json_decode(json_encode($createdWishListEntry), true));
+
+                return $newEntry;
             }
             else
             {
-                return pluginApp(ItemWishList::class)->fillByAttributes(json_decode(json_encode($wishListModels[0]), true));
+                $newEntry = pluginApp(ItemWishList::class);
+                $newEntry->fillByAttributes(json_decode(json_encode($wishListModels[0]), true));
+
+                return $newEntry;
             }
         }
         else

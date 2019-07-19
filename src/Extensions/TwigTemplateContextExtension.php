@@ -86,10 +86,10 @@ class TwigTemplateContextExtension extends Twig_Extension
             {
                 $context->init( TemplateService::$currentTemplateData );
             }
-            
+
             return ArrayHelper::toArray( $context );
         }
-        
+
         return [];
     }
 }

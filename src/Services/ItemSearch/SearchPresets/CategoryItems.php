@@ -60,7 +60,7 @@ class CategoryItems implements SearchPreset
         $searchFactory = pluginApp(VariationSearchFactory::class);
 
         $searchFactory->withResultFields(
-                ResultFieldTemplate::get( ResultFieldTemplate::TEMPLATE_LIST_ITEM )
+                ResultFieldTemplate::load( ResultFieldTemplate::TEMPLATE_LIST_ITEM )
             );
 
         $searchFactory
@@ -80,7 +80,9 @@ class CategoryItems implements SearchPreset
             ->sortByMultiple( $sorting )
             ->setPage( $page, $itemsPerPage )
             ->groupByTemplateConfig()
-            ->withLinkToContent();
+            ->withLinkToContent()
+            ->withGroupedAttributeValues()
+            ->withReducedResults();
 
         return $searchFactory;
     }

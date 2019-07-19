@@ -2,7 +2,10 @@
 
 namespace IO\Controllers;
 
+use IO\Extensions\Constants\ShopUrls;
 use IO\Guards\AuthGuard;
+use IO\Services\SessionStorageService;
+use IO\Services\WebstoreConfigurationService;
 use Plenty\Plugin\Http\Request;
 
 class ItemSearchController extends LayoutController
@@ -27,7 +30,10 @@ class ItemSearchController extends LayoutController
 
     public function redirectToSearch($query):string
     {
-        AuthGuard::redirect('/search', ['query' => $query]);
+
+        $shopUrl = pluginApp(ShopUrls::class);
+
+        AuthGuard::redirect($shopUrl->search, ['query' => $query]);
         return "";
     }
 }

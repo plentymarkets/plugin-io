@@ -2,29 +2,34 @@
 
 namespace IO\Services;
 
-use Plenty\Modules\Account\Address\Contracts\AddressRepositoryContract;
-use Plenty\Modules\Frontend\PaymentMethod\Contracts\FrontendPaymentMethodRepositoryContract;
-use Plenty\Modules\Order\ContactWish\Contracts\ContactWishRepositoryContract;
-use Plenty\Modules\Order\Contracts\OrderRepositoryContract;
-use Plenty\Modules\Order\Property\Contracts\OrderPropertyRepositoryContract;
-use Plenty\Modules\Order\Property\Models\OrderPropertyType;
-use Plenty\Modules\Payment\Method\Contracts\PaymentMethodRepositoryContract;
-use Plenty\Repositories\Models\PaginatedResult;
-use Plenty\Plugin\Http\Response;
-use Plenty\Modules\Order\Models\Order;
-use Plenty\Plugin\ConfigRepository;
-use IO\Constants\OrderPaymentStatus;
-use IO\Models\LocalizedOrder;
+use IO\Builder\Order\AddressType;
 use IO\Builder\Order\OrderBuilder;
+use IO\Builder\Order\OrderItemType;
 use IO\Builder\Order\OrderType;
 use IO\Builder\Order\OrderOptionSubType;
-use IO\Builder\Order\AddressType;
+use IO\Constants\OrderPaymentStatus;
 use IO\Constants\SessionStorageKeys;
-use IO\Services\TemplateConfigService;
+use IO\Extensions\Constants\ShopUrls;
+use IO\Extensions\Mail\SendMail;
+use IO\Models\LocalizedOrder;
+use Plenty\Modules\Account\Address\Contracts\AddressRepositoryContract;
+use Plenty\Modules\Account\Address\Models\AddressOption;
 use Plenty\Modules\Authorization\Services\AuthHelper;
-use IO\Services\UrlService;
-use IO\Builder\Order\OrderItemType;
-
+use Plenty\Modules\Frontend\PaymentMethod\Contracts\FrontendPaymentMethodRepositoryContract;
+use Plenty\Modules\Helper\AutomaticEmail\Models\AutomaticEmailOrder;
+use Plenty\Modules\Helper\AutomaticEmail\Models\AutomaticEmailTemplate;
+use Plenty\Modules\Order\Contracts\OrderRepositoryContract;
+use Plenty\Modules\Order\Date\Models\OrderDate;
+use Plenty\Modules\Order\Date\Models\OrderDateType;
+use Plenty\Modules\Order\Property\Contracts\OrderPropertyRepositoryContract;
+use Plenty\Modules\Order\Property\Models\OrderPropertyType;
+use Plenty\Modules\Payment\Contracts\PaymentRepositoryContract;
+use Plenty\Modules\Payment\Method\Contracts\PaymentMethodRepositoryContract;
+use Plenty\Plugin\Log\Loggable;
+use Plenty\Repositories\Models\PaginatedResult;
+use Plenty\Modules\Order\Models\Order;
+use Plenty\Plugin\Application;
+use Plenty\Plugin\ConfigRepository;
 
 /**
  * Class OrderService
@@ -32,6 +37,9 @@ use IO\Builder\Order\OrderItemType;
  */
 class OrderService
 {
+    use SendMail;
+    use Loggable;
+
 	/**
 	 * @var OrderRepositoryContract
 	 */
@@ -58,6 +66,13 @@ class OrderService
      */
     private $urlService;
 
+    /** @var CheckoutService $checkoutService */
+    private $checkoutService;
+
+    /** @var CustomerService $customerService */
+    private $customerService;
+
+
     /**
      * The OrderItem types that will be wrapped. All other OrderItems will be stripped from the order.
      */
@@ -74,6 +89,11 @@ class OrderService
      * @param OrderRepositoryContract $orderRepository
      * @param BasketService $basketService
      * @param \IO\Services\SessionStorageService $sessionStorage
+     * @param FrontendPaymentMethodRepositoryContract $frontendPaymentMethodRepository
+     * @param AddressRepositoryContract $addressRepository
+     * @param \IO\Services\UrlService $urlService
+     * @param \IO\Services\CheckoutService $checkoutService
+     * @param \IO\Services\CustomerService $customerService
      */
 	public function __construct(
 		OrderRepositoryContract $orderRepository,
@@ -81,8 +101,9 @@ class OrderService
         SessionStorageService $sessionStorage,
         FrontendPaymentMethodRepositoryContract $frontendPaymentMethodRepository,
         AddressRepositoryContract $addressRepository,
-        UrlService $urlService
-	)
+        UrlService $urlService,
+        CheckoutService $checkoutService,
+        CustomerService $customerService)
 	{
 		$this->orderRepository = $orderRepository;
 		$this->basketService   = $basketService;
@@ -90,6 +111,8 @@ class OrderService
         $this->frontendPaymentMethodRepository = $frontendPaymentMethodRepository;
         $this->addressRepository = $addressRepository;
         $this->urlService = $urlService;
+        $this->checkoutService = $checkoutService;
+        $this->customerService = $customerService;
 	}
 
     /**
@@ -98,12 +121,8 @@ class OrderService
      */
 	public function placeOrder():LocalizedOrder
 	{
-	    /** @var CheckoutService $checkoutService */
-        $checkoutService = pluginApp(CheckoutService::class);
-        
-        /** @var CustomerService $customerService */
-        $customerService = pluginApp(CustomerService::class);
-        
+	    $email = $this->customerService->getEmail();
+	    $billingAddressId = $this->checkoutService->getBillingAddressId();
         $basket = $this->basketService->getBasket();
         
         $couponCode = null;
@@ -118,40 +137,103 @@ class OrderService
         {
             $isShippingPrivacyHintAccepted = 'false';
         }
-        
-		$order = pluginApp(OrderBuilder::class)->prepare(OrderType::ORDER)
-		                            ->fromBasket()
-		                            ->withContactId($customerService->getContactId())
-		                            ->withAddressId($checkoutService->getBillingAddressId(), AddressType::BILLING)
-		                            ->withAddressId($checkoutService->getDeliveryAddressId(), AddressType::DELIVERY)
-		                            ->withOrderProperty(OrderPropertyType::PAYMENT_METHOD, OrderOptionSubType::MAIN_VALUE, $checkoutService->getMethodOfPaymentId())
-                                    ->withOrderProperty(OrderPropertyType::SHIPPING_PROFILE, OrderOptionSubType::MAIN_VALUE, $checkoutService->getShippingProfileId())
-                                    ->withOrderProperty(OrderPropertyType::DOCUMENT_LANGUAGE, OrderOptionSubType::MAIN_VALUE, $this->sessionStorage->getLang())
-                                    ->withOrderProperty(OrderPropertyType::SHIPPING_PRIVACY_HINT_ACCEPTED, OrderOptionSubType::MAIN_VALUE, $isShippingPrivacyHintAccepted)
-		                            ->done();
-        
-		$order = $this->orderRepository->createOrder($order, $couponCode);
-        $this->saveOrderContactWish($order->id, $this->sessionStorage->getSessionValue(SessionStorageKeys::ORDER_CONTACT_WISH));
-        
-        if($customerService->getContactId() <= 0)
+
+        $order = pluginApp(OrderBuilder::class)->prepare(OrderType::ORDER)
+            ->fromBasket()
+            ->withContactId($this->customerService->getContactId())
+            ->withAddressId($this->checkoutService->getBillingAddressId(), AddressType::BILLING)
+            ->withAddressId($this->checkoutService->getDeliveryAddressId(), AddressType::DELIVERY)
+            ->withOrderProperty(OrderPropertyType::PAYMENT_METHOD, OrderOptionSubType::MAIN_VALUE, $this->checkoutService->getMethodOfPaymentId())
+            ->withOrderProperty(OrderPropertyType::SHIPPING_PROFILE, OrderOptionSubType::MAIN_VALUE, $this->checkoutService->getShippingProfileId())
+            ->withOrderProperty(OrderPropertyType::DOCUMENT_LANGUAGE, OrderOptionSubType::MAIN_VALUE, $this->sessionStorage->getLang())
+            ->withOrderProperty(OrderPropertyType::SHIPPING_PRIVACY_HINT_ACCEPTED, OrderOptionSubType::MAIN_VALUE, $isShippingPrivacyHintAccepted)
+            ->withComment(true, $this->sessionStorage->getSessionValue(SessionStorageKeys::ORDER_CONTACT_WISH))
+            ->done();
+
+        try
+        {
+            $order = $this->orderRepository->createOrder($order, $couponCode);
+        }
+        catch (\Exception $e)
+        {
+            $this->getLogger(__CLASS__)->error("IO::Debug.OrderService_orderValidationError", [
+                'code' => $e->getCode(),
+                'message' => $e->getMessage()
+            ]);
+        }
+
+        $this->getLogger(__CLASS__)->debug('IO::Debug.OrderService_placeOrder', [
+            'order' => $order,
+            'basket' => $basket
+        ]);
+
+        if ($order instanceof Order && $order->id > 0) {
+            $params = [
+                'orderId' => $order->id,
+                'webstoreId' => pluginApp(Application::class)->getWebstoreId(),
+                'language' => $this->sessionStorage->getLang()
+            ];
+            $this->sendMail(AutomaticEmailTemplate::SHOP_ORDER ,AutomaticEmailOrder::class, $params);
+        }
+
+        $this->subscribeToNewsletter($email, $billingAddressId);
+
+        $this->sessionStorage->setSessionValue(SessionStorageKeys::ORDER_CONTACT_WISH, null);
+
+        if($this->customerService->getContactId() <= 0)
         {
             $this->sessionStorage->setSessionValue(SessionStorageKeys::LATEST_ORDER_ID, $order->id);
         }
-        
+
+        if( ($order->amounts[0]->invoiceTotal == 0) || ($order->amounts[0]->invoiceTotal == $order->amounts[0]->giftCardAmount) ) {
+            $this->createAndAssignDummyPayment($order);
+        }
+
         return LocalizedOrder::wrap( $order, $this->sessionStorage->getLang() );
 	}
-	
-	private function saveOrderContactWish($orderId, $text = '')
+    
+    /**
+     * Subscribe the customer to the newsletter, if stored in the session
+     *
+     * @param $email
+     * @param $billingAddressId
+     */
+	public function subscribeToNewsletter($email, $billingAddressId)
     {
-        if(!is_null($text) && strlen($text))
+        /** @var CustomerNewsletterService $customerNewsletterService $email */
+        $customerNewsletterService = pluginApp(CustomerNewsletterService::class);
+        $newsletterSubscriptions = $this->sessionStorage->getSessionValue(SessionStorageKeys::NEWSLETTER_SUBSCRIPTIONS);
+
+        if (count($newsletterSubscriptions) && strlen($email))
         {
-            /**
-             * @var ContactWishRepositoryContract $contactWishRepo
-             */
-            $contactWishRepo = pluginApp(ContactWishRepositoryContract::class);
-            $contactWishRepo->createContactWish($orderId, nl2br($text));
-            $this->sessionStorage->setSessionValue(SessionStorageKeys::ORDER_CONTACT_WISH, null);
+            $firstName = '';
+            $lastName = '';
+            
+            $address = $this->customerService->getAddress($billingAddressId, AddressType::BILLING);
+
+            // if the address is for a company, the contact person will be store into the last name
+            if (strlen($address->name1))
+            {
+                foreach ($address->options as $option)
+                {
+                    if ($option['typeId'] === AddressOption::TYPE_CONTACT_PERSON)
+                    {
+                        $lastName = $option['value'];
+
+                        break;
+                    }
+                }
+            }
+            else
+            {
+                $firstName = $address->name2;
+                $lastName = $address->name3;
+            }
+
+            $customerNewsletterService->saveMultipleNewsletterData($email, $newsletterSubscriptions, $firstName, $lastName);
         }
+
+        $this->sessionStorage->setSessionValue(SessionStorageKeys::NEWSLETTER_SUBSCRIPTIONS, null);
     }
 
     /**
@@ -162,8 +244,40 @@ class OrderService
      */
 	public function executePayment( int $orderId, int $paymentId ):array
     {
-        $paymentRepository = pluginApp( PaymentMethodRepositoryContract::class );
-        return $paymentRepository->executePayment( $paymentId, $orderId );
+        $result = [];
+        try
+        {
+            $paymentRepository = pluginApp( PaymentMethodRepositoryContract::class );
+            $result = $paymentRepository->executePayment( $paymentId, $orderId );
+        }
+        catch (\Exception $e)
+        {
+            $this->getLogger(__CLASS__)->error('IO::Debug.OrderService_executePaymentFailed', [
+                'orderId' => $orderId,
+                'paymentId' => $paymentId,
+                'code' => $e->getCode(),
+                'message' => $e->getMessage()
+            ]);
+        }
+
+        if ( $result['type'] === "error" )
+        {
+            $this->getLogger(__CLASS__)->error('IO::Debug.OrderService_executePaymentError', [
+                'orderId' => $orderId,
+                'paymentId' => $paymentId,
+                'response' => $result
+            ]);
+        }
+        else
+        {
+            $this->getLogger(__CLASS__)->debug('IO::Debug.OrderService_executePayment', [
+                'orderId' => $orderId,
+                'paymentId' => $paymentId,
+                'response' => $result
+            ]);
+        }
+
+        return $result;
     }
     
     /**
@@ -204,11 +318,6 @@ class OrderService
         
         if($redirectToLogin == 'true')
         {
-            /**
-             * @var CustomerService $customerService
-             */
-            $customerService = pluginApp(CustomerService::class);
-    
             $orderContactId = 0;
             foreach ($order->relations as $relation)
             {
@@ -220,12 +329,12 @@ class OrderService
     
             if ((int)$orderContactId > 0)
             {
-                if ((int)$customerService->getContactId() <= 0)
+                if ((int)$this->customerService->getContactId() <= 0)
                 {
 
-                    return $this->urlService->redirectTo('login?backlink=confirmation/' . $orderId . '/' . $orderAccessKey);
+                    return $this->urlService->redirectTo(pluginApp(ShopUrls::class)->login . '?backlink=' . pluginApp(ShopUrls::class)->confirmation . '/' . $orderId . '/' . $orderAccessKey);
                 }
-                elseif ((int)$orderContactId !== (int)$customerService->getContactId())
+                elseif ((int)$orderContactId !== (int)$this->customerService->getContactId())
                 {
                     return null;
                 }
@@ -262,20 +371,81 @@ class OrderService
         if($wrapped)
         {
             $orders = LocalizedOrder::wrapPaginated( $orders, $this->sessionStorage->getLang() );
-    
-            $o = $orders->getResult();
-            foreach($orders->getResult() as $key => $order)
-            {
-                $order = $order->order;
-                if($order->typeId == OrderType::ORDER)
-                {
-                    $o[$key]->isReturnable = $this->isOrderReturnable($order);
-                }
-            }
-            $orders->setResult($o);
         }
         
         return $orders;
+    }
+    
+    public function getOrdersCompact(int $page = 1, int $items = 50)
+    {
+        $orderResult = null;
+        $contactId = $this->customerService->getContactId();
+        
+        if($contactId > 0)
+        {
+            $this->orderRepository->setFilters(['orderType' => OrderType::ORDER]);
+    
+            /** @var PaginatedResult $orderResult */
+            $orderResult = $this->orderRepository->allOrdersByContact(
+                $contactId,
+                $page,
+                $items
+            );
+    
+            /** @var OrderTotalsService $orderTotalsService */
+            $orderTotalsService = pluginApp(OrderTotalsService::class);
+            
+            /** @var OrderStatusService $orderStatusService */
+            $orderStatusService = pluginApp(OrderStatusService::class);
+    
+            /** @var OrderTrackingService $orderTrackingService */
+            $orderTrackingService = pluginApp(OrderTrackingService::class);
+    
+            /** @var SessionStorageService $sessionStorageService */
+            $sessionStorageService = pluginApp(SessionStorageService::class);
+            $lang = $sessionStorageService->getLang();
+            
+            $orders = [];
+            foreach($orderResult->getResult() as $order)
+            {
+                if($order instanceof Order)
+                {
+                    $totals = $orderTotalsService->getAllTotals($order);
+                    $highlightNetPrices = $orderTotalsService->highlightNetPrices($order);
+                    
+                    $orderStatusName = $orderStatusService->getOrderStatus($order->id, $order->statusId);
+    
+                    $creationDate = '';
+                    $creationDateData = $order->dates->firstWhere('typeId', OrderDateType::ORDER_ENTRY_AT);
+    
+                    if($creationDateData instanceof OrderDate)
+                    {
+                        $creationDate = $creationDateData->date->toDateTimeString();
+                    }
+    
+                    $shippingDate = '';
+                    $shippingDateData = $order->dates->firstWhere('typeId', OrderDateType::ORDER_COMPLETED_ON);
+    
+                    if($shippingDateData instanceof OrderDate)
+                    {
+                        $shippingDate = $shippingDateData->date->toDateTimeString();
+                    }
+
+                    $orders[] = [
+                        'id'           => $order->id,
+                        'total'        => $highlightNetPrices ? $totals['totalNet'] : $totals['totalGross'],
+                        'status'       => $orderStatusName,
+                        'creationDate' => $creationDate,
+                        'shippingDate' => $shippingDate,
+                        'trackingURL'  => $orderTrackingService->getTrackingURL($order, $lang)
+                    ];
+                }
+            };
+    
+            $orderResult->setResult($orders);
+        }
+        
+        return $orderResult;
     }
     
     /**
@@ -300,17 +470,6 @@ class OrderService
         }
         
         return null;
-    }
-    
-    /**
-     * Return order status text by status id
-     * @param $statusId
-     * @return string
-     */
-	public function getOrderStatusText($statusId)
-    {
-	    //OrderStatusTexts::$orderStatusTexts[(string)$statusId];
-        return '';
     }
     
     public function getOrderPropertyByOrderId($orderId, $typeId)
@@ -340,9 +499,7 @@ class OrderService
     
     public function isOrderReturnable(Order $order)
     {
-        $returnActive = $this->isReturnActive();
-        
-        if($returnActive)
+        if($this->customerService->getContactId() > 0 && $this->isReturnActive())
         {
             /**
              * @var ConfigRepository $config
@@ -457,7 +614,14 @@ class OrderService
             {
                 $returnStatus = 9.0;
             }
-    
+
+            $order['properties'][] = [
+                "typeId"    => OrderPropertyType::NEW_RETURNS_MY_ACCOUNT,
+                "value"     => "1"
+            ];
+
+
+
             $order['statusId'] = (float)$returnStatus;
             $order['typeId'] = OrderType::RETURNS;
     
@@ -470,12 +634,15 @@ class OrderService
             unset($order['dates']);
             unset($order['lockStatus']);
 
-            $createdReturn = $this->orderRepository->createOrder($order);
-
             if(!is_null($returnNote) && strlen($returnNote))
             {
-                $this->saveOrderContactWish($createdReturn->id, $returnNote);
+                $order["comments"][] = [
+                    "isVisibleForContact" => true,
+                    "text"                => $returnNote
+                ];
             }
+
+            $createdReturn = $this->orderRepository->createOrder($order);
 
             return $createdReturn;
         }
@@ -755,5 +922,63 @@ class OrderService
         }
     
         return null;
+    }
+
+    /**
+     * Creates a payment with amount 0 and assigns it to the given order so that the status of the given order with amount 0 is calculated correctly.
+     * @param Order $order
+     */
+    private function createAndAssignDummyPayment(Order $order) {
+
+        /** @var \Plenty\Modules\Payment\Models\Payment $payment */
+        $payment = pluginApp(\Plenty\Modules\Payment\Models\Payment::class);
+
+        $payment->mopId             = 5000; // PLENTY_MOP_MANUAL
+        $payment->transactionType   = \Plenty\Modules\Payment\Models\Payment::TRANSACTION_TYPE_BOOKED_POSTING;
+        $payment->status            = \Plenty\Modules\Payment\Models\Payment::STATUS_APPROVED;
+
+        /** @var \Plenty\Modules\Order\Models\OrderAmount $orderAmount */
+        $orderAmount = $order->amounts->where('isSystemCurrency',false)->first();
+        if(!$orderAmount){
+            /** @var \Plenty\Modules\Order\Models\OrderAmount $orderAmount */
+            $orderAmount = $order->amounts->where('isSystemCurrency',true)->first();
+        }
+
+        $payment->currency          = $orderAmount->currency;
+        $payment->amount            = 0;
+
+        $paymentProperties = [];
+        $paymentProperties[] = $this->getPaymentProperty(\Plenty\Modules\Payment\Models\PaymentProperty::TYPE_BOOKING_TEXT, 'ORDER '.$order->id);
+        $paymentProperties[] = $this->getPaymentProperty(\Plenty\Modules\Payment\Models\PaymentProperty::TYPE_TRANSACTION_ID, time());
+
+        $payment->properties = $paymentProperties;
+        $payment->regenerateHash = true;
+
+        /** @var PaymentRepositoryContract $paymentRepo */
+        $paymentRepo = pluginApp(PaymentRepositoryContract::class);
+        $payment = $paymentRepo->createPayment($payment);
+
+        /** @var \Plenty\Modules\Payment\Contracts\PaymentOrderRelationRepositoryContract $paymentOrderRelationRepo */
+        $paymentOrderRelationRepo = pluginApp(\Plenty\Modules\Payment\Contracts\PaymentOrderRelationRepositoryContract::class);
+        $paymentOrderRelationRepo->createOrderRelation($payment, $order);
+    }
+
+    /**
+     * Returns a PaymentProperty with the given params
+     *
+     * @param int       $typeId
+     * @param string    $value
+     *
+     * @return \Plenty\Modules\Payment\Models\PaymentProperty PaymentProperty
+     */
+    private function getPaymentProperty(int $typeId, string $value)
+    {
+        /** @var \Plenty\Modules\Payment\Models\PaymentProperty $paymentProperty */
+        $paymentProperty = pluginApp( \Plenty\Modules\Payment\Models\PaymentProperty::class );
+
+        $paymentProperty->typeId = $typeId;
+        $paymentProperty->value = $value;
+
+        return $paymentProperty;
     }
 }
