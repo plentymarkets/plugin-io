@@ -22,6 +22,7 @@ use Plenty\Modules\Pim\VariationDataInterface\Contracts\VariationDataInterfaceCo
 use Plenty\Modules\Pim\VariationDataInterface\Model\Attributes\VariationBaseAttribute;
 use Plenty\Modules\Pim\VariationDataInterface\Model\Attributes\VariationCategoryAttribute;
 use Plenty\Modules\Pim\VariationDataInterface\Model\Attributes\VariationSalesPriceAttribute;
+use Plenty\Modules\Pim\VariationDataInterface\Model\Variation;
 use Plenty\Modules\Pim\VariationDataInterface\Model\VariationDataInterfaceContext;
 use Plenty\Modules\ShopBuilder\Helper\ShopBuilderRequest;
 use Plenty\Plugin\Application;
@@ -95,10 +96,14 @@ class ItemController extends LayoutController
         /** @var VariationDataInterfaceContract $vdi */
         $vdi = app(VariationDataInterfaceContract::class);
 
+        /** @var VariationBaseAttribute $basePart */
+        $basePart = app(VariationBaseAttribute::class);
+        $basePart->addLazyLoadParts(VariationBaseAttribute::DESCRIPTION);
+        
         /** @var VariationDataInterfaceContext $vdiContext */
         $vdiContext = app(VariationDataInterfaceContext::class);
         $vdiContext->setParts([
-            app(VariationBaseAttribute::class)
+            $basePart
         ]);
 
         /** @var ClientFilter $clientFilter */
@@ -129,9 +134,10 @@ class ItemController extends LayoutController
             ->addFilter($priceFilter);
 
         $vdiResult = $vdi->getResult($vdiContext);
+        /** @var Variation $vdiVariation */
         foreach($vdiResult->get() as $vdiVariation)
         {
-            $test = true;
+            $texts  = $vdiVariation->base->with()->texts;
         }
 
         $end = microtime(true);
