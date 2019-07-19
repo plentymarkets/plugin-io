@@ -180,11 +180,16 @@ class ItemController extends LayoutController
         /** @var VariationBaseAttribute $basePart */
         $basePart = app(VariationBaseAttribute::class);
         $basePart->addLazyLoadParts(VariationBaseAttribute::DESCRIPTION);
+        
+        /** @var VariationSalesPriceAttribute $pricePart */
+        $pricePart = app(VariationSalesPriceAttribute::class);
+        $pricePart->addLazyLoadParts(VariationSalesPriceAttribute::SALES_PRICE);
     
         /** @var VariationDataInterfaceContext $vdiContext */
         $vdiContext = app(VariationDataInterfaceContext::class);
         $vdiContext->setParts([
-                                  $basePart
+                                  $basePart,
+                                  $pricePart
                               ]);
     
         /** @var ClientFilter $clientFilter */
@@ -223,6 +228,7 @@ class ItemController extends LayoutController
         foreach($vdiResult->get() as $vdiVariation)
         {
             $texts  = $vdiVariation->base->with()->texts;
+            $prices = $vdiVariation->salesPrices[1]->with()->salesPrice;
         }
     
         $end = microtime(true);
