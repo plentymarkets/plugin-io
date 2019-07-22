@@ -33,19 +33,15 @@ class VDIToElasticSearchMapper
         'variation'           => VariationFMD::class,
         'variationProperties' => VariationPropertyFMD::class
     ];
-    
+
     public function __construct(){}
 
     public function map(VariationDataInterfaceResultInterface $vdiResult, $resultFields = ['*'])
     {
         $data = [
-            'documents' => [
-                'score' => 0,
-                'id' => 0,
-                'data' => []
-            ]
+            'documents' => []
         ];
-        
+
         $fmdClasses = [];
         if(count($resultFields))
         {
@@ -59,7 +55,7 @@ class VDIToElasticSearchMapper
                 }
             }
         }
-        
+
         if(count($fmdClasses))
         {
             /**
@@ -67,11 +63,15 @@ class VDIToElasticSearchMapper
              */
             foreach($vdiResult->get() as $vdiKey => $vdiVariation)
             {
-                $data['documents']['data'][$vdiKey] = [];
+                $item = [
+                    'score' => 0,
+                    'id' => $vdiVariation->id,
+                    'data' => []];
                 foreach($fmdClasses as $fmdKey => $fmdClass)
                 {
-                    $data['documents']['data'][$vdiKey] = $fmdClass->fill($vdiVariation, $data['documents']['data'][$vdiKey], []);
+                    $item['data'] = $fmdClass->fill($vdiVariation, $item['data'], []);
                 }
+                $data['documents'][] = $item;
             }
         }
 
