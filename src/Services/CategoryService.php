@@ -412,65 +412,96 @@ class CategoryService
 
     public function getPartialTree($categoryId = 0, $type = CategoryType::ALL)
     {
-        $tree = $this->getNavigationTree(
-            $type,
-            $this->sessionStorageService->getLang(),
-            $categoryId > 0 ? 6 : 2,
-            pluginApp(CustomerService::class)->getContactClassId()
-        );
-
         if($categoryId > 0)
         {
             $currentCategory = $this->get($categoryId);
             $branch = $currentCategory->branch->toArray();
+            $maxLevel = max($currentCategory->level + 2, 6);
+
+            $tree = $this->getNavigationTree(
+                $type,
+                $this->sessionStorageService->getLang(),
+                $maxLevel,
+                pluginApp(CustomerService::class)->getContactClassId()
+            );
 
             return $this->filterBranchEntries($tree, $branch);
         }
+        else
+        {
+            $tree = $this->getNavigationTree(
+                $type,
+                $this->sessionStorageService->getLang(),
+                2,
+                pluginApp(CustomerService::class)->getContactClassId()
+            );
 
-        return $this->filterBranchEntries($tree);
+            foreach($tree as $category)
+            {
+                $this->appendBranchFields($category, '', true);
+            }
+
+            return $tree;
+        }
     }
 
 
     private function filterBranchEntries($tree, $branch = [], $level = 1, $urlPrefix = '')
     {
-        $branchKey = "category".$level."Id";
-        $isParentLevel = $branch["category".($level+1)."Id"] === $branch["categoryId"];
-        $result = [];
+        $branchKey      = "category".$level."Id";
+        $isCurrentLevel = $branch[$branchKey] === $branch["categoryId"];
+        $result         = [];
+
         foreach($tree as $category)
         {
             $isInBranch = $category['id'] === $branch[$branchKey];
 
-            // Filter children not having texts in current language
-            $children = array_filter($category['children'], function($child)
-            {
-                return count($child['details']);
-            });
-
-            // add flags for lazy loading
-            $category['hasChildren'] = !!count($children);
-
-            // add url
-            $details = $category['details'][0];
-            $category['url'] = pluginApp(UrlQuery::class, ['path' => $urlPrefix])->join($details['nameUrl'])->toRelativeUrl();
-
             // filter children by current branch
-            if($isInBranch && !$isParentLevel)
+            if($isInBranch && !$isCurrentLevel)
             {
-                $category['children'] = $this->filterBranchEntries($children, $branch, $level+1, $category['url']);
+                $this->appendBranchFields($category, $urlPrefix, false);
+                $category['children'] = $this->filterBranchEntries($category['children'], $branch, $level+1, $category['url']);
                 $result[] = $category;
             }
-            else if($isInBranch && $isParentLevel)
+            else if($isInBranch && $isCurrentLevel)
             {
+                $this->appendBranchFields($category, $urlPrefix, true);
                 $result[] = $category;
             }
-            else if(!$isInBranch && $isParentLevel)
+            else if(!$isInBranch && $isCurrentLevel)
             {
+                $this->appendBranchFields($category, $urlPrefix, false);
                 unset($category['children']);
                 $result[] = $category;
             }
         }
 
         return $result;
+    }
+
+    private function appendBranchFields(&$category, $urlPrefix = '', $recursive = true)
+    {
+        // Filter children not having texts in current language
+        $category['children'] = array_filter($category['children'], function($child)
+        {
+            return count($child['details']);
+        });
+
+        // add flags for lazy loading
+        $category['hasChildren'] = !!count($category['children']);
+
+        // add url
+        $details = $category['details'][0];
+        $category['url'] = pluginApp(UrlQuery::class, ['path' => $urlPrefix])->join($details['nameUrl'])->toRelativeUrl();
+
+        if(count($category['children']) && $recursive)
+        {
+            foreach($category['children'] as $i => $child)
+            {
+                $this->appendBranchFields($category['children'][$i], $category['url'], true);
+            }
+        }
+
     }
 
     /**
