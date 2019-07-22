@@ -11,6 +11,7 @@ use IO\Helper\UserSession;
 use IO\Services\ItemSearch\Helper\LoadResultFields;
 use IO\Services\ItemSearch\Helper\ResultFieldTemplate;
 use IO\Services\UrlBuilder\UrlQuery;
+use Plenty\Modules\Category\Contracts\CategoryBranchRepositoryContract;
 use Plenty\Modules\Category\Models\Category;
 use Plenty\Modules\Category\Contracts\CategoryRepositoryContract;
 use Plenty\Modules\Category\Models\CategoryClient;
@@ -409,110 +410,53 @@ class CategoryService
         return $result;
     }
 
-
-    public function filterPartialCategoryTree($categoryTree, $categoryId, $dataFields = [], $parents = [], $breadcrumbs = [], $level = 0)
+    public function getPartialTree($categoryId = 0, $type = CategoryType::ALL)
     {
-        $filteredCategories = [];
-        foreach($categoryTree as $category)
+        $tree = $this->getNavigationTree(
+            $type,
+            $this->sessionStorageService->getLang(),
+            $categoryId > 0 ? 6 : 2,
+            pluginApp(CustomerService::class)->getContactClassId()
+        );
+
+        if($categoryId > 0)
         {
-            if($category['id'] === (int)$categoryId)
-            {
-                if(in_array('breadcrumbs', $dataFields))
-                {
-                    $breadcrumbs = array_merge($breadcrumbs, $this->filterChildren([$category]));
-                    $filteredCategories['breadcrumbs'] = $breadcrumbs;
-                }
+            $currentCategory = $this->get($categoryId);
+            $branch = $currentCategory->branch->toArray();
 
-                if(in_array('parents', $dataFields))
-                {
-                    $filteredCategories['parents'] = $parents;
-                }
-
-                if(in_array('current', $dataFields))
-                {
-                    $filteredCategories['current'] = $this->filterChildren($categoryTree, 0);
-                }
-
-                if(in_array('children', $dataFields))
-                {
-                    foreach($categoryTree as $temp)
-                    {
-                        $filteredCategories['children'][$temp['id']] = $this->filterChildren( $temp['children'] ?? [], 0);
-
-                    }
-                }
-            }
+            return $this->filterBranchEntries($tree, $branch);
         }
 
-        if(count($filteredCategories) > 0)
-        {
-            return $filteredCategories;
-        }
-
-        foreach($categoryTree as $category)
-        {
-            if(isset($category['children']))
-            {
-                $tempBreadcrumbs = array_merge($breadcrumbs, $this->filterChildren([$category]));
-
-                $tempParents = $this->filterChildren($categoryTree,0);
-                $filteredCategories = $this->filterPartialCategoryTree($category['children'], $categoryId, $dataFields, $tempParents, $tempBreadcrumbs, $level++);
-
-                if (count($filteredCategories) > 0)
-                {
-                    break;
-                }
-            }
-        }
-        return $filteredCategories;
+        return $this->filterBranchEntries($tree);
     }
 
-    private function filterChildren($categories, $skipLevel = 0)
+
+    private function filterBranchEntries($tree, $branch = [], $level = 1)
     {
-        $cleanedCategories = [];
-        foreach($categories as $category)
+        $branchKey = "category".$level."Id";
+        $isParentLevel = $branch["category".($level+1)."Id"] === $branch["categoryId"];
+        $result = [];
+        foreach($tree as $category)
         {
-            if(isset($category['details']))
+            $isInBranch = $category['id'] === $branch[$branchKey];
+            $category['hasChildren'] = !!count($category['children']);
+            if($isInBranch && !$isParentLevel)
             {
-                $category = json_decode(json_encode($category));
-                if ($skipLevel === 0 && isset($category->children))
-                {
-                    $detailsExist = false;
-                    foreach ($category->children as $categoryChildren)
-                    {
-                        if (isset($categoryChildren->details))
-                        {
-                            $detailsExist = true;
-                        }
-                    }
-
-                    if ($detailsExist)
-                    {
-                        $category->hasChildren = true;
-                    }
-                    unset($category->children);
-                    $category = json_decode(json_encode($category), true); //Turn it into an array
-                    $cleanedCategories[] = $category;
-                } elseif ($skipLevel === 1 && isset($category->children))
-                {
-                    $temp = [];
-                    foreach ($category->children as $children) {
-                        unset($children['children']);
-                        $temp[] = $children;
-                    }
-                    $category->children = $temp;
-                    $category = json_decode(json_encode($category), true); //Turn it into an array
-
-                    $cleanedCategories[] = $category;
-                } else
-                {
-                    $category = json_decode(json_encode($category), true); //Turn it into an array
-                    $cleanedCategories[] = $category;
-                }
+                $category['children'] = $this->filterBranchEntries($category['children'], $branch, $level+1);
+                $result[] = $category;
+            }
+            else if($isInBranch && $isParentLevel)
+            {
+                $result[] = $category;
+            }
+            else if(!$isInBranch && $isParentLevel)
+            {
+                unset($category['children']);
+                $result[] = $category;
             }
         }
 
-        return $cleanedCategories;
+        return $result;
     }
 
     /**
