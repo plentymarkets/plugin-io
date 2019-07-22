@@ -431,7 +431,7 @@ class CategoryService
     }
 
 
-    private function filterBranchEntries($tree, $branch = [], $level = 1)
+    private function filterBranchEntries($tree, $branch = [], $level = 1, $urlPrefix = '')
     {
         $branchKey = "category".$level."Id";
         $isParentLevel = $branch["category".($level+1)."Id"] === $branch["categoryId"];
@@ -439,10 +439,24 @@ class CategoryService
         foreach($tree as $category)
         {
             $isInBranch = $category['id'] === $branch[$branchKey];
-            $category['hasChildren'] = !!count($category['children']);
+
+            // Filter children not having texts in current language
+            $children = array_filter($category['children'], function($child)
+            {
+                return count($child['details']);
+            });
+
+            // add flags for lazy loading
+            $category['hasChildren'] = !!count($children);
+
+            // add url
+            $details = $category['details'][0];
+            $category['url'] = pluginApp(UrlQuery::class, ['path' => $urlPrefix])->join($details['nameUrl'])->toRelativeUrl();
+
+            // filter children by current branch
             if($isInBranch && !$isParentLevel)
             {
-                $category['children'] = $this->filterBranchEntries($category['children'], $branch, $level+1);
+                $category['children'] = $this->filterBranchEntries($children, $branch, $level+1, $category['url']);
                 $result[] = $category;
             }
             else if($isInBranch && $isParentLevel)
