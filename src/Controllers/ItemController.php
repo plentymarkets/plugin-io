@@ -20,9 +20,12 @@ use Plenty\Modules\Pim\SearchService\Filter\SalesPriceFilter;
 use Plenty\Modules\Pim\SearchService\Filter\TextFilter;
 use Plenty\Modules\Pim\SearchService\Filter\VariationBaseFilter;
 use Plenty\Modules\Pim\VariationDataInterface\Contracts\VariationDataInterfaceContract;
+use Plenty\Modules\Pim\VariationDataInterface\Model\Attributes\VariationAttributeValueAttribute;
 use Plenty\Modules\Pim\VariationDataInterface\Model\Attributes\VariationBaseAttribute;
 use Plenty\Modules\Pim\VariationDataInterface\Model\Attributes\VariationCategoryAttribute;
+use Plenty\Modules\Pim\VariationDataInterface\Model\Attributes\VariationImageAttribute;
 use Plenty\Modules\Pim\VariationDataInterface\Model\Attributes\VariationSalesPriceAttribute;
+use Plenty\Modules\Pim\VariationDataInterface\Model\Attributes\VariationUnitAttribute;
 use Plenty\Modules\Pim\VariationDataInterface\Model\Variation;
 use Plenty\Modules\Pim\VariationDataInterface\Model\VariationDataInterfaceContext;
 use Plenty\Modules\ShopBuilder\Helper\ShopBuilderRequest;
@@ -180,18 +183,44 @@ class ItemController extends LayoutController
 
         /** @var VariationBaseAttribute $basePart */
         $basePart = app(VariationBaseAttribute::class);
-        $basePart->addLazyLoadParts(VariationBaseAttribute::DESCRIPTION);
+        $basePart->addLazyLoadParts(
+            VariationBaseAttribute::DESCRIPTION,
+            VariationBaseAttribute::AVAILABILITY,
+            VariationBaseAttribute::CROSS_SELLING,
+            VariationBaseAttribute::IMAGE,
+            VariationBaseAttribute::ITEM,
+            VariationBaseAttribute::PROPERTY,
+            VariationBaseAttribute::SERIAL_NUMBER,
+            VariationBaseAttribute::STOCK
+        );
 
         /** @var VariationSalesPriceAttribute $pricePart */
         $pricePart = app(VariationSalesPriceAttribute::class);
         $pricePart->addLazyLoadParts(VariationSalesPriceAttribute::SALES_PRICE);
+        
+        /** @var VariationUnitAttribute $unitPart */
+        $unitPart = app(VariationUnitAttribute::class);
+        $unitPart->addLazyLoadParts(VariationUnitAttribute::UNIT);
+        
+        /** @var VariationImageAttribute $imagePart */
+        $imagePart = app(VariationImageAttribute::class);
+        
+        /** @var VariationAttributeValueAttribute $attriuteValuePart */
+        $attributeValuePart = app(VariationAttributeValueAttribute::class);
+        $attributeValuePart->addLazyLoadParts(
+            VariationAttributeValueAttribute::ATTRIBUTE,
+            VariationAttributeValueAttribute::VALUE
+        );
 
         /** @var VariationDataInterfaceContext $vdiContext */
         $vdiContext = app(VariationDataInterfaceContext::class);
         $vdiContext->setParts([
-                                  $basePart,
-                                  $pricePart
-                              ]);
+            $basePart,
+            $pricePart,
+            $unitPart,
+            $imagePart,
+            $attributeValuePart
+        ]);
 
         /** @var ClientFilter $clientFilter */
         $clientFilter = app(ClientFilter::class);
@@ -230,10 +259,12 @@ class ItemController extends LayoutController
          * @var VDIToElasticSearchMapper $mappingHelper
          */
         $mappingHelper = pluginApp(VDIToElasticSearchMapper::class);
-        $mappedData = $mappingHelper->map($vdiResult, ResultFieldTemplate::get(ResultFieldTemplate::TEMPLATE_SINGLE_ITEM));
+        $mappedData = $mappingHelper->map($vdiResult, ResultFieldTemplate::load(ResultFieldTemplate::TEMPLATE_SINGLE_ITEM));
 
         $end = microtime(true);
         $executionTime = $end - $start;
         $this->getLogger('Performance')->error('VDI: '. $executionTime . ' Sekunden');
+        
+        return $mappedData;
     }
 }
