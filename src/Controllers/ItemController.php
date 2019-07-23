@@ -8,10 +8,9 @@ use IO\Services\CategoryService;
 use IO\Services\ItemListService;
 use IO\Services\ItemSearch\Factories\VariationSearchResultFactory;
 use IO\Services\ItemSearch\Helper\ResultFieldTemplate;
-use IO\Services\ItemSearch\SearchPresets\CrossSellingItems;
-use IO\Services\ItemSearch\SearchPresets\SingleItem;
+use IO\Services\VdiSearch\SearchPresets\SingleItem;
 use IO\Services\ItemSearch\SearchPresets\VariationAttributeMap;
-use IO\Services\ItemSearch\Services\ItemSearchService;
+use IO\Services\VdiSearch\Services\ItemSearchService;
 use IO\Services\PriceDetectService;
 use IO\Services\SessionStorageService;
 use Plenty\Modules\Category\Models\Category;
@@ -22,11 +21,9 @@ use Plenty\Modules\Pim\SearchService\Filter\VariationBaseFilter;
 use Plenty\Modules\Pim\VariationDataInterface\Contracts\VariationDataInterfaceContract;
 use Plenty\Modules\Pim\VariationDataInterface\Model\Attributes\VariationAttributeValueAttribute;
 use Plenty\Modules\Pim\VariationDataInterface\Model\Attributes\VariationBaseAttribute;
-use Plenty\Modules\Pim\VariationDataInterface\Model\Attributes\VariationCategoryAttribute;
 use Plenty\Modules\Pim\VariationDataInterface\Model\Attributes\VariationImageAttribute;
 use Plenty\Modules\Pim\VariationDataInterface\Model\Attributes\VariationSalesPriceAttribute;
 use Plenty\Modules\Pim\VariationDataInterface\Model\Attributes\VariationUnitAttribute;
-use Plenty\Modules\Pim\VariationDataInterface\Model\Variation;
 use Plenty\Modules\Pim\VariationDataInterface\Model\VariationDataInterfaceContext;
 use Plenty\Modules\ShopBuilder\Helper\ShopBuilderRequest;
 use Plenty\Plugin\Application;
@@ -74,7 +71,7 @@ class ItemController extends LayoutController
         $itemSearchService = pluginApp( ItemSearchService::class );
         $itemResult = $itemSearchService->getResults([
             'item' => SingleItem::getSearchFactory( $itemSearchOptions ),
-            'variationAttributeMap' => VariationAttributeMap::getSearchFactory( $itemSearchOptions )
+            //'variationAttributeMap' => VariationAttributeMap::getSearchFactory( $itemSearchOptions )
         ]);
 
 
@@ -95,7 +92,7 @@ class ItemController extends LayoutController
             );
         }
 
-        $vdiResult = $this->loadItemDataVdi($itemId, $variationId);
+        //$vdiResult = $this->loadItemDataVdi($itemId, $variationId);
 
         if(empty($itemResult['item']['documents']))
         {

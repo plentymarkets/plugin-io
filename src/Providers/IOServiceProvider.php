@@ -82,6 +82,8 @@ class IOServiceProvider extends ServiceProvider
         $this->getApplication()->bind('IO\Builder\Item\ItemColumnBuilder');
         $this->getApplication()->bind('IO\Builder\Item\ItemFilterBuilder');
         $this->getApplication()->bind('IO\Builder\Item\ItemParamsBuilder');
+    
+        $this->getApplication()->bind('IO\Services\VdiSearch\Factories\BaseSearchFactory');
 
         // Register services
         $this->registerSingletons([
