@@ -435,10 +435,11 @@ class CategoryService
                 3,
                 pluginApp(CustomerService::class)->getContactClassId()
             );
+            $siblingCount = count($tree);
 
             foreach($tree as $i => $category)
             {
-                $this->appendBranchFields($tree[$i], '', 1);
+                $this->appendBranchFields($tree[$i], $siblingCount, '', 1);
             }
 
             return $tree;
@@ -451,6 +452,7 @@ class CategoryService
         $branchKey      = "category".$level."Id";
         $isCurrentLevel = $branch[$branchKey] === $branch["categoryId"];
         $result         = [];
+        $siblingCount   = count($tree);
 
         foreach($tree as $category)
         {
@@ -459,18 +461,18 @@ class CategoryService
             // filter children by current branch
             if($isInBranch && !$isCurrentLevel)
             {
-                $this->appendBranchFields($category, $urlPrefix, 6);
+                $this->appendBranchFields($category, $siblingCount, $urlPrefix, 6);
                 $category['children'] = $this->filterBranchEntries($category['children'], $branch, $level+1, $category['url']);
                 $result[] = $category;
             }
             else if($isInBranch && $isCurrentLevel)
             {
-                $this->appendBranchFields($category, $urlPrefix, 2);
+                $this->appendBranchFields($category, $siblingCount, $urlPrefix, 2);
                 $result[] = $category;
             }
             else if(!$isInBranch && $isCurrentLevel)
             {
-                $this->appendBranchFields($category, $urlPrefix, 0);
+                $this->appendBranchFields($category, $siblingCount, $urlPrefix, 0);
                 $result[] = $category;
             }
         }
@@ -478,7 +480,7 @@ class CategoryService
         return $result;
     }
 
-    private function appendBranchFields(&$category, $urlPrefix = '', $depth = 6)
+    private function appendBranchFields(&$category, $siblingCount = 1, $urlPrefix = '', $depth = 6)
     {
         // Filter children not having texts in current language
         $category['children'] = array_filter($category['children'], function($child)
@@ -488,6 +490,7 @@ class CategoryService
 
         // add flags for lazy loading
         $category['childCount'] = count($category['children']);
+        $category['siblingCount'] = $siblingCount;
 
         // add url
         $details = $category['details'][0];
@@ -497,7 +500,7 @@ class CategoryService
         {
             foreach($category['children'] as $i => $child)
             {
-                $this->appendBranchFields($category['children'][$i], $category['url'], $depth - 1);
+                $this->appendBranchFields($category['children'][$i], $category['childCount'], $category['url'], $depth - 1);
             }
         }
         else
