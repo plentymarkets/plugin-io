@@ -17,7 +17,7 @@ class IsEqualArrayStructure
     {
         foreach((array)$expectedStructure as $key => $value)
         {
-            if (!array_key_exists($key, $data))
+            if ((is_array($data) && !array_key_exists($key, $data)) || (!is_array($data) && !isset($data->{$key})))
             {
                 /**
                  * @var \Exception $exception
@@ -33,7 +33,8 @@ class IsEqualArrayStructure
             {
                 try
                 {
-                    $result = self::validate($data[$key], $expectedStructure[$key], $parentKey . '.' . $key);
+
+                    $result = self::validate($data[$key] ?? $data->{$key}, $expectedStructure[$key], $parentKey . '.' . $key);
                 } catch (\Exception $exception)
                 {
                     throw $exception;

@@ -16,7 +16,7 @@ class AttributeFMD extends FieldMapDefinition
     {
         return VariationAttributeValueAttribute::class;
     }
-    
+
     /**
      * @inheritDoc
      */
@@ -27,7 +27,7 @@ class AttributeFMD extends FieldMapDefinition
             VariationAttributeValueAttribute::ATTRIBUTE
         ];
     }
-    
+
     /**
      * @inheritDoc
      */
@@ -35,36 +35,36 @@ class AttributeFMD extends FieldMapDefinition
     {
         return 'attributes';
     }
-    
+
     /**
      * @inheritDoc
      */
     public function fill(Variation $decoratedVariation, array $content, array $sourceFields)
     {
         $attributeValues = $decoratedVariation->attributeValues;
-        
+
         $data = [];
         foreach ($attributeValues as $attributeValue) {
             $attribute = $attributeValue->with()->attribute;
             $attribute = $this::map($attribute, 'attributeNames', 'names');
-            
+
             $value = $attributeValue->with()->attributeValue;
             $value = $this::map($value, 'valueNames', 'names');
-            
+
             $entry = [
                 'attributeId' => $attribute->id,
                 'valueId' => $value->id,
                 'isLinkableToImage' => $attribute->isLinkableToImage,
-                'attribute' => $attribute,
-                'value' => $value
+                'attribute' => $attribute->toArray(),
+                'value' => $value->toArray()
             ];
-            
+
             $data[] = $entry;
         }
-        
+
         $content['attributes'] = $data;
-        
-        
+
+
         return $content;
     }
 }

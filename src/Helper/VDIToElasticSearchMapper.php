@@ -2,16 +2,15 @@
 
 namespace IO\Helper;
 
-use ClassesWithParents\F;
 
 use IO\Services\VdiSearch\FMD\AttributeFMD;
+use \IO\Services\VdiSearch\FMD\TextFMD;
+
 use Plenty\Modules\Pim\MappingLayer\Models\BarcodeFMD;
 use Plenty\Modules\Pim\MappingLayer\Models\DefaultCategoryFMD;
-use Plenty\Modules\Pim\MappingLayer\Models\FieldMapDefinition;
 use Plenty\Modules\Pim\MappingLayer\Models\ImageFMD;
 use Plenty\Modules\Pim\MappingLayer\Models\ItemFMD;
 use Plenty\Modules\Pim\MappingLayer\Models\PropertyFMD;
-use Plenty\Modules\Pim\MappingLayer\Models\TextFMD;
 use Plenty\Modules\Pim\MappingLayer\Models\UnitFMD;
 use Plenty\Modules\Pim\MappingLayer\Models\VariationFMD;
 use Plenty\Modules\Pim\MappingLayer\Models\VariationPropertyFMD;
