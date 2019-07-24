@@ -16,9 +16,22 @@ class AddressValidator extends Validator
         $this->addString('address2', $addressFormat === ShippingCountry::ADDRESS_FORMAT_DE);
         $this->addString('postalCode', true);
         $this->addString('town', true);
-        $this->addString('name1', $isCompany);
-        $this->addString('name2', !$isCompany);
-        $this->addString('name3', !$isCompany);
+        
+        
+        $name1Condition = $this->addString('name1', $isCompany);
+        $name2Condition = $this->addString('name2', !$isCompany);
+        $name3Condition = $this->addString('name3', !$isCompany);
+        
+        if($isCompany)
+        {
+            $name2Condition->nullable();
+            $name3Condition->nullable();
+        }
+        else
+        {
+            $name1Condition->nullable();
+        }
+        
         $this->addDate('birthday')->date()->dateBefore(date('Y-m-d'));
     }
 }
