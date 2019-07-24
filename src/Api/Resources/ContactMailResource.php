@@ -42,14 +42,6 @@ class ContactMailResource extends ApiResource
     {
         $mailTemplate = TemplateContainer::get('tpl.mail.contact')->getTemplate();
 
-        $response = $this->contactMailService->sendMail(
-            $mailTemplate,
-            $this->request->all()
-        );
-        
-        /*
-        $mailTemplate = $this->request->get('template', '');
-        $contactData = $this->request->get('contactData',[]);
         $recaptchaToken = $this->request->get('recaptchaToken', null);
         $recaptchaSecret = $this->templateConfigService->get('global.google_recaptcha_secret');
 
@@ -58,8 +50,10 @@ class ContactMailResource extends ApiResource
             return $this->response->create("", ResponseCode::BAD_REQUEST);
         }
 
-        $response = $this->contactMailService->sendMail($mailTemplate, $contactData);
-        */
+        $response = $this->contactMailService->sendMail(
+            $mailTemplate,
+            $this->request->all()
+        );
 
         if($response)
         {
@@ -106,6 +100,9 @@ class ContactMailResource extends ApiResource
 
         $result = json_decode($content, true);
 
-        return $result["success"];
+        return $result["success"]
+            && (!array_key_exists('score', $result)
+                || $result['score'] >= $this->templateConfigService->get('global.google_recaptcha_threshold')
+            );
     }
 }
