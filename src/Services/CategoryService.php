@@ -436,9 +436,9 @@ class CategoryService
                 pluginApp(CustomerService::class)->getContactClassId()
             );
 
-            foreach($tree as $category)
+            foreach($tree as $i => $category)
             {
-                $this->appendBranchFields($category, '', true);
+                $this->appendBranchFields($tree[$i]);
             }
 
             return $tree;
@@ -459,19 +459,18 @@ class CategoryService
             // filter children by current branch
             if($isInBranch && !$isCurrentLevel)
             {
-                $this->appendBranchFields($category, $urlPrefix, false);
+                $this->appendBranchFields($category, $urlPrefix, 6);
                 $category['children'] = $this->filterBranchEntries($category['children'], $branch, $level+1, $category['url']);
                 $result[] = $category;
             }
             else if($isInBranch && $isCurrentLevel)
             {
-                $this->appendBranchFields($category, $urlPrefix, true);
+                $this->appendBranchFields($category, $urlPrefix, 2);
                 $result[] = $category;
             }
             else if(!$isInBranch && $isCurrentLevel)
             {
-                $this->appendBranchFields($category, $urlPrefix, false);
-                unset($category['children']);
+                $this->appendBranchFields($category, $urlPrefix, 0);
                 $result[] = $category;
             }
         }
@@ -479,7 +478,7 @@ class CategoryService
         return $result;
     }
 
-    private function appendBranchFields(&$category, $urlPrefix = '', $recursive = true)
+    private function appendBranchFields(&$category, $urlPrefix = '', $depth = 6)
     {
         // Filter children not having texts in current language
         $category['children'] = array_filter($category['children'], function($child)
@@ -494,12 +493,16 @@ class CategoryService
         $details = $category['details'][0];
         $category['url'] = pluginApp(UrlQuery::class, ['path' => $urlPrefix])->join($details['nameUrl'])->toRelativeUrl();
 
-        if(count($category['children']) && $recursive)
+        if(count($category['children']) && $depth > 0)
         {
             foreach($category['children'] as $i => $child)
             {
-                $this->appendBranchFields($category['children'][$i], $category['url'], true);
+                $this->appendBranchFields($category['children'][$i], $category['url'], $depth - 1);
             }
+        }
+        else
+        {
+            unset($category['children']);
         }
 
     }
