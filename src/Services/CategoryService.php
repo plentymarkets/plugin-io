@@ -487,7 +487,7 @@ class CategoryService
         });
 
         // add flags for lazy loading
-        $category['hasChildren'] = !!count($category['children']);
+        $category['childCount'] = count($category['children']);
 
         // add url
         $details = $category['details'][0];
