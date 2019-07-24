@@ -265,11 +265,19 @@ class CheckoutService
             );
         }
 
+        // Check if pattern has ISO Code in front
+        $pattern = $formatter->getPattern();
+        if(mb_substr($pattern, 0, 1, "UTF-8") === "\u{00A4}")
+        {
+            // Insert a space after the beginning character
+            $pattern = mb_substr($pattern, 0, 1, "UTF-8") . " " . mb_substr($pattern, 1);
+        }
+
         return [
             "separator_decimal"   => $formatter->getSymbol(\NumberFormatter::MONETARY_SEPARATOR_SYMBOL),
             "separator_thousands" => $formatter->getSymbol(\NumberFormatter::MONETARY_GROUPING_SEPARATOR_SYMBOL),
             "number_decimals"     => $formatter->getAttribute(\NumberFormatter::FRACTION_DIGITS),
-            "pattern"             => $formatter->getPattern()
+            "pattern"             => $pattern
         ];
     }
 
