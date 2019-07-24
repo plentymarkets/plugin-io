@@ -416,7 +416,7 @@ class CategoryService
         {
             $currentCategory = $this->get($categoryId);
             $branch = $currentCategory->branch->toArray();
-            $maxLevel = max($currentCategory->level + 2, 6);
+            $maxLevel = max($currentCategory->level + 3, 6);
 
             $tree = $this->getNavigationTree(
                 $type,
@@ -432,13 +432,13 @@ class CategoryService
             $tree = $this->getNavigationTree(
                 $type,
                 $this->sessionStorageService->getLang(),
-                2,
+                3,
                 pluginApp(CustomerService::class)->getContactClassId()
             );
 
             foreach($tree as $i => $category)
             {
-                $this->appendBranchFields($tree[$i]);
+                $this->appendBranchFields($tree[$i], '', 1);
             }
 
             return $tree;
