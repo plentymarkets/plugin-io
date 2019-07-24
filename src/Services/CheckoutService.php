@@ -270,7 +270,7 @@ class CheckoutService
         if(mb_substr($pattern, 0, 1, "UTF-8") === "\u{00A4}")
         {
             // Insert a space after the beginning character
-            $pattern = mb_substr($pattern, 0, 1, "UTF-8") . " " . mb_substr($pattern, 1);
+            $pattern = mb_substr($pattern, 0, 1) . " " . mb_substr($pattern, 1);
         }
 
         return [
