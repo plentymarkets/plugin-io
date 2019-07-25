@@ -92,9 +92,6 @@ class MultiSearchFactory
      */
     public function getResults()
     {
-        $results = [];
-        //$searchRepository = pluginApp( VariationElasticSearchMultiSearchRepositoryContract::class );
-
         $vdiContexts = [];
         foreach( $this->searches as $resultName => $searches )
         {
@@ -168,14 +165,20 @@ class MultiSearchFactory
             }
         }*/
     
-        foreach($results[0]->get() as $variarion)
+        // TODO remove later
+        if(!is_null($results) && count($results))
         {
-            $test = true;
+            foreach($results as $result)
+            {
+                foreach($result->get() as $variation)
+                {
+                    $test = true;
+                }
+            }
         }
-        
-        foreach($results[1]->get() as $facet)
+        else
         {
-            $test = true;
+            $results = [];
         }
         
         return $results;

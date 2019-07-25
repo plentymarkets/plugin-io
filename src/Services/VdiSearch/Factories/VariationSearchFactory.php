@@ -330,37 +330,7 @@ class VariationSearchFactory extends BaseSearchFactory
             {
                 $lang = pluginApp(SessionStorageService::class)->getLang();
             }
-    
-            $langMap = [
-                'de' => 'german',
-                'en' => 'english',
-                'fr' => 'french',
-                'bg' => 'bulgarian',
-                'it' => 'italian',
-                'es' => 'spanish',
-                'tr' => 'turkish',
-                'nl' => 'dutch',
-                // 'pl' => '',
-                'pt' => 'portuguese',
-                'nn' => 'norwegian',
-                'ro' => 'romanian',
-                'da' => 'danish',
-                'se' => 'swedish',
-                'cz' => 'czech',
-                'ru' => 'russian',
-                //'sk' => '',
-                //'cn' => '',
-                //'vn' => '',
-            ];
-    
-            if ( array_key_exists( $lang, $langMap ) )
-            {
-                $lang = $langMap[$lang];
-            }
-            else
-            {
-                $lang = TextFilter::LANG_DE;
-            }
+            
             /** @var TextFilter $textFilter */
             $textFilter = $this->createFilter(TextFilter::class);
             $textFilter->hasNameInLanguage( $lang, $type );
