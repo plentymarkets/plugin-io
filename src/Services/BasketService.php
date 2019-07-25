@@ -2,8 +2,8 @@
 
 namespace IO\Services;
 
-use IO\Services\ItemSearch\SearchPresets\BasketItems;
-use IO\Services\ItemSearch\Services\ItemSearchService;
+use IO\Services\VdiSearch\SearchPresets\BasketItems;
+use IO\Services\VdiSearch\Services\ItemSearchService;
 use Plenty\Modules\Accounting\Vat\Contracts\VatInitContract;
 use Plenty\Modules\Accounting\Vat\Models\VatRate;
 use Plenty\Modules\Basket\Contracts\BasketRepositoryContract;

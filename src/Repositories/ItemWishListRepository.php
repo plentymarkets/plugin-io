@@ -2,8 +2,8 @@
 
 namespace IO\Repositories;
 
-use IO\Services\ItemSearch\SearchPresets\VariationList;
-use IO\Services\ItemSearch\Services\ItemSearchService;
+use IO\Services\VdiSearch\SearchPresets\VariationList;
+use IO\Services\VdiSearch\Services\ItemSearchService;
 use Plenty\Modules\Plugin\DataBase\Contracts\DataBase;
 use Plenty\Modules\Plugin\DataBase\Contracts\Query;
 use IO\Services\CustomerService;

@@ -9,7 +9,7 @@ use IO\Services\ItemListService;
 use IO\Services\ItemSearch\Factories\VariationSearchResultFactory;
 use IO\Services\ItemSearch\Helper\ResultFieldTemplate;
 use IO\Services\VdiSearch\SearchPresets\SingleItem;
-use IO\Services\ItemSearch\SearchPresets\VariationAttributeMap;
+use IO\Services\VdiSearch\SearchPresets\VariationAttributeMap;
 use IO\Services\VdiSearch\Services\ItemSearchService;
 use IO\Services\PriceDetectService;
 use IO\Services\SessionStorageService;
@@ -71,7 +71,7 @@ class ItemController extends LayoutController
         $itemSearchService = pluginApp( ItemSearchService::class );
         $itemResult = $itemSearchService->getResults([
             'item' => SingleItem::getSearchFactory( $itemSearchOptions ),
-            //'variationAttributeMap' => VariationAttributeMap::getSearchFactory( $itemSearchOptions )
+            'variationAttributeMap' => VariationAttributeMap::getSearchFactory( $itemSearchOptions )
         ]);
 
 
@@ -91,9 +91,7 @@ class ItemController extends LayoutController
                 ResultFieldTemplate::get(ResultFieldTemplate::TEMPLATE_SINGLE_ITEM)
             );
         }
-
-        //$vdiResult = $this->loadItemDataVdi($itemId, $variationId);
-
+        
         if(empty($itemResult['item']['documents']))
         {
             $this->getLogger(__CLASS__)->info(

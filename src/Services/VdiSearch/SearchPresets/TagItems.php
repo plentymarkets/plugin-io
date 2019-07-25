@@ -2,9 +2,7 @@
 
 namespace IO\Services\VdiSearch\SearchPresets;
 
-use IO\Services\ItemSearch\Extensions\ContentCacheVariationLinkExtension;
-use IO\Services\ItemSearch\Factories\VariationSearchFactory;
-use IO\Services\ItemSearch\Helper\SortingHelper;
+use IO\Services\VdiSearch\Factories\VariationSearchFactory;
 
 /**
  * Class TagItems
@@ -13,7 +11,7 @@ use IO\Services\ItemSearch\Helper\SortingHelper;
  * Available options (see VariationList for inherited options)
  * - tagIds: List of tag ids to get assigned items for
  *
- * @package IO\Services\ItemSearch\SearchPresets
+ * @package IO\Services\VdiSearch\SearchPresets
  */
 class TagItems extends VariationList
 {

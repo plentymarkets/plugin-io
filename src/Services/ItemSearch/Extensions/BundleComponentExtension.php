@@ -2,9 +2,9 @@
 
 namespace IO\Services\ItemSearch\Extensions;
 
-use IO\Services\ItemSearch\Factories\VariationSearchFactory;
-use IO\Services\ItemSearch\SearchPresets\BasketItems;
-use IO\Services\ItemSearch\Services\ItemSearchService;
+use IO\Services\VdiSearch\Factories\VariationSearchFactory;
+use IO\Services\VdiSearch\SearchPresets\BasketItems;
+use IO\Services\VdiSearch\Services\ItemSearchService;
 use IO\Services\TemplateConfigService;
 use Plenty\Modules\Authorization\Services\AuthHelper;
 use Plenty\Modules\Item\VariationBundle\Contracts\VariationBundleRepositoryContract;
@@ -25,10 +25,10 @@ class BundleComponentExtension implements ItemSearchExtension
                 VariationSearchFactory::INHERIT_AGGREGATIONS,
                 VariationSearchFactory::INHERIT_SORTING
             ])
-            ->withResultFields([
+            /*->withResultFields([
                 'variation.bundleType',
                 'variation.id'
-            ])
+            ])*/
             ->build();
     }
 

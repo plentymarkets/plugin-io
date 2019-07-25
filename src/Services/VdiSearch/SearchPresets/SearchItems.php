@@ -2,9 +2,13 @@
 
 namespace IO\Services\VdiSearch\SearchPresets;
 
-use IO\Services\ItemSearch\Factories\VariationSearchFactory;
-use IO\Services\ItemSearch\Helper\ResultFieldTemplate;
+use IO\Services\VdiSearch\Factories\VariationSearchFactory;
 use IO\Services\ItemSearch\Helper\SortingHelper;
+use Plenty\Modules\Pim\VariationDataInterface\Model\Attributes\VariationAttributeValueAttribute;
+use Plenty\Modules\Pim\VariationDataInterface\Model\Attributes\VariationBaseAttribute;
+use Plenty\Modules\Pim\VariationDataInterface\Model\Attributes\VariationImageAttribute;
+use Plenty\Modules\Pim\VariationDataInterface\Model\Attributes\VariationSalesPriceAttribute;
+use Plenty\Modules\Pim\VariationDataInterface\Model\Attributes\VariationUnitAttribute;
 
 /**
  * Class SearchItems
@@ -21,7 +25,7 @@ use IO\Services\ItemSearch\Helper\SortingHelper;
  * - autocomplete:  Flag indicating if autocompletion should be used
  *
  *
- * @package IO\Services\ItemSearch\SearchPresets
+ * @package IO\Services\VdiSearch\SearchPresets
  */
 class SearchItems implements SearchPreset
 {
@@ -62,9 +66,9 @@ class SearchItems implements SearchPreset
 
         if ( array_key_exists('autocomplete', $options ) && $options['autocomplete'] === true )
         {
-            $searchFactory->withResultFields(
-                ResultFieldTemplate::load( ResultFieldTemplate::TEMPLATE_AUTOCOMPLETE_ITEM_LIST )
-            );        }
+            //TODO
+            $searchFactory->withParts( self::getParts() );
+        }
         else
         {
             $searchFactory
@@ -74,9 +78,7 @@ class SearchItems implements SearchPreset
                 ->hasPriceInRange($priceMin, $priceMax)
                 ->hasFacets( $facets );
 
-            $searchFactory->withResultFields(
-                ResultFieldTemplate::load( ResultFieldTemplate::TEMPLATE_LIST_ITEM )
-            );
+            $searchFactory->withParts( self::getParts() );
         }
 
         $searchFactory
@@ -97,5 +99,47 @@ class SearchItems implements SearchPreset
         $searchFactory->hasSearchString( $query );
 
         return $searchFactory;
+    }
+    
+    private static function getParts()
+    {
+        /** @var VariationBaseAttribute $basePart */
+        $basePart = app(VariationBaseAttribute::class);
+        $basePart->addLazyLoadParts(
+            VariationBaseAttribute::TEXTS,
+            VariationBaseAttribute::AVAILABILITY,
+            VariationBaseAttribute::CROSS_SELLING,
+            VariationBaseAttribute::IMAGE,
+            VariationBaseAttribute::ITEM,
+            VariationBaseAttribute::PROPERTY,
+            VariationBaseAttribute::SERIAL_NUMBER,
+            VariationBaseAttribute::STOCK
+        );
+        
+        /** @var VariationSalesPriceAttribute $pricePart */
+        $pricePart = app(VariationSalesPriceAttribute::class);
+        $pricePart->addLazyLoadParts(VariationSalesPriceAttribute::SALES_PRICE);
+        
+        /** @var VariationUnitAttribute $unitPart */
+        $unitPart = app(VariationUnitAttribute::class);
+        $unitPart->addLazyLoadParts(VariationUnitAttribute::UNIT);
+        
+        /** @var VariationImageAttribute $imagePart */
+        $imagePart = app(VariationImageAttribute::class);
+        
+        /** @var VariationAttributeValueAttribute $attriuteValuePart */
+        $attributeValuePart = app(VariationAttributeValueAttribute::class);
+        $attributeValuePart->addLazyLoadParts(
+            VariationAttributeValueAttribute::ATTRIBUTE,
+            VariationAttributeValueAttribute::VALUE
+        );
+        
+        return [
+            $basePart,
+            $pricePart,
+            $unitPart,
+            $imagePart,
+            $attributeValuePart
+        ];
     }
 }

@@ -2,8 +2,8 @@
 
 namespace IO\Services\UrlBuilder;
 
-use IO\Services\ItemSearch\Factories\VariationSearchFactory;
-use IO\Services\ItemSearch\Services\ItemSearchService;
+use IO\Services\VdiSearch\Factories\VariationSearchFactory;
+use IO\Services\VdiSearch\Services\ItemSearchService;
 use IO\Services\SessionStorageService;
 
 class ItemUrlBuilder

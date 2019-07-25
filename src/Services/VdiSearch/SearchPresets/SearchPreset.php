@@ -7,7 +7,7 @@ namespace IO\Services\VdiSearch\SearchPresets;
  *
  * Define a preset of a search factory.
  *
- * @package IO\Services\ItemSearch\SearchPresets
+ * @package IO\Services\VdiSearch\SearchPresets
  */
 interface SearchPreset
 {

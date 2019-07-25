@@ -500,7 +500,7 @@ class BaseSearchFactory
     /**
      * Build the search instance itself. May be overridden by concrete factories.
      *
-     * @return DocumentSearch
+     * @return VariationDataInterfaceContext
      */
     protected function prepareSearch()
     {

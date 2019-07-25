@@ -5,20 +5,18 @@ namespace IO\Models;
 use IO\Builder\Order\OrderItemType;
 use IO\Builder\Order\OrderType;
 use IO\Extensions\Filters\ItemImagesFilter;
-use IO\Services\ItemSearch\Factories\VariationSearchFactory;
-use IO\Services\ItemSearch\Services\ItemSearchService;
+use IO\Services\VdiSearch\Factories\VariationSearchFactory;
+use IO\Services\VdiSearch\Services\ItemSearchService;
 use IO\Services\OrderService;
 use IO\Services\OrderStatusService;
 use IO\Services\OrderTotalsService;
 use IO\Services\OrderTrackingService;
-use Plenty\Modules\Authorization\Services\AuthHelper;
 use Plenty\Modules\Order\Models\Order;
 use Plenty\Modules\Order\Property\Models\OrderProperty;
 use Plenty\Modules\Order\Property\Models\OrderPropertyType;
 use Plenty\Modules\Frontend\PaymentMethod\Contracts\FrontendPaymentMethodRepositoryContract;
 use Plenty\Modules\Order\Shipping\Contracts\ParcelServicePresetRepositoryContract;
 use IO\Extensions\Filters\URLFilter;
-use Plenty\Modules\Order\Status\Contracts\OrderStatusRepositoryContract;
 
 class LocalizedOrder extends ModelWrapper
 {

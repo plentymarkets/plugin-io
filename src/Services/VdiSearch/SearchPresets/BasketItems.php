@@ -3,7 +3,8 @@
 namespace IO\Services\VdiSearch\SearchPresets;
 
 use IO\Services\VdiSearch\Factories\VariationSearchFactory;
-use IO\Services\ItemSearch\Helper\ResultFieldTemplate;
+use Plenty\Modules\Pim\VariationDataInterface\Model\Attributes\VariationBaseAttribute;
+use Plenty\Modules\Pim\VariationDataInterface\Model\Attributes\VariationImageAttribute;
 
 /**
  * Class BasketItems
@@ -13,7 +14,7 @@ use IO\Services\ItemSearch\Helper\ResultFieldTemplate;
  * - variationIds: Ids of basket items to get data for
  * - quantities:   Quantity of each item to be considered when searching prices
  *
- * @package IO\Services\ItemSearch\SearchPresets
+ * @package IO\Services\VdiSearch\SearchPresets
  */
 class BasketItems implements SearchPreset
 {
@@ -26,10 +27,7 @@ class BasketItems implements SearchPreset
         $quantities     = $options['quantities'];
 
         /** @var VariationSearchFactory $searchFactory */
-        $searchFactory = pluginApp( VariationSearchFactory::class )
-            ->withResultFields(
-                ResultFieldTemplate::load( ResultFieldTemplate::TEMPLATE_BASKET_ITEM )
-            );
+        $searchFactory = pluginApp( VariationSearchFactory::class )->withParts( self::getParts() );
 
         $searchFactory
             ->withLanguage()
@@ -51,5 +49,25 @@ class BasketItems implements SearchPreset
         }
 
         return $searchFactory;
+    }
+    
+    private static function getParts()
+    {
+        /** @var VariationBaseAttribute $basePart */
+        $basePart = app(VariationBaseAttribute::class);
+        $basePart->addLazyLoadParts(
+            VariationBaseAttribute::TEXTS,
+            VariationBaseAttribute::IMAGE,
+            VariationBaseAttribute::ITEM,
+            VariationBaseAttribute::STOCK
+        );
+        
+        /** @var VariationImageAttribute $imagePart */
+        $imagePart = app(VariationImageAttribute::class);
+    
+        return [
+            $basePart,
+            $imagePart,
+        ];
     }
 }

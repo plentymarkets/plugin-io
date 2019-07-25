@@ -3,8 +3,8 @@
 namespace IO\Services;
 
 use IO\Services\ItemSearch\Helper\SortingHelper;
-use IO\Services\ItemSearch\SearchPresets\LiveShoppingItems;
-use IO\Services\ItemSearch\Services\ItemSearchService;
+use IO\Services\VdiSearch\SearchPresets\LiveShoppingItems;
+use IO\Services\VdiSearch\Services\ItemSearchService;
 use Plenty\Modules\LiveShopping\Contracts\LiveShoppingRepositoryContract;
 use Plenty\Modules\LiveShopping\Models\LiveShopping;
 
@@ -67,7 +67,9 @@ class LiveShoppingService
                                                    ]);
         
        
-        return $this->filterLiveShoppingVariations($itemList);
+        //TODO vdi
+        return [];
+        //return $this->filterLiveShoppingVariations($itemList);
     }
     
     /**

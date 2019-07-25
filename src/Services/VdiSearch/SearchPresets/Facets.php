@@ -2,7 +2,7 @@
 
 namespace IO\Services\VdiSearch\SearchPresets;
 
-use IO\Services\ItemSearch\Factories\FacetSearchFactory;
+use IO\Services\VdiSearch\Factories\FacetSearchFactory;
 
 /**
  * Class Facets
@@ -14,7 +14,7 @@ use IO\Services\ItemSearch\Factories\FacetSearchFactory;
  * - query:         Search string to get variations by.
  * - autocomplete:  Flag indicating if autocomplete search should be used (boolean). Will only be used if 'query' is defined.
  *
- * @package IO\Services\ItemSearch\SearchPresets
+ * @package IO\Services\VdiSearch\SearchPresets
  */
 class Facets implements SearchPreset
 {

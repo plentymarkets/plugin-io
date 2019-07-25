@@ -3,12 +3,12 @@
 namespace IO\Services;
 
 use IO\Constants\SessionStorageKeys;
-use IO\Services\ItemSearch\SearchPresets\CategoryItems;
-use IO\Services\ItemSearch\SearchPresets\CrossSellingItems;
-use IO\Services\ItemSearch\SearchPresets\TagItems;
-use IO\Services\ItemSearch\SearchPresets\VariationList;
-use IO\Services\ItemSearch\Services\ItemSearchService;
-use IO\Services\ItemSearch\SearchPresets\ManufacturerItems;
+use IO\Services\VdiSearch\SearchPresets\CategoryItems;
+use IO\Services\VdiSearch\SearchPresets\CrossSellingItems;
+use IO\Services\VdiSearch\SearchPresets\TagItems;
+use IO\Services\VdiSearch\SearchPresets\VariationList;
+use IO\Services\VdiSearch\Services\ItemSearchService;
+use IO\Services\VdiSearch\SearchPresets\ManufacturerItems;
 use Plenty\Plugin\CachingRepository;
 use Plenty\Modules\Basket\Contracts\BasketRepositoryContract;
 

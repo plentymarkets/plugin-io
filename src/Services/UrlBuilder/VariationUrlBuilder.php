@@ -3,8 +3,8 @@
 namespace IO\Services\UrlBuilder;
 
 use IO\Helper\StringUtils;
-use IO\Services\ItemSearch\Factories\VariationSearchFactory;
-use IO\Services\ItemSearch\Services\ItemSearchService;
+use IO\Services\VdiSearch\Factories\VariationSearchFactory;
+use IO\Services\VdiSearch\Services\ItemSearchService;
 use IO\Services\SessionStorageService;
 use IO\Services\TemplateConfigService;
 use Plenty\Modules\Authorization\Services\AuthHelper;

@@ -98,10 +98,10 @@ class MultiSearchFactory
         $vdiContexts = [];
         foreach( $this->searches as $resultName => $searches )
         {
-            $vdiContexts[] = $searches['primary'];
-            foreach( $searches['secondary'] as $secondarySearch )
+            $vdiContexts[$resultName] = $searches['primary'];
+            foreach( $searches['secondary'] as $secondaryResultName => $secondarySearch )
             {
-                $vdiContexts[] = $secondarySearch;
+                $vdiContexts[$secondaryResultName] = $secondarySearch;
             }
         }
     
@@ -167,7 +167,17 @@ class MultiSearchFactory
                 }
             }
         }*/
-
+    
+        foreach($results[0]->get() as $variarion)
+        {
+            $test = true;
+        }
+        
+        foreach($results[1]->get() as $facet)
+        {
+            $test = true;
+        }
+        
         return $results;
     }
 }

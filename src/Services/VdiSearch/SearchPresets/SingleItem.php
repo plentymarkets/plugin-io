@@ -29,7 +29,7 @@ class SingleItem implements SearchPreset
         /** @var VariationSearchFactory $searchFactory */
         $searchFactory = pluginApp( VariationSearchFactory::class );
         
-        $searchFactory->withParts(self::getParts());
+        $searchFactory->withParts( self::getParts() );
 
         $searchFactory
             ->withLanguage()
@@ -85,7 +85,7 @@ class SingleItem implements SearchPreset
         /** @var VariationBaseAttribute $basePart */
         $basePart = app(VariationBaseAttribute::class);
         $basePart->addLazyLoadParts(
-            VariationBaseAttribute::DESCRIPTION,
+            VariationBaseAttribute::TEXTS,
             VariationBaseAttribute::AVAILABILITY,
             VariationBaseAttribute::CROSS_SELLING,
             VariationBaseAttribute::IMAGE,
