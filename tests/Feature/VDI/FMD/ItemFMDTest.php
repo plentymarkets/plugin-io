@@ -6,6 +6,7 @@ namespace IO\Tests\Feature\VDI\FMD;
 use IO\Helper\VDIToElasticSearchMapper;
 use IO\Tests\Asserts\IsEqualArrayStructure;
 use IO\Tests\TestCase;
+
 use Plenty\Modules\Pim\VariationDataInterface\Contracts\VariationDataInterfaceContract;
 use Plenty\Modules\Pim\VariationDataInterface\Model\Attributes\VariationBaseAttribute;
 use Plenty\Modules\Pim\VariationDataInterface\Model\VariationDataInterfaceContext;
@@ -20,7 +21,6 @@ class ItemFMDTest extends TestCase
     /** @test */
     public function should_map_vdi_result_to_es_result()
     {
-
         $variation = factory(\Plenty\Modules\Item\Variation\Models\Variation::class)->states('withMain')->create();
 
           /** @var VariationDataInterfaceContract $vdi */
@@ -43,7 +43,6 @@ class ItemFMDTest extends TestCase
 
         $vdiResult = $vdi->getResult($vdiContext);
 
-
         /**
          * @var VDIToElasticSearchMapper $mappingHelper
          */
@@ -54,46 +53,119 @@ class ItemFMDTest extends TestCase
             'documents' => [
                 0 => [
                     'data' =>  [
-                        'item' => [
-                                0 => [
-                                    'availabilities' => [
-                                      'listing' => NULL,
-                                      'mandant' => NULL,
-                                      'market' => NULL,
-                                    ],
-                                    'cleanImageName' => NULL,
-                                    'createdAt' => NULL,
-                                    'documentUploadPath' => NULL,
-                                    'documentUploadPathPreview' => NULL,
-                                    'documentUploadPreviewHeight' => NULL,
-                                    'documentUploadPreviewWidth' => NULL,
-                                    'fileType' => NULL,
-                                    'height' => NULL,
-                                    'id' => NULL,
-                                    'itemId' => NULL,
-                                    'md5Checksum' => NULL,
-                                    'md5ChecksumOriginal' => NULL,
-                                    'names' => [
-                                      0 => [
-                                        'alternate' => NULL,
-                                        'imageId' => NULL,
-                                        'lang' => NULL,
-                                        'name' => NULL,
-                                      ],
-                                    ],
-                                    'path' => NULL,
-                                    'position' => NULL,
-                                    'size' => NULL,
-                                    'storageProviderId' => NULL,
-                                    'type' => NULL,
-                                    'updatedAt' => NULL,
-                                    'url' => NULL,
-                                    'urlMiddle' => NULL,
-                                    'urlPreview' => NULL,
-                                    'urlSecondPreview' => NULL,
-                                    'width' => NULL
+                        'item' =>   [
+                            'add_cms_page' => NULL,
+                            'ageRestriction' => NULL,
+                            'amazonFbaPlatform' => NULL,
+                            'amazonFedas' => NULL,
+                            'amazonProductType' => NULL,
+                            'condition' =>
+                            [
+                              'id' => NULL,
+                              'names' =>
+                              [
+                                0 =>
+                                [
+                                  'lang' => NULL,
+                                  'name' => NULL,
                                 ],
-                            ]
+                              ],
+                            ],
+                            'conditionApi' =>
+                            [
+                              'id' => NULL,
+                              'names' =>
+                              [
+                                0 =>
+                                [
+                                  'lang' => NULL,
+                                  'name' => NULL,
+                                ],
+                              ],
+                            ],
+                            'couponRestriction' => NULL,
+                            'createdAt' => NULL,
+                            'customsTariffNumber' => NULL,
+                            'ebayCategory' => NULL,
+                            'ebayCategory2' => NULL,
+                            'ebayPresetId' => NULL,
+                            'ebayStoreCategory' => NULL,
+                            'ebayStoreCategory2' => NULL,
+                            'feedback' => NULL,
+                            //'feedbackCount' => NULL,
+                            //'feedbackDecimal' => NULL,
+                            'flags' =>
+                            [
+                              'flag1' =>
+                              [
+                                'icon' => NULL,
+                                'id' => NULL,
+                                'name' => NULL,
+                                'text' => NULL,
+                              ],
+                              'flag2' =>
+                              [
+                                'icon' => NULL,
+                                'id' => NULL,
+                                'name' => NULL,
+                                'text' => NULL,
+                              ],
+                            ],
+                            //'gimahhot' => NULL,
+                            'id' => NULL,
+                            'isSerialNumber' => NULL,
+                            'isShippableByAmazon' => NULL,
+                            'isShippingPackage' => NULL,
+                            'isSubscribable' => NULL,
+                            'itemType' => NULL,
+                            'mainVariationId' => NULL,
+                            'manufacturer' =>
+                            [
+                              'externalName' => NULL,
+                              //'icon' => NULL,
+                              'id' => NULL,
+                              'logo' => NULL,
+                              'name' => NULL,
+                              'position' => NULL,
+                            ],
+                            'manufacturerId' => NULL,
+                            'maximumOrderQuantity' => NULL,
+                            'ownerId' => NULL,
+                            'position' => NULL,
+                            'producingCountry' =>
+                            [
+                              'id' => NULL,
+                              'isoCode2' => NULL,
+                              'isoCode3' => NULL,
+                              'name' => NULL,
+                              'names' =>
+                              [
+                                0 =>
+                                [
+                                  'lang' => NULL,
+                                  'name' => NULL,
+                                ],
+                              ],
+                            ],
+                            'producingCountryId' => NULL,
+                            'rakutenCategoryId' => NULL,
+                            'revenueAccount' => NULL,
+                            'stockType' => NULL,
+                            'storeSpecial' =>
+                            [
+                              'id' => NULL,
+                              'names' =>
+                              [
+                                0 =>
+                                [
+                                  'lang' => NULL,
+                                  'name' => NULL,
+                                ],
+                              ],
+                            ],
+                            //'type' => NULL,
+                            'updatedAt' => NULL,
+                          ]
                         ]
                     ]
                 ]

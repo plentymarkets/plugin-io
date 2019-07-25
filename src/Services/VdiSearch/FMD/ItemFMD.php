@@ -215,7 +215,7 @@ class ItemFMD extends FieldMapDefinition
     {
         $x = Item::find($decoratedVariation->base->itemId);
         $y = $x->toArray();
-        $item = $decoratedVariation->base->with()->item;
+        $item = $decoratedVariation->base->with()->item->toArray();
         $f = $decoratedVariation->base->with()->feedback;
 
         $item['condition'] = isset(self::$conditions[$item['condition']]) ? self::$conditions[$item['condition']] : null;
@@ -248,7 +248,7 @@ class ItemFMD extends FieldMapDefinition
         if ($item['manufacturerId'] > 0) {
             /** @var Manufacturer $manufacturer */
             $manufacturer = $this->manufacturerLazyLoader->getById($item['manufacturerId']);
-            $item['manufacturer'] = $manufacturer->toArray();
+            $item['manufacturer'] = $manufacturer;
         }
         $content['item'] = $item;
 

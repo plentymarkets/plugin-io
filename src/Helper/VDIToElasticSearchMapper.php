@@ -5,14 +5,15 @@ namespace IO\Helper;
 
 use IO\Services\VdiSearch\FMD\AttributeFMD;
 use \IO\Services\VdiSearch\FMD\TextFMD;
+use \IO\Services\VdiSearch\FMD\VariationFMD;
+use \IO\Services\VdiSearch\FMD\ItemFMD;
+
 
 use Plenty\Modules\Pim\MappingLayer\Models\BarcodeFMD;
 use Plenty\Modules\Pim\MappingLayer\Models\DefaultCategoryFMD;
 use Plenty\Modules\Pim\MappingLayer\Models\ImageFMD;
-use Plenty\Modules\Pim\MappingLayer\Models\ItemFMD;
 use Plenty\Modules\Pim\MappingLayer\Models\PropertyFMD;
 use Plenty\Modules\Pim\MappingLayer\Models\UnitFMD;
-use Plenty\Modules\Pim\MappingLayer\Models\VariationFMD;
 use Plenty\Modules\Pim\MappingLayer\Models\VariationPropertyFMD;
 use Plenty\Modules\Pim\VariationDataInterface\Contracts\VariationDataInterfaceResultInterface;
 use Plenty\Modules\Pim\VariationDataInterface\Model\Variation;

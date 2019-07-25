@@ -10,6 +10,9 @@
          stopOnFailure="false"
          syntaxCheck="false">
     <testsuites>
+        <testsuite name="vdi">
+            <directory suffix="Test.php">./Tests/Feature/VDI/FMD/</directory>
+        </testsuite>
         <testsuite name="unit">
             <directory suffix="Test.php">./Tests/Unit</directory>
         </testsuite>

@@ -20,7 +20,7 @@ class VariationFMDTest extends TestCase
     /** @test */
     public function should_map_vdi_result_to_es_result()
     {
-
+        //TODO Malsch muss ein Seeder für Availability bauen
         $variation = factory(\Plenty\Modules\Item\Variation\Models\Variation::class)->states('withMain')->create();
 
           /** @var VariationDataInterfaceContract $vdi */
@@ -30,7 +30,8 @@ class VariationFMDTest extends TestCase
         $basePart = app(VariationBaseAttribute::class);
 
         $basePart->addLazyLoadParts(
-            VariationBaseAttribute::ITEM
+            VariationBaseAttribute::ITEM,
+            VariationBaseAttribute::AVAILABILITY
         );
 
         /** @var VariationDataInterfaceContext $vdiContext */
@@ -55,7 +56,7 @@ class VariationFMDTest extends TestCase
                 0 => [
                     'data' =>  [
                         'variation' => [
-                                    'activeChildren' => NULL,
+                                    //'activeChildren' => NULL,
                                     'automaticClientVisibility' => NULL,
                                     'automaticListVisibility' => NULL,
                                     'availability' =>
