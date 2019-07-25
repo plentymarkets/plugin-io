@@ -8,7 +8,6 @@ use IO\Tests\Asserts\IsEqualArrayStructure;
 use IO\Tests\TestCase;
 use Plenty\Modules\Pim\VariationDataInterface\Contracts\VariationDataInterfaceContract;
 use Plenty\Modules\Pim\VariationDataInterface\Model\Attributes\VariationBaseAttribute;
-use Plenty\Modules\Item\VariationDescription\Models\VariationDescription;
 use Plenty\Modules\Pim\VariationDataInterface\Model\VariationDataInterfaceContext;
 
 class ItemFMDTest extends TestCase
