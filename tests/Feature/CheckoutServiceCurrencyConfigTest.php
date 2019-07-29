@@ -126,7 +126,7 @@ class CheckoutServiceCurrencyConfigTest extends TestCase
     {
         $expectedSeparatorDecimal = ".";
         $expectedSeparatorThousands = ",";
-        $expectedPattern = "¤#,##0.00";
+        $expectedPattern = "¤ #,##0.00";
 
         /** @var FrontendSessionStorageFactoryContract $sessionStorage */
         $sessionStorage = pluginApp(FrontendSessionStorageFactoryContract::class);

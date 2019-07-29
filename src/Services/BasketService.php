@@ -6,10 +6,12 @@ use IO\Services\VdiSearch\SearchPresets\BasketItems;
 use IO\Services\VdiSearch\Services\ItemSearchService;
 use Plenty\Modules\Accounting\Vat\Contracts\VatInitContract;
 use Plenty\Modules\Accounting\Vat\Models\VatRate;
+use Plenty\Modules\Authorization\Services\AuthHelper;
 use Plenty\Modules\Basket\Contracts\BasketRepositoryContract;
 use Plenty\Modules\Basket\Contracts\BasketItemRepositoryContract;
 use Plenty\Modules\Basket\Exceptions\BasketItemCheckException;
 use Plenty\Modules\Basket\Exceptions\BasketItemQuantityCheckException;
+use Plenty\Modules\Item\VariationCategory\Contracts\VariationCategoryRepositoryContract;
 use Plenty\Modules\Order\Coupon\Campaign\Contracts\CouponCampaignRepositoryContract;
 use Plenty\Modules\Order\Coupon\Campaign\Models\CouponCampaign;
 use Plenty\Modules\Basket\Models\Basket;
@@ -516,20 +518,74 @@ class BasketService
             {
                 /** @var NotificationService $notificationService */
                 $notificationService = pluginApp(NotificationService::class);
-                
+
                 if($campaign->minOrderValue > (( $basket->basketAmount - $basket->couponDiscount ) - ($basketItem['price'] * $basketItem['quantity'])))
                 {
                     $this->basketRepository->removeCouponCode();
                     $notificationService->info('CouponValidation',301);
                 }
-    
+
                 //check if basket item to remove is matching with a coupon campaign and remove coupon if no item with the matching item id of the campaign is left in the basket
-                $campaignItems = $campaign->references->where('referenceType', 'item')->where('value', $basketItem['itemId']);
+
+                /**
+                 * @var VariationCategoryRepositoryContract $variationCategoryRepository
+                 */
+                $variationCategoryRepository = pluginApp(VariationCategoryRepositoryContract::class);
+
+                $authHelper = pluginApp(AuthHelper::class);
+                $variationId = $basketItem['variationId'];
+                $categories = $authHelper->processUnguarded( function() use ($variationId, $variationCategoryRepository)
+                {
+                    return $variationCategoryRepository->findByVariationIdWithInheritance($variationId);
+                });
+
+
+                $categoryIds = [];
+                $categories->each(function($category) use (&$categoryIds)
+                {
+                    $categoryIds[] = $category->categoryId;
+                });
+
+                $campaignItems = $campaign->references->where('referenceType', 'category')->whereIn('value', $categoryIds);
+                if(count($campaignItems) == 0)
+                {
+                    $campaignItems = $campaign->references->where('referenceType', 'item')->where('value', $basketItem['itemId']);
+                }
+
                 if(count($campaignItems))
                 {
                     $matchingBasketItems = $basket->basketItems->where('itemId', $basketItem['itemId']);
-                    
-                    if(count($matchingBasketItems) <= 1)
+
+                    $basketItems = $basket->basketItems->where('itemId', '!=', $basketItem['itemId']);
+                    $noOtherCouponBasketItemsExists = true;
+
+                    $basketItems->each(function($item) use (&$noOtherCouponBasketItemsExists, $campaign, $authHelper, $variationCategoryRepository)
+                    {
+                        $variationId = $item->variationId;
+                        $categories = $authHelper->processUnguarded( function() use ($variationId, $variationCategoryRepository)
+                        {
+                            return $variationCategoryRepository->findByVariationIdWithInheritance($variationId);
+                        });
+                        $categoryIds = [];
+                        $categories->each(function($category) use (&$categoryIds)
+                        {
+                            $categoryIds[] = $category->categoryId;
+                        });
+
+                        $campaignItems = $campaign->references->where('referenceType', 'category')->whereIn('value', $categoryIds);
+                        if(count($campaignItems) == 0)
+                        {
+                            $campaignItems = $campaign->references->where('referenceType', 'item')->where('value', $item->itemId);
+                        }
+
+                        if(count($campaignItems))
+                        {
+                          $noOtherCouponBasketItemsExists = false;
+                          return false;
+                        }
+                    });
+
+                    if(count($matchingBasketItems) <= 1 && $noOtherCouponBasketItemsExists)
                     {
                         $this->basketRepository->removeCouponCode();
                         $notificationService->info('CouponValidation',302);
