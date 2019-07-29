@@ -5,6 +5,7 @@ namespace IO\Services\VdiSearch\Factories;
 use IO\Services\ItemSearch\Extensions\FacetFilterExtension;
 use IO\Services\SessionStorageService;
 use Plenty\Modules\Item\Search\Helper\SearchHelper;
+use Plenty\Modules\Pim\SearchService\Helper\FacetHelper;
 use Plenty\Plugin\Application;
 
 /**
@@ -49,10 +50,10 @@ class FacetSearchFactory extends VariationSearchFactory
     {
         $plentyId   = pluginApp( Application::class )->getPlentyId();
         $lang       = pluginApp( SessionStorageService::class )->getLang();
-
-        /** @var SearchHelper $searchHelper */
-        $searchHelper = pluginApp( SearchHelper::class, [$this->facetValues, $plentyId, 'item', $lang]);
-        return $searchHelper->getFacetSearch();
+    
+        /** @var FacetHelper $facetHelper */
+        $facetHelper = app(FacetHelper::class, ['facetValuesSelected' => [], 'collapse' => false, 'lang' => $lang, 'plentyId' => $plentyId]);
+        return $facetHelper->createVdiContext();
     }
 
     /**

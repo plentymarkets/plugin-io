@@ -25,6 +25,8 @@ use Plenty\Modules\Item\Search\Aggregations\ItemAttributeValueCardinalityAggrega
 use Plenty\Modules\Item\Search\Aggregations\ItemAttributeValueCardinalityAggregationProcessor;
 use Plenty\Modules\Item\Search\Sort\NameSorting;
 
+use Plenty\Modules\Pim\SearchService\Query\ManagedSearchQuery;
+use Plenty\Modules\Pim\SearchService\Query\NameAutoCompleteQuery;
 use Plenty\Modules\Pim\VariationDataInterface\Model\VariationDataInterfaceContext;
 
 use Plenty\Plugin\Application;
@@ -89,7 +91,7 @@ class BaseSearchFactory
 
     /** @var int */
     private $itemsPerPage = -1;
-
+    
     /**
      * Create a new factory instance based on properties of an existing factory.
      *
@@ -177,11 +179,11 @@ class BaseSearchFactory
      *
      * @return TypeInterface
      */
-    public function createFilter( $filterClass )
+    public function createFilter( $filterClass, $params = [] )
     {
         if ( !array_key_exists( $filterClass, $this->filterInstances ) )
         {
-            $this->filterInstances[$filterClass] = app( $filterClass ); //TODO pluginApp()
+            $this->filterInstances[$filterClass] = app( $filterClass, $params ); //TODO pluginApp()
             $this->filters[] = $this->filterInstances[$filterClass];
         }
 
@@ -408,32 +410,23 @@ class BaseSearchFactory
      */
     public function build()
     {
-        //$search = $this->prepareSearch();
-    
-        /** @var VariationDataInterfaceContext $vdiContext */
-        $vdiContext = app(VariationDataInterfaceContext::class);
-        //$vdiContext->setParts($this->getVdiParts());
-        $vdiContextParts = $this->parts;
-        if(count($vdiContextParts))
-        {
-            $vdiContext->setParts($vdiContextParts);
-        }
+        $vdiContext = $this->prepareSearch();
 
         // ADD FILTERS
         $filterClasses = [];
         $queryClasses = [];
         foreach( $this->filters as $filter )
         {
-            /*if ( $filter instanceof SearchFilter )
+            if ( $filter instanceof NameAutoCompleteQuery || $filter instanceof ManagedSearchQuery)
             {
                 $queryClasses[] = get_class($filter);
                 $vdiContext->addQuery( $filter );
             }
             else
-            {*/
+            {
                 $filterClasses[] = get_class($filter);
                 $vdiContext->addFilter( $filter );
-            //}
+            }
         }
     
         // ADD RANDOM MODIFIER
@@ -504,21 +497,31 @@ class BaseSearchFactory
      */
     protected function prepareSearch()
     {
-        if($this->collapse instanceof BaseCollapse)
+        /** @var VariationDataInterfaceContext $vdiContext */
+        $vdiContext = app(VariationDataInterfaceContext::class);
+        $vdiContextParts = $this->parts;
+        if(count($vdiContextParts))
+        {
+            $vdiContext->setParts($vdiContextParts);
+        }
+        
+        return $vdiContext;
+        
+        /*if($this->collapse instanceof BaseCollapse)
         {
             /** @var IndependentSource $source */
-            $source = pluginApp(IndependentSource::class);
+            /*$source = pluginApp(IndependentSource::class);
             //$source->activate('variation.id', 'item.id');
             $source->activate();
     
             /** @var BaseInnerHit $innerHit */
-            $innerHit = pluginApp(BaseInnerHit::class, ['cheapest']);
+            /*$innerHit = pluginApp(BaseInnerHit::class, ['cheapest']);
             $innerHit->setSorting(pluginApp(SingleSorting::class, ['sorting.price.avg', 'asc']));
             $innerHit->setSource($source);
             $this->collapse->addInnerHit($innerHit);
     
             /** @var DocumentInnerHitsToRootProcessor $docProcessor */
-            $processor = pluginApp(DocumentInnerHitsToRootProcessor::class, [$innerHit->getName()]);
+            /*$processor = pluginApp(DocumentInnerHitsToRootProcessor::class, [$innerHit->getName()]);
             $search = pluginApp(DocumentSearch::class, [$processor]);
     
             // Group By Item Id
@@ -527,13 +530,13 @@ class BaseSearchFactory
         else
         {
             /** @var DocumentProcessor $processor */
-            $processor = pluginApp( DocumentProcessor::class );
+            /*$processor = pluginApp( DocumentProcessor::class );
             /** @var DocumentSearch $search */
-            $search = pluginApp( DocumentSearch::class, [$processor] );
-        }
+            /*$search = pluginApp( DocumentSearch::class, [$processor] );
+        }*/
     
         // ADD MUTATORS
-        $mutatorClasses = [];
+        /*$mutatorClasses = [];
         foreach( $this->mutators as $mutator )
         {
             $processor->addMutator( $mutator );
@@ -548,7 +551,7 @@ class BaseSearchFactory
             ]
         );
         
-        return $search;
+        return $search;*/
     }
     
     private function checkRandomSorting($sortingField)

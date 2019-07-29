@@ -166,13 +166,14 @@ class MultiSearchFactory
         }*/
     
         // TODO remove later
+        $variations = [];
         if(!is_null($results) && count($results))
         {
             foreach($results as $result)
             {
                 foreach($result->get() as $variation)
                 {
-                    $test = true;
+                    $variations[] = $variation;
                 }
             }
         }

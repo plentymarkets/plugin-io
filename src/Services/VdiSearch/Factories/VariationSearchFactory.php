@@ -21,7 +21,6 @@ use IO\Services\ItemSearch\Mutators\OrderPropertySelectionValueMutator;
 use IO\Services\PriceDetectService;
 use IO\Services\SessionStorageService;
 use IO\Services\TemplateConfigService;
-use Plenty\Modules\Cloud\ElasticSearch\Lib\ElasticSearch;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Source\Mutator\BuiltIn\LanguageMutator;
 
 use Plenty\Modules\Pim\SearchService\Filter\CategoryFilter;
@@ -29,16 +28,17 @@ use Plenty\Modules\Pim\SearchService\Filter\ClientFilter;
 use Plenty\Modules\Pim\SearchService\Filter\CrossSellingFilter;
 use Plenty\Modules\Pim\SearchService\Filter\PriceFilter;
 use Plenty\Modules\Pim\SearchService\Filter\SalesPriceFilter;
-use Plenty\Modules\Pim\SearchService\Filter\SearchFilter;
 use Plenty\Modules\Pim\SearchService\Filter\TagFilter;
 use Plenty\Modules\Pim\SearchService\Filter\TextFilter;
 use Plenty\Modules\Pim\SearchService\Filter\VariationBaseFilter;
 use Plenty\Modules\Pim\SearchService\Filter\PropertyFilter;
 
-use Plenty\Modules\Item\Search\Helper\SearchHelper;
 use Plenty\Modules\Item\Search\Mutators\ImageDomainMutator;
 use Plenty\Modules\Item\Search\Mutators\ImageMutator;
 use Plenty\Modules\Item\Search\Mutators\VariationPropertyGroupMutator;
+use Plenty\Modules\Pim\SearchService\Helper\FacetHelper;
+use Plenty\Modules\Pim\SearchService\Query\ManagedSearchQuery;
+use Plenty\Modules\Pim\SearchService\Query\NameAutoCompleteQuery;
 use Plenty\Plugin\Application;
 
 /**
@@ -516,9 +516,15 @@ class VariationSearchFactory extends BaseSearchFactory
             $facetValues = explode(",", $facetValues );
         }
         
-        /** @var SearchHelper $searchHelper */
-        $searchHelper = pluginApp( SearchHelper::class, [$facetValues, $clientId, 'item', $lang] );
-        $this->withFilter( $searchHelper->getFacetFilter() );
+        /** @var FacetHelper $facetHelper */
+        $facetHelper = app(FacetHelper::class, [
+            'facetValuesSelected' => $facetValues,
+            'collapse' => false, //TODO collapse
+            'lang' => $lang,
+            'plentyId' => $clientId
+        ]);
+        
+        $this->withFilter($facetHelper->getFilter());
 
         $facetExtensions = pluginApp( FacetExtensionContainer::class )->getFacetExtensions();
         foreach( $facetExtensions as $facetExtension )
@@ -549,33 +555,17 @@ class VariationSearchFactory extends BaseSearchFactory
      * Filter variations by given search string.
      * @param string    $query      The search string to filter variations by
      * @param string    $lang       The language to apply search on. If null, default language from session will be used
-     * @param string    $searchType Type of the search ('exact', 'fuzzy', 'autocomplete')
-     * @param string    $operator   Operator ot be used for search
      *
      * @return $this
      */
-    public function hasSearchString( $query, $lang = null, $searchType = ElasticSearch::SEARCH_TYPE_EXACT, $operator = ElasticSearch::OR_OPERATOR )
+    public function hasSearchString( $query, $lang = null)
     {
         if ( $lang === null )
         {
             $lang = pluginApp( SessionStorageService::class )->getLang();
         }
-
-        if ( $searchType !== ElasticSearch::SEARCH_TYPE_FUZZY
-            && $searchType !== ElasticSearch::SEARCH_TYPE_AUTOCOMPLETE
-            && $searchType !== ElasticSearch::SEARCH_TYPE_EXACT )
-        {
-            $searchType = ElasticSearch::SEARCH_TYPE_EXACT;
-        }
-
-        if ( $operator !== ElasticSearch::OR_OPERATOR && $operator !== ElasticSearch::AND_OPERATOR )
-        {
-            $operator = ElasticSearch::OR_OPERATOR;
-        }
-
-        /** @var SearchFilter $searchFilter */
-        $searchFilter = $this->createFilter(SearchFilter::class);
-        $searchFilter->setSearchString($query, $lang, $searchType, $operator);
+        
+        $this->createFilter(ManagedSearchQuery::class, ['query' => $query, 'lang' => $lang]);
 
         return $this;
     }
@@ -595,9 +585,7 @@ class VariationSearchFactory extends BaseSearchFactory
             $lang = pluginApp( SessionStorageService::class )->getLang();
         }
 
-        /** @var SearchFilter $searchFilter */
-        $searchFilter = $this->createFilter( SearchFilter::class );
-        $searchFilter->setNamesString( $query, $lang );
+        $this->createFilter( NameAutoCompleteQuery::class, ['query' => $query, 'lang' => $lang]);
 
         return $this;
     }

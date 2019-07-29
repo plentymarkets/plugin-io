@@ -61,13 +61,12 @@ class SearchItems implements SearchPreset
 
         /** @var VariationSearchFactory $searchFactory */
         $searchFactory = pluginApp( VariationSearchFactory::class );
-
-
-
+        
         if ( array_key_exists('autocomplete', $options ) && $options['autocomplete'] === true )
         {
             //TODO
             $searchFactory->withParts( self::getParts() );
+            $searchFactory->hasNameString($query);
         }
         else
         {
@@ -79,6 +78,7 @@ class SearchItems implements SearchPreset
                 ->hasFacets( $facets );
 
             $searchFactory->withParts( self::getParts() );
+            $searchFactory->hasSearchString( $query );
         }
 
         $searchFactory
@@ -94,10 +94,7 @@ class SearchItems implements SearchPreset
             ->groupByTemplateConfig()
             ->withGroupedAttributeValues()
             ->withReducedResults();
-
-        $searchFactory->hasNameString($query);
-        $searchFactory->hasSearchString( $query );
-
+        
         return $searchFactory;
     }
     
