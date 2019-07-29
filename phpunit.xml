@@ -12,6 +12,11 @@
     <testsuites>
         <testsuite name="vdi">
             <directory suffix="Test.php">./Tests/Feature/VDI/FMD/</directory>
+            <exclude>./Tests/Feature/VDI/FMD/TagFMDTest.php</exclude>
+            <exclude>./Tests/Feature/VDI/FMD/ImageFMDTest.php</exclude>
+            <exclude>./Tests/Feature/VDI/FMD/UnitFMDTest.php</exclude>
+            <exclude>./Tests/Feature/VDI/FMD/VariationPropertiesFMDTest.php</exclude>
+            <exclude>./Tests/Feature/VDI/FMD/SalesPriceFMDTest.php</exclude>
         </testsuite>
         <testsuite name="unit">
             <directory suffix="Test.php">./Tests/Unit</directory>
@@ -28,6 +33,8 @@
         <env name="CACHE_DRIVER" value="array"/>
         <env name="DB_CONNECTION" value="mysql-test"/>
         <env name="SESSION_DRIVER" value="array"/>
+        <env name="PLENTY_ID_HASH" value="1000"/>
+
         <env name="SYMFONY_DEPRECATIONS_HELPER" value="disabled"/>
         <env name="QUEUE_DRIVER" value="sync"/>
     </php>

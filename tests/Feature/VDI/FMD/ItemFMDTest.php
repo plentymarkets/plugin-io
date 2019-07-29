@@ -59,18 +59,18 @@ class ItemFMDTest extends TestCase
                             'amazonFbaPlatform' => NULL,
                             'amazonFedas' => NULL,
                             'amazonProductType' => NULL,
-                            'condition' =>
-                            [
-                              'id' => NULL,
-                              'names' =>
-                              [
-                                0 =>
-                                [
-                                  'lang' => NULL,
-                                  'name' => NULL,
-                                ],
-                              ],
-                            ],
+//                            'condition' =>
+//                            [
+//                              'id' => NULL,
+//                              'names' =>
+//                              [
+//                                0 =>
+//                                [
+//                                  'lang' => NULL,
+//                                  'name' => NULL,
+//                                ],
+//                              ],
+//                            ],
                             'conditionApi' =>
                             [
                               'id' => NULL,

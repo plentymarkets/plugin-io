@@ -4,17 +4,20 @@ namespace IO\Helper;
 
 
 use IO\Services\VdiSearch\FMD\AttributeFMD;
-use \IO\Services\VdiSearch\FMD\TextFMD;
-use \IO\Services\VdiSearch\FMD\VariationFMD;
-use \IO\Services\VdiSearch\FMD\ItemFMD;
-
-
-use Plenty\Modules\Pim\MappingLayer\Models\BarcodeFMD;
-use Plenty\Modules\Pim\MappingLayer\Models\DefaultCategoryFMD;
-use Plenty\Modules\Pim\MappingLayer\Models\ImageFMD;
-use Plenty\Modules\Pim\MappingLayer\Models\PropertyFMD;
-use Plenty\Modules\Pim\MappingLayer\Models\UnitFMD;
-use Plenty\Modules\Pim\MappingLayer\Models\VariationPropertyFMD;
+use IO\Services\VdiSearch\FMD\BarcodeFMD;
+use IO\Services\VdiSearch\FMD\CrossSellingFMD;
+use IO\Services\VdiSearch\FMD\DefaultCategoryFMD;
+use IO\Services\VdiSearch\FMD\ImageFMD;
+use IO\Services\VdiSearch\FMD\PropertyFMD;
+use IO\Services\VdiSearch\FMD\SalesPriceFMD;
+use IO\Services\VdiSearch\FMD\SkusFMD;
+use IO\Services\VdiSearch\FMD\StockFMD;
+use IO\Services\VdiSearch\FMD\TagsFMD;
+use IO\Services\VdiSearch\FMD\TextFMD;
+use IO\Services\VdiSearch\FMD\UnitFMD;
+use IO\Services\VdiSearch\FMD\VariationFMD;
+use IO\Services\VdiSearch\FMD\ItemFMD;
+use IO\Services\VdiSearch\FMD\VariationPropertyFMD;
 use Plenty\Modules\Pim\VariationDataInterface\Contracts\VariationDataInterfaceResultInterface;
 use Plenty\Modules\Pim\VariationDataInterface\Model\Variation;
 
@@ -24,10 +27,15 @@ class VDIToElasticSearchMapper
     private $fmdMap = [
         'attributes'          => AttributeFMD::class,
         'barcodes'            => BarcodeFMD::class,
+        'crossSelling'        => CrossSellingFMD::class,
         'defaultCategories'   => DefaultCategoryFMD::class,
         'images'              => ImageFMD::class,
         'item'                => ItemFMD::class,
         'properties'          => PropertyFMD::class,
+        'salesPrices'         => SalesPriceFMD::class,
+        'skus'                => SkusFMD::class,
+        'stock'               => StockFMD::class,
+        'tags'                => TagsFMD::class,
         'texts'               => TextFMD::class,
         'unit'                => UnitFMD::class,
         'variation'           => VariationFMD::class,

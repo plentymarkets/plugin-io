@@ -15,6 +15,7 @@ use Plenty\Modules\Order\Shipping\Countries\Models\Country;
 use Plenty\Modules\Pim\VariationDataInterface\Model\Attributes\VariationBaseAttribute;
 use Plenty\Modules\Pim\VariationDataInterface\Model\Variation;
 
+
 class ItemFMD extends FieldMapDefinition
 {
     /**
@@ -240,14 +241,15 @@ class ItemFMD extends FieldMapDefinition
         }
 
         $item['flags'] = [
-            'flag1' => self::$marks1[$item['flagOne']],
-            'flag2' => self::$marks2[$item['flagTwo']]
+            'flag1' => static::map(self::$marks1[$item['flagOne']], 'markId', 'id'),
+            'flag2' => static::map(self::$marks2[$item['flagTwo']], 'markId', 'id')
         ];
 
         $item['manufacturer'] = null;
         if ($item['manufacturerId'] > 0) {
             /** @var Manufacturer $manufacturer */
             $manufacturer = $this->manufacturerLazyLoader->getById($item['manufacturerId']);
+            //$manufacturer = static::map($manufacturer, 'externalName', 'nameExternal');
             $item['manufacturer'] = $manufacturer;
         }
         $content['item'] = $item;

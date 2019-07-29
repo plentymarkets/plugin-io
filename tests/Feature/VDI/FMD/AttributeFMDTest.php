@@ -87,7 +87,7 @@ class AttributeFMDTest extends TestCase
                               'ottoAttribute' => NULL,
                               'updatedAt' => NULL,
                             ],
-                            'attributeValueSetId' => NULL,
+                            //'attributeValueSetId' => NULL,
                             'value' => [
                               'image' => NULL,
                               'percentageDistribution' => NULL,

@@ -47,9 +47,14 @@ class AttributeFMD extends FieldMapDefinition
         foreach ($attributeValues as $attributeValue) {
             $attribute = $attributeValue->with()->attribute;
             $attribute = $this::map($attribute, 'attributeNames', 'names');
+            $attribute['names'] = $attribute['names']->first()->toArray();
+            $attribute['names'] = $this::map($attribute['names'], 'attribute_id', 'attributeId');
+
 
             $value = $attributeValue->with()->attributeValue;
             $value = $this::map($value, 'valueNames', 'names');
+            $value['names'] = $value['names']->first()->toArray();
+            $value['names'] = $this::map($value['names'], 'value_id', 'valueId');
 
             $entry = [
                 'attributeId' => $attribute->id,

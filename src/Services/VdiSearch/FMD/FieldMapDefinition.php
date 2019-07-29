@@ -16,7 +16,7 @@ abstract class FieldMapDefinition
      * @return string
      */
     abstract public function getAttribute(): string;
-    
+
     /**
      * @return null|array
      */
@@ -24,20 +24,28 @@ abstract class FieldMapDefinition
     {
         return null;
     }
-    
+
     protected static function map($object, $old, $new)
     {
-        $object->{$new} = isset($object->{$old}) ? $object->{$old} : null;
-        unset($object->{$old});
-        
+        if(!is_array($object))
+        {
+
+            $object->{$new} = isset($object->{$old}) ? $object->{$old} : null;
+            unset($object->{$old});
+        }else
+        {
+            $object[$new] = isset($object[$old]) ? $object[$old] : null;
+            unset($object[$old]);
+        }
+
         return $object;
     }
-    
+
     /**
      * @return string
      */
     abstract public function getOldField(): string;
-    
+
     /**
      * @param Variation $variation
      * @param array $content
