@@ -41,7 +41,7 @@ class UnitFMD extends FieldMapDefinition
     {
         $variationUnit = $decoratedVariation->unit;
 
-        $data = $variationUnit->with()->unit;
+        $data = $variationUnit->with()->unit->toArray();
         $data['content'] = $variationUnit->content;
         $content['unit'] = $data;
 
