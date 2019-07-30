@@ -53,13 +53,23 @@ class VDIToElasticSearchMapper
         $fmdClasses = [];
         if(count($resultFields))
         {
-            foreach($resultFields as $resultField)
+            if($resultFields === ['*'])
             {
-                $e = explode('.', $resultField);
-                $resultFieldMainKey = $e[0];
-                if(array_key_exists($resultFieldMainKey, $this->fmdMap) && !array_key_exists($resultFieldMainKey, $fmdClasses))
+                foreach($this->fmdMap as $key => $value)
                 {
-                    $fmdClasses[$resultFieldMainKey] = app($this->fmdMap[$resultFieldMainKey]);
+                    $fmdClasses[$key] = app($value);
+                }
+            }
+            elseif(is_array($resultFields) )
+            {
+                foreach($resultFields as $resultField)
+                {
+                    $e = explode('.', $resultField);
+                    $resultFieldMainKey = $e[0];
+                    if(array_key_exists($resultFieldMainKey, $this->fmdMap) && !array_key_exists($resultFieldMainKey, $fmdClasses))
+                    {
+                        $fmdClasses[$resultFieldMainKey] = app($this->fmdMap[$resultFieldMainKey]);
+                    }
                 }
             }
         }

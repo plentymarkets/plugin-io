@@ -2,6 +2,7 @@
 
 namespace IO\Services\VdiSearch\Factories;
 
+use IO\Helper\VDIToElasticSearchMapper;
 use IO\Services\ItemSearch\Extensions\ItemSearchExtension;
 use IO\Services\ItemSearch\Helper\FacetExtensionContainer;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Search\Document\DocumentSearch;
@@ -93,30 +94,51 @@ class MultiSearchFactory
     public function getResults()
     {
         $vdiContexts = [];
+        $primarySearchNames = [];
         foreach( $this->searches as $resultName => $searches )
         {
             $vdiContexts[$resultName] = $searches['primary'];
+              // remember primary search names
+            $primarySearchNames[] = $resultName;
             foreach( $searches['secondary'] as $secondaryResultName => $secondarySearch )
             {
                 $vdiContexts[$secondaryResultName] = $secondarySearch;
             }
         }
-    
+
         /** @var VariationDataInterfaceContract $searchRepository */
         $searchRepository = app(VariationDataInterfaceContract::class);
-        $results = $searchRepository->getMultipleResults($vdiContexts);
-
-        // execute multisearch
-        /*$rawResults = $searchRepository->execute();
-
-        if ( count($this->searches) === 1 && count($this->searches[$primarySearchNames[0]]['secondary']) === 0 )
-        {
-            $tmp = $rawResults;
-            $rawResults = [];
-            $rawResults[$primarySearchNames[0]] = $tmp;
-        }
-
+        $rawResults = $searchRepository->getMultipleResults($vdiContexts);
         $results = [];
+        // execute multisearch
+        // $rawResults = $searchRepository->execute();
+
+//        if ( count($this->searches) === 1 && count($this->searches[$primarySearchNames[0]]['secondary']) === 0 )
+//        {
+//            $tmp = $rawResults;
+//            $rawResults = [];
+//            $rawResults[$primarySearchNames[0]] = $tmp;
+//        }
+//
+//        $results = [];
+
+        if(!is_null($rawResults) && count($rawResults))
+        {
+            foreach($rawResults as $key => $rawResult)
+            {
+                /**
+                 * @var VDIToElasticSearchMapper $mappingHelper
+                 */
+                $mappingHelper = pluginApp(VDIToElasticSearchMapper::class);
+                $mappedData = $mappingHelper->map($rawResult, ['*']);
+                $rawResults[$primarySearchNames[$key]] = $mappedData;
+                unset($rawResults[$key]);
+            }
+        }
+        else
+        {
+            $rawResults = [];
+        }
 
         foreach( $primarySearchNames as $searchName )
         {
@@ -140,12 +162,12 @@ class MultiSearchFactory
             {
                 $results[$searchName] = $result;
             }
-        }*/
-    
+        }
+
         /** @var FacetExtensionContainer $facetExtensionContainer */
         /*$facetExtensionContainer = pluginApp(FacetExtensionContainer::class);
         $facetExtensions = $facetExtensionContainer->getFacetExtensions();
-    
+
         if(isset($results['facets']) && count($facetExtensions))
         {
             foreach($results as $searchName => $searchData)
@@ -164,24 +186,7 @@ class MultiSearchFactory
                 }
             }
         }*/
-    
-        // TODO remove later
-        $variations = [];
-        if(!is_null($results) && count($results))
-        {
-            foreach($results as $result)
-            {
-                foreach($result->get() as $variation)
-                {
-                    $variations[] = $variation;
-                }
-            }
-        }
-        else
-        {
-            $results = [];
-        }
-        
+
         return $results;
     }
 }
