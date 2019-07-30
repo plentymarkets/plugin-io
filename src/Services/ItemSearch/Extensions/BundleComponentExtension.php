@@ -4,7 +4,7 @@ namespace IO\Services\ItemSearch\Extensions;
 
 use IO\Services\VdiSearch\Factories\VariationSearchFactory;
 use IO\Services\VdiSearch\SearchPresets\BasketItems;
-use IO\Services\VdiSearch\Services\ItemSearchService;
+use IO\Contracts\ItemSearchContract;
 use IO\Services\TemplateConfigService;
 use Plenty\Modules\Authorization\Services\AuthHelper;
 use Plenty\Modules\Item\VariationBundle\Contracts\VariationBundleRepositoryContract;
@@ -71,13 +71,13 @@ class BundleComponentExtension implements ItemSearchExtension
                     $bundleQuantities[$bundleComponent->componentVariationId] = $bundleComponent->componentQuantity;
                 }
 
-                /** @var ItemSearchService $itemSearchService */
-                $itemSearchService = pluginApp( ItemSearchService::class );
-                $bundleVariations  = $itemSearchService->getResult(
+                /** @var ItemSearchContract $itemSearchService */
+                $itemSearchService = pluginApp( ItemSearchContract::class );
+                $bundleVariations  = $itemSearchService->getResults([
                     BasketItems::getSearchFactory([
                         'variationIds' => $bundleVariationIds
                     ])
-                );
+                ])[0];
 
                 $bundleComponents = [];
                 foreach( $bundleVariations['documents'] as $bundleVariation )

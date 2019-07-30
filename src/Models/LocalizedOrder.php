@@ -6,7 +6,7 @@ use IO\Builder\Order\OrderItemType;
 use IO\Builder\Order\OrderType;
 use IO\Extensions\Filters\ItemImagesFilter;
 use IO\Services\VdiSearch\Factories\VariationSearchFactory;
-use IO\Services\VdiSearch\Services\ItemSearchService;
+use IO\Contracts\ItemSearchContract;
 use IO\Services\OrderService;
 use IO\Services\OrderStatusService;
 use IO\Services\OrderTotalsService;
@@ -164,12 +164,12 @@ class LocalizedOrder extends ModelWrapper
             }
         }
 
-        /** @var ItemSearchService $itemSearchService */
-        $itemSearchService = pluginApp( ItemSearchService::class );
+        /** @var ItemSearchContract $itemSearchService */
+        $itemSearchService = pluginApp( ItemSearchContract::class );
         /** @var VariationSearchFactory $searchFactory */
         $searchFactory = pluginApp( VariationSearchFactory::class );
         $searchFactory->setPage(1, count($orderVariationIds));
-        $orderVariations = $itemSearchService->getResult(
+        $orderVariations = $itemSearchService->getResults([
             $searchFactory
                 ->withLanguage()
                 ->withImages()
@@ -177,7 +177,7 @@ class LocalizedOrder extends ModelWrapper
                 ->withUrls()
                 ->withBundleComponents()
                 ->hasVariationIds( $orderVariationIds )
-        );
+        ])[0];
 
         foreach( $orderVariations['documents'] as $orderVariation )
         {

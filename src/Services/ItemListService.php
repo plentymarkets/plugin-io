@@ -7,7 +7,7 @@ use IO\Services\VdiSearch\SearchPresets\CategoryItems;
 use IO\Services\VdiSearch\SearchPresets\CrossSellingItems;
 use IO\Services\VdiSearch\SearchPresets\TagItems;
 use IO\Services\VdiSearch\SearchPresets\VariationList;
-use IO\Services\VdiSearch\Services\ItemSearchService;
+use IO\Contracts\ItemSearchContract;
 use IO\Services\VdiSearch\SearchPresets\ManufacturerItems;
 use Plenty\Plugin\CachingRepository;
 use Plenty\Modules\Basket\Contracts\BasketRepositoryContract;
@@ -23,8 +23,8 @@ class ItemListService
 
     public function getItemList( $type, $id = null, $sorting = null, $maxItems = 0, $crossSellingRelationType = null)
     {
-        /** @var ItemSearchService $searchService */
-        $searchService = pluginApp( ItemSearchService::class );
+        /** @var ItemSearchContract $searchService */
+        $searchService = pluginApp( ItemSearchContract::class );
         $searchFactory = null;
 
         if ( !$this->isValidId( $id ) && !(in_array($type, [self::TYPE_LAST_SEEN, self::TYPE_CROSS_SELLER] )))

@@ -2,6 +2,7 @@
 
 namespace IO\Services\ItemSearch\Services;
 
+use IO\Contracts\ItemSearchContract;
 use IO\Helper\DefaultSearchResult;
 use IO\Services\ItemSearch\Factories\BaseSearchFactory;
 use IO\Services\ItemSearch\Factories\MultiSearchFactory;
@@ -13,7 +14,7 @@ use IO\Services\ItemSearch\Factories\MultiSearchFactory;
  *
  * @package IO\Services\ItemSearch\Services
  */
-class ItemSearchService
+class ItemSearchService implements ItemSearchContract
 {
     /**
      * Get search results for multiple search requests.

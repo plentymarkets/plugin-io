@@ -518,7 +518,7 @@ class VariationSearchFactory extends BaseSearchFactory
         
         /** @var FacetHelper $facetHelper */
         $facetHelper = app(FacetHelper::class, [
-            'facetValuesSelected' => $facetValues,
+            'facetValuesSelected' => is_array($facetValues) ? $facetValues : [],
             'collapse' => false, //TODO collapse
             'lang' => $lang,
             'plentyId' => $clientId

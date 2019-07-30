@@ -17,7 +17,7 @@ use IO\Helper\MemoryCache;
 use IO\Extensions\Filters\ItemImagesFilter;
 use IO\Services\VdiSearch\SearchPresets\SingleItem;
 use IO\Services\VdiSearch\SearchPresets\VariationList;
-use IO\Services\VdiSearch\Services\ItemSearchService;
+use IO\Contracts\ItemSearchContract;
 use Plenty\Modules\Authorization\Services\AuthHelper;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\ElasticSearch;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Processor\DocumentProcessor;
@@ -176,10 +176,10 @@ class ItemService
 	 */
 	public function getVariation(int $variationId = 0)
 	{
-	    /** @var ItemSearchService $itemSearchService */
-	    $itemSearchService = pluginApp(ItemSearchService::class);
+	    /** @var ItemSearchContract $itemSearchService */
+	    $itemSearchService = pluginApp(ItemSearchContract::class);
 
-        return $itemSearchService->getResult(SingleItem::getSearchFactory(['variationId' => $variationId]));
+        return $itemSearchService->getResults([SingleItem::getSearchFactory(['variationId' => $variationId])])[0];
 	}
 
 	/**
@@ -189,10 +189,10 @@ class ItemService
 	 */
 	public function getVariations(array $variationIds):array
 	{
-        /** @var ItemSearchService $itemSearchService */
-        $itemSearchService = pluginApp(ItemSearchService::class);
+        /** @var ItemSearchContract $itemSearchService */
+        $itemSearchService = pluginApp(ItemSearchContract::class);
 
-        return $itemSearchService->getResult(VariationList::getSearchFactory(['variationIds' => $variationIds]));
+        return $itemSearchService->getResults([VariationList::getSearchFactory(['variationIds' => $variationIds])])[0];
 	}
 
     /**
@@ -304,13 +304,13 @@ class ItemService
      */
     public function getVariationImage(int $variationId = 0, string $imageAccessor = 'urlPreview'):string
     {
-        /** @var ItemSearchService $itemSearchService */
-        $itemSearchService = pluginApp( ItemSearchService::class );
-        $variation = $itemSearchService->getResult(
+        /** @var ItemSearchContract $itemSearchService */
+        $itemSearchService = pluginApp( ItemSearchContract::class );
+        $variation = $itemSearchService->getResults([
             SingleItem::getSearchFactory([
                 'variationId' => $variationId
             ])
-        );
+        ])[0];
 
 
         if(is_array($variation) && count($variation['documents']))

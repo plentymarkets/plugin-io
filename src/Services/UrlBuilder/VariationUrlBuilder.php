@@ -4,7 +4,7 @@ namespace IO\Services\UrlBuilder;
 
 use IO\Helper\StringUtils;
 use IO\Services\VdiSearch\Factories\VariationSearchFactory;
-use IO\Services\VdiSearch\Services\ItemSearchService;
+use IO\Contracts\ItemSearchContract;
 use IO\Services\SessionStorageService;
 use IO\Services\TemplateConfigService;
 use Plenty\Modules\Authorization\Services\AuthHelper;
@@ -154,8 +154,8 @@ class VariationUrlBuilder
         if(!is_array(self::$requestedItems[$itemId][$variationId]) || !in_array($lang, self::$requestedItems[$itemId][$variationId]))
         {
             self::$requestedItems[$itemId][$variationId][] = $lang;
-            /** @var ItemSearchService $itemSearchService */
-            $itemSearchService = pluginApp( ItemSearchService::class );
+            /** @var ItemSearchContract $itemSearchService */
+            $itemSearchService = pluginApp( ItemSearchContract::class );
 
             /** @var VariationSearchFactory $searchFactory */
             $searchFactory = pluginApp( VariationSearchFactory::class );
@@ -165,7 +165,7 @@ class VariationUrlBuilder
                 ->hasItemId( $itemId )
                 ->hasVariationId( $variationId );
 
-            $itemSearchService->getResult($searchFactory);
+            $itemSearchService->getResults([$searchFactory])[0];
         }
         return [];
     }

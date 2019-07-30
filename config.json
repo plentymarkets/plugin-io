@@ -231,6 +231,19 @@
                   }
               }
           }
+      },
+      "Config.ItemSearchTab": {
+          "label": "Config.ItemSearchTab",
+          "formFields": {
+              "item_search.vdi_active": {
+                  "type": "checkBox",
+                  "required": false,
+                  "label": "Config.itemSearchVdiActiveLabel",
+                  "options": {
+                      "defaultValue": "false"
+                  }
+              }
+          }
       }
   }
 }

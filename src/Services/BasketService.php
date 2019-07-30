@@ -3,7 +3,7 @@
 namespace IO\Services;
 
 use IO\Services\VdiSearch\SearchPresets\BasketItems;
-use IO\Services\VdiSearch\Services\ItemSearchService;
+use IO\Contracts\ItemSearchContract;
 use Plenty\Modules\Accounting\Vat\Contracts\VatInitContract;
 use Plenty\Modules\Accounting\Vat\Models\VatRate;
 use Plenty\Modules\Authorization\Services\AuthHelper;
@@ -319,20 +319,20 @@ class BasketService
 
         if($webstoreConfigService->getWebstoreConfig()->dontSplitItemBundle === 0)
         {
-            /** @var ItemSearchService $itemSearchService */
-            $itemSearchService = pluginApp( ItemSearchService::class );
+            /** @var ItemSearchContract $itemSearchService */
+            $itemSearchService = pluginApp( ItemSearchContract::class );
 
             /** @var VariationSearchFactory $searchFactory */
             $searchFactory = pluginApp( VariationSearchFactory::class );
 
-            $item = $itemSearchService->getResult(
+            $item = $itemSearchService->getResults([
                 $searchFactory
                     ->hasVariationId( $data['variationId'] )
                     ->withBundleComponents()
                     ->withResultFields([
                         'variation.bundleType'
                     ])
-            );
+            ])[0];
 
             if($item['documents']['0']['data']['variation']['bundleType'] === 'bundle')
             {
@@ -641,8 +641,8 @@ class BasketService
             $temp = $basketItem->basketItemOrderParams;
         }
 
-        /** @var ItemSearchService $itemSearchService */
-        $itemSearchService = pluginApp( ItemSearchService::class );
+        /** @var ItemSearchContract $itemSearchService */
+        $itemSearchService = pluginApp( ItemSearchContract::class );
         $items = $itemSearchService->getResults(
             BasketItems::getSearchFactory([
                 'variationIds'  => $basketItemVariationIds,

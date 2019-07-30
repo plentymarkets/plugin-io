@@ -25,4 +25,5 @@ class SessionStorageKeys
     const NEWSLETTER_SUBSCRIPTIONS       = 'newsletterSubscriptions';
     const READONLY_CHECKOUT              = 'readOnlyCheckout';
     const LAST_PLACE_ORDER_TRY           = 'lastPlaceOrderTry';
+    const USE_VDI_SEARCH                 = 'useVdiSearch';
 }

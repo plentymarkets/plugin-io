@@ -3,6 +3,7 @@
 namespace IO\Providers;
 
 use IO\Constants\SessionStorageKeys;
+use IO\Contracts\ItemSearchContract;
 use IO\Extensions\Basket\IOFrontendShippingProfileChanged;
 use IO\Extensions\Basket\IOFrontendUpdateDeliveryAddress;
 use IO\Extensions\ContentCache\IOAfterBuildPlugins;
@@ -27,6 +28,7 @@ use IO\Services\CustomerService;
 use IO\Services\ItemCrossSellingService;
 use IO\Services\ItemLastSeenService;
 use IO\Services\ItemSearch\Helper\FacetExtensionContainer;
+use IO\Services\ItemSearch\Services\ItemSearchService;
 use IO\Services\ItemService;
 use IO\Services\ItemWishListService;
 use IO\Services\LegalInformationService;
@@ -43,6 +45,8 @@ use IO\Services\TemplateConfigService;
 use IO\Services\TemplateService;
 use IO\Services\UnitService;
 use IO\Services\UrlService;
+use IO\Services\VdiSearch\SearchPresets\BasketItems;
+use IO\Services\VdiSearch\Services\ItemSearchService as ItemSearchServiceVdi;
 use IO\Services\WebstoreConfigurationService;
 use Plenty\Modules\Authentication\Events\AfterAccountAuthentication;
 use Plenty\Modules\Authentication\Events\AfterAccountContactLogout;
@@ -59,6 +63,8 @@ use Plenty\Modules\Payment\Events\Checkout\ExecutePayment;
 use Plenty\Modules\Plugin\Events\AfterBuildPlugins;
 use Plenty\Modules\Plugin\Events\LoadSitemapPattern;
 use Plenty\Modules\Plugin\Events\PluginSendMail;
+use Plenty\Plugin\ConfigRepository;
+use Plenty\Plugin\Http\Request;
 use Plenty\Plugin\ServiceProvider;
 use Plenty\Plugin\Templates\Twig;
 use Plenty\Plugin\Events\Dispatcher;
@@ -117,6 +123,20 @@ class IOServiceProvider extends ServiceProvider
         ]);
 
         $this->getApplication()->singleton(FacetExtensionContainer::class);
+    
+        /** @var ConfigRepository $config */
+        $config = pluginApp(ConfigRepository::class);
+        $vdiSearchActive = $config->get('IO.item_search.vdi_active');
+        
+        if($vdiSearchActive == 'true')
+        {
+            $this->getApplication()->bind(ItemSearchContract::class, ItemSearchServiceVdi::class);
+            $this->getApplication()->bind(BasketItemsContract::class, BasketItems::class);
+        }
+        else
+        {
+            $this->getApplication()->bind(ItemSearchContract::class, ItemSearchService::class);
+        }
     }
 
     /**

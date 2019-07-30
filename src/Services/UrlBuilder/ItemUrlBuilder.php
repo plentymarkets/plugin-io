@@ -3,7 +3,7 @@
 namespace IO\Services\UrlBuilder;
 
 use IO\Services\VdiSearch\Factories\VariationSearchFactory;
-use IO\Services\VdiSearch\Services\ItemSearchService;
+use IO\Contracts\ItemSearchContract;
 use IO\Services\SessionStorageService;
 
 class ItemUrlBuilder
@@ -38,8 +38,8 @@ class ItemUrlBuilder
 
     private function searchItemVariationId( $itemId, $lang )
     {
-        /** @var ItemSearchService $itemSearchService */
-        $itemSearchService = pluginApp( ItemSearchService::class );
+        /** @var ItemSearchContract $itemSearchService */
+        $itemSearchService = pluginApp( ItemSearchContract::class );
 
         /** @var VariationSearchFactory $searchFactory */
         $searchFactory = pluginApp( VariationSearchFactory::class );
@@ -48,7 +48,7 @@ class ItemUrlBuilder
             ->withUrls()
             ->hasItemId( $itemId );
 
-        $itemSearchService->getResult($searchFactory);
+        $itemSearchService->getResults([$searchFactory])[0];
 
         return 0;
     }

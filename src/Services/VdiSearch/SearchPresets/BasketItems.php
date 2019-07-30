@@ -16,7 +16,7 @@ use Plenty\Modules\Pim\VariationDataInterface\Model\Attributes\VariationImageAtt
  *
  * @package IO\Services\VdiSearch\SearchPresets
  */
-class BasketItems implements SearchPreset
+class BasketItems implements SearchPreset, BasketItemsContract
 {
     /**
      * @inheritdoc

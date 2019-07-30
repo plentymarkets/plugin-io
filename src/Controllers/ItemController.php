@@ -10,7 +10,7 @@ use IO\Services\ItemSearch\Factories\VariationSearchResultFactory;
 use IO\Services\ItemSearch\Helper\ResultFieldTemplate;
 use IO\Services\VdiSearch\SearchPresets\SingleItem;
 use IO\Services\VdiSearch\SearchPresets\VariationAttributeMap;
-use IO\Services\VdiSearch\Services\ItemSearchService;
+use IO\Contracts\ItemSearchContract;
 use IO\Services\PriceDetectService;
 use IO\Services\SessionStorageService;
 use Plenty\Modules\Category\Models\Category;
@@ -67,8 +67,8 @@ class ItemController extends LayoutController
             'variationId'   => $variationId,
             'setCategory'   => is_null($category)
         ];
-        /** @var ItemSearchService $itemSearchService */
-        $itemSearchService = pluginApp( ItemSearchService::class );
+        /** @var ItemSearchContract $itemSearchService */
+        $itemSearchService = pluginApp( ItemSearchContract::class );
         $itemResult = $itemSearchService->getResults([
             'item' => SingleItem::getSearchFactory( $itemSearchOptions ),
             'variationAttributeMap' => VariationAttributeMap::getSearchFactory( $itemSearchOptions )

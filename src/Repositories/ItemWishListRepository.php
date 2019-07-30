@@ -3,7 +3,7 @@
 namespace IO\Repositories;
 
 use IO\Services\VdiSearch\SearchPresets\VariationList;
-use IO\Services\VdiSearch\Services\ItemSearchService;
+use IO\Contracts\ItemSearchContract;
 use Plenty\Modules\Plugin\DataBase\Contracts\DataBase;
 use Plenty\Modules\Plugin\DataBase\Contracts\Query;
 use IO\Services\CustomerService;
@@ -58,8 +58,8 @@ class ItemWishListRepository
 
         if(count($tempVariationIds) > 0)
         {
-            /** @var ItemSearchService $itemSearchService */
-            $itemSearchService = pluginApp( ItemSearchService::class );
+            /** @var ItemSearchContract $itemSearchService */
+            $itemSearchService = pluginApp( ItemSearchContract::class );
             $variatonFactory = VariationList::getSearchFactory([
                     'variationIds'  => $tempVariationIds
                     ]);
