@@ -6,12 +6,8 @@ namespace IO\Tests\Feature\VDI\FMD;
 use IO\Helper\VDIToElasticSearchMapper;
 use IO\Tests\Asserts\IsEqualArrayStructure;
 use IO\Tests\TestCase;
-use IO\Tests\Unit\VariationSearchFactoryTest;
-use Plenty\Modules\Item\SalesPrice\Models\SalesPrice;
 use Plenty\Modules\Item\VariationSalesPrice\Models\VariationSalesPrice;
 use Plenty\Modules\Pim\VariationDataInterface\Contracts\VariationDataInterfaceContract;
-use Plenty\Modules\Pim\VariationDataInterface\Model\Attributes\VariationAttributeValueAttribute;
-use Plenty\Modules\Pim\VariationDataInterface\Model\Attributes\VariationBaseAttribute;
 use Plenty\Modules\Pim\VariationDataInterface\Model\Attributes\VariationSalesPriceAttribute;
 use Plenty\Modules\Pim\VariationDataInterface\Model\VariationDataInterfaceContext;
 
@@ -26,7 +22,7 @@ class SalesPriceFMDTest extends TestCase
     public function should_map_vdi_result_to_es_result()
     {
         $variation = factory(\Plenty\Modules\Item\Variation\Models\Variation::class)->states('withMain')->create();
-        $salesPrices = factory(VariationSalesPrice::class)->create(['variationId' => $variation->id]);
+        factory(VariationSalesPrice::class)->create(['variationId' => $variation->salesPriceVariationId]);
 
           /** @var VariationDataInterfaceContract $vdi */
         $vdi = app(VariationDataInterfaceContract::class);

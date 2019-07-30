@@ -45,6 +45,7 @@ class SalesPriceFMD extends FieldMapDefinition
         foreach ($variationSalesPrices AS $variationSalesPrice){
             $entry = $variationSalesPrice->with()->salesPrice;
 
+            $entry = $entry->toArray();
             if(isset($entry['names']))
             {
                 $entry['names'] = array_map(function($name) use ($variationSalesPrice) {

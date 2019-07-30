@@ -16,7 +16,6 @@
             <exclude>./Tests/Feature/VDI/FMD/ImageFMDTest.php</exclude>
             <exclude>./Tests/Feature/VDI/FMD/UnitFMDTest.php</exclude>
             <exclude>./Tests/Feature/VDI/FMD/VariationPropertiesFMDTest.php</exclude>
-            <exclude>./Tests/Feature/VDI/FMD/SalesPriceFMDTest.php</exclude>
         </testsuite>
         <testsuite name="unit">
             <directory suffix="Test.php">./Tests/Unit</directory>
