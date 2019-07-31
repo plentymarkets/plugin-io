@@ -30,17 +30,9 @@ class ContactMailService
         /** @var Twig */
         $twig = pluginApp(Twig::class);
 
-        $templateData = [];
-        foreach($mailData['data'] as $key => $value)
-        {
-            $templateData[$key] = nl2br($value);
-        }
-        
         $mailBody = $twig->render(
             $mailTemplate,
-            [
-                'data' => $templateData
-            ]
+            $mailData
         );
         
         if(!strlen($mailBody))
