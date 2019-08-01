@@ -205,14 +205,14 @@ class ApiResponse
 		{
 			$stock = $event->getQuantity();
             $quantity = $event->getBasketItem()->quantity;
-            $overSellingAmount = $quantity - $stock;
+            $oversellingAmount = $quantity - $stock;
 
 			$this->eventData["BasketItemWarnOversell"] = [
 			    "stock" => $stock,
 			    "quantity" => $quantity
             ];
 
-            $this->notificationService->warn("Overselling by {$overSellingAmount}.", 12);
+            $this->notificationService->warn("Overselling by {$oversellingAmount}.", 12, ['oversellingAmount' => $oversellingAmount]);
 		}, 0);
 	}
 
