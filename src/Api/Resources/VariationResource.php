@@ -2,9 +2,9 @@
 
 namespace IO\Api\Resources;
 
-use IO\Services\VdiSearch\SearchPresets\SingleItem;
-use IO\Services\VdiSearch\SearchPresets\VariationList;
-use IO\Contracts\ItemSearchContract;
+use IO\Services\ItemSearch\SearchPresets\SingleItem;
+use IO\Services\ItemSearch\SearchPresets\VariationList;
+use IO\Services\ItemSearch\Services\ItemSearchService;
 use Plenty\Plugin\Http\Request;
 use Plenty\Plugin\Http\Response;
 use IO\Api\ApiResource;
@@ -36,8 +36,8 @@ class VariationResource extends ApiResource
         
         if(strlen($template))
         {
-            /** @var ItemSearchContract $itemSearchService */
-            $itemSearchService = pluginApp( ItemSearchContract::class );
+            /** @var ItemSearchService $itemSearchService */
+            $itemSearchService = pluginApp( ItemSearchService::class );
             $variations = $itemSearchService->getResults(
                 VariationList::getSearchFactory([
                     'variationIds'  => $this->request->get('variationIds' ),
@@ -65,8 +65,8 @@ class VariationResource extends ApiResource
         $template = $this->request->get('template', '');
         if(strlen($template))
         {
-            /** @var ItemSearchContract $itemSearchService */
-            $itemSearchService = pluginApp( ItemSearchContract::class );
+            /** @var ItemSearchService $itemSearchService */
+            $itemSearchService = pluginApp( ItemSearchService::class );
             $variation = $itemSearchService->getResults(
                 SingleItem::getSearchFactory([
                     'variationId' => $variationId

@@ -24,20 +24,18 @@ class FacetSearchFactory extends VariationSearchFactory
      *
      * @return FacetSearchFactory
      */
-    public static function create( $facets )
+    public function create( $facets )
     {
-        /** @var FacetSearchFactory $instance */
-        $instance = pluginApp( FacetSearchFactory::class );
         if ( is_string( $facets ) )
         {
-            $instance->facetValues = explode(",", $facets );
+            $this->facetValues = explode(",", $facets );
         }
         else
         {
-            $instance->facetValues = $facets;
+            $this->facetValues = $facets;
         }
 
-        return $instance;
+        return $this;
     }
 
     /**

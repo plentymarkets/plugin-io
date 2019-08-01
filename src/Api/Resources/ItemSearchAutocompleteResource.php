@@ -2,8 +2,8 @@
 
 namespace IO\Api\Resources;
 
-use IO\Services\VdiSearch\SearchPresets\SearchItems;
-use IO\Contracts\ItemSearchContract;
+use IO\Services\ItemSearch\SearchPresets\SearchItems;
+use IO\Services\ItemSearch\Services\ItemSearchService;
 use Plenty\Plugin\Http\Response;
 use Plenty\Plugin\Http\Request;
 use IO\Api\ApiResource;
@@ -36,8 +36,8 @@ class ItemSearchAutocompleteResource extends ApiResource
         
         if(strlen($searchString))
         {
-            /** @var ItemSearchContract $itemSearchService */
-            $itemSearchService = pluginApp( ItemSearchContract::class );
+            /** @var ItemSearchService $itemSearchService */
+            $itemSearchService = pluginApp( ItemSearchService::class );
             $response = $itemSearchService->getResults(
                 SearchItems::getSearchFactory([
                     'query'         => $searchString,

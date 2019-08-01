@@ -2,11 +2,11 @@
 
 namespace IO\Services\VdiSearch\Factories;
 
+use IO\Contracts\MultiSearchFactoryContract;
 use IO\Helper\VDIToElasticSearchMapper;
 use IO\Services\ItemSearch\Extensions\ItemSearchExtension;
 use IO\Services\ItemSearch\Helper\FacetExtensionContainer;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Search\Document\DocumentSearch;
-use Plenty\Modules\Item\Search\Contracts\VariationElasticSearchMultiSearchRepositoryContract;
 use Plenty\Modules\Pim\VariationDataInterface\Contracts\VariationDataInterfaceContract;
 
 /**
@@ -16,7 +16,7 @@ use Plenty\Modules\Pim\VariationDataInterface\Contracts\VariationDataInterfaceCo
  *
  * @package IO\Services\ItemSearch\Factories
  */
-class MultiSearchFactory
+class MultiSearchFactory implements MultiSearchFactoryContract
 {
     /** @var array */
     private $searches = [];

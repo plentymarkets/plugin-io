@@ -2,7 +2,7 @@
 
 namespace IO\Services\ItemSearch\Services;
 
-use IO\Contracts\ItemSearchContract;
+use IO\Contracts\MultiSearchFactoryContract;
 use IO\Helper\DefaultSearchResult;
 use IO\Services\ItemSearch\Factories\BaseSearchFactory;
 use IO\Services\ItemSearch\Factories\MultiSearchFactory;
@@ -14,7 +14,7 @@ use IO\Services\ItemSearch\Factories\MultiSearchFactory;
  *
  * @package IO\Services\ItemSearch\Services
  */
-class ItemSearchService implements ItemSearchContract
+class ItemSearchService
 {
     /**
      * Get search results for multiple search requests.
@@ -26,7 +26,7 @@ class ItemSearchService implements ItemSearchContract
     public function getResults( $searches )
     {
         /** @var MultiSearchFactory $multiSearchFactory */
-        $multiSearchFactory = pluginApp( MultiSearchFactory::class );
+        $multiSearchFactory = pluginApp( MultiSearchFactoryContract::class );
 
         if ( is_array( $searches ) )
         {

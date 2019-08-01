@@ -3,12 +3,9 @@
 namespace IO\Services\ItemSearch\Extensions;
 
 use IO\Services\CategoryService;
-use IO\Services\ItemSearch\Factories\BaseSearchFactory;
-use IO\Services\ItemSearch\Factories\VariationSearchFactory;
+use IO\Contracts\VariationSearchFactoryContract as VariationSearchFactory;
 use IO\Services\SessionStorageService;
-use IO\Services\WebstoreConfigurationService;
 use Plenty\Modules\Category\Contracts\CategoryRepositoryContract;
-use Plenty\Modules\Cloud\ElasticSearch\Lib\Search\Document\DocumentSearch;
 use Plenty\Plugin\Application;
 
 /**
@@ -25,8 +22,7 @@ class CurrentCategoryExtension implements ItemSearchExtension
      */
     public function getSearch( $parentSearchBuilder )
     {
-        return VariationSearchFactory::inherit(
-            $parentSearchBuilder,
+        return $parentSearchBuilder->inherit(
             [
                 VariationSearchFactory::INHERIT_FILTERS,
                 VariationSearchFactory::INHERIT_MUTATORS,

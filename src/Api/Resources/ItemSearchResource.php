@@ -2,9 +2,9 @@
 
 namespace IO\Api\Resources;
 
-use IO\Services\VdiSearch\SearchPresets\Facets;
-use IO\Services\VdiSearch\SearchPresets\SearchItems;
-use IO\Contracts\ItemSearchContract;
+use IO\Services\ItemSearch\SearchPresets\Facets;
+use IO\Services\ItemSearch\SearchPresets\SearchItems;
+use IO\Services\ItemSearch\Services\ItemSearchService;
 use Plenty\Plugin\Http\Response;
 use Plenty\Plugin\Http\Request;
 use IO\Api\ApiResource;
@@ -47,8 +47,8 @@ class ItemSearchResource extends ApiResource
                 'priceMax'      => $this->request->get('priceMax', 0)
             ];
 
-            /** @var ItemSearchContract $itemSearchService */
-            $itemSearchService = pluginApp( ItemSearchContract::class );
+            /** @var ItemSearchService $itemSearchService */
+            $itemSearchService = pluginApp( ItemSearchService::class );
             $response = $itemSearchService->getResults([
                 'itemList' => SearchItems::getSearchFactory( $itemListOptions ),
                 'facets'   => Facets::getSearchFactory( $itemListOptions )

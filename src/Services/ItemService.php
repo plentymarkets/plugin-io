@@ -15,9 +15,9 @@ use IO\Constants\ItemConditionTexts;
 use IO\Constants\Language;
 use IO\Helper\MemoryCache;
 use IO\Extensions\Filters\ItemImagesFilter;
-use IO\Services\VdiSearch\SearchPresets\SingleItem;
-use IO\Services\VdiSearch\SearchPresets\VariationList;
-use IO\Contracts\ItemSearchContract;
+use IO\Services\ItemSearch\SearchPresets\SingleItem;
+use IO\Services\ItemSearch\SearchPresets\VariationList;
+use IO\Services\ItemSearch\Services\ItemSearchService;
 use Plenty\Modules\Authorization\Services\AuthHelper;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\ElasticSearch;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Processor\DocumentProcessor;
@@ -176,8 +176,8 @@ class ItemService
 	 */
 	public function getVariation(int $variationId = 0)
 	{
-	    /** @var ItemSearchContract $itemSearchService */
-	    $itemSearchService = pluginApp(ItemSearchContract::class);
+	    /** @var ItemSearchService $itemSearchService */
+	    $itemSearchService = pluginApp(ItemSearchService::class);
 
         return $itemSearchService->getResults([SingleItem::getSearchFactory(['variationId' => $variationId])])[0];
 	}
@@ -189,8 +189,8 @@ class ItemService
 	 */
 	public function getVariations(array $variationIds):array
 	{
-        /** @var ItemSearchContract $itemSearchService */
-        $itemSearchService = pluginApp(ItemSearchContract::class);
+        /** @var ItemSearchService $itemSearchService */
+        $itemSearchService = pluginApp(ItemSearchService::class);
 
         return $itemSearchService->getResults([VariationList::getSearchFactory(['variationIds' => $variationIds])])[0];
 	}
@@ -304,8 +304,8 @@ class ItemService
      */
     public function getVariationImage(int $variationId = 0, string $imageAccessor = 'urlPreview'):string
     {
-        /** @var ItemSearchContract $itemSearchService */
-        $itemSearchService = pluginApp( ItemSearchContract::class );
+        /** @var ItemSearchService $itemSearchService */
+        $itemSearchService = pluginApp( ItemSearchService::class );
         $variation = $itemSearchService->getResults([
             SingleItem::getSearchFactory([
                 'variationId' => $variationId

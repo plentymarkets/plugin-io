@@ -2,7 +2,7 @@
 
 namespace IO\Services\ItemSearch\Extensions;
 
-use IO\Services\ItemSearch\Factories\VariationSearchFactory;
+use IO\Contracts\VariationSearchFactoryContract as VariationSearchFactory;
 use IO\Services\UrlBuilder\VariationUrlBuilder;
 use IO\Services\WebstoreConfigurationService;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Source\Mutator\BuiltIn\LanguageMutator;
@@ -30,8 +30,7 @@ class ItemUrlExtension implements ItemSearchExtension
             [ "languages" => $webstoreConfigService->getActiveLanguageList() ]
         );
 
-        return VariationSearchFactory::inherit(
-            $parentSearchBuilder,
+        return $parentSearchBuilder->inherit(
             [
                 VariationSearchFactory::INHERIT_FILTERS,
                 VariationSearchFactory::INHERIT_PAGINATION,

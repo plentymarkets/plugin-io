@@ -2,7 +2,7 @@
 
 namespace IO\Services\ItemSearch\Extensions;
 
-use IO\Services\ItemSearch\Factories\VariationSearchFactory;
+use IO\Contracts\VariationSearchFactoryContract as VariationSearchFactory;
 use IO\Services\SessionStorageService;
 use IO\Services\TemplateConfigService;
 
@@ -13,8 +13,7 @@ class GroupedAttributeValuesExtension implements ItemSearchExtension
      */
     public function getSearch($parentSearchBuilder)
     {
-        return VariationSearchFactory::inherit(
-            $parentSearchBuilder,
+        return $parentSearchBuilder->inherit(
             [
                 VariationSearchFactory::INHERIT_FILTERS,
                 VariationSearchFactory::INHERIT_PAGINATION,

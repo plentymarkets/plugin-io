@@ -2,6 +2,7 @@
 
 namespace IO\Services\ItemSearch\Factories;
 
+use IO\Contracts\VariationSearchFactoryContract;
 use IO\Helper\CurrencyConverter;
 use IO\Helper\VatConverter;
 use IO\Services\ItemSearch\Contracts\FacetExtension;
@@ -46,7 +47,7 @@ use Plenty\Plugin\Application;
  *
  * @package IO\Services\ItemSearch\Factories
  */
-class VariationSearchFactory extends BaseSearchFactory
+class VariationSearchFactory extends BaseSearchFactory implements VariationSearchFactoryContract
 {
     private $isAdminPreview = false;
     

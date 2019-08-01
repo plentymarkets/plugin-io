@@ -2,8 +2,8 @@
 
 namespace IO\Services;
 
-use IO\Services\VdiSearch\SearchPresets\BasketItems;
-use IO\Contracts\ItemSearchContract;
+use IO\Services\ItemSearch\SearchPresets\BasketItems;
+use IO\Services\ItemSearch\Services\ItemSearchService;
 use Plenty\Modules\Accounting\Vat\Contracts\VatInitContract;
 use Plenty\Modules\Accounting\Vat\Models\VatRate;
 use Plenty\Modules\Authorization\Services\AuthHelper;
@@ -19,7 +19,7 @@ use Plenty\Modules\Basket\Models\BasketItem;
 use Plenty\Modules\Frontend\Contracts\Checkout;
 use IO\Extensions\Filters\NumberFormatFilter;
 use Plenty\Modules\Frontend\Services\VatService;
-use IO\Services\ItemSearch\Factories\VariationSearchFactory;
+use IO\Contracts\VariationSearchFactoryContract as VariationSearchFactory;
 use IO\Constants\LogLevel;
 
 /**
@@ -319,8 +319,8 @@ class BasketService
 
         if($webstoreConfigService->getWebstoreConfig()->dontSplitItemBundle === 0)
         {
-            /** @var ItemSearchContract $itemSearchService */
-            $itemSearchService = pluginApp( ItemSearchContract::class );
+            /** @var ItemSearchService $itemSearchService */
+            $itemSearchService = pluginApp( ItemSearchService::class );
 
             /** @var VariationSearchFactory $searchFactory */
             $searchFactory = pluginApp( VariationSearchFactory::class );
@@ -641,8 +641,8 @@ class BasketService
             $temp = $basketItem->basketItemOrderParams;
         }
 
-        /** @var ItemSearchContract $itemSearchService */
-        $itemSearchService = pluginApp( ItemSearchContract::class );
+        /** @var ItemSearchService $itemSearchService */
+        $itemSearchService = pluginApp( ItemSearchService::class );
         $items = $itemSearchService->getResults(
             BasketItems::getSearchFactory([
                 'variationIds'  => $basketItemVariationIds,

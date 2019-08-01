@@ -5,8 +5,8 @@ namespace IO\Models;
 use IO\Builder\Order\OrderItemType;
 use IO\Builder\Order\OrderType;
 use IO\Extensions\Filters\ItemImagesFilter;
-use IO\Services\VdiSearch\Factories\VariationSearchFactory;
-use IO\Contracts\ItemSearchContract;
+use IO\Contracts\VariationSearchFactoryContract as VariationSearchFactory;
+use IO\Services\ItemSearch\Services\ItemSearchService;
 use IO\Services\OrderService;
 use IO\Services\OrderStatusService;
 use IO\Services\OrderTotalsService;
@@ -164,8 +164,8 @@ class LocalizedOrder extends ModelWrapper
             }
         }
 
-        /** @var ItemSearchContract $itemSearchService */
-        $itemSearchService = pluginApp( ItemSearchContract::class );
+        /** @var ItemSearchService $itemSearchService */
+        $itemSearchService = pluginApp( ItemSearchService::class );
         /** @var VariationSearchFactory $searchFactory */
         $searchFactory = pluginApp( VariationSearchFactory::class );
         $searchFactory->setPage(1, count($orderVariationIds));

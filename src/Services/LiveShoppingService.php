@@ -3,8 +3,8 @@
 namespace IO\Services;
 
 use IO\Services\ItemSearch\Helper\SortingHelper;
-use IO\Services\VdiSearch\SearchPresets\LiveShoppingItems;
-use IO\Contracts\ItemSearchContract;
+use IO\Services\ItemSearch\SearchPresets\LiveShoppingItems;
+use IO\Services\ItemSearch\Services\ItemSearchService;
 use Plenty\Modules\LiveShopping\Contracts\LiveShoppingRepositoryContract;
 use Plenty\Modules\LiveShopping\Models\LiveShopping;
 
@@ -60,8 +60,8 @@ class LiveShoppingService
             'itemId'        => $itemId,
             'sorting'       => SortingHelper::splitPathAndOrder($sorting)
         ];
-        /** @var ItemSearchContract $itemSearchService */
-        $itemSearchService = pluginApp( ItemSearchContract::class );
+        /** @var ItemSearchService $itemSearchService */
+        $itemSearchService = pluginApp( ItemSearchService::class );
         $itemList = $itemSearchService->getResults([
                                                        LiveShoppingItems::getSearchFactory( $itemSearchOptions )
                                                    ]);

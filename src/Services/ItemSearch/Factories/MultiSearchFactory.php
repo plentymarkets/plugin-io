@@ -2,6 +2,7 @@
 
 namespace IO\Services\ItemSearch\Factories;
 
+use IO\Contracts\MultiSearchFactoryContract;
 use IO\Services\ItemSearch\Extensions\ItemSearchExtension;
 use IO\Services\ItemSearch\Helper\FacetExtensionContainer;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Search\Document\DocumentSearch;
@@ -14,7 +15,7 @@ use Plenty\Modules\Item\Search\Contracts\VariationElasticSearchMultiSearchReposi
  *
  * @package IO\Services\ItemSearch\Factories
  */
-class MultiSearchFactory
+class MultiSearchFactory implements MultiSearchFactoryContract
 {
     /** @var array */
     private $searches = [];

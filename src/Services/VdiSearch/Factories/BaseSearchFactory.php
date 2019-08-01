@@ -2,6 +2,7 @@
 
 namespace IO\Services\VdiSearch\Factories;
 
+use IO\Contracts\VariationSearchFactoryContract;
 use IO\Services\ItemSearch\Extensions\ItemSearchExtension;
 use IO\Services\ItemSearch\Extensions\SortExtension;
 use IO\Services\ItemSearch\Helper\LoadResultFields;
@@ -27,6 +28,11 @@ use Plenty\Modules\Item\Search\Sort\NameSorting;
 
 use Plenty\Modules\Pim\SearchService\Query\ManagedSearchQuery;
 use Plenty\Modules\Pim\SearchService\Query\NameAutoCompleteQuery;
+use Plenty\Modules\Pim\VariationDataInterface\Model\Attributes\VariationAttributeValueAttribute;
+use Plenty\Modules\Pim\VariationDataInterface\Model\Attributes\VariationBaseAttribute;
+use Plenty\Modules\Pim\VariationDataInterface\Model\Attributes\VariationImageAttribute;
+use Plenty\Modules\Pim\VariationDataInterface\Model\Attributes\VariationSalesPriceAttribute;
+use Plenty\Modules\Pim\VariationDataInterface\Model\Attributes\VariationUnitAttribute;
 use Plenty\Modules\Pim\VariationDataInterface\Model\VariationDataInterfaceContext;
 
 use Plenty\Plugin\Application;
@@ -43,18 +49,6 @@ class BaseSearchFactory
 {
     use LoadResultFields;
     use Loggable;
-
-    const SORTING_ORDER_ASC     = ElasticSearch::SORTING_ORDER_ASC;
-    const SORTING_ORDER_DESC    = ElasticSearch::SORTING_ORDER_DESC;
-
-    const INHERIT_AGGREGATIONS  = 'aggregations';
-    const INHERIT_COLLAPSE      = 'collapse';
-    const INHERIT_EXTENSIONS    = 'extensions';
-    const INHERIT_FILTERS       = 'filters';
-    const INHERIT_MUTATORS      = 'mutators';
-    const INHERIT_PAGINATION    = 'pagination';
-    const INHERIT_RESULT_FIELDS = 'resultFields';
-    const INHERIT_SORTING       = 'sorting';
 
     /** @var AggregationInterface[] */
     private $aggregations = [];
@@ -101,59 +95,56 @@ class BaseSearchFactory
      * @return BaseSearchFactory
      * @throws \ErrorException
      */
-    public static function inherit( $searchBuilder, $inheritedProperties = null )
+    public function inherit( $inheritedProperties = null )
     {
         /** @var BaseSearchFactory $newBuilder */
         $newBuilder = pluginApp( self::class );
 
-        if ( $searchBuilder !== null )
+        if ( $inheritedProperties === null || in_array(VariationSearchFactoryContract::INHERIT_COLLAPSE, $inheritedProperties ) )
         {
-            if ( $inheritedProperties === null || in_array(self::INHERIT_COLLAPSE, $inheritedProperties ) )
-            {
-                $newBuilder->collapse = $searchBuilder->collapse;
-            }
+            $newBuilder->collapse = $this->collapse;
+        }
 
-            if ( $inheritedProperties === null || in_array(self::INHERIT_EXTENSIONS, $inheritedProperties ) )
-            {
-                $newBuilder->extensions = $searchBuilder->extensions;
-            }
+        if ( $inheritedProperties === null || in_array(VariationSearchFactoryContract::INHERIT_EXTENSIONS, $inheritedProperties ) )
+        {
+            $newBuilder->extensions = $this->extensions;
+        }
 
-            if ( $inheritedProperties === null || in_array( self::INHERIT_FILTERS, $inheritedProperties ) )
+        if ( $inheritedProperties === null || in_array( VariationSearchFactoryContract::INHERIT_FILTERS, $inheritedProperties ) )
+        {
+            foreach( $this->filters as $filter )
             {
-                foreach( $searchBuilder->filters as $filter )
-                {
-                    $newBuilder->withFilter( $filter );
-                }
+                $newBuilder->withFilter( $filter );
             }
+        }
 
-            if ( $inheritedProperties === null || in_array(self::INHERIT_MUTATORS, $inheritedProperties ) )
+        if ( $inheritedProperties === null || in_array(VariationSearchFactoryContract::INHERIT_MUTATORS, $inheritedProperties ) )
+        {
+            foreach( $this->mutators as $mutator )
             {
-                foreach( $searchBuilder->mutators as $mutator )
-                {
-                    $newBuilder->withMutator( $mutator );
-                }
+                $newBuilder->withMutator( $mutator );
             }
+        }
 
-            if ( $inheritedProperties === null || in_array( self::INHERIT_PAGINATION, $inheritedProperties ) )
-            {
-                $newBuilder->setPage(
-                    $searchBuilder->page,
-                    $searchBuilder->itemsPerPage
-                );
-            }
+        if ( $inheritedProperties === null || in_array( VariationSearchFactoryContract::INHERIT_PAGINATION, $inheritedProperties ) )
+        {
+            $newBuilder->setPage(
+                $this->page,
+                $this->itemsPerPage
+            );
+        }
 
-            /*if ( $inheritedProperties === null || in_array( self::INHERIT_RESULT_FIELDS, $inheritedProperties ) )
-            {
-                $newBuilder->withResultFields(
-                    $searchBuilder->resultFields
-                );
-            }*/
+        /*if ( $inheritedProperties === null || in_array( self::INHERIT_RESULT_FIELDS, $inheritedProperties ) )
+        {
+            $newBuilder->withResultFields(
+                $searchBuilder->resultFields
+            );
+        }*/
 
-            if ( $inheritedProperties === null || in_array( self::INHERIT_SORTING, $inheritedProperties ) )
-            {
-                $newBuilder->sorting = $searchBuilder->sorting;
-                $newBuilder->randomScoreModifier = $searchBuilder->randomScoreModifier;
-            }
+        if ( $inheritedProperties === null || in_array( VariationSearchFactoryContract::INHERIT_SORTING, $inheritedProperties ) )
+        {
+            $newBuilder->sorting = $this->sorting;
+            $newBuilder->randomScoreModifier = $this->randomScoreModifier;
         }
 
         return $newBuilder;
@@ -233,6 +224,11 @@ class BaseSearchFactory
         return $this->resultFields;
     }*/
     
+    public function withResultFields( $fields )
+    {
+        return $this;
+    }
+    
     /**
      * @param $parts
      * @return BaseSearchFactory
@@ -242,6 +238,47 @@ class BaseSearchFactory
         if(is_array($parts) && count($parts))
         {
             $this->parts = $parts;
+        }
+        else
+        {
+            /** @var VariationBaseAttribute $basePart */
+            $basePart = app(VariationBaseAttribute::class);
+            $basePart->addLazyLoadParts(
+                VariationBaseAttribute::TEXTS,
+                VariationBaseAttribute::AVAILABILITY,
+                VariationBaseAttribute::CROSS_SELLING,
+                VariationBaseAttribute::IMAGE,
+                VariationBaseAttribute::ITEM,
+                VariationBaseAttribute::PROPERTY,
+                VariationBaseAttribute::SERIAL_NUMBER,
+                VariationBaseAttribute::STOCK
+            );
+    
+            /** @var VariationSalesPriceAttribute $pricePart */
+            $pricePart = app(VariationSalesPriceAttribute::class);
+            $pricePart->addLazyLoadParts(VariationSalesPriceAttribute::SALES_PRICE);
+    
+            /** @var VariationUnitAttribute $unitPart */
+            $unitPart = app(VariationUnitAttribute::class);
+            $unitPart->addLazyLoadParts(VariationUnitAttribute::UNIT);
+    
+            /** @var VariationImageAttribute $imagePart */
+            $imagePart = app(VariationImageAttribute::class);
+    
+            /** @var VariationAttributeValueAttribute $attriuteValuePart */
+            $attributeValuePart = app(VariationAttributeValueAttribute::class);
+            $attributeValuePart->addLazyLoadParts(
+                VariationAttributeValueAttribute::ATTRIBUTE,
+                VariationAttributeValueAttribute::VALUE
+            );
+    
+            $this->parts = [
+                $basePart,
+                $pricePart,
+                $unitPart,
+                $imagePart,
+                $attributeValuePart
+            ];
         }
         
         return $this;
@@ -311,7 +348,7 @@ class BaseSearchFactory
      *
      * @return $this
      */
-    public function sortBy( $field, $order = self::SORTING_ORDER_DESC )
+    public function sortBy( $field, $order = VariationSearchFactoryContract::SORTING_ORDER_DESC )
     {
         $field = $this->checkRandomSorting($field);
         if ( $this->sorting === null )
@@ -319,9 +356,9 @@ class BaseSearchFactory
             $this->sorting = pluginApp( MultipleSorting::class );
         }
 
-        if ( $order !== self::SORTING_ORDER_ASC && $order !== self::SORTING_ORDER_DESC )
+        if ( $order !== VariationSearchFactoryContract::SORTING_ORDER_ASC && $order !== VariationSearchFactoryContract::SORTING_ORDER_DESC )
         {
-            $order = self::SORTING_ORDER_DESC;
+            $order = VariationSearchFactoryContract::SORTING_ORDER_DESC;
         }
 
         $sortingInterface = null;
