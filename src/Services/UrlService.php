@@ -148,7 +148,7 @@ class UrlService
                     return null;
                 }
 
-                if ( TemplateService::$currentTemplate === 'tpl.home' )
+                if ( TemplateService::$currentTemplate === 'tpl.home' || TemplateService::$currentTemplate === 'tpl.home.category' )
                 {
                     return pluginApp( UrlQuery::class, ['path' => "", 'lang' => $lang])
                         ->toAbsoluteUrl($includeLanguage);

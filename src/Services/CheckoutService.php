@@ -265,11 +265,19 @@ class CheckoutService
             );
         }
 
+        // Check if pattern has ISO Code in front
+        $pattern = $formatter->getPattern();
+        if(mb_substr($pattern, 0, 1, "UTF-8") === "\u{00A4}")
+        {
+            // Insert a space after the beginning character
+            $pattern = mb_substr($pattern, 0, 1) . " " . mb_substr($pattern, 1);
+        }
+
         return [
             "separator_decimal"   => $formatter->getSymbol(\NumberFormatter::MONETARY_SEPARATOR_SYMBOL),
             "separator_thousands" => $formatter->getSymbol(\NumberFormatter::MONETARY_GROUPING_SEPARATOR_SYMBOL),
             "number_decimals"     => $formatter->getAttribute(\NumberFormatter::FRACTION_DIGITS),
-            "pattern"             => $formatter->getPattern()
+            "pattern"             => $pattern
         ];
     }
 
@@ -425,23 +433,23 @@ class CheckoutService
      */
     public function getShippingProfileList()
     {
-        return $this->fromMemoryCache('shippingProfileList', function()
+        return $this->fromMemoryCache('shippingProfileList.' . $this->getShippingCountryId(), function()
         {
             /** @var AccountingLocationRepositoryContract $accountRepo*/
             $accountRepo = pluginApp(AccountingLocationRepositoryContract::class);
             /** @var VatService $vatService*/
             $vatService = pluginApp(VatService::class);
             $showNetPrice   = $this->sessionStorageService->getCustomer()->showNetPrice;
-        
+
             $list = $this->parcelServicePresetRepo->getLastWeightedPresetCombinations($this->basketRepository->load(), $this->sessionStorageService->getCustomer()->accountContactClassId);
-        
+
             $locationId = $vatService->getLocationId($this->getShippingCountryId());
             $accountSettings = $accountRepo->getSettings($locationId);
-        
+
             if ($showNetPrice && !(bool)$accountSettings->showShippingVat) {
-    
+
                 $maxVatValue = $this->basketService->getMaxVatValue();
-    
+
                 if (is_array($list)) {
                     foreach ($list as $key => $shippingProfile) {
                         if (isset($shippingProfile['shippingAmount'])) {
@@ -449,7 +457,7 @@ class CheckoutService
                         }
                     }
                 }
-    
+
                 $basket = $this->basketService->getBasket();
                 if ($basket->currency !== $this->currencyExchangeRepo->getDefaultCurrency())
                 {
@@ -465,7 +473,7 @@ class CheckoutService
                     }
                 }
             }
-            
+
             return $list;
         });
     }
@@ -572,7 +580,7 @@ class CheckoutService
 
         $this->setShippingCountryId($defaultShippingCountryId);
     }
-    
+
     public function getMaxDeliveryDays()
     {
         /** @var ShippingService $shippingService */
@@ -591,7 +599,7 @@ class CheckoutService
         }
 
     }
-    
+
     public function getReadOnlyCheckout()
     {
         $readOnlyCheckout = $this->sessionStorageService->getSessionValue(SessionStorageKeys::READONLY_CHECKOUT);

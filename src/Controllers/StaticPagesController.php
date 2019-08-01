@@ -1,8 +1,6 @@
 <?php //strict
 namespace IO\Controllers;
 
-use IO\Helper\TemplateContainer;
-
 /**
  * Class HomepageController
  * @package IO\Controllers

@@ -139,10 +139,6 @@ class OrderItemBuilder
         }
         
 		$shippingAmount = $basket->shippingAmount;
-        if($basket->shippingDeleteByCoupon)
-        {
-            $shippingAmount -= $basket->couponDiscount;
-        }
 
 		// add shipping costs
         $shippingCosts = [
