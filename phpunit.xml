@@ -14,6 +14,7 @@
             <directory suffix="Test.php">./Tests/Feature/VDI/FMD/</directory>
             <exclude>./Tests/Feature/VDI/FMD/TagFMDTest.php</exclude>
             <exclude>./Tests/Feature/VDI/FMD/ImageFMDTest.php</exclude>
+            <exclude>./Tests/Feature/VDI/FMD/VariationPropertiesFMDTest.php</exclude>
         </testsuite>
         <testsuite name="unit">
             <directory suffix="Test.php">./Tests/Unit</directory>

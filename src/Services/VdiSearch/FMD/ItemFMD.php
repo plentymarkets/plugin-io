@@ -195,7 +195,7 @@ class ItemFMD extends FieldMapDefinition
     {
         return [
             VariationBaseAttribute::ITEM,
-            VariationBaseAttribute::FEEDBACK
+            //VariationBaseAttribute::FEEDBACK
         ];
     }
 

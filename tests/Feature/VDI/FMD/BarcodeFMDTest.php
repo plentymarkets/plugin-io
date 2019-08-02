@@ -2,7 +2,6 @@
 
 namespace IO\Tests\Feature\VDI\FMD;
 
-
 use IO\Helper\VDIToElasticSearchMapper;
 use IO\Tests\Asserts\IsEqualArrayStructure;
 use IO\Tests\TestCase;

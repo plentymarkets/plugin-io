@@ -23,7 +23,6 @@ use Plenty\Modules\Pim\VariationDataInterface\Model\Variation;
 
 class VDIToElasticSearchMapper
 {
-    //TODO add others
     private $fmdMap = [
         'attributes'          => AttributeFMD::class,
         'barcodes'            => BarcodeFMD::class,

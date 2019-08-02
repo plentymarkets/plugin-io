@@ -3,6 +3,7 @@
 namespace IO\Services\VdiSearch\Factories;
 
 use IO\Contracts\VariationSearchFactoryContract;
+use IO\Helper\VDIPart;
 use IO\Services\ItemSearch\Extensions\ItemSearchExtension;
 use IO\Services\ItemSearch\Extensions\SortExtension;
 use IO\Services\ItemSearch\Helper\LoadResultFields;
@@ -60,8 +61,8 @@ class BaseSearchFactory
     private $filters = [];
 
     /** @var array  */
-    //private $resultFields = [];
-    
+    private $resultFields = [];
+
     /** @var array  */
     private $parts = [];
 
@@ -76,7 +77,7 @@ class BaseSearchFactory
 
     /** @var MultipleSorting */
     private $sorting = null;
-    
+
     /** @var RandomScore */
     private $randomScoreModifier = null;
 
@@ -85,7 +86,7 @@ class BaseSearchFactory
 
     /** @var int */
     private $itemsPerPage = -1;
-    
+
     /**
      * Create a new factory instance based on properties of an existing factory.
      *
@@ -204,7 +205,7 @@ class BaseSearchFactory
      *
      * @return BaseSearchFactory
      */
-    /*public function withResultFields( $fields )
+    public function withResultFields( $fields )
     {
         if ( is_array( $fields ) )
         {
@@ -216,19 +217,25 @@ class BaseSearchFactory
             // load result fields from given resource
             $this->resultFields = $this->loadResultFields( $fields );
         }
-        return $this;
-    }*/
-    
-    /*public function getResultFields()
-    {
-        return $this->resultFields;
-    }*/
-    
-    public function withResultFields( $fields )
-    {
+
+        $this->addParts();
+
         return $this;
     }
-    
+
+    public function getResultFields()
+    {
+        return $this->resultFields;
+    }
+
+    private function addParts()
+    {
+        /**
+         * @var VDIPart $vdiPartHelper
+         */
+        $vdiPartHelper = pluginApp(VDIPart::class);
+        $this->parts = $vdiPartHelper->getPartsByResultFields($this->resultFields);
+    }
     /**
      * @param $parts
      * @return BaseSearchFactory
@@ -239,48 +246,7 @@ class BaseSearchFactory
         {
             $this->parts = $parts;
         }
-        else
-        {
-            /** @var VariationBaseAttribute $basePart */
-            $basePart = app(VariationBaseAttribute::class);
-            $basePart->addLazyLoadParts(
-                VariationBaseAttribute::TEXTS,
-                VariationBaseAttribute::AVAILABILITY,
-                VariationBaseAttribute::CROSS_SELLING,
-                VariationBaseAttribute::IMAGE,
-                VariationBaseAttribute::ITEM,
-                VariationBaseAttribute::PROPERTY,
-                VariationBaseAttribute::SERIAL_NUMBER,
-                VariationBaseAttribute::STOCK
-            );
-    
-            /** @var VariationSalesPriceAttribute $pricePart */
-            $pricePart = app(VariationSalesPriceAttribute::class);
-            $pricePart->addLazyLoadParts(VariationSalesPriceAttribute::SALES_PRICE);
-    
-            /** @var VariationUnitAttribute $unitPart */
-            $unitPart = app(VariationUnitAttribute::class);
-            $unitPart->addLazyLoadParts(VariationUnitAttribute::UNIT);
-    
-            /** @var VariationImageAttribute $imagePart */
-            $imagePart = app(VariationImageAttribute::class);
-    
-            /** @var VariationAttributeValueAttribute $attriuteValuePart */
-            $attributeValuePart = app(VariationAttributeValueAttribute::class);
-            $attributeValuePart->addLazyLoadParts(
-                VariationAttributeValueAttribute::ATTRIBUTE,
-                VariationAttributeValueAttribute::VALUE
-            );
-    
-            $this->parts = [
-                $basePart,
-                $pricePart,
-                $unitPart,
-                $imagePart,
-                $attributeValuePart
-            ];
-        }
-        
+
         return $this;
     }
 
@@ -465,7 +431,7 @@ class BaseSearchFactory
                 $vdiContext->addFilter( $filter );
             }
         }
-    
+
         // ADD RANDOM MODIFIER
         //TODO
         /*if($this->randomScoreModifier instanceof RandomScore)
@@ -500,12 +466,12 @@ class BaseSearchFactory
         {
             $search->setSorting( $this->sorting );
         }*/
-        
+
         if ( $this->itemsPerPage < 0 )
         {
             $this->itemsPerPage = 1000;
         }
-    
+
         $vdiContext->setPage( $this->page, $this->itemsPerPage );
 
         //TODO
@@ -541,26 +507,26 @@ class BaseSearchFactory
         {
             $vdiContext->setParts($vdiContextParts);
         }
-        
+
         return $vdiContext;
-        
+
         /*if($this->collapse instanceof BaseCollapse)
         {
             /** @var IndependentSource $source */
             /*$source = pluginApp(IndependentSource::class);
             //$source->activate('variation.id', 'item.id');
             $source->activate();
-    
+
             /** @var BaseInnerHit $innerHit */
             /*$innerHit = pluginApp(BaseInnerHit::class, ['cheapest']);
             $innerHit->setSorting(pluginApp(SingleSorting::class, ['sorting.price.avg', 'asc']));
             $innerHit->setSource($source);
             $this->collapse->addInnerHit($innerHit);
-    
+
             /** @var DocumentInnerHitsToRootProcessor $docProcessor */
             /*$processor = pluginApp(DocumentInnerHitsToRootProcessor::class, [$innerHit->getName()]);
             $search = pluginApp(DocumentSearch::class, [$processor]);
-    
+
             // Group By Item Id
             $search->setCollapse($this->collapse);
         }
@@ -571,7 +537,7 @@ class BaseSearchFactory
             /** @var DocumentSearch $search */
             /*$search = pluginApp( DocumentSearch::class, [$processor] );
         }*/
-    
+
         // ADD MUTATORS
         /*$mutatorClasses = [];
         foreach( $this->mutators as $mutator )
@@ -587,10 +553,10 @@ class BaseSearchFactory
                 "mutators"      => $mutatorClasses
             ]
         );
-        
+
         return $search;*/
     }
-    
+
     private function checkRandomSorting($sortingField)
     {
         if($sortingField == 'item.random')

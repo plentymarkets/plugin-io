@@ -2,13 +2,11 @@
 
 namespace IO\Tests\Feature\VDI\FMD;
 
-
 use IO\Helper\VDIToElasticSearchMapper;
 use IO\Tests\Asserts\IsEqualArrayStructure;
 use IO\Tests\TestCase;
 use Plenty\Modules\Pim\VariationDataInterface\Contracts\VariationDataInterfaceContract;
 use Plenty\Modules\Pim\VariationDataInterface\Model\Attributes\VariationAttributeValueAttribute;
-use Plenty\Modules\Pim\VariationDataInterface\Model\Attributes\VariationBaseAttribute;
 use Plenty\Modules\Pim\VariationDataInterface\Model\VariationDataInterfaceContext;
 
 class AttributeFMDTest extends TestCase
@@ -24,12 +22,8 @@ class AttributeFMDTest extends TestCase
 
         $variation = factory(\Plenty\Modules\Item\Variation\Models\Variation::class)->states('withMain')->create();
 
-
           /** @var VariationDataInterfaceContract $vdi */
         $vdi = app(VariationDataInterfaceContract::class);
-
-         /** @var VariationBaseAttribute $basePart */
-        $basePart = app(VariationBaseAttribute::class);
 
          /** @var VariationAttributeValueAttribute $attriuteValuePart */
         $attributeValuePart = app(VariationAttributeValueAttribute::class);
@@ -41,7 +35,6 @@ class AttributeFMDTest extends TestCase
         /** @var VariationDataInterfaceContext $vdiContext */
         $vdiContext = app(VariationDataInterfaceContext::class);
         $vdiContext->setParts([
-            $basePart,
             $attributeValuePart
         ]);
 
@@ -87,7 +80,7 @@ class AttributeFMDTest extends TestCase
                               'ottoAttribute' => NULL,
                               'updatedAt' => NULL,
                             ],
-                            //'attributeValueSetId' => NULL,
+                            'attributeValueSetId' => NULL,
                             'value' => [
                               'image' => NULL,
                               'percentageDistribution' => NULL,

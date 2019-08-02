@@ -20,6 +20,8 @@ use Plenty\Modules\Property\Models\PropertyGroup;
 use Plenty\Modules\Property\Models\PropertyGroupName;
 use Plenty\Modules\Property\Models\PropertyGroupRelation;
 use Plenty\Modules\Property\Models\PropertyName;
+use Plenty\Modules\Property\Models\PropertyOption;
+use Plenty\Modules\Property\Models\PropertyOptionValue;
 use Plenty\Modules\Property\Models\PropertyRelation;
 
 class VariationPropertiesFMDTest extends TestCase
@@ -42,7 +44,15 @@ class VariationPropertiesFMDTest extends TestCase
         ]);
 
         $propertyId = $property->propertyId;
+        /** @var PropertyOption $propertyOption */
+        $propertyOption = pluginApp(PropertyOption::class)->create(['propertyId' => $propertyId]);
 
+        /** @var PropertyOptionValue  $propertyOptionValue */
+        $propertyOptionValue = pluginApp(PropertyOptionValue::class);
+        $propertyOptionValue->optionId = $propertyOption->id;
+
+        $propertyOptionValue->value = '';
+        $propertyOptionValue->save();
         /** @var PropertyGroup $group */
         $group = factory(PropertyGroup::class)->create();
 

@@ -3,6 +3,7 @@
 
 namespace IO\Services\VdiSearch\FMD;
 
+use IO\Services\SessionStorageService;
 use Plenty\Modules\Pim\VariationDataInterface\Model\Attributes\VariationBaseAttribute;
 use Plenty\Modules\Pim\VariationDataInterface\Model\Variation;
 
@@ -40,18 +41,20 @@ class TextFMD extends FieldMapDefinition
      */
     public function fill(Variation $decoratedVariation, array $content, array $sourceFields)
     {
-
-        $languages = $decoratedVariation->base->with()->texts;
-        $data = [];
-
-        foreach ($languages AS $text) {
+        $lang = pluginApp(SessionStorageService::class)->getLang();
+        $text = $decoratedVariation->base->with()->texts[$lang];
+        if($text !== null)
+        {
             $text = self::map($text, 'name', 'name1');
             $text = self::map($text, 'previewDescription', 'shortDescription');
             $text = self::map($text, 'metaKeywords', 'keywords');
-            $data[] = $text->toArray();
+        }
+        else
+        {
+            $text = [];
         }
 
-        $content['texts'] = $data;
+        $content['texts'] = $text;
 
         return $content;
     }

@@ -59,29 +59,29 @@ class VariationPropertyFMD extends FieldMapDefinition
             $options = [];
             $display = [];
 
-            foreach ($property['options'] as $option)
-            {
-                /** @var PropertyOption $option */
-                $type = $option['typeOptionIdentifier'];
-
-                foreach ($option['propertyOptionValues'] as $optionValue) {
-
-                    switch ($type) {
-                        case 'clients':
-                            $clients[] = (int)$optionValue['value'];
-                            break;
-                        case 'referrers':
-                            $referrer[] = $optionValue['value'];
-                            break;
-                        case 'display':
-                            $display[] = $optionValue['value'];
-                            break;
-                        default:
-                            $options[$type][] = (string)$optionValue['value'];
-                            break;
-                    }
-                }
-            }
+//            foreach ($property['options'] as $option)
+//            {
+//                /** @var PropertyOption $option */
+//                $type = $option['typeOptionIdentifier'];
+//
+//                foreach ($option['propertyOptionValues'] as $optionValue) {
+//
+//                    switch ($type) {
+//                        case 'clients':
+//                            $clients[] = (int)$optionValue['value'];
+//                            break;
+//                        case 'referrers':
+//                            $referrer[] = $optionValue['value'];
+//                            break;
+//                        case 'display':
+//                            $display[] = $optionValue['value'];
+//                            break;
+//                        default:
+//                            $options[$type][] = (string)$optionValue['value'];
+//                            break;
+//                    }
+//                }
+//            }
 
             $propertyEntry = [];
             $propertyEntry['cast'] = $property['cast'];
