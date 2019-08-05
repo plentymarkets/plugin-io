@@ -23,7 +23,9 @@ use IO\Guards\AuthGuard;
 class Middleware extends \Plenty\Plugin\Middleware
 {
     public static $FORCE_404 = false;
-    
+
+    const WEB_AJAX_BASE = '/WebAjaxBase.php';
+
     public function before(Request $request)
     {
         /** @var SessionStorageService $sessionService */
@@ -44,11 +46,12 @@ class Middleware extends \Plenty\Plugin\Middleware
         $webstoreConfig  = $webstoreService->getWebstoreConfig();
         $requestLang     = $request->get('Lang', null);
 
+        $isWebAjaxBase = (substr($request->getRequestUri(), 0, strlen(self::WEB_AJAX_BASE)) === self::WEB_AJAX_BASE);
         if(!is_null($requestLang) && in_array($requestLang, $webstoreConfig->languageList))
         {
             $this->setLanguage($requestLang, $webstoreConfig);
         }
-        else if((is_null($splittedURL[0]) || strlen($splittedURL[0]) != 2 || !in_array($splittedURL[0], $webstoreConfig->languageList)) && strpos(end($splittedURL), '.') === false && $webstoreConfig->defaultLanguage !== $sessionService->getLang())
+        else if((is_null($splittedURL[0]) || strlen($splittedURL[0]) != 2 || !in_array($splittedURL[0], $webstoreConfig->languageList)) && strpos(end($splittedURL), '.') === false && !$isWebAjaxBase && $webstoreConfig->defaultLanguage !== $sessionService->getLang())
         {
             $this->setLanguage($webstoreConfig->defaultLanguage, $webstoreConfig);
         }
@@ -156,7 +159,7 @@ class Middleware extends \Plenty\Plugin\Middleware
             {
                 /** @var StaticPagesController $controller */
                 $controller = pluginApp(StaticPagesController::class);
-                
+
                 $response = $response->make(
                     $controller->showPageNotFound(),
                     ResponseCode::NOT_FOUND
