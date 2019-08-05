@@ -135,12 +135,12 @@ class BaseSearchFactory
             );
         }
 
-        /*if ( $inheritedProperties === null || in_array( self::INHERIT_RESULT_FIELDS, $inheritedProperties ) )
+        if ( $inheritedProperties === null || in_array( VariationSearchFactoryContract::INHERIT_RESULT_FIELDS, $inheritedProperties ) )
         {
             $newBuilder->withResultFields(
-                $searchBuilder->resultFields
+                $this->resultFields
             );
-        }*/
+        }
 
         if ( $inheritedProperties === null || in_array( VariationSearchFactoryContract::INHERIT_SORTING, $inheritedProperties ) )
         {
@@ -221,8 +221,9 @@ class BaseSearchFactory
         $this->addParts();
 
         return $this;
-    }
 
+    }
+    
     public function getResultFields()
     {
         return $this->resultFields;

@@ -23,6 +23,8 @@ class MultiSearchFactory implements MultiSearchFactoryContract
 
     /** @var array */
     private $extensions = [];
+    
+    private $resultFields = [];
 
     /**
      * Get all registered searches
@@ -56,23 +58,23 @@ class MultiSearchFactory implements MultiSearchFactoryContract
     {
         if ( !array_key_exists( $resultName, $this->searches ) )
         {
+            $this->resultFields[$resultName] = $searchBuilder->getResultFields();
             /** @var DocumentSearch $search */
             $search = $searchBuilder->build();
-            //$search->setName( $resultName );
 
             $secondarySearches = [];
 
-            //TODO extensions
-            /*foreach( $searchBuilder->getExtensions() as $i => $extension )
+            foreach( $searchBuilder->getExtensions() as $i => $extension )
             {
                 // collect secondary searches required by registered extensions
                 $secondarySearch = $extension->getSearch( $searchBuilder );
                 if ( $secondarySearch !== null )
                 {
-                    $secondarySearch->setName( $resultName . "__" . $i );
-                    $secondarySearches[] = $secondarySearch;
+                    //$secondarySearch->setName( $resultName . "__" . $i );
+                    $secondarySearches[$resultName . "__" . $i] = $secondarySearch;
+                    $this->resultFields[$resultName . "__" . $i] = $secondarySearch->getResultFields();
                 }
-            }*/
+            }
 
             // primary search       = The search itself
             // secondary searches   = Additional searches required by registered extensions
@@ -95,6 +97,7 @@ class MultiSearchFactory implements MultiSearchFactoryContract
     {
         $vdiContexts = [];
         $primarySearchNames = [];
+        
         foreach( $this->searches as $resultName => $searches )
         {
             $vdiContexts[$resultName] = $searches['primary'];
@@ -109,17 +112,18 @@ class MultiSearchFactory implements MultiSearchFactoryContract
         /** @var VariationDataInterfaceContract $searchRepository */
         $searchRepository = app(VariationDataInterfaceContract::class);
         $rawResults = $searchRepository->getMultipleResults($vdiContexts);
-        $results = [];
+        
+        /*$results = [];
         // execute multisearch
         // $rawResults = $searchRepository->execute();
 
-//        if ( count($this->searches) === 1 && count($this->searches[$primarySearchNames[0]]['secondary']) === 0 )
-//        {
-//            $tmp = $rawResults;
-//            $rawResults = [];
-//            $rawResults[$primarySearchNames[0]] = $tmp;
-//        }
-//
+        if ( count($this->searches) === 1 && count($this->searches[$primarySearchNames[0]]['secondary']) === 0 )
+        {
+            $tmp = $rawResults;
+            $rawResults = [];
+            $rawResults[$primarySearchNames[0]] = $tmp;
+        }*/
+
 //        $results = [];
 
         if(!is_null($rawResults) && count($rawResults))
@@ -130,9 +134,9 @@ class MultiSearchFactory implements MultiSearchFactoryContract
                  * @var VDIToElasticSearchMapper $mappingHelper
                  */
                 $mappingHelper = pluginApp(VDIToElasticSearchMapper::class);
-                $mappedData = $mappingHelper->map($rawResult, ['*']);
-                $rawResults[$primarySearchNames[$key]] = $mappedData;
-                unset($rawResults[$key]);
+                $mappedData = $mappingHelper->map($rawResult, $this->resultFields[$key]);
+                
+                $rawResults[$key] = $mappedData;
             }
         }
         else
@@ -165,7 +169,7 @@ class MultiSearchFactory implements MultiSearchFactoryContract
         }
 
         /** @var FacetExtensionContainer $facetExtensionContainer */
-        /*$facetExtensionContainer = pluginApp(FacetExtensionContainer::class);
+        $facetExtensionContainer = pluginApp(FacetExtensionContainer::class);
         $facetExtensions = $facetExtensionContainer->getFacetExtensions();
 
         if(isset($results['facets']) && count($facetExtensions))
@@ -185,7 +189,7 @@ class MultiSearchFactory implements MultiSearchFactoryContract
                     }
                 }
             }
-        }*/
+        }
 
         return $results;
     }

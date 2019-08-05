@@ -48,6 +48,12 @@ class VDIToElasticSearchMapper
         $data = [
             'documents' => []
         ];
+        
+        $additionalData = $vdiResult->getAdditionalData();
+        if(count($additionalData) && isset($additionalData['facets']))
+        {
+            $data['facets'] = $additionalData['facets'];
+        }
 
         $fmdClasses = [];
         if(count($resultFields))

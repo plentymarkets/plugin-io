@@ -23,8 +23,7 @@ class VariationAttributeMap implements SearchPreset
         
         $searchFactory->withResultFields(
             ResultFieldTemplate::load( ResultFieldTemplate::TEMPLATE_VARIATION_ATTRIBUTE_MAP )
-        )
-        ->withParts(self::getParts());
+        );
         
         $searchFactory
             ->withAttributes()

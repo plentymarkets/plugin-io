@@ -24,10 +24,10 @@ class BundleComponentExtension implements ItemSearchExtension
                 VariationSearchFactory::INHERIT_AGGREGATIONS,
                 VariationSearchFactory::INHERIT_SORTING
             ])
-            /*->withResultFields([
+            ->withResultFields([
                 'variation.bundleType',
                 'variation.id'
-            ])*/
+            ])
             ->build();
     }
 
