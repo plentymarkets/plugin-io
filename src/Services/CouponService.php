@@ -63,12 +63,14 @@ class CouponService
 
     public function removeCoupon($code = NULL)
     {
+        $response = $this->basketRepository->removeCouponCode();
+
         if($code != NULL)
         {
             pluginApp(NotificationService::class)->info('CouponValidation', $code);
         }
 
-        return $this->basketRepository->removeCouponCode();
+        return $response;
     }
 
     /**
