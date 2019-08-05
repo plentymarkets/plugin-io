@@ -6,14 +6,10 @@ use IO\Services\ItemSearch\SearchPresets\BasketItems;
 use IO\Services\ItemSearch\Services\ItemSearchService;
 use Plenty\Modules\Accounting\Vat\Contracts\VatInitContract;
 use Plenty\Modules\Accounting\Vat\Models\VatRate;
-use Plenty\Modules\Authorization\Services\AuthHelper;
 use Plenty\Modules\Basket\Contracts\BasketRepositoryContract;
 use Plenty\Modules\Basket\Contracts\BasketItemRepositoryContract;
 use Plenty\Modules\Basket\Exceptions\BasketItemCheckException;
 use Plenty\Modules\Basket\Exceptions\BasketItemQuantityCheckException;
-use Plenty\Modules\Item\VariationCategory\Contracts\VariationCategoryRepositoryContract;
-use Plenty\Modules\Order\Coupon\Campaign\Contracts\CouponCampaignRepositoryContract;
-use Plenty\Modules\Order\Coupon\Campaign\Models\CouponCampaign;
 use Plenty\Modules\Basket\Models\Basket;
 use Plenty\Modules\Basket\Models\BasketItem;
 use Plenty\Modules\Frontend\Contracts\Checkout;
@@ -39,16 +35,10 @@ class BasketService
     private $basketRepository;
 
     /**
-     * @var CouponCampaignRepositoryContract
-     */
-    private $couponCampaignRepository;
-
-    /**
      * @var Checkout
      */
     private $checkout;
 
-    private $template = '';
     /**
      * @var VatService
      */
@@ -59,29 +49,39 @@ class BasketService
      */
     private $customerService;
 
+    /**
+     * @var CouponService $couponService
+     */
+    private $couponService;
+
     private $basketItems;
+    private $template = '';
 
     /**
      * BasketService constructor.
      * @param BasketItemRepositoryContract $basketItemRepository
      * @param Checkout $checkout
      * @param VatService $vatService
+     * @param CustomerService $customerService
+     * @param BasketRepositoryContract $basketRepository
+     * @param VatInitContract $vatInitService
+     * @param CouponService $couponService
      */
     public function __construct(
         BasketItemRepositoryContract $basketItemRepository,
         Checkout $checkout,
         VatService $vatService,
         CustomerService $customerService,
-        CouponCampaignRepositoryContract $couponCampaignRepository,
         BasketRepositoryContract $basketRepository,
-        VatInitContract $vatInitService)
+        VatInitContract $vatInitService,
+        CouponService $couponService)
     {
         $this->basketItemRepository = $basketItemRepository;
         $this->checkout             = $checkout;
         $this->vatService           = $vatService;
         $this->customerService      = $customerService;
-        $this->couponCampaignRepository = $couponCampaignRepository;
         $this->basketRepository = $basketRepository;
+        $this->couponService = $couponService;
 
         if(!$vatInitService->isInitialized())
         {
@@ -117,36 +117,10 @@ class BasketService
             $basket["shippingAmount"] = $basket["shippingAmountNet"];
         }
 
-        $basket = $this->checkCoupon($basket);
+        $basket = $this->couponService->checkCoupon($basket);
 
         return $basket;
     }
-
-    /**
-     * @param $basket
-     * @return array
-     */
-    public function checkCoupon($basket): array
-    {
-        if(isset($basket['couponCode']) && strlen($basket['couponCode']) > 0)
-        {
-            $campaign = $this->couponCampaignRepository->findByCouponCode($basket['couponCode']);
-
-            if($campaign instanceof CouponCampaign)
-            {
-                if($campaign->couponType == CouponCampaign::COUPON_TYPE_SALES)
-                {
-                    $basket['openAmount']       = $basket['basketAmount'];
-                    $basket["basketAmount"]     -= $basket['couponDiscount'];
-                    $basket["basketAmountNet"]  -= $basket['couponDiscount'];
-
-                }
-                $basket['couponCampaignType'] = $campaign->couponType;
-            }
-        }
-        return $basket;
-    }
-
 
     /**
      * Return the basket as an array
@@ -218,34 +192,34 @@ class BasketService
         $basketItems    = $this->getBasketItemsRaw();
         $basketItemData = $this->getBasketItemData($basketItems, $template);
         $showNetPrice   = $this->customerService->showNetPrices();
-        
+
         foreach ($basketItems as $basketItem)
         {
             if($showNetPrice)
             {
                 $basketItem->price = round($basketItem->price * 100 / (100.0 + $basketItem->vat), 2);
             }
-            
+
             array_push(
                 $result,
                 $this->addVariationData($basketItem, $basketItemData[$basketItem->variationId])
             );
         }
-        
+
         return $result;
     }
-    
+
     public function checkBasketItemsLang($template = '')
     {
         if (!strlen($template))
         {
             $template = $this->template;
         }
-    
+
         $basketItems    = $this->getBasketItemsRaw();
         $basketItemData = $this->getBasketItemData($basketItems, $template);
         $showWarning = [];
-    
+
         foreach ($basketItems as $basketItem)
         {
             if(!array_key_exists($basketItem->variationId, $basketItemData))
@@ -259,18 +233,18 @@ class BasketService
                 $showWarning[] = 10;
             }
         }
-    
+
         if(count($showWarning) > 0)
         {
             $showWarning = array_unique($showWarning);
-        
+
             foreach($showWarning as $warning)
             {
                 /** @var NotificationService $notificationService */
                 $notificationService = pluginApp(NotificationService::class);
                 $notificationService->warn(LogLevel::WARN, $warning);
             }
-        
+
         }
     }
 
@@ -462,8 +436,11 @@ class BasketService
      */
     public function updateBasketItem(int $basketItemId, array $data): array
     {
+        $basket = $this->getBasket();
         $data['id'] = $basketItemId;
+        $basketItem = $this->getBasketItem($basketItemId);
         try {
+            $this->couponService->validateBasketItemUpdate($basket, $data, $basketItem);
             $this->basketItemRepository->updateBasketItem($basketItemId, $data);
         } catch (BasketItemQuantityCheckException $e) {
              switch($e->getCode()) {
@@ -508,91 +485,8 @@ class BasketService
         $basket = $this->getBasket();
         $basketItem = $this->getBasketItem($basketItemId);
 
-        if(strlen($basket->couponCode) > 0)
-        {
-            $campaign = $this->couponCampaignRepository->findByCouponCode($basket->couponCode);
-
-            // $basket->basketAmount is basket amount minus coupon value
-            // $basket->couponDiscount is negative
-            if($campaign instanceof CouponCampaign)
-            {
-                /** @var NotificationService $notificationService */
-                $notificationService = pluginApp(NotificationService::class);
-
-                if($campaign->minOrderValue > (( $basket->basketAmount - $basket->couponDiscount ) - ($basketItem['price'] * $basketItem['quantity'])))
-                {
-                    $this->basketRepository->removeCouponCode();
-                    $notificationService->info('CouponValidation',301);
-                }
-
-                //check if basket item to remove is matching with a coupon campaign and remove coupon if no item with the matching item id of the campaign is left in the basket
-
-                /**
-                 * @var VariationCategoryRepositoryContract $variationCategoryRepository
-                 */
-                $variationCategoryRepository = pluginApp(VariationCategoryRepositoryContract::class);
-
-                $authHelper = pluginApp(AuthHelper::class);
-                $variationId = $basketItem['variationId'];
-                $categories = $authHelper->processUnguarded( function() use ($variationId, $variationCategoryRepository)
-                {
-                    return $variationCategoryRepository->findByVariationIdWithInheritance($variationId);
-                });
-
-
-                $categoryIds = [];
-                $categories->each(function($category) use (&$categoryIds)
-                {
-                    $categoryIds[] = $category->categoryId;
-                });
-
-                $campaignItems = $campaign->references->where('referenceType', 'category')->whereIn('value', $categoryIds);
-                if(count($campaignItems) == 0)
-                {
-                    $campaignItems = $campaign->references->where('referenceType', 'item')->where('value', $basketItem['itemId']);
-                }
-
-                if(count($campaignItems))
-                {
-                    $matchingBasketItems = $basket->basketItems->where('itemId', $basketItem['itemId']);
-
-                    $basketItems = $basket->basketItems->where('itemId', '!=', $basketItem['itemId']);
-                    $noOtherCouponBasketItemsExists = true;
-
-                    $basketItems->each(function($item) use (&$noOtherCouponBasketItemsExists, $campaign, $authHelper, $variationCategoryRepository)
-                    {
-                        $variationId = $item->variationId;
-                        $categories = $authHelper->processUnguarded( function() use ($variationId, $variationCategoryRepository)
-                        {
-                            return $variationCategoryRepository->findByVariationIdWithInheritance($variationId);
-                        });
-                        $categoryIds = [];
-                        $categories->each(function($category) use (&$categoryIds)
-                        {
-                            $categoryIds[] = $category->categoryId;
-                        });
-
-                        $campaignItems = $campaign->references->where('referenceType', 'category')->whereIn('value', $categoryIds);
-                        if(count($campaignItems) == 0)
-                        {
-                            $campaignItems = $campaign->references->where('referenceType', 'item')->where('value', $item->itemId);
-                        }
-
-                        if(count($campaignItems))
-                        {
-                          $noOtherCouponBasketItemsExists = false;
-                          return false;
-                        }
-                    });
-
-                    if(count($matchingBasketItems) <= 1 && $noOtherCouponBasketItemsExists)
-                    {
-                        $this->basketRepository->removeCouponCode();
-                        $notificationService->info('CouponValidation',302);
-                    }
-                }
-            }
-        }
+        // Validate and on fail, remove coupon
+        $this->couponService->validateBasketItemDelete($basket, $basketItem);
 
         $this->basketItemRepository->removeBasketItem($basketItemId);
         return $this->getBasketItemsForTemplate();
