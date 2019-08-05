@@ -23,34 +23,71 @@ class CouponService
     private $basketRepository;
 
     /**
+     * @var VariationCategoryRepositoryContract $variationCategoryRepository
+     */
+    private $variationCategoryRepository;
+
+    /**
+     * @var AuthHelper $authHelper
+     */
+    private $authHelper;
+
+    const BELOW_MINIMAL_ORDER_VALUE = 301;
+    const NO_VALID_ITEM_IN_BASKET = 302;
+
+    /**
      * CouponService constructor.
      * @param CouponCampaignRepositoryContract $couponCampaignRepository
+     * @param BasketRepositoryContract $basketRepository
+     * @param VariationCategoryRepositoryContract $variationCategoryRepository
+     * @param AuthHelper $authHelper
      */
     public function __construct(
         CouponCampaignRepositoryContract $couponCampaignRepository,
-        BasketRepositoryContract $basketRepository
+        BasketRepositoryContract $basketRepository,
+        VariationCategoryRepositoryContract $variationCategoryRepository,
+        AuthHelper $authHelper
     )
     {
         $this->couponCampaignRepository = $couponCampaignRepository;
         $this->basketRepository = $basketRepository;
+        $this->variationCategoryRepository = $variationCategoryRepository;
+        $this->authHelper = $authHelper;
     }
 
     public function setCoupon(string $couponCode)
     {
-        /**
-         * @var BasketRepositoryContract $basket
-         */
-        $basket = pluginApp(BasketRepositoryContract::class);
-        return $basket->setCouponCode($couponCode);
+        return $this->basketRepository->setCouponCode($couponCode);
     }
 
     public function removeCoupon()
     {
-        /**
-         * @var BasketRepositoryContract $basket
-         */
-        $basket = pluginApp(BasketRepositoryContract::class);
-        return $basket->removeCouponCode();
+        return $this->basketRepository->removeCouponCode();
+    }
+
+    /**
+     * @param $basket
+     * @return array
+     */
+    public function checkCoupon($basket): array
+    {
+        if(isset($basket['couponCode']) && strlen($basket['couponCode']) > 0)
+        {
+            $campaign = $this->couponCampaignRepository->findByCouponCode($basket['couponCode']);
+
+            if($campaign instanceof CouponCampaign)
+            {
+                if($campaign->couponType == CouponCampaign::COUPON_TYPE_SALES)
+                {
+                    $basket['openAmount']       = $basket['basketAmount'];
+                    $basket["basketAmount"]     -= $basket['couponDiscount'];
+                    $basket["basketAmountNet"]  -= $basket['couponDiscount'];
+
+                }
+                $basket['couponCampaignType'] = $campaign->couponType;
+            }
+        }
+        return $basket;
     }
 
     /**
@@ -68,12 +105,12 @@ class CouponService
                 if($this->isCouponMinimalOrderOnDelete($basket, $basketItem, $campaign))
                 {
                     // Check if the minimal order value is not met
-                    $this->removeInvalidCoupon(301);
+                    $this->removeInvalidCoupon(CouponService::BELOW_MINIMAL_ORDER_VALUE);
                 }
                 else if($this->isCouponValidForBasketItems($basket, $basketItem, $campaign))
                 {
                     // Check if the coupon is still valid with the new basket (only coupon item removed?)
-                    $this->removeInvalidCoupon(302);
+                    $this->removeInvalidCoupon(CouponService::NO_VALID_ITEM_IN_BASKET);
                 }
             }
         }
@@ -95,7 +132,7 @@ class CouponService
                 if($this->isCouponMinimalOrderOnUpdate($basket, $data, $basketItem, $campaign))
                 {
                     // Check if the minimal order value is not met
-                    $this->removeInvalidCoupon(301);
+                    $this->removeInvalidCoupon(CouponService::BELOW_MINIMAL_ORDER_VALUE);
                 }
             }
         }
@@ -107,7 +144,7 @@ class CouponService
      */
     private function removeInvalidCoupon($code)
     {
-        $this->basketRepository->removeCouponCode();
+        $this->removeCoupon();
         pluginApp(NotificationService::class)->info('CouponValidation', $code);
     }
 
@@ -259,12 +296,10 @@ class CouponService
      * @param int $variationId
      * @return array
      */
-    private function getCategoryIds($variationId) {
-        $variationCategoryRepository = pluginApp(VariationCategoryRepositoryContract::class);
-        $authHelper = pluginApp(AuthHelper::class);
-
-        $categories = $authHelper->processUnguarded(function () use ($variationId, $variationCategoryRepository) {
-            return $variationCategoryRepository->findByVariationIdWithInheritance($variationId);
+    private function getCategoryIds($variationId)
+    {
+        $categories = $this->authHelper->processUnguarded(function () use ($variationId) {
+            return $this->variationCategoryRepository->findByVariationIdWithInheritance($variationId);
         });
 
         // Transform categories in an array of category ids

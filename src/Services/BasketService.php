@@ -39,16 +39,10 @@ class BasketService
     private $basketRepository;
 
     /**
-     * @var CouponCampaignRepositoryContract
-     */
-    private $couponCampaignRepository;
-
-    /**
      * @var Checkout
      */
     private $checkout;
 
-    private $template = '';
     /**
      * @var VatService
      */
@@ -59,12 +53,13 @@ class BasketService
      */
     private $customerService;
 
-    private $basketItems;
-
     /**
      * @var CouponService $couponService
      */
     private $couponService;
+
+    private $basketItems;
+    private $template = '';
 
     /**
      * BasketService constructor.
@@ -72,7 +67,6 @@ class BasketService
      * @param Checkout $checkout
      * @param VatService $vatService
      * @param CustomerService $customerService
-     * @param CouponCampaignRepositoryContract $couponCampaignRepository
      * @param BasketRepositoryContract $basketRepository
      * @param VatInitContract $vatInitService
      * @param CouponService $couponService
@@ -82,7 +76,6 @@ class BasketService
         Checkout $checkout,
         VatService $vatService,
         CustomerService $customerService,
-        CouponCampaignRepositoryContract $couponCampaignRepository,
         BasketRepositoryContract $basketRepository,
         VatInitContract $vatInitService,
         CouponService $couponService)
@@ -91,7 +84,6 @@ class BasketService
         $this->checkout             = $checkout;
         $this->vatService           = $vatService;
         $this->customerService      = $customerService;
-        $this->couponCampaignRepository = $couponCampaignRepository;
         $this->basketRepository = $basketRepository;
         $this->couponService = $couponService;
 
@@ -129,36 +121,10 @@ class BasketService
             $basket["shippingAmount"] = $basket["shippingAmountNet"];
         }
 
-        $basket = $this->checkCoupon($basket);
+        $basket = $this->couponService->checkCoupon($basket);
 
         return $basket;
     }
-
-    /**
-     * @param $basket
-     * @return array
-     */
-    public function checkCoupon($basket): array
-    {
-        if(isset($basket['couponCode']) && strlen($basket['couponCode']) > 0)
-        {
-            $campaign = $this->couponCampaignRepository->findByCouponCode($basket['couponCode']);
-
-            if($campaign instanceof CouponCampaign)
-            {
-                if($campaign->couponType == CouponCampaign::COUPON_TYPE_SALES)
-                {
-                    $basket['openAmount']       = $basket['basketAmount'];
-                    $basket["basketAmount"]     -= $basket['couponDiscount'];
-                    $basket["basketAmountNet"]  -= $basket['couponDiscount'];
-
-                }
-                $basket['couponCampaignType'] = $campaign->couponType;
-            }
-        }
-        return $basket;
-    }
-
 
     /**
      * Return the basket as an array
