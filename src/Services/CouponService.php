@@ -32,6 +32,7 @@ class CouponService
      */
     private $authHelper;
 
+    // Info constants
     const BELOW_MINIMAL_ORDER_VALUE = 301;
     const NO_VALID_ITEM_IN_BASKET = 302;
 
@@ -60,8 +61,13 @@ class CouponService
         return $this->basketRepository->setCouponCode($couponCode);
     }
 
-    public function removeCoupon()
+    public function removeCoupon($code = NULL)
     {
+        if($code != NULL)
+        {
+            pluginApp(NotificationService::class)->info('CouponValidation', $code);
+        }
+
         return $this->basketRepository->removeCouponCode();
     }
 
@@ -105,12 +111,12 @@ class CouponService
                 if($this->isCouponMinimalOrderOnDelete($basket, $basketItem, $campaign))
                 {
                     // Check if the minimal order value is not met
-                    $this->removeInvalidCoupon(CouponService::BELOW_MINIMAL_ORDER_VALUE);
+                    $this->removeCoupon(CouponService::BELOW_MINIMAL_ORDER_VALUE);
                 }
                 else if($this->isCouponValidForBasketItems($basket, $basketItem, $campaign))
                 {
                     // Check if the coupon is still valid with the new basket (only coupon item removed?)
-                    $this->removeInvalidCoupon(CouponService::NO_VALID_ITEM_IN_BASKET);
+                    $this->removeCoupon(CouponService::NO_VALID_ITEM_IN_BASKET);
                 }
             }
         }
@@ -132,20 +138,10 @@ class CouponService
                 if($this->isCouponMinimalOrderOnUpdate($basket, $data, $basketItem, $campaign))
                 {
                     // Check if the minimal order value is not met
-                    $this->removeInvalidCoupon(CouponService::BELOW_MINIMAL_ORDER_VALUE);
+                    $this->removeCoupon(CouponService::BELOW_MINIMAL_ORDER_VALUE);
                 }
             }
         }
-    }
-
-    /**
-     * Remove a coupon and throw a notification
-     * @param int $code Infocode for notification
-     */
-    private function removeInvalidCoupon($code)
-    {
-        $this->removeCoupon();
-        pluginApp(NotificationService::class)->info('CouponValidation', $code);
     }
 
     /**
@@ -184,7 +180,7 @@ class CouponService
         // Subtract the changed quantity from the basketAmountWithoutNormal
         $basketAmountFinal = $basketAmountWithoutNormal - ($data['price'] * $quantityChange);
 
-        return $campaign->minOrderValue > $basketAmountFinal;
+        return $campaign->minOrderValue >= $basketAmountFinal;
     }
 
     /**

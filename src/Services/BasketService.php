@@ -6,14 +6,10 @@ use IO\Services\ItemSearch\SearchPresets\BasketItems;
 use IO\Services\ItemSearch\Services\ItemSearchService;
 use Plenty\Modules\Accounting\Vat\Contracts\VatInitContract;
 use Plenty\Modules\Accounting\Vat\Models\VatRate;
-use Plenty\Modules\Authorization\Services\AuthHelper;
 use Plenty\Modules\Basket\Contracts\BasketRepositoryContract;
 use Plenty\Modules\Basket\Contracts\BasketItemRepositoryContract;
 use Plenty\Modules\Basket\Exceptions\BasketItemCheckException;
 use Plenty\Modules\Basket\Exceptions\BasketItemQuantityCheckException;
-use Plenty\Modules\Item\VariationCategory\Contracts\VariationCategoryRepositoryContract;
-use Plenty\Modules\Order\Coupon\Campaign\Contracts\CouponCampaignRepositoryContract;
-use Plenty\Modules\Order\Coupon\Campaign\Models\CouponCampaign;
 use Plenty\Modules\Basket\Models\Basket;
 use Plenty\Modules\Basket\Models\BasketItem;
 use Plenty\Modules\Frontend\Contracts\Checkout;
@@ -442,8 +438,9 @@ class BasketService
     {
         $basket = $this->getBasket();
         $data['id'] = $basketItemId;
+        $basketItem = $this->getBasketItem($basketItemId);
         try {
-            $this->couponService->validateBasketItemUpdate($basket, $data, $this->getBasketItem($basketItemId));
+            $this->couponService->validateBasketItemUpdate($basket, $data, $basketItem);
             $this->basketItemRepository->updateBasketItem($basketItemId, $data);
         } catch (BasketItemQuantityCheckException $e) {
              switch($e->getCode()) {
