@@ -71,7 +71,7 @@ class ItemController extends LayoutController
         });
 
         $shopBuilderRequest->setMainCategory($defaultCategory[0]['id']);
-        $shopBuilderRequest->setMainContentType($defaultCategory[0]['type']);
+        $shopBuilderRequest->setMainContentType('singleitem');
         if ($shopBuilderRequest->isShopBuilder())
         {
             /** @var VariationSearchResultFactory $searchResultFactory */
