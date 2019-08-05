@@ -44,8 +44,7 @@ class ItemUrlExtension implements ItemSearchExtension
                 'texts.*',
                 'defaultCategories'
             ])
-            ->withMutator( $languageMutator )
-            ->build();
+            ->withMutator( $languageMutator );
     }
 
     /**

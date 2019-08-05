@@ -61,15 +61,19 @@ class MultiSearchFactory implements MultiSearchFactoryContract
 
             $secondarySearches = [];
 
-            foreach( $searchBuilder->getExtensions() as $i => $extension )
+            foreach( $searchBuilder->getExtensions() as $i => $extensionContainer )
             {
+                $extension = pluginApp($extensionContainer['class'], $extensionContainer['params']);
                 // collect secondary searches required by registered extensions
                 $secondarySearch = $extension->getSearch( $searchBuilder );
                 if ( $secondarySearch !== null )
                 {
+                    $secondarySearch = $secondarySearch->build();
                     $secondarySearch->setName( $resultName . "__" . $i );
                     $secondarySearches[] = $secondarySearch;
                 }
+    
+                $this->extensions[$resultName][] = $extension;
             }
 
             // primary search       = The search itself
@@ -78,8 +82,6 @@ class MultiSearchFactory implements MultiSearchFactoryContract
                 'primary'   => $search,
                 'secondary' => $secondarySearches
             ];
-
-            $this->extensions[$resultName] = $searchBuilder->getExtensions();
         }
         return $this;
     }

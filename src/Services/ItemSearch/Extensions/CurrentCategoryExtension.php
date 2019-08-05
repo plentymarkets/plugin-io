@@ -36,8 +36,7 @@ class CurrentCategoryExtension implements ItemSearchExtension
                 'variation.id',
                 'texts.*',
                 'defaultCategories'
-            ])
-            ->build();
+            ]);
     }
 
     /**

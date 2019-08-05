@@ -265,7 +265,7 @@ class BaseSearchFactory
      */
     public function withExtension( $extensionClass, $extensionParams = [] )
     {
-        $this->extensions[] = pluginApp( $extensionClass, $extensionParams );
+        $this->extensions[] = ['class' => $extensionClass, 'params' => $extensionParams] ;
         return $this;
     }
 

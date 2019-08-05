@@ -23,8 +23,7 @@ class GroupedAttributeValuesExtension implements ItemSearchExtension
             ])
             ->withResultFields([
                 'attributes.*'
-            ])
-            ->build();
+            ]);
     }
 
     /**

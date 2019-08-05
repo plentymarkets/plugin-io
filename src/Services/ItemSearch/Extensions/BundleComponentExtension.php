@@ -27,8 +27,7 @@ class BundleComponentExtension implements ItemSearchExtension
             ->withResultFields([
                 'variation.bundleType',
                 'variation.id'
-            ])
-            ->build();
+            ]);
     }
 
     /**
