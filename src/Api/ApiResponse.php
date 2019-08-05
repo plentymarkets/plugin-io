@@ -212,7 +212,7 @@ class ApiResponse
 			    "quantity" => $quantity
             ];
 
-            $this->notificationService->warn("Overselling by {$oversellingAmount}.", 12, ['oversellingAmount' => $oversellingAmount]);
+            $this->notificationService->warn("Overselling by {$oversellingAmount}.", 12, ['oversellingAmount' => $oversellingAmount, 'stock' => $stock]);
 		}, 0);
 	}
 
