@@ -24,6 +24,7 @@ class OrderReturnConfirmationController extends LayoutController
          */
         $customerService = pluginApp(CustomerService::class);
 
+        // TODO: is check for login state required in here?
         if( (int)$customerService->getContactId() <= 0 )
         {
             /** @var Response $response */

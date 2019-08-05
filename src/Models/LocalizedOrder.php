@@ -11,6 +11,7 @@ use IO\Services\OrderService;
 use IO\Services\OrderStatusService;
 use IO\Services\OrderTotalsService;
 use IO\Services\OrderTrackingService;
+use IO\Services\TemplateConfigService;
 use Plenty\Modules\Authorization\Services\AuthHelper;
 use Plenty\Modules\Order\Models\Order;
 use Plenty\Modules\Order\Property\Models\OrderProperty;
@@ -66,6 +67,9 @@ class LocalizedOrder extends ModelWrapper
      */
     public static function wrap( $order, ...$data ):LocalizedOrder
     {
+        /** @var OrderService $orderService */
+        $orderService = pluginApp(OrderService::class);
+
         if( $order == null )
         {
             return null;
@@ -132,9 +136,6 @@ class LocalizedOrder extends ModelWrapper
         $paymentMethodIdProperty = $order->properties->firstWhere('typeId', OrderPropertyType::PAYMENT_METHOD);
         if($paymentMethodIdProperty instanceof OrderProperty)
         {
-            /** @var OrderService $orderService */
-            $orderService = pluginApp(OrderService::class);
-
             $instance->allowPaymentMethodSwitchFrom = $orderService->allowPaymentMethodSwitchFrom($paymentMethodIdProperty->value, $order->id);
             $instance->paymentMethodListForSwitch = $orderService->getPaymentMethodListForSwitch($paymentMethodIdProperty->value, $order->id);
         }
@@ -197,11 +198,6 @@ class LocalizedOrder extends ModelWrapper
             }
         }
 
-        if ($order->typeId == OrderType::ORDER)
-        {
-            $instance->isReturnable = $orderService->isOrderReturnable($order);
-        }
-
         /** @var OrderTotalsService $orderTotalsService */
         $orderTotalsService = pluginApp(OrderTotalsService::class);
         $instance->highlightNetPrices = $orderTotalsService->highlightNetPrices($instance->order);
@@ -237,10 +233,53 @@ class LocalizedOrder extends ModelWrapper
             "paymentMethodListForSwitch"   => $this->paymentMethodListForSwitch,
             "itemURLs"                     => $this->itemURLs,
             "itemImages"                   => $this->itemImages,
-            "isReturnable"                 => $this->isReturnable,
+            "isReturnable"                 => $this->isReturnable(),
             "highlightNetPrices"           => $this->highlightNetPrices
         ];
 
         return $data;
+    }
+
+    public function isReturnable()
+    {
+        if($this->order->typeId === OrderType::ORDER)
+        {
+            $orderItems = count($this->orderData)
+                ? $this->orderData['orderItems']
+                : $this->order->orderItems;
+
+            if(!count($orderItems))
+            {
+                return false;
+            }
+
+            $shippingDateSet = false;
+            $createdDateUnix = 0;
+
+            $dates = count($this->orderData) ? $this->orderData['dates'] : $this->order->dates;
+            foreach($dates as $date)
+            {
+                if($date['typeId'] === 5 && strlen($date['date']))
+                {
+                    $shippingDateSet = true;
+                }
+                elseif($date['typeId'] === 2 && strlen($date['date']))
+                {
+                    $createdDateUnix = strtotime($date['date']);
+                }
+            }
+
+            /**  @var TemplateConfigService $templateConfigService */
+            $templateConfigService = pluginApp(TemplateConfigService::class);
+            $returnTime = (int)$templateConfigService->get('my_account.order_return_days', 14);
+
+            return $shippingDateSet
+                && $createdDateUnix > 0
+                && $returnTime > 0
+                && time() < $createdDateUnix + ($returnTime * 24 * 60 * 60);
+
+        }
+
+        return false;
     }
 }

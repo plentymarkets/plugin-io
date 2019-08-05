@@ -264,7 +264,7 @@ class IORouteServiceProvider extends RouteServiceProvider
 
         if( RouteConfig::isActive(RouteConfig::ORDER_RETURN) )
         {
-            $router->get('returns/{orderId}', 'IO\Controllers\OrderReturnController@showOrderReturn');
+            $router->get('returns/{orderId}/{orderAccessKey?}', 'IO\Controllers\OrderReturnController@showOrderReturn');
         }
 
         if( RouteConfig::isActive(RouteConfig::ORDER_RETURN_CONFIRMATION) )

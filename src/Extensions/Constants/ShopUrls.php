@@ -77,9 +77,9 @@ class ShopUrls
         $this->returnConfirmation       = $this->getShopUrl(RouteConfig::ORDER_RETURN_CONFIRMATION, "return-confirmation");
     }
 
-    public function returns($orderId)
+    public function returns($orderId, $orderAccessKey = null)
     {
-        return $this->getShopUrl(RouteConfig::ORDER_RETURN, "returns", $orderId);
+        return $this->getShopUrl(RouteConfig::ORDER_RETURN, "returns", $orderId, $orderAccessKey);
     }
 
     public function orderPropertyFile($path)
@@ -119,7 +119,7 @@ class ShopUrls
     private function applyParams( $url, $routeParams )
     {
         $routeParam = array_shift($routeParams);
-        while(!is_null($routeParam))
+        while(!is_null($routeParam) && strlen($routeParam))
         {
             $url->join($routeParam);
             $routeParam = array_shift($routeParams);
