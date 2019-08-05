@@ -277,6 +277,16 @@ class IORouteServiceProvider extends RouteServiceProvider
             //contact
             $router->get('contact', 'IO\Controllers\ContactController@showContact');
         }
+        else if( in_array(RouteConfig::CONTACT, RouteConfig::getEnabledRoutes())
+            && RouteConfig::getCategoryId(RouteConfig::CONTACT) > 0
+            && !$shopUrls->equals($shopUrls->contact, '/contact') )
+        {
+            // contact-route is activated and category is linked and category url is not '/contact'
+            $router->get('contact', function() use ($shopUrls)
+            {
+                return pluginApp(CategoryController::class)->redirectToCategory( $shopUrls->contact );
+            });
+        }
 
         if( RouteConfig::isActive(RouteConfig::PASSWORD_RESET) )
         {
@@ -401,6 +411,14 @@ class IORouteServiceProvider extends RouteServiceProvider
                 $router->get($shopUrls->termsConditions, function() use ($shopUrls)
                 {
                     return pluginApp(CategoryController::class)->showCategoryById( RouteConfig::getCategoryId(RouteConfig::TERMS_CONDITIONS) );
+                });
+            }
+    
+            if ( RouteConfig::getCategoryId(RouteConfig::CONTACT) > 0 )
+            {
+                $router->get($shopUrls->contact, function() use ($shopUrls)
+                {
+                    return pluginApp(CategoryController::class)->showCategoryById( RouteConfig::getCategoryId(RouteConfig::CONTACT) );
                 });
             }
         }

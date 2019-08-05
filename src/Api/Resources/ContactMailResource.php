@@ -2,6 +2,7 @@
 
 namespace IO\Api\Resources;
 
+use IO\Helper\TemplateContainer;
 use IO\Extensions\Functions\ExternalContent;
 use IO\Services\TemplateConfigService;
 use Plenty\Plugin\Http\Response;
@@ -39,17 +40,21 @@ class ContactMailResource extends ApiResource
     
     public function store():Response
     {
-        $mailTemplate = $this->request->get('template', '');
-        $contactData = $this->request->get('contactData',[]);
+        $mailTemplate = TemplateContainer::get('tpl.mail.contact')->getTemplate();
+
         $recaptchaToken = $this->request->get('recaptchaToken', null);
         $recaptchaSecret = $this->templateConfigService->get('global.google_recaptcha_secret');
+        $recaptchaApiKey = $this->templateConfigService->get('global.google_recaptcha_api_key');
 
-        if ( !$this->verifyRecaptcha($recaptchaSecret, $recaptchaToken) )
+        if ( $recaptchaToken !== $recaptchaApiKey && !$this->verifyRecaptcha($recaptchaSecret, $recaptchaToken) )
         {
             return $this->response->create("", ResponseCode::BAD_REQUEST);
         }
 
-        $response = $this->contactMailService->sendMail($mailTemplate, $contactData);
+        $response = $this->contactMailService->sendMail(
+            $mailTemplate,
+            $this->request->all()
+        );
 
         if($response)
         {
@@ -96,6 +101,9 @@ class ContactMailResource extends ApiResource
 
         $result = json_decode($content, true);
 
-        return $result["success"];
+        return $result["success"]
+            && (!array_key_exists('score', $result)
+                || $result['score'] >= $this->templateConfigService->get('global.google_recaptcha_threshold')
+            );
     }
 }
