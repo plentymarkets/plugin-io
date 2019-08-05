@@ -1,6 +1,7 @@
 <?php
 namespace IO\Helper;
-use IO\Helper\ContextInterface;
+
+use Plenty\Plugin\Events\Dispatcher;
 use Plenty\Plugin\Log\Loggable;
 
 /**
@@ -11,6 +12,21 @@ use Plenty\Plugin\Log\Loggable;
 class TemplateContainer
 {
     use Loggable;
+
+    public static function get($templateKey, $data = [])
+    {
+        $container = pluginApp(self::class);
+        $container->setTemplateKey($templateKey);
+
+        /** @var Dispatcher $eventDispatcher */
+        $eventDispatcher = pluginApp(Dispatcher::class);
+        $eventDispatcher->fire('IO.' . $templateKey, [
+            $container,
+            $data
+        ]);
+
+        return $container;
+    }
 
 	/**
 	 * @var string
