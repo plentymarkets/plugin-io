@@ -61,7 +61,7 @@ class AttributeFMD extends FieldMapDefinition
                 'valueId' => $value->id,
                 'isLinkableToImage' => $attribute->isLinkableToImage,
                 'attribute' => $attribute->toArray(),
-                'value' => $value->toArray()
+                'value' => $value->toArray(),
                 'attributeValueSetId' => $attributeValue->attributeValueSetId
             ];
 
