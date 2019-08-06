@@ -2,6 +2,7 @@
 
 namespace IO\Services;
 
+use IO\Helper\MemoryCache;
 use Plenty\Legacy\Services\Accounting\VatInitService;
 use Plenty\Legacy\Services\Item\Variation\DetectSalesPriceService;
 use Plenty\Modules\Account\Contact\Models\Contact;
@@ -19,6 +20,9 @@ use IO\Services\BasketService;
  */
 class PriceDetectService
 {
+    use MemoryCache;
+
+
     private $classId = null;
     private $singleAccess = null;
     private $currency = null;
@@ -112,17 +116,31 @@ class PriceDetectService
 
     public function getPriceIdsForCustomer()
     {
-        $this->detectSalesPriceService
-            ->setAccountId(0)
-            ->setAccountType($this->singleAccess)
-            ->setCountryOfDelivery($this->shippingCountryId)
-            ->setCurrency($this->currency)
-            ->setCustomerClass($this->classId)
-            ->setOrderReferrer($this->referrerId)
-            ->setPlentyId($this->plentyId)
-            ->setQuantity(-1)
-            ->setType(DetectSalesPriceService::PRICE_TYPE_DEFAULT);
+        $accountType = $this->accountType;
+        $shippingCountryId = $this->shippingCountryId;
+        $currency = $this->currency;
+        $customerClassId = $this->classId;
+        $referrerId = $this->referrerId;
+        $plentyId = $this->plentyId;
+        $detectSalesPriceService = $this->detectSalesPriceService;
 
-        return $this->detectSalesPriceService->detect();
+        $priceIds = $this->fromMemoryCache(
+	        "detectPriceIds.$accountType.$shippingCountryId.$currency.$customerClassId.$referrerId.$plentyId",
+            function() use ($accountType, $shippingCountryId, $currency, $customerClassId, $referrerId, $plentyId, $detectSalesPriceService)
+            {
+               $detectSalesPriceService->setAccountId(0)
+                ->setAccountType($accountType)
+                ->setCountryOfDelivery($shippingCountryId)
+                ->setCurrency($currency)
+                ->setCustomerClass($customerClassId)
+                ->setOrderReferrer($referrerId)
+                ->setPlentyId($plentyId)
+                ->setQuantity(-1)
+                ->setType(DetectSalesPriceService::PRICE_TYPE_DEFAULT);
+               return $detectSalesPriceService->detect();
+            }
+        );
+
+	    return $priceIds;
     }
 }

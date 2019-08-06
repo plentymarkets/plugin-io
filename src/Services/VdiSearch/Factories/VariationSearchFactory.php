@@ -52,14 +52,14 @@ use Plenty\Plugin\Application;
 class VariationSearchFactory extends BaseSearchFactory implements VariationSearchFactoryContract
 {
     private $isAdminPreview = false;
-    
+
     public function __construct()
     {
         /** @var Application $app */
         $app = pluginApp(Application::class);
         $this->isAdminPreview = $app->isAdminPreview();
     }
-    
+
     /**
      * @param $isAdminPreview
      * @return $this
@@ -69,7 +69,7 @@ class VariationSearchFactory extends BaseSearchFactory implements VariationSearc
         $this->isAdminPreview = $isAdminPreview;
         return $this;
     }
-    
+
     //
     // VARIATION BASE FILTERS
     //
@@ -86,7 +86,7 @@ class VariationSearchFactory extends BaseSearchFactory implements VariationSearc
             $variationFilter = $this->createFilter( VariationBaseFilter::class );
             $variationFilter->isActive();
         }
-        
+
         return $this;
     }
 
@@ -103,7 +103,7 @@ class VariationSearchFactory extends BaseSearchFactory implements VariationSearc
             $variationFilter = $this->createFilter( VariationBaseFilter::class );
             $variationFilter->isInactive();
         }
-        
+
         return $this;
     }
 
@@ -268,10 +268,10 @@ class VariationSearchFactory extends BaseSearchFactory implements VariationSearc
             $variationFilter = $this->createFilter( VariationBaseFilter::class );
             $variationFilter->isHiddenInCategoryList( $isHidden );
         }
-        
+
         return $this;
     }
-    
+
     /**
      * Filter variations by isSalable flag
      *
@@ -282,7 +282,7 @@ class VariationSearchFactory extends BaseSearchFactory implements VariationSearc
         /** @var VariationBaseFilter $variationFilter */
         $variationFilter = $this->createFilter( VariationBaseFilter::class );
         $variationFilter->isSalable();
-    
+
         return $this;
     }
 
@@ -308,7 +308,7 @@ class VariationSearchFactory extends BaseSearchFactory implements VariationSearc
             $clientFilter = $this->createFilter( ClientFilter::class );
             $clientFilter->isVisibleForClient( $clientId );
         }
-        
+
         return $this;
     }
 
@@ -331,12 +331,12 @@ class VariationSearchFactory extends BaseSearchFactory implements VariationSearc
             {
                 $lang = pluginApp(SessionStorageService::class)->getLang();
             }
-            
+
             /** @var TextFilter $textFilter */
             $textFilter = $this->createFilter(TextFilter::class);
             $textFilter->hasNameInLanguage( $lang, $type );
         }
-        
+
         return $this;
     }
 
@@ -376,7 +376,7 @@ class VariationSearchFactory extends BaseSearchFactory implements VariationSearc
             $priceFilter = $this->createFilter( SalesPriceFilter::class );
             $priceFilter->hasAtLeastOnePrice( $priceIds );
         }
-        
+
         return $this;
     }
 
@@ -393,33 +393,37 @@ class VariationSearchFactory extends BaseSearchFactory implements VariationSearc
             $priceDetectService = pluginApp( PriceDetectService::class );
             $this->hasAtLeastOnePrice( $priceDetectService->getPriceIdsForCustomer() );
         }
-        
+
         return $this;
     }
-    
+
     public function hasPriceInRange($priceMin, $priceMax)
     {
         if( !( (float)$priceMin == 0 && (float)$priceMax == 0 ) )
         {
             /** @var CurrencyConverter $currencyConverter */
             $currencyConverter = pluginApp(CurrencyConverter::class);
-            
+
             /** @var VatConverter $vatConverter */
             $vatConverter = pluginApp(VatConverter::class);
-            
+
             $priceMin = $vatConverter->convertToGross($currencyConverter->convertToDefaultCurrency((float)$priceMin));
             $priceMax = $vatConverter->convertToGross($currencyConverter->convertToDefaultCurrency((float)$priceMax));
-    
+
             if((float)$priceMax == 0)
             {
                 $priceMax = null;
             }
-            
+
+            /** @var PriceDetectService  $priceDetectService */
+            $priceDetectService = pluginApp(PriceDetectService::class);
+            $prices = $priceDetectService->getPriceIdsForCustomer();
+
             /** @var PriceFilter $priceRangeFilter */
             $priceRangeFilter = $this->createFilter(PriceFilter::class);
-            $priceRangeFilter->betweenByClient($priceMin, $priceMax, pluginApp(Application::class)->getPlentyId());
+            $priceRangeFilter->betweenByPriceId($prices, $priceMin, $priceMax);
         }
-        
+
         return $this;
     }
 
@@ -516,7 +520,7 @@ class VariationSearchFactory extends BaseSearchFactory implements VariationSearc
         {
             $facetValues = explode(",", $facetValues );
         }
-        
+
         /** @var FacetHelper $facetHelper */
         $facetHelper = app(FacetHelper::class, [
             'facetValuesSelected' => is_array($facetValues) ? $facetValues : [],
@@ -524,7 +528,7 @@ class VariationSearchFactory extends BaseSearchFactory implements VariationSearc
             'lang' => $lang,
             'plentyId' => $clientId
         ]);
-        
+
         $this->withFilter($facetHelper->getFilter());
 
         $facetExtensions = pluginApp( FacetExtensionContainer::class )->getFacetExtensions();
@@ -565,7 +569,7 @@ class VariationSearchFactory extends BaseSearchFactory implements VariationSearc
         {
             $lang = pluginApp( SessionStorageService::class )->getLang();
         }
-        
+
         $this->createFilter(ManagedSearchQuery::class, ['query' => $query, 'lang' => $lang]);
 
         return $this;
@@ -642,7 +646,7 @@ class VariationSearchFactory extends BaseSearchFactory implements VariationSearc
 
         return $this;
     }
-    
+
     /**
      * Includes VariatonAttributeMap for variation select
      *
@@ -651,30 +655,30 @@ class VariationSearchFactory extends BaseSearchFactory implements VariationSearc
     public function withAttributes()
     {
         $this->withExtension( VariationAttributeMapExtension::class );
-        
+
         return $this;
     }
-    
+
     public function withPropertyGroups()
     {
         $propertyGroupMutator = pluginApp(VariationPropertyGroupMutator::class);
         $this->withMutator($propertyGroupMutator);
-        
+
         return $this;
     }
-    
+
     public function withOrderPropertySelectionValues()
     {
         $orderPropertySelectionValueMutator = pluginApp(OrderPropertySelectionValueMutator::class);
         $this->withMutator($orderPropertySelectionValueMutator);
-        
+
         return $this;
     }
-    
+
     public function withVariationProperties()
     {
         $this->withExtension(VariationPropertyExtension::class);
-        
+
         return $this;
     }
 
@@ -753,7 +757,7 @@ class VariationSearchFactory extends BaseSearchFactory implements VariationSearc
         $this->withExtension(ReduceDataExtension::class);
         return $this;
     }
-    
+
     public function withAvailability()
     {
         $this->withExtension(AvailabilityExtension::class);

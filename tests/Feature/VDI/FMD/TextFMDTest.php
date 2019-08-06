@@ -4,6 +4,7 @@ namespace IO\Tests\Feature\VDI\FMD;
 
 
 use IO\Helper\VDIToElasticSearchMapper;
+use IO\Services\SessionStorageService;
 use IO\Tests\Asserts\IsEqualArrayStructure;
 use IO\Tests\TestCase;
 use Plenty\Modules\Pim\VariationDataInterface\Contracts\VariationDataInterfaceContract;
@@ -23,7 +24,13 @@ class TextFMDTest extends TestCase
     {
 
         $variation = factory(\Plenty\Modules\Item\Variation\Models\Variation::class)->states('withMain')->create();
-        $variationDescription = factory(VariationDescription::class)->create( ['itemId' => $variation->itemId]);
+
+        /**
+         * @var SessionStorageService $sessionStorageService
+         */
+        $sessionStorageService = pluginApp(SessionStorageService::class);
+        $lang = $sessionStorageService->getLang();
+        $variationDescription = factory(VariationDescription::class)->create( ['itemId' => $variation->itemId, 'lang' => $lang]);
 
         /** @var VariationDataInterfaceContract $vdi */
         $vdi = app(VariationDataInterfaceContract::class);
@@ -56,7 +63,6 @@ class TextFMDTest extends TestCase
                 0 => [
                     'data' =>  [
                         'texts' => [
-                                0 => [
                                 'description' => NULL,
                                 'keywords' => NULL,
                                 'lang' => NULL,
@@ -71,7 +77,6 @@ class TextFMDTest extends TestCase
                         ]
                     ]
                 ]
-            ]
         ];
 
         try

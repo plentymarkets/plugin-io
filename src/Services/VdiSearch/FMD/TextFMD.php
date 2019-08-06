@@ -41,7 +41,11 @@ class TextFMD extends FieldMapDefinition
      */
     public function fill(Variation $decoratedVariation, array $content, array $sourceFields)
     {
-        $lang = pluginApp(SessionStorageService::class)->getLang();
+       /**
+         * @var SessionStorageService $sessionStorageService
+         */
+        $sessionStorageService = pluginApp(SessionStorageService::class);
+        $lang = $sessionStorageService->getLang();
         $text = $decoratedVariation->base->with()->texts[$lang];
         if($text !== null)
         {
