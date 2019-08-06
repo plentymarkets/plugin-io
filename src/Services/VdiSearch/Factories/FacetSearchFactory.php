@@ -52,7 +52,7 @@ class FacetSearchFactory extends VariationSearchFactory
         $lang       = pluginApp( SessionStorageService::class )->getLang();
     
         /** @var FacetHelper $facetHelper */
-        $facetHelper = app(FacetHelper::class, ['facetValuesSelected' => [], 'collapse' => false, 'lang' => $lang, 'plentyId' => $plentyId]);
+        $facetHelper = app(FacetHelper::class, ['facetValuesSelected' => $this->facetValues, 'collapse' => true, 'lang' => $lang, 'plentyId' => $plentyId]);
         return $facetHelper->createVdiContext();
     }
 
