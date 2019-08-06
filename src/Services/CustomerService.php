@@ -7,6 +7,7 @@ use IO\Builder\Order\AddressType;
 use IO\Builder\Order\OrderType;
 use IO\Constants\SessionStorageKeys;
 use IO\Constants\ShippingCountry;
+use IO\Extensions\Filters\PropertyNameFilter;
 use IO\Extensions\Mail\SendMail;
 use IO\Helper\ArrayHelper;
 use IO\Helper\MemoryCache;
@@ -310,7 +311,7 @@ class CustomerService
 
         if ($contact instanceof Contact && $contact->id > 0) {
 
-            $params = ['contactId' => $contact->id, 'clientId' => pluginApp(Application::class)->getWebstoreId(), 'password' => $contactData['password']];
+            $params = ['contactId' => $contact->id, 'clientId' => pluginApp(Application::class)->getWebstoreId(), 'password' => $contactData['password'], 'language' => $this->sessionStorage->getLang()];
 
             $this->sendMail(AutomaticEmailTemplate::CONTACT_REGISTRATION , AutomaticEmailContact::class, $params);
         }
@@ -348,8 +349,12 @@ class CustomerService
 	{
 	    $contact = null;
         $contactData['checkForExistingEmail'] = true;
-        $contactData['lang'] = $this->sessionStorage->getLang();
 	    $contactData['plentyId'] = pluginApp(Application::class)->getPlentyId();
+	    
+	    if(!isset($contactData['lang']) || is_null($contactData['lang']))
+        {
+            $contactData['lang'] = $this->sessionStorage->getLang();
+        }
 
 	    try
         {
@@ -522,7 +527,7 @@ class CustomerService
             /** @var WebstoreConfiguration $webstoreConfiguration */
             $webstoreConfiguration = $webstoreConfigurationRepository->findByPlentyId($contact->plentyId);
 
-            $params = ['contactId' => $contact->id, 'clientId' => $webstoreConfiguration->webstoreId];
+            $params = ['contactId' => $contact->id, 'clientId' => $webstoreConfiguration->webstoreId, 'language' => $this->sessionStorage->getLang()];
 
             $this->sendMail(AutomaticEmailTemplate::CONTACT_NEW_PASSWORD_CONFIRMATION , AutomaticEmailContact::class, $params);
         }
@@ -1016,13 +1021,33 @@ class CustomerService
     {
         $filters['orderType'] = OrderType::RETURNS;
 
-        return pluginApp(OrderService::class)->getOrdersForContact(
+        $returnOrders = pluginApp(OrderService::class)->getOrdersForContact(
             $this->getContactId(),
             $page,
             $items,
             $filters,
             $wrapped
         );
+
+        /** @var PropertyNameFilter $propertyNameFilter */
+        $propertyNameFilter = pluginApp(PropertyNameFilter::class);
+
+        foreach($returnOrders->getResult() as $returnOrder)
+        {
+            foreach($returnOrder->order->orderItems as $orderItem)
+            {
+                foreach($orderItem->orderProperties as $orderProperty)
+                {
+                    $orderProperty->name = $propertyNameFilter->getPropertyName($orderProperty);
+                    if($orderProperty->type === 'selection')
+                    {
+                        $orderProperty->selectionValueName = $propertyNameFilter->getPropertySelectionValueName($orderProperty);
+                    }
+                }
+            }
+        }
+
+        return $returnOrders;
     }
 
     /**

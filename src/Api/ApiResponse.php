@@ -7,6 +7,7 @@ use IO\Services\BasketService;
 use IO\Services\CheckoutService;
 use IO\Services\LocalizationService;
 use IO\Services\NotificationService;
+use Plenty\Modules\Item\Stock\Events\BasketItemWarnOversell;
 use Plenty\Plugin\Http\Response;
 use Plenty\Modules\Account\Events\FrontendUpdateCustomerSettings;
 use Plenty\Modules\Authentication\Events\AfterAccountAuthentication;
@@ -198,6 +199,21 @@ class ApiResponse
 		$this->dispatcher->listen(AfterAccountContactLogout::class, function ()
 		{
 			$this->eventData["AfterAccountContactLogout"] = [];
+		}, 0);
+
+		$this->dispatcher->listen(BasketItemWarnOversell::class, function ($event)
+		{
+			$stock = $event->getQuantity();
+            $quantity = $event->getBasketItem()->quantity;
+			$oversellingAmount = $quantity - $stock;
+			$oversellingData = [
+				'stock' => $stock,
+				'quantity' => $quantity,
+				'oversellingAmount' => $oversellingAmount
+			];
+
+			$this->eventData["BasketItemWarnOversell"] = $oversellingData;
+            $this->notificationService->warn("Overselling by {$oversellingAmount}.", 12, $oversellingData);
 		}, 0);
 	}
 

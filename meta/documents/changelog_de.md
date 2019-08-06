@@ -1,5 +1,66 @@
 # Release Notes für IO
 
+## v4.1.2 (2019-07-16) <a href="https://github.com/plentymarkets/plugin-io/compare/4.1.1...4.1.2" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
+
+### Hinzugefügt
+
+- Wir haben die neue REST-Route 'rest/io/categorytree' hinzugefügt, um Kategorien der mobilen Navigation zu laden.
+
+### Geändert
+
+- Attribute von Varianten ohne Bestand werden nun angezeigt, wenn an der Variante die Optionen "Automatisch verfügbar, wenn Netto-WB positiv" und "Automatisch nicht verfügbar, wenn kein Netto-WB" deaktiviert sind.
+
+## v4.1.1 (2019-07-10) <a href="https://github.com/plentymarkets/plugin-io/compare/4.1.0...4.1.1" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
+
+### Behoben
+
+- Durch einen Fehler wurde die IO-Route “Seite nicht gefunden” im Bereich **Routing** bei der Bereitstellung der Plugins auch für Callisto-Webshops mit Ceres-Checkout aktiviert. Dieses Verhalten wurde behoben.
+
+## v4.1.0 (2019-07-08) <a href="https://github.com/plentymarkets/plugin-io/compare/4.0.1...4.1.0" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
+
+### Hinzugefügt
+
+- Plugins können ab sofort zusätzliche Datenfelder angeben, die unabhängig vom Result Fields-Template immer geladen werden.
+- Metainformationen von Dateien, die im neuen Webspace abgelegt werden, können ab sofort im Template mithilfe der Twig-Funktion `cdn_metadata()` ausgelesen werden.
+- Der TWIG-Filter 'propertySelectionValueName' wurde hinzugefügt. Dieser gibt den Namen eines Werts innerhalb eines Bestellmerkmals vom Typ **Auswahl** aus.
+- Es kann nun über den Tab Routing in der IO-Konfiguration gesteuert werden, ob die 404 Seite von IO ausgegeben werden soll.
+
+### Geändert
+
+- Die Variantenauswahl in der Artikeleinzelansicht wurde auf die ElasticSearch-Technologie umgebaut, um bessere Performance bieten zu können.
+- Die "Passwort ändern"-Funktion im Mein Konto-Bereich validiert nun serverseitig das Passwort entlang unserer Vorgaben.
+- Die Fehlermeldung, die bei Nichterreichen des Mindestbestellwerts angezeigt wird, wurde angepasst und um den benötigten Wert erweitert.
+- Die Einstellung "Variantenauswahl für Varianten ohne Bestand in der Varianten-Dropdown-Liste aktivieren" wurde in der Ceres-Konfiguration als "deprecated" markiert und wird im Variantenauswahl-Widget nicht mehr berücksichtigt.
+
+### Behoben
+
+- Das Eingabefeld für Datum wird nun serverseitig korrekt validiert.
+- Durch einen Fehler wurde bei Klick auf die Schaltfläche "Auftragsabwicklung" in der Auftragsübersicht keine Seite geöffnet, wenn die Startseite deaktiviert war. Dies wurde behoben.
+- Die Mengenangabe auf der Wunschliste hat auch inaktive Artikel mitgezählt. Dieses Verhalten wurde behoben.
+- Artikellisten-Widgets, bei denen mit die Einstellung **Hersteller** aktiv waren, hat die Sortierung ignoriert. Dieses Verhalten wurde behoben.
+- Durch einen Fehler wurden URLs von Kategorien nicht richtig generiert, wenn der Kategoriename mit den Buchstaben des Sprachkürzels der aktuell ausgewählten Sprache begann. Dies wurde behoben.
+- In der Auftragsübersicht konnte es zu dem Fehler "Resource not Found" kommen, wenn das am Auftrag hinterlegte Versandprofil nicht mehr im System vorhanden war. Das Verhalten wurde behoben.
+- In der Auftragsübersicht konnte es zu dem Fehler "Resource not Found" kommen, wenn der am Auftrag hinterlegte Status kein Systemstatus war. Das Verhalten wurde behoben.
+- Die Bezeichnungen von Bestellmerkmalen werden nun in der richtigen Sprache ausgegeben.
+- Es kam bei der Berechnung von Staffelpreisen bei Varianten mit Bestellmerkmalen zu Problemen. Dieses Verhalten wurde behoben.
+- Es kam zu Fehlern bei der Anzeige von Netto- und Bruttopreisen im Zusammenhang mit der USt.-ID an der Rechnungsadresse. Dieses Verhalten wurde behoben.
+- Wenn nach dem Abschließen eines Auftrags während der Zahlung ein Fehler auftritt, kann der Auftrag erst nach 30 Sekunden erneut abgeschlossen werden. Dies verhindert das Anlegen von doppelten und somit ungültigen Aufträgen.
+- Bei Aufrufen von Kategorien die mit a-XXX enden kam es zur Anzeige einer 404 Seite oder einer Artikeldetailansicht. Dieses Verhalten wurde behoben.
+- Es wurde ein Fehler behoben, der die Weiterleitung von den Routen /checkout und /my-account auf den entprechenden ShopBuilder-Inhalt verhinderte.
+- Die Sprache der aus dem Shop versendeten E-Mails stimmt nun mit der aktuell gewählten Sprache im Shop überein.
+- Es wurde ein Fehler behoben, der das Ausliefern der Seite verhindert hat, wenn die Twig-Funktion `queryString` mit einem ungültigen Parameter aufgerufen wurde.
+
+## v4.0.1 (2019-05-14) <a href="https://github.com/plentymarkets/plugin-io/compare/4.0.0...4.0.1" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
+
+### Geändert
+
+- Für die Methode `createContact()` in der Klasse CustomerService wurde die Möglichkeit ergänzt, eine Kundensprache in den übermittelten Daten mitzugeben, falls nicht die aktuell im Webshop ausgewählte Sprache verwendet werden soll.
+
+### Behoben
+
+- Bei Gastbestellungen konnte es beim Wechsel des Versandprofils zu Fehlern kommen. Dieses Verhalten wurde behoben.
+- Bei Weiterleitungen innerhalb des Webshops wird die Sprache nun korrekt berücksichtigt.
+
 ## v4.0.0 (2019-05-02) <a href="https://github.com/plentymarkets/plugin-io/compare/3.2.0...4.0.0" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
 
 ### TODO

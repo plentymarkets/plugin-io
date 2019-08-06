@@ -1,6 +1,7 @@
 <?php
 namespace IO\Builder\Order;
 use IO\Services\BasketService;
+use IO\Services\SessionStorageService;
 use Plenty\Modules\Basket\Models\Basket;
 use Plenty\Plugin\Application;
 
@@ -85,6 +86,15 @@ class OrderBuilderQuery
 
 		return $this;
 	}
+    
+    /**
+     * Add the lang to the order
+     * @param string $lang
+     */
+	public function withLang(string $lang)
+    {
+        $this->order['lang'] = $lang;
+    }
 
     /**
      * Add the status to the order
@@ -192,6 +202,12 @@ class OrderBuilderQuery
 	public function withContactId(int $customerId):OrderBuilderQuery
 	{
 		$this->withRelation(ReferenceType::CONTACT, $customerId, RelationType::RECEIVER);
+		
+		if((int)$customerId <= 0)
+        {
+            $this->withLang(pluginApp(SessionStorageService::class)->getLang());
+        }
+		
 		return $this;
 	}
 

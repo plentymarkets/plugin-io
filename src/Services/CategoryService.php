@@ -11,6 +11,7 @@ use IO\Helper\UserSession;
 use IO\Services\ItemSearch\Helper\LoadResultFields;
 use IO\Services\ItemSearch\Helper\ResultFieldTemplate;
 use IO\Services\UrlBuilder\UrlQuery;
+use Plenty\Modules\Category\Contracts\CategoryBranchRepositoryContract;
 use Plenty\Modules\Category\Models\Category;
 use Plenty\Modules\Category\Contracts\CategoryRepositoryContract;
 use Plenty\Modules\Category\Models\CategoryClient;
@@ -220,7 +221,7 @@ class CategoryService
         $categoryUrl = $this->fromMemoryCache(
             "categoryUrl.$category->id.$lang.$webstoreId",
             function() use ($category, $lang, $defaultLanguage, $webstoreId) {
-                if(!$category instanceof Category || $category->details[0] === null)
+                if(!$category instanceof Category || $category->details->first() === null)
                 {
                     return null;
                 }
@@ -381,7 +382,7 @@ class CategoryService
         $categoryDataFilter = pluginApp(CategoryDataFilter::class);
         return $categoryDataFilter->applyResultFields(
             $tree,
-            $this->loadResultFields( ResultFieldTemplate::get( ResultFieldTemplate::TEMPLATE_CATEGORY_TREE ) )
+            ResultFieldTemplate::load( ResultFieldTemplate::TEMPLATE_CATEGORY_TREE )
         );
     }
 
@@ -409,6 +410,105 @@ class CategoryService
         return $result;
     }
 
+    public function getPartialTree($categoryId = 0, $type = CategoryType::ALL)
+    {
+        if($categoryId > 0)
+        {
+            $currentCategory = $this->get($categoryId);
+            $branch = $currentCategory->branch->toArray();
+            $maxLevel = max($currentCategory->level + 3, 6);
+
+            $tree = $this->getNavigationTree(
+                $type,
+                $this->sessionStorageService->getLang(),
+                $maxLevel,
+                pluginApp(CustomerService::class)->getContactClassId()
+            );
+
+            return $this->filterBranchEntries($tree, $branch);
+        }
+        else
+        {
+            $tree = $this->getNavigationTree(
+                $type,
+                $this->sessionStorageService->getLang(),
+                3,
+                pluginApp(CustomerService::class)->getContactClassId()
+            );
+            $siblingCount = count($tree);
+
+            foreach($tree as $i => $category)
+            {
+                $this->appendBranchFields($tree[$i], $siblingCount, '', 1);
+            }
+
+            return $tree;
+        }
+    }
+
+
+    private function filterBranchEntries($tree, $branch = [], $level = 1, $urlPrefix = '')
+    {
+        $branchKey      = "category".$level."Id";
+        $isCurrentLevel = $branch[$branchKey] === $branch["categoryId"];
+        $result         = [];
+        $siblingCount   = count($tree);
+
+        foreach($tree as $category)
+        {
+            $isInBranch = $category['id'] === $branch[$branchKey];
+
+            // filter children by current branch
+            if($isInBranch && !$isCurrentLevel)
+            {
+                $this->appendBranchFields($category, $siblingCount, $urlPrefix, 6);
+                $category['children'] = $this->filterBranchEntries($category['children'], $branch, $level+1, $category['url']);
+                $result[] = $category;
+            }
+            else if($isInBranch && $isCurrentLevel)
+            {
+                $this->appendBranchFields($category, $siblingCount, $urlPrefix, 2);
+                $result[] = $category;
+            }
+            else if(!$isInBranch && $isCurrentLevel)
+            {
+                $this->appendBranchFields($category, $siblingCount, $urlPrefix, 0);
+                $result[] = $category;
+            }
+        }
+
+        return $result;
+    }
+
+    private function appendBranchFields(&$category, $siblingCount = 1, $urlPrefix = '', $depth = 6)
+    {
+        // Filter children not having texts in current language
+        $category['children'] = array_filter($category['children'], function($child)
+        {
+            return count($child['details']);
+        });
+
+        // add flags for lazy loading
+        $category['childCount'] = count($category['children']);
+        $category['siblingCount'] = $siblingCount;
+
+        // add url
+        $details = $category['details'][0];
+        $category['url'] = pluginApp(UrlQuery::class, ['path' => $urlPrefix])->join($details['nameUrl'])->toRelativeUrl();
+
+        if(count($category['children']) && $depth > 0)
+        {
+            foreach($category['children'] as $i => $child)
+            {
+                $this->appendBranchFields($category['children'][$i], $category['childCount'], $category['url'], $depth - 1);
+            }
+        }
+        else
+        {
+            unset($category['children']);
+        }
+
+    }
 
     /**
      * Return the sitemap list as an array
@@ -432,7 +532,7 @@ class CategoryService
 
         return $filter->applyResultFields(
             $list,
-            $this->loadResultFields( ResultFieldTemplate::get( ResultFieldTemplate::TEMPLATE_CATEGORY_TREE ) )
+            ResultFieldTemplate::load( ResultFieldTemplate::TEMPLATE_CATEGORY_TREE )
         );
     }
 

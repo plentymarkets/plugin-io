@@ -2,7 +2,6 @@
 
 namespace IO\Extensions\Functions;
 
-use Plenty\Plugin\Events\Dispatcher;
 use IO\Extensions\AbstractFunction;
 use Plenty\Plugin\Http\Request;
 
@@ -34,11 +33,17 @@ class QueryString extends AbstractFunction
         $queryParameters = $request->all();
         unset($queryParameters['plentyMarkets']);
         $queryParameters = array_replace($queryParameters, $params);
+
+        if (!is_array($queryParameters)) {
+            return '';
+        }
+
         $queryParameters = $this->createUniqueMultidimensionalArray($queryParameters);
-        
-        return '?' . http_build_query($queryParameters);
+
+        $queryParameters = http_build_query($queryParameters);
+        return strlen($queryParameters) > 0 ? '?' . $queryParameters : '';
     }
-    
+
     /**
      * @param array $array
      * @return array

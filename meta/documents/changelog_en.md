@@ -1,5 +1,66 @@
 # Release Notes for IO
 
+## v4.1.2 (2019-07-16) <a href="https://github.com/plentymarkets/plugin-io/compare/4.1.1...4.1.2" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
+
+### Added
+
+- We added the new REST route 'rest/io/categorytree' for loading categories of the mobile navigation.
+
+### Changed
+
+- Attributes of variations without stock are now displayed if the options "Available automatically if net stock is positive" and "Not available automatically if net stock is 0 or negative" are deactivated.
+
+## v4.1.1 (2019-07-10) <a href="https://github.com/plentymarkets/plugin-io/compare/4.1.0...4.1.1" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
+
+### Fixed
+
+- Due to an error, the IO route “Page not found” in the **Routing** section was also activated for Callisto online stores that use the Ceres checkout. This behaviour has been fixed.
+
+## v4.1.0 (2019-07-08) <a href="https://github.com/plentymarkets/plugin-io/compare/4.0.1...4.1.0" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
+
+### Added
+
+- Plugins can now specify data fields that are always loaded, independent from the Result Fields template.
+- Meta information of files stored in the new Webspace can now be read within the template via the Twig function `cdn_metadata()`.
+- We added the TWIG filter 'propertySelectionValueName'. This returns the name of a value of an order property of the type **selection**.
+- You can now determine whether the IO 404 page should be displayed in the **routing** tab of the IO configuration.
+
+### Changed
+
+- The variation selection in the single item view has been remodeled on the basis of ElasticSearch technology in order to increase performance.
+- The "Change password" function in the My Account area now validates the password on the side of the server according to our specifications.
+- The error notification that is displayed when the minimum order value is not met has been adjusted and now contains the minimum order value.
+- The setting "Enable selection of variations without stock in variation dropdown" in the Ceres configuration has been marked as "deprecated" and is no longer considered by the variation selection widget.
+
+### Fixed
+
+- The input field for dates is now correctly validated on the server side.
+- Due to an error, clicking the "Order process" button in the order history did not open a link if the homepage was deactivated. This has been fixed.
+- The wish list's quantity indication also counted inactive items. This behaviour has been fixed.
+- Item list widgets for which the option **manufacturer** was active ignored the sorting options. This behaviour has been fixed.
+- Due to an error, URLs of categories were not generated correctly if the category's name began with the same letters as the language code of the currently selected language.
+- The error "Resource not found" could occur in the order overview if the shipping profile specified in the order was no longer available in the system. This behaviour has been fixed.
+- The error "Resource not found" could occur in the order confirmation if the order's status was no system status. This behaviour has been fixed.
+- The labels of order properties are now displayed in the correct language.
+- The calculation of graduated prices for variations with order characteristics could lead to errors. This behaviour has been fixed.
+- The display of gross and net prices in combination with the invoice address's VAT identification number could lead to errors. This behaviour has been fixed.
+- If an error occurs during payment after an order has been completed, the order can only be finalised after a waiting period of 30 seconds. This prevents the creation of duplicate orders that would thereby be invalid.
+- Accessing categories that ended in the URL slug a-XXX would sometimes redirect to a 404 page or a single item view. This behaviour has been fixed.
+- We fixed an error due to which the routes /checkout and /my-account did not redirect to the corresponding ShopBuilder content.
+- The language of emails sent via the online store now corresponds with the currently selected language in the online store.
+- Due to an error, pages would not load if the TWIG function `queryString` was called with an invalid parameter. This has been fixed.
+
+## v4.0.1 (2019-05-14) <a href="https://github.com/plentymarkets/plugin-io/compare/4.0.0...4.0.1" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
+
+### Changed
+
+- The method `createContact()` in the class CustomerService was modified to include the possibility of adding a customer language in the transmitted data if the language that is currently selected in the online store should not be used.
+
+### Fixed
+
+- For orders placed by guest customers, changing the shipping profile could lead to errors. This behaviour has been fixed.
+- Redirects in the online store now correctly consider the language.
+
 ## v4.0.0 (2019-05-02) <a href="https://github.com/plentymarkets/plugin-io/compare/3.2.0...4.0.0" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
 
 ### TODO

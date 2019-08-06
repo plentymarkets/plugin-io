@@ -61,14 +61,16 @@ class TagService
 
         $tag = $this->getTagById($tagId);
 
-        if ( !is_null($tag) )
+        if( is_null($tag) )
         {
-            foreach( $tag->names as $tagName )
+            return "";
+        }
+
+        foreach( $tag->names as $tagName )
+        {
+            if ( $tagName->tagLang === $lang )
             {
-                if ( $tagName->tagLang === $lang )
-                {
-                    return $tagName->tagName;
-                }
+                return $tagName->tagName;
             }
         }
 
