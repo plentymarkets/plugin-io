@@ -5,11 +5,6 @@ namespace IO\Services\ItemSearch\SearchPresets;
 use IO\Contracts\VariationSearchFactoryContract as VariationSearchFactory;
 use IO\Services\ItemSearch\Helper\ResultFieldTemplate;
 use IO\Services\TemplateConfigService;
-use Plenty\Modules\Pim\VariationDataInterface\Model\Attributes\VariationAttributeValueAttribute;
-use Plenty\Modules\Pim\VariationDataInterface\Model\Attributes\VariationBaseAttribute;
-use Plenty\Modules\Pim\VariationDataInterface\Model\Attributes\VariationImageAttribute;
-use Plenty\Modules\Pim\VariationDataInterface\Model\Attributes\VariationSalesPriceAttribute;
-use Plenty\Modules\Pim\VariationDataInterface\Model\Attributes\VariationUnitAttribute;
 
 /**
  * Class SingleItem

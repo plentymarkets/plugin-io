@@ -10,32 +10,19 @@ use IO\Services\ItemSearch\Helper\LoadResultFields;
 use IO\Services\SessionStorageService;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Collapse\BaseCollapse;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Collapse\CollapseInterface;
-use Plenty\Modules\Cloud\ElasticSearch\Lib\Collapse\InnerHit\BaseInnerHit;
-use Plenty\Modules\Cloud\ElasticSearch\Lib\ElasticSearch;
-use Plenty\Modules\Cloud\ElasticSearch\Lib\Processor\DocumentInnerHitsToRootProcessor;
-use Plenty\Modules\Cloud\ElasticSearch\Lib\Processor\DocumentProcessor;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Query\Type\ScoreModifier\RandomScore;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Query\Type\TypeInterface;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Search\Aggregation\AggregationInterface;
-use Plenty\Modules\Cloud\ElasticSearch\Lib\Search\Document\DocumentSearch;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Sorting\MultipleSorting;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Sorting\SingleSorting;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Source\IncludeSource;
-use Plenty\Modules\Cloud\ElasticSearch\Lib\Source\IndependentSource;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Source\Mutator\MutatorInterface;
 use Plenty\Modules\Item\Search\Aggregations\ItemAttributeValueCardinalityAggregation;
 use Plenty\Modules\Item\Search\Aggregations\ItemAttributeValueCardinalityAggregationProcessor;
 use Plenty\Modules\Item\Search\Sort\NameSorting;
-
 use Plenty\Modules\Pim\SearchService\Query\ManagedSearchQuery;
 use Plenty\Modules\Pim\SearchService\Query\NameAutoCompleteQuery;
-use Plenty\Modules\Pim\VariationDataInterface\Model\Attributes\VariationAttributeValueAttribute;
-use Plenty\Modules\Pim\VariationDataInterface\Model\Attributes\VariationBaseAttribute;
-use Plenty\Modules\Pim\VariationDataInterface\Model\Attributes\VariationImageAttribute;
-use Plenty\Modules\Pim\VariationDataInterface\Model\Attributes\VariationSalesPriceAttribute;
-use Plenty\Modules\Pim\VariationDataInterface\Model\Attributes\VariationUnitAttribute;
 use Plenty\Modules\Pim\VariationDataInterface\Model\VariationDataInterfaceContext;
-
 use Plenty\Plugin\Application;
 use Plenty\Plugin\Log\Loggable;
 
@@ -236,24 +223,6 @@ class BaseSearchFactory
          */
         $vdiPartHelper = pluginApp(VDIPart::class);
         $this->parts = $vdiPartHelper->getPartsByResultFields($this->resultFields);
-    }
-    /**
-     * @param $parts
-     * @return BaseSearchFactory
-     */
-    public function withParts( $parts )
-    {
-        if(is_array($parts) && count($parts))
-        {
-            $this->parts = $parts;
-        }
-
-        return $this;
-    }
-
-    public function getParts()
-    {
-        return $this->parts;
     }
 
     /**

@@ -46,7 +46,8 @@ class VDIToElasticSearchMapper
     public function map(VariationDataInterfaceResultInterface $vdiResult, $resultFields = ['*'])
     {
         $data = [
-            'documents' => []
+            'documents' => [],
+            'total' => $vdiResult->total()
         ];
         
         $additionalData = $vdiResult->getAdditionalData();
