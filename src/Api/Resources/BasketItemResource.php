@@ -54,7 +54,7 @@ class BasketItemResource extends ApiResource
 
         if(array_key_exists("code", $basketItems))
         {
-            return $this->response->create(["exceptionCode" => $basketItems["code"]], ResponseCode::BAD_REQUEST);
+            return $this->response->create(["exceptionCode" => $basketItems["code"], 'placeholder' => $basketItems['placeholder']], ResponseCode::BAD_REQUEST);
         }
 
 		return $this->response->create($basketItems, ResponseCode::CREATED);
