@@ -15,7 +15,7 @@ class ContactMailService
     {
         $recipient = $mailData['recipient'];
 
-        if ( is_null( $recipient ) )
+        if ( !strlen( $recipient ) )
         {
             /** @var TemplateConfigService $templateConfigService */
             $templateConfigService = pluginApp(TemplateConfigService::class);
@@ -26,7 +26,7 @@ class ContactMailService
         {
             return false;
         }
-        
+
         /** @var Twig */
         $twig = pluginApp(Twig::class);
 
@@ -34,12 +34,12 @@ class ContactMailService
             $mailTemplate,
             $mailData
         );
-        
+
         if(!strlen($mailBody))
         {
             return false;
         }
-        
+
         /** @var MailerContract $mailer */
         $mailer = pluginApp(MailerContract::class);
 
