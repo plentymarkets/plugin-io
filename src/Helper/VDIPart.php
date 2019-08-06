@@ -129,7 +129,24 @@ class VDIPart
                 {
                     $part = $parts[$partName];
                     $fmd = pluginApp($partConfig[$partName]);
-                    $part->addLazyLoadParts(...$fmd->getLazyLoadable());
+
+                    if($fmd->getAttribute() !== $partName)
+                    {
+                        if(isset($parts[$fmd->getAttribute()]))
+                        {
+                            $newPart = $parts[$fmd->getAttribute()];
+                        }
+                        else
+                        {
+                            $newPart = app($fmd->getAttribute());
+                        }
+                        $newPart->addLazyLoadParts(...$fmd->getLazyLoadable());
+                        $parts[$fmd->getAttribute()] = $newPart;
+
+                    }else
+                    {
+                        $part->addLazyLoadParts(...$fmd->getLazyLoadable());
+                    }
                     $parts[$partName] = $part;
                 }
                 else
@@ -142,7 +159,7 @@ class VDIPart
 
              }
         }
-            $parts = array_values($parts);
+        $parts = array_values($parts);
         return $parts;
     }
 }
