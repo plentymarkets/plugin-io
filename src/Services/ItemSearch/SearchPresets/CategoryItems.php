@@ -4,7 +4,7 @@ namespace IO\Services\ItemSearch\SearchPresets;
 
 use IO\Contracts\VariationSearchFactoryContract as VariationSearchFactory;
 use IO\Services\ItemSearch\Helper\ResultFieldTemplate;
-use IO\Services\ItemSearch\Helper\SortingHelper;
+use IO\Contracts\SortingContract as SortingHelper;
 
 /**
  * Class CategoryItems
@@ -30,7 +30,10 @@ class CategoryItems implements SearchPreset
     {
         $categoryId     = $options['categoryId'];
         $facets         = $options['facets'];
-        $sorting        = SortingHelper::getCategorySorting( $options['sorting'] );
+        
+        /** @var SortingContract $sortingHelper */
+        $sortingHelper = pluginApp(SortingHelper::class);
+        $sorting        = $sortingHelper->getCategorySorting( $options['sorting'] );
 
         $page = 1;
         if ( array_key_exists('page', $options ) )

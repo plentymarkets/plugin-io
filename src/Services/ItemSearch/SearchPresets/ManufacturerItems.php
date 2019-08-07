@@ -3,7 +3,7 @@
 namespace IO\Services\ItemSearch\SearchPresets;
 
 use IO\Contracts\VariationSearchFactoryContract as VariationSearchFactory;
-use IO\Services\ItemSearch\Helper\SortingHelper;
+use IO\Contracts\SortingContract as SortingHelper;
 
 class ManufacturerItems implements SearchPreset
 {
@@ -18,7 +18,9 @@ class ManufacturerItems implements SearchPreset
         $sorting = '';
         if ( array_key_exists( 'sorting', $options ) )
         {
-            $sorting = SortingHelper::getSorting( $options['sorting'] );
+            /** @var SortingContract $sortingHelper */
+            $sortingHelper = pluginApp(SortingHelper::class);
+            $sorting = $sortingHelper->getSorting( $options['sorting'] );
         }
 
         $itemsPerPage = 20;

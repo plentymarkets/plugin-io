@@ -2,7 +2,7 @@
 
 namespace IO\Services;
 
-use IO\Services\ItemSearch\Helper\SortingHelper;
+use IO\Contracts\SortingContract as SortingHelper;
 use IO\Services\ItemSearch\SearchPresets\LiveShoppingItems;
 use IO\Services\ItemSearch\Services\ItemSearchService;
 use Plenty\Modules\LiveShopping\Contracts\LiveShoppingRepositoryContract;
@@ -56,9 +56,12 @@ class LiveShoppingService
     
     public function getLiveShoppingVariations($itemId, $sorting)
     {
+        /** @var SortingContract $sortingHelper */
+        $sortingHelper = pluginApp(SortingHelper::class);
+        
         $itemSearchOptions = [
             'itemId'        => $itemId,
-            'sorting'       => SortingHelper::splitPathAndOrder($sorting)
+            'sorting'       => $sortingHelper->splitPathAndOrder($sorting)
         ];
         /** @var ItemSearchService $itemSearchService */
         $itemSearchService = pluginApp( ItemSearchService::class );

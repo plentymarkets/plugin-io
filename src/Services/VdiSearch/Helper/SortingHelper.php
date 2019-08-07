@@ -1,20 +1,34 @@
 <?php
 
-namespace IO\Services\ItemSearch\Helper;
+namespace IO\Services\VdiSearch\Helper;
 
 use IO\Contracts\SortingContract;
 use IO\Contracts\VariationSearchFactoryContract;
+use IO\Services\SessionStorageService;
 use IO\Services\TemplateConfigService;
+use Plenty\Modules\Cloud\ElasticSearch\Lib\Data\Update\Handler\Traits\MultilingualTrait;
 
-/**
- * Class SortingHelper
- *
- * Generate sorting values from plugin configuration.
- *
- * @package IO\Services\ItemSearch\Helper
- */
 class SortingHelper implements SortingContract
 {
+    use MultilingualTrait;
+    
+    const SORTING_MAP = [
+        'item.id'                            => 'filter.itemId',
+        'texts.name1'                        => 'analyzed.multilingual.{{lang}}.name1.sorting',
+        'texts.name2'                        => 'analyzed.multilingual.{{lang}}.name2.sorting',
+        'texts.name3'                        => 'analyzed.multilingual.{{lang}}.name3.sorting',
+        'variation.createdAt'                => 'filter.timestamps.createdAt',
+        'variation.updatedAt'                => 'filter.timestamps.updatedAt',
+        'variation.id'                       => 'variationId',
+        'variation.number'                   => 'analyzed.number.sorting',
+        'variation.availability.averageDays' => 'filter.availabilityAverageDays',
+        'variation.position'                 => 'filter.position',
+        'item.manufacturer.externalName'     => 'analyzed.externalManufacturer.sorting',
+        'item.manufacturer.position'         => 'analyzed.manufacturer.sorting',
+        'stock.net'                          => 'filter.stock.net',
+        'sorting.price.avg'                  =>'filter.prices.price'
+    ];
+    
     /**
      * Get sorting values from plugin configuration
      *
@@ -31,7 +45,7 @@ class SortingHelper implements SortingContract
             /** @var TemplateConfigService $templateConfigService */
             $templateConfigService = pluginApp( TemplateConfigService::class );
             $configKeyPrefix = $isCategory ? 'sorting.priorityCategory' : 'sorting.prioritySearch';
-
+            
             foreach( [1,2,3] as $priority )
             {
                 $defaultSortingValue = $templateConfigService->get($configKeyPrefix . $priority );
@@ -50,18 +64,21 @@ class SortingHelper implements SortingContract
                 $sortingField = '_score';
                 $sortingOrder = VariationSearchFactoryContract::SORTING_ORDER_DESC;
             }
-
+            
             else if ( $sortingField === 'texts.name' )
             {
                 $sortingField = self::getUsedItemName();
             }
-
-            $sortings[] = ['field' => $sortingField, 'order' => $sortingOrder];
+            
+            $sortings[] = [
+                'field' => str_replace('{{lang}}', $this->getM10lByLanguage(pluginApp(SessionStorageService::class)->getLang()), self::SORTING_MAP[$sortingField]),
+                'order' => $sortingOrder
+            ];
         }
-
+        
         return $sortings;
     }
-
+    
     /**
      * Get sorting values for categories from config
      *
@@ -72,7 +89,7 @@ class SortingHelper implements SortingContract
     {
         return self::getSorting( $sortingConfig, true );
     }
-
+    
     /**
      * Get sorting values for searches from config
      *
@@ -90,7 +107,7 @@ class SortingHelper implements SortingContract
     public function getUsedItemName()
     {
         $templateConfigService = pluginApp(TemplateConfigService::class);
-    
+        
         $usedItemNameIndex = $templateConfigService->get('item.name');
         
         $usedItemName = [

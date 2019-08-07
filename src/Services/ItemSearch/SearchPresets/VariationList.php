@@ -4,7 +4,7 @@ namespace IO\Services\ItemSearch\SearchPresets;
 
 use IO\Contracts\VariationSearchFactoryContract as VariationSearchFactory;
 use IO\Services\ItemSearch\Helper\ResultFieldTemplate;
-use IO\Services\ItemSearch\Helper\SortingHelper;
+use IO\Contracts\SortingContract as SortingHelper;
 
 /**
  * Class VariationList
@@ -67,7 +67,9 @@ class VariationList implements SearchPreset
             }
             else
             {
-                $sorting = SortingHelper::getSearchSorting( $options['sorting'] );
+                /** @var SortingContract $sortingHelper */
+                $sortingHelper = pluginApp(SortingHelper::class);
+                $sorting = $sortingHelper->getSearchSorting( $options['sorting'] );
                 $searchFactory->sortByMultiple( $sorting );
             }
         }

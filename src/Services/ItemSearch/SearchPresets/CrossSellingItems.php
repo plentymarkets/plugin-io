@@ -6,7 +6,7 @@ use IO\Services\CategoryService;
 use IO\Services\ItemCrossSellingService;
 use IO\Contracts\VariationSearchFactoryContract as VariationSearchFactory;
 use IO\Services\ItemSearch\Helper\ResultFieldTemplate;
-use IO\Services\ItemSearch\Helper\SortingHelper;
+use IO\Contracts\SortingContract as SortingHelper;
 
 /**
  * Class CrossSellingItems
@@ -43,15 +43,17 @@ class CrossSellingItems implements SearchPreset
         {
             $relation = $crossSellingService->getType();
         }
-
+    
+        /** @var SortingContract $sortingHelper */
+        $sortingHelper = pluginApp(SortingHelper::class);
+        
         if(is_null($sorting))
         {
-            $sorting = SortingHelper::splitPathAndOrder($crossSellingService->getSorting());
+            $sorting = $sortingHelper->splitPathAndOrder($crossSellingService->getSorting());
         }elseif(strlen($sorting))
         {
-            $sorting = SortingHelper::getSorting($sorting);
+            $sorting = $sortingHelper->getSorting($sorting);
         }
-
 
         /** @var VariationSearchFactory $searchFactory */
         $searchFactory = pluginApp( VariationSearchFactory::class )

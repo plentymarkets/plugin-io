@@ -7,21 +7,21 @@ use IO\Helper\VDIPart;
 use IO\Services\ItemSearch\Extensions\ItemSearchExtension;
 use IO\Services\ItemSearch\Extensions\SortExtension;
 use IO\Services\ItemSearch\Helper\LoadResultFields;
-use IO\Services\SessionStorageService;
+use IO\Services\PriceDetectService;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Collapse\BaseCollapse;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Collapse\CollapseInterface;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Query\Type\ScoreModifier\RandomScore;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Query\Type\TypeInterface;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Search\Aggregation\AggregationInterface;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Sorting\MultipleSorting;
+use Plenty\Modules\Cloud\ElasticSearch\Lib\Sorting\SingleNestedSorting;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Sorting\SingleSorting;
-use Plenty\Modules\Cloud\ElasticSearch\Lib\Source\IncludeSource;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Source\Mutator\MutatorInterface;
 use Plenty\Modules\Item\Search\Aggregations\ItemAttributeValueCardinalityAggregation;
 use Plenty\Modules\Item\Search\Aggregations\ItemAttributeValueCardinalityAggregationProcessor;
-use Plenty\Modules\Item\Search\Sort\NameSorting;
-use Plenty\Modules\Pim\SearchService\Query\ManagedSearchQuery;
+ use Plenty\Modules\Pim\SearchService\Query\ManagedSearchQuery;
 use Plenty\Modules\Pim\SearchService\Query\NameAutoCompleteQuery;
+use Plenty\Modules\Pim\VariationDataInterface\Model\Context\GroupBy;
 use Plenty\Modules\Pim\VariationDataInterface\Model\VariationDataInterfaceContext;
 use Plenty\Plugin\Application;
 use Plenty\Plugin\Log\Loggable;
@@ -298,37 +298,30 @@ class BaseSearchFactory
         }
 
         $sortingInterface = null;
-        if ( strpos( $field, 'texts.name' ) !== false )
+        if ( strlen($field) )
         {
-            $sortingInterface = pluginApp(
-                NameSorting::class,
-                [
-                    str_replace('texts.', '', $field ),
-                    pluginApp(SessionStorageService::class)->getLang(),
-                    $order
-                ]
-            );
-        }
-        else if ( strlen($field) )
-        {
-            if ( strpos( $field, 'sorting.price.') !== false )
+            if ( strpos( $field, 'filter.prices.price') !== false )
             {
-                $field = sprintf(
-                    'sorting.priceByClientDynamic.%d.%s',
-                    pluginApp(Application::class)->getPlentyId(),
-                    substr($field, strlen('sorting.price.'))
-                );
+                /** @var PriceDetectService  $priceDetectService */
+                $priceDetectService = pluginApp(PriceDetectService::class);
+                $sortingInterface = new SingleNestedSorting($field, $order, 'filter.prices', [
+                    'terms' => [
+                        'filter.prices.priceId' => $priceDetectService->getPriceIdsForCustomer()
+                    ]
+                ]);
             }
-
-            $sortingInterface = pluginApp( SingleSorting::class, [$field, $order] );
+            else
+            {
+                $sortingInterface = pluginApp( SingleSorting::class, [$field, $order] );
+            }
+            
         }
 
         if ( !is_null($sortingInterface) )
         {
             $this->sorting->addSorting( $sortingInterface );
         }
-
-
+        
         return $this;
     }
 
@@ -417,25 +410,12 @@ class BaseSearchFactory
             $aggregationClasses[] = get_class($aggregation);
             $vdiContext->addAggregation( $aggregation );
         }*/
+        
 
-        // ADD RESULT FIELDS
-        //TODO
-        /** @var IncludeSource $source */
-        /*$source = pluginApp( IncludeSource::class );
-        $resultFields = $this->resultFields;
-        if ( count( $resultFields ) )
+        if ( $this->sorting !== null )
         {
-            $source->activateList( $resultFields );
+            $vdiContext->setSorting( $this->sorting );
         }
-        else
-        {
-            $source->activateAll();
-        }*/
-
-        /*if ( $this->sorting !== null )
-        {
-            $search->setSorting( $this->sorting );
-        }*/
 
         if ( $this->itemsPerPage < 0 )
         {
@@ -456,7 +436,7 @@ class BaseSearchFactory
                 "sorting"       => is_null($this->sorting) ? null : $this->sorting->toArray(),
                 "page"          => $this->page,
                 "itemsPerPage"  => $this->itemsPerPage,
-                //"resultFields"  => $this->resultFields
+                "resultFields"  => $this->resultFields
             ]
         );
 
@@ -478,53 +458,11 @@ class BaseSearchFactory
             $vdiContext->setParts($vdiContextParts);
         }
 
+        //TODO append if needed
+        $groupBy = new GroupBy('filter.itemAttributeValue');
+        $vdiContext->setGroupBy($groupBy);
+        
         return $vdiContext;
-
-        /*if($this->collapse instanceof BaseCollapse)
-        {
-            /** @var IndependentSource $source */
-            /*$source = pluginApp(IndependentSource::class);
-            //$source->activate('variation.id', 'item.id');
-            $source->activate();
-
-            /** @var BaseInnerHit $innerHit */
-            /*$innerHit = pluginApp(BaseInnerHit::class, ['cheapest']);
-            $innerHit->setSorting(pluginApp(SingleSorting::class, ['sorting.price.avg', 'asc']));
-            $innerHit->setSource($source);
-            $this->collapse->addInnerHit($innerHit);
-
-            /** @var DocumentInnerHitsToRootProcessor $docProcessor */
-            /*$processor = pluginApp(DocumentInnerHitsToRootProcessor::class, [$innerHit->getName()]);
-            $search = pluginApp(DocumentSearch::class, [$processor]);
-
-            // Group By Item Id
-            $search->setCollapse($this->collapse);
-        }
-        else
-        {
-            /** @var DocumentProcessor $processor */
-            /*$processor = pluginApp( DocumentProcessor::class );
-            /** @var DocumentSearch $search */
-            /*$search = pluginApp( DocumentSearch::class, [$processor] );
-        }*/
-
-        // ADD MUTATORS
-        /*$mutatorClasses = [];
-        foreach( $this->mutators as $mutator )
-        {
-            $processor->addMutator( $mutator );
-            $mutatorClasses[] = get_class($mutator);
-        }
-
-        $this->getLogger(__CLASS__)->debug(
-            "IO::Debug.BaseSearchFactory_prepareSearch",
-            [
-                "hasCollapse"   => $this->collapse instanceof BaseCollapse,
-                "mutators"      => $mutatorClasses
-            ]
-        );
-
-        return $search;*/
     }
 
     private function checkRandomSorting($sortingField)

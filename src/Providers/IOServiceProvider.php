@@ -5,6 +5,7 @@ namespace IO\Providers;
 use IO\Constants\SessionStorageKeys;
 use IO\Contracts\FacetSearchFactoryContract;
 use IO\Contracts\MultiSearchFactoryContract;
+use IO\Contracts\SortingContract;
 use IO\Contracts\VariationSearchFactoryContract;
 use IO\Extensions\Basket\IOFrontendShippingProfileChanged;
 use IO\Extensions\Basket\IOFrontendUpdateDeliveryAddress;
@@ -33,6 +34,7 @@ use IO\Services\ItemSearch\Factories\FacetSearchFactory;
 use IO\Services\ItemSearch\Factories\MultiSearchFactory;
 use IO\Services\ItemSearch\Factories\VariationSearchFactory;
 use IO\Services\ItemSearch\Helper\FacetExtensionContainer;
+use IO\Services\ItemSearch\Helper\SortingHelper;
 use IO\Services\ItemService;
 use IO\Services\ItemWishListService;
 use IO\Services\LegalInformationService;
@@ -52,6 +54,7 @@ use IO\Services\UrlService;
 use IO\Services\VdiSearch\Factories\FacetSearchFactory as FacetSearchFactoryVdi;
 use IO\Services\VdiSearch\Factories\MultiSearchFactory as MultiSearchFactoryVdi;
 use IO\Services\VdiSearch\Factories\VariationSearchFactory as VariationSearchFactoryVdi;
+use IO\Services\VdiSearch\Helper\SortingHelper as SortingHelperVdi;
 use IO\Services\WebstoreConfigurationService;
 use Plenty\Modules\Authentication\Events\AfterAccountAuthentication;
 use Plenty\Modules\Authentication\Events\AfterAccountContactLogout;
@@ -88,6 +91,7 @@ class IOServiceProvider extends ServiceProvider
         $this->getApplication()->register(IORouteServiceProvider::class);
 
         $this->getApplication()->singleton('IO\Helper\TemplateContainer');
+        $this->getApplication()->singleton('IO\Contracts\SortingContract');
 
         $this->getApplication()->bind('IO\Builder\Item\ItemColumnBuilder');
         $this->getApplication()->bind('IO\Builder\Item\ItemFilterBuilder');
@@ -220,13 +224,14 @@ class IOServiceProvider extends ServiceProvider
             $this->getApplication()->bind(VariationSearchFactoryContract::class, VariationSearchFactoryVdi::class);
             $this->getApplication()->bind(MultiSearchFactoryContract::class, MultiSearchFactoryVdi::class);
             $this->getApplication()->bind(FacetSearchFactoryContract::class, FacetSearchFactoryVdi::class);
-            
+            $this->getApplication()->bind(SortingContract::class, SortingHelperVdi::class);
         }
         else
         {
             $this->getApplication()->bind(VariationSearchFactoryContract::class, VariationSearchFactory::class);
             $this->getApplication()->bind(MultiSearchFactoryContract::class, MultiSearchFactory::class);
             $this->getApplication()->bind(FacetSearchFactoryContract::class, FacetSearchFactory::class);
+            $this->getApplication()->bind(SortingContract::class, SortingHelper::class);
         }
     }
 }
