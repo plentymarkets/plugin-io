@@ -40,6 +40,7 @@ class CheckoutController extends LayoutController
 
         /** @var ShopBuilderRequest $shopBuilderRequest */
         $shopBuilderRequest = pluginApp(ShopBuilderRequest::class);
+        $shopBuilderRequest->setMainContentType('checkout');
 
         if ( !$shopBuilderRequest->isShopBuilder() )
         {
