@@ -13,6 +13,7 @@ use Plenty\Plugin\Application;
  * Concrete factory to build facet searches.
  *
  * @package IO\Services\ItemSearch\Factories
+ * @deprecated IO\Contracts\FacetSearchFactoryContract
  */
 class FacetSearchFactory extends VariationSearchFactory
 {

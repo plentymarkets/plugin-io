@@ -62,7 +62,23 @@ class VariationFMD extends FieldMapDefinition
         $docVariation['id'] = (int)$decoratedVariation->id;
 
         $docVariation['salesRank'] = $base->position;
+$mainVariationId = $base->mainVariationId ?? $decoratedVariation->id;
 
+        //$docVariation['unitCombinationId'] = $decoratedVariation->unit->unitCombinationId;
+
+        $docVariation['categoryVariationId'] = $base->categoriesInherited ? $mainVariationId : $decoratedVariation->id;
+        $docVariation['marketVariationId'] = $base->referrerInherited ? $mainVariationId : $decoratedVariation->id;
+        $docVariation['clientVariationId'] = $base->clientsInherited ? $mainVariationId : $decoratedVariation->id;
+        $docVariation['salesPriceVariationId'] = $base->salesPricesInherited ? $mainVariationId : $decoratedVariation->id;
+        $docVariation['supplierVariationId'] = $base->supplierInherited ? $mainVariationId : $decoratedVariation->id;
+        $docVariation['warehouseVariationId'] = $base->warehousesInherited ? $mainVariationId : $decoratedVariation->id;
+        $docVariation['propertyVariationId'] = $base->propertiesInherited ? $mainVariationId : $decoratedVariation->id;
+        $docVariation['tagVariationId'] = $base->tagsInherited ? $mainVariationId : $decoratedVariation->id;
+
+        $docVariation['updatedAt'] = $decoratedVariation->timestamps->base;
+        $docVariation['relatedUpdatedAt'] = $decoratedVariation->timestamps->related;
+        $docVariation['createdAt'] = $decoratedVariation->timestamps->createdAt;
+        $docVariation['availabilityUpdatedAt'] = $decoratedVariation->timestamps->availability;
         $content['variation'] = $docVariation;
         return $content;
     }

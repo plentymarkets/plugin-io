@@ -15,6 +15,7 @@ use Plenty\Modules\Pim\VariationDataInterface\Contracts\VariationDataInterfaceCo
  * Factory to build an elastic search multisearch request by collecting multiple search factory instances.
  *
  * @package IO\Services\ItemSearch\Factories
+ * @deprecated use instead IO\Contracts\MultiSearchFactoryContract
  */
 class MultiSearchFactory implements MultiSearchFactoryContract
 {
@@ -23,7 +24,7 @@ class MultiSearchFactory implements MultiSearchFactoryContract
 
     /** @var array */
     private $extensions = [];
-    
+
     private $resultFields = [];
 
     /**
@@ -76,7 +77,7 @@ class MultiSearchFactory implements MultiSearchFactoryContract
                     $secondarySearches[$resultName . "__" . $i] = $secondarySearch;
                     $this->resultFields[$resultName . "__" . $i] = $extension->getSearch($searchBuilder)->getResultFields();
                 }
-    
+
                 $this->extensions[$resultName][] = $extension;
             }
 
@@ -99,7 +100,7 @@ class MultiSearchFactory implements MultiSearchFactoryContract
     {
         $vdiContexts = [];
         $primarySearchNames = [];
-        
+
         foreach( $this->searches as $resultName => $searches )
         {
             $vdiContexts[$resultName] = $searches['primary'];
@@ -114,7 +115,7 @@ class MultiSearchFactory implements MultiSearchFactoryContract
         /** @var VariationDataInterfaceContract $searchRepository */
         $searchRepository = app(VariationDataInterfaceContract::class);
         $rawResults = $searchRepository->getMultipleResults($vdiContexts);
-        
+
         /*$results = [];
         // execute multisearch
         // $rawResults = $searchRepository->execute();
@@ -137,7 +138,7 @@ class MultiSearchFactory implements MultiSearchFactoryContract
                  */
                 $mappingHelper = pluginApp(VDIToElasticSearchMapper::class);
                 $mappedData = $mappingHelper->map($rawResult, $this->resultFields[$key]);
-                
+
                 $rawResults[$key] = $mappedData;
             }
         }
