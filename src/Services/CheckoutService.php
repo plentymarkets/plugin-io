@@ -450,7 +450,8 @@ class CheckoutService
             {
                 $maxVatValue = $this->basketService->getMaxVatValue();
 
-                if (is_array($list)) {
+                if (is_array($list))
+                {
                     foreach ($list as $key => $shippingProfile)
                     {
                         if (isset($shippingProfile['shippingAmount']))
