@@ -461,7 +461,7 @@ class VariationSearchFactory extends BaseSearchFactory implements VariationSearc
         $variationShowType = $templateConfigService->get($configKey);
         if ($variationShowType === 'combined')
         {
-            $this->groupBy( 'ids.itemAttributeValue' );
+            $this->groupBy( 'filter.itemAttributeValue' );
         }
         else if ( $variationShowType === 'main' )
         {

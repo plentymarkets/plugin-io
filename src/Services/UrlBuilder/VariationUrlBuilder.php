@@ -163,8 +163,7 @@ class VariationUrlBuilder
                 ->withLanguage( $lang )
                 ->withUrls()
                 ->hasItemId( $itemId )
-                ->hasVariationId( $variationId )
-                ->withParts([]);
+                ->hasVariationId( $variationId );
 
             return $itemSearchService->getResults([$searchFactory])[0];
         }

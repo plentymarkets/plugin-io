@@ -206,11 +206,6 @@ class BaseSearchFactory
         }
         return $this;
     }
-    
-    public function withParts()
-    {
-        return $this;
-    }
 
     public function getResultFields()
     {

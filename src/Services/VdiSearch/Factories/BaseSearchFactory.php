@@ -23,7 +23,6 @@ use Plenty\Modules\Item\Search\Aggregations\ItemAttributeValueCardinalityAggrega
 use Plenty\Modules\Pim\SearchService\Query\NameAutoCompleteQuery;
 use Plenty\Modules\Pim\VariationDataInterface\Model\Context\GroupBy;
 use Plenty\Modules\Pim\VariationDataInterface\Model\VariationDataInterfaceContext;
-use Plenty\Plugin\Application;
 use Plenty\Plugin\Log\Loggable;
 
 /**
@@ -61,6 +60,8 @@ class BaseSearchFactory
 
     /** @var CollapseInterface */
     private $collapse = null;
+    
+    private $groupBy = null;
 
     /** @var MultipleSorting */
     private $sorting = null;
@@ -358,14 +359,7 @@ class BaseSearchFactory
      */
     public function groupBy( $field )
     {
-        /** @var BaseCollapse $collapse */
-        $collapse = pluginApp( BaseCollapse::class, [$field] );
-        $this->collapse = $collapse;
-
-        $counterAggregationProcessor = pluginApp( ItemAttributeValueCardinalityAggregationProcessor::class );
-        $counterAggregation = pluginApp( ItemAttributeValueCardinalityAggregation::class, [$counterAggregationProcessor, $field] );
-        $this->withAggregation( $counterAggregation );
-
+        $this->groupBy = new GroupBy($field);
         return $this;
     }
 
@@ -458,9 +452,10 @@ class BaseSearchFactory
             $vdiContext->setParts($vdiContextParts);
         }
 
-        //TODO append if needed
-        $groupBy = new GroupBy('filter.itemAttributeValue');
-        $vdiContext->setGroupBy($groupBy);
+        if($this->groupBy instanceof GroupBy)
+        {
+            $vdiContext->setGroupBy($this->groupBy);
+        }
         
         return $vdiContext;
     }
