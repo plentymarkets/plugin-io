@@ -2,6 +2,8 @@
 
 namespace IO\Services;
 
+use Plenty\Modules\Plugin\PluginSet\Contracts\PluginSetRepositoryContract;
+use Plenty\Modules\Plugin\PluginSet\Models\PluginSet;
 use Plenty\Modules\System\Contracts\WebstoreConfigurationRepositoryContract;
 use Plenty\Modules\System\Models\WebstoreConfiguration;
 use Plenty\Plugin\Application;
@@ -107,5 +109,14 @@ class WebstoreConfigurationService
         }
 
         return $defaultShippingCountryId;
+    }
+
+    /**
+     * @return PluginSet
+     */
+    public function getPluginSet()
+    {
+        $pluginSetId = pluginApp(Application::class)->getPluginSetId();
+        return pluginApp(PluginSetRepositoryContract::class)->get($pluginSetId);
     }
 }
