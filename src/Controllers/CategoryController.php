@@ -171,6 +171,22 @@ class CategoryController extends LayoutController
             $myAccountController = pluginApp(MyAccountController::class);
             return $myAccountController->showMyAccount( $category );
         }
+    
+        if ( RouteConfig::getCategoryId( RouteConfig::CONFIRMATION ) === $category->id || $shopBuilderRequest->getPreviewContentType() === 'confirmation')
+        {
+            $this->getLogger(__CLASS__)->info(
+                "IO::Debug.CategoryController_showConfirmationCategory",
+                [
+                    "category" => $category,
+                    "previewContentType" => $shopBuilderRequest->getPreviewContentType()
+                ]
+            );
+            RouteConfig::overrideCategoryId(RouteConfig::CONFIRMATION, $category->id);
+        
+            /** @var ConfirmationController $confirmationController */
+            $confirmationController = pluginApp(ConfirmationController::class);
+            return $confirmationController->showConfirmation($request->get('orderId', 0), $request->get('accessKey', ''), $category);
+        }
 
         return $this->renderTemplate(
             "tpl.category." . $category->type,

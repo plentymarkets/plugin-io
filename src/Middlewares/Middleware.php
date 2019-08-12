@@ -3,6 +3,7 @@
 namespace IO\Middlewares;
 
 use IO\Api\ResponseCode;
+use IO\Controllers\CategoryController;
 use IO\Extensions\Constants\ShopUrls;
 use IO\Helper\RouteConfig;
 use IO\Services\CountryService;
@@ -146,6 +147,18 @@ class Middleware extends \Plenty\Plugin\Middleware
             if(strlen($orderAccessKey) && (int)$orderId > 0)
             {
                 $confirmationRoute = $shopUrls->confirmation . '/'.$orderId.'/'.$orderAccessKey;
+                AuthGuard::redirect($confirmationRoute);
+            }
+        }
+        else if( in_array(RouteConfig::CONFIRMATION, RouteConfig::getEnabledRoutes())
+            && RouteConfig::getCategoryId(RouteConfig::CONFIRMATION) > 0 )
+        {
+            $orderId = $request->get('id', 0);
+            $orderAccessKey = $request->get('ak', '');
+    
+            if(strlen($orderAccessKey) && (int)$orderId > 0)
+            {
+                $confirmationRoute = $shopUrls->confirmation.'?orderId='.$orderId.'&accessKey='.$orderAccessKey;
                 AuthGuard::redirect($confirmationRoute);
             }
         }

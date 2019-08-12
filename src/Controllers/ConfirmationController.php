@@ -29,7 +29,7 @@ class ConfirmationController extends LayoutController
      * Prepare and render the data for the order confirmation
      * @return string
      */
-    public function showConfirmation(int $orderId = 0, $orderAccesskey = '')
+    public function showConfirmation(int $orderId = 0, $orderAccesskey = '', $category = null)
     {
         $order = null;
     
@@ -136,6 +136,7 @@ class ConfirmationController extends LayoutController
                 return $this->renderTemplate(
                     "tpl.confirmation",
                     [
+                        "category" => $category,
                         "data" => $order,
                         "showAdditionalPaymentInformation" => true
                     ],
