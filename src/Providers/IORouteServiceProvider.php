@@ -116,22 +116,49 @@ class IORouteServiceProvider extends RouteServiceProvider
             && RouteConfig::getCategoryId(RouteConfig::MY_ACCOUNT) > 0
             && !$shopUrls->equals($shopUrls->myAccount,'/my-account') )
         {
-            // checkout-route is activated and category is linked and category url is not '/my-account'
+            // my-account-route is activated and category is linked and category url is not '/my-account'
             $router->get('my-account', function() use ($shopUrls)
             {
                 return pluginApp(CategoryController::class)->redirectToCategory( $shopUrls->myAccount );
             });
         }
-
-		if ( RouteConfig::isActive(RouteConfig::CONFIRMATION) )
+        
+        if ( RouteConfig::isActive(RouteConfig::CONFIRMATION) )
         {
             //Confirmation route
             $router->get('confirmation/{orderId?}/{orderAccessKey?}', 'IO\Controllers\ConfirmationController@showConfirmation');
-
+            
             $router->get('-/akQQ{orderAccessKey}/idQQ{orderId}', 'IO\Controllers\ConfirmationEmailController@showConfirmation');
             $router->get('_py-/akQQ{orderAccessKey}/idQQ{orderId}', 'IO\Controllers\ConfirmationEmailController@showConfirmation');
             $router->get('_py_/akQQ{orderAccessKey}/idQQ{orderId}', 'IO\Controllers\ConfirmationEmailController@showConfirmation');
             $router->get('_plentyShop__/akQQ{orderAccessKey}/idQQ{orderId}', 'IO\Controllers\ConfirmationEmailController@showConfirmation');
+        }
+        else if( in_array(RouteConfig::CONFIRMATION, RouteConfig::getEnabledRoutes())
+            && RouteConfig::getCategoryId(RouteConfig::CONFIRMATION) > 0
+            && !$shopUrls->equals($shopUrls->confirmation,'/confirmation') )
+        {
+            // confirmation-route is activated and category is linked and category url is not '/confirmation'
+            $router->get('confirmation/{orderId?}/{orderAccessKey?}', function($orderId, $accessKey) use ($shopUrls)
+            {
+                return pluginApp(CategoryController::class)->redirectToCategory($shopUrls->confirmation.'?orderId='.$orderId.'&accessKey='.$accessKey);
+            });
+    
+            $router->get('-/akQQ{orderAccessKey}/idQQ{orderId}', function($orderId, $accessKey) use ($shopUrls)
+            {
+                return pluginApp(CategoryController::class)->redirectToCategory($shopUrls->confirmation.'?orderId='.$orderId.'&accessKey='.$accessKey);
+            });
+            $router->get('_py-/akQQ{orderAccessKey}/idQQ{orderId}', function($orderId, $accessKey) use ($shopUrls)
+            {
+                return pluginApp(CategoryController::class)->redirectToCategory($shopUrls->confirmation.'?orderId='.$orderId.'&accessKey='.$accessKey);
+            });
+            $router->get('_py_/akQQ{orderAccessKey}/idQQ{orderId}', function($orderId, $accessKey) use ($shopUrls)
+            {
+                return pluginApp(CategoryController::class)->redirectToCategory($shopUrls->confirmation.'?orderId='.$orderId.'&accessKey='.$accessKey);
+            });
+            $router->get('_plentyShop__/akQQ{orderAccessKey}/idQQ{orderId}', function($orderId, $accessKey) use ($shopUrls)
+            {
+                return pluginApp(CategoryController::class)->redirectToCategory($shopUrls->confirmation.'?orderId='.$orderId.'&accessKey='.$accessKey);
+            });
         }
 
 		if ( RouteConfig::isActive(RouteConfig::LOGIN) )
