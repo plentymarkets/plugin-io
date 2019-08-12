@@ -12,6 +12,7 @@ use IO\Extensions\Sitemap\IOSitemapPattern;
 use IO\Extensions\TwigIOExtension;
 use IO\Extensions\TwigServiceProvider;
 use IO\Extensions\TwigTemplateContextExtension;
+use IO\Jobs\CleanupUserDataHashes;
 use IO\Middlewares\Middleware;
 use IO\Services\AuthenticationService;
 use IO\Services\AvailabilityService;
@@ -20,17 +21,12 @@ use IO\Services\CategoryService;
 use IO\Services\CheckoutService;
 use IO\Services\ContactBankService;
 use IO\Services\ContactMailService;
-use IO\Services\ContentCaching\ContentCachingProvider;
 use IO\Services\CountryService;
 use IO\Services\CouponService;
-use IO\Services\CustomerPasswordResetService;
 use IO\Services\CustomerService;
 use IO\Services\ItemCrossSellingService;
 use IO\Services\ItemLastSeenService;
-use IO\Services\ItemLoader\Contracts\ItemLoaderFactory;
-use IO\Services\ItemLoader\Extensions\TwigLoaderPresets;
-use IO\Services\ItemLoader\Factories\ItemLoaderFactoryES;
-use IO\Services\ItemLoader\Services\FacetExtensionContainer;
+use IO\Services\ItemSearch\Helper\FacetExtensionContainer;
 use IO\Services\ItemService;
 use IO\Services\ItemWishListService;
 use IO\Services\LegalInformationService;
@@ -52,12 +48,14 @@ use Plenty\Modules\Authentication\Events\AfterAccountAuthentication;
 use Plenty\Modules\Authentication\Events\AfterAccountContactLogout;
 use IO\Events\Basket\BeforeBasketItemToOrderItem;
 use Plenty\Modules\Basket\Events\Basket\AfterBasketChanged;
+use Plenty\Modules\Cron\Services\CronContainer;
 use Plenty\Modules\Frontend\Events\FrontendCurrencyChanged;
+use Plenty\Modules\Frontend\Events\FrontendLanguageChanged;
 use Plenty\Modules\Frontend\Events\FrontendShippingProfileChanged;
 use Plenty\Modules\Frontend\Events\FrontendUpdateDeliveryAddress;
 use Plenty\Modules\Frontend\Session\Storage\Contracts\FrontendSessionStorageFactoryContract;
 use Plenty\Modules\Item\Stock\Hooks\CheckItemStock;
-use Plenty\Modules\Order\Events\OrderCreated;
+use Plenty\Modules\Payment\Events\Checkout\ExecutePayment;
 use Plenty\Modules\Plugin\Events\AfterBuildPlugins;
 use Plenty\Modules\Plugin\Events\LoadSitemapPattern;
 use Plenty\Modules\Plugin\Events\PluginSendMail;
@@ -76,7 +74,6 @@ class IOServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->getApplication()->register(ContentCachingProvider::class);
         $this->addGlobalMiddleware(Middleware::class);
         $this->getApplication()->register(IORouteServiceProvider::class);
 
@@ -97,7 +94,6 @@ class IOServiceProvider extends ServiceProvider
             ContactMailService::class,
             CountryService::class,
             CouponService::class,
-            CustomerPasswordResetService::class,
             CustomerService::class,
             ItemCrossSellingService::class,
             ItemLastSeenService::class,
@@ -119,9 +115,7 @@ class IOServiceProvider extends ServiceProvider
             WebstoreConfigurationService::class,
             LiveShoppingService::class
         ]);
-        
-        //TODO check ES ready state
-        $this->getApplication()->bind(ItemLoaderFactory::class, ItemLoaderFactoryES::class);
+
         $this->getApplication()->singleton(FacetExtensionContainer::class);
     }
 
@@ -129,14 +123,13 @@ class IOServiceProvider extends ServiceProvider
      * boot twig extensions and services
      * @param Twig $twig
      */
-    public function boot(Twig $twig, Dispatcher $dispatcher)
+    public function boot(Twig $twig, Dispatcher $dispatcher, CronContainer $cronContainer)
     {
         $twig->addExtension(TwigServiceProvider::class);
         $twig->addExtension(TwigIOExtension::class);
         $twig->addExtension(TwigTemplateContextExtension::class);
         $twig->addExtension('Twig_Extensions_Extension_Intl');
-        $twig->addExtension(TwigLoaderPresets::class);
-        
+
         $dispatcher->listen(AfterAccountAuthentication::class, function($event)
         {
             /** @var CustomerService $customerService */
@@ -155,12 +148,12 @@ class IOServiceProvider extends ServiceProvider
     
         $dispatcher->listen(AfterBasketChanged::class, function($event)
         {
-            /** @var SessionStorageService $sessionStorageService */
-            $sessionStorageService = pluginApp(SessionStorageService::class);
-            $sessionStorageService->setSessionValue(SessionStorageKeys::READONLY_CHECKOUT, false);
+            /** @var CheckoutService $checkoutService */
+            $checkoutService = pluginApp(CheckoutService::class);
+            $checkoutService->setReadOnlyCheckout(false);
         });
     
-        $dispatcher->listen(OrderCreated::class, function($event)
+        $dispatcher->listen(ExecutePayment::class, function($event)
         {
             /** @var CustomerService $customerService */
             $customerService = pluginApp(CustomerService::class);
@@ -183,9 +176,18 @@ class IOServiceProvider extends ServiceProvider
             $sessionStorage = pluginApp( FrontendSessionStorageFactoryContract::class );
             $sessionStorage->getPlugin()->setValue(SessionStorageKeys::CURRENCY, $event->getCurrency());
         });
+        
+        $dispatcher->listen(FrontendLanguageChanged::class, function($event) {
+            /** @var BasketService $basketService */
+            $basketService = pluginApp(BasketService::class);
+            $basketService->checkBasketItemsLang();
+            Middleware::$DETECTED_LANGUAGE = $event->getLanguage();
+        });
 
         $dispatcher->listen(FrontendShippingProfileChanged::class, IOFrontendShippingProfileChanged::class);
         $dispatcher->listen(FrontendUpdateDeliveryAddress::class, IOFrontendUpdateDeliveryAddress::class);
+
+        $cronContainer->add(CronContainer::DAILY, CleanupUserDataHashes::class );
     }
 
     private function registerSingletons( $classes )

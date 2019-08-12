@@ -53,6 +53,7 @@ class IORouteServiceProvider extends RouteServiceProvider
 			$api->resource('io/customer/logout', 'CustomerLogoutResource');
 			$api->resource('io/customer/password', 'CustomerPasswordResource');
             $api->resource('io/customer/password_reset', 'CustomerPasswordResetResource');
+            $api->resource('io/customer/mail', 'CustomerMailResource');
             $api->resource('io/customer/contact/mail', 'ContactMailResource');
             $api->resource('io/customer/bank_data', 'ContactBankResource');
             $api->get('io/customer/order/list', 'CustomerOrderResource@index');
@@ -70,11 +71,15 @@ class IORouteServiceProvider extends RouteServiceProvider
             $api->resource('io/template', 'TemplateResource');
             $api->resource('io/localization/language', 'LanguageResource');
             $api->resource('io/itemWishList', 'ItemWishListResource');
-            $api->resource('io/cache/reset_template_cache', 'ResetTemplateCacheResource');
             $api->resource('io/shipping/country', 'ShippingCountryResource');
             $api->resource('io/live-shopping', 'LiveShoppingResource');
             $api->resource('io/facet', 'FacetResource');
+            $api->resource('io/categorytree', 'CategoryTreeResource');
+
 		});
+
+        /** @var ShopUrls $shopUrls */
+        $shopUrls = pluginApp(ShopUrls::class);
 
 		/*
 		 * STATIC ROUTES
@@ -88,8 +93,18 @@ class IORouteServiceProvider extends RouteServiceProvider
 
         if ( RouteConfig::isActive(RouteConfig::CHECKOUT) )
         {
-            //Checkout-confirm purchase route
+            // checkout-route is active and no category is linked
             $router->get('checkout', 'IO\Controllers\CheckoutController@showCheckout');
+        }
+        else if( in_array(RouteConfig::CHECKOUT, RouteConfig::getEnabledRoutes())
+            && RouteConfig::getCategoryId(RouteConfig::CHECKOUT) > 0
+            && !$shopUrls->equals($shopUrls->checkout,'/checkout') )
+        {
+            // checkout-route is activated and category is linked and category url is not '/checkout'
+            $router->get('checkout', function() use ($shopUrls)
+            {
+                return pluginApp(CategoryController::class)->redirectToCategory( $shopUrls->checkout );
+            });
         }
 
         if ( RouteConfig::isActive(RouteConfig::MY_ACCOUNT) )
@@ -97,10 +112,20 @@ class IORouteServiceProvider extends RouteServiceProvider
             //My-account route
             $router->get('my-account', 'IO\Controllers\MyAccountController@showMyAccount');
         }
+        else if( in_array(RouteConfig::MY_ACCOUNT, RouteConfig::getEnabledRoutes())
+            && RouteConfig::getCategoryId(RouteConfig::MY_ACCOUNT) > 0
+            && !$shopUrls->equals($shopUrls->myAccount,'/my-account') )
+        {
+            // checkout-route is activated and category is linked and category url is not '/my-account'
+            $router->get('my-account', function() use ($shopUrls)
+            {
+                return pluginApp(CategoryController::class)->redirectToCategory( $shopUrls->myAccount );
+            });
+        }
 
 		if ( RouteConfig::isActive(RouteConfig::CONFIRMATION) )
         {
-            //Confiramtion route
+            //Confirmation route
             $router->get('confirmation/{orderId?}/{orderAccessKey?}', 'IO\Controllers\ConfirmationController@showConfirmation');
 
             $router->get('-/akQQ{orderAccessKey}/idQQ{orderId}', 'IO\Controllers\ConfirmationEmailController@showConfirmation');
@@ -145,17 +170,42 @@ class IORouteServiceProvider extends RouteServiceProvider
             //homepage route
             $router->get('', 'IO\Controllers\HomepageController@showHomepage');
         }
+        else if( in_array(RouteConfig::HOME, RouteConfig::getEnabledRoutes())
+            && RouteConfig::getCategoryId(RouteConfig::HOME) > 0)
+        {
+            $router->get('', 'IO\Controllers\HomepageController@showHomepageCategory');
+        }
 
         if ( RouteConfig::isActive(RouteConfig::CANCELLATION_RIGHTS) )
         {
             //cancellation rights page
             $router->get('cancellation-rights', 'IO\Controllers\StaticPagesController@showCancellationRights');
         }
+        else if( in_array(RouteConfig::CANCELLATION_RIGHTS, RouteConfig::getEnabledRoutes())
+            && RouteConfig::getCategoryId(RouteConfig::CANCELLATION_RIGHTS) > 0
+            && !$shopUrls->equals($shopUrls->cancellationRights,'/cancellations-rights') )
+        {
+            // cancellation-rights-route is activated and category is linked and category url is not '/cancellation-rights'
+            $router->get('cancellation-rights', function() use ($shopUrls)
+            {
+                return pluginApp(CategoryController::class)->redirectToCategory( $shopUrls->cancellationRights );
+            });
+        }
 
         if ( RouteConfig::isActive(RouteConfig::CANCELLATION_FORM) )
         {
-            //cancellation rights page
+            //cancellation form page
             $router->get('cancellation-form', 'IO\Controllers\StaticPagesController@showCancellationForm');
+        }
+        else if( in_array(RouteConfig::CANCELLATION_FORM, RouteConfig::getEnabledRoutes())
+            && RouteConfig::getCategoryId(RouteConfig::CANCELLATION_FORM) > 0
+            && !$shopUrls->equals($shopUrls->cancellationForm,'/cancellation-form') )
+        {
+            // cancellation-form-route is activated and category is linked and category url is not '/cancellation-form'
+            $router->get('cancellation-form', function() use ($shopUrls)
+            {
+                return pluginApp(CategoryController::class)->redirectToCategory( $shopUrls->cancellationForm );
+            });
         }
 
         if ( RouteConfig::isActive(RouteConfig::LEGAL_DISCLOSURE) )
@@ -163,17 +213,47 @@ class IORouteServiceProvider extends RouteServiceProvider
             //legal disclosure page
             $router->get('legal-disclosure', 'IO\Controllers\StaticPagesController@showLegalDisclosure');
         }
+        else if( in_array(RouteConfig::LEGAL_DISCLOSURE, RouteConfig::getEnabledRoutes())
+            && RouteConfig::getCategoryId(RouteConfig::LEGAL_DISCLOSURE) > 0
+            && !$shopUrls->equals($shopUrls->legalDisclosure, '/legal-disclosure') )
+        {
+            // legal-disclosure-route is activated and category is linked and category url is not '/legal-disclosure'
+            $router->get('legal-disclosure', function() use ($shopUrls)
+            {
+                return pluginApp(CategoryController::class)->redirectToCategory( $shopUrls->legalDisclosure );
+            });
+        }
 
         if ( RouteConfig::isActive(RouteConfig::PRIVACY_POLICY))
         {
             //privacy policy page
             $router->get('privacy-policy', 'IO\Controllers\StaticPagesController@showPrivacyPolicy');
         }
+        else if( in_array(RouteConfig::PRIVACY_POLICY, RouteConfig::getEnabledRoutes())
+            && RouteConfig::getCategoryId(RouteConfig::PRIVACY_POLICY) > 0
+            && !$shopUrls->equals($shopUrls->privacyPolicy, '/privacy-policy') )
+        {
+            // privacy-policy-route is activated and category is linked and category url is not '/privacy-policy'
+            $router->get('privacy-policy', function() use ($shopUrls)
+            {
+                return pluginApp(CategoryController::class)->redirectToCategory( $shopUrls->privacyPolicy );
+            });
+        }
 
         if ( RouteConfig::isActive(RouteConfig::TERMS_CONDITIONS) )
         {
             //terms and conditions page
             $router->get('gtc', 'IO\Controllers\StaticPagesController@showTermsAndConditions');
+        }
+        else if( in_array(RouteConfig::TERMS_CONDITIONS, RouteConfig::getEnabledRoutes())
+            && RouteConfig::getCategoryId(RouteConfig::TERMS_CONDITIONS) > 0
+            && !$shopUrls->equals($shopUrls->termsConditions, '/gtc') )
+        {
+            // gtc-route is activated and category is linked and category url is not '/gtc'
+            $router->get('gtc', function() use ($shopUrls)
+            {
+                return pluginApp(CategoryController::class)->redirectToCategory( $shopUrls->termsConditions );
+            });
         }
 
 
@@ -197,10 +277,25 @@ class IORouteServiceProvider extends RouteServiceProvider
             //contact
             $router->get('contact', 'IO\Controllers\ContactController@showContact');
         }
+        else if( in_array(RouteConfig::CONTACT, RouteConfig::getEnabledRoutes())
+            && RouteConfig::getCategoryId(RouteConfig::CONTACT) > 0
+            && !$shopUrls->equals($shopUrls->contact, '/contact') )
+        {
+            // contact-route is activated and category is linked and category url is not '/contact'
+            $router->get('contact', function() use ($shopUrls)
+            {
+                return pluginApp(CategoryController::class)->redirectToCategory( $shopUrls->contact );
+            });
+        }
 
         if( RouteConfig::isActive(RouteConfig::PASSWORD_RESET) )
         {
             $router->get('password-reset/{contactId}/{hash}', 'IO\Controllers\CustomerPasswordResetController@showReset');
+        }
+
+        if( RouteConfig::isActive(RouteConfig::CHANGE_MAIL) )
+        {
+            $router->get('change-mail/{contactId}/{hash}', 'IO\Controllers\CustomerChangeMailController@show');
         }
 
         if( RouteConfig::isActive(RouteConfig::ORDER_PROPERTY_FILE) )
@@ -241,7 +336,7 @@ class IORouteServiceProvider extends RouteServiceProvider
                 ->where('variationId', '[0-9]+');
 
             //old webshop routes mapping
-            $router->get('{slug}a-{itemId}', 'IO\Controllers\ItemController@showItemOld')
+            $router->get('{slug}/a-{itemId}', 'IO\Controllers\ItemController@showItemOld')
                 ->where('slug', '.*')
                 ->where('itemId', '[0-9]+');
 
@@ -258,36 +353,79 @@ class IORouteServiceProvider extends RouteServiceProvider
         }
         else
         {
-            /** @var ShopUrls $shopUrls */
-            $shopUrls = pluginApp(ShopUrls::class);
-            $staticCategories = [
-                [RouteConfig::CHECKOUT, $shopUrls->checkout, "checkout"],
-                [RouteConfig::MY_ACCOUNT, $shopUrls->myAccount, "my-account"]
-            ];
-
-            foreach($staticCategories as $staticCategory)
+            if ( RouteConfig::getCategoryId(RouteConfig::HOME) > 0 )
             {
-                list($catKey, $catUrl, $legacyUrl) = $staticCategory;
-
-                if ( RouteConfig::getCategoryId($catKey) > 0 )
-                {
-                    $router->get($catUrl, function() use ($catKey, $catUrl)
-                    {
-                        return pluginApp(CategoryController::class)->showCategoryById(
-                            RouteConfig::getCategoryId($catKey)
-                        );
-                    });
-
-
-                    if ( !is_null($legacyUrl) && $catUrl !== "/" . $legacyUrl )
-                    {
-                        $router->get($legacyUrl, function() use ($catKey, $catUrl)
-                        {
-                            return pluginApp(CategoryController::class)->redirectToCategory( $catUrl );
-                        });
-                    }
-                }
+                $router->get('', 'IO\Controllers\HomepageController@showHomepageCategory');
             }
+            
+            if ( RouteConfig::getCategoryId(RouteConfig::CHECKOUT) > 0 )
+            {
+                $router->get($shopUrls->checkout, function() use ($shopUrls)
+                {
+                    return pluginApp(CategoryController::class)->showCategoryById( RouteConfig::getCategoryId(RouteConfig::CHECKOUT) );
+                });
+            }
+
+            if ( RouteConfig::getCategoryId(RouteConfig::MY_ACCOUNT) > 0 )
+            {
+                $router->get($shopUrls->myAccount, function() use ($shopUrls)
+                {
+                    return pluginApp(CategoryController::class)->showCategoryById( RouteConfig::getCategoryId(RouteConfig::MY_ACCOUNT) );
+                });
+            }
+    
+            if ( RouteConfig::getCategoryId(RouteConfig::CANCELLATION_RIGHTS) > 0 )
+            {
+                $router->get($shopUrls->cancellationRights, function() use ($shopUrls)
+                {
+                    return pluginApp(CategoryController::class)->showCategoryById( RouteConfig::getCategoryId(RouteConfig::CANCELLATION_RIGHTS) );
+                });
+            }
+    
+            if ( RouteConfig::getCategoryId(RouteConfig::CANCELLATION_FORM) > 0 )
+            {
+                $router->get($shopUrls->cancellationForm, function() use ($shopUrls)
+                {
+                    return pluginApp(CategoryController::class)->showCategoryById( RouteConfig::getCategoryId(RouteConfig::CANCELLATION_FORM) );
+                });
+            }
+    
+            if ( RouteConfig::getCategoryId(RouteConfig::LEGAL_DISCLOSURE) > 0 )
+            {
+                $router->get($shopUrls->legalDisclosure, function() use ($shopUrls)
+                {
+                    return pluginApp(CategoryController::class)->showCategoryById( RouteConfig::getCategoryId(RouteConfig::LEGAL_DISCLOSURE) );
+                });
+            }
+    
+            if ( RouteConfig::getCategoryId(RouteConfig::PRIVACY_POLICY) > 0 )
+            {
+                $router->get($shopUrls->privacyPolicy, function() use ($shopUrls)
+                {
+                    return pluginApp(CategoryController::class)->showCategoryById( RouteConfig::getCategoryId(RouteConfig::PRIVACY_POLICY) );
+                });
+            }
+    
+            if ( RouteConfig::getCategoryId(RouteConfig::TERMS_CONDITIONS) > 0 )
+            {
+                $router->get($shopUrls->termsConditions, function() use ($shopUrls)
+                {
+                    return pluginApp(CategoryController::class)->showCategoryById( RouteConfig::getCategoryId(RouteConfig::TERMS_CONDITIONS) );
+                });
+            }
+    
+            if ( RouteConfig::getCategoryId(RouteConfig::CONTACT) > 0 )
+            {
+                $router->get($shopUrls->contact, function() use ($shopUrls)
+                {
+                    return pluginApp(CategoryController::class)->showCategoryById( RouteConfig::getCategoryId(RouteConfig::CONTACT) );
+                });
+            }
+        }
+
+        if ( RouteConfig::isActive(RouteConfig::PAGE_NOT_FOUND) )
+        {
+            $router->get('{anything?}', 'IO\Controllers\StaticPagesController@showPageNotFound');
         }
 	}
 }

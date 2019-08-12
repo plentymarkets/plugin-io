@@ -25,7 +25,7 @@ class SingleItem implements SearchPreset
         $searchFactory = pluginApp( VariationSearchFactory::class );
         
         $searchFactory->withResultFields(
-            ResultFieldTemplate::get( ResultFieldTemplate::TEMPLATE_SINGLE_ITEM )
+            ResultFieldTemplate::load( ResultFieldTemplate::TEMPLATE_SINGLE_ITEM )
         );
 
         $searchFactory
@@ -33,10 +33,12 @@ class SingleItem implements SearchPreset
             ->withImages()
             ->withPropertyGroups()
             ->withOrderPropertySelectionValues()
+            ->withVariationProperties()
             ->withUrls()
             ->withPrices()
             ->withDefaultImage()
             ->withBundleComponents()
+            ->withAvailability()
             ->isVisibleForClient()
             ->isActive()
             ->hasNameInLanguage()

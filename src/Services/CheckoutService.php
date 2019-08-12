@@ -4,11 +4,13 @@ namespace IO\Services;
 
 use IO\Builder\Order\AddressType;
 use IO\Constants\SessionStorageKeys;
+use IO\Events\Checkout\CheckoutReadonlyChanged;
 use IO\Helper\LanguageMap;
 use IO\Helper\MemoryCache;
 use Plenty\Modules\Accounting\Contracts\AccountingLocationRepositoryContract;
 use Plenty\Modules\Basket\Contracts\BasketRepositoryContract;
 use Plenty\Modules\Basket\Events\Basket\AfterBasketChanged;
+use Plenty\Modules\Basket\Models\Basket;
 use Plenty\Modules\Frontend\Contracts\Checkout;
 use Plenty\Modules\Frontend\Contracts\CurrencyExchangeRepositoryContract;
 use Plenty\Modules\Frontend\Events\ValidateCheckoutEvent;
@@ -19,9 +21,9 @@ use Plenty\Modules\Order\Currency\Contracts\CurrencyRepositoryContract;
 use Plenty\Modules\Order\Shipping\Contracts\ParcelServicePresetRepositoryContract;
 use Plenty\Modules\Payment\Events\Checkout\GetPaymentMethodContent;
 use Plenty\Modules\Payment\Method\Contracts\PaymentMethodRepositoryContract;
-use Plenty\Plugin\Application;
 use Plenty\Plugin\ConfigRepository;
 use Plenty\Plugin\Events\Dispatcher;
+use Plenty\Plugin\Log\Loggable;
 use Plenty\Plugin\Translation\Translator;
 
 /**
@@ -31,6 +33,7 @@ use Plenty\Plugin\Translation\Translator;
 class CheckoutService
 {
     use MemoryCache;
+    use Loggable;
 
     /**
      * @var FrontendPaymentMethodRepositoryContract
@@ -68,9 +71,16 @@ class CheckoutService
      * @var BasketService
      */
     private $basketService;
-    
-    /** @var SessionStorageService */
+
+    /**
+     * @var SessionStorageService
+     */
     private $sessionStorageService;
+
+    /**
+     * @var WebstoreConfigurationService
+     */
+    private $webstoreConfigurationService;
 
     /**
      * CheckoutService constructor.
@@ -83,6 +93,7 @@ class CheckoutService
      * @param CurrencyExchangeRepositoryContract $currencyExchangeRepo
      * @param BasketService $basketService
      * @param SessionStorageService $sessionStorageService
+     * @param WebstoreConfigurationService $webstoreConfigurationService
      */
     public function __construct(
         FrontendPaymentMethodRepositoryContract $frontendPaymentMethodRepository,
@@ -93,7 +104,8 @@ class CheckoutService
         ParcelServicePresetRepositoryContract $parcelServicePresetRepo,
         CurrencyExchangeRepositoryContract $currencyExchangeRepo,
         BasketService $basketService,
-        SessionStorageService $sessionStorageService)
+        SessionStorageService $sessionStorageService,
+        WebstoreConfigurationService $webstoreConfigurationService)
     {
         $this->frontendPaymentMethodRepository = $frontendPaymentMethodRepository;
         $this->checkout                        = $checkout;
@@ -104,6 +116,7 @@ class CheckoutService
         $this->currencyExchangeRepo            = $currencyExchangeRepo;
         $this->basketService                   = $basketService;
         $this->sessionStorageService           = $sessionStorageService;
+        $this->webstoreConfigurationService    = $webstoreConfigurationService;
     }
 
     /**
@@ -123,9 +136,10 @@ class CheckoutService
                 "shippingCountryId"   => $this->getShippingCountryId(),
                 "shippingProfileId"   => $this->getShippingProfileId(),
                 "shippingProfileList" => $this->getShippingProfileList(),
-                "deliveryAddressId"   => $this->getDeliveryAddressId(),
-                "billingAddressId"    => $this->getBillingAddressId(),
-                "paymentDataList"     => $this->getCheckoutPaymentDataList(),
+                "deliveryAddressId" => $this->getDeliveryAddressId(),
+                "billingAddressId" => $this->getBillingAddressId(),
+                "paymentDataList" => $this->getCheckoutPaymentDataList(),
+                "maxDeliveryDays" => $this->getMaxDeliveryDays(),
                 "readOnly"            => $this->getReadOnlyCheckout()
             ];
         }
@@ -251,11 +265,19 @@ class CheckoutService
             );
         }
 
+        // Check if pattern has ISO Code in front
+        $pattern = $formatter->getPattern();
+        if(mb_substr($pattern, 0, 1, "UTF-8") === "\u{00A4}")
+        {
+            // Insert a space after the beginning character
+            $pattern = mb_substr($pattern, 0, 1) . " " . mb_substr($pattern, 1);
+        }
+
         return [
             "separator_decimal"   => $formatter->getSymbol(\NumberFormatter::MONETARY_SEPARATOR_SYMBOL),
             "separator_thousands" => $formatter->getSymbol(\NumberFormatter::MONETARY_GROUPING_SEPARATOR_SYMBOL),
             "number_decimals"     => $formatter->getAttribute(\NumberFormatter::FRACTION_DIGITS),
-            "pattern"             => $formatter->getPattern()
+            "pattern"             => $pattern
         ];
     }
 
@@ -319,19 +341,48 @@ class CheckoutService
             $translator = pluginApp(Translator::class);
             if ($translator instanceof Translator) {
                 $errors = [];
+                $webstoreConfiguration = $this->webstoreConfigurationService->getWebstoreConfig();
                 foreach ($validateCheckoutEvent->getErrorKeysList() as $errorKey) {
-                    $errors[] = $translator->trans($errorKey);
+                    switch($errorKey) {
+                        case 'frontend/checkout/validation.minimum_order_value':
+                            $params = [
+                                'minimumOrderValue' => $webstoreConfiguration->minimumOrderValue,
+                                'currency' => $webstoreConfiguration->defaultCurrency,
+                            ];
+                            $errors[] = $translator->trans('Ceres::Template.errorMinimumOrderValueNotReached', $params);
+                            break;
+                        default:
+                            $errors[] = $translator->trans($errorKey);
+                    }
                 }
 
-                return array(
+                $result = array(
                     "type" => GetPaymentMethodContent::RETURN_TYPE_ERROR,
                     "value" => implode('<br>', $errors)
                 );
+
+                $this->getLogger(__CLASS__)->error(
+                    "IO::Debug.CheckoutService_preparePaymentFailed",
+                    $result
+                );
+
+                return $result;
             }
         }
 
         $mopId = $this->getMethodOfPaymentId();
-        return pluginApp(PaymentMethodRepositoryContract::class)->preparePaymentMethod($mopId);
+        $result = pluginApp(PaymentMethodRepositoryContract::class)->preparePaymentMethod($mopId);
+        $this->getLogger(__CLASS__)->debug(
+            "IO::Debug.CheckoutService_paymentPrepared",
+            [
+                "type" => $result["type"],
+                "value" => $result["value"],
+                "paymentId" => $mopId,
+                "basket" => pluginApp(BasketService::class)->getBasket()
+            ]
+        );
+
+        return $result;
     }
 
     /**
@@ -382,43 +433,53 @@ class CheckoutService
      */
     public function getShippingProfileList()
     {
-        /** @var AccountingLocationRepositoryContract $accountRepo*/
-        $accountRepo = pluginApp(AccountingLocationRepositoryContract::class);
-        /** @var VatService $vatService*/
-        $vatService = pluginApp(VatService::class);
-        $showNetPrice   = $this->sessionStorageService->getCustomer()->showNetPrice;
-
-        $list = $this->parcelServicePresetRepo->getLastWeightedPresetCombinations($this->basketRepository->load(), $this->sessionStorageService->getCustomer()->accountContactClassId);
-
-        $locationId = $vatService->getLocationId($this->getShippingCountryId());
-        $accountSettings = $accountRepo->getSettings($locationId);
-
-        if ($showNetPrice && !(bool)$accountSettings->showShippingVat) {
-
-            $maxVatValue   = $this->basketService->getMaxVatValue();
-
-            if (is_array($list)) {
-                foreach ($list as $key => $shippingProfile) {
-                    if (isset($shippingProfile['shippingAmount'])) {
-                        $list[$key]['shippingAmount'] = (100.0 * $shippingProfile['shippingAmount']) / (100.0 + $maxVatValue);
-                    }
-                }
-            }
-        }
-
-        $basket = $this->basketService->getBasket();
-        if($basket->currency !== $this->currencyExchangeRepo->getDefaultCurrency())
+        return $this->fromMemoryCache('shippingProfileList.' . $this->getShippingCountryId(), function()
         {
-            if (is_array($list)) {
-                foreach ($list as $key => $shippingProfile) {
-                    if (isset($shippingProfile['shippingAmount'])) {
-                        $list[$key]['shippingAmount'] = $this->currencyExchangeRepo->convertFromDefaultCurrency($basket->currency, $list[$key]['shippingAmount']);
+            /** @var AccountingLocationRepositoryContract $accountRepo*/
+            $accountRepo = pluginApp(AccountingLocationRepositoryContract::class);
+            /** @var VatService $vatService*/
+            $vatService = pluginApp(VatService::class);
+            $showNetPrice   = $this->sessionStorageService->getCustomer()->showNetPrice;
+
+            $list = $this->parcelServicePresetRepo->getLastWeightedPresetCombinations($this->basketRepository->load(), $this->sessionStorageService->getCustomer()->accountContactClassId);
+
+            $locationId = $vatService->getLocationId($this->getShippingCountryId());
+            $accountSettings = $accountRepo->getSettings($locationId);
+
+            if ($showNetPrice && !(bool)$accountSettings->showShippingVat)
+            {
+                $maxVatValue = $this->basketService->getMaxVatValue();
+
+                if (is_array($list))
+                {
+                    foreach ($list as $key => $shippingProfile)
+                    {
+                        if (isset($shippingProfile['shippingAmount']))
+                        {
+                            $list[$key]['shippingAmount'] = (100.0 * $shippingProfile['shippingAmount']) / (100.0 + $maxVatValue);
+                        }
                     }
                 }
             }
-        }
 
-        return $list;
+            $basket = $this->basketService->getBasket();
+            if ($basket->currency !== $this->currencyExchangeRepo->getDefaultCurrency())
+            {
+                if (is_array($list))
+                {
+                    foreach ($list as $key => $shippingProfile)
+                    {
+                        if (isset($shippingProfile['shippingAmount']))
+                        {
+                            $list[$key]['shippingAmount'] = $this->currencyExchangeRepo->convertFromDefaultCurrency($basket->currency, $list[$key]['shippingAmount']);
+                        }
+                    }
+                }
+            }
+
+
+            return $list;
+        });
     }
 
     /**
@@ -523,8 +584,27 @@ class CheckoutService
 
         $this->setShippingCountryId($defaultShippingCountryId);
     }
-    
-    private function getReadOnlyCheckout()
+
+    public function getMaxDeliveryDays()
+    {
+        /** @var ShippingService $shippingService */
+        $shippingService = pluginApp(ShippingService::class);
+        return $shippingService->getMaxDeliveryDays();
+    }
+
+    public function setReadOnlyCheckout($readonly)
+    {
+        if ( $this->getReadOnlyCheckout() !== $readonly )
+        {
+            /** @var Dispatcher $dispatcher */
+            $dispatcher = pluginApp(Dispatcher::class);
+            $dispatcher->fire(pluginApp(CheckoutReadonlyChanged::class, ['isReadonly' => $readonly]));
+            $this->sessionStorageService->setSessionValue(SessionStorageKeys::READONLY_CHECKOUT, $readonly);
+        }
+
+    }
+
+    public function getReadOnlyCheckout()
     {
         $readOnlyCheckout = $this->sessionStorageService->getSessionValue(SessionStorageKeys::READONLY_CHECKOUT);
         return ( !is_null($readOnlyCheckout) ? $readOnlyCheckout : false );

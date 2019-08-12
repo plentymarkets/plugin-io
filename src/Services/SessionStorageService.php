@@ -2,8 +2,10 @@
 
 namespace IO\Services;
 
+use Plenty\Modules\Frontend\Events\FrontendLanguageChanged;
 use Plenty\Modules\Frontend\Session\Storage\Contracts\FrontendSessionStorageFactoryContract;
 use Plenty\Modules\Frontend\Session\Storage\Models\Customer;
+use Plenty\Plugin\Events\Dispatcher;
 
 /**
  * Class SessionStorageService
@@ -11,6 +13,8 @@ use Plenty\Modules\Frontend\Session\Storage\Models\Customer;
  */
 class SessionStorageService
 {
+    private $language;
+
 	/**
 	 * @var FrontendSessionStorageFactoryContract
 	 */
@@ -20,9 +24,13 @@ class SessionStorageService
      * SessionStorageService constructor.
      * @param FrontendSessionStorageFactoryContract $sessionStorage
      */
-	public function __construct(FrontendSessionStorageFactoryContract $sessionStorage)
+	public function __construct(FrontendSessionStorageFactoryContract $sessionStorage, Dispatcher $eventDispatcher)
 	{
 		$this->sessionStorage = $sessionStorage;
+		$eventDispatcher->listen(FrontendLanguageChanged::class, function(FrontendLanguageChanged $event)
+        {
+            $this->language = $event->getLanguage();
+        });
 	}
 
     /**
@@ -47,18 +55,21 @@ class SessionStorageService
 
     /**
      * Get the language from session
-     * @return string|null
+     * @return string
      */
 	public function getLang()
 	{
-        $lang = $this->sessionStorage->getLocaleSettings()->language;
-
-        if(is_null($lang) || !strlen($lang))
+	    if ( is_null($this->language) )
         {
-            $lang = 'de';
+            $this->language = $this->sessionStorage->getLocaleSettings()->language;
+
+            if(is_null($this->language) || !strlen($this->language))
+            {
+                $this->language = pluginApp(WebstoreConfigurationService::class)->getDefaultLanguage();
+            }
         }
 
-		return $lang;
+		return $this->language;
 	}
 
     /**

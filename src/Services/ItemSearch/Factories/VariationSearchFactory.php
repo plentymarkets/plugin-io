@@ -4,8 +4,8 @@ namespace IO\Services\ItemSearch\Factories;
 
 use IO\Helper\CurrencyConverter;
 use IO\Helper\VatConverter;
-use IO\Services\ItemLoader\Contracts\FacetExtension;
-use IO\Services\ItemLoader\Services\FacetExtensionContainer;
+use IO\Services\ItemSearch\Contracts\FacetExtension;
+use IO\Services\ItemSearch\Extensions\AvailabilityExtension;
 use IO\Services\ItemSearch\Extensions\GroupedAttributeValuesExtension;
 use IO\Services\ItemSearch\Extensions\BundleComponentExtension;
 use IO\Services\ItemSearch\Extensions\ContentCacheVariationLinkExtension;
@@ -14,6 +14,9 @@ use IO\Services\ItemSearch\Extensions\ItemDefaultImage;
 use IO\Services\ItemSearch\Extensions\ItemUrlExtension;
 use IO\Services\ItemSearch\Extensions\PriceSearchExtension;
 use IO\Services\ItemSearch\Extensions\ReduceDataExtension;
+use IO\Services\ItemSearch\Extensions\VariationAttributeMapExtension;
+use IO\Services\ItemSearch\Extensions\VariationPropertyExtension;
+use IO\Services\ItemSearch\Helper\FacetExtensionContainer;
 use IO\Services\ItemSearch\Mutators\OrderPropertySelectionValueMutator;
 use IO\Services\PriceDetectService;
 use IO\Services\SessionStorageService;
@@ -263,6 +266,20 @@ class VariationSearchFactory extends BaseSearchFactory
             $variationFilter->isHiddenInCategoryList( $isHidden );
         }
         
+        return $this;
+    }
+    
+    /**
+     * Filter variations by isSalable flag
+     *
+     * @return $this
+     */
+    public function isSalable()
+    {
+        /** @var VariationBaseFilter $variationFilter */
+        $variationFilter = $this->createFilter( VariationBaseFilter::class );
+        $variationFilter->isSalable();
+    
         return $this;
     }
 
@@ -665,6 +682,18 @@ class VariationSearchFactory extends BaseSearchFactory
         return $this;
     }
     
+    /**
+     * Includes VariatonAttributeMap for variation select
+     *
+     * @return $this
+     */
+    public function withAttributes()
+    {
+        $this->withExtension( VariationAttributeMapExtension::class );
+        
+        return $this;
+    }
+    
     public function withPropertyGroups()
     {
         $propertyGroupMutator = pluginApp(VariationPropertyGroupMutator::class);
@@ -677,6 +706,13 @@ class VariationSearchFactory extends BaseSearchFactory
     {
         $orderPropertySelectionValueMutator = pluginApp(OrderPropertySelectionValueMutator::class);
         $this->withMutator($orderPropertySelectionValueMutator);
+        
+        return $this;
+    }
+    
+    public function withVariationProperties()
+    {
+        $this->withExtension(VariationPropertyExtension::class);
         
         return $this;
     }
@@ -754,6 +790,12 @@ class VariationSearchFactory extends BaseSearchFactory
     public function withReducedResults()
     {
         $this->withExtension(ReduceDataExtension::class);
+        return $this;
+    }
+    
+    public function withAvailability()
+    {
+        $this->withExtension(AvailabilityExtension::class);
         return $this;
     }
 }

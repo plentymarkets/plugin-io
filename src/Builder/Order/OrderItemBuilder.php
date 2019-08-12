@@ -139,10 +139,6 @@ class OrderItemBuilder
         }
         
 		$shippingAmount = $basket->shippingAmount;
-        if($basket->shippingDeleteByCoupon)
-        {
-            $shippingAmount -= $basket->couponDiscount;
-        }
 
 		// add shipping costs
         $shippingCosts = [
@@ -276,7 +272,7 @@ class OrderItemBuilder
 			"shippingProfileId" => $basketItem['shippingProfileId'],
 			"countryVatId"      => $this->vatService->getCountryVatId(),
 			"vatRate"           => $basketItem['vat'],
-            "vatField"			=> $this->getVatField($this->vatService->getVat(), $basketItem['vat']),
+            "vatField"			=> $basketItem['variation']['data']['variation']['vatId'] ?? $this->getVatField($this->vatService->getVat(), $basketItem['vat']),
             "orderProperties"   => $basketItemProperties,
             "properties"        => $properties,
 			"amounts"           => [

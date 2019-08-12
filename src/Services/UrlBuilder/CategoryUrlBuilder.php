@@ -48,6 +48,11 @@ class CategoryUrlBuilder
 
     private function buildUrlQuery( $path, $lang ): UrlQuery
     {
+        if(substr($path, 0, 4) === '/'.$lang.'/')
+        {
+            // FIX: category url already contains language, if it is different to default language
+            $path = substr($path, 4);
+        }
         return pluginApp(
             UrlQuery::class,
             ['path' => $path, 'lang' => $lang]

@@ -3,13 +3,14 @@
 namespace IO\Middlewares;
 
 use IO\Api\ResponseCode;
-use IO\Constants\SessionStorageKeys;
+use IO\Extensions\Constants\ShopUrls;
 use IO\Helper\RouteConfig;
 use IO\Services\CountryService;
 use IO\Services\TemplateService;
 use IO\Services\WebstoreConfigurationService;
 use IO\Services\TemplateConfigService;
 
+use Plenty\Modules\System\Models\WebstoreConfiguration;
 use Plenty\Plugin\Http\Request;
 use Plenty\Plugin\Http\Response;
 use Plenty\Modules\Frontend\Contracts\Checkout;
@@ -22,11 +23,13 @@ use IO\Guards\AuthGuard;
 
 class Middleware extends \Plenty\Plugin\Middleware
 {
+    public static $FORCE_404 = false;
+    public static $DETECTED_LANGUAGE = null;
+
+    const WEB_AJAX_BASE = '/WebAjaxBase.php';
+
     public function before(Request $request)
     {
-        /** @var SessionStorageService $sessionService */
-        $sessionService  = pluginApp(SessionStorageService::class);
-        
         $loginToken = $request->get('token', '');
         if(strlen($loginToken))
         {
@@ -35,27 +38,26 @@ class Middleware extends \Plenty\Plugin\Middleware
             $authRepo->authenticateWithToken($loginToken);
         }
 
-        $splittedURL     = explode('/', $request->get('plentyMarkets'));
-        $lang            = $splittedURL[0];
+
+        /** @var WebstoreConfigurationService $webstoreService */
         $webstoreService = pluginApp(WebstoreConfigurationService::class);
         $webstoreConfig  = $webstoreService->getWebstoreConfig();
 
-        if (($lang == null || strlen($lang) != 2 || !in_array($lang, $webstoreConfig->languageList)) && strpos(end($splittedURL), '.') === false)
+        if(substr($request->getRequestUri(), 0, strlen(self::WEB_AJAX_BASE)) !== self::WEB_AJAX_BASE)
         {
-            if($sessionService->getLang() != $webstoreConfig->defaultLanguage)
+            // request uri is not "/webAjaxBase.php"
+            if(!is_null(self::$DETECTED_LANGUAGE))
             {
-                $service = pluginApp(LocalizationService::class);
-                $service->setLanguage($webstoreConfig->defaultLanguage);
-
-                 /** @var TemplateConfigService $templateConfigService */
-                $templateConfigService = pluginApp(TemplateConfigService::class);
-                $enabledCurrencies = explode(', ',  $templateConfigService->get('currency.available_currencies') );
-                $currency = $webstoreConfig->defaultCurrencyList[$webstoreConfig->defaultLanguage];
-                if(!is_null($currency) && (in_array($currency, $enabledCurrencies) || array_pop($enabledCurrencies) == 'all'))
+                // language has been detected by plentymarkets core
+                $this->setLanguage(self::$DETECTED_LANGUAGE, $webstoreConfig);
+            }
+            else
+            {
+                // language has not been detected. check if url points to default language
+                $splittedURL = explode('/', $request->get('plentyMarkets'));
+                if(strpos(end($splittedURL), '.') === false)
                 {
-                    /** @var CheckoutService $checkoutService */
-                    $checkoutService = pluginApp(CheckoutService::class);
-                    $checkoutService->setCurrency( $currency );
+                    $this->setLanguage($splittedURL[0], $webstoreConfig);
                 }
             }
         }
@@ -130,33 +132,80 @@ class Middleware extends \Plenty\Plugin\Middleware
         {
             AuthGuard::redirect('/search', ['query' => $request->get('Params')['SearchParam']]);
         }
-        
-        $readonlyCheckout = $request->get('readonlyCheckout',0);
-        if((int)$readonlyCheckout == 1)
+
+        /** @var ShopUrls $shopUrls */
+        $shopUrls = pluginApp(ShopUrls::class);
+
+        if ($request->has('readonlyCheckout') || $request->getRequestUri() !== $shopUrls->checkout)
         {
-            $sessionService->setSessionValue(SessionStorageKeys::READONLY_CHECKOUT, true);
+            /** @var CheckoutService $checkoutService */
+            $checkoutService = pluginApp(CheckoutService::class);
+            $checkoutService->setReadOnlyCheckout($request->get('readonlyCheckout',0) == 1);
         }
-        else
+
+        // access 'Kaufabwicklungslink'
+        if ( RouteConfig::isActive(RouteConfig::CONFIRMATION) )
         {
-            $sessionService->setSessionValue(SessionStorageKeys::READONLY_CHECKOUT, false);
+            $orderId = $request->get('id', 0);
+            $orderAccessKey = $request->get('ak', '');
+
+            if(strlen($orderAccessKey) && (int)$orderId > 0)
+            {
+                $confirmationRoute = $shopUrls->confirmation . '/'.$orderId.'/'.$orderAccessKey;
+                AuthGuard::redirect($confirmationRoute);
+            }
         }
     }
 
     public function after(Request $request, Response $response):Response
     {
-        if ($response->status() == ResponseCode::NOT_FOUND) {
-            /** @var StaticPagesController $controller */
-            $controller = pluginApp(StaticPagesController::class);
+        if ($response->status() == ResponseCode::NOT_FOUND)
+        {
+            if(RouteConfig::isActive(RouteConfig::PAGE_NOT_FOUND) || self::$FORCE_404)
+            {
+                /** @var StaticPagesController $controller */
+                $controller = pluginApp(StaticPagesController::class);
 
-            $response = $response->make(
-                $controller->showPageNotFound(),
-                ResponseCode::NOT_FOUND
-            );
-
-            $response->forceStatus(ResponseCode::NOT_FOUND);
-            return $response;
+                $response = $response->make(
+                    $controller->showPageNotFound(),
+                    ResponseCode::NOT_FOUND
+                );
+                $response->forceStatus(ResponseCode::NOT_FOUND);
+            }
         }
 
         return $response;
+    }
+
+    /**
+     * @param string                $language
+     * @param WebstoreConfiguration $webstoreConfig
+     */
+    private function setLanguage($language, $webstoreConfig)
+    {
+        if(is_null($language) || strlen($language) !== 2 || !in_array($language, $webstoreConfig->languageList))
+        {
+            // language is not valid. set default language
+            $language = $webstoreConfig->defaultLanguage;
+        }
+
+        if($language === pluginApp(SessionStorageService::class)->getLang())
+        {
+            // language has not changed
+            return;
+        }
+
+        $service = pluginApp(LocalizationService::class);
+        $service->setLanguage($language);
+
+        /** @var TemplateConfigService $templateConfigService */
+        $templateConfigService = pluginApp(TemplateConfigService::class);
+        $enabledCurrencies = explode(', ', $templateConfigService->get('currency.available_currencies'));
+        $currency = $webstoreConfig->defaultCurrencyList[$language];
+        if (!is_null($currency) && (in_array($currency, $enabledCurrencies) || array_pop($enabledCurrencies) == 'all')) {
+            /** @var CheckoutService $checkoutService */
+            $checkoutService = pluginApp(CheckoutService::class);
+            $checkoutService->setCurrency($currency);
+        }
     }
 }

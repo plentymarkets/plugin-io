@@ -2,9 +2,9 @@
 
 namespace IO\Services\ItemSearch\Factories;
 
-use IO\Services\ItemLoader\Services\LoadResultFields;
 use IO\Services\ItemSearch\Extensions\ItemSearchExtension;
 use IO\Services\ItemSearch\Extensions\SortExtension;
+use IO\Services\ItemSearch\Helper\LoadResultFields;
 use IO\Services\SessionStorageService;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Collapse\BaseCollapse;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Collapse\CollapseInterface;
@@ -26,6 +26,7 @@ use Plenty\Modules\Item\Search\Aggregations\ItemAttributeValueCardinalityAggrega
 use Plenty\Modules\Item\Search\Filter\SearchFilter;
 use Plenty\Modules\Item\Search\Sort\NameSorting;
 use Plenty\Plugin\Application;
+use Plenty\Plugin\Log\Loggable;
 
 /**
  * Class BaseSearchFactory
@@ -37,6 +38,7 @@ use Plenty\Plugin\Application;
 class BaseSearchFactory
 {
     use LoadResultFields;
+    use Loggable;
 
     const SORTING_ORDER_ASC     = ElasticSearch::SORTING_ORDER_ASC;
     const SORTING_ORDER_DESC    = ElasticSearch::SORTING_ORDER_DESC;
@@ -385,14 +387,18 @@ class BaseSearchFactory
         $search = $this->prepareSearch();
 
         // ADD FILTERS
+        $filterClasses = [];
+        $queryClasses = [];
         foreach( $this->filters as $filter )
         {
             if ( $filter instanceof SearchFilter )
             {
+                $queryClasses[] = get_class($filter);
                 $search->addQuery( $filter );
             }
             else
             {
+                $filterClasses[] = get_class($filter);
                 $search->addFilter( $filter );
             }
         }
@@ -404,8 +410,10 @@ class BaseSearchFactory
         }
 
         // ADD AGGREGATIONS
+        $aggregationClasses = [];
         foreach( $this->aggregations as $aggregation )
         {
+            $aggregationClasses[] = get_class($aggregation);
             $search->addAggregation( $aggregation );
         }
 
@@ -435,6 +443,19 @@ class BaseSearchFactory
         $search->setPage( $this->page, $this->itemsPerPage );
 
         $search->addSource( $source );
+
+        $this->getLogger(__CLASS__)->debug(
+            "IO::Debug.BaseSearchFactory_buildSearch",
+            [
+                "queries"       => $queryClasses,
+                "filter"        => $filterClasses,
+                "aggregations"  => $aggregationClasses,
+                "sorting"       => is_null($this->sorting) ? null : $this->sorting->toArray(),
+                "page"          => $this->page,
+                "itemsPerPage"  => $this->itemsPerPage,
+                "resultFields"  => $this->resultFields
+            ]
+        );
 
         return $search;
     }
@@ -475,10 +496,20 @@ class BaseSearchFactory
         }
     
         // ADD MUTATORS
+        $mutatorClasses = [];
         foreach( $this->mutators as $mutator )
         {
             $processor->addMutator( $mutator );
+            $mutatorClasses[] = get_class($mutator);
         }
+
+        $this->getLogger(__CLASS__)->debug(
+            "IO::Debug.BaseSearchFactory_prepareSearch",
+            [
+                "hasCollapse"   => $this->collapse instanceof BaseCollapse,
+                "mutators"      => $mutatorClasses
+            ]
+        );
         
         return $search;
     }

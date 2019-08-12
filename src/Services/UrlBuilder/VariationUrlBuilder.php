@@ -7,6 +7,7 @@ use IO\Services\ItemSearch\Factories\VariationSearchFactory;
 use IO\Services\ItemSearch\Services\ItemSearchService;
 use IO\Services\SessionStorageService;
 use IO\Services\TemplateConfigService;
+use Plenty\Log\Contracts\LoggerContract;
 use Plenty\Modules\Authorization\Services\AuthHelper;
 use Plenty\Modules\Item\VariationDescription\Contracts\VariationDescriptionRepositoryContract;
 use Plenty\Plugin\Log\Loggable;
@@ -123,9 +124,12 @@ class VariationUrlBuilder
                     /** @var AuthHelper $authHelper */
                     $authHelper = pluginApp(AuthHelper::class);
 
+                    /** @var LoggerContract $logger */
+                    $logger = $this->getLogger(__CLASS__);
+
                     $authHelper->processUnguarded(
-                        function () use ($variationId, $lang, $itemUrl) {
-                            $this->getLogger(__CLASS__)->debug(
+                        function () use ($variationId, $lang, $itemUrl, $logger) {
+                            $logger->debug(
                                 'IO::Debug.VariationUrlBuilder_saveItemUrl',
                                 [
                                     'url'           => rtrim($itemUrl->getPath(), '/'),

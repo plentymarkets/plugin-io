@@ -44,8 +44,24 @@ class CategoryController extends LayoutController
         $lang = $sessionService->getLang();
         $webstoreId = pluginApp(Application::class)->getWebstoreId();
 
+        $category = $this->categoryRepo->findCategoryByUrl($lvl1, $lvl2, $lvl3, $lvl4, $lvl5, $lvl6, $webstoreId, $lang);
+
+        /** @var ShopBuilderRequest $shopBuilderRequest */
+        $shopBuilderRequest = pluginApp(ShopBuilderRequest::class);
+        if ($shopBuilderRequest->isShopBuilder() && ($shopBuilderRequest->getPreviewContentType() === 'singleitem' || $category->type === 'item'))
+        {
+            /*
+             * TODO
+             * Remove check for category type when ceres is ready to handle item categories.
+             * Right now we need to display single item each time we open an item category in the shop builder to avoid loading non-editable pages
+             */
+            /** @var ItemController $itemController */
+            $itemController = pluginApp(ItemController::class);
+            return $itemController->showItemForCategory($category);
+        }
+
         return $this->renderCategory(
-            $this->categoryRepo->findCategoryByUrl($lvl1, $lvl2, $lvl3, $lvl4, $lvl5, $lvl6, $webstoreId, $lang)
+            $category
         );
 	}
 
@@ -121,6 +137,8 @@ class CategoryController extends LayoutController
 
         /** @var ShopBuilderRequest $shopBuilderRequest */
         $shopBuilderRequest = pluginApp(ShopBuilderRequest::class);
+        $shopBuilderRequest->setMainContentType($category->type);
+        $shopBuilderRequest->setMainCategory($category->id);
 
         if ( RouteConfig::getCategoryId( RouteConfig::CHECKOUT ) === $category->id || $shopBuilderRequest->getPreviewContentType() === 'checkout')
         {

@@ -11,6 +11,7 @@ class RouteConfig
     const CANCELLATION_RIGHTS       = "cancellation-rights";
     const CANCELLATION_FORM         = "cancellation-form";
     const CATEGORY                  = "category";
+    const CHANGE_MAIL               = "change-mail";
     const CHECKOUT                  = "checkout";
     const CONFIRMATION              = "confirmation";
     const CONTACT                   = "contact";
@@ -32,6 +33,7 @@ class RouteConfig
     const SEARCH                    = "search";
     const TERMS_CONDITIONS          = "gtc";
     const WISH_LIST                 = "wish-list";
+    const PAGE_NOT_FOUND            = "page-not-found";
 
     private static $enabledRoutes = null;
     private static $overrides = [];
@@ -50,6 +52,7 @@ class RouteConfig
                     self::CANCELLATION_RIGHTS,
                     self::CANCELLATION_FORM,
                     self::CATEGORY,
+                    self::CHANGE_MAIL,
                     self::CHECKOUT,
                     self::CONFIRMATION,
                     self::CONTACT,
@@ -70,6 +73,7 @@ class RouteConfig
                     self::SEARCH,
                     self::TERMS_CONDITIONS,
                     self::WISH_LIST,
+                    self::PAGE_NOT_FOUND
                 ];
             }
             else

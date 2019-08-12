@@ -148,7 +148,7 @@ class UrlService
                     return null;
                 }
 
-                if ( TemplateService::$currentTemplate === 'tpl.home' )
+                if ( TemplateService::$currentTemplate === 'tpl.home' || TemplateService::$currentTemplate === 'tpl.home.category' )
                 {
                     return pluginApp( UrlQuery::class, ['path' => "", 'lang' => $lang])
                         ->toAbsoluteUrl($includeLanguage);
@@ -227,9 +227,8 @@ class UrlService
     {
         if(strpos($redirectURL, 'http:') !== 0 && strpos($redirectURL, 'https:') !== 0)
         {
-            $redirectURL = pluginApp( UrlQuery::class, ['path' => $this->getHomepageURL()])
-                ->join($redirectURL)
-                ->toRelativeUrl($this->webstoreConfigurationService->getDefaultLanguage() !== $this->sessionStorage->getLang());
+            $redirectURL = pluginApp( UrlQuery::class, ['path' => $redirectURL])
+                ->toRelativeUrl($this->webstoreConfigurationService->getDefaultLanguage() !== $this->sessionStorage->getLang() );
         }
 
         return pluginApp(Response::class)->redirectTo($redirectURL);

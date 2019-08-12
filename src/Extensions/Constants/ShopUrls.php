@@ -9,6 +9,8 @@ use IO\Services\SessionStorageService;
 use IO\Services\UrlBuilder\CategoryUrlBuilder;
 use IO\Services\UrlBuilder\UrlQuery;
 use IO\Services\WebstoreConfigurationService;
+use Plenty\Modules\Frontend\Events\FrontendLanguageChanged;
+use Plenty\Plugin\Events\Dispatcher;
 
 class ShopUrls
 {
@@ -35,13 +37,23 @@ class ShopUrls
     public $search              = "";
     public $termsConditions     = "";
     public $wishList            = "";
+    public $returnConfirmation  = "";
 
-
-    public function __construct()
+    public function __construct(Dispatcher $dispatcher, SessionStorageService $sessionStorageService)
     {
+        $this->init($sessionStorageService->getLang());
+        $dispatcher->listen(FrontendLanguageChanged::class, function(FrontendLanguageChanged $event)
+        {
+            $this->init($event->getLanguage());
+        });
+    }
+
+    private function init($lang)
+    {
+        $this->resetMemoryCache();
         $this->appendTrailingSlash      = UrlQuery::shouldAppendTrailingSlash();
         $this->trailingSlashSuffix      = $this->appendTrailingSlash ? '/' : '';
-        $this->includeLanguage = pluginApp(SessionStorageService::class)->getLang() !== pluginApp(WebstoreConfigurationService::class)->getDefaultLanguage();
+        $this->includeLanguage          = $lang !== pluginApp(WebstoreConfigurationService::class)->getDefaultLanguage();
 
         $this->basket                   = $this->getShopUrl(RouteConfig::BASKET);
         $this->cancellationForm         = $this->getShopUrl(RouteConfig::CANCELLATION_FORM);
@@ -62,11 +74,22 @@ class ShopUrls
         $this->search                   = $this->getShopUrl(RouteConfig::SEARCH);
         $this->termsConditions          = $this->getShopUrl(RouteConfig::TERMS_CONDITIONS);
         $this->wishList                 = $this->getShopUrl(RouteConfig::WISH_LIST);
+        $this->returnConfirmation       = $this->getShopUrl(RouteConfig::ORDER_RETURN_CONFIRMATION, "return-confirmation");
     }
 
-    private function getShopUrl( $route )
+    public function returns($orderId)
     {
-        return $this->fromMemoryCache($route, function() use ($route)
+        return $this->getShopUrl(RouteConfig::ORDER_RETURN, "returns", $orderId);
+    }
+
+    public function orderPropertyFile($path)
+    {
+        return $this->getShopUrl(RouteConfig::ORDER_PROPERTY_FILE, null, $path);
+    }
+
+    private function getShopUrl( $route, $url = null, ...$routeParams )
+    {
+        return $this->fromMemoryCache($route, function() use ($route, $url, $routeParams)
         {
             $categoryId = RouteConfig::getCategoryId( $route );
             if ( $categoryId > 0 )
@@ -79,11 +102,34 @@ class ShopUrls
                 {
                     /** @var CategoryUrlBuilder $categoryUrlBuilder */
                     $categoryUrlBuilder = pluginApp( CategoryUrlBuilder::class );
-                    return $categoryUrlBuilder->buildUrl( $category->id )->toRelativeUrl($this->includeLanguage);
+                    return $this->applyParams(
+                        $categoryUrlBuilder->buildUrl( $category->id ),
+                        $routeParams
+                    );
                 }
             }
 
-            return pluginApp(UrlQuery::class, ['path' => $route] )->toRelativeUrl($this->includeLanguage);
+            return $this->applyParams(
+                pluginApp(UrlQuery::class, ['path' => ($url ?? $route)] ),
+                $routeParams
+            );
         });
+    }
+
+    private function applyParams( $url, $routeParams )
+    {
+        $routeParam = array_shift($routeParams);
+        while(!is_null($routeParam))
+        {
+            $url->join($routeParam);
+            $routeParam = array_shift($routeParams);
+        }
+
+        return $url->toRelativeUrl($this->includeLanguage);
+    }
+
+    public function equals($routeUrl, $url)
+    {
+        return $routeUrl === $url || $routeUrl === $url . '/';
     }
 }

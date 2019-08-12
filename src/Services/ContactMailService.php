@@ -2,76 +2,69 @@
 
 namespace IO\Services;
 
+use Plenty\Plugin\Log\Loggable;
 use Plenty\Plugin\Mail\Contracts\MailerContract;
 use Plenty\Plugin\Mail\Models\ReplyTo;
 use Plenty\Plugin\Templates\Twig;
-use IO\Services\TemplateConfigService;
-use IO\Validators\Customer\ContactFormValidator;
+use Plenty\Plugin\Translation\Translator;
 
 class ContactMailService
 {
-    private $name = '';
-    private $message = '';
-    private $orderId = '';
-    
-    public function __construct()
+    use Loggable;
+
+    public function sendMail($mailTemplate, $mailData = [])
     {
-    
-    }
-    
-    public function sendMail($mailTemplate, $contactData = [])
-    {
-        ContactFormValidator::validateOrFail($contactData);
-    
-        /**
-         * @var TemplateConfigService $templateConfigService
-         */
-        $templateConfigService = pluginApp(TemplateConfigService::class);
-        $recipient = $templateConfigService->get('contact.shop_mail');
-        
+        $recipient = $mailData['recipient'];
+
+        if ( !strlen($recipient) )
+        {
+            /** @var TemplateConfigService $templateConfigService */
+            $templateConfigService = pluginApp(TemplateConfigService::class);
+            $recipient = $templateConfigService->get('contact.shop_mail');
+        }
+
         if(!strlen($recipient) || !strlen($mailTemplate))
         {
+            $this->getLogger(__CLASS__)->error("IO::Debug.ContactMailService_noRecipient");
             return false;
         }
-        
-        /**
-         * @var Twig
-         */
+
+        /** @var Twig */
         $twig = pluginApp(Twig::class);
-    
-        $mailTemplateParams = [];
-        foreach($contactData as $key => $value)
+
+        $mailBody = $twig->render(
+            $mailTemplate,
+            $mailData
+        );
+
+        if(!strlen($mailBody))
         {
-            $mailTemplateParams[$key] = nl2br($value);
-        }
-        
-        $renderedMailTemplate = $twig->render($mailTemplate, $mailTemplateParams);
-        
-        if(!strlen($renderedMailTemplate))
-        {
+            $this->getLogger(__CLASS__)->error("IO::Debug.ContactMailService_noMailContent");
             return false;
         }
         
-        $cc = [];
-        if(isset($contactData['cc']) && $contactData['cc'] == 'true')
-        {
-            $cc[] = $contactData['userMail'];
-        }
-        
-        /**
-         * @var MailerContract $mailer
-         */
+        /** @var MailerContract $mailer */
         $mailer = pluginApp(MailerContract::class);
 
-        /**
-         * @var ReplyTo $replyTo
-         */
-        $replyTo = pluginApp(ReplyTo::class);
-        $replyTo->mailAddress = $contactData['userMail'];
-        $replyTo->name = $contactData['name'];
+        $replyTo = null;
+        if ( array_key_exists('replyTo', $mailData) )
+        {
+            /** @var ReplyTo $replyTo */
+            $replyTo = pluginApp(ReplyTo::class);
+            $replyTo->mailAddress = $mailData['replyTo']['mail'];
+            $replyTo->name = $mailData['replyTo']['name'];
+        }
 
-        $mailer->sendHtml($renderedMailTemplate, $recipient, $contactData['subject'], $cc, [], $replyTo);
-        
+        $translator = pluginApp(Translator::class);
+        $subject = $translator->trans(
+            'Ceres::Template.contactMailSubject',
+            [
+                'subject' => $mailData['subject'],
+                'data'    => $mailData['data']
+            ]
+        );
+
+        $mailer->sendHtml($mailBody, $recipient, $subject, $mailData['cc'] ?? [], $mailData['bcc'] ?? [], $replyTo);
         return true;
     }
 }

@@ -3,7 +3,6 @@
 namespace IO\Api\Resources;
 
 use IO\Services\AuthenticationService;
-use IO\Services\CustomerPasswordResetService;
 use Plenty\Plugin\Http\Request;
 use Plenty\Plugin\Http\Response;
 use IO\Api\ApiResource;
@@ -22,22 +21,16 @@ class CustomerPasswordResource extends ApiResource
 	 */
 	private $customerService;
 
-	/**
-	 * @var CustomerPasswordResetService
-	 */
-	private $customerPasswordResetService;
     /**
      * CustomerPasswordResource constructor.
      * @param Request $request
      * @param ApiResponse $response
      * @param CustomerService $customerService
-     * @param CustomerPasswordResetService $customerPasswordResetService
      */
-	public function __construct(Request $request, ApiResponse $response, CustomerService $customerService, CustomerPasswordResetService $customerPasswordResetService)
+	public function __construct(Request $request, ApiResponse $response, CustomerService $customerService)
 	{
 		parent::__construct($request, $response);
 		$this->customerService = $customerService;
-		$this->customerPasswordResetService = $customerPasswordResetService;
 	}
 
     /**
@@ -52,10 +45,10 @@ class CustomerPasswordResource extends ApiResource
 	    $contactId = $this->request->get('contactId', 0);
         $hash = $this->request->get('hash', '');
 
-		if(strlen($newPassword) && strlen($newPassword2) && $newPassword == $newPassword2)
+		if(strlen($newPassword) && strlen($newPassword2) && $newPassword == $newPassword2 && $this->isValidPassword($newPassword))
 		{
-
-		    if (!strlen($hash)) {
+		    if (!strlen($hash))
+		    {
 		        /** @var AuthenticationService $authService */
                 $authService = pluginApp(AuthenticationService::class);
 
@@ -66,10 +59,6 @@ class CustomerPasswordResource extends ApiResource
 
                     return $response;
                 }
-            }
-		    elseif (!$this->customerPasswordResetService->checkHash($contactId, $hash))
-            {
-                return $this->response->create(null, ResponseCode::BAD_REQUEST);
             }
 
 			$result = $this->customerService->updatePassword($newPassword, $contactId, $hash);
@@ -86,4 +75,12 @@ class CustomerPasswordResource extends ApiResource
 		return $this->response->create(null, ResponseCode::BAD_REQUEST);
 	}
 
+    /**
+     * Checks if the password meets the requirements
+     */
+    static public function isValidPassword($password)
+    {
+        $passwordPattern = '/^(?=.*[A-Za-z])(?=.*\d)\S{8,}$/';
+        return preg_match($passwordPattern,$password);
+    }
 }

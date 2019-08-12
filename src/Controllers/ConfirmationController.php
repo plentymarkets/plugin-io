@@ -3,6 +3,7 @@
 namespace IO\Controllers;
 
 use IO\Api\ResponseCode;
+use IO\Middlewares\Middleware;
 use IO\Services\CustomerService;
 use IO\Services\OrderService;
 use IO\Services\SessionStorageService;
@@ -12,6 +13,7 @@ use IO\Services\TemplateConfigService;
 use Plenty\Modules\Order\Date\Models\OrderDate;
 use Plenty\Modules\Order\Date\Models\OrderDateType;
 use Plenty\Modules\Order\Models\Order;
+use Plenty\Modules\ShopBuilder\Helper\ShopBuilderRequest;
 use Plenty\Plugin\Http\Response;
 use Plenty\Plugin\Log\Loggable;
 
@@ -33,6 +35,10 @@ class ConfirmationController extends LayoutController
     
         /** @var SessionStorageService $sessionStorageService */
         $sessionStorageService = pluginApp(SessionStorageService::class);
+
+        /** @var ShopBuilderRequest $shopBuilderRequest */
+        $shopBuilderRequest = pluginApp(ShopBuilderRequest::class);
+        $shopBuilderRequest->setMainContentType('checkout');
     
         /**
          * @var OrderService $orderService
@@ -142,6 +148,8 @@ class ConfirmationController extends LayoutController
                 $response = pluginApp(Response::class);
                 $response->forceStatus(ResponseCode::NOT_FOUND);
     
+                Middleware::$FORCE_404 = true;
+    
                 return $response;
             }
         }
@@ -155,6 +163,8 @@ class ConfirmationController extends LayoutController
             /** @var Response $response */
             $response = pluginApp(Response::class);
             $response->forceStatus(ResponseCode::NOT_FOUND);
+    
+            Middleware::$FORCE_404 = true;
 
             return $response;
         }

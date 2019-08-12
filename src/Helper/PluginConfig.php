@@ -41,9 +41,14 @@ class PluginConfig
         }
     }
 
-    protected function getTextValue( $key, $default = "" )
+    protected function getTextValue( $key, $default = "", $transformDefault = "" )
     {
-        return $this->getConfigValue( $key, $default );
+        $value = $this->getConfigValue( $key, $default );
+        if ($value === $transformDefault)
+        {
+            return $default;
+        }
+        return $value;
     }
 
     protected function getIntegerValue( $key, $default = 0 )
