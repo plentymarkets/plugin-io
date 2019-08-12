@@ -446,33 +446,37 @@ class CheckoutService
             $locationId = $vatService->getLocationId($this->getShippingCountryId());
             $accountSettings = $accountRepo->getSettings($locationId);
 
-            if ($showNetPrice && !(bool)$accountSettings->showShippingVat) {
-
+            if ($showNetPrice && !(bool)$accountSettings->showShippingVat)
+            {
                 $maxVatValue = $this->basketService->getMaxVatValue();
 
-                if (is_array($list)) {
-                    foreach ($list as $key => $shippingProfile) {
-                        if (isset($shippingProfile['shippingAmount'])) {
+                if (is_array($list))
+                {
+                    foreach ($list as $key => $shippingProfile)
+                    {
+                        if (isset($shippingProfile['shippingAmount']))
+                        {
                             $list[$key]['shippingAmount'] = (100.0 * $shippingProfile['shippingAmount']) / (100.0 + $maxVatValue);
                         }
                     }
                 }
+            }
 
-                $basket = $this->basketService->getBasket();
-                if ($basket->currency !== $this->currencyExchangeRepo->getDefaultCurrency())
+            $basket = $this->basketService->getBasket();
+            if ($basket->currency !== $this->currencyExchangeRepo->getDefaultCurrency())
+            {
+                if (is_array($list))
                 {
-                    if (is_array($list))
+                    foreach ($list as $key => $shippingProfile)
                     {
-                        foreach ($list as $key => $shippingProfile)
+                        if (isset($shippingProfile['shippingAmount']))
                         {
-                            if (isset($shippingProfile['shippingAmount']))
-                            {
-                                $list[$key]['shippingAmount'] = $this->currencyExchangeRepo->convertFromDefaultCurrency($basket->currency, $list[$key]['shippingAmount']);
-                            }
+                            $list[$key]['shippingAmount'] = $this->currencyExchangeRepo->convertFromDefaultCurrency($basket->currency, $list[$key]['shippingAmount']);
                         }
                     }
                 }
             }
+
 
             return $list;
         });

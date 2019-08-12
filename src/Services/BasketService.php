@@ -387,11 +387,12 @@ class BasketService
                     break;
                 case BasketItemCheckException::NOT_ENOUGH_STOCK_FOR_VARIATION:
                     $code = 111;
+                    $placeholder = ['stock' => $e->getStockNet()];
                     break;
                 default:
                     $code = 0;
             }
-            return ["code" => $code];
+            return ["code" => $code, 'placeholder' => $placeholder];
         } catch (\Exception $e) {
             return ["code" => $e->getCode()];
         }
@@ -464,11 +465,12 @@ class BasketService
                     break;
                 case BasketItemCheckException::NOT_ENOUGH_STOCK_FOR_VARIATION:
                     $code = 111;
+                    $placeholder = ['stock' => $e->getStockNet()];
                     break;
                 default:
                     $code = 0;
             }
-            return ["code" => $code];
+            return ["code" => $code, 'placeholder' => $placeholder];
         } catch (\Exception $e) {
             return ["code" => $e->getCode()];
         }
