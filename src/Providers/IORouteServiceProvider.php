@@ -143,19 +143,19 @@ class IORouteServiceProvider extends RouteServiceProvider
                 return pluginApp(CategoryController::class)->redirectToCategory($shopUrls->confirmation.'?orderId='.$orderId.'&accessKey='.$accessKey);
             });
     
-            $router->get('-/akQQ{orderAccessKey}/idQQ{orderId}', function($orderId, $accessKey) use ($shopUrls)
+            $router->get('-/akQQ{orderAccessKey}/idQQ{orderId}', function($accessKey, $orderId) use ($shopUrls)
             {
                 return pluginApp(CategoryController::class)->redirectToCategory($shopUrls->confirmation.'?orderId='.$orderId.'&accessKey='.$accessKey);
             });
-            $router->get('_py-/akQQ{orderAccessKey}/idQQ{orderId}', function($orderId, $accessKey) use ($shopUrls)
+            $router->get('_py-/akQQ{orderAccessKey}/idQQ{orderId}', function($accessKey, $orderId) use ($shopUrls)
             {
                 return pluginApp(CategoryController::class)->redirectToCategory($shopUrls->confirmation.'?orderId='.$orderId.'&accessKey='.$accessKey);
             });
-            $router->get('_py_/akQQ{orderAccessKey}/idQQ{orderId}', function($orderId, $accessKey) use ($shopUrls)
+            $router->get('_py_/akQQ{orderAccessKey}/idQQ{orderId}', function($accessKey, $orderId) use ($shopUrls)
             {
                 return pluginApp(CategoryController::class)->redirectToCategory($shopUrls->confirmation.'?orderId='.$orderId.'&accessKey='.$accessKey);
             });
-            $router->get('_plentyShop__/akQQ{orderAccessKey}/idQQ{orderId}', function($orderId, $accessKey) use ($shopUrls)
+            $router->get('_plentyShop__/akQQ{orderAccessKey}/idQQ{orderId}', function($accessKey, $orderId) use ($shopUrls)
             {
                 return pluginApp(CategoryController::class)->redirectToCategory($shopUrls->confirmation.'?orderId='.$orderId.'&accessKey='.$accessKey);
             });

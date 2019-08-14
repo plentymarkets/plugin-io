@@ -4,16 +4,18 @@ namespace IO\Controllers;
 
 use IO\Api\ResponseCode;
 use IO\Middlewares\Middleware;
+use IO\Services\CategoryService;
 use IO\Services\CustomerService;
 use IO\Services\OrderService;
 use IO\Services\SessionStorageService;
 use IO\Constants\SessionStorageKeys;
 use IO\Models\LocalizedOrder;
 use IO\Services\TemplateConfigService;
-use Plenty\Modules\Order\Date\Models\OrderDate;
+use Plenty\Modules\Category\Models\Category;
 use Plenty\Modules\Order\Date\Models\OrderDateType;
 use Plenty\Modules\Order\Models\Order;
 use Plenty\Modules\ShopBuilder\Helper\ShopBuilderRequest;
+use Plenty\Plugin\ConfigRepository;
 use Plenty\Plugin\Http\Response;
 use Plenty\Plugin\Log\Loggable;
 
@@ -39,6 +41,11 @@ class ConfirmationController extends LayoutController
         /** @var ShopBuilderRequest $shopBuilderRequest */
         $shopBuilderRequest = pluginApp(ShopBuilderRequest::class);
         $shopBuilderRequest->setMainContentType('checkout');
+    
+        /**
+         * @var CustomerService $customerService
+         */
+        $customerService = pluginApp(CustomerService::class);
     
         /**
          * @var OrderService $orderService
@@ -81,10 +88,6 @@ class ConfirmationController extends LayoutController
                 }
                 else
                 {
-                    /**
-                     * @var CustomerService $customerService
-                     */
-                    $customerService = pluginApp(CustomerService::class);
                     $order = $customerService->getLatestOrder();
                 }
             }
@@ -133,6 +136,19 @@ class ConfirmationController extends LayoutController
         {
             if($this->checkValidity($order->order))
             {
+                if($category instanceof Category && $customerService->getContactId() <= 0)
+                {
+                    /** @var ConfigRepository $config */
+                    $config = pluginApp(ConfigRepository::class);
+                    $categoryGuestId = (int)$config->get('IO.routing.category_confirmation-guest', 0);
+                    if($categoryGuestId > 0)
+                    {
+                        /** @var CategoryService $categoryService */
+                        $categoryService = pluginApp(CategoryService::class);
+                        $category = $categoryService->get($categoryGuestId);
+                    }
+                }
+                
                 return $this->renderTemplate(
                     "tpl.confirmation",
                     [
