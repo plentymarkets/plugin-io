@@ -140,7 +140,7 @@ class VariationPriceList
 
         if ( $this->lot > 0 && strlen($this->unit) > 0 )
         {
-            if(isset(self::$basePrices[$this->lot][$unitPrice][$this->unit]))
+            if(isset(self::$basePrices[(string)$this->lot][(string)$unitPrice][$this->unit]))
             {
                 $basePrice = self::$basePrices[(string)$this->lot][(string)$unitPrice][$this->unit];
             }
