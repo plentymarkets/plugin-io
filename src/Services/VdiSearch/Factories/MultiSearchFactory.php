@@ -15,7 +15,6 @@ use Plenty\Modules\Pim\VariationDataInterface\Contracts\VariationDataInterfaceCo
  * Factory to build an elastic search multisearch request by collecting multiple search factory instances.
  *
  * @package IO\Services\ItemSearch\Factories
- * @deprecated use instead IO\Contracts\MultiSearchFactoryContract
  */
 class MultiSearchFactory implements MultiSearchFactoryContract
 {

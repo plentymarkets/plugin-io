@@ -14,6 +14,7 @@ use Plenty\Modules\Item\Search\Contracts\VariationElasticSearchMultiSearchReposi
  * Factory to build an elastic search multisearch request by collecting multiple search factory instances.
  *
  * @package IO\Services\ItemSearch\Factories
+ * @deprecated use instead IO\Contracts\MultiSearchFactoryContract
  */
 class MultiSearchFactory implements MultiSearchFactoryContract
 {
