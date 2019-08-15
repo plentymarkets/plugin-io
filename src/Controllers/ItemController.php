@@ -29,7 +29,6 @@ use Plenty\Modules\ShopBuilder\Helper\ShopBuilderRequest;
 use Plenty\Plugin\Application;
 use Plenty\Plugin\Http\Response;
 use Plenty\Plugin\Log\Loggable;
-use Plenty\Plugin\Application;
 
 /**
  * Class ItemController
