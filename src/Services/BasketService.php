@@ -17,6 +17,7 @@ use IO\Extensions\Filters\NumberFormatFilter;
 use Plenty\Modules\Frontend\Services\VatService;
 use IO\Contracts\VariationSearchFactoryContract as VariationSearchFactory;
 use IO\Constants\LogLevel;
+use Plenty\Plugin\Log\Loggable;
 
 /**
  * Class BasketService
@@ -24,6 +25,8 @@ use IO\Constants\LogLevel;
  */
 class BasketService
 {
+    use Loggable;
+
     /**
      * @var BasketItemRepositoryContract
      */
@@ -366,6 +369,14 @@ class BasketService
                 $this->basketItemRepository->addBasketItem($data);
             }
         } catch (BasketItemQuantityCheckException $e) {
+            $this->getLogger(__CLASS__)->warning(
+                'IO::Debug.BasketService_addItemQuantityCheckFailed',
+                [
+                    'data' => $data,
+                    'code' => $e->getCode(),
+                    'message' => $e->getMessage()
+                ]
+            );
              switch($e->getCode()) {
                 case BasketItemQuantityCheckException::DID_REACH_MAXIMUM_QUANTITY_FOR_ITEM:
                     $code = 112;
@@ -381,18 +392,35 @@ class BasketService
             }
             return ["code" => $code];
         } catch (BasketItemCheckException $e) {
+            $this->getLogger(__CLASS__)->warning(
+                'IO::Debug.BasketService_addItemCheckFailed',
+                [
+                    'data' => $data,
+                    'code' => $e->getCode(),
+                    'message' => $e->getMessage()
+                ]
+            );
             switch($e->getCode()) {
                 case BasketItemCheckException::VARIATION_NOT_FOUND:
                     $code = 110;
                     break;
                 case BasketItemCheckException::NOT_ENOUGH_STOCK_FOR_VARIATION:
                     $code = 111;
+                    $placeholder = ['stock' => $e->getStockNet()];
                     break;
                 default:
                     $code = 0;
             }
-            return ["code" => $code];
+            return ["code" => $code, 'placeholder' => $placeholder];
         } catch (\Exception $e) {
+            $this->getLogger(__CLASS__)->warning(
+                'IO::Debug.BasketService_cannotAddItem',
+                [
+                    'data' => $data,
+                    'code' => $e->getCode(),
+                    'message' => $e->getMessage()
+                ]
+            );
             return ["code" => $e->getCode()];
         }
     }
@@ -443,6 +471,14 @@ class BasketService
             $this->couponService->validateBasketItemUpdate($basket, $data, $basketItem);
             $this->basketItemRepository->updateBasketItem($basketItemId, $data);
         } catch (BasketItemQuantityCheckException $e) {
+            $this->getLogger(__CLASS__)->warning(
+                'IO::Debug.BasketService_updateItemQuantityCheckFailed',
+                [
+                    'data' => $data,
+                    'code' => $e->getCode(),
+                    'message' => $e->getMessage()
+                ]
+            );
              switch($e->getCode()) {
                 case BasketItemQuantityCheckException::DID_REACH_MAXIMUM_QUANTITY_FOR_ITEM:
                     $code = 112;
@@ -458,18 +494,35 @@ class BasketService
             }
             return ["code" => $code];
         } catch (BasketItemCheckException $e) {
+            $this->getLogger(__CLASS__)->warning(
+                'IO::Debug.BasketService_updateItemCheckFailed',
+                [
+                    'data' => $data,
+                    'code' => $e->getCode(),
+                    'message' => $e->getMessage()
+                ]
+            );
             switch($e->getCode()) {
                 case BasketItemCheckException::VARIATION_NOT_FOUND:
                     $code = 110;
                     break;
                 case BasketItemCheckException::NOT_ENOUGH_STOCK_FOR_VARIATION:
                     $code = 111;
+                    $placeholder = ['stock' => $e->getStockNet()];
                     break;
                 default:
                     $code = 0;
             }
-            return ["code" => $code];
+            return ["code" => $code, 'placeholder' => $placeholder];
         } catch (\Exception $e) {
+            $this->getLogger(__CLASS__)->warning(
+                'IO::Debug.BasketService_cannotAddItem',
+                [
+                    'data' => $data,
+                    'code' => $e->getCode(),
+                    'message' => $e->getMessage()
+                ]
+            );
             return ["code" => $e->getCode()];
         }
         return $this->getBasketItemsForTemplate();

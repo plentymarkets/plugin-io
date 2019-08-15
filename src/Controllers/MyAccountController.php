@@ -22,7 +22,7 @@ class MyAccountController extends LayoutController
 	{
         /** @var ShopBuilderRequest $shopBuilderRequest */
         $shopBuilderRequest = pluginApp(ShopBuilderRequest::class);
-
+        $shopBuilderRequest->setMainContentType('myaccount');
         if ( !$shopBuilderRequest->isShopBuilder() )
         {
             /** @var AuthGuard $guard */

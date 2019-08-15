@@ -29,6 +29,7 @@ use Plenty\Modules\ShopBuilder\Helper\ShopBuilderRequest;
 use Plenty\Plugin\Application;
 use Plenty\Plugin\Http\Response;
 use Plenty\Plugin\Log\Loggable;
+use Plenty\Plugin\Application;
 
 /**
  * Class ItemController
@@ -37,7 +38,7 @@ use Plenty\Plugin\Log\Loggable;
 class ItemController extends LayoutController
 {
     use Loggable;
-
+    private $plentyId;
     /**
      * Prepare and render the item data.
      * @param string    $slug
@@ -67,6 +68,11 @@ class ItemController extends LayoutController
             'variationId'   => $variationId,
             'setCategory'   => is_null($category)
         ];
+
+        /** @var Application $app */
+        $app = pluginApp( Application::class );
+        $this->plentyId = $app->getPlentyId();
+
         /** @var ItemSearchService $itemSearchService */
         $itemSearchService = pluginApp( ItemSearchService::class );
         $itemResult = $itemSearchService->getResults([
@@ -75,13 +81,28 @@ class ItemController extends LayoutController
         ]);
 
 
+
         $end = microtime(true);
         $executionTime = $end - $start;
         $this->getLogger('Performance')->error('ES: '. $executionTime . ' Sekunden');
 
 
+
+        if (!is_null($category))
+        {
+            pluginApp(CategoryService::class)->setCurrentCategory($category);
+        }
+
         /** @var ShopBuilderRequest $shopBuilderRequest */
         $shopBuilderRequest = pluginApp(ShopBuilderRequest::class);
+
+        $defaultCategories = $itemResult['item']['documents'][0]['data']['defaultCategories'];
+        $defaultCategory = array_filter($defaultCategories, function($category) {
+            return $category['plentyId'] == $this->plentyId;
+        });
+
+        $shopBuilderRequest->setMainCategory($defaultCategory[0]['id']);
+        $shopBuilderRequest->setMainContentType('singleitem');
         if ($shopBuilderRequest->isShopBuilder())
         {
             /** @var VariationSearchResultFactory $searchResultFactory */
@@ -91,7 +112,7 @@ class ItemController extends LayoutController
                 ResultFieldTemplate::get(ResultFieldTemplate::TEMPLATE_SINGLE_ITEM)
             );
         }
-        
+
         if(empty($itemResult['item']['documents']))
         {
             $this->getLogger(__CLASS__)->info(
