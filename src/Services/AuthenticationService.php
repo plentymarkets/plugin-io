@@ -6,6 +6,7 @@ use Plenty\Modules\Account\Contact\Contracts\ContactRepositoryContract;
 use Plenty\Modules\Account\Contact\Models\Contact;
 use Plenty\Modules\Authentication\Contracts\ContactAuthenticationRepositoryContract;
 use IO\Constants\SessionStorageKeys;
+use Plenty\Plugin\Log\Loggable;
 
 /**
  * Class AuthenticationService
@@ -13,6 +14,8 @@ use IO\Constants\SessionStorageKeys;
  */
 class AuthenticationService
 {
+    use Loggable;
+
 	/**
 	 * @var ContactAuthenticationRepositoryContract
 	 */
@@ -95,6 +98,12 @@ class AuthenticationService
             }
             catch( \Exception $e )
             {
+                $this->getLogger(__CLASS__)->info(
+                    'IO::Debug.AuthenticationService_invalidPassword',
+                    [
+                        'contactId' => $contact->id
+                    ]
+                );
                 return false;
             }
         }

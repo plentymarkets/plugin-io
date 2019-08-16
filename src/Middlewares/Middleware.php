@@ -11,6 +11,7 @@ use IO\Services\TemplateService;
 use IO\Services\WebstoreConfigurationService;
 use IO\Services\TemplateConfigService;
 
+use Plenty\Modules\System\Models\WebstoreConfiguration;
 use Plenty\Plugin\Http\Request;
 use Plenty\Plugin\Http\Response;
 use Plenty\Modules\Frontend\Contracts\Checkout;
@@ -24,14 +25,12 @@ use IO\Guards\AuthGuard;
 class Middleware extends \Plenty\Plugin\Middleware
 {
     public static $FORCE_404 = false;
+    public static $DETECTED_LANGUAGE = null;
 
     const WEB_AJAX_BASE = '/WebAjaxBase.php';
 
     public function before(Request $request)
     {
-        /** @var SessionStorageService $sessionService */
-        $sessionService  = pluginApp(SessionStorageService::class);
-
         $loginToken = $request->get('token', '');
         if(strlen($loginToken))
         {
@@ -40,21 +39,28 @@ class Middleware extends \Plenty\Plugin\Middleware
             $authRepo->authenticateWithToken($loginToken);
         }
 
-        $splittedURL     = explode('/', $request->get('plentyMarkets'));
 
         /** @var WebstoreConfigurationService $webstoreService */
         $webstoreService = pluginApp(WebstoreConfigurationService::class);
         $webstoreConfig  = $webstoreService->getWebstoreConfig();
-        $requestLang     = $request->get('Lang', null);
 
-        $isWebAjaxBase = (substr($request->getRequestUri(), 0, strlen(self::WEB_AJAX_BASE)) === self::WEB_AJAX_BASE);
-        if(!is_null($requestLang) && in_array($requestLang, $webstoreConfig->languageList))
+        if(substr($request->getRequestUri(), 0, strlen(self::WEB_AJAX_BASE)) !== self::WEB_AJAX_BASE)
         {
-            $this->setLanguage($requestLang, $webstoreConfig);
-        }
-        else if((is_null($splittedURL[0]) || strlen($splittedURL[0]) != 2 || !in_array($splittedURL[0], $webstoreConfig->languageList)) && strpos(end($splittedURL), '.') === false && !$isWebAjaxBase && $webstoreConfig->defaultLanguage !== $sessionService->getLang())
-        {
-            $this->setLanguage($webstoreConfig->defaultLanguage, $webstoreConfig);
+            // request uri is not "/webAjaxBase.php"
+            if(!is_null(self::$DETECTED_LANGUAGE))
+            {
+                // language has been detected by plentymarkets core
+                $this->setLanguage(self::$DETECTED_LANGUAGE, $webstoreConfig);
+            }
+            else
+            {
+                // language has not been detected. check if url points to default language
+                $splittedURL = explode('/', $request->get('plentyMarkets'));
+                if(strpos(end($splittedURL), '.') === false)
+                {
+                    $this->setLanguage($splittedURL[0], $webstoreConfig);
+                }
+            }
         }
 
         $currency = $request->get('currency', null);
@@ -184,20 +190,35 @@ class Middleware extends \Plenty\Plugin\Middleware
         return $response;
     }
 
+    /**
+     * @param string                $language
+     * @param WebstoreConfiguration $webstoreConfig
+     */
     private function setLanguage($language, $webstoreConfig)
     {
+        if(is_null($language) || strlen($language) !== 2 || !in_array($language, $webstoreConfig->languageList))
+        {
+            // language is not valid. set default language
+            $language = $webstoreConfig->defaultLanguage;
+        }
+
+        if($language === pluginApp(SessionStorageService::class)->getLang())
+        {
+            // language has not changed
+            return;
+        }
+
         $service = pluginApp(LocalizationService::class);
         $service->setLanguage($language);
 
         /** @var TemplateConfigService $templateConfigService */
         $templateConfigService = pluginApp(TemplateConfigService::class);
-        $enabledCurrencies = explode(', ',  $templateConfigService->get('currency.available_currencies') );
+        $enabledCurrencies = explode(', ', $templateConfigService->get('currency.available_currencies'));
         $currency = $webstoreConfig->defaultCurrencyList[$language];
-        if(!is_null($currency) && (in_array($currency, $enabledCurrencies) || array_pop($enabledCurrencies) == 'all'))
-        {
+        if (!is_null($currency) && (in_array($currency, $enabledCurrencies) || array_pop($enabledCurrencies) == 'all')) {
             /** @var CheckoutService $checkoutService */
             $checkoutService = pluginApp(CheckoutService::class);
-            $checkoutService->setCurrency( $currency );
+            $checkoutService->setCurrency($currency);
         }
     }
 }

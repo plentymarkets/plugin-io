@@ -36,8 +36,8 @@ class CategoryUrlBuilder
             );
         }
 
-        $this->getLogger('CategoryUrlBuilder')->error(
-            'Cannot find category.',
+        $this->getLogger(__CLASS__)->error(
+            'IO::Debug.CategoryUrlBuilder_categoryNotFound',
             [
                 'categoryId' => $categoryId,
                 'lang'       => $lang
@@ -48,6 +48,11 @@ class CategoryUrlBuilder
 
     private function buildUrlQuery( $path, $lang ): UrlQuery
     {
+        if(substr($path, 0, 4) === '/'.$lang.'/')
+        {
+            // FIX: category url already contains language, if it is different to default language
+            $path = substr($path, 4);
+        }
         return pluginApp(
             UrlQuery::class,
             ['path' => $path, 'lang' => $lang]
