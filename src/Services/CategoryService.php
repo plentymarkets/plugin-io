@@ -487,21 +487,23 @@ class CategoryService
         if(count($category['children']))
         {
             $this->getLogger(__CLASS__)->error("PartialTreeUnfiltered", [
-                "category" => $category,
+                "category" => $category['id'],
                 "children" => $category['children']
             ]);
         }
 
         // Filter children not having texts in current language
-        $category['children'] = array_values(array_filter($category['children'], function($child)
+        $category['children'] = array_filter($category['children'], function($child)
         {
             return count($child['details']);
-        }));
+        });
+
+        $category['children'] = array_values($category['children']);
 
         if(count($category['children']))
         {
             $this->getLogger(__CLASS__)->error("PartialTreeFiltered", [
-                "category" => $category,
+                "category" => $category['id'],
                 "children" => $category['children']
             ]);
         }
