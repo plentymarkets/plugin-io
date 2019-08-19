@@ -510,10 +510,13 @@ class CategoryService
             unset($category['children']);
         }
 
-        $this->getLogger(__CLASS__)->error("PartialTree", [
-            "category" => $category,
-            "children" => $category['children']
-        ]);
+        if(count($category['children']))
+        {
+            $this->getLogger(__CLASS__)->error("PartialTree", [
+                "category" => $category,
+                "children" => $category['children']
+            ]);
+        }
     }
 
     /**
