@@ -484,11 +484,27 @@ class CategoryService
 
     private function appendBranchFields(&$category, $siblingCount = 1, $urlPrefix = '', $depth = 6)
     {
+        if(count($category['children']))
+        {
+            $this->getLogger(__CLASS__)->error("PartialTreeUnfiltered", [
+                "category" => $category,
+                "children" => $category['children']
+            ]);
+        }
+
         // Filter children not having texts in current language
         $category['children'] = array_filter($category['children'], function($child)
         {
             return count($child['details']);
         });
+
+        if(count($category['children']))
+        {
+            $this->getLogger(__CLASS__)->error("PartialTreeFiltered", [
+                "category" => $category,
+                "children" => $category['children']
+            ]);
+        }
 
         // add flags for lazy loading
         $category['childCount'] = count($category['children']);
@@ -508,14 +524,6 @@ class CategoryService
         else
         {
             unset($category['children']);
-        }
-
-        if(count($category['children']))
-        {
-            $this->getLogger(__CLASS__)->error("PartialTree", [
-                "category" => $category,
-                "children" => $category['children']
-            ]);
         }
     }
 
