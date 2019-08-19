@@ -5,6 +5,7 @@ namespace IO\Services;
 use IO\Helper\LanguageMap;
 use IO\Helper\MemoryCache;
 use IO\Services\UrlBuilder\CategoryUrlBuilder;
+use IO\Services\UrlBuilder\InternalUrlBuilder;
 use IO\Services\UrlBuilder\UrlQuery;
 use IO\Services\UrlBuilder\VariationUrlBuilder;
 use Plenty\Plugin\Http\Request;
@@ -27,18 +28,22 @@ class UrlService
 
     /**
      * UrlService constructor.
+     * @param SessionStorageService $sessionStorage
+     * @param WebstoreConfigurationService $webstoreConfigurationService
      */
-    public function __construct()
+    public function __construct(
+        SessionStorageService $sessionStorage,
+        WebstoreConfigurationService $webstoreConfigurationService
+    )
     {
-        $this->sessionStorage = pluginApp(SessionStorageService::class);
-        $this->webstoreConfigurationService = pluginApp(WebstoreConfigurationService::class);
+        $this->sessionStorage = $sessionStorage;
+        $this->webstoreConfigurationService = $webstoreConfigurationService;
     }
 
     /**
      * Get canonical url for a category
-     * @param int           $categoryId
-     * @param string|null   $lang
-     * @param int | null $webstoreId
+     * @param int $categoryId
+     * @param string|null $lang
      * @return UrlQuery
      */
     public function getCategoryURL( $categoryId, $lang = null)
@@ -159,7 +164,6 @@ class UrlService
         );
 
         return $canonicalUrl;
-
     }
 
     public function isCanonical($lang = null)
@@ -232,5 +236,33 @@ class UrlService
         }
 
         return pluginApp(Response::class)->redirectTo($redirectURL);
+    }
+
+    /**
+     * Takes a key and generates a link for it based on current state
+     *
+     * @param $internalLink
+     * @param array $varargs
+     * @return string
+     */
+    public function getInternalLink($internalLink, $envargs = [])
+    {
+        $internalUrlBuilder = pluginApp(InternalUrlBuilder::class);
+
+        switch($internalLink) {
+            case "retoure":
+                $generatedURL = $internalUrlBuilder->buildRetoureUrl($envargs[0]);
+                break;
+
+            case "tracking":
+                $generatedURL = $internalUrlBuilder->buildTrackingUrl($envargs[0]);
+                break;
+
+            default:
+                // noop
+                break;
+        }
+
+        return $generatedURL;
     }
 }
