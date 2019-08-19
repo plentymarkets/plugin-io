@@ -11,7 +11,6 @@ use IO\Helper\UserSession;
 use IO\Services\ItemSearch\Helper\LoadResultFields;
 use IO\Services\ItemSearch\Helper\ResultFieldTemplate;
 use IO\Services\UrlBuilder\UrlQuery;
-use Plenty\Plugin\Log\Loggable;
 use Plenty\Modules\Category\Contracts\CategoryBranchRepositoryContract;
 use Plenty\Modules\Category\Models\Category;
 use Plenty\Modules\Category\Contracts\CategoryRepositoryContract;
@@ -26,7 +25,6 @@ use Plenty\Repositories\Models\PaginatedResult;
  */
 class CategoryService
 {
-    use Loggable;
     use MemoryCache;
     use LoadResultFields;
 
@@ -484,29 +482,12 @@ class CategoryService
 
     private function appendBranchFields(&$category, $siblingCount = 1, $urlPrefix = '', $depth = 6)
     {
-        if(count($category['children']))
-        {
-            $this->getLogger(__CLASS__)->error("PartialTreeUnfiltered", [
-                "category" => $category['id'],
-                "children" => $category['children']
-            ]);
-        }
-
         // Filter children not having texts in current language
         $category['children'] = array_filter($category['children'], function($child)
         {
             return count($child['details']);
         });
-
         $category['children'] = array_values($category['children']);
-
-        if(count($category['children']))
-        {
-            $this->getLogger(__CLASS__)->error("PartialTreeFiltered", [
-                "category" => $category['id'],
-                "children" => $category['children']
-            ]);
-        }
 
         // add flags for lazy loading
         $category['childCount'] = count($category['children']);
