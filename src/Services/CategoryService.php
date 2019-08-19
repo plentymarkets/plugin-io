@@ -11,6 +11,7 @@ use IO\Helper\UserSession;
 use IO\Services\ItemSearch\Helper\LoadResultFields;
 use IO\Services\ItemSearch\Helper\ResultFieldTemplate;
 use IO\Services\UrlBuilder\UrlQuery;
+use Plenty\Plugin\Log\Loggable;
 use Plenty\Modules\Category\Contracts\CategoryBranchRepositoryContract;
 use Plenty\Modules\Category\Models\Category;
 use Plenty\Modules\Category\Contracts\CategoryRepositoryContract;
@@ -25,6 +26,7 @@ use Plenty\Repositories\Models\PaginatedResult;
  */
 class CategoryService
 {
+    use Loggable;
     use MemoryCache;
     use LoadResultFields;
 
@@ -476,6 +478,11 @@ class CategoryService
                 $result[] = $category;
             }
         }
+
+        $this->getLogger(__CLASS__)->error("PartialTree", [
+            "level" => $level,
+            "children" => $result
+        ]);
 
         return $result;
     }
