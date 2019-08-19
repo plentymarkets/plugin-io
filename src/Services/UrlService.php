@@ -8,6 +8,7 @@ use IO\Services\UrlBuilder\CategoryUrlBuilder;
 use IO\Services\UrlBuilder\InternalUrlBuilder;
 use IO\Services\UrlBuilder\UrlQuery;
 use IO\Services\UrlBuilder\VariationUrlBuilder;
+use phpDocumentor\Reflection\Types\Array_;
 use Plenty\Plugin\Http\Request;
 use Plenty\Plugin\Http\Response;
 
@@ -248,14 +249,19 @@ class UrlService
     public function getInternalLink($internalLink, $envargs = [])
     {
         $internalUrlBuilder = pluginApp(InternalUrlBuilder::class);
+        $generatedURL = "";
+
+        if(!is_array($envargs)) {
+            return $generatedURL;
+        }
 
         switch($internalLink) {
             case "retoure":
-                $generatedURL = $internalUrlBuilder->buildRetoureUrl($envargs[0]);
+                $generatedURL = $internalUrlBuilder->buildRetoureUrl($envargs['order']['id']);
                 break;
 
             case "tracking":
-                $generatedURL = $internalUrlBuilder->buildTrackingUrl($envargs[0]);
+                $generatedURL = $internalUrlBuilder->buildTrackingUrl($envargs['order']['id']);
                 break;
 
             default:

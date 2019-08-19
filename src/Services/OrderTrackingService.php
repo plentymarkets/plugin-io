@@ -15,7 +15,7 @@ use Plenty\Plugin\Log\Loggable;
 class OrderTrackingService
 {
     use Loggable;
-    
+
     /** @var OrderRepositoryContract */
     private $orderRepo;
 
@@ -32,7 +32,7 @@ class OrderTrackingService
         $this->orderRepo = $orderRepo;
         $this->parcelServicePresetRepo = $parcelServicePresetRepo;
     }
-    
+
     /**
      * @param Order $order
      * @param string $lang
