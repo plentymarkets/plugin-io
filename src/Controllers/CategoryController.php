@@ -172,7 +172,7 @@ class CategoryController extends LayoutController
             return $myAccountController->showMyAccount( $category );
         }
     
-        if ( RouteConfig::getCategoryId( RouteConfig::CONFIRMATION ) === $category->id || $shopBuilderRequest->getPreviewContentType() === 'confirmation')
+        if ( RouteConfig::getCategoryId( RouteConfig::CONFIRMATION ) === $category->id || $shopBuilderRequest->getPreviewContentType() === 'orderconfirmation')
         {
             $this->getLogger(__CLASS__)->info(
                 "IO::Debug.CategoryController_showConfirmationCategory",

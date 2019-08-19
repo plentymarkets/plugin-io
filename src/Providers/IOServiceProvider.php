@@ -181,6 +181,7 @@ class IOServiceProvider extends ServiceProvider
             /** @var BasketService $basketService */
             $basketService = pluginApp(BasketService::class);
             $basketService->checkBasketItemsLang();
+            Middleware::$DETECTED_LANGUAGE = $event->getLanguage();
         });
 
         $dispatcher->listen(FrontendShippingProfileChanged::class, IOFrontendShippingProfileChanged::class);
