@@ -2,6 +2,7 @@
 
 namespace IO\Services;
 
+use IO\Extensions\Constants\ShopUrls;
 use IO\Helper\LanguageMap;
 use IO\Helper\MemoryCache;
 use IO\Services\UrlBuilder\CategoryUrlBuilder;
@@ -167,6 +168,11 @@ class UrlService
         return $canonicalUrl;
     }
 
+    /**
+     * Check if the current URL is canonical
+     * @param null $lang
+     * @return bool
+     */
     public function isCanonical($lang = null)
     {
         $defaultLanguage = $this->webstoreConfigurationService->getDefaultLanguage();
@@ -228,6 +234,11 @@ class UrlService
             ['path' => '/'])->toRelativeUrl($this->webstoreConfigurationService->getDefaultLanguage() !== $this->sessionStorage->getLang());
     }
 
+    /**
+     * Redirects to the given URL
+     * @param $redirectURL
+     * @return mixed
+     */
     public function redirectTo($redirectURL)
     {
         if(strpos($redirectURL, 'http:') !== 0 && strpos($redirectURL, 'https:') !== 0)
@@ -249,6 +260,7 @@ class UrlService
     public function getInternalLink($internalLink, $envargs = [])
     {
         $internalUrlBuilder = pluginApp(InternalUrlBuilder::class);
+        $shopUrls = pluginApp(ShopUrls::class);
         $generatedURL = "";
 
         if(!is_array($envargs)) {

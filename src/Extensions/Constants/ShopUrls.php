@@ -5,6 +5,7 @@ namespace IO\Extensions\Constants;
 use IO\Helper\MemoryCache;
 use IO\Helper\RouteConfig;
 use IO\Services\CategoryService;
+use IO\Services\OrderTrackingService;
 use IO\Services\SessionStorageService;
 use IO\Services\UrlBuilder\CategoryUrlBuilder;
 use IO\Services\UrlBuilder\UrlQuery;
@@ -15,6 +16,11 @@ use Plenty\Plugin\Events\Dispatcher;
 class ShopUrls
 {
     use MemoryCache;
+
+    /**
+     * @var SessionStorageService $sessionStorageService
+     */
+    private $sessionStorageService;
 
     public $appendTrailingSlash = false;
     public $trailingSlashSuffix = "";
@@ -41,6 +47,8 @@ class ShopUrls
 
     public function __construct(Dispatcher $dispatcher, SessionStorageService $sessionStorageService)
     {
+        $this->sessionStorageService = $sessionStorageService;
+
         $this->init($sessionStorageService->getLang());
         $dispatcher->listen(FrontendLanguageChanged::class, function(FrontendLanguageChanged $event)
         {
@@ -85,6 +93,18 @@ class ShopUrls
     public function orderPropertyFile($path)
     {
         return $this->getShopUrl(RouteConfig::ORDER_PROPERTY_FILE, null, $path);
+    }
+
+    public function tracking($order)
+    {
+        $lang = $this->sessionStorageService->getLang();
+        return $this->fromMemoryCache("tracking", function() use($order, $lang)
+        {
+            $orderTrackingService = pluginApp(OrderTrackingService::class);
+            $trackingURL = $orderTrackingService->getTrackingURL($order, $lang);
+
+            return $trackingURL;
+        });
     }
 
     private function getShopUrl( $route, $url = null, ...$routeParams )
