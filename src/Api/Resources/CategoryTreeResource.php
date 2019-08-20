@@ -2,6 +2,7 @@
 
 namespace IO\Api\Resources;
 
+use IO\Constants\CategoryType;
 use IO\Services\CategoryService;
 use IO\Services\CustomerService;
 use IO\Services\SessionStorageService;
@@ -42,16 +43,10 @@ class CategoryTreeResource extends ApiResource
      */
     public function index():Response
     {
-        $type = $this->request->get('type', 'all');
+        $type = $this->request->get('type', CategoryType::ALL);
         $categoryId = $this->request->get('categoryId', null);
+        $response = $this->categoryService->getPartialTree($categoryId, $type);
 
-        $response = $this->categoryService->getNavigationTree($type, $this->sessionStorageService->getLang(), 6, $this->customerService->getContactClassId());
-
-        if($categoryId > 0)
-        {
-            $dataFields = $this->request->get('dataFields', ['breadcrumbs','parents', 'current', 'children']);
-            $response = $this->categoryService->filterPartialCategoryTree($response, $categoryId, $dataFields);
-        }
         return $this->response->create($response, ResponseCode::OK);
     }
 }

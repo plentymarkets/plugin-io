@@ -11,6 +11,7 @@ use IO\Helper\UserSession;
 use IO\Services\ItemSearch\Helper\LoadResultFields;
 use IO\Services\ItemSearch\Helper\ResultFieldTemplate;
 use IO\Services\UrlBuilder\UrlQuery;
+use Plenty\Modules\Category\Contracts\CategoryBranchRepositoryContract;
 use Plenty\Modules\Category\Models\Category;
 use Plenty\Modules\Category\Contracts\CategoryRepositoryContract;
 use Plenty\Modules\Category\Models\CategoryClient;
@@ -409,110 +410,104 @@ class CategoryService
         return $result;
     }
 
-
-    public function filterPartialCategoryTree($categoryTree, $categoryId, $dataFields = [], $parents = [], $breadcrumbs = [], $level = 0)
+    public function getPartialTree($categoryId = 0, $type = CategoryType::ALL)
     {
-        $filteredCategories = [];
-        foreach($categoryTree as $category)
+        if($categoryId > 0)
         {
-            if($category['id'] === (int)$categoryId)
+            $currentCategory = $this->get($categoryId);
+            $branch = $currentCategory->branch->toArray();
+            $maxLevel = max($currentCategory->level + 3, 6);
+
+            $tree = $this->getNavigationTree(
+                $type,
+                $this->sessionStorageService->getLang(),
+                $maxLevel,
+                pluginApp(CustomerService::class)->getContactClassId()
+            );
+
+            return $this->filterBranchEntries($tree, $branch);
+        }
+        else
+        {
+            $tree = $this->getNavigationTree(
+                $type,
+                $this->sessionStorageService->getLang(),
+                3,
+                pluginApp(CustomerService::class)->getContactClassId()
+            );
+            $siblingCount = count($tree);
+
+            foreach($tree as $i => $category)
             {
-                if(in_array('breadcrumbs', $dataFields))
-                {
-                    $breadcrumbs = array_merge($breadcrumbs, $this->filterChildren([$category]));
-                    $filteredCategories['breadcrumbs'] = $breadcrumbs;
-                }
-
-                if(in_array('parents', $dataFields))
-                {
-                    $filteredCategories['parents'] = $parents;
-                }
-
-                if(in_array('current', $dataFields))
-                {
-                    $filteredCategories['current'] = $this->filterChildren($categoryTree, 0);
-                }
-
-                if(in_array('children', $dataFields))
-                {
-                    foreach($categoryTree as $temp)
-                    {
-                        $filteredCategories['children'][$temp['id']] = $this->filterChildren( $temp['children'] ?? [], 0);
-
-                    }
-                }
+                $this->appendBranchFields($tree[$i], $siblingCount, '', 1);
             }
+
+            return $tree;
         }
-
-        if(count($filteredCategories) > 0)
-        {
-            return $filteredCategories;
-        }
-
-        foreach($categoryTree as $category)
-        {
-            if(isset($category['children']))
-            {
-                $tempBreadcrumbs = array_merge($breadcrumbs, $this->filterChildren([$category]));
-
-                $tempParents = $this->filterChildren($categoryTree,0);
-                $filteredCategories = $this->filterPartialCategoryTree($category['children'], $categoryId, $dataFields, $tempParents, $tempBreadcrumbs, $level++);
-
-                if (count($filteredCategories) > 0)
-                {
-                    break;
-                }
-            }
-        }
-        return $filteredCategories;
     }
 
-    private function filterChildren($categories, $skipLevel = 0)
+
+    private function filterBranchEntries($tree, $branch = [], $level = 1, $urlPrefix = '')
     {
-        $cleanedCategories = [];
-        foreach($categories as $category)
+        $branchKey      = "category".$level."Id";
+        $isCurrentLevel = $branch[$branchKey] === $branch["categoryId"];
+        $result         = [];
+        $siblingCount   = count($tree);
+
+        foreach($tree as $category)
         {
-            if(isset($category['details']))
+            $isInBranch = $category['id'] === $branch[$branchKey];
+
+            // filter children by current branch
+            if($isInBranch && !$isCurrentLevel)
             {
-                $category = json_decode(json_encode($category));
-                if ($skipLevel === 0 && isset($category->children))
-                {
-                    $detailsExist = false;
-                    foreach ($category->children as $categoryChildren)
-                    {
-                        if (isset($categoryChildren->details))
-                        {
-                            $detailsExist = true;
-                        }
-                    }
-
-                    if ($detailsExist)
-                    {
-                        $category->hasChildren = true;
-                    }
-                    unset($category->children);
-                    $category = json_decode(json_encode($category), true); //Turn it into an array
-                    $cleanedCategories[] = $category;
-                } elseif ($skipLevel === 1 && isset($category->children))
-                {
-                    $temp = [];
-                    foreach ($category->children as $children) {
-                        unset($children['children']);
-                        $temp[] = $children;
-                    }
-                    $category->children = $temp;
-                    $category = json_decode(json_encode($category), true); //Turn it into an array
-
-                    $cleanedCategories[] = $category;
-                } else
-                {
-                    $category = json_decode(json_encode($category), true); //Turn it into an array
-                    $cleanedCategories[] = $category;
-                }
+                $this->appendBranchFields($category, $siblingCount, $urlPrefix, 6);
+                $category['children'] = $this->filterBranchEntries($category['children'], $branch, $level+1, $category['url']);
+                $result[] = $category;
+            }
+            else if($isInBranch && $isCurrentLevel)
+            {
+                $this->appendBranchFields($category, $siblingCount, $urlPrefix, 2);
+                $result[] = $category;
+            }
+            else if(!$isInBranch && $isCurrentLevel)
+            {
+                $this->appendBranchFields($category, $siblingCount, $urlPrefix, 0);
+                $result[] = $category;
             }
         }
 
-        return $cleanedCategories;
+        return $result;
+    }
+
+    private function appendBranchFields(&$category, $siblingCount = 1, $urlPrefix = '', $depth = 6)
+    {
+        // Filter children not having texts in current language
+        $category['children'] = array_filter($category['children'], function($child)
+        {
+            return count($child['details']);
+        });
+        $category['children'] = array_values($category['children']);
+
+        // add flags for lazy loading
+        $category['childCount'] = count($category['children']);
+        $category['siblingCount'] = $siblingCount;
+
+        // add url
+        $details = $category['details'][0];
+        $category['url'] = pluginApp(UrlQuery::class, ['path' => $urlPrefix])->join($details['nameUrl'])->toRelativeUrl();
+
+        if(count($category['children']) && $depth > 0)
+        {
+            foreach($category['children'] as $i => $child)
+            {
+                $this->appendBranchFields($category['children'][$i], $category['childCount'], $category['url'], $depth - 1);
+            }
+        }
+        else
+        {
+            unset($category['children']);
+        }
     }
 
     /**

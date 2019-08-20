@@ -56,8 +56,9 @@ class NotificationService
      * @param string $message
      * @param string $type
      * @param int $code
+     * @param array|null $placeholder
      */
-    private function addNotification(string $message, string $type, int $code = 0)
+    private function addNotification(string $message, string $type, int $code = 0, array $placeholder = null)
     {
         $notifications = $this->getNotifications(false);
         if ( !array_key_exists($type, $notifications) )
@@ -68,7 +69,8 @@ class NotificationService
         $notification = [
             'message'       => $message,
             'code'          => $code,
-            'stackTrace'    => []
+            'stackTrace'    => [],
+            'placeholder'          => $placeholder
         ];
         $lastNotification = $notifications[$type];
 
@@ -87,54 +89,60 @@ class NotificationService
     /**
      * @param string $message
      * @param int $code
+     * @param array $placeholder
      */
-    public function log(string $message, $code = 0)
+    public function log(string $message, $code = 0, array $placeholder = null)
     {
-        $this->addNotification($message, LogLevel::LOG, $code);
+        $this->addNotification($message, LogLevel::LOG, $code, $placeholder);
     }
 
     /**
      * @param string $message
      * @param int $code
+     * @param array|null $placeholder
      */
-    public function info(string $message, $code = 0)
+    public function info(string $message, $code = 0, array $placeholder = null)
     {
-        $this->addNotification($message, LogLevel::INFO, $code);
+        $this->addNotification($message, LogLevel::INFO, $code, $placeholder);
     }
 
     /**
      * @param string $message
      * @param int $code
+     * @param array|null $placeholder
      */
-    public function warn(string $message, $code = 0)
+    public function warn(string $message, $code = 0, array $placeholder = null)
     {
-        $this->addNotification($message, LogLevel::WARN, $code);
+        $this->addNotification($message, LogLevel::WARN, $code, $placeholder);
     }
 
     /**
      * @param string $message
      * @param int $code
+     * @param array|null $placeholder
      */
-    public function error(string $message, $code = 0)
+    public function error(string $message, $code = 0, array $placeholder = null)
     {
-        $this->addNotification($message, LogLevel::ERROR, $code);
+        $this->addNotification($message, LogLevel::ERROR, $code, $placeholder);
     }
 
     /**
      * @param string $message
      * @param int $code
+     * @param array|null $placeholder
      */
-    public function success(string $message, $code = 0)
+    public function success(string $message, $code = 0, array $placeholder = null)
     {
-        $this->addNotification($message, LogLevel::SUCCESS, $code);
+        $this->addNotification($message, LogLevel::SUCCESS, $code, $placeholder);
     }
 
     /**
      * @param $type
      * @param int $code
+     * @param array|null $placeholder
      */
-    public function addNotificationCode($type, int $code = 0)
+    public function addNotificationCode($type, int $code = 0, array $placeholder = null)
     {
-        $this->addNotification("", $type, $code);
+        $this->addNotification("", $type, $code, $placeholder);
     }
 }

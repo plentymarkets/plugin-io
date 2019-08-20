@@ -13,6 +13,7 @@ use IO\Services\TemplateConfigService;
 use Plenty\Modules\Order\Date\Models\OrderDate;
 use Plenty\Modules\Order\Date\Models\OrderDateType;
 use Plenty\Modules\Order\Models\Order;
+use Plenty\Modules\ShopBuilder\Helper\ShopBuilderRequest;
 use Plenty\Plugin\Http\Response;
 use Plenty\Plugin\Log\Loggable;
 
@@ -34,6 +35,10 @@ class ConfirmationController extends LayoutController
     
         /** @var SessionStorageService $sessionStorageService */
         $sessionStorageService = pluginApp(SessionStorageService::class);
+
+        /** @var ShopBuilderRequest $shopBuilderRequest */
+        $shopBuilderRequest = pluginApp(ShopBuilderRequest::class);
+        $shopBuilderRequest->setMainContentType('checkout');
     
         /**
          * @var OrderService $orderService
