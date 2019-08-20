@@ -1,5 +1,20 @@
 # Release Notes for IO
 
+## v4.2.2 (2019-08-19) <a href="https://github.com/plentymarkets/plugin-io/compare/4.1.2...4.2.0" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
+
+### Added
+
+- The static pages for cancellation form, cancellation rights, general terms and conditions, privacy policy and legal disclosure can now be created and edited with the ShopBuilder.
+
+### Fixed
+
+- Under certain circumstances, the display of base prices could lead to errors. This behaviour has been fixed.
+- Changing the item quantity in the shopping cart in connection with a coupon could cause problems if the minimum order value was not reached. This has been fixed.
+- For some languages, a space character was missing between the ISO code of the currency and the amount in the shopping cart. This has been fixed.
+- Removing items could lead to errors if a coupon had already been redeemed. This behaviour has been fixed.
+- Due to an error in the address validation, entering a company address could under certain circumstances lead to the issuing of an error notification, in which case the address was not saved. This has been fixed.
+- Shipping methods were not refreshed when the country of delivery was changed. This has been fixed.
+
 ## v4.1.2 (2019-07-16) <a href="https://github.com/plentymarkets/plugin-io/compare/4.1.1...4.1.2" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
 
 ### Added
