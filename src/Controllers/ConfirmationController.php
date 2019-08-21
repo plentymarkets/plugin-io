@@ -51,6 +51,19 @@ class ConfirmationController extends LayoutController
          * @var OrderService $orderService
          */
         $orderService = pluginApp(OrderService::class);
+
+        if($shopBuilderRequest->isShopBuilder() && !is_null($category))
+        {
+            return $this->renderTemplate(
+            "tpl.confirmation",
+            [
+                "category" => $category,
+                "data" => null,
+                "showAdditionalPaymentInformation" => true
+            ],
+            false
+        );
+        }
         
         if(strlen($orderAccesskey) && (int)$orderId > 0)
         {
