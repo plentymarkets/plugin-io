@@ -776,15 +776,4 @@ class OrderService
 
         return $paymentProperty;
     }
-    
-    public function getRandomOrder()
-    {
-        $filters['orderType'] = OrderType::ORDER;
-        $this->orderRepository->setFilters($filters);
-        $orderList = $this->orderRepository->searchOrders(1, 1)->getResult();
-        $orderArray = $orderList->first();
-        $order = $this->findOrderById($orderArray['id']);
-        
-        return $order;
-    }
 }
