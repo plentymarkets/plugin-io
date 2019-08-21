@@ -1096,4 +1096,30 @@ class CustomerService
 
         return $email;
     }
+
+    /**
+     * @param int $contactId
+     * @return string|null
+     * @throws \Throwable
+     */
+    public function getContactNumber($contactId)
+    {
+        /** @var AuthHelper $authHelper */
+        $authHelper = pluginApp(AuthHelper::class);
+        $contactRepo = $this->contactRepository;
+
+        try
+        {
+            $contact = $authHelper->processUnguarded( function() use ($contactRepo, $contactId)
+            {
+                return $contactRepo->findContactById($contactId);
+            });
+
+            return $contact->number;
+        }
+        catch (\Exception $exception)
+        {
+            return null;
+        }
+    }
 }
