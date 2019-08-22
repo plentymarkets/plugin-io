@@ -249,38 +249,4 @@ class UrlService
 
         return pluginApp(Response::class)->redirectTo($redirectURL);
     }
-
-    /**
-     * Takes a key and generates a link for it based on current state
-     *
-     * @param $internalLink
-     * @param array $varargs
-     * @return string
-     */
-    public function getInternalLink($internalLink, $envargs = [])
-    {
-        $internalUrlBuilder = pluginApp(InternalUrlBuilder::class);
-        $shopUrls = pluginApp(ShopUrls::class);
-        $generatedURL = "";
-
-        if(!is_array($envargs)) {
-            return $generatedURL;
-        }
-
-        switch($internalLink) {
-            case "retoure":
-                $generatedURL = $internalUrlBuilder->buildRetoureUrl($envargs['order']['id']);
-                break;
-
-            case "tracking":
-                $generatedURL = $internalUrlBuilder->buildTrackingUrl($envargs['order']['id']);
-                break;
-
-            default:
-                // noop
-                break;
-        }
-
-        return $generatedURL;
-    }
 }

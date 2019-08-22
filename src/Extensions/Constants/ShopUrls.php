@@ -11,6 +11,7 @@ use IO\Services\UrlBuilder\CategoryUrlBuilder;
 use IO\Services\UrlBuilder\UrlQuery;
 use IO\Services\WebstoreConfigurationService;
 use Plenty\Modules\Frontend\Events\FrontendLanguageChanged;
+use Plenty\Modules\Order\Contracts\OrderRepositoryContract;
 use Plenty\Plugin\Events\Dispatcher;
 
 class ShopUrls
@@ -95,12 +96,14 @@ class ShopUrls
         return $this->getShopUrl(RouteConfig::ORDER_PROPERTY_FILE, null, $path);
     }
 
-    public function tracking($order)
+    public function tracking($orderId)
     {
         $lang = $this->sessionStorageService->getLang();
-        return $this->fromMemoryCache("tracking", function() use($order, $lang)
+        return $this->fromMemoryCache("tracking", function() use($orderId, $lang)
         {
+            $orderRepository = pluginApp(OrderRepositoryContract::class);
             $orderTrackingService = pluginApp(OrderTrackingService::class);
+            $order = $orderRepository->findOrderById($orderId);
             $trackingURL = $orderTrackingService->getTrackingURL($order, $lang);
 
             return $trackingURL;
