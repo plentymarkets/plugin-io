@@ -10,6 +10,7 @@ use IO\Services\SessionStorageService;
 use IO\Services\UrlBuilder\CategoryUrlBuilder;
 use IO\Services\UrlBuilder\UrlQuery;
 use IO\Services\WebstoreConfigurationService;
+use Plenty\Modules\Authorization\Services\AuthHelper;
 use Plenty\Modules\Frontend\Events\FrontendLanguageChanged;
 use Plenty\Modules\Order\Contracts\OrderRepositoryContract;
 use Plenty\Plugin\Events\Dispatcher;
@@ -103,7 +104,10 @@ class ShopUrls
         {
             $orderRepository = pluginApp(OrderRepositoryContract::class);
             $orderTrackingService = pluginApp(OrderTrackingService::class);
-            $order = $orderRepository->findOrderById($orderId);
+            $authHelper = pluginApp(AuthHelper::class);
+            $order = $authHelper->processUnguarded(function() use ($orderRepository, $orderId) {
+                return $orderRepository->findOrderById($orderId);
+            });
             $trackingURL = $orderTrackingService->getTrackingURL($order, $lang);
 
             return $trackingURL;
