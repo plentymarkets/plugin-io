@@ -487,6 +487,7 @@ class CategoryService
         {
             return count($child['details']);
         });
+        $category['children'] = array_values($category['children']);
 
         // add flags for lazy loading
         $category['childCount'] = count($category['children']);
@@ -507,7 +508,6 @@ class CategoryService
         {
             unset($category['children']);
         }
-
     }
 
     /**

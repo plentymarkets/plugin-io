@@ -1,5 +1,20 @@
 # Release Notes für IO
 
+## v4.2.0 (2019-08-21) <a href="https://github.com/plentymarkets/plugin-io/compare/4.1.2...4.2.0" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
+
+### Hinzugefügt
+
+- Die statischen Seiten für Widerrufsformular, Widerrufsrecht, AGB, Datenschutzerklärung und Impressum können nun mit dem ShopBuilder erstellt und bearbeitet werden.
+
+### Behoben
+
+- Bei der Darstellung von Grundpreisen konnte es zu Problemen kommen. Dieses Verhalten wurde behoben.
+- Änderungen der Artikelmenge im Warenkorb in Verbindung mit einem Gutschein führten zu Problemen, wenn der Mindestbestellwert unterschritten wurde. Dies wurde behoben.
+- Bei manchen Sprachen wurde im Warenkorb kein Leerzeichen zwischen dem ISO-Code der Währung und dem Wert ausgegeben. Dies wurde behoben.
+- Beim Entfernen von Artikeln konnte es zu Fehlern kommen, wenn bereits ein Gutschein eingelöst wurde. Das Verhalten wurde behoben.
+- Es wurde ein Fehler bei der Adressvalidierung behoben, durch welchen bei der Eingabe von Firmenadressen unter bestimmten Umständen eine Fehlermeldung im Shop angezeigt und die Adresse nicht gespeichert wurde.
+- Versandarten wurden beim Wechsel des Lieferlandes nicht aktualisiert. Dies wurde behoben.
+
 ## v4.1.2 (2019-07-16) <a href="https://github.com/plentymarkets/plugin-io/compare/4.1.1...4.1.2" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
 
 ### Hinzugefügt
