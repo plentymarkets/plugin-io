@@ -14,6 +14,7 @@ use Plenty\Modules\Authorization\Services\AuthHelper;
 use Plenty\Modules\Frontend\Events\FrontendLanguageChanged;
 use Plenty\Modules\Order\Contracts\OrderRepositoryContract;
 use Plenty\Plugin\Events\Dispatcher;
+use Plenty\Plugin\Http\Request;
 
 class ShopUrls
 {
@@ -89,6 +90,11 @@ class ShopUrls
 
     public function returns($orderId, $orderAccessKey = null)
     {
+        if($orderAccessKey == null) {
+            $request = pluginApp(Request::class);
+            $orderAccessKey = $request->get('accessKey');
+        }
+
         return $this->getShopUrl(RouteConfig::ORDER_RETURN, "returns", $orderId, $orderAccessKey);
     }
 
