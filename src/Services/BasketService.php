@@ -704,22 +704,12 @@ class BasketService
 
     private function reduceBasketItem($basketItem)
     {
-        $basketItemOrderParams = array_map(function($orderParam) {
-            return [
-                "propertyId" => $orderParam["propertyId"],
-                "property"   => [
-                    "type"      => $orderParam["property"]["type"],
-                    "value"     => $orderParam["property"]["value"]
-                ]
-            ];
-        }, $basketItem["basketItemOrderParams"]);
-
         return [
             "id"                    => $basketItem["id"],
             "quantity"              => $basketItem["quantity"],
             "price"                 => $basketItem["price"],
             "variation"             => $basketItem["variation"],
-            "basketItemOrderParams" => $basketItemOrderParams ?? []
+            "basketItemOrderParams" => $basketItem["basketItemOrderParams"] ?? []
         ];
     }
 }
