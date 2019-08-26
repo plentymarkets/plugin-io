@@ -17,6 +17,7 @@ use IO\Extensions\Filters\NumberFormatFilter;
 use Plenty\Modules\Frontend\Services\VatService;
 use IO\Services\ItemSearch\Factories\VariationSearchFactory;
 use IO\Constants\LogLevel;
+use Plenty\Modules\Order\Shipping\Contracts\EUCountryCodesServiceContract;
 use Plenty\Plugin\Log\Loggable;
 
 /**
@@ -99,6 +100,9 @@ class BasketService
 
     public function getBasketForTemplate(): array
     {
+        /** @var EUCountryCodesServiceContract $euCountryService */
+        $euCountryService = pluginApp(EUCountryCodesServiceContract::class);
+
         $basket = $this->getBasket()->toArray();
 
         $basket["itemQuantity"] = $this->getBasketQuantity();
@@ -121,6 +125,8 @@ class BasketService
         }
 
         $basket = $this->couponService->checkCoupon($basket);
+
+        $basket["isExportDelivery"] = $euCountryService->isExportDelivery($basket["shippingCountryId"]);
 
         return $basket;
     }
