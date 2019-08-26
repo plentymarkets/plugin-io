@@ -203,9 +203,15 @@ class BasketService
                 $basketItem->price = round($basketItem->price * 100 / (100.0 + $basketItem->vat), 2);
             }
 
+            $itemData = [];
+            if(array_key_exists($basketItem->variationId, $basketItemData))
+            {
+                $itemData = $basketItemData[$basketItem->variationId];
+            }
+
             array_push(
                 $result,
-                $this->addVariationData($basketItem, $basketItemData[$basketItem->variationId])
+                $this->addVariationData($basketItem, $itemData)
             );
         }
 
