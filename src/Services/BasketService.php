@@ -709,6 +709,7 @@ class BasketService
             "quantity"              => $basketItem["quantity"],
             "price"                 => $basketItem["price"],
             "variation"             => $basketItem["variation"],
+            "variationId"           => $basketItem["variationId"],
             "basketItemOrderParams" => $basketItem["basketItemOrderParams"] ?? []
         ];
     }
