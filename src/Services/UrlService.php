@@ -188,7 +188,10 @@ class UrlService
             "languageUrls",
             function() {
                 $result = [];
-                $defaultUrl = $this->getCanonicalURL();
+
+                $defaultLanguage = $this->webstoreConfigurationService->getDefaultLanguage();
+
+                $defaultUrl = $this->getCanonicalURL( $defaultLanguage );
 
                 if ( $defaultUrl !== null )
                 {
