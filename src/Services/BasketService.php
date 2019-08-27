@@ -4,6 +4,7 @@ namespace IO\Services;
 
 use IO\Services\ItemSearch\SearchPresets\BasketItems;
 use IO\Services\ItemSearch\Services\ItemSearchService;
+use Plenty\Modules\Accounting\Contracts\DetermineShopCountryContract;
 use Plenty\Modules\Accounting\Vat\Contracts\VatInitContract;
 use Plenty\Modules\Accounting\Vat\Models\VatRate;
 use Plenty\Modules\Basket\Contracts\BasketRepositoryContract;
@@ -103,6 +104,9 @@ class BasketService
         /** @var EUCountryCodesServiceContract $euCountryService */
         $euCountryService = pluginApp(EUCountryCodesServiceContract::class);
 
+        /** @var DetermineShopCountryContract $determineShopCountry */
+        $determineShopCountry = pluginApp(DetermineShopCountryContract::class);
+
         $basket = $this->getBasket()->toArray();
 
         $basket["itemQuantity"] = $this->getBasketQuantity();
@@ -127,6 +131,7 @@ class BasketService
         $basket = $this->couponService->checkCoupon($basket);
 
         $basket["isExportDelivery"] = $euCountryService->isExportDelivery($basket["shippingCountryId"]);
+        $basket["shopCountryId"] = $determineShopCountry->getCountryId();
 
         return $basket;
     }
