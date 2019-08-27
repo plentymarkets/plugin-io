@@ -2,6 +2,7 @@
 
 namespace IO\Services\Order\Factories\Faker;
 
+use IO\Services\ItemSearch\Factories\Faker\AbstractFaker;
 use IO\Services\SessionStorageService;
 use IO\Services\WebstoreConfigurationService;
 use Plenty\Modules\Authorization\Services\AuthHelper;

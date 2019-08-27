@@ -2,6 +2,7 @@
 
 namespace IO\Services\Order\Factories\Faker;
 
+use IO\Services\ItemSearch\Factories\Faker\AbstractFaker;
 use IO\Services\ItemSearch\SearchPresets\VariationList;
 use IO\Services\ItemSearch\Services\ItemSearchService;
 use Plenty\Plugin\Translation\Translator;

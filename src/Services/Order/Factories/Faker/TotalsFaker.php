@@ -2,6 +2,8 @@
 
 namespace IO\Services\Order\Factories\Faker;
 
+use IO\Services\ItemSearch\Factories\Faker\AbstractFaker;
+
 class TotalsFaker extends AbstractFaker
 {
     public function fill($data)

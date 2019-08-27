@@ -2,6 +2,7 @@
 
 namespace IO\Services\Order\Factories;
 
+use IO\Services\ItemSearch\Factories\Faker\AbstractFaker;
 use IO\Services\Order\Factories\Faker\LocalizedOrderFaker;
 use IO\Services\Order\Factories\Faker\OrderFaker;
 use IO\Services\Order\Factories\Faker\TotalsFaker;
@@ -96,7 +97,10 @@ class OrderResultFactory
             if(array_key_exists($key, self::FAKER_MAP))
             {
                 $faker = pluginApp(self::FAKER_MAP[$key]);
-                $orderResult[$key] = $faker->fill($orderResult[$key]);
+                if($faker instanceof AbstractFaker)
+                {
+                    $orderResult[$key] = $faker->fill($orderResult[$key]);
+                }
             }
             else
             {
