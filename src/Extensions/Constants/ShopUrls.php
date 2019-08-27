@@ -106,15 +106,16 @@ class ShopUrls
     public function tracking($orderId)
     {
         $lang = $this->sessionStorageService->getLang();
-        return $this->fromMemoryCache("tracking", function() use($orderId, $lang)
+        return $this->fromMemoryCache("tracking" . "." . $orderId, function() use($orderId, $lang)
         {
-            $orderRepository = pluginApp(OrderRepositoryContract::class);
-            $orderTrackingService = pluginApp(OrderTrackingService::class);
             $authHelper = pluginApp(AuthHelper::class);
-            $order = $authHelper->processUnguarded(function() use ($orderRepository, $orderId) {
-                return $orderRepository->findOrderById($orderId);
+            $trackingURL = $authHelper->processUnguarded(function() use ($orderId, $lang) {
+                $orderRepository = pluginApp(OrderRepositoryContract::class);
+                $orderTrackingService = pluginApp(OrderTrackingService::class);
+
+                $order = $orderRepository->findOrderById($orderId);
+                return $orderTrackingService->getTrackingURL($order, $lang);
             });
-            $trackingURL = $orderTrackingService->getTrackingURL($order, $lang);
 
             return $trackingURL;
         });
