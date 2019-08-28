@@ -154,6 +154,7 @@ class IORouteServiceProvider extends RouteServiceProvider
         $this->registerRedirectedRoute(
             $router,
             RouteConfig::CONTACT,
+            $shopUrls->contact,
             function()
             {
                 return pluginApp(ContactController::class)->showContact();
