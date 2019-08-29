@@ -94,10 +94,7 @@ class IORouteServiceProvider extends RouteServiceProvider
             $router,
             RouteConfig::BASKET,
             $shopUrls->basket,
-            function()
-            {
-                return pluginApp(BasketController::class)->showBasket();
-            }
+            'IO\Controllers\BasketController@showBasket'
         );
 
         // CANCELLATION FORM
@@ -105,10 +102,7 @@ class IORouteServiceProvider extends RouteServiceProvider
             $router,
             RouteConfig::CANCELLATION_FORM,
             $shopUrls->cancellationForm,
-            function()
-            {
-                return pluginApp(StaticPagesController::class)->showCancellationForm();
-            }
+            'IO\Controllers\StaticPagesController@showCancellationForm'
         );
 
         // CANCELLATION RIGHTS
@@ -116,10 +110,7 @@ class IORouteServiceProvider extends RouteServiceProvider
             $router,
             RouteConfig::CANCELLATION_RIGHTS,
             $shopUrls->cancellationRights,
-            function()
-            {
-                return pluginApp(StaticPagesController::class)->showCancellationRights();
-            }
+            'IO\Controllers\StaticPagesController@showCancellationRights'
         );
 
         // CHANGE MAIL
@@ -133,10 +124,7 @@ class IORouteServiceProvider extends RouteServiceProvider
             $router,
             RouteConfig::CHECKOUT,
             $shopUrls->checkout,
-            function()
-            {
-                return pluginApp(CheckoutController::class)->showCheckout();
-            }
+            'IO\Controllers\CheckoutController@showCheckout'
         );
 
         // CONFIRMATION
@@ -155,10 +143,7 @@ class IORouteServiceProvider extends RouteServiceProvider
             $router,
             RouteConfig::CONTACT,
             $shopUrls->contact,
-            function()
-            {
-                return pluginApp(ContactController::class)->showContact();
-            }
+            'IO\Controllers\ContactController@showContact'
         );
 
         // HOME
@@ -178,10 +163,7 @@ class IORouteServiceProvider extends RouteServiceProvider
             $router,
             RouteConfig::LEGAL_DISCLOSURE,
             $shopUrls->legalDisclosure,
-            function()
-            {
-                return pluginApp(StaticPagesController::class)->showLegalDisclosure();
-            }
+            'IO\Controllers\StaticPagesController@showLegalDisclosure'
         );
 
         // LOGIN
@@ -189,10 +171,7 @@ class IORouteServiceProvider extends RouteServiceProvider
             $router,
             RouteConfig::LOGIN,
             $shopUrls->login,
-            function()
-            {
-                return pluginApp(LoginController::class)->showLogin();
-            }
+            'IO\Controllers\LoginController@showLogin'
         );
 
         // MY ACCOUNT
@@ -200,10 +179,7 @@ class IORouteServiceProvider extends RouteServiceProvider
             $router,
             RouteConfig::MY_ACCOUNT,
             $shopUrls->myAccount,
-            function()
-            {
-                return pluginApp(MyAccountController::class)->showMyAccount();
-            }
+            'IO\Controllers\MyAccountController@showMyAccount'
         );
 
         // NEWSLETTER OPT IN
@@ -267,10 +243,7 @@ class IORouteServiceProvider extends RouteServiceProvider
             $router,
             RouteConfig::PRIVACY_POLICY,
             $shopUrls->privacyPolicy,
-            function()
-            {
-                return pluginApp(StaticPagesController::class)->showPrivacyPolicy();
-            }
+            'IO\Controllers\StaticPagesController@showPrivacyPolicy'
         );
 
         // REGISTER
@@ -294,10 +267,7 @@ class IORouteServiceProvider extends RouteServiceProvider
             $router,
             RouteConfig::TERMS_CONDITIONS,
             $shopUrls->termsConditions,
-            function()
-            {
-                return pluginApp(StaticPagesController::class)->showTermsAndConditions();
-            }
+            'IO\Controllers\StaticPagesController@showTermsAndConditions'
         );
 
         // WISH LIST
@@ -340,19 +310,20 @@ class IORouteServiceProvider extends RouteServiceProvider
         }
 	}
 
-	private function registerRedirectedRoute(Router $router, $route, $shopUrl, \Closure $fallback = null)
+	private function registerRedirectedRoute(Router $router, $route, $shopUrl, $legacyController = '')
     {
         if(in_array($route, RouteConfig::getEnabledRoutes()))
         {
+
             // legacy route is active
-            $router->get($route, function() use ($route, $fallback)
+            if(RouteConfig::getCategoryId($route) <= 0)
             {
-                // no category is assigned => call legacy controller
-                if(RouteConfig::getCategoryId($route) <= 0)
-                {
-                    return is_null($fallback) ? '' : $fallback->call($this);
-                }
-                else
+                // no category is assigned => bind legacy controller
+                $router->get($route, $legacyController);
+            }
+            else
+            {
+                $router->get($route, function() use ($route)
                 {
                     // category is assigend => redirect from legacy route to category url
                     // This will also check if the category url equals the legacy route to avoid endless loops
@@ -360,8 +331,8 @@ class IORouteServiceProvider extends RouteServiceProvider
                         RouteConfig::getCategoryId($route),
                         "/".$route
                     );
-                }
-            });
+                });
+            }
         }
 
         if ( !RouteConfig::isActive(RouteConfig::CATEGORY) && RouteConfig::getCategoryId($route) > 0 )
