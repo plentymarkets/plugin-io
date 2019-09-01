@@ -247,10 +247,15 @@ class IORouteServiceProvider extends RouteServiceProvider
         );
 
         // REGISTER
+        $this->registerRedirectedRoute(
+            $router,
+            RouteConfig::REGISTER,
+            $shopUrls->registration,
+            'IO\Controllers\RegisterController@showRegister'
+        );
         if ( RouteConfig::isActive(RouteConfig::REGISTER) )
         {
             //Register page route
-            $router->get('register', 'IO\Controllers\RegisterController@showRegister');
             $router->get('registration', 'IO\Controllers\RegisterController@redirectRegister');
         }
 
@@ -271,10 +276,12 @@ class IORouteServiceProvider extends RouteServiceProvider
         );
 
         // WISH LIST
-        if( RouteConfig::isActive(RouteConfig::WISH_LIST) )
-        {
-            $router->get('wish-list', 'IO\Controllers\ItemWishListController@showWishList');
-        }
+        $this->registerRedirectedRoute(
+            $router,
+            RouteConfig::WISH_LIST,
+            $shopUrls->wishList,
+            'IO\Controllers\ItemWishListController@showWishList'
+        );
 
         // ITEM ROUTES
         if ( RouteConfig::isActive(RouteConfig::ITEM) )
