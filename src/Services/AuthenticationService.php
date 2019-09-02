@@ -110,4 +110,15 @@ class AuthenticationService
 
         return false;
     }
+
+    public function isLoggedIn()
+    {
+        /** @var CustomerService $customerService */
+        $customerService = pluginApp(CustomerService::class);
+
+        $contactId = $customerService->getContactId();
+        $email = $this->sessionStorage->getSessionValue(SessionStorageKeys::GUEST_EMAIL);
+
+        return $contactId > 0 || !empty(trim($email));
+    }
 }
