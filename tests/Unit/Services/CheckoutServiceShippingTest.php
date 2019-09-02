@@ -11,6 +11,7 @@ namespace IO\Tests\Unit;
 
 use IO\Services\BasketService;
 use IO\Services\CheckoutService;
+use IO\Services\CustomerService;
 use IO\Services\SessionStorageService;
 use IO\Services\WebstoreConfigurationService;
 use IO\Tests\TestCase;
@@ -75,6 +76,11 @@ class CheckoutServiceShippingTest extends TestCase
     private $basketServiceMock;
 
     /**
+     * @var CustomerService $customerServiceMock
+     */
+    private $customerServiceMock;
+
+    /**
      * @var CurrencyExchangeRepositoryContract $currencyExchangeRepoMock
      */
     private $currencyExchangeRepoMock;
@@ -113,6 +119,9 @@ class CheckoutServiceShippingTest extends TestCase
 
         $this->currencyExchangeRepoMock = Mockery::mock(CurrencyExchangeRepositoryContract::class);
         $this->replaceInstanceByMock(CurrencyExchangeRepositoryContract::class, $this->currencyExchangeRepoMock);
+
+        $this->customerServiceMock = Mockery::mock(CustomerService::class);
+        $this->replaceInstanceByMock(CustomerService::class, $this->customerServiceMock);
 
         $this->checkoutService = pluginApp(CheckoutService::class);
 
@@ -157,6 +166,9 @@ class CheckoutServiceShippingTest extends TestCase
                 'accountContactClassId' => 1
             ]);
 
+        $this->customerServiceMock->shouldReceive('showNetPrices')
+            ->andReturn(false);
+
         $this->checkoutMock->shouldReceive('getShippingCountryId')->andReturn(10);
 
         $this->applicationMock->shouldReceive('getWebstoreId')->andReturn(1);
@@ -167,7 +179,7 @@ class CheckoutServiceShippingTest extends TestCase
 
         $this->accountRepositoryMock->shouldReceive('getSettings')
             ->andReturn((object)[
-                "showSoppingVat" => true
+                "showShippingVat" => true
             ]);
 
         $this->basketServiceMock->shouldReceive('getBasket')->andReturn($basket);

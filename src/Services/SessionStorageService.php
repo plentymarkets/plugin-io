@@ -6,6 +6,7 @@ use Plenty\Modules\Frontend\Events\FrontendLanguageChanged;
 use Plenty\Modules\Frontend\Session\Storage\Contracts\FrontendSessionStorageFactoryContract;
 use Plenty\Modules\Frontend\Session\Storage\Models\Customer;
 use Plenty\Plugin\Events\Dispatcher;
+use Plenty\Plugin\Http\Request;
 
 /**
  * Class SessionStorageService
@@ -62,6 +63,11 @@ class SessionStorageService
 	    if ( is_null($this->language) )
         {
             $this->language = $this->sessionStorage->getLocaleSettings()->language;
+
+            if(is_null($this->language) || !strlen($this->language))
+            {
+                $this->language = pluginApp(Request::class)->getLocale();
+            }
 
             if(is_null($this->language) || !strlen($this->language))
             {

@@ -2,6 +2,7 @@
 
 namespace IO\Extensions;
 
+use IO\Services\AuthenticationService;
 use IO\Services\AvailabilityService;
 use IO\Services\BasketService;
 use IO\Services\CategoryService;
@@ -165,5 +166,10 @@ class TwigServiceContainer
     public function getLiveShopping()
     {
         return pluginApp( LiveShoppingService::class );
+    }
+
+    public function getAuthentication()
+    {
+        return pluginApp( AuthenticationService::class );
     }
 }
