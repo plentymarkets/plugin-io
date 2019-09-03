@@ -160,24 +160,24 @@ class IORouteServiceProvider extends RouteServiceProvider
             // confirmation-route is activated and category is linked and category url is not '/confirmation'
             $router->get('confirmation/{orderId?}/{orderAccessKey?}', function($orderId, $accessKey) use ($shopUrls)
             {
-                return pluginApp(CategoryController::class)->redirectToCategory($shopUrls->confirmation.'?orderId='.$orderId.'&accessKey='.$accessKey);
+                return pluginApp(CategoryController::class)->redirectToCategory(RouteConfig::getCategoryId(RouteConfig::CONFIRMATION), '/confirmation', ['orderId' => $orderId, 'accessKey' => $accessKey]);
             });
     
             $router->get('-/akQQ{orderAccessKey}/idQQ{orderId}', function($accessKey, $orderId) use ($shopUrls)
             {
-                return pluginApp(CategoryController::class)->redirectToCategory($shopUrls->confirmation.'?orderId='.$orderId.'&accessKey='.$accessKey);
+                return pluginApp(CategoryController::class)->redirectToCategory(RouteConfig::getCategoryId(RouteConfig::CONFIRMATION), '/confirmation', ['orderId' => $orderId, 'accessKey' => $accessKey]);
             });
             $router->get('_py-/akQQ{orderAccessKey}/idQQ{orderId}', function($accessKey, $orderId) use ($shopUrls)
             {
-                return pluginApp(CategoryController::class)->redirectToCategory($shopUrls->confirmation.'?orderId='.$orderId.'&accessKey='.$accessKey);
+                return pluginApp(CategoryController::class)->redirectToCategory(RouteConfig::getCategoryId(RouteConfig::CONFIRMATION), '/confirmation', ['orderId' => $orderId, 'accessKey' => $accessKey]);
             });
             $router->get('_py_/akQQ{orderAccessKey}/idQQ{orderId}', function($accessKey, $orderId) use ($shopUrls)
             {
-                return pluginApp(CategoryController::class)->redirectToCategory($shopUrls->confirmation.'?orderId='.$orderId.'&accessKey='.$accessKey);
+                return pluginApp(CategoryController::class)->redirectToCategory(RouteConfig::getCategoryId(RouteConfig::CONFIRMATION), '/confirmation', ['orderId' => $orderId, 'accessKey' => $accessKey]);
             });
             $router->get('_plentyShop__/akQQ{orderAccessKey}/idQQ{orderId}', function($accessKey, $orderId) use ($shopUrls)
             {
-                return pluginApp(CategoryController::class)->redirectToCategory($shopUrls->confirmation.'?orderId='.$orderId.'&accessKey='.$accessKey);
+                return pluginApp(CategoryController::class)->redirectToCategory(RouteConfig::getCategoryId(RouteConfig::CONFIRMATION), '/confirmation', ['orderId' => $orderId, 'accessKey' => $accessKey]);
             });
         }
 
