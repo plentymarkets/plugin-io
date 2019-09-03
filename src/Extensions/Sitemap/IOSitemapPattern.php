@@ -10,15 +10,6 @@ use Plenty\Plugin\ConfigRepository;
 
 class IOSitemapPattern
 {
-    private $contentRoutes = [
-        'cancellation-rights',
-        'cancellation-form',
-        'legal-disclosure',
-        'privacy-policy',
-        'gtc',
-        'contact'
-    ];
-    
     /**
      * @param LoadSitemapPattern $sitemapPattern
      */
@@ -45,26 +36,5 @@ class IOSitemapPattern
         }
 
         $seoSitemapService->setItemPattern($itemPattern);
-
-        /** @var ConfigRepository $configRepository */
-        $configRepository = pluginApp(ConfigRepository::class);
-
-        $contentRoutes = [];
-        $enabledRoutes = explode(', ', $configRepository->get('IO.routing.enabled_routes', ''));
-        if(count($enabledRoutes))
-        {
-            foreach($this->contentRoutes as $route)
-            {
-                if(in_array($route, $enabledRoutes))
-                {
-                    $contentRoutes[] = ['url' => $route];
-                }
-            }
-        }
-
-        if(count($contentRoutes))
-        {
-            $seoSitemapService->setContentCategoryPattern(['pattern' => '', 'container' => $contentRoutes]);
-        }
     }
 }
