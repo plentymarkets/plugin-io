@@ -24,7 +24,7 @@ class LocalizedOrderFaker extends AbstractFaker
         $sessionStorageService = pluginApp(SessionStorageService::class);
         $lang = $sessionStorageService->getLang();
     
-        $paymentMethodName = $translator->trans('IO::Faker.addressAddress1');
+        $paymentMethodName = '';
         $paymentMethodIcon = '';
         
         /** @var FrontendPaymentMethodRepositoryContract $frontentPaymentRepository */
