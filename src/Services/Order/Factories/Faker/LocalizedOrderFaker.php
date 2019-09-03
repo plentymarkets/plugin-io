@@ -9,22 +9,42 @@ use Plenty\Modules\Authorization\Services\AuthHelper;
 use Plenty\Modules\Frontend\PaymentMethod\Contracts\FrontendPaymentMethodRepositoryContract;
 use Plenty\Modules\Order\Shipping\Contracts\ParcelServicePresetRepositoryContract;
 use Plenty\Modules\Order\Status\Contracts\OrderStatusRepositoryContract;
+use Plenty\Modules\Order\Status\Models\OrderStatus;
+use Plenty\Modules\Payment\Method\Models\PaymentMethod;
+use Plenty\Plugin\Translation\Translator;
 
 class LocalizedOrderFaker extends AbstractFaker
 {
     public function fill($data)
     {
+        /** @var Translator $translator */
+        $translator = pluginApp(Translator::class);
+        
         /** @var SessionStorageService $sessionStorageService */
         $sessionStorageService = pluginApp(SessionStorageService::class);
         $lang = $sessionStorageService->getLang();
     
+        $paymentMethodName = '';
+        $paymentMethodIcon = '';
+        
         /** @var FrontendPaymentMethodRepositoryContract $frontentPaymentRepository */
         $frontendPaymentRepository = pluginApp( FrontendPaymentMethodRepositoryContract::class );
         $paymentMethodList = $frontendPaymentRepository->getCurrentPaymentMethodsList();
-    
-        $paymentMethod = $this->rand($paymentMethodList);
-    
-    
+        
+        if(count($paymentMethodList))
+        {
+            $paymentMethod = $this->rand($paymentMethodList);
+            if($paymentMethod instanceof PaymentMethod)
+            {
+                $paymentMethodName = $frontendPaymentRepository->getPaymentMethodName($paymentMethod, $lang);
+                $paymentMethodIcon = $frontendPaymentRepository->getPaymentMethodIcon($paymentMethod, $lang);
+            }
+        }
+        else
+        {
+            $paymentMethodName = $translator->trans('IO::Faker.paymentMethodName');
+        }
+        
         $shippingProfileName = '';
         $shippingProvider = '';
         
@@ -53,6 +73,8 @@ class LocalizedOrderFaker extends AbstractFaker
             }
         }
     
+        $orderStatusName = '';
+        
         /** @var OrderStatusRepositoryContract $orderStatusRepo */
         $orderStatusRepo = pluginApp(OrderStatusRepositoryContract::class);
     
@@ -63,8 +85,18 @@ class LocalizedOrderFaker extends AbstractFaker
             return $orderStatusRepo->all();
         });
     
-        $orderStatus = $this->rand($orderStatusList);
-        $orderStatusName = $orderStatus->names[$lang];
+        if(count($orderStatusList))
+        {
+            $orderStatus = $this->rand($orderStatusList);
+            if($orderStatus instanceof OrderStatus)
+            {
+                $orderStatusName = $orderStatus->names[$lang];
+            }
+        }
+        else
+        {
+            $orderStatusName = $translator->trans('IO::Faker.orderStatusName');
+        }
     
         /** @var WebstoreConfigurationService $webstoreConfigService */
         $webstoreConfigService = pluginApp(WebstoreConfigurationService::class);
@@ -80,8 +112,8 @@ class LocalizedOrderFaker extends AbstractFaker
         }
         
         $default = [
-            'paymentMethodName'   => $frontendPaymentRepository->getPaymentMethodName($paymentMethod, $lang),
-            'paymentMethodIcon'   => $frontendPaymentRepository->getPaymentMethodIcon($paymentMethod, $lang),
+            'paymentMethodName'   => $paymentMethodName,
+            'paymentMethodIcon'   => $paymentMethodIcon,
             'shippingProfileName' => $shippingProfileName,
             'shippingProvider'    => $shippingProvider,
             'status'              => $orderStatusName,
