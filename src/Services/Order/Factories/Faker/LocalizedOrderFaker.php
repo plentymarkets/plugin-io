@@ -11,16 +11,20 @@ use Plenty\Modules\Order\Shipping\Contracts\ParcelServicePresetRepositoryContrac
 use Plenty\Modules\Order\Status\Contracts\OrderStatusRepositoryContract;
 use Plenty\Modules\Order\Status\Models\OrderStatus;
 use Plenty\Modules\Payment\Method\Models\PaymentMethod;
+use Plenty\Plugin\Translation\Translator;
 
 class LocalizedOrderFaker extends AbstractFaker
 {
     public function fill($data)
     {
+        /** @var Translator $translator */
+        $translator = pluginApp(Translator::class);
+        
         /** @var SessionStorageService $sessionStorageService */
         $sessionStorageService = pluginApp(SessionStorageService::class);
         $lang = $sessionStorageService->getLang();
     
-        $paymentMethodName = '';
+        $paymentMethodName = $translator->trans('IO::Faker.addressAddress1');
         $paymentMethodIcon = '';
         
         /** @var FrontendPaymentMethodRepositoryContract $frontentPaymentRepository */
@@ -35,6 +39,10 @@ class LocalizedOrderFaker extends AbstractFaker
                 $paymentMethodName = $frontendPaymentRepository->getPaymentMethodName($paymentMethod, $lang);
                 $paymentMethodIcon = $frontendPaymentRepository->getPaymentMethodIcon($paymentMethod, $lang);
             }
+        }
+        else
+        {
+            $paymentMethodName = $translator->trans('IO::Faker.paymentMethodName');
         }
         
         $shippingProfileName = '';
@@ -84,6 +92,10 @@ class LocalizedOrderFaker extends AbstractFaker
             {
                 $orderStatusName = $orderStatus->names[$lang];
             }
+        }
+        else
+        {
+            $orderStatusName = $translator->trans('IO::Faker.orderStatusName');
         }
     
         /** @var WebstoreConfigurationService $webstoreConfigService */
