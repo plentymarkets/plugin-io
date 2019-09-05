@@ -67,6 +67,7 @@ class CrossSellingItems implements SearchPreset
             ->withDefaultImage()
             ->isVisibleForClient()
             ->isActive()
+            ->isHiddenInCategoryList( false )
             ->groupByTemplateConfig()
             ->isCrossSellingItem( $itemId, $relation )
             ->hasNameInLanguage()
