@@ -130,7 +130,7 @@ class CategoryService
             function() use ($catID, $lang) {
                 $category = $this->categoryRepository->get($catID, $lang);
 
-                $currentDetail = [];
+                $currentDetail = null;
                 foreach($category->details as $detail)
                 {
                     if($detail->plentyId == pluginApp(Application::class)->getPlentyId())
@@ -139,7 +139,7 @@ class CategoryService
                     }
                 }
 
-                if(count($currentDetail))
+                if(!is_null($currentDetail))
                 {
                     $category->details = pluginApp(Collection::class, [ [$currentDetail] ]);
                 }
