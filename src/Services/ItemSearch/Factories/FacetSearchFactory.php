@@ -47,8 +47,6 @@ class FacetSearchFactory extends VariationSearchFactory
      *
      * @param IncludeSource $source
      * @return DocumentSearch
-     *
-     * @inheritdoc
      */
     protected function prepareSearch($source)
     {
