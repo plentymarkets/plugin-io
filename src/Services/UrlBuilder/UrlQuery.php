@@ -108,4 +108,9 @@ class UrlQuery
 
         return substr( $this->toRelativeUrl( $includeLanguage ), 1 );
     }
+
+    public function equals( $path )
+    {
+        return $this->path === $path || $this->path === $path."/";
+    }
 }

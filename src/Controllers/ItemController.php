@@ -3,11 +3,19 @@
 namespace IO\Controllers;
 
 use IO\Api\ResponseCode;
+use IO\Services\CategoryService;
+use IO\Services\ItemListService;
+use IO\Services\ItemSearch\Factories\VariationSearchResultFactory;
+use IO\Services\ItemSearch\Helper\ResultFieldTemplate;
 use IO\Services\ItemSearch\SearchPresets\CrossSellingItems;
 use IO\Services\ItemSearch\SearchPresets\SingleItem;
+use IO\Services\ItemSearch\SearchPresets\VariationAttributeMap;
 use IO\Services\ItemSearch\Services\ItemSearchService;
+use Plenty\Modules\Category\Models\Category;
+use Plenty\Modules\ShopBuilder\Helper\ShopBuilderRequest;
 use Plenty\Plugin\Http\Response;
 use Plenty\Plugin\Log\Loggable;
+use Plenty\Plugin\Application;
 
 /**
  * Class ItemController
@@ -16,32 +24,65 @@ use Plenty\Plugin\Log\Loggable;
 class ItemController extends LayoutController
 {
     use Loggable;
+    private $plentyId;
     /**
      * Prepare and render the item data.
-     * @param string $slug
-     * @param int $itemId The itemId read from current request url. Will be null if item url does not contain a slug.
-     * @param int $variationId
+     * @param string    $slug
+     * @param int       $itemId         The itemId read from current request url. Will be null if item url does not contain a slug.
+     * @param int       $variationId
+     * @param Category  $category
      * @return string
+     * @throws \ErrorException
      */
     public function showItem(
         string $slug = "",
         int $itemId = 0,
-        int $variationId = 0
+        int $variationId = 0,
+        $category = null
     )
     {
         $itemSearchOptions = [
             'itemId'        => $itemId,
             'variationId'   => $variationId,
-            'setCategory'   => true
+            'setCategory'   => is_null($category)
         ];
+
+        /** @var Application $app */
+        $app = pluginApp( Application::class );
+        $this->plentyId = $app->getPlentyId();
+
         /** @var ItemSearchService $itemSearchService */
         $itemSearchService = pluginApp( ItemSearchService::class );
-        $itemResult = $itemSearchService->getResult(
-            SingleItem::getSearchFactory( $itemSearchOptions )
-        );
+        $itemResult = $itemSearchService->getResults([
+            'item' => SingleItem::getSearchFactory( $itemSearchOptions ),
+            'variationAttributeMap' => VariationAttributeMap::getSearchFactory( $itemSearchOptions )
+        ]);
 
+        if (!is_null($category))
+        {
+            pluginApp(CategoryService::class)->setCurrentCategory($category);
+        }
+        /** @var ShopBuilderRequest $shopBuilderRequest */
+        $shopBuilderRequest = pluginApp(ShopBuilderRequest::class);
 
-        if(empty($itemResult['documents']))
+        $defaultCategories = $itemResult['item']['documents'][0]['data']['defaultCategories'];
+        $defaultCategory = array_filter($defaultCategories, function($category) {
+            return $category['plentyId'] == $this->plentyId;
+        });
+
+        $shopBuilderRequest->setMainCategory($defaultCategory[0]['id']);
+        $shopBuilderRequest->setMainContentType('singleitem');
+        if ($shopBuilderRequest->isShopBuilder())
+        {
+            /** @var VariationSearchResultFactory $searchResultFactory */
+            $searchResultFactory = pluginApp(VariationSearchResultFactory::class);
+            $itemResult['item'] = $searchResultFactory->fillSearchResults(
+                $itemResult['item'],
+                ResultFieldTemplate::get(ResultFieldTemplate::TEMPLATE_SINGLE_ITEM)
+            );
+        }
+
+        if(empty($itemResult['item']['documents']))
         {
             $this->getLogger(__CLASS__)->info(
                 "IO::Debug.ItemController_itemNotFound",
@@ -61,9 +102,7 @@ class ItemController extends LayoutController
         {
             return $this->renderTemplate(
                 'tpl.item',
-                [
-                    'item' => $itemResult
-                ]
+                $itemResult
             );
         }
     }
@@ -95,5 +134,28 @@ class ItemController extends LayoutController
         }
 
         return $this->showItem("", (int)$itemId, 0);
+    }
+
+    public function showItemForCategory($category)
+    {
+        /** @var ItemListService $itemListService */
+        $itemListService = pluginApp(ItemListService::class);
+        $itemList = $itemListService->getItemList(ItemListService::TYPE_CATEGORY, $category->id, null, 1);
+        if (count($itemList['documents']))
+        {
+            return $this->showItem(
+                '',
+                $itemList['documents'][0]['data']['item']['id'],
+                $itemList['documents'][0]['data']['variation']['id'],
+                $category
+            );
+        }
+
+        return $this->showItem(
+            '',
+            0,
+            0,
+            $category
+        );
     }
 }

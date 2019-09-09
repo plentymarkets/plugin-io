@@ -109,8 +109,7 @@ class CheckoutServiceCurrencyConfigTest extends TestCase
         /** @var FrontendSessionStorageFactoryContract $sessionStorage */
         $sessionStorage = pluginApp(FrontendSessionStorageFactoryContract::class);
         $sessionStorage->getPlugin()->setValue(SessionStorageKeys::CURRENCY, "USD");
-
-
+        $sessionStorage->getLocaleSettings()->language = 'de';
         $currencyPattern = $this->checkoutService->getCurrencyPattern();
 
         $this->assertNotNull($currencyPattern);
@@ -126,7 +125,7 @@ class CheckoutServiceCurrencyConfigTest extends TestCase
     {
         $expectedSeparatorDecimal = ".";
         $expectedSeparatorThousands = ",";
-        $expectedPattern = "¤#,##0.00";
+        $expectedPattern = "¤ #,##0.00";
 
         /** @var FrontendSessionStorageFactoryContract $sessionStorage */
         $sessionStorage = pluginApp(FrontendSessionStorageFactoryContract::class);

@@ -170,7 +170,8 @@ class OrderService
         if ($order instanceof Order && $order->id > 0) {
             $params = [
                 'orderId' => $order->id,
-                'webstoreId' => pluginApp(Application::class)->getWebstoreId()
+                'webstoreId' => pluginApp(Application::class)->getWebstoreId(),
+                'language' => $this->sessionStorage->getLang()
             ];
             $this->sendMail(AutomaticEmailTemplate::SHOP_ORDER ,AutomaticEmailOrder::class, $params);
         }

@@ -140,15 +140,15 @@ class VariationPriceList
 
         if ( $this->lot > 0 && strlen($this->unit) > 0 )
         {
-            if(isset(self::$basePrices[$this->lot][$unitPrice][$this->unit]))
+            if(isset(self::$basePrices[(string)$this->lot][(string)$unitPrice][$this->unit]))
             {
-                $basePrice = self::$basePrices[$this->lot][$unitPrice][$this->unit];
+                $basePrice = self::$basePrices[(string)$this->lot][(string)$unitPrice][$this->unit];
             }
             else
             {
                 $basePrice = [];
                 list( $basePrice['lot'], $basePrice['price'], $basePrice['unitKey'] ) = $basePriceService->getUnitPrice($this->lot, $unitPrice, $this->unit);
-                self::$basePrices[$this->lot][$unitPrice][$this->unit] = $basePrice;
+                self::$basePrices[(string)$this->lot][(string)$unitPrice][$this->unit] = $basePrice;
             }
 
             $unitName = $this->unitService->getUnitNameByKey( $basePrice['unitKey'], $lang );
@@ -378,9 +378,9 @@ class VariationPriceList
                 'formatted' => $this->numberFormatFilter->formatMonetary( $unitPrice, $price->currency )
             ],
             'basePrice'             => $this->getBasePrice( $unitPrice, $price->currency ),
-            'baseLot'               => self::$basePrices[$this->lot][$unitPrice][$this->unit]['lot'],
-            'baseUnit'              => self::$basePrices[$this->lot][$unitPrice][$this->unit]['unitKey'],
-            'baseSinglePrice'       => self::$basePrices[$this->lot][$unitPrice][$this->unit]['price'],
+            'baseLot'               => self::$basePrices[(string)$this->lot][(string)$unitPrice][$this->unit]['lot'],
+            'baseUnit'              => self::$basePrices[(string)$this->lot][(string)$unitPrice][$this->unit]['unitKey'],
+            'baseSinglePrice'       => self::$basePrices[(string)$this->lot][(string)$unitPrice][$this->unit]['price'],
 
             'minimumOrderQuantity'  => (float) $price->minimumOrderQuantity,
             'contactClassDiscount'  => [

@@ -127,4 +127,9 @@ class ShopUrls
 
         return $url->toRelativeUrl($this->includeLanguage);
     }
+
+    public function equals($routeUrl, $url)
+    {
+        return $routeUrl === $url || $routeUrl === $url . '/';
+    }
 }

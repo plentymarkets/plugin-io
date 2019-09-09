@@ -2,111 +2,75 @@
 
 namespace IO\Services;
 
+use Plenty\Plugin\Log\Loggable;
 use Plenty\Plugin\Mail\Contracts\MailerContract;
 use Plenty\Plugin\Mail\Models\ReplyTo;
 use Plenty\Plugin\Templates\Twig;
-use IO\Services\TemplateConfigService;
-use IO\Validators\Customer\ContactFormValidator;
 use Plenty\Plugin\Translation\Translator;
 
 class ContactMailService
 {
-    private $name = '';
-    private $message = '';
-    private $orderId = '';
+    use Loggable;
 
-    public function __construct()
-    { }
-
-    public function sendMail($mailTemplate, $contactData = [])
+    public function sendMail($mailTemplate, $mailData = [])
     {
-        ContactFormValidator::validateOrFail($contactData);
+        $recipient = $mailData['recipient'];
 
-        /**
-         * @var TemplateConfigService $templateConfigService
-         */
-        $templateConfigService = pluginApp(TemplateConfigService::class);
-        $recipient = $templateConfigService->get('contact.shop_mail');
+        if ( !strlen($recipient) )
+        {
+            /** @var TemplateConfigService $templateConfigService */
+            $templateConfigService = pluginApp(TemplateConfigService::class);
+            $recipient = $templateConfigService->get('contact.shop_mail');
+        }
 
         if(!strlen($recipient) || !strlen($mailTemplate))
         {
+            $this->getLogger(__CLASS__)->error("IO::Debug.ContactMailService_noRecipient");
             return false;
         }
 
-        $bcc = [];
-        $recipientBcc = $templateConfigService->get('contact.shop_mail_bcc');
-        if(!is_null($recipientBcc) && strlen($recipientBcc))
-        {
-            $recipientBcc = explode(',', $recipientBcc);
-            foreach($recipientBcc as $_bccMail)
-            {
-                if($_bccMail != "your@email.com")
-                {
-                    $bcc[] = trim($_bccMail);
-                }
-            }
-        }
-
-        /**
-         * @var Twig
-         */
+        /** @var Twig */
         $twig = pluginApp(Twig::class);
 
-        $mailTemplateParams = [];
-        foreach($contactData as $key => $value)
-        {
-            $mailTemplateParams[$key] = nl2br($value);
-        }
+        $mailBody = $twig->render(
+            $mailTemplate,
+            $mailData
+        );
 
-        $renderedMailTemplate = $twig->render($mailTemplate, $mailTemplateParams);
-
-        if(!strlen($renderedMailTemplate))
+        if(!strlen($mailBody))
         {
+            $this->getLogger(__CLASS__)->error("IO::Debug.ContactMailService_noMailContent");
             return false;
         }
 
-        $cc = [];
-        if(isset($contactData['cc']) && $contactData['cc'] == 'true')
-        {
-            $cc[] = $contactData['userMail'];
-        }
+        /** @var MailerContract $mailer */
+        $mailer = pluginApp(MailerContract::class);
 
-        $recipientCc = $templateConfigService->get('contact.shop_mail_cc');
-        if(!is_null($recipientCc) && strlen($recipientCc))
+        $replyTo = null;
+        if ( array_key_exists('replyTo', $mailData) )
         {
-            $recipientCc = explode(',', $recipientCc);
-            foreach($recipientCc as $_ccMail)
-            {
-                if($_ccMail != "your@email.com")
-                {
-                    $cc[] = trim($_ccMail);
-                }
-            }
+            /** @var ReplyTo $replyTo */
+            $replyTo = pluginApp(ReplyTo::class);
+            $replyTo->mailAddress = $mailData['replyTo']['mail'];
+            $replyTo->name = $mailData['replyTo']['name'];
         }
 
         $translator = pluginApp(Translator::class);
-        $contactData['subject'] = $translator->trans(
+        $subject = $translator->trans(
             'Ceres::Template.contactMailSubject',
             [
-                'subject' => $contactData['subject'],
-                'orderId' => $contactData['orderId']
+                'subject' => $mailData['subject'],
+                'data'    => $mailData['data']
             ]
         );
 
-        /**
-         * @var MailerContract $mailer
-         */
-        $mailer = pluginApp(MailerContract::class);
-
-        /**
-         * @var ReplyTo $replyTo
-         */
-        $replyTo = pluginApp(ReplyTo::class);
-        $replyTo->mailAddress = $contactData['userMail'];
-        $replyTo->name = $contactData['name'];
-
-        $mailer->sendHtml($renderedMailTemplate, $recipient, $contactData['subject'], $cc, $bcc, $replyTo);
-
+        try
+        {
+            $mailer->sendHtml($mailBody, $recipient, $subject, $mailData['cc'] ?? [], $mailData['bcc'] ?? [], $replyTo);
+        }catch(\Exception $exception)
+        {
+            return false;
+        }
         return true;
     }
 }
