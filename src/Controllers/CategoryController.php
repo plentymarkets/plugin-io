@@ -77,7 +77,7 @@ class CategoryController extends LayoutController
         );
     }
 
-    public function redirectToCategory( $categoryId, $defaultUrl )
+    public function redirectToCategory( $categoryId, $defaultUrl = "" )
     {
         /** @var SessionStorageService $sessionService */
         $sessionService  = pluginApp(SessionStorageService::class);
@@ -174,7 +174,7 @@ class CategoryController extends LayoutController
             $myAccountController = pluginApp(MyAccountController::class);
             return $myAccountController->showMyAccount( $category );
         }
-    
+
         if ( RouteConfig::getCategoryId( RouteConfig::CONFIRMATION ) === $category->id || $shopBuilderRequest->getPreviewContentType() === 'orderconfirmation')
         {
             $this->getLogger(__CLASS__)->info(
@@ -185,7 +185,7 @@ class CategoryController extends LayoutController
                 ]
             );
             RouteConfig::overrideCategoryId(RouteConfig::CONFIRMATION, $category->id);
-        
+
             /** @var ConfirmationController $confirmationController */
             $confirmationController = pluginApp(ConfirmationController::class);
             return $confirmationController->showConfirmation($request->get('orderId', 0), $request->get('accessKey', ''), $category);
