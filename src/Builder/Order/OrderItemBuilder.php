@@ -147,7 +147,6 @@ class OrderItemBuilder
             "quantity"      => 1,
             "orderItemName" => "shipping costs",
             "countryVatId"  => $this->vatService->getCountryVatId(),
-            "vatRate"       => $maxVatRate,
             'vatField'      => $this->getVatField($this->vatService->getVat(), $maxVatRate),
             "amounts"       => [
                 [
@@ -167,7 +166,6 @@ class OrderItemBuilder
 			"quantity"      => 1,
 			"orderItemName" => "payment surcharge",
 			"countryVatId"  => $this->vatService->getCountryVatId(),
-			"vatRate"       => $maxVatRate,
             'vatField'      => $this->getVatField($this->vatService->getVat(), $maxVatRate),
             "amounts"       => [
 				[
@@ -271,7 +269,6 @@ class OrderItemBuilder
 			"orderItemName"     => $this->itemNameFilter->itemName( $basketItem['variation']['data'] ),
 			"shippingProfileId" => $basketItem['shippingProfileId'],
 			"countryVatId"      => $this->vatService->getCountryVatId(),
-			"vatRate"           => $basketItem['vat'],
             "vatField"			=> $basketItem['variation']['data']['variation']['vatId'] ?? $this->getVatField($this->vatService->getVat(), $basketItem['vat']),
             "orderProperties"   => $basketItemProperties,
             "properties"        => $properties,
