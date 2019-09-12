@@ -439,7 +439,7 @@ class CheckoutService
             $accountRepo = pluginApp(AccountingLocationRepositoryContract::class);
             /** @var VatService $vatService*/
             $vatService = pluginApp(VatService::class);
-            $showNetPrice   = $this->sessionStorageService->getCustomer()->showNetPrice;
+            $showNetPrice   = $this->customerService->showNetPrices();
 
             $list = $this->parcelServicePresetRepo->getLastWeightedPresetCombinations($this->basketRepository->load(), $this->sessionStorageService->getCustomer()->accountContactClassId);
 

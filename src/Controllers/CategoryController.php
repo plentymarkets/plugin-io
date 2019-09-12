@@ -7,6 +7,7 @@ use IO\Helper\RouteConfig;
 use IO\Guards\AuthGuard;
 use IO\Services\SessionStorageService;
 use IO\Services\UrlService;
+use IO\Services\WebstoreConfigurationService;
 use Plenty\Modules\ShopBuilder\Helper\ShopBuilderRequest;
 use Plenty\Plugin\Application;
 use Plenty\Plugin\Http\Request;
@@ -76,33 +77,35 @@ class CategoryController extends LayoutController
         );
     }
 
-    public function redirectToCategory( $categoryUrl )
+    public function redirectToCategory( $categoryId, $defaultUrl )
     {
-        // Check if category can be displayed
-        $categoryLevels = array_filter(
-            explode("/", $categoryUrl),
-            function($lvl)
-            {
-                return strlen($lvl);
-            }
-        );
-        $categoryResponse = $this->showCategory(
-            $categoryLevels[0],
-            $categoryLevels[1],
-            $categoryLevels[2],
-            $categoryLevels[3],
-            $categoryLevels[4],
-            $categoryLevels[5]
-        );
-        if (!($categoryResponse instanceof Response && $categoryResponse->status() == ResponseCode::NOT_FOUND))
-        {
-            // category cannot be displayed. Return 404
-            return $categoryResponse;
-        }
+        /** @var SessionStorageService $sessionService */
+        $sessionService  = pluginApp(SessionStorageService::class);
+        $lang = $sessionService->getLang();
 
         /** @var UrlService $urlService */
         $urlService = pluginApp(UrlService::class);
-        return $urlService->redirectTo($categoryUrl);
+        $categoryUrl = $urlService->getCategoryURL( $categoryId, $lang );
+        if($categoryUrl->equals($defaultUrl))
+        {
+            // category url equals legacy route name
+            return $this->showCategoryById($categoryId);
+        }
+
+        $category = $this->categoryRepo->get($categoryId, $lang);
+
+        if(is_null($category))
+        {
+            /** @var Response $response */
+            $response = pluginApp(Response::class);
+            $response->forceStatus(ResponseCode::NOT_FOUND);
+
+            return $response;
+        }
+
+        return $urlService->redirectTo(
+            $categoryUrl->toRelativeUrl()
+        );
     }
 
 	private function renderCategory($category)
