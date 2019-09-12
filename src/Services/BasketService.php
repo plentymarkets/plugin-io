@@ -142,8 +142,14 @@ class BasketService
      */
     public function getBasket(): Basket
     {
-        $basket = pluginApp(BasketRepositoryContract::class)->load();
-        $basket->currency = pluginApp(CheckoutService::class)->getCurrency();
+        /** @var BasketRepositoryContract $basketRepository */
+        $basketRepository = pluginApp(BasketRepositoryContract::class);
+
+        /** @var CheckoutService $checkoutService */
+        $checkoutService = pluginApp(CheckoutService::class);
+
+        $basket = $basketRepository->load();
+        $basket->currency = $checkoutService->getCurrency();
         return $basket;
     }
 

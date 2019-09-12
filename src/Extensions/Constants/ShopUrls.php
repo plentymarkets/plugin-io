@@ -4,6 +4,7 @@ namespace IO\Extensions\Constants;
 
 use IO\Helper\MemoryCache;
 use IO\Helper\RouteConfig;
+use IO\Helper\Utils;
 use IO\Services\CategoryService;
 use IO\Services\SessionStorageService;
 use IO\Services\UrlBuilder\CategoryUrlBuilder;
@@ -50,10 +51,12 @@ class ShopUrls
 
     private function init($lang)
     {
+        /** @var WebstoreConfigurationService $webstoreConfigurationService */
+        $webstoreConfigurationService = pluginApp(WebstoreConfigurationService::class);
         $this->resetMemoryCache();
         $this->appendTrailingSlash      = UrlQuery::shouldAppendTrailingSlash();
         $this->trailingSlashSuffix      = $this->appendTrailingSlash ? '/' : '';
-        $this->includeLanguage          = $lang !== pluginApp(WebstoreConfigurationService::class)->getDefaultLanguage();
+        $this->includeLanguage          = $lang !== $webstoreConfigurationService->getDefaultLanguage();
 
         $this->basket                   = $this->getShopUrl(RouteConfig::BASKET);
         $this->cancellationForm         = $this->getShopUrl(RouteConfig::CANCELLATION_FORM);
@@ -64,7 +67,7 @@ class ShopUrls
         $this->gtc                      = $this->getShopUrl(RouteConfig::TERMS_CONDITIONS);
 
         // Homepage URL may not be used from category. Even if linked to category, the homepage url should be "/"
-        $this->home                     = pluginApp(UrlQuery::class, ['path' => '/'])->toRelativeUrl($this->includeLanguage);
+        $this->home                     = Utils::makeRelativeUrl('/', $this->includeLanguage);
         $this->legalDisclosure          = $this->getShopUrl(RouteConfig::LEGAL_DISCLOSURE);
         $this->login                    = $this->getShopUrl(RouteConfig::LOGIN);
         $this->myAccount                = $this->getShopUrl(RouteConfig::MY_ACCOUNT);
@@ -110,7 +113,7 @@ class ShopUrls
             }
 
             return $this->applyParams(
-                pluginApp(UrlQuery::class, ['path' => ($url ?? $route)] ),
+                pluginApp(UrlQuery::class, ['path' => ($url ?? $route)]),
                 $routeParams
             );
         });

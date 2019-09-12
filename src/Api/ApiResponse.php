@@ -98,9 +98,11 @@ class ApiResponse
 
 		$this->dispatcher->listen(AfterBasketItemAdd::class, function ($event)
 		{
+		    /** @var BasketService $basketService */
+		    $basketService = pluginApp(BasketService::class);
 		    $basketItem = $event->getBasketItem();
 			$this->eventData["AfterBasketItemAdd"] = [
-				"basketItem" => pluginApp(BasketService::class)->getBasketItem($basketItem)
+				"basketItem" => $basketService->getBasketItem($basketItem)
 			];
 		}, 0);
 
@@ -111,9 +113,11 @@ class ApiResponse
 
 		$this->dispatcher->listen(AfterBasketItemUpdate::class, function ($event)
 		{
+		    /** @var BasketService $basketService */
+            $basketService = pluginApp(BasketService::class);
             $basketItem = $event->getBasketItem();
 			$this->eventData["AfterBasketItemUpdate"] = [
-			    "basketItem" => pluginApp(BasketService::class)->getBasketItem($basketItem, false)
+			    "basketItem" => $basketService->getBasketItem($basketItem, false)
             ];
 		}, 0);
 
@@ -169,9 +173,11 @@ class ApiResponse
         }, 0);
         $this->dispatcher->listen(FrontendShippingProfileChanged::class, function ($event)
         {
+            /** @var LocalizationService $localizationService */
+            $localizationService = pluginApp(LocalizationService::class);
             $this->eventData["FrontendShippingProfileChanged"] = [];
             $this->eventData["LocalizationChanged"] = [
-                "localization" => pluginApp(LocalizationService::class)->getLocalizationData()
+                "localization" => $localizationService->getLocalizationData()
             ];
 
         }, 0);
@@ -275,9 +281,18 @@ class ApiResponse
 		// FIX: Set basket data after "showNetPrice" has been recalculated
         if ( array_key_exists('AfterBasketChanged', $responseData['events'] ) )
         {
-            $responseData['events']['AfterBasketChanged']['basket']  = pluginApp(BasketService::class)->getBasketForTemplate();
-            $responseData['events']['AfterBasketChanged']['showNetPrices']  = pluginApp(CustomerService::class)->showNetPrices();
-            $responseData['events']['CheckoutChanged']['checkout']   = pluginApp(CheckoutService::class)->getCheckout();
+            /** @var BasketService $basketService */
+            $basketService = pluginApp(BasketService::class);
+
+            /** @var CustomerService $customerService */
+            $customerService = pluginApp(CustomerService::class);
+
+            /** @var CheckoutService $checkoutService */
+            $checkoutService = pluginApp(CheckoutService::class);
+
+            $responseData['events']['AfterBasketChanged']['basket']         = $basketService->getBasketForTemplate();
+            $responseData['events']['AfterBasketChanged']['showNetPrices']  = $customerService->showNetPrices();
+            $responseData['events']['CheckoutChanged']['checkout']          = $checkoutService->getCheckout();
         }
 
 		$responseData["data"]   = $data;

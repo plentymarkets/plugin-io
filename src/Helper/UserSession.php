@@ -7,6 +7,9 @@ use Plenty\Modules\Frontend\Services\AccountService;
 /**
  * Class UserSession
  * @package IO\Helper
+ *
+ * @deprecated since 4.3.0
+ * Use AccountService instead
  */
 class UserSession
 {
@@ -27,6 +30,9 @@ class UserSession
     /**
      * Get the current contact ID
      * @return int
+     *
+     * @deprecated since 4.3.0
+     * Use AccountService::getAccountContactId instead
      */
 	public function getCurrentContactId():int
 	{
@@ -36,6 +42,9 @@ class UserSession
     /**
      * Check whether contact is logged in
      * @return bool
+     *
+     * @deprecated since 4.3.0
+     * Use AccountService::getIsAccountLoggedIn instead
      */
 	public function isContactLoggedIn():bool
 	{

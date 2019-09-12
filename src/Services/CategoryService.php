@@ -7,16 +7,14 @@ use IO\Constants\CategoryType;
 use IO\Guards\AuthGuard;
 use IO\Helper\CategoryDataFilter;
 use IO\Helper\MemoryCache;
-use IO\Helper\UserSession;
+use IO\Helper\Utils;
 use IO\Services\ItemSearch\Helper\LoadResultFields;
 use IO\Services\ItemSearch\Helper\ResultFieldTemplate;
 use IO\Services\UrlBuilder\UrlQuery;
-use Plenty\Modules\Category\Contracts\CategoryBranchRepositoryContract;
 use Plenty\Modules\Category\Models\Category;
 use Plenty\Modules\Category\Contracts\CategoryRepositoryContract;
 use Plenty\Modules\Category\Models\CategoryClient;
 use Plenty\Modules\Category\Models\CategoryDetails;
-use Plenty\Plugin\Application;
 use Plenty\Repositories\Models\PaginatedResult;
 
 /**
@@ -133,7 +131,7 @@ class CategoryService
                 $currentDetail = null;
                 foreach($category->details as $detail)
                 {
-                    if($detail->plentyId == pluginApp(Application::class)->getPlentyId())
+                    if($detail->plentyId == Utils::getPlentyId())
                     {
                         $currentDetail = $detail;
                     }
@@ -156,7 +154,7 @@ class CategoryService
         $category = $this->get( $catID, $lang );
         if ( is_null($plentyId) )
         {
-            $plentyId = pluginApp(Application::class)->getPlentyId();
+            $plentyId = Utils::getPlentyId();
         }
 
         if ( !is_null($category) )
@@ -370,15 +368,11 @@ class CategoryService
             return $category['linklist'] == 'Y';
         });
 
-        if(pluginApp(UserSession::class)->isContactLoggedIn() === false && pluginApp(Application::class)->isAdminPreview() === false)
+        if(Utils::isContactLoggedIn() === false && Utils::isAdminPreview() === false)
         {
             $tree = $this->filterVisibleCategories($tree);
         }
-        /**
-         * pluginApp(CategoryDataFilter::class) creates an instance that could be used directly without temporarily
-         * storing it in a variable. However, our plugin code check does not understand this in this particular case,
-         * so this workaround is necessary.
-         */
+
         $categoryDataFilter = pluginApp(CategoryDataFilter::class);
         return $categoryDataFilter->applyResultFields(
             $tree,
@@ -412,6 +406,8 @@ class CategoryService
 
     public function getPartialTree($categoryId = 0, $type = CategoryType::ALL)
     {
+        /** @var CustomerService $customerService */
+        $customerService = pluginApp(CustomerService::class);
         if($categoryId > 0)
         {
             $currentCategory = $this->get($categoryId);
@@ -422,18 +418,19 @@ class CategoryService
                 $type,
                 $this->sessionStorageService->getLang(),
                 $maxLevel,
-                pluginApp(CustomerService::class)->getContactClassId()
+                $customerService->getContactClassId()
             );
 
             return $this->filterBranchEntries($tree, $branch);
         }
         else
         {
+
             $tree = $this->getNavigationTree(
                 $type,
                 $this->sessionStorageService->getLang(),
                 3,
-                pluginApp(CustomerService::class)->getContactClassId()
+                $customerService->getContactClassId()
             );
             $siblingCount = count($tree);
 
@@ -495,7 +492,10 @@ class CategoryService
 
         // add url
         $details = $category['details'][0];
-        $category['url'] = pluginApp(UrlQuery::class, ['path' => $urlPrefix])->join($details['nameUrl'])->toRelativeUrl();
+
+        /** @var UrlQuery $urlQuery */
+        $urlQuery = pluginApp(UrlQuery::class, ['path' => $urlPrefix]);
+        $category['url'] = $urlQuery->join($details['nameUrl'])->toRelativeUrl();
 
         if(count($category['children']) && $depth > 0)
         {
@@ -555,13 +555,13 @@ class CategoryService
             }
         }
 
-        $loggedIn = pluginApp(UserSession::class)->isContactLoggedIn();
+        $loggedIn = Utils::isContactLoggedIn();
         $result = array_filter(
             $categoryList,
 
             function($category) use ($types, $loggedIn)
             {
-                return in_array($category->type, $types) && ($category->right !== 'customer' || $loggedIn || pluginApp(Application::class)->isAdminPreview());
+                return in_array($category->type, $types) && ($category->right !== 'customer' || $loggedIn || Utils::isAdminPreview());
             }
         );
 
@@ -594,14 +594,14 @@ class CategoryService
         }
 
         $hierarchy = [];
-        $loggedIn = pluginApp(UserSession::class)->isContactLoggedIn();
+        $loggedIn = Utils::isContactLoggedIn();
 
         /**
          * @var Category $category
          */
         foreach ( $this->currentCategoryTree as $lvl => $category )
         {
-            if($filterCategories == false  || $category->right === 'all' || $loggedIn || pluginApp(Application::class)->isAdminPreview())
+            if($filterCategories == false  || $category->right === 'all' || $loggedIn || Utils::isAdminPreview())
             {
                 array_push( $hierarchy, $category );
             }else
@@ -617,7 +617,7 @@ class CategoryService
 
         if(count($this->currentItem))
         {
-            $lang = pluginApp( SessionStorageService::class )->getLang();
+            $lang = Utils::getLang();
             array_push( $hierarchy, $this->currentItem['texts'][$lang] );
         }
 
@@ -628,7 +628,7 @@ class CategoryService
     {
         if ( is_null($lang) )
         {
-            $lang = pluginApp( SessionStorageService::class )->getLang();
+            $lang = Utils::getLang();
         }
 
         if ( is_null($webstoreId) )
@@ -655,7 +655,7 @@ class CategoryService
 
     public function isHidden($id){
 
-        if(pluginApp(Application::class)->isAdminPreview())
+        if(Utils::isAdminPreview())
         {
             return false;
         }

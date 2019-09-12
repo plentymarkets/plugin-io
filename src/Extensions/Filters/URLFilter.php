@@ -3,12 +3,11 @@
 namespace IO\Extensions\Filters;
 
 use IO\Extensions\AbstractFilter;
+use IO\Helper\Utils;
 use IO\Services\ItemService;
 use IO\Services\SessionStorageService;
-use IO\Services\TemplateConfigService;
 use IO\Services\UrlBuilder\ItemUrlBuilder;
 use IO\Services\UrlBuilder\VariationUrlBuilder;
-use IO\Services\UrlService;
 use IO\Services\WebstoreConfigurationService;
 
 /**
@@ -72,7 +71,7 @@ class URLFilter extends AbstractFilter
             return "";
         }
 
-        $includeLanguage = pluginApp(SessionStorageService::class)->getLang() !== pluginApp(WebstoreConfigurationService::class)->getDefaultLanguage();
+        $includeLanguage = Utils::getLang() !== Utils::getDefaultLang();
         if ( $variationId === null || $variationId <= 0 )
         {
             /** @var ItemUrlBuilder $itemUrlBuilder */
