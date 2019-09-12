@@ -69,8 +69,8 @@ class CategoryService
         $this->categoryRepository    = $categoryRepository;
         $this->webstoreConfig 		 = $webstoreConfig;
         $this->sessionStorageService = $sessionStorageService;
-        $this->authGuard = $authGuard;
-        $this->webstoreId = pluginApp(Application::class)->getWebstoreId();
+        $this->authGuard             = $authGuard;
+        $this->webstoreId            = Utils::getWebstoreId();
 
     }
 
