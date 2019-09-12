@@ -227,7 +227,7 @@ class UrlService
      * Get language specific homepage url
      * @return string
      * @deprecated since 4.3.0
-     * Use ShopUrls::$home instead.
+     * Use IO\Extensions\Constants\ShopUrls::$home instead.
      */
     public function getHomepageURL()
     {
