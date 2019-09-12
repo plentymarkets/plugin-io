@@ -56,6 +56,11 @@ class CategoryService
     private $currentItem = [];
 
     /**
+     * @var null|int
+     */
+    private $webstoreId = null;
+
+    /**
      * CategoryService constructor.
      * @param CategoryRepositoryContract $category
      */
@@ -65,6 +70,8 @@ class CategoryService
         $this->webstoreConfig 		 = $webstoreConfig;
         $this->sessionStorageService = $sessionStorageService;
         $this->authGuard = $authGuard;
+        $this->webstoreId = pluginApp(Application::class)->getWebstoreId();
+
     }
 
     /**
@@ -74,7 +81,7 @@ class CategoryService
     public function setCurrentCategoryID(int $catID = 0)
     {
         $this->setCurrentCategory(
-            $this->categoryRepository->get($catID, $this->sessionStorageService->getLang())
+            $this->categoryRepository->get($catID, $this->sessionStorageService->getLang(), $this->webstoreId)
         );
     }
 
@@ -98,7 +105,7 @@ class CategoryService
         while($cat !== null)
         {
             $this->currentCategoryTree[$cat->level] = $cat;
-            $cat                                    = $this->categoryRepository->get($cat->parentCategoryId, $lang);
+            $cat                                    = $this->categoryRepository->get($cat->parentCategoryId, $lang, $this->webstoreId);
         }
     }
 
@@ -123,25 +130,11 @@ class CategoryService
             $lang = $this->sessionStorageService->getLang();
         }
 
+        $webstoreId = $this->webstoreId;
         $category = $this->fromMemoryCache(
             "category.$catID.$lang",
-            function() use ($catID, $lang) {
-                $category = $this->categoryRepository->get($catID, $lang);
-
-                $currentDetail = null;
-                foreach($category->details as $detail)
-                {
-                    if($detail->plentyId == Utils::getPlentyId())
-                    {
-                        $currentDetail = $detail;
-                    }
-                }
-
-                if(!is_null($currentDetail))
-                {
-                    $category->details = pluginApp(Collection::class, [ [$currentDetail] ]);
-                }
-
+            function() use ($catID, $lang, $webstoreId) {
+                $category = $this->categoryRepository->get($catID, $lang, $webstoreId);
                 return $category;
             }
         );
