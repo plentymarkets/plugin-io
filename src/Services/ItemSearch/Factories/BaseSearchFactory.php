@@ -2,12 +2,11 @@
 
 namespace IO\Services\ItemSearch\Factories;
 
+use IO\Helper\Utils;
 use IO\Services\ItemSearch\Extensions\ItemSearchExtension;
 use IO\Services\ItemSearch\Extensions\SortExtension;
 use IO\Services\ItemSearch\Helper\LoadResultFields;
-use IO\Services\SessionStorageService;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Collapse\BaseCollapse;
-use Plenty\Modules\Cloud\ElasticSearch\Lib\Collapse\CollapseInterface;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Collapse\InnerHit\BaseInnerHit;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\ElasticSearch;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Processor\DocumentInnerHitsToRootProcessor;
@@ -19,13 +18,11 @@ use Plenty\Modules\Cloud\ElasticSearch\Lib\Search\Document\DocumentSearch;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Sorting\MultipleSorting;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Sorting\SingleSorting;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Source\IncludeSource;
-use Plenty\Modules\Cloud\ElasticSearch\Lib\Source\IndependentSource;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Source\Mutator\MutatorInterface;
 use Plenty\Modules\Item\Search\Aggregations\ItemAttributeValueCardinalityAggregation;
 use Plenty\Modules\Item\Search\Aggregations\ItemAttributeValueCardinalityAggregationProcessor;
 use Plenty\Modules\Item\Search\Filter\SearchFilter;
 use Plenty\Modules\Item\Search\Sort\NameSorting;
-use Plenty\Plugin\Application;
 use Plenty\Plugin\Log\Loggable;
 
 /**
@@ -305,7 +302,7 @@ class BaseSearchFactory
                 NameSorting::class,
                 [
                     str_replace('texts.', '', $field ),
-                    pluginApp(SessionStorageService::class)->getLang(),
+                    Utils::getLang(),
                     $order
                 ]
             );
@@ -316,7 +313,7 @@ class BaseSearchFactory
             {
                 $field = sprintf(
                     'sorting.priceByClientDynamic.%d.%s',
-                    pluginApp(Application::class)->getPlentyId(),
+                    Utils::getPlentyId(),
                     substr($field, strlen('sorting.price.'))
                 );
             }

@@ -2,9 +2,9 @@
 
 namespace IO\Services\ItemSearch\Extensions;
 
+use IO\Helper\Utils;
 use IO\Helper\VariationPriceList;
 use IO\Services\CustomerService;
-use Plenty\Plugin\Application;
 use Plenty\Plugin\Log\Loggable;
 
 /**
@@ -112,7 +112,7 @@ class PriceSearchExtension implements ItemSearchExtension
                     {
                         $this->getLogger(__CLASS__)->warning('IO::Debug.PriceSearchExtension_freeItemFound', [
                             'variation' => $variation,
-                            'isAdminPreview' => pluginApp(Application::class)->isAdminPreview()
+                            'isAdminPreview' => Utils::isAdminPreview()
                         ]);
                     }
 

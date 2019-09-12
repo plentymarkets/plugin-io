@@ -11,14 +11,12 @@ use IO\Services\OrderService;
 use IO\Services\OrderStatusService;
 use IO\Services\OrderTotalsService;
 use IO\Services\OrderTrackingService;
-use Plenty\Modules\Authorization\Services\AuthHelper;
 use Plenty\Modules\Order\Models\Order;
 use Plenty\Modules\Order\Property\Models\OrderProperty;
 use Plenty\Modules\Order\Property\Models\OrderPropertyType;
 use Plenty\Modules\Frontend\PaymentMethod\Contracts\FrontendPaymentMethodRepositoryContract;
 use Plenty\Modules\Order\Shipping\Contracts\ParcelServicePresetRepositoryContract;
 use IO\Extensions\Filters\URLFilter;
-use Plenty\Modules\Order\Status\Contracts\OrderStatusRepositoryContract;
 
 class LocalizedOrder extends ModelWrapper
 {
@@ -70,6 +68,23 @@ class LocalizedOrder extends ModelWrapper
         {
             return null;
         }
+        /** @var ParcelServicePresetRepositoryContract $parcelServicePresetRepository */
+        $parcelServicePresetRepository = pluginApp(ParcelServicePresetRepositoryContract::class);
+
+        /** @var OrderTotalsService $orderTotalsService */
+        $orderTotalsService = pluginApp(OrderTotalsService::class);
+
+        /** @var OrderService $orderService */
+        $orderService = pluginApp(OrderService::class);
+
+        /** @var URLFilter $urlFilter */
+        $urlFilter = pluginApp(URLFilter::class);
+
+        /** @var ItemImagesFilter $imageFilter */
+        $imageFilter = pluginApp(ItemImagesFilter::class);
+
+        /** @var OrderStatusService $orderStatusService */
+        $orderStatusService = pluginApp(OrderStatusService::class);
 
         list( $lang ) = $data;
 
@@ -77,12 +92,8 @@ class LocalizedOrder extends ModelWrapper
         $instance->order = $order;
 
         $instance->status = [];
-        $instance->totals = pluginApp(OrderTotalsService::class)->getAllTotals($order);
+        $instance->totals = $orderTotalsService->getAllTotals($order);
 
-        /**
-         * @var ParcelServicePresetRepositoryContract $parcelServicePresetRepository
-         */
-        $parcelServicePresetRepository = pluginApp(ParcelServicePresetRepositoryContract::class);
 
         try
         {
@@ -132,22 +143,11 @@ class LocalizedOrder extends ModelWrapper
         $paymentMethodIdProperty = $order->properties->firstWhere('typeId', OrderPropertyType::PAYMENT_METHOD);
         if($paymentMethodIdProperty instanceof OrderProperty)
         {
-            /** @var OrderService $orderService */
-            $orderService = pluginApp(OrderService::class);
-
             $instance->allowPaymentMethodSwitchFrom = $orderService->allowPaymentMethodSwitchFrom($paymentMethodIdProperty->value, $order->id);
             $instance->paymentMethodListForSwitch = $orderService->getPaymentMethodListForSwitch($paymentMethodIdProperty->value, $order->id);
         }
-        
-        /** @var OrderStatusService $orderStatusService */
-        $orderStatusService = pluginApp(OrderStatusService::class);
+
         $instance->status = $orderStatusService->getOrderStatus($order->id, $order->statusId);
-
-        /** @var URLFilter $urlFilter */
-        $urlFilter = pluginApp(URLFilter::class);
-
-        /** @var ItemImagesFilter $imageFilter */
-        $imageFilter = pluginApp( ItemImagesFilter::class );
 
         $orderVariationIds = [];
         foreach( $order->orderItems as $key => $orderItem )
@@ -202,8 +202,6 @@ class LocalizedOrder extends ModelWrapper
             $instance->isReturnable = $orderService->isOrderReturnable($order);
         }
 
-        /** @var OrderTotalsService $orderTotalsService */
-        $orderTotalsService = pluginApp(OrderTotalsService::class);
         $instance->highlightNetPrices = $orderTotalsService->highlightNetPrices($instance->order);
 
         return $instance;

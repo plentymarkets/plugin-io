@@ -72,7 +72,9 @@ class OrderPropertyFileController extends LayoutController
             $objectFile = $orderPropertyFileService->getFile($key);
             $headerData = $objectFile->metaData['headers'];
 
-            return pluginApp(Response::class)->make($objectFile->body, 200,
+            /** @var Response $response */
+            $response = pluginApp(Response::class);
+            return $response->make($objectFile->body, 200,
                 [
                     'Content-Type' => $headerData['content-type'],
                     'Content-Length' => $headerData['content-length']

@@ -65,9 +65,11 @@ class OrderTemplateResource extends ApiResource
             $order = $this->orderRepository->findOrderById($orderId);
             if($order instanceof Order)
             {
+                /** @var OrderTotalsService $orderTotalsService */
+                $orderTotalsService = pluginApp(OrderTotalsService::class);
                 $renderedTemplate = $this->templateService->renderTemplate($template, [
                     'orderData' => LocalizedOrder::wrap($order, $sessionStorageService->getLang())->toArray(),
-                    'totals' => pluginApp(OrderTotalsService::class)->getAllTotals($order)
+                    'totals'    => $orderTotalsService->getAllTotals($order)
                 ]);
             }
         }

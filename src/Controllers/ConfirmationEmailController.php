@@ -17,7 +17,9 @@ class ConfirmationEmailController extends LayoutController
     {
         if(strlen($orderAccessKey) && (int)$orderId > 0)
         {
-            return $this->urlService->redirectTo(pluginApp(ShopUrls::class)->confirmation . '/'.$orderId.'/'.$orderAccessKey);
+            /** @var ShopUrls $shopUrls */
+            $shopUrls = pluginApp(ShopUrls::class);
+            return $this->urlService->redirectTo($shopUrls->confirmation . '/'.$orderId.'/'.$orderAccessKey);
         }
         
         return $this->renderTemplate(

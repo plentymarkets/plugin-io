@@ -157,8 +157,9 @@ class OrderItemBuilder
         ];
         array_push($orderItems, $shippingCosts);
 
-		$paymentFee = pluginApp(FrontendPaymentMethodRepositoryContract::class)
-			->getPaymentMethodFeeById($this->checkoutService->getMethodOfPaymentId());
+        /** @var FrontendPaymentMethodRepositoryContract $paymentMethodRepo */
+        $paymentMethodRepo = pluginApp(FrontendPaymentMethodRepositoryContract::class);
+		$paymentFee = $paymentMethodRepo->getPaymentMethodFeeById($this->checkoutService->getMethodOfPaymentId());
 
 		$paymentSurcharge = [
 			"typeId"        => OrderItemType::PAYMENT_SURCHARGE,

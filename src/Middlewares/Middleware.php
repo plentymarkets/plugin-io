@@ -5,6 +5,7 @@ namespace IO\Middlewares;
 use IO\Api\ResponseCode;
 use IO\Extensions\Constants\ShopUrls;
 use IO\Helper\RouteConfig;
+use IO\Helper\Utils;
 use IO\Services\CountryService;
 use IO\Services\TemplateService;
 use IO\Services\WebstoreConfigurationService;
@@ -189,7 +190,7 @@ class Middleware extends \Plenty\Plugin\Middleware
             $language = $webstoreConfig->defaultLanguage;
         }
 
-        if($language === pluginApp(SessionStorageService::class)->getLang())
+        if($language === Utils::getLang())
         {
             // language has not changed
             return;
