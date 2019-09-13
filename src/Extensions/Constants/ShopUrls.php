@@ -38,6 +38,7 @@ class ShopUrls
     public $termsConditions     = "";
     public $wishList            = "";
     public $returnConfirmation  = "";
+    public $newsletterOptOut    = "";
 
     public function __construct(Dispatcher $dispatcher, SessionStorageService $sessionStorageService)
     {
@@ -75,6 +76,7 @@ class ShopUrls
         $this->termsConditions          = $this->getShopUrl(RouteConfig::TERMS_CONDITIONS);
         $this->wishList                 = $this->getShopUrl(RouteConfig::WISH_LIST);
         $this->returnConfirmation       = $this->getShopUrl(RouteConfig::ORDER_RETURN_CONFIRMATION, "return-confirmation");
+        $this->newsletterOptOut         = $this->getShopUrl(RouteConfig::NEWSLETTER_OPT_OUT);
     }
 
     public function returns($orderId)
