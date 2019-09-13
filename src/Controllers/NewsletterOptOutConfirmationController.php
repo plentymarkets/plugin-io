@@ -15,7 +15,7 @@ class NewsletterOptOutConfirmationController extends LayoutController
         /** @var Request $request */
         $request = pluginApp(Request::class);
         $email = $request->get('email', '');
-        $folderId = $request->get('folderId', '');
+        $folderId = $request->get('folderId', 0);
         
         /** @var CustomerNewsletterService $newsletterService */
         $newsletterService = pluginApp(CustomerNewsletterService::class);
