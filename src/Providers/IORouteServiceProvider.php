@@ -118,6 +118,16 @@ class IORouteServiceProvider extends RouteServiceProvider
         {
             $router->get('change-mail/{contactId}/{hash}', 'IO\Controllers\CustomerChangeMailController@show');
         }
+        else if( in_array(RouteConfig::CHANGE_MAIL, RouteConfig::getEnabledRoutes())
+            && RouteConfig::getCategoryId(RouteConfig::CHANGE_MAIL) > 0
+            && !$shopUrls->equals($shopUrls->changeMail, '/change-mail')
+        )
+        {
+            $router->get('change-mail/{contactId}/{hash}', function($contactId, $hash) use ($shopUrls)
+            {
+                return pluginApp(CategoryController::class)->redirectToCategory($shopUrls->confirmation.'?contactId='.$contactId.'&hash='.$hash);
+            });
+        }
 
         // CHECKOUT
         $this->registerRedirectedRoute(
