@@ -32,7 +32,7 @@ class CustomerNewsletterService
 
             foreach ($emailFolders as $key => $emailFolder)
             {
-                $recipientData = $authHelper->processUnguarded(function () use ($email, $emailFolder, $newsletterRepo)
+                $recipientData = $authHelper->processUnguarded(function() use ($email, $emailFolder, $newsletterRepo)
                 {
                     return $newsletterRepo->listRecipients(['*'], 1, 1, ['email' => $email, 'folderId' => $emailFolder], [])->getResult()[0];
                 });
@@ -56,14 +56,14 @@ class CustomerNewsletterService
         $authHelper = pluginApp(AuthHelper::class);
         $newsletterRepo = $this->newsletterRepo;
 
-        $emailData = $authHelper->processUnguarded(function () use ($newsletterEmailId, $newsletterRepo)
+        $emailData = $authHelper->processUnguarded(function() use ($newsletterEmailId, $newsletterRepo)
         {
             return $newsletterRepo->listRecipientById($newsletterEmailId);
         });
 
         if ($authString === $emailData->confirmAuthString)
         {
-            $authHelper->processUnguarded(function () use ($newsletterEmailId, $newsletterRepo)
+            $authHelper->processUnguarded(function() use ($newsletterEmailId, $newsletterRepo)
             {
                 $newsletterRepo->updateRecipientById($newsletterEmailId, [
                     'confirmedTimestamp' => date('Y-m-d H:i:s', time())
@@ -101,7 +101,7 @@ class CustomerNewsletterService
         }
 
         // Fetch list of \Recipient based on filters
-        $recipientList = $authHelper->processUnguarded(function () use ($filter, $newsletterRepo)
+        $recipientList = $authHelper->processUnguarded(function() use ($filter, $newsletterRepo)
         {
             return $newsletterRepo->listRecipients(['*'], 1, 100, $filter, [])->getResult();
         });
@@ -113,7 +113,7 @@ class CustomerNewsletterService
             {
                 if ($recipientData instanceof Recipient)
                 {
-                    $authHelper->processUnguarded(function () use ($recipientData, $newsletterRepo)
+                    $authHelper->processUnguarded(function() use ($recipientData, $newsletterRepo)
                     {
                         return $this->newsletterRepo->deleteRecipientById($recipientData->id);
                     });
