@@ -24,23 +24,27 @@ class CustomerNewsletterService
 
     public function saveMultipleNewsletterData($email, $emailFolders, $firstName = '', $lastName = '')
     {
-        if (strlen($email) && count($emailFolders)) {
+        if (strlen($email) && count($emailFolders))
+        {
             /** @var AuthHelper $authHelper */
             $authHelper = pluginApp(AuthHelper::class);
             $newsletterRepo = $this->newsletterRepo;
 
-            foreach ($emailFolders as $key => $emailFolder) {
-                $recipientData = $authHelper->processUnguarded(function () use ($email, $emailFolder, $newsletterRepo) {
-                    return $newsletterRepo->listRecipients(['*'], 1, 1, ['email' => $email, 'folderId' => $emailFolder],
-                        [])->getResult()[0];
+            foreach ($emailFolders as $key => $emailFolder)
+            {
+                $recipientData = $authHelper->processUnguarded(function () use ($email, $emailFolder, $newsletterRepo)
+                {
+                    return $newsletterRepo->listRecipients(['*'], 1, 1, ['email' => $email, 'folderId' => $emailFolder], [])->getResult()[0];
                 });
 
-                if ($recipientData instanceof Recipient) {
+                if ($recipientData instanceof Recipient)
+                {
                     unset($emailFolders[$key]);
                 }
             }
 
-            if (count($emailFolders)) {
+            if (count($emailFolders))
+            {
                 $this->newsletterRepo->addToNewsletterList($email, $firstName, $lastName, $emailFolders);
             }
         }
@@ -52,12 +56,15 @@ class CustomerNewsletterService
         $authHelper = pluginApp(AuthHelper::class);
         $newsletterRepo = $this->newsletterRepo;
 
-        $emailData = $authHelper->processUnguarded(function () use ($newsletterEmailId, $newsletterRepo) {
+        $emailData = $authHelper->processUnguarded(function () use ($newsletterEmailId, $newsletterRepo)
+        {
             return $newsletterRepo->listRecipientById($newsletterEmailId);
         });
 
-        if ($authString === $emailData->confirmAuthString) {
-            $authHelper->processUnguarded(function () use ($newsletterEmailId, $newsletterRepo) {
+        if ($authString === $emailData->confirmAuthString)
+        {
+            $authHelper->processUnguarded(function () use ($newsletterEmailId, $newsletterRepo)
+            {
                 $newsletterRepo->updateRecipientById($newsletterEmailId, [
                     'confirmedTimestamp' => date('Y-m-d H:i:s', time())
                 ]);
@@ -88,27 +95,35 @@ class CustomerNewsletterService
             'email' => $email
         ];
 
-        if ($emailFolder > 0) {
+        if ($emailFolder > 0)
+        {
             $filter['folderId'] = $emailFolder;
         }
 
         // Fetch list of \Recipient based on filters
-        $recipientList = $authHelper->processUnguarded(function () use ($filter, $newsletterRepo) {
+        $recipientList = $authHelper->processUnguarded(function () use ($filter, $newsletterRepo)
+        {
             return $newsletterRepo->listRecipients(['*'], 1, 100, $filter, [])->getResult();
         });
 
         // If any exist, delete them
-        if (count($recipientList)) {
-            foreach ($recipientList as $recipientData) {
-                if ($recipientData instanceof Recipient) {
-                    $authHelper->processUnguarded(function () use ($recipientData, $newsletterRepo) {
+        if (count($recipientList))
+        {
+            foreach ($recipientList as $recipientData)
+            {
+                if ($recipientData instanceof Recipient)
+                {
+                    $authHelper->processUnguarded(function () use ($recipientData, $newsletterRepo)
+                    {
                         return $this->newsletterRepo->deleteRecipientById($recipientData->id);
                     });
                 }
             }
 
             $success = true;
-        } else {
+        }
+        else
+        {
             $success = false;
         }
 
