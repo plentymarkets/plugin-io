@@ -10,8 +10,6 @@ use IO\Services\CountryService;
 use IO\Services\TemplateService;
 use IO\Services\WebstoreConfigurationService;
 use IO\Services\TemplateConfigService;
-
-use Plenty\Modules\RestDocumentation\Export\Models\Auth;
 use Plenty\Modules\System\Models\WebstoreConfiguration;
 use Plenty\Plugin\Http\Request;
 use Plenty\Plugin\Http\Response;
