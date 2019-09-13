@@ -76,7 +76,7 @@ class ShopUrls
         $this->termsConditions          = $this->getShopUrl(RouteConfig::TERMS_CONDITIONS);
         $this->wishList                 = $this->getShopUrl(RouteConfig::WISH_LIST);
         $this->returnConfirmation       = $this->getShopUrl(RouteConfig::ORDER_RETURN_CONFIRMATION, "return-confirmation");
-        $this->newsletterOptOut         = $this->getShopUrl(RouteConfig::NEWSLETTER_OPT_OUT);
+        $this->newsletterOptOut         = $this->getShopUrl(RouteConfig::NEWSLETTER_OPT_OUT, "newsletter/unsubscribe");
     }
 
     public function returns($orderId)
