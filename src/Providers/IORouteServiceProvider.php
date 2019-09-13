@@ -199,9 +199,9 @@ class IORouteServiceProvider extends RouteServiceProvider
             && RouteConfig::getCategoryId(RouteConfig::NEWSLETTER_OPT_OUT) > 0
             && !$shopUrls->equals($shopUrls->newsletterOptOut, '/newsletter/unsubscribe'))
         {
-            $router->get('/newsletter/unsubscribe', function() use ($shopUrls)
+            $router->get('newsletter/unsubscribe', function() use ($shopUrls)
             {
-                return pluginApp(CategoryController::class)->redirectToCategory($shopUrls->newsletterOptOut);
+                return pluginApp(CategoryController::class)->redirectToCategory($shopUrls->newsletterOptOut, '/newsletter/unsubscribe');
             });
         }
 
