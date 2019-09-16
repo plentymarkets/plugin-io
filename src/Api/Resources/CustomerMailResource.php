@@ -9,6 +9,7 @@ use IO\DBModels\UserDataHash;
 use IO\Extensions\Constants\ShopUrls;
 use IO\Extensions\Mail\SendMail;
 use IO\Helper\RouteConfig;
+use IO\Helper\Utils;
 use IO\Services\AuthenticationService;
 use IO\Services\CustomerService;
 use IO\Services\SessionStorageService;
@@ -46,8 +47,11 @@ class CustomerMailResource extends ApiResource
         $newMail  = $this->request->get('newMail', null);
         $newMail2 = $this->request->get('newMail2', null);
 
+        /** @var CustomerService $customerService */
+        $customerService = pluginApp(CustomerService::class);
+
         /** @var Contact $contact */
-        $contact  = pluginApp(CustomerService::class)->getContact();
+        $contact = $customerService->getContact();
 
         if ( is_null($contact) )
         {
@@ -84,7 +88,7 @@ class CustomerMailResource extends ApiResource
         $webstoreConfigurationRepository = pluginApp(WebstoreConfigurationRepositoryContract::class);
 
 
-        $clientId = pluginApp( Application::class )->getPlentyId();
+        $clientId = Utils::getPlentyId();
 
         /**  @var WebstoreConfiguration $webstoreConfiguration */
         $webstoreConfiguration = $webstoreConfigurationRepository->findByPlentyId($clientId);
@@ -109,7 +113,7 @@ class CustomerMailResource extends ApiResource
 
         $params = [
             'contactId' => $contact->id,
-            'clientId' => pluginApp(Application::class)->getWebstoreId(),
+            'clientId' => Utils::getWebstoreId(),
             'password' => null,
             'newEmailLink' => $newEmailLink,
             'language' => $sessionService->getLang()

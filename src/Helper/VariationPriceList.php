@@ -62,12 +62,16 @@ class VariationPriceList
     /** @var SalesPriceSearchResponse */
     private $defaultPrice;
 
-    public function __construct( NumberFormatFilter $numberFormatFilter, UnitService $unitService, LiveShoppingRepositoryContract $liveShoppingRepo )
+    public function __construct(
+        NumberFormatFilter $numberFormatFilter,
+        UnitService $unitService,
+        LiveShoppingRepositoryContract $liveShoppingRepo,
+        CustomerService $customerService )
     {
-        $this->numberFormatFilter = $numberFormatFilter;
-        $this->unitService = $unitService;
-        $this->showNetPrice = pluginApp( CustomerService::class )->showNetPrices();
-        $this->liveShoppingRepo = $liveShoppingRepo;
+        $this->numberFormatFilter   = $numberFormatFilter;
+        $this->unitService          = $unitService;
+        $this->showNetPrice         = $customerService->showNetPrices();
+        $this->liveShoppingRepo     = $liveShoppingRepo;
     }
 
     public static function create( int $variationId, int $itemId, $minimumOrderQuantity = 0, $maximumOrderQuantity = null, $lot = 0, $unit = null )

@@ -3,9 +3,9 @@
 namespace IO\Services\UrlBuilder;
 
 use IO\Helper\StringUtils;
+use IO\Helper\Utils;
 use IO\Services\ItemSearch\Factories\VariationSearchFactory;
 use IO\Services\ItemSearch\Services\ItemSearchService;
-use IO\Services\SessionStorageService;
 use IO\Services\TemplateConfigService;
 use Plenty\Log\Contracts\LoggerContract;
 use Plenty\Modules\Authorization\Services\AuthHelper;
@@ -75,7 +75,7 @@ class VariationUrlBuilder
 
         if ( $lang === null )
         {
-            $lang = pluginApp( SessionStorageService::class )->getLang();
+            $lang = Utils::getLang();
         }
 
         if ( count( self::$urlPathMap[$itemId][$variationId] ) <= 0 )

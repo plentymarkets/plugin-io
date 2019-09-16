@@ -46,6 +46,7 @@ class VariationList implements SearchPreset
             ->withDefaultImage()
             ->isVisibleForClient()
             ->isActive()
+            ->isHiddenInCategoryList( false )
             ->hasPriceForCustomer()
             ->withReducedResults();
 
