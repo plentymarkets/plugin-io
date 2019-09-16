@@ -6,6 +6,7 @@ use IO\Builder\Order\OrderItemType;
 use IO\Builder\Order\OrderType;
 use IO\Extensions\Filters\ItemImagesFilter;
 use IO\Services\ItemSearch\Factories\VariationSearchFactory;
+use IO\Services\ItemSearch\Helper\ResultFieldTemplate;
 use IO\Services\ItemSearch\Services\ItemSearchService;
 use IO\Services\OrderService;
 use IO\Services\OrderStatusService;
@@ -116,7 +117,7 @@ class LocalizedOrder extends ModelWrapper
                     break;
                 }
             }
-    
+
             /** @var OrderTrackingService $orderTrackingService */
             $orderTrackingService = pluginApp(OrderTrackingService::class);
             $instance->trackingURL = $orderTrackingService->getTrackingURL($order, $lang);
@@ -147,6 +148,13 @@ class LocalizedOrder extends ModelWrapper
             $instance->paymentMethodListForSwitch = $orderService->getPaymentMethodListForSwitch($paymentMethodIdProperty->value, $order->id);
         }
 
+        /** @var OrderStatusService $orderStatusService */
+        $orderStatusService = pluginApp(OrderStatusService::class);
+        $instance->status = $orderStatusService->getOrderStatus($order->id, $order->statusId);
+
+        /** @var URLFilter $urlFilter */
+        $urlFilter = pluginApp(URLFilter::class);
+
         $instance->status = $orderStatusService->getOrderStatus($order->id, $order->statusId);
 
         $orderVariationIds = [];
@@ -166,6 +174,15 @@ class LocalizedOrder extends ModelWrapper
             }
         }
 
+        $resultFields = ResultFieldTemplate::load( ResultFieldTemplate::TEMPLATE_LIST_ITEM );
+        foreach( ['attributes.attribute.names.*', 'attributes.value.names.*', 'images.all.urlPreview', 'images.variation.urlPreview'] as $field )
+        {
+            if (!in_array($field, $resultFields))
+            {
+                $resultFields[] = $field;
+            }
+        }
+
         /** @var ItemSearchService $itemSearchService */
         $itemSearchService = pluginApp( ItemSearchService::class );
         /** @var VariationSearchFactory $searchFactory */
@@ -179,6 +196,9 @@ class LocalizedOrder extends ModelWrapper
                 ->withUrls()
                 ->withBundleComponents()
                 ->hasVariationIds( $orderVariationIds )
+                ->withResultFields(
+                    $resultFields
+                )
         );
 
         foreach( $orderVariations['documents'] as $orderVariation )
@@ -193,6 +213,17 @@ class LocalizedOrder extends ModelWrapper
                 {
                     $orderItem['bundleComponents'] = $orderVariation['data']['bundleComponents'];
                     $orderItem['bundleType'] = $orderVariation['data']['variation']['bundleType'];
+                    $attributes = [];
+
+                    foreach($orderVariation['data']['attributes'] as $attribute)
+                    {
+                        $attributes[] = [
+                            'name' => $attribute['attribute']['names']['name'],
+                            'value' => $attribute['value']['names']['name']
+                        ];
+                    }
+
+                    $orderItem['attributes'] = $attributes;
                 }
             }
         }
