@@ -2,9 +2,11 @@
 
 namespace IO\Services;
 
+use IO\Helper\Utils;
 use Plenty\Modules\Frontend\Events\FrontendLanguageChanged;
 use Plenty\Modules\Frontend\Session\Storage\Contracts\FrontendSessionStorageFactoryContract;
 use Plenty\Modules\Frontend\Session\Storage\Models\Customer;
+use Plenty\Plugin\Application;
 use Plenty\Plugin\Events\Dispatcher;
 use Plenty\Plugin\Http\Request;
 
@@ -66,12 +68,14 @@ class SessionStorageService
 
             if(is_null($this->language) || !strlen($this->language))
             {
-                $this->language = pluginApp(Request::class)->getLocale();
+                /** @var Request $request */
+                $request = pluginApp(Request::class);
+                $this->language = $request->getLocale();
             }
 
             if(is_null($this->language) || !strlen($this->language))
             {
-                $this->language = pluginApp(WebstoreConfigurationService::class)->getDefaultLanguage();
+                $this->language = Utils::getDefaultLang();
             }
         }
 

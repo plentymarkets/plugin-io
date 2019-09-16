@@ -67,7 +67,9 @@ class CouponService
 
         if($code != NULL)
         {
-            pluginApp(NotificationService::class)->info('CouponValidation', $code);
+            /** @var NotificationService $notificationService */
+            $notificationService = pluginApp(NotificationService::class);
+            $notificationService->info('CouponValidation', $code);
         }
 
         return $response;

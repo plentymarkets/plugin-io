@@ -54,8 +54,8 @@ class CrossSellingItems implements SearchPreset
 
 
         /** @var VariationSearchFactory $searchFactory */
-        $searchFactory = pluginApp( VariationSearchFactory::class )
-            ->withResultFields(
+        $searchFactory = pluginApp( VariationSearchFactory::class );
+        $searchFactory->withResultFields(
                 ResultFieldTemplate::load( ResultFieldTemplate::TEMPLATE_LIST_ITEM )
             );
 
@@ -67,6 +67,7 @@ class CrossSellingItems implements SearchPreset
             ->withDefaultImage()
             ->isVisibleForClient()
             ->isActive()
+            ->isHiddenInCategoryList( false )
             ->groupByTemplateConfig()
             ->isCrossSellingItem( $itemId, $relation )
             ->hasNameInLanguage()
