@@ -3,9 +3,8 @@ namespace IO\Controllers;
 
 use IO\Extensions\Constants\ShopUrls;
 use IO\Services\UrlService;
-use Plenty\Plugin\Http\Response;
+use Plenty\Modules\ShopBuilder\Helper\ShopBuilderRequest;
 use IO\Guards\AuthGuard;
-use IO\Helper\TemplateContainer;
 use IO\Services\CustomerService;
 use Plenty\Plugin\Log\Loggable;
 
@@ -25,12 +24,14 @@ class RegisterController extends LayoutController
      */
 	public function showRegister(CustomerService $customerService, UrlService $urlService): string
 	{
-	    if($customerService->getContactId() > 0)
+        /** @var ShopBuilderRequest $shopBuilderRequest */
+        $shopBuilderRequest = pluginApp(ShopBuilderRequest::class);
+	    if($customerService->getContactId() > 0 && !$shopBuilderRequest->isShopBuilder())
         {
             $this->getLogger(__CLASS__)->info("IO::Debug.RegisterController_alreadyLoggedIn");
             AuthGuard::redirect($urlService->getHomepageURL(), []);
         }
-	
+
 		return $this->renderTemplate(
 			"tpl.register",
 			[
