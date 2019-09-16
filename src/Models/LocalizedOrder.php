@@ -148,13 +148,6 @@ class LocalizedOrder extends ModelWrapper
             $instance->paymentMethodListForSwitch = $orderService->getPaymentMethodListForSwitch($paymentMethodIdProperty->value, $order->id);
         }
 
-        /** @var OrderStatusService $orderStatusService */
-        $orderStatusService = pluginApp(OrderStatusService::class);
-        $instance->status = $orderStatusService->getOrderStatus($order->id, $order->statusId);
-
-        /** @var URLFilter $urlFilter */
-        $urlFilter = pluginApp(URLFilter::class);
-
         $instance->status = $orderStatusService->getOrderStatus($order->id, $order->statusId);
 
         $orderVariationIds = [];
