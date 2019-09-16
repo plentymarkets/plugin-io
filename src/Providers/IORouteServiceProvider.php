@@ -125,7 +125,7 @@ class IORouteServiceProvider extends RouteServiceProvider
         {
             $router->get('change-mail/{contactId}/{hash}', function($contactId, $hash) use ($shopUrls)
             {
-                return pluginApp(CategoryController::class)->redirectToCategory($shopUrls->confirmation.'?contactId='.$contactId.'&hash='.$hash);
+                return pluginApp(CategoryController::class)->redirectToCategory($shopUrls->changeMail.'?contactId='.$contactId.'&hash='.$hash, "/change-mail".'?contactId='.$contactId.'&hash='.$hash);
             });
         }
 

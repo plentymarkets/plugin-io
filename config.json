@@ -142,16 +142,16 @@
                   "label": "Config.routingCategoryWishList",
                   "options": {}
               },
-              "routing.category_page-not-found": {
-                  "type": "categoryPicker",
-                  "required": false,
-                  "label": "Config.routingCategoryPageNotFound",
-                  "options": {}
-              },
               "routing.category_change-mail": {
                   "type": "categoryPicker",
                   "required": false,
                   "label": "Config.routingCategoryChangeMail",
+                  "options": {}
+              },
+              "routing.category_page-not-found": {
+                  "type": "categoryPicker",
+                  "required": false,
+                  "label": "Config.routingCategoryPageNotFound",
                   "options": {}
               },
               "routing.enabled_routes": {
