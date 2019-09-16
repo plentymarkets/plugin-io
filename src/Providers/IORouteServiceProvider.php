@@ -151,9 +151,17 @@ class IORouteServiceProvider extends RouteServiceProvider
             && !$shopUrls->equals($shopUrls->confirmation,'/confirmation') )
         {
             // confirmation-route is activated and category is linked and category url is not '/confirmation'
-            $router->get('confirmation/{orderId?}/{orderAccessKey?}', function($orderId, $accessKey) use ($shopUrls)
+            $router->get('confirmation/{orderId?}/{orderAccessKey?}', function($orderId = 0, $accessKey = '') use ($shopUrls)
             {
-                return pluginApp(CategoryController::class)->redirectToCategory(RouteConfig::getCategoryId(RouteConfig::CONFIRMATION), '/confirmation', ['orderId' => $orderId, 'accessKey' => $accessKey]);
+                $confirmationParams = [];
+                
+                if((int)$orderId > 0 && strlen($accessKey))
+                {
+                    $confirmationParams['orderId'] = $orderId;
+                    $confirmationParams['accessKey'] = $accessKey;
+                }
+                
+                return pluginApp(CategoryController::class)->redirectToCategory(RouteConfig::getCategoryId(RouteConfig::CONFIRMATION), '/confirmation', $confirmationParams);
             });
     
             $router->get('-/akQQ{orderAccessKey}/idQQ{orderId}', function($accessKey, $orderId) use ($shopUrls)
