@@ -188,7 +188,8 @@ class CategoryController extends LayoutController
             $confirmationController = pluginApp(ConfirmationController::class);
             return $confirmationController->showConfirmation(
                 $params['orderId'] ?? $request->get('orderId', 0),
-                $params['accessKey'] ?? $request->get('accessKey', ''), $category
+                $params['accessKey'] ?? $request->get('accessKey', ''),
+                $category
             );
         }
 
