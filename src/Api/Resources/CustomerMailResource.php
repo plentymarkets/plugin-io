@@ -6,6 +6,7 @@ use IO\Api\ApiResource;
 use IO\Api\ApiResponse;
 use IO\Api\ResponseCode;
 use IO\DBModels\UserDataHash;
+use IO\Extensions\Constants\ShopUrls;
 use IO\Extensions\Mail\SendMail;
 use IO\Services\AuthenticationService;
 use IO\Services\CustomerService;
@@ -93,8 +94,12 @@ class CustomerMailResource extends ApiResource
         /** @var SessionStorageService $sessionService */
         $sessionService = pluginApp(SessionStorageService::class);
         $lang = $sessionService->getLang();
+        /** @var ShopUrls $shopUrls */
+        $shopUrls = pluginApp(ShopUrls::class);
+        //$newEmailLink = $domain . ($lang != $defaultLang ? '/' . $lang : ''). '/change-mail/'. $userDataHash->contactId . '/' . $userDataHash->hash;
 
-        $newEmailLink = $domain . ($lang != $defaultLang ? '/' . $lang : ''). '/change-mail/'. $userDataHash->contactId . '/' . $userDataHash->hash;
+        $newEmailLink = $shopUrls->changeMail . '?contactId=' . $userDataHash->contactId . '&hash=' . $userDataHash->hash;
+
         $params = [
             'contactId' => $contact->id,
             'clientId' => pluginApp(Application::class)->getWebstoreId(),
