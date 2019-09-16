@@ -172,4 +172,9 @@ class TwigServiceContainer
     {
         return pluginApp( AuthenticationService::class );
     }
+
+    public function getUserDataHash()
+    {
+        return pluginApp( UserDataHashService::class );
+    }
 }
