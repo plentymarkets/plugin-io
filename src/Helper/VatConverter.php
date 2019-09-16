@@ -4,7 +4,6 @@ namespace IO\Helper;
 
 use IO\Services\CustomerService;
 use Plenty\Modules\Accounting\Vat\Contracts\VatRepositoryContract;
-use Plenty\Plugin\Application;
 
 /**
  * Class VatConverter
@@ -30,7 +29,7 @@ class VatConverter
      */
     public function getDefaultVat()
     {
-        $defaultVat = $this->vatRepo->getStandardVat(pluginApp(Application::class)->getPlentyId())->vatRates->first();
+        $defaultVat = $this->vatRepo->getStandardVat(Utils::getPlentyId())->vatRates->first();
         return $defaultVat;
     }
     

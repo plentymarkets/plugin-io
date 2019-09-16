@@ -27,7 +27,9 @@ trait LoadResultFields
 			return $resource->load($resourceName . '.fields')->getData();
 		}
 
-        pluginApp(LoggerFactory::class)
+		/** @var LoggerFactory $loggerFactory */
+		$loggerFactory = pluginApp(LoggerFactory::class);
+		$loggerFactory
             ->getLogger("IO", __CLASS__)
             ->warning(
                 "IO::Debug.LoadResultFields_notFound",

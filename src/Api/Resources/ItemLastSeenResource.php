@@ -33,11 +33,15 @@ class ItemLastSeenResource extends ApiResource
      */
     public function index():Response
     {
-        $items = $this->request->get("items", 20);
-        $lastSeenItems = pluginApp(ItemListService::class)->getItemList(ItemListService::TYPE_LAST_SEEN, null, null, $items);
-        $lastSeenContainers = [];
+        /** @var ItemListService $itemListService */
+        $itemListService = pluginApp(ItemListService::class);
 
+        /** @var Twig $twig */
         $twig = pluginApp(Twig::class);
+
+        $items              = $this->request->get("items", 20);
+        $lastSeenItems      = $itemListService->getItemList(ItemListService::TYPE_LAST_SEEN, null, null, $items);
+        $lastSeenContainers = [];
 
         foreach( $lastSeenItems["documents"] as $item )
         {
@@ -59,6 +63,7 @@ class ItemLastSeenResource extends ApiResource
     {
         if((int)$variationId > 0)
         {
+            /** @var ItemLastSeenService $itemLastSeenService */
             $itemLastSeenService = pluginApp(ItemLastSeenService::class);
             $itemLastSeenService->setLastSeenItem((int)$variationId);
         }

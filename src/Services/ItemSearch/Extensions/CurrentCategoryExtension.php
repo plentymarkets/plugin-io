@@ -2,14 +2,10 @@
 
 namespace IO\Services\ItemSearch\Extensions;
 
+use IO\Helper\Utils;
 use IO\Services\CategoryService;
-use IO\Services\ItemSearch\Factories\BaseSearchFactory;
 use IO\Services\ItemSearch\Factories\VariationSearchFactory;
-use IO\Services\SessionStorageService;
-use IO\Services\WebstoreConfigurationService;
 use Plenty\Modules\Category\Contracts\CategoryRepositoryContract;
-use Plenty\Modules\Cloud\ElasticSearch\Lib\Search\Document\DocumentSearch;
-use Plenty\Plugin\Application;
 
 /**
  * Class CurrentCategoryExtension
@@ -59,7 +55,7 @@ class CurrentCategoryExtension implements ItemSearchExtension
                 $currentCategoryId = 0;
                 foreach($defaultCategories as $defaultCategory)
                 {
-                    if((int)$defaultCategory['plentyId'] == pluginApp(Application::class)->getPlentyId())
+                    if((int)$defaultCategory['plentyId'] == Utils::getPlentyId())
                     {
                         $currentCategoryId = $defaultCategory['id'];
                     }
@@ -70,7 +66,7 @@ class CurrentCategoryExtension implements ItemSearchExtension
                      * @var CategoryRepositoryContract $categoryRepo
                      */
                     $categoryRepo = pluginApp(CategoryRepositoryContract::class);
-                    $currentCategory = $categoryRepo->get($currentCategoryId, pluginApp(SessionStorageService::class)->getLang());
+                    $currentCategory = $categoryRepo->get($currentCategoryId, Utils::getLang());
 
                     /**
                      * @var CategoryService $categoryService

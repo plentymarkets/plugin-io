@@ -3,6 +3,7 @@
 namespace IO\Services;
 
 use IO\Helper\MemoryCache;
+use IO\Helper\Utils;
 use Plenty\Modules\Authorization\Services\AuthHelper;
 use Plenty\Modules\Item\Unit\Contracts\UnitNameRepositoryContract;
 use Plenty\Modules\Item\Unit\Contracts\UnitRepositoryContract;
@@ -51,7 +52,7 @@ class UnitService
 	public function __construct(UnitNameRepositoryContract $unitRepository)
 	{
 		$this->unitNameRepository = $unitRepository;
-		$this->defaultLang = pluginApp(SessionStorageService::class)->getLang();
+		$this->defaultLang = Utils::getLang();
 	}
 
     /**

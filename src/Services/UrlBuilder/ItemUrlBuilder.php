@@ -2,9 +2,9 @@
 
 namespace IO\Services\UrlBuilder;
 
+use IO\Helper\Utils;
 use IO\Services\ItemSearch\Factories\VariationSearchFactory;
 use IO\Services\ItemSearch\Services\ItemSearchService;
-use IO\Services\SessionStorageService;
 
 class ItemUrlBuilder
 {
@@ -12,7 +12,7 @@ class ItemUrlBuilder
     {
         if ( $lang === null )
         {
-            $lang = pluginApp( SessionStorageService::class )->getLang();
+            $lang = Utils::getLang();
         }
 
         $variationId = 0;
