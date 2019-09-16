@@ -7,8 +7,10 @@ use IO\Helper\LanguageMap;
 use IO\Helper\MemoryCache;
 use IO\Helper\Utils;
 use IO\Services\UrlBuilder\CategoryUrlBuilder;
+use IO\Services\UrlBuilder\InternalUrlBuilder;
 use IO\Services\UrlBuilder\UrlQuery;
 use IO\Services\UrlBuilder\VariationUrlBuilder;
+use phpDocumentor\Reflection\Types\Array_;
 use Plenty\Plugin\Http\Request;
 use Plenty\Plugin\Http\Response;
 
@@ -29,18 +31,22 @@ class UrlService
 
     /**
      * UrlService constructor.
+     * @param SessionStorageService $sessionStorage
+     * @param WebstoreConfigurationService $webstoreConfigurationService
      */
-    public function __construct()
+    public function __construct(
+        SessionStorageService $sessionStorage,
+        WebstoreConfigurationService $webstoreConfigurationService
+    )
     {
-        $this->sessionStorage = pluginApp(SessionStorageService::class);
-        $this->webstoreConfigurationService = pluginApp(WebstoreConfigurationService::class);
+        $this->sessionStorage = $sessionStorage;
+        $this->webstoreConfigurationService = $webstoreConfigurationService;
     }
 
     /**
      * Get canonical url for a category
-     * @param int           $categoryId
-     * @param string|null   $lang
-     * @param int | null $webstoreId
+     * @param int $categoryId
+     * @param string|null $lang
      * @return UrlQuery
      */
     public function getCategoryURL( $categoryId, $lang = null)
@@ -161,9 +167,13 @@ class UrlService
         );
 
         return $canonicalUrl;
-
     }
 
+    /**
+     * Check if the current URL is canonical
+     * @param null $lang
+     * @return bool
+     */
     public function isCanonical($lang = null)
     {
         $defaultLanguage = $this->webstoreConfigurationService->getDefaultLanguage();
@@ -236,6 +246,11 @@ class UrlService
         return $shopUrls->home;
     }
 
+    /**
+     * Redirects to the given URL
+     * @param $redirectURL
+     * @return mixed
+     */
     public function redirectTo($redirectURL)
     {
         if(strpos($redirectURL, 'http:') !== 0 && strpos($redirectURL, 'https:') !== 0)
