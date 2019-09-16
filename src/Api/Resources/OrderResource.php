@@ -34,10 +34,12 @@ class OrderResource extends ApiResource
      */
 	public function index():Response
 	{
+	    /** @var CustomerService $customerService */
+	    $customerService = pluginApp(CustomerService::class);
 		$page  = (int)$this->request->get("page", 1);
 		$items = (int)$this->request->get("items", 10);
 
-		$data = pluginApp(CustomerService::class)->getOrders($page, $items);
+		$data = $customerService->getOrders($page, $items);
 		return $this->response->create($data, ResponseCode::OK);
 	}
 
@@ -47,7 +49,9 @@ class OrderResource extends ApiResource
      */
 	public function store():Response
 	{
-		$order = pluginApp(OrderService::class)->placeOrder();
+	    /** @var OrderService $orderService */
+	    $orderService = pluginApp(OrderService::class);
+		$order = $orderService->placeOrder();
 		return $this->response->create($order, ResponseCode::OK);
 	}
 }

@@ -12,6 +12,7 @@ use IO\Constants\SessionStorageKeys;
 use IO\Extensions\Constants\ShopUrls;
 use IO\Extensions\Mail\SendMail;
 use IO\Helper\RouteConfig;
+use IO\Helper\Utils;
 use IO\Models\LocalizedOrder;
 use Plenty\Modules\Account\Address\Contracts\AddressRepositoryContract;
 use Plenty\Modules\Account\Address\Models\AddressOption;
@@ -29,8 +30,6 @@ use Plenty\Modules\Payment\Method\Contracts\PaymentMethodRepositoryContract;
 use Plenty\Plugin\Log\Loggable;
 use Plenty\Repositories\Models\PaginatedResult;
 use Plenty\Modules\Order\Models\Order;
-use Plenty\Plugin\Application;
-use Plenty\Plugin\ConfigRepository;
 
 /**
  * Class OrderService
@@ -139,7 +138,10 @@ class OrderService
             $isShippingPrivacyHintAccepted = 'false';
         }
 
-        $order = pluginApp(OrderBuilder::class)->prepare(OrderType::ORDER)
+        /** @var OrderBuilder $orderBuilder */
+        $orderBuilder = pluginApp(OrderBuilder::class);
+
+        $order = $orderBuilder->prepare(OrderType::ORDER)
             ->fromBasket()
             ->withContactId($this->customerService->getContactId())
             ->withAddressId($this->checkoutService->getBillingAddressId(), AddressType::BILLING)
@@ -171,7 +173,7 @@ class OrderService
         if ($order instanceof Order && $order->id > 0) {
             $params = [
                 'orderId' => $order->id,
-                'webstoreId' => pluginApp(Application::class)->getWebstoreId(),
+                'webstoreId' => Utils::getWebstoreId(),
                 'language' => $this->sessionStorage->getLang()
             ];
             $this->sendMail(AutomaticEmailTemplate::SHOP_ORDER ,AutomaticEmailOrder::class, $params);
@@ -324,8 +326,9 @@ class OrderService
             {
                 if ((int)$this->customerService->getContactId() <= 0)
                 {
-
-                    return $this->urlService->redirectTo(pluginApp(ShopUrls::class)->login . '?backlink=' . pluginApp(ShopUrls::class)->confirmation . '/' . $orderId . '/' . $orderAccessKey);
+                    /** @var ShopUrls $shopUrls */
+                    $shopUrls = pluginApp(ShopUrls::class);
+                    return $this->urlService->redirectTo($shopUrls->login . '?backlink=' . $shopUrls->confirmation . '/' . $orderId . '/' . $orderAccessKey);
                 }
                 elseif ((int)$orderContactId !== (int)$this->customerService->getContactId())
                 {
@@ -606,12 +609,13 @@ class OrderService
         
         return $localizedOrder;
     }
-    
+
     /**
      * List all payment methods available for switch in MyAccount
      *
      * @param int $currentPaymentMethodId
      * @param null $orderId
+     * @return \Illuminate\Support\Collection
      */
     public function getPaymentMethodListForSwitch($currentPaymentMethodId = 0, $orderId = null)
     {

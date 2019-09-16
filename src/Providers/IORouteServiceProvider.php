@@ -2,17 +2,10 @@
 
 namespace IO\Providers;
 
-use IO\Controllers\BasketController;
 use IO\Controllers\CategoryController;
-use IO\Controllers\CheckoutController;
-use IO\Controllers\ContactController;
-use IO\Controllers\LoginController;
-use IO\Controllers\MyAccountController;
-use IO\Controllers\StaticPagesController;
 use IO\Extensions\Constants\ShopUrls;
 use IO\Helper\RouteConfig;
-use IO\Services\SessionStorageService;
-use IO\Services\UrlBuilder\UrlQuery;
+use IO\Helper\Utils;
 use Plenty\Plugin\RouteServiceProvider;
 use Plenty\Plugin\Routing\Router;
 use Plenty\Plugin\Routing\ApiRouter;
@@ -370,7 +363,10 @@ class IORouteServiceProvider extends RouteServiceProvider
                 {
                     // category is assigend => redirect from legacy route to category url
                     // This will also check if the category url equals the legacy route to avoid endless loops
-                    return pluginApp(CategoryController::class)->redirectToCategory(
+                    /** @var CategoryController $categoryController */
+                    $categoryController = pluginApp(CategoryController::class);
+
+                    return $categoryController->redirectToCategory(
                         RouteConfig::getCategoryId($route),
                         "/".$route
                     );
@@ -381,17 +377,19 @@ class IORouteServiceProvider extends RouteServiceProvider
         if ( !RouteConfig::isActive(RouteConfig::CATEGORY) && RouteConfig::getCategoryId($route) > 0 )
         {
             // register single category url if global category route is disabled
-            $lang = pluginApp(SessionStorageService::class)->getLang();
+            $lang = Utils::getLang();
             if(strpos($shopUrl, "/{$lang}/") === 0)
             {
                 // remove language from shop url before registering the route
                 $shopUrl = substr($shopUrl, strlen("/{$lang}/"));
             }
             $router->get(
-                pluginApp(UrlQuery::class, ['path' => $shopUrl])->toRelativeUrl(false),
+                Utils::makeRelativeUrl($shopUrl, false),
                 function() use ($route)
                 {
-                    return pluginApp(CategoryController::class)->showCategoryById( RouteConfig::getCategoryId($route) );
+                    /** @var CategoryController $categoryController */
+                    $categoryController = pluginApp(CategoryController::class);
+                    return $categoryController->showCategoryById( RouteConfig::getCategoryId($route) );
                 }
             );
         }

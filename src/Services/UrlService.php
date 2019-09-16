@@ -5,6 +5,7 @@ namespace IO\Services;
 use IO\Extensions\Constants\ShopUrls;
 use IO\Helper\LanguageMap;
 use IO\Helper\MemoryCache;
+use IO\Helper\Utils;
 use IO\Services\UrlBuilder\CategoryUrlBuilder;
 use IO\Services\UrlBuilder\InternalUrlBuilder;
 use IO\Services\UrlBuilder\UrlQuery;
@@ -182,8 +183,13 @@ class UrlService
             $lang = $this->sessionStorage->getLang();
         }
 
-        $requestUri = pluginApp(Request::class)->getRequestUri();
-        $requestUrl = pluginApp( UrlQuery::class, ['path' => $requestUri])->toAbsoluteUrl($lang !== $defaultLanguage);
+        /** @var Request $request */
+        $request    = pluginApp(Request::class);
+        $requestUri = $request->getRequestUri();
+
+        /** @var UrlQuery $urlQuery */
+        $urlQuery   = pluginApp( UrlQuery::class, ['path' => $requestUri]);
+        $requestUrl = $urlQuery->toAbsoluteUrl($lang !== $defaultLanguage);
         $canonical = $this->getCanonicalURL($lang);
 
         return $requestUrl === $canonical;
@@ -230,11 +236,14 @@ class UrlService
     /**
      * Get language specific homepage url
      * @return string
+     * @deprecated since 4.3.0
+     * Use IO\Extensions\Constants\ShopUrls::$home instead.
      */
     public function getHomepageURL()
     {
-        return pluginApp(UrlQuery::class,
-            ['path' => '/'])->toRelativeUrl($this->webstoreConfigurationService->getDefaultLanguage() !== $this->sessionStorage->getLang());
+        /** @var ShopUrls $shopUrrls */
+        $shopUrls = pluginApp(ShopUrls::class);
+        return $shopUrls->home;
     }
 
     /**
@@ -246,10 +255,14 @@ class UrlService
     {
         if(strpos($redirectURL, 'http:') !== 0 && strpos($redirectURL, 'https:') !== 0)
         {
-            $redirectURL = pluginApp( UrlQuery::class, ['path' => $redirectURL])
-                ->toRelativeUrl($this->webstoreConfigurationService->getDefaultLanguage() !== $this->sessionStorage->getLang() );
+            $redirectURL = Utils::makeRelativeUrl(
+                $redirectURL,
+                $this->webstoreConfigurationService->getDefaultLanguage() !== $this->sessionStorage->getLang()
+            );
         }
 
-        return pluginApp(Response::class)->redirectTo($redirectURL);
+        /** @var Response $response */
+        $response = pluginApp(Response::class);
+        return $response->redirectTo($redirectURL);
     }
 }

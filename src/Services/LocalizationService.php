@@ -2,10 +2,7 @@
 
 namespace IO\Services;
 
-use IO\Services\SessionStorageService;
-use IO\Services\CountryService;
-use IO\Services\WebstoreConfigurationService;
-use IO\Services\CheckoutService;
+use IO\Helper\Utils;
 use Plenty\Modules\Frontend\Services\LocaleService;
 use Plenty\Plugin\Data\Contracts\Resources;
 
@@ -53,7 +50,7 @@ class LocalizationService
     {
         if ( $lang === null )
         {
-            $lang = pluginApp(SessionStorageService::class)->getLang();
+            $lang = Utils::getLang();
         }
 
         /** @var Resources $resource */
