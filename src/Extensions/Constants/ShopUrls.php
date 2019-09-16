@@ -6,16 +6,25 @@ use IO\Helper\MemoryCache;
 use IO\Helper\RouteConfig;
 use IO\Helper\Utils;
 use IO\Services\CategoryService;
+use IO\Services\OrderTrackingService;
 use IO\Services\SessionStorageService;
 use IO\Services\UrlBuilder\CategoryUrlBuilder;
 use IO\Services\UrlBuilder\UrlQuery;
 use IO\Services\WebstoreConfigurationService;
+use Plenty\Modules\Authorization\Services\AuthHelper;
 use Plenty\Modules\Frontend\Events\FrontendLanguageChanged;
+use Plenty\Modules\Order\Contracts\OrderRepositoryContract;
 use Plenty\Plugin\Events\Dispatcher;
+use Plenty\Plugin\Http\Request;
 
 class ShopUrls
 {
     use MemoryCache;
+
+    /**
+     * @var SessionStorageService $sessionStorageService
+     */
+    private $sessionStorageService;
 
     public $appendTrailingSlash = false;
     public $trailingSlashSuffix = "";
@@ -42,6 +51,8 @@ class ShopUrls
 
     public function __construct(Dispatcher $dispatcher, SessionStorageService $sessionStorageService)
     {
+        $this->sessionStorageService = $sessionStorageService;
+
         $this->init($sessionStorageService->getLang());
         $dispatcher->listen(FrontendLanguageChanged::class, function(FrontendLanguageChanged $event)
         {
@@ -80,14 +91,37 @@ class ShopUrls
         $this->returnConfirmation       = $this->getShopUrl(RouteConfig::ORDER_RETURN_CONFIRMATION, "return-confirmation");
     }
 
-    public function returns($orderId)
+    public function returns($orderId, $orderAccessKey = null)
     {
-        return $this->getShopUrl(RouteConfig::ORDER_RETURN, "returns", $orderId);
+        if($orderAccessKey == null) {
+            $request = pluginApp(Request::class);
+            $orderAccessKey = $request->get('accessKey');
+        }
+
+        return $this->getShopUrl(RouteConfig::ORDER_RETURN, "returns", $orderId, $orderAccessKey);
     }
 
     public function orderPropertyFile($path)
     {
         return $this->getShopUrl(RouteConfig::ORDER_PROPERTY_FILE, null, $path);
+    }
+
+    public function tracking($orderId)
+    {
+        $lang = $this->sessionStorageService->getLang();
+        return $this->fromMemoryCache("tracking.{$orderId}", function() use($orderId, $lang)
+        {
+            $authHelper = pluginApp(AuthHelper::class);
+            $trackingURL = $authHelper->processUnguarded(function() use ($orderId, $lang) {
+                $orderRepository = pluginApp(OrderRepositoryContract::class);
+                $orderTrackingService = pluginApp(OrderTrackingService::class);
+
+                $order = $orderRepository->findOrderById($orderId);
+                return $orderTrackingService->getTrackingURL($order, $lang);
+            });
+
+            return $trackingURL;
+        });
     }
 
     private function getShopUrl( $route, $url = null, ...$routeParams )
@@ -122,7 +156,7 @@ class ShopUrls
     private function applyParams( $url, $routeParams )
     {
         $routeParam = array_shift($routeParams);
-        while(!is_null($routeParam))
+        while(!is_null($routeParam) && strlen($routeParam))
         {
             $url->join($routeParam);
             $routeParam = array_shift($routeParams);
