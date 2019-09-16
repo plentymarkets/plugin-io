@@ -243,6 +243,11 @@ class BasketService
     public function getSortedBasketItemOrderParams($basketItem): array
     {
         $newParams = [];
+        if(!array_key_exists('basketItemOrderParams', $basketItem))
+        {
+            return [];
+        }
+
         foreach ($basketItem['basketItemOrderParams'] as $param)
         {
             $propertyId = (int)$param['propertyId'];
