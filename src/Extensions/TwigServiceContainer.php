@@ -29,6 +29,7 @@ use IO\Services\TagService;
 use IO\Services\TemplateService;
 use IO\Services\UnitService;
 use IO\Services\UrlService;
+use IO\Services\UserDataHashService;
 use IO\Services\WebstoreConfigurationService;
 
 class TwigServiceContainer
@@ -171,5 +172,10 @@ class TwigServiceContainer
     public function getAuthentication()
     {
         return pluginApp( AuthenticationService::class );
+    }
+
+    public function getUserDataHash()
+    {
+        return pluginApp( UserDataHashService::class );
     }
 }

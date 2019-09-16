@@ -1,4 +1,5 @@
 <?php //strict
+
 namespace IO\Controllers;
 
 use IO\Constants\LogLevel;
@@ -9,7 +10,6 @@ use IO\Services\OrderService;
 use IO\Services\SessionStorageService;
 use IO\Services\UrlBuilder\UrlQuery;
 use Plenty\Modules\Basket\Exceptions\BasketItemCheckException;
-use Plenty\Plugin\Http\Response;
 use Plenty\Plugin\Http\Request;
 use Plenty\Plugin\Log\Loggable;
 
@@ -27,14 +27,14 @@ class PlaceOrderController extends LayoutController
      * @param OrderService $orderService
      * @param NotificationService $notificationService
      * @param SessionStorageService $sessionStorageService
-     * @param Response $response
+     * @param ShopUrls $shopUrls
      * @return \Symfony\Component\HttpFoundation\Response
      */
     public function placeOrder(
         OrderService $orderService,
         NotificationService $notificationService,
         SessionStorageService $sessionStorageService,
-        Response $response)
+        ShopUrls $shopUrls)
     {
         $request = pluginApp(Request::class);
         $redirectParam = $request->get('redirectParam', '');
@@ -93,7 +93,7 @@ class PlaceOrderController extends LayoutController
                 $notificationService->warn('not enough stock for item', 9);
             }
             
-            return $this->urlService->redirectTo(pluginApp(ShopUrls::class)->checkout);
+            return $this->urlService->redirectTo($shopUrls->checkout);
         }
         catch (\Exception $exception)
         {
@@ -107,22 +107,22 @@ class PlaceOrderController extends LayoutController
 
             if($exception->getCode() === 15)
             {
-                return $this->urlService->redirectTo(pluginApp(ShopUrls::class)->confirmation);
+                return $this->urlService->redirectTo($shopUrls->confirmation);
             }
             elseif($exception->getCode() == 115)
             {
                 //place order has been called a second time in a time frame of 30 seconds
                 $notificationService->addNotificationCode(LogLevel::ERROR, $exception->getCode());
-                return $this->urlService->redirectTo(pluginApp(ShopUrls::class)->checkout);
+                return $this->urlService->redirectTo($shopUrls->checkout);
             }
 
             // TODO get better error text
             $notificationService->error($exception->getMessage());
-            return $this->urlService->redirectTo(pluginApp(ShopUrls::class)->checkout);
+            return $this->urlService->redirectTo($shopUrls->checkout);
         }
     }
 
-    public function executePayment( OrderService $orderService, NotificationService $notificationService, Response $response, int $orderId, int $paymentId = -1 )
+    public function executePayment( OrderService $orderService, NotificationService $notificationService, ShopUrls $shopUrls, int $orderId, int $paymentId = -1 )
     {
         $this->getLogger(__CLASS__)->debug(
             "IO::Debug.PlaceOrderController_executePayment",
@@ -147,7 +147,7 @@ class PlaceOrderController extends LayoutController
                 ]
             );
             $notificationService->error("Order (". $orderId .") not found!");
-            return $this->urlService->redirectTo(pluginApp(ShopUrls::class)->checkout);
+            return $this->urlService->redirectTo($shopUrls->checkout);
         }
 
         if( $paymentId < 0 )
@@ -206,6 +206,6 @@ class PlaceOrderController extends LayoutController
             );
             return $this->urlService->redirectTo($redirectParam);
         }
-        return $this->urlService->redirectTo(pluginApp(ShopUrls::class)->confirmation);
+        return $this->urlService->redirectTo($shopUrls->confirmation);
     }
 }

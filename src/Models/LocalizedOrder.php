@@ -11,14 +11,13 @@ use IO\Services\OrderService;
 use IO\Services\OrderStatusService;
 use IO\Services\OrderTotalsService;
 use IO\Services\OrderTrackingService;
-use Plenty\Modules\Authorization\Services\AuthHelper;
+use IO\Services\TemplateConfigService;
 use Plenty\Modules\Order\Models\Order;
 use Plenty\Modules\Order\Property\Models\OrderProperty;
 use Plenty\Modules\Order\Property\Models\OrderPropertyType;
 use Plenty\Modules\Frontend\PaymentMethod\Contracts\FrontendPaymentMethodRepositoryContract;
 use Plenty\Modules\Order\Shipping\Contracts\ParcelServicePresetRepositoryContract;
 use IO\Extensions\Filters\URLFilter;
-use Plenty\Modules\Order\Status\Contracts\OrderStatusRepositoryContract;
 
 class LocalizedOrder extends ModelWrapper
 {
@@ -66,10 +65,30 @@ class LocalizedOrder extends ModelWrapper
      */
     public static function wrap( $order, ...$data ):LocalizedOrder
     {
+        /** @var OrderService $orderService */
+        $orderService = pluginApp(OrderService::class);
+
         if( $order == null )
         {
             return null;
         }
+        /** @var ParcelServicePresetRepositoryContract $parcelServicePresetRepository */
+        $parcelServicePresetRepository = pluginApp(ParcelServicePresetRepositoryContract::class);
+
+        /** @var OrderTotalsService $orderTotalsService */
+        $orderTotalsService = pluginApp(OrderTotalsService::class);
+
+        /** @var OrderService $orderService */
+        $orderService = pluginApp(OrderService::class);
+
+        /** @var URLFilter $urlFilter */
+        $urlFilter = pluginApp(URLFilter::class);
+
+        /** @var ItemImagesFilter $imageFilter */
+        $imageFilter = pluginApp(ItemImagesFilter::class);
+
+        /** @var OrderStatusService $orderStatusService */
+        $orderStatusService = pluginApp(OrderStatusService::class);
 
         list( $lang ) = $data;
 
@@ -77,12 +96,8 @@ class LocalizedOrder extends ModelWrapper
         $instance->order = $order;
 
         $instance->status = [];
-        $instance->totals = pluginApp(OrderTotalsService::class)->getAllTotals($order);
+        $instance->totals = $orderTotalsService->getAllTotals($order);
 
-        /**
-         * @var ParcelServicePresetRepositoryContract $parcelServicePresetRepository
-         */
-        $parcelServicePresetRepository = pluginApp(ParcelServicePresetRepositoryContract::class);
 
         try
         {
@@ -132,22 +147,11 @@ class LocalizedOrder extends ModelWrapper
         $paymentMethodIdProperty = $order->properties->firstWhere('typeId', OrderPropertyType::PAYMENT_METHOD);
         if($paymentMethodIdProperty instanceof OrderProperty)
         {
-            /** @var OrderService $orderService */
-            $orderService = pluginApp(OrderService::class);
-
             $instance->allowPaymentMethodSwitchFrom = $orderService->allowPaymentMethodSwitchFrom($paymentMethodIdProperty->value, $order->id);
             $instance->paymentMethodListForSwitch = $orderService->getPaymentMethodListForSwitch($paymentMethodIdProperty->value, $order->id);
         }
-        
-        /** @var OrderStatusService $orderStatusService */
-        $orderStatusService = pluginApp(OrderStatusService::class);
+
         $instance->status = $orderStatusService->getOrderStatus($order->id, $order->statusId);
-
-        /** @var URLFilter $urlFilter */
-        $urlFilter = pluginApp(URLFilter::class);
-
-        /** @var ItemImagesFilter $imageFilter */
-        $imageFilter = pluginApp( ItemImagesFilter::class );
 
         $orderVariationIds = [];
         foreach( $order->orderItems as $key => $orderItem )
@@ -197,11 +201,6 @@ class LocalizedOrder extends ModelWrapper
             }
         }
 
-        if ($order->typeId == OrderType::ORDER)
-        {
-            $instance->isReturnable = $orderService->isOrderReturnable($order);
-        }
-
         /** @var OrderTotalsService $orderTotalsService */
         $orderTotalsService = pluginApp(OrderTotalsService::class);
         $instance->highlightNetPrices = $orderTotalsService->highlightNetPrices($instance->order);
@@ -226,7 +225,7 @@ class LocalizedOrder extends ModelWrapper
         $data = [
             "order"                        => $order,
             "status"                       => $this->status,
-            "totals"                => $this->totals,
+            "totals"                       => $this->totals,
             "shippingProfileId"            => $this->shippingProfileId,
             "shippingProvider"             => $this->shippingProvider,
             "shippingProfileName"          => $this->shippingProfileName,
@@ -237,10 +236,53 @@ class LocalizedOrder extends ModelWrapper
             "paymentMethodListForSwitch"   => $this->paymentMethodListForSwitch,
             "itemURLs"                     => $this->itemURLs,
             "itemImages"                   => $this->itemImages,
-            "isReturnable"                 => $this->isReturnable,
+            "isReturnable"                 => $this->isReturnable(),
             "highlightNetPrices"           => $this->highlightNetPrices
         ];
 
         return $data;
+    }
+
+    public function isReturnable()
+    {
+        if($this->order->typeId === OrderType::ORDER)
+        {
+            $orderItems = count($this->orderData)
+                ? $this->orderData['orderItems']
+                : $this->order->orderItems;
+
+            if(!count($orderItems))
+            {
+                return false;
+            }
+
+            $shippingDateSet = false;
+            $createdDateUnix = 0;
+
+            $dates = count($this->orderData) ? $this->orderData['dates'] : $this->order->dates;
+            foreach($dates as $date)
+            {
+                if($date['typeId'] === 5 && strlen($date['date']))
+                {
+                    $shippingDateSet = true;
+                }
+                elseif($date['typeId'] === 2 && strlen($date['date']))
+                {
+                    $createdDateUnix = strtotime($date['date']);
+                }
+            }
+
+            /**  @var TemplateConfigService $templateConfigService */
+            $templateConfigService = pluginApp(TemplateConfigService::class);
+            $returnTime = (int)$templateConfigService->get('my_account.order_return_days', 14);
+
+            return $shippingDateSet
+                && $createdDateUnix > 0
+                && $returnTime > 0
+                && time() < $createdDateUnix + ($returnTime * 24 * 60 * 60);
+
+        }
+
+        return false;
     }
 }

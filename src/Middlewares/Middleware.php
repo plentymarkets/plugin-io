@@ -6,6 +6,7 @@ use IO\Api\ResponseCode;
 use IO\Controllers\CategoryController;
 use IO\Extensions\Constants\ShopUrls;
 use IO\Helper\RouteConfig;
+use IO\Helper\Utils;
 use IO\Services\CountryService;
 use IO\Services\TemplateService;
 use IO\Services\WebstoreConfigurationService;
@@ -155,6 +156,18 @@ class Middleware extends \Plenty\Plugin\Middleware
                 AuthGuard::redirect($confirmationRoute);
             }
         }
+        else if( in_array(RouteConfig::CONFIRMATION, RouteConfig::getEnabledRoutes())
+            && RouteConfig::getCategoryId(RouteConfig::CONFIRMATION) > 0 )
+        {
+            $orderId = $request->get('id', 0);
+            $orderAccessKey = $request->get('ak', '');
+    
+            if(strlen($orderAccessKey) && (int)$orderId > 0)
+            {
+                $confirmationRoute = $shopUrls->confirmation.'?orderId='.$orderId.'&accessKey='.$orderAccessKey;
+                AuthGuard::redirect($confirmationRoute);
+            }
+        }
     }
 
     public function after(Request $request, Response $response):Response
@@ -202,7 +215,7 @@ class Middleware extends \Plenty\Plugin\Middleware
             $language = $webstoreConfig->defaultLanguage;
         }
 
-        if($language === pluginApp(SessionStorageService::class)->getLang())
+        if($language === Utils::getLang())
         {
             // language has not changed
             return;

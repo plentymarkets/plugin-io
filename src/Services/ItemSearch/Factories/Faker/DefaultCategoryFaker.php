@@ -10,7 +10,9 @@ class DefaultCategoryFaker extends AbstractFaker
     
     public function fill($data)
     {
-        $currentCategory = pluginApp(CategoryService::class)->getCurrentCategory();
+        /** @var CategoryService $categoryService */
+        $categoryService = pluginApp(CategoryService::class);
+        $currentCategory = $categoryService->getCurrentCategory();
         $default = [
             "id"                    => !is_null($currentCategory) ? $currentCategory->id : $this->number(),
             "plentyId"              => $this->index === 0 ? $this->plentyId : $this->number(),

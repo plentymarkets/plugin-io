@@ -2,7 +2,7 @@
 
 namespace IO\Services;
 
-use Illuminate\Database\Eloquent\Collection;
+use IO\Helper\Utils;
 use Plenty\Modules\Authorization\Services\AuthHelper;
 use Plenty\Modules\Order\Status\Contracts\OrderStatusRepositoryContract;
 use Plenty\Modules\Order\Status\Models\OrderStatus;
@@ -46,11 +46,10 @@ class OrderStatusService
      */
     public function getOrderStatus($orderId, $orderStatusId)
     {
-        $lang = pluginApp(SessionStorageService::class)->getLang();
-
-        $orderStatusRepo = $this->orderStatusRepo;
-        $statusHistoryRepo = $this->statusHistoryRepo;
-        $logger = $this->getLogger(__CLASS__);
+        $lang               = Utils::getLang();
+        $orderStatusRepo    = $this->orderStatusRepo;
+        $statusHistoryRepo  = $this->statusHistoryRepo;
+        $logger             = $this->getLogger(__CLASS__);
 
         $orderStatus = $this->authHelper->processUnguarded( function() use ($orderId, $orderStatusId, $lang, $orderStatusRepo, $statusHistoryRepo, $logger)
         {
