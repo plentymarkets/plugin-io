@@ -8,6 +8,7 @@ use IO\Api\ResponseCode;
 use IO\DBModels\UserDataHash;
 use IO\Extensions\Constants\ShopUrls;
 use IO\Extensions\Mail\SendMail;
+use IO\Helper\RouteConfig;
 use IO\Services\AuthenticationService;
 use IO\Services\CustomerService;
 use IO\Services\SessionStorageService;
@@ -96,9 +97,15 @@ class CustomerMailResource extends ApiResource
         $lang = $sessionService->getLang();
         /** @var ShopUrls $shopUrls */
         $shopUrls = pluginApp(ShopUrls::class);
-        //$newEmailLink = $domain . ($lang != $defaultLang ? '/' . $lang : ''). '/change-mail/'. $userDataHash->contactId . '/' . $userDataHash->hash;
+        $newEmailLink = "";
 
-        $newEmailLink = $shopUrls->changeMail . '?contactId=' . $userDataHash->contactId . '&hash=' . $userDataHash->hash;
+        if(RouteConfig::getCategoryId(RouteConfig::CHANGE_MAIL) <= 0) {
+            $newEmailLink = $domain . ($lang != $defaultLang ? '/' . $lang : ''). '/change-mail/'. $userDataHash->contactId . '/' . $userDataHash->hash;
+        }
+        else
+        {
+            $newEmailLink = $shopUrls->changeMail . '?contactId=' . $userDataHash->contactId . '&hash=' . $userDataHash->hash;
+        }
 
         $params = [
             'contactId' => $contact->id,
