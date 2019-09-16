@@ -21,12 +21,13 @@ class OrderReturnResource extends ApiResource
     
     public function store():Response
     {
-        $orderId = $this->request->get('orderId', 0);
-        $variationIds = $this->request->get('variationIds', []);
-        $returnNote = $this->request->get('returnNote', '');
+        $returnOrder = $this->orderService->createOrderReturn(
+            $this->request->get('orderId', 0),
+            $this->request->get('orderAccessKey', ''),
+            $this->request->get('variationIds', []),
+            $this->request->get('returnNote', '')
+        );
         
-        $this->orderService->createOrderReturn($orderId, $variationIds, $returnNote);
-        
-        return $this->response->create([], ResponseCode::OK);
+        return $this->response->create($returnOrder, ResponseCode::OK);
     }
 }
