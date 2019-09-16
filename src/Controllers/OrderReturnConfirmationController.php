@@ -19,21 +19,6 @@ class OrderReturnConfirmationController extends LayoutController
      */
     public function showOrderReturnConfirmation()
     {
-        /**
-         * @var CustomerService $customerService
-         */
-        $customerService = pluginApp(CustomerService::class);
-
-        if( (int)$customerService->getContactId() <= 0 )
-        {
-            /** @var Response $response */
-            $response = pluginApp(Response::class);
-            $response->forceStatus(ResponseCode::NOT_FOUND);
-            Middleware::$FORCE_404 = true;
-
-            return $response;
-        }
-
         return $this->renderTemplate(
             'tpl.order.return.confirmation',
             ['data' => ''],

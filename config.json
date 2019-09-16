@@ -82,6 +82,18 @@
                   "label": "Config.routingCategoryMyAccount",
                   "options": {}
               },
+              "routing.category_confirmation": {
+                  "type": "categoryPicker",
+                  "required": false,
+                  "label": "Config.routingCategoryConfirmation",
+                  "options": {}
+              },
+              "routing.category_confirmation-guest": {
+                  "type": "categoryPicker",
+                  "required": false,
+                  "label": "Config.routingCategoryGuestConfirmation",
+                  "options": {}
+              },
               "routing.category_cancellation-rights": {
                   "type": "categoryPicker",
                   "required": false,

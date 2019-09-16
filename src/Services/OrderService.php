@@ -11,6 +11,7 @@ use IO\Constants\OrderPaymentStatus;
 use IO\Constants\SessionStorageKeys;
 use IO\Extensions\Constants\ShopUrls;
 use IO\Extensions\Mail\SendMail;
+use IO\Helper\RouteConfig;
 use IO\Helper\Utils;
 use IO\Models\LocalizedOrder;
 use Plenty\Modules\Account\Address\Contracts\AddressRepositoryContract;
@@ -29,7 +30,6 @@ use Plenty\Modules\Payment\Method\Contracts\PaymentMethodRepositoryContract;
 use Plenty\Plugin\Log\Loggable;
 use Plenty\Repositories\Models\PaginatedResult;
 use Plenty\Modules\Order\Models\Order;
-use Plenty\Plugin\ConfigRepository;
 
 /**
  * Class OrderService
@@ -140,6 +140,7 @@ class OrderService
 
         /** @var OrderBuilder $orderBuilder */
         $orderBuilder = pluginApp(OrderBuilder::class);
+
         $order = $orderBuilder->prepare(OrderType::ORDER)
             ->fromBasket()
             ->withContactId($this->customerService->getContactId())
@@ -285,21 +286,13 @@ class OrderService
     /**
      * Find an order by ID
      * @param int $orderId
-     * @param bool $removeReturnItems
      * @param bool $wrap
      * @return LocalizedOrder|mixed|Order
      */
-	public function findOrderById(int $orderId, $removeReturnItems = false, $wrap = true)
+	public function findOrderById(int $orderId, $wrap = true)
 	{
-        if($removeReturnItems)
-        {
-            $order = $this->removeReturnItemsFromOrder($this->orderRepository->findOrderById($orderId));
-        }
-        else
-        {
-            $order = $this->orderRepository->findOrderById($orderId);
-        }
-        
+        $order = $this->orderRepository->findOrderById($orderId);
+
         if($wrap)
         {
             return LocalizedOrder::wrap($order, $this->sessionStorage->getLang());
@@ -486,344 +479,143 @@ class OrderService
     
     public function isReturnActive()
     {
-        /**
-         * @var TemplateConfigService $templateConfigService
-         */
-        $templateConfigService = pluginApp(TemplateConfigService::class);
-        $returnsActive = $templateConfigService->get('my_account.order_return_active', 'true');
-        
-        if($returnsActive == 'true')
-        {
-            return true;
-        }
-        
-        return false;
+        return RouteConfig::isActive(RouteConfig::ORDER_RETURN);
     }
     
-    public function isOrderReturnable(Order $order)
+    public function createOrderReturn($orderId, $orderAccessKey = '', $items = [], $returnNote = '')
     {
-        if($this->customerService->getContactId() > 0 && $this->isReturnActive())
+        $localizedOrder = $this->getReturnOrder($orderId, $orderAccessKey);
+        if ($localizedOrder->isReturnable())
         {
-            /**
-             * @var ConfigRepository $config
-             */
-            $config = pluginApp(ConfigRepository::class);
-            $enabledRoutes = explode(', ',  $config->get('IO.routing.enabled_routes') );
-            if ( !in_array('order-return', $enabledRoutes) && !in_array('all', $enabledRoutes) )
-            {
-                return false;
-            }
-            
-            $orderWithoutReturnItems = $this->removeReturnItemsFromOrder($order);
-            if(!count($orderWithoutReturnItems->orderItems))
-            {
-                return false;
-            }
+            $returnOrderData = $localizedOrder->orderData;
 
-            $newOrderItems = [];
+            foreach($returnOrderData['orderItems'] as $i => $orderItem)
+            {
+                $variationId = $orderItem['itemVariationId'];
+                $returnQuantity = max((int) $items[$variationId], $orderItem->quantity);
 
-            foreach($orderWithoutReturnItems->orderItems as $orderItem)
-            {
-                if($orderItem['bundleType'] !== 'bundle_item' && count($orderItem['references']) === 0)
+                if ($returnQuantity > 0)
                 {
-                    $newOrderItems[] = $orderItem;
-                }
-            }
-
-            $newItemsExist = false;
-
-            if(count($newOrderItems) > 0)
-            {
-                foreach($newOrderItems as $newOrderItem)
-                {
-                    if($newOrderItem['quantity'] > 0)
-                    {
-                        $newItemsExist = true;
-                    }
-                }
-            }
-            
-            $shippingDateSet = false;
-            $createdDateUnix = 0;
-    
-            foreach($order->dates as $date)
-            {
-                if($date->typeId == 5 && strlen($date->date))
-                {
-                    $shippingDateSet = true;
-                }
-                elseif($date->typeId == 2 && strlen($date->date))
-                {
-                    $createdDateUnix = $date->date->timestamp;
-                }
-            }
-    
-            /**
-             * @var TemplateConfigService $templateConfigService
-             */
-            $templateConfigService = pluginApp(TemplateConfigService::class);
-            $returnTime = (int)$templateConfigService->get('my_account.order_return_days', 14);
-    
-            if( $shippingDateSet && ($createdDateUnix > 0 && $returnTime > 0) && (time() < ($createdDateUnix + ($returnTime * 24 * 60 * 60))) && $newItemsExist )
-            {
-                return true;
-            }
-        }
-        
-        return false;
-    }
-    
-    public function createOrderReturn($orderId, $items = [], $returnNote = '')
-    {
-        $order = $this->orderRepository->findOrderById($orderId);
-        $order = $this->removeReturnItemsFromOrder($order);
-        $order = $order->toArray();
-        
-        if($this->isReturnActive())
-        {
-            foreach($order['orderItems'] as $key => $orderItem)
-            {
-                if(array_key_exists($orderItem['itemVariationId'], $items) && (int)$items[$orderItem['itemVariationId']] > 0)
-                {
-                    $returnQuantity = (int)$items[$orderItem['itemVariationId']];
-                    
-                    if($returnQuantity > $order['orderItems'][$key]['quantity'])
-                    {
-                        $returnQuantity = $order['orderItems'][$key]['quantity'];
-                    }
-                    
-                    $order['orderItems'][$key]['quantity'] = $returnQuantity;
-
-                    $order['orderItems'][$key]['references'][] = [
-                        'referenceOrderItemId' =>   $order['orderItems'][$key]['id'],
-                        'referenceType' => 'parent'
+                    $returnOrderData['orderItems'][$i]['quantity'] = $returnQuantity;
+                    $returnOrderData['orderItems'][$i]['references'][] = [
+                        'referenceOrderItemId'  => $orderItem['id'],
+                        'referenceType'         => 'parent'
                     ];
-                    
-                    unset($order['orderItems'][$key]['id']);
-                    unset($order['orderItems'][$key]['orderId']);
+
+                    unset($returnOrderData['orderItems'][$i]['id']);
+                    unset($returnOrderData['orderItems'][$i]['orderId']);
                 }
                 else
                 {
-                    unset($order['orderItems'][$key]);
+                    unset($returnOrderData['orderItems'][$i]);
                 }
             }
-    
-            /**
-             * @var TemplateConfigService $templateConfigService
-             */
+
+            /** @var TemplateConfigService $templateConfigService */
             $templateConfigService = pluginApp(TemplateConfigService::class);
-            $returnStatus = $templateConfigService->get('my_account.order_return_initial_status', '');
+            $returnStatus = $templateConfigService->get('my_account.order_return_initial_status', 9.0);
             if(!strlen($returnStatus) || (float)$returnStatus <= 0)
             {
                 $returnStatus = 9.0;
             }
 
-            $order['properties'][] = [
+            $returnOrderData['properties'][]      = [
                 "typeId"    => OrderPropertyType::NEW_RETURNS_MY_ACCOUNT,
                 "value"     => "1"
             ];
-
-
-
-            $order['statusId'] = (float)$returnStatus;
-            $order['typeId'] = OrderType::RETURNS;
-    
-            $order['orderReferences'][] = [
-                'referenceOrderId' => $order['id'],
-                'referenceType' => 'parent'
+            $returnOrderData['statusId']          = (float) $returnStatus;
+            $returnOrderData['typeId']            = OrderType::RETURNS;
+            $returnOrderData['orderReferences'][] = [
+                'referenceOrderId'  => $localizedOrder->order->id,
+                'referenceType'     => 'parent'
             ];
-    
-            unset($order['id']);
-            unset($order['dates']);
-            unset($order['lockStatus']);
+
+            unset($returnOrderData['id']);
+            unset($returnOrderData['dates']);
+            unset($returnOrderData['lockStatus']);
 
             if(!is_null($returnNote) && strlen($returnNote))
             {
-                $order["comments"][] = [
+                $returnOrderData["comments"][] = [
                     "isVisibleForContact" => true,
                     "text"                => $returnNote
                 ];
             }
 
-            $createdReturn = $this->orderRepository->createOrder($order);
+            $createdReturn = $this->orderRepository->createOrder($returnOrderData);
 
             return $createdReturn;
         }
         
-        return $order;
+        return $localizedOrder->order;
     }
-    
-    private function removeReturnItemsFromOrder($order)
+
+    /**
+     * @param $orderId
+     * @param string $orderAccessKey
+     * @return LocalizedOrder
+     */
+    public function getReturnOrder($orderId, $orderAccessKey = '')
     {
-        $orderId = $order->id;
+        $localizedOrder = strlen($orderAccessKey)
+            ? $this->findOrderByAccessKey($orderId, $orderAccessKey)
+            : $this->findOrderById($orderId);
 
-        $returnFilters = [
-            'orderType' => OrderType::RETURNS,
-            'referenceOrderId' => $orderId
-        ];
+        /** @var Order $order */
+        $order = $localizedOrder->order;
 
-        /** @var CustomerService $customerService */
-        $customerService = pluginApp(CustomerService::class);
-        $allReturns = $this->getOrdersForContact($customerService->getContactId(), 1, 100, $returnFilters, false)->getResult();
-        
-        $returnItems = [];
+        /** @var AuthHelper $authHelper */
+        $authHelper = pluginApp(AuthHelper::class);
+
+        // collect quantities of already returned variations
+        $returnItems = $authHelper->processUnguarded(function() use ($order)
+        {
+            $returnItems = [];
+            foreach ($order->childOrders as $childOrder)
+            {
+                if($childOrder->typeId === OrderType::RETURNS)
+                {
+                    foreach($childOrder->orderItems as $orderItem)
+                    {
+                        $variationId = $orderItem->itemVariationId;
+                        $returnItems[$variationId] += $orderItem->quantity;
+                    }
+                }
+            }
+            return $returnItems;
+        });
+
         $newOrderItems = [];
-        
-        if(count($allReturns))
+        foreach($order->orderItems as $key => $orderItem)
         {
-            foreach($allReturns as $returnKey => $return)
+            $newQuantity = $orderItem->quantity;
+            if(array_key_exists($orderItem->itemVariationId, $returnItems))
             {
-                foreach($return['orderReferences'] as $reference)
-                {
-                    if($reference['referenceType'] == 'parent' && (int)$reference['referenceOrderId'] == $orderId)
-                    {
-                        foreach($return['orderItems'] as $returnItem)
-                        {
-                            if(array_key_exists($returnItem['itemVariationId'], $returnItems))
-                            {
-                                $returnItems[$returnItem['itemVariationId']] += $returnItem['quantity'];
-                            }
-                            else
-                            {
-                                $returnItems[$returnItem['itemVariationId']] = $returnItem['quantity'];
-                            }
-                        }
-                    }
-                }
+                $newQuantity -= $returnItems[$orderItem->itemVariationId];
             }
-            
-            if(count($returnItems))
-            {
-                foreach($order->orderItems as $key => $orderItem)
-                {
-                    if(array_key_exists($orderItem['itemVariationId'], $returnItems))
-                    {
-                        $newQuantity = $orderItem['quantity'] - $returnItems[$orderItem['itemVariationId']];
-                    }
-                    else
-                    {
-                        $newQuantity = $orderItem['quantity'];
-                    }
-    
-                    if($newQuantity > 0 && in_array((int)$orderItem->typeId, self::WRAPPED_ORDERITEM_TYPES))
-                    {
-                        $orderItem['quantity'] = $newQuantity;
-                        $newOrderItems[] = $orderItem;
-                    }
-                    else
-                    {
-                        $orderItem->quantity = 0;
-                    }
-                }
-                
-                //$order->returnItems = $newOrderItems;
-                $order->orderItems = $newOrderItems;
-            }
-            else
-            {
-                foreach($order->orderItems as $key => $orderItem)
-                {
-                    if(in_array((int)$orderItem->typeId, self::WRAPPED_ORDERITEM_TYPES))
-                    {
-                        $newOrderItems[] = $orderItem;
-                    }
-                }
-                
-                //$order->returnItems = $newOrderItems;
-                $order->orderItems = $newOrderItems;
-            }
-        }
-        
-        return $order;
-    }
-    
-    public function getReturnOrder($localizedOrder)
-    {
-        $order = $localizedOrder->order->toArray();
-        $orderId = $order['id'];
-        
-        $returnFilters = [
-            'orderType' => OrderType::RETURNS,
-            'referenceOrderId' => $orderId
-        ];
 
-        /** @var CustomerService $customerService */
-        $customerService = pluginApp(CustomerService::class);
-        $allReturns = $this->getOrdersForContact($customerService->getContactId(), 1, 1000, $returnFilters, false)->getResult();
-    
-        $returnItems = [];
-        $newOrderItems = [];
-    
-        if(count($allReturns))
-        {
-            foreach ($allReturns as $returnKey => $return)
+            if($newQuantity > 0
+                && in_array($orderItem->typeId, self::WRAPPED_ORDERITEM_TYPES))
             {
-                foreach ($return['orderReferences'] as $reference)
-                {
-                    if ($reference['referenceType'] == 'parent' && (int)$reference['referenceOrderId'] == $orderId)
-                    {
-                        foreach ($return['orderItems'] as $returnItem)
-                        {
-                            if (array_key_exists($returnItem['itemVariationId'], $returnItems))
-                            {
-                                $returnItems[$returnItem['itemVariationId']] += $returnItem['quantity'];
-                            }
-                            else
-                            {
-                                $returnItems[$returnItem['itemVariationId']] = $returnItem['quantity'];
-                            }
-                        }
-                    }
-                }
+                $orderItemData = $orderItem->toArray();
+                $orderItemData['quantity'] = $newQuantity;
+                $newOrderItems[] = $orderItemData;
             }
         }
-        
-        if(count($returnItems))
-        {
-            foreach($order['orderItems'] as $key => $orderItem)
-            {
-                if(array_key_exists($orderItem['itemVariationId'], $returnItems))
-                {
-                    $newQuantity = $orderItem['quantity'] - $returnItems[$orderItem['itemVariationId']];
-                }
-                else
-                {
-                    $newQuantity = $orderItem['quantity'];
-                }
-            
-                if($newQuantity > 0 && in_array((int)$orderItem['typeId'], self::WRAPPED_ORDERITEM_TYPES))
-                {
-                    $orderItem['quantity'] = $newQuantity;
-                    $newOrderItems[] = $orderItem;
-                }
-                else
-                {
-                    $orderItem['quantity'] = 0;
-                }
-            }
-        }
-        else
-        {
-            foreach($order['orderItems'] as $key => $orderItem)
-            {
-                if(in_array((int)$orderItem['typeId'], self::WRAPPED_ORDERITEM_TYPES))
-                {
-                    $newOrderItems[] = $orderItem;
-                }
-            }
-        }
-        
-        $order['orderItems'] = $newOrderItems;
-        $localizedOrder->orderData = $order;
+
+        $orderData = $order->toArray();
+        $orderData['orderItems'] = $newOrderItems;
+        $localizedOrder->orderData = $orderData;
         
         return $localizedOrder;
     }
-    
+
     /**
      * List all payment methods available for switch in MyAccount
      *
      * @param int $currentPaymentMethodId
      * @param null $orderId
+     * @return \Illuminate\Support\Collection
      */
     public function getPaymentMethodListForSwitch($currentPaymentMethodId = 0, $orderId = null)
     {
