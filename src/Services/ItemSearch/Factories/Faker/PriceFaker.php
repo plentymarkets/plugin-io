@@ -16,7 +16,9 @@ class PriceFaker extends AbstractFaker
 
     public function fill($data)
     {
-        $this->currency             = pluginApp(CheckoutService::class)->getCurrency() ?? 'EUR';
+        /** @var CheckoutService $checkoutService */
+        $checkoutService = pluginApp(CheckoutService::class);
+        $this->currency             = $checkoutService->getCurrency() ?? 'EUR';
         $this->numberFormatFilter   = pluginApp(NumberFormatFilter::class);
         $this->showNetPrice         = $this->boolean();
         $defaultPrice               = $this->makePrice(0);
