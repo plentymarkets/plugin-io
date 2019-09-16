@@ -3,11 +3,11 @@
 namespace IO\Controllers;
 
 use IO\Api\ResponseCode;
+use IO\Helper\Utils;
 use IO\Services\CategoryService;
 use IO\Services\ItemListService;
 use IO\Services\ItemSearch\Factories\VariationSearchResultFactory;
 use IO\Services\ItemSearch\Helper\ResultFieldTemplate;
-use IO\Services\ItemSearch\SearchPresets\CrossSellingItems;
 use IO\Services\ItemSearch\SearchPresets\SingleItem;
 use IO\Services\ItemSearch\SearchPresets\VariationAttributeMap;
 use IO\Services\ItemSearch\Services\ItemSearchService;
@@ -15,7 +15,6 @@ use Plenty\Modules\Category\Models\Category;
 use Plenty\Modules\ShopBuilder\Helper\ShopBuilderRequest;
 use Plenty\Plugin\Http\Response;
 use Plenty\Plugin\Log\Loggable;
-use Plenty\Plugin\Application;
 
 /**
  * Class ItemController
@@ -47,9 +46,7 @@ class ItemController extends LayoutController
             'setCategory'   => is_null($category)
         ];
 
-        /** @var Application $app */
-        $app = pluginApp( Application::class );
-        $this->plentyId = $app->getPlentyId();
+        $this->plentyId = Utils::getPlentyId();
 
         /** @var ItemSearchService $itemSearchService */
         $itemSearchService = pluginApp( ItemSearchService::class );
@@ -60,7 +57,9 @@ class ItemController extends LayoutController
 
         if (!is_null($category))
         {
-            pluginApp(CategoryService::class)->setCurrentCategory($category);
+            /** @var CategoryService $categoryService */
+            $categoryService = pluginApp(CategoryService::class);
+            $categoryService->setCurrentCategory($category);
         }
         /** @var ShopBuilderRequest $shopBuilderRequest */
         $shopBuilderRequest = pluginApp(ShopBuilderRequest::class);

@@ -1,14 +1,12 @@
 <?php //strict
 namespace IO\Controllers;
 
-use IO\Helper\TemplateContainer;
-use Plenty\Modules\Order\Contracts\OrderRepositoryContract;
-use Plenty\Modules\Order\Models\Order;
-use Plenty\Plugin\ConfigRepository;
+use IO\Extensions\Constants\ShopUrls;
+use IO\Models\LocalizedOrder;
 use IO\Services\CustomerService;
 use IO\Services\OrderService;
 use IO\Guards\AuthGuard;
-use IO\Services\UrlBuilder\UrlQuery;
+use Plenty\Plugin\Http\Response;
 use Plenty\Plugin\Log\Loggable;
 
 /**
@@ -21,97 +19,66 @@ class OrderReturnController extends LayoutController
 
     /**
      * Render the order returns view
-     * @return string
+     * @param int               $orderId
+     * @param string            $orderAccessKey
+     *
+     * @return string|Response
+     *
+     * @throws \ErrorException
      */
-    public function showOrderReturn($orderId, CustomerService $customerService):string
+    public function showOrderReturn($orderId, $orderAccessKey = null)
     {
-        if($customerService->getContactId() <= 0)
-        {
-            $url = $this->urlService->getHomepageURL();
-            if(substr($url, -1) !== '/')
-            {
-                $url .= '/';
-            }
-            $url .= 'login';
-            $url .= UrlQuery::shouldAppendTrailingSlash() ? '/' : '';
 
-            AuthGuard::redirect($url, ["backlink" => AuthGuard::getUrl()]);
+        if(pluginApp(CustomerService::class)->getContactId() <= 0 && !strlen($orderAccessKey))
+        {
+            AuthGuard::redirect(
+                pluginApp(ShopUrls::class)->login,
+                ["backlink" => AuthGuard::getUrl()]
+            );
         }
 
-        $configRepo = pluginApp(ConfigRepository::class);
-    
-        /**
-         * @var OrderService $orderService
-         */
-        $orderService = pluginApp(OrderService::class);
-        
-        $returnOrder = [];
-        $template = 'tpl.order.return';
-        
-        $enabledRoutes = explode(", ",  $configRepo->get("IO.routing.enabled_routes") );
-        if( (in_array('order-return', $enabledRoutes) || in_array("all", $enabledRoutes)) && $orderService->isReturnActive() )
+        try
         {
-            try
+            /** @var OrderService $orderService */
+            $orderService   = pluginApp(OrderService::class);
+
+            /** @var LocalizedOrder $returnOrder */
+            $returnOrder    = $orderService->getReturnOrder($orderId, $orderAccessKey);
+
+            if(!$returnOrder->isReturnable())
             {
-                $order = $orderService->findOrderById($orderId, false, true);
-                $returnOrder = $orderService->getReturnOrder($order);
-    
-                /** @var OrderRepositoryContract $orderRepo */
-                $orderRepo = pluginApp(OrderRepositoryContract::class);
-
-                $newOrderItems = [];
-
-                foreach($returnOrder->orderData['orderItems'] as $orderItem)
-                {
-                    if($orderItem['bundleType'] !== 'bundle_item' && count($orderItem['references']) === 0)
-                    {
-                        $newOrderItems[] = $orderItem;
-                    }
-                }
-
-                if(count($newOrderItems) > 0)
-                {
-                    $returnOrder->orderData['orderItems'] = $newOrderItems;
-                }
-                
-                if(!count($returnOrder->orderData['orderItems']) || !$orderService->isOrderReturnable($orderRepo->findOrderById($orderId)))
-                {
-                    $this->getLogger(__CLASS__)->info(
-                        "IO::Debug.OrderReturnController_orderNotReturnable",
-                        [
-                            "orderId"           => $orderId,
-                            "returnOrderItems"  => $returnOrder->orderData['orderItems']
-                        ]
-                    );
-                    return '';
-                }
-                
-            }
-            catch (\Exception $e)
-            {
-                $this->getLogger(__CLASS__)->warning(
-                    "IO::Debug.OrderReturnController_cannotPrepareReturn",
+                $this->getLogger(__CLASS__)->info(
+                    "IO::Debug.OrderReturnController_orderNotReturnable",
                     [
-                        "orderId" => $orderId,
-                        "returnOrder" => $returnOrder !== null ? $returnOrder->orderData : null,
-                        "error" => [
-                            "code" => $e->getCode(),
-                            "message" => $e->getMessage()
-                        ]
+                        "orderId"           => $orderId,
+                        "returnOrderItems"  => $returnOrder->orderData['orderItems']
                     ]
                 );
-                return '';
+                return $this->notFound();
             }
+
         }
-        else
+        catch (\Exception $e)
         {
-            $this->getLogger(__CLASS__)->info("IO::Debug.OrderReturnController_orderReturnDisabled");
-            return '';
+            $this->getLogger(__CLASS__)->warning(
+                "IO::Debug.OrderReturnController_cannotPrepareReturn",
+                [
+                    "orderId" => $orderId,
+                    "error" => [
+                        "code" => $e->getCode(),
+                        "message" => $e->getMessage()
+                    ]
+                ]
+            );
+            return $this->notFound();
         }
-        
+
         return $this->renderTemplate(
             'tpl.order.return',
-            ['orderData' => $returnOrder],
+            [
+                'orderData'         => $returnOrder,
+                'orderAccessKey'    => $orderAccessKey
+            ],
             false
 		);
     }
