@@ -34,9 +34,13 @@ class FacetFilterExtension implements ItemSearchExtension
 
             foreach( $facets as $facet )
             {
-                if ( (int) $facet['count'] >= (int) $facet['minHitCount'] || $facet['type'] == 'price' )
-                {
+                $hits = array_filter($facet['values'], function ($value) use ($facet) {
+                    return (int)$value['count'] > (int) $facet['minHitCount'];
+                });
 
+                if ( count($hits) || $facet['type'] == 'price' )
+                {
+                    $facet['values'] = $hits;
                     $facet['values'] = array_slice( $facet['values'], 0, (int) $facet['maxResultCount'] );
                     $filteredFacets[] = $facet;
                 }
