@@ -133,7 +133,6 @@ class NumberFormatFilter extends AbstractFilter
                         $formatter->setAttribute(\NumberFormatter::FRACTION_DIGITS, $this->config->get('IO.format.number_decimals', 2));
                     }
 
-                    $formatter->setAttribute(\NumberFormatter::ROUNDING_MODE, \NumberFormatter::ROUND_DOWN);
                     return $formatter;
                 }
             );
