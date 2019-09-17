@@ -5,8 +5,8 @@ namespace IO\Services\ItemSearch\Factories\Faker\Traits;
 trait HandleNestedArray
 {
     /**
-     * @param mixed         $object
-     * @param mixed|array   $defaults
+     * @param array   $object
+     * @param array   $defaults
      */
     protected function merge(&$object, $defaults)
     {
@@ -14,6 +14,7 @@ trait HandleNestedArray
         {
             if ( is_array($defaultValue) && is_array($object[$key]) )
             {
+                /** @var array $defaultValue */
                 $this->merge($object[$key], $defaultValue);
             }
             else if (is_null($object[$key]))
