@@ -76,7 +76,7 @@ class IORouteServiceProvider extends RouteServiceProvider
             $api->resource('io/live-shopping', 'LiveShoppingResource');
             $api->resource('io/facet', 'FacetResource');
             $api->resource('io/categorytree', 'CategoryTreeResource');
-
+            $api->resource('io/faker/basket', 'FakerBasketResource');
 		});
 
 		/** @var ShopUrls $shopUrls */
