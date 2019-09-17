@@ -4,6 +4,10 @@ namespace IO\Services\ItemSearch\Factories\Faker\Traits;
 
 trait HandleNestedArray
 {
+    /**
+     * @param mixed         $object
+     * @param mixed|array   $defaults
+     */
     protected function merge(&$object, $defaults)
     {
         foreach($defaults as $key => $defaultValue)
@@ -19,6 +23,11 @@ trait HandleNestedArray
         }
     }
 
+    /**
+     * @param array   $arr
+     * @param string  $field
+     * @return mixed
+     */
     protected function get($arr, $field)
     {
         $path = explode(".", $field);
@@ -34,6 +43,11 @@ trait HandleNestedArray
         return $arr[$key];
     }
 
+    /**
+     * @param array     $arr
+     * @param string    $field
+     * @return bool
+     */
     protected function isDefined($arr, $field)
     {
         $path = explode(".", $field);
@@ -50,6 +64,13 @@ trait HandleNestedArray
         return false;
     }
 
+    /**
+     * @param array     $arr
+     * @param string    $field
+     * @param string    $key
+     * @param mixed     $value
+     * @return bool
+     */
     protected function hasAny($arr, $field, $key, $value)
     {
         $list = $this->get($arr, $field) ?? [];
