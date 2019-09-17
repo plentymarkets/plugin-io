@@ -14,8 +14,7 @@ trait HandleNestedArray
         {
             if ( is_array($defaultValue) && is_array($object[$key]) )
             {
-                /** @var array $defaultValue */
-                $this->merge($object[$key], $defaultValue);
+                $this->merge($object[$key], (array)$defaultValue);
             }
             else if (is_null($object[$key]))
             {
