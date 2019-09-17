@@ -62,18 +62,19 @@ class CategoryController extends LayoutController
         );
 	}
 
-	public function showCategoryById($categoryId)
+	public function showCategoryById($categoryId, $params = [])
     {
         /** @var SessionStorageService $sessionService */
         $sessionService  = pluginApp(SessionStorageService::class);
         $lang = $sessionService->getLang();
 
         return $this->renderCategory(
-            $this->categoryRepo->get( $categoryId, $lang )
+            $this->categoryRepo->get( $categoryId, $lang ),
+            $params
         );
     }
 
-    public function redirectToCategory( $categoryId, $defaultUrl = "" )
+    public function redirectToCategory( $categoryId, $defaultUrl = '', $params = [] )
     {
         /** @var SessionStorageService $sessionService */
         $sessionService  = pluginApp(SessionStorageService::class);
@@ -81,11 +82,11 @@ class CategoryController extends LayoutController
 
         /** @var UrlService $urlService */
         $urlService = pluginApp(UrlService::class);
-        $categoryUrl = $urlService->getCategoryURL( $categoryId, $lang );
+        $categoryUrl = $urlService->getCategoryURL( (int)$categoryId, $lang );
         if($categoryUrl->equals($defaultUrl))
         {
             // category url equals legacy route name
-            return $this->showCategoryById($categoryId);
+            return $this->showCategoryById($categoryId, $params);
         }
 
         $category = $this->categoryRepo->get($categoryId, $lang);
@@ -99,12 +100,13 @@ class CategoryController extends LayoutController
             return $response;
         }
 
+        $urlParams = http_build_query($params);
         return $urlService->redirectTo(
-            $categoryUrl->toRelativeUrl()
+            $categoryUrl->toRelativeUrl() . ( strlen($urlParams) ? '?'.$urlParams : '')
         );
     }
 
-	private function renderCategory($category)
+	private function renderCategory($category, $params = [])
     {
         /** @var Request $request */
         $request = pluginApp(Request::class);
@@ -184,7 +186,11 @@ class CategoryController extends LayoutController
 
             /** @var ConfirmationController $confirmationController */
             $confirmationController = pluginApp(ConfirmationController::class);
-            return $confirmationController->showConfirmation($request->get('orderId', 0), $request->get('accessKey', ''), $category);
+            return $confirmationController->showConfirmation(
+                $params['orderId'] ?? $request->get('orderId', 0),
+                $params['accessKey'] ?? $request->get('accessKey', ''),
+                $category
+            );
         }
 
         return $this->renderTemplate(
