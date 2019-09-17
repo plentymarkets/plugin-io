@@ -2,6 +2,7 @@
 
 namespace IO\Api\Resources;
 
+use IO\Helper\ReCaptcha;
 use Plenty\Modules\Account\Contact\Models\Contact;
 use Plenty\Plugin\Http\Response;
 use Plenty\Plugin\Http\Request;
@@ -49,6 +50,11 @@ class CustomerResource extends ApiResource
      */
 	public function store():Response
 	{
+        if( !ReCaptcha::verify($this->request->get("recaptcha", null)) )
+        {
+            return $this->response->create("", ResponseCode::BAD_REQUEST);
+        }
+
 		$contactData         = $this->request->get("contact", null);
 		$billingAddressData  = $this->request->get("billingAddress", []);
 		$deliveryAddressData = $this->request->get("deliveryAddress", []);
