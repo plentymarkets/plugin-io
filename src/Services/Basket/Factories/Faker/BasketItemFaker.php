@@ -9,15 +9,40 @@ use Plenty\Plugin\Translation\Translator;
 
 class BasketItemFaker extends AbstractFaker
 {
+    private $rawBasketItems = [];
+
     public function fill($data)
     {
-        $orderId = $this->number(1, 10000);
-
         $default = [
 
         ];
 
+        if(count($this->rawBasketItems))
+        {
+            $id = 100;
+            foreach ($this->rawBasketItems as $rawBasketItem)
+            {
+                $basketItem = [];
+
+                $basketItem['variation'] = $rawBasketItem;
+                $basketItem['variationId'] = $rawBasketItem['id'];
+                $basketItem['basketItemOrderParams'] = [];
+                $basketItem['price'] = $rawBasketItem['prices']['default']['data']['basePrice'];
+                $basketItem['quantity'] = 1;
+                $basketItem['id'] = $id;
+                $id += 1;
+
+                $default[] = $basketItem;
+            }
+        }
+
+
         $this->merge($data, $default);
         return $data;
+    }
+
+    public function setRawBasketItems($rawBasketitems)
+    {
+        $this->rawBasketItems = $rawBasketitems;
     }
 }

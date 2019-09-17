@@ -7,10 +7,11 @@ use IO\Services\Basket\Factories\Faker\BasketFaker;
 use IO\Services\Basket\Factories\Faker\BasketItemFaker;
 use IO\Services\ItemSearch\SearchPresets\VariationList;
 use IO\Services\ItemSearch\Services\ItemSearchService;
+use Plenty\Modules\Basket\Models\Basket;
 
 class BasketResultFactory
 {
-    const ORDER_STRUCTURE = [
+    const BASKET_STRUCTURE = [
         'basket' => [
             'basketAmount'                  => 0.0,
             'basketAmountNet'               => 0.0,
@@ -65,14 +66,15 @@ class BasketResultFactory
         // Fill in fake data into objects
         $basketResult = [];
 
-        foreach(self::ORDER_STRUCTURE as $key => $value)
+        foreach(self::BASKET_STRUCTURE as $key => $value)
         {
             if(array_key_exists($key, self::FAKER_MAP))
             {
                 $faker = pluginApp(self::FAKER_MAP[$key]);
-                if($faker instanceof AbstractFaker)
+                if($faker instanceof BasketFaker || $faker instanceof BasketItemFaker)
                 {
-                    $basketResult[$key] = $faker->fill($basketResult[$key]);
+                    $faker->setRawBasketItems($rawBasketItems);
+                    $basketResult[$key] = $faker->fill(self::BASKET_STRUCTURE[$key]);
                 }
             }
             else

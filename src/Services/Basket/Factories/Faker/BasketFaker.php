@@ -13,13 +13,6 @@ class BasketFaker extends AbstractFaker
 {
     private $rawBasketItems = [];
 
-    public function __construct(SessionStorageService $sessionStorageService, Application $app, $rawBasketItems)
-    {
-        parent::__construct($sessionStorageService, $app);
-
-        $this->rawBasketItems = $rawBasketItems;
-    }
-
     public function fill($data)
     {
         $orderId = $this->number(1, 10000);
@@ -30,5 +23,10 @@ class BasketFaker extends AbstractFaker
 
         $this->merge($data, $default);
         return $data;
+    }
+
+    public function setRawBasketItems($rawBasketitems)
+    {
+        $this->rawBasketItems = $rawBasketitems;
     }
 }
