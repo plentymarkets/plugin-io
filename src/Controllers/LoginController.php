@@ -22,14 +22,15 @@ class LoginController extends LayoutController
      */
 	public function showLogin(CustomerService $customerService): string
 	{
-        if($customerService->getContactId() > 0)
+        /** @var ShopBuilderRequest $shopBuilderRequest */
+        $shopBuilderRequest = pluginApp(ShopBuilderRequest::class);
+
+        if($customerService->getContactId() > 0 && !$shopBuilderRequest->isShopBuilder())
         {
             $this->getLogger(__CLASS__)->info("IO::Debug.LoginController_alreadyLoggedIn");
             AuthGuard::redirect($this->urlService->getHomepageURL(), []);
         }
 
-        /** @var ShopBuilderRequest $shopBuilderRequest */
-        $shopBuilderRequest = pluginApp(ShopBuilderRequest::class);
         $shopBuilderRequest->setMainContentType('checkout');
 
 		return $this->renderTemplate(
