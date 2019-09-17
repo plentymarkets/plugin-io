@@ -2,8 +2,8 @@
 
 namespace IO\Services\UrlBuilder;
 
+use IO\Helper\Utils;
 use IO\Services\CategoryService;
-use IO\Services\SessionStorageService;
 use IO\Services\WebstoreConfigurationService;
 use Plenty\Plugin\Log\Loggable;
 
@@ -15,7 +15,7 @@ class CategoryUrlBuilder
     {
         if ( $lang === null )
         {
-            $lang = pluginApp( SessionStorageService::class )->getLang();
+            $lang = Utils::getLang();
         }
 
         /** @var CategoryService $categoryService */

@@ -86,7 +86,9 @@ class CountryService
      */
   public function getShippingCountryId()
   {
-    return pluginApp(Checkout::class)->getShippingCountryId();
+      /** @var Checkout $checkout */
+      $checkout = pluginApp(Checkout::class);
+      return $checkout->getShippingCountryId();
   }
 
     /**
@@ -95,7 +97,9 @@ class CountryService
      */
 	public function setShippingCountryId(int $shippingCountryId)
 	{
-		pluginApp(Checkout::class)->setShippingCountryId($shippingCountryId);
+        /** @var Checkout $checkout */
+        $checkout = pluginApp(Checkout::class);
+        $checkout->setShippingCountryId($shippingCountryId);
 	}
 
     /**

@@ -2,7 +2,7 @@
 
 namespace IO\Guards;
 
-use IO\Helper\UserSession;
+use IO\Helper\Utils;
 
 class AuthGuard extends AbstractGuard
 {
@@ -16,6 +16,6 @@ class AuthGuard extends AbstractGuard
      */
     protected function assert()
     {
-        return pluginApp(UserSession::class)->isContactLoggedIn();
+        return Utils::isContactLoggedIn();
     }
 }

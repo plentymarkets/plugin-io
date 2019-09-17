@@ -2,11 +2,13 @@
 
 namespace IO\Controllers;
 
+use IO\Api\ResponseCode;
 use IO\Extensions\TwigTemplateContextExtension;
 use IO\Helper\ContextInterface;
 use IO\Helper\ArrayHelper;
 use IO\Helper\CategoryMap;
 use IO\Helper\TemplateContainer;
+use IO\Middlewares\Middleware;
 use IO\Services\CategoryService;
 use IO\Services\TemplateService;
 use IO\Services\UrlService;
@@ -15,6 +17,7 @@ use Plenty\Modules\ContentCache\Contracts\ContentCacheRepositoryContract;
 use Plenty\Plugin\Application;
 use Plenty\Plugin\Controller;
 use Plenty\Plugin\Events\Dispatcher;
+use Plenty\Plugin\Http\Response;
 use Plenty\Plugin\Log\Loggable;
 use Plenty\Plugin\Templates\Twig;
 
@@ -211,4 +214,18 @@ abstract class LayoutController extends Controller
         }
 	}
 
+    /**
+     * Return a NOT_FOUND response
+     *
+     * @return Response
+     */
+	protected function notFound()
+    {
+        /** @var Response $response */
+        $response = pluginApp(Response::class);
+        $response->forceStatus(ResponseCode::NOT_FOUND);
+        Middleware::$FORCE_404 = true;
+
+        return $response;
+    }
 }

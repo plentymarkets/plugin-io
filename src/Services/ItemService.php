@@ -394,7 +394,10 @@ class ItemService
                     /** @var ItemFilterBuilder $filterBuilder */
                     $filterBuilder = pluginApp(ItemFilterBuilder::class);
 
-                    if(pluginApp(TemplateConfigService::class)->get('item.show_variation_over_dropdown') != 'true')
+                    /** @var TemplateConfigService $templateConfigService */
+                    $templateConfigService = pluginApp(TemplateConfigService::class);
+
+                    if($templateConfigService->get('item.show_variation_over_dropdown') != 'true')
                     {
                         $filterBuilder
                             ->variationStockIsSalable();
@@ -486,11 +489,14 @@ class ItemService
 
         /** @var ItemParamsBuilder $paramsBuilder */
         $paramsBuilder = pluginApp(ItemParamsBuilder::class);
+
+        /** @var CustomerService $customerService */
+        $customerService = pluginApp(CustomerService::class);
         $params        = $paramsBuilder
             ->withParam(ItemColumnsParams::TYPE, 'virtual')
             ->withParam(ItemColumnsParams::LANGUAGE, $this->sessionStorage->getLang())
             ->withParam(ItemColumnsParams::PLENTY_ID, $this->app->getPlentyId())
-            ->withParam(ItemColumnsParams::CUSTOMER_CLASS, pluginApp(CustomerService::class)->getContactClassId())
+            ->withParam(ItemColumnsParams::CUSTOMER_CLASS, $customerService->getContactClassId())
             ->build();
 
         $record = $this->itemRepository->search($columns, $filter, $params)->current();
