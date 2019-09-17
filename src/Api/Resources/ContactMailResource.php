@@ -2,6 +2,7 @@
 
 namespace IO\Api\Resources;
 
+use IO\Helper\ReCaptcha;
 use IO\Helper\TemplateContainer;
 use IO\Extensions\Functions\ExternalContent;
 use IO\Services\TemplateConfigService;
@@ -42,10 +43,7 @@ class ContactMailResource extends ApiResource
     {
         $mailTemplate = TemplateContainer::get('tpl.mail.contact')->getTemplate();
 
-        $recaptchaToken = $this->request->get('recaptchaToken', null);
-        $recaptchaSecret = $this->templateConfigService->get('global.google_recaptcha_secret');
-
-        if ( !$this->verifyRecaptcha($recaptchaSecret, $recaptchaToken) )
+        if( !ReCaptcha::verify($this->request->get('recaptchaToken', null)) )
         {
             return $this->response->create("", ResponseCode::BAD_REQUEST);
         }
