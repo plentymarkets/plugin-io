@@ -18,7 +18,7 @@ class ItemWishListController extends LayoutController
 			[
                 "object" => ""
             ],
-            false
+            true
 		);
     }
 }
