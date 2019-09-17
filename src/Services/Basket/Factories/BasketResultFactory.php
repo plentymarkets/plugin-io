@@ -5,81 +5,47 @@ namespace IO\Services\Basket\Factories;
 use IO\Services\ItemSearch\Factories\Faker\AbstractFaker;
 use IO\Services\Basket\Factories\Faker\BasketFaker;
 use IO\Services\Basket\Factories\Faker\BasketItemFaker;
+use IO\Services\ItemSearch\SearchPresets\VariationList;
+use IO\Services\ItemSearch\Services\ItemSearchService;
 
 class BasketResultFactory
 {
     const ORDER_STRUCTURE = [
-        'order' => [
-            'id'                => 0,
-            'typeId'            => 0,
-            'methodOfPaymentId' => 0,
-            'shippingProfileId' => 0,
-            'paymentStatus'     => 'unpaid',
-            'statusId'          => 0,
-            'statusName'        => '',
-            'ownerId'           => 0,
-            'referrerId'        => 1.0,
-            'createdAt'         => '',
-            'updatedAt'         => '',
-            'plentyId'          => 0,
-            'locationId'        => 0,
-            'roundTotalsOnly'   => false,
-            'numberOfDecimals'  => 2,
-            'lockStatus'        => 'unlocked',
-            'owner'             => null,
-            'billingAddress'    => [],
-            'deliveryAddress'   =>[],
-            'addresses'         => [],
-            'orderItems'        => [],
-            'properties'        => [],
-            'amounts'           => [],
-            'comments'          => [],
-            'location'          => null,
-            'payments'          => [],
-            'orderReferences'   => [],
-            'documents'         => [],
-            'dates'             => [],
-            'originOrder' => null,
-            'parentOrder' => null,
-            'systemAmount' => null,
-            'amount' => null,
+        'basket' => [
+            'basketAmount'                  => 0.0,
+            'basketAmountNet'               => 0.0,
+            'basketRebate'                  => 0,
+            'basketRebatetype'              => '0',
+            'couponCode'                    => '',
+            'couponDiscount'                => 0,
+            'createdAt'                     => '',
+            'currency'                      => 'EUR',
+            'customerId'                    => null,
+            'customerInvoiceAddressId'      => null,
+            'customerShippingAddressId'     => null,
+            'id'                            => 0,
+            'isExportDelivery'              => true,
+            'itemQuantity'                  => 0,
+            'itemSum'                       => 0.0,
+            'itemSumNet'                    => 0.0,
+            'maxFsk'                        => 0,
+            'methodOfPaymentId'             => 0,
+            'orderId'                       => null,
+            'orderTimestamp'                => null,
+            'paymentAmount'                 => 0,
+            'reffererId'                    => 0,
+            'sessionId'                     => '',
+            'shippingAmount'                => 0.0,
+            'shippingAmountNet'             => 0.0,
+            'shippingCountryId'             => 0,
+            'shippingDeleteByCoupon'        => 0,
+            'shippingProfileId'             => 0,
+            'shippingProviderId'            => 0,
+            'shopCountryId'                 => 0,
+            'totalVats'                     => [],
+            'updatedAt'                     => '',
         ],
-        'totals' => [
-            'itemSumGross'       => 0.0,
-            'itemSumNet'         => 0.0,
-            'itemSumRebateGross' => 0.0,
-            'itemSumRebateNet'   => 0.0,
-            'shippingGross'      => 0.0,
-            'shippingNet'        => 0.0,
-            'couponValue'        => 0,
-            'openAmount'         => 0,
-            'couponType'         => '',
-            'couponCode'         => '',
-            'totalGross'         => 0.0,
-            'totalNet'           => 0.0,
-            'currency'           => 'EUR',
-            'isNet' =>           false,
-            'vats' => [
-                [
-                    'rate' => 0.0,
-                    'value' => 0.0
-                ]
-            ]
-        ],
-        'status'                       => null,
-        'shippingProvider'             => null,
-        'shippingProfileName'          => null,
-        'shippingProfileId'            => 0,
-        'trackingURL'                  => '',
-        'paymentMethodName'            => null,
-        'paymentMethodIcon'            => null,
-        'paymentStatus'                => 'unpaid',
-        'itemURLs'                     => [],
-        'itemImages'                   =>[],
-        'isReturnable'                 => true,
-        'highlightNetPrices'           => true,
-        'allowPaymentMethodSwitchFrom' => true,
-        'paymentMethodListForSwitch'   => []
+        'basketItems' => []
     ];
 
     const FAKER_MAP = [
@@ -87,8 +53,16 @@ class BasketResultFactory
         'basketItems' => BasketItemFaker::class,
     ];
 
+    /**
+     * Faker function for the basket view
+     * @return array
+     */
     public function fillBasketResult()
     {
+        // Fetch random items for the faker to use
+        $rawBasketItems = $this->makeRawBasketItems();
+
+        // Fill in fake data into objects
         $basketResult = [];
 
         foreach(self::ORDER_STRUCTURE as $key => $value)
@@ -111,5 +85,28 @@ class BasketResultFactory
             'basket' => $basketResult['basket'],
             'basketItems' => $basketResult['basketItems']
         ];
+    }
+
+    private function makeRawBasketItems()
+    {
+        $itemSearchOptions = [
+            'page'         => 1,
+            'itemsPerPage' => rand(1, 5),
+            'sortingField' => 'item.random',
+            'sortingOrder' => 'ASC'
+        ];
+
+        /** @var ItemSearchService $itemSearchService */
+        $itemSearchService = pluginApp( ItemSearchService::class );
+        $itemResult = $itemSearchService->getResults(['items' => VariationList::getSearchFactory( $itemSearchOptions )]);
+
+        $flatItemResult = [];
+
+        foreach ($itemResult['items']['documents'] as $itemData)
+        {
+            $flatItemResult[] = $itemData;
+        }
+
+        return $flatItemResult;
     }
 }
