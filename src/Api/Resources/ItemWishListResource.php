@@ -46,8 +46,11 @@ class ItemWishListResource extends ApiResource
      */
     public function index():Response
     {
-        $itemWishList = $this->itemWishListService->getItemWishList();
-        return $this->response->create($itemWishList, ResponseCode::OK);
+        /** @var ItemListService $itemListService */
+        $itemListService = pluginApp(ItemListService::class);
+        $items = $itemListService->getItemList(ItemListService::TYPE_WISH_LIST, null, null, null, null);
+
+        return $this->response->create($items, ResponseCode::OK);
     }
 
     // Post
@@ -76,17 +79,5 @@ class ItemWishListResource extends ApiResource
         $itemWishList = $this->itemWishListService->removeItemWishListEntry((INT)$selector);
 
         return $this->response->create($itemWishList, ResponseCode::OK);
-    }
-
-    /**
-     * @return Response
-     */
-    public function getWishListItems():Response
-    {
-        /** @var ItemListService $itemListService */
-        $itemListService = pluginApp(ItemListService::class);
-        $items = $itemListService->getItemList(ItemListService::TYPE_WISH_LIST, null, null, null, null);
-
-        return $this->response->create($items, ResponseCode::OK);
     }
 }
