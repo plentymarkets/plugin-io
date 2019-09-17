@@ -3,9 +3,11 @@
 namespace IO\Controllers;
 
 use IO\Api\ResponseCode;
+use IO\Extensions\Constants\ShopUrls;
 use IO\Helper\RouteConfig;
 use IO\Guards\AuthGuard;
 use IO\Helper\Utils;
+use IO\Services\CustomerService;
 use IO\Services\SessionStorageService;
 use IO\Services\UrlService;
 use Plenty\Modules\ShopBuilder\Helper\ShopBuilderRequest;
@@ -173,7 +175,7 @@ class CategoryController extends LayoutController
             return $myAccountController->showMyAccount( $category );
         }
 
-        if ( RouteConfig::getCategoryId( RouteConfig::CONFIRMATION ) === $category->id || $shopBuilderRequest->getPreviewContentType() === 'orderconfirmation')
+        if ( RouteConfig::getCategoryId( RouteConfig::CONFIRMATION ) === $category->id )
         {
             $this->getLogger(__CLASS__)->info(
                 "IO::Debug.CategoryController_showConfirmationCategory",
@@ -191,6 +193,20 @@ class CategoryController extends LayoutController
                 $params['accessKey'] ?? $request->get('accessKey', ''),
                 $category
             );
+        }
+
+        if ( RouteConfig::getCategoryId( RouteConfig::LOGIN ) === $category->id
+            || RouteConfig::getCategoryId( RouteConfig::REGISTER ) === $category->id )
+        {
+            /** @var CustomerService $customerService */
+            $customerService = pluginApp(CustomerService::class);
+
+            if($customerService->getContactId() > 0 && !$shopBuilderRequest->isShopBuilder())
+            {
+                /** @var ShopUrls $shopUrls */
+                $shopUrls = pluginApp(ShopUrls::class);
+                AuthGuard::redirect($shopUrls->home);
+            }
         }
 
         return $this->renderTemplate(

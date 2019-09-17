@@ -277,6 +277,18 @@ class IORouteServiceProvider extends RouteServiceProvider
             $router->get('newsletter/unsubscribe', 'IO\Controllers\NewsletterOptOutController@showOptOut');
             $router->post('newsletter/unsubscribe', 'IO\Controllers\NewsletterOptOutConfirmationController@showOptOutConfirmation');
         }
+        else if( in_array(RouteConfig::NEWSLETTER_OPT_OUT, RouteConfig::getEnabledRoutes())
+            && RouteConfig::getCategoryId(RouteConfig::NEWSLETTER_OPT_OUT) > 0
+            && !$shopUrls->equals($shopUrls->newsletterOptOut, '/newsletter/unsubscribe'))
+        {
+            $router->get('newsletter/unsubscribe', function() use ($shopUrls)
+            {
+                /** @var CategoryController $categoryController */
+                $categoryController = pluginApp(CategoryController::class);
+
+                return $categoryController->redirectToCategory(RouteConfig::getCategoryId(RouteConfig::NEWSLETTER_OPT_OUT), '/newsletter/unsubscribe');
+            });
+        }
 
         // ORDER DOCUMENT
         if( RouteConfig::isActive(RouteConfig::ORDER_DOCUMENT) )
@@ -400,6 +412,13 @@ class IORouteServiceProvider extends RouteServiceProvider
         }
 	}
 
+    /**
+     * @param Router $router
+     * @param $route
+     * @param $shopUrl
+     * @param string $legacyController
+     * @throws \Plenty\Plugin\Routing\Exceptions\RouteReservedException
+     */
 	private function registerRedirectedRoute(Router $router, $route, $shopUrl, $legacyController = '')
     {
         if(in_array($route, RouteConfig::getEnabledRoutes()))
