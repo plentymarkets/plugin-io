@@ -127,7 +127,7 @@ class IORouteServiceProvider extends RouteServiceProvider
                 return pluginApp(CategoryController::class)->redirectToCategory( $shopUrls->myAccount );
             });
         }
-        
+
         // CHECKOUT
         $this->registerRedirectedRoute(
             $router,
@@ -154,45 +154,45 @@ class IORouteServiceProvider extends RouteServiceProvider
             $router->get('confirmation/{orderId?}/{orderAccessKey?}', function($orderId = 0, $accessKey = '') use ($shopUrls)
             {
                 $confirmationParams = [];
-                
+
                 if((int)$orderId > 0 && strlen($accessKey))
                 {
                     $confirmationParams['orderId'] = $orderId;
                     $confirmationParams['accessKey'] = $accessKey;
                 }
-                
+
                 /** @var CategoryController $categoryController */
                 $categoryController = pluginApp(CategoryController::class);
-                
+
                 return $categoryController->redirectToCategory(RouteConfig::getCategoryId(RouteConfig::CONFIRMATION), '/confirmation', $confirmationParams);
             });
-    
+
             $router->get('-/akQQ{orderAccessKey}/idQQ{orderId}', function($accessKey, $orderId) use ($shopUrls)
             {
                 /** @var CategoryController $categoryController */
                 $categoryController = pluginApp(CategoryController::class);
-                
+
                 return $categoryController->redirectToCategory(RouteConfig::getCategoryId(RouteConfig::CONFIRMATION), '/confirmation', ['orderId' => $orderId, 'accessKey' => $accessKey]);
             });
             $router->get('_py-/akQQ{orderAccessKey}/idQQ{orderId}', function($accessKey, $orderId) use ($shopUrls)
             {
                 /** @var CategoryController $categoryController */
                 $categoryController = pluginApp(CategoryController::class);
-                
+
                 return $categoryController->redirectToCategory(RouteConfig::getCategoryId(RouteConfig::CONFIRMATION), '/confirmation', ['orderId' => $orderId, 'accessKey' => $accessKey]);
             });
             $router->get('_py_/akQQ{orderAccessKey}/idQQ{orderId}', function($accessKey, $orderId) use ($shopUrls)
             {
                 /** @var CategoryController $categoryController */
                 $categoryController = pluginApp(CategoryController::class);
-                
+
                 return $categoryController->redirectToCategory(RouteConfig::getCategoryId(RouteConfig::CONFIRMATION), '/confirmation', ['orderId' => $orderId, 'accessKey' => $accessKey]);
             });
             $router->get('_plentyShop__/akQQ{orderAccessKey}/idQQ{orderId}', function($accessKey, $orderId) use ($shopUrls)
             {
                 /** @var CategoryController $categoryController */
                 $categoryController = pluginApp(CategoryController::class);
-                
+
                 return $categoryController->redirectToCategory(RouteConfig::getCategoryId(RouteConfig::CONFIRMATION), '/confirmation', ['orderId' => $orderId, 'accessKey' => $accessKey]);
             });
         }
@@ -252,6 +252,18 @@ class IORouteServiceProvider extends RouteServiceProvider
         {
             $router->get('newsletter/unsubscribe', 'IO\Controllers\NewsletterOptOutController@showOptOut');
             $router->post('newsletter/unsubscribe', 'IO\Controllers\NewsletterOptOutConfirmationController@showOptOutConfirmation');
+        }
+        else if( in_array(RouteConfig::NEWSLETTER_OPT_OUT, RouteConfig::getEnabledRoutes())
+            && RouteConfig::getCategoryId(RouteConfig::NEWSLETTER_OPT_OUT) > 0
+            && !$shopUrls->equals($shopUrls->newsletterOptOut, '/newsletter/unsubscribe'))
+        {
+            $router->get('newsletter/unsubscribe', function() use ($shopUrls)
+            {
+                /** @var CategoryController $categoryController */
+                $categoryController = pluginApp(CategoryController::class);
+
+                return $categoryController->redirectToCategory(RouteConfig::getCategoryId(RouteConfig::NEWSLETTER_OPT_OUT), '/newsletter/unsubscribe');
+            });
         }
 
         // ORDER DOCUMENT
@@ -376,6 +388,13 @@ class IORouteServiceProvider extends RouteServiceProvider
         }
 	}
 
+    /**
+     * @param Router $router
+     * @param $route
+     * @param $shopUrl
+     * @param string $legacyController
+     * @throws \Plenty\Plugin\Routing\Exceptions\RouteReservedException
+     */
 	private function registerRedirectedRoute(Router $router, $route, $shopUrl, $legacyController = '')
     {
         if(in_array($route, RouteConfig::getEnabledRoutes()))
