@@ -10,15 +10,18 @@ trait HandleNestedArray
      */
     protected function merge(&$object, $defaults)
     {
-        foreach($defaults as $key => $defaultValue)
+        if(is_array($defaults))
         {
-            if ( is_array($defaultValue) && is_array($object[$key]) )
+            foreach((array)$defaults as $key => $defaultValue)
             {
-                $this->merge($object[$key], (array)$defaultValue);
-            }
-            else if (is_null($object[$key]))
-            {
-                $object[$key] = $defaultValue;
+                if ( is_array($defaultValue) && is_array($object[$key]) )
+                {
+                    $this->merge($object[$key], (array)$defaultValue);
+                }
+                else if (is_null($object[$key]))
+                {
+                    $object[$key] = $defaultValue;
+                }
             }
         }
     }
