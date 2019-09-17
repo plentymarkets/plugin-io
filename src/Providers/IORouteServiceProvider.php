@@ -7,7 +7,6 @@ use IO\Extensions\Constants\ShopUrls;
 use IO\Helper\RouteConfig;
 use IO\Helper\Utils;
 use Plenty\Plugin\RouteServiceProvider;
-use Plenty\Plugin\Routing\Route;
 use Plenty\Plugin\Routing\Router;
 use Plenty\Plugin\Routing\ApiRouter;
 
