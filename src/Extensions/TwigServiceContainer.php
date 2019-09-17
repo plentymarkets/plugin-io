@@ -29,6 +29,7 @@ use IO\Services\TagService;
 use IO\Services\TemplateService;
 use IO\Services\UnitService;
 use IO\Services\UrlService;
+use IO\Services\UserDataHashService;
 use IO\Services\WebstoreConfigurationService;
 
 class TwigServiceContainer
