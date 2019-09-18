@@ -20,6 +20,7 @@ use IO\Services\ItemSearch\Factories\VariationSearchFactory;
 use IO\Constants\LogLevel;
 use Plenty\Modules\Order\Shipping\Contracts\EUCountryCodesServiceContract;
 use Plenty\Plugin\Log\Loggable;
+use IO\Services\ItemWishListService;
 
 /**
  * Class BasketService
