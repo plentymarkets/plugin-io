@@ -254,10 +254,9 @@ class UrlService
     {
         if(strpos($redirectURL, 'http:') !== 0 && strpos($redirectURL, 'https:') !== 0)
         {
-            $redirectURL = Utils::makeRelativeUrl(
-                $redirectURL,
-                $this->webstoreConfigurationService->getDefaultLanguage() !== $this->sessionStorage->getLang()
-            );
+            /** @var UrlQuery $query */
+            $query = pluginApp(UrlQuery::class, ['path' => $redirectURL]);
+            $redirectURL = $query->toAbsoluteUrl($this->webstoreConfigurationService->getDefaultLanguage() !== $this->sessionStorage->getLang());
         }
 
         /** @var Response $response */
