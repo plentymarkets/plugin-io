@@ -4,20 +4,29 @@ namespace IO\Services\Basket\Factories;
 
 use IO\Services\Basket\Factories\Faker\BasketFaker;
 use IO\Services\Basket\Factories\Faker\BasketItemFaker;
+use IO\Services\ItemSearch\Helper\ResultFieldTemplate;
 use IO\Services\ItemSearch\SearchPresets\VariationList;
 use IO\Services\ItemSearch\Services\ItemSearchService;
 
 class BasketResultFactory
 {
-    const BASKET_STRUCTURE = [
-        'basket' => [],
-        'basketItems' => []
-    ];
+    /** @var BasketFaker $basketFaker */
+    private $basketFaker;
 
-    const FAKER_MAP = [
-        'basket' => BasketFaker::class,
-        'basketItems' => BasketItemFaker::class,
-    ];
+    /** @var BasketItemFaker $basketItemFaker */
+    private $basketItemFaker;
+
+    public function __construct()
+    {
+        // Fetch random items for the faker to use
+        $rawBasketItems = $this->makeRawBasketItems();
+
+        $this->basketFaker = pluginApp(BasketFaker::class);
+        $this->basketFaker->setRawBasketItems($rawBasketItems);
+
+        $this->basketItemFaker = pluginApp(BasketItemFaker::class);
+        $this->basketItemFaker->setRawBasketItems($rawBasketItems);
+    }
 
     /**
      * Faker function for the basket view
@@ -25,32 +34,12 @@ class BasketResultFactory
      */
     public function fillBasketResult()
     {
-        // Fetch random items for the faker to use
-        $rawBasketItems = $this->makeRawBasketItems();
-
-        // Fill in fake data into objects
-        $basketResult = [];
-
-        foreach(self::BASKET_STRUCTURE as $key => $value)
-        {
-            if(array_key_exists($key, self::FAKER_MAP))
-            {
-                $faker = pluginApp(self::FAKER_MAP[$key]);
-                if($faker instanceof BasketFaker || $faker instanceof BasketItemFaker)
-                {
-                    $faker->setRawBasketItems($rawBasketItems);
-                    $basketResult[$key] = $faker->fill([]);
-                }
-            }
-            else
-            {
-                $basketResult[$key] = $value;
-            }
-        }
+        $fakeBasket = $this->basketFaker->fill([]);
+        $fakeBasketItems = $this->basketItemFaker->fill([]);
 
         return [
-            'basket' => $basketResult['basket'],
-            'basketItems' => $basketResult['basketItems']
+            'basket' => $fakeBasket,
+            'basketItems' => $fakeBasketItems
         ];
     }
 
@@ -70,7 +59,14 @@ class BasketResultFactory
 
         /** @var ItemSearchService $itemSearchService */
         $itemSearchService = pluginApp( ItemSearchService::class );
-        $itemResult = $itemSearchService->getResults(['items' => VariationList::getSearchFactory( $itemSearchOptions )]);
+
+        $searchFactory = VariationList::getSearchFactory( $itemSearchOptions );
+        $searchFactory
+            ->withResultFields(
+                ResultFieldTemplate::load( ResultFieldTemplate::TEMPLATE_BASKET_ITEM )
+            );
+
+        $itemResult = $itemSearchService->getResults(['items' => $searchFactory]);
 
         $flatItemResult = [];
 
