@@ -60,11 +60,6 @@ class BasketService
      */
     private $couponService;
 
-    /**
-     * @var ItemWishListService $itemWishListService
-     */
-    private $itemWishListService;
-
     private $basketItems;
     private $template = '';
 
@@ -77,7 +72,6 @@ class BasketService
      * @param BasketRepositoryContract $basketRepository
      * @param VatInitContract $vatInitService
      * @param CouponService $couponService
-     * @param ItemWishListService $itemWishListService
      */
     public function __construct(
         BasketItemRepositoryContract $basketItemRepository,
@@ -86,8 +80,7 @@ class BasketService
         CustomerService $customerService,
         BasketRepositoryContract $basketRepository,
         VatInitContract $vatInitService,
-        CouponService $couponService,
-        ItemWishListService $itemWishListService)
+        CouponService $couponService)
     {
         $this->basketItemRepository = $basketItemRepository;
         $this->checkout             = $checkout;
@@ -95,7 +88,6 @@ class BasketService
         $this->customerService      = $customerService;
         $this->basketRepository     = $basketRepository;
         $this->couponService        = $couponService;
-        $this->itemWishListService  = $itemWishListService;
 
         if(!$vatInitService->isInitialized())
         {
@@ -115,6 +107,9 @@ class BasketService
 
         /** @var DetermineShopCountryContract $determineShopCountry */
         $determineShopCountry = pluginApp(DetermineShopCountryContract::class);
+
+        /** @var ItemWishListService $wishListService */
+        $wishListService = pluginApp(ItemWishListService::class);
 
         $basket = $this->getBasket()->toArray();
 
@@ -142,7 +137,7 @@ class BasketService
         $basket["isExportDelivery"] = $euCountryService->isExportDelivery($basket["shippingCountryId"]);
         $basket["shopCountryId"] = $determineShopCountry->getCountryId();
 
-        $basket["itemWishListIds"] = $this->itemWishListService->getItemWishList();
+        $basket["itemWishListIds"] = $wishListService->getItemWishList();
 
         return $basket;
     }
