@@ -15,9 +15,6 @@ use Plenty\Modules\Authentication\Events\AfterAccountContactLogout;
 use Plenty\Modules\Basket\Events\BasketItem\AfterBasketItemAdd;
 use Plenty\Modules\Basket\Events\BasketItem\AfterBasketItemRemove;
 use Plenty\Modules\Basket\Events\BasketItem\AfterBasketItemUpdate;
-use Plenty\Modules\Basket\Events\BasketItem\BeforeBasketItemAdd;
-use Plenty\Modules\Basket\Events\BasketItem\BeforeBasketItemRemove;
-use Plenty\Modules\Basket\Events\BasketItem\BeforeBasketItemUpdate;
 use Plenty\Modules\Frontend\Events\FrontendCurrencyChanged;
 use Plenty\Modules\Frontend\Events\FrontendLanguageChanged;
 use Plenty\Modules\Frontend\Events\FrontendUpdateDeliveryAddress;
@@ -99,34 +96,29 @@ class ApiResponse
             ];
         }, 0);
 
-		// Register events for basket items
-		$this->dispatcher->listen(BeforeBasketItemAdd::class, function ($event)
-		{
-			$this->eventData["BeforeBasketItemAdd"] = [
-				"basketItem" => $event->getBasketItem()
-			];
-		}, 0);
 		$this->dispatcher->listen(AfterBasketItemAdd::class, function ($event)
 		{
+		    /** @var BasketService $basketService */
+		    $basketService = pluginApp(BasketService::class);
+		    $basketItem = $event->getBasketItem();
 			$this->eventData["AfterBasketItemAdd"] = [
-				"basketItem" => $event->getBasketItem()
+				"basketItem" => $basketService->getBasketItem($basketItem)
 			];
 		}, 0);
-		$this->dispatcher->listen(BeforeBasketItemRemove::class, function ()
-		{
-			$this->eventData["BeforeBasketItemRemove"] = [];
-		}, 0);
+
 		$this->dispatcher->listen(AfterBasketItemRemove::class, function ()
 		{
 			$this->eventData["AfterBasketItemRemove"] = [];
 		}, 0);
-		$this->dispatcher->listen(BeforeBasketItemUpdate::class, function ()
+
+		$this->dispatcher->listen(AfterBasketItemUpdate::class, function ($event)
 		{
-			$this->eventData["BeforeBasketItemUpdate"] = [];
-		}, 0);
-		$this->dispatcher->listen(AfterBasketItemUpdate::class, function ()
-		{
-			$this->eventData["AfterBasketItemUpdate"] = [];
+		    /** @var BasketService $basketService */
+            $basketService = pluginApp(BasketService::class);
+            $basketItem = $event->getBasketItem();
+			$this->eventData["AfterBasketItemUpdate"] = [
+			    "basketItem" => $basketService->getBasketItem($basketItem, false)
+            ];
 		}, 0);
 
 		// Register front end events
@@ -181,9 +173,11 @@ class ApiResponse
         }, 0);
         $this->dispatcher->listen(FrontendShippingProfileChanged::class, function ($event)
         {
+            /** @var LocalizationService $localizationService */
+            $localizationService = pluginApp(LocalizationService::class);
             $this->eventData["FrontendShippingProfileChanged"] = [];
             $this->eventData["LocalizationChanged"] = [
-                "localization" => pluginApp(LocalizationService::class)->getLocalizationData()
+                "localization" => $localizationService->getLocalizationData()
             ];
 
         }, 0);
@@ -287,10 +281,18 @@ class ApiResponse
 		// FIX: Set basket data after "showNetPrice" has been recalculated
         if ( array_key_exists('AfterBasketChanged', $responseData['events'] ) )
         {
-            $responseData['events']['AfterBasketChanged']['basket']  = pluginApp(BasketService::class)->getBasketForTemplate();
-            $responseData['events']['AfterBasketChanged']['showNetPrices']  = pluginApp(CustomerService::class)->showNetPrices();
-            $responseData['events']['AfterBasketChanged']['basketItems']  = pluginApp(BasketService::class)->getBasketItems();
-            $responseData['events']['CheckoutChanged']['checkout']   = pluginApp(CheckoutService::class)->getCheckout();
+            /** @var BasketService $basketService */
+            $basketService = pluginApp(BasketService::class);
+
+            /** @var CustomerService $customerService */
+            $customerService = pluginApp(CustomerService::class);
+
+            /** @var CheckoutService $checkoutService */
+            $checkoutService = pluginApp(CheckoutService::class);
+
+            $responseData['events']['AfterBasketChanged']['basket']         = $basketService->getBasketForTemplate();
+            $responseData['events']['AfterBasketChanged']['showNetPrices']  = $customerService->showNetPrices();
+            $responseData['events']['CheckoutChanged']['checkout']          = $checkoutService->getCheckout();
         }
 
 		$responseData["data"]   = $data;

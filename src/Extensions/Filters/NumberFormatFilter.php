@@ -138,7 +138,6 @@ class NumberFormatFilter extends AbstractFilter
             );
 
             return $formatter->format($value);
-
         }
 
         return '';

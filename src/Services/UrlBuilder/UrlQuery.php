@@ -2,7 +2,7 @@
 
 namespace IO\Services\UrlBuilder;
 
-use IO\Services\SessionStorageService;
+use IO\Helper\Utils;
 use IO\Services\WebstoreConfigurationService;
 use Plenty\Plugin\ConfigRepository;
 
@@ -21,7 +21,9 @@ class UrlQuery
 
     public function __construct( $path = null, $lang = null )
     {
-        $this->domain = pluginApp(WebstoreConfigurationService::class )->getWebstoreConfig()->domainSsl;
+        /** @var WebstoreConfigurationService $webstoreConfigService */
+        $webstoreConfigService = pluginApp(WebstoreConfigurationService::class);
+        $this->domain = $webstoreConfigService->getWebstoreConfig()->domainSsl;
         $this->path = $path;
 
         if ( $path !== null )
@@ -38,7 +40,7 @@ class UrlQuery
 
         if ( $lang === null )
         {
-            $this->lang = pluginApp( SessionStorageService::class )->getLang();
+            $this->lang = Utils::getLang();
         }
         else
         {
@@ -107,5 +109,10 @@ class UrlQuery
         }
 
         return substr( $this->toRelativeUrl( $includeLanguage ), 1 );
+    }
+
+    public function equals( $path )
+    {
+        return $this->path === $path || $this->path === $path."/";
     }
 }

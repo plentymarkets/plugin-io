@@ -2,6 +2,7 @@
 
 namespace IO\Extensions;
 
+use IO\Services\AuthenticationService;
 use IO\Services\AvailabilityService;
 use IO\Services\BasketService;
 use IO\Services\CategoryService;
@@ -28,6 +29,7 @@ use IO\Services\TagService;
 use IO\Services\TemplateService;
 use IO\Services\UnitService;
 use IO\Services\UrlService;
+use IO\Services\UserDataHashService;
 use IO\Services\WebstoreConfigurationService;
 
 class TwigServiceContainer
@@ -165,5 +167,15 @@ class TwigServiceContainer
     public function getLiveShopping()
     {
         return pluginApp( LiveShoppingService::class );
+    }
+
+    public function getAuthentication()
+    {
+        return pluginApp( AuthenticationService::class );
+    }
+
+    public function getUserDataHash()
+    {
+        return pluginApp( UserDataHashService::class );
     }
 }

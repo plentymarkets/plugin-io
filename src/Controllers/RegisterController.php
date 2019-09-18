@@ -1,11 +1,10 @@
 <?php //strict
+
 namespace IO\Controllers;
 
 use IO\Extensions\Constants\ShopUrls;
 use IO\Services\UrlService;
-use Plenty\Plugin\Http\Response;
 use IO\Guards\AuthGuard;
-use IO\Helper\TemplateContainer;
 use IO\Services\CustomerService;
 use Plenty\Plugin\Log\Loggable;
 
@@ -42,9 +41,11 @@ class RegisterController extends LayoutController
 
     /**
      * @param UrlService $urlService
+     * @param ShopUrls $shopUrls
+     * @return string
      */
-	public function redirectRegister(UrlService $urlService)
+	public function redirectRegister(UrlService $urlService, ShopUrls $shopUrls)
     {
-        return $urlService->redirectTo(pluginApp(ShopUrls::class)->registration);
+        return $urlService->redirectTo($shopUrls->registration);
     }
 }

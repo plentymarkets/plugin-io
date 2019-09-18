@@ -2,8 +2,6 @@
 
 namespace IO\Helper;
 
-use Plenty\Plugin\Application;
-
 class DefaultSearchResult
 {
     const DEFAULT_RESULT = [
@@ -57,7 +55,7 @@ class DefaultSearchResult
     public static function merge( $data )
     {
         $defaults = self::DEFAULT_RESULT;
-        if ( pluginApp(Application::class)->isAdminPreview() )
+        if ( Utils::isAdminPreview() )
         {
             $defaults = self::mergeValues( $defaults, self::ADMIN_PREVIEW_DEFAULT_RESULT );
         }

@@ -331,6 +331,12 @@ class CheckoutService
      */
     public function preparePayment(): array
     {
+        /** @var PaymentMethodRepositoryContract $paymentMethodRepo */
+        $paymentMethodRepo = pluginApp(PaymentMethodRepositoryContract::class);
+
+        /** @var BasketService $basketService */
+        $basketService = pluginApp(BasketService::class);
+
         $validateCheckoutEvent = $this->checkout->validateCheckout();
         if ($validateCheckoutEvent instanceof ValidateCheckoutEvent && !empty($validateCheckoutEvent->getErrorKeysList())) {
             $dispatcher = pluginApp(Dispatcher::class);
@@ -371,14 +377,14 @@ class CheckoutService
         }
 
         $mopId = $this->getMethodOfPaymentId();
-        $result = pluginApp(PaymentMethodRepositoryContract::class)->preparePaymentMethod($mopId);
+        $result = $paymentMethodRepo->preparePaymentMethod($mopId);
         $this->getLogger(__CLASS__)->debug(
             "IO::Debug.CheckoutService_paymentPrepared",
             [
                 "type" => $result["type"],
                 "value" => $result["value"],
                 "paymentId" => $mopId,
-                "basket" => pluginApp(BasketService::class)->getBasket()
+                "basket" => $basketService->getBasket()
             ]
         );
 
@@ -439,7 +445,7 @@ class CheckoutService
             $accountRepo = pluginApp(AccountingLocationRepositoryContract::class);
             /** @var VatService $vatService*/
             $vatService = pluginApp(VatService::class);
-            $showNetPrice   = $this->sessionStorageService->getCustomer()->showNetPrice;
+            $showNetPrice   = $this->customerService->showNetPrices();
 
             $list = $this->parcelServicePresetRepo->getLastWeightedPresetCombinations($this->basketRepository->load(), $this->sessionStorageService->getCustomer()->accountContactClassId);
 
@@ -491,7 +497,9 @@ class CheckoutService
         $currentShippingCountryId = (int)$this->checkout->getShippingCountryId();
         if($currentShippingCountryId <= 0)
         {
-            return pluginApp(WebstoreConfigurationService::class)->getDefaultShippingCountryId();
+            /** @var WebstoreConfigurationService $webstoreConfigurationService */
+            $webstoreConfigurationService = pluginApp(WebstoreConfigurationService::class);
+            return $webstoreConfigurationService->getDefaultShippingCountryId();
         }
 
         return $currentShippingCountryId;

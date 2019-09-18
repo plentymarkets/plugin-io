@@ -11,7 +11,7 @@ use IO\Extensions\Filters\PropertyNameFilter;
 use IO\Extensions\Mail\SendMail;
 use IO\Helper\ArrayHelper;
 use IO\Helper\MemoryCache;
-use IO\Helper\UserSession;
+use IO\Helper\Utils;
 use IO\Models\LocalizedOrder;
 use IO\Validators\Customer\AddressValidator;
 use Plenty\Modules\Account\Address\Contracts\AddressRepositoryContract;
@@ -29,11 +29,11 @@ use Plenty\Modules\Basket\Events\Basket\AfterBasketChanged;
 use Plenty\Modules\Frontend\Events\FrontendCustomerAddressChanged;
 use Plenty\Modules\Frontend\Events\FrontendUpdateDeliveryAddress;
 use Plenty\Modules\Frontend\Events\FrontendUpdateInvoiceAddress;
+use Plenty\Modules\Frontend\Services\AccountService;
 use Plenty\Modules\Helper\AutomaticEmail\Models\AutomaticEmailTemplate;
 use Plenty\Modules\Helper\AutomaticEmail\Models\AutomaticEmailContact;
 use Plenty\Modules\System\Contracts\WebstoreConfigurationRepositoryContract;
 use Plenty\Modules\System\Models\WebstoreConfiguration;
-use Plenty\Plugin\Application;
 use Plenty\Plugin\Events\Dispatcher;
 
 /**
@@ -70,11 +70,6 @@ class CustomerService
      * @var SessionStorageService
      */
     private $sessionStorage;
-	/**
-	 * @var UserSession
-	 */
-	private $userSession = null;
-
 
     /**
      * CustomerService constructor.
@@ -107,11 +102,9 @@ class CustomerService
      */
 	public function getContactId():int
 	{
-		if($this->userSession === null)
-		{
-			$this->userSession = pluginApp(UserSession::class);
-		}
-		return $this->userSession->getCurrentContactId();
+	    /** @var AccountService $accountService */
+	    $accountService = pluginApp(AccountService::class);
+		return $accountService->getAccountContactId();
 	}
 
 	public function getContactClassData($contactClassId)
@@ -151,6 +144,11 @@ class CustomerService
                     $customerShowNet = $customer->showNetPrice;
                 }
 
+                if ($customerShowNet)
+                {
+                    return true;
+                }
+
                 $contactClassShowNet = false;
                 $contactClassId = $this->getContactClassId();
                 if ( $contactClassId !== null )
@@ -162,7 +160,7 @@ class CustomerService
                     }
                 }
 
-                return $customerShowNet || $contactClassShowNet;
+                return $contactClassShowNet;
             }
         );
     }
@@ -238,10 +236,11 @@ class CustomerService
      */
 	public function registerCustomer(array $contactData, $billingAddressData = null, $deliveryAddressData = null)
 	{
-        /**
-         * @var BasketService $basketService
-         */
+        /** @var BasketService $basketService */
         $basketService = pluginApp(BasketService::class);
+
+        /** @var AuthenticationService $authenticationService */
+        $authenticationService = pluginApp(AuthenticationService::class);
 
         $newBillingAddress = null;
         $newDeliveryAddress = null;
@@ -267,7 +266,7 @@ class CustomerService
         if(!is_null($contact) && $contact->id > 0)
         {
             //Login
-            pluginApp(AuthenticationService::class)->loginWithContactId($contact->id, (string)$contactData['password']);
+            $authenticationService->loginWithContactId($contact->id, (string)$contactData['password']);
 
             if($guestBillingAddress !== null)
             {
@@ -278,7 +277,7 @@ class CustomerService
                 //$this->sessionStorage->setSessionValue(SessionStorageKeys::BILLING_ADDRESS_ID, $newBillingAddress->id);
                 $basketService->setBillingAddressId($newBillingAddress->id);
             }
-            
+
             if($guestDeliveryAddress !== null)
             {
                 $newDeliveryAddress = $this->createAddress(
@@ -288,21 +287,21 @@ class CustomerService
                 //$this->sessionStorage->setSessionValue(SessionStorageKeys::DELIVERY_ADDRESS_ID, $newDeliveryAddress->id);
                 $basketService->setDeliveryAddressId($newDeliveryAddress->id);
             }
-    
+
             if($billingAddressData !== null)
             {
                 $newBillingAddress = $this->createAddress($billingAddressData, AddressType::BILLING);
                 //$this->sessionStorage->setSessionValue(SessionStorageKeys::BILLING_ADDRESS_ID, $newBillingAddress->id);
                 $basketService->setBillingAddressId($newBillingAddress->id);
             }
-    
+
             if($deliveryAddressData !== null)
             {
                 $newDeliveryAddress = $this->createAddress($deliveryAddressData, AddressType::DELIVERY);
                 //$this->sessionStorage->setSessionValue(SessionStorageKeys::DELIVERY_ADDRESS_ID, $newDeliveryAddress->id);
                 $basketService->setDeliveryAddressId($newDeliveryAddress->id);
             }
-    
+
             if($newBillingAddress instanceof Address)
             {
                 $contact = $this->updateContactWithAddressData($newBillingAddress);
@@ -311,7 +310,7 @@ class CustomerService
 
         if ($contact instanceof Contact && $contact->id > 0) {
 
-            $params = ['contactId' => $contact->id, 'clientId' => pluginApp(Application::class)->getWebstoreId(), 'password' => $contactData['password'], 'language' => $this->sessionStorage->getLang()];
+            $params = ['contactId' => $contact->id, 'clientId' => Utils::getWebstoreId(), 'password' => $contactData['password'], 'language' => $this->sessionStorage->getLang()];
 
             $this->sendMail(AutomaticEmailTemplate::CONTACT_REGISTRATION , AutomaticEmailContact::class, $params);
         }
@@ -325,7 +324,7 @@ class CustomerService
         $authHelper = pluginApp(AuthHelper::class);
         $contactId = $this->getContactId();
         $accountRepo = $this->accountRepository;
-        
+
         return $authHelper->processUnguarded( function() use ($accountData, $contactId, $accountRepo)
         {
             return $accountRepo->createAccount($accountData, (int)$contactId);
@@ -349,8 +348,8 @@ class CustomerService
 	{
 	    $contact = null;
         $contactData['checkForExistingEmail'] = true;
-	    $contactData['plentyId'] = pluginApp(Application::class)->getPlentyId();
-	    
+	    $contactData['plentyId'] = Utils::getPlentyId();
+
 	    if(!isset($contactData['lang']) || is_null($contactData['lang']))
         {
             $contactData['lang'] = $this->sessionStorage->getLang();
@@ -500,7 +499,7 @@ class CustomerService
             /** @var AuthHelper $authHelper */
             $authHelper = pluginApp(AuthHelper::class);
             $contactRepo = $this->contactRepository;
-            
+
             $contact = $authHelper->processUnguarded( function() use ($newPassword, $contactId, $contactRepo)
             {
                 return $contactRepo->updateContact([
@@ -545,7 +544,7 @@ class CustomerService
         if($this->getContactId() > 0)
         {
             $addresses = $this->contactAddressRepository->getAddresses($this->getContactId(), $type);
-            
+
             if(count($addresses))
             {
                 foreach($addresses as $key => $address)
@@ -556,7 +555,7 @@ class CustomerService
                     }
                 }
             }
-            
+
             return $addresses;
         }
         else
@@ -583,7 +582,7 @@ class CustomerService
                 {
                     $address->gender = 'company';
                 }
-                
+
                 return [
                     $address
                 ];
@@ -602,7 +601,7 @@ class CustomerService
 	public function getAddress(int $addressId, int $type):Address
 	{
 	    $address = null;
-	    
+
         if($this->getContactId() > 0)
         {
             $address = $this->contactAddressRepository->getAddress($addressId, $this->getContactId(), $type);
@@ -623,12 +622,12 @@ class CustomerService
                 $address = $this->addressRepository->findAddressById(((int)$addressId > 0 ? $addressId : $basketService->getDeliveryAddressId()));
             }
         }
-        
+
         if(is_null($address->gender))
         {
             $address->gender = 'company';
         }
-        
+
         return $address;
 	}
 
@@ -645,7 +644,7 @@ class CustomerService
         {
             $addressData['gender'] = null;
         }
-        
+
 	    AddressValidator::validateOrFail($addressData);
 
         if(ShippingCountry::getAddressFormat($addressData['countryId']) === ShippingCountry::ADDRESS_FORMAT_EN)
@@ -719,7 +718,7 @@ class CustomerService
             {
                 $basketService->setDeliveryAddressId($newAddress->id);
             }
-            
+
             if(is_null($newAddress->gender))
             {
                 $newAddress->gender = 'company';
@@ -826,7 +825,7 @@ class CustomerService
         {
             $addressData['gender'] = null;
         }
-        
+
         AddressValidator::validateOrFail($addressData);
 
         $existingAddress = $this->addressRepository->findAddressById($addressId);
@@ -839,7 +838,7 @@ class CustomerService
         {
             unset($addressData['checkedAt']);
         }
-        
+
         if((int)$this->getContactId() > 0)
         {
             $addressData['options'] = $this->buildAddressEmailOptions([], false, $addressData);
@@ -919,7 +918,7 @@ class CustomerService
 
         //fire public event
         $pluginEventDispatcher->fire(FrontendCustomerAddressChanged::class);
-        
+
         if(is_null($newAddress->gender))
         {
             $newAddress->gender = 'company';
@@ -992,7 +991,9 @@ class CustomerService
 
         try
         {
-            $orders = pluginApp(OrderService::class)->getOrdersForContact(
+            /** @var OrderService $orderService */
+            $orderService = pluginApp(OrderService::class);
+            $orders = $orderService->getOrdersForContact(
                 $this->getContactId(),
                 $page,
                 $items,
@@ -1019,9 +1020,12 @@ class CustomerService
 
 	public function getReturns(int $page = 1, int $items = 10, array $filters = [], $wrapped = true)
     {
+        /** @var OrderService $orderService */
+        $orderService = pluginApp(OrderService::class);
+
         $filters['orderType'] = OrderType::RETURNS;
 
-        $returnOrders = pluginApp(OrderService::class)->getOrdersForContact(
+        $returnOrders = $orderService->getOrdersForContact(
             $this->getContactId(),
             $page,
             $items,
@@ -1056,7 +1060,9 @@ class CustomerService
      */
 	public function getLatestOrder()
 	{
-        return pluginApp(OrderService::class)->getLatestOrderForContact(
+	    /** @var OrderService $orderService */
+	    $orderService = pluginApp(OrderService::class);
+        return $orderService->getLatestOrderForContact(
             $this->getContactId()
         );
 	}
@@ -1065,9 +1071,7 @@ class CustomerService
     {
         if($this->getContactId() <= 0)
         {
-            /**
-             * @var BasketService $basketService
-             */
+            /** @var BasketService $basketService */
             $basketService = pluginApp(BasketService::class);
 
             $basketService->setBillingAddressId(0);
@@ -1088,12 +1092,38 @@ class CustomerService
         {
             $email = $this->sessionStorage->getSessionValue(SessionStorageKeys::GUEST_EMAIL);
         }
-        
+
         if(is_null($email))
         {
             $email = '';
         }
 
         return $email;
+    }
+
+    /**
+     * @param int $contactId
+     * @return string|null
+     * @throws \Throwable
+     */
+    public function getContactNumber($contactId)
+    {
+        /** @var AuthHelper $authHelper */
+        $authHelper = pluginApp(AuthHelper::class);
+        $contactRepo = $this->contactRepository;
+
+        try
+        {
+            $contact = $authHelper->processUnguarded( function() use ($contactRepo, $contactId)
+            {
+                return $contactRepo->findContactById($contactId);
+            });
+
+            return $contact->number;
+        }
+        catch (\Exception $exception)
+        {
+            return null;
+        }
     }
 }

@@ -38,26 +38,7 @@ class QueryString extends AbstractFunction
             return '';
         }
 
-        $queryParameters = $this->createUniqueMultidimensionalArray($queryParameters);
-
         $queryParameters = http_build_query($queryParameters);
         return strlen($queryParameters) > 0 ? '?' . $queryParameters : '';
     }
-
-    /**
-     * @param array $array
-     * @return array
-     */
-    private function createUniqueMultidimensionalArray(array $array): array
-	{
-	    $array = array_unique($array, SORT_REGULAR);
-	
-	    foreach ($array as $key => $elem) {
-	        if (is_array($elem)) {
-	            $array[$key] = $this->createUniqueMultidimensionalArray($elem);
-	        }
-	    }
-	
-	    return $array;
-	}
 }
