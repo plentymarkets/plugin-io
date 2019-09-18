@@ -111,6 +111,27 @@ class IORouteServiceProvider extends RouteServiceProvider
         {
             $router->get('change-mail/{contactId}/{hash}', 'IO\Controllers\CustomerChangeMailController@show');
         }
+        else if( in_array(RouteConfig::CHANGE_MAIL, RouteConfig::getEnabledRoutes())
+            && RouteConfig::getCategoryId(RouteConfig::CHANGE_MAIL) > 0
+            && !$shopUrls->equals($shopUrls->changeMail, '/change-mail')
+        )
+        {
+            $router->get('change-mail/{contactId}/{hash}', function($contactId, $hash) use ($shopUrls)
+            {
+                $changeMailParams = [];
+
+                if((int)$contactId > 0 && strlen($hash))
+                {
+                    $confirmationParams['contactId'] = $contactId;
+                    $confirmationParams['hash'] = $hash;
+                }
+
+                /** @var CategoryController $categoryController */
+                $categoryController = pluginApp(CategoryController::class);
+
+                return $categoryController->redirectToCategory(RouteConfig::getCategoryId(RouteConfig::CHANGE_MAIL), '/change-mail', $changeMailParams);
+            });
+        }
 
         if ( RouteConfig::isActive(RouteConfig::MY_ACCOUNT) )
         {
@@ -124,7 +145,10 @@ class IORouteServiceProvider extends RouteServiceProvider
             // my-account-route is activated and category is linked and category url is not '/my-account'
             $router->get('my-account', function() use ($shopUrls)
             {
-                return pluginApp(CategoryController::class)->redirectToCategory( $shopUrls->myAccount );
+                /** @var CategoryController $categoryController */
+                $categoryController = pluginApp(CategoryController::class);
+
+                return $categoryController->redirectToCategory( RouteConfig::getCategoryId(RouteConfig::MY_ACCOUNT), '/my-account' );
             });
         }
 
