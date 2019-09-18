@@ -48,7 +48,7 @@ class ItemWishListResource extends ApiResource
     {
         /** @var ItemListService $itemListService */
         $itemListService = pluginApp(ItemListService::class);
-        $items = $itemListService->getItemList(ItemListService::TYPE_WISH_LIST, null, null, null, null);
+        $items = $itemListService->getItemList(ItemListService::TYPE_WISH_LIST);
 
         return $this->response->create($items, ResponseCode::OK);
     }
