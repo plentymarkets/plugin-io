@@ -6,12 +6,13 @@ use IO\Constants\SessionStorageKeys;
 use IO\Services\ItemSearch\SearchPresets\BasketItems;
 use IO\Services\ItemSearch\SearchPresets\CategoryItems;
 use IO\Services\ItemSearch\SearchPresets\CrossSellingItems;
+use IO\Services\ItemSearch\SearchPresets\ManufacturerItems;
 use IO\Services\ItemSearch\SearchPresets\TagItems;
 use IO\Services\ItemSearch\SearchPresets\VariationList;
 use IO\Services\ItemSearch\Services\ItemSearchService;
-use IO\Services\ItemSearch\SearchPresets\ManufacturerItems;
-use Plenty\Plugin\CachingRepository;
+use IO\Services\ItemWishListService;
 use Plenty\Modules\Basket\Contracts\BasketRepositoryContract;
+use Plenty\Plugin\CachingRepository;
 
 class ItemListService
 {
