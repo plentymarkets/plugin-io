@@ -4,9 +4,11 @@ namespace IO\Services\UrlBuilder;
 
 use IO\Helper\StringUtils;
 use IO\Helper\Utils;
+use IO\Services\CategoryService;
 use IO\Services\ItemSearch\Factories\VariationSearchFactory;
 use IO\Services\ItemSearch\Services\ItemSearchService;
 use IO\Services\TemplateConfigService;
+use IO\Services\WebstoreConfigurationService;
 use Plenty\Log\Contracts\LoggerContract;
 use Plenty\Modules\Authorization\Services\AuthHelper;
 use Plenty\Modules\Item\VariationDescription\Contracts\VariationDescriptionRepositoryContract;
@@ -105,19 +107,7 @@ class VariationUrlBuilder
             // generate url
             if ( strlen($itemData['name']) )
             {
-                $itemName4Url = StringUtils::string4URL($itemData['name']);
-                if ($itemData['defaultCategory'] > 0)
-                {
-                    /** @var CategoryUrlBuilder $categoryUrlBuilder */
-                    $categoryUrlBuilder = pluginApp(CategoryUrlBuilder::class);
-                    $itemUrl = $categoryUrlBuilder
-                        ->buildUrl($itemData['defaultCategory'], $lang)
-                        ->join($itemName4Url);
-                }
-                else
-                {
-                    $itemUrl = $this->buildUrlQuery($itemName4Url, $lang);
-                }
+                $itemUrl = $this->generateUrlByConfig($itemData, $lang);
 
                 if ( strlen($itemUrl->getPath()) )
                 {
@@ -172,6 +162,7 @@ class VariationUrlBuilder
 
     public function getSuffix( $itemId, $variationId, $withVariationId = true )
     {
+        /** @var TemplateConfigService $templateConfigService */
         $templateConfigService = pluginApp( TemplateConfigService::class );
         $enableOldUrlPattern = $templateConfigService->get('global.enableOldUrlPattern') === "true";
 
@@ -211,5 +202,83 @@ class VariationUrlBuilder
             UrlQuery::class,
             array('path' => $path, 'lang' => $lang)
         );
+    }
+
+    private function generateUrlByConfig($itemData, $lang)
+    {
+        /** @var TemplateConfigService $templateConfigService */
+        $templateConfigService = pluginApp( TemplateConfigService::class );
+
+        /** @var WebstoreConfigurationService $webstoreConfigService */
+        $webstoreConfigService = pluginApp(WebstoreConfigurationService::class);
+
+        $urlPattern = $webstoreConfigService->getWebstoreConfig()->urlItemContent;
+        if ($templateConfigService->get('global.enableOldUrlPattern') !== "true")
+        {
+            $urlPattern = "all";
+        }
+
+        $itemName4Url = StringUtils::string4URL($itemData['name']);
+
+        if($itemData['defaultCategory'] <= 0)
+        {
+            return $this->buildUrlQuery($itemName4Url, $lang);
+        }
+
+        switch ($urlPattern)
+        {
+            case "all":
+                // Fallback for variation based ceres-urls
+                return $this->getBranchUrl($itemData['defaultCategory'], $lang, 6)->join($itemName4Url);
+
+            case "":
+                // Default config for legacy callisto shops
+                // => /category_1/category_2/category_3/item_name
+                return $this->getBranchUrl($itemData['defaultCategory'], $lang, 3)->join($itemName4Url);
+            case "cat1":
+                // => /category_1/name
+                return $this->getBranchUrl($itemData['defaultCategory'], $lang, 1)->join($itemName4Url);
+            case "cat0":
+                // => /name
+                return $this->buildUrlQuery($itemName4Url, $lang);
+            case "name_cat1":
+                // => /name/category_1
+                return $this->buildUrlQuery($itemName4Url, $lang)
+                    ->join(
+                        $this->getBranchUrl($itemData['defaultCategory'], $lang, 1)->getPath(false)
+                    );
+            case "name_cat":
+                // => /name/category_1/category_2/category_3
+                return $this->buildUrlQuery($itemName4Url, $lang)
+                    ->join(
+                        $this->getBranchUrl($itemData['defaultCategory'], $lang, 3)->getPath(false)
+                    );
+            default:
+                return $this->getBranchUrl($itemData['defaultCategory'], $lang, 6)->join($itemName4Url);
+
+        }
+    }
+
+    private function getBranchUrl($categoryId, $lang, $maxLevel = 6)
+    {
+        /** @var CategoryService $categoryService */
+        $categoryService = pluginApp(CategoryService::class);
+        $category = $categoryService->get($categoryId);
+
+        $branch = $category->branch->toArray();
+        for($i = $maxLevel; $i >= 0; $i--)
+        {
+            if(!is_null($branch['category' . $i . 'Id']))
+            {
+                /** @var CategoryUrlBuilder $categoryUrlBuilder */
+                $categoryUrlBuilder = pluginApp(CategoryUrlBuilder::class);
+                return $categoryUrlBuilder->buildUrl(
+                    $branch['category' . $i . 'Id'],
+                    $lang
+                );
+            }
+        }
+
+        return $this->buildUrlQuery("", $lang);
     }
 }

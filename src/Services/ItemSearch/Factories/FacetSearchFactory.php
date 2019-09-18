@@ -29,13 +29,13 @@ class FacetSearchFactory extends VariationSearchFactory
     {
         /** @var FacetSearchFactory $instance */
         $instance = pluginApp( FacetSearchFactory::class );
-        if ( is_string( $facets ) )
+        if ( is_array( $facets ) )
         {
-            $instance->facetValues = explode(",", $facets );
+            $instance->facetValues = (array)$facets;
         }
         else
         {
-            $instance->facetValues = $facets;
+            $instance->facetValues = explode(",", (string)$facets );
         }
 
         return $instance;
