@@ -10,40 +10,7 @@ use IO\Services\ItemSearch\Services\ItemSearchService;
 class BasketResultFactory
 {
     const BASKET_STRUCTURE = [
-        'basket' => [
-            'basketAmount'                  => 0.0,
-            'basketAmountNet'               => 0.0,
-            'basketRebate'                  => 0,
-            'basketRebatetype'              => '0',
-            'couponCode'                    => '',
-            'couponDiscount'                => 0,
-            'createdAt'                     => '',
-            'currency'                      => 'EUR',
-            'customerId'                    => null,
-            'customerInvoiceAddressId'      => null,
-            'customerShippingAddressId'     => null,
-            'id'                            => 0,
-            'isExportDelivery'              => true,
-            'itemQuantity'                  => 0,
-            'itemSum'                       => 0.0,
-            'itemSumNet'                    => 0.0,
-            'maxFsk'                        => 0,
-            'methodOfPaymentId'             => 0,
-            'orderId'                       => null,
-            'orderTimestamp'                => null,
-            'paymentAmount'                 => 0,
-            'reffererId'                    => 0,
-            'sessionId'                     => '',
-            'shippingAmount'                => 0.0,
-            'shippingAmountNet'             => 0.0,
-            'shippingCountryId'             => 0,
-            'shippingDeleteByCoupon'        => 0,
-            'shippingProfileId'             => 0,
-            'shippingProviderId'            => 0,
-            'shopCountryId'                 => 0,
-            'totalVats'                     => [],
-            'updatedAt'                     => '',
-        ],
+        'basket' => [],
         'basketItems' => []
     ];
 
@@ -72,7 +39,7 @@ class BasketResultFactory
                 if($faker instanceof BasketFaker || $faker instanceof BasketItemFaker)
                 {
                     $faker->setRawBasketItems($rawBasketItems);
-                    $basketResult[$key] = $faker->fill(self::BASKET_STRUCTURE[$key]);
+                    $basketResult[$key] = $faker->fill([]);
                 }
             }
             else

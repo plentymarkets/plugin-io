@@ -33,9 +33,7 @@ class BasketItemFaker extends AbstractFaker
             }
         }
 
-
-        $this->merge($default, $data);
-        return $default;
+        return $data;
     }
 
     /**

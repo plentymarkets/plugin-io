@@ -40,6 +40,8 @@ class FakerBasketResource extends ApiResource
     {
         $basket = $this->basketResultFactory->fillBasketResult();
 
+        $basket = $basket;
+
         return $this->response->create($basket, ResponseCode::OK);
     }
 }
