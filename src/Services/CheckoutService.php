@@ -447,14 +447,37 @@ class CheckoutService
             $vatService = pluginApp(VatService::class);
             $showNetPrice   = $this->customerService->showNetPrices();
 
-            $list = $this->parcelServicePresetRepo->getLastWeightedPresetCombinations($this->basketRepository->load(), $this->sessionStorageService->getCustomer()->accountContactClassId);
+            /** @var TemplateConfigService $templateConfigService */
+            $templateConfigService = pluginApp( TemplateConfigService::class );
 
+            $showAllShippingProfiles = $templateConfigService->get('basket.show_all_shipping_profiles', false) === 'true';
+
+            $params = [
+                'skipCheckForMethodOfPaymentId' => $showAllShippingProfiles
+            ];
+
+            $shippingProfilesList = $this->parcelServicePresetRepo->getLastWeightedPresetCombinations($this->basketRepository->load(), $this->sessionStorageService->getCustomer()->accountContactClassId, $params);
+
+            $paymentMethodList = $this->getMethodOfPaymentList();
+            $list = [];
+
+            foreach ($shippingProfilesList as $shippingProfile)
+            {
+                foreach ($paymentMethodList as $paymentMethod)
+                {
+                    if (!in_array($paymentMethod->id, $shippingProfile['excludedPaymentMethodIds']))
+                    {
+                        $list[] = $shippingProfile;
+                        break;
+                    }
+                }
+            }
             $locationId = $vatService->getLocationId($this->getShippingCountryId());
             $accountSettings = $accountRepo->getSettings($locationId);
 
             if ($showNetPrice && !(bool)$accountSettings->showShippingVat)
             {
-                $maxVatValue = $this->basketService->getMaxVatValue();
+                $maxVatValue = $this->payService->getMaxVatValue();
 
                 if (is_array($list))
                 {
