@@ -11,34 +11,34 @@ class BasketItemFaker extends AbstractFaker
 {
     private $rawBasketItems = [];
 
-    public function fill($data)
+    public function fill($default)
     {
-        $default = [
-
-        ];
+        $data = [];
 
         if(count($this->rawBasketItems))
         {
             $id = 100;
             foreach ($this->rawBasketItems as $rawBasketItem)
             {
-                $basketItem = [];
+                $itemData = $rawBasketItem['itemData'];
+                $quantity = $rawBasketItem['quantity'];
 
-                $basketItem['variation'] = $rawBasketItem;
-                $basketItem['variationId'] = $rawBasketItem['id'];
+                $basketItem = [];
+                $basketItem['variation'] = $itemData;
+                $basketItem['variationId'] = $itemData['id'];
                 $basketItem['basketItemOrderParams'] = [];
-                $basketItem['price'] = $rawBasketItem['prices']['default']['data']['basePrice'];
-                $basketItem['quantity'] = 1;
+                $basketItem['price'] = $itemData['data']['prices']['default']['data']['basePrice'];
+                $basketItem['quantity'] = $quantity;
                 $basketItem['id'] = $id;
                 $id += 1;
 
-                $default[] = $basketItem;
+                $data[] = $basketItem;
             }
         }
 
 
-        $this->merge($data, $default);
-        return $data;
+        $this->merge($default, $data);
+        return $default;
     }
 
     public function setRawBasketItems($rawBasketitems)

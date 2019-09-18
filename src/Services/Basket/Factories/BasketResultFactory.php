@@ -2,12 +2,10 @@
 
 namespace IO\Services\Basket\Factories;
 
-use IO\Services\ItemSearch\Factories\Faker\AbstractFaker;
 use IO\Services\Basket\Factories\Faker\BasketFaker;
 use IO\Services\Basket\Factories\Faker\BasketItemFaker;
 use IO\Services\ItemSearch\SearchPresets\VariationList;
 use IO\Services\ItemSearch\Services\ItemSearchService;
-use Plenty\Modules\Basket\Models\Basket;
 
 class BasketResultFactory
 {
@@ -89,6 +87,11 @@ class BasketResultFactory
         ];
     }
 
+    /**
+     * Get random amount of items between 1 and 5 with random quantities between 1 and 3
+     * Format of array is [item, quantity]
+     * @return array
+     */
     private function makeRawBasketItems()
     {
         $itemSearchOptions = [
@@ -106,7 +109,14 @@ class BasketResultFactory
 
         foreach ($itemResult['items']['documents'] as $itemData)
         {
-            $flatItemResult[] = $itemData;
+            // Add urlPreview image to display in basket
+            $itemData['data']['images']['all'][0]['urlPreview'] = $itemData['data']['images']['all'][0]['urlMiddle'];
+
+            $quantity = rand(1, 3);
+            $flatItemResult[] = [
+                'itemData' => $itemData,
+                'quantity' => $quantity
+            ];
         }
 
         return $flatItemResult;
