@@ -450,7 +450,8 @@ class CheckoutService
             /** @var TemplateConfigService $templateConfigService */
             $templateConfigService = pluginApp( TemplateConfigService::class );
 
-            $showAllShippingProfiles = $templateConfigService->get('basket.show_all_shipping_profiles', false) === 'true';
+            $showAllShippingProfiles = $templateConfigService->get('checkout.show_all_shipping_profiles', false);
+            $showAllShippingProfiles = ($showAllShippingProfiles == '1' || $showAllShippingProfiles === 'true');
 
             $params = [
                 'skipCheckForMethodOfPaymentId' => $showAllShippingProfiles
