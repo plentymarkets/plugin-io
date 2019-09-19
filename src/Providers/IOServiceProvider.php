@@ -24,6 +24,7 @@ use IO\Services\ContactMailService;
 use IO\Services\CountryService;
 use IO\Services\CouponService;
 use IO\Services\CustomerService;
+use IO\Services\FakerService;
 use IO\Services\ItemCrossSellingService;
 use IO\Services\ItemLastSeenService;
 use IO\Services\ItemSearch\Helper\FacetExtensionContainer;
@@ -113,7 +114,8 @@ class IOServiceProvider extends ServiceProvider
             UnitService::class,
             UrlService::class,
             WebstoreConfigurationService::class,
-            LiveShoppingService::class
+            LiveShoppingService::class,
+            FakerService::class
         ]);
 
         $this->getApplication()->singleton(FacetExtensionContainer::class);
@@ -136,29 +138,29 @@ class IOServiceProvider extends ServiceProvider
             $customerService = pluginApp(CustomerService::class);
             $customerService->resetGuestAddresses();
         });
-    
+
         $dispatcher->listen(BeforeBasketItemToOrderItem::class, CheckItemStock::class);
-        
+
         $dispatcher->listen(AfterAccountContactLogout::class, function($event)
         {
             /** @var CheckoutService $checkoutService */
             $checkoutService = pluginApp(CheckoutService::class);
             $checkoutService->setDefaultShippingCountryId();
         });
-    
+
         $dispatcher->listen(AfterBasketChanged::class, function($event)
         {
             /** @var CheckoutService $checkoutService */
             $checkoutService = pluginApp(CheckoutService::class);
             $checkoutService->setReadOnlyCheckout(false);
         });
-    
+
         $dispatcher->listen(ExecutePayment::class, function($event)
         {
             /** @var CustomerService $customerService */
             $customerService = pluginApp(CustomerService::class);
             $customerService->resetGuestAddresses();
-        
+
             /** @var BasketService $basketService */
             $basketService = pluginApp(BasketService::class);
             $basketService->resetBasket();
@@ -176,7 +178,7 @@ class IOServiceProvider extends ServiceProvider
             $sessionStorage = pluginApp( FrontendSessionStorageFactoryContract::class );
             $sessionStorage->getPlugin()->setValue(SessionStorageKeys::CURRENCY, $event->getCurrency());
         });
-        
+
         $dispatcher->listen(FrontendLanguageChanged::class, function($event) {
             /** @var BasketService $basketService */
             $basketService = pluginApp(BasketService::class);
