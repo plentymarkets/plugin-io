@@ -5,12 +5,11 @@ namespace IO\Services;
 use IO\Extensions\Constants\ShopUrls;
 use IO\Helper\LanguageMap;
 use IO\Helper\MemoryCache;
+use IO\Helper\RouteConfig;
 use IO\Helper\Utils;
 use IO\Services\UrlBuilder\CategoryUrlBuilder;
-use IO\Services\UrlBuilder\InternalUrlBuilder;
 use IO\Services\UrlBuilder\UrlQuery;
 use IO\Services\UrlBuilder\VariationUrlBuilder;
-use phpDocumentor\Reflection\Types\Array_;
 use Plenty\Plugin\Http\Request;
 use Plenty\Plugin\Http\Response;
 
@@ -255,14 +254,23 @@ class UrlService
     {
         if(strpos($redirectURL, 'http:') !== 0 && strpos($redirectURL, 'https:') !== 0)
         {
-            $redirectURL = Utils::makeRelativeUrl(
-                $redirectURL,
-                $this->webstoreConfigurationService->getDefaultLanguage() !== $this->sessionStorage->getLang()
-            );
+            /** @var UrlQuery $query */
+            $query = pluginApp(UrlQuery::class, ['path' => $redirectURL]);
+            $redirectURL = $query->toAbsoluteUrl($this->webstoreConfigurationService->getDefaultLanguage() !== $this->sessionStorage->getLang());
         }
 
         /** @var Response $response */
         $response = pluginApp(Response::class);
         return $response->redirectTo($redirectURL);
+    }
+
+    /**
+     * Check if route is enabled or category is linked to route.
+     * @param $route
+     * @return bool
+     */
+    public function isRouteEnabled($route)
+    {
+        return in_array($route, RouteConfig::getEnabledRoutes()) || RouteConfig::getCategoryId($route) > 0;
     }
 }
