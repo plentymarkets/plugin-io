@@ -307,6 +307,27 @@ class IORouteServiceProvider extends RouteServiceProvider
         {
             $router->get('returns/{orderId}/{orderAccessKey?}', 'IO\Controllers\OrderReturnController@showOrderReturn');
         }
+        else if( in_array(RouteConfig::CONFIRMATION, RouteConfig::getEnabledRoutes())
+            && RouteConfig::getCategoryId(RouteConfig::CONFIRMATION) > 0
+            && !$shopUrls->equals($shopUrls->confirmation,'/confirmation') )
+        {
+            $router->get('returns/{orderId}/{orderAccessKey?}', function( $orderId = 0, $accessKey = '' ) use ($shopUrls)
+            {
+                $returnsParams = [];
+
+                if((int)$orderId > 0 && strlen($accessKey))
+                {
+                    $returnsParams['orderId'] = $orderId;
+                    $returnsParams['accessKey'] = $accessKey;
+                }
+
+                /** @var CategoryController $categoryController */
+                $categoryController = pluginApp(CategoryController::class);
+
+                return $categoryController->redirectToCategory(RouteConfig::getCategoryId(RouteConfig::ORDER_RETURN), '/returns', $returnsParams);
+            });
+
+        }
 
         // ORDER RETURN CONFIRMATION
         if( RouteConfig::isActive(RouteConfig::ORDER_RETURN_CONFIRMATION) )
