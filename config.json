@@ -172,6 +172,12 @@
                     "label": "Config.routingCategoryNewsletterOptOut",
                     "options": {}
                 },
+                "routing.category_order-return" : {
+                    "type": "categoryPicker",
+                    "required": false,
+                    "label": "Config.routingCategoryOrderReturn",
+                    "options": {}
+                },
                 "routing.category_page-not-found": {
                     "type": "categoryPicker",
                     "required": false,
