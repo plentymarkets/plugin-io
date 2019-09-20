@@ -186,7 +186,7 @@ class CheckoutServiceShippingTest extends TestCase
 
         $this->vatServiceMock->shouldReceive('getLocationId')->andReturn(1);
 
-        $this->frontendPaymentMock->shouldReceive('getAllowedPaymentMethodListForContact')->andReturn([]);
+        $this->frontendPaymentMock->shouldReceive('getCurrentPaymentMethodsList')->andReturn([]);
         $this->accountRepositoryMock->shouldReceive('getSettings')
             ->andReturn((object)[
                 "showShippingVat" => true
