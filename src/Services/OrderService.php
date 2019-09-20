@@ -307,11 +307,11 @@ class OrderService
          * @var TemplateConfigService $templateConfigService
          */
         $templateConfigService = pluginApp(TemplateConfigService::class);
-        $redirectToLogin = $templateConfigService->get('my_account.confirmation_link_login_redirect');
+        $redirectToLogin = $templateConfigService->getBoolean('my_account.confirmation_link_login_redirect');
     
         $order = $this->orderRepository->findOrderByAccessKey($orderId, $orderAccessKey);
         
-        if($redirectToLogin == 'true')
+        if($redirectToLogin)
         {
             $orderContactId = 0;
             foreach ($order->relations as $relation)
@@ -631,7 +631,7 @@ class OrderService
 	{
 		/** @var TemplateConfigService $config */
 		$config = pluginApp(TemplateConfigService::class);
-		if ($config->get('my_account.change_payment') == "false")
+		if (!$config->getBoolean('my_account.change_payment'))
 		{
 			return false;
 		}

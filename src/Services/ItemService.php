@@ -397,7 +397,7 @@ class ItemService
                     /** @var TemplateConfigService $templateConfigService */
                     $templateConfigService = pluginApp(TemplateConfigService::class);
 
-                    if($templateConfigService->get('item.show_variation_over_dropdown') != 'true')
+                    if(!$templateConfigService->getBoolean('item.show_variation_over_dropdown'))
                     {
                         $filterBuilder
                             ->variationStockIsSalable();
