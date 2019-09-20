@@ -175,6 +175,9 @@ class CheckoutServiceShippingTest extends TestCase
                 'accountContactClassId' => 1
             ]);
 
+         $this->sessionStorageServiceMock->shouldReceive('getLang')
+            ->andReturn('de');
+
         $this->customerServiceMock->shouldReceive('showNetPrices')
             ->andReturn(false);
 
