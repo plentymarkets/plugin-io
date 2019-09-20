@@ -31,22 +31,6 @@ class TemplateConfigService
         return $value === "true" || $value === "1" || $value === 1 || $default;
     }
 
-    public function getArray($key, $default = [], $allValue = [])
-    {
-        $value = $this->get($key);
-
-        if($value === "all")
-        {
-            return $allValue;
-        }
-        else if(is_null($value))
-        {
-            return $default;
-        }
-
-        return explode(", ", $value);
-    }
-
     public function getInteger($key, $default = 0)
     {
         return intval($this->get($key, $default));
