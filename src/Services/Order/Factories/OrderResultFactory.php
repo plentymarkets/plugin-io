@@ -75,8 +75,9 @@ class OrderResultFactory
         'paymentMethodName'            => null,
         'paymentMethodIcon'            => null,
         'paymentStatus'                => 'unpaid',
+        'variations'                   => [],
         'itemURLs'                     => [],
-        'itemImages'                   =>[],
+        'itemImages'                   => [],
         'isReturnable'                 => true,
         'highlightNetPrices'           => true,
         'allowPaymentMethodSwitchFrom' => true,
@@ -91,7 +92,7 @@ class OrderResultFactory
     public function fillOrderResult()
     {
         $orderResult = [];
-        
+        $variations = [];
         foreach(self::ORDER_STRUCTURE as $key => $value)
         {
             if(array_key_exists($key, self::FAKER_MAP))
@@ -100,6 +101,11 @@ class OrderResultFactory
                 if($faker instanceof AbstractFaker)
                 {
                     $orderResult[$key] = $faker->fill($orderResult[$key]);
+                }
+
+                if($faker instanceof OrderFaker)
+                {
+                    $variations = $faker->variations;
                 }
             }
             else
@@ -110,7 +116,7 @@ class OrderResultFactory
         
         /** @var LocalizedOrderFaker $localizedOrderFaker */
         $localizedOrderFaker = pluginApp(LocalizedOrderFaker::class);
-        $orderResult = $localizedOrderFaker->fill($orderResult);
+        $orderResult = $localizedOrderFaker->fill($orderResult, $variations);
         
         return $orderResult;
     }
