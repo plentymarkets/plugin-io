@@ -2,6 +2,7 @@
 
 namespace IO\Services\Order\Factories\Faker;
 
+use IO\Extensions\Filters\ItemImagesFilter;
 use IO\Services\ItemSearch\Factories\Faker\AbstractFaker;
 use IO\Services\SessionStorageService;
 use IO\Services\WebstoreConfigurationService;
@@ -15,7 +16,7 @@ use Plenty\Plugin\Translation\Translator;
 
 class LocalizedOrderFaker extends AbstractFaker
 {
-    public function fill($data)
+    public function fill($data, $variations = [])
     {
         /** @var Translator $translator */
         $translator = pluginApp(Translator::class);
@@ -98,16 +99,15 @@ class LocalizedOrderFaker extends AbstractFaker
             $orderStatusName = $translator->trans('IO::Faker.orderStatusName');
         }
     
-        /** @var WebstoreConfigurationService $webstoreConfigService */
-        $webstoreConfigService = pluginApp(WebstoreConfigurationService::class);
-        $webstoreConfig = $webstoreConfigService->getWebstoreConfig();
-    
+        /** @var ItemImagesFilter $imageFilter */
+        $imageFilter = pluginApp(ItemImagesFilter::class);
+
         $itemImages = [];
         foreach($data['order']['orderItems'] as $orderItem)
         {
             foreach($orderItem['images'] as $variationId => $imageUrl)
             {
-                $itemImages[$variationId] = $webstoreConfig->domainSsl.'/'.$imageUrl;
+                $itemImages[$variationId] = $imageFilter->getFirstItemImageUrl( $variations[$variationId]['images'], 'urlMiddle' );
             }
         }
         
@@ -117,7 +117,8 @@ class LocalizedOrderFaker extends AbstractFaker
             'shippingProfileName' => $shippingProfileName,
             'shippingProvider'    => $shippingProvider,
             'status'              => $orderStatusName,
-            'itemImages'          => $itemImages
+            'itemImages'          => $itemImages,
+            'variations'          => $variations
         ];
         
         $this->merge($data, $default);

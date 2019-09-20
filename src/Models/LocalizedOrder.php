@@ -49,6 +49,7 @@ class LocalizedOrder extends ModelWrapper
     public $paymentMethodIcon = "";
     public $paymentStatus = '';
 
+    public $variations = [];
     public $itemURLs = [];
     public $itemImages = [];
     public $isReturnable = false;
@@ -201,6 +202,7 @@ class LocalizedOrder extends ModelWrapper
         foreach( $orderVariations['documents'] as $orderVariation )
         {
             $variationId =  $orderVariation['data']['variation']['id'];
+            $instance->variations[$variationId] = $orderVariation['data'];
             $instance->itemURLs[$variationId]   = $urlFilter->buildItemURL( $orderVariation['data'] );
             $instance->itemImages[$variationId] = $imageFilter->getFirstItemImageUrl( $orderVariation['data']['images'], 'urlPreview' );
 
@@ -260,6 +262,7 @@ class LocalizedOrder extends ModelWrapper
             "paymentMethodListForSwitch"   => $this->paymentMethodListForSwitch,
             "itemURLs"                     => $this->itemURLs,
             "itemImages"                   => $this->itemImages,
+            "variations"                   => $this->variations,
             "isReturnable"                 => $this->isReturnable(),
             "highlightNetPrices"           => $this->highlightNetPrices
         ];
