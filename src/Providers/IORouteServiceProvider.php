@@ -121,8 +121,8 @@ class IORouteServiceProvider extends RouteServiceProvider
 
                 if((int)$contactId > 0 && strlen($hash))
                 {
-                    $confirmationParams['contactId'] = $contactId;
-                    $confirmationParams['hash'] = $hash;
+                    $changeMailParams['contactId'] = $contactId;
+                    $changeMailParams['hash'] = $hash;
                 }
 
                 /** @var CategoryController $categoryController */
@@ -339,6 +339,27 @@ class IORouteServiceProvider extends RouteServiceProvider
         if( RouteConfig::isActive(RouteConfig::PASSWORD_RESET) )
         {
             $router->get('password-reset/{contactId}/{hash}', 'IO\Controllers\CustomerPasswordResetController@showReset');
+        }
+        else if( in_array(RouteConfig::PASSWORD_RESET, RouteConfig::getEnabledRoutes())
+            && RouteConfig::getCategoryId(RouteConfig::PASSWORD_RESET) > 0
+            && !$shopUrls->equals($shopUrls->passwordReset, '/password-reset')
+        )
+        {
+            $router->get('password-reset/{contactId}/{hash}', function($contactId, $hash) use ($shopUrls)
+            {
+                $passwordResetParams = [];
+
+                if((int)$contactId > 0 && strlen($hash))
+                {
+                    $passwordResetParams['contactId'] = $contactId;
+                    $passwordResetParams['hash'] = $hash;
+                }
+
+                /** @var CategoryController $categoryController */
+                $categoryController = pluginApp(CategoryController::class);
+
+                return $categoryController->redirectToCategory(RouteConfig::getCategoryId(RouteConfig::PASSWORD_RESET), '/password-reset', $passwordResetParams);
+            });
         }
 
         // PLACE ORDER
