@@ -309,15 +309,15 @@ class IORouteServiceProvider extends RouteServiceProvider
         }
         else if( in_array(RouteConfig::ORDER_RETURN, RouteConfig::getEnabledRoutes())
             && RouteConfig::getCategoryId(RouteConfig::ORDER_RETURN) > 0
-            && !$shopUrls->equals($shopUrls->returns(),'/returns') )
+            && !$shopUrls->equals($shopUrls->returns,'/returns') )
         {
             $router->get('returns/{orderId}/{orderAccessKey?}', function( $orderId = 0, $accessKey = '' ) use ($shopUrls)
             {
                 $returnsParams = [];
+                $returnsParams['orderId'] = $orderId;
 
-                if((int)$orderId > 0 && strlen($accessKey))
+                if(strlen($accessKey))
                 {
-                    $returnsParams['orderId'] = $orderId;
                     $returnsParams['accessKey'] = $accessKey;
                 }
 
