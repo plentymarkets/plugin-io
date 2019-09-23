@@ -20,6 +20,7 @@ use IO\Services\ItemSearch\Factories\VariationSearchFactory;
 use IO\Constants\LogLevel;
 use Plenty\Modules\Order\Shipping\Contracts\EUCountryCodesServiceContract;
 use Plenty\Plugin\Log\Loggable;
+use IO\Services\ItemWishListService;
 
 /**
  * Class BasketService
@@ -85,8 +86,8 @@ class BasketService
         $this->checkout             = $checkout;
         $this->vatService           = $vatService;
         $this->customerService      = $customerService;
-        $this->basketRepository = $basketRepository;
-        $this->couponService = $couponService;
+        $this->basketRepository     = $basketRepository;
+        $this->couponService        = $couponService;
 
         if(!$vatInitService->isInitialized())
         {
@@ -106,6 +107,9 @@ class BasketService
 
         /** @var DetermineShopCountryContract $determineShopCountry */
         $determineShopCountry = pluginApp(DetermineShopCountryContract::class);
+
+        /** @var ItemWishListService $wishListService */
+        $wishListService = pluginApp(ItemWishListService::class);
 
         $basket = $this->getBasket()->toArray();
 
@@ -132,6 +136,8 @@ class BasketService
 
         $basket["isExportDelivery"] = $euCountryService->isExportDelivery($basket["shippingCountryId"]);
         $basket["shopCountryId"] = $determineShopCountry->getCountryId();
+
+        $basket["itemWishListIds"] = $wishListService->getItemWishList();
 
         return $basket;
     }

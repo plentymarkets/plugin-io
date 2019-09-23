@@ -3,9 +3,11 @@
 namespace IO\Controllers;
 
 use IO\Api\ResponseCode;
+use IO\Extensions\Constants\ShopUrls;
 use IO\Helper\RouteConfig;
 use IO\Guards\AuthGuard;
 use IO\Helper\Utils;
+use IO\Services\CustomerService;
 use IO\Services\SessionStorageService;
 use IO\Services\UrlService;
 use Plenty\Modules\ShopBuilder\Helper\ShopBuilderRequest;
@@ -173,7 +175,7 @@ class CategoryController extends LayoutController
             return $myAccountController->showMyAccount( $category );
         }
 
-        if ( RouteConfig::getCategoryId( RouteConfig::CONFIRMATION ) === $category->id || $shopBuilderRequest->getPreviewContentType() === 'orderconfirmation')
+        if ( RouteConfig::getCategoryId( RouteConfig::CONFIRMATION ) === $category->id )
         {
             $this->getLogger(__CLASS__)->info(
                 "IO::Debug.CategoryController_showConfirmationCategory",
@@ -191,6 +193,43 @@ class CategoryController extends LayoutController
                 $params['accessKey'] ?? $request->get('accessKey', ''),
                 $category
             );
+        }
+
+        if ( RouteConfig::getCategoryId( RouteConfig::LOGIN ) === $category->id
+            || RouteConfig::getCategoryId( RouteConfig::REGISTER ) === $category->id )
+        {
+            /** @var CustomerService $customerService */
+            $customerService = pluginApp(CustomerService::class);
+
+            if($customerService->getContactId() > 0 && !$shopBuilderRequest->isShopBuilder())
+            {
+                /** @var ShopUrls $shopUrls */
+                $shopUrls = pluginApp(ShopUrls::class);
+                AuthGuard::redirect($shopUrls->home);
+            }
+        }
+
+        if( RouteConfig::getCategoryId(RouteConfig::ORDER_RETURN) === $category->id)
+        {
+            /** @var OrderReturnController $orderReturnController */
+            $orderReturnController = pluginApp(OrderReturnController::class);
+
+            $orderId = $request->get('orderId', 0);
+            if($orderId > 0)
+            {
+                return $orderReturnController->showOrderReturn(
+                    $orderId,
+                    $request->get('orderAccessKey', null)
+                );
+            }
+            else
+            {
+                /** @var Response $response */
+                $response = pluginApp(Response::class);
+                $response->forceStatus(ResponseCode::NOT_FOUND);
+
+                return $response;
+            }
         }
 
         return $this->renderTemplate(

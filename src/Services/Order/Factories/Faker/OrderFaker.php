@@ -9,14 +9,16 @@ use Plenty\Plugin\Translation\Translator;
 
 class OrderFaker extends AbstractFaker
 {
+    public $variations = [];
+
     public function fill($data)
     {
-        $orderId =         $this->number(1, 10000);
-        $billingAddress =  $this->makeAddress();
-        $deliveryAddress = $billingAddress;
-        $orderItems =      $this->makeOrderItems($orderId);
-        
-        $default = [
+        $orderId            = $this->number(1, 10000);
+        $billingAddress     = $this->makeAddress();
+        $deliveryAddress    = $billingAddress;
+        $orderItems         = $this->makeOrderItems($orderId);
+        $amount             = $this->makeAmount($orderId, $orderItems);
+        $default            = [
             'id'                => $orderId,
             'typeId'            => 0,
             'methodOfPaymentId' => 0,
@@ -39,7 +41,7 @@ class OrderFaker extends AbstractFaker
             'addresses'         => [$billingAddress, $deliveryAddress],
             'orderItems'        => $orderItems,
             'properties'        => $this->makeProperties(),
-            'amounts'           => [],
+            'amounts'           => [$amount],
             'comments'          => [],
             'location'          => null,
             'payments'          => [],
@@ -48,8 +50,8 @@ class OrderFaker extends AbstractFaker
             'dates'             => [],
             'originOrder'       => null,
             'parentOrder'       => null,
-            'systemAmount'      => null,
-            'amount'            => null
+            'systemAmount'      => $amount,
+            'amount'            => $amount
         ];
         
         $this->merge($data, $default);
@@ -97,14 +99,15 @@ class OrderFaker extends AbstractFaker
         foreach($itemResult['items']['documents'] as $itemData)
         {
             $item = $itemData['data'];
-            
+            $variationId = $item['variation']['id'];
+            $this->variations[$variationId] = $item;
             $orderItems[] = [
                 'id'                => $item['item']['id'],
                 'orderId'           => $orderId,
                 'typeId'            => 1,
                 'referrerId'        => 1.00,
-                'itemVariationId'   => $item['variation']['id'],
-                'quantity'          => 1.00,
+                'itemVariationId'   => $variationId,
+                'quantity'          => $this->number(1, 10),
                 'orderItemName'     => $item['texts']['name1'],
                 'attributeValues'   => null,
                 'shippingProfileId' => 1,
@@ -137,6 +140,37 @@ class OrderFaker extends AbstractFaker
         }
         
         return $orderItems;
+    }
+
+    private function makeAmount($orderId, $orderItems)
+    {
+        $totalsGross = 0;
+        $totalsNet   = 0;
+        $shipping    = $this->float(0, 10);
+
+        foreach($orderItems as $orderItem)
+        {
+            $totalsNet += $orderItem['amounts'][0]['priceNet'];
+            $totalsGross += $orderItem['amounts'][0]['priceGross'];
+        }
+
+        return [
+            'id'                => $this->number(),
+            'orderId'           => $orderId,
+            'isSystemCurrency'  => true,
+            'isNet'             => $this->boolean(),
+            'currency'          => 'EUR',
+            'exchangeRate'      => 1.0,
+            'netTotal'          => $totalsNet,
+            'grossTotal'        => $totalsGross,
+            'vatTotal'          => $totalsGross - $totalsNet,
+            'invoiceTotal'      => $totalsGross,
+            'paidAmount'        => 0,
+            'prepaidAmount'     => 0,
+            'giftCardAmount'    => 0,
+            'shippingCostsGross'=> $shipping,
+            'shippingCostsNet'  => $shipping,
+        ];
     }
     
     private function makeProperties()

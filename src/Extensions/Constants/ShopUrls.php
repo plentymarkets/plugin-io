@@ -47,7 +47,10 @@ class ShopUrls
     public $search              = "";
     public $termsConditions     = "";
     public $wishList            = "";
+    public $returns             = "";
     public $returnConfirmation  = "";
+    public $changeMail          = "";
+    public $newsletterOptOut    = "";
 
     public function __construct(Dispatcher $dispatcher, SessionStorageService $sessionStorageService)
     {
@@ -88,7 +91,10 @@ class ShopUrls
         $this->search                   = $this->getShopUrl(RouteConfig::SEARCH);
         $this->termsConditions          = $this->getShopUrl(RouteConfig::TERMS_CONDITIONS);
         $this->wishList                 = $this->getShopUrl(RouteConfig::WISH_LIST);
+        $this->returns                  = $this->getShopUrl(RouteConfig::ORDER_RETURN, "returns");
         $this->returnConfirmation       = $this->getShopUrl(RouteConfig::ORDER_RETURN_CONFIRMATION, "return-confirmation");
+        $this->changeMail               = $this->getShopUrl(RouteConfig::CHANGE_MAIL);
+        $this->newsletterOptOut         = $this->getShopUrl(RouteConfig::NEWSLETTER_OPT_OUT, "newsletter/unsubscribe");
     }
 
     public function returns($orderId, $orderAccessKey = null)

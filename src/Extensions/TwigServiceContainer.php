@@ -12,6 +12,7 @@ use IO\Services\ContactMailService;
 use IO\Services\CountryService;
 use IO\Services\CouponService;
 use IO\Services\CustomerService;
+use IO\Services\FakerService;
 use IO\Services\ItemCrossSellingService;
 use IO\Services\ItemLastSeenService;
 use IO\Services\ItemListService;
@@ -163,7 +164,7 @@ class TwigServiceContainer
     {
         return pluginApp( UrlService::class );
     }
-    
+
     public function getLiveShopping()
     {
         return pluginApp( LiveShoppingService::class );
@@ -177,5 +178,10 @@ class TwigServiceContainer
     public function getUserDataHash()
     {
         return pluginApp( UserDataHashService::class );
+    }
+
+    public function getFaker()
+    {
+        return pluginApp( FakerService::class );
     }
 }

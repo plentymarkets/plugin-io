@@ -1,254 +1,308 @@
 {
-  "formatVersion": 1,
-  "menu": {
-      "Config.TemplateTab": {
-          "label": "Config.TemplateTab",
-          "formFields": {
-              "template.template_plugin_name": {
-                  "type": "inputText",
-                  "required": false,
-                  "label": "Config.templateTemplatePluginNameLabel",
-                  "options": {
-                      "defaultValue": "Ceres"
-                  }
-              }
-          }
-      },
-      "Config.NumberFormatsTab": {
-          "label": "Config.NumberFormatsTab",
-          "formFields": {
-              "format.number_decimals": {
-                  "type": "inputText",
-                  "required": false,
-                  "label": "Config.formatNumberDecimalsLabel",
-                  "options": {
-                      "defaultValue": "2"
-                  }
-              },
-              "format.separator_decimal": {
-                  "type": "inputText",
-                  "required": false,
-                  "label": "Config.formatSeparatorDecimalLabel",
-                  "options": {
-                      "defaultValue": ","
-                  }
-              },
-              "format.separator_thousands": {
-                  "type": "inputText",
-                  "required": false,
-                  "label": "Config.formatSeparatorThousandsLabel",
-                  "options": {
-                      "defaultValue": "."
-                  }
-              },
-              "format.use_locale_currency_format": {
-                  "type": "selectBox",
-                  "required": false,
-                  "label": "Config.formatUseLocaleCurrencyFormatLabel",
-                  "options": {
-                      "defaultValue": "1",
-                      "selectBoxValues": [
-                          {
-                              "value": "0",
-                              "caption": "Config.formatUseLocaleCurrencyFormatPossibleValue0"
-                          },
-                          {
-                              "value": "1",
-                              "caption": "Config.formatUseLocaleCurrencyFormatPossibleValue1"
-                          }
-                      ]
-                  }
-              }
-          }
-      },
-      "Config.RoutingTab": {
-          "label": "Config.RoutingTab",
-          "formFields": {
-              "routing.category_home": {
-                  "type": "categoryPicker",
-                  "required": false,
-                  "label": "Config.routingCategoryHome",
-                  "options": {}
-              },
-              "routing.category_checkout": {
-                  "type": "categoryPicker",
-                  "required": false,
-                  "label": "Config.routingCategoryCheckout",
-                  "options": {}
-              },
-              "routing.category_my-account": {
-                  "type": "categoryPicker",
-                  "required": false,
-                  "label": "Config.routingCategoryMyAccount",
-                  "options": {}
-              },
-              "routing.category_confirmation": {
-                  "type": "categoryPicker",
-                  "required": false,
-                  "label": "Config.routingCategoryConfirmation",
-                  "options": {}
-              },
-              "routing.category_confirmation-guest": {
-                  "type": "categoryPicker",
-                  "required": false,
-                  "label": "Config.routingCategoryGuestConfirmation",
-                  "options": {}
-              },
-              "routing.category_cancellation-rights": {
-                  "type": "categoryPicker",
-                  "required": false,
-                  "label": "Config.routingCategoryCancellationRights",
-                  "options": {}
-              },
-              "routing.category_cancellation-form": {
-                  "type": "categoryPicker",
-                  "required": false,
-                  "label": "Config.routingCategoryCancellationForm",
-                  "options": {}
-              },
-              "routing.category_legal-disclosure": {
-                  "type": "categoryPicker",
-                  "required": false,
-                  "label": "Config.routingCategoryLegalDisclosure",
-                  "options": {}
-              },
-              "routing.category_privacy-policy": {
-                  "type": "categoryPicker",
-                  "required": false,
-                  "label": "Config.routingCategoryPrivacyPolicy",
-                  "options": {}
-              },
-              "routing.category_gtc": {
-                  "type": "categoryPicker",
-                  "required": false,
-                  "label": "Config.routingCategoryGtc",
-                  "options": {}
-              },
-              "routing.category_contact": {
-                  "type": "categoryPicker",
-                  "required": false,
-                  "label": "Config.routingCategoryContact",
-                  "options": {}
-              },
-              "routing.enabled_routes": {
-                  "type": "multiCheckBox",
-                  "required": false,
-                  "label": "Config.routingEnabledRoutesLabel",
-                  "options": {
-                      "defaultValue": "all",
-                      "checkBoxValues": [
-                          {
-                              "value": "home",
-                              "caption": "Config.routingEnabledRoutesPossibleValueHome"
-                          },
-                          {
-                              "value": "basket",
-                              "caption": "Config.routingEnabledRoutesPossibleValueBasket"
-                          },
-                          {
-                              "value": "checkout",
-                              "caption": "Config.routingEnabledRoutesPossibleValueCheckout"
-                          },
-                          {
-                              "value": "my-account",
-                              "caption": "Config.routingEnabledRoutesPossibleValueMyAccount"
-                          },
-                          {
-                              "value": "confirmation",
-                              "caption": "Config.routingEnabledRoutesPossibleValueConfirmation"
-                          },
-                          {
-                              "value": "login",
-                              "caption": "Config.routingEnabledRoutesPossibleValueLogin"
-                          },
-                          {
-                              "value": "register",
-                              "caption": "Config.routingEnabledRoutesPossibleValueRegister"
-                          },
-                          {
-                              "value": "password-reset",
-                              "caption": "Config.routingEnabledRoutesPossibleValuePasswordReset"
-                          },
-                          {
-                              "value": "change-mail",
-                              "caption": "Config.routingEnabledRoutesPossibleValueChangeMail"
-                          },
-                          {
-                              "value": "search",
-                              "caption": "Config.routingEnabledRoutesPossibleValueSearch"
-                          },
-                          {
-                              "value": "place-order",
-                              "caption": "Config.routingEnabledRoutesPossibleValuePlaceOrder"
-                          },
-                          {
-                              "value": "cancellation-rights",
-                              "caption": "Config.routingEnabledRoutesPossibleValueCancellationRights"
-                          },
-                          {
-                              "value": "cancellation-form",
-                              "caption": "Config.routingEnabledRoutesPossibleValueCancellationForm"
-                          },
-                          {
-                              "value": "legal-disclosure",
-                              "caption": "Config.routingEnabledRoutesPossibleValueLegalDisclosure"
-                          },
-                          {
-                              "value": "privacy-policy",
-                              "caption": "Config.routingEnabledRoutesPossibleValuePrivacyPolicy"
-                          },
-                          {
-                              "value": "gtc",
-                              "caption": "Config.routingEnabledRoutesPossibleValueGtc"
-                          },
-                          {
-                              "value": "contact",
-                              "caption": "Config.routingEnabledRoutesPossibleValueContact"
-                          },
-                          {
-                              "value": "item",
-                              "caption": "Config.routingEnabledRoutesPossibleValueItem"
-                          },
-                          {
-                              "value": "category",
-                              "caption": "Config.routingEnabledRoutesPossibleValueCategory"
-                          },
-                          {
-                              "value": "wish-list",
-                              "caption": "Config.routingEnabledRoutesPossibleValueWishList"
-                          },
-                          {
-                              "value": "order-return",
-                              "caption": "Config.routingEnabledRoutesPossibleValueOrderReturn"
-                          },
-                          {
-                              "value": "order-property-file",
-                              "caption": "Config.routingEnabledRoutesPossibleValueOrderPropertyFile"
-                          },
-                          {
-                              "value": "order-document",
-                              "caption": "Config.routingEnabledRoutesPossibleValueOrderDocument"
-                          },
-                          {
-                              "value": "order-return-confirmation",
-                              "caption": "Config.routingEnabledRoutesPossibleValueOrderReturnConfirmation"
-                          },
-                          {
-                              "value": "newsletter-opt-in",
-                              "caption": "Config.routingEnabledRoutesPossibleValueNewsletterOptIn"
-                          },
-                          {
-                              "value": "newsletter-opt-out",
-                              "caption": "Config.routingEnabledRoutesPossibleValueNewsletterOptOut"
-                          },
-                          {
-                              "value": "page-not-found",
-                              "caption": "Config.routingEnabledRoutesPossibleValuePageNotFound"
-                          }
-                      ]
-                  }
-              }
-          }
-      }
-  }
+    "formatVersion": 1,
+    "menu": {
+        "Config.TemplateTab": {
+            "label": "Config.TemplateTab",
+            "formFields": {
+                "template.template_plugin_name": {
+                    "type": "inputText",
+                    "required": false,
+                    "label": "Config.templateTemplatePluginNameLabel",
+                    "options": {
+                        "defaultValue": "Ceres"
+                    }
+                }
+            }
+        },
+        "Config.NumberFormatsTab": {
+            "label": "Config.NumberFormatsTab",
+            "formFields": {
+                "format.number_decimals": {
+                    "type": "inputText",
+                    "required": false,
+                    "label": "Config.formatNumberDecimalsLabel",
+                    "options": {
+                        "defaultValue": "2"
+                    }
+                },
+                "format.separator_decimal": {
+                    "type": "inputText",
+                    "required": false,
+                    "label": "Config.formatSeparatorDecimalLabel",
+                    "options": {
+                        "defaultValue": ","
+                    }
+                },
+                "format.separator_thousands": {
+                    "type": "inputText",
+                    "required": false,
+                    "label": "Config.formatSeparatorThousandsLabel",
+                    "options": {
+                        "defaultValue": "."
+                    }
+                },
+                "format.use_locale_currency_format": {
+                    "type": "selectBox",
+                    "required": false,
+                    "label": "Config.formatUseLocaleCurrencyFormatLabel",
+                    "options": {
+                        "defaultValue": "1",
+                        "selectBoxValues": [
+                            {
+                                "value": "0",
+                                "caption": "Config.formatUseLocaleCurrencyFormatPossibleValue0"
+                            },
+                            {
+                                "value": "1",
+                                "caption": "Config.formatUseLocaleCurrencyFormatPossibleValue1"
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        "Config.RoutingTab": {
+            "label": "Config.RoutingTab",
+            "formFields": {
+                "routing.category_home": {
+                    "type": "categoryPicker",
+                    "required": false,
+                    "label": "Config.routingCategoryHome",
+                    "options": {}
+                },
+                "routing.category_basket": {
+                    "type": "categoryPicker",
+                    "required": false,
+                    "label": "Config.routingCategoryBasket",
+                    "options": {}
+                },
+                "routing.category_checkout": {
+                    "type": "categoryPicker",
+                    "required": false,
+                    "label": "Config.routingCategoryCheckout",
+                    "options": {}
+                },
+                "routing.category_my-account": {
+                    "type": "categoryPicker",
+                    "required": false,
+                    "label": "Config.routingCategoryMyAccount",
+                    "options": {}
+                },
+                "routing.category_login": {
+                    "type": "categoryPicker",
+                    "required": false,
+                    "label": "Config.routingCategoryLogin",
+                    "options": {}
+                },
+                "routing.category_register": {
+                    "type": "categoryPicker",
+                    "required": false,
+                    "label": "Config.routingCategoryRegister",
+                    "options": {}
+                },
+                "routing.category_confirmation": {
+                    "type": "categoryPicker",
+                    "required": false,
+                    "label": "Config.routingCategoryConfirmation",
+                    "options": {}
+                },
+                "routing.category_confirmation-guest": {
+                    "type": "categoryPicker",
+                    "required": false,
+                    "label": "Config.routingCategoryGuestConfirmation",
+                    "options": {}
+                },
+                "routing.category_cancellation-rights": {
+                    "type": "categoryPicker",
+                    "required": false,
+                    "label": "Config.routingCategoryCancellationRights",
+                    "options": {}
+                },
+                "routing.category_cancellation-form": {
+                    "type": "categoryPicker",
+                    "required": false,
+                    "label": "Config.routingCategoryCancellationForm",
+                    "options": {}
+                },
+                "routing.category_legal-disclosure": {
+                    "type": "categoryPicker",
+                    "required": false,
+                    "label": "Config.routingCategoryLegalDisclosure",
+                    "options": {}
+                },
+                "routing.category_privacy-policy": {
+                    "type": "categoryPicker",
+                    "required": false,
+                    "label": "Config.routingCategoryPrivacyPolicy",
+                    "options": {}
+                },
+                "routing.category_gtc": {
+                    "type": "categoryPicker",
+                    "required": false,
+                    "label": "Config.routingCategoryGtc",
+                    "options": {}
+                },
+                "routing.category_contact": {
+                    "type": "categoryPicker",
+                    "required": false,
+                    "label": "Config.routingCategoryContact",
+                    "options": {}
+                },
+                "routing.category_wish-list": {
+                    "type": "categoryPicker",
+                    "required": false,
+                    "label": "Config.routingCategoryWishList",
+                    "options": {}
+                },
+                "routing.category_change-mail": {
+                    "type": "categoryPicker",
+                    "required": false,
+                    "label": "Config.routingCategoryChangeMail",
+                    "options": {}
+                },
+                "routing.category_password-reset": {
+                    "type": "categoryPicker",
+                    "required": false,
+                    "label": "Config.routingCategoryPasswordReset",
+                    "options": {}
+                },
+                "routing.category_newsletter-opt-out" : {
+                    "type": "categoryPicker",
+                    "required": false,
+                    "label": "Config.routingCategoryNewsletterOptOut",
+                    "options": {}
+                },
+                "routing.category_order-return" : {
+                    "type": "categoryPicker",
+                    "required": false,
+                    "label": "Config.routingCategoryOrderReturn",
+                    "options": {}
+                },
+                "routing.category_page-not-found": {
+                    "type": "categoryPicker",
+                    "required": false,
+                    "label": "Config.routingCategoryPageNotFound",
+                    "options": {}
+                },
+                "routing.enabled_routes": {
+                    "type": "multiCheckBox",
+                    "required": false,
+                    "label": "Config.routingEnabledRoutesLabel",
+                    "options": {
+                        "defaultValue": "all",
+                        "checkBoxValues": [
+                            {
+                                "value": "home",
+                                "caption": "Config.routingEnabledRoutesPossibleValueHome"
+                            },
+                            {
+                                "value": "basket",
+                                "caption": "Config.routingEnabledRoutesPossibleValueBasket"
+                            },
+                            {
+                                "value": "checkout",
+                                "caption": "Config.routingEnabledRoutesPossibleValueCheckout"
+                            },
+                            {
+                                "value": "my-account",
+                                "caption": "Config.routingEnabledRoutesPossibleValueMyAccount"
+                            },
+                            {
+                                "value": "confirmation",
+                                "caption": "Config.routingEnabledRoutesPossibleValueConfirmation"
+                            },
+                            {
+                                "value": "login",
+                                "caption": "Config.routingEnabledRoutesPossibleValueLogin"
+                            },
+                            {
+                                "value": "register",
+                                "caption": "Config.routingEnabledRoutesPossibleValueRegister"
+                            },
+                            {
+                                "value": "password-reset",
+                                "caption": "Config.routingEnabledRoutesPossibleValuePasswordReset"
+                            },
+                            {
+                                "value": "change-mail",
+                                "caption": "Config.routingEnabledRoutesPossibleValueChangeMail"
+                            },
+                            {
+                                "value": "search",
+                                "caption": "Config.routingEnabledRoutesPossibleValueSearch"
+                            },
+                            {
+                                "value": "place-order",
+                                "caption": "Config.routingEnabledRoutesPossibleValuePlaceOrder"
+                            },
+                            {
+                                "value": "cancellation-rights",
+                                "caption": "Config.routingEnabledRoutesPossibleValueCancellationRights"
+                            },
+                            {
+                                "value": "cancellation-form",
+                                "caption": "Config.routingEnabledRoutesPossibleValueCancellationForm"
+                            },
+                            {
+                                "value": "legal-disclosure",
+                                "caption": "Config.routingEnabledRoutesPossibleValueLegalDisclosure"
+                            },
+                            {
+                                "value": "privacy-policy",
+                                "caption": "Config.routingEnabledRoutesPossibleValuePrivacyPolicy"
+                            },
+                            {
+                                "value": "gtc",
+                                "caption": "Config.routingEnabledRoutesPossibleValueGtc"
+                            },
+                            {
+                                "value": "contact",
+                                "caption": "Config.routingEnabledRoutesPossibleValueContact"
+                            },
+                            {
+                                "value": "item",
+                                "caption": "Config.routingEnabledRoutesPossibleValueItem"
+                            },
+                            {
+                                "value": "category",
+                                "caption": "Config.routingEnabledRoutesPossibleValueCategory"
+                            },
+                            {
+                                "value": "wish-list",
+                                "caption": "Config.routingEnabledRoutesPossibleValueWishList"
+                            },
+                            {
+                                "value": "order-return",
+                                "caption": "Config.routingEnabledRoutesPossibleValueOrderReturn"
+                            },
+                            {
+                                "value": "order-property-file",
+                                "caption": "Config.routingEnabledRoutesPossibleValueOrderPropertyFile"
+                            },
+                            {
+                                "value": "order-document",
+                                "caption": "Config.routingEnabledRoutesPossibleValueOrderDocument"
+                            },
+                            {
+                                "value": "order-return-confirmation",
+                                "caption": "Config.routingEnabledRoutesPossibleValueOrderReturnConfirmation"
+                            },
+                            {
+                                "value": "newsletter-opt-in",
+                                "caption": "Config.routingEnabledRoutesPossibleValueNewsletterOptIn"
+                            },
+                            {
+                                "value": "newsletter-opt-out",
+                                "caption": "Config.routingEnabledRoutesPossibleValueNewsletterOptOut"
+                            },
+                            {
+                                "value": "page-not-found",
+                                "caption": "Config.routingEnabledRoutesPossibleValuePageNotFound"
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    }
 }
