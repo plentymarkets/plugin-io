@@ -24,6 +24,7 @@ use Plenty\Modules\Frontend\Contracts\CurrencyExchangeRepositoryContract;
 use Plenty\Modules\Frontend\PaymentMethod\Contracts\FrontendPaymentMethodRepositoryContract;
 use Plenty\Modules\Frontend\Services\VatService;
 use Plenty\Modules\Order\Shipping\Contracts\ParcelServicePresetRepositoryContract;
+use Plenty\Modules\Payment\Method\Models\PaymentMethod;
 use Plenty\Plugin\Application;
 
 class CheckoutServiceShippingTest extends TestCase
@@ -189,7 +190,15 @@ class CheckoutServiceShippingTest extends TestCase
 
         $this->vatServiceMock->shouldReceive('getLocationId')->andReturn(1);
 
-        $this->frontendPaymentMock->shouldReceive('getCurrentPaymentMethodsList')->andReturn([]);
+        $this->frontendPaymentMock->shouldReceive('getCurrentPaymentMethodsList')->andReturn([pluginApp(PaymentMethod::class)]);
+        $this->frontendPaymentMock->shouldReceive('getPaymentMethodName')->andReturn('Invoice');
+        $this->frontendPaymentMock->shouldReceive('getPaymentMethodFee')->andReturn(0.00);
+        $this->frontendPaymentMock->shouldReceive('getPaymentMethodIcon')->andReturn('');
+        $this->frontendPaymentMock->shouldReceive('getPaymentMethodDescription')->andReturn('');
+        $this->frontendPaymentMock->shouldReceive('getPaymentMethodSourceUrl')->andReturn('');
+        $this->frontendPaymentMock->shouldReceive('getPaymentMethodIsSelectable')->andReturn(true);
+
+
         $this->accountRepositoryMock->shouldReceive('getSettings')
             ->andReturn((object)[
                 "showShippingVat" => true
@@ -251,6 +260,7 @@ class CheckoutServiceShippingTest extends TestCase
                                     'parcelServiceAddress' => NULL,
                                 ],
                             ],
+                        'excludedPaymentMethodIds' => [],
                         'isPostOffice' => false,
                         'isParcelBox' => false,
 
@@ -274,6 +284,7 @@ class CheckoutServiceShippingTest extends TestCase
                                     'parcelServiceAddress' => NULL,
                                 ],
                             ],
+                        'excludedPaymentMethodIds' => [],
                         'isPostOffice' => true,
                         'isParcelBox' => false,
 
