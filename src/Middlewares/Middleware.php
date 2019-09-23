@@ -129,7 +129,8 @@ class Middleware extends \Plenty\Plugin\Middleware
         $orderShow = $request->get('OrderShow', '');
         if(strlen($orderShow) && $orderShow == 'CancelNewsletter' && in_array(RouteConfig::NEWSLETTER_OPT_OUT, RouteConfig::getEnabledRoutes()) )
         {
-            AuthGuard::redirect($shopUrls->newsletterOptOut);
+            $folderId = $request->get('folderId', 0);
+            AuthGuard::redirect($shopUrls->newsletterOptOut, ['folderId' => $folderId]);
         }
 
         if ( RouteConfig::isActive(RouteConfig::SEARCH) && $request->get('ActionCall') == 'WebActionArticleSearch' )
@@ -161,7 +162,7 @@ class Middleware extends \Plenty\Plugin\Middleware
         {
             $orderId = $request->get('id', 0);
             $orderAccessKey = $request->get('ak', '');
-    
+
             if(strlen($orderAccessKey) && (int)$orderId > 0)
             {
                 $confirmationRoute = $shopUrls->confirmation.'?orderId='.$orderId.'&accessKey='.$orderAccessKey;
