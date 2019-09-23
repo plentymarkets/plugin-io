@@ -3,6 +3,8 @@
 namespace IO\Services;
 
 use IO\Constants\SessionStorageKeys;
+use IO\Services\ItemSearch\Factories\VariationSearchResultFactory;
+use IO\Services\ItemSearch\Helper\ResultFieldTemplate;
 use IO\Services\ItemSearch\SearchPresets\BasketItems;
 use IO\Services\ItemSearch\SearchPresets\CategoryItems;
 use IO\Services\ItemSearch\SearchPresets\CrossSellingItems;
@@ -110,7 +112,23 @@ class ItemListService
         {
             $searchFactory->setPage(1, $maxItems );
         }
-        return $searchService->getResult( $searchFactory );
+
+        $itemListResult = $searchService->getResult( $searchFactory );
+
+        /** @var ShopBuilderRequest $shopBuilderRequest */
+        $shopBuilderRequest = pluginApp(ShopBuilderRequest::class);
+
+        if ($shopBuilderRequest->isShopBuilder())
+        {
+            /** @var VariationSearchResultFactory $searchResultFactory */
+            $searchResultFactory = pluginApp(VariationSearchResultFactory::class);
+            $itemListResult = $searchResultFactory->fillSearchResults(
+                $itemListResult,
+                ResultFieldTemplate::get(ResultFieldTemplate::TEMPLATE_SINGLE_ITEM)
+            );
+        }
+
+        return $itemListResult;
     }
 
     private function isValidId( $id )
