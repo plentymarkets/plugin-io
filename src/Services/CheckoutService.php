@@ -82,6 +82,11 @@ class CheckoutService
      */
     private $webstoreConfigurationService;
 
+    private static $methodOfPaymentList = null;
+
+    private static $paymentDataList = null;
+
+
     /**
      * CheckoutService constructor.
      * @param FrontendPaymentMethodRepositoryContract $frontendPaymentMethodRepository
@@ -397,7 +402,11 @@ class CheckoutService
      */
     public function getMethodOfPaymentList(): array
     {
-        return $this->frontendPaymentMethodRepository->getCurrentPaymentMethodsList();
+        if(!isset(self::$methodOfPaymentList))
+        {
+            self::$methodOfPaymentList = $this->frontendPaymentMethodRepository->getCurrentPaymentMethodsList();
+        }
+        return self::$methodOfPaymentList;
     }
 
     /**
@@ -415,22 +424,26 @@ class CheckoutService
      */
     public function getCheckoutPaymentDataList(): array
     {
-        $paymentDataList = array();
-        $mopList         = $this->getMethodOfPaymentList();
-        $lang            = $this->sessionStorageService->getLang();
-        foreach ($mopList as $paymentMethod) {
-            $paymentData                = array();
-            $paymentData['id']          = $paymentMethod->id;
-            $paymentData['name']        = $this->frontendPaymentMethodRepository->getPaymentMethodName($paymentMethod, $lang);
-            $paymentData['fee']         = $this->frontendPaymentMethodRepository->getPaymentMethodFee($paymentMethod);
-            $paymentData['icon']        = $this->frontendPaymentMethodRepository->getPaymentMethodIcon($paymentMethod, $lang);
-            $paymentData['description'] = $this->frontendPaymentMethodRepository->getPaymentMethodDescription($paymentMethod, $lang);
-            $paymentData['sourceUrl']   = $this->frontendPaymentMethodRepository->getPaymentMethodSourceUrl($paymentMethod);
-            $paymentData['key']         = $paymentMethod->pluginKey;
-            $paymentData['isSelectable']= $this->frontendPaymentMethodRepository->getPaymentMethodIsSelectable($paymentMethod);
-            $paymentDataList[]          = $paymentData;
+        if(!isset(self::$paymentDataList))
+        {
+            $paymentDataList = array();
+            $mopList         = $this->getMethodOfPaymentList();
+            $lang            = $this->sessionStorageService->getLang();
+            foreach ($mopList as $paymentMethod) {
+                $paymentData                = array();
+                $paymentData['id']          = $paymentMethod->id;
+                $paymentData['name']        = $this->frontendPaymentMethodRepository->getPaymentMethodName($paymentMethod, $lang);
+                $paymentData['fee']         = $this->frontendPaymentMethodRepository->getPaymentMethodFee($paymentMethod);
+                $paymentData['icon']        = $this->frontendPaymentMethodRepository->getPaymentMethodIcon($paymentMethod, $lang);
+                $paymentData['description'] = $this->frontendPaymentMethodRepository->getPaymentMethodDescription($paymentMethod, $lang);
+                $paymentData['sourceUrl']   = $this->frontendPaymentMethodRepository->getPaymentMethodSourceUrl($paymentMethod);
+                $paymentData['isSelectable']   = $this->frontendPaymentMethodRepository->getPaymentMethodIsSelectable($paymentMethod);
+                $paymentData['key']         = $paymentMethod->pluginKey;
+                $paymentDataList[]          = $paymentData;
+            }
+            self::$paymentDataList = $paymentDataList;
         }
-        return $paymentDataList;
+        return self::$paymentDataList;
     }
 
     /**
@@ -447,7 +460,19 @@ class CheckoutService
             $vatService = pluginApp(VatService::class);
             $showNetPrice   = $this->customerService->showNetPrices();
 
-            $list = $this->parcelServicePresetRepo->getLastWeightedPresetCombinations($this->basketRepository->load(), $this->sessionStorageService->getCustomer()->accountContactClassId);
+            /** @var TemplateConfigService $templateConfigService */
+            $templateConfigService = pluginApp( TemplateConfigService::class );
+
+            $showAllShippingProfiles = $templateConfigService->get('checkout.show_all_shipping_profiles', false);
+            $showAllShippingProfiles = ($showAllShippingProfiles == '1' || $showAllShippingProfiles === 'true');
+
+            $params = [
+                'skipCheckForMethodOfPaymentId' => $showAllShippingProfiles
+            ];
+
+            $shippingProfilesList = $this->parcelServicePresetRepo->getLastWeightedPresetCombinations($this->basketRepository->load(), $this->sessionStorageService->getCustomer()->accountContactClassId, $params);
+
+            $list = $this->filterShippingProfiles($shippingProfilesList);
 
             $locationId = $vatService->getLocationId($this->getShippingCountryId());
             $accountSettings = $accountRepo->getSettings($locationId);
@@ -488,6 +513,29 @@ class CheckoutService
         });
     }
 
+
+    private function filterShippingProfiles($shippingProfilesList)
+    {
+        $paymentMethodList = $this->getCheckoutPaymentDataList();
+        $list = [];
+        foreach ($shippingProfilesList as $shippingProfile)
+        {
+            $shouldKeepShippingProfile = false;
+            foreach ($paymentMethodList as $paymentMethod)
+            {
+                if (!in_array($paymentMethod['id'], $shippingProfile['excludedPaymentMethodIds']))
+                {
+                    $shouldKeepShippingProfile = true;
+                    $shippingProfile['allowedPaymentMethodNames'][] = $paymentMethod['name'];
+                }
+            }
+            if( $shouldKeepShippingProfile)
+            {
+                $list[] = $shippingProfile;
+            }
+        }
+        return $list;
+    }
     /**
      * Get the ID of the current shipping country
      * @return int
