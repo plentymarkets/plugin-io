@@ -14,6 +14,7 @@ use IO\Services\ItemSearch\SearchPresets\VariationList;
 use IO\Services\ItemSearch\Services\ItemSearchService;
 use IO\Services\ItemWishListService;
 use Plenty\Modules\Basket\Contracts\BasketRepositoryContract;
+use Plenty\Modules\ShopBuilder\Helper\ShopBuilderRequest;
 use Plenty\Plugin\CachingRepository;
 
 class ItemListService
@@ -124,7 +125,7 @@ class ItemListService
             $searchResultFactory = pluginApp(VariationSearchResultFactory::class);
             $itemListResult = $searchResultFactory->fillSearchResults(
                 $itemListResult,
-                ResultFieldTemplate::get(ResultFieldTemplate::TEMPLATE_SINGLE_ITEM)
+                null
             );
         }
 
