@@ -209,6 +209,29 @@ class CategoryController extends LayoutController
             }
         }
 
+        if( RouteConfig::getCategoryId(RouteConfig::ORDER_RETURN) === $category->id)
+        {
+            /** @var OrderReturnController $orderReturnController */
+            $orderReturnController = pluginApp(OrderReturnController::class);
+
+            $orderId = $request->get('orderId', 0);
+            if($orderId > 0)
+            {
+                return $orderReturnController->showOrderReturn(
+                    $orderId,
+                    $request->get('orderAccessKey', null)
+                );
+            }
+            else
+            {
+                /** @var Response $response */
+                $response = pluginApp(Response::class);
+                $response->forceStatus(ResponseCode::NOT_FOUND);
+
+                return $response;
+            }
+        }
+
         return $this->renderTemplate(
             "tpl.category." . $category->type,
             [
