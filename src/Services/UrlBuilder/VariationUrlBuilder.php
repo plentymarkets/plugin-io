@@ -164,7 +164,7 @@ class VariationUrlBuilder
     {
         /** @var TemplateConfigService $templateConfigService */
         $templateConfigService = pluginApp( TemplateConfigService::class );
-        $enableOldUrlPattern = $templateConfigService->get('global.enableOldUrlPattern') === "true";
+        $enableOldUrlPattern = $templateConfigService->getBoolean('global.enableOldUrlPattern');
 
         if($withVariationId)
         {
@@ -213,7 +213,7 @@ class VariationUrlBuilder
         $webstoreConfigService = pluginApp(WebstoreConfigurationService::class);
 
         $urlPattern = $webstoreConfigService->getWebstoreConfig()->urlItemContent;
-        if ($templateConfigService->get('global.enableOldUrlPattern') !== "true")
+        if (!$templateConfigService->getBoolean('global.enableOldUrlPattern'))
         {
             $urlPattern = "all";
         }

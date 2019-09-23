@@ -24,4 +24,15 @@ class TemplateConfigService
         
         return null;
     }
+
+    public function getBoolean($key, $default = false)
+    {
+        $value = $this->get($key);
+        return $value === "true" || $value === "1" || $value === 1 || $default;
+    }
+
+    public function getInteger($key, $default = 0)
+    {
+        return intval($this->get($key, $default));
+    }
 }

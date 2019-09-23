@@ -47,9 +47,10 @@ class IOSendMail
                 $this->setPlaceholderValue('Link_TermsCondition', '');
             }
 
+            /** @var TemplateConfigService $templateConfig */
             $templateConfig = pluginApp(TemplateConfigService::class);
-            $enableOldURLPattern = $templateConfig->get('global.enableOldUrlPattern');
-            if( RouteConfig::isActive(RouteConfig::ITEM) && (!strlen($enableOldURLPattern) || $enableOldURLPattern == 'false')) {
+            $enableOldURLPattern = $templateConfig->getBoolean('global.enableOldUrlPattern');
+            if( RouteConfig::isActive(RouteConfig::ITEM) && !$enableOldURLPattern) {
                 $this->setPlaceholderValue('Link_Item', '_{itemId}_{variationId}');
             } else {
                 $this->setPlaceholderValue('Link_Item', '');
