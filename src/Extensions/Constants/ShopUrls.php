@@ -132,7 +132,17 @@ class ShopUrls
 
     private function getShopUrl( $route, $url = null, ...$routeParams )
     {
-        return $this->fromMemoryCache($route, function() use ($route, $url, $routeParams)
+        $key = $route;
+
+        if(count($routeParams))
+        {
+            foreach ($routeParams as $param)
+            {
+                $key .= '.'.$param;
+            }
+        }
+
+        return $this->fromMemoryCache($key, function() use ($route, $url, $routeParams)
         {
             $categoryId = RouteConfig::getCategoryId( $route );
             if ( $categoryId > 0 )
