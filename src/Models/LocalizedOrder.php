@@ -263,20 +263,20 @@ class LocalizedOrder extends ModelWrapper
             "itemURLs"                     => $this->itemURLs,
             "itemImages"                   => $this->itemImages,
             "variations"                   => $this->variations,
-            "isReturnable"                 => $this->isReturnable(),
+            "isReturnable"                 => $this->isReturnable($order),
             "highlightNetPrices"           => $this->highlightNetPrices
         ];
 
         return $data;
     }
 
-    public function isReturnable()
+    public function isReturnable($order)
     {
-        if($this->order->typeId === OrderType::ORDER)
+        if($order['typeId'] === OrderType::ORDER)
         {
             $orderItems = count($this->orderData)
                 ? $this->orderData['orderItems']
-                : $this->order->orderItems;
+                : $order['orderItems'];
 
             if(!count($orderItems))
             {
@@ -286,7 +286,7 @@ class LocalizedOrder extends ModelWrapper
             $shippingDateSet = false;
             $createdDateUnix = 0;
 
-            $dates = count($this->orderData) ? $this->orderData['dates'] : $this->order->dates;
+            $dates = count($this->orderData) ? $this->orderData['dates'] : $order['dates'];
             foreach($dates as $date)
             {
                 if($date['typeId'] === 5 && strlen($date['date']))
