@@ -263,15 +263,17 @@ class LocalizedOrder extends ModelWrapper
             "itemURLs"                     => $this->itemURLs,
             "itemImages"                   => $this->itemImages,
             "variations"                   => $this->variations,
-            "isReturnable"                 => $this->isReturnable($order),
+            "isReturnable"                 => $this->isReturnable(),
             "highlightNetPrices"           => $this->highlightNetPrices
         ];
 
         return $data;
     }
 
-    public function isReturnable($order)
+    public function isReturnable()
     {
+        $order = $this->order->toArray();
+
         if($order['typeId'] === OrderType::ORDER)
         {
             $orderItems = count($this->orderData)
