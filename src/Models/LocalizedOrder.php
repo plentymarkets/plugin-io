@@ -67,9 +67,6 @@ class LocalizedOrder extends ModelWrapper
      */
     public static function wrap( $order, ...$data ):LocalizedOrder
     {
-        /** @var OrderService $orderService */
-        $orderService = pluginApp(OrderService::class);
-
         if( $order == null )
         {
             return null;
@@ -272,11 +269,13 @@ class LocalizedOrder extends ModelWrapper
 
     public function isReturnable()
     {
-        if($this->order->typeId === OrderType::ORDER)
+        $order = $this->order->toArray();
+
+        if($order['typeId'] === OrderType::ORDER)
         {
             $orderItems = count($this->orderData)
                 ? $this->orderData['orderItems']
-                : $this->order->orderItems;
+                : $order['orderItems'];
 
             if(!count($orderItems))
             {
@@ -286,7 +285,7 @@ class LocalizedOrder extends ModelWrapper
             $shippingDateSet = false;
             $createdDateUnix = 0;
 
-            $dates = count($this->orderData) ? $this->orderData['dates'] : $this->order->dates;
+            $dates = count($this->orderData) ? $this->orderData['dates'] : $order['dates'];
             foreach($dates as $date)
             {
                 if($date['typeId'] === 5 && strlen($date['date']))

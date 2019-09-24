@@ -39,8 +39,17 @@ class CheckoutSetShippingIdResource extends ApiResource
     public function store():Response
     {
         $shippingId = $this->request->get('shippingId', 0);
+        $methodOfPaymentId = $this->request->get('methodOfPaymentId', 0);
 
-        $this->checkoutService->setShippingProfileId($shippingId);
+        if($methodOfPaymentId > 0)
+        {
+            $this->checkoutService->setMethodOfPaymentId($methodOfPaymentId);
+        }
+
+        if($this->checkoutService->getShippingProfileId() !== $shippingId)
+        {
+            $this->checkoutService->setShippingProfileId($shippingId);
+        }
 
         return $this->response->create( $shippingId, ResponseCode::OK );
     }

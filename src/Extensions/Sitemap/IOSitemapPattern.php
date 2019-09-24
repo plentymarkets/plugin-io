@@ -29,9 +29,9 @@ class IOSitemapPattern
 
         /** @var TemplateConfigService $templateConfigService */
         $templateConfigService = pluginApp(TemplateConfigService::class);
-        $enableOldURLPattern = $templateConfigService->get('global.enableOldUrlPattern');
+        $enableOldURLPattern = $templateConfigService->getBoolean('global.enableOldUrlPattern');
 
-        if(!strlen($enableOldURLPattern) || $enableOldURLPattern == 'false')
+        if(!$enableOldURLPattern)
         {
             $itemPattern = [
                 'pattern' => '_{itemId}_{variationId?}',
