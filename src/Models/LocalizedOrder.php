@@ -67,9 +67,6 @@ class LocalizedOrder extends ModelWrapper
      */
     public static function wrap( $order, ...$data ):LocalizedOrder
     {
-        /** @var OrderService $orderService */
-        $orderService = pluginApp(OrderService::class);
-
         if( $order == null )
         {
             return null;
