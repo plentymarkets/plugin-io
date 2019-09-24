@@ -119,7 +119,7 @@ class ItemListService
         /** @var ShopBuilderRequest $shopBuilderRequest */
         $shopBuilderRequest = pluginApp(ShopBuilderRequest::class);
 
-        if ($shopBuilderRequest->isShopBuilder())
+        if($shopBuilderRequest->isShopBuilder() && $type == self::TYPE_RANDOM)
         {
             /** @var VariationSearchResultFactory $searchResultFactory */
             $searchResultFactory = pluginApp(VariationSearchResultFactory::class);
