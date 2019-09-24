@@ -21,6 +21,7 @@ use Plenty\Modules\Order\Currency\Contracts\CurrencyRepositoryContract;
 use Plenty\Modules\Order\Shipping\Contracts\ParcelServicePresetRepositoryContract;
 use Plenty\Modules\Payment\Events\Checkout\GetPaymentMethodContent;
 use Plenty\Modules\Payment\Method\Contracts\PaymentMethodRepositoryContract;
+use Plenty\Plugin\Application;
 use Plenty\Plugin\ConfigRepository;
 use Plenty\Plugin\Events\Dispatcher;
 use Plenty\Plugin\Log\Loggable;
@@ -466,7 +467,10 @@ class CheckoutService
             $showAllShippingProfiles = $templateConfigService->get('checkout.show_all_shipping_profiles', false);
             $showAllShippingProfiles = ($showAllShippingProfiles == '1' || $showAllShippingProfiles === 'true');
 
-            $params = [
+            $application = pluginApp(Application::class);
+            $params  = [
+                'countryId'  => $this->checkout->getShippingCountryId(),
+                'webstoreId' => $application->getWebstoreId(),
                 'skipCheckForMethodOfPaymentId' => $showAllShippingProfiles
             ];
 
