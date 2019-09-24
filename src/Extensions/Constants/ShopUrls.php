@@ -136,10 +136,7 @@ class ShopUrls
 
         if(count($routeParams))
         {
-            foreach ($routeParams as $param)
-            {
-                $key .= '.'.$param;
-            }
+            $key .= '.'.implode('.', $routeParams);
         }
 
         return $this->fromMemoryCache($key, function() use ($route, $url, $routeParams)
