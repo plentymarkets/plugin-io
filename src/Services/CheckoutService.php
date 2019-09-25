@@ -25,6 +25,7 @@ use Plenty\Plugin\ConfigRepository;
 use Plenty\Plugin\Events\Dispatcher;
 use Plenty\Plugin\Log\Loggable;
 use Plenty\Plugin\Translation\Translator;
+use IO\Helper\Utils;
 
 /**
  * Class CheckoutService
@@ -466,9 +467,33 @@ class CheckoutService
             $showAllShippingProfiles = $templateConfigService->get('checkout.show_all_shipping_profiles', false);
             $showAllShippingProfiles = ($showAllShippingProfiles == '1' || $showAllShippingProfiles === 'true');
 
-            $params = [
+            $webstoreId = Utils::getWebstoreId();
+            $params  = [
+                'countryId'  => $this->checkout->getShippingCountryId(),
+                'webstoreId' => $webstoreId,
                 'skipCheckForMethodOfPaymentId' => $showAllShippingProfiles
             ];
+
+            $deliveryAddressId = $this->getDeliveryAddressId();
+            $type = AddressType::DELIVERY;
+
+            if ($deliveryAddressId == 0 && $this->getBillingAddressId() > 0)
+            {
+                $deliveryAddressId = $this->getBillingAddressId();
+                $type = AddressType::BILLING;
+            }
+
+            if($deliveryAddressId > 0)
+            {
+                try
+                {
+                    $address = $this->customerService->getAddress($deliveryAddressId, $type);
+                    $params['zipCode'] = $address->postalCode;
+                } catch (\Exception $exception)
+                {}
+            }
+
+
 
             $shippingProfilesList = $this->parcelServicePresetRepo->getLastWeightedPresetCombinations($this->basketRepository->load(), $this->sessionStorageService->getCustomer()->accountContactClassId, $params);
 
