@@ -60,10 +60,16 @@ class VariationSearchResultFactory
 
     use LoadResultFields;
 
-    public function fillSearchResults( $searchResult, $resultFieldsTemplate, $numberOfEntries = 1 )
+    public function fillSearchResults( $searchResult, $resultFieldsTemplate = null, $numberOfEntries = 1 )
     {
-        $resultFields   = $this->loadResultFields($resultFieldsTemplate);
+        $resultFields   = is_null($resultFieldsTemplate) ? [] : $this->loadResultFields($resultFieldsTemplate);
         $entries        = [];
+        
+        if(!count($resultFields))
+        {
+            $resultFields = array_keys(self::FAKER_MAP);
+        }
+        
         foreach($resultFields as $resultField)
         {
             if (strpos($resultField,"."))
