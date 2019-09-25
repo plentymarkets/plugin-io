@@ -28,7 +28,7 @@ class IORouteServiceProvider extends RouteServiceProvider
      */
 	public function map(Router $router, ApiRouter $api)
 	{
-		$api->version(['v1'], ['namespace' => 'IO\Api\Resources'], function ($api)
+		$api->version(['v1'], ['namespace' => 'IO\Api\Resources', 'middleware' => ['csrf']], function ($api)
 		{
 			$api->get('io/basket', 'BasketResource@index');
             $api->resource('io/basket/items', 'BasketItemResource');
