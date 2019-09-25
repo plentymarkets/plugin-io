@@ -474,6 +474,27 @@ class CheckoutService
                 'skipCheckForMethodOfPaymentId' => $showAllShippingProfiles
             ];
 
+            $deliveryAddressId = $this->getDeliveryAddressId();
+            $type = AddressType::DELIVERY;
+
+            if ($deliveryAddressId == 0 && $this->getBillingAddressId() > 0)
+            {
+                $deliveryAddressId = $this->getBillingAddressId();
+                $type = AddressType::BILLING;
+            }
+
+            if($deliveryAddressId > 0)
+            {
+                try
+                {
+                    $address = $this->customerService->getAddress($deliveryAddressId, $type);
+                    $params['zipCode'] = $address->postalCode;
+                } catch (\Exception $exception)
+                {}
+            }
+
+
+
             $shippingProfilesList = $this->parcelServicePresetRepo->getLastWeightedPresetCombinations($this->basketRepository->load(), $this->sessionStorageService->getCustomer()->accountContactClassId, $params);
 
             $list = $this->filterShippingProfiles($shippingProfilesList);
