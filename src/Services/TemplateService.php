@@ -13,6 +13,8 @@ class TemplateService
     public static $currentTemplate = "";
 
     public static $currentTemplateData = [];
+    
+    public static $shouldBeCached = true;
 
     public $forceNoIndex = false;
 
@@ -24,6 +26,16 @@ class TemplateService
     public function isNoIndexForced()
     {
         return $this->forceNoIndex;
+    }
+    
+    public function shouldBeCached()
+    {
+        return TemplateService::$shouldBeCached;
+    }
+    
+    public function disableCacheForTemplate()
+    {
+        TemplateService::$shouldBeCached = false;
     }
 
     public function getCurrentTemplate():string

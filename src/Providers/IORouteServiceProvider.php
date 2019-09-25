@@ -28,37 +28,23 @@ class IORouteServiceProvider extends RouteServiceProvider
      */
 	public function map(Router $router, ApiRouter $api)
 	{
-		$api->version(['v1'], ['namespace' => 'IO\Api\Resources', 'middleware' => ['csrf']], function ($api)
+		$api->version(['v1'], ['namespace' => 'IO\Api\Resources'], function ($api)
 		{
 			$api->get('io/basket', 'BasketResource@index');
             $api->resource('io/basket/items', 'BasketItemResource');
             $api->get('io/order', 'OrderResource@index');
-            $api->post('io/order', 'OrderResource@store');
 			$api->get('io/order/paymentMethods', 'OrderPaymentResource@paymentMethodListForSwitch');
-            $api->resource('io/order/payment', 'OrderPaymentResource');
-            $api->resource('io/checkout/paymentId', 'CheckoutSetPaymentResource');
-            $api->resource('io/checkout/shippingId', 'CheckoutSetShippingIdResource');
-            $api->resource('io/order/contactWish', 'OrderContactWishResource');
-            $api->resource('io/order/additional_information', 'OrderAdditionalInformationResource');
-            $api->resource('io/order/return', 'OrderReturnResource');
             $api->resource('io/order/template', 'OrderTemplateResource');
             $api->resource('io/order/property/file', 'OrderPropertyFileResource');
             $api->get('io/checkout', 'CheckoutResource@index');
-            $api->post('io/checkout', 'CheckoutResource@store');
-            $api->put('io/checkout', 'CheckoutResource@update');
             $api->resource('io/category/description', 'CategoryDescriptionResource');
-			$api->resource('io/checkout/payment', 'CheckoutPaymentResource');
-			$api->resource('io/customer', 'CustomerResource');
-			$api->resource('io/customer/address', 'CustomerAddressResource');
 			$api->resource('io/customer/login', 'CustomerAuthenticationResource');
 			$api->resource('io/customer/logout', 'CustomerLogoutResource');
 			$api->resource('io/customer/password', 'CustomerPasswordResource');
             $api->resource('io/customer/password_reset', 'CustomerPasswordResetResource');
             $api->resource('io/customer/mail', 'CustomerMailResource');
             $api->resource('io/customer/contact/mail', 'ContactMailResource');
-            $api->resource('io/customer/bank_data', 'ContactBankResource');
             $api->get('io/customer/order/list', 'CustomerOrderResource@index');
-            $api->resource('io/customer/order/return', 'CustomerOrderReturnResource');
             $api->resource('io/customer/newsletter', 'CustomerNewsletterResource');
             $api->resource('io/variations', 'VariationResource');
             $api->resource('io/item/availability', 'AvailabilityResource');
@@ -77,6 +63,24 @@ class IORouteServiceProvider extends RouteServiceProvider
             $api->resource('io/facet', 'FacetResource');
             $api->resource('io/categorytree', 'CategoryTreeResource');
 		});
+        
+        $api->version(['v1'], ['namespace' => 'IO\Api\Resources', 'middleware' => ['csrf']], function ($api)
+        {
+            $api->post('io/order', 'OrderResource@store');
+            $api->resource('io/order/payment', 'OrderPaymentResource');
+            $api->resource('io/checkout/paymentId', 'CheckoutSetPaymentResource');
+            $api->resource('io/customer', 'CustomerResource');
+            $api->resource('io/customer/address', 'CustomerAddressResource');
+            $api->resource('io/checkout/shippingId', 'CheckoutSetShippingIdResource');
+            $api->resource('io/order/contactWish', 'OrderContactWishResource');
+            $api->resource('io/order/return', 'OrderReturnResource');
+            $api->post('io/checkout', 'CheckoutResource@store');
+            $api->put('io/checkout', 'CheckoutResource@update');
+            $api->resource('io/checkout/payment', 'CheckoutPaymentResource');
+            $api->resource('io/customer/bank_data', 'ContactBankResource');
+            $api->resource('io/customer/order/return', 'CustomerOrderReturnResource');
+            $api->resource('io/order/additional_information', 'OrderAdditionalInformationResource');
+        });
 
 		/** @var ShopUrls $shopUrls */
 		$shopUrls = pluginApp(ShopUrls::class);
