@@ -182,6 +182,9 @@ class CheckoutServiceShippingTest extends TestCase
         $this->customerServiceMock->shouldReceive('showNetPrices')
             ->andReturn(false);
 
+        $this->customerServiceMock->shouldReceive('getAddresses')
+            ->andReturn([]);
+
         $this->checkoutMock->shouldReceive('getShippingCountryId')->andReturn(10);
 
         $this->applicationMock->shouldReceive('getWebstoreId')->andReturn(1);
@@ -205,6 +208,11 @@ class CheckoutServiceShippingTest extends TestCase
             ]);
 
         $this->basketServiceMock->shouldReceive('getBasket')->andReturn($basket);
+
+        $this->basketServiceMock->shouldReceive('getDeliveryAddressId')->andReturn(null);
+
+        $this->basketServiceMock->shouldReceive('getBillingAddressId')->andReturn(null);
+
 
         $this->currencyExchangeRepoMock->shouldReceive('getDefaultCurrency')->andReturn('EUR');
 
