@@ -414,17 +414,29 @@ class CategoryService
                 $customerService->getContactClassId()
             );
 
+            // Filter categories not having texts in current language
+            $tree = array_filter($tree, function($category)
+            {
+                return count($category['details']);
+            });
+
             return $this->filterBranchEntries($tree, $branch);
         }
         else
         {
-
             $tree = $this->getNavigationTree(
                 $type,
                 $this->sessionStorageService->getLang(),
                 3,
                 $customerService->getContactClassId()
             );
+
+            // Filter categories not having texts in current language
+            $tree = array_filter($tree, function($category)
+            {
+                return count($category['details']);
+            });
+
             $siblingCount = count($tree);
 
             foreach($tree as $i => $category)
