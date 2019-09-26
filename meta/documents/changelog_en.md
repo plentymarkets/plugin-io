@@ -1,5 +1,35 @@
 # Release Notes for IO
 
+## v4.3.0 (2019-09-26) <a href="https://github.com/plentymarkets/plugin-io/compare/4.2.0...4.3.0" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
+
+### Added 
+
+- Guest accounts can now return orders.
+- We added the link button widget to the ShopBuilder. It serves to provide buttons that link to returns and shipment tracking.
+- We added a REST route for unsubscribing from individual newsletters.
+
+### Changed
+
+- The data of the class **LocalizedOrder** now also contain the attributes of the variation.
+- The amount of data transferred during changes to the shopping cart has been reduced in order to improve the performance of the online store.
+- Objects created via **pluginApp** are now stored in their variables before they are processed further. The direct use of new instances could, under certain circumstances, lead to errors during the publishing of plugins.
+- The function `getBasketForTemplate` now adds the field "isExportDelivery" to the shopping cart. This contains the information whether the combination of shop location and selected country of delivery constitutes an export delivery.
+- The REST route `io/itemWishList` now returns the entire item data of variations in the wish list instead of the variation IDs.
+- The shopping cart data now contains the IDs of variations in the wish list.
+- The ShopBooster now also caches the wish list view.
+- If a customer unsubscribes from a newsletter, they now only unsubscribe from one newsletter, depending on the link they followed. Previously, a customer unsubscribed from all newsletters at once. 
+
+### Fixed 
+
+- The dynamic grouping of variations now considers the result fields correctly and no longer loads unnecessary data.
+- The amount of properties per group that can be used as placeholders in the ShopBuilder is no longer limited to 50.
+- Due to an error, duplicate values were removed from URL parameters. This has been fixed.
+- Cross-selling item lists displayed variations for which the setting "invisible in item lists" was active. This behaviour has been fixed.
+- Due to an error, facet values were displayed even though they did not meet the minimum number of hits. This behaviour has been fixed.
+- Internal links now always redirect to the secure HTTPS domain, if it is available.
+- During loading of the mobile navigation, categories without names are filtered out of the result.
+- Due to an error, some attributes could not be selected in the single item view. This has been fixed.
+
 ## v4.2.2 (2019-08-21) <a href="https://github.com/plentymarkets/plugin-io/compare/4.1.2...4.2.0" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
 
 ### Added
