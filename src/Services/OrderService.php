@@ -595,7 +595,9 @@ class OrderService
             }
 
             if($newQuantity > 0
-                && in_array($orderItem->typeId, self::WRAPPED_ORDERITEM_TYPES))
+                && in_array($orderItem->typeId, self::WRAPPED_ORDERITEM_TYPES)
+                && $orderItem->bundleType !== 'bundle_item'
+                && count($orderItem->references) === 0)
             {
                 $orderItemData = $orderItem->toArray();
                 $orderItemData['quantity'] = $newQuantity;
