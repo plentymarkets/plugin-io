@@ -14,7 +14,6 @@
 - Die Menge der übertragenen Daten beim Bearbeiten des Warenkorbs wurde minimiert, um die Performance des Webshops zu verbessern.
 - Über pluginApp erzeugte Objekte werden nun vor der weiteren Verwendung in eigene Variablen gespeichert. Die direkte Verwendung neuer Instanzen führte in einzelnen Fällen zu Fehlern während der Plugin-Bereitstellung.
 - Die Funktion `getBasketForTemplate` fügt dem Warenkorb nun das Feld "isExportDelivery" hinzu. Dieses enthält die Information, ob es sich bei der aktuellen Kombination aus Shop-Standort und ausgewähltem Lieferland um eine Ausfuhrlieferung handelt.
-- In den Cross-Selling-Listen wurden Varianten angezeigt, für welche die Option "unsichtbar in Artikellisten" aktiv war. Dieses Verhalten wurde behoben.
 - Die REST-Route `io/itemWishList` gibt nun die gesamten Artikeldaten der Varianten auf der Wunschliste anstatt der Varianten-IDs zurück.
 - Die Warenkorbdaten enthalten nun die IDs der Wunschliste.
 - Die Wunschlistenansicht wird nun vom ShopBooster gecached.
