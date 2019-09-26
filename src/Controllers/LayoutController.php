@@ -148,9 +148,12 @@ abstract class LayoutController extends Controller
 		{
 			TemplateService::$currentTemplate = $templateEvent;
 			TemplateService::$currentTemplateData = $controllerData;
+			TemplateService::$shouldBeCached = $cacheContent;
 
+			$renderedTemplate = $this->renderTemplateContainer($templateContainer, $controllerData);
+			
 			// activate content cache
-            if ( $cacheContent )
+            if ( TemplateService::$shouldBeCached )
             {
                 $this->getLogger(__CLASS__)->info(
                     "IO::Debug.LayoutController_enableContentCache",
@@ -165,7 +168,7 @@ abstract class LayoutController extends Controller
             }
 
             // Render the received plugin
-			return $this->renderTemplateContainer($templateContainer, $controllerData);
+			return $renderedTemplate;
 		}
 		else
 		{
