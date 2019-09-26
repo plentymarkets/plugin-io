@@ -84,9 +84,10 @@ class VariationAttributeMapExtension implements ItemSearchExtension
                             'imageUrl'         => $attributeImageUrl,
                             'name'             => $attribute['value']['names']['name']
                         ];
-                        
-                        $newResult['variations'][$extensionDocument['id']]['attributes'] = array_values($newResult['variations'][$extensionDocument['id']]['attributes']);
+
                     }
+                    $newResult['variations'][$extensionDocument['id']]['attributes'] = array_values($newResult['variations'][$extensionDocument['id']]['attributes']);
+
                 }
             }
             
