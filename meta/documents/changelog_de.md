@@ -25,6 +25,7 @@
 - Bei der dynamischen Gruppierung von Varianten werden die Ergebnisfelder wieder korrekt berücksichtigt und keine unnötigen Daten mehr geladen.
 - Im ShopBuilder sind jetzt mehr als 50 Eigenschaften pro Gruppe als Platzhalter verfügbar.
 - Durch einen Fehler wurden doppelte Werte in URL-Parametern entfernt. Dies wurde behoben.
+- In Cross-Selling-Listen wurden Varianten angezeigt, für die die Option "unsichtbar in Artikellisten" aktiv war. Dieses Verhalten wurde behoben.
 - Es wurden Facettenwerte angezeigt, die nicht die minimale Trefferzahl erreichten. Dieses Verhalten wurde behoben.
 - Interne Weiterleitungen erfolgen ab sofort immer auf die gesicherte HTTPS-Domain, sofern diese verfügbar ist.
 - Beim Laden der mobilen Navigation werden Kategorien ohne Namen nun aus dem Ergebnis gefiltert.
