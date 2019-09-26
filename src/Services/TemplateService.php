@@ -30,7 +30,7 @@ class TemplateService
     
     public function shouldBeCached()
     {
-        return TemplateService::$shouldBeCached;
+        return self::$shouldBeCached;
     }
     
     public function disableCacheForTemplate()
