@@ -35,7 +35,7 @@ class TemplateService
     
     public function disableCacheForTemplate()
     {
-        TemplateService::$shouldBeCached = false;
+        self::$shouldBeCached = false;
     }
 
     public function getCurrentTemplate():string
