@@ -284,7 +284,7 @@ class LocalizedOrder extends ModelWrapper
 
             /** @var OrderService $orderService */
             $orderService = pluginApp(OrderService::class);
-            $returnableItems = $orderService->getReturnableItems($order);
+            $returnableItems = $orderService->getReturnableItems($this->order);
             if(!count($returnableItems))
             {
                 return false;
