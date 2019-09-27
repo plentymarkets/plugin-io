@@ -112,10 +112,10 @@ class ShopUrls
                 "orderAccessKey" => $orderAccessKey
             ];
 
-            return $this->getShopUrlWithUrlParameters($categoryId, $params);
+            return $this->getShopUrl(RouteConfig::ORDER_RETURN, "returns", null, $params);
         }
 
-        return $this->getShopUrl(RouteConfig::ORDER_RETURN, "returns", $orderId, $orderAccessKey);
+        return $this->getShopUrl(RouteConfig::ORDER_RETURN, "returns", [$orderId, $orderAccessKey]);
     }
 
     public function orderPropertyFile($path)
@@ -141,16 +141,16 @@ class ShopUrls
         });
     }
 
-    private function getShopUrl( $route, $url = null, ...$routeParams )
+    private function getShopUrl( $route, $url = null, $routeParams = [], $urlParams = [] )
     {
         $key = $route;
 
-        if(count($routeParams))
+        if(count($routeParams) || count($urlParams))
         {
-            $key .= '.'.implode('.', $routeParams);
+            $key .= '.'.implode('.', $routeParams) . '.' . json_encode($urlParams);
         }
 
-        return $this->fromMemoryCache($key, function() use ($route, $url, $routeParams)
+        return $this->fromMemoryCache($key, function() use ($route, $url, $routeParams, $urlParams)
         {
             $categoryId = RouteConfig::getCategoryId( $route );
             if ( $categoryId > 0 )
@@ -163,8 +163,18 @@ class ShopUrls
                 {
                     /** @var CategoryUrlBuilder $categoryUrlBuilder */
                     $categoryUrlBuilder = pluginApp( CategoryUrlBuilder::class );
+                    $builtUrl = $categoryUrlBuilder->buildUrl( $category->id );
+
+                    if (count($urlParams))
+                    {
+                        $builtUrl = $builtUrl->toRelativeUrl($this->includeLanguage);
+                        $queryParameters = http_build_query($urlParams);
+
+                        return $builtUrl . (strlen($queryParameters) > 0 ? '?' . $queryParameters : '');
+                    }
+
                     return $this->applyParams(
-                        $categoryUrlBuilder->buildUrl( $category->id ),
+                        $builtUrl,
                         $routeParams
                     );
                 }
@@ -174,33 +184,6 @@ class ShopUrls
                 pluginApp(UrlQuery::class, ['path' => ($url ?? $route)]),
                 $routeParams
             );
-        });
-    }
-
-    private function getShopUrlWithUrlParameters( $categoryId, $params )
-    {
-        $key = $categoryId;
-
-        if(count($params))
-        {
-            $key .= '.' . json_encode($params);
-        }
-
-        return $this->fromMemoryCache($key, function() use ($categoryId, $params) {
-            /** @var CategoryService $categoryService */
-            $categoryService = pluginApp(CategoryService::class);
-            $category = $categoryService->get($categoryId);
-
-            if ($category !== null) {
-                /** @var CategoryUrlBuilder $categoryUrlBuilder */
-                $categoryUrlBuilder = pluginApp(CategoryUrlBuilder::class);
-
-                $url = $categoryUrlBuilder->buildUrl($category->id);
-                $builtUrl = $url->toRelativeUrl($this->includeLanguage);
-                $queryParameters = http_build_query($params);
-
-                return $builtUrl . (strlen($queryParameters) > 0 ? '?' . $queryParameters : '');
-            }
         });
     }
 
