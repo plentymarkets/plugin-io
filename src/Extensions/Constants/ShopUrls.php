@@ -163,31 +163,24 @@ class ShopUrls
                 {
                     /** @var CategoryUrlBuilder $categoryUrlBuilder */
                     $categoryUrlBuilder = pluginApp( CategoryUrlBuilder::class );
-                    $builtUrl = $categoryUrlBuilder->buildUrl( $category->id );
-
-                    if (count($urlParams))
-                    {
-                        $builtUrl = $builtUrl->toRelativeUrl($this->includeLanguage);
-                        $queryParameters = http_build_query($urlParams);
-
-                        return $builtUrl . (strlen($queryParameters) > 0 ? '?' . $queryParameters : '');
-                    }
 
                     return $this->applyParams(
-                        $builtUrl,
-                        $routeParams
+                        $categoryUrlBuilder->buildUrl( $category->id ),
+                        $routeParams,
+                        $urlParams
                     );
                 }
             }
 
             return $this->applyParams(
                 pluginApp(UrlQuery::class, ['path' => ($url ?? $route)]),
-                $routeParams
+                $routeParams,
+                $urlParams
             );
         });
     }
 
-    private function applyParams( $url, $routeParams )
+    private function applyParams( $url, $routeParams, $urlParams )
     {
         $routeParam = array_shift($routeParams);
         while(!is_null($routeParam) && strlen($routeParam))
@@ -196,7 +189,10 @@ class ShopUrls
             $routeParam = array_shift($routeParams);
         }
 
-        return $url->toRelativeUrl($this->includeLanguage);
+        $queryParameters = http_build_query($urlParams);
+        $relativeUrl = $url->toRelativeUrl($this->includeLanguage);
+
+        return $relativeUrl . (strlen($queryParameters) > 0 ? '?' . $queryParameters : '');
     }
 
     public function equals($routeUrl, $url)
