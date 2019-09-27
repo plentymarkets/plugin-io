@@ -564,6 +564,20 @@ class OrderService
         /** @var Order $order */
         $order = $localizedOrder->order;
 
+        $orderData = $order->toArray();
+        $orderData['orderItems'] = $this->getReturnableItems($order);
+        $localizedOrder->orderData = $orderData;
+        
+        return $localizedOrder;
+    }
+
+    /**
+     * @param Order $order
+     * @throws \Throwable
+     * @return array
+     */
+    public function getReturnableItems($order)
+    {
         /** @var AuthHelper $authHelper */
         $authHelper = pluginApp(AuthHelper::class);
 
@@ -605,11 +619,7 @@ class OrderService
             }
         }
 
-        $orderData = $order->toArray();
-        $orderData['orderItems'] = $newOrderItems;
-        $localizedOrder->orderData = $orderData;
-        
-        return $localizedOrder;
+        return $newOrderItems;
     }
 
     /**

@@ -282,6 +282,14 @@ class LocalizedOrder extends ModelWrapper
                 return false;
             }
 
+            /** @var OrderService $orderService */
+            $orderService = pluginApp(OrderService::class);
+            $returnableItems = $orderService->getReturnableItems($order);
+            if(!count($returnableItems))
+            {
+                return false;
+            }
+
             $shippingDateSet = false;
             $createdDateUnix = 0;
 
