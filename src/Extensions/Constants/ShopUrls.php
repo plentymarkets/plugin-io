@@ -104,7 +104,18 @@ class ShopUrls
             $orderAccessKey = $request->get('accessKey');
         }
 
-        return $this->getShopUrl(RouteConfig::ORDER_RETURN, "returns", $orderId, $orderAccessKey);
+        $categoryId = RouteConfig::getCategoryId( RouteConfig::ORDER_RETURN );
+        if ( $categoryId > 0 )
+        {
+            $params = [
+                "orderId"        => $orderId,
+                "orderAccessKey" => $orderAccessKey
+            ];
+
+            return $this->getShopUrl(RouteConfig::ORDER_RETURN, "returns", null, $params);
+        }
+
+        return $this->getShopUrl(RouteConfig::ORDER_RETURN, "returns", [$orderId, $orderAccessKey]);
     }
 
     public function orderPropertyFile($path)
@@ -130,16 +141,16 @@ class ShopUrls
         });
     }
 
-    private function getShopUrl( $route, $url = null, ...$routeParams )
+    private function getShopUrl( $route, $url = null, $routeParams = [], $urlParams = [] )
     {
         $key = $route;
 
-        if(count($routeParams))
+        if(count($routeParams) || count($urlParams))
         {
-            $key .= '.'.implode('.', $routeParams);
+            $key .= '.'.implode('.', $routeParams) . '.' . json_encode($urlParams);
         }
 
-        return $this->fromMemoryCache($key, function() use ($route, $url, $routeParams)
+        return $this->fromMemoryCache($key, function() use ($route, $url, $routeParams, $urlParams)
         {
             $categoryId = RouteConfig::getCategoryId( $route );
             if ( $categoryId > 0 )
@@ -152,21 +163,24 @@ class ShopUrls
                 {
                     /** @var CategoryUrlBuilder $categoryUrlBuilder */
                     $categoryUrlBuilder = pluginApp( CategoryUrlBuilder::class );
+
                     return $this->applyParams(
                         $categoryUrlBuilder->buildUrl( $category->id ),
-                        $routeParams
+                        $routeParams,
+                        $urlParams
                     );
                 }
             }
 
             return $this->applyParams(
                 pluginApp(UrlQuery::class, ['path' => ($url ?? $route)]),
-                $routeParams
+                $routeParams,
+                $urlParams
             );
         });
     }
 
-    private function applyParams( $url, $routeParams )
+    private function applyParams( $url, $routeParams, $urlParams )
     {
         $routeParam = array_shift($routeParams);
         while(!is_null($routeParam) && strlen($routeParam))
@@ -175,7 +189,10 @@ class ShopUrls
             $routeParam = array_shift($routeParams);
         }
 
-        return $url->toRelativeUrl($this->includeLanguage);
+        $queryParameters = http_build_query($urlParams);
+        $relativeUrl = $url->toRelativeUrl($this->includeLanguage);
+
+        return $relativeUrl . (strlen($queryParameters) > 0 ? '?' . $queryParameters : '');
     }
 
     public function equals($routeUrl, $url)
