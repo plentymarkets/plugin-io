@@ -10,46 +10,46 @@ use Plenty\Plugin\Application;
  */
 class OrderBuilderQuery
 {
-	/**
-	 * @var array
-	 */
-	private $order;
+    /**
+     * @var array
+     */
+    private $order;
 
-	/**
-	 * @var Application
-	 */
-	private $app;
+    /**
+     * @var Application
+     */
+    private $app;
 
-	/**
-	 * @var BasketService
-	 */
-	private $basketService;
+    /**
+     * @var BasketService
+     */
+    private $basketService;
 
     /**
      * OrderBuilderQuery constructor.
-     * @param Application $app
+     * @param Application   $app
      * @param BasketService $basketService
-     * @param int $type
-     * @param int $plentyId
+     * @param int           $type
+     * @param int           $plentyId
      */
-	public function __construct(Application $app, BasketService $basketService, int $type, int $plentyId)
-	{
-		$this->app           = $app;
-		$this->basketService = $basketService;
+    public function __construct(Application $app, BasketService $basketService, int $type, int $plentyId)
+    {
+        $this->app           = $app;
+        $this->basketService = $basketService;
 
-		$this->order             = [];
-		$this->order["typeId"]   = $type;
-		$this->order["plentyId"] = $plentyId;
-	}
+        $this->order             = [];
+        $this->order["typeId"]   = $type;
+        $this->order["plentyId"] = $plentyId;
+    }
 
     /**
      * Return the order array
      * @return array
      */
-	public function done():array
-	{
-		return $this->order;
-	}
+    public function done(): array
+    {
+        return $this->order;
+    }
 
     /**
      * Build order from basket data
@@ -57,55 +57,66 @@ class OrderBuilderQuery
      * @return OrderBuilderQuery
      * @throws \Exception
      */
-	public function fromBasket($basket = null):OrderBuilderQuery
-	{
+    public function fromBasket($basket = null): OrderBuilderQuery
+    {
 		if($basket === null)
 		{
-			$basket = $this->basketService->getBasket();
-		}
+            $basket = $this->basketService->getBasket();
+        }
 
-		// Add basket items to order
-		$orderItemBuilder = $this->app->make(OrderItemBuilder::class);
+        // Add basket items to order
+        $orderItemBuilder = $this->app->make(OrderItemBuilder::class);
 		if(!$orderItemBuilder instanceof OrderItemBuilder)
 		{
-			throw new \Exception("Error while instantiating OrderItemBuilder.");
-		}
+            throw new \Exception("Error while instantiating OrderItemBuilder.");
+        }
 
-		$items = $this->basketService->getBasketItems();
+        $items = $this->basketService->getBasketItems();
 
 		if(!is_array($items))
 		{
-			throw new \Exception("Error while reading item data from basket");
-		}
+            throw new \Exception("Error while reading item data from basket");
+        }
 
-		$this->withOrderItems(
-			$orderItemBuilder->fromBasket($basket, $items)
-		);
+        $this->withOrderItems(
+            $orderItemBuilder->fromBasket($basket, $items)
+        );
 
-		return $this;
-	}
+        return $this;
+    }
 
     /**
      * Add the status to the order
      * @param float $status
      * @return OrderBuilderQuery
      */
-	public function withStatus(float $status):OrderBuilderQuery
-	{
-		$this->order["statusId"] = $status;
-		return $this;
-	}
+    public function withStatus(float $status): OrderBuilderQuery
+    {
+        $this->order["statusId"] = $status;
+        return $this;
+    }
 
     /**
      * Add the owner to the order
      * @param int $ownerId
      * @return OrderBuilderQuery
      */
-	public function withOwner(int $ownerId):OrderBuilderQuery
-	{
-		$this->order["ownerId"] = $ownerId;
-		return $this;
-	}
+    public function withOwner(int $ownerId): OrderBuilderQuery
+    {
+        $this->order["ownerId"] = $ownerId;
+        return $this;
+    }
+
+    /**
+     * Add the order referrerId
+     * @param $referrerId
+     * @return $this
+     */
+    public function withReferrer(float $referrerId): OrderBuilderQuery
+    {
+        $this->order["referrerId"] = $referrerId;
+        return $this;
+    }
 
     /**
      * Add an order item to the order
