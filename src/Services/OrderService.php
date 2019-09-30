@@ -52,7 +52,7 @@ class OrderService
      * @var SessionStorageService
      */
     private $sessionStorage;
-    
+
     /**
      * @var FrontendPaymentMethodRepositoryContract
      */
@@ -124,7 +124,7 @@ class OrderService
 	    $email = $this->customerService->getEmail();
 	    $billingAddressId = $this->checkoutService->getBillingAddressId();
         $basket = $this->basketService->getBasket();
-        
+
         $couponCode = null;
         if(strlen($basket->couponCode))
         {
@@ -194,7 +194,7 @@ class OrderService
 
         return LocalizedOrder::wrap( $order, $this->sessionStorage->getLang() );
 	}
-    
+
     /**
      * Subscribe the customer to the newsletter, if stored in the session
      *
@@ -211,7 +211,7 @@ class OrderService
         {
             $firstName = '';
             $lastName = '';
-            
+
             $address = $this->customerService->getAddress($billingAddressId, AddressType::BILLING);
 
             // if the address is for a company, the contact person will be store into the last name
@@ -282,7 +282,7 @@ class OrderService
 
         return $result;
     }
-    
+
     /**
      * Find an order by ID
      * @param int $orderId
@@ -297,10 +297,10 @@ class OrderService
         {
             return LocalizedOrder::wrap($order, $this->sessionStorage->getLang());
         }
-        
+
         return $order;
 	}
-	
+
 	public function findOrderByAccessKey($orderId, $orderAccessKey)
     {
         /**
@@ -308,9 +308,9 @@ class OrderService
          */
         $templateConfigService = pluginApp(TemplateConfigService::class);
         $redirectToLogin = $templateConfigService->getBoolean('my_account.confirmation_link_login_redirect');
-    
+
         $order = $this->orderRepository->findOrderByAccessKey($orderId, $orderAccessKey);
-        
+
         if($redirectToLogin)
         {
             $orderContactId = 0;
@@ -321,7 +321,7 @@ class OrderService
                     $orderContactId = $relation['referenceId'];
                 }
             }
-    
+
             if ((int)$orderContactId > 0)
             {
                 if ((int)$this->customerService->getContactId() <= 0)
@@ -336,10 +336,10 @@ class OrderService
                 }
             }
         }
-    
+
         return LocalizedOrder::wrap($order, $this->sessionStorage->getLang());
     }
-    
+
     /**
      * Get a list of orders for a contact
      * @param int $contactId
@@ -355,7 +355,7 @@ class OrderService
         {
             $filters['orderType'] = OrderType::ORDER;
         }
-        
+
         $this->orderRepository->setFilters($filters);
 
         $orders = $this->orderRepository->allOrdersByContact(
@@ -368,39 +368,39 @@ class OrderService
         {
             $orders = LocalizedOrder::wrapPaginated( $orders, $this->sessionStorage->getLang() );
         }
-        
+
         return $orders;
     }
-    
+
     public function getOrdersCompact(int $page = 1, int $items = 50)
     {
         $orderResult = null;
         $contactId = $this->customerService->getContactId();
-        
+
         if($contactId > 0)
         {
             $this->orderRepository->setFilters(['orderType' => OrderType::ORDER]);
-    
+
             /** @var PaginatedResult $orderResult */
             $orderResult = $this->orderRepository->allOrdersByContact(
                 $contactId,
                 $page,
                 $items
             );
-    
+
             /** @var OrderTotalsService $orderTotalsService */
             $orderTotalsService = pluginApp(OrderTotalsService::class);
-            
+
             /** @var OrderStatusService $orderStatusService */
             $orderStatusService = pluginApp(OrderStatusService::class);
-    
+
             /** @var OrderTrackingService $orderTrackingService */
             $orderTrackingService = pluginApp(OrderTrackingService::class);
-    
+
             /** @var SessionStorageService $sessionStorageService */
             $sessionStorageService = pluginApp(SessionStorageService::class);
             $lang = $sessionStorageService->getLang();
-            
+
             $orders = [];
             foreach($orderResult->getResult() as $order)
             {
@@ -408,20 +408,20 @@ class OrderService
                 {
                     $totals = $orderTotalsService->getAllTotals($order);
                     $highlightNetPrices = $orderTotalsService->highlightNetPrices($order);
-                    
+
                     $orderStatusName = $orderStatusService->getOrderStatus($order->id, $order->statusId);
-    
+
                     $creationDate = '';
                     $creationDateData = $order->dates->firstWhere('typeId', OrderDateType::ORDER_ENTRY_AT);
-    
+
                     if($creationDateData instanceof OrderDate)
                     {
                         $creationDate = $creationDateData->date->toDateTimeString();
                     }
-    
+
                     $shippingDate = '';
                     $shippingDateData = $order->dates->firstWhere('typeId', OrderDateType::ORDER_COMPLETED_ON);
-    
+
                     if($shippingDateData instanceof OrderDate)
                     {
                         $shippingDate = $shippingDateData->date->toDateTimeString();
@@ -437,13 +437,13 @@ class OrderService
                     ];
                 }
             };
-    
+
             $orderResult->setResult($orders);
         }
-        
+
         return $orderResult;
     }
-    
+
     /**
      * Get the last order created by the current contact
      * @param int $contactId
@@ -459,15 +459,15 @@ class OrderService
         {
             $order = $this->orderRepository->findOrderById($this->sessionStorage->getSessionValue(SessionStorageKeys::LATEST_ORDER_ID));
         }
-        
+
         if(!is_null($order))
         {
             return LocalizedOrder::wrap( $order, $this->sessionStorage->getLang() );
         }
-        
+
         return null;
     }
-    
+
     public function getOrderPropertyByOrderId($orderId, $typeId)
     {
         /**
@@ -476,12 +476,12 @@ class OrderService
         $orderPropertyRepo = pluginApp(OrderPropertyRepositoryContract::class);
         return $orderPropertyRepo->findByOrderId($orderId, $typeId);
     }
-    
+
     public function isReturnActive()
     {
         return RouteConfig::isActive(RouteConfig::ORDER_RETURN);
     }
-    
+
     public function createOrderReturn($orderId, $orderAccessKey = '', $items = [], $returnNote = '')
     {
         $localizedOrder = $this->getReturnOrder($orderId, $orderAccessKey);
@@ -546,7 +546,7 @@ class OrderService
 
             return $createdReturn;
         }
-        
+
         return $localizedOrder->order;
     }
 
@@ -564,6 +564,20 @@ class OrderService
         /** @var Order $order */
         $order = $localizedOrder->order;
 
+        $orderData = $order->toArray();
+        $orderData['orderItems'] = $this->getReturnableItems($order);
+        $localizedOrder->orderData = $orderData;
+
+        return $localizedOrder;
+    }
+
+    /**
+     * @param Order $order
+     * @throws \Throwable
+     * @return array
+     */
+    public function getReturnableItems($order)
+    {
         /** @var AuthHelper $authHelper */
         $authHelper = pluginApp(AuthHelper::class);
 
@@ -596,8 +610,7 @@ class OrderService
 
             if($newQuantity > 0
                 && in_array($orderItem->typeId, self::WRAPPED_ORDERITEM_TYPES)
-                && $orderItem->bundleType !== 'bundle_item'
-                && count($orderItem->references) === 0)
+                && !($orderItem->bundleType === 'bundle_item' && count($orderItem->references) > 0))
             {
                 $orderItemData = $orderItem->toArray();
                 $orderItemData['quantity'] = $newQuantity;
@@ -605,11 +618,7 @@ class OrderService
             }
         }
 
-        $orderData = $order->toArray();
-        $orderData['orderItems'] = $newOrderItems;
-        $localizedOrder->orderData = $orderData;
-        
-        return $localizedOrder;
+        return $newOrderItems;
     }
 
     /**
@@ -623,7 +632,7 @@ class OrderService
     {
         return $this->frontendPaymentMethodRepository->getCurrentPaymentMethodsListForSwitch($currentPaymentMethodId, $orderId, $this->sessionStorage->getLang());
     }
-    
+
     /**
      * @param $paymentMethodId
      * @param int $orderId
@@ -642,21 +651,21 @@ class OrderService
             /** @var AuthHelper $authHelper */
             $authHelper = pluginApp(AuthHelper::class);
             $orderRepo = $this->orderRepository;
-            
+
             $order = $authHelper->processUnguarded( function() use ($orderId, $orderRepo)
             {
                 return $orderRepo->findOrderById($orderId);
             });
-			
+
 			if ($order->paymentStatus !== OrderPaymentStatus::UNPAID)
 			{
 				// order was paid
 				return false;
 			}
-			
+
 			$statusId = $order->statusId;
 			$orderCreatedDate = $order->createdAt;
-			
+
 			if(!($statusId <= 3.4 || ($statusId == 5 && $orderCreatedDate->toDateString() == date('Y-m-d'))))
 			{
 				return false;
@@ -664,8 +673,8 @@ class OrderService
 		}
 		return $this->frontendPaymentMethodRepository->getPaymentMethodSwitchFromById($paymentMethodId, $orderId);
 	}
-    
-    
+
+
     /**
      * @param $orderId
      * @param $paymentMethodId
@@ -676,19 +685,19 @@ class OrderService
         if((int)$orderId > 0)
         {
             $currentPaymentMethodId = 0;
-    
+
             /** @var AuthHelper $authHelper */
             $authHelper = pluginApp(AuthHelper::class);
             $orderRepo = $this->orderRepository;
-    
+
             $order = $authHelper->processUnguarded( function() use ($orderId, $orderRepo)
             {
                 return $orderRepo->findOrderById($orderId);
             });
-        
+
             $newOrderProperties = [];
             $orderProperties = $order->properties;
-        
+
             if(count($orderProperties))
             {
                 foreach($orderProperties as $key => $orderProperty)
@@ -704,7 +713,7 @@ class OrderService
                     }
                 }
             }
-        
+
             if($paymentMethodId !== $currentPaymentMethodId)
             {
                 if($this->frontendPaymentMethodRepository->getPaymentMethodSwitchableFromById($currentPaymentMethodId, $orderId) && $this->frontendPaymentMethodRepository->getPaymentMethodSwitchableToById($paymentMethodId))
@@ -713,7 +722,7 @@ class OrderService
                     {
                         return $orderRepo->updateOrder(['properties' => $newOrderProperties], $orderId);
                     });
-                    
+
                     if(!is_null($order))
                     {
                         return LocalizedOrder::wrap( $order, $this->sessionStorage->getLang() );
@@ -721,7 +730,7 @@ class OrderService
                 }
             }
         }
-    
+
         return null;
     }
 
