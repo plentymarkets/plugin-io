@@ -41,6 +41,13 @@ class Utils
         return $webstoreConfigService->getDefaultLanguage();
     }
 
+    public static function getLanguageList()
+    {
+        /** @var WebstoreConfigurationService $webstoreConfigService */
+        $webstoreConfigService = pluginApp(WebstoreConfigurationService::class);
+        return $webstoreConfigService->getActiveLanguageList();
+    }
+
     public static function isAdminPreview()
     {
         /** @var Application $app */
