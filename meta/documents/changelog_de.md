@@ -4,8 +4,8 @@
 
 ### Behoben 
 
-- Beim auflösen der URL, kam es beim ermitteln der Sprache zu Fehlern. Das Verhalten wurde behoben.
-- Beim Laden der mobilen Navigation kam es zu Fehlern. Das Verhalten wurde behoben.
+- Ein Fehler führte dazu, dass sprachspezifische URLs nicht korrekt ermittelt werden konnten. Dies wurde behoben.
+- Ein Fehler führte dazu, dass die mobile Navigation nicht richtig geladen wurde. Dies wurde behoben.
 
 ## v4.3.0 (2019-09-26) <a href="https://github.com/plentymarkets/plugin-io/compare/4.2.0...4.3.0" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
 
