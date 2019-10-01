@@ -1,5 +1,12 @@
 # Release Notes for IO
 
+## v4.3.1 (2019-10-01) <a href="https://github.com/plentymarkets/plugin-io/compare/4.3.0...4.3.1" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
+
+### Fixed
+
+- Due to an error, language-specific URLs could not be determined correctly. This has been fixed.
+- Due to an error, the mobile navigation could not be loaded correctly. This has been fixed.
+
 ## v4.3.0 (2019-09-26) <a href="https://github.com/plentymarkets/plugin-io/compare/4.2.0...4.3.0" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
 
 ### Added 
