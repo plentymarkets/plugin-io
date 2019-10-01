@@ -419,6 +419,7 @@ class CategoryService
             {
                 return count($category['details']);
             });
+            $tree = array_values($tree);
 
             return $this->filterBranchEntries($tree, $branch);
         }
@@ -436,7 +437,7 @@ class CategoryService
             {
                 return count($category['details']);
             });
-
+            $tree = array_values($tree);
             $siblingCount = count($tree);
 
             foreach($tree as $i => $category)
