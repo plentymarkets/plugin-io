@@ -70,7 +70,11 @@ class SessionStorageService
             {
                 /** @var Request $request */
                 $request = pluginApp(Request::class);
-                $this->language = $request->getLocale();
+                $splittedURL = explode('/', $request->get('plentyMarkets'));
+                if(strpos(end($splittedURL), '.') === false && in_array($splittedURL[0], Utils::getLanguageList()))
+                {
+                    $this->language = $splittedURL[0];
+                }
             }
 
             if(is_null($this->language) || !strlen($this->language))
