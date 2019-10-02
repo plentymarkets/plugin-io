@@ -38,6 +38,7 @@ class IORouteServiceProvider extends RouteServiceProvider
             $api->resource('io/order/property/file', 'OrderPropertyFileResource');
             $api->get('io/checkout', 'CheckoutResource@index');
             $api->resource('io/category/description', 'CategoryDescriptionResource');
+            $api->resource('io/customer', 'CustomerResource');
 			$api->resource('io/customer/login', 'CustomerAuthenticationResource');
 			$api->resource('io/customer/logout', 'CustomerLogoutResource');
 			$api->resource('io/customer/password', 'CustomerPasswordResource');
@@ -69,7 +70,6 @@ class IORouteServiceProvider extends RouteServiceProvider
             $api->post('io/order', 'OrderResource@store');
             $api->resource('io/order/payment', 'OrderPaymentResource');
             $api->resource('io/checkout/paymentId', 'CheckoutSetPaymentResource');
-            $api->resource('io/customer', 'CustomerResource');
             $api->resource('io/customer/address', 'CustomerAddressResource');
             $api->resource('io/checkout/shippingId', 'CheckoutSetShippingIdResource');
             $api->resource('io/order/contactWish', 'OrderContactWishResource');
