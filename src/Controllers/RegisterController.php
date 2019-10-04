@@ -3,6 +3,7 @@
 namespace IO\Controllers;
 
 use IO\Extensions\Constants\ShopUrls;
+use IO\Helper\RouteConfig;
 use IO\Services\UrlService;
 use Plenty\Modules\ShopBuilder\Helper\ShopBuilderRequest;
 use IO\Guards\AuthGuard;
@@ -50,5 +51,10 @@ class RegisterController extends LayoutController
 	public function redirectRegister(UrlService $urlService, ShopUrls $shopUrls)
     {
         return $urlService->redirectTo($shopUrls->registration);
+    }
+
+    public function redirect()
+    {
+        return pluginApp(CategoryController::class)->redirectRoute(RouteConfig::REGISTER);
     }
 }

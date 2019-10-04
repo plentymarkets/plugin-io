@@ -2,6 +2,7 @@
 namespace IO\Controllers;
 
 use IO\Extensions\Constants\ShopUrls;
+use IO\Helper\RouteConfig;
 
 /**
  * Class ConfirmationEmailController
@@ -28,6 +29,21 @@ class ConfirmationEmailController extends LayoutController
                 "data" => ''
             ],
             false
+        );
+    }
+
+    public function redirect($accessKey, $orderId)
+    {
+        /** @var CategoryController $categoryController */
+        $categoryController = pluginApp(CategoryController::class);
+
+        return $categoryController->redirectToCategory(
+            RouteConfig::getCategoryId(RouteConfig::CONFIRMATION),
+            '/confirmation',
+            [
+                'orderId' => $orderId,
+                'accessKey' => $accessKey
+            ]
         );
     }
 }

@@ -2,6 +2,7 @@
 namespace IO\Controllers;
 
 use IO\Extensions\Constants\ShopUrls;
+use IO\Helper\RouteConfig;
 use IO\Models\LocalizedOrder;
 use IO\Services\CustomerService;
 use IO\Services\OrderService;
@@ -81,5 +82,21 @@ class OrderReturnController extends LayoutController
             ],
             false
 		);
+    }
+
+    public function redirect($orderId = 0, $accessKey = '')
+    {
+        $returnsParams = [];
+        $returnsParams['orderId'] = $orderId;
+
+        if(strlen($accessKey))
+        {
+            $returnsParams['accessKey'] = $accessKey;
+        }
+
+        /** @var CategoryController $categoryController */
+        $categoryController = pluginApp(CategoryController::class);
+
+        return $categoryController->redirectToCategory(RouteConfig::getCategoryId(RouteConfig::ORDER_RETURN), '/returns', $returnsParams);
     }
 }
