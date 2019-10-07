@@ -349,7 +349,15 @@ class BasketService
             }
 
             $arr = $basketItem->toArray();
-            $arr["variation"] = $basketItemData[$basketItem->variationId];
+
+            if (array_key_exists($basketItem->variationId, $basketItemData))
+            {
+                $arr["variation"] = $basketItemData[$basketItem->variationId];
+            }else
+            {
+                $arr["variation"] = null;
+            }
+
 
             if ($sortOrderItems && array_key_exists($basketItem->variationId, $basketItemData))
             {
