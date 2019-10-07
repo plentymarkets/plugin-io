@@ -19,9 +19,11 @@ class ConfirmationEmailController extends LayoutController
         {
             /** @var ShopUrls $shopUrls */
             $shopUrls = pluginApp(ShopUrls::class);
-            return $this->urlService->redirectTo($shopUrls->confirmation . '/'.$orderId.'/'.$orderAccessKey);
+            $confirmationUrl = $shopUrls->confirmation . ($shopUrls->appendTrailingSlash ? '' : '/');
+
+            return $this->urlService->redirectTo($confirmationUrl.$orderId.'/'.$orderAccessKey);
         }
-        
+
         return $this->renderTemplate(
             "tpl.confirmation",
             [
