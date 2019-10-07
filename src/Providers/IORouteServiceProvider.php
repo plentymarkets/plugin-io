@@ -2,6 +2,7 @@
 
 namespace IO\Providers;
 
+use IO\Controllers\CategoryController;
 use IO\Extensions\Constants\ShopUrls;
 use IO\Helper\RouteConfig;
 use IO\Helper\Utils;
@@ -420,7 +421,12 @@ class IORouteServiceProvider extends RouteServiceProvider
             }
             $router->get(
                 Utils::makeRelativeUrl($shopUrl, false),
-                $redirectController
+                function() use ($route)
+                {
+                    /** @var CategoryController $categoryController */
+                    $categoryController = pluginApp(CategoryController::class);
+                    return $categoryController->showCategoryById( RouteConfig::getCategoryId($route) );
+                }
             );
         }
     }
