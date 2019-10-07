@@ -730,7 +730,7 @@ class BasketService
              * @var VariationDescription $texts
              */
 
-            $result[$basketItem->variationId]['data']['name'] = $variation->name ?? '';
+            $result[$basketItem->variationId]['data']['variation']['name'] = $variation->name ?? '';
             $result[$basketItem->variationId]['data']['texts']['name1'] = $texts->name ?? '';
             $result[$basketItem->variationId]['data']['texts']['name2'] = $texts->name2 ?? '';
             $result[$basketItem->variationId]['data']['texts']['name3'] = $texts->name3 ?? '';
