@@ -10,7 +10,7 @@ use Plenty\Plugin\Translation\Translator;
 class OrderFaker extends AbstractFaker
 {
     public $variations = [];
-
+    
     public function fill($data)
     {
         $orderId            = $this->number(1, 10000);
@@ -53,16 +53,16 @@ class OrderFaker extends AbstractFaker
             'systemAmount'      => $amount,
             'amount'            => $amount
         ];
-        
+
         $this->merge($data, $default);
         return $data;
     }
-    
+
     private function makeAddress()
     {
         /** @var Translator $translator */
         $translator = pluginApp(Translator::class);
-        
+
         return [
             'id'         => $this->number(0, 10000),
             'gender'     => 'male',
@@ -80,22 +80,22 @@ class OrderFaker extends AbstractFaker
             'stateId'    => null,
         ];
     }
-    
+
     private function makeOrderItems($orderId)
     {
         $itemSearchOptions = [
             'page'         => 1,
-            'itemsPerPage' => $this->number(1, 5),
+            'itemsPerPage' => 5,
             'sortingField' => 'item.random',
             'sortingOrder' => 'ASC'
         ];
-        
+
         /** @var ItemSearchService $itemSearchService */
         $itemSearchService = pluginApp( ItemSearchService::class );
         $itemResult = $itemSearchService->getResults(['items' => VariationList::getSearchFactory( $itemSearchOptions )]);
-        
+
         $orderItems = [];
-        
+
         foreach($itemResult['items']['documents'] as $itemData)
         {
             $item = $itemData['data'];
@@ -138,7 +138,7 @@ class OrderFaker extends AbstractFaker
                 ]
             ];
         }
-        
+
         return $orderItems;
     }
 
@@ -172,7 +172,7 @@ class OrderFaker extends AbstractFaker
             'shippingCostsNet'  => $shipping,
         ];
     }
-    
+
     private function makeProperties()
     {
         return [
