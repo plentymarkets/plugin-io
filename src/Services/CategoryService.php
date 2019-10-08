@@ -421,8 +421,16 @@ class CategoryService
             });
 
             $tree = array_values($tree);
+            $filteredTree = $this->filterBranchEntries($tree, $branch);
 
-            return $this->filterBranchEntries($tree, $branch);
+            if(count($filteredTree))
+            {
+                return $filteredTree;
+            }
+            else
+            {
+                return $this->getPartialTree(null, $type);
+            }
         }
         else
         {
