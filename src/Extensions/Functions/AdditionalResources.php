@@ -5,7 +5,6 @@ namespace IO\Extensions\Functions;
 use IO\Extensions\AbstractFunction;
 use IO\Helper\EventDispatcher;
 use IO\Helper\ResourceContainer;
-use Plenty\Plugin\Events\Dispatcher;
 
 class AdditionalResources extends AbstractFunction
 {

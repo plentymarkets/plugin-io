@@ -7,8 +7,8 @@ use Plenty\Plugin\Events\Dispatcher;
 
 class EventDispatcher
 {
-    private const EVENT_PREFIX = 'IO.';
-    private const INTERNAL_PREFIX = 'intl.';
+    const EVENT_PREFIX = 'IO.';
+    const INTERNAL_PREFIX = 'intl.';
 
     public static function fire($event, $payload = [])
     {
