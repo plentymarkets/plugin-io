@@ -222,7 +222,7 @@ class CategoryController extends LayoutController
                     $request->get('orderAccessKey', null)
                 );
             }
-            else
+            elseif(!$shopBuilderRequest->isShopBuilder())
             {
                 /** @var Response $response */
                 $response = pluginApp(Response::class);
