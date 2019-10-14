@@ -215,6 +215,8 @@ abstract class LayoutController extends Controller
                 ]
             );
         }
+
+        return '';
 	}
 
     /**
