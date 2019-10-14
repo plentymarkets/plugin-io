@@ -1,13 +1,16 @@
 <?php //strict
 namespace IO\Controllers;
 
+use IO\Constants\SessionStorageKeys;
 use IO\Extensions\Constants\ShopUrls;
 use IO\Models\LocalizedOrder;
 use IO\Services\CustomerService;
 use IO\Services\OrderService;
 use IO\Guards\AuthGuard;
+use IO\Services\SessionStorageService;
 use Plenty\Plugin\Http\Response;
 use Plenty\Plugin\Log\Loggable;
+use Zend\Session\Storage\SessionStorage;
 
 /**
  * Class OrderReturnController
@@ -28,8 +31,16 @@ class OrderReturnController extends LayoutController
      */
     public function showOrderReturn($orderId, $orderAccessKey = null)
     {
-
-        if(pluginApp(CustomerService::class)->getContactId() <= 0 && !strlen($orderAccessKey))
+        /** @var SessionStorageService $sessionStorageService */
+        $sessionStorageService = pluginApp(SessionStorageService::class);
+        $sessionOrder = $sessionStorageService->getSessionValue(SessionStorageKeys::LAST_ACCESSED_ORDER);
+        
+        if((int)$sessionOrder['orderId'] == (int)$orderId)
+        {
+            $orderAccessKey = $sessionOrder['accessKey'];
+        }
+        
+        if( pluginApp(CustomerService::class)->getContactId() <= 0 && !strlen($orderAccessKey))
         {
             AuthGuard::redirect(
                 pluginApp(ShopUrls::class)->login,
