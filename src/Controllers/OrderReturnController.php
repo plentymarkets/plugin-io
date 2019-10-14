@@ -10,7 +10,6 @@ use IO\Guards\AuthGuard;
 use IO\Services\SessionStorageService;
 use Plenty\Plugin\Http\Response;
 use Plenty\Plugin\Log\Loggable;
-use Zend\Session\Storage\SessionStorage;
 
 /**
  * Class OrderReturnController
