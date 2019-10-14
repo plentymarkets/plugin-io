@@ -39,7 +39,7 @@ class OrderReturnController extends LayoutController
             $orderAccessKey = $sessionOrder['accessKey'];
         }
         
-        if( pluginApp(CustomerService::class)->getContactId() <= 0 && !strlen($orderAccessKey))
+        if(pluginApp(CustomerService::class)->getContactId() <= 0 && !strlen($orderAccessKey))
         {
             AuthGuard::redirect(
                 pluginApp(ShopUrls::class)->login,
