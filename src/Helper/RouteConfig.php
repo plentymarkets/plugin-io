@@ -62,6 +62,7 @@ class RouteConfig
                     self::MY_ACCOUNT,
                     self::NEWSLETTER_OPT_IN,
                     self::NEWSLETTER_OPT_OUT,
+                    self::ORDER_DOCUMENT,
                     self::ORDER_PROPERTY_FILE,
                     self::ORDER_RETURN,
                     self::ORDER_RETURN_CONFIRMATION,
