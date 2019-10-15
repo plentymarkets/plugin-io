@@ -59,9 +59,10 @@ class PluginConfig
     protected function getBooleanValue( $key, $default = false )
     {
         $value = $this->getConfigValue($key);
-        if ( $value === "true" || $value === "false" )
+
+        if ( $value === "true" || $value === "false"  || $value === "1" || $value === "0" || $value === 1 || $value === 0)
         {
-            return $value === "true";
+            return $value === "true" || $value === "1" || $value === 1;
         }
 
         return $default;
