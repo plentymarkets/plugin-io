@@ -2,6 +2,8 @@
 namespace IO\Controllers;
 
 use IO\Extensions\Constants\ShopUrls;
+use IO\Helper\RouteConfig;
+use IO\Services\UrlBuilder\UrlQuery;
 
 /**
  * Class ConfirmationEmailController
@@ -19,9 +21,22 @@ class ConfirmationEmailController extends LayoutController
         {
             /** @var ShopUrls $shopUrls */
             $shopUrls = pluginApp(ShopUrls::class);
-            return $this->urlService->redirectTo($shopUrls->confirmation . '/'.$orderId.'/'.$orderAccessKey);
+
+            /** @var UrlQuery $urlQuery */
+            $urlQuery = pluginApp(UrlQuery::class, ['path' => $shopUrls->confirmation]);
+            if(RouteConfig::getCategoryId(RouteConfig::CONFIRMATION) > 0)
+            {
+                $params = '?'.http_build_query(['orderId' => $orderId, 'accessKey' => $orderAccessKey]);
+            }
+            else
+            {
+                $params = '';
+                $urlQuery->join($orderId.'/'.$orderAccessKey);
+            }
+
+            return $this->urlService->redirectTo($urlQuery->toRelativeUrl().$params);
         }
-        
+
         return $this->renderTemplate(
             "tpl.confirmation",
             [

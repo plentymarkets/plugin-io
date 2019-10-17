@@ -38,6 +38,7 @@ class IORouteServiceProvider extends RouteServiceProvider
             $api->resource('io/order/property/file', 'OrderPropertyFileResource');
             $api->get('io/checkout', 'CheckoutResource@index');
             $api->resource('io/category/description', 'CategoryDescriptionResource');
+            $api->resource('io/customer', 'CustomerResource');
 			$api->resource('io/customer/login', 'CustomerAuthenticationResource');
 			$api->resource('io/customer/logout', 'CustomerLogoutResource');
 			$api->resource('io/customer/password', 'CustomerPasswordResource');
@@ -69,7 +70,6 @@ class IORouteServiceProvider extends RouteServiceProvider
             $api->post('io/order', 'OrderResource@store');
             $api->resource('io/order/payment', 'OrderPaymentResource');
             $api->resource('io/checkout/paymentId', 'CheckoutSetPaymentResource');
-            $api->resource('io/customer', 'CustomerResource');
             $api->resource('io/customer/address', 'CustomerAddressResource');
             $api->resource('io/checkout/shippingId', 'CheckoutSetShippingIdResource');
             $api->resource('io/order/contactWish', 'OrderContactWishResource');
@@ -162,16 +162,22 @@ class IORouteServiceProvider extends RouteServiceProvider
             $shopUrls->checkout,
             'IO\Controllers\CheckoutController@showCheckout'
         );
-
+        
         // CONFIRMATION
-        if ( RouteConfig::isActive(RouteConfig::CONFIRMATION) )
+        if(RouteConfig::isActive(RouteConfig::CONFIRMATION)
+            || in_array(RouteConfig::CONFIRMATION, RouteConfig::getEnabledRoutes())
+            || RouteConfig::getCategoryId(RouteConfig::CONFIRMATION) > 0)
         {
-            //Confirmation route
-            $router->get('confirmation/{orderId?}/{orderAccessKey?}', 'IO\Controllers\ConfirmationController@showConfirmation');
             $router->get('-/akQQ{orderAccessKey}/idQQ{orderId}', 'IO\Controllers\ConfirmationEmailController@showConfirmation');
             $router->get('_py-/akQQ{orderAccessKey}/idQQ{orderId}', 'IO\Controllers\ConfirmationEmailController@showConfirmation');
             $router->get('_py_/akQQ{orderAccessKey}/idQQ{orderId}', 'IO\Controllers\ConfirmationEmailController@showConfirmation');
             $router->get('_plentyShop__/akQQ{orderAccessKey}/idQQ{orderId}', 'IO\Controllers\ConfirmationEmailController@showConfirmation');
+        }
+        
+        if ( RouteConfig::isActive(RouteConfig::CONFIRMATION) )
+        {
+            //Confirmation route
+            $router->get('confirmation/{orderId?}/{orderAccessKey?}', 'IO\Controllers\ConfirmationController@showConfirmation');
         }
         else if( in_array(RouteConfig::CONFIRMATION, RouteConfig::getEnabledRoutes())
             && RouteConfig::getCategoryId(RouteConfig::CONFIRMATION) > 0
@@ -192,35 +198,6 @@ class IORouteServiceProvider extends RouteServiceProvider
                 $categoryController = pluginApp(CategoryController::class);
 
                 return $categoryController->redirectToCategory(RouteConfig::getCategoryId(RouteConfig::CONFIRMATION), '/confirmation', $confirmationParams);
-            });
-
-            $router->get('-/akQQ{orderAccessKey}/idQQ{orderId}', function($accessKey, $orderId) use ($shopUrls)
-            {
-                /** @var CategoryController $categoryController */
-                $categoryController = pluginApp(CategoryController::class);
-
-                return $categoryController->redirectToCategory(RouteConfig::getCategoryId(RouteConfig::CONFIRMATION), '/confirmation', ['orderId' => $orderId, 'accessKey' => $accessKey]);
-            });
-            $router->get('_py-/akQQ{orderAccessKey}/idQQ{orderId}', function($accessKey, $orderId) use ($shopUrls)
-            {
-                /** @var CategoryController $categoryController */
-                $categoryController = pluginApp(CategoryController::class);
-
-                return $categoryController->redirectToCategory(RouteConfig::getCategoryId(RouteConfig::CONFIRMATION), '/confirmation', ['orderId' => $orderId, 'accessKey' => $accessKey]);
-            });
-            $router->get('_py_/akQQ{orderAccessKey}/idQQ{orderId}', function($accessKey, $orderId) use ($shopUrls)
-            {
-                /** @var CategoryController $categoryController */
-                $categoryController = pluginApp(CategoryController::class);
-
-                return $categoryController->redirectToCategory(RouteConfig::getCategoryId(RouteConfig::CONFIRMATION), '/confirmation', ['orderId' => $orderId, 'accessKey' => $accessKey]);
-            });
-            $router->get('_plentyShop__/akQQ{orderAccessKey}/idQQ{orderId}', function($accessKey, $orderId) use ($shopUrls)
-            {
-                /** @var CategoryController $categoryController */
-                $categoryController = pluginApp(CategoryController::class);
-
-                return $categoryController->redirectToCategory(RouteConfig::getCategoryId(RouteConfig::CONFIRMATION), '/confirmation', ['orderId' => $orderId, 'accessKey' => $accessKey]);
             });
         }
 

@@ -1,5 +1,11 @@
 # Release Notes für IO
 
+## v4.3.2 (2019-10-02) <a href="https://github.com/plentymarkets/plugin-io/compare/4.3.1...4.3.2" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
+
+### Behoben
+
+- Durch einen Fehler war die Registrierungsseite nicht mehr über den Header des Shops erreichbar. Dies wurde behoben.
+
 ## v4.3.1 (2019-10-1) <a href="https://github.com/plentymarkets/plugin-io/compare/4.3.0...4.3.01" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
 
 ### Behoben
