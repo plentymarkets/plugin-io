@@ -90,6 +90,7 @@ class OrderItemBuilder
         $maxVatRate      = 0;
 
         $itemsWithoutStock = [];
+        $depositItems = [];
         
         foreach($items as $item)
 		{
@@ -101,6 +102,39 @@ class OrderItemBuilder
             try
             {
                 array_push($orderItems, $this->basketItemToOrderItem($item, $basket->basketRebate));
+    
+                //convert deposit properties to order items
+                if(count($item['variation']['data']['properties']))
+                {
+                    foreach($item['variation']['data']['properties'] as $property)
+                    {
+                        if($property['property']['isShownAsAdditionalCosts'] && !$property['property']['isOderProperty'])
+                        {
+                            if(array_key_exists($property['propertyId'], $depositItems))
+                            {
+                                $depositItems[$property['propertyId']]['quantity'] += $item['quantity'];
+                            }
+                            else
+                            {
+                                $depositItem = [
+                                    "typeId"          => OrderItemType::DEPOSIT,
+                                    "referrerId"      => $basket->basketItems->first()->referrerId,
+                                    "quantity"        => $item['quantity'],
+                                    "orderItemName"   => $property['property']['backendName'] ?? 'deposit',
+                                    "itemVariationId" => -2,
+                                    "amounts"         => [
+                                        [
+                                            "currency"           => $this->checkoutService->getCurrency(),
+                                            "priceOriginalGross" => $property['property']['surcharge']
+                                        ]
+                                    ]
+                                ];
+                                
+                                $depositItems[$property['propertyId']] = $depositItem;
+                            }
+                        }
+                    }
+                }
             }
 			catch(BasketItemCheckException $exception)
             {
@@ -136,6 +170,15 @@ class OrderItemBuilder
             }
             
             throw pluginApp(BasketItemCheckException::class, [BasketItemCheckException::NOT_ENOUGH_STOCK_FOR_ITEM]);
+        }
+        
+		// add deposit items
+        if(count($depositItems))
+        {
+            foreach($depositItems as $depositBasketItem)
+            {
+                array_push($orderItems, $depositBasketItem);
+            }
         }
         
 		$shippingAmount = $basket->shippingAmount;
@@ -176,7 +219,6 @@ class OrderItemBuilder
 			]
 		];
 		array_push($orderItems, $paymentSurcharge);
-
 
 		return $orderItems;
 	}
