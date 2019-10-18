@@ -65,6 +65,11 @@ class BasketService
      */
     private $couponService;
 
+    /**
+     * @var WebstoreConfigurationService $webstoreConfigurationService
+     */
+    private $webstoreConfigurationService;
+
     private $basketItems;
     private $template = '';
 
@@ -77,6 +82,7 @@ class BasketService
      * @param BasketRepositoryContract $basketRepository
      * @param VatInitContract $vatInitService
      * @param CouponService $couponService
+     * @param WebstoreConfigurationService $webstoreConfigurationService
      */
     public function __construct(
         BasketItemRepositoryContract $basketItemRepository,
@@ -85,7 +91,8 @@ class BasketService
         CustomerService $customerService,
         BasketRepositoryContract $basketRepository,
         VatInitContract $vatInitService,
-        CouponService $couponService)
+        CouponService $couponService,
+        WebstoreConfigurationService $webstoreConfigurationService)
     {
         $this->basketItemRepository = $basketItemRepository;
         $this->checkout             = $checkout;
@@ -93,6 +100,7 @@ class BasketService
         $this->customerService      = $customerService;
         $this->basketRepository     = $basketRepository;
         $this->couponService        = $couponService;
+        $this->webstoreConfigurationService = $webstoreConfigurationService;
 
         if(!$vatInitService->isInitialized())
         {
@@ -139,7 +147,7 @@ class BasketService
 
         $basket = $this->couponService->checkCoupon($basket);
 
-        $basket["isExportDelivery"] = $euCountryService->isExportDelivery($basket["shippingCountryId"]);
+        $basket["isExportDelivery"] = $euCountryService->isExportDelivery($basket["shippingCountryId"] ?? $this->webstoreConfigurationService->getDefaultShippingCountryId());
         $basket["shopCountryId"] = $determineShopCountry->getCountryId();
 
         $basket["itemWishListIds"] = $wishListService->getItemWishList();
