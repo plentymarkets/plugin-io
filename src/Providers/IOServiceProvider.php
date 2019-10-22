@@ -138,6 +138,11 @@ class IOServiceProvider extends ServiceProvider
             /** @var CustomerService $customerService */
             $customerService = pluginApp(CustomerService::class);
             $customerService->resetGuestAddresses();
+
+              /** @var CheckoutService $checkoutService */
+            $checkoutService = pluginApp(CheckoutService::class);
+            //validate methodOfPayment
+            $methodOfPaymentId = $checkoutService->getMethodOfPaymentId();
         });
 
         $dispatcher->listen(BeforeBasketItemToOrderItem::class, CheckItemStock::class);
