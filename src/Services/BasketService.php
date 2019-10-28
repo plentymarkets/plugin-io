@@ -726,23 +726,25 @@ class BasketService
         $result = [];
         foreach ($basketItems as $basketItem)
         {
-            $variation = $variationRepository->findById($basketItem->variationId);
             /**
              * @var Variation $variation
+             */
+            $variation = $variationRepository->findById($basketItem->variationId);
+    
+            /**
+             * @var VariationDescription $texts
              */
             $texts = $authHelper->processUnguarded(function() use ($variationDescriptionRepository, $basketItem, $lang)
             {
                 return $variationDescriptionRepository->find($basketItem->variationId, $lang);
             });
-            /**
-             * @var VariationDescription $texts
-             */
 
             $result[$basketItem->variationId]['data']['variation']['name'] = $variation->name ?? '';
             $result[$basketItem->variationId]['data']['texts']['name1'] = $texts->name ?? '';
             $result[$basketItem->variationId]['data']['texts']['name2'] = $texts->name2 ?? '';
             $result[$basketItem->variationId]['data']['texts']['name3'] = $texts->name3 ?? '';
             $result[$basketItem->variationId]['data']['variation']['vatId'] = $variation->vatId ?? $variation->parent->vatId;
+            $result[$basketItem->variationId]['data']['properties'] = $variation->variationProperties->toArray();
         }
 
         return $result;
