@@ -27,6 +27,8 @@ class ContactController extends LayoutController
 
     public function redirect()
     {
-        return pluginApp(CategoryController::class)->redirectRoute(RouteConfig::CONTACT);
+        /** @var CategoryController $categoryController */
+        $categoryController = pluginApp(CategoryController::class);
+        return $categoryController->redirectRoute(RouteConfig::CONTACT);
     }
 }

@@ -36,6 +36,8 @@ class BasketController extends LayoutController
 
 	public function redirect()
     {
-        return pluginApp(CategoryController::class)->redirectRoute(RouteConfig::BASKET);
+        /** @var CategoryController $categoryController */
+        $categoryController = pluginApp(CategoryController::class);
+        return $categoryController->redirectRoute(RouteConfig::BASKET);
     }
 }

@@ -55,6 +55,8 @@ class RegisterController extends LayoutController
 
     public function redirect()
     {
-        return pluginApp(CategoryController::class)->redirectRoute(RouteConfig::REGISTER);
+        /** @var CategoryController $categoryController */
+        $categoryController = pluginApp(CategoryController::class);
+        return $categoryController->redirectRoute(RouteConfig::REGISTER);
     }
 }

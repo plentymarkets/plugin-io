@@ -43,6 +43,8 @@ class MyAccountController extends LayoutController
 
     public function redirect()
     {
-        return pluginApp(CategoryController::class)->redirectRoute(RouteConfig::MY_ACCOUNT);
+        /** @var CategoryController $categoryController */
+        $categoryController = pluginApp(CategoryController::class);
+        return $categoryController->redirectRoute(RouteConfig::MY_ACCOUNT);
     }
 }

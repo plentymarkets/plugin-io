@@ -52,7 +52,9 @@ class StaticPagesController extends LayoutController
      */
     public function redirectCancellationForm()
     {
-        return pluginApp(CategoryController::class)->redirectRoute(RouteConfig::CANCELLATION_FORM);
+        /** @var CategoryController $categoryController */
+        $categoryController = pluginApp(CategoryController::class);
+        return $categoryController->redirectRoute(RouteConfig::CANCELLATION_FORM);
     }
 
     /**
@@ -75,7 +77,9 @@ class StaticPagesController extends LayoutController
      */
     public function redirectLegalDisclosure()
     {
-        return pluginApp(CategoryController::class)->redirectRoute(RouteConfig::LEGAL_DISCLOSURE);
+        /** @var CategoryController $categoryController */
+        $categoryController = pluginApp(CategoryController::class);
+        return $categoryController->redirectRoute(RouteConfig::LEGAL_DISCLOSURE);
     }
 
     /**
@@ -98,7 +102,9 @@ class StaticPagesController extends LayoutController
      */
     public function redirectPrivacyPolicy()
     {
-        return pluginApp(CategoryController::class)->redirectRoute(RouteConfig::PRIVACY_POLICY);
+        /** @var CategoryController $categoryController */
+        $categoryController = pluginApp(CategoryController::class);
+        return $categoryController->redirectRoute(RouteConfig::PRIVACY_POLICY);
     }
 
     /**
@@ -121,7 +127,9 @@ class StaticPagesController extends LayoutController
      */
     public function redirectTermsAndConditions()
     {
-        return pluginApp(CategoryController::class)->redirectRoute(RouteConfig::TERMS_CONDITIONS);
+        /** @var CategoryController $categoryController */
+        $categoryController = pluginApp(CategoryController::class);
+        return $categoryController->redirectRoute(RouteConfig::TERMS_CONDITIONS);
     }
 
     /**
@@ -145,6 +153,8 @@ class StaticPagesController extends LayoutController
      */
     public function redirectPageNotFound()
     {
-        return pluginApp(CategoryController::class)->redirectRoute(RouteConfig::PAGE_NOT_FOUND);
+        /** @var CategoryController $categoryController */
+        $categoryController = pluginApp(CategoryController::class);
+        return $categoryController->redirectRoute(RouteConfig::PAGE_NOT_FOUND);
     }
 }

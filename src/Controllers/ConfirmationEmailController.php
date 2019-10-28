@@ -3,6 +3,7 @@ namespace IO\Controllers;
 
 use IO\Extensions\Constants\ShopUrls;
 use IO\Helper\RouteConfig;
+use IO\Services\UrlBuilder\UrlQuery;
 
 /**
  * Class ConfirmationEmailController
@@ -20,9 +21,20 @@ class ConfirmationEmailController extends LayoutController
         {
             /** @var ShopUrls $shopUrls */
             $shopUrls = pluginApp(ShopUrls::class);
-            $confirmationUrl = $shopUrls->confirmation . ($shopUrls->appendTrailingSlash ? '' : '/');
 
-            return $this->urlService->redirectTo($confirmationUrl.$orderId.'/'.$orderAccessKey);
+            /** @var UrlQuery $urlQuery */
+            $urlQuery = pluginApp(UrlQuery::class, ['path' => $shopUrls->confirmation]);
+            if(RouteConfig::getCategoryId(RouteConfig::CONFIRMATION) > 0)
+            {
+                $params = '?'.http_build_query(['orderId' => $orderId, 'accessKey' => $orderAccessKey]);
+            }
+            else
+            {
+                $params = '';
+                $urlQuery->join($orderId.'/'.$orderAccessKey);
+            }
+
+            return $this->urlService->redirectTo($urlQuery->toRelativeUrl().$params);
         }
 
         return $this->renderTemplate(
@@ -31,21 +43,6 @@ class ConfirmationEmailController extends LayoutController
                 "data" => ''
             ],
             false
-        );
-    }
-
-    public function redirect($accessKey, $orderId)
-    {
-        /** @var CategoryController $categoryController */
-        $categoryController = pluginApp(CategoryController::class);
-
-        return $categoryController->redirectToCategory(
-            RouteConfig::getCategoryId(RouteConfig::CONFIRMATION),
-            '/confirmation',
-            [
-                'orderId' => $orderId,
-                'accessKey' => $accessKey
-            ]
         );
     }
 }

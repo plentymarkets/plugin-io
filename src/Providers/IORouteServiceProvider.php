@@ -146,16 +146,22 @@ class IORouteServiceProvider extends RouteServiceProvider
             'IO\Controllers\CheckoutController@showCheckout',
             'IO\Controllers\CheckoutController@redirect'
         );
-
+        
         // CONFIRMATION
-        if ( RouteConfig::isActive(RouteConfig::CONFIRMATION) )
+        if(RouteConfig::isActive(RouteConfig::CONFIRMATION)
+            || in_array(RouteConfig::CONFIRMATION, RouteConfig::getEnabledRoutes())
+            || RouteConfig::getCategoryId(RouteConfig::CONFIRMATION) > 0)
         {
-            //Confirmation route
-            $router->get('confirmation/{orderId?}/{orderAccessKey?}', 'IO\Controllers\ConfirmationController@showConfirmation');
             $router->get('-/akQQ{orderAccessKey}/idQQ{orderId}', 'IO\Controllers\ConfirmationEmailController@showConfirmation');
             $router->get('_py-/akQQ{orderAccessKey}/idQQ{orderId}', 'IO\Controllers\ConfirmationEmailController@showConfirmation');
             $router->get('_py_/akQQ{orderAccessKey}/idQQ{orderId}', 'IO\Controllers\ConfirmationEmailController@showConfirmation');
             $router->get('_plentyShop__/akQQ{orderAccessKey}/idQQ{orderId}', 'IO\Controllers\ConfirmationEmailController@showConfirmation');
+        }
+        
+        if ( RouteConfig::isActive(RouteConfig::CONFIRMATION) )
+        {
+            //Confirmation route
+            $router->get('confirmation/{orderId?}/{orderAccessKey?}', 'IO\Controllers\ConfirmationController@showConfirmation');
         }
         else if( in_array(RouteConfig::CONFIRMATION, RouteConfig::getEnabledRoutes())
             && RouteConfig::getCategoryId(RouteConfig::CONFIRMATION) > 0
@@ -163,13 +169,6 @@ class IORouteServiceProvider extends RouteServiceProvider
         {
             // confirmation-route is activated and category is linked and category url is not '/confirmation'
             $router->get('confirmation/{orderId?}/{orderAccessKey?}', 'IO\Controllers\ConfirmationController@redirect');
-
-            $confirmationEmailAction = 'IO\Controllers\ConfirmationEmailController@redirect';
-
-            $router->get('-/akQQ{orderAccessKey}/idQQ{orderId}', $confirmationEmailAction);
-            $router->get('_py-/akQQ{orderAccessKey}/idQQ{orderId}', $confirmationEmailAction);
-            $router->get('_py_/akQQ{orderAccessKey}/idQQ{orderId}', $confirmationEmailAction);
-            $router->get('_plentyShop__/akQQ{orderAccessKey}/idQQ{orderId}', $confirmationEmailAction);
         }
 
         // CONTACT
