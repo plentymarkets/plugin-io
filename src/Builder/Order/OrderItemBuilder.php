@@ -90,7 +90,7 @@ class OrderItemBuilder
         $maxVatRate      = 0;
 
         $itemsWithoutStock = [];
-        $depositItems = [];
+        $taxFreeItems = [];
         
         foreach($items as $item)
 		{
@@ -103,25 +103,26 @@ class OrderItemBuilder
             {
                 array_push($orderItems, $this->basketItemToOrderItem($item, $basket->basketRebate));
     
-                //convert deposit properties to order items
+                //convert tax free properties to order items
                 if(count($item['variation']['data']['properties']))
                 {
                     foreach($item['variation']['data']['properties'] as $property)
                     {
                         if($property['property']['isShownAsAdditionalCosts'] && !$property['property']['isOderProperty'])
                         {
-                            if(array_key_exists($property['propertyId'], $depositItems))
+                            if(array_key_exists($property['propertyId'], $taxFreeItems))
                             {
-                                $depositItems[$property['propertyId']]['quantity'] += $item['quantity'];
+                                $taxFreeItems[$property['propertyId']]['quantity'] += $item['quantity'];
                             }
                             else
                             {
-                                $depositItem = [
+                                $taxFreeItem = [
+                                    "itemId"          => -2,
+                                    "itemVariationId" => -2,
                                     "typeId"          => OrderItemType::DEPOSIT,
                                     "referrerId"      => $basket->basketItems->first()->referrerId,
                                     "quantity"        => $item['quantity'],
-                                    "orderItemName"   => $property['property']['backendName'] ?? 'deposit',
-                                    "itemVariationId" => -2,
+                                    "orderItemName"   => $property['property']['backendName'] ?? 'tax free item',
                                     "amounts"         => [
                                         [
                                             "currency"           => $this->checkoutService->getCurrency(),
@@ -130,7 +131,7 @@ class OrderItemBuilder
                                     ]
                                 ];
                                 
-                                $depositItems[$property['propertyId']] = $depositItem;
+                                $taxFreeItems[$property['propertyId']] = $taxFreeItem;
                             }
                         }
                     }
@@ -172,12 +173,12 @@ class OrderItemBuilder
             throw pluginApp(BasketItemCheckException::class, [BasketItemCheckException::NOT_ENOUGH_STOCK_FOR_ITEM]);
         }
         
-		// add deposit items
-        if(count($depositItems))
+		// add tax free items
+        if(count($taxFreeItems))
         {
-            foreach($depositItems as $depositBasketItem)
+            foreach($taxFreeItems as $taxFreeOrderItem)
             {
-                array_push($orderItems, $depositBasketItem);
+                array_push($orderItems, $taxFreeOrderItem);
             }
         }
         
