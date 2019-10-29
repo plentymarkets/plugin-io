@@ -20,7 +20,7 @@ use Plenty\Plugin\Log\Loggable;
 class PlaceOrderController extends LayoutController
 {
     const ORDER_RETRY_INTERVAL = 30;
-    
+
     use Loggable;
 
     /**
@@ -38,7 +38,7 @@ class PlaceOrderController extends LayoutController
     {
         $request = pluginApp(Request::class);
         $redirectParam = $request->get('redirectParam', '');
-        
+
         try
         {
             //check if an order has already been placed in the last 30 seconds
@@ -51,17 +51,17 @@ class PlaceOrderController extends LayoutController
                 $urlParams = [];
                 $url = "execute-payment/" . $orderData->order->id;
                 $url .= UrlQuery::shouldAppendTrailingSlash() ? '/' : '';
-                
+
                 if(strlen($redirectParam))
                 {
                     $urlParams['redirectParam'] = $redirectParam;
                 }
-                
+
                 if($sessionStorageService->getSessionValue(SessionStorageKeys::READONLY_CHECKOUT) === true)
                 {
                     $urlParams['readonlyCheckout'] = true;
                 }
-                
+
                 if(count($urlParams))
                 {
                     $paramString = http_build_query($urlParams);
@@ -70,14 +70,14 @@ class PlaceOrderController extends LayoutController
                         $url .= '?'.$paramString;
                     }
                 }
-    
+
                 return $this->urlService->redirectTo($url);
             }
             else
             {
                 throw new \Exception('order retry time not reached', 115);
             }
-            
+
         }
         catch(BasketItemCheckException $exception)
         {
@@ -92,7 +92,11 @@ class PlaceOrderController extends LayoutController
             {
                 $notificationService->warn('not enough stock for item', 9);
             }
-            
+            else if($exception->getCode() == BasketItemCheckException::COUPON_REQUIRED)
+            {
+                $notificationService->error('promotion coupon required', 501);
+            }
+
             return $this->urlService->redirectTo($shopUrls->checkout);
         }
         catch (\Exception $exception)

@@ -14,6 +14,9 @@ use Plenty\Modules\Frontend\PaymentMethod\Contracts\FrontendPaymentMethodReposit
 use Plenty\Modules\Frontend\Services\OrderPropertyFileService;
 use Plenty\Modules\Frontend\Services\VatService;
 use Plenty\Modules\Accounting\Vat\Contracts\VatRepositoryContract;
+use Plenty\Modules\Item\Item\Contracts\ItemRepositoryContract;
+use Plenty\Modules\Order\Coupon\Campaign\Contracts\CouponCampaignRepositoryContract;
+use Plenty\Modules\Order\Coupon\Campaign\Models\CouponCampaign;
 use Plenty\Modules\Order\Property\Models\OrderPropertyType;
 use Plenty\Modules\System\Contracts\WebstoreRepositoryContract;
 use Plenty\Modules\Accounting\Vat\Models\Vat;
@@ -54,6 +57,16 @@ class OrderItemBuilder
     private $customerService;
 
     /**
+     * @var ItemRepositoryContract
+     */
+    private $itemRepository;
+
+    /**
+     * @var CouponCampaignRepositoryContract
+     */
+    private $couponRepository;
+
+    /**
      * OrderItemBuilder constructor.
      *
      * @param CheckoutService $checkoutService
@@ -61,6 +74,9 @@ class OrderItemBuilder
      * @param ItemNameFilter $itemNameFilter
      * @param WebstoreRepositoryContract $webstoreRepository
      * @param VatRepositoryContract $vatRepository
+     * @param CustomerService $customerService
+     * @param ItemRepositoryContract $itemRepository
+     * @param CouponCampaignRepositoryContract $couponRepository
      */
 	public function __construct(
 	    CheckoutService $checkoutService,
@@ -68,7 +84,9 @@ class OrderItemBuilder
         ItemNameFilter $itemNameFilter,
         WebstoreRepositoryContract $webstoreRepository,
         VatRepositoryContract $vatRepository,
-        CustomerService $customerService)
+        CustomerService $customerService,
+        ItemRepositoryContract $itemRepository,
+        CouponCampaignRepositoryContract $couponRepository)
 	{
 		$this->checkoutService = $checkoutService;
 		$this->vatService = $vatService;
@@ -76,6 +94,8 @@ class OrderItemBuilder
         $this->vatRepository = $vatRepository;
         $this->itemNameFilter = $itemNameFilter;
         $this->customerService = $customerService;
+        $this->itemRepository = $itemRepository;
+        $this->couponRepository = $couponRepository;
 	}
 
 	/**
@@ -89,15 +109,24 @@ class OrderItemBuilder
 		$orderItems      = [];
         $maxVatRate      = 0;
 
-        $itemsWithoutStock = [];
-        
+        $itemsWithCouponRestriction = [];
+        $itemsWithoutStock          = [];
+
         foreach($items as $item)
 		{
+		    $itemData = $this->itemRepository->show($item["itemId"], ["couponRestriction"]);
+            $couponRestriction = $itemData["couponRestriction"];
+
+            if ($couponRestriction === 2)
+            {
+                $itemsWithCouponRestriction[] = $item;
+            }
+
             if($maxVatRate < $item['vat'])
             {
                 $maxVatRate = $item['vat'];
             }
-            
+
             try
             {
                 array_push($orderItems, $this->basketItemToOrderItem($item, $basket->basketRebate));
@@ -115,15 +144,15 @@ class OrderItemBuilder
         {
             /** @var BasketService $basketService */
             $basketService = pluginApp(BasketService::class);
-            
+
             foreach($itemsWithoutStock as $itemWithoutStock)
             {
                 $updatedItem = array_shift(array_filter($items, function($filterItem) use ($itemWithoutStock) {
                     return $filterItem['id'] == $itemWithoutStock['item']['id'];
                 }));
-         
+
                 $quantity = $itemWithoutStock['stockNet'];
-                
+
                 if($quantity <= 0 && (int)$updatedItem['id'] > 0)
                 {
                     $basketService->deleteBasketItem($updatedItem['id']);
@@ -134,10 +163,23 @@ class OrderItemBuilder
                     $basketService->updateBasketItem($updatedItem['id'], $updatedItem);
                 }
             }
-            
+
             throw pluginApp(BasketItemCheckException::class, [BasketItemCheckException::NOT_ENOUGH_STOCK_FOR_ITEM]);
         }
-        
+
+		$couponTypeIsPromotion = false;
+		$campaign = $this->couponRepository->findByCouponCode($basket["couponCode"]);
+
+		if($campaign instanceof CouponCampaign)
+        {
+            $couponTypeIsPromotion = $campaign->couponType === CouponCampaign::COUPON_TYPE_PROMOTION;
+        }
+
+		if(count($itemsWithCouponRestriction) && !$couponTypeIsPromotion)
+        {
+            throw pluginApp(BasketItemCheckException::class, [BasketItemCheckException::COUPON_REQUIRED]);
+        }
+
 		$shippingAmount = $basket->shippingAmount;
 
 		// add shipping costs
@@ -195,17 +237,17 @@ class OrderItemBuilder
         $checkStockBasketItem->orderRowId  = $basketItem['orderRowId'];
         $checkStockBasketItem->quantity    = $basketItem['quantity'];
         $checkStockBasketItem->id          = $basketItem['id'];
-        
+
         /** @var Dispatcher $eventDispatcher */
         $eventDispatcher = pluginApp(Dispatcher::class);
         $eventDispatcher->fire(pluginApp(BeforeBasketItemToOrderItem::class, [$checkStockBasketItem]));
-	    
+
         $basketItemProperties = [];
         if(count($basketItem['basketItemOrderParams']))
         {
             /** @var OrderPropertyFileService $orderPropertyFileService */
             $orderPropertyFileService = pluginApp(OrderPropertyFileService::class);
-            
+
             foreach($basketItem['basketItemOrderParams'] as $property)
             {
                 if($property['type'] == 'file')
@@ -238,14 +280,14 @@ class OrderItemBuilder
         {
             $rebate += $basketDiscount;
         }
-        
+
         $priceOriginal = $basketItem['price'];
 		if ( $this->customerService->showNetPrices() )
         {
             $priceOriginal = $basketItem['price'] * (100.0 + $basketItem['vat']) / 100.0;
         }
         $priceOriginal -= $attributeTotalMarkup;
-        
+
 		$properties = [];
 		if($basketItem['inputLength'] > 0)
         {
