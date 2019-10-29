@@ -3,6 +3,7 @@
 namespace IO\Controllers;
 
 use IO\Api\ResponseCode;
+use IO\Helper\RouteConfig;
 use IO\Middlewares\Middleware;
 use IO\Services\CategoryService;
 use IO\Services\CustomerService;
@@ -230,5 +231,21 @@ class ConfirmationController extends LayoutController
         }
         
         return true;
+    }
+
+    public function redirect($orderId = 0, $accessKey = '')
+    {
+        $confirmationParams = [];
+
+        if((int)$orderId > 0 && strlen($accessKey))
+        {
+            $confirmationParams['orderId'] = $orderId;
+            $confirmationParams['accessKey'] = $accessKey;
+        }
+
+        /** @var CategoryController $categoryController */
+        $categoryController = pluginApp(CategoryController::class);
+
+        return $categoryController->redirectToCategory(RouteConfig::getCategoryId(RouteConfig::CONFIRMATION), '/confirmation', $confirmationParams);
     }
 }
