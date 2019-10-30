@@ -1,5 +1,11 @@
 # Release Notes for IO
 
+## v4.3.4 (2019-10-30) <a href="https://github.com/plentymarkets/plugin-io/compare/4.3.3...4.3.4" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
+
+### Fixed
+
+- In the case of two consecutive orders in the online store, the list of payment methods was not loaded correctly when accessing the checkout. This behaviour has been fixed.
+
 ## v4.3.3 (2019-10-17) <a href="https://github.com/plentymarkets/plugin-io/compare/4.3.2...4.3.3" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
 
 ### TODO
