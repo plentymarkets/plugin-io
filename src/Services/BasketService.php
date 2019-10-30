@@ -369,7 +369,7 @@ class BasketService
 
             if ($sortOrderItems && array_key_exists($basketItem->variationId, $basketItemData))
             {
-                $arr['basketItemOrderParams'] = $this->getSortedBasketItemOrderParams($basketItemData[$basketItem->variationId]);
+                $arr['basketItemOrderParams'] = $this->getSortedBasketItemOrderParams($arr);
             }
 
             array_push(
