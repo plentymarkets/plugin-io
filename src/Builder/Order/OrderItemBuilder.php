@@ -168,7 +168,8 @@ class OrderItemBuilder
         }
 
 		$couponTypeIsPromotion = false;
-		$campaign = $this->couponRepository->findByCouponCode($basket["couponCode"]);
+		$campaign = $this->couponRepository->findByCouponCode($basket->couponCode);
+
 
 		if($campaign instanceof CouponCampaign)
         {
