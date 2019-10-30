@@ -690,4 +690,10 @@ class CheckoutService
         $readOnlyCheckout = $this->sessionStorageService->getSessionValue(SessionStorageKeys::READONLY_CHECKOUT);
         return ( !is_null($readOnlyCheckout) ? $readOnlyCheckout : false );
     }
+    
+    public static function clearPaymentMethodList()
+    {
+        self::$methodOfPaymentList = null;
+        self::$paymentDataList = null;
+    }
 }

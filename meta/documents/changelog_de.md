@@ -1,5 +1,11 @@
 # Release Notes für IO
 
+## v4.3.4 (2019-10-30) <a href="https://github.com/plentymarkets/plugin-io/compare/4.3.3...4.3.4" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
+
+### Behoben
+
+- Bei zwei aufeinanderfolgenden Bestellungen im Webshop wurde die Liste der Zahlungsarten beim Aufruf des Checkouts nicht korrekt geladen. Dieses Verhalten wurde behoben.
+
 ## v4.3.3 (2019-10-17) <a href="https://github.com/plentymarkets/plugin-io/compare/4.3.2...4.3.3" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
 
 ### TODO
