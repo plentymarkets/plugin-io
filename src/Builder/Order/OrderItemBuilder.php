@@ -15,8 +15,6 @@ use Plenty\Modules\Frontend\Services\OrderPropertyFileService;
 use Plenty\Modules\Frontend\Services\VatService;
 use Plenty\Modules\Accounting\Vat\Contracts\VatRepositoryContract;
 use Plenty\Modules\Item\Item\Contracts\ItemRepositoryContract;
-use Plenty\Modules\Order\Coupon\Campaign\Contracts\CouponCampaignRepositoryContract;
-use Plenty\Modules\Order\Coupon\Campaign\Models\CouponCampaign;
 use Plenty\Modules\Order\Property\Models\OrderPropertyType;
 use Plenty\Modules\System\Contracts\WebstoreRepositoryContract;
 use Plenty\Modules\Accounting\Vat\Models\Vat;
@@ -62,11 +60,6 @@ class OrderItemBuilder
     private $itemRepository;
 
     /**
-     * @var CouponCampaignRepositoryContract
-     */
-    private $couponRepository;
-
-    /**
      * OrderItemBuilder constructor.
      *
      * @param CheckoutService $checkoutService
@@ -76,7 +69,6 @@ class OrderItemBuilder
      * @param VatRepositoryContract $vatRepository
      * @param CustomerService $customerService
      * @param ItemRepositoryContract $itemRepository
-     * @param CouponCampaignRepositoryContract $couponRepository
      */
 	public function __construct(
 	    CheckoutService $checkoutService,
@@ -85,8 +77,7 @@ class OrderItemBuilder
         WebstoreRepositoryContract $webstoreRepository,
         VatRepositoryContract $vatRepository,
         CustomerService $customerService,
-        ItemRepositoryContract $itemRepository,
-        CouponCampaignRepositoryContract $couponRepository)
+        ItemRepositoryContract $itemRepository)
 	{
 		$this->checkoutService = $checkoutService;
 		$this->vatService = $vatService;
@@ -95,7 +86,6 @@ class OrderItemBuilder
         $this->itemNameFilter = $itemNameFilter;
         $this->customerService = $customerService;
         $this->itemRepository = $itemRepository;
-        $this->couponRepository = $couponRepository;
 	}
 
 	/**
@@ -114,14 +104,6 @@ class OrderItemBuilder
 
         foreach($items as $item)
 		{
-		    $itemData = $this->itemRepository->show($item["itemId"], ["couponRestriction"]);
-            $couponRestriction = $itemData["couponRestriction"];
-
-            if ($couponRestriction === 2)
-            {
-                $itemsWithCouponRestriction[] = $item;
-            }
-
             if($maxVatRate < $item['vat'])
             {
                 $maxVatRate = $item['vat'];
@@ -133,10 +115,17 @@ class OrderItemBuilder
             }
 			catch(BasketItemCheckException $exception)
             {
-                $itemsWithoutStock[] = [
-                    'item' => $item,
-                    'stockNet' => $exception->getStockNet()
-                ];
+                if ($exception->getCode() === 4)
+                {
+                    $itemsWithCouponRestriction[] = $item;
+                }
+                else
+                {
+                    $itemsWithoutStock[] = [
+                        'item' => $item,
+                        'stockNet' => $exception->getStockNet()
+                    ];
+                }
             }
 		}
 
@@ -167,16 +156,7 @@ class OrderItemBuilder
             throw pluginApp(BasketItemCheckException::class, [BasketItemCheckException::NOT_ENOUGH_STOCK_FOR_ITEM]);
         }
 
-		$couponTypeIsPromotion = false;
-		$campaign = $this->couponRepository->findByCouponCode($basket->couponCode);
-
-
-		if($campaign instanceof CouponCampaign)
-        {
-            $couponTypeIsPromotion = $campaign->couponType === CouponCampaign::COUPON_TYPE_PROMOTION;
-        }
-
-		if(count($itemsWithCouponRestriction) && !$couponTypeIsPromotion)
+		if(count($itemsWithCouponRestriction))
         {
             throw pluginApp(BasketItemCheckException::class, [BasketItemCheckException::COUPON_REQUIRED]);
         }

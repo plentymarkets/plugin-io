@@ -55,6 +55,7 @@ use Plenty\Modules\Frontend\Events\FrontendLanguageChanged;
 use Plenty\Modules\Frontend\Events\FrontendShippingProfileChanged;
 use Plenty\Modules\Frontend\Events\FrontendUpdateDeliveryAddress;
 use Plenty\Modules\Frontend\Session\Storage\Contracts\FrontendSessionStorageFactoryContract;
+use Plenty\Modules\Item\ItemCoupon\Hooks\CheckItemRestriction;
 use Plenty\Modules\Item\Stock\Hooks\CheckItemStock;
 use Plenty\Modules\Payment\Events\Checkout\ExecutePayment;
 use Plenty\Modules\Plugin\Events\AfterBuildPlugins;
@@ -140,6 +141,7 @@ class IOServiceProvider extends ServiceProvider
         });
 
         $dispatcher->listen(BeforeBasketItemToOrderItem::class, CheckItemStock::class);
+        $dispatcher->listen(BeforeBasketItemToOrderItem::class, CheckItemRestriction::class);
 
         $dispatcher->listen(AfterAccountContactLogout::class, function($event)
         {
