@@ -14,7 +14,6 @@ use Plenty\Modules\Frontend\PaymentMethod\Contracts\FrontendPaymentMethodReposit
 use Plenty\Modules\Frontend\Services\OrderPropertyFileService;
 use Plenty\Modules\Frontend\Services\VatService;
 use Plenty\Modules\Accounting\Vat\Contracts\VatRepositoryContract;
-use Plenty\Modules\Item\Item\Contracts\ItemRepositoryContract;
 use Plenty\Modules\Order\Property\Models\OrderPropertyType;
 use Plenty\Modules\System\Contracts\WebstoreRepositoryContract;
 use Plenty\Modules\Accounting\Vat\Models\Vat;
@@ -55,11 +54,6 @@ class OrderItemBuilder
     private $customerService;
 
     /**
-     * @var ItemRepositoryContract
-     */
-    private $itemRepository;
-
-    /**
      * OrderItemBuilder constructor.
      *
      * @param CheckoutService $checkoutService
@@ -68,7 +62,6 @@ class OrderItemBuilder
      * @param WebstoreRepositoryContract $webstoreRepository
      * @param VatRepositoryContract $vatRepository
      * @param CustomerService $customerService
-     * @param ItemRepositoryContract $itemRepository
      */
 	public function __construct(
 	    CheckoutService $checkoutService,
@@ -76,8 +69,7 @@ class OrderItemBuilder
         ItemNameFilter $itemNameFilter,
         WebstoreRepositoryContract $webstoreRepository,
         VatRepositoryContract $vatRepository,
-        CustomerService $customerService,
-        ItemRepositoryContract $itemRepository)
+        CustomerService $customerService)
 	{
 		$this->checkoutService = $checkoutService;
 		$this->vatService = $vatService;
@@ -85,7 +77,6 @@ class OrderItemBuilder
         $this->vatRepository = $vatRepository;
         $this->itemNameFilter = $itemNameFilter;
         $this->customerService = $customerService;
-        $this->itemRepository = $itemRepository;
 	}
 
 	/**
