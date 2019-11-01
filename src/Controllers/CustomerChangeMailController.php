@@ -61,4 +61,20 @@ class CustomerChangeMailController extends LayoutController
         }
 
     }
+
+    public function redirect($contactId, $hash)
+    {
+        $changeMailParams = [];
+
+        if((int)$contactId > 0 && strlen($hash))
+        {
+            $changeMailParams['contactId'] = $contactId;
+            $changeMailParams['hash'] = $hash;
+        }
+
+        /** @var CategoryController $categoryController */
+        $categoryController = pluginApp(CategoryController::class);
+
+        return $categoryController->redirectToCategory(RouteConfig::getCategoryId(RouteConfig::CHANGE_MAIL), '/change-mail', $changeMailParams);
+    }
 }

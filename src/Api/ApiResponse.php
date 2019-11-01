@@ -52,7 +52,7 @@ class ApiResponse
 	 * @var array
 	 */
 	private $headers = [];
-    
+
     /**
      * @var null|Response
      */
@@ -101,9 +101,7 @@ class ApiResponse
 		    /** @var BasketService $basketService */
 		    $basketService = pluginApp(BasketService::class);
 		    $basketItem = $event->getBasketItem();
-			$this->eventData["AfterBasketItemAdd"] = [
-				"basketItem" => $basketService->getBasketItem($basketItem)
-			];
+			$this->eventData["AfterBasketItemAdd"]["basketItems"][] = $basketService->getBasketItem($basketItem);
 		}, 0);
 
 		$this->dispatcher->listen(AfterBasketItemRemove::class, function ()
@@ -116,9 +114,7 @@ class ApiResponse
 		    /** @var BasketService $basketService */
             $basketService = pluginApp(BasketService::class);
             $basketItem = $event->getBasketItem();
-			$this->eventData["AfterBasketItemUpdate"] = [
-			    "basketItem" => $basketService->getBasketItem($basketItem, false)
-            ];
+			$this->eventData["AfterBasketItemUpdate"]["basketItems"][] = $basketService->getBasketItem($basketItem, false);
 		}, 0);
 
 		// Register front end events
@@ -181,7 +177,7 @@ class ApiResponse
             ];
 
         }, 0);
-        
+
 		// Register auth events
 		$this->dispatcher->listen(AfterAccountAuthentication::class, function ($event)
 		{

@@ -1,5 +1,27 @@
 # Release Notes for IO
 
+## v4.3.4 (2019-10-30) <a href="https://github.com/plentymarkets/plugin-io/compare/4.3.3...4.3.4" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
+
+### Fixed
+
+- In the case of two consecutive orders in the online store, the list of payment methods was not loaded correctly when accessing the checkout. This behaviour has been fixed.
+
+## v4.3.3 (2019-10-17) <a href="https://github.com/plentymarkets/plugin-io/compare/4.3.2...4.3.3" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
+
+### TODO
+
+- In order to use IO 4.3.3, you need to update the plugin Ceres to its current version 4.3.4.
+
+### Fixed 
+
+- The ShopBuilder displayed a 404 page if a category was linked as the returns page. This has been fixed.
+- Due to an error, the order confirmation page was not displayed if a ShopBuilder category with the URL slug "/confirmation" was created and linked.
+- Due to an error, the link on the returns page was not working if the link was accessed without additional parameters. This has been fixed.
+- Guest accounts could not access order documents. This has been fixed.
+- Checkboxes that were configured via the assistant could not be interpreted correctly. This has been fixed.
+- Under certain circumstances, the number of log entries could increase significantly. This behaviour has been fixed.
+- The components of item bundles were displayed incorrectly. This has been fixed.
+
 ## v4.3.2 (2019-10-02) <a href="https://github.com/plentymarkets/plugin-io/compare/4.3.1...4.3.2" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
 
 ### Fixed

@@ -65,6 +65,11 @@ class BasketService
      */
     private $couponService;
 
+    /**
+     * @var WebstoreConfigurationService $webstoreConfigurationService
+     */
+    private $webstoreConfigurationService;
+
     private $basketItems;
     private $template = '';
 
@@ -77,6 +82,7 @@ class BasketService
      * @param BasketRepositoryContract $basketRepository
      * @param VatInitContract $vatInitService
      * @param CouponService $couponService
+     * @param WebstoreConfigurationService $webstoreConfigurationService
      */
     public function __construct(
         BasketItemRepositoryContract $basketItemRepository,
@@ -85,7 +91,8 @@ class BasketService
         CustomerService $customerService,
         BasketRepositoryContract $basketRepository,
         VatInitContract $vatInitService,
-        CouponService $couponService)
+        CouponService $couponService,
+        WebstoreConfigurationService $webstoreConfigurationService)
     {
         $this->basketItemRepository = $basketItemRepository;
         $this->checkout             = $checkout;
@@ -93,6 +100,7 @@ class BasketService
         $this->customerService      = $customerService;
         $this->basketRepository     = $basketRepository;
         $this->couponService        = $couponService;
+        $this->webstoreConfigurationService = $webstoreConfigurationService;
 
         if(!$vatInitService->isInitialized())
         {
@@ -139,7 +147,7 @@ class BasketService
 
         $basket = $this->couponService->checkCoupon($basket);
 
-        $basket["isExportDelivery"] = $euCountryService->isExportDelivery($basket["shippingCountryId"]);
+        $basket["isExportDelivery"] = $euCountryService->isExportDelivery($basket["shippingCountryId"] ?? $this->webstoreConfigurationService->getDefaultShippingCountryId());
         $basket["shopCountryId"] = $determineShopCountry->getCountryId();
 
         $basket["itemWishListIds"] = $wishListService->getItemWishList();
@@ -361,7 +369,7 @@ class BasketService
 
             if ($sortOrderItems && array_key_exists($basketItem->variationId, $basketItemData))
             {
-                $arr['basketItemOrderParams'] = $this->getSortedBasketItemOrderParams($basketItemData[$basketItem->variationId]);
+                $arr['basketItemOrderParams'] = $this->getSortedBasketItemOrderParams($arr);
             }
 
             array_push(
@@ -718,23 +726,25 @@ class BasketService
         $result = [];
         foreach ($basketItems as $basketItem)
         {
-            $variation = $variationRepository->findById($basketItem->variationId);
             /**
              * @var Variation $variation
+             */
+            $variation = $variationRepository->findById($basketItem->variationId);
+    
+            /**
+             * @var VariationDescription $texts
              */
             $texts = $authHelper->processUnguarded(function() use ($variationDescriptionRepository, $basketItem, $lang)
             {
                 return $variationDescriptionRepository->find($basketItem->variationId, $lang);
             });
-            /**
-             * @var VariationDescription $texts
-             */
 
             $result[$basketItem->variationId]['data']['variation']['name'] = $variation->name ?? '';
             $result[$basketItem->variationId]['data']['texts']['name1'] = $texts->name ?? '';
             $result[$basketItem->variationId]['data']['texts']['name2'] = $texts->name2 ?? '';
             $result[$basketItem->variationId]['data']['texts']['name3'] = $texts->name3 ?? '';
             $result[$basketItem->variationId]['data']['variation']['vatId'] = $variation->vatId ?? $variation->parent->vatId;
+            $result[$basketItem->variationId]['data']['properties'] = $variation->variationProperties->toArray();
         }
 
         return $result;

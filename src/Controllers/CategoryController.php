@@ -108,6 +108,14 @@ class CategoryController extends LayoutController
         );
     }
 
+    public function redirectRoute($route)
+    {
+        return $this->redirectToCategory(
+            RouteConfig::getCategoryId($route),
+            "/".$route
+        );
+    }
+
 	private function renderCategory($category, $params = [])
     {
         /** @var Request $request */
@@ -222,7 +230,7 @@ class CategoryController extends LayoutController
                     $request->get('orderAccessKey', null)
                 );
             }
-            else
+            elseif(!$shopBuilderRequest->isShopBuilder())
             {
                 /** @var Response $response */
                 $response = pluginApp(Response::class);

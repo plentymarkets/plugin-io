@@ -3,6 +3,7 @@ namespace IO\Controllers;
 
 use IO\Constants\SessionStorageKeys;
 use IO\Extensions\Constants\ShopUrls;
+use IO\Helper\RouteConfig;
 use IO\Services\CustomerService;
 use IO\Services\SessionStorageService;
 use Plenty\Modules\Basket\Contracts\BasketItemRepositoryContract;
@@ -74,5 +75,12 @@ class CheckoutController extends LayoutController
             ],
             false
         );
+    }
+
+    public function redirect()
+    {
+        /** @var CategoryController $categoryController */
+        $categoryController = pluginApp(CategoryController::class);
+        return $categoryController->redirectRoute(RouteConfig::CHECKOUT);
     }
 }

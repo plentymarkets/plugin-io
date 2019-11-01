@@ -53,7 +53,7 @@ class GetCdnMetadata extends AbstractFunction
                     $key = trim($match[1]);
                     $value = trim($match[2]);
 
-                    $metadata[$key] = $value;
+                    $metadata[$key] = urldecode($value);
                 }
                 return strlen($header);
             }
