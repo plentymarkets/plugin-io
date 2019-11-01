@@ -93,6 +93,8 @@ class OrderItemBuilder
         $itemsWithCouponRestriction = [];
         $itemsWithoutStock          = [];
 
+        $taxFreeItems = [];
+        
         foreach($items as $item)
 		{
             if($maxVatRate < $item['vat'])
@@ -103,6 +105,40 @@ class OrderItemBuilder
             try
             {
                 array_push($orderItems, $this->basketItemToOrderItem($item, $basket->basketRebate));
+    
+                //convert tax free properties to order items
+                if(count($item['variation']['data']['properties']))
+                {
+                    foreach($item['variation']['data']['properties'] as $property)
+                    {
+                        if($property['property']['isShownAsAdditionalCosts'] && !$property['property']['isOderProperty'])
+                        {
+                            if(array_key_exists($property['propertyId'], $taxFreeItems))
+                            {
+                                $taxFreeItems[$property['propertyId']]['quantity'] += $item['quantity'];
+                            }
+                            else
+                            {
+                                $taxFreeItem = [
+                                    "itemId"          => -2,
+                                    "itemVariationId" => -2,
+                                    "typeId"          => OrderItemType::DEPOSIT,
+                                    "referrerId"      => $basket->basketItems->first()->referrerId,
+                                    "quantity"        => $item['quantity'],
+                                    "orderItemName"   => $property['property']['backendName'] ?? 'tax free item',
+                                    "amounts"         => [
+                                        [
+                                            "currency"           => $this->checkoutService->getCurrency(),
+                                            "priceOriginalGross" => $property['property']['surcharge']
+                                        ]
+                                    ]
+                                ];
+                                
+                                $taxFreeItems[$property['propertyId']] = $taxFreeItem;
+                            }
+                        }
+                    }
+                }
             }
 			catch(BasketItemCheckException $exception)
             {
@@ -151,7 +187,16 @@ class OrderItemBuilder
         {
             throw pluginApp(BasketItemCheckException::class, [BasketItemCheckException::COUPON_REQUIRED]);
         }
-
+        
+		// add tax free items
+        if(count($taxFreeItems))
+        {
+            foreach($taxFreeItems as $taxFreeOrderItem)
+            {
+                array_push($orderItems, $taxFreeOrderItem);
+            }
+        }
+        
 		$shippingAmount = $basket->shippingAmount;
 
 		// add shipping costs
@@ -190,7 +235,6 @@ class OrderItemBuilder
 			]
 		];
 		array_push($orderItems, $paymentSurcharge);
-
 
 		return $orderItems;
 	}

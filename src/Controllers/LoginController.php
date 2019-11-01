@@ -2,6 +2,7 @@
 namespace IO\Controllers;
 
 use IO\Guards\AuthGuard;
+use IO\Helper\RouteConfig;
 use IO\Helper\TemplateContainer;
 use IO\Services\CustomerService;
 use Plenty\Modules\ShopBuilder\Helper\ShopBuilderRequest;
@@ -41,4 +42,11 @@ class LoginController extends LayoutController
             false
 		);
 	}
+
+    public function redirect()
+    {
+        /** @var CategoryController $categoryController */
+        $categoryController = pluginApp(CategoryController::class);
+        return $categoryController->redirectRoute(RouteConfig::LOGIN);
+    }
 }

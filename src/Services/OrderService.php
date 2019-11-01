@@ -177,6 +177,10 @@ class OrderService
                 'language' => $this->sessionStorage->getLang()
             ];
             $this->sendMail(AutomaticEmailTemplate::SHOP_ORDER ,AutomaticEmailOrder::class, $params);
+    
+            if( ($order->amounts[0]->invoiceTotal == 0) || ($order->amounts[0]->invoiceTotal == $order->amounts[0]->giftCardAmount) ) {
+                $this->createAndAssignDummyPayment($order);
+            }
         }
 
         $this->subscribeToNewsletter($email, $billingAddressId);
@@ -186,10 +190,6 @@ class OrderService
         if($this->customerService->getContactId() <= 0)
         {
             $this->sessionStorage->setSessionValue(SessionStorageKeys::LATEST_ORDER_ID, $order->id);
-        }
-
-        if( ($order->amounts[0]->invoiceTotal == 0) || ($order->amounts[0]->invoiceTotal == $order->amounts[0]->giftCardAmount) ) {
-            $this->createAndAssignDummyPayment($order);
         }
 
         return LocalizedOrder::wrap( $order, $this->sessionStorage->getLang() );

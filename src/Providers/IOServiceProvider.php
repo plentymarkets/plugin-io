@@ -152,6 +152,8 @@ class IOServiceProvider extends ServiceProvider
 
         $dispatcher->listen(AfterBasketChanged::class, function($event)
         {
+            CheckoutService::clearPaymentMethodList();
+            
             /** @var CheckoutService $checkoutService */
             $checkoutService = pluginApp(CheckoutService::class);
             $checkoutService->setReadOnlyCheckout(false);
