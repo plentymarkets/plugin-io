@@ -54,6 +54,7 @@ use Plenty\Modules\Frontend\Events\FrontendCurrencyChanged;
 use Plenty\Modules\Frontend\Events\FrontendLanguageChanged;
 use Plenty\Modules\Frontend\Events\FrontendShippingProfileChanged;
 use Plenty\Modules\Frontend\Events\FrontendUpdateDeliveryAddress;
+use Plenty\Modules\Frontend\Session\Events\AfterSessionCreate;
 use Plenty\Modules\Frontend\Session\Storage\Contracts\FrontendSessionStorageFactoryContract;
 use Plenty\Modules\Item\Stock\Hooks\CheckItemStock;
 use Plenty\Modules\Payment\Events\Checkout\ExecutePayment;
@@ -137,6 +138,11 @@ class IOServiceProvider extends ServiceProvider
             /** @var CustomerService $customerService */
             $customerService = pluginApp(CustomerService::class);
             $customerService->resetGuestAddresses();
+
+              /** @var CheckoutService $checkoutService */
+            $checkoutService = pluginApp(CheckoutService::class);
+            //validate methodOfPayment
+            $methodOfPaymentId = $checkoutService->getMethodOfPaymentId();
         });
 
         $dispatcher->listen(BeforeBasketItemToOrderItem::class, CheckItemStock::class);
@@ -146,7 +152,18 @@ class IOServiceProvider extends ServiceProvider
             /** @var CheckoutService $checkoutService */
             $checkoutService = pluginApp(CheckoutService::class);
             $checkoutService->setDefaultShippingCountryId();
+              //validate methodOfPayment
+            $methodOfPaymentId = $checkoutService->getMethodOfPaymentId();
         });
+
+        $dispatcher->listen(AfterSessionCreate::class, function($event)
+        {
+            /** @var CheckoutService $checkoutService */
+            $checkoutService = pluginApp(CheckoutService::class);
+            //validate methodOfPayment
+            $methodOfPaymentId = $checkoutService->getMethodOfPaymentId();
+        });
+
 
         $dispatcher->listen(AfterBasketChanged::class, function($event)
         {
