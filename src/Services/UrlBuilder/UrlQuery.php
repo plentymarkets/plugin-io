@@ -88,15 +88,20 @@ class UrlQuery
         }
     
         $queryParams = '';
-        if($this->hasQueryParams($this->path))
+        $e = explode('?', $this->path);
+        if(count($e) > 1)
         {
-            $e = explode('?', $this->path);
-        
-            $this->path = $e[0];
+            $path = $e[0];
+            if($path[strlen($path)-1] == '/')
+            {
+                $path = substr($path, 0, -1);
+            }
+    
+            $this->path = $path;
             $queryParams = '?'.$e[1];
         }
 
-        $trailingSlash = self::shouldAppendTrailingSlash() && !$this->hasTralingSlash($this->path) ? "/" : "";
+        $trailingSlash = self::shouldAppendTrailingSlash() ? "/" : "";
 
         if ( $includeLanguage && strpos($this->path, '/'.$this->lang) !== 0)
         {
@@ -123,25 +128,5 @@ class UrlQuery
     public function equals( $path )
     {
         return $this->path === $path || $this->path === $path."/";
-    }
-    
-    public function hasTralingSlash($path)
-    {
-        if(strpos($path, '/', strlen($path)-1) == strlen($path)-1)
-        {
-            return true;
-        }
-        
-        return false;
-    }
-    
-    public function hasQueryParams($path)
-    {
-        if(count(explode('?', $path)) > 1)
-        {
-            return true;
-        }
-        
-        return false;
     }
 }
