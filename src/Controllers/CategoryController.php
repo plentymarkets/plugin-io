@@ -194,7 +194,10 @@ class CategoryController extends LayoutController
             );
             RouteConfig::overrideCategoryId(RouteConfig::CONFIRMATION, $category->id);
 
-            if ($request->get('contentLinkId', false))
+            /** @var CustomerService $customerService */
+            $customerService = pluginApp(CustomerService::class);
+
+            if ($request->get('contentLinkId', false) && $customerService->getContactId() <= 0 )
             {
                 /** @var ShopUrls $shopUrls */
                 $shopUrls = pluginApp(ShopUrls::class);
