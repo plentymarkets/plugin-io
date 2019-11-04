@@ -86,8 +86,7 @@ class ApiResponse
 			// FIX: Set basket and checkout data after "showNetPrice" has been recalculated
             // showNetPrice does not have been recalculated at this point
             $this->eventData["AfterBasketChanged"] = [
-				'basket' => null,
-				'basketItems' => $basketService->getBasketItemsForTemplate('', false)
+				'basket' => null
             ];
             $this->eventData['CheckoutChanged'] = [
                 'checkout' => null
@@ -291,7 +290,8 @@ class ApiResponse
             $checkoutService = pluginApp(CheckoutService::class);
 
             $responseData['events']['AfterBasketChanged']['basket']         = $basketService->getBasketForTemplate();
-            $responseData['events']['AfterBasketChanged']['showNetPrices']  = $customerService->showNetPrices();
+			$responseData['events']['AfterBasketChanged']['showNetPrices']  = $customerService->showNetPrices();
+			$responseData['events']['AfterBasketChanged']['basketItems']  	= $basketService->getBasketItemsForTemplate('', false);
             $responseData['events']['CheckoutChanged']['checkout']          = $checkoutService->getCheckout();
         }
 
