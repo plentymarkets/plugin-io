@@ -86,19 +86,28 @@ class UrlQuery
         {
             return null;
         }
+    
+        $queryParams = '';
+        if($this->hasQueryParams($this->path))
+        {
+            $e = explode('?', $this->path);
+        
+            $this->path = $e[0];
+            $queryParams = '?'.$e[1];
+        }
 
-        $trailingSlash = self::shouldAppendTrailingSlash() && !$this->hasQueryParams($this->path) ? "/" : "";
+        $trailingSlash = self::shouldAppendTrailingSlash() && !$this->hasTralingSlash($this->path) ? "/" : "";
 
         if ( $includeLanguage && strpos($this->path, '/'.$this->lang) !== 0)
         {
-            return '/' . $this->lang . $this->path . $trailingSlash;
+            return '/' . $this->lang . $this->path . $trailingSlash . $queryParams;
         }
         elseif(strlen($this->path) == 0)
         {
             return '/';
         }
 
-        return $this->path . $trailingSlash;
+        return $this->path . $trailingSlash . $queryParams;
     }
 
     public function getPath( bool $includeLanguage = false )
@@ -114,6 +123,16 @@ class UrlQuery
     public function equals( $path )
     {
         return $this->path === $path || $this->path === $path."/";
+    }
+    
+    public function hasTralingSlash($path)
+    {
+        if(strpos($path, '/', strlen($path)-1) == strlen($path)-1)
+        {
+            return true;
+        }
+        
+        return false;
     }
     
     public function hasQueryParams($path)
