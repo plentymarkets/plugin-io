@@ -142,7 +142,7 @@ class OrderItemBuilder
             }
 			catch(BasketItemCheckException $exception)
             {
-                if ($exception->getCode() === 4)
+                if ($exception->getCode() === BasketItemCheckException::COUPON_REQUIRED)
                 {
                     $itemsWithCouponRestriction[] = $item;
                 }
