@@ -80,10 +80,14 @@ class ApiResponse
 
 		// Register basket events
         $this->dispatcher->listen( AfterBasketChanged::class, function($event) {
-            // FIX: Set basket and checkout data after "showNetPrice" has been recalculated
+			/** @var BasketService $basketService */
+		    $basketService = pluginApp(BasketService::class);
+			
+			// FIX: Set basket and checkout data after "showNetPrice" has been recalculated
             // showNetPrice does not have been recalculated at this point
             $this->eventData["AfterBasketChanged"] = [
-				"basket" => null
+				'basket' => null,
+				'basketItems' => $basketService->getBasketItemsForTemplate('', false)
             ];
             $this->eventData['CheckoutChanged'] = [
                 'checkout' => null
