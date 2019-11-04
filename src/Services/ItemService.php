@@ -13,6 +13,7 @@ use IO\Builder\Item\ItemParamsBuilder;
 use IO\Builder\Item\Params\ItemColumnsParams;
 use IO\Constants\ItemConditionTexts;
 use IO\Constants\Language;
+use IO\Helper\EventDispatcher;
 use IO\Helper\MemoryCache;
 use IO\Extensions\Filters\ItemImagesFilter;
 use IO\Services\ItemSearch\SearchPresets\SingleItem;
@@ -862,9 +863,7 @@ class ItemService
      *
      */
 	public function getAdditionalItemSorting(){
-	    /** @var Dispatcher $dispatcher */
-	    $dispatcher = pluginApp(Dispatcher::class);
-	    $dispatcher->fire('IO.initAdditionalSorting', [$this]);
+	    EventDispatcher::fire('initAdditionalSorting', [$this]);
 	    return $this->additionalItemSortingMap;
     }
 

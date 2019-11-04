@@ -21,7 +21,7 @@ class ConfirmationEmailController extends LayoutController
         {
             /** @var ShopUrls $shopUrls */
             $shopUrls = pluginApp(ShopUrls::class);
-            
+
             /** @var UrlQuery $urlQuery */
             $urlQuery = pluginApp(UrlQuery::class, ['path' => $shopUrls->confirmation]);
             if(RouteConfig::getCategoryId(RouteConfig::CONFIRMATION) > 0)
@@ -33,10 +33,10 @@ class ConfirmationEmailController extends LayoutController
                 $params = '';
                 $urlQuery->join($orderId.'/'.$orderAccessKey);
             }
-            
+
             return $this->urlService->redirectTo($urlQuery->toRelativeUrl().$params);
         }
-        
+
         return $this->renderTemplate(
             "tpl.confirmation",
             [

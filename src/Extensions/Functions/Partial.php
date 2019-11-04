@@ -2,7 +2,7 @@
 
 namespace IO\Extensions\Functions;
 
-use Plenty\Plugin\Events\Dispatcher;
+use IO\Helper\EventDispatcher;
 use IO\Extensions\AbstractFunction;
 
 /**
@@ -47,12 +47,9 @@ class Partial extends AbstractFunction
     {
         if(!$this->partial instanceof Partial)
         {
-            /** @var Dispatcher $event */
-            $event = pluginApp(Dispatcher::class);
-
             /** @var Partial $partial */
             $this->partial = pluginApp(Partial::class);
-            $event->fire('IO.init.templates', [$this->partial]);
+            EventDispatcher::fire('init.templates', [$this->partial]);
         }
 
         return $this->partial->getTemplate($key);
