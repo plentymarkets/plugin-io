@@ -730,7 +730,7 @@ class BasketService
              * @var Variation $variation
              */
             $variation = $variationRepository->findById($basketItem->variationId);
-    
+
             /**
              * @var VariationDescription $texts
              */
@@ -842,7 +842,9 @@ class BasketService
             "itemId"                => $basketItem["itemId"],
             "variation"             => $basketItem["variation"],
             "variationId"           => $basketItem["variationId"],
-            "basketItemOrderParams" => $basketItem["basketItemOrderParams"] ?? []
+            "basketItemOrderParams" => $basketItem["basketItemOrderParams"] ?? [],
+            "inputLength"           => $basketItem["inputLength"] ?? 0,
+            "inputWidth"            => $basketItem["inputWidth"] ?? 0
         ];
     }
 }
