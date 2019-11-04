@@ -118,7 +118,7 @@ class UrlQuery
     
     public function hasQueryParams($path)
     {
-        if(explode('?', $path) > 1)
+        if(count(explode('?', $path)) > 1)
         {
             return true;
         }
