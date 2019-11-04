@@ -87,7 +87,7 @@ class UrlQuery
             return null;
         }
 
-        $trailingSlash = self::shouldAppendTrailingSlash() ? "/" : "";
+        $trailingSlash = self::shouldAppendTrailingSlash() && !$this->hasQueryParams($this->path) ? "/" : "";
 
         if ( $includeLanguage && strpos($this->path, '/'.$this->lang) !== 0)
         {
@@ -114,5 +114,15 @@ class UrlQuery
     public function equals( $path )
     {
         return $this->path === $path || $this->path === $path."/";
+    }
+    
+    public function hasQueryParams($path)
+    {
+        if(explode('?', $path) > 1)
+        {
+            return true;
+        }
+        
+        return false;
     }
 }
