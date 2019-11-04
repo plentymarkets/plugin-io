@@ -189,6 +189,18 @@ class CategoryController extends LayoutController
             );
             RouteConfig::overrideCategoryId(RouteConfig::CONFIRMATION, $category->id);
 
+            /** @var CustomerService $customerService */
+            $customerService = pluginApp(CustomerService::class);
+
+            if ($request->get('contentLinkId', false) && $customerService->getContactId() <= 0 )
+            {
+                /** @var ShopUrls $shopUrls */
+                $shopUrls = pluginApp(ShopUrls::class);
+                /** @var AuthGuard $guard */
+                $guard = pluginApp(AuthGuard::class);
+                $guard->assertOrRedirect( true, $shopUrls->login );
+            }
+
             /** @var ConfirmationController $confirmationController */
             $confirmationController = pluginApp(ConfirmationController::class);
             return $confirmationController->showConfirmation(
