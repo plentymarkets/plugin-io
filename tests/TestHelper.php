@@ -8,4 +8,9 @@ trait MemoryCache
     {
         return $callack->call($this);
     }
+
+    protected function resetMemoryCache($key = null)
+    {
+        return;
+    }
 }
