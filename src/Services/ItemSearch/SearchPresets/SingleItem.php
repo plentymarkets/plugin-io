@@ -58,7 +58,7 @@ class SingleItem implements SearchPreset
         }
         else
         {
-            $searchFactory->isMain();
+            $searchFactory->groupByTemplateConfig();
         }
 
         if ( array_key_exists( 'setCategory', $options ) && $options['setCategory'] === true )
