@@ -8,6 +8,7 @@ use IO\Helper\RouteConfig;
 use IO\Guards\AuthGuard;
 use IO\Helper\Utils;
 use IO\Services\CustomerService;
+use IO\Services\ItemSearch\Factories\Faker\FacetFaker;
 use IO\Services\SessionStorageService;
 use IO\Services\UrlService;
 use Plenty\Modules\ShopBuilder\Helper\ShopBuilderRequest;
