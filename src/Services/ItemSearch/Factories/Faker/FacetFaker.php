@@ -9,8 +9,7 @@ class FacetFaker extends AbstractFaker
     public function fill($data)
     {
         $default = [
-            "facet" => $this->makeFacet(),
-            "value" => $this->makeValue()
+            $this->makeFacet()
         ];
 
         $this->merge($data, $default);
@@ -20,26 +19,27 @@ class FacetFaker extends AbstractFaker
     private function makeFacet()
     {
         return [
-            "id"    => $this->number(),
-            "names" => [
-                [
-                    "lang" => $this->lang,
-                    "name" => $this->trans("IO::Faker.facetName")
-                ]
-            ]
+            'id' => $this->number(),
+            'name' => $this->trans("IO::Faker.facetName"),
+            'position' => 0,
+            'values' => $this->makeValues(),
+            "type" => "dynamic"
         ];
     }
 
-    private function makeValue()
+    private function makeValues()
     {
-        return [
-            "id"    => $this->number(),
-            "names" => [
-                [
-                    "lang" => $this->lang,
-                    "name" => $this->trans("IO::Faker.facetValueName")
-                ]
-            ]
-        ];
+        $result = [];
+
+        for ($i = 1; $i <= $this->number(3, 10); $i++)
+        {
+            $result[] = [
+                'id' => $i,
+                'name' => $this->trans("IO::Faker.facetValueName"),
+                'count' => $this->number(1, 10),
+            ];
+        }
+
+        return $result;
     }
 }
