@@ -31,6 +31,8 @@ class FacetResource extends ApiResource
     /**
      * Get Facets
      * @return Response
+     * 
+     * @deprecated since 4.4.0
      */
     public function index():Response
     {
