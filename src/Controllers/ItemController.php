@@ -99,6 +99,11 @@ class ItemController extends LayoutController
         }
         else
         {
+            if ($variationId === 0)
+            {
+                $itemResult['addPleaseSelectOption'] = true;
+            }
+
             return $this->renderTemplate(
                 'tpl.item',
                 $itemResult
