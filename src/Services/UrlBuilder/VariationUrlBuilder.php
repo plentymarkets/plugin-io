@@ -265,18 +265,49 @@ class VariationUrlBuilder
         $categoryService = pluginApp(CategoryService::class);
         $category = $categoryService->get($categoryId);
 
-        $branch = $category->branch->toArray();
-        for($i = $maxLevel; $i >= 0; $i--)
+        if(!is_null($category))
         {
-            if(!is_null($branch['category' . $i . 'Id']))
+            /** @var CategoryUrlBuilder $categoryUrlBuilder */
+            $categoryUrlBuilder = pluginApp(CategoryUrlBuilder::class);
+
+            if(!is_null($category->branch))
             {
-                /** @var CategoryUrlBuilder $categoryUrlBuilder */
-                $categoryUrlBuilder = pluginApp(CategoryUrlBuilder::class);
-                return $categoryUrlBuilder->buildUrl(
-                    $branch['category' . $i . 'Id'],
-                    $lang
+                $branch = $category->branch->toArray();
+                for($i = $maxLevel; $i >= 0; $i--)
+                {
+                    if(!is_null($branch['category' . $i . 'Id']))
+                    {
+                        return $categoryUrlBuilder->buildUrl(
+                            $branch['category' . $i . 'Id'],
+                            $lang
+                        );
+                    }
+                }
+            }
+            else
+            {
+                $this->getLogger(__CLASS__)->error(
+                    'IO::Debug.VariationUrlBuilder_noCategoryBranch',
+                    [
+                        'categoryId' => $categoryId,
+                        'lang' => $lang
+                    ]
                 );
             }
+
+            /** @var CategoryUrlBuilder $categoryUrlBuilder */
+            $categoryUrlBuilder = pluginApp(CategoryUrlBuilder::class);
+            return $categoryUrlBuilder->buildUrl($categoryId, $lang);
+        }
+        else
+        {
+            $this->getLogger(__CLASS__)->warning(
+                'IO::Debug.VariationUrlBuilder_categoryNotFound',
+                [
+                    'categoryId' => $categoryId,
+                    'lang' => $lang
+                ]
+            );
         }
 
         return $this->buildUrlQuery("", $lang);

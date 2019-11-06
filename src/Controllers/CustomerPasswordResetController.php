@@ -53,4 +53,20 @@ class CustomerPasswordResetController extends LayoutController
         }
         
     }
+
+    public function redirect($contactId, $hash)
+    {
+        $passwordResetParams = [];
+
+        if((int)$contactId > 0 && strlen($hash))
+        {
+            $passwordResetParams['contactId'] = $contactId;
+            $passwordResetParams['hash'] = $hash;
+        }
+
+        /** @var CategoryController $categoryController */
+        $categoryController = pluginApp(CategoryController::class);
+
+        return $categoryController->redirectToCategory(RouteConfig::getCategoryId(RouteConfig::PASSWORD_RESET), '/password-reset', $passwordResetParams);
+    }
 }

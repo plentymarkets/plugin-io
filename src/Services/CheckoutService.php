@@ -83,11 +83,6 @@ class CheckoutService
      */
     private $webstoreConfigurationService;
 
-    private static $methodOfPaymentList = null;
-
-    private static $paymentDataList = null;
-
-
     /**
      * CheckoutService constructor.
      * @param FrontendPaymentMethodRepositoryContract $frontendPaymentMethodRepository
@@ -111,7 +106,8 @@ class CheckoutService
         CurrencyExchangeRepositoryContract $currencyExchangeRepo,
         BasketService $basketService,
         SessionStorageService $sessionStorageService,
-        WebstoreConfigurationService $webstoreConfigurationService)
+        WebstoreConfigurationService $webstoreConfigurationService,
+        Dispatcher $dispatcher)
     {
         $this->frontendPaymentMethodRepository = $frontendPaymentMethodRepository;
         $this->checkout                        = $checkout;
@@ -123,6 +119,11 @@ class CheckoutService
         $this->basketService                   = $basketService;
         $this->sessionStorageService           = $sessionStorageService;
         $this->webstoreConfigurationService    = $webstoreConfigurationService;
+        $dispatcher->listen(AfterBasketChanged::class, function($event)
+        {
+            $this->resetMemoryCache('methodOfPaymentList');
+            $this->resetMemoryCache('paymentDataList');
+        });
     }
 
     /**
@@ -403,11 +404,9 @@ class CheckoutService
      */
     public function getMethodOfPaymentList(): array
     {
-        if(!isset(self::$methodOfPaymentList))
-        {
-            self::$methodOfPaymentList = $this->frontendPaymentMethodRepository->getCurrentPaymentMethodsList();
-        }
-        return self::$methodOfPaymentList;
+        return $this->fromMemoryCache('methodOfPaymentList', function() {
+            return $this->frontendPaymentMethodRepository->getCurrentPaymentMethodsList();
+        });
     }
 
     /**
@@ -425,7 +424,7 @@ class CheckoutService
      */
     public function getCheckoutPaymentDataList(): array
     {
-        if(!isset(self::$paymentDataList))
+        return $this->fromMemoryCache('paymentDataList', function()
         {
             $paymentDataList = array();
             $mopList         = $this->getMethodOfPaymentList();
@@ -442,9 +441,8 @@ class CheckoutService
                 $paymentData['key']         = $paymentMethod->pluginKey;
                 $paymentDataList[]          = $paymentData;
             }
-            self::$paymentDataList = $paymentDataList;
-        }
-        return self::$paymentDataList;
+            return $paymentDataList;
+        });
     }
 
     /**

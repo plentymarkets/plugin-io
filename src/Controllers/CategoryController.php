@@ -108,6 +108,14 @@ class CategoryController extends LayoutController
         );
     }
 
+    public function redirectRoute($route)
+    {
+        return $this->redirectToCategory(
+            RouteConfig::getCategoryId($route),
+            "/".$route
+        );
+    }
+
 	private function renderCategory($category, $params = [])
     {
         /** @var Request $request */
@@ -186,6 +194,18 @@ class CategoryController extends LayoutController
             );
             RouteConfig::overrideCategoryId(RouteConfig::CONFIRMATION, $category->id);
 
+            /** @var CustomerService $customerService */
+            $customerService = pluginApp(CustomerService::class);
+
+            if ($request->get('contentLinkId', false) && $customerService->getContactId() <= 0 )
+            {
+                /** @var ShopUrls $shopUrls */
+                $shopUrls = pluginApp(ShopUrls::class);
+                /** @var AuthGuard $guard */
+                $guard = pluginApp(AuthGuard::class);
+                $guard->assertOrRedirect( true, $shopUrls->login );
+            }
+
             /** @var ConfirmationController $confirmationController */
             $confirmationController = pluginApp(ConfirmationController::class);
             return $confirmationController->showConfirmation(
@@ -222,7 +242,7 @@ class CategoryController extends LayoutController
                     $request->get('orderAccessKey', null)
                 );
             }
-            else
+            elseif(!$shopBuilderRequest->isShopBuilder())
             {
                 /** @var Response $response */
                 $response = pluginApp(Response::class);

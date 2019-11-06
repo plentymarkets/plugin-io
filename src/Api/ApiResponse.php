@@ -52,7 +52,7 @@ class ApiResponse
 	 * @var array
 	 */
 	private $headers = [];
-    
+
     /**
      * @var null|Response
      */
@@ -80,10 +80,10 @@ class ApiResponse
 
 		// Register basket events
         $this->dispatcher->listen( AfterBasketChanged::class, function($event) {
-            // FIX: Set basket and checkout data after "showNetPrice" has been recalculated
+			// FIX: Set basket and checkout data after "showNetPrice" has been recalculated
             // showNetPrice does not have been recalculated at this point
             $this->eventData["AfterBasketChanged"] = [
-				"basket" => null
+				'basket' => null
             ];
             $this->eventData['CheckoutChanged'] = [
                 'checkout' => null
@@ -101,9 +101,7 @@ class ApiResponse
 		    /** @var BasketService $basketService */
 		    $basketService = pluginApp(BasketService::class);
 		    $basketItem = $event->getBasketItem();
-			$this->eventData["AfterBasketItemAdd"] = [
-				"basketItem" => $basketService->getBasketItem($basketItem)
-			];
+			$this->eventData["AfterBasketItemAdd"]["basketItems"][] = $basketService->getBasketItem($basketItem);
 		}, 0);
 
 		$this->dispatcher->listen(AfterBasketItemRemove::class, function ()
@@ -116,9 +114,7 @@ class ApiResponse
 		    /** @var BasketService $basketService */
             $basketService = pluginApp(BasketService::class);
             $basketItem = $event->getBasketItem();
-			$this->eventData["AfterBasketItemUpdate"] = [
-			    "basketItem" => $basketService->getBasketItem($basketItem, false)
-            ];
+			$this->eventData["AfterBasketItemUpdate"]["basketItems"][] = $basketService->getBasketItem($basketItem, false);
 		}, 0);
 
 		// Register front end events
@@ -181,7 +177,7 @@ class ApiResponse
             ];
 
         }, 0);
-        
+
 		// Register auth events
 		$this->dispatcher->listen(AfterAccountAuthentication::class, function ($event)
 		{
@@ -291,7 +287,8 @@ class ApiResponse
             $checkoutService = pluginApp(CheckoutService::class);
 
             $responseData['events']['AfterBasketChanged']['basket']         = $basketService->getBasketForTemplate();
-            $responseData['events']['AfterBasketChanged']['showNetPrices']  = $customerService->showNetPrices();
+			$responseData['events']['AfterBasketChanged']['showNetPrices']  = $customerService->showNetPrices();
+			$responseData['events']['AfterBasketChanged']['basketItems']  	= $basketService->getBasketItemsForTemplate('', false);
             $responseData['events']['CheckoutChanged']['checkout']          = $checkoutService->getCheckout();
         }
 

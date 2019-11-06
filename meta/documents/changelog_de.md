@@ -1,5 +1,27 @@
 # Release Notes für IO
 
+## v4.3.4 (2019-10-30) <a href="https://github.com/plentymarkets/plugin-io/compare/4.3.3...4.3.4" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
+
+### Behoben
+
+- Bei zwei aufeinanderfolgenden Bestellungen im Webshop wurde die Liste der Zahlungsarten beim Aufruf des Checkouts nicht korrekt geladen. Dieses Verhalten wurde behoben.
+
+## v4.3.3 (2019-10-17) <a href="https://github.com/plentymarkets/plugin-io/compare/4.3.2...4.3.3" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
+
+### TODO
+
+- Für die Verwendung von IO 4.3.3 muss das Plugin Ceres auf die aktuelle Version 4.3.4 aktualisiert werden.
+
+### Behoben
+
+- Im ShopBuilder wurde eine 404-Seite angezeigt, wenn eine Kategorie für die Retourenseite verknüpft war. Dies wurde behoben.
+- Durch einen Fehler wurde die Auftragsbestätigungsseite nicht angezeigt, wenn eine ShopBuilder-Kategorie mit der Route "/confirmation" angelegt und verknüpft wurde.
+- Durch einen Fehler funktionierte Verlinkung auf die Retourenseite nicht, wenn diese ohne zusätzliche Parameter aufgerufen wurde. Dies wurde behoben.
+- Auftragsdokumente konnten nicht für Gastbestellungen angezeigt werden. Dies wurde behoben.
+- Checkboxen, die über den Assistenten gespeichert wurden, konnten nicht korrekt ausgelesen werden. Dieses Verhalten wurde behoben.
+- Es kam unter bestimmten Voraussetzungen zu einer erhöhten Anzahl an Log-Einträgen. Dieses Verhalten wurde behoben.
+- Beim Aufsplitten von Artikelpaketen kam es zu einer fehlerhaften Anzeige. Dies wurde behoben. 
+
 ## v4.3.2 (2019-10-02) <a href="https://github.com/plentymarkets/plugin-io/compare/4.3.1...4.3.2" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
 
 ### Behoben

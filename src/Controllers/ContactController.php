@@ -2,6 +2,7 @@
 
 namespace IO\Controllers;
 
+use IO\Helper\RouteConfig;
 use IO\Helper\TemplateContainer;
 
 /**
@@ -22,5 +23,12 @@ class ContactController extends LayoutController
                 "object" => ""
             ]
         );
+    }
+
+    public function redirect()
+    {
+        /** @var CategoryController $categoryController */
+        $categoryController = pluginApp(CategoryController::class);
+        return $categoryController->redirectRoute(RouteConfig::CONTACT);
     }
 }

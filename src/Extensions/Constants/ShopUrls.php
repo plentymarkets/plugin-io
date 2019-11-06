@@ -51,6 +51,7 @@ class ShopUrls
     public $returnConfirmation  = "";
     public $changeMail          = "";
     public $newsletterOptOut    = "";
+    public $orderDocument       = "";
 
     public function __construct(Dispatcher $dispatcher, SessionStorageService $sessionStorageService)
     {
@@ -95,6 +96,7 @@ class ShopUrls
         $this->returnConfirmation       = $this->getShopUrl(RouteConfig::ORDER_RETURN_CONFIRMATION, "return-confirmation");
         $this->changeMail               = $this->getShopUrl(RouteConfig::CHANGE_MAIL);
         $this->newsletterOptOut         = $this->getShopUrl(RouteConfig::NEWSLETTER_OPT_OUT, "newsletter/unsubscribe");
+        $this->orderDocument            = $this->getShopUrl(RouteConfig::ORDER_DOCUMENT, "order-document");
     }
 
     public function returns($orderId, $orderAccessKey = null)
@@ -121,6 +123,21 @@ class ShopUrls
     public function orderPropertyFile($path)
     {
         return $this->getShopUrl(RouteConfig::ORDER_PROPERTY_FILE, null, $path);
+    }
+    
+    public function orderDocumentPreview($documentId, $orderId, $orderAccessKey = null)
+    {
+        if($orderAccessKey == null)
+        {
+            /** @var Request $request */
+            $request = pluginApp(Request::class);
+            $orderAccessKey = $request->get('accessKey');
+        }
+        
+        return $this->getShopUrl(RouteConfig::ORDER_DOCUMENT,
+                                         "order-document/preview",
+                                         ['documentId' => $documentId],
+                                         ['orderId' => $orderId,'accessKey' => $orderAccessKey]);
     }
 
     public function tracking($orderId)

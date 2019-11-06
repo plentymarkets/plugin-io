@@ -28,7 +28,7 @@ class IORouteServiceProvider extends RouteServiceProvider
      */
 	public function map(Router $router, ApiRouter $api)
 	{
-		$api->version(['v1'], ['namespace' => 'IO\Api\Resources'], function ($api)
+		$api->version(['v1'], ['namespace' => 'IO\Api\Resources'], function (ApiRouter $api)
 		{
 			$api->get('io/basket', 'BasketResource@index');
             $api->resource('io/basket/items', 'BasketItemResource');
@@ -65,7 +65,7 @@ class IORouteServiceProvider extends RouteServiceProvider
             $api->resource('io/categorytree', 'CategoryTreeResource');
 		});
         
-        $api->version(['v1'], ['namespace' => 'IO\Api\Resources', 'middleware' => ['csrf']], function ($api)
+        $api->version(['v1'], ['namespace' => 'IO\Api\Resources', 'middleware' => ['csrf']], function (ApiRouter $api)
         {
             $api->post('io/order', 'OrderResource@store');
             $api->resource('io/order/payment', 'OrderPaymentResource');
@@ -90,7 +90,8 @@ class IORouteServiceProvider extends RouteServiceProvider
             $router,
             RouteConfig::BASKET,
             $shopUrls->basket,
-            'IO\Controllers\BasketController@showBasket'
+            'IO\Controllers\BasketController@showBasket',
+            'IO\Controllers\BasketController@redirect'
         );
 
         // CANCELLATION FORM
@@ -98,7 +99,8 @@ class IORouteServiceProvider extends RouteServiceProvider
             $router,
             RouteConfig::CANCELLATION_FORM,
             $shopUrls->cancellationForm,
-            'IO\Controllers\StaticPagesController@showCancellationForm'
+            'IO\Controllers\StaticPagesController@showCancellationForm',
+            'IO\Controllers\StaticPagesController@redirectCancellationForm'
         );
 
         // CANCELLATION RIGHTS
@@ -106,7 +108,8 @@ class IORouteServiceProvider extends RouteServiceProvider
             $router,
             RouteConfig::CANCELLATION_RIGHTS,
             $shopUrls->cancellationRights,
-            'IO\Controllers\StaticPagesController@showCancellationRights'
+            'IO\Controllers\StaticPagesController@showCancellationRights',
+            'IO\Controllers\StaticPagesController@redirectCancellationRights'
         );
 
         // CHANGE MAIL
@@ -119,21 +122,7 @@ class IORouteServiceProvider extends RouteServiceProvider
             && !$shopUrls->equals($shopUrls->changeMail, '/change-mail')
         )
         {
-            $router->get('change-mail/{contactId}/{hash}', function($contactId, $hash) use ($shopUrls)
-            {
-                $changeMailParams = [];
-
-                if((int)$contactId > 0 && strlen($hash))
-                {
-                    $changeMailParams['contactId'] = $contactId;
-                    $changeMailParams['hash'] = $hash;
-                }
-
-                /** @var CategoryController $categoryController */
-                $categoryController = pluginApp(CategoryController::class);
-
-                return $categoryController->redirectToCategory(RouteConfig::getCategoryId(RouteConfig::CHANGE_MAIL), '/change-mail', $changeMailParams);
-            });
+            $router->get('change-mail/{contactId}/{hash}', 'IO\Controllers\CustomerChangeMailController@redirect');
         }
 
         if ( RouteConfig::isActive(RouteConfig::MY_ACCOUNT) )
@@ -146,13 +135,7 @@ class IORouteServiceProvider extends RouteServiceProvider
             && !$shopUrls->equals($shopUrls->myAccount,'/my-account') )
         {
             // my-account-route is activated and category is linked and category url is not '/my-account'
-            $router->get('my-account', function() use ($shopUrls)
-            {
-                /** @var CategoryController $categoryController */
-                $categoryController = pluginApp(CategoryController::class);
-
-                return $categoryController->redirectToCategory( RouteConfig::getCategoryId(RouteConfig::MY_ACCOUNT), '/my-account' );
-            });
+            $router->get('my-account', 'IO\Controllers\MyAccountController@showMyAccount');
         }
 
         // CHECKOUT
@@ -160,68 +143,32 @@ class IORouteServiceProvider extends RouteServiceProvider
             $router,
             RouteConfig::CHECKOUT,
             $shopUrls->checkout,
-            'IO\Controllers\CheckoutController@showCheckout'
+            'IO\Controllers\CheckoutController@showCheckout',
+            'IO\Controllers\CheckoutController@redirect'
         );
-
+        
         // CONFIRMATION
-        if ( RouteConfig::isActive(RouteConfig::CONFIRMATION) )
+        if(RouteConfig::isActive(RouteConfig::CONFIRMATION)
+            || in_array(RouteConfig::CONFIRMATION, RouteConfig::getEnabledRoutes())
+            || RouteConfig::getCategoryId(RouteConfig::CONFIRMATION) > 0)
         {
-            //Confirmation route
-            $router->get('confirmation/{orderId?}/{orderAccessKey?}', 'IO\Controllers\ConfirmationController@showConfirmation');
             $router->get('-/akQQ{orderAccessKey}/idQQ{orderId}', 'IO\Controllers\ConfirmationEmailController@showConfirmation');
             $router->get('_py-/akQQ{orderAccessKey}/idQQ{orderId}', 'IO\Controllers\ConfirmationEmailController@showConfirmation');
             $router->get('_py_/akQQ{orderAccessKey}/idQQ{orderId}', 'IO\Controllers\ConfirmationEmailController@showConfirmation');
             $router->get('_plentyShop__/akQQ{orderAccessKey}/idQQ{orderId}', 'IO\Controllers\ConfirmationEmailController@showConfirmation');
+        }
+        
+        if ( RouteConfig::isActive(RouteConfig::CONFIRMATION) )
+        {
+            //Confirmation route
+            $router->get('confirmation/{orderId?}/{orderAccessKey?}', 'IO\Controllers\ConfirmationController@showConfirmation');
         }
         else if( in_array(RouteConfig::CONFIRMATION, RouteConfig::getEnabledRoutes())
             && RouteConfig::getCategoryId(RouteConfig::CONFIRMATION) > 0
             && !$shopUrls->equals($shopUrls->confirmation,'/confirmation') )
         {
             // confirmation-route is activated and category is linked and category url is not '/confirmation'
-            $router->get('confirmation/{orderId?}/{orderAccessKey?}', function($orderId = 0, $accessKey = '') use ($shopUrls)
-            {
-                $confirmationParams = [];
-
-                if((int)$orderId > 0 && strlen($accessKey))
-                {
-                    $confirmationParams['orderId'] = $orderId;
-                    $confirmationParams['accessKey'] = $accessKey;
-                }
-
-                /** @var CategoryController $categoryController */
-                $categoryController = pluginApp(CategoryController::class);
-
-                return $categoryController->redirectToCategory(RouteConfig::getCategoryId(RouteConfig::CONFIRMATION), '/confirmation', $confirmationParams);
-            });
-
-            $router->get('-/akQQ{orderAccessKey}/idQQ{orderId}', function($accessKey, $orderId) use ($shopUrls)
-            {
-                /** @var CategoryController $categoryController */
-                $categoryController = pluginApp(CategoryController::class);
-
-                return $categoryController->redirectToCategory(RouteConfig::getCategoryId(RouteConfig::CONFIRMATION), '/confirmation', ['orderId' => $orderId, 'accessKey' => $accessKey]);
-            });
-            $router->get('_py-/akQQ{orderAccessKey}/idQQ{orderId}', function($accessKey, $orderId) use ($shopUrls)
-            {
-                /** @var CategoryController $categoryController */
-                $categoryController = pluginApp(CategoryController::class);
-
-                return $categoryController->redirectToCategory(RouteConfig::getCategoryId(RouteConfig::CONFIRMATION), '/confirmation', ['orderId' => $orderId, 'accessKey' => $accessKey]);
-            });
-            $router->get('_py_/akQQ{orderAccessKey}/idQQ{orderId}', function($accessKey, $orderId) use ($shopUrls)
-            {
-                /** @var CategoryController $categoryController */
-                $categoryController = pluginApp(CategoryController::class);
-
-                return $categoryController->redirectToCategory(RouteConfig::getCategoryId(RouteConfig::CONFIRMATION), '/confirmation', ['orderId' => $orderId, 'accessKey' => $accessKey]);
-            });
-            $router->get('_plentyShop__/akQQ{orderAccessKey}/idQQ{orderId}', function($accessKey, $orderId) use ($shopUrls)
-            {
-                /** @var CategoryController $categoryController */
-                $categoryController = pluginApp(CategoryController::class);
-
-                return $categoryController->redirectToCategory(RouteConfig::getCategoryId(RouteConfig::CONFIRMATION), '/confirmation', ['orderId' => $orderId, 'accessKey' => $accessKey]);
-            });
+            $router->get('confirmation/{orderId?}/{orderAccessKey?}', 'IO\Controllers\ConfirmationController@redirect');
         }
 
         // CONTACT
@@ -229,7 +176,8 @@ class IORouteServiceProvider extends RouteServiceProvider
             $router,
             RouteConfig::CONTACT,
             $shopUrls->contact,
-            'IO\Controllers\ContactController@showContact'
+            'IO\Controllers\ContactController@showContact',
+            'IO\Controllers\ContactController@redirect'
         );
 
         // HOME
@@ -249,7 +197,8 @@ class IORouteServiceProvider extends RouteServiceProvider
             $router,
             RouteConfig::LEGAL_DISCLOSURE,
             $shopUrls->legalDisclosure,
-            'IO\Controllers\StaticPagesController@showLegalDisclosure'
+            'IO\Controllers\StaticPagesController@showLegalDisclosure',
+            'IO\Controllers\StaticPagesController@redirectLegalDisclosure'
         );
 
         // LOGIN
@@ -257,7 +206,8 @@ class IORouteServiceProvider extends RouteServiceProvider
             $router,
             RouteConfig::LOGIN,
             $shopUrls->login,
-            'IO\Controllers\LoginController@showLogin'
+            'IO\Controllers\LoginController@showLogin',
+            'IO\Controllers\LoginController@redirect'
         );
 
         // MY ACCOUNT
@@ -265,7 +215,8 @@ class IORouteServiceProvider extends RouteServiceProvider
             $router,
             RouteConfig::MY_ACCOUNT,
             $shopUrls->myAccount,
-            'IO\Controllers\MyAccountController@showMyAccount'
+            'IO\Controllers\MyAccountController@showMyAccount',
+            'IO\Controllers\MyAccountController@redirect'
         );
 
         // NEWSLETTER OPT IN
@@ -284,13 +235,7 @@ class IORouteServiceProvider extends RouteServiceProvider
             && RouteConfig::getCategoryId(RouteConfig::NEWSLETTER_OPT_OUT) > 0
             && !$shopUrls->equals($shopUrls->newsletterOptOut, '/newsletter/unsubscribe'))
         {
-            $router->get('newsletter/unsubscribe', function() use ($shopUrls)
-            {
-                /** @var CategoryController $categoryController */
-                $categoryController = pluginApp(CategoryController::class);
-
-                return $categoryController->redirectToCategory(RouteConfig::getCategoryId(RouteConfig::NEWSLETTER_OPT_OUT), '/newsletter/unsubscribe');
-            });
+            $router->get('newsletter/unsubscribe', 'IO\Controllers\NewsletterOptOutController@redirect');
         }
 
         // ORDER DOCUMENT
@@ -315,21 +260,7 @@ class IORouteServiceProvider extends RouteServiceProvider
             && RouteConfig::getCategoryId(RouteConfig::ORDER_RETURN) > 0
             && !$shopUrls->equals($shopUrls->returns,'/returns') )
         {
-            $router->get('returns/{orderId}/{orderAccessKey?}', function( $orderId = 0, $accessKey = '' ) use ($shopUrls)
-            {
-                $returnsParams = [];
-                $returnsParams['orderId'] = $orderId;
-
-                if(strlen($accessKey))
-                {
-                    $returnsParams['accessKey'] = $accessKey;
-                }
-
-                /** @var CategoryController $categoryController */
-                $categoryController = pluginApp(CategoryController::class);
-
-                return $categoryController->redirectToCategory(RouteConfig::getCategoryId(RouteConfig::ORDER_RETURN), '/returns', $returnsParams);
-            });
+            $router->get('returns/{orderId}/{orderAccessKey?}', 'IO\Controllers\OrderReturnController@redirect');
 
         }
 
@@ -349,21 +280,7 @@ class IORouteServiceProvider extends RouteServiceProvider
             && !$shopUrls->equals($shopUrls->passwordReset, '/password-reset')
         )
         {
-            $router->get('password-reset/{contactId}/{hash}', function($contactId, $hash) use ($shopUrls)
-            {
-                $passwordResetParams = [];
-
-                if((int)$contactId > 0 && strlen($hash))
-                {
-                    $passwordResetParams['contactId'] = $contactId;
-                    $passwordResetParams['hash'] = $hash;
-                }
-
-                /** @var CategoryController $categoryController */
-                $categoryController = pluginApp(CategoryController::class);
-
-                return $categoryController->redirectToCategory(RouteConfig::getCategoryId(RouteConfig::PASSWORD_RESET), '/password-reset', $passwordResetParams);
-            });
+            $router->get('password-reset/{contactId}/{hash}', 'IO\Controllers\CustomerPasswordResetController@redirect');
         }
 
         // PLACE ORDER
@@ -383,7 +300,8 @@ class IORouteServiceProvider extends RouteServiceProvider
             $router,
             RouteConfig::PRIVACY_POLICY,
             $shopUrls->privacyPolicy,
-            'IO\Controllers\StaticPagesController@showPrivacyPolicy'
+            'IO\Controllers\StaticPagesController@showPrivacyPolicy',
+            'IO\Controllers\StaticPagesController@redirectPrivacyPolicy'
         );
 
         // REGISTER
@@ -391,7 +309,8 @@ class IORouteServiceProvider extends RouteServiceProvider
             $router,
             RouteConfig::REGISTER,
             $shopUrls->registration,
-            'IO\Controllers\RegisterController@showRegister'
+            'IO\Controllers\RegisterController@showRegister',
+            'IO\Controllers\RegisterController@redirect'
         );
         if ( RouteConfig::isActive(RouteConfig::REGISTER) )
         {
@@ -412,7 +331,8 @@ class IORouteServiceProvider extends RouteServiceProvider
             $router,
             RouteConfig::TERMS_CONDITIONS,
             $shopUrls->termsConditions,
-            'IO\Controllers\StaticPagesController@showTermsAndConditions'
+            'IO\Controllers\StaticPagesController@showTermsAndConditions',
+            'IO\Controllers\StaticPagesController@redirectTermsAndConditions'
         );
 
         // WISH LIST
@@ -420,7 +340,8 @@ class IORouteServiceProvider extends RouteServiceProvider
             $router,
             RouteConfig::WISH_LIST,
             $shopUrls->wishList,
-            'IO\Controllers\ItemWishListController@showWishList'
+            'IO\Controllers\ItemWishListController@showWishList',
+            'IO\Controllers\ItemWishListController@redirect'
         );
 
         // ITEM ROUTES
@@ -466,9 +387,16 @@ class IORouteServiceProvider extends RouteServiceProvider
      * @param $route
      * @param $shopUrl
      * @param string $legacyController
+     * @param $redirectController
      * @throws \Plenty\Plugin\Routing\Exceptions\RouteReservedException
      */
-	private function registerRedirectedRoute(Router $router, $route, $shopUrl, $legacyController = '')
+	private function registerRedirectedRoute(
+	    Router $router,
+        $route,
+        $shopUrl,
+        $legacyController,
+        $redirectController
+    )
     {
         if(in_array($route, RouteConfig::getEnabledRoutes()))
         {
@@ -481,22 +409,11 @@ class IORouteServiceProvider extends RouteServiceProvider
             }
             else
             {
-                $router->get($route, function() use ($route)
-                {
-                    // category is assigend => redirect from legacy route to category url
-                    // This will also check if the category url equals the legacy route to avoid endless loops
-                    /** @var CategoryController $categoryController */
-                    $categoryController = pluginApp(CategoryController::class);
-
-                    return $categoryController->redirectToCategory(
-                        RouteConfig::getCategoryId($route),
-                        "/".$route
-                    );
-                });
+                $router->get($route, $redirectController);
             }
         }
 
-        if ( !RouteConfig::isActive(RouteConfig::CATEGORY) && RouteConfig::getCategoryId($route) > 0 )
+        if (!RouteConfig::isActive(RouteConfig::CATEGORY) && RouteConfig::getCategoryId($route) > 0)
         {
             // register single category url if global category route is disabled
             $lang = Utils::getLang();
