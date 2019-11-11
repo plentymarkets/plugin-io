@@ -28,6 +28,7 @@ class PlaceOrderController extends LayoutController
      * @param NotificationService $notificationService
      * @param SessionStorageService $sessionStorageService
      * @param ShopUrls $shopUrls
+     *
      * @return \Symfony\Component\HttpFoundation\Response
      */
     public function placeOrder(
@@ -36,94 +37,84 @@ class PlaceOrderController extends LayoutController
         SessionStorageService $sessionStorageService,
         ShopUrls $shopUrls)
     {
-        $request = pluginApp(Request::class);
-        $redirectParam = $request->get('redirectParam', '');
+        //check if an order has already been placed in the last 30 seconds
+        $lastPlaceOrderTry = $sessionStorageService->getSessionValue(SessionStorageKeys::LAST_PLACE_ORDER_TRY);
+
+        if (!is_null($lastPlaceOrderTry) && time() < (int)$lastPlaceOrderTry + self::ORDER_RETRY_INTERVAL)
+        {
+            //place order has been called a second time in a time frame of 30 seconds
+            $notificationService->addNotificationCode(LogLevel::ERROR, 115);
+            return $this->urlService->redirectTo($shopUrls->checkout);
+        }
+        $sessionStorageService->setSessionValue(SessionStorageKeys::LAST_PLACE_ORDER_TRY, time());
 
         try
         {
-            //check if an order has already been placed in the last 30 seconds
-            $lastPlaceOrderTry = $sessionStorageService->getSessionValue(SessionStorageKeys::LAST_PLACE_ORDER_TRY);
-            if (is_null($lastPlaceOrderTry) ||
-                ((int)$lastPlaceOrderTry > 0 && time() > (int)$lastPlaceOrderTry + self::ORDER_RETRY_INTERVAL))
-            {
-                $sessionStorageService->setSessionValue(SessionStorageKeys::LAST_PLACE_ORDER_TRY, time());
-                $orderData = $orderService->placeOrder();
-                $urlParams = [];
-                $url = "execute-payment/" . $orderData->order->id;
-                $url .= UrlQuery::shouldAppendTrailingSlash() ? '/' : '';
-
-                if(strlen($redirectParam))
-                {
-                    $urlParams['redirectParam'] = $redirectParam;
-                }
-
-                if($sessionStorageService->getSessionValue(SessionStorageKeys::READONLY_CHECKOUT) === true)
-                {
-                    $urlParams['readonlyCheckout'] = true;
-                }
-
-                if(count($urlParams))
-                {
-                    $paramString = http_build_query($urlParams);
-                    if(strlen($paramString))
-                    {
-                        $url .= '?'.$paramString;
-                    }
-                }
-
-                return $this->urlService->redirectTo($url);
-            }
-            else
-            {
-                throw new \Exception('order retry time not reached', 115);
-            }
-
-        }
-        catch(BasketItemCheckException $exception)
-        {
-            $this->getLogger(__CLASS__)->warning(
-                "IO::Debug.PlaceOrderController_cannotPlaceOrder",
-                [
-                    "code" => $exception->getCode(),
-                    "message" => $exception->getMessage()
-                ]
-            );
-            if($exception->getCode() == BasketItemCheckException::NOT_ENOUGH_STOCK_FOR_ITEM)
-            {
-                $notificationService->warn('not enough stock for item', 9);
-            }
-            else if($exception->getCode() == BasketItemCheckException::COUPON_REQUIRED)
-            {
-                $notificationService->error('promotion coupon required', 501);
-            }
-
-            return $this->urlService->redirectTo($shopUrls->checkout);
+            $orderData = $orderService->placeOrder();
         }
         catch (\Exception $exception)
         {
-            $this->getLogger(__CLASS__)->warning(
-                "IO::Debug.PlaceOrderController_cannotPlaceOrder",
+            return $this->handlePlaceOrderException($exception);
+        }
+        //TODO translation keys
+        $this->getLogger(__CLASS__)->debug(
+           "IO::Debug.PlaceOrderController_executePayment",
+           [
+               "order" => $orderData->order,
+           ]
+        );
+
+        try
+        {
+            $orderService->complete($orderData->order);
+        }
+        catch (\Exception $exception)
+        {
+           $this->getLogger(__CLASS__)->warning(
+        "IO::Debug.PlaceOrderController_cannotPlaceOrder",
                 [
                     "code" => $exception->getCode(),
                     "message" => $exception->getMessage()
                 ]
             );
-
-            if($exception->getCode() === 15)
-            {
-                return $this->urlService->redirectTo($shopUrls->confirmation);
-            }
-            elseif($exception->getCode() == 115)
-            {
-                //place order has been called a second time in a time frame of 30 seconds
-                $notificationService->addNotificationCode(LogLevel::ERROR, $exception->getCode());
-                return $this->urlService->redirectTo($shopUrls->checkout);
-            }
-
-            // TODO get better error text
-            $notificationService->error($exception->getMessage());
-            return $this->urlService->redirectTo($shopUrls->checkout);
         }
+        catch (\Throwable $throwable)
+        {
+            $this->getLogger(__CLASS__)->warning(
+            "IO::Debug.PlaceOrderController_cannotPlaceOrder",
+                [
+                        "code" => $throwable->getCode(),
+                        "message" => $throwable->getMessage()
+                ]
+            );
+        }
+
+        $request = pluginApp(Request::class);
+        $redirectParam = $request->get('redirectParam', '');
+        $urlParams = [];
+        $url = "execute-payment/" . $orderData->order->id;
+        $url .= UrlQuery::shouldAppendTrailingSlash() ? '/' : '';
+
+        if (strlen($redirectParam))
+        {
+            $urlParams['redirectParam'] = $redirectParam;
+        }
+
+        if ($sessionStorageService->getSessionValue(SessionStorageKeys::READONLY_CHECKOUT) === true)
+        {
+            $urlParams['readonlyCheckout'] = true;
+        }
+
+        if (count($urlParams))
+        {
+            $paramString = http_build_query($urlParams);
+            if (strlen($paramString))
+            {
+                $url .= '?'.$paramString;
+            }
+        }
+
+        return $this->urlService->redirectTo($url);
     }
 
     public function executePayment( OrderService $orderService, NotificationService $notificationService, ShopUrls $shopUrls, int $orderId, int $paymentId = -1 )
@@ -211,5 +202,43 @@ class PlaceOrderController extends LayoutController
             return $this->urlService->redirectTo($redirectParam);
         }
         return $this->urlService->redirectTo($shopUrls->confirmation);
+    }
+
+
+
+    private function handlePlaceOrderException(\Exception $exception)
+    {
+        /**
+         * @var NotificationService $notificationService
+         */
+        $notificationService = pluginApp(NotificationService::class);
+        /**
+         * @var ShopUrls $shopUrls
+         */
+        $shopUrls = pluginApp(ShopUrls::class);
+
+        if ($exception instanceof BasketItemCheckException)
+        {
+            if ($exception->getCode() == BasketItemCheckException::NOT_ENOUGH_STOCK_FOR_ITEM)
+            {
+                $notificationService->warn('not enough stock for item', 9);
+            }
+            elseif ($exception->getCode() == BasketItemCheckException::COUPON_REQUIRED)
+            {
+                $notificationService->error('promotion coupon required', 501);
+            }
+
+            return $this->urlService->redirectTo($shopUrls->checkout);
+        }
+        elseif ($exception->getCode() === 15)
+        {
+            // No baskets items found
+            return $this->urlService->redirectTo($shopUrls->confirmation);
+        }
+
+        // TODO get better error text
+        $notificationService->error($exception->getMessage());
+
+        return $this->urlService->redirectTo($shopUrls->checkout);
     }
 }

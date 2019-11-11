@@ -121,19 +121,16 @@ class OrderService
      */
 	public function placeOrder():LocalizedOrder
 	{
-	    $email = $this->customerService->getEmail();
-	    $billingAddressId = $this->checkoutService->getBillingAddressId();
         $basket = $this->basketService->getBasket();
-
         $couponCode = null;
-        if(strlen($basket->couponCode))
+        if (strlen($basket->couponCode))
         {
             $couponCode = $basket->couponCode;
         }
 
         $isShippingPrivacyHintAccepted = $this->sessionStorage->getSessionValue(SessionStorageKeys::SHIPPING_PRIVACY_HINT_ACCEPTED);
 
-        if(is_null($isShippingPrivacyHintAccepted) || !strlen($isShippingPrivacyHintAccepted))
+        if (is_null($isShippingPrivacyHintAccepted) || !strlen($isShippingPrivacyHintAccepted))
         {
             $isShippingPrivacyHintAccepted = 'false';
         }
@@ -169,28 +166,6 @@ class OrderService
             'order' => $order,
             'basket' => $basket
         ]);
-
-        if ($order instanceof Order && $order->id > 0) {
-            $params = [
-                'orderId' => $order->id,
-                'webstoreId' => Utils::getWebstoreId(),
-                'language' => $this->sessionStorage->getLang()
-            ];
-            $this->sendMail(AutomaticEmailTemplate::SHOP_ORDER ,AutomaticEmailOrder::class, $params);
-    
-            if( ($order->amounts[0]->invoiceTotal == 0) || ($order->amounts[0]->invoiceTotal == $order->amounts[0]->giftCardAmount) ) {
-                $this->createAndAssignDummyPayment($order);
-            }
-        }
-
-        $this->subscribeToNewsletter($email, $billingAddressId);
-
-        $this->sessionStorage->setSessionValue(SessionStorageKeys::ORDER_CONTACT_WISH, null);
-
-        if($this->customerService->getContactId() <= 0)
-        {
-            $this->sessionStorage->setSessionValue(SessionStorageKeys::LATEST_ORDER_ID, $order->id);
-        }
 
         return LocalizedOrder::wrap( $order, $this->sessionStorage->getLang() );
 	}
@@ -732,6 +707,57 @@ class OrderService
         }
 
         return null;
+    }
+
+
+    /**
+     * Do steps after creating the order
+     *
+     * @param Order $order
+     */
+    public function complete($order)
+    {
+        if ($order instanceof Order && $order->id > 0)
+        {
+            try
+            {
+                $params = [
+                    'orderId' => $order->id,
+                    'webstoreId' => Utils::getWebstoreId(),
+                    'language' => $this->sessionStorage->getLang()
+                ];
+                $this->sendMail(AutomaticEmailTemplate::SHOP_ORDER ,AutomaticEmailOrder::class, $params);
+
+            }
+            catch (\Throwable $throwable)
+            {
+                //TODO write log
+            }
+
+            try
+            {
+                if( ($order->amounts[0]->invoiceTotal == 0) || ($order->amounts[0]->invoiceTotal == $order->amounts[0]->giftCardAmount) )
+                {
+                    $this->createAndAssignDummyPayment($order);
+                }
+            }
+            catch (\Throwable $throwable)
+            {
+                //TODO write log
+            }
+        }
+
+	    $email = $this->customerService->getEmail();
+	    $billingAddressId = $this->checkoutService->getBillingAddressId();
+
+        $this->subscribeToNewsletter($email, $billingAddressId);
+
+        $this->sessionStorage->setSessionValue(SessionStorageKeys::ORDER_CONTACT_WISH, null);
+
+        if ($this->customerService->getContactId() <= 0)
+        {
+            $this->sessionStorage->setSessionValue(SessionStorageKeys::LATEST_ORDER_ID, $order->id);
+        }
     }
 
     /**
