@@ -464,6 +464,7 @@ class OrderService
                     if ($relation->referenceType === OrderReference::REFERENCE_TYPE_PARENT)
                     {
                         $order = $relation->referenceOrder;
+                        break;
                     }
                 }
             }
