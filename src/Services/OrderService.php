@@ -155,12 +155,13 @@ class OrderService
         {
             $order = $this->orderRepository->createOrder($order, $couponCode);
         }
-        catch (\Exception $e)
+        catch (\Exception $exception)
         {
             $this->getLogger(__CLASS__)->error("IO::Debug.OrderService_orderValidationError", [
-                'code' => $e->getCode(),
-                'message' => $e->getMessage()
+                'code' => $exception->getCode(),
+                'message' => $exception->getMessage()
             ]);
+            throw $exception;
         }
 
         $this->getLogger(__CLASS__)->debug('IO::Debug.OrderService_placeOrder', [
@@ -745,33 +746,46 @@ class OrderService
             }
             catch (\Throwable $throwable)
             {
-                //TODO write log
+                $this->handleThrowable($throwable);
             }
 
             try
             {
-                if( ($order->amounts[0]->invoiceTotal == 0) || ($order->amounts[0]->invoiceTotal == $order->amounts[0]->giftCardAmount) )
+                if (($order->amounts[0]->invoiceTotal == 0) || ($order->amounts[0]->invoiceTotal == $order->amounts[0]->giftCardAmount))
                 {
                     $this->createAndAssignDummyPayment($order);
                 }
             }
             catch (\Throwable $throwable)
             {
-                //TODO write log
+                $this->handleThrowable($throwable);
             }
         }
 
-	    $email = $this->customerService->getEmail();
-	    $billingAddressId = $this->checkoutService->getBillingAddressId();
 
-        $this->subscribeToNewsletter($email, $billingAddressId);
+        try
+        {
+            $email = $this->customerService->getEmail();
+            $billingAddressId = $this->checkoutService->getBillingAddressId();
+            $this->subscribeToNewsletter($email, $billingAddressId);
+        }
+        catch (\Throwable $throwable)
+        {
+            $this->handleThrowable($throwable);
+        }
 
         $this->sessionStorage->setSessionValue(SessionStorageKeys::ORDER_CONTACT_WISH, null);
-
         if ($this->customerService->getContactId() <= 0)
         {
             $this->sessionStorage->setSessionValue(SessionStorageKeys::LATEST_ORDER_ID, $order->id);
         }
+    }
+
+    private function handleThrowable(\Throwable $throwable)
+    {
+        $this->getLogger(__CLASS__)->error("IO::Debug.OrderService_orderCompleteError", [
+            'message' => $throwable->getMessage()
+        ]);
     }
 
     /**

@@ -56,9 +56,9 @@ class PlaceOrderController extends LayoutController
         {
             return $this->handlePlaceOrderException($exception);
         }
-        //TODO translation keys
+
         $this->getLogger(__CLASS__)->debug(
-           "IO::Debug.PlaceOrderController_executePayment",
+           "IO::Debug.PlaceOrderController_orderCreated",
            [
                "order" => $orderData->order,
            ]
@@ -71,20 +71,10 @@ class PlaceOrderController extends LayoutController
         catch (\Exception $exception)
         {
            $this->getLogger(__CLASS__)->warning(
-        "IO::Debug.PlaceOrderController_cannotPlaceOrder",
+        "IO::Debug.PlaceOrderController_cannotCompleteOrder",
                 [
                     "code" => $exception->getCode(),
                     "message" => $exception->getMessage()
-                ]
-            );
-        }
-        catch (\Throwable $throwable)
-        {
-            $this->getLogger(__CLASS__)->warning(
-            "IO::Debug.PlaceOrderController_cannotPlaceOrder",
-                [
-                        "code" => $throwable->getCode(),
-                        "message" => $throwable->getMessage()
                 ]
             );
         }
@@ -228,16 +218,17 @@ class PlaceOrderController extends LayoutController
                 $notificationService->error('promotion coupon required', 501);
             }
 
-            return $this->urlService->redirectTo($shopUrls->checkout);
         }
         elseif ($exception->getCode() === 15)
         {
             // No baskets items found
             return $this->urlService->redirectTo($shopUrls->confirmation);
         }
-
-        // TODO get better error text
-        $notificationService->error($exception->getMessage());
+        else
+        {
+            // TODO get better error text
+            $notificationService->error($exception->getMessage());
+        }
 
         return $this->urlService->redirectTo($shopUrls->checkout);
     }
