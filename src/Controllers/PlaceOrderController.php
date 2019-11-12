@@ -70,8 +70,9 @@ class PlaceOrderController extends LayoutController
         }
         catch (\Exception $exception)
         {
-           $this->getLogger(__CLASS__)->warning(
-        "IO::Debug.PlaceOrderController_cannotCompleteOrder",
+            // This should never happen since every exception should be caught inside this function!
+            $this->getLogger(__CLASS__)->error(
+                "IO::Debug.PlaceOrderController_cannotCompleteOrder",
                 [
                     "code" => $exception->getCode(),
                     "message" => $exception->getMessage()
@@ -221,7 +222,8 @@ class PlaceOrderController extends LayoutController
         }
         elseif ($exception->getCode() === 15)
         {
-            // No baskets items found
+            // No baskets items found because basket has already been cleared after previous try of placing an order.
+            // Order should already been created => redirect to confirmation page
             return $this->urlService->redirectTo($shopUrls->confirmation);
         }
         else

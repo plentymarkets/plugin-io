@@ -746,7 +746,7 @@ class OrderService
             }
             catch (\Throwable $throwable)
             {
-                $this->handleThrowable($throwable);
+                $this->handleThrowable($throwable, "IO::Debug.OrderService_orderCompleteErrorSendMail");
             }
 
             try
@@ -758,7 +758,7 @@ class OrderService
             }
             catch (\Throwable $throwable)
             {
-                $this->handleThrowable($throwable);
+                $this->handleThrowable($throwable, "IO::Debug.OrderService_orderCompleteErrorDummyPayment");
             }
         }
 
@@ -771,7 +771,7 @@ class OrderService
         }
         catch (\Throwable $throwable)
         {
-            $this->handleThrowable($throwable);
+            $this->handleThrowable($throwable, "IO::Debug.OrderService_orderCompleteErrorSubscribeNewsletter");
         }
 
         $this->sessionStorage->setSessionValue(SessionStorageKeys::ORDER_CONTACT_WISH, null);
@@ -781,9 +781,9 @@ class OrderService
         }
     }
 
-    private function handleThrowable(\Throwable $throwable)
+    private function handleThrowable(\Throwable $throwable, $message = null)
     {
-        $this->getLogger(__CLASS__)->error("IO::Debug.OrderService_orderCompleteError", [
+        $this->getLogger(__CLASS__)->error($message ?? "IO::Debug.OrderService_orderCompleteError", [
             'message' => $throwable->getMessage()
         ]);
     }
