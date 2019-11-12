@@ -23,6 +23,7 @@ use Plenty\Modules\Helper\AutomaticEmail\Models\AutomaticEmailTemplate;
 use Plenty\Modules\Order\Contracts\OrderRepositoryContract;
 use Plenty\Modules\Order\Date\Models\OrderDate;
 use Plenty\Modules\Order\Date\Models\OrderDateType;
+use Plenty\Modules\Order\Models\OrderReference;
 use Plenty\Modules\Order\Property\Contracts\OrderPropertyRepositoryContract;
 use Plenty\Modules\Order\Property\Models\OrderPropertyType;
 use Plenty\Modules\Payment\Contracts\PaymentRepositoryContract;
@@ -177,7 +178,7 @@ class OrderService
                 'language' => $this->sessionStorage->getLang()
             ];
             $this->sendMail(AutomaticEmailTemplate::SHOP_ORDER ,AutomaticEmailOrder::class, $params);
-    
+
             if( ($order->amounts[0]->invoiceTotal == 0) || ($order->amounts[0]->invoiceTotal == $order->amounts[0]->giftCardAmount) ) {
                 $this->createAndAssignDummyPayment($order);
             }
@@ -454,6 +455,19 @@ class OrderService
         if($contactId > 0)
         {
             $order = $this->orderRepository->getLatestOrderByContactId( $contactId );
+
+            // load parent order, if given
+            if ($order->typeId !== OrderType::ORDER)
+            {
+                foreach ($order->orderReferences as $relation)
+                {
+                    if ($relation->referenceType === OrderReference::REFERENCE_TYPE_PARENT)
+                    {
+                        $order = $relation->referenceOrder;
+                        break;
+                    }
+                }
+            }
         }
         else
         {
