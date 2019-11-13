@@ -67,6 +67,6 @@ trait FakeString
 
     protected function hexColor()
     {
-       return '#' . str_pad(dechex(mt_rand(0, 0xFFFFFF)), 6, '0', STR_PAD_LEFT);
+        return "#".substr(md5(rand()), 0, 6);
     }
 }
