@@ -24,6 +24,7 @@ use IO\Services\LocalizationService;
 use IO\Services\NotificationService;
 use IO\Services\OrderService;
 use IO\Services\OrderTotalsService;
+use IO\Services\PropertyFileService;
 use IO\Services\SalesPriceService;
 use IO\Services\SessionStorageService;
 use IO\Services\TagService;
@@ -183,5 +184,10 @@ class TwigServiceContainer
     public function getFaker()
     {
         return pluginApp( FakerService::class );
+    }
+
+    public function getPropertyFile()
+    {
+        return pluginApp(PropertyFileService::class);
     }
 }
