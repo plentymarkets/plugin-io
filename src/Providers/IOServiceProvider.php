@@ -37,6 +37,7 @@ use IO\Services\NotificationService;
 use IO\Services\OrderService;
 use IO\Services\OrderTotalsService;
 use IO\Services\PriceDetectService;
+use IO\Services\PropertyFileService;
 use IO\Services\SalesPriceService;
 use IO\Services\SessionStorageService;
 use IO\Services\ShippingService;
@@ -117,7 +118,8 @@ class IOServiceProvider extends ServiceProvider
             UrlService::class,
             WebstoreConfigurationService::class,
             LiveShoppingService::class,
-            FakerService::class
+            FakerService::class,
+            PropertyFileService::class
         ]);
 
         $this->getApplication()->singleton(FacetExtensionContainer::class);
