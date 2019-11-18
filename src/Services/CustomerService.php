@@ -232,9 +232,11 @@ class CustomerService
      * @param array $contactData
      * @param null $billingAddressData
      * @param null $deliveryAddressData
+     * @param int|null $plentyId
      * @return Contact
+     * @throws \Plenty\Exceptions\ValidationException
      */
-	public function registerCustomer(array $contactData, $billingAddressData = null, $deliveryAddressData = null)
+	public function registerCustomer(array $contactData, $billingAddressData = null, $deliveryAddressData = null, $plentyId = null)
 	{
         /** @var BasketService $basketService */
         $basketService = pluginApp(BasketService::class);
@@ -261,7 +263,7 @@ class CustomerService
             $guestDeliveryAddress = $this->addressRepository->findAddressById($guestDeliveryAddressId);
         }
 
-        $contact = $this->createContact($contactData);
+        $contact = $this->createContact($contactData, $plentyId);
 
         if(!is_null($contact) && $contact->id > 0)
         {
@@ -342,13 +344,14 @@ class CustomerService
     /**
      * Create a new contact
      * @param array $contactData
+     * @param int|null $plentyId
      * @return Contact
      */
-	public function createContact(array $contactData)
+	public function createContact(array $contactData, $plentyId = null)
 	{
 	    $contact = null;
         $contactData['checkForExistingEmail'] = true;
-	    $contactData['plentyId'] = Utils::getPlentyId();
+	    $contactData['plentyId'] = $plentyId ?? Utils::getPlentyId();
 
 	    if(!isset($contactData['lang']) || is_null($contactData['lang']))
         {
