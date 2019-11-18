@@ -345,12 +345,25 @@ class CustomerService
      * Create a new contact
      * @param array $contactData
      * @param int|null $plentyId
-     * @return Contact
+     * @return Contact|array
      */
 	public function createContact(array $contactData, $plentyId = null)
 	{
 	    $contact = null;
         $contactData['checkForExistingEmail'] = true;
+
+        if ($plentyId) {
+            /** @var WebstoreConfigurationRepositoryContract $webstoreConfig */
+            $webstoreConfig = pluginApp(WebstoreConfigurationRepositoryContract::class);
+            $webstore = $webstoreConfig->findByPlentyId($plentyId);
+            if (!$webstore->storeIdentifier) {
+                return [
+                    'code'      => 1,
+                    'message'   => "given plentyId does not exist"
+                ];
+            }
+        }
+
 	    $contactData['plentyId'] = $plentyId ?? Utils::getPlentyId();
 
 	    if(!isset($contactData['lang']) || is_null($contactData['lang']))
