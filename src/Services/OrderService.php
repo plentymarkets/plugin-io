@@ -23,6 +23,7 @@ use Plenty\Modules\Helper\AutomaticEmail\Models\AutomaticEmailTemplate;
 use Plenty\Modules\Order\Contracts\OrderRepositoryContract;
 use Plenty\Modules\Order\Date\Models\OrderDate;
 use Plenty\Modules\Order\Date\Models\OrderDateType;
+use Plenty\Modules\Order\Models\OrderReference;
 use Plenty\Modules\Order\Property\Contracts\OrderPropertyRepositoryContract;
 use Plenty\Modules\Order\Property\Models\OrderPropertyType;
 use Plenty\Modules\Payment\Contracts\PaymentRepositoryContract;
@@ -121,19 +122,16 @@ class OrderService
      */
 	public function placeOrder():LocalizedOrder
 	{
-	    $email = $this->customerService->getEmail();
-	    $billingAddressId = $this->checkoutService->getBillingAddressId();
         $basket = $this->basketService->getBasket();
-
         $couponCode = null;
-        if(strlen($basket->couponCode))
+        if (strlen($basket->couponCode))
         {
             $couponCode = $basket->couponCode;
         }
 
         $isShippingPrivacyHintAccepted = $this->sessionStorage->getSessionValue(SessionStorageKeys::SHIPPING_PRIVACY_HINT_ACCEPTED);
 
-        if(is_null($isShippingPrivacyHintAccepted) || !strlen($isShippingPrivacyHintAccepted))
+        if (is_null($isShippingPrivacyHintAccepted) || !strlen($isShippingPrivacyHintAccepted))
         {
             $isShippingPrivacyHintAccepted = 'false';
         }
@@ -157,40 +155,19 @@ class OrderService
         {
             $order = $this->orderRepository->createOrder($order, $couponCode);
         }
-        catch (\Exception $e)
+        catch (\Exception $exception)
         {
             $this->getLogger(__CLASS__)->error("IO::Debug.OrderService_orderValidationError", [
-                'code' => $e->getCode(),
-                'message' => $e->getMessage()
+                'code' => $exception->getCode(),
+                'message' => $exception->getMessage()
             ]);
+            throw $exception;
         }
 
         $this->getLogger(__CLASS__)->debug('IO::Debug.OrderService_placeOrder', [
             'order' => $order,
             'basket' => $basket
         ]);
-
-        if ($order instanceof Order && $order->id > 0) {
-            $params = [
-                'orderId' => $order->id,
-                'webstoreId' => Utils::getWebstoreId(),
-                'language' => $this->sessionStorage->getLang()
-            ];
-            $this->sendMail(AutomaticEmailTemplate::SHOP_ORDER ,AutomaticEmailOrder::class, $params);
-    
-            if( ($order->amounts[0]->invoiceTotal == 0) || ($order->amounts[0]->invoiceTotal == $order->amounts[0]->giftCardAmount) ) {
-                $this->createAndAssignDummyPayment($order);
-            }
-        }
-
-        $this->subscribeToNewsletter($email, $billingAddressId);
-
-        $this->sessionStorage->setSessionValue(SessionStorageKeys::ORDER_CONTACT_WISH, null);
-
-        if($this->customerService->getContactId() <= 0)
-        {
-            $this->sessionStorage->setSessionValue(SessionStorageKeys::LATEST_ORDER_ID, $order->id);
-        }
 
         return LocalizedOrder::wrap( $order, $this->sessionStorage->getLang() );
 	}
@@ -454,6 +431,19 @@ class OrderService
         if($contactId > 0)
         {
             $order = $this->orderRepository->getLatestOrderByContactId( $contactId );
+
+            // load parent order, if given
+            if ($order->typeId !== OrderType::ORDER)
+            {
+                foreach ($order->orderReferences as $relation)
+                {
+                    if ($relation->referenceType === OrderReference::REFERENCE_TYPE_PARENT)
+                    {
+                        $order = $relation->referenceOrder;
+                        break;
+                    }
+                }
+            }
         }
         else
         {
@@ -732,6 +722,70 @@ class OrderService
         }
 
         return null;
+    }
+
+
+    /**
+     * Do steps after creating the order
+     *
+     * @param Order $order
+     */
+    public function complete($order)
+    {
+        if ($order instanceof Order && $order->id > 0)
+        {
+            try
+            {
+                $params = [
+                    'orderId' => $order->id,
+                    'webstoreId' => Utils::getWebstoreId(),
+                    'language' => $this->sessionStorage->getLang()
+                ];
+                $this->sendMail(AutomaticEmailTemplate::SHOP_ORDER ,AutomaticEmailOrder::class, $params);
+
+            }
+            catch (\Throwable $throwable)
+            {
+                $this->handleThrowable($throwable, "IO::Debug.OrderService_orderCompleteErrorSendMail");
+            }
+
+            try
+            {
+                if (($order->amounts[0]->invoiceTotal == 0) || ($order->amounts[0]->invoiceTotal == $order->amounts[0]->giftCardAmount))
+                {
+                    $this->createAndAssignDummyPayment($order);
+                }
+            }
+            catch (\Throwable $throwable)
+            {
+                $this->handleThrowable($throwable, "IO::Debug.OrderService_orderCompleteErrorDummyPayment");
+            }
+        }
+
+
+        try
+        {
+            $email = $this->customerService->getEmail();
+            $billingAddressId = $this->checkoutService->getBillingAddressId();
+            $this->subscribeToNewsletter($email, $billingAddressId);
+        }
+        catch (\Throwable $throwable)
+        {
+            $this->handleThrowable($throwable, "IO::Debug.OrderService_orderCompleteErrorSubscribeNewsletter");
+        }
+
+        $this->sessionStorage->setSessionValue(SessionStorageKeys::ORDER_CONTACT_WISH, null);
+        if ($this->customerService->getContactId() <= 0)
+        {
+            $this->sessionStorage->setSessionValue(SessionStorageKeys::LATEST_ORDER_ID, $order->id);
+        }
+    }
+
+    private function handleThrowable(\Throwable $throwable, $message = null)
+    {
+        $this->getLogger(__CLASS__)->error($message ?? "IO::Debug.OrderService_orderCompleteError", [
+            'message' => $throwable->getMessage()
+        ]);
     }
 
     /**
