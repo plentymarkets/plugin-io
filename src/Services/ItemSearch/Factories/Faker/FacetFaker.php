@@ -19,7 +19,7 @@ class FacetFaker extends AbstractFaker
     private function makeFacet()
     {
         return [
-            'id' => $this->number(),
+            'id' => $this->number().'',
             'name' => $this->trans("IO::Faker.facetName"),
             'position' => 0,
             'values' => $this->makeValues(),
@@ -34,7 +34,7 @@ class FacetFaker extends AbstractFaker
         for ($i = 1; $i <= $this->number(3, 10); $i++)
         {
             $result[] = [
-                'id' => $i,
+                'id' => $i.'',
                 'name' => $this->trans("IO::Faker.facetValueName"),
                 'count' => $this->number(1, 10),
             ];
