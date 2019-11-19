@@ -9,7 +9,7 @@ namespace IO\Controllers;
 class TagController extends LayoutController
 {
     /**
-     * @param string $name
+     * @param string $tagName
      * @param int $tagId
      */
     public function showItemByTag(string $tagName = "", int $tagId = null)
