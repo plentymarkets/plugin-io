@@ -4,37 +4,35 @@ namespace IO\Services\ItemSearch\Factories\Faker;
 
 class FacetFaker extends AbstractFaker
 {
-    public $isList = true;
-
-    public $facetData = [];
+    public $facetTypes = [
+        "availability" => [
+            "name"      => "IO::Faker.facetNameAvailability",
+            "valueName" => "IO::Faker.facetValueNameAvailability"
+        ],
+        "category" => [
+            "name"      => "IO::Faker.facetNameCategory",
+            "valueName" => "IO::Faker.facetValueNameCategory"
+        ],
+        "dynamic" => [
+            "name"      => "IO::Faker.facetNameDynamic",
+            "valueName" => "IO::Faker.facetValueNameDynamic"
+        ],
+        "price" => [
+            "name"      => "IO::Faker.facetNamePrice",
+            "valueName" => "IO::Faker.facetValueNamePrice"
+        ]
+    ];
 
     public function fill($data)
     {
-        $types = [
-            "availability" => [
-                "name"      => "IO::Faker.facetNameAvailability",
-                "valueName" => "IO::Faker.facetValueNameAvailability"
-            ],
-            "category" => [
-                "name"      => "IO::Faker.facetNameCategory",
-                "valueName" => "IO::Faker.facetValueNameCategory"
-            ],
-            "dynamic" => [
-                "name"      => "IO::Faker.facetNameDynamic",
-                "valueName" => "IO::Faker.facetValueNameDynamic"
-            ],
-            "price" => [
-                "name"      => "IO::Faker.facetNamePrice",
-                "valueName" => "IO::Faker.facetValueNamePrice"
-            ]
-        ];
+        $default = [];
 
-        foreach ($types as $type => $names)
+        foreach ($this->facetTypes as $type => $names)
         {
-            $this->facetData[] = $this->makeFacet($type, $names);
+            $default[] = $this->makeFacet($type, $names);
         }
 
-        $this->merge($data, $this->facetData);
+        $this->merge($data, $default);
         return $data;
     }
 
