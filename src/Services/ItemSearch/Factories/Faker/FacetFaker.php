@@ -5,49 +5,37 @@ namespace IO\Services\ItemSearch\Factories\Faker;
 class FacetFaker extends AbstractFaker
 {
     public $facetTypes = [
-        "availability" => [
-            "name"      => "IO::Faker.facetNameAvailability",
-            "valueName" => "IO::Faker.facetValueNameAvailability"
-        ],
-        "category" => [
-            "name"      => "IO::Faker.facetNameCategory",
-            "valueName" => "IO::Faker.facetValueNameCategory"
-        ],
-        "dynamic" => [
-            "name"      => "IO::Faker.facetNameDynamic",
-            "valueName" => "IO::Faker.facetValueNameDynamic"
-        ],
-        "price" => [
-            "name"      => "IO::Faker.facetNamePrice",
-            "valueName" => "IO::Faker.facetValueNamePrice"
-        ]
+        "availability" => "IO::Faker.facetNameAvailability",
+        "category"     => "IO::Faker.facetNameCategory",
+        "dynamic"      => "IO::Faker.facetNameDynamic",
+        "price"        => "IO::Faker.facetNamePrice"
     ];
 
     public function fill($data)
     {
         $default = [];
 
-        foreach ($this->facetTypes as $type => $names)
+        foreach ($this->facetTypes as $type => $name)
         {
-            $default[] = $this->makeFacet($type, $names);
+            $default[] = $this->makeFacet($type, $name);
         }
 
         $this->merge($data, $default);
         return $data;
     }
 
-    private function makeFacet($type, $names)
+    private function makeFacet($type, $name)
     {
         return [
             'id' => $type,
-            'name' => $this->trans($names["name"]),
+            'name' => $this->trans($name),
             'position' => 0,
-            'values' => $this->makeValues($names["valueName"]),
+            'values' => $this->makeValues(),
             "type" => $type
         ];
     }
 
-    private function makeValues($valueName)
+    private function makeValues()
     {
         $result = [];
 
@@ -55,7 +43,7 @@ class FacetFaker extends AbstractFaker
         {
             $result[] = [
                 'id' => $i.'',
-                'name' => $this->trans($valueName),
+                'name' => $this->trans("IO::Faker.facetValueName"),
                 'count' => $this->number(1, 10),
             ];
         }
