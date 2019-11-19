@@ -6,6 +6,8 @@ class FacetFaker extends AbstractFaker
 {
     public $isList = true;
 
+    public $facetData = [];
+
     public function fill($data)
     {
         $types = [
@@ -27,14 +29,12 @@ class FacetFaker extends AbstractFaker
             ]
         ];
 
-        $default = [];
-
         foreach ($types as $type => $names)
         {
-            $default[] = $this->makeFacet($type, $names);
+            $this->facetData[] = $this->makeFacet($type, $names);
         }
 
-        $this->merge($data, $default);
+        $this->merge($data, $this->facetData);
         return $data;
     }
 
