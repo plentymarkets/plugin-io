@@ -745,6 +745,7 @@ class BasketService
             $result[$basketItem->variationId]['data']['texts']['name3'] = $texts->name3 ?? '';
             $result[$basketItem->variationId]['data']['variation']['vatId'] = $variation->vatId ?? $variation->parent->vatId;
             $result[$basketItem->variationId]['data']['properties'] = $variation->variationProperties->toArray();
+            $result[$basketItem->variationId]['data']['basketItemOrderParams'] = $basketItem->basketItemOrderParams;
         }
 
         return $result;
