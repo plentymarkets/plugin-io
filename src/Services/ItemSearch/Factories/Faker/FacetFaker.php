@@ -54,7 +54,7 @@ class FacetFaker extends AbstractFaker
         for ($i = 1; $i <= $this->number(3, 10); $i++)
         {
             $result[] = [
-                'id' => $i,
+                'id' => $i.'',
                 'name' => $this->trans($valueName),
                 'count' => $this->number(1, 10),
             ];
