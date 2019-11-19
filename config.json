@@ -298,6 +298,10 @@
                             {
                                 "value": "page-not-found",
                                 "caption": "Config.routingEnabledRoutesPossibleValuePageNotFound"
+                            },
+                            {
+                                "value": "tags",
+                                "caption": "Config.routingEnabledRoutesPossibleValueTags"
                             }
                         ]
                     }

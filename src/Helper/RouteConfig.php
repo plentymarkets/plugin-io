@@ -33,6 +33,7 @@ class RouteConfig
     const TERMS_CONDITIONS          = "gtc";
     const WISH_LIST                 = "wish-list";
     const PAGE_NOT_FOUND            = "page-not-found";
+    const TAGS                      = "tags";
 
     private static $enabledRoutes = null;
     private static $overrides = [];
@@ -73,7 +74,8 @@ class RouteConfig
                     self::SEARCH,
                     self::TERMS_CONDITIONS,
                     self::WISH_LIST,
-                    self::PAGE_NOT_FOUND
+                    self::PAGE_NOT_FOUND,
+                    self::TAGS
                 ];
             }
             else

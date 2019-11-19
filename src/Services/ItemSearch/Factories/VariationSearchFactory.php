@@ -15,7 +15,7 @@ use IO\Services\ItemSearch\Extensions\ItemDefaultImage;
 use IO\Services\ItemSearch\Extensions\ItemUrlExtension;
 use IO\Services\ItemSearch\Extensions\PriceSearchExtension;
 use IO\Services\ItemSearch\Extensions\ReduceDataExtension;
-use IO\Services\ItemSearch\Extensions\TagsExtension;
+use IO\Services\ItemSearch\Extensions\TagExtension;
 use IO\Services\ItemSearch\Extensions\VariationAttributeMapExtension;
 use IO\Services\ItemSearch\Extensions\VariationPropertyExtension;
 use IO\Services\ItemSearch\Helper\FacetExtensionContainer;
@@ -805,7 +805,7 @@ class VariationSearchFactory extends BaseSearchFactory
 
     public function withTags()
     {
-        $this->withExtension(TagsExtension::class);
+        $this->withExtension(TagExtension::class);
         return $this;
     }
 

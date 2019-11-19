@@ -368,10 +368,6 @@ class IORouteServiceProvider extends RouteServiceProvider
 
             $router->get('a-{itemId}', 'IO\Controllers\ItemController@showItemFromAdmin')
                 ->where('itemId', '[0-9]+');
-            
-            $router->get('{slug}_t{tagId}', 'IO\Controllers\TagController@showItemByTag')
-            ->where('slug', '.*')
-            ->where('tagId', '[0-9]+');
         }
 
         // CATEGORY ROUTES
@@ -384,6 +380,14 @@ class IORouteServiceProvider extends RouteServiceProvider
         if ( RouteConfig::isActive(RouteConfig::PAGE_NOT_FOUND) )
         {
             $router->get('{anything?}', 'IO\Controllers\StaticPagesController@showPageNotFound');
+        }
+
+        // TAGS
+        if ( RouteConfig::isActive(RouteConfig::TAGS) )
+        {
+            $router->get('{slug}_t{tagId}', 'IO\Controllers\TagController@showItemByTag')
+            ->where('slug', '.*')
+            ->where('tagId', '[0-9]+');
         }
 	}
 

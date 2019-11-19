@@ -5,7 +5,7 @@ namespace IO\Services\ItemSearch\Extensions;
 use Plenty\Modules\Authorization\Services\AuthHelper;
 use Plenty\Modules\Tag\Contracts\TagRepositoryContract;
 
-class TagsExtension implements ItemSearchExtension
+class TagExtension implements ItemSearchExtension
 {
     /**
      * @inheritdoc
@@ -20,7 +20,6 @@ class TagsExtension implements ItemSearchExtension
      */
     public function transformResult($baseResult, $extensionResult)
     {
-
         /** @var AuthHelper $authHelper */
         $authHelper = pluginApp(AuthHelper::class);
 
@@ -45,11 +44,14 @@ class TagsExtension implements ItemSearchExtension
 
         foreach($tags as $tag)
         {
-            foreach($baseResult['documents'][0]['data']['tags'] as $key => $baseResultTag)
+            foreach($baseResult['documents'] as $documentIndex => $baseResultDocument )
             {
-                if($baseResultTag['id'] === $tag['id'])
+                foreach($baseResultDocument['data']['tags'] as $tagsIndex => $baseResultTag)
                 {
-                    $baseResult['documents'][0]['data']['tags'][$key]['color'] = $tag['color'];
+                    if($baseResultTag['id'] === $tag['id'])
+                    {
+                        $baseResult['documents'][$documentIndex]['data']['tags'][$tagsIndex]['color'] = $tag['color'];
+                    }
                 }
             }
         }
