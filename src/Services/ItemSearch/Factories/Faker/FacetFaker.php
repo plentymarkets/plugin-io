@@ -8,26 +8,48 @@ class FacetFaker extends AbstractFaker
 
     public function fill($data)
     {
-        $default = [
-            $this->makeFacet()
+        $types = [
+            "availability" => [
+                "name"      => "IO::Faker.facetNameAvailability",
+                "valueName" => "IO::Faker.facetValueNameAvailability"
+            ],
+            "category" => [
+                "name"      => "IO::Faker.facetNameCategory",
+                "valueName" => "IO::Faker.facetValueNameCategory"
+            ],
+            "dynamic" => [
+                "name"      => "IO::Faker.facetNameDynamic",
+                "valueName" => "IO::Faker.facetValueNameDynamic"
+            ],
+            "price" => [
+                "name"      => "IO::Faker.facetNamePrice",
+                "valueName" => "IO::Faker.facetValueNamePrice"
+            ]
         ];
+
+        $default = [];
+
+        foreach ($types as $type => $names)
+        {
+            $default[] = $this->makeFacet($type, $names);
+        }
 
         $this->merge($data, $default);
         return $data;
     }
 
-    private function makeFacet()
+    private function makeFacet($type, $names)
     {
         return [
-            'id' => $this->number(),
-            'name' => $this->trans("IO::Faker.facetName"),
+            'id' => $type,
+            'name' => $this->trans($names["name"]),
             'position' => 0,
-            'values' => $this->makeValues(),
-            "type" => "dynamic"
+            'values' => $this->makeValues($names["valueName"]),
+            "type" => $type
         ];
     }
 
-    private function makeValues()
+    private function makeValues($valueName)
     {
         $result = [];
 
@@ -35,7 +57,7 @@ class FacetFaker extends AbstractFaker
         {
             $result[] = [
                 'id' => $i,
-                'name' => $this->trans("IO::Faker.facetValueName"),
+                'name' => $this->trans($valueName),
                 'count' => $this->number(1, 10),
             ];
         }
