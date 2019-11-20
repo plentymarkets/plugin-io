@@ -74,8 +74,8 @@ class RouteConfig
                     self::SEARCH,
                     self::TERMS_CONDITIONS,
                     self::WISH_LIST,
-                    self::PAGE_NOT_FOUND,
-                    self::TAGS
+                    self::TAGS,
+                    self::PAGE_NOT_FOUND
                 ];
             }
             else

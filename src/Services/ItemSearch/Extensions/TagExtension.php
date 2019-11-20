@@ -20,20 +20,14 @@ class TagExtension implements ItemSearchExtension
      */
     public function transformResult($baseResult, $extensionResult)
     {
+        $tagIds = $this->getTagIds($baseResult);
+        if(!count($tagIds))
+        {
+            return $baseResult;
+        }
+
         /** @var AuthHelper $authHelper */
         $authHelper = pluginApp(AuthHelper::class);
-
-        $tagIds = [];
-        if(count($baseResult['documents']))
-        {
-            foreach($baseResult['documents'] as $item)
-            {
-               foreach($item['data']['tags'] as $tag)
-               {
-                   array_push($tagIds, $tag['id']);
-               }
-            }
-        }
 
         $tags = $authHelper->processUnguarded( function() use ($tagIds)
         {
@@ -56,5 +50,21 @@ class TagExtension implements ItemSearchExtension
             }
         }
         return $baseResult;
+    }
+
+    private function getTagIds($baseResult)
+    {
+        $tagIds = [];
+        if(count($baseResult['documents']))
+        {
+            foreach($baseResult['documents'] as $item)
+            {
+               foreach($item['data']['tags'] as $tag)
+               {
+                   array_push($tagIds, $tag['id']);
+               }
+            }
+        }
+        return $tagIds;
     }
 }

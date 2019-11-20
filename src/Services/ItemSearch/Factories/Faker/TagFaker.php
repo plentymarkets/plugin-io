@@ -12,11 +12,10 @@ class TagFaker extends AbstractFaker
             "id"    => $this->number(),
             "color" => $this->hexColor(),
             "names" =>
-                [
-                    "lang" => $this->lang,
-                    "name" => $this->trans("IO::Faker.tagName"),
-                ]
-            ,
+            [
+                "lang" => $this->lang,
+                "name" => $this->trans("IO::Faker.tagName")
+            ]
         ];
 
         $this->merge($data, $default);

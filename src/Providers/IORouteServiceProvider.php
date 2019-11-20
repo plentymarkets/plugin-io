@@ -376,18 +376,18 @@ class IORouteServiceProvider extends RouteServiceProvider
             $router->get('{level1?}/{level2?}/{level3?}/{level4?}/{level5?}/{level6?}', 'IO\Controllers\CategoryController@showCategory');
         }
 
-        // NOT FOUND
-        if ( RouteConfig::isActive(RouteConfig::PAGE_NOT_FOUND) )
-        {
-            $router->get('{anything?}', 'IO\Controllers\StaticPagesController@showPageNotFound');
-        }
-
         // TAGS
         if ( RouteConfig::isActive(RouteConfig::TAGS) )
         {
             $router->get('{slug}_t{tagId}', 'IO\Controllers\TagController@showItemByTag')
             ->where('slug', '.*')
             ->where('tagId', '[0-9]+');
+        }
+
+        // NOT FOUND
+        if ( RouteConfig::isActive(RouteConfig::PAGE_NOT_FOUND) )
+        {
+            $router->get('{anything?}', 'IO\Controllers\StaticPagesController@showPageNotFound');
         }
 	}
 
