@@ -87,8 +87,16 @@ class UrlQuery
             return null;
         }
     
-        list($path, $queryParams) = explode('?', $this->path);
-        if($path[strlen($path)-1] == '/')
+        $splittedPath  = explode('?', $this->path);
+        $path = $splittedPath[0];
+    
+        $queryParams = '';
+        if (isset($splittedPath[1]))
+        {
+            $queryParams = $splittedPath[1];
+        }
+        
+        if (isset($path[strlen($path)-1]) && $path[strlen($path)-1] == '/')
         {
             $path = substr($path, 0, -1);
         }
@@ -101,7 +109,7 @@ class UrlQuery
         {
             return '/' . $this->lang . $path . $trailingSlash . $queryParams;
         }
-        elseif(strlen($path) == 0)
+        elseif (strlen($path) == 0)
         {
             return '/';
         }

@@ -1,5 +1,37 @@
 # Release Notes for IO
 
+## v4.4.1 (2019-11-19) <a href="https://github.com/plentymarkets/plugin-io/compare/4.4.0...4.4.1" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
+
+### Fixed 
+
+- Due to an error, order characteristics were not displayed in the shopping cart and the checkout and were not included in the order. This behaviour has been fixed.
+
+## v4.4.0 (2019-11-14) <a href="https://github.com/plentymarkets/plugin-io/compare/4.3.4...4.4.0" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
+
+### Added 
+
+- The ShopBuilder now enables the display of properties of the type **file** in the single item view.
+
+### Changed 
+
+- During the completion of the order, the required item data is now loaded from the database in order to reduce susceptibility to errors.
+- The event **AfterBasketChanged** now also contains basketItems.
+
+### Fixed 
+
+- If an order was split via an event procedure, an incorrect order was displayed in the order confirmation. This has been fixed.
+- Items for which the setting **Promotional coupon/POS discount: Purchasable with coupon only** is active can no longer be bought if no promotional coupon has been redeemed.
+- If the trailing slash option for URLs was active, the order confirmation page could lead to a redirection error. This has been fixed.
+- Due to an error, the mobile navigation did not display categories if other categories of the same branch were not included in the link list. Now, all categories of the first level are displayed.
+- Characteristics for which the setting "Display as additional costs" (deposit) is active are now correctly included in the order items and are added to the totals of the order.
+- If an error occurs while loading item data, the ShopBooster no longer writes the corresponding template into the cache.
+- Metadata is now output correctly.
+- Under certain circumstances, shipping costs were displayed incorrectly. This behaviour has been fixed.
+- Due to an error, trailing slashes were appended to URLs that contained query parameters. This behaviour has been fixed.
+- Under certain circumstances, orders were created twice. This behaviour has been fixed.
+- For Callisto stores that use the Ceres checkout, the order confirmation could not be displayed if it had been created with the ShopBuilder. This has been fixed.
+- Using a ShopBuilder category as the homepage could sometimes lead to the loading of a wrong header. This has been fixed.
+
 ## v4.3.4 (2019-10-30) <a href="https://github.com/plentymarkets/plugin-io/compare/4.3.3...4.3.4" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
 
 ### Fixed

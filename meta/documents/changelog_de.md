@@ -1,5 +1,37 @@
 # Release Notes für IO
 
+## v4.4.1 (2019-11-19) <a href="https://github.com/plentymarkets/plugin-io/compare/4.4.0...4.4.1" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
+
+### Behoben 
+
+- Bestellmerkmale wurden im Warenkorb und im Checkout erst nach einem erneuten Laden der Seite angezeigt und nicht am Auftrag mitgegeben. Dieses Verhalten wurde behoben.
+
+## v4.4.0 (2019-11-14) <a href="https://github.com/plentymarkets/plugin-io/compare/4.3.4...4.4.0" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
+
+### Hinzugefügt
+
+- Über den ShopBuilder ist es nun möglich, Eigenschaften vom Typ **Datei** in der Artikelansicht anzuzeigen.
+
+### Geändert
+
+- Beim Bestellabschluss werden die benötigten Artikeldaten nun aus der Datenbank gelesen, um Fehleranfälligkeit zu reduzieren.
+- Das Event **AfterBasketChanged** enthält nun auch basketItems.
+
+### Behoben
+
+- Wenn ein Auftrag durch eine Ereignisaktion aufgeteilt wurde, wurde nicht der korrekte Auftrag auf der Bestätigungsseite angezeigt. Dies wurde behoben.
+- Artikel, für die die Einstellung **Aktionsgutschein/POS-Rabatt: Nur mit Gutschein kaufbar** aktiv ist, können nun nicht mehr gekauft werden, wenn kein Aktionsgutschein eingelöst wurde.
+- Bei aktiviertem Trailing Slash kam es auf der Bestellbestätigungsseite zu einem Weiterleitungsfehler. Dies wurde behoben.
+- Durch einen Fehler wurden keine Kategorien in der mobilen Navigation ausgegeben, wenn nicht alle Kategorien des betreffenden Asts in der Linkliste enthalten waren. Nun werden die Kategorien der ersten Ebene angezeigt.
+- Merkmale, für die die Option "Als Zusatzkosten darstellen" (Pfand) aktiv ist, werden nun korrekt als Auftragspositionen übernommen und auf die Gesamtsumme des Auftrags addiert.
+- Wenn ein Fehler beim Laden von Artikeldaten auftritt, schreibt der ShopBooster das betreffende Template nicht mehr in den Cache.
+- Metadaten werden jetzt korrekt ausgegeben.
+- Es kam unter bestimmten Umständen zu einer falschen Anzeige der Versandkosten. Dieses Verhalten wurde behoben.
+- Es wurde fälschlicherweise ein Trailing Slash an URLs angehängt, die Query-Parameter enthielten. Dieses Verhalten wurde behoben.
+- Unter bestimmten Umständen konnte es zu doppelten Aufträgen kommen. Dieses Verhalten wurde behoben.
+- Bei der Nutzung von Callisto mit eingebundenem Ceres-Checkout konnte die Auftragsbestätigung nicht angezeigt werden, wenn diese über den ShopBuilder erstellt wurde. Dies wurde behoben.
+- Bei Verwendung einer ShopBuilder-Kategorie als Startseite wurde unter bestimmten Umständen ein falscher Header geladen. Dies wurde behoben.
+
 ## v4.3.4 (2019-10-30) <a href="https://github.com/plentymarkets/plugin-io/compare/4.3.3...4.3.4" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
 
 ### Behoben
