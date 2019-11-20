@@ -11,6 +11,7 @@ use Plenty\Plugin\Http\Request;
 use IO\Api\ApiResource;
 use IO\Api\ApiResponse;
 use IO\Api\ResponseCode;
+use Plenty\Plugin\Templates\Twig;
 
 /**
  * Class CategoryTreeResource
@@ -28,12 +29,15 @@ class CategoryTreeResource extends ApiResource
      * CategoryTreeResource constructor.
      * @param Request $request
      * @param ApiResponse $response
+     * @param CategoryService $categoryService
+     * @param CustomerService $customerService
+     * @param SessionStorageService $sessionStorageService
      */
     public function __construct(Request $request, ApiResponse $response, CategoryService $categoryService, CustomerService $customerService, SessionStorageService $sessionStorageService)
     {
         parent::__construct($request, $response);
-        $this->categoryService = $categoryService;
-        $this->customerService = $customerService;
+        $this->categoryService       = $categoryService;
+        $this->customerService       = $customerService;
         $this->sessionStorageService = $sessionStorageService;
     }
 
@@ -48,5 +52,25 @@ class CategoryTreeResource extends ApiResource
         $response = $this->categoryService->getPartialTree($categoryId, $type);
 
         return $this->response->create($response, ResponseCode::OK);
+    }
+
+    public function getTemplateForChildren():Response
+    {
+        /** @var Twig $twig */
+        $twig = pluginApp(Twig::class);
+
+        $categoryId = $this->request->get('categoryId', null);
+        $currentUrl = $this->request->get('currentUrl', null);
+        $childrenCategories = $this->categoryService->getChildren($categoryId);
+
+        $template = "{% import \"Ceres::Category.Macros.CategoryTree\" as Tree %}";
+        $template .= "{{ Tree.get_sidemenu(categoryBreadcrumbs, categories, currentUrl, spacingPadding, inlinePadding) }}";
+
+        $renderedTemplate = $twig->renderString($template, [
+            "categories" => $childrenCategories,
+            "currentUrl" => $currentUrl
+        ]);
+
+        return $this->response->create($renderedTemplate, ResponseCode::OK);
     }
 }
