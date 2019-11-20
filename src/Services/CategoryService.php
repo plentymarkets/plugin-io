@@ -16,6 +16,7 @@ use Plenty\Modules\Category\Contracts\CategoryRepositoryContract;
 use Plenty\Modules\Category\Models\CategoryClient;
 use Plenty\Modules\Category\Models\CategoryDetails;
 use Plenty\Plugin\Application;
+use Plenty\Plugin\Log\Loggable;
 use Plenty\Repositories\Models\PaginatedResult;
 
 /**
@@ -26,6 +27,7 @@ class CategoryService
 {
     use MemoryCache;
     use LoadResultFields;
+    use Loggable;
 
     /**
      * @var CategoryRepositoryContract
@@ -369,10 +371,30 @@ class CategoryService
             return $category['linklist'] == 'Y';
         });
 
+        $filteredTree = null;
         if(pluginApp(UserSession::class)->isContactLoggedIn() === false && pluginApp(Application::class)->isAdminPreview() === false)
         {
-            $tree = $this->filterVisibleCategories($tree);
+            $filteredTree = $this->filterVisibleCategories($tree);
         }
+
+        $this->getLogger(__CLASS__)->debug(
+            "IO::Debug.CategoryService_getNavigationTree",
+            [
+                "paramters" => [
+                    "type" => $type,
+                    "lang" => $lang,
+                    "maxLevel" => $maxLevel,
+                    "customerClassId" => $customerClassId
+                ],
+                "tree" => $tree,
+                "filteredTree" => $filteredTree
+            ]
+        );
+
+        if ($filteredTree) {
+            $tree = $filteredTree;
+        }
+
         /**
          * pluginApp(CategoryDataFilter::class) creates an instance that could be used directly without temporarily
          * storing it in a variable. However, our plugin code check does not understand this in this particular case,
