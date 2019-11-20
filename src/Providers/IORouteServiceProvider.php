@@ -170,6 +170,11 @@ class IORouteServiceProvider extends RouteServiceProvider
             // confirmation-route is activated and category is linked and category url is not '/confirmation'
             $router->get('confirmation/{orderId?}/{orderAccessKey?}', 'IO\Controllers\ConfirmationController@redirect');
         }
+        
+        if(RouteConfig::getCategoryId(RouteConfig::CONFIRMATION) > 0 && !RouteConfig::isActive(RouteConfig::CATEGORY))
+        {
+            $this->registerSingleCategoryRoute($router, RouteConfig::CONFIRMATION, $shopUrls->confirmation);
+        }
 
         // CONTACT
         $this->registerRedirectedRoute(
@@ -411,22 +416,27 @@ class IORouteServiceProvider extends RouteServiceProvider
 
         if (!RouteConfig::isActive(RouteConfig::CATEGORY) && RouteConfig::getCategoryId($route) > 0)
         {
-            // register single category url if global category route is disabled
-            $lang = Utils::getLang();
-            if(strpos($shopUrl, "/{$lang}/") === 0)
-            {
-                // remove language from shop url before registering the route
-                $shopUrl = substr($shopUrl, strlen("/{$lang}/"));
-            }
-            $router->get(
-                Utils::makeRelativeUrl($shopUrl, false),
-                function() use ($route)
-                {
-                    /** @var CategoryController $categoryController */
-                    $categoryController = pluginApp(CategoryController::class);
-                    return $categoryController->showCategoryById( RouteConfig::getCategoryId($route) );
-                }
-            );
+            $this->registerSingleCategoryRoute($router, $route, $shopUrl);
         }
+    }
+    
+    private function registerSingleCategoryRoute(Router $router, $route, $shopUrl)
+    {
+        // register single category url if global category route is disabled
+        $lang = Utils::getLang();
+        if(strpos($shopUrl, "/{$lang}/") === 0)
+        {
+            // remove language from shop url before registering the route
+            $shopUrl = substr($shopUrl, strlen("/{$lang}/"));
+        }
+        $router->get(
+            Utils::makeRelativeUrl($shopUrl, false),
+            function() use ($route)
+            {
+                /** @var CategoryController $categoryController */
+                $categoryController = pluginApp(CategoryController::class);
+                return $categoryController->showCategoryById( RouteConfig::getCategoryId($route) );
+            }
+        );
     }
 }

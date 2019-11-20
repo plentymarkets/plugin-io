@@ -86,19 +86,35 @@ class UrlQuery
         {
             return null;
         }
+    
+        $splittedPath  = explode('?', $this->path);
+        $path = $splittedPath[0];
+    
+        $queryParams = '';
+        if (isset($splittedPath[1]))
+        {
+            $queryParams = $splittedPath[1];
+        }
+        
+        if (isset($path[strlen($path)-1]) && $path[strlen($path)-1] == '/')
+        {
+            $path = substr($path, 0, -1);
+        }
+
+        $queryParams = strlen($queryParams) ? "?" . $queryParams : "";
 
         $trailingSlash = self::shouldAppendTrailingSlash() ? "/" : "";
 
-        if ( $includeLanguage && strpos($this->path, '/'.$this->lang) !== 0)
+        if ( $includeLanguage && strpos($path, '/'.$this->lang) !== 0)
         {
-            return '/' . $this->lang . $this->path . $trailingSlash;
+            return '/' . $this->lang . $path . $trailingSlash . $queryParams;
         }
-        elseif(strlen($this->path) == 0)
+        elseif (strlen($path) == 0)
         {
             return '/';
         }
 
-        return $this->path . $trailingSlash;
+        return $path . $trailingSlash . $queryParams;
     }
 
     public function getPath( bool $includeLanguage = false )

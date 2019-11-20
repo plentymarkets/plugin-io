@@ -58,16 +58,7 @@ class SingleItem implements SearchPreset
         }
         else
         {
-            $templateConfigService = pluginApp( TemplateConfigService::class );
-            $variationShowType = $templateConfigService->get('item.variation_show_type');
-            if($variationShowType == 'main')
-            {
-                $searchFactory->isMain();
-            }
-            elseif($variationShowType == 'child')
-            {
-                $searchFactory->isChild();
-            }
+            $searchFactory->groupByTemplateConfig();
         }
 
         if ( array_key_exists( 'setCategory', $options ) && $options['setCategory'] === true )
