@@ -4,26 +4,34 @@ namespace IO\Services\ItemSearch\Factories\Faker;
 
 class FacetFaker extends AbstractFaker
 {
-    public $isList = true;
+    public $facetTypes = [
+        "availability" => "IO::Faker.facetNameAvailability",
+        "category"     => "IO::Faker.facetNameCategory",
+        "dynamic"      => "IO::Faker.facetNameDynamic",
+        "price"        => "IO::Faker.facetNamePrice"
+    ];
 
     public function fill($data)
     {
-        $default = [
-            $this->makeFacet()
-        ];
+        $default = [];
+
+        foreach ($this->facetTypes as $type => $name)
+        {
+            $default[] = $this->makeFacet($type, $name);
+        }
 
         $this->merge($data, $default);
         return $data;
     }
 
-    private function makeFacet()
+    private function makeFacet($type, $name)
     {
         return [
-            'id' => $this->number().'',
-            'name' => $this->trans("IO::Faker.facetName"),
+            'id' => $type,
+            'name' => $this->trans($name),
             'position' => 0,
             'values' => $this->makeValues(),
-            "type" => "dynamic"
+            "type" => $type
         ];
     }
 

@@ -23,7 +23,9 @@ class FakerService
         $facetFaker = pluginApp(FacetFaker::class);
         $facetResult = $facetFaker->fill([]);
         
-        return $facetResult;
+        return [
+            $facetResult[0]
+        ];
     }
     
     public function getSelectedFacetIds($facets)
