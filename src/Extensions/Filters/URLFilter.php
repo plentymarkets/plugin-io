@@ -62,7 +62,7 @@ class URLFilter extends AbstractFilter
      * @param bool $withVariationId
      * @return string
      */
-    public function buildItemURL($itemData, $withVariationId = true):string
+    public function buildItemURL($itemData, $withVariationId = false):string
     {
         $itemId = $itemData['item']['id'];
         $variationId = $itemData['variation']['id'];
