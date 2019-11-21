@@ -67,13 +67,13 @@ class CategoryTreeResource extends ApiResource
         $children = $this->findInTree($partialTree, $categoryId);
 
         $template = "{% import \"Ceres::Category.Macros.CategoryTree\" as Tree %}";
-        $template .= "{{ Tree.get_sidemenu(categoryBreadcrumbs, categories, currentUrl, spacingPadding, inlinePadding, showItemCount, openableChildren) }}";
+        $template .= "{{ Tree.get_sidemenu(categoryBreadcrumbs, categories, currentUrl, spacingPadding, inlinePadding, showItemCount, expandableChildren) }}";
 
         $renderedTemplate = $twig->renderString($template, [
             "categories" => $children["children"],
             "currentUrl" => $currentUrl,
             "showItemCount" => $showItemCount,
-            "openableChildren" => true
+            "expandableChildren" => true
         ]);
 
         return $this->response->create($renderedTemplate, ResponseCode::OK);
