@@ -61,7 +61,8 @@ class CategoryTreeResource extends ApiResource
 
         $categoryId = $this->request->get('categoryId', null);
         $currentUrl = $this->request->get('currentUrl', null);
-        $showItemCount = $this->request->get('showItemCount', null);
+        $showItemCount = $this->request->get('showItemCount', false);
+        $showItemCount = (boolean)$showItemCount;
 
         $partialTree = $this->categoryService->getPartialTree($categoryId);
         $children = $this->findInTree($partialTree, $categoryId);
