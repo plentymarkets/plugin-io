@@ -128,14 +128,14 @@ class MultiSearchFactory
             // get result of primary search
             $result = $rawResults[$searchName];
 
-            if(!$result['success'])
+            if(array_key_exists('success', $result) && $result['success'] === false)
             {
                 /** @var TemplateService $templateService */
                 $templateService = pluginApp(TemplateService::class);
                 $templateService->disableCacheForTemplate();
 
                 $this->getLogger(__CLASS__)->error(
-                    "IO::Debug.ItemSearchService_searchResultError",
+                    "IO::Debug.MultiSearchFactory_searchResultError",
                     [
                         "resultName" => $searchName,
                         "errorMessage" => $result['error']
