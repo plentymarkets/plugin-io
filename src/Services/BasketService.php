@@ -745,6 +745,7 @@ class BasketService
             $result[$basketItem->variationId]['data']['texts']['name3'] = $texts->name3 ?? '';
             $result[$basketItem->variationId]['data']['variation']['vatId'] = $variation->vatId ?? $variation->parent->vatId;
             $result[$basketItem->variationId]['data']['properties'] = $variation->variationProperties->toArray();
+            $result[$basketItem->variationId]['data']['basketItemOrderParams'] = $basketItem->basketItemOrderParams;
         }
 
         return $result;
@@ -842,7 +843,7 @@ class BasketService
             "itemId"                => $basketItem["itemId"],
             "variation"             => $basketItem["variation"],
             "variationId"           => $basketItem["variationId"],
-            "basketItemOrderParams" => $basketItem["basketItemOrderParams"] ?? [],
+            "basketItemOrderParams" => $basketItem["basketItemOrderParams"] ?? null,
             "inputLength"           => $basketItem["inputLength"] ?? 0,
             "inputWidth"            => $basketItem["inputWidth"] ?? 0
         ];

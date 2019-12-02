@@ -1,5 +1,23 @@
 # Release Notes für IO
 
+## v4.4.3 (2019-11-29) <a href="https://github.com/plentymarkets/plugin-io/compare/4.4.2...4.4.3" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
+
+### Behoben 
+
+- Durch einen Fehler konnten Artikelkategorieseiten nicht mehr vom ShopBooster in den Cache geschrieben werden. Dies wurde behoben.
+
+## v4.4.2 (2019-11-28) <a href="https://github.com/plentymarkets/plugin-io/compare/4.4.1...4.4.2" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
+
+### Behoben 
+
+- Durch einen Fehler konnten Artikelkategorieseiten nicht mehr vom ShopBooster in den Cache geschrieben werden. Dies wurde behoben.
+
+## v4.4.1 (2019-11-19) <a href="https://github.com/plentymarkets/plugin-io/compare/4.4.0...4.4.1" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
+
+### Behoben 
+
+- Bestellmerkmale wurden im Warenkorb und im Checkout erst nach einem erneuten Laden der Seite angezeigt und nicht am Auftrag mitgegeben. Dieses Verhalten wurde behoben.
+
 ## v4.4.0 (2019-11-14) <a href="https://github.com/plentymarkets/plugin-io/compare/4.3.4...4.4.0" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
 
 ### Hinzugefügt
