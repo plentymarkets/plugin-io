@@ -10,7 +10,7 @@ use Plenty\Plugin\Http\Request;
 
 class ItemSearchController extends LayoutController
 {
-    public function showSearch():string
+    public function showSearch( $category = null ):string
     {
         /** @var Request $request */
         $request = pluginApp(Request::class);
@@ -18,6 +18,7 @@ class ItemSearchController extends LayoutController
         return $this->renderTemplate(
             "tpl.search",
             [
+                'category'      => $category,
                 'page'          => $request->get('page', null),
                 'itemsPerPage'  => $request->get('items', null),
                 'query'         => $request->get('query', null),
