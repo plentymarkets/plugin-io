@@ -14,7 +14,7 @@ class ItemSearchController extends LayoutController
     {
         /** @var Request $request */
         $request = pluginApp(Request::class);
-        
+
         return $this->renderTemplate(
             "tpl.search",
             [
@@ -29,12 +29,19 @@ class ItemSearchController extends LayoutController
         );
     }
 
-    public function redirectToSearch($query):string
+    /**
+     * Redirect to new search url from category when search route
+     * is enabled and called.
+     *
+     * @return void
+     */
+    public function redirectToSearch(): void
     {
-
+        /** @var Request $request */
+        $request = pluginApp(Request::class);
+        /** @var ShopUrls $shopUrl */
         $shopUrl = pluginApp(ShopUrls::class);
 
-        AuthGuard::redirect($shopUrl->search, ['query' => $query]);
-        return "";
+        AuthGuard::redirect($shopUrl->search, ['query' => $request->get('query', null)]);
     }
 }
