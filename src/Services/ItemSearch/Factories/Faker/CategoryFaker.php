@@ -11,6 +11,7 @@ class CategoryFaker extends AbstractFaker
         $default = $this->makeDetailsEntry();
 
         $this->merge($data, $default);
+        
         return $data;
     }
 
@@ -33,12 +34,11 @@ class CategoryFaker extends AbstractFaker
             "itemCount"             => [[]]
         ];
         
-        if($type == 'item')
-        {
+        if ($type == 'item') {
             $details["itemCount"] = [
                 [
-                    "count"      => $this->number(1, 100),
-                    "variationCount" => $this->number(1, 100)
+                    'count'          => $this->number(1, 100),
+                    'variationCount' => $this->number(1, 100)
                 ]
             ];
         }
