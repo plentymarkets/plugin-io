@@ -10,7 +10,7 @@ use Plenty\Plugin\Http\Request;
 
 class ItemSearchController extends LayoutController
 {
-    public function showSearch( $category = null ):string
+    public function showSearch($category = null): string
     {
         /** @var Request $request */
         $request = pluginApp(Request::class);
