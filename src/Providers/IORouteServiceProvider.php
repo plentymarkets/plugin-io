@@ -62,10 +62,11 @@ class IORouteServiceProvider extends RouteServiceProvider
             $api->resource('io/shipping/country', 'ShippingCountryResource');
             $api->resource('io/live-shopping', 'LiveShoppingResource');
             $api->resource('io/facet', 'FacetResource');
-            $api->get('io/categorytree/children', 'CategoryTreeResource@getTemplateForChildren');
+            $api->get('io/categorytree/children', 'CategoryTreeResource@getChildren');
+            $api->get('io/categorytree/template_for_children', 'CategoryTreeResource@getTemplateForChildren');
             $api->resource('io/categorytree', 'CategoryTreeResource');
 		});
-        
+
         $api->version(['v1'], ['namespace' => 'IO\Api\Resources', 'middleware' => ['csrf']], function (ApiRouter $api)
         {
             $api->post('io/order', 'OrderResource@store');
@@ -147,7 +148,7 @@ class IORouteServiceProvider extends RouteServiceProvider
             'IO\Controllers\CheckoutController@showCheckout',
             'IO\Controllers\CheckoutController@redirect'
         );
-        
+
         // CONFIRMATION
         if(RouteConfig::isActive(RouteConfig::CONFIRMATION)
             || in_array(RouteConfig::CONFIRMATION, RouteConfig::getEnabledRoutes())
@@ -158,7 +159,7 @@ class IORouteServiceProvider extends RouteServiceProvider
             $router->get('_py_/akQQ{orderAccessKey}/idQQ{orderId}', 'IO\Controllers\ConfirmationEmailController@showConfirmation');
             $router->get('_plentyShop__/akQQ{orderAccessKey}/idQQ{orderId}', 'IO\Controllers\ConfirmationEmailController@showConfirmation');
         }
-        
+
         if ( RouteConfig::isActive(RouteConfig::CONFIRMATION) )
         {
             //Confirmation route
@@ -171,7 +172,7 @@ class IORouteServiceProvider extends RouteServiceProvider
             // confirmation-route is activated and category is linked and category url is not '/confirmation'
             $router->get('confirmation/{orderId?}/{orderAccessKey?}', 'IO\Controllers\ConfirmationController@redirect');
         }
-        
+
         if(RouteConfig::getCategoryId(RouteConfig::CONFIRMATION) > 0 && !RouteConfig::isActive(RouteConfig::CATEGORY))
         {
             $this->registerSingleCategoryRoute($router, RouteConfig::CONFIRMATION, $shopUrls->confirmation);
@@ -426,7 +427,7 @@ class IORouteServiceProvider extends RouteServiceProvider
             $this->registerSingleCategoryRoute($router, $route, $shopUrl);
         }
     }
-    
+
     private function registerSingleCategoryRoute(Router $router, $route, $shopUrl)
     {
         // register single category url if global category route is disabled
