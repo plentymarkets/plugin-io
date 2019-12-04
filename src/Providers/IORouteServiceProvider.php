@@ -327,10 +327,16 @@ class IORouteServiceProvider extends RouteServiceProvider
         // SEARCH
         if ( RouteConfig::isActive(RouteConfig::SEARCH) )
         {
-            $router->get('search', 'IO\Controllers\ItemSearchController@showSearch');
             //Callisto Tag route
             $router->get('tag/{tagName}', 'IO\Controllers\ItemSearchController@redirectToSearch');
         }
+        $this->registerRedirectedRoute(
+            $router,
+            RouteConfig::SEARCH,
+            $shopUrls->search,
+            'IO\Controllers\ItemSearchController@showSearch',
+            'IO\Controllers\ItemSearchController@redirectToSearch'
+        );
 
         // TERMS AND CONDITIONS
         $this->registerRedirectedRoute(
