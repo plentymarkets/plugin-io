@@ -33,11 +33,16 @@ class CategoryTreeResource extends ApiResource
      * @param CustomerService $customerService
      * @param SessionStorageService $sessionStorageService
      */
-    public function __construct(Request $request, ApiResponse $response, CategoryService $categoryService, CustomerService $customerService, SessionStorageService $sessionStorageService)
-    {
+    public function __construct(
+        Request $request,
+        ApiResponse $response,
+        CategoryService $categoryService,
+        CustomerService $customerService,
+        SessionStorageService $sessionStorageService
+    ) {
         parent::__construct($request, $response);
-        $this->categoryService       = $categoryService;
-        $this->customerService       = $customerService;
+        $this->categoryService = $categoryService;
+        $this->customerService = $customerService;
         $this->sessionStorageService = $sessionStorageService;
     }
 
@@ -45,7 +50,7 @@ class CategoryTreeResource extends ApiResource
      * Get Category Items
      * @return Response
      */
-    public function index():Response
+    public function index(): Response
     {
         $type = $this->request->get('type', CategoryType::ALL);
         $categoryId = $this->request->get('categoryId', null);
@@ -54,47 +59,41 @@ class CategoryTreeResource extends ApiResource
         return $this->response->create($response, ResponseCode::OK);
     }
 
-    public function getChildren():Response
+    public function getChildren(): Response
     {
         $categoryId = $this->request->get('categoryId', null);
-        $indexStart = $this->request->get('indexStart', 0);
-        $indexStart = (int)$indexStart;
-        $maxCount =   $this->request->get('maxCount', null);
-        $maxCount =   !is_null($maxCount) ? (int)$maxCount : null;
+        $indexStart = (int)$this->request->get('indexStart', 0);
+        $maxCount = $this->request->get('maxCount', null);
 
         $partialTree = $this->categoryService->getPartialTree($categoryId);
         $tree = $this->findInTree($partialTree, $categoryId);
         $children = $tree['children'];
 
-        if (!is_null($maxCount))
-        {
+        if (!is_null($maxCount)) {
+            $maxCount = (int)$maxCount;
             $filteredChildren = [];
 
-            for ($i = 0; $i < $maxCount; $i++)
-            {
+            for ($i = 0; $i < $maxCount; $i++) {
                 $index = $i + $indexStart;
 
-                if (array_key_exists($index, $children))
-                {
+                if (array_key_exists($index, $children)) {
                     $filteredChildren[] = $children[$index];
                 }
             }
 
             return $this->response->create($filteredChildren, ResponseCode::OK);
         }
-        else
-        {
-            return $this->response->create($children, ResponseCode::OK);
-        }
+        
+        return $this->response->create($children, ResponseCode::OK);
     }
 
-    public function getTemplateForChildren():Response
+    public function getTemplateForChildren(): Response
     {
         /** @var Twig $twig */
         $twig = pluginApp(Twig::class);
 
-        $categoryId =    $this->request->get('categoryId', null);
-        $currentUrl =    $this->request->get('currentUrl', null);
+        $categoryId = $this->request->get('categoryId', null);
+        $currentUrl = $this->request->get('currentUrl', null);
         $showItemCount = $this->request->get('showItemCount', false);
         $showItemCount = (boolean)$showItemCount;
 
@@ -118,16 +117,13 @@ class CategoryTreeResource extends ApiResource
     {
         $result = null;
 
-        foreach ($tree as $category)
-        {
-            if ($category["id"] == $categoryId)
-            {
+        foreach ($tree as $category) {
+            if ($category["id"] == $categoryId) {
                 $result = $category;
                 break;
             }
 
-            if (is_null($result) && count($category["children"]))
-            {
+            if (is_null($result) && count($category["children"])) {
                 $result = $this->findInTree($category["children"], $categoryId);
             }
         }
