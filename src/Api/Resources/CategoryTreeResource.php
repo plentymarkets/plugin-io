@@ -54,13 +54,49 @@ class CategoryTreeResource extends ApiResource
         return $this->response->create($response, ResponseCode::OK);
     }
 
+    public function getChildren():Response
+    {
+        $categoryId = $this->request->get('categoryId', null);
+        $indexStart = $this->request->get('indexStart', 0);
+        $indexStart = (int)$indexStart;
+        $maxCount =   $this->request->get('maxCount', null);
+        $maxCount =   !is_null($maxCount) ? (int)$maxCount : null;
+
+        $partialTree = $this->categoryService->getPartialTree($categoryId);
+        $tree = $this->findInTree($partialTree, $categoryId);
+        $children = $tree['children'];
+
+        $maxCount = !is_null($maxCount) ? $maxCount : array_key_last($children);
+
+        if (!is_null($maxCount))
+        {
+            $filteredChildren = [];
+
+            for ($i = 0; $i < $maxCount; $i++)
+            {
+                $index = $i + $indexStart;
+
+                if (array_key_exists($index, $children))
+                {
+                    $filteredChildren[] = $children[$index];
+                }
+            }
+
+            return $this->response->create($filteredChildren, ResponseCode::OK);
+        }
+        else
+        {
+            return $this->response->create($children, ResponseCode::OK);
+        }
+    }
+
     public function getTemplateForChildren():Response
     {
         /** @var Twig $twig */
         $twig = pluginApp(Twig::class);
 
-        $categoryId = $this->request->get('categoryId', null);
-        $currentUrl = $this->request->get('currentUrl', null);
+        $categoryId =    $this->request->get('categoryId', null);
+        $currentUrl =    $this->request->get('currentUrl', null);
         $showItemCount = $this->request->get('showItemCount', false);
         $showItemCount = (boolean)$showItemCount;
 
