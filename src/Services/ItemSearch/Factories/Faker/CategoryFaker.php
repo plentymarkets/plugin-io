@@ -4,41 +4,46 @@ namespace IO\Services\ItemSearch\Factories\Faker;
 
 class CategoryFaker extends AbstractFaker
 {
+    public $types = ['content', 'item', 'container', 'blog'];
+    
     public function fill($data)
     {
-        $default = [
-            "paths" => "",
-            "details" => $this->makeDetails()
-        ];
+        $default = $this->makeDetailsEntry();
 
         $this->merge($data, $default);
+        
         return $data;
-    }
-
-    private function makeDetails()
-    {
-        $details = [];
-
-        $details[] = $this->makeDetailsEntry();
-
-        return $details;
     }
 
     private function makeDetailsEntry()
     {
         $categoryId = $this->number();
-        return [
+        $type = $this->rand($this->types);
+        
+        $details = [
             "id"                    => $categoryId,
             "parentCategoryId"      => $this->number(),
             "level"                 => $this->number(0, 5),
-            "type"                  => $this->rand(['content', 'item', 'container', 'blog']),
+            "type"                  => $type,
             "linklist"              => $this->boolean(),
             "right"                 => $this->rand(['all', 'customer']),
             "sitemap"               => $this->boolean(),
             "isNeckermannPrimary"   => $this->boolean(),
             "path"                  => $this->number(),
-            "details"               => $this->makeCategoryDetails($categoryId)
+            "details"               => $this->makeCategoryDetails($categoryId),
+            "itemCount"             => [[]]
         ];
+        
+        if ($type == 'item') {
+            $details["itemCount"] = [
+                [
+                    'count'          => $this->number(1, 100),
+                    'variationCount' => $this->number(1, 100)
+                ]
+            ];
+        }
+        
+        return $details;
     }
 
     private function makeCategoryDetails($categoryId)
