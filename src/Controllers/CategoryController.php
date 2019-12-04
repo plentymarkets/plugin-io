@@ -190,6 +190,7 @@ class CategoryController extends LayoutController
         
             /** @var ItemSearchController $itemSearchController */
             $itemSearchController = pluginApp(ItemSearchController::class);
+            
             return $itemSearchController->showSearch( $category );
         }
 
