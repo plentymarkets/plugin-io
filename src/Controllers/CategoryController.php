@@ -179,7 +179,6 @@ class CategoryController extends LayoutController
         }
     
         if (RouteConfig::getCategoryId( RouteConfig::SEARCH ) === $category->id || $shopBuilderRequest->getPreviewContentType() === 'itemsearch') {
-        {
             $this->getLogger(__CLASS__)->info(
                 "IO::Debug.CategoryController_showMyAccountCategory",
                 [
