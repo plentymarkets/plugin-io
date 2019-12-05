@@ -634,7 +634,7 @@ class CheckoutService
         if (is_null($billingAddressId) || (int)$billingAddressId <= 0)
         {
             $addresses = $this->customerService->getAddresses(AddressType::BILLING);
-            if (count($addresses) > 0)
+            if (is_array($addresses) && count($addresses) > 0)
             {
                 $billingAddressId = $addresses[0]->id;
                 $this->setBillingAddressId($billingAddressId);

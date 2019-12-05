@@ -42,21 +42,6 @@ class ItemSearchService
             foreach( $results as $resultName => $result )
             {
                 $results[$resultName] = $this->normalizeResult( $result );
-                
-                if(!$result['success'])
-                {
-                    /** @var TemplateService $templateService */
-                    $templateService = pluginApp(TemplateService::class);
-                    $templateService->disableCacheForTemplate();
-    
-                    $this->getLogger(__CLASS__)->warning(
-                        "IO::Debug.ItemSearchService_searchResultError",
-                        [
-                            "resultName" => $resultName,
-                            "errorMessage" => $result['error']
-                        ]
-                    );
-                }
             }
             
             return $results;
