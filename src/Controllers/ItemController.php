@@ -2,7 +2,7 @@
 
 namespace IO\Controllers;
 
-use Ceres\Config\CeresItemConfig;
+use Ceres\Config\CeresConfig;
 use IO\Api\ResponseCode;
 use IO\Helper\Utils;
 use IO\Services\CategoryService;
@@ -53,11 +53,10 @@ class ItemController extends LayoutController
             'item' => SingleItem::getSearchFactory($itemSearchOptions),
             'variationAttributeMap' => VariationAttributeMap::getSearchFactory($itemSearchOptions)
         ];
-        /**
-         * @var CeresItemConfig $ceresItemConfig
-         */
-        $ceresItemConfig = pluginApp(CeresItemConfig::class);
-        if ($variationId > 0 && $ceresItemConfig->showPleaseSelect) {
+
+        /** @var CeresConfig $ceresItemConfig */
+        $ceresConfig = pluginApp(CeresConfig::class);
+        if ($variationId > 0 && $ceresConfig->item->showPleaseSelect) {
             unset($itemSearchOptions['variationId']);
             $searches['dynamic'] = SingleItem::getSearchFactory($itemSearchOptions);
         }
@@ -71,6 +70,7 @@ class ItemController extends LayoutController
             $categoryService = pluginApp(CategoryService::class);
             $categoryService->setCurrentCategory($category);
         }
+
         /** @var ShopBuilderRequest $shopBuilderRequest */
         $shopBuilderRequest = pluginApp(ShopBuilderRequest::class);
 
@@ -104,16 +104,12 @@ class ItemController extends LayoutController
             $response->forceStatus(ResponseCode::NOT_FOUND);
 
             return $response;
-        } else {
-            if ($variationId === 0) {
-                $itemResult['initialPleaseSelectOption'] = true;
-            }
-            $itemResult['addPleaseSelectOption'] = $ceresItemConfig->showPleaseSelect;
-            return $this->renderTemplate(
-                'tpl.item',
-                $itemResult
-            );
         }
+
+        return $this->renderTemplate(
+            'tpl.item',
+            $itemResult
+        );
     }
 
     /**

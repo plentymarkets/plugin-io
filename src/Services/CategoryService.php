@@ -187,6 +187,12 @@ class CategoryService
         return $children;
     }
 
+    public function getChildrenWithCount($categoryId, $lang = null)
+    {
+        $categories = $this->getChildren($categoryId, $lang);
+        return $categories->where('itemCount', '>', 0)->count();
+    }
+
     /**
      * Return the URL for a given category ID.
      * @param Category $category the category to get the URL for
