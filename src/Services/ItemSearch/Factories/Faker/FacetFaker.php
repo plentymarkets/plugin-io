@@ -43,7 +43,7 @@ class FacetFaker extends AbstractFaker
         for ($i = 1; $i <= $this->number(3, 10); $i++)
         {
             $result[] = [
-                'id' => $i.'',
+                'id' => $this->index.'',
                 'name' => $this->trans("IO::Faker.facetValueName"),
                 'count' => $this->number(1, 10),
             ];
