@@ -5,6 +5,7 @@ namespace IO\Services;
 use IO\Builder\Order\AddressType;
 use IO\Constants\SessionStorageKeys;
 use IO\Events\Checkout\CheckoutReadonlyChanged;
+use IO\Helper\ArrayHelper;
 use IO\Helper\LanguageMap;
 use IO\Helper\MemoryCache;
 use Plenty\Modules\Accounting\Contracts\AccountingLocationRepositoryContract;
@@ -634,9 +635,10 @@ class CheckoutService
         if (is_null($billingAddressId) || (int)$billingAddressId <= 0)
         {
             $addresses = $this->customerService->getAddresses(AddressType::BILLING);
+            $addresses = ArrayHelper::toArray($addresses);
             if (is_array($addresses) && count($addresses) > 0)
             {
-                $billingAddressId = $addresses[0]->id;
+                $billingAddressId = $addresses[0]['id'];
                 $this->setBillingAddressId($billingAddressId);
             }
         }
