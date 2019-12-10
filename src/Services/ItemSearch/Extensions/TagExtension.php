@@ -65,6 +65,6 @@ class TagExtension implements ItemSearchExtension
                }
             }
         }
-        return $tagIds;
+        return array_unique($tagIds);
     }
 }
