@@ -3,6 +3,7 @@
 namespace IO\Api\Resources;
 
 use IO\Builder\Order\AddressType;
+use IO\Helper\ArrayHelper;
 use IO\Services\CustomerService;
 use Plenty\Plugin\Http\Response;
 use Plenty\Plugin\Http\Request;
@@ -38,11 +39,10 @@ class GuestResource extends ApiResource
             $addressList[AddressType::BILLING]  = $this->customerService->getAddresses(AddressType::BILLING);
             $addressList[AddressType::DELIVERY] = $this->customerService->getAddresses(AddressType::DELIVERY);
             
-            if (count($addressList)) {
-                foreach ($addressList as $type => $addresses) {
-                    if (count($addresses)) {
-                        $this->deleteAddresses($type, $addresses);
-                    }
+            foreach ($addressList as $type => $addresses) {
+                $addresses = ArrayHelper::toArray($addresses);
+                if (is_array($addresses) && count($addresses) > 0) {
+                    $this->deleteAddresses($type, $addresses);
                 }
             }
         }
@@ -55,7 +55,7 @@ class GuestResource extends ApiResource
     private function deleteAddresses($type, $addresses)
     {
         foreach ($addresses as $address) {
-            $this->customerService->deleteAddress($address->id, $type);
+            $this->customerService->deleteAddress($address['id'], $type);
         }
     }
 }
