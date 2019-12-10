@@ -12,6 +12,7 @@ use IO\Services\ItemSearch\Helper\ResultFieldTemplate;
 use IO\Services\ItemSearch\SearchPresets\SingleItem;
 use IO\Services\ItemSearch\SearchPresets\VariationAttributeMap;
 use IO\Services\ItemSearch\Services\ItemSearchService;
+use IO\Services\WebstoreConfigurationService;
 use Plenty\Modules\Category\Models\Category;
 use Plenty\Modules\ShopBuilder\Helper\ShopBuilderRequest;
 use Plenty\Plugin\Http\Response;
@@ -106,6 +107,10 @@ class ItemController extends LayoutController
             return $response;
         }
 
+        /** @var WebstoreConfigurationService $webstoreConfigService */
+        $webstoreConfigService = pluginApp(WebstoreConfigurationService::class);
+        $webstoreConfig = $webstoreConfigService->getWebstoreConfig();
+        $itemResult['initPleaseSelectOption'] = $variationId <= 0 && $webstoreConfig->attributeSelectDefaultOption === 1;
         return $this->renderTemplate(
             'tpl.item',
             $itemResult
