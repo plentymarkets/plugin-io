@@ -4,6 +4,7 @@ namespace IO\Api\Resources;
 
 use IO\Builder\Order\AddressType;
 use IO\Helper\ArrayHelper;
+use IO\Services\AuthenticationService;
 use IO\Services\CustomerService;
 use Plenty\Plugin\Http\Response;
 use Plenty\Plugin\Http\Request;
@@ -34,15 +35,22 @@ class GuestResource extends ApiResource
          */
         $sessionStorage = pluginApp(SessionStorageService::class);
         
-        $existingEmail = $sessionStorage->getSessionValue(SessionStorageKeys::GUEST_EMAIL);
-        if (!is_null($existingEmail) && strlen($existingEmail) && $email !== $existingEmail) {
-            $addressList[AddressType::BILLING]  = $this->customerService->getAddresses(AddressType::BILLING);
-            $addressList[AddressType::DELIVERY] = $this->customerService->getAddresses(AddressType::DELIVERY);
-            
-            foreach ($addressList as $type => $addresses) {
-                $addresses = ArrayHelper::toArray($addresses);
-                if (is_array($addresses) && count($addresses) > 0) {
-                    $this->deleteAddresses($type, $addresses);
+        
+        if ($this->customerService->getContactId() > 0) {
+            /** @var AuthenticationService $authService */
+            $authService = pluginApp(AuthenticationService::class);
+            $authService->logout();
+        } else {
+            $existingEmail = $sessionStorage->getSessionValue(SessionStorageKeys::GUEST_EMAIL);
+            if (!is_null($existingEmail) && strlen($existingEmail) && $email !== $existingEmail) {
+                $addressList[AddressType::BILLING]  = $this->customerService->getAddresses(AddressType::BILLING);
+                $addressList[AddressType::DELIVERY] = $this->customerService->getAddresses(AddressType::DELIVERY);
+                
+                foreach ($addressList as $type => $addresses) {
+                    $addresses = ArrayHelper::toArray($addresses);
+                    if (is_array($addresses) && count($addresses) > 0) {
+                        $this->deleteAddresses($type, $addresses);
+                    }
                 }
             }
         }
