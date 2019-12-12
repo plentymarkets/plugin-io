@@ -53,6 +53,7 @@ class AuthenticationService
      */
     public function login(string $email, string $password)
     {
+        $this->customerService->deleteGuestAddresses();
         $this->customerService->resetGuestAddresses();
         
         $this->contactAuthRepository->authenticateWithContactEmail($email, $password);
@@ -71,7 +72,6 @@ class AuthenticationService
      */
     public function loginWithContactId(int $contactId, string $password)
     {
-        $this->customerService->resetGuestAddresses();
         $this->contactAuthRepository->authenticateWithContactId($contactId, $password);
         $this->sessionStorage->setSessionValue(SessionStorageKeys::GUEST_WISHLIST_MIGRATION, true);
     }
