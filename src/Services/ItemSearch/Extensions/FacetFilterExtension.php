@@ -45,9 +45,27 @@ class FacetFilterExtension implements ItemSearchExtension
                     $filteredFacets[] = $facet;
                 }
             }
+            $this->sortFacets($filteredFacets);
             $baseResult['facets'] = $filteredFacets;
         }
-
+        
         return $baseResult;
+    }
+
+    private function sortFacets($facets)
+    {
+        usort($facets,
+            function ($facetA, $facetB) {
+                return ($facetA['position'] <=> $facetB['position']);
+            });
+
+        foreach ($facets as $i => $facet) {
+            usort($facets[$i]['values'],
+                function ($valueA, $valueB) {
+                    return ($valueA['position'] <=> $valueB['position']);
+                });
+        }
+
+        return $facets;
     }
 }
