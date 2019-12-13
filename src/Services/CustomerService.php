@@ -101,9 +101,9 @@ class CustomerService
 
     /**
      * @param int $contactClassId
-     * @return array
+     * @return array|null
      */
-    public function getContactClassData($contactClassId): array
+    public function getContactClassData($contactClassId)
     {
         return $this->fromMemoryCache(
             "contactClassData.$contactClassId",
