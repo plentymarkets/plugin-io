@@ -722,7 +722,7 @@ class CustomerService
      * @param bool $isGuest
      * @param array $addressData
      * @return array
-     * @throws Exception
+     * @throws \Exception
      */
     private function buildAddressEmailOptions(array $options = [], $isGuest = false, $addressData = []): array
     {
@@ -732,7 +732,7 @@ class CustomerService
             $email = $sessionStorage->getSessionValue(SessionStorageKeys::GUEST_EMAIL);
 
             if (!strlen($email)) {
-                throw new Exception('no guest email address found', 11);
+                throw new \Exception('no guest email address found', 11);
             }
         } else {
             $email = $this->getContact()->email;
