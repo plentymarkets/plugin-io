@@ -474,27 +474,11 @@ class VariationSearchFactory extends BaseSearchFactory
     /**
      * Group results depending on a config value.
      *
-     * @param string $configKey     The config key containing the grouping method: ('all', 'combined', 'main', 'child')
-     *
      * @return $this
      */
-    public function groupByTemplateConfig( $configKey = 'item.variation_show_type' )
+    public function groupByTemplateConfig()
     {
-        /** @var TemplateConfigService $templateConfigService */
-        $templateConfigService = pluginApp(TemplateConfigService::class);
-        $variationShowType = $templateConfigService->get($configKey);
-        if ($variationShowType === 'combined')
-        {
-            $this->groupBy( 'ids.itemAttributeValue' );
-        }
-        else if ( $variationShowType === 'main' )
-        {
-            $this->isMain();
-        }
-        else if ( $variationShowType === 'child' )
-        {
-            $this->isChild();
-        }
+        $this->groupBy( 'ids.itemAttributeValue' );
 
         return $this;
     }

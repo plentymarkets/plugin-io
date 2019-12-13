@@ -10,14 +10,15 @@ use Plenty\Plugin\Http\Request;
 
 class ItemSearchController extends LayoutController
 {
-    public function showSearch():string
+    public function showSearch($category = null): string
     {
         /** @var Request $request */
         $request = pluginApp(Request::class);
-        
+
         return $this->renderTemplate(
             "tpl.search",
             [
+                'category'      => $category,
                 'page'          => $request->get('page', null),
                 'itemsPerPage'  => $request->get('items', null),
                 'query'         => $request->get('query', null),
@@ -28,12 +29,19 @@ class ItemSearchController extends LayoutController
         );
     }
 
-    public function redirectToSearch($query):string
+    /**
+     * Redirect to new search url from category when search route
+     * is enabled and called.
+     *
+     * @return void
+     */
+    public function redirectToSearch(): void
     {
-
+        /** @var Request $request */
+        $request = pluginApp(Request::class);
+        /** @var ShopUrls $shopUrl */
         $shopUrl = pluginApp(ShopUrls::class);
 
-        AuthGuard::redirect($shopUrl->search, ['query' => $query]);
-        return "";
+        AuthGuard::redirect($shopUrl->search, ['query' => $request->get('query', null)]);
     }
 }

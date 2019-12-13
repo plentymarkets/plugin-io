@@ -88,6 +88,12 @@
                     "label": "Config.routingCategoryMyAccount",
                     "options": {}
                 },
+                "routing.category_search": {
+                    "type": "categoryPicker",
+                    "required": false,
+                    "label": "Config.routingCategoryItemSearch",
+                    "options": {}
+                },
                 "routing.category_login": {
                     "type": "categoryPicker",
                     "required": false,

@@ -33,7 +33,6 @@ class GroupedAttributeValuesExtension implements ItemSearchExtension
     public function transformResult($baseResult, $extensionResult)
     {
         $lang = Utils::getLang();
-        $variationShowType = Utils::getTemplateConfig('item.variation_show_type');
 
         foreach( $baseResult["documents"] as $i => $document )
         {
@@ -43,7 +42,7 @@ class GroupedAttributeValuesExtension implements ItemSearchExtension
             {
                 foreach( $attributes as $attribute )
                 {
-                    if ( $attribute["attribute"]["isGroupable"] || $variationShowType !== 'combined' )
+                    if ( $attribute["attribute"]["isGroupable"] )
                     {
                         $name = "";
                         foreach( $attribute["attribute"]["names"] as $attrName )

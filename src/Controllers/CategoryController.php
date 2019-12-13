@@ -47,13 +47,8 @@ class CategoryController extends LayoutController
 
         /** @var ShopBuilderRequest $shopBuilderRequest */
         $shopBuilderRequest = pluginApp(ShopBuilderRequest::class);
-        if ($shopBuilderRequest->isShopBuilder() && ($shopBuilderRequest->getPreviewContentType() === 'singleitem' || $category->type === 'item'))
+        if ($shopBuilderRequest->isShopBuilder() && ($shopBuilderRequest->getPreviewContentType() === 'singleitem'))
         {
-            /*
-             * TODO
-             * Remove check for category type when ceres is ready to handle item categories.
-             * Right now we need to display single item each time we open an item category in the shop builder to avoid loading non-editable pages
-             */
             /** @var ItemController $itemController */
             $itemController = pluginApp(ItemController::class);
             return $itemController->showItemForCategory($category);
@@ -181,6 +176,22 @@ class CategoryController extends LayoutController
             /** @var MyAccountController $myAccountController */
             $myAccountController = pluginApp(MyAccountController::class);
             return $myAccountController->showMyAccount( $category );
+        }
+
+        if (RouteConfig::getCategoryId( RouteConfig::SEARCH ) === $category->id || $shopBuilderRequest->getPreviewContentType() === 'itemsearch') {
+            $this->getLogger(__CLASS__)->info(
+                "IO::Debug.CategoryController_showMyAccountCategory",
+                [
+                    "category" => $category,
+                    "previewContentType" => $shopBuilderRequest->getPreviewContentType()
+                ]
+            );
+            RouteConfig::overrideCategoryId(RouteConfig::SEARCH, $category->id);
+
+            /** @var ItemSearchController $itemSearchController */
+            $itemSearchController = pluginApp(ItemSearchController::class);
+
+            return $itemSearchController->showSearch( $category );
         }
 
         if ( RouteConfig::getCategoryId( RouteConfig::CONFIRMATION ) === $category->id )

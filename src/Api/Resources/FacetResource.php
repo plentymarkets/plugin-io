@@ -15,6 +15,9 @@ use IO\Api\ResponseCode;
 /**
  * Class FacetResource
  * @package IO\Api\Resources
+ * 
+ * @deprecated since 4.4.0
+ * this class will be removed with IO 5.0.0
  */
 class FacetResource extends ApiResource
 {
@@ -31,6 +34,8 @@ class FacetResource extends ApiResource
     /**
      * Get Facets
      * @return Response
+     * 
+     * @deprecated since 4.4.0
      */
     public function index():Response
     {
