@@ -24,6 +24,7 @@ use IO\Services\ContactMailService;
 use IO\Services\CountryService;
 use IO\Services\CouponService;
 use IO\Services\CustomerService;
+use IO\Services\FacetService;
 use IO\Services\FakerService;
 use IO\Services\ItemCrossSellingService;
 use IO\Services\ItemLastSeenService;
@@ -99,6 +100,7 @@ class IOServiceProvider extends ServiceProvider
             CountryService::class,
             CouponService::class,
             CustomerService::class,
+            FacetService::class,
             ItemCrossSellingService::class,
             ItemLastSeenService::class,
             ItemService::class,
