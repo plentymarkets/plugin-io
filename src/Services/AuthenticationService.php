@@ -15,20 +15,20 @@ use Plenty\Plugin\Log\Loggable;
 class AuthenticationService
 {
     use Loggable;
-    
+
     /**
      * @var ContactAuthenticationRepositoryContract
      */
     private $contactAuthRepository;
-    
+
     /**
      * @var SessionStorageService $sessionStorage
      */
     private $sessionStorage;
-    
+
     /** @var CustomerService */
     private $customerService;
-    
+
     /**
      * AuthenticationService constructor.
      * @param ContactAuthenticationRepositoryContract $contactAuthRepository
@@ -40,49 +40,48 @@ class AuthenticationService
         CustomerService $customerService
     ) {
         $this->contactAuthRepository = $contactAuthRepository;
-        $this->sessionStorage        = $sessionStorage;
-        $this->customerService       = $customerService;
+        $this->sessionStorage = $sessionStorage;
+        $this->customerService = $customerService;
     }
-    
+
     /**
      * Perform the login with email and password
      * @param string $email
      * @param string $password
-     *
-     * @return int
+     * @return int|null
      */
     public function login(string $email, string $password)
     {
         $this->customerService->deleteGuestAddresses();
         $this->customerService->resetGuestAddresses();
-        
+
         $this->contactAuthRepository->authenticateWithContactEmail($email, $password);
         $this->sessionStorage->setSessionValue(SessionStorageKeys::GUEST_WISHLIST_MIGRATION, true);
-        
+
         /** @var ContactRepositoryContract $contactRepository */
         $contactRepository = pluginApp(ContactRepositoryContract::class);
-        
+
         return $contactRepository->getContactIdByEmail($email);
     }
-    
+
     /**
      * Perform the login with customer ID and password
      * @param int $contactId
      * @param string $password
      */
-    public function loginWithContactId(int $contactId, string $password)
+    public function loginWithContactId(int $contactId, string $password): void
     {
         $this->contactAuthRepository->authenticateWithContactId($contactId, $password);
         $this->sessionStorage->setSessionValue(SessionStorageKeys::GUEST_WISHLIST_MIGRATION, true);
     }
-    
+
     /**
      * Log out the customer
      */
-    public function logout()
+    public function logout(): void
     {
         $this->contactAuthRepository->logout();
-        
+
         /**
          * @var BasketService $basketService
          */
@@ -90,12 +89,16 @@ class AuthenticationService
         $basketService->setBillingAddressId(0);
         $basketService->setDeliveryAddressId(0);
     }
-    
-    public function checkPassword($password)
+
+    /**
+     * @param string $password
+     * @return bool
+     */
+    public function checkPassword($password): bool
     {
         /** @var CustomerService $customerService */
         $customerService = pluginApp(CustomerService::class);
-        $contact         = $customerService->getContact();
+        $contact = $customerService->getContact();
         if ($contact instanceof Contact) {
             try {
                 $this->login(
@@ -110,21 +113,23 @@ class AuthenticationService
                         'contactId' => $contact->id
                     ]
                 );
-                return false;
             }
         }
-        
+
         return false;
     }
-    
-    public function isLoggedIn()
+
+    /**
+     * @return bool
+     */
+    public function isLoggedIn(): bool
     {
         /** @var CustomerService $customerService */
         $customerService = pluginApp(CustomerService::class);
-        
+
         $contactId = $customerService->getContactId();
-        $email     = $this->sessionStorage->getSessionValue(SessionStorageKeys::GUEST_EMAIL);
-        
+        $email = $this->sessionStorage->getSessionValue(SessionStorageKeys::GUEST_EMAIL);
+
         return $contactId > 0 || !empty(trim($email));
     }
 }
