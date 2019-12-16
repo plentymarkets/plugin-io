@@ -177,7 +177,7 @@ class CategoryController extends LayoutController
             $myAccountController = pluginApp(MyAccountController::class);
             return $myAccountController->showMyAccount( $category );
         }
-    
+
         if (RouteConfig::getCategoryId( RouteConfig::SEARCH ) === $category->id || $shopBuilderRequest->getPreviewContentType() === 'itemsearch') {
             $this->getLogger(__CLASS__)->info(
                 "IO::Debug.CategoryController_showMyAccountCategory",
@@ -187,10 +187,10 @@ class CategoryController extends LayoutController
                 ]
             );
             RouteConfig::overrideCategoryId(RouteConfig::SEARCH, $category->id);
-        
+
             /** @var ItemSearchController $itemSearchController */
             $itemSearchController = pluginApp(ItemSearchController::class);
-            
+
             return $itemSearchController->showSearch( $category );
         }
 

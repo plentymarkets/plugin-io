@@ -23,7 +23,7 @@ class SingleItem implements SearchPreset
     {
         /** @var VariationSearchFactory $searchFactory */
         $searchFactory = pluginApp( VariationSearchFactory::class );
-        
+
         $searchFactory->withResultFields(
             ResultFieldTemplate::load( ResultFieldTemplate::TEMPLATE_SINGLE_ITEM )
         );
@@ -45,6 +45,7 @@ class SingleItem implements SearchPreset
             ->hasPriceForCustomer()
             ->withLinkToContent()
             ->withReducedResults()
+            ->withTags()
             ->setPage(1, 1);
 
         if(array_key_exists('itemId', $options) && $options['itemId'] != 0)

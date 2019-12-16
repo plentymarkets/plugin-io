@@ -378,6 +378,14 @@ class IORouteServiceProvider extends RouteServiceProvider
                 ->where('itemId', '[0-9]+');
         }
 
+        // TAGS
+        if ( RouteConfig::isActive(RouteConfig::TAGS) )
+        {
+            $router->get('{tagName}_t{tagId}', 'IO\Controllers\TagController@showItemByTag')
+            ->where('tagName', '[^\/]*')
+            ->where('tagId', '[0-9]+');
+        }
+
         // CATEGORY ROUTES
         if ( RouteConfig::isActive(RouteConfig::CATEGORY) )
         {
