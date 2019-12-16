@@ -2,6 +2,7 @@
 
 namespace IO\Services;
 
+use Illuminate\Support\Facades\Auth;
 use IO\Builder\Order\AddressType;
 use IO\Builder\Order\OrderBuilder;
 use IO\Builder\Order\OrderItemType;
@@ -502,25 +503,7 @@ class OrderService
                 }
             }
 
-            /** @var TemplateConfigService $templateConfigService */
-            $templateConfigService = pluginApp(TemplateConfigService::class);
-            $returnStatus = $templateConfigService->get('my_account.order_return_initial_status', 9.0);
-            if(!strlen($returnStatus) || (float)$returnStatus <= 0)
-            {
-                $returnStatus = 9.0;
-            }
-            else
-            {
-                try {
-                    $orderStatusRepository = pluginApp(OrderStatusRepositoryContract::class);
-                    $orderStatusRepository->get($returnStatus);
-                } catch(\Exception $e) {
-                    $this->getLogger(__CLASS__)->warning('IO::Debug.OrderService_returnStatusNotFound', [
-                        'statusId' => $returnStatus
-                    ]);
-                    $returnStatus = 9.0;
-                }
-            }
+            $returnStatus = $this->getReturnOrderStatus();
 
             $returnOrderData['properties'][]      = [
                 "typeId"    => OrderPropertyType::NEW_RETURNS_MY_ACCOUNT,
@@ -857,5 +840,35 @@ class OrderService
         $paymentProperty->value = $value;
 
         return $paymentProperty;
+    }
+
+    private function getReturnOrderStatus()
+    {
+        /** @var TemplateConfigService $templateConfigService */
+        $templateConfigService = pluginApp(TemplateConfigService::class);
+        $returnStatus = $templateConfigService->get('my_account.order_return_initial_status', 9.0);
+
+        if (strlen($returnStatus) && (float)$returnStatus > 0) {
+            $returnStatus = (float)$returnStatus;
+            try {
+                /** @var AuthHelper $authHelper */
+                $authHelper = pluginApp(AuthHelper::class);
+
+                return $authHelper->processUnguarded(function () use ($returnStatus) {
+                    $orderStatusRepository = pluginApp(OrderStatusRepositoryContract::class);
+                    $status = $orderStatusRepository->get($returnStatus);
+                    if (is_null($status)) {
+                        return 9.0;
+                    }
+
+                    return $returnStatus;
+                });
+            } catch (\Exception $e) {
+                $this->getLogger(__CLASS__)->warning('IO::Debug.OrderService_returnStatusNotFound', [
+                    'statusId' => $returnStatus
+                ]);
+            }
+        }
+        return 9.0;
     }
 }
