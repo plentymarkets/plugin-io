@@ -2,9 +2,6 @@
 
 namespace IO\Services\ItemSearch\Extensions;
 
-use IO\Services\ItemSearch\Factories\BaseSearchFactory;
-use Plenty\Modules\Cloud\ElasticSearch\Lib\Search\Document\DocumentSearch;
-
 /**
  * Class FacetFilterExtension
  *
@@ -27,28 +24,24 @@ class FacetFilterExtension implements ItemSearchExtension
      */
     public function transformResult($baseResult, $extensionResult)
     {
-        if ( $baseResult['facets'] )
-        {
+        if ($baseResult['facets']) {
             $facets = $baseResult['facets'];
             $filteredFacets = [];
 
-            foreach( $facets as $facet )
-            {
+            foreach ($facets as $facet) {
                 $hits = array_filter($facet['values'], function ($value) use ($facet) {
-                    return (int)$value['count'] >= (int) $facet['minHitCount'];
+                    return (int)$value['count'] >= (int)$facet['minHitCount'];
                 });
 
-                if ( count($hits) || $facet['type'] == 'price' )
-                {
+                if (count($hits) || $facet['type'] == 'price') {
                     $facet['values'] = $hits;
-                    $facet['values'] = array_slice( $facet['values'], 0, (int) $facet['maxResultCount'] );
+                    $facet['values'] = array_slice($facet['values'], 0, (int)$facet['maxResultCount']);
                     $filteredFacets[] = $facet;
                 }
             }
-            $this->sortFacets($filteredFacets);
-            $baseResult['facets'] = $filteredFacets;
+            $baseResult['facets'] = $this->sortFacets($filteredFacets);
         }
-        
+
         return $baseResult;
     }
 
