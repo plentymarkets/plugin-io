@@ -26,6 +26,7 @@ use Plenty\Modules\Order\Date\Models\OrderDateType;
 use Plenty\Modules\Order\Models\OrderReference;
 use Plenty\Modules\Order\Property\Contracts\OrderPropertyRepositoryContract;
 use Plenty\Modules\Order\Property\Models\OrderPropertyType;
+use Plenty\Modules\Order\Status\Contracts\OrderStatusRepositoryContract;
 use Plenty\Modules\Payment\Contracts\PaymentRepositoryContract;
 use Plenty\Modules\Payment\Method\Contracts\PaymentMethodRepositoryContract;
 use Plenty\Plugin\Log\Loggable;
@@ -507,6 +508,18 @@ class OrderService
             if(!strlen($returnStatus) || (float)$returnStatus <= 0)
             {
                 $returnStatus = 9.0;
+            }
+            else
+            {
+                try {
+                    $orderStatusRepository = pluginApp(OrderStatusRepositoryContract::class);
+                    $orderStatusRepository->get($returnStatus);
+                } catch(\Exception $e) {
+                    $this->getLogger(__CLASS__)->warning('IO::Debug.OrderService_returnStatusNotFound', [
+                        'statusId' => $returnStatus
+                    ]);
+                    $returnStatus = 9.0;
+                }
             }
 
             $returnOrderData['properties'][]      = [
