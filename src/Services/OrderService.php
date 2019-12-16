@@ -2,7 +2,6 @@
 
 namespace IO\Services;
 
-use Illuminate\Support\Facades\Auth;
 use IO\Builder\Order\AddressType;
 use IO\Builder\Order\OrderBuilder;
 use IO\Builder\Order\OrderItemType;
