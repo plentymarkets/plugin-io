@@ -26,6 +26,7 @@ use Plenty\Modules\Order\Date\Models\OrderDateType;
 use Plenty\Modules\Order\Models\OrderReference;
 use Plenty\Modules\Order\Property\Contracts\OrderPropertyRepositoryContract;
 use Plenty\Modules\Order\Property\Models\OrderPropertyType;
+use Plenty\Modules\Order\Status\Contracts\OrderStatusRepositoryContract;
 use Plenty\Modules\Payment\Contracts\PaymentRepositoryContract;
 use Plenty\Modules\Payment\Method\Contracts\PaymentMethodRepositoryContract;
 use Plenty\Plugin\Log\Loggable;
@@ -501,13 +502,7 @@ class OrderService
                 }
             }
 
-            /** @var TemplateConfigService $templateConfigService */
-            $templateConfigService = pluginApp(TemplateConfigService::class);
-            $returnStatus = $templateConfigService->get('my_account.order_return_initial_status', 9.0);
-            if(!strlen($returnStatus) || (float)$returnStatus <= 0)
-            {
-                $returnStatus = 9.0;
-            }
+            $returnStatus = $this->getReturnOrderStatus();
 
             $returnOrderData['properties'][]      = [
                 "typeId"    => OrderPropertyType::NEW_RETURNS_MY_ACCOUNT,
@@ -844,5 +839,35 @@ class OrderService
         $paymentProperty->value = $value;
 
         return $paymentProperty;
+    }
+
+    private function getReturnOrderStatus()
+    {
+        /** @var TemplateConfigService $templateConfigService */
+        $templateConfigService = pluginApp(TemplateConfigService::class);
+        $returnStatus = $templateConfigService->get('my_account.order_return_initial_status', 9.0);
+
+        if (strlen($returnStatus) && (float)$returnStatus > 0) {
+            $returnStatus = (float)$returnStatus;
+            try {
+                /** @var AuthHelper $authHelper */
+                $authHelper = pluginApp(AuthHelper::class);
+
+                return $authHelper->processUnguarded(function () use ($returnStatus) {
+                    $orderStatusRepository = pluginApp(OrderStatusRepositoryContract::class);
+                    $status = $orderStatusRepository->get($returnStatus);
+                    if (is_null($status)) {
+                        return 9.0;
+                    }
+
+                    return $returnStatus;
+                });
+            } catch (\Exception $e) {
+                $this->getLogger(__CLASS__)->warning('IO::Debug.OrderService_returnStatusNotFound', [
+                    'statusId' => $returnStatus
+                ]);
+            }
+        }
+        return 9.0;
     }
 }
