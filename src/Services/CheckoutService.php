@@ -184,6 +184,7 @@ class CheckoutService
             }
             $this->setCurrency($currency);
         }
+        return $currency;
     }
 
     /**

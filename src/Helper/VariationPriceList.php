@@ -53,7 +53,7 @@ class VariationPriceList
 
     /** @var UnitService $unitService */
     private $unitService;
-    
+
     /** @var LiveShoppingRepositoryContract $liveShoppingRepo */
     private $liveShoppingRepo;
 
@@ -172,12 +172,12 @@ class VariationPriceList
 
         $defaultPrice   = $this->findPriceForQuantity( $quantity );
         $rrp            = $this->findPriceForQuantity( $quantity, self::TYPE_RRP );
-    
+
         if($this->liveShoppingRepo->itemHasActiveLiveShopping($this->itemId))
         {
             $specialOffer   = $this->findPriceForQuantity( $quantity, self::TYPE_SPECIAL_OFFER );
         }
-        
+
         return [
             'default'           => $this->preparePrice( $defaultPrice, $this->showNetPrice ),
             'rrp'               => $this->preparePrice( $rrp, $this->showNetPrice ),
@@ -196,7 +196,7 @@ class VariationPriceList
         $defaultPrice   = $this->findPriceForQuantity( $quantity );
         $rrp            = $this->findPriceForQuantity( $quantity, self::TYPE_RRP );
         $graduatedPrices= [];
-        
+
         $specialOffer = null;
         if($this->liveShoppingRepo->itemHasActiveLiveShopping($this->itemId))
         {
@@ -322,6 +322,7 @@ class VariationPriceList
     private function getSearchRequest( int $variationId, string $type = self::TYPE_DEFAULT, float $quantity = 0 )
     {
         /** @var SalesPriceSearchRequest $salesPriceSearchRequest */
+
         $salesPriceSearchRequest = $this->fromMemoryCache(
             "salesPriceRequest",
             function()
@@ -340,12 +341,6 @@ class VariationPriceList
                 }
                 $salesPriceSearchRequest->customerClassId = $customerService->getContactClassId();
 
-                /** @var CheckoutService $checkoutService */
-                $checkoutService = pluginApp( CheckoutService::class );
-
-                $salesPriceSearchRequest->countryId = $checkoutService->getShippingCountryId();
-                $salesPriceSearchRequest->currency  = $checkoutService->getCurrency();
-
                 /** @var BasketService $basketService */
                 $basketService = pluginApp( BasketService::class );
                 $salesPriceSearchRequest->referrerId = $basketService->getBasket()->referrerId;
@@ -358,9 +353,15 @@ class VariationPriceList
             }
         );
 
+         /** @var CheckoutService $checkoutService */
+        $checkoutService = pluginApp( CheckoutService::class );
+
+        $salesPriceSearchRequest->countryId = $checkoutService->getShippingCountryId();
+        $salesPriceSearchRequest->currency  = $checkoutService->getCurrency();
         $salesPriceSearchRequest->variationId = $variationId;
         $salesPriceSearchRequest->quantity    = $quantity;
         $salesPriceSearchRequest->type        = $type;
+
         return $salesPriceSearchRequest;
     }
 
