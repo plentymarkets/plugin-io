@@ -430,7 +430,7 @@ class IORouteServiceProvider extends RouteServiceProvider
             }
         }
 
-        if (!RouteConfig::isActive(RouteConfig::CATEGORY) && RouteConfig::getCategoryId($route) > 0)
+        if (!RouteConfig::isActive(RouteConfig::CATEGORY) && RouteConfig::getCategoryId($route) > 0 && $shopUrl !== '')
         {
             $this->registerSingleCategoryRoute($router, $route, $shopUrl);
         }
