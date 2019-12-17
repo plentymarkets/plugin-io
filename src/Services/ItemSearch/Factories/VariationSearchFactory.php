@@ -474,11 +474,12 @@ class VariationSearchFactory extends BaseSearchFactory
     /**
      * Group results depending on a config value.
      *
+     * @param string $key
      * @return $this
      */
-    public function groupByTemplateConfig()
+    public function groupByTemplateConfig($key = 'ids.itemAttributeValue')
     {
-        $this->groupBy( 'ids.itemAttributeValue' );
+        $this->groupBy($key);
 
         return $this;
     }

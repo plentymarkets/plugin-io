@@ -59,7 +59,7 @@ class SingleItem implements SearchPreset
         }
         else
         {
-            $searchFactory->groupByTemplateConfig();
+            $searchFactory->groupByTemplateConfig('ids.itemId');
         }
 
         if ( array_key_exists( 'setCategory', $options ) && $options['setCategory'] === true )
