@@ -9,7 +9,7 @@ class LanguageMap
     private static $locales = array(
         'de' => 'de_DE',
         'en' => 'en_GB',
-        'bg' => 'bg_BG',
+        'bg' => 'de_DE',
         'fr' => 'fr_FR',
         'it' => 'it_IT',
         'es' => 'es_ES',
