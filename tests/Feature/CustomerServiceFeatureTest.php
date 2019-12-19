@@ -63,7 +63,7 @@ class CustomerServiceFeatureTest extends TestCase
         $email    = $this->fake->email;
         $password = $this->fake->password;
 
-      $this->checkoutService
+        $this->checkoutService
             ->shouldReceive('getCustomerShippingAddressId')
             ->andReturn($addressData['countryId']);
 
