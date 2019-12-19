@@ -62,6 +62,15 @@ class CustomerServiceFeatureTest extends TestCase
     {
         $email    = $this->fake->email;
         $password = $this->fake->password;
+
+      $this->checkoutService
+            ->shouldReceive('getCustomerShippingAddressId')
+            ->andReturn($addressData['countryId']);
+
+        $this->checkoutService
+            ->shouldReceive('getCustomerInvoiceAddressId')
+            ->andReturn($addressData['countryId']);
+
         $this->createContact($email, $password);
         $this->performLogin($email, $password);
         $this->createAddress($addressData, $addressType);
@@ -126,6 +135,15 @@ class CustomerServiceFeatureTest extends TestCase
     {
         $email    = $this->fake->email;
         $password = $this->fake->password;
+
+        $this->checkoutService
+            ->shouldReceive('getCustomerShippingAddressId')
+            ->andReturn(null);
+
+        $this->checkoutService
+            ->shouldReceive('getCustomerInvoiceAddressId')
+            ->andReturn(null);
+
         $this->createContact($email, $password);
         $this->performLogin($email, $password);
         $this->deleteAddress($addressData, $addressType);
@@ -198,6 +216,16 @@ class CustomerServiceFeatureTest extends TestCase
     {
         $email    = $this->fake->email;
         $password = $this->fake->password;
+
+         $this->checkoutService
+                ->shouldReceive('getCustomerShippingAddressId')
+                ->andReturn($addressDataCreate['countryId']);
+
+
+         $this->checkoutService
+                ->shouldReceive('getCustomerInvoiceAddressId')
+                ->andReturn($addressDataCreate['countryId']);
+
         $this->createContact($email, $password);
         $this->performLogin($email, $password);
         $this->updateAddress($addressDataCreate, $addressDataUpdate, $addressType);
