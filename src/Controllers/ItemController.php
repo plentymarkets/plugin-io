@@ -2,7 +2,6 @@
 
 namespace IO\Controllers;
 
-use Ceres\Config\CeresConfig;
 use IO\Api\ResponseCode;
 use IO\Helper\Utils;
 use IO\Services\CategoryService;
@@ -12,6 +11,7 @@ use IO\Services\ItemSearch\Helper\ResultFieldTemplate;
 use IO\Services\ItemSearch\SearchPresets\SingleItem;
 use IO\Services\ItemSearch\SearchPresets\VariationAttributeMap;
 use IO\Services\ItemSearch\Services\ItemSearchService;
+use IO\Services\TemplateConfigService;
 use IO\Services\WebstoreConfigurationService;
 use Plenty\Modules\Category\Models\Category;
 use Plenty\Modules\ShopBuilder\Helper\ShopBuilderRequest;
@@ -54,10 +54,11 @@ class ItemController extends LayoutController
             'item' => SingleItem::getSearchFactory($itemSearchOptions),
             'variationAttributeMap' => VariationAttributeMap::getSearchFactory($itemSearchOptions)
         ];
-
-        /** @var CeresConfig $ceresItemConfig */
-        $ceresConfig = pluginApp(CeresConfig::class);
-        if ($variationId > 0 && $ceresConfig->item->showPleaseSelect) {
+        
+        /** @var TemplateConfigService $templateConfigService */
+        $templateConfigService = pluginApp(TemplateConfigService::class);
+        
+        if ($variationId > 0 && (int)$templateConfigService->get('item.show_please_select') == 1) {
             unset($itemSearchOptions['variationId']);
             $searches['dynamic'] = SingleItem::getSearchFactory($itemSearchOptions);
         }
