@@ -15,6 +15,7 @@ use IO\Services\ItemSearch\Extensions\ItemDefaultImage;
 use IO\Services\ItemSearch\Extensions\ItemUrlExtension;
 use IO\Services\ItemSearch\Extensions\PriceSearchExtension;
 use IO\Services\ItemSearch\Extensions\ReduceDataExtension;
+use IO\Services\ItemSearch\Extensions\TagExtension;
 use IO\Services\ItemSearch\Extensions\VariationAttributeMapExtension;
 use IO\Services\ItemSearch\Extensions\VariationPropertyExtension;
 use IO\Services\ItemSearch\Helper\FacetExtensionContainer;
@@ -49,14 +50,14 @@ use Plenty\Plugin\Application;
 class VariationSearchFactory extends BaseSearchFactory
 {
     private $isAdminPreview = false;
-    
+
     public function __construct()
     {
         /** @var Application $app */
         $app = pluginApp(Application::class);
         $this->isAdminPreview = $app->isAdminPreview();
     }
-    
+
     /**
      * @param $isAdminPreview
      * @return $this
@@ -66,7 +67,7 @@ class VariationSearchFactory extends BaseSearchFactory
         $this->isAdminPreview = $isAdminPreview;
         return $this;
     }
-    
+
     //
     // VARIATION BASE FILTERS
     //
@@ -83,7 +84,7 @@ class VariationSearchFactory extends BaseSearchFactory
             $variationFilter = $this->createFilter( VariationBaseFilter::class );
             $variationFilter->isActive();
         }
-        
+
         return $this;
     }
 
@@ -100,7 +101,7 @@ class VariationSearchFactory extends BaseSearchFactory
             $variationFilter = $this->createFilter( VariationBaseFilter::class );
             $variationFilter->isInactive();
         }
-        
+
         return $this;
     }
 
@@ -265,10 +266,10 @@ class VariationSearchFactory extends BaseSearchFactory
             $variationFilter = $this->createFilter( VariationBaseFilter::class );
             $variationFilter->isHiddenInCategoryList( $isHidden );
         }
-        
+
         return $this;
     }
-    
+
     /**
      * Filter variations by isSalable flag
      *
@@ -279,7 +280,7 @@ class VariationSearchFactory extends BaseSearchFactory
         /** @var VariationBaseFilter $variationFilter */
         $variationFilter = $this->createFilter( VariationBaseFilter::class );
         $variationFilter->isSalable();
-    
+
         return $this;
     }
 
@@ -305,7 +306,7 @@ class VariationSearchFactory extends BaseSearchFactory
             $clientFilter = $this->createFilter( ClientFilter::class );
             $clientFilter->isVisibleForClient( $clientId );
         }
-        
+
         return $this;
     }
 
@@ -328,7 +329,7 @@ class VariationSearchFactory extends BaseSearchFactory
             {
                 $lang = Utils::getLang();
             }
-    
+
             $langMap = [
                 'de' => 'german',
                 'en' => 'english',
@@ -350,7 +351,7 @@ class VariationSearchFactory extends BaseSearchFactory
                 //'cn' => '',
                 //'vn' => '',
             ];
-    
+
             if ( array_key_exists( $lang, $langMap ) )
             {
                 $lang = $langMap[$lang];
@@ -363,7 +364,7 @@ class VariationSearchFactory extends BaseSearchFactory
             $textFilter = $this->createFilter(TextFilter::class);
             $textFilter->hasNameInLanguage( $lang, $type );
         }
-        
+
         return $this;
     }
 
@@ -403,7 +404,7 @@ class VariationSearchFactory extends BaseSearchFactory
             $priceFilter = $this->createFilter( SalesPriceFilter::class );
             $priceFilter->hasAtLeastOnePrice( $priceIds );
         }
-        
+
         return $this;
     }
 
@@ -420,33 +421,33 @@ class VariationSearchFactory extends BaseSearchFactory
             $priceDetectService = pluginApp( PriceDetectService::class );
             $this->hasAtLeastOnePrice( $priceDetectService->getPriceIdsForCustomer() );
         }
-        
+
         return $this;
     }
-    
+
     public function hasPriceInRange($priceMin, $priceMax)
     {
         if( !( (float)$priceMin == 0 && (float)$priceMax == 0 ) )
         {
             /** @var CurrencyConverter $currencyConverter */
             $currencyConverter = pluginApp(CurrencyConverter::class);
-            
+
             /** @var VatConverter $vatConverter */
             $vatConverter = pluginApp(VatConverter::class);
-            
+
             $priceMin = $vatConverter->convertToGross($currencyConverter->convertToDefaultCurrency((float)$priceMin));
             $priceMax = $vatConverter->convertToGross($currencyConverter->convertToDefaultCurrency((float)$priceMax));
-    
+
             if((float)$priceMax == 0)
             {
                 $priceMax = null;
             }
-            
+
             /** @var PriceFilter $priceRangeFilter */
             $priceRangeFilter = $this->createFilter(PriceFilter::class);
             $priceRangeFilter->betweenByClient($priceMin, $priceMax, Utils::getPlentyId());
         }
-        
+
         return $this;
     }
 
@@ -473,27 +474,12 @@ class VariationSearchFactory extends BaseSearchFactory
     /**
      * Group results depending on a config value.
      *
-     * @param string $configKey     The config key containing the grouping method: ('all', 'combined', 'main', 'child')
-     *
+     * @param string $key
      * @return $this
      */
-    public function groupByTemplateConfig( $configKey = 'item.variation_show_type' )
+    public function groupByTemplateConfig($key = 'ids.itemAttributeValue')
     {
-        /** @var TemplateConfigService $templateConfigService */
-        $templateConfigService = pluginApp(TemplateConfigService::class);
-        $variationShowType = $templateConfigService->get($configKey);
-        if ($variationShowType === 'combined')
-        {
-            $this->groupBy( 'ids.itemAttributeValue' );
-        }
-        else if ( $variationShowType === 'main' )
-        {
-            $this->isMain();
-        }
-        else if ( $variationShowType === 'child' )
-        {
-            $this->isChild();
-        }
+        $this->groupBy($key);
 
         return $this;
     }
@@ -543,7 +529,7 @@ class VariationSearchFactory extends BaseSearchFactory
         {
             $facetValues = explode(",", $facetValues );
         }
-        
+
         /** @var SearchHelper $searchHelper */
         $searchHelper = pluginApp( SearchHelper::class, [$facetValues, $clientId, 'item', $lang] );
         $this->withFilter( $searchHelper->getFacetFilter() );
@@ -684,7 +670,7 @@ class VariationSearchFactory extends BaseSearchFactory
 
         return $this;
     }
-    
+
     /**
      * Includes VariatonAttributeMap for variation select
      *
@@ -693,30 +679,30 @@ class VariationSearchFactory extends BaseSearchFactory
     public function withAttributes()
     {
         $this->withExtension( VariationAttributeMapExtension::class );
-        
+
         return $this;
     }
-    
+
     public function withPropertyGroups()
     {
         $propertyGroupMutator = pluginApp(VariationPropertyGroupMutator::class);
         $this->withMutator($propertyGroupMutator);
-        
+
         return $this;
     }
-    
+
     public function withOrderPropertySelectionValues()
     {
         $orderPropertySelectionValueMutator = pluginApp(OrderPropertySelectionValueMutator::class);
         $this->withMutator($orderPropertySelectionValueMutator);
-        
+
         return $this;
     }
-    
+
     public function withVariationProperties()
     {
         $this->withExtension(VariationPropertyExtension::class);
-        
+
         return $this;
     }
 
@@ -795,11 +781,18 @@ class VariationSearchFactory extends BaseSearchFactory
         $this->withExtension(ReduceDataExtension::class);
         return $this;
     }
-    
+
     public function withAvailability()
     {
         $this->withExtension(AvailabilityExtension::class);
         return $this;
     }
+
+    public function withTags()
+    {
+        $this->withExtension(TagExtension::class);
+        return $this;
+    }
+
 }
 

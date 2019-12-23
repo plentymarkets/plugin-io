@@ -23,7 +23,7 @@ class SingleItem implements SearchPreset
     {
         /** @var VariationSearchFactory $searchFactory */
         $searchFactory = pluginApp( VariationSearchFactory::class );
-        
+
         $searchFactory->withResultFields(
             ResultFieldTemplate::load( ResultFieldTemplate::TEMPLATE_SINGLE_ITEM )
         );
@@ -45,6 +45,7 @@ class SingleItem implements SearchPreset
             ->hasPriceForCustomer()
             ->withLinkToContent()
             ->withReducedResults()
+            ->withTags()
             ->setPage(1, 1);
 
         if(array_key_exists('itemId', $options) && $options['itemId'] != 0)
@@ -58,16 +59,7 @@ class SingleItem implements SearchPreset
         }
         else
         {
-            $templateConfigService = pluginApp( TemplateConfigService::class );
-            $variationShowType = $templateConfigService->get('item.variation_show_type');
-            if($variationShowType == 'main')
-            {
-                $searchFactory->isMain();
-            }
-            elseif($variationShowType == 'child')
-            {
-                $searchFactory->isChild();
-            }
+            $searchFactory->groupByTemplateConfig('ids.itemId');
         }
 
         if ( array_key_exists( 'setCategory', $options ) && $options['setCategory'] === true )

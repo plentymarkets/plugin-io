@@ -1,5 +1,25 @@
 # Release Notes for IO
 
+## v4.5.0 (2019-12-19) <a href="https://github.com/plentymarkets/plugin-io/compare/4.4.3...4.4.0" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
+
+### Added 
+
+- The Ceres assistant now includes settings for the variation selection, with which the "Please select" option can be added and preselected.
+- The route `/rest/io/categorytree/children` has been added. It serves to return subcategories of a category.
+- The route `/rest/io/categorytree/template_for_children` has been added. It serves to return rendered markup of the navigation tree widget.
+
+### Changed
+
+- The route `io/facet` has been marked as `deprecated`.
+- Facet values are now returned in a sorted fashion.
+
+### Fixed
+
+- No address was preselected in the address selection. This behaviour has been fixed.
+- Under certain circumstances, item URLs were generated incorrectly. This behaviour has been fixed.
+- Routing errors could occur if a category, for which no translations had been stored, was linked via the ShopBuilder. This behaviour has been fixed.
+- The shopping cart was displayed incorrectly if changing the language also entailed a change of currency and country of delivery. This behaviour has been fixed.
+
 ## v4.4.3 (2019-11-29) <a href="https://github.com/plentymarkets/plugin-io/compare/4.4.2...4.4.3" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
 
 ### Fixed 

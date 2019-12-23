@@ -55,7 +55,8 @@ class CategoryFacet implements FacetExtension
                     'position' => 0,
                     'values' => [],
                     'minHitCount' => 1,
-                    'maxResultCount' => self::MAX_RESULT_COUNT
+                    'maxResultCount' => self::MAX_RESULT_COUNT,
+                    'type' => 'category'
                 ];
 
                 $loggedIn = Utils::isContactLoggedIn();

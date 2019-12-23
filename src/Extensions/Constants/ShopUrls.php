@@ -253,6 +253,8 @@ class ShopUrls
         // match url pattern
         if (preg_match('/(?:a\-\d+|_\d+|_\d+_\d+)$/m', $url) === 1) {
             return RouteConfig::ITEM;
+        } else if(preg_match('/_t\d+$/m', $url) === 1) {
+            return RouteConfig::TAGS;
         }
 
         // template type cannot be determined

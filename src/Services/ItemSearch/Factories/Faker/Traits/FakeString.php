@@ -64,4 +64,9 @@ trait FakeString
 
         return "/" . implode("/", $path);
     }
+
+    protected function hexColor()
+    {
+        return "#".substr(md5(rand()), 0, 6);
+    }
 }
