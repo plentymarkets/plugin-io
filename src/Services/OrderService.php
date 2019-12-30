@@ -527,7 +527,16 @@ class OrderService
                 ];
             }
 
-            $createdReturn = $this->orderRepository->createOrder($returnOrderData);
+            if(strlen($orderAccessKey)) {
+                /** @var AuthHelper $authHelper */
+                $authHelper = pluginApp(AuthHelper::class);
+                $createdReturn = $authHelper->processUnguarded(function() use ($returnOrderData) {
+                    $this->orderRepository->createOrder($returnOrderData);
+                });
+            } else {
+                $createdReturn = $this->orderRepository->createOrder($returnOrderData);
+            }
+
 
             return $createdReturn;
         }
