@@ -182,7 +182,7 @@ class CouponService
         }
 
         // Subtract the changed quantity from the basketAmountWithoutNormal
-        $basketAmountFinal = $basketAmountWithoutNormal - ($data['price'] * $quantityChange);
+        $basketAmountFinal = $basketAmountWithoutNormal - ($basketItem['price'] * $quantityChange);
 
         return $campaign->minOrderValue >= $basketAmountFinal;
     }
