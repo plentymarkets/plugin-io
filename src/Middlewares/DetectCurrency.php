@@ -19,7 +19,7 @@ class DetectCurrency extends Middleware
         $currency = $request->get('currency', null);
         $currency = !is_null($currency) ? $currency : $request->get('Currency', null);
 
-        if ($currency != null) {
+        if (!is_null($currency)) {
             /** @var TemplateConfigService $templateConfigService */
             $templateConfigService = pluginApp(TemplateConfigService::class);
             $enabledCurrencies = explode(', ', $templateConfigService->get('currency.available_currencies'));
