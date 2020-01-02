@@ -28,16 +28,14 @@ class HandleOrderPreviewUrl extends Middleware
                 $confirmationRoute = $shopUrls->confirmation . '/' . $orderId . '/' . $orderAccessKey;
                 AuthGuard::redirect($confirmationRoute);
             }
-        } else {
-            if (in_array(RouteConfig::CONFIRMATION, RouteConfig::getEnabledRoutes())
-                && RouteConfig::getCategoryId(RouteConfig::CONFIRMATION) > 0) {
-                $orderId = $request->get('id', 0);
-                $orderAccessKey = $request->get('ak', '');
+        } elseif (in_array(RouteConfig::CONFIRMATION, RouteConfig::getEnabledRoutes())
+            && RouteConfig::getCategoryId(RouteConfig::CONFIRMATION) > 0) {
+            $orderId = $request->get('id', 0);
+            $orderAccessKey = $request->get('ak', '');
 
-                if (strlen($orderAccessKey) && (int)$orderId > 0) {
-                    $confirmationRoute = $shopUrls->confirmation . '?orderId=' . $orderId . '&accessKey=' . $orderAccessKey;
-                    AuthGuard::redirect($confirmationRoute);
-                }
+            if (strlen($orderAccessKey) && (int)$orderId > 0) {
+                $confirmationRoute = $shopUrls->confirmation . '?orderId=' . $orderId . '&accessKey=' . $orderAccessKey;
+                AuthGuard::redirect($confirmationRoute);
             }
         }
     }
