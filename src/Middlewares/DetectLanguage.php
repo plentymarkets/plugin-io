@@ -25,7 +25,6 @@ class DetectLanguage extends Middleware
     public function before(Request $request)
     {
         if (substr($request->getRequestUri(), 0, strlen(self::WEB_AJAX_BASE)) !== self::WEB_AJAX_BASE) {
-
             /** @var WebstoreConfigurationService $webstoreService */
             $webstoreService = pluginApp(WebstoreConfigurationService::class);
             $webstoreConfig = $webstoreService->getWebstoreConfig();
@@ -40,10 +39,9 @@ class DetectLanguage extends Middleware
                     // Do not cache content if detected language does not match the language of the url
                     TemplateService::$shouldBeCached = false;
                 }
-
             } else {
-                // language has not been detected. check if url points to default language
                 if (strpos(end($splittedURL), '.') === false) {
+                    // language has not been detected. check if url points to default language
                     $this->setLanguage($splittedURL[0], $webstoreConfig);
                 }
             }
@@ -83,8 +81,10 @@ class DetectLanguage extends Middleware
         $templateConfigService = pluginApp(TemplateConfigService::class);
         $enabledCurrencies = explode(', ', $templateConfigService->get('currency.available_currencies'));
         $currency = $webstoreConfig->defaultCurrencyList[$language];
-        if (!is_null($currency) && (in_array($currency,
-                    $enabledCurrencies) || array_pop($enabledCurrencies) == 'all')) {
+        if (!is_null($currency) && (in_array(
+                    $currency,
+                    $enabledCurrencies
+                ) || array_pop($enabledCurrencies) == 'all')) {
             /** @var CheckoutService $checkoutService */
             $checkoutService = pluginApp(CheckoutService::class);
             $checkoutService->setCurrency($currency);
