@@ -4,7 +4,7 @@ namespace IO\Controllers;
 
 use IO\Api\ResponseCode;
 use IO\Constants\SessionStorageKeys;
-use IO\Middlewares\Middleware;
+use IO\Middlewares\CheckNotFound;
 use IO\Services\CustomerService;
 use IO\Services\SessionStorageService;
 use Plenty\Modules\Authorization\Services\AuthHelper;
@@ -107,7 +107,7 @@ class DocumentController extends LayoutController
         {
             //document not found or logged in contact not matching
             $response->forceStatus(ResponseCode::NOT_FOUND);
-            Middleware::$FORCE_404 = true;
+            CheckNotFound::$FORCE_404 = true;
         }
         
         return $response;

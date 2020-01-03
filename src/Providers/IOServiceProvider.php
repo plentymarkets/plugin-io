@@ -13,7 +13,16 @@ use IO\Extensions\TwigIOExtension;
 use IO\Extensions\TwigServiceProvider;
 use IO\Extensions\TwigTemplateContextExtension;
 use IO\Jobs\CleanupUserDataHashes;
-use IO\Middlewares\Middleware;
+use IO\Middlewares\AuthenticateWithToken;
+use IO\Middlewares\CheckNotFound;
+use IO\Middlewares\DetectCurrency;
+use IO\Middlewares\DetectLanguage;
+use IO\Middlewares\DetectLegacySearch;
+use IO\Middlewares\DetectReadonlyCheckout;
+use IO\Middlewares\DetectReferrer;
+use IO\Middlewares\DetectShippingCountry;
+use IO\Middlewares\HandleNewsletter;
+use IO\Middlewares\HandleOrderPreviewUrl;
 use IO\Services\AuthenticationService;
 use IO\Services\AvailabilityService;
 use IO\Services\BasketService;
@@ -79,7 +88,18 @@ class IOServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->addGlobalMiddleware(Middleware::class);
+        $this->registerMiddlewares([
+            AuthenticateWithToken::class,
+            CheckNotFound::class,
+            DetectCurrency::class,
+            DetectLanguage::class,
+            DetectLegacySearch::class,
+            DetectReadonlyCheckout::class,
+            DetectReferrer::class,
+            DetectShippingCountry::class,
+            HandleNewsletter::class,
+            HandleOrderPreviewUrl::class
+        ]);
         $this->getApplication()->register(IORouteServiceProvider::class);
 
         $this->getApplication()->singleton('IO\Helper\TemplateContainer');
@@ -206,7 +226,7 @@ class IOServiceProvider extends ServiceProvider
             /** @var BasketService $basketService */
             $basketService = pluginApp(BasketService::class);
             $basketService->checkBasketItemsLang();
-            Middleware::$DETECTED_LANGUAGE = $event->getLanguage();
+            DetectLanguage::$DETECTED_LANGUAGE = $event->getLanguage();
         });
 
         $dispatcher->listen(FrontendShippingProfileChanged::class, IOFrontendShippingProfileChanged::class);
@@ -220,6 +240,13 @@ class IOServiceProvider extends ServiceProvider
         foreach( $classes as $class )
         {
             $this->getApplication()->singleton( $class );
+        }
+    }
+
+    private function registerMiddlewares($middlewares)
+    {
+        foreach($middlewares as $middleware) {
+            $this->addGlobalMiddleware($middleware);
         }
     }
 }
