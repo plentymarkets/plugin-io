@@ -3,12 +3,10 @@
 namespace IO\Controllers;
 
 use IO\Api\ResponseCode;
-use IO\Extensions\TwigTemplateContextExtension;
-use IO\Helper\ContextInterface;
 use IO\Helper\ArrayHelper;
 use IO\Helper\CategoryMap;
 use IO\Helper\TemplateContainer;
-use IO\Middlewares\Middleware;
+use IO\Middlewares\CheckNotFound;
 use IO\Services\CategoryService;
 use IO\Services\TemplateService;
 use IO\Services\UrlService;
@@ -229,7 +227,7 @@ abstract class LayoutController extends Controller
         /** @var Response $response */
         $response = pluginApp(Response::class);
         $response->forceStatus(ResponseCode::NOT_FOUND);
-        Middleware::$FORCE_404 = true;
+        CheckNotFound::$FORCE_404 = true;
 
         return $response;
     }
