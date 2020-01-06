@@ -298,16 +298,36 @@ class CouponService
      */
     private function getCategoryIds($variationId)
     {
-        $categories = $this->authHelper->processUnguarded(function () use ($variationId) {
+        $variationCategories = $this->authHelper->processUnguarded(function () use ($variationId) {
             return $this->variationCategoryRepository->findByVariationIdWithInheritance($variationId);
         });
 
         // Transform categories in an array of category ids
-        $categoryIds = [];
-        $categories->each(function ($category) use (&$categoryIds) {
-            $categoryIds[] = $category->categoryId;
+        $variationCategoryIds = [];
+        $variationCategories->each(function ($category) use (&$variationCategoryIds) {
+            $variationCategoryIds[] = $category->categoryId;
         });
 
-        return $categoryIds;
+        // Collect sub-category ids
+        /** @var CategoryService $categoryService */
+        $categoryService = pluginApp(CategoryService::class);
+        $categoryIds = $variationCategoryIds;
+
+        foreach($variationCategoryIds as $categoryId)
+        {
+            $category = $categoryService->get($categoryId);
+            if($category->branch !== null)
+            {
+                $branchData = $category->branch->toArray();
+
+                for ($i = 6; $i > 0; $i--) {
+                    if ($branchData['category' . $i . 'Id'] !== null && $branchData['category' . $i . 'Id'] > 0) {
+                        $categoryIds[] = $branchData['category' . $i . 'Id'];
+                    }
+                }
+            }
+        }
+
+        return array_unique($categoryIds);
     }
 }
