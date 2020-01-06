@@ -108,7 +108,7 @@ class CouponService
                 if ($this->isCouponMinimalOrderOnDelete($basket, $basketItem, $campaign)) {
                     // Check if the minimal order value is not met
                     $this->removeCoupon(CouponService::BELOW_MINIMAL_ORDER_VALUE);
-                } else if ($this->isCouponValidForBasketItems($basket, $basketItem, $campaign)) {
+                } elseif ($this->isCouponValidForBasketItems($basket, $basketItem, $campaign)) {
                     // Check if the coupon is still valid with the new basket (only coupon item removed?)
                     $this->removeCoupon(CouponService::NO_VALID_ITEM_IN_BASKET);
                 }
