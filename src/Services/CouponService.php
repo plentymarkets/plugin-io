@@ -108,11 +108,9 @@ class CouponService
                 if ($this->isCouponMinimalOrderOnDelete($basket, $basketItem, $campaign)) {
                     // Check if the minimal order value is not met
                     $this->removeCoupon(CouponService::BELOW_MINIMAL_ORDER_VALUE);
-                } else {
-                    if ($this->isCouponValidForBasketItems($basket, $basketItem, $campaign)) {
-                        // Check if the coupon is still valid with the new basket (only coupon item removed?)
-                        $this->removeCoupon(CouponService::NO_VALID_ITEM_IN_BASKET);
-                    }
+                } else if ($this->isCouponValidForBasketItems($basket, $basketItem, $campaign)) {
+                    // Check if the coupon is still valid with the new basket (only coupon item removed?)
+                    $this->removeCoupon(CouponService::NO_VALID_ITEM_IN_BASKET);
                 }
             }
         }
@@ -129,11 +127,11 @@ class CouponService
         if (strlen($basket->couponCode) > 0) {
             $campaign = $this->couponCampaignRepository->findByCouponCode($basket->couponCode);
 
-            if ($campaign instanceof CouponCampaign) {
-                if ($this->isCouponMinimalOrderOnUpdate($basket, $data, $basketItem, $campaign)) {
-                    // Check if the minimal order value is not met
-                    $this->removeCoupon(CouponService::BELOW_MINIMAL_ORDER_VALUE);
-                }
+            if ($campaign instanceof CouponCampaign &&
+                $this->isCouponMinimalOrderOnUpdate($basket, $data, $basketItem, $campaign)
+            ) {
+                // Check if the minimal order value is not met
+                $this->removeCoupon(CouponService::BELOW_MINIMAL_ORDER_VALUE);
             }
         }
     }
