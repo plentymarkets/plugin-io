@@ -2,11 +2,6 @@
 
 namespace IO\Controllers;
 
-use IO\Api\ResponseCode;
-use IO\Middlewares\Middleware;
-use IO\Services\CustomerService;
-use Plenty\Plugin\Http\Response;
-
 /**
  * Class OrderReturnController
  * @package IO\Controllers

@@ -1,6 +1,7 @@
 <?php
 namespace IO\Extensions\Mail;
 
+use IO\Helper\Utils;
 use Plenty\Modules\Helper\AutomaticEmail\Contracts\AutomaticEmailContract;
 use Plenty\Modules\Helper\AutomaticEmail\Models\AutomaticEmail;
 
@@ -14,6 +15,14 @@ trait SendMail
      */
     private function sendMail($template, $emailData, $params)
     {
+        if(!strlen($params['language'])) {
+            $params['language'] = Utils::getLang();
+        }
+
+        if(!isset($params['clientId'])) {
+            $params['clientId'] = Utils::getWebstoreId();
+        }
+
         $emailData = pluginApp($emailData, $params);
 
         /**

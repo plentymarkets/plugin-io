@@ -4,7 +4,7 @@ namespace IO\Controllers;
 
 use IO\Api\ResponseCode;
 use IO\Helper\RouteConfig;
-use IO\Middlewares\Middleware;
+use IO\Middlewares\CheckNotFound;
 use IO\Services\CategoryService;
 use IO\Services\CustomerService;
 use IO\Services\OrderService;
@@ -179,7 +179,7 @@ class ConfirmationController extends LayoutController
                 $response = pluginApp(Response::class);
                 $response->forceStatus(ResponseCode::NOT_FOUND);
     
-                Middleware::$FORCE_404 = true;
+                CheckNotFound::$FORCE_404 = true;
     
                 return $response;
             }
@@ -194,8 +194,8 @@ class ConfirmationController extends LayoutController
             /** @var Response $response */
             $response = pluginApp(Response::class);
             $response->forceStatus(ResponseCode::NOT_FOUND);
-    
-            Middleware::$FORCE_404 = true;
+
+            CheckNotFound::$FORCE_404 = true;
 
             return $response;
         }
