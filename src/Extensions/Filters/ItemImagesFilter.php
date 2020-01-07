@@ -44,7 +44,9 @@ class ItemImagesFilter extends AbstractFilter
         {
             $imageUrls[] = [
                 "url" => $image[$imageAccessor],
-                "position" => $image["position"]
+                "position" => $image["position"],
+                'alternate' => $image['names']['alternate'],
+                'name' => $image['names']['name']
             ];
         }
 
