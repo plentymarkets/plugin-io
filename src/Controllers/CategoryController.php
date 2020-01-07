@@ -245,12 +245,15 @@ class CategoryController extends LayoutController
             /** @var OrderReturnController $orderReturnController */
             $orderReturnController = pluginApp(OrderReturnController::class);
 
+            RouteConfig::overrideCategoryId(RouteConfig::ORDER_RETURN, $category->id);
+
             $orderId = $request->get('orderId', 0);
             if($orderId > 0)
             {
                 return $orderReturnController->showOrderReturn(
                     $orderId,
-                    $request->get('orderAccessKey', null)
+                    $request->get('orderAccessKey', null),
+                    $category
                 );
             }
             elseif(!$shopBuilderRequest->isShopBuilder())

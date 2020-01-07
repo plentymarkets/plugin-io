@@ -9,6 +9,7 @@ use IO\Services\CustomerService;
 use IO\Services\OrderService;
 use IO\Guards\AuthGuard;
 use IO\Services\SessionStorageService;
+use Plenty\Modules\Category\Models\Category;
 use Plenty\Plugin\Http\Response;
 use Plenty\Plugin\Log\Loggable;
 
@@ -24,22 +25,23 @@ class OrderReturnController extends LayoutController
      * Render the order returns view
      * @param int               $orderId
      * @param string            $orderAccessKey
+     * @param Category          $category
      *
      * @return string|Response
      *
      * @throws \ErrorException
      */
-    public function showOrderReturn($orderId, $orderAccessKey = null)
+    public function showOrderReturn($orderId, $orderAccessKey = null, $category = null)
     {
         /** @var SessionStorageService $sessionStorageService */
         $sessionStorageService = pluginApp(SessionStorageService::class);
         $sessionOrder = $sessionStorageService->getSessionValue(SessionStorageKeys::LAST_ACCESSED_ORDER);
-        
+
         if((int)$sessionOrder['orderId'] == (int)$orderId)
         {
             $orderAccessKey = $sessionOrder['accessKey'];
         }
-        
+
         if(pluginApp(CustomerService::class)->getContactId() <= 0 && !strlen($orderAccessKey))
         {
             AuthGuard::redirect(
@@ -61,6 +63,7 @@ class OrderReturnController extends LayoutController
                 $this->getLogger(__CLASS__)->info(
                     "IO::Debug.OrderReturnController_orderNotReturnable",
                     [
+                        "category"          => $category,
                         "orderId"           => $orderId,
                         "returnOrderItems"  => $returnOrder->orderData['orderItems']
                     ]
@@ -87,6 +90,7 @@ class OrderReturnController extends LayoutController
         return $this->renderTemplate(
             'tpl.order.return',
             [
+                'category'          => $category,
                 'orderData'         => $returnOrder,
                 'orderAccessKey'    => $orderAccessKey
             ],
