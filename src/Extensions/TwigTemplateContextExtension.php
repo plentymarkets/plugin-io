@@ -58,7 +58,7 @@ class TwigTemplateContextExtension extends Twig_Extension
         EventDispatcher::fire($contextEvent, [$templateContainer]);
 
         $contextClass = $templateContainer->getContext();
-        if (strlen($contextClass)) {
+        if (strlen($contextClass) && strlen(TemplateService::$currentTemplate)) {
             $context = pluginApp($contextClass);
             if ($context instanceof ContextInterface) {
                 $context->init(TemplateService::$currentTemplateData);
