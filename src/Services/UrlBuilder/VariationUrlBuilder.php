@@ -281,7 +281,7 @@ class VariationUrlBuilder
 
             if (!is_null($category->branch)) {
                 $branch = $category->branch->toArray();
-                for ($i = $maxLevel; $i >= 0; $i--) {
+                for ($i = $maxLevel; $i > 0; $i--) {
                     if (!is_null($branch['category' . $i . 'Id']) && $branch['category' . $i . 'Id'] > 0) {
                         return $categoryUrlBuilder->buildUrl(
                             $branch['category' . $i . 'Id'],
