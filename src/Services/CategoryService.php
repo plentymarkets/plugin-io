@@ -5,6 +5,7 @@ namespace IO\Services;
 use Illuminate\Support\Collection;
 use IO\Constants\CategoryType;
 use IO\Guards\AuthGuard;
+use IO\Helper\ArrayHelper;
 use IO\Helper\CategoryDataFilter;
 use IO\Helper\MemoryCache;
 use IO\Helper\Utils;
@@ -165,6 +166,13 @@ class CategoryService
         return null;
     }
 
+    /**
+     * @param $categoryId
+     * @param null $lang
+     * @return mixed
+     *
+     * @deprecated
+     */
     public function getChildren($categoryId, $lang = null)
     {
         if ( $lang === null )
@@ -183,6 +191,37 @@ class CategoryService
                 return null;
             }
         );
+
+        return $children;
+    }
+
+    public function getCurrentCategoryChildren()
+    {
+        /** @var CustomerService $customerService */
+        $customerService = pluginApp(CustomerService::class);
+
+        /** @var TemplateConfigService $templateConfigService */
+        $templateConfigService = pluginApp(TemplateConfigService::class);
+        $category = $this->getCurrentCategory();
+        $branches = ArrayHelper::toArray($category->branch);
+        $children = $this->getNavigationTree($templateConfigService->get('header.showCategoryTypes'),
+            $this->sessionStorageService->getLang(),
+            $category->level + 1,
+            $customerService->getContactClassId());
+
+        for ($level = 1; $level <= 6; $level++) {
+            if (!is_null($branches) && $branches['category' . $level. 'Id'] > 0) {
+
+                foreach ($children as $childrenCategory) {
+                    if ($childrenCategory['id'] === $branches['category' . $level . 'Id']) {
+                        $children = $childrenCategory['children'];
+                        break;
+                    }
+                }
+            } else {
+                break;
+            }
+        }
 
         return $children;
     }
