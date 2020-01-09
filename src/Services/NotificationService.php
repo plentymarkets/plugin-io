@@ -4,6 +4,7 @@ namespace IO\Services;
 
 use IO\Constants\SessionStorageKeys;
 use IO\Constants\LogLevel;
+use IO\Middlewares\ClearNotifications;
 
 /**
  * Class BasketService
@@ -46,7 +47,7 @@ class NotificationService
 
         if ($clear)
         {
-            $this->sessionStorageService->setSessionValue(SessionStorageKeys::NOTIFICATIONS, json_encode(array()));
+            ClearNotifications::$CLEAR_NOTIFICATIONS = true;
         }
 
         return $notifications;
