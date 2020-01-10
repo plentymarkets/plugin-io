@@ -96,6 +96,8 @@ class CategoryTreeResource extends ApiResource
         $currentUrl = $this->request->get('currentUrl', null);
         $showItemCount = $this->request->get('showItemCount', false);
         $showItemCount = (boolean)$showItemCount;
+        $spacingPadding = $this->request->get('spacingPadding', '');
+        $inlinePadding = $this->request->get('inlinePadding', '');
 
         $partialTree = $this->categoryService->getPartialTree($categoryId);
         $children = $this->findInTree($partialTree, $categoryId);
@@ -107,7 +109,9 @@ class CategoryTreeResource extends ApiResource
             "categories" => $children["children"],
             "currentUrl" => $currentUrl,
             "showItemCount" => $showItemCount,
-            "expandableChildren" => true
+            "expandableChildren" => true,
+            "spacingPadding" => $spacingPadding,
+            "inlinePadding" => $inlinePadding
         ]);
 
         return $this->response->create($renderedTemplate, ResponseCode::OK);
