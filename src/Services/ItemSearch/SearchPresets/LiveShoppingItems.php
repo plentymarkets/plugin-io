@@ -12,23 +12,19 @@ class LiveShoppingItems implements SearchPreset
     public static function getSearchFactory($options)
     {
         /** @var VariationSearchFactory $searchFactory */
-        $searchFactory = pluginApp( VariationSearchFactory::class );
+        $searchFactory = pluginApp(VariationSearchFactory::class);
 
-        if(isset($options['resultFields']) && count($options['resultFields']))
-        {
+        if (isset($options['resultFields']) && count($options['resultFields'])) {
             $searchFactory->withResultFields($options['resultFields']);
-        }
-        else
-        {
+        } else {
             $searchFactory->withResultFields(
                 array_merge(
-                    ResultFieldTemplate::load( ResultFieldTemplate::TEMPLATE_LIST_ITEM ),
+                    ResultFieldTemplate::load(ResultFieldTemplate::TEMPLATE_LIST_ITEM),
                     ['stock.net', 'variation.stockLimitation']
                 )
 
             );
         }
-
 
         $searchFactory
             ->withLanguage()
@@ -45,21 +41,17 @@ class LiveShoppingItems implements SearchPreset
             ->withLinkToContent()
             ->withReducedResults();
 
-        if(array_key_exists('itemId', $options) && $options['itemId'] != 0)
-        {
+        if (array_key_exists('itemId', $options) && $options['itemId'] != 0) {
             $searchFactory->hasItemId($options['itemId']);
         }
 
-        if(array_key_exists('itemIds', $options) && count($options['itemIds']))
-        {
+        if (array_key_exists('itemIds', $options) && count($options['itemIds'])) {
             $searchFactory->hasItemIds($options['itemIds']);
         }
 
-        if(array_key_exists('sorting', $options) && count($options['sorting']))
-        {
+        if (array_key_exists('sorting', $options) && count($options['sorting'])) {
             $searchFactory->sortBy($options['sorting']['path'], $options['sorting']['order']);
         }
-
 
         return $searchFactory;
     }
