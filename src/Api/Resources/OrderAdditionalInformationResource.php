@@ -18,16 +18,17 @@ class OrderAdditionalInformationResource extends ApiResource
 {
 
     private $sessionStorage;
-    
+
     public function __construct(Request $request, ApiResponse $response, SessionStorageService $sessionStorage)
     {
         parent::__construct($request, $response);
         $this->sessionStorage = $sessionStorage;
     }
-    
+
     public function store():Response
     {
         $this->setContactWish();
+        $this->setCustomerSign();
         $this->setShippingPrivacyHint();
         $this->setNewsletterSubscriptions();
 
@@ -41,6 +42,16 @@ class OrderAdditionalInformationResource extends ApiResource
         if(strlen($orderContactWish))
         {
             $this->sessionStorage->setSessionValue(SessionStorageKeys::ORDER_CONTACT_WISH, $orderContactWish);
+        }
+    }
+
+    private function setCustomerSign()
+    {
+        $orderCustomerSign = $this->request->get('orderCustomerSign', '');
+
+        if(strlen($orderCustomerSign))
+        {
+            $this->sessionStorage->setSessionValue(SessionStorageKeys::ORDER_CUSTOMER_SIGN, $orderCustomerSign);
         }
     }
 
