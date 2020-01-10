@@ -25,35 +25,35 @@ class LiveShoppingService
         {
             $sorting = 'sorting.price.avg_asc';
         }
-        
+
         /** @var LiveShoppingRepositoryContract $liveShoppingRepo */
         $liveShoppingRepo = pluginApp(LiveShoppingRepositoryContract::class);
         /** @var LiveShopping $liveShopping */
         $liveShopping = $liveShoppingRepo->getLiveShopping($liveShoppingId);
-        
+
         $liveShoppingItem = [];
         $liveShoppingData = [];
-        
+
         if($liveShopping instanceof LiveShopping)
         {
             $itemList = $this->getLiveShoppingVariations($liveShopping->itemId, $sorting);
-            
+
             if(count($itemList[0]['documents']))
             {
                 $liveShoppingItem = array_slice($itemList[0]['documents'], 0, 1);
             }
-            
+
             $liveShoppingData = $liveShopping->toArray();
-            $liveShoppingData['quantitySold'] = $liveShoppingData['quantitySold'] + $liveShoppingData['quantitySoldReal'];
+            $liveShoppingData['quantitySold'] += $liveShoppingData['quantitySoldReal'];
             unset($liveShoppingData['quantitySoldReal']);
         }
-        
+
         return [
             'item' => $liveShoppingItem[0]['data'],
             'liveShopping' => $liveShoppingData
         ];
     }
-    
+
     public function getLiveShoppingVariations($itemId, $sorting)
     {
         $itemSearchOptions = [
@@ -65,11 +65,11 @@ class LiveShoppingService
         $itemList = $itemSearchService->getResults([
                                                        LiveShoppingItems::getSearchFactory( $itemSearchOptions )
                                                    ]);
-        
-       
+
+
         return $this->filterLiveShoppingVariations($itemList);
     }
-    
+
     /**
      * @param $itemList
      * @return array
@@ -93,7 +93,7 @@ class LiveShoppingService
                 }
             }
         }
-        
+
         return $itemList;
     }
 }
