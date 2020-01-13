@@ -4,9 +4,12 @@ namespace IO\Tests\Feature;
 
 use IO\Constants\LogLevel;
 use IO\Constants\SessionStorageKeys;
+use IO\Middlewares\ClearNotifications;
 use IO\Services\NotificationService;
 use IO\Services\SessionStorageService;
 use IO\Tests\TestCase;
+use Plenty\Plugin\Http\Request;
+use Plenty\Plugin\Http\Response;
 
 
 class NotificationServiceFeatureTest extends TestCase
@@ -17,11 +20,23 @@ class NotificationServiceFeatureTest extends TestCase
     /** @var NotificationService $notificationService */
     protected $notificationService;
 
+    /* @var Request $request */
+    protected $request;
+
+    /* @var Response $response */
+    protected $response;
+
+    /* @var ClearNotifications $clearNotifications*/
+    protected $clearNotifications;
+
     protected function setUp()
     {
         parent::setUp();
         $this->sessionStorageService = pluginApp(SessionStorageService::class);
         $this->notificationService = pluginApp(NotificationService::class);
+        $this->request = pluginApp(Request::class);
+        $this->response = pluginApp(Response::class);
+        $this->clearNotifications = pluginApp(ClearNotifications::class);
     }
 
     /**
@@ -42,6 +57,7 @@ class NotificationServiceFeatureTest extends TestCase
         $expectedEmptyArray = [];
         $this->notificationService->log($this->fake->text,200);
         $this->notificationService->getNotifications(true);
+        $this->clearNotifications->after($this->request,$this->response);
         $notifications = json_decode($this->sessionStorageService->getSessionValue(SessionStorageKeys::NOTIFICATIONS), true);
         $this->assertEquals($expectedEmptyArray,$notifications);
     }

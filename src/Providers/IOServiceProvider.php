@@ -15,6 +15,7 @@ use IO\Extensions\TwigTemplateContextExtension;
 use IO\Jobs\CleanupUserDataHashes;
 use IO\Middlewares\AuthenticateWithToken;
 use IO\Middlewares\CheckNotFound;
+use IO\Middlewares\ClearNotifications;
 use IO\Middlewares\DetectCurrency;
 use IO\Middlewares\DetectLanguage;
 use IO\Middlewares\DetectLegacySearch;
@@ -98,7 +99,8 @@ class IOServiceProvider extends ServiceProvider
             DetectReferrer::class,
             DetectShippingCountry::class,
             HandleNewsletter::class,
-            HandleOrderPreviewUrl::class
+            HandleOrderPreviewUrl::class,
+            ClearNotifications::class
         ]);
         $this->getApplication()->register(IORouteServiceProvider::class);
 
