@@ -38,15 +38,20 @@ class LiveShoppingService
 
             if (count($itemList[0]['documents'])) {
                 $liveShoppingItem = array_slice($itemList[0]['documents'], 0, 1);
+                $liveShoppingItem = $liveShoppingItem[0]['data'];
             }
 
             $liveShoppingData = $liveShopping->toArray();
             $liveShoppingData['quantitySold'] += $liveShoppingData['quantitySoldReal'];
             unset($liveShoppingData['quantitySoldReal']);
+
+            $this->checkStockLimit($liveShoppingData, $liveShoppingItem);
+
+            unset($liveShoppingItem['stock'], $liveShoppingItem['variation']['stockLimitation']);
         }
 
         return [
-            'item' => $liveShoppingItem[0]['data'],
+            'item' => $liveShoppingItem,
             'liveShopping' => $liveShoppingData
         ];
     }
@@ -88,5 +93,21 @@ class LiveShoppingService
         }
 
         return $itemList;
+    }
+
+    /**
+     * Check if item is limited to net stock and modify quantitySold to reflect the limited stock
+     *
+     * @param $data
+     * @param $item
+     */
+    private function checkStockLimit(&$data, $item)
+    {
+        $isStockLimited = $item['variation']['stockLimitation'] === 1;
+        $isNetStockLess = (int)$item['stock']['net'] < $data['quantityMax'] - $data['quantitySold'];
+
+        if ($isStockLimited && $isNetStockLess) {
+            $data['quantitySold'] = $data['quantityMax'] - $item['stock']['net'];
+        }
     }
 }
