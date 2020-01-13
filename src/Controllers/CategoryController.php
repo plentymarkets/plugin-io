@@ -39,16 +39,16 @@ class CategoryController extends LayoutController
         $lvl3 = null,
         $lvl4 = null,
         $lvl5 = null,
-        $lvl6 = null)
-    {
-        $lang       = Utils::getLang();
+        $lvl6 = null
+    ) {
+        $lang = Utils::getLang();
         $webstoreId = Utils::getWebstoreId();
-        $category   = $this->categoryRepo->findCategoryByUrl($lvl1, $lvl2, $lvl3, $lvl4, $lvl5, $lvl6, $webstoreId, $lang);
+        $category = $this->categoryRepo->findCategoryByUrl($lvl1, $lvl2, $lvl3, $lvl4, $lvl5, $lvl6, $webstoreId,
+            $lang);
 
         /** @var ShopBuilderRequest $shopBuilderRequest */
         $shopBuilderRequest = pluginApp(ShopBuilderRequest::class);
-        if ($shopBuilderRequest->isShopBuilder() && ($shopBuilderRequest->getPreviewContentType() === 'singleitem'))
-        {
+        if ($shopBuilderRequest->isShopBuilder() && ($shopBuilderRequest->getPreviewContentType() === 'singleitem')) {
             /** @var ItemController $itemController */
             $itemController = pluginApp(ItemController::class);
             return $itemController->showItemForCategory($category);
@@ -57,39 +57,37 @@ class CategoryController extends LayoutController
         return $this->renderCategory(
             $category
         );
-	}
+    }
 
-	public function showCategoryById($categoryId, $params = [])
+    public function showCategoryById($categoryId, $params = [])
     {
         /** @var SessionStorageService $sessionService */
-        $sessionService  = pluginApp(SessionStorageService::class);
+        $sessionService = pluginApp(SessionStorageService::class);
         $lang = $sessionService->getLang();
 
         return $this->renderCategory(
-            $this->categoryRepo->get( $categoryId, $lang ),
+            $this->categoryRepo->get($categoryId, $lang),
             $params
         );
     }
 
-    public function redirectToCategory( $categoryId, $defaultUrl = '', $params = [] )
+    public function redirectToCategory($categoryId, $defaultUrl = '', $params = [])
     {
         /** @var SessionStorageService $sessionService */
-        $sessionService  = pluginApp(SessionStorageService::class);
+        $sessionService = pluginApp(SessionStorageService::class);
         $lang = $sessionService->getLang();
 
         /** @var UrlService $urlService */
         $urlService = pluginApp(UrlService::class);
-        $categoryUrl = $urlService->getCategoryURL( (int)$categoryId, $lang );
-        if($categoryUrl->equals($defaultUrl))
-        {
+        $categoryUrl = $urlService->getCategoryURL((int)$categoryId, $lang);
+        if ($categoryUrl->equals($defaultUrl)) {
             // category url equals legacy route name
             return $this->showCategoryById($categoryId, $params);
         }
 
         $category = $this->categoryRepo->get($categoryId, $lang);
 
-        if(is_null($category))
-        {
+        if (is_null($category)) {
             /** @var Response $response */
             $response = pluginApp(Response::class);
             $response->forceStatus(ResponseCode::NOT_FOUND);
@@ -99,7 +97,7 @@ class CategoryController extends LayoutController
 
         $urlParams = http_build_query($params);
         return $urlService->redirectTo(
-            $categoryUrl->toRelativeUrl() . ( strlen($urlParams) ? '?'.$urlParams : '')
+            $categoryUrl->toRelativeUrl() . (strlen($urlParams) ? '?' . $urlParams : '')
         );
     }
 
@@ -107,17 +105,16 @@ class CategoryController extends LayoutController
     {
         return $this->redirectToCategory(
             RouteConfig::getCategoryId($route),
-            "/".$route
+            "/" . $route
         );
     }
 
-	private function renderCategory($category, $params = [])
+    private function renderCategory($category, $params = [])
     {
         /** @var Request $request */
         $request = pluginApp(Request::class);
 
-        if ($category === null || (($category->clients->count() == 0 || $category->details->count() == 0) && !$this->app->isAdminPreview()))
-        {
+        if ($category === null || (($category->clients->count() == 0 || $category->details->count() == 0) && !$this->app->isAdminPreview())) {
             $this->getLogger(__CLASS__)->warning(
                 "IO::Debug.CategoryController_cannotDisplayCategory",
                 [
@@ -138,7 +135,7 @@ class CategoryController extends LayoutController
         $this->categoryService->setCurrentCategory($category);
         if ($this->categoryService->isHidden($category->id)) {
             $guard = pluginApp(AuthGuard::class);
-            $guard->assertOrRedirect( true, '/login');
+            $guard->assertOrRedirect(true, '/login');
         }
 
         /** @var ShopBuilderRequest $shopBuilderRequest */
@@ -146,8 +143,7 @@ class CategoryController extends LayoutController
         $shopBuilderRequest->setMainContentType($category->type);
         $shopBuilderRequest->setMainCategory($category->id);
 
-        if ( RouteConfig::getCategoryId( RouteConfig::CHECKOUT ) === $category->id || $shopBuilderRequest->getPreviewContentType() === 'checkout')
-        {
+        if (RouteConfig::getCategoryId(RouteConfig::CHECKOUT) === $category->id || $shopBuilderRequest->getPreviewContentType() === 'checkout') {
             $this->getLogger(__CLASS__)->info(
                 "IO::Debug.CategoryController_showCheckoutCategory",
                 [
@@ -159,11 +155,10 @@ class CategoryController extends LayoutController
 
             /** @var CheckoutController $checkoutController */
             $checkoutController = pluginApp(CheckoutController::class);
-            return $checkoutController->showCheckout( $category );
+            return $checkoutController->showCheckout($category);
         }
 
-        if ( RouteConfig::getCategoryId( RouteConfig::MY_ACCOUNT ) === $category->id || $shopBuilderRequest->getPreviewContentType() === 'myaccount')
-        {
+        if (RouteConfig::getCategoryId(RouteConfig::MY_ACCOUNT) === $category->id || $shopBuilderRequest->getPreviewContentType() === 'myaccount') {
             $this->getLogger(__CLASS__)->info(
                 "IO::Debug.CategoryController_showMyAccountCategory",
                 [
@@ -175,10 +170,10 @@ class CategoryController extends LayoutController
 
             /** @var MyAccountController $myAccountController */
             $myAccountController = pluginApp(MyAccountController::class);
-            return $myAccountController->showMyAccount( $category );
+            return $myAccountController->showMyAccount($category);
         }
 
-        if (RouteConfig::getCategoryId( RouteConfig::SEARCH ) === $category->id || $shopBuilderRequest->getPreviewContentType() === 'itemsearch') {
+        if (RouteConfig::getCategoryId(RouteConfig::SEARCH) === $category->id || $shopBuilderRequest->getPreviewContentType() === 'itemsearch') {
             $this->getLogger(__CLASS__)->info(
                 "IO::Debug.CategoryController_showMyAccountCategory",
                 [
@@ -191,11 +186,10 @@ class CategoryController extends LayoutController
             /** @var ItemSearchController $itemSearchController */
             $itemSearchController = pluginApp(ItemSearchController::class);
 
-            return $itemSearchController->showSearch( $category );
+            return $itemSearchController->showSearch($category);
         }
 
-        if ( RouteConfig::getCategoryId( RouteConfig::CONFIRMATION ) === $category->id )
-        {
+        if (RouteConfig::getCategoryId(RouteConfig::CONFIRMATION) === $category->id) {
             $this->getLogger(__CLASS__)->info(
                 "IO::Debug.CategoryController_showConfirmationCategory",
                 [
@@ -208,13 +202,12 @@ class CategoryController extends LayoutController
             /** @var CustomerService $customerService */
             $customerService = pluginApp(CustomerService::class);
 
-            if ($request->get('contentLinkId', false) && $customerService->getContactId() <= 0 )
-            {
+            if ($request->get('contentLinkId', false) && $customerService->getContactId() <= 0) {
                 /** @var ShopUrls $shopUrls */
                 $shopUrls = pluginApp(ShopUrls::class);
                 /** @var AuthGuard $guard */
                 $guard = pluginApp(AuthGuard::class);
-                $guard->assertOrRedirect( true, $shopUrls->login );
+                $guard->assertOrRedirect(true, $shopUrls->login);
             }
 
             /** @var ConfirmationController $confirmationController */
@@ -226,36 +219,30 @@ class CategoryController extends LayoutController
             );
         }
 
-        if ( RouteConfig::getCategoryId( RouteConfig::LOGIN ) === $category->id
-            || RouteConfig::getCategoryId( RouteConfig::REGISTER ) === $category->id )
-        {
+        if (RouteConfig::getCategoryId(RouteConfig::LOGIN) === $category->id
+            || RouteConfig::getCategoryId(RouteConfig::REGISTER) === $category->id) {
             /** @var CustomerService $customerService */
             $customerService = pluginApp(CustomerService::class);
 
-            if($customerService->getContactId() > 0 && !$shopBuilderRequest->isShopBuilder())
-            {
+            if ($customerService->getContactId() > 0 && !$shopBuilderRequest->isShopBuilder()) {
                 /** @var ShopUrls $shopUrls */
                 $shopUrls = pluginApp(ShopUrls::class);
                 AuthGuard::redirect($shopUrls->home);
             }
         }
 
-        if( RouteConfig::getCategoryId(RouteConfig::ORDER_RETURN) === $category->id)
-        {
+        if (RouteConfig::getCategoryId(RouteConfig::ORDER_RETURN) === $category->id) {
             /** @var OrderReturnController $orderReturnController */
             $orderReturnController = pluginApp(OrderReturnController::class);
 
             $orderId = $request->get('orderId', 0);
-            if($orderId > 0)
-            {
+            if ($orderId > 0) {
                 return $orderReturnController->showOrderReturn(
                     $orderId,
                     $request->get('orderAccessKey', null),
                     $category
                 );
-            }
-            elseif(!$shopBuilderRequest->isShopBuilder())
-            {
+            } elseif (!$shopBuilderRequest->isShopBuilder()) {
                 /** @var Response $response */
                 $response = pluginApp(Response::class);
                 $response->forceStatus(ResponseCode::NOT_FOUND);
@@ -267,11 +254,11 @@ class CategoryController extends LayoutController
         return $this->renderTemplate(
             "tpl.category." . $category->type,
             [
-                'category'      => $category,
-                'sorting'       => $request->get('sorting', null),
-                'itemsPerPage'  => $request->get('items', null),
-                'page'          => $request->get('page', null),
-                'facets'        => $request->get('facets', '')
+                'category' => $category,
+                'sorting' => $request->get('sorting', null),
+                'itemsPerPage' => $request->get('items', null),
+                'page' => $request->get('page', null),
+                'facets' => $request->get('facets', '')
             ]
         );
     }
