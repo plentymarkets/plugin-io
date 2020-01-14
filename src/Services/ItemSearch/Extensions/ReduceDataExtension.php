@@ -65,11 +65,6 @@ class ReduceDataExtension implements ItemSearchExtension
         $data['properties'] = array_values($properties);
         $data['hasOrderProperties'] = count($orderProperties) > 0;
 
-        if(isset($data['texts'])) {
-            unset($data['texts']['character_cache']);
-            unset($data['texts']['character_cache_xml']);
-        }
-
         return $data;
     }
 }
