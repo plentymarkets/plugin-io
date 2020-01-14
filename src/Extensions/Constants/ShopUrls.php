@@ -26,7 +26,12 @@ class ShopUrls
      */
     private $sessionStorageService;
 
-    private $urlMap = [];
+    private $urlMap = [
+        RouteConfig::ORDER_RETURN => "returns",
+        RouteConfig::ORDER_RETURN_CONFIRMATION => "return-confirmation",
+        RouteConfig::NEWSLETTER_OPT_OUT => "newsletter/unsubscribe",
+        RouteConfig::ORDER_DOCUMENT => "order-document"
+    ];
 
     public $appendTrailingSlash = false;
     public $trailingSlashSuffix = "";
@@ -58,18 +63,11 @@ class ShopUrls
     public function __construct(Dispatcher $dispatcher, SessionStorageService $sessionStorageService)
     {
         $this->sessionStorageService = $sessionStorageService;
-
         $this->init($sessionStorageService->getLang());
         $dispatcher->listen(FrontendLanguageChanged::class, function (FrontendLanguageChanged $event) {
             $this->init($event->getLanguage());
         });
 
-        $this->urlMap = [
-            RouteConfig::ORDER_RETURN => "returns",
-            RouteConfig::ORDER_RETURN_CONFIRMATION => "return-confirmation",
-            RouteConfig::NEWSLETTER_OPT_OUT => "newsletter/unsubscribe",
-            RouteConfig::ORDER_DOCUMENT => "order-document"
-        ];
     }
 
     private function init($lang)

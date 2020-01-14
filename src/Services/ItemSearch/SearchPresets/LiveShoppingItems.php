@@ -22,7 +22,6 @@ class LiveShoppingItems implements SearchPreset
                     ResultFieldTemplate::load(ResultFieldTemplate::TEMPLATE_LIST_ITEM),
                     ['stock.net', 'variation.stockLimitation']
                 )
-
             );
         }
 
@@ -39,7 +38,7 @@ class LiveShoppingItems implements SearchPreset
             ->hasNameInLanguage()
             ->hasPriceForCustomer()
             ->withLinkToContent()
-            ->withReducedResults();
+            ->withReducedResults(true);
 
         if (array_key_exists('itemId', $options) && $options['itemId'] != 0) {
             $searchFactory->hasItemId($options['itemId']);
@@ -52,6 +51,7 @@ class LiveShoppingItems implements SearchPreset
         if (array_key_exists('sorting', $options) && count($options['sorting'])) {
             $searchFactory->sortBy($options['sorting']['path'], $options['sorting']['order']);
         }
+
 
         return $searchFactory;
     }

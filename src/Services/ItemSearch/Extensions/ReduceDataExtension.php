@@ -15,8 +15,10 @@ use Plenty\Legacy\Repositories\Frontend\CurrencyExchangeRepository;
  */
 class ReduceDataExtension implements ItemSearchExtension
 {
-    public function __construct()
+    private $removeProperties = false;
+    public function __construct($removeProperties = false)
     {
+        $this->removeProperties = $removeProperties;
     }
 
     /**
@@ -46,14 +48,27 @@ class ReduceDataExtension implements ItemSearchExtension
 
     private function reduceData($data)
     {
-        $properties = array_filter($data['properties'], function($property)
-        {
+        $properties = array_filter($data['properties'], function($property) {
             return $property['property']['isShownOnItemPage']
                 || $property['property']['isShownOnItemList']
                 || $property['property']['isShownAtCheckout'];
         });
 
+        $orderProperties = array_filter($properties, function($property) {
+            return $property['property']['isOderProperty'];
+        });
+
+        if($this->removeProperties) {
+            $properties = [];
+        }
+
         $data['properties'] = array_values($properties);
+        $data['hasOrderProperties'] = count($orderProperties) > 0;
+
+        if(isset($data['texts'])) {
+            unset($data['texts']['character_cache']);
+            unset($data['texts']['character_cache_xml']);
+        }
 
         return $data;
     }
