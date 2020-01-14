@@ -61,6 +61,7 @@ class OrderItemBuilder
      * @param ItemNameFilter $itemNameFilter
      * @param WebstoreRepositoryContract $webstoreRepository
      * @param VatRepositoryContract $vatRepository
+     * @param CustomerService $customerService
      */
 	public function __construct(
 	    CheckoutService $checkoutService,
@@ -89,7 +90,10 @@ class OrderItemBuilder
 		$orderItems      = [];
         $maxVatRate      = 0;
 
-        $itemsWithoutStock = [];
+        $itemsWithCouponRestriction = [];
+        $itemsWithoutStock          = [];
+
+        $taxFreeItems = [];
         
         foreach($items as $item)
 		{
@@ -97,17 +101,58 @@ class OrderItemBuilder
             {
                 $maxVatRate = $item['vat'];
             }
-            
+
             try
             {
                 array_push($orderItems, $this->basketItemToOrderItem($item, $basket->basketRebate));
+    
+                //convert tax free properties to order items
+                if(count($item['variation']['data']['properties']))
+                {
+                    foreach($item['variation']['data']['properties'] as $property)
+                    {
+                        if($property['property']['isShownAsAdditionalCosts'] && !$property['property']['isOderProperty'])
+                        {
+                            if(array_key_exists($property['propertyId'], $taxFreeItems))
+                            {
+                                $taxFreeItems[$property['propertyId']]['quantity'] += $item['quantity'];
+                            }
+                            else
+                            {
+                                $taxFreeItem = [
+                                    "itemId"          => -2,
+                                    "itemVariationId" => -2,
+                                    "typeId"          => OrderItemType::DEPOSIT,
+                                    "referrerId"      => $basket->basketItems->first()->referrerId,
+                                    "quantity"        => $item['quantity'],
+                                    "orderItemName"   => $property['property']['backendName'] ?? 'tax free item',
+                                    "amounts"         => [
+                                        [
+                                            "currency"           => $this->checkoutService->getCurrency(),
+                                            "priceOriginalGross" => $property['property']['surcharge']
+                                        ]
+                                    ]
+                                ];
+                                
+                                $taxFreeItems[$property['propertyId']] = $taxFreeItem;
+                            }
+                        }
+                    }
+                }
             }
 			catch(BasketItemCheckException $exception)
             {
-                $itemsWithoutStock[] = [
-                    'item' => $item,
-                    'stockNet' => $exception->getStockNet()
-                ];
+                if ($exception->getCode() === BasketItemCheckException::COUPON_REQUIRED)
+                {
+                    $itemsWithCouponRestriction[] = $item;
+                }
+                else
+                {
+                    $itemsWithoutStock[] = [
+                        'item' => $item,
+                        'stockNet' => $exception->getStockNet()
+                    ];
+                }
             }
 		}
 
@@ -115,15 +160,15 @@ class OrderItemBuilder
         {
             /** @var BasketService $basketService */
             $basketService = pluginApp(BasketService::class);
-            
+
             foreach($itemsWithoutStock as $itemWithoutStock)
             {
                 $updatedItem = array_shift(array_filter($items, function($filterItem) use ($itemWithoutStock) {
                     return $filterItem['id'] == $itemWithoutStock['item']['id'];
                 }));
-         
+
                 $quantity = $itemWithoutStock['stockNet'];
-                
+
                 if($quantity <= 0 && (int)$updatedItem['id'] > 0)
                 {
                     $basketService->deleteBasketItem($updatedItem['id']);
@@ -134,8 +179,22 @@ class OrderItemBuilder
                     $basketService->updateBasketItem($updatedItem['id'], $updatedItem);
                 }
             }
-            
+
             throw pluginApp(BasketItemCheckException::class, [BasketItemCheckException::NOT_ENOUGH_STOCK_FOR_ITEM]);
+        }
+
+		if(count($itemsWithCouponRestriction))
+        {
+            throw pluginApp(BasketItemCheckException::class, [BasketItemCheckException::COUPON_REQUIRED]);
+        }
+        
+		// add tax free items
+        if(count($taxFreeItems))
+        {
+            foreach($taxFreeItems as $taxFreeOrderItem)
+            {
+                array_push($orderItems, $taxFreeOrderItem);
+            }
         }
         
 		$shippingAmount = $basket->shippingAmount;
@@ -147,7 +206,6 @@ class OrderItemBuilder
             "quantity"      => 1,
             "orderItemName" => "shipping costs",
             "countryVatId"  => $this->vatService->getCountryVatId(),
-            "vatRate"       => $maxVatRate,
             'vatField'      => $this->getVatField($this->vatService->getVat(), $maxVatRate),
             "amounts"       => [
                 [
@@ -158,8 +216,9 @@ class OrderItemBuilder
         ];
         array_push($orderItems, $shippingCosts);
 
-		$paymentFee = pluginApp(FrontendPaymentMethodRepositoryContract::class)
-			->getPaymentMethodFeeById($this->checkoutService->getMethodOfPaymentId());
+        /** @var FrontendPaymentMethodRepositoryContract $paymentMethodRepo */
+        $paymentMethodRepo = pluginApp(FrontendPaymentMethodRepositoryContract::class);
+		$paymentFee = $paymentMethodRepo->getPaymentMethodFeeById($this->checkoutService->getMethodOfPaymentId());
 
 		$paymentSurcharge = [
 			"typeId"        => OrderItemType::PAYMENT_SURCHARGE,
@@ -167,7 +226,6 @@ class OrderItemBuilder
 			"quantity"      => 1,
 			"orderItemName" => "payment surcharge",
 			"countryVatId"  => $this->vatService->getCountryVatId(),
-			"vatRate"       => $maxVatRate,
             'vatField'      => $this->getVatField($this->vatService->getVat(), $maxVatRate),
             "amounts"       => [
 				[
@@ -177,7 +235,6 @@ class OrderItemBuilder
 			]
 		];
 		array_push($orderItems, $paymentSurcharge);
-
 
 		return $orderItems;
 	}
@@ -196,17 +253,17 @@ class OrderItemBuilder
         $checkStockBasketItem->orderRowId  = $basketItem['orderRowId'];
         $checkStockBasketItem->quantity    = $basketItem['quantity'];
         $checkStockBasketItem->id          = $basketItem['id'];
-        
+
         /** @var Dispatcher $eventDispatcher */
         $eventDispatcher = pluginApp(Dispatcher::class);
         $eventDispatcher->fire(pluginApp(BeforeBasketItemToOrderItem::class, [$checkStockBasketItem]));
-	    
+
         $basketItemProperties = [];
         if(count($basketItem['basketItemOrderParams']))
         {
             /** @var OrderPropertyFileService $orderPropertyFileService */
             $orderPropertyFileService = pluginApp(OrderPropertyFileService::class);
-            
+
             foreach($basketItem['basketItemOrderParams'] as $property)
             {
                 if($property['type'] == 'file')
@@ -239,14 +296,14 @@ class OrderItemBuilder
         {
             $rebate += $basketDiscount;
         }
-        
+
         $priceOriginal = $basketItem['price'];
 		if ( $this->customerService->showNetPrices() )
         {
             $priceOriginal = $basketItem['price'] * (100.0 + $basketItem['vat']) / 100.0;
         }
         $priceOriginal -= $attributeTotalMarkup;
-        
+
 		$properties = [];
 		if($basketItem['inputLength'] > 0)
         {
@@ -271,7 +328,6 @@ class OrderItemBuilder
 			"orderItemName"     => $this->itemNameFilter->itemName( $basketItem['variation']['data'] ),
 			"shippingProfileId" => $basketItem['shippingProfileId'],
 			"countryVatId"      => $this->vatService->getCountryVatId(),
-			"vatRate"           => $basketItem['vat'],
             "vatField"			=> $basketItem['variation']['data']['variation']['vatId'] ?? $this->getVatField($this->vatService->getVat(), $basketItem['vat']),
             "orderProperties"   => $basketItemProperties,
             "properties"        => $properties,

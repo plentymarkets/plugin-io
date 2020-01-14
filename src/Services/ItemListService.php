@@ -3,14 +3,19 @@
 namespace IO\Services;
 
 use IO\Constants\SessionStorageKeys;
+use IO\Services\ItemSearch\Factories\VariationSearchResultFactory;
+use IO\Services\ItemSearch\Helper\ResultFieldTemplate;
+use IO\Services\ItemSearch\SearchPresets\BasketItems;
 use IO\Services\ItemSearch\SearchPresets\CategoryItems;
 use IO\Services\ItemSearch\SearchPresets\CrossSellingItems;
+use IO\Services\ItemSearch\SearchPresets\ManufacturerItems;
 use IO\Services\ItemSearch\SearchPresets\TagItems;
 use IO\Services\ItemSearch\SearchPresets\VariationList;
 use IO\Services\ItemSearch\Services\ItemSearchService;
-use IO\Services\ItemSearch\SearchPresets\ManufacturerItems;
-use Plenty\Plugin\CachingRepository;
+use IO\Services\ItemWishListService;
 use Plenty\Modules\Basket\Contracts\BasketRepositoryContract;
+use Plenty\Modules\ShopBuilder\Helper\ShopBuilderRequest;
+use Plenty\Plugin\CachingRepository;
 
 class ItemListService
 {
@@ -20,6 +25,7 @@ class ItemListService
     const TYPE_RANDOM       = 'random';
     const TYPE_MANUFACTURER = 'manufacturer';
     const TYPE_CROSS_SELLER = 'cross_selling';
+    const TYPE_WISH_LIST    = 'wish_list';
 
     public function getItemList( $type, $id = null, $sorting = null, $maxItems = 0, $crossSellingRelationType = null)
     {
@@ -27,7 +33,7 @@ class ItemListService
         $searchService = pluginApp( ItemSearchService::class );
         $searchFactory = null;
 
-        if ( !$this->isValidId( $id ) && !(in_array($type, [self::TYPE_LAST_SEEN, self::TYPE_CROSS_SELLER] )))
+        if ( !$this->isValidId( $id ) && !(in_array($type, [self::TYPE_LAST_SEEN, self::TYPE_CROSS_SELLER, self::TYPE_WISH_LIST] )))
         {
             $type = self::TYPE_RANDOM;
         }
@@ -83,6 +89,17 @@ class ItemListService
                     'sorting' => $sorting
                 ]);
                 break;
+            case self::TYPE_WISH_LIST:
+                /** @var ItemWishListService $wishListService */
+                $wishListService = pluginApp(ItemWishListService::class);
+                $wishListVariationIds = $wishListService->getItemWishList();
+
+                $searchFactory = BasketItems::getSearchFactory([
+                    'variationIds'  => $wishListVariationIds,
+                    'quantities'    => 1,
+                    'itemsPerPage'  => count($wishListVariationIds)
+                ]);
+                break;
             default:
                 break;
         }
@@ -96,7 +113,23 @@ class ItemListService
         {
             $searchFactory->setPage(1, $maxItems );
         }
-        return $searchService->getResult( $searchFactory );
+
+        $itemListResult = $searchService->getResult( $searchFactory );
+
+        /** @var ShopBuilderRequest $shopBuilderRequest */
+        $shopBuilderRequest = pluginApp(ShopBuilderRequest::class);
+
+        if($shopBuilderRequest->isShopBuilder())
+        {
+            /** @var VariationSearchResultFactory $searchResultFactory */
+            $searchResultFactory = pluginApp(VariationSearchResultFactory::class);
+            $itemListResult = $searchResultFactory->fillSearchResults(
+                $itemListResult,
+                null
+            );
+        }
+
+        return $itemListResult;
     }
 
     private function isValidId( $id )

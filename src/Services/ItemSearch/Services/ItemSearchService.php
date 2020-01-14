@@ -6,6 +6,8 @@ use IO\Contracts\MultiSearchFactoryContract;
 use IO\Helper\DefaultSearchResult;
 use IO\Services\ItemSearch\Factories\BaseSearchFactory;
 use IO\Services\ItemSearch\Factories\MultiSearchFactory;
+use IO\Services\TemplateService;
+use Plenty\Plugin\Log\Loggable;
 
 /**
  * Class ItemSearchService
@@ -16,6 +18,8 @@ use IO\Services\ItemSearch\Factories\MultiSearchFactory;
  */
 class ItemSearchService
 {
+    use Loggable;
+    
     /**
      * Get search results for multiple search requests.
      *
@@ -40,7 +44,7 @@ class ItemSearchService
             {
                 $results[$resultName] = $this->normalizeResult( $result );
             }
-
+            
             return $results;
 
         }

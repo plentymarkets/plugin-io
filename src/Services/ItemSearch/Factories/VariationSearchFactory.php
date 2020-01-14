@@ -4,6 +4,7 @@ namespace IO\Services\ItemSearch\Factories;
 
 use IO\Contracts\VariationSearchFactoryContract;
 use IO\Helper\CurrencyConverter;
+use IO\Helper\Utils;
 use IO\Helper\VatConverter;
 use IO\Services\ItemSearch\Contracts\FacetExtension;
 use IO\Services\ItemSearch\Extensions\AvailabilityExtension;
@@ -15,12 +16,12 @@ use IO\Services\ItemSearch\Extensions\ItemDefaultImage;
 use IO\Services\ItemSearch\Extensions\ItemUrlExtension;
 use IO\Services\ItemSearch\Extensions\PriceSearchExtension;
 use IO\Services\ItemSearch\Extensions\ReduceDataExtension;
+use IO\Services\ItemSearch\Extensions\TagExtension;
 use IO\Services\ItemSearch\Extensions\VariationAttributeMapExtension;
 use IO\Services\ItemSearch\Extensions\VariationPropertyExtension;
 use IO\Services\ItemSearch\Helper\FacetExtensionContainer;
 use IO\Services\ItemSearch\Mutators\OrderPropertySelectionValueMutator;
 use IO\Services\PriceDetectService;
-use IO\Services\SessionStorageService;
 use IO\Services\TemplateConfigService;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\ElasticSearch;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Source\Mutator\BuiltIn\LanguageMutator;
@@ -301,7 +302,7 @@ class VariationSearchFactory extends BaseSearchFactory implements VariationSearc
         {
             if ( $clientId === null )
             {
-                $clientId = pluginApp( Application::class )->getPlentyId();
+                $clientId = Utils::getPlentyId();
             }
             /** @var ClientFilter $clientFilter */
             $clientFilter = $this->createFilter( ClientFilter::class );
@@ -328,7 +329,7 @@ class VariationSearchFactory extends BaseSearchFactory implements VariationSearc
         {
             if ( $lang === null )
             {
-                $lang = pluginApp(SessionStorageService::class)->getLang();
+                $lang = Utils::getLang();
             }
 
             $langMap = [
@@ -446,7 +447,7 @@ class VariationSearchFactory extends BaseSearchFactory implements VariationSearc
 
             /** @var PriceFilter $priceRangeFilter */
             $priceRangeFilter = $this->createFilter(PriceFilter::class);
-            $priceRangeFilter->betweenByClient($priceMin, $priceMax, pluginApp(Application::class)->getPlentyId());
+            $priceRangeFilter->betweenByClient($priceMin, $priceMax, Utils::getPlentyId());
         }
 
         return $this;
@@ -475,27 +476,12 @@ class VariationSearchFactory extends BaseSearchFactory implements VariationSearc
     /**
      * Group results depending on a config value.
      *
-     * @param string $configKey     The config key containing the grouping method: ('all', 'combined', 'main', 'child')
-     *
+     * @param string $key
      * @return $this
      */
-    public function groupByTemplateConfig( $configKey = 'item.variation_show_type' )
+    public function groupByTemplateConfig($key = 'ids.itemAttributeValue')
     {
-        /** @var TemplateConfigService $templateConfigService */
-        $templateConfigService = pluginApp(TemplateConfigService::class);
-        $variationShowType = $templateConfigService->get($configKey);
-        if ($variationShowType === 'combined')
-        {
-            $this->groupBy( 'ids.itemAttributeValue' );
-        }
-        else if ( $variationShowType === 'main' )
-        {
-            $this->isMain();
-        }
-        else if ( $variationShowType === 'child' )
-        {
-            $this->isChild();
-        }
+        $this->groupBy($key);
 
         return $this;
     }
@@ -533,12 +519,12 @@ class VariationSearchFactory extends BaseSearchFactory implements VariationSearc
     {
         if ( $clientId === null )
         {
-            $clientId = pluginApp( Application::class )->getPlentyId();
+            $clientId = Utils::getPlentyId();
         }
 
         if ( $lang === null )
         {
-            $lang = pluginApp( SessionStorageService::class )->getLang();
+            $lang = Utils::getLang();
         }
 
         if ( is_string( $facetValues ) )
@@ -550,7 +536,10 @@ class VariationSearchFactory extends BaseSearchFactory implements VariationSearc
         $searchHelper = pluginApp( SearchHelper::class, [$facetValues, $clientId, 'item', $lang] );
         $this->withFilter( $searchHelper->getFacetFilter() );
 
-        $facetExtensions = pluginApp( FacetExtensionContainer::class )->getFacetExtensions();
+        /** @var FacetExtensionContainer $facetExtensionContainer */
+        $facetExtensionContainer = pluginApp(FacetExtensionContainer::class);
+
+        $facetExtensions = $facetExtensionContainer->getFacetExtensions();
         foreach( $facetExtensions as $facetExtension )
         {
             if ( $facetExtension instanceof FacetExtension )
@@ -588,7 +577,7 @@ class VariationSearchFactory extends BaseSearchFactory implements VariationSearc
     {
         if ( $lang === null )
         {
-            $lang = pluginApp( SessionStorageService::class )->getLang();
+            $lang = Utils::getLang();
         }
 
         if ( $searchType !== ElasticSearch::SEARCH_TYPE_FUZZY
@@ -622,7 +611,7 @@ class VariationSearchFactory extends BaseSearchFactory implements VariationSearc
     {
         if ( $lang === null )
         {
-            $lang = pluginApp( SessionStorageService::class )->getLang();
+            $lang = Utils::getLang();
         }
 
         /** @var SearchFilter $searchFilter */
@@ -646,7 +635,7 @@ class VariationSearchFactory extends BaseSearchFactory implements VariationSearc
     {
         if ( $lang === null )
         {
-            $lang = pluginApp( SessionStorageService::class )->getLang();
+            $lang = Utils::getLang();
         }
         $languageMutator = pluginApp(LanguageMutator::class, ["languages" => [$lang]]);
         $this->withMutator( $languageMutator );
@@ -665,7 +654,7 @@ class VariationSearchFactory extends BaseSearchFactory implements VariationSearc
     {
         if ( $clientId === null )
         {
-            $clientId = pluginApp( Application::class )->getPlentyId();
+            $clientId = Utils::getPlentyId();
         }
 
         $imageMutator = pluginApp(ImageMutator::class);
@@ -800,5 +789,12 @@ class VariationSearchFactory extends BaseSearchFactory implements VariationSearc
         $this->withExtension(AvailabilityExtension::class);
         return $this;
     }
+
+    public function withTags()
+    {
+        $this->withExtension(TagExtension::class);
+        return $this;
+    }
+
 }
 

@@ -1,5 +1,149 @@
 # Release Notes for IO
 
+## v4.5.0 (2019-12-19) <a href="https://github.com/plentymarkets/plugin-io/compare/4.4.3...4.4.0" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
+
+### Added 
+
+- The Ceres assistant now includes settings for the variation selection, with which the "Please select" option can be added and preselected.
+- The route `/rest/io/categorytree/children` has been added. It serves to return subcategories of a category.
+- The route `/rest/io/categorytree/template_for_children` has been added. It serves to return rendered markup of the navigation tree widget.
+
+### Changed
+
+- The route `io/facet` has been marked as `deprecated`.
+- Facet values are now returned in a sorted fashion.
+
+### Fixed
+
+- No address was preselected in the address selection. This behaviour has been fixed.
+- Under certain circumstances, item URLs were generated incorrectly. This behaviour has been fixed.
+- Routing errors could occur if a category, for which no translations had been stored, was linked via the ShopBuilder. This behaviour has been fixed.
+- The shopping cart was displayed incorrectly if changing the language also entailed a change of currency and country of delivery. This behaviour has been fixed.
+
+## v4.4.3 (2019-11-29) <a href="https://github.com/plentymarkets/plugin-io/compare/4.4.2...4.4.3" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
+
+### Fixed 
+
+- Due to an error, ShopBooster was unable to write item category pages to the cache. This has been fixed.
+
+## v4.4.2 (2019-11-28) <a href="https://github.com/plentymarkets/plugin-io/compare/4.4.1...4.4.2" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
+
+### Fixed 
+
+- Due to an error, ShopBooster was unable to write item category pages to the cache. This has been fixed.
+
+## v4.4.1 (2019-11-19) <a href="https://github.com/plentymarkets/plugin-io/compare/4.4.0...4.4.1" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
+
+### Fixed 
+
+- Due to an error, order characteristics were not displayed in the shopping cart and the checkout and were not included in the order. This behaviour has been fixed.
+
+## v4.4.0 (2019-11-14) <a href="https://github.com/plentymarkets/plugin-io/compare/4.3.4...4.4.0" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
+
+### Added 
+
+- The ShopBuilder now enables the display of properties of the type **file** in the single item view.
+
+### Changed 
+
+- During the completion of the order, the required item data is now loaded from the database in order to reduce susceptibility to errors.
+- The event **AfterBasketChanged** now also contains basketItems.
+
+### Fixed 
+
+- If an order was split via an event procedure, an incorrect order was displayed in the order confirmation. This has been fixed.
+- Items for which the setting **Promotional coupon/POS discount: Purchasable with coupon only** is active can no longer be bought if no promotional coupon has been redeemed.
+- If the trailing slash option for URLs was active, the order confirmation page could lead to a redirection error. This has been fixed.
+- Due to an error, the mobile navigation did not display categories if other categories of the same branch were not included in the link list. Now, all categories of the first level are displayed.
+- Characteristics for which the setting "Display as additional costs" (deposit) is active are now correctly included in the order items and are added to the totals of the order.
+- If an error occurs while loading item data, the ShopBooster no longer writes the corresponding template into the cache.
+- Metadata is now output correctly.
+- Under certain circumstances, shipping costs were displayed incorrectly. This behaviour has been fixed.
+- Due to an error, trailing slashes were appended to URLs that contained query parameters. This behaviour has been fixed.
+- Under certain circumstances, orders were created twice. This behaviour has been fixed.
+- For Callisto stores that use the Ceres checkout, the order confirmation could not be displayed if it had been created with the ShopBuilder. This has been fixed.
+- Using a ShopBuilder category as the homepage could sometimes lead to the loading of a wrong header. This has been fixed.
+
+## v4.3.4 (2019-10-30) <a href="https://github.com/plentymarkets/plugin-io/compare/4.3.3...4.3.4" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
+
+### Fixed
+
+- In the case of two consecutive orders in the online store, the list of payment methods was not loaded correctly when accessing the checkout. This behaviour has been fixed.
+
+## v4.3.3 (2019-10-17) <a href="https://github.com/plentymarkets/plugin-io/compare/4.3.2...4.3.3" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
+
+### TODO
+
+- In order to use IO 4.3.3, you need to update the plugin Ceres to its current version 4.3.4.
+
+### Fixed 
+
+- The ShopBuilder displayed a 404 page if a category was linked as the returns page. This has been fixed.
+- Due to an error, the order confirmation page was not displayed if a ShopBuilder category with the URL slug "/confirmation" was created and linked.
+- Due to an error, the link on the returns page was not working if the link was accessed without additional parameters. This has been fixed.
+- Guest accounts could not access order documents. This has been fixed.
+- Checkboxes that were configured via the assistant could not be interpreted correctly. This has been fixed.
+- Under certain circumstances, the number of log entries could increase significantly. This behaviour has been fixed.
+- The components of item bundles were displayed incorrectly. This has been fixed.
+
+## v4.3.2 (2019-10-02) <a href="https://github.com/plentymarkets/plugin-io/compare/4.3.1...4.3.2" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
+
+### Fixed
+
+- Due to an error, the registration page could not be opened via the header of the online store. This has been fixed.
+
+## v4.3.1 (2019-10-01) <a href="https://github.com/plentymarkets/plugin-io/compare/4.3.0...4.3.1" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
+
+### Fixed
+
+- Due to an error, language-specific URLs could not be determined correctly. This has been fixed.
+- Due to an error, the mobile navigation could not be loaded correctly. This has been fixed.
+
+## v4.3.0 (2019-09-26) <a href="https://github.com/plentymarkets/plugin-io/compare/4.2.0...4.3.0" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
+
+### Added 
+
+- Guest accounts can now return orders.
+- We added the link button widget to the ShopBuilder. It serves to provide buttons that link to returns and shipment tracking.
+- We added a REST route for unsubscribing from individual newsletters.
+
+### Changed
+
+- The data of the class **LocalizedOrder** now also contain the attributes of the variation.
+- The amount of data transferred during changes to the shopping cart has been reduced in order to improve the performance of the online store.
+- Objects created via **pluginApp** are now stored in their variables before they are processed further. The direct use of new instances could, under certain circumstances, lead to errors during the publishing of plugins.
+- The function `getBasketForTemplate` now adds the field "isExportDelivery" to the shopping cart. This contains the information whether the combination of shop location and selected country of delivery constitutes an export delivery.
+- The REST route `io/itemWishList` now returns the entire item data of variations in the wish list instead of the variation IDs.
+- The shopping cart data now contains the IDs of variations in the wish list.
+- The ShopBooster now also caches the wish list view.
+- If a customer unsubscribes from a newsletter, they now only unsubscribe from one newsletter, depending on the link they followed. Previously, a customer unsubscribed from all newsletters at once. 
+
+### Fixed 
+
+- The dynamic grouping of variations now considers the result fields correctly and no longer loads unnecessary data.
+- The amount of properties per group that can be used as placeholders in the ShopBuilder is no longer limited to 50.
+- Due to an error, duplicate values were removed from URL parameters. This has been fixed.
+- Cross-selling item lists displayed variations for which the setting "invisible in item lists" was active. This behaviour has been fixed.
+- Due to an error, facet values were displayed even though they did not meet the minimum number of hits. This behaviour has been fixed.
+- Internal links now always redirect to the secure HTTPS domain, if it is available.
+- During loading of the mobile navigation, categories without names are filtered out of the result.
+- Due to an error, some attributes could not be selected in the single item view. This has been fixed.
+
+## v4.2.2 (2019-08-21) <a href="https://github.com/plentymarkets/plugin-io/compare/4.1.2...4.2.0" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
+
+### Added
+
+- The static pages for cancellation form, cancellation rights, general terms and conditions, privacy policy and legal disclosure can now be created and edited with the ShopBuilder.
+
+### Fixed
+
+- Under certain circumstances, the display of base prices could lead to errors. This behaviour has been fixed.
+- Changing the item quantity in the shopping cart in connection with a coupon could cause problems if the minimum order value was not reached. This has been fixed.
+- For some languages, a space character was missing between the ISO code of the currency and the amount in the shopping cart. This has been fixed.
+- Removing items could lead to errors if a coupon had already been redeemed. This behaviour has been fixed.
+- Due to an error in the address validation, entering a company address could under certain circumstances lead to the issuing of an error notification, in which case the address was not saved. This has been fixed.
+- Shipping methods were not refreshed when the country of delivery was changed. This has been fixed.
+
 ## v4.1.2 (2019-07-16) <a href="https://github.com/plentymarkets/plugin-io/compare/4.1.1...4.1.2" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
 
 ### Added

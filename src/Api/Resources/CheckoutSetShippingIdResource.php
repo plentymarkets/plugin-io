@@ -26,9 +26,9 @@ class CheckoutSetShippingIdResource extends ApiResource
      * @param ApiResponse $response
      * @param CheckoutService $checkoutService
      */
-    public function __construct( Request $request, ApiResponse $response, CheckoutService $checkoutService )
+    public function __construct(Request $request, ApiResponse $response, CheckoutService $checkoutService)
     {
-        parent::__construct( $request, $response );
+        parent::__construct($request, $response);
         $this->checkoutService = $checkoutService;
     }
 
@@ -36,12 +36,19 @@ class CheckoutSetShippingIdResource extends ApiResource
      * Prepare the payment
      * @return Response
      */
-    public function store():Response
+    public function store(): Response
     {
         $shippingId = $this->request->get('shippingId', 0);
+        $methodOfPaymentId = $this->request->get('methodOfPaymentId', 0);
 
-        $this->checkoutService->setShippingProfileId($shippingId);
+        if ($methodOfPaymentId > 0) {
+            $this->checkoutService->setMethodOfPaymentId($methodOfPaymentId);
+        }
 
-        return $this->response->create( $shippingId, ResponseCode::OK );
+        if ($this->checkoutService->getShippingProfileId() !== $shippingId) {
+            $this->checkoutService->setShippingProfileId($shippingId);
+        }
+
+        return $this->response->create($shippingId, ResponseCode::OK);
     }
 }

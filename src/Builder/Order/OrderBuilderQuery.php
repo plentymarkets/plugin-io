@@ -1,5 +1,6 @@
 <?php
 namespace IO\Builder\Order;
+use IO\Helper\Utils;
 use IO\Services\BasketService;
 use IO\Services\SessionStorageService;
 use Plenty\Modules\Basket\Models\Basket;
@@ -72,7 +73,7 @@ class OrderBuilderQuery
 			throw new \Exception("Error while instantiating OrderItemBuilder.");
 		}
 
-		$items = $this->basketService->getBasketItems();
+		$items = $this->basketService->getBasketItemsForOrder();
 
 		if (!is_array($items)) {
 			throw new \Exception("Error while reading item data from basket");
@@ -205,7 +206,7 @@ class OrderBuilderQuery
 		
 		if((int)$customerId <= 0)
         {
-            $this->withLang(pluginApp(SessionStorageService::class)->getLang());
+            $this->withLang(Utils::getLang());
         }
 		
 		return $this;

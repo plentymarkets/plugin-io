@@ -2,6 +2,7 @@
 
 namespace IO\Api\Resources;
 
+use IO\Helper\ReCaptcha;
 use IO\Helper\TemplateContainer;
 use IO\Extensions\Functions\ExternalContent;
 use IO\Services\TemplateConfigService;
@@ -21,7 +22,7 @@ class ContactMailResource extends ApiResource
     private $contactMailService;
 
     private $templateConfigService;
-    
+
     /**
      * ContactMailResource constructor.
      * @param Request $request
@@ -31,22 +32,18 @@ class ContactMailResource extends ApiResource
         Request $request,
         ApiResponse $response,
         ContactMailService $contactMailService,
-        TemplateConfigService $templateConfigService)
-    {
+        TemplateConfigService $templateConfigService
+    ) {
         parent::__construct($request, $response);
         $this->contactMailService = $contactMailService;
         $this->templateConfigService = $templateConfigService;
     }
-    
-    public function store():Response
+
+    public function store(): Response
     {
         $mailTemplate = TemplateContainer::get('tpl.mail.contact')->getTemplate();
 
-        $recaptchaToken = $this->request->get('recaptchaToken', null);
-        $recaptchaSecret = $this->templateConfigService->get('global.google_recaptcha_secret');
-
-        if ( !$this->verifyRecaptcha($recaptchaSecret, $recaptchaToken) )
-        {
+        if (!ReCaptcha::verify($this->request->get('recaptchaToken', null))) {
             return $this->response->create("", ResponseCode::BAD_REQUEST);
         }
 
@@ -55,26 +52,21 @@ class ContactMailResource extends ApiResource
             $this->request->all()
         );
 
-        if($response)
-        {
+        if ($response) {
             return $this->response->create($response, ResponseCode::CREATED);
-        }
-        else
-        {
+        } else {
             return $this->response->create($response, ResponseCode::BAD_REQUEST);
         }
-        
     }
 
-    public function verifyRecaptcha( $secret, $token )
+    public function verifyRecaptcha($secret, $token)
     {
-        if ( !strlen( $secret ) )
-        {
+        if (!strlen($secret)) {
             return true;
-        }
-        else if ( !strlen( $token ) )
-        {
-            return false;
+        } else {
+            if (!strlen($token)) {
+                return false;
+            }
         }
 
         $params = [
@@ -90,8 +82,7 @@ class ContactMailResource extends ApiResource
 
         $ch = curl_init();
 
-        foreach($options as $option => $value)
-        {
+        foreach ($options as $option => $value) {
             curl_setopt($ch, $option, $value);
         }
 

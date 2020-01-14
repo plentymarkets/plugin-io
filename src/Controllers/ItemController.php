@@ -3,7 +3,7 @@
 namespace IO\Controllers;
 
 use IO\Api\ResponseCode;
-use IO\Helper\VDIToElasticSearchMapper;
+use IO\Helper\Utils;
 use IO\Services\CategoryService;
 use IO\Services\ItemListService;
 use IO\Services\ItemSearch\Factories\VariationSearchResultFactory;
@@ -11,22 +11,10 @@ use IO\Services\ItemSearch\Helper\ResultFieldTemplate;
 use IO\Services\ItemSearch\SearchPresets\SingleItem;
 use IO\Services\ItemSearch\SearchPresets\VariationAttributeMap;
 use IO\Services\ItemSearch\Services\ItemSearchService;
-use IO\Services\PriceDetectService;
-use IO\Services\SessionStorageService;
+use IO\Services\TemplateConfigService;
+use IO\Services\WebstoreConfigurationService;
 use Plenty\Modules\Category\Models\Category;
-use Plenty\Modules\Pim\SearchService\Filter\ClientFilter;
-use Plenty\Modules\Pim\SearchService\Filter\SalesPriceFilter;
-use Plenty\Modules\Pim\SearchService\Filter\TextFilter;
-use Plenty\Modules\Pim\SearchService\Filter\VariationBaseFilter;
-use Plenty\Modules\Pim\VariationDataInterface\Contracts\VariationDataInterfaceContract;
-use Plenty\Modules\Pim\VariationDataInterface\Model\Attributes\VariationAttributeValueAttribute;
-use Plenty\Modules\Pim\VariationDataInterface\Model\Attributes\VariationBaseAttribute;
-use Plenty\Modules\Pim\VariationDataInterface\Model\Attributes\VariationImageAttribute;
-use Plenty\Modules\Pim\VariationDataInterface\Model\Attributes\VariationSalesPriceAttribute;
-use Plenty\Modules\Pim\VariationDataInterface\Model\Attributes\VariationUnitAttribute;
-use Plenty\Modules\Pim\VariationDataInterface\Model\VariationDataInterfaceContext;
 use Plenty\Modules\ShopBuilder\Helper\ShopBuilderRequest;
-use Plenty\Plugin\Application;
 use Plenty\Plugin\Http\Response;
 use Plenty\Plugin\Log\Loggable;
 
@@ -38,12 +26,13 @@ class ItemController extends LayoutController
 {
     use Loggable;
     private $plentyId;
+
     /**
      * Prepare and render the item data.
-     * @param string    $slug
-     * @param int       $itemId         The itemId read from current request url. Will be null if item url does not contain a slug.
-     * @param int       $variationId
-     * @param Category  $category
+     * @param string $slug
+     * @param int $itemId The itemId read from current request url. Will be null if item url does not contain a slug.
+     * @param int $variationId
+     * @param Category $category
      * @return string
      * @throws \ErrorException
      */
@@ -52,58 +41,61 @@ class ItemController extends LayoutController
         int $itemId = 0,
         int $variationId = 0,
         $category = null
-    )
-    {
+    ) {
         if (!is_null($category))
         {
             pluginApp(CategoryService::class)->setCurrentCategory($category);
         }
 
-
         $start = microtime(true);
 
         $itemSearchOptions = [
-            'itemId'        => $itemId,
-            'variationId'   => $variationId,
-            'setCategory'   => is_null($category)
+            'itemId' => $itemId,
+            'variationId' => $variationId,
+            'setCategory' => is_null($category)
         ];
 
-        /** @var Application $app */
-        $app = pluginApp( Application::class );
-        $this->plentyId = $app->getPlentyId();
+        $this->plentyId = Utils::getPlentyId();
+
+        $searches = [
+            'item' => SingleItem::getSearchFactory($itemSearchOptions),
+            'variationAttributeMap' => VariationAttributeMap::getSearchFactory($itemSearchOptions)
+        ];
+        
+        /** @var TemplateConfigService $templateConfigService */
+        $templateConfigService = pluginApp(TemplateConfigService::class);
+        
+        if ($variationId > 0 && (int)$templateConfigService->get('item.show_please_select') == 1) {
+            unset($itemSearchOptions['variationId']);
+            $searches['dynamic'] = SingleItem::getSearchFactory($itemSearchOptions);
+        }
 
         /** @var ItemSearchService $itemSearchService */
-        $itemSearchService = pluginApp( ItemSearchService::class );
-        $itemResult = $itemSearchService->getResults([
-            'item' => SingleItem::getSearchFactory( $itemSearchOptions ),
-            'variationAttributeMap' => VariationAttributeMap::getSearchFactory( $itemSearchOptions )
-        ]);
 
-
+        $itemSearchService = pluginApp(ItemSearchService::class);
+        $itemResult = $itemSearchService->getResults($searches);
 
         $end = microtime(true);
         $executionTime = $end - $start;
         $this->getLogger('Performance')->error('ES: '. $executionTime . ' Sekunden');
 
-
-
-        if (!is_null($category))
-        {
-            pluginApp(CategoryService::class)->setCurrentCategory($category);
+        if (!is_null($category)) {
+            /** @var CategoryService $categoryService */
+            $categoryService = pluginApp(CategoryService::class);
+            $categoryService->setCurrentCategory($category);
         }
 
         /** @var ShopBuilderRequest $shopBuilderRequest */
         $shopBuilderRequest = pluginApp(ShopBuilderRequest::class);
 
         $defaultCategories = $itemResult['item']['documents'][0]['data']['defaultCategories'];
-        $defaultCategory = array_filter($defaultCategories, function($category) {
+        $defaultCategory = array_filter($defaultCategories, function ($category) {
             return $category['plentyId'] == $this->plentyId;
         });
 
         $shopBuilderRequest->setMainCategory($defaultCategory[0]['id']);
         $shopBuilderRequest->setMainContentType('singleitem');
-        if ($shopBuilderRequest->isShopBuilder())
-        {
+        if ($shopBuilderRequest->isShopBuilder()) {
             /** @var VariationSearchResultFactory $searchResultFactory */
             $searchResultFactory = pluginApp(VariationSearchResultFactory::class);
             $itemResult['item'] = $searchResultFactory->fillSearchResults(
@@ -112,14 +104,13 @@ class ItemController extends LayoutController
             );
         }
 
-        if(empty($itemResult['item']['documents']))
-        {
+        if (empty($itemResult['item']['documents'])) {
             $this->getLogger(__CLASS__)->info(
                 "IO::Debug.ItemController_itemNotFound",
                 [
-                    "slug"          => $slug,
-                    "itemId"        => $itemId,
-                    "variationId"   => $variationId
+                    "slug" => $slug,
+                    "itemId" => $itemId,
+                    "variationId" => $variationId
                 ]
             );
             /** @var Response $response */
@@ -128,13 +119,15 @@ class ItemController extends LayoutController
 
             return $response;
         }
-        else
-        {
-            return $this->renderTemplate(
-                'tpl.item',
-                $itemResult
-            );
-        }
+
+        /** @var WebstoreConfigurationService $webstoreConfigService */
+        $webstoreConfigService = pluginApp(WebstoreConfigurationService::class);
+        $webstoreConfig = $webstoreConfigService->getWebstoreConfig();
+        $itemResult['initPleaseSelectOption'] = $variationId <= 0 && $webstoreConfig->attributeSelectDefaultOption === 1;
+        return $this->renderTemplate(
+            'tpl.item',
+            $itemResult
+        );
     }
 
     /**
@@ -158,8 +151,7 @@ class ItemController extends LayoutController
 
     public function showItemOld($name = null, $itemId = null)
     {
-        if(is_null($itemId))
-        {
+        if (is_null($itemId)) {
             $itemId = $name;
         }
 
@@ -171,8 +163,7 @@ class ItemController extends LayoutController
         /** @var ItemListService $itemListService */
         $itemListService = pluginApp(ItemListService::class);
         $itemList = $itemListService->getItemList(ItemListService::TYPE_CATEGORY, $category->id, null, 1);
-        if (count($itemList['documents']))
-        {
+        if (count($itemList['documents'])) {
             return $this->showItem(
                 '',
                 $itemList['documents'][0]['data']['item']['id'],

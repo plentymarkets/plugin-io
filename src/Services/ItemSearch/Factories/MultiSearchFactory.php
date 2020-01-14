@@ -5,8 +5,10 @@ namespace IO\Services\ItemSearch\Factories;
 use IO\Contracts\MultiSearchFactoryContract;
 use IO\Services\ItemSearch\Extensions\ItemSearchExtension;
 use IO\Services\ItemSearch\Helper\FacetExtensionContainer;
+use IO\Services\TemplateService;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Search\Document\DocumentSearch;
 use Plenty\Modules\Item\Search\Contracts\VariationElasticSearchMultiSearchRepositoryContract;
+use Plenty\Plugin\Log\Loggable;
 
 /**
  * Class MultiSearchFactory
@@ -18,6 +20,8 @@ use Plenty\Modules\Item\Search\Contracts\VariationElasticSearchMultiSearchReposi
  */
 class MultiSearchFactory implements MultiSearchFactoryContract
 {
+    use Loggable;
+
     /** @var array */
     private $searches = [];
 
@@ -127,6 +131,21 @@ class MultiSearchFactory implements MultiSearchFactoryContract
         {
             // get result of primary search
             $result = $rawResults[$searchName];
+
+            if(array_key_exists('success', $result) && $result['success'] === false)
+            {
+                /** @var TemplateService $templateService */
+                $templateService = pluginApp(TemplateService::class);
+                $templateService->disableCacheForTemplate();
+
+                $this->getLogger(__CLASS__)->error(
+                    "IO::Debug.MultiSearchFactory_searchResultError",
+                    [
+                        "resultName" => $searchName,
+                        "errorMessage" => $result['error']
+                    ]
+                );
+            }
 
             // apply extensions
             foreach( $this->extensions[$searchName] as $i => $extension )

@@ -1,5 +1,8 @@
 <?php
+
 namespace IO\Extensions\Facets;
+
+use IO\Helper\Utils;
 use IO\Services\CategoryService;
 use IO\Services\ItemSearch\Contracts\FacetExtension;
 use IO\Services\SessionStorageService;
@@ -9,9 +12,6 @@ use Plenty\Modules\Cloud\ElasticSearch\Lib\Search\Aggregation\AggregationInterfa
 use Plenty\Modules\Item\Search\Aggregations\CategoryAllTermsAggregation;
 use Plenty\Modules\Item\Search\Aggregations\CategoryProcessor;
 use Plenty\Modules\Item\Search\Filter\CategoryFilter;
-use IO\Helper\UserSession;
-use Plenty\Plugin\Application;
-
 
 class CategoryFacet implements FacetExtension
 {
@@ -55,9 +55,11 @@ class CategoryFacet implements FacetExtension
                     'position' => 0,
                     'values' => [],
                     'minHitCount' => 1,
-                    'maxResultCount' => self::MAX_RESULT_COUNT
+                    'maxResultCount' => self::MAX_RESULT_COUNT,
+                    'type' => 'category'
                 ];
-                $loggedIn = pluginApp(UserSession::class)->isContactLoggedIn();
+
+                $loggedIn = Utils::isContactLoggedIn();
 
                 /** @var CategoryService $categoryService */
                 $categoryService = pluginApp(CategoryService::class);
@@ -67,7 +69,7 @@ class CategoryFacet implements FacetExtension
                     $category = $categoryService->getForPlentyId($categoryId, $sessionStorage->getLang());
 
 
-                    if ( !is_null($category) && (!$categoryService->isHidden($category->id) || $loggedIn || pluginApp(Application::class)->isAdminPreview()) )
+                    if ( !is_null($category) && (!$categoryService->isHidden($category->id) || $loggedIn || Utils::isAdminPreview()) )
                     {
                         $categoryFacet['values'][] = [
                             'id' => 'category-' . $categoryId,

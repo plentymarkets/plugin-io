@@ -3,7 +3,7 @@
 namespace IO\Controllers;
 
 use IO\Api\ResponseCode;
-use IO\Middlewares\Middleware;
+use IO\Middlewares\CheckNotFound;
 use Plenty\Modules\Frontend\Services\OrderPropertyFileService;
 use Plenty\Plugin\Http\Response;
 use Plenty\Plugin\Http\Request;
@@ -25,7 +25,7 @@ class OrderPropertyFileController extends LayoutController
             /** @var Response $response */
             $response = pluginApp(Response::class);
             $response->forceStatus(ResponseCode::NOT_FOUND);
-            Middleware::$FORCE_404 = true;
+            CheckNotFound::$FORCE_404 = true;
         }
         return $response;
     }
@@ -50,7 +50,7 @@ class OrderPropertyFileController extends LayoutController
             /** @var Response $response */
             $response = pluginApp(Response::class);
             $response->forceStatus(ResponseCode::NOT_FOUND);
-            Middleware::$FORCE_404 = true;
+            CheckNotFound::$FORCE_404 = true;
         }
         return $response;
     }
@@ -72,7 +72,9 @@ class OrderPropertyFileController extends LayoutController
             $objectFile = $orderPropertyFileService->getFile($key);
             $headerData = $objectFile->metaData['headers'];
 
-            return pluginApp(Response::class)->make($objectFile->body, 200,
+            /** @var Response $response */
+            $response = pluginApp(Response::class);
+            return $response->make($objectFile->body, 200,
                 [
                     'Content-Type' => $headerData['content-type'],
                     'Content-Length' => $headerData['content-length']

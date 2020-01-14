@@ -2,8 +2,11 @@
 
 namespace IO\Services;
 
+use IO\Extensions\Constants\ShopUrls;
 use IO\Helper\LanguageMap;
 use IO\Helper\MemoryCache;
+use IO\Helper\RouteConfig;
+use IO\Helper\Utils;
 use IO\Services\UrlBuilder\CategoryUrlBuilder;
 use IO\Services\UrlBuilder\UrlQuery;
 use IO\Services\UrlBuilder\VariationUrlBuilder;
@@ -27,18 +30,22 @@ class UrlService
 
     /**
      * UrlService constructor.
+     * @param SessionStorageService $sessionStorage
+     * @param WebstoreConfigurationService $webstoreConfigurationService
      */
-    public function __construct()
+    public function __construct(
+        SessionStorageService $sessionStorage,
+        WebstoreConfigurationService $webstoreConfigurationService
+    )
     {
-        $this->sessionStorage = pluginApp(SessionStorageService::class);
-        $this->webstoreConfigurationService = pluginApp(WebstoreConfigurationService::class);
+        $this->sessionStorage = $sessionStorage;
+        $this->webstoreConfigurationService = $webstoreConfigurationService;
     }
 
     /**
      * Get canonical url for a category
-     * @param int           $categoryId
-     * @param string|null   $lang
-     * @param int | null $webstoreId
+     * @param int $categoryId
+     * @param string|null $lang
      * @return UrlQuery
      */
     public function getCategoryURL( $categoryId, $lang = null)
@@ -159,9 +166,13 @@ class UrlService
         );
 
         return $canonicalUrl;
-
     }
 
+    /**
+     * Check if the current URL is canonical
+     * @param null $lang
+     * @return bool
+     */
     public function isCanonical($lang = null)
     {
         $defaultLanguage = $this->webstoreConfigurationService->getDefaultLanguage();
@@ -171,8 +182,13 @@ class UrlService
             $lang = $this->sessionStorage->getLang();
         }
 
-        $requestUri = pluginApp(Request::class)->getRequestUri();
-        $requestUrl = pluginApp( UrlQuery::class, ['path' => $requestUri])->toAbsoluteUrl($lang !== $defaultLanguage);
+        /** @var Request $request */
+        $request    = pluginApp(Request::class);
+        $requestUri = $request->getRequestUri();
+
+        /** @var UrlQuery $urlQuery */
+        $urlQuery   = pluginApp( UrlQuery::class, ['path' => $requestUri]);
+        $requestUrl = $urlQuery->toAbsoluteUrl($lang !== $defaultLanguage);
         $canonical = $this->getCanonicalURL($lang);
 
         return $requestUrl === $canonical;
@@ -188,7 +204,10 @@ class UrlService
             "languageUrls",
             function() {
                 $result = [];
-                $defaultUrl = $this->getCanonicalURL();
+
+                $defaultLanguage = $this->webstoreConfigurationService->getDefaultLanguage();
+
+                $defaultUrl = $this->getCanonicalURL( $defaultLanguage );
 
                 if ( $defaultUrl !== null )
                 {
@@ -216,21 +235,42 @@ class UrlService
     /**
      * Get language specific homepage url
      * @return string
+     * @deprecated since 4.3.0
+     * Use IO\Extensions\Constants\ShopUrls::$home instead.
      */
     public function getHomepageURL()
     {
-        return pluginApp(UrlQuery::class,
-            ['path' => '/'])->toRelativeUrl($this->webstoreConfigurationService->getDefaultLanguage() !== $this->sessionStorage->getLang());
+        /** @var ShopUrls $shopUrrls */
+        $shopUrls = pluginApp(ShopUrls::class);
+        return $shopUrls->home;
     }
 
+    /**
+     * Redirects to the given URL
+     * @param $redirectURL
+     * @return mixed
+     */
     public function redirectTo($redirectURL)
     {
         if(strpos($redirectURL, 'http:') !== 0 && strpos($redirectURL, 'https:') !== 0)
         {
-            $redirectURL = pluginApp( UrlQuery::class, ['path' => $redirectURL])
-                ->toRelativeUrl($this->webstoreConfigurationService->getDefaultLanguage() !== $this->sessionStorage->getLang() );
+            /** @var UrlQuery $query */
+            $query = pluginApp(UrlQuery::class, ['path' => $redirectURL]);
+            $redirectURL = $query->toAbsoluteUrl($this->webstoreConfigurationService->getDefaultLanguage() !== $this->sessionStorage->getLang());
         }
 
-        return pluginApp(Response::class)->redirectTo($redirectURL);
+        /** @var Response $response */
+        $response = pluginApp(Response::class);
+        return $response->redirectTo($redirectURL);
+    }
+
+    /**
+     * Check if route is enabled or category is linked to route.
+     * @param $route
+     * @return bool
+     */
+    public function isRouteEnabled($route)
+    {
+        return in_array($route, RouteConfig::getEnabledRoutes()) || RouteConfig::getCategoryId($route) > 0;
     }
 }

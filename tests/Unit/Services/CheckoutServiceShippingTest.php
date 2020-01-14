@@ -11,6 +11,7 @@ namespace IO\Tests\Unit;
 
 use IO\Services\BasketService;
 use IO\Services\CheckoutService;
+use IO\Services\CustomerService;
 use IO\Services\SessionStorageService;
 use IO\Services\WebstoreConfigurationService;
 use IO\Tests\TestCase;
@@ -20,8 +21,10 @@ use Plenty\Modules\Accounting\Contracts\AccountingLocationRepositoryContract;
 use Plenty\Modules\Basket\Models\Basket;
 use Plenty\Modules\Frontend\Contracts\Checkout;
 use Plenty\Modules\Frontend\Contracts\CurrencyExchangeRepositoryContract;
+use Plenty\Modules\Frontend\PaymentMethod\Contracts\FrontendPaymentMethodRepositoryContract;
 use Plenty\Modules\Frontend\Services\VatService;
 use Plenty\Modules\Order\Shipping\Contracts\ParcelServicePresetRepositoryContract;
+use Plenty\Modules\Payment\Method\Models\PaymentMethod;
 use Plenty\Plugin\Application;
 
 class CheckoutServiceShippingTest extends TestCase
@@ -75,6 +78,16 @@ class CheckoutServiceShippingTest extends TestCase
     private $basketServiceMock;
 
     /**
+     * @var CustomerService $customerServiceMock
+     */
+    private $customerServiceMock;
+
+    /**
+     * @var FrontendPaymentMethodRepositoryContract $frontendPaymentMock
+     */
+    private $frontendPaymentMock;
+
+    /**
      * @var CurrencyExchangeRepositoryContract $currencyExchangeRepoMock
      */
     private $currencyExchangeRepoMock;
@@ -113,6 +126,12 @@ class CheckoutServiceShippingTest extends TestCase
 
         $this->currencyExchangeRepoMock = Mockery::mock(CurrencyExchangeRepositoryContract::class);
         $this->replaceInstanceByMock(CurrencyExchangeRepositoryContract::class, $this->currencyExchangeRepoMock);
+
+        $this->customerServiceMock = Mockery::mock(CustomerService::class);
+        $this->replaceInstanceByMock(CustomerService::class, $this->customerServiceMock);
+
+        $this->frontendPaymentMock = Mockery::mock(FrontendPaymentMethodRepositoryContract::class);
+        $this->replaceInstanceByMock(FrontendPaymentMethodRepositoryContract::class, $this->frontendPaymentMock);
 
         $this->checkoutService = pluginApp(CheckoutService::class);
 
@@ -157,20 +176,43 @@ class CheckoutServiceShippingTest extends TestCase
                 'accountContactClassId' => 1
             ]);
 
+         $this->sessionStorageServiceMock->shouldReceive('getLang')
+            ->andReturn('de');
+
+        $this->customerServiceMock->shouldReceive('showNetPrices')
+            ->andReturn(false);
+
+        $this->customerServiceMock->shouldReceive('getAddresses')
+            ->andReturn([]);
+
         $this->checkoutMock->shouldReceive('getShippingCountryId')->andReturn(10);
 
         $this->applicationMock->shouldReceive('getWebstoreId')->andReturn(1);
 
-        $this->parcelServiceRepoMock->shouldReceive('getLastWeightedPresetCombinations')->with(Mockery::any(), Mockery::any())->andReturn($shippingList);
+        $this->parcelServiceRepoMock->shouldReceive('getLastWeightedPresetCombinations')->with(Mockery::any(), Mockery::any(), Mockery::any())->andReturn($shippingList);
 
         $this->vatServiceMock->shouldReceive('getLocationId')->andReturn(1);
 
+        $this->frontendPaymentMock->shouldReceive('getCurrentPaymentMethodsList')->andReturn([pluginApp(PaymentMethod::class)]);
+        $this->frontendPaymentMock->shouldReceive('getPaymentMethodName')->andReturn('Invoice');
+        $this->frontendPaymentMock->shouldReceive('getPaymentMethodFee')->andReturn(0.00);
+        $this->frontendPaymentMock->shouldReceive('getPaymentMethodIcon')->andReturn('');
+        $this->frontendPaymentMock->shouldReceive('getPaymentMethodDescription')->andReturn('');
+        $this->frontendPaymentMock->shouldReceive('getPaymentMethodSourceUrl')->andReturn('');
+        $this->frontendPaymentMock->shouldReceive('getPaymentMethodIsSelectable')->andReturn(true);
+
+
         $this->accountRepositoryMock->shouldReceive('getSettings')
             ->andReturn((object)[
-                "showSoppingVat" => true
+                "showShippingVat" => true
             ]);
 
         $this->basketServiceMock->shouldReceive('getBasket')->andReturn($basket);
+
+        $this->basketServiceMock->shouldReceive('getDeliveryAddressId')->andReturn(null);
+
+        $this->basketServiceMock->shouldReceive('getBillingAddressId')->andReturn(null);
+
 
         $this->currencyExchangeRepoMock->shouldReceive('getDefaultCurrency')->andReturn('EUR');
 
@@ -226,6 +268,7 @@ class CheckoutServiceShippingTest extends TestCase
                                     'parcelServiceAddress' => NULL,
                                 ],
                             ],
+                        'excludedPaymentMethodIds' => [],
                         'isPostOffice' => false,
                         'isParcelBox' => false,
 
@@ -249,6 +292,7 @@ class CheckoutServiceShippingTest extends TestCase
                                     'parcelServiceAddress' => NULL,
                                 ],
                             ],
+                        'excludedPaymentMethodIds' => [],
                         'isPostOffice' => true,
                         'isParcelBox' => false,
 

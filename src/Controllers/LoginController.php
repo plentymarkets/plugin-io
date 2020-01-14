@@ -2,6 +2,7 @@
 namespace IO\Controllers;
 
 use IO\Guards\AuthGuard;
+use IO\Helper\RouteConfig;
 use IO\Helper\TemplateContainer;
 use IO\Services\CustomerService;
 use Plenty\Modules\ShopBuilder\Helper\ShopBuilderRequest;
@@ -22,14 +23,15 @@ class LoginController extends LayoutController
      */
 	public function showLogin(CustomerService $customerService): string
 	{
-        if($customerService->getContactId() > 0)
+        /** @var ShopBuilderRequest $shopBuilderRequest */
+        $shopBuilderRequest = pluginApp(ShopBuilderRequest::class);
+
+        if($customerService->getContactId() > 0 && !$shopBuilderRequest->isShopBuilder())
         {
             $this->getLogger(__CLASS__)->info("IO::Debug.LoginController_alreadyLoggedIn");
             AuthGuard::redirect($this->urlService->getHomepageURL(), []);
         }
 
-        /** @var ShopBuilderRequest $shopBuilderRequest */
-        $shopBuilderRequest = pluginApp(ShopBuilderRequest::class);
         $shopBuilderRequest->setMainContentType('checkout');
 
 		return $this->renderTemplate(
@@ -40,4 +42,11 @@ class LoginController extends LayoutController
             false
 		);
 	}
+
+    public function redirect()
+    {
+        /** @var CategoryController $categoryController */
+        $categoryController = pluginApp(CategoryController::class);
+        return $categoryController->redirectRoute(RouteConfig::LOGIN);
+    }
 }

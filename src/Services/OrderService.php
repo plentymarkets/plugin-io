@@ -11,6 +11,8 @@ use IO\Constants\OrderPaymentStatus;
 use IO\Constants\SessionStorageKeys;
 use IO\Extensions\Constants\ShopUrls;
 use IO\Extensions\Mail\SendMail;
+use IO\Helper\RouteConfig;
+use IO\Helper\Utils;
 use IO\Models\LocalizedOrder;
 use Plenty\Modules\Account\Address\Contracts\AddressRepositoryContract;
 use Plenty\Modules\Account\Address\Models\AddressOption;
@@ -21,15 +23,15 @@ use Plenty\Modules\Helper\AutomaticEmail\Models\AutomaticEmailTemplate;
 use Plenty\Modules\Order\Contracts\OrderRepositoryContract;
 use Plenty\Modules\Order\Date\Models\OrderDate;
 use Plenty\Modules\Order\Date\Models\OrderDateType;
+use Plenty\Modules\Order\Models\OrderReference;
 use Plenty\Modules\Order\Property\Contracts\OrderPropertyRepositoryContract;
 use Plenty\Modules\Order\Property\Models\OrderPropertyType;
+use Plenty\Modules\Order\Status\Contracts\OrderStatusRepositoryContract;
 use Plenty\Modules\Payment\Contracts\PaymentRepositoryContract;
 use Plenty\Modules\Payment\Method\Contracts\PaymentMethodRepositoryContract;
 use Plenty\Plugin\Log\Loggable;
 use Plenty\Repositories\Models\PaginatedResult;
 use Plenty\Modules\Order\Models\Order;
-use Plenty\Plugin\Application;
-use Plenty\Plugin\ConfigRepository;
 
 /**
  * Class OrderService
@@ -52,7 +54,7 @@ class OrderService
      * @var SessionStorageService
      */
     private $sessionStorage;
-    
+
     /**
      * @var FrontendPaymentMethodRepositoryContract
      */
@@ -121,24 +123,24 @@ class OrderService
      */
 	public function placeOrder():LocalizedOrder
 	{
-	    $email = $this->customerService->getEmail();
-	    $billingAddressId = $this->checkoutService->getBillingAddressId();
         $basket = $this->basketService->getBasket();
-        
         $couponCode = null;
-        if(strlen($basket->couponCode))
+        if (strlen($basket->couponCode))
         {
             $couponCode = $basket->couponCode;
         }
 
         $isShippingPrivacyHintAccepted = $this->sessionStorage->getSessionValue(SessionStorageKeys::SHIPPING_PRIVACY_HINT_ACCEPTED);
 
-        if(is_null($isShippingPrivacyHintAccepted) || !strlen($isShippingPrivacyHintAccepted))
+        if (is_null($isShippingPrivacyHintAccepted) || !strlen($isShippingPrivacyHintAccepted))
         {
             $isShippingPrivacyHintAccepted = 'false';
         }
 
-        $order = pluginApp(OrderBuilder::class)->prepare(OrderType::ORDER)
+        /** @var OrderBuilder $orderBuilder */
+        $orderBuilder = pluginApp(OrderBuilder::class);
+
+        $order = $orderBuilder->prepare(OrderType::ORDER)
             ->fromBasket()
             ->withContactId($this->customerService->getContactId())
             ->withAddressId($this->checkoutService->getBillingAddressId(), AddressType::BILLING)
@@ -154,12 +156,13 @@ class OrderService
         {
             $order = $this->orderRepository->createOrder($order, $couponCode);
         }
-        catch (\Exception $e)
+        catch (\Exception $exception)
         {
             $this->getLogger(__CLASS__)->error("IO::Debug.OrderService_orderValidationError", [
-                'code' => $e->getCode(),
-                'message' => $e->getMessage()
+                'code' => $exception->getCode(),
+                'message' => $exception->getMessage()
             ]);
+            throw $exception;
         }
 
         $this->getLogger(__CLASS__)->debug('IO::Debug.OrderService_placeOrder', [
@@ -167,31 +170,9 @@ class OrderService
             'basket' => $basket
         ]);
 
-        if ($order instanceof Order && $order->id > 0) {
-            $params = [
-                'orderId' => $order->id,
-                'webstoreId' => pluginApp(Application::class)->getWebstoreId(),
-                'language' => $this->sessionStorage->getLang()
-            ];
-            $this->sendMail(AutomaticEmailTemplate::SHOP_ORDER ,AutomaticEmailOrder::class, $params);
-        }
-
-        $this->subscribeToNewsletter($email, $billingAddressId);
-
-        $this->sessionStorage->setSessionValue(SessionStorageKeys::ORDER_CONTACT_WISH, null);
-
-        if($this->customerService->getContactId() <= 0)
-        {
-            $this->sessionStorage->setSessionValue(SessionStorageKeys::LATEST_ORDER_ID, $order->id);
-        }
-
-        if( ($order->amounts[0]->invoiceTotal == 0) || ($order->amounts[0]->invoiceTotal == $order->amounts[0]->giftCardAmount) ) {
-            $this->createAndAssignDummyPayment($order);
-        }
-
         return LocalizedOrder::wrap( $order, $this->sessionStorage->getLang() );
 	}
-    
+
     /**
      * Subscribe the customer to the newsletter, if stored in the session
      *
@@ -208,7 +189,7 @@ class OrderService
         {
             $firstName = '';
             $lastName = '';
-            
+
             $address = $this->customerService->getAddress($billingAddressId, AddressType::BILLING);
 
             // if the address is for a company, the contact person will be store into the last name
@@ -279,44 +260,36 @@ class OrderService
 
         return $result;
     }
-    
+
     /**
      * Find an order by ID
      * @param int $orderId
-     * @param bool $removeReturnItems
      * @param bool $wrap
      * @return LocalizedOrder|mixed|Order
      */
-	public function findOrderById(int $orderId, $removeReturnItems = false, $wrap = true)
+	public function findOrderById(int $orderId, $wrap = true)
 	{
-        if($removeReturnItems)
-        {
-            $order = $this->removeReturnItemsFromOrder($this->orderRepository->findOrderById($orderId));
-        }
-        else
-        {
-            $order = $this->orderRepository->findOrderById($orderId);
-        }
-        
+        $order = $this->orderRepository->findOrderById($orderId);
+
         if($wrap)
         {
             return LocalizedOrder::wrap($order, $this->sessionStorage->getLang());
         }
-        
+
         return $order;
 	}
-	
+
 	public function findOrderByAccessKey($orderId, $orderAccessKey)
     {
         /**
          * @var TemplateConfigService $templateConfigService
          */
         $templateConfigService = pluginApp(TemplateConfigService::class);
-        $redirectToLogin = $templateConfigService->get('my_account.confirmation_link_login_redirect');
-    
+        $redirectToLogin = $templateConfigService->getBoolean('my_account.confirmation_link_login_redirect');
+
         $order = $this->orderRepository->findOrderByAccessKey($orderId, $orderAccessKey);
-        
-        if($redirectToLogin == 'true')
+
+        if($redirectToLogin)
         {
             $orderContactId = 0;
             foreach ($order->relations as $relation)
@@ -326,13 +299,14 @@ class OrderService
                     $orderContactId = $relation['referenceId'];
                 }
             }
-    
+
             if ((int)$orderContactId > 0)
             {
                 if ((int)$this->customerService->getContactId() <= 0)
                 {
-
-                    return $this->urlService->redirectTo(pluginApp(ShopUrls::class)->login . '?backlink=' . pluginApp(ShopUrls::class)->confirmation . '/' . $orderId . '/' . $orderAccessKey);
+                    /** @var ShopUrls $shopUrls */
+                    $shopUrls = pluginApp(ShopUrls::class);
+                    return $this->urlService->redirectTo($shopUrls->login . '?backlink=' . $shopUrls->confirmation . '/' . $orderId . '/' . $orderAccessKey);
                 }
                 elseif ((int)$orderContactId !== (int)$this->customerService->getContactId())
                 {
@@ -340,10 +314,10 @@ class OrderService
                 }
             }
         }
-    
+
         return LocalizedOrder::wrap($order, $this->sessionStorage->getLang());
     }
-    
+
     /**
      * Get a list of orders for a contact
      * @param int $contactId
@@ -359,7 +333,7 @@ class OrderService
         {
             $filters['orderType'] = OrderType::ORDER;
         }
-        
+
         $this->orderRepository->setFilters($filters);
 
         $orders = $this->orderRepository->allOrdersByContact(
@@ -372,39 +346,39 @@ class OrderService
         {
             $orders = LocalizedOrder::wrapPaginated( $orders, $this->sessionStorage->getLang() );
         }
-        
+
         return $orders;
     }
-    
+
     public function getOrdersCompact(int $page = 1, int $items = 50)
     {
         $orderResult = null;
         $contactId = $this->customerService->getContactId();
-        
+
         if($contactId > 0)
         {
             $this->orderRepository->setFilters(['orderType' => OrderType::ORDER]);
-    
+
             /** @var PaginatedResult $orderResult */
             $orderResult = $this->orderRepository->allOrdersByContact(
                 $contactId,
                 $page,
                 $items
             );
-    
+
             /** @var OrderTotalsService $orderTotalsService */
             $orderTotalsService = pluginApp(OrderTotalsService::class);
-            
+
             /** @var OrderStatusService $orderStatusService */
             $orderStatusService = pluginApp(OrderStatusService::class);
-    
+
             /** @var OrderTrackingService $orderTrackingService */
             $orderTrackingService = pluginApp(OrderTrackingService::class);
-    
+
             /** @var SessionStorageService $sessionStorageService */
             $sessionStorageService = pluginApp(SessionStorageService::class);
             $lang = $sessionStorageService->getLang();
-            
+
             $orders = [];
             foreach($orderResult->getResult() as $order)
             {
@@ -412,20 +386,20 @@ class OrderService
                 {
                     $totals = $orderTotalsService->getAllTotals($order);
                     $highlightNetPrices = $orderTotalsService->highlightNetPrices($order);
-                    
+
                     $orderStatusName = $orderStatusService->getOrderStatus($order->id, $order->statusId);
-    
+
                     $creationDate = '';
                     $creationDateData = $order->dates->firstWhere('typeId', OrderDateType::ORDER_ENTRY_AT);
-    
+
                     if($creationDateData instanceof OrderDate)
                     {
                         $creationDate = $creationDateData->date->toDateTimeString();
                     }
-    
+
                     $shippingDate = '';
                     $shippingDateData = $order->dates->firstWhere('typeId', OrderDateType::ORDER_COMPLETED_ON);
-    
+
                     if($shippingDateData instanceof OrderDate)
                     {
                         $shippingDate = $shippingDateData->date->toDateTimeString();
@@ -441,13 +415,13 @@ class OrderService
                     ];
                 }
             };
-    
+
             $orderResult->setResult($orders);
         }
-        
+
         return $orderResult;
     }
-    
+
     /**
      * Get the last order created by the current contact
      * @param int $contactId
@@ -458,20 +432,33 @@ class OrderService
         if($contactId > 0)
         {
             $order = $this->orderRepository->getLatestOrderByContactId( $contactId );
+
+            // load parent order, if given
+            if ($order->typeId !== OrderType::ORDER)
+            {
+                foreach ($order->orderReferences as $relation)
+                {
+                    if ($relation->referenceType === OrderReference::REFERENCE_TYPE_PARENT)
+                    {
+                        $order = $relation->referenceOrder;
+                        break;
+                    }
+                }
+            }
         }
         else
         {
             $order = $this->orderRepository->findOrderById($this->sessionStorage->getSessionValue(SessionStorageKeys::LATEST_ORDER_ID));
         }
-        
+
         if(!is_null($order))
         {
             return LocalizedOrder::wrap( $order, $this->sessionStorage->getLang() );
         }
-        
+
         return null;
     }
-    
+
     public function getOrderPropertyByOrderId($orderId, $typeId)
     {
         /**
@@ -480,349 +467,166 @@ class OrderService
         $orderPropertyRepo = pluginApp(OrderPropertyRepositoryContract::class);
         return $orderPropertyRepo->findByOrderId($orderId, $typeId);
     }
-    
+
     public function isReturnActive()
     {
-        /**
-         * @var TemplateConfigService $templateConfigService
-         */
-        $templateConfigService = pluginApp(TemplateConfigService::class);
-        $returnsActive = $templateConfigService->get('my_account.order_return_active', 'true');
-        
-        if($returnsActive == 'true')
-        {
-            return true;
-        }
-        
-        return false;
+        return RouteConfig::isActive(RouteConfig::ORDER_RETURN);
     }
-    
-    public function isOrderReturnable(Order $order)
+
+    public function createOrderReturn($orderId, $orderAccessKey = '', $items = [], $returnNote = '')
     {
-        if($this->customerService->getContactId() > 0 && $this->isReturnActive())
+        $localizedOrder = $this->getReturnOrder($orderId, $orderAccessKey);
+        if ($localizedOrder->isReturnable())
         {
-            /**
-             * @var ConfigRepository $config
-             */
-            $config = pluginApp(ConfigRepository::class);
-            $enabledRoutes = explode(', ',  $config->get('IO.routing.enabled_routes') );
-            if ( !in_array('order-return', $enabledRoutes) && !in_array('all', $enabledRoutes) )
-            {
-                return false;
-            }
-            
-            $orderWithoutReturnItems = $this->removeReturnItemsFromOrder($order);
-            if(!count($orderWithoutReturnItems->orderItems))
-            {
-                return false;
-            }
+            $returnOrderData = $localizedOrder->orderData;
 
-            $newOrderItems = [];
+            foreach($returnOrderData['orderItems'] as $i => $orderItem)
+            {
+                $variationId = $orderItem['itemVariationId'];
+                $returnQuantity = max((int) $items[$variationId], $orderItem->quantity);
 
-            foreach($orderWithoutReturnItems->orderItems as $orderItem)
-            {
-                if($orderItem['bundleType'] !== 'bundle_item' && count($orderItem['references']) === 0)
+                if ($returnQuantity > 0)
                 {
-                    $newOrderItems[] = $orderItem;
-                }
-            }
-
-            $newItemsExist = false;
-
-            if(count($newOrderItems) > 0)
-            {
-                foreach($newOrderItems as $newOrderItem)
-                {
-                    if($newOrderItem['quantity'] > 0)
-                    {
-                        $newItemsExist = true;
-                    }
-                }
-            }
-            
-            $shippingDateSet = false;
-            $createdDateUnix = 0;
-    
-            foreach($order->dates as $date)
-            {
-                if($date->typeId == 5 && strlen($date->date))
-                {
-                    $shippingDateSet = true;
-                }
-                elseif($date->typeId == 2 && strlen($date->date))
-                {
-                    $createdDateUnix = $date->date->timestamp;
-                }
-            }
-    
-            /**
-             * @var TemplateConfigService $templateConfigService
-             */
-            $templateConfigService = pluginApp(TemplateConfigService::class);
-            $returnTime = (int)$templateConfigService->get('my_account.order_return_days', 14);
-    
-            if( $shippingDateSet && ($createdDateUnix > 0 && $returnTime > 0) && (time() < ($createdDateUnix + ($returnTime * 24 * 60 * 60))) && $newItemsExist )
-            {
-                return true;
-            }
-        }
-        
-        return false;
-    }
-    
-    public function createOrderReturn($orderId, $items = [], $returnNote = '')
-    {
-        $order = $this->orderRepository->findOrderById($orderId);
-        $order = $this->removeReturnItemsFromOrder($order);
-        $order = $order->toArray();
-        
-        if($this->isReturnActive())
-        {
-            foreach($order['orderItems'] as $key => $orderItem)
-            {
-                if(array_key_exists($orderItem['itemVariationId'], $items) && (int)$items[$orderItem['itemVariationId']] > 0)
-                {
-                    $returnQuantity = (int)$items[$orderItem['itemVariationId']];
-                    
-                    if($returnQuantity > $order['orderItems'][$key]['quantity'])
-                    {
-                        $returnQuantity = $order['orderItems'][$key]['quantity'];
-                    }
-                    
-                    $order['orderItems'][$key]['quantity'] = $returnQuantity;
-
-                    $order['orderItems'][$key]['references'][] = [
-                        'referenceOrderItemId' =>   $order['orderItems'][$key]['id'],
-                        'referenceType' => 'parent'
+                    $returnOrderData['orderItems'][$i]['quantity'] = $returnQuantity;
+                    $returnOrderData['orderItems'][$i]['references'][] = [
+                        'referenceOrderItemId'  => $orderItem['id'],
+                        'referenceType'         => 'parent'
                     ];
-                    
-                    unset($order['orderItems'][$key]['id']);
-                    unset($order['orderItems'][$key]['orderId']);
+
+                    unset($returnOrderData['orderItems'][$i]['id']);
+                    unset($returnOrderData['orderItems'][$i]['orderId']);
                 }
                 else
                 {
-                    unset($order['orderItems'][$key]);
+                    unset($returnOrderData['orderItems'][$i]);
                 }
             }
-    
-            /**
-             * @var TemplateConfigService $templateConfigService
-             */
-            $templateConfigService = pluginApp(TemplateConfigService::class);
-            $returnStatus = $templateConfigService->get('my_account.order_return_initial_status', '');
-            if(!strlen($returnStatus) || (float)$returnStatus <= 0)
-            {
-                $returnStatus = 9.0;
-            }
 
-            $order['properties'][] = [
+            $returnStatus = $this->getReturnOrderStatus();
+
+            $returnOrderData['properties'][]      = [
                 "typeId"    => OrderPropertyType::NEW_RETURNS_MY_ACCOUNT,
                 "value"     => "1"
             ];
-
-
-
-            $order['statusId'] = (float)$returnStatus;
-            $order['typeId'] = OrderType::RETURNS;
-    
-            $order['orderReferences'][] = [
-                'referenceOrderId' => $order['id'],
-                'referenceType' => 'parent'
+            $returnOrderData['statusId']          = (float) $returnStatus;
+            $returnOrderData['typeId']            = OrderType::RETURNS;
+            $returnOrderData['orderReferences'][] = [
+                'referenceOrderId'  => $localizedOrder->order->id,
+                'referenceType'     => 'parent'
             ];
-    
-            unset($order['id']);
-            unset($order['dates']);
-            unset($order['lockStatus']);
+
+            unset($returnOrderData['id']);
+            unset($returnOrderData['dates']);
+            unset($returnOrderData['lockStatus']);
 
             if(!is_null($returnNote) && strlen($returnNote))
             {
-                $order["comments"][] = [
+                $returnOrderData["comments"][] = [
                     "isVisibleForContact" => true,
                     "text"                => $returnNote
                 ];
             }
 
-            $createdReturn = $this->orderRepository->createOrder($order);
+            if(strlen($orderAccessKey)) {
+                /** @var AuthHelper $authHelper */
+                $authHelper = pluginApp(AuthHelper::class);
+                $createdReturn = $authHelper->processUnguarded(function() use ($returnOrderData) {
+                    $this->orderRepository->createOrder($returnOrderData);
+                });
+            } else {
+                $createdReturn = $this->orderRepository->createOrder($returnOrderData);
+            }
+
 
             return $createdReturn;
         }
-        
-        return $order;
-    }
-    
-    private function removeReturnItemsFromOrder($order)
-    {
-        $orderId = $order->id;
 
-        $returnFilters = [
-            'orderType' => OrderType::RETURNS,
-            'referenceOrderId' => $orderId
-        ];
-        
-        $allReturns = $this->getOrdersForContact(pluginApp(CustomerService::class)->getContactId(), 1, 100, $returnFilters, false)->getResult();
-        
-        $returnItems = [];
-        $newOrderItems = [];
-        
-        if(count($allReturns))
-        {
-            foreach($allReturns as $returnKey => $return)
-            {
-                foreach($return['orderReferences'] as $reference)
-                {
-                    if($reference['referenceType'] == 'parent' && (int)$reference['referenceOrderId'] == $orderId)
-                    {
-                        foreach($return['orderItems'] as $returnItem)
-                        {
-                            if(array_key_exists($returnItem['itemVariationId'], $returnItems))
-                            {
-                                $returnItems[$returnItem['itemVariationId']] += $returnItem['quantity'];
-                            }
-                            else
-                            {
-                                $returnItems[$returnItem['itemVariationId']] = $returnItem['quantity'];
-                            }
-                        }
-                    }
-                }
-            }
-            
-            if(count($returnItems))
-            {
-                foreach($order->orderItems as $key => $orderItem)
-                {
-                    if(array_key_exists($orderItem['itemVariationId'], $returnItems))
-                    {
-                        $newQuantity = $orderItem['quantity'] - $returnItems[$orderItem['itemVariationId']];
-                    }
-                    else
-                    {
-                        $newQuantity = $orderItem['quantity'];
-                    }
-    
-                    if($newQuantity > 0 && in_array((int)$orderItem->typeId, self::WRAPPED_ORDERITEM_TYPES))
-                    {
-                        $orderItem['quantity'] = $newQuantity;
-                        $newOrderItems[] = $orderItem;
-                    }
-                    else
-                    {
-                        $orderItem->quantity = 0;
-                    }
-                }
-                
-                //$order->returnItems = $newOrderItems;
-                $order->orderItems = $newOrderItems;
-            }
-            else
-            {
-                foreach($order->orderItems as $key => $orderItem)
-                {
-                    if(in_array((int)$orderItem->typeId, self::WRAPPED_ORDERITEM_TYPES))
-                    {
-                        $newOrderItems[] = $orderItem;
-                    }
-                }
-                
-                //$order->returnItems = $newOrderItems;
-                $order->orderItems = $newOrderItems;
-            }
-        }
-        
-        return $order;
+        return $localizedOrder->order;
     }
-    
-    public function getReturnOrder($localizedOrder)
+
+    /**
+     * @param $orderId
+     * @param string $orderAccessKey
+     * @return LocalizedOrder
+     */
+    public function getReturnOrder($orderId, $orderAccessKey = '')
     {
-        $order = $localizedOrder->order->toArray();
-        $orderId = $order['id'];
-        
-        $returnFilters = [
-            'orderType' => OrderType::RETURNS,
-            'referenceOrderId' => $orderId
-        ];
-    
-        $allReturns = $this->getOrdersForContact(pluginApp(CustomerService::class)->getContactId(), 1, 1000, $returnFilters, false)->getResult();
-    
-        $returnItems = [];
-        $newOrderItems = [];
-    
-        if(count($allReturns))
-        {
-            foreach ($allReturns as $returnKey => $return)
-            {
-                foreach ($return['orderReferences'] as $reference)
-                {
-                    if ($reference['referenceType'] == 'parent' && (int)$reference['referenceOrderId'] == $orderId)
-                    {
-                        foreach ($return['orderItems'] as $returnItem)
-                        {
-                            if (array_key_exists($returnItem['itemVariationId'], $returnItems))
-                            {
-                                $returnItems[$returnItem['itemVariationId']] += $returnItem['quantity'];
-                            }
-                            else
-                            {
-                                $returnItems[$returnItem['itemVariationId']] = $returnItem['quantity'];
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        
-        if(count($returnItems))
-        {
-            foreach($order['orderItems'] as $key => $orderItem)
-            {
-                if(array_key_exists($orderItem['itemVariationId'], $returnItems))
-                {
-                    $newQuantity = $orderItem['quantity'] - $returnItems[$orderItem['itemVariationId']];
-                }
-                else
-                {
-                    $newQuantity = $orderItem['quantity'];
-                }
-            
-                if($newQuantity > 0 && in_array((int)$orderItem['typeId'], self::WRAPPED_ORDERITEM_TYPES))
-                {
-                    $orderItem['quantity'] = $newQuantity;
-                    $newOrderItems[] = $orderItem;
-                }
-                else
-                {
-                    $orderItem['quantity'] = 0;
-                }
-            }
-        }
-        else
-        {
-            foreach($order['orderItems'] as $key => $orderItem)
-            {
-                if(in_array((int)$orderItem['typeId'], self::WRAPPED_ORDERITEM_TYPES))
-                {
-                    $newOrderItems[] = $orderItem;
-                }
-            }
-        }
-        
-        $order['orderItems'] = $newOrderItems;
-        $localizedOrder->orderData = $order;
-        
+        $localizedOrder = strlen($orderAccessKey)
+            ? $this->findOrderByAccessKey($orderId, $orderAccessKey)
+            : $this->findOrderById($orderId);
+
+        /** @var Order $order */
+        $order = $localizedOrder->order;
+
+        $orderData = $order->toArray();
+        $orderData['orderItems'] = $this->getReturnableItems($order);
+        $localizedOrder->orderData = $orderData;
+
         return $localizedOrder;
     }
-    
+
+    /**
+     * @param Order $order
+     * @throws \Throwable
+     * @return array
+     */
+    public function getReturnableItems($order)
+    {
+        /** @var AuthHelper $authHelper */
+        $authHelper = pluginApp(AuthHelper::class);
+
+        // collect quantities of already returned variations
+        $returnItems = $authHelper->processUnguarded(function() use ($order)
+        {
+            $returnItems = [];
+            foreach ($order->childOrders as $childOrder)
+            {
+                if($childOrder->typeId === OrderType::RETURNS)
+                {
+                    foreach($childOrder->orderItems as $orderItem)
+                    {
+                        $variationId = $orderItem->itemVariationId;
+                        $returnItems[$variationId] += $orderItem->quantity;
+                    }
+                }
+            }
+            return $returnItems;
+        });
+
+        $newOrderItems = [];
+        foreach($order->orderItems as $key => $orderItem)
+        {
+            $newQuantity = $orderItem->quantity;
+            if(array_key_exists($orderItem->itemVariationId, $returnItems))
+            {
+                $newQuantity -= $returnItems[$orderItem->itemVariationId];
+            }
+
+            if($newQuantity > 0
+                && in_array($orderItem->typeId, self::WRAPPED_ORDERITEM_TYPES)
+                && !($orderItem->bundleType === 'bundle_item' && count($orderItem->references) > 0))
+            {
+                $orderItemData = $orderItem->toArray();
+                $orderItemData['quantity'] = $newQuantity;
+                $newOrderItems[] = $orderItemData;
+            }
+        }
+
+        return $newOrderItems;
+    }
+
     /**
      * List all payment methods available for switch in MyAccount
      *
      * @param int $currentPaymentMethodId
      * @param null $orderId
+     * @return \Illuminate\Support\Collection
      */
     public function getPaymentMethodListForSwitch($currentPaymentMethodId = 0, $orderId = null)
     {
         return $this->frontendPaymentMethodRepository->getCurrentPaymentMethodsListForSwitch($currentPaymentMethodId, $orderId, $this->sessionStorage->getLang());
     }
-    
+
     /**
      * @param $paymentMethodId
      * @param int $orderId
@@ -832,7 +636,7 @@ class OrderService
 	{
 		/** @var TemplateConfigService $config */
 		$config = pluginApp(TemplateConfigService::class);
-		if ($config->get('my_account.change_payment') == "false")
+		if (!$config->getBoolean('my_account.change_payment'))
 		{
 			return false;
 		}
@@ -841,21 +645,21 @@ class OrderService
             /** @var AuthHelper $authHelper */
             $authHelper = pluginApp(AuthHelper::class);
             $orderRepo = $this->orderRepository;
-            
+
             $order = $authHelper->processUnguarded( function() use ($orderId, $orderRepo)
             {
                 return $orderRepo->findOrderById($orderId);
             });
-			
+
 			if ($order->paymentStatus !== OrderPaymentStatus::UNPAID)
 			{
 				// order was paid
 				return false;
 			}
-			
+
 			$statusId = $order->statusId;
 			$orderCreatedDate = $order->createdAt;
-			
+
 			if(!($statusId <= 3.4 || ($statusId == 5 && $orderCreatedDate->toDateString() == date('Y-m-d'))))
 			{
 				return false;
@@ -863,8 +667,8 @@ class OrderService
 		}
 		return $this->frontendPaymentMethodRepository->getPaymentMethodSwitchFromById($paymentMethodId, $orderId);
 	}
-    
-    
+
+
     /**
      * @param $orderId
      * @param $paymentMethodId
@@ -875,19 +679,19 @@ class OrderService
         if((int)$orderId > 0)
         {
             $currentPaymentMethodId = 0;
-    
+
             /** @var AuthHelper $authHelper */
             $authHelper = pluginApp(AuthHelper::class);
             $orderRepo = $this->orderRepository;
-    
+
             $order = $authHelper->processUnguarded( function() use ($orderId, $orderRepo)
             {
                 return $orderRepo->findOrderById($orderId);
             });
-        
+
             $newOrderProperties = [];
             $orderProperties = $order->properties;
-        
+
             if(count($orderProperties))
             {
                 foreach($orderProperties as $key => $orderProperty)
@@ -903,7 +707,7 @@ class OrderService
                     }
                 }
             }
-        
+
             if($paymentMethodId !== $currentPaymentMethodId)
             {
                 if($this->frontendPaymentMethodRepository->getPaymentMethodSwitchableFromById($currentPaymentMethodId, $orderId) && $this->frontendPaymentMethodRepository->getPaymentMethodSwitchableToById($paymentMethodId))
@@ -912,7 +716,7 @@ class OrderService
                     {
                         return $orderRepo->updateOrder(['properties' => $newOrderProperties], $orderId);
                     });
-                    
+
                     if(!is_null($order))
                     {
                         return LocalizedOrder::wrap( $order, $this->sessionStorage->getLang() );
@@ -920,8 +724,72 @@ class OrderService
                 }
             }
         }
-    
+
         return null;
+    }
+
+
+    /**
+     * Do steps after creating the order
+     *
+     * @param Order $order
+     */
+    public function complete($order)
+    {
+        if ($order instanceof Order && $order->id > 0)
+        {
+            try
+            {
+                $params = [
+                    'orderId' => $order->id,
+                    'webstoreId' => Utils::getWebstoreId(),
+                    'language' => $this->sessionStorage->getLang()
+                ];
+                $this->sendMail(AutomaticEmailTemplate::SHOP_ORDER ,AutomaticEmailOrder::class, $params);
+
+            }
+            catch (\Throwable $throwable)
+            {
+                $this->handleThrowable($throwable, "IO::Debug.OrderService_orderCompleteErrorSendMail");
+            }
+
+            try
+            {
+                if (($order->amounts[0]->invoiceTotal == 0) || ($order->amounts[0]->invoiceTotal == $order->amounts[0]->giftCardAmount))
+                {
+                    $this->createAndAssignDummyPayment($order);
+                }
+            }
+            catch (\Throwable $throwable)
+            {
+                $this->handleThrowable($throwable, "IO::Debug.OrderService_orderCompleteErrorDummyPayment");
+            }
+        }
+
+
+        try
+        {
+            $email = $this->customerService->getEmail();
+            $billingAddressId = $this->checkoutService->getBillingAddressId();
+            $this->subscribeToNewsletter($email, $billingAddressId);
+        }
+        catch (\Throwable $throwable)
+        {
+            $this->handleThrowable($throwable, "IO::Debug.OrderService_orderCompleteErrorSubscribeNewsletter");
+        }
+
+        $this->sessionStorage->setSessionValue(SessionStorageKeys::ORDER_CONTACT_WISH, null);
+        if ($this->customerService->getContactId() <= 0)
+        {
+            $this->sessionStorage->setSessionValue(SessionStorageKeys::LATEST_ORDER_ID, $order->id);
+        }
+    }
+
+    private function handleThrowable(\Throwable $throwable, $message = null)
+    {
+        $this->getLogger(__CLASS__)->error($message ?? "IO::Debug.OrderService_orderCompleteError", [
+            'message' => $throwable->getMessage()
+        ]);
     }
 
     /**
@@ -980,5 +848,35 @@ class OrderService
         $paymentProperty->value = $value;
 
         return $paymentProperty;
+    }
+
+    private function getReturnOrderStatus()
+    {
+        /** @var TemplateConfigService $templateConfigService */
+        $templateConfigService = pluginApp(TemplateConfigService::class);
+        $returnStatus = $templateConfigService->get('my_account.order_return_initial_status', 9.0);
+
+        if (strlen($returnStatus) && (float)$returnStatus > 0) {
+            $returnStatus = (float)$returnStatus;
+            try {
+                /** @var AuthHelper $authHelper */
+                $authHelper = pluginApp(AuthHelper::class);
+
+                return $authHelper->processUnguarded(function () use ($returnStatus) {
+                    $orderStatusRepository = pluginApp(OrderStatusRepositoryContract::class);
+                    $status = $orderStatusRepository->get($returnStatus);
+                    if (is_null($status)) {
+                        return 9.0;
+                    }
+
+                    return $returnStatus;
+                });
+            } catch (\Exception $e) {
+                $this->getLogger(__CLASS__)->warning('IO::Debug.OrderService_returnStatusNotFound', [
+                    'statusId' => $returnStatus
+                ]);
+            }
+        }
+        return 9.0;
     }
 }

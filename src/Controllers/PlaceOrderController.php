@@ -1,4 +1,5 @@
 <?php //strict
+
 namespace IO\Controllers;
 
 use IO\Constants\LogLevel;
@@ -9,7 +10,6 @@ use IO\Services\OrderService;
 use IO\Services\SessionStorageService;
 use IO\Services\UrlBuilder\UrlQuery;
 use Plenty\Modules\Basket\Exceptions\BasketItemCheckException;
-use Plenty\Plugin\Http\Response;
 use Plenty\Plugin\Http\Request;
 use Plenty\Plugin\Log\Loggable;
 
@@ -20,109 +20,95 @@ use Plenty\Plugin\Log\Loggable;
 class PlaceOrderController extends LayoutController
 {
     const ORDER_RETRY_INTERVAL = 30;
-    
+
     use Loggable;
 
     /**
      * @param OrderService $orderService
      * @param NotificationService $notificationService
      * @param SessionStorageService $sessionStorageService
-     * @param Response $response
+     * @param ShopUrls $shopUrls
+     *
      * @return \Symfony\Component\HttpFoundation\Response
      */
     public function placeOrder(
         OrderService $orderService,
         NotificationService $notificationService,
         SessionStorageService $sessionStorageService,
-        Response $response)
+        ShopUrls $shopUrls)
     {
-        $request = pluginApp(Request::class);
-        $redirectParam = $request->get('redirectParam', '');
-        
+        //check if an order has already been placed in the last 30 seconds
+        $lastPlaceOrderTry = $sessionStorageService->getSessionValue(SessionStorageKeys::LAST_PLACE_ORDER_TRY);
+
+        if (!is_null($lastPlaceOrderTry) && time() < (int)$lastPlaceOrderTry + self::ORDER_RETRY_INTERVAL)
+        {
+            //place order has been called a second time in a time frame of 30 seconds
+            $notificationService->addNotificationCode(LogLevel::ERROR, 115);
+            return $this->urlService->redirectTo($shopUrls->checkout);
+        }
+        $sessionStorageService->setSessionValue(SessionStorageKeys::LAST_PLACE_ORDER_TRY, time());
+
         try
         {
-            //check if an order has already been placed in the last 30 seconds
-            $lastPlaceOrderTry = $sessionStorageService->getSessionValue(SessionStorageKeys::LAST_PLACE_ORDER_TRY);
-            if (is_null($lastPlaceOrderTry) ||
-                ((int)$lastPlaceOrderTry > 0 && time() > (int)$lastPlaceOrderTry + self::ORDER_RETRY_INTERVAL))
-            {
-                $sessionStorageService->setSessionValue(SessionStorageKeys::LAST_PLACE_ORDER_TRY, time());
-                $orderData = $orderService->placeOrder();
-                $urlParams = [];
-                $url = "execute-payment/" . $orderData->order->id;
-                $url .= UrlQuery::shouldAppendTrailingSlash() ? '/' : '';
-                
-                if(strlen($redirectParam))
-                {
-                    $urlParams['redirectParam'] = $redirectParam;
-                }
-                
-                if($sessionStorageService->getSessionValue(SessionStorageKeys::READONLY_CHECKOUT) === true)
-                {
-                    $urlParams['readonlyCheckout'] = true;
-                }
-                
-                if(count($urlParams))
-                {
-                    $paramString = http_build_query($urlParams);
-                    if(strlen($paramString))
-                    {
-                        $url .= '?'.$paramString;
-                    }
-                }
-    
-                return $this->urlService->redirectTo($url);
-            }
-            else
-            {
-                throw new \Exception('order retry time not reached', 115);
-            }
-            
-        }
-        catch(BasketItemCheckException $exception)
-        {
-            $this->getLogger(__CLASS__)->warning(
-                "IO::Debug.PlaceOrderController_cannotPlaceOrder",
-                [
-                    "code" => $exception->getCode(),
-                    "message" => $exception->getMessage()
-                ]
-            );
-            if($exception->getCode() == BasketItemCheckException::NOT_ENOUGH_STOCK_FOR_ITEM)
-            {
-                $notificationService->warn('not enough stock for item', 9);
-            }
-            
-            return $this->urlService->redirectTo(pluginApp(ShopUrls::class)->checkout);
+            $orderData = $orderService->placeOrder();
         }
         catch (\Exception $exception)
         {
-            $this->getLogger(__CLASS__)->warning(
-                "IO::Debug.PlaceOrderController_cannotPlaceOrder",
+            return $this->handlePlaceOrderException($exception);
+        }
+
+        $this->getLogger(__CLASS__)->debug(
+           "IO::Debug.PlaceOrderController_orderCreated",
+           [
+               "order" => $orderData->order,
+           ]
+        );
+
+        try
+        {
+            $orderService->complete($orderData->order);
+        }
+        catch (\Exception $exception)
+        {
+            // This should never happen since every exception should be caught inside this function!
+            $this->getLogger(__CLASS__)->error(
+                "IO::Debug.PlaceOrderController_cannotCompleteOrder",
                 [
                     "code" => $exception->getCode(),
                     "message" => $exception->getMessage()
                 ]
             );
-
-            if($exception->getCode() === 15)
-            {
-                return $this->urlService->redirectTo(pluginApp(ShopUrls::class)->confirmation);
-            }
-            elseif($exception->getCode() == 115)
-            {
-                //place order has been called a second time in a time frame of 30 seconds
-                $notificationService->addNotificationCode(LogLevel::ERROR, $exception->getCode());
-                return $this->urlService->redirectTo(pluginApp(ShopUrls::class)->checkout);
-            }
-
-            // TODO get better error text
-            $notificationService->error($exception->getMessage());
-            return $this->urlService->redirectTo(pluginApp(ShopUrls::class)->checkout);
         }
+
+        $request = pluginApp(Request::class);
+        $redirectParam = $request->get('redirectParam', '');
+        $urlParams = [];
+        $url = "execute-payment/" . $orderData->order->id;
+        $url .= UrlQuery::shouldAppendTrailingSlash() ? '/' : '';
+
+        if (strlen($redirectParam))
+        {
+            $urlParams['redirectParam'] = $redirectParam;
+        }
+
+        if ($sessionStorageService->getSessionValue(SessionStorageKeys::READONLY_CHECKOUT) === true)
+        {
+            $urlParams['readonlyCheckout'] = true;
+        }
+
+        if (count($urlParams))
+        {
+            $paramString = http_build_query($urlParams);
+            if (strlen($paramString))
+            {
+                $url .= '?'.$paramString;
+            }
+        }
+
+        return $this->urlService->redirectTo($url);
     }
 
-    public function executePayment( OrderService $orderService, NotificationService $notificationService, Response $response, int $orderId, int $paymentId = -1 )
+    public function executePayment( OrderService $orderService, NotificationService $notificationService, ShopUrls $shopUrls, int $orderId, int $paymentId = -1 )
     {
         $this->getLogger(__CLASS__)->debug(
             "IO::Debug.PlaceOrderController_executePayment",
@@ -147,7 +133,7 @@ class PlaceOrderController extends LayoutController
                 ]
             );
             $notificationService->error("Order (". $orderId .") not found!");
-            return $this->urlService->redirectTo(pluginApp(ShopUrls::class)->checkout);
+            return $this->urlService->redirectTo($shopUrls->checkout);
         }
 
         if( $paymentId < 0 )
@@ -206,6 +192,46 @@ class PlaceOrderController extends LayoutController
             );
             return $this->urlService->redirectTo($redirectParam);
         }
-        return $this->urlService->redirectTo(pluginApp(ShopUrls::class)->confirmation);
+        return $this->urlService->redirectTo($shopUrls->confirmation);
+    }
+
+
+
+    private function handlePlaceOrderException(\Exception $exception)
+    {
+        /**
+         * @var NotificationService $notificationService
+         */
+        $notificationService = pluginApp(NotificationService::class);
+        /**
+         * @var ShopUrls $shopUrls
+         */
+        $shopUrls = pluginApp(ShopUrls::class);
+
+        if ($exception instanceof BasketItemCheckException)
+        {
+            if ($exception->getCode() == BasketItemCheckException::NOT_ENOUGH_STOCK_FOR_ITEM)
+            {
+                $notificationService->warn('not enough stock for item', 9);
+            }
+            elseif ($exception->getCode() == BasketItemCheckException::COUPON_REQUIRED)
+            {
+                $notificationService->error('promotion coupon required', 501);
+            }
+
+        }
+        elseif ($exception->getCode() === 15)
+        {
+            // No baskets items found because basket has already been cleared after previous try of placing an order.
+            // Order should already been created => redirect to confirmation page
+            return $this->urlService->redirectTo($shopUrls->confirmation);
+        }
+        else
+        {
+            // TODO get better error text
+            $notificationService->error($exception->getMessage());
+        }
+
+        return $this->urlService->redirectTo($shopUrls->checkout);
     }
 }

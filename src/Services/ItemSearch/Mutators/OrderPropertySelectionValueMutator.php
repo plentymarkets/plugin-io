@@ -2,7 +2,7 @@
 
 namespace IO\Services\ItemSearch\Mutators;
 
-use IO\Services\SessionStorageService;
+use IO\Helper\Utils;
 use Plenty\Modules\Authorization\Services\AuthHelper;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Source\Mutator\BaseMutator;
 use Plenty\Modules\Item\Property\Contracts\PropertySelectionRepositoryContract;
@@ -11,7 +11,7 @@ class OrderPropertySelectionValueMutator extends BaseMutator
 {
     public function mutate(array $data)
     {
-        $lang = pluginApp(SessionStorageService::class)->getLang();
+        $lang = Utils::getLang();
         
         /** @var PropertySelectionRepositoryContract $propertySelectionRepo */
         $propertySelectionRepo = pluginApp(PropertySelectionRepositoryContract::class);

@@ -9,7 +9,7 @@ class LanguageMap
     private static $locales = array(
         'de' => 'de_DE',
         'en' => 'en_GB',
-        'bg' => 'bg_BG',
+        'bg' => 'de_DE',
         'fr' => 'fr_FR',
         'it' => 'it_IT',
         'es' => 'es_ES',
@@ -52,7 +52,7 @@ class LanguageMap
 
     public static function getLocale(): string
     {
-        $lang = pluginApp(SessionStorageService::class)->getLang();
+        $lang = Utils::getLang();
         if ( array_key_exists( $lang, LanguageMap::$locales ) )
         {
             return LanguageMap::$locales[$lang];
@@ -65,7 +65,7 @@ class LanguageMap
     {
         if ( is_null( $countryCode ) )
         {
-            $countryCode = pluginApp(SessionStorageService::class)->getLang();
+            $countryCode = Utils::getLang();
         }
 
         return LanguageMap::$languages[$countryCode];
@@ -75,7 +75,7 @@ class LanguageMap
     {
         if ( is_null( $language ) )
         {
-            return pluginApp(SessionStorageService::class)->getLang();
+            return Utils::getLang();
         }
 
         foreach( LanguageMap::$languages as $countryCode => $languageCode )
@@ -86,6 +86,6 @@ class LanguageMap
             }
         }
 
-        return pluginApp(SessionStorageService::class)->getLang();
+        return Utils::getLang();
     }
 }

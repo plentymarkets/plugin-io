@@ -3,26 +3,15 @@
 namespace IO\Extensions\Functions;
 
 use IO\Extensions\AbstractFunction;
+use IO\Helper\EventDispatcher;
 use IO\Helper\ResourceContainer;
-use Plenty\Plugin\Events\Dispatcher;
 
 class AdditionalResources extends AbstractFunction
 {
     /**
-     * @var Dispatcher
-     */
-    private $event;
-
-    /**
      * @var ResourceContainer
      */
     private $resourceContainer = null;
-
-    public function __construct(Dispatcher $event)
-    {
-        parent::__construct();
-        $this->event = $event;
-    }
 
     public function getFunctions(): array
     {
@@ -38,7 +27,7 @@ class AdditionalResources extends AbstractFunction
         if ( $this->resourceContainer === null )
         {
             $this->resourceContainer = pluginApp(ResourceContainer::class);
-            $this->event->fire('IO.Resources.Import', [
+            EventDispatcher::fire('Resources.Import', [
                 $this->resourceContainer
             ]);
         }
@@ -52,7 +41,7 @@ class AdditionalResources extends AbstractFunction
         if ( $this->resourceContainer === null )
         {
             $this->resourceContainer = pluginApp(ResourceContainer::class);
-            $this->event->fire('IO.Resources.Import', [
+            EventDispatcher::fire('Resources.Import', [
                 $this->resourceContainer
             ]);
         }

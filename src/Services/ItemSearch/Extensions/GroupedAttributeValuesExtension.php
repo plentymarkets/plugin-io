@@ -3,8 +3,7 @@
 namespace IO\Services\ItemSearch\Extensions;
 
 use IO\Contracts\VariationSearchFactoryContract as VariationSearchFactory;
-use IO\Services\SessionStorageService;
-use IO\Services\TemplateConfigService;
+use IO\Helper\Utils;
 
 class GroupedAttributeValuesExtension implements ItemSearchExtension
 {
@@ -31,8 +30,7 @@ class GroupedAttributeValuesExtension implements ItemSearchExtension
      */
     public function transformResult($baseResult, $extensionResult)
     {
-        $lang = pluginApp(SessionStorageService::class)->getLang();
-        $variationShowType = pluginApp(TemplateConfigService::class)->get('item.variation_show_type');
+        $lang = Utils::getLang();
 
         foreach( $baseResult["documents"] as $i => $document )
         {
@@ -42,7 +40,7 @@ class GroupedAttributeValuesExtension implements ItemSearchExtension
             {
                 foreach( $attributes as $attribute )
                 {
-                    if ( $attribute["attribute"]["isGroupable"] || $variationShowType !== 'combined' )
+                    if ( $attribute["attribute"]["isGroupable"] )
                     {
                         $name = "";
                         foreach( $attribute["attribute"]["names"] as $attrName )

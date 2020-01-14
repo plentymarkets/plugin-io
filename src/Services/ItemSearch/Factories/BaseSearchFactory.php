@@ -3,14 +3,12 @@
 namespace IO\Services\ItemSearch\Factories;
 
 use IO\Contracts\VariationSearchFactoryContract;
+use IO\Helper\Utils;
 use IO\Services\ItemSearch\Extensions\ItemSearchExtension;
 use IO\Services\ItemSearch\Extensions\SortExtension;
 use IO\Services\ItemSearch\Helper\LoadResultFields;
-use IO\Services\SessionStorageService;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Collapse\BaseCollapse;
-use Plenty\Modules\Cloud\ElasticSearch\Lib\Collapse\CollapseInterface;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Collapse\InnerHit\BaseInnerHit;
-use Plenty\Modules\Cloud\ElasticSearch\Lib\ElasticSearch;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Processor\DocumentInnerHitsToRootProcessor;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Processor\DocumentProcessor;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Query\Type\ScoreModifier\RandomScore;
@@ -20,13 +18,11 @@ use Plenty\Modules\Cloud\ElasticSearch\Lib\Search\Document\DocumentSearch;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Sorting\MultipleSorting;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Sorting\SingleSorting;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Source\IncludeSource;
-use Plenty\Modules\Cloud\ElasticSearch\Lib\Source\IndependentSource;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Source\Mutator\MutatorInterface;
 use Plenty\Modules\Item\Search\Aggregations\ItemAttributeValueCardinalityAggregation;
 use Plenty\Modules\Item\Search\Aggregations\ItemAttributeValueCardinalityAggregationProcessor;
 use Plenty\Modules\Item\Search\Filter\SearchFilter;
 use Plenty\Modules\Item\Search\Sort\NameSorting;
-use Plenty\Plugin\Application;
 use Plenty\Plugin\Log\Loggable;
 
 /**
@@ -59,8 +55,8 @@ class BaseSearchFactory
     /** @var ItemSearchExtension[] */
     private $extensions = [];
 
-    /** @var CollapseInterface */
-    private $collapse = null;
+    /** @var string */
+    private $collapseField = null;
 
     /** @var MultipleSorting */
     private $sorting = null;
@@ -88,10 +84,15 @@ class BaseSearchFactory
         /** @var BaseSearchFactory $newBuilder */
         $newBuilder = pluginApp( self::class );
 
-        if ( $inheritedProperties === null || in_array(VariationSearchFactoryContract::INHERIT_COLLAPSE, $inheritedProperties ) )
+        /*if ( $inheritedProperties === null || in_array(VariationSearchFactoryContract::INHERIT_COLLAPSE, $inheritedProperties ) )
         {
             $newBuilder->collapse = $this->collapse;
         }
+
+        if ( $inheritedProperties === null || in_array(VariationSearchFactoryContract::INHERIT_COLLAPSE, $inheritedProperties ) && !is_null($newBuilder->collapseField))
+        {
+            $newBuilder->groupBy($newBuilder->collapseField);
+        }*/
 
         if ( $inheritedProperties === null || in_array(VariationSearchFactoryContract::INHERIT_EXTENSIONS, $inheritedProperties ) )
         {
@@ -291,7 +292,7 @@ class BaseSearchFactory
                 NameSorting::class,
                 [
                     str_replace('texts.', '', $field ),
-                    pluginApp(SessionStorageService::class)->getLang(),
+                    Utils::getLang(),
                     $order
                 ]
             );
@@ -302,7 +303,7 @@ class BaseSearchFactory
             {
                 $field = sprintf(
                     'sorting.priceByClientDynamic.%d.%s',
-                    pluginApp(Application::class)->getPlentyId(),
+                    Utils::getPlentyId(),
                     substr($field, strlen('sorting.price.'))
                 );
             }
@@ -352,14 +353,7 @@ class BaseSearchFactory
      */
     public function groupBy( $field )
     {
-        /** @var BaseCollapse $collapse */
-        $collapse = pluginApp( BaseCollapse::class, [$field] );
-        $this->collapse = $collapse;
-
-        $counterAggregationProcessor = pluginApp( ItemAttributeValueCardinalityAggregationProcessor::class );
-        $counterAggregation = pluginApp( ItemAttributeValueCardinalityAggregation::class, [$counterAggregationProcessor, $field] );
-        $this->withAggregation( $counterAggregation );
-
+        $this->collapseField = $field;
         return $this;
     }
 
@@ -370,7 +364,20 @@ class BaseSearchFactory
      */
     public function build()
     {
-        $search = $this->prepareSearch();
+        // ADD RESULT FIELDS
+        /** @var IncludeSource $source */
+        $source = pluginApp( IncludeSource::class );
+        $resultFields = $this->resultFields;
+        if ( count( $resultFields ) )
+        {
+            $source->activateList( $resultFields );
+        }
+        else
+        {
+            $source->activateAll();
+        }
+
+        $search = $this->prepareSearch($source);
 
         // ADD FILTERS
         $filterClasses = [];
@@ -401,19 +408,6 @@ class BaseSearchFactory
         {
             $aggregationClasses[] = get_class($aggregation);
             $search->addAggregation( $aggregation );
-        }
-
-        // ADD RESULT FIELDS
-        /** @var IncludeSource $source */
-        $source = pluginApp( IncludeSource::class );
-        $resultFields = $this->resultFields;
-        if ( count( $resultFields ) )
-        {
-            $source->activateList( $resultFields );
-        }
-        else
-        {
-            $source->activateAll();
         }
 
         if ( $this->sorting !== null )
@@ -449,29 +443,33 @@ class BaseSearchFactory
     /**
      * Build the search instance itself. May be overridden by concrete factories.
      *
+     * @param IncludeSource $source
      * @return DocumentSearch
      */
-    protected function prepareSearch()
+    protected function prepareSearch($source)
     {
-        if($this->collapse instanceof BaseCollapse)
+        $collapse = null;
+        if(!is_null($this->collapseField))
         {
-            /** @var IndependentSource $source */
-            $source = pluginApp(IndependentSource::class);
-            //$source->activate('variation.id', 'item.id');
-            $source->activate();
-    
+            /** @var BaseCollapse $collapse */
+            $collapse = pluginApp( BaseCollapse::class, [$this->collapseField] );
+
+            $counterAggregationProcessor = pluginApp( ItemAttributeValueCardinalityAggregationProcessor::class );
+            $counterAggregation = pluginApp( ItemAttributeValueCardinalityAggregation::class, [$counterAggregationProcessor, $this->collapseField] );
+            $this->withAggregation( $counterAggregation );
+            
             /** @var BaseInnerHit $innerHit */
             $innerHit = pluginApp(BaseInnerHit::class, ['cheapest']);
             $innerHit->setSorting(pluginApp(SingleSorting::class, ['sorting.price.avg', 'asc']));
             $innerHit->setSource($source);
-            $this->collapse->addInnerHit($innerHit);
+            $collapse->addInnerHit($innerHit);
     
             /** @var DocumentInnerHitsToRootProcessor $docProcessor */
             $processor = pluginApp(DocumentInnerHitsToRootProcessor::class, [$innerHit->getName()]);
             $search = pluginApp(DocumentSearch::class, [$processor]);
     
             // Group By Item Id
-            $search->setCollapse($this->collapse);
+            $search->setCollapse($collapse);
         }
         else
         {
@@ -492,7 +490,7 @@ class BaseSearchFactory
         $this->getLogger(__CLASS__)->debug(
             "IO::Debug.BaseSearchFactory_prepareSearch",
             [
-                "hasCollapse"   => $this->collapse instanceof BaseCollapse,
+                "hasCollapse"   => $collapse instanceof BaseCollapse,
                 "mutators"      => $mutatorClasses
             ]
         );

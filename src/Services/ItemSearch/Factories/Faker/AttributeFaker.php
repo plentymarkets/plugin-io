@@ -43,11 +43,9 @@ class AttributeFaker extends AbstractFaker
             "isGroupable"                   => $this->boolean(),
             "updatedAt"                     => $this->dateString("Y-m-d"),
             "names"                         => [
-                [
-                    "attributeId"   => $attributeId,
-                    "lang"          => $this->lang,
-                    "name"          => $attributeName
-                ]
+                "attributeId"   => $attributeId,
+                "lang"          => $this->lang,
+                "name"          => $attributeName
             ]
         ];
     }
@@ -70,11 +68,9 @@ class AttributeFaker extends AbstractFaker
             "percentageDistribution"=> $this->percentage(),
             "updatedAt"             => $this->dateString("Y-m-d"),
             "names"                 => [
-                [
-                    "lang"      => $this->lang,
-                    "valueId"   => $valueId,
-                    "name"      => $valueName
-                ]
+                "lang"      => $this->lang,
+                "valueId"   => $valueId,
+                "name"      => $valueName
             ]
         ];
     }

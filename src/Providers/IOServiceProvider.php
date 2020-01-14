@@ -17,7 +17,17 @@ use IO\Extensions\TwigIOExtension;
 use IO\Extensions\TwigServiceProvider;
 use IO\Extensions\TwigTemplateContextExtension;
 use IO\Jobs\CleanupUserDataHashes;
-use IO\Middlewares\Middleware;
+use IO\Middlewares\AuthenticateWithToken;
+use IO\Middlewares\CheckNotFound;
+use IO\Middlewares\ClearNotifications;
+use IO\Middlewares\DetectCurrency;
+use IO\Middlewares\DetectLanguage;
+use IO\Middlewares\DetectLegacySearch;
+use IO\Middlewares\DetectReadonlyCheckout;
+use IO\Middlewares\DetectReferrer;
+use IO\Middlewares\DetectShippingCountry;
+use IO\Middlewares\HandleNewsletter;
+use IO\Middlewares\HandleOrderPreviewUrl;
 use IO\Services\AuthenticationService;
 use IO\Services\AvailabilityService;
 use IO\Services\BasketService;
@@ -28,6 +38,8 @@ use IO\Services\ContactMailService;
 use IO\Services\CountryService;
 use IO\Services\CouponService;
 use IO\Services\CustomerService;
+use IO\Services\FacetService;
+use IO\Services\FakerService;
 use IO\Services\ItemCrossSellingService;
 use IO\Services\ItemLastSeenService;
 use IO\Services\ItemSearch\Factories\FacetSearchFactory;
@@ -44,6 +56,7 @@ use IO\Services\NotificationService;
 use IO\Services\OrderService;
 use IO\Services\OrderTotalsService;
 use IO\Services\PriceDetectService;
+use IO\Services\PropertyFileService;
 use IO\Services\SalesPriceService;
 use IO\Services\SessionStorageService;
 use IO\Services\ShippingService;
@@ -65,7 +78,9 @@ use Plenty\Modules\Frontend\Events\FrontendCurrencyChanged;
 use Plenty\Modules\Frontend\Events\FrontendLanguageChanged;
 use Plenty\Modules\Frontend\Events\FrontendShippingProfileChanged;
 use Plenty\Modules\Frontend\Events\FrontendUpdateDeliveryAddress;
+use Plenty\Modules\Frontend\Session\Events\AfterSessionCreate;
 use Plenty\Modules\Frontend\Session\Storage\Contracts\FrontendSessionStorageFactoryContract;
+use Plenty\Modules\Item\ItemCoupon\Hooks\CheckItemRestriction;
 use Plenty\Modules\Item\Stock\Hooks\CheckItemStock;
 use Plenty\Modules\Payment\Events\Checkout\ExecutePayment;
 use Plenty\Modules\Plugin\Events\AfterBuildPlugins;
@@ -87,7 +102,19 @@ class IOServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->addGlobalMiddleware(Middleware::class);
+        $this->registerMiddlewares([
+            AuthenticateWithToken::class,
+            CheckNotFound::class,
+            DetectCurrency::class,
+            DetectLanguage::class,
+            DetectLegacySearch::class,
+            DetectReadonlyCheckout::class,
+            DetectReferrer::class,
+            DetectShippingCountry::class,
+            HandleNewsletter::class,
+            HandleOrderPreviewUrl::class,
+            ClearNotifications::class
+        ]);
         $this->getApplication()->register(IORouteServiceProvider::class);
 
         $this->getApplication()->singleton('IO\Helper\TemplateContainer');
@@ -109,6 +136,7 @@ class IOServiceProvider extends ServiceProvider
             CountryService::class,
             CouponService::class,
             CustomerService::class,
+            FacetService::class,
             ItemCrossSellingService::class,
             ItemLastSeenService::class,
             ItemService::class,
@@ -127,7 +155,9 @@ class IOServiceProvider extends ServiceProvider
             UnitService::class,
             UrlService::class,
             WebstoreConfigurationService::class,
-            LiveShoppingService::class
+            LiveShoppingService::class,
+            FakerService::class,
+            PropertyFileService::class
         ]);
 
         $this->getApplication()->singleton(FacetExtensionContainer::class);
@@ -151,30 +181,47 @@ class IOServiceProvider extends ServiceProvider
             /** @var CustomerService $customerService */
             $customerService = pluginApp(CustomerService::class);
             $customerService->resetGuestAddresses();
+
+              /** @var CheckoutService $checkoutService */
+            $checkoutService = pluginApp(CheckoutService::class);
+            //validate methodOfPayment
+            $methodOfPaymentId = $checkoutService->getMethodOfPaymentId();
         });
-    
+
         $dispatcher->listen(BeforeBasketItemToOrderItem::class, CheckItemStock::class);
-        
+        $dispatcher->listen(BeforeBasketItemToOrderItem::class, CheckItemRestriction::class);
+
         $dispatcher->listen(AfterAccountContactLogout::class, function($event)
         {
             /** @var CheckoutService $checkoutService */
             $checkoutService = pluginApp(CheckoutService::class);
             $checkoutService->setDefaultShippingCountryId();
+              //validate methodOfPayment
+            $methodOfPaymentId = $checkoutService->getMethodOfPaymentId();
         });
-    
+
+        $dispatcher->listen(AfterSessionCreate::class, function($event)
+        {
+            /** @var CheckoutService $checkoutService */
+            $checkoutService = pluginApp(CheckoutService::class);
+            //validate methodOfPayment
+            $methodOfPaymentId = $checkoutService->getMethodOfPaymentId();
+        });
+
+
         $dispatcher->listen(AfterBasketChanged::class, function($event)
         {
             /** @var CheckoutService $checkoutService */
             $checkoutService = pluginApp(CheckoutService::class);
             $checkoutService->setReadOnlyCheckout(false);
         });
-    
+
         $dispatcher->listen(ExecutePayment::class, function($event)
         {
             /** @var CustomerService $customerService */
             $customerService = pluginApp(CustomerService::class);
             $customerService->resetGuestAddresses();
-        
+
             /** @var BasketService $basketService */
             $basketService = pluginApp(BasketService::class);
             $basketService->resetBasket();
@@ -192,12 +239,12 @@ class IOServiceProvider extends ServiceProvider
             $sessionStorage = pluginApp( FrontendSessionStorageFactoryContract::class );
             $sessionStorage->getPlugin()->setValue(SessionStorageKeys::CURRENCY, $event->getCurrency());
         });
-        
+
         $dispatcher->listen(FrontendLanguageChanged::class, function($event) {
             /** @var BasketService $basketService */
             $basketService = pluginApp(BasketService::class);
             $basketService->checkBasketItemsLang();
-            Middleware::$DETECTED_LANGUAGE = $event->getLanguage();
+            DetectLanguage::$DETECTED_LANGUAGE = $event->getLanguage();
         });
 
         $dispatcher->listen(FrontendShippingProfileChanged::class, IOFrontendShippingProfileChanged::class);
@@ -213,7 +260,7 @@ class IOServiceProvider extends ServiceProvider
             $this->getApplication()->singleton( $class );
         }
     }
-    
+
     private function bindItemSearchClasses()
     {
         /** @var ConfigRepository $config */
@@ -233,6 +280,13 @@ class IOServiceProvider extends ServiceProvider
             $this->getApplication()->bind(MultiSearchFactoryContract::class, MultiSearchFactory::class);
             $this->getApplication()->bind(FacetSearchFactoryContract::class, FacetSearchFactory::class);
             $this->getApplication()->bind(SortingContract::class, SortingHelper::class);
+        }
+    }
+
+    private function registerMiddlewares($middlewares)
+    {
+        foreach($middlewares as $middleware) {
+            $this->addGlobalMiddleware($middleware);
         }
     }
 }

@@ -7,6 +7,7 @@ use IO\Api\ApiResponse;
 use IO\Api\ResponseCode;
 use IO\DBModels\UserDataHash;
 use IO\Extensions\Mail\SendMail;
+use IO\Helper\Utils;
 use IO\Services\UserDataHashService;
 use Plenty\Modules\Account\Contact\Contracts\ContactRepositoryContract;
 use Plenty\Modules\Account\Contact\Models\Contact;
@@ -70,7 +71,7 @@ class CustomerPasswordResetResource extends ApiResource
             $hashService = pluginApp(UserDataHashService::class);
             $hashService->create(['mail' => $email], UserDataHash::TYPE_RESET_PASSWORD, null, $contact->id);
 
-            $params = ['contactId' => $contact->id, 'clientId' => pluginApp(Application::class)->getWebstoreId()];
+            $params = ['contactId' => $contact->id];
             $this->sendMail(AutomaticEmailTemplate::CONTACT_NEW_PASSWORD, AutomaticEmailContact::class, $params);
 
             return $this->response->create(true, ResponseCode::OK);

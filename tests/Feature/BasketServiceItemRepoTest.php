@@ -88,14 +88,11 @@ class BasketServiceItemRepoTest extends TestCase
     /** @test */
     public function it_adds_an_item_to_the_basket()
     {
-
-
         $item1 = ['variationId' => $this->variation['id'], 'quantity' => 1, 'template' => '', 'basketItemOrderParams' => [] ];
 
+        $this->basketService->addBasketItem($item1);
 
-        $result = $this->basketService->addBasketItem($item1);
-
-
+        $result = $this->basketService->getBasketItemsForTemplate('', false);
         $this->assertEquals($this->variation['id'], $result[0]['variationId']);
         $this->assertEquals(1, $result[0]['quantity']);
         $this->assertCount(1, $result);
@@ -107,8 +104,9 @@ class BasketServiceItemRepoTest extends TestCase
         $item1 = ['variationId' => $this->variation['id'], 'quantity' => 1, 'template' => ''];
 
         $this->basketService->addBasketItem($item1);
-        $result = $this->basketService->addBasketItem($item1);
+        $this->basketService->addBasketItem($item1);
 
+        $result = $this->basketService->getBasketItemsForTemplate('', false);
         $this->assertEquals($this->variation['id'], $result[0]['variationId']);
         $this->assertEquals(2, $result[0]['quantity']);
         $this->assertCount(1, $result);
@@ -119,8 +117,10 @@ class BasketServiceItemRepoTest extends TestCase
     {
         $item1 = ['variationId' => $this->variation['id'], 'quantity' => 1, 'template' => ''];
 
-        $basketItems = $this->basketService->addBasketItem($item1);
-        $result = $this->basketService->deleteBasketItem($basketItems[0]['id']);
+        $this->basketService->addBasketItem($item1);
+        $basketItems = $this->basketService->getBasketItemsForTemplate('', false);
+        $this->basketService->deleteBasketItem($basketItems[0]['id']);
+        $result = $this->basketService->getBasketItemsForTemplate('', false);
 
         $this->assertEmpty($result);
     }

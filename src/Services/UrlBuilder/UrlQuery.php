@@ -2,7 +2,7 @@
 
 namespace IO\Services\UrlBuilder;
 
-use IO\Services\SessionStorageService;
+use IO\Helper\Utils;
 use IO\Services\WebstoreConfigurationService;
 use Plenty\Plugin\ConfigRepository;
 
@@ -21,7 +21,9 @@ class UrlQuery
 
     public function __construct( $path = null, $lang = null )
     {
-        $this->domain = pluginApp(WebstoreConfigurationService::class )->getWebstoreConfig()->domainSsl;
+        /** @var WebstoreConfigurationService $webstoreConfigService */
+        $webstoreConfigService = pluginApp(WebstoreConfigurationService::class);
+        $this->domain = $webstoreConfigService->getWebstoreConfig()->domainSsl;
         $this->path = $path;
 
         if ( $path !== null )
@@ -38,7 +40,7 @@ class UrlQuery
 
         if ( $lang === null )
         {
-            $this->lang = pluginApp( SessionStorageService::class )->getLang();
+            $this->lang = Utils::getLang();
         }
         else
         {
@@ -84,19 +86,35 @@ class UrlQuery
         {
             return null;
         }
+    
+        $splittedPath  = explode('?', $this->path);
+        $path = $splittedPath[0];
+    
+        $queryParams = '';
+        if (isset($splittedPath[1]))
+        {
+            $queryParams = $splittedPath[1];
+        }
+        
+        if (isset($path[strlen($path)-1]) && $path[strlen($path)-1] == '/')
+        {
+            $path = substr($path, 0, -1);
+        }
+
+        $queryParams = strlen($queryParams) ? "?" . $queryParams : "";
 
         $trailingSlash = self::shouldAppendTrailingSlash() ? "/" : "";
 
-        if ( $includeLanguage && strpos($this->path, '/'.$this->lang) !== 0)
+        if ( $includeLanguage && strpos($path, '/'.$this->lang) !== 0)
         {
-            return '/' . $this->lang . $this->path . $trailingSlash;
+            return '/' . $this->lang . $path . $trailingSlash . $queryParams;
         }
-        elseif(strlen($this->path) == 0)
+        elseif (strlen($path) == 0)
         {
             return '/';
         }
 
-        return $this->path . $trailingSlash;
+        return $path . $trailingSlash . $queryParams;
     }
 
     public function getPath( bool $includeLanguage = false )
@@ -107,5 +125,10 @@ class UrlQuery
         }
 
         return substr( $this->toRelativeUrl( $includeLanguage ), 1 );
+    }
+
+    public function equals( $path )
+    {
+        return $this->path === $path || $this->path === $path."/";
     }
 }

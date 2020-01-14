@@ -53,7 +53,7 @@ class VariationPriceList
 
     /** @var UnitService $unitService */
     private $unitService;
-    
+
     /** @var LiveShoppingRepositoryContract $liveShoppingRepo */
     private $liveShoppingRepo;
 
@@ -62,12 +62,16 @@ class VariationPriceList
     /** @var SalesPriceSearchResponse */
     private $defaultPrice;
 
-    public function __construct( NumberFormatFilter $numberFormatFilter, UnitService $unitService, LiveShoppingRepositoryContract $liveShoppingRepo )
+    public function __construct(
+        NumberFormatFilter $numberFormatFilter,
+        UnitService $unitService,
+        LiveShoppingRepositoryContract $liveShoppingRepo,
+        CustomerService $customerService )
     {
-        $this->numberFormatFilter = $numberFormatFilter;
-        $this->unitService = $unitService;
-        $this->showNetPrice = pluginApp( CustomerService::class )->showNetPrices();
-        $this->liveShoppingRepo = $liveShoppingRepo;
+        $this->numberFormatFilter   = $numberFormatFilter;
+        $this->unitService          = $unitService;
+        $this->showNetPrice         = $customerService->showNetPrices();
+        $this->liveShoppingRepo     = $liveShoppingRepo;
     }
 
     public static function create( int $variationId, int $itemId, $minimumOrderQuantity = 0, $maximumOrderQuantity = null, $lot = 0, $unit = null )
@@ -140,15 +144,15 @@ class VariationPriceList
 
         if ( $this->lot > 0 && strlen($this->unit) > 0 )
         {
-            if(isset(self::$basePrices[$this->lot][$unitPrice][$this->unit]))
+            if(isset(self::$basePrices[(string)$this->lot][(string)$unitPrice][$this->unit]))
             {
-                $basePrice = self::$basePrices[$this->lot][$unitPrice][$this->unit];
+                $basePrice = self::$basePrices[(string)$this->lot][(string)$unitPrice][$this->unit];
             }
             else
             {
                 $basePrice = [];
                 list( $basePrice['lot'], $basePrice['price'], $basePrice['unitKey'] ) = $basePriceService->getUnitPrice($this->lot, $unitPrice, $this->unit);
-                self::$basePrices[$this->lot][$unitPrice][$this->unit] = $basePrice;
+                self::$basePrices[(string)$this->lot][(string)$unitPrice][$this->unit] = $basePrice;
             }
 
             $unitName = $this->unitService->getUnitNameByKey( $basePrice['unitKey'], $lang );
@@ -168,12 +172,12 @@ class VariationPriceList
 
         $defaultPrice   = $this->findPriceForQuantity( $quantity );
         $rrp            = $this->findPriceForQuantity( $quantity, self::TYPE_RRP );
-    
+
         if($this->liveShoppingRepo->itemHasActiveLiveShopping($this->itemId))
         {
             $specialOffer   = $this->findPriceForQuantity( $quantity, self::TYPE_SPECIAL_OFFER );
         }
-        
+
         return [
             'default'           => $this->preparePrice( $defaultPrice, $this->showNetPrice ),
             'rrp'               => $this->preparePrice( $rrp, $this->showNetPrice ),
@@ -192,7 +196,7 @@ class VariationPriceList
         $defaultPrice   = $this->findPriceForQuantity( $quantity );
         $rrp            = $this->findPriceForQuantity( $quantity, self::TYPE_RRP );
         $graduatedPrices= [];
-        
+
         $specialOffer = null;
         if($this->liveShoppingRepo->itemHasActiveLiveShopping($this->itemId))
         {
@@ -318,6 +322,7 @@ class VariationPriceList
     private function getSearchRequest( int $variationId, string $type = self::TYPE_DEFAULT, float $quantity = 0 )
     {
         /** @var SalesPriceSearchRequest $salesPriceSearchRequest */
+
         $salesPriceSearchRequest = $this->fromMemoryCache(
             "salesPriceRequest",
             function()
@@ -336,12 +341,6 @@ class VariationPriceList
                 }
                 $salesPriceSearchRequest->customerClassId = $customerService->getContactClassId();
 
-                /** @var CheckoutService $checkoutService */
-                $checkoutService = pluginApp( CheckoutService::class );
-
-                $salesPriceSearchRequest->countryId = $checkoutService->getShippingCountryId();
-                $salesPriceSearchRequest->currency  = $checkoutService->getCurrency();
-
                 /** @var BasketService $basketService */
                 $basketService = pluginApp( BasketService::class );
                 $salesPriceSearchRequest->referrerId = $basketService->getBasket()->referrerId;
@@ -354,9 +353,15 @@ class VariationPriceList
             }
         );
 
+         /** @var CheckoutService $checkoutService */
+        $checkoutService = pluginApp( CheckoutService::class );
+
+        $salesPriceSearchRequest->countryId = $checkoutService->getShippingCountryId();
+        $salesPriceSearchRequest->currency  = $checkoutService->getCurrency();
         $salesPriceSearchRequest->variationId = $variationId;
         $salesPriceSearchRequest->quantity    = $quantity;
         $salesPriceSearchRequest->type        = $type;
+
         return $salesPriceSearchRequest;
     }
 
@@ -378,9 +383,9 @@ class VariationPriceList
                 'formatted' => $this->numberFormatFilter->formatMonetary( $unitPrice, $price->currency )
             ],
             'basePrice'             => $this->getBasePrice( $unitPrice, $price->currency ),
-            'baseLot'               => self::$basePrices[$this->lot][$unitPrice][$this->unit]['lot'],
-            'baseUnit'              => self::$basePrices[$this->lot][$unitPrice][$this->unit]['unitKey'],
-            'baseSinglePrice'       => self::$basePrices[$this->lot][$unitPrice][$this->unit]['price'],
+            'baseLot'               => self::$basePrices[(string)$this->lot][(string)$unitPrice][$this->unit]['lot'],
+            'baseUnit'              => self::$basePrices[(string)$this->lot][(string)$unitPrice][$this->unit]['unitKey'],
+            'baseSinglePrice'       => self::$basePrices[(string)$this->lot][(string)$unitPrice][$this->unit]['price'],
 
             'minimumOrderQuantity'  => (float) $price->minimumOrderQuantity,
             'contactClassDiscount'  => [

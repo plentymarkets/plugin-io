@@ -58,7 +58,7 @@ abstract class AbstractFaker
 
     protected function rand($values)
     {
-        $index = $this->number(0, count($values));
+        $index = $this->number(0, count($values)-1);
         return $values[$index];
     }
 

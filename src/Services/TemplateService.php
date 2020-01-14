@@ -2,6 +2,8 @@
 
 namespace IO\Services;
 
+use IO\Extensions\Constants\ShopUrls;
+use IO\Helper\RouteConfig;
 use Plenty\Plugin\Templates\Twig;
 
 /**
@@ -13,6 +15,8 @@ class TemplateService
     public static $currentTemplate = "";
 
     public static $currentTemplateData = [];
+    
+    public static $shouldBeCached = true;
 
     public $forceNoIndex = false;
 
@@ -25,6 +29,16 @@ class TemplateService
     {
         return $this->forceNoIndex;
     }
+    
+    public function shouldBeCached()
+    {
+        return self::$shouldBeCached;
+    }
+    
+    public function disableCacheForTemplate()
+    {
+        self::$shouldBeCached = false;
+    }
 
     public function getCurrentTemplate():string
     {
@@ -36,57 +50,74 @@ class TemplateService
         self::$currentTemplate = $template;
     }
 
+    /**
+     * @deprecated Use ShopUrls::is() instead
+     * @param $templateToCheck
+     * @return bool
+     */
     public function isCurrentTemplate($templateToCheck):bool
     {
         return TemplateService::$currentTemplate == $templateToCheck;
     }
 
     /**
-     * @deprecated use isCurrentTemplate('tpl.home') instead
+     * @deprecated Use ShopUrls::is(RouteConfig::HOME) instead
      */
     public function isHome():bool
     {
-        return TemplateService::$currentTemplate == "tpl.home" || TemplateService::$currentTemplate == "tpl.home.category";
+        /** @var ShopUrls $shopUrls */
+        $shopUrls = pluginApp(ShopUrls::class);
+        return $shopUrls->is(RouteConfig::HOME);
     }
 
     /**
-     * @deprecated use isCurrentTemplate('tpl.item') instead
+     * @deprecated Use ShopUrls::is(RouteConfig::ITEM) instead
      */
     public function isItem():bool
     {
-        return TemplateService::$currentTemplate == "tpl.item";
+        /** @var ShopUrls $shopUrls */
+        $shopUrls = pluginApp(ShopUrls::class);
+        return $shopUrls->is(RouteConfig::ITEM);
     }
 
     /**
-     * @deprecated use isCurrentTemplate('tpl.my-account') instead
+     * @deprecated Use ShopUrls::is(RouteConfig::MY_ACCOUNT) instead
      */
     public function isMyAccount():bool
     {
-        return TemplateService::$currentTemplate == "tpl.my-account";
+        /** @var ShopUrls $shopUrls */
+        $shopUrls = pluginApp(ShopUrls::class);
+        return $shopUrls->is(RouteConfig::MY_ACCOUNT);
     }
 
     /**
-     * @deprecated use isCurrentTemplate('tpl.checkout') instead
+     * @deprecated Use ShopUrls::is(RouteConfig::CHECKOUT) instead
      */
     public function isCheckout():bool
     {
-        return TemplateService::$currentTemplate == "tpl.checkout";
+        /** @var ShopUrls $shopUrls */
+        $shopUrls = pluginApp(ShopUrls::class);
+        return $shopUrls->is(RouteConfig::CHECKOUT);
     }
 
     /**
-     * @deprecated use isCurrentTemplate('tpl.search') instead
+     * @deprecated Use ShopUrls::is(RouteConfig::SEARCH) instead
      */
     public function isSearch():bool
     {
-        return TemplateService::$currentTemplate == "tpl.search";
+        /** @var ShopUrls $shopUrls */
+        $shopUrls = pluginApp(ShopUrls::class);
+        return $shopUrls->is(RouteConfig::SEARCH);
     }
 
     /**
-     * @deprecated use isCurrentTemplate('tpl.category.item') instead
+     * @deprecated Use ShopUrls::is(RouteConfig::CATEGORY) instead
      */
     public function isCategory():bool
     {
-        return TemplateService::$currentTemplate == "tpl.category.item" || TemplateService::$currentTemplate == "tpl.category.content";
+        /** @var ShopUrls $shopUrls */
+        $shopUrls = pluginApp(ShopUrls::class);
+        return $shopUrls->is(RouteConfig::CATEGORY);
     }
     
     public function renderTemplate($template, $params)

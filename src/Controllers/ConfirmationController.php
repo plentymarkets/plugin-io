@@ -3,17 +3,20 @@
 namespace IO\Controllers;
 
 use IO\Api\ResponseCode;
-use IO\Middlewares\Middleware;
+use IO\Helper\RouteConfig;
+use IO\Middlewares\CheckNotFound;
+use IO\Services\CategoryService;
 use IO\Services\CustomerService;
 use IO\Services\OrderService;
 use IO\Services\SessionStorageService;
 use IO\Constants\SessionStorageKeys;
 use IO\Models\LocalizedOrder;
 use IO\Services\TemplateConfigService;
-use Plenty\Modules\Order\Date\Models\OrderDate;
+use Plenty\Modules\Category\Models\Category;
 use Plenty\Modules\Order\Date\Models\OrderDateType;
 use Plenty\Modules\Order\Models\Order;
 use Plenty\Modules\ShopBuilder\Helper\ShopBuilderRequest;
+use Plenty\Plugin\ConfigRepository;
 use Plenty\Plugin\Http\Response;
 use Plenty\Plugin\Log\Loggable;
 
@@ -29,7 +32,7 @@ class ConfirmationController extends LayoutController
      * Prepare and render the data for the order confirmation
      * @return string
      */
-    public function showConfirmation(int $orderId = 0, $orderAccesskey = '')
+    public function showConfirmation(int $orderId = 0, $orderAccesskey = '', $category = null)
     {
         $order = null;
     
@@ -41,9 +44,27 @@ class ConfirmationController extends LayoutController
         $shopBuilderRequest->setMainContentType('checkout');
     
         /**
+         * @var CustomerService $customerService
+         */
+        $customerService = pluginApp(CustomerService::class);
+    
+        /**
          * @var OrderService $orderService
          */
         $orderService = pluginApp(OrderService::class);
+
+        if($shopBuilderRequest->isShopBuilder() && !is_null($category))
+        {
+            return $this->renderTemplate(
+            "tpl.confirmation",
+            [
+                "category" => $category,
+                "data" => null,
+                "showAdditionalPaymentInformation" => true
+            ],
+            false
+        );
+        }
         
         if(strlen($orderAccesskey) && (int)$orderId > 0)
         {
@@ -81,10 +102,6 @@ class ConfirmationController extends LayoutController
                 }
                 else
                 {
-                    /**
-                     * @var CustomerService $customerService
-                     */
-                    $customerService = pluginApp(CustomerService::class);
                     $order = $customerService->getLatestOrder();
                 }
             }
@@ -133,9 +150,23 @@ class ConfirmationController extends LayoutController
         {
             if($this->checkValidity($order->order))
             {
+                if($category instanceof Category && $customerService->getContactId() <= 0)
+                {
+                    /** @var ConfigRepository $config */
+                    $config = pluginApp(ConfigRepository::class);
+                    $categoryGuestId = (int)$config->get('IO.routing.category_confirmation-guest', 0);
+                    if($categoryGuestId > 0)
+                    {
+                        /** @var CategoryService $categoryService */
+                        $categoryService = pluginApp(CategoryService::class);
+                        $category = $categoryService->get($categoryGuestId);
+                    }
+                }
+                
                 return $this->renderTemplate(
                     "tpl.confirmation",
                     [
+                        "category" => $category,
                         "data" => $order,
                         "showAdditionalPaymentInformation" => true
                     ],
@@ -148,7 +179,7 @@ class ConfirmationController extends LayoutController
                 $response = pluginApp(Response::class);
                 $response->forceStatus(ResponseCode::NOT_FOUND);
     
-                Middleware::$FORCE_404 = true;
+                CheckNotFound::$FORCE_404 = true;
     
                 return $response;
             }
@@ -163,8 +194,8 @@ class ConfirmationController extends LayoutController
             /** @var Response $response */
             $response = pluginApp(Response::class);
             $response->forceStatus(ResponseCode::NOT_FOUND);
-    
-            Middleware::$FORCE_404 = true;
+
+            CheckNotFound::$FORCE_404 = true;
 
             return $response;
         }
@@ -200,5 +231,21 @@ class ConfirmationController extends LayoutController
         }
         
         return true;
+    }
+
+    public function redirect($orderId = 0, $accessKey = '')
+    {
+        $confirmationParams = [];
+
+        if((int)$orderId > 0 && strlen($accessKey))
+        {
+            $confirmationParams['orderId'] = $orderId;
+            $confirmationParams['accessKey'] = $accessKey;
+        }
+
+        /** @var CategoryController $categoryController */
+        $categoryController = pluginApp(CategoryController::class);
+
+        return $categoryController->redirectToCategory(RouteConfig::getCategoryId(RouteConfig::CONFIRMATION), '/confirmation', $confirmationParams);
     }
 }

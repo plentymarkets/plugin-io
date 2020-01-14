@@ -2,6 +2,7 @@
 
 namespace IO\Services;
 
+use IO\Helper\Utils;
 use Plenty\Modules\System\Contracts\WebstoreConfigurationRepositoryContract;
 use Plenty\Modules\System\Models\WebstoreConfiguration;
 use Plenty\Plugin\Application;
@@ -20,10 +21,12 @@ class WebstoreConfigurationService
 
     /**
      * Get the plenty-id
+     * @deprecated since 4.3.0
+     * Use IO\Helper\Utils::getPlentyId() instead
      */
     public function getPlentyId()
     {
-        return pluginApp(Application::class)->getPlentyId();
+        return Utils::getPlentyId();
     }
 
     /**
@@ -51,21 +54,21 @@ class WebstoreConfigurationService
     public function getActiveLanguageList()
 	{
         $activeLanguages = [];
-        
+
         /** @var TemplateConfigService $templateConfigService */
         $templateConfigService = pluginApp(TemplateConfigService::class);
         $languages = $templateConfigService->get('language.active_languages');
-        
+
         if(!is_null($languages) && strlen($languages))
         {
             $activeLanguages = explode(', ', $languages);
         }
 
-        if(!in_array($this->webstoreConfig->defaultLanguage, $activeLanguages))
+        if(!in_array($this->getWebstoreConfig()->defaultLanguage, $activeLanguages))
         {
-            $activeLanguages[] = $this->webstoreConfig->defaultLanguage;
+            $activeLanguages[] = $this->getWebstoreConfig()->defaultLanguage;
         }
-        
+
 		return $activeLanguages;
 	}
 

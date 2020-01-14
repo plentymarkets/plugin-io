@@ -2,10 +2,11 @@
 
 namespace IO\Services\ItemSearch\Factories;
 
+use IO\Helper\Utils;
 use IO\Services\ItemSearch\Extensions\FacetFilterExtension;
-use IO\Services\SessionStorageService;
+use Plenty\Modules\Cloud\ElasticSearch\Lib\Search\Document\DocumentSearch;
+use Plenty\Modules\Cloud\ElasticSearch\Lib\Source\IncludeSource;
 use Plenty\Modules\Item\Search\Helper\SearchHelper;
-use Plenty\Plugin\Application;
 
 /**
  * Class FacetSearchFactory
@@ -27,13 +28,15 @@ class FacetSearchFactory extends VariationSearchFactory
      */
     public function create( $facets )
     {
-        if ( is_string( $facets ) )
+        /** @var FacetSearchFactory $instance */
+        $instance = pluginApp( FacetSearchFactory::class );
+        if ( is_array( $facets ) )
         {
-            $this->facetValues = explode(",", $facets );
+            $instance->facetValues = (array)$facets;
         }
         else
         {
-            $this->facetValues = $facets;
+            $instance->facetValues = explode(",", (string)$facets );
         }
 
         return $this;
@@ -42,12 +45,13 @@ class FacetSearchFactory extends VariationSearchFactory
     /**
      * Build facet search classes
      *
-     * @inheritdoc
+     * @param IncludeSource $source
+     * @return DocumentSearch
      */
-    protected function prepareSearch()
+    protected function prepareSearch($source)
     {
-        $plentyId   = pluginApp( Application::class )->getPlentyId();
-        $lang       = pluginApp( SessionStorageService::class )->getLang();
+        $plentyId   = Utils::getPlentyId();
+        $lang       = Utils::getLang();
 
         /** @var SearchHelper $searchHelper */
         $searchHelper = pluginApp( SearchHelper::class, [$this->facetValues, $plentyId, 'item', $lang]);
