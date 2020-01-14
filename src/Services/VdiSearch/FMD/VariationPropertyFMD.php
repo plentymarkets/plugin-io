@@ -27,7 +27,7 @@ class VariationPropertyFMD extends FieldMapDefinition
     public function getLazyLoadable()
     {
         return [
-            VariationBaseAttribute::PROPERTY
+            VariationBaseAttribute::CHARACTERISTIC
         ];
     }
 
