@@ -7,13 +7,16 @@ use Plenty\Modules\Frontend\Contracts\CurrencyExchangeRepositoryContract;
 
 /**
  * Class CurrencyConverter
+ *
  * @package IO\Helper
+ *
+ * @depreacted since 5.0.0 will be removed in 6.0.0
  */
 class CurrencyConverter
 {
     /** @var CurrencyExchangeRepositoryContract $currencyExchcangeRepo */
     private $currencyExchcangeRepo;
-    
+
     /**
      * CurrencyConverter constructor.
      * @param CurrencyExchangeRepositoryContract $currencyExchangeRepo
@@ -22,7 +25,7 @@ class CurrencyConverter
     {
         $this->currencyExchcangeRepo= $currencyExchangeRepo;
     }
-    
+
     /**
      * @return bool
      * @throws \ErrorException
@@ -31,7 +34,7 @@ class CurrencyConverter
     {
         return $this->getCurrentCurrency() == $this->getDefaultCurrency();
     }
-    
+
     /**
      * @return string
      */
@@ -39,7 +42,7 @@ class CurrencyConverter
     {
         return $this->currencyExchcangeRepo->getDefaultCurrency();
     }
-    
+
     /**
      * @return string
      * @throws \ErrorException
@@ -50,7 +53,7 @@ class CurrencyConverter
         $checkoutService = pluginApp(CheckoutService::class);
         return $checkoutService->getCurrency();
     }
-    
+
     /**
      * @param float $amount
      * @return float
@@ -62,7 +65,7 @@ class CurrencyConverter
         {
             return $this->currencyExchcangeRepo->convertToDefaultCurrency($this->getCurrentCurrency(), $amount);
         }
-        
+
         return $amount;
     }
 }

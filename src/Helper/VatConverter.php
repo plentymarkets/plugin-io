@@ -7,13 +7,16 @@ use Plenty\Modules\Accounting\Vat\Contracts\VatRepositoryContract;
 
 /**
  * Class VatConverter
+ *
  * @package IO\Helper
+ *
+ * @depreacted since 5.0.0 will be removed in 6.0.0
  */
 class VatConverter
 {
     /** @var VatRepositoryContract $vatRepo */
     private $vatRepo;
-    
+
     /**
      * VatConverter constructor.
      * @param VatRepositoryContract $vatRepo
@@ -22,19 +25,19 @@ class VatConverter
     {
         $this->vatRepo = $vatRepo;
     }
-    
+
     /**
      * @return mixed
-     * @throws \ErrorException
      */
     public function getDefaultVat()
     {
         $defaultVat = $this->vatRepo->getStandardVat(Utils::getPlentyId())->vatRates->first();
         return $defaultVat;
     }
-    
+
     /**
      * @param float $amount
+     *
      * @return float|int
      * @throws \ErrorException
      */
@@ -43,12 +46,12 @@ class VatConverter
         /** @var CustomerService $customerService */
         $customerService = pluginApp(CustomerService::class);
         $contactClassData = $customerService->getContactClassData($customerService->getContactClassId());
-        
+
         if(isset($contactClassData['showNetPrice']) && $contactClassData['showNetPrice'])
         {
             return $amount + (($amount * $this->getDefaultVat()->vatRate) / 100);
         }
-        
+
         return $amount;
     }
 }
