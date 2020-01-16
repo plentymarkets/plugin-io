@@ -26,50 +26,50 @@ class ShopUrls
      */
     private $sessionStorageService;
 
-    private $urlMap = [];
+    private $urlMap = [
+        RouteConfig::ORDER_RETURN => 'returns',
+        RouteConfig::ORDER_RETURN_CONFIRMATION => 'return-confirmation',
+        RouteConfig::NEWSLETTER_OPT_OUT => 'newsletter/unsubscribe',
+        RouteConfig::ORDER_DOCUMENT => 'order-document'
+    ];
 
     public $appendTrailingSlash = false;
-    public $trailingSlashSuffix = "";
+    public $trailingSlashSuffix = '';
     public $includeLanguage = false;
 
-    public $basket = "";
-    public $cancellationForm = "";
-    public $cancellationRights = "";
-    public $checkout = "";
-    public $confirmation = "";
-    public $contact = "";
-    public $gtc = "";
-    public $home = "";
-    public $legalDisclosure = "";
-    public $login = "";
-    public $myAccount = "";
-    public $passwordReset = "";
-    public $privacyPolicy = "";
-    public $registration = "";
-    public $search = "";
-    public $termsConditions = "";
-    public $wishList = "";
-    public $returns = "";
-    public $returnConfirmation = "";
-    public $changeMail = "";
-    public $newsletterOptOut = "";
-    public $orderDocument = "";
+    public $basket = '';
+    public $cancellationForm = '';
+    public $cancellationRights = '';
+    public $checkout = '';
+    public $confirmation = '';
+    public $contact = '';
+    public $gtc = '';
+    public $home = '';
+    public $legalDisclosure = '';
+    public $login = '';
+    public $myAccount = '';
+    public $passwordReset = '';
+    public $privacyPolicy = '';
+    public $registration = '';
+    public $search = '';
+    public $termsConditions = '';
+    public $wishList = '';
+    public $returns = '';
+    public $returnConfirmation = '';
+    public $changeMail = '';
+    public $newsletterOptOut = '';
+    public $orderDocument = '';
 
     public function __construct(Dispatcher $dispatcher, SessionStorageService $sessionStorageService)
     {
         $this->sessionStorageService = $sessionStorageService;
-
         $this->init($sessionStorageService->getLang());
-        $dispatcher->listen(FrontendLanguageChanged::class, function (FrontendLanguageChanged $event) {
-            $this->init($event->getLanguage());
-        });
-
-        $this->urlMap = [
-            RouteConfig::ORDER_RETURN => "returns",
-            RouteConfig::ORDER_RETURN_CONFIRMATION => "return-confirmation",
-            RouteConfig::NEWSLETTER_OPT_OUT => "newsletter/unsubscribe",
-            RouteConfig::ORDER_DOCUMENT => "order-document"
-        ];
+        $dispatcher->listen(
+            FrontendLanguageChanged::class,
+            function (FrontendLanguageChanged $event) {
+                $this->init($event->getLanguage());
+            }
+        );
     }
 
     private function init($lang)
@@ -89,7 +89,7 @@ class ShopUrls
         $this->contact = $this->getShopUrl(RouteConfig::CONTACT);
         $this->gtc = $this->getShopUrl(RouteConfig::TERMS_CONDITIONS);
 
-        // Homepage URL may not be used from category. Even if linked to category, the homepage url should be "/"
+        // Homepage URL may not be used from category. Even if linked to category, the homepage url should be '/'
         $this->home = Utils::makeRelativeUrl('/', $this->includeLanguage);
         $this->legalDisclosure = $this->getShopUrl(RouteConfig::LEGAL_DISCLOSURE);
         $this->login = $this->getShopUrl(RouteConfig::LOGIN);
@@ -117,8 +117,8 @@ class ShopUrls
         $categoryId = RouteConfig::getCategoryId(RouteConfig::ORDER_RETURN);
         if ($categoryId > 0) {
             $params = [
-                "orderId" => $orderId,
-                "orderAccessKey" => $orderAccessKey
+                'orderId' => $orderId,
+                'orderAccessKey' => $orderAccessKey
             ];
 
             return $this->getShopUrl(RouteConfig::ORDER_RETURN, null, $params);
@@ -140,28 +140,35 @@ class ShopUrls
             $orderAccessKey = $request->get('accessKey');
         }
 
-        $url = $this->getShopUrl(RouteConfig::ORDER_DOCUMENT,
+        $url = $this->getShopUrl(
+            RouteConfig::ORDER_DOCUMENT,
             ['documentId' => $documentId],
             ['orderId' => $orderId, 'accessKey' => $orderAccessKey],
-            "order-document/preview");
+            'order-document/preview'
+        );
         return $url;
     }
 
     public function tracking($orderId)
     {
         $lang = $this->sessionStorageService->getLang();
-        return $this->fromMemoryCache("tracking.{$orderId}", function () use ($orderId, $lang) {
-            $authHelper = pluginApp(AuthHelper::class);
-            $trackingURL = $authHelper->processUnguarded(function () use ($orderId, $lang) {
-                $orderRepository = pluginApp(OrderRepositoryContract::class);
-                $orderTrackingService = pluginApp(OrderTrackingService::class);
+        return $this->fromMemoryCache(
+            "tracking.{$orderId}",
+            function () use ($orderId, $lang) {
+                $authHelper = pluginApp(AuthHelper::class);
+                $trackingURL = $authHelper->processUnguarded(
+                    function () use ($orderId, $lang) {
+                        $orderRepository = pluginApp(OrderRepositoryContract::class);
+                        $orderTrackingService = pluginApp(OrderTrackingService::class);
 
-                $order = $orderRepository->findOrderById($orderId);
-                return $orderTrackingService->getTrackingURL($order, $lang);
-            });
+                        $order = $orderRepository->findOrderById($orderId);
+                        return $orderTrackingService->getTrackingURL($order, $lang);
+                    }
+                );
 
-            return $trackingURL;
-        });
+                return $trackingURL;
+            }
+        );
     }
 
     private function getShopUrl($route, $routeParams = [], $urlParams = [], $overrideUrl = null)
@@ -176,32 +183,35 @@ class ShopUrls
             $key .= '.' . $overrideUrl;
         }
 
-        return $this->fromMemoryCache($key, function () use ($route, $routeParams, $urlParams, $overrideUrl) {
-            $categoryId = RouteConfig::getCategoryId($route);
-            if ($categoryId > 0) {
-                /** @var CategoryService $categoryService */
-                $categoryService = pluginApp(CategoryService::class);
-                $category = $categoryService->get($categoryId);
+        return $this->fromMemoryCache(
+            $key,
+            function () use ($route, $routeParams, $urlParams, $overrideUrl) {
+                $categoryId = RouteConfig::getCategoryId($route);
+                if ($categoryId > 0) {
+                    /** @var CategoryService $categoryService */
+                    $categoryService = pluginApp(CategoryService::class);
+                    $category = $categoryService->get($categoryId);
 
-                if ($category !== null) {
-                    /** @var CategoryUrlBuilder $categoryUrlBuilder */
-                    $categoryUrlBuilder = pluginApp(CategoryUrlBuilder::class);
+                    if ($category !== null) {
+                        /** @var CategoryUrlBuilder $categoryUrlBuilder */
+                        $categoryUrlBuilder = pluginApp(CategoryUrlBuilder::class);
 
-                    return $this->applyParams(
-                        $categoryUrlBuilder->buildUrl($category->id),
-                        $routeParams,
-                        $urlParams
-                    );
+                        return $this->applyParams(
+                            $categoryUrlBuilder->buildUrl($category->id),
+                            $routeParams,
+                            $urlParams
+                        );
+                    }
                 }
-            }
 
-            $url = $overrideUrl ?? $this->urlMap[$route];
-            return $this->applyParams(
-                pluginApp(UrlQuery::class, ['path' => ($url ?? $route)]),
-                $routeParams,
-                $urlParams
-            );
-        });
+                $url = $overrideUrl ?? $this->urlMap[$route];
+                return $this->applyParams(
+                    pluginApp(UrlQuery::class, ['path' => ($url ?? $route)]),
+                    $routeParams,
+                    $urlParams
+                );
+            }
+        );
     }
 
     private function applyParams($url, $routeParams, $urlParams)
@@ -235,7 +245,7 @@ class ShopUrls
 
         // detect template type from request uri
         $url = Utils::makeRelativeUrl(
-            explode("?", $request->getRequestUri())[0],
+            explode('?', $request->getRequestUri())[0],
             $this->includeLanguage
         );
 
@@ -253,7 +263,7 @@ class ShopUrls
         // match url pattern
         if (preg_match('/(?:a\-\d+|_\d+|_\d+_\d+)$/m', $url) === 1) {
             return RouteConfig::ITEM;
-        } else if(preg_match('/_t\d+$/m', $url) === 1) {
+        } elseif (preg_match('/_t\d+$/m', $url) === 1) {
             return RouteConfig::TAGS;
         }
 

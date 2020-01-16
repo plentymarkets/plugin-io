@@ -778,9 +778,9 @@ class VariationSearchFactory extends BaseSearchFactory implements VariationSearc
         return $this;
     }
 
-    public function withReducedResults()
+    public function withReducedResults($removeProperties = false)
     {
-        $this->withExtension(ReduceDataExtension::class);
+        $this->withExtension(ReduceDataExtension::class, ['removeProperties' => $removeProperties]);
         return $this;
     }
 

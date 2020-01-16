@@ -96,6 +96,8 @@ class CategoryTreeResource extends ApiResource
         $currentUrl = $this->request->get('currentUrl', null);
         $showItemCount = $this->request->get('showItemCount', false);
         $showItemCount = (boolean)$showItemCount;
+        $spacingPadding = $this->request->get('spacingPadding', '');
+        $inlinePadding = $this->request->get('inlinePadding', '');
 
         $partialTree = $this->categoryService->getPartialTree($categoryId);
         $children = $this->findInTree($partialTree, $categoryId);
@@ -106,10 +108,12 @@ class CategoryTreeResource extends ApiResource
         $renderedTemplate = $twig->renderString(
             $template,
             [
-                "categories" => $children["children"],
-                "currentUrl" => $currentUrl,
-                "showItemCount" => $showItemCount,
-                "expandableChildren" => true
+                'categories' => $children['children'],
+                'currentUrl' => $currentUrl,
+                'showItemCount' => $showItemCount,
+                'expandableChildren' => true,
+                'spacingPadding' => $spacingPadding,
+                'inlinePadding' => $inlinePadding
             ]
         );
 
@@ -121,13 +125,13 @@ class CategoryTreeResource extends ApiResource
         $result = null;
 
         foreach ($tree as $category) {
-            if ($category["id"] == $categoryId) {
+            if ($category['id'] == $categoryId) {
                 $result = $category;
                 break;
             }
 
-            if (is_null($result) && count($category["children"])) {
-                $result = $this->findInTree($category["children"], $categoryId);
+            if (is_null($result) && count($category['children'])) {
+                $result = $this->findInTree($category['children'], $categoryId);
             }
         }
 

@@ -21,11 +21,11 @@ class ItemImagesFilter extends AbstractFilter
     /**
      * @return array
      */
-    public function getFilters():array
+    public function getFilters(): array
     {
         return [
-            'itemImages'        => 'getItemImages',
-            'firstItemImage'    => 'getFirstItemImage',
+            'itemImages' => 'getItemImages',
+            'firstItemImage' => 'getFirstItemImage',
             'firstItemImageUrl' => 'getFirstItemImageUrl'
         ];
     }
@@ -35,30 +35,29 @@ class ItemImagesFilter extends AbstractFilter
      * @param string $imageAccessor
      * @return array
      */
-    public function getItemImages( $images, string $imageAccessor = 'url' ):array
+    public function getItemImages($images, string $imageAccessor = 'url'): array
     {
         $imageUrls = [];
-        $imageObject = (empty( $images['variation'] ) ? 'all' : 'variation');
+        $imageObject = (empty($images['variation']) ? 'all' : 'variation');
 
-        foreach ($images[$imageObject] as $image)
-        {
+        foreach ($images[$imageObject] as $image) {
             $imageUrls[] = [
-                "url" => $image[$imageAccessor],
-                "position" => $image["position"]
+                'url' => $image[$imageAccessor],
+                'position' => $image['position'],
+                'alternate' => $image['names']['alternate'],
+                'name' => $image['names']['name']
             ];
         }
 
         return $imageUrls;
     }
 
-    public function getFirstItemImage( $images, $imageAccessor = 'url' )
+    public function getFirstItemImage($images, $imageAccessor = 'url')
     {
-        $images = $this->getItemImages( $images, $imageAccessor );
+        $images = $this->getItemImages($images, $imageAccessor);
         $itemImage = [];
-        foreach( $images as $image )
-        {
-            if ( !count( $itemImage ) || $itemImage['position'] > $image['position'] )
-            {
+        foreach ($images as $image) {
+            if (!count($itemImage) || $itemImage['position'] > $image['position']) {
                 $itemImage = $image;
             }
         }
@@ -66,11 +65,10 @@ class ItemImagesFilter extends AbstractFilter
         return $itemImage;
     }
 
-    public function getFirstItemImageUrl( $images, $imageAccessor = 'url' )
+    public function getFirstItemImageUrl($images, $imageAccessor = 'url')
     {
-        $itemImage = $this->getFirstItemImage( $images, $imageAccessor );
-        if ( $itemImage !== null && $itemImage['url'] !== null )
-        {
+        $itemImage = $this->getFirstItemImage($images, $imageAccessor);
+        if ($itemImage !== null && $itemImage['url'] !== null) {
             return $itemImage['url'];
         };
 

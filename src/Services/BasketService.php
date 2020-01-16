@@ -449,7 +449,9 @@ class BasketService
      */
     private function addDataToBasket($data)
     {
-        if (isset($data['basketItemOrderParams']) && is_array($data['basketItemOrderParams'])) {
+        if (isset($data['basketItemOrderParams'])
+            && is_array($data['basketItemOrderParams'])
+            && !isset($data['totalOrderParamsMarkup'])) {
             list($data['basketItemOrderParams'], $data['totalOrderParamsMarkup']) = $this->parseBasketItemOrderParams($data['basketItemOrderParams']);
         }
 
