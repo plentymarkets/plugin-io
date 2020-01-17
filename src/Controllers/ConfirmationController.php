@@ -11,11 +11,11 @@ use IO\Services\OrderService;
 use IO\Services\SessionStorageService;
 use IO\Constants\SessionStorageKeys;
 use IO\Models\LocalizedOrder;
-use IO\Services\TemplateConfigService;
 use Plenty\Modules\Category\Models\Category;
 use Plenty\Modules\Order\Date\Models\OrderDateType;
 use Plenty\Modules\Order\Models\Order;
 use Plenty\Modules\ShopBuilder\Helper\ShopBuilderRequest;
+use Plenty\Modules\Webshop\Template\Contracts\TemplateConfigRepositoryContract;
 use Plenty\Plugin\ConfigRepository;
 use Plenty\Plugin\Http\Response;
 use Plenty\Plugin\Log\Loggable;
@@ -203,9 +203,9 @@ class ConfirmationController extends LayoutController
     
     private function checkValidity(Order $order)
     {
-        /** @var TemplateConfigService $templateConfigService */
-        $templateConfigService = pluginApp(TemplateConfigService::class);
-        $expiration = $templateConfigService->get('my_account.confirmation_link_expiration', 'always');
+        /** @var TemplateConfigRepositoryContract $templateConfigRepo */
+        $templateConfigRepo = pluginApp(TemplateConfigRepositoryContract::class);
+        $expiration = $templateConfigRepo->get('my_account.confirmation_link_expiration', 'always');
         
         if($expiration !== 'always')
         {

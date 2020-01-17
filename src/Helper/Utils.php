@@ -8,6 +8,7 @@ use IO\Services\UrlBuilder\UrlQuery;
 use IO\Services\WebstoreConfigurationService;
 use Plenty\Modules\Frontend\Services\AccountService;
 use Plenty\Modules\ShopBuilder\Helper\ShopBuilderRequest;
+use Plenty\Modules\Webshop\Template\Contracts\TemplateConfigRepositoryContract;
 use Plenty\Plugin\Application;
 use Plenty\Plugin\Translation\Translator;
 
@@ -71,9 +72,9 @@ class Utils
 
     public static function getTemplateConfig($key, $default = null)
     {
-        /** @var TemplateConfigService $templateConfigService */
-        $templateConfigService = pluginApp(TemplateConfigService::class);
-        return $templateConfigService->get($key, $default);
+        /** @var TemplateConfigRepositoryContract $templateConfigRepo */
+        $templateConfigRepo = pluginApp(TemplateConfigRepositoryContract::class);
+        return $templateConfigRepo->get($key, $default);
     }
 
     public static function translate($key, $params = [], $locale = null)

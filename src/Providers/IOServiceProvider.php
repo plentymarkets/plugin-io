@@ -3,10 +3,6 @@
 namespace IO\Providers;
 
 use IO\Constants\SessionStorageKeys;
-use IO\Contracts\FacetSearchFactoryContract;
-use IO\Contracts\MultiSearchFactoryContract;
-use IO\Contracts\SortingContract;
-use IO\Contracts\VariationSearchFactoryContract;
 use IO\Extensions\Basket\IOFrontendShippingProfileChanged;
 use IO\Extensions\Basket\IOFrontendUpdateDeliveryAddress;
 use IO\Extensions\ContentCache\IOAfterBuildPlugins;
@@ -42,11 +38,7 @@ use IO\Services\FacetService;
 use IO\Services\FakerService;
 use IO\Services\ItemCrossSellingService;
 use IO\Services\ItemLastSeenService;
-use IO\Services\ItemSearch\Factories\FacetSearchFactory;
-use IO\Services\ItemSearch\Factories\MultiSearchFactory;
-use IO\Services\ItemSearch\Factories\VariationSearchFactory;
 use IO\Services\ItemSearch\Helper\FacetExtensionContainer;
-use IO\Services\ItemSearch\Helper\SortingHelper;
 use IO\Services\ItemService;
 use IO\Services\ItemWishListService;
 use IO\Services\LegalInformationService;
@@ -64,10 +56,6 @@ use IO\Services\TemplateConfigService;
 use IO\Services\TemplateService;
 use IO\Services\UnitService;
 use IO\Services\UrlService;
-use IO\Services\VdiSearch\Factories\FacetSearchFactory as FacetSearchFactoryVdi;
-use IO\Services\VdiSearch\Factories\MultiSearchFactory as MultiSearchFactoryVdi;
-use IO\Services\VdiSearch\Factories\VariationSearchFactory as VariationSearchFactoryVdi;
-use IO\Services\VdiSearch\Helper\SortingHelper as SortingHelperVdi;
 use IO\Services\WebstoreConfigurationService;
 use Plenty\Modules\Authentication\Events\AfterAccountAuthentication;
 use Plenty\Modules\Authentication\Events\AfterAccountContactLogout;
@@ -86,7 +74,6 @@ use Plenty\Modules\Payment\Events\Checkout\ExecutePayment;
 use Plenty\Modules\Plugin\Events\AfterBuildPlugins;
 use Plenty\Modules\Plugin\Events\LoadSitemapPattern;
 use Plenty\Modules\Plugin\Events\PluginSendMail;
-use Plenty\Plugin\ConfigRepository;
 use Plenty\Plugin\ServiceProvider;
 use Plenty\Plugin\Templates\Twig;
 use Plenty\Plugin\Events\Dispatcher;
@@ -161,8 +148,6 @@ class IOServiceProvider extends ServiceProvider
         ]);
 
         $this->getApplication()->singleton(FacetExtensionContainer::class);
-    
-        $this->bindItemSearchClasses();
     }
 
     /**
@@ -258,28 +243,6 @@ class IOServiceProvider extends ServiceProvider
         foreach( $classes as $class )
         {
             $this->getApplication()->singleton( $class );
-        }
-    }
-
-    private function bindItemSearchClasses()
-    {
-        /** @var ConfigRepository $config */
-        $config = pluginApp(ConfigRepository::class);
-        $vdiSearchActive = $config->get('IO.item_search.vdi_active');
-    
-        if($vdiSearchActive == 'true')
-        {
-            $this->getApplication()->bind(VariationSearchFactoryContract::class, VariationSearchFactoryVdi::class);
-            $this->getApplication()->bind(MultiSearchFactoryContract::class, MultiSearchFactoryVdi::class);
-            $this->getApplication()->bind(FacetSearchFactoryContract::class, FacetSearchFactoryVdi::class);
-            $this->getApplication()->bind(SortingContract::class, SortingHelperVdi::class);
-        }
-        else
-        {
-            $this->getApplication()->bind(VariationSearchFactoryContract::class, VariationSearchFactory::class);
-            $this->getApplication()->bind(MultiSearchFactoryContract::class, MultiSearchFactory::class);
-            $this->getApplication()->bind(FacetSearchFactoryContract::class, FacetSearchFactory::class);
-            $this->getApplication()->bind(SortingContract::class, SortingHelper::class);
         }
     }
 

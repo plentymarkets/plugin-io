@@ -2,15 +2,15 @@
 
 namespace IO\Helper;
 
-use IO\Services\TemplateConfigService;
+use Plenty\Modules\Webshop\Template\Contracts\TemplateConfigRepositoryContract;
 
 class ReCaptcha
 {
     public static function verify($token)
     {
-        /** @var TemplateConfigService $templateConfigService */
-        $templateConfigService = pluginApp(TemplateConfigService::class);
-        $secret = $templateConfigService->get('global.google_recaptcha_secret');
+        /** @var TemplateConfigRepositoryContract $templateConfigRepo */
+        $templateConfigRepo = pluginApp(TemplateConfigRepositoryContract::class);
+        $secret = $templateConfigRepo->get('global.google_recaptcha_secret');
 
         if ( !strlen( $secret ) )
         {
@@ -47,7 +47,7 @@ class ReCaptcha
 
         return $result["success"]
             && (!array_key_exists('score', $result)
-                || $result['score'] >= $templateConfigService->get('global.google_recaptcha_threshold')
+                || $result['score'] >= $templateConfigRepo->get('global.google_recaptcha_threshold')
             );
     }
 }

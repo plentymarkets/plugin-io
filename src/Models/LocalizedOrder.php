@@ -12,13 +12,13 @@ use IO\Services\OrderService;
 use IO\Services\OrderStatusService;
 use IO\Services\OrderTotalsService;
 use IO\Services\OrderTrackingService;
-use IO\Services\TemplateConfigService;
 use Plenty\Modules\Order\Models\Order;
 use Plenty\Modules\Order\Property\Models\OrderProperty;
 use Plenty\Modules\Order\Property\Models\OrderPropertyType;
 use Plenty\Modules\Frontend\PaymentMethod\Contracts\FrontendPaymentMethodRepositoryContract;
 use Plenty\Modules\Order\Shipping\Contracts\ParcelServicePresetRepositoryContract;
 use IO\Extensions\Filters\URLFilter;
+use Plenty\Modules\Webshop\Template\Contracts\TemplateConfigRepositoryContract;
 
 class LocalizedOrder extends ModelWrapper
 {
@@ -306,9 +306,9 @@ class LocalizedOrder extends ModelWrapper
                 }
             }
 
-            /**  @var TemplateConfigService $templateConfigService */
-            $templateConfigService = pluginApp(TemplateConfigService::class);
-            $returnTime = (int)$templateConfigService->get('my_account.order_return_days', 14);
+            /**  @var TemplateConfigRepositoryContract $templateConfigRepo */
+            $templateConfigRepo = pluginApp(TemplateConfigRepositoryContract::class);
+            $returnTime = $templateConfigRepo->getInteger('my_account.order_return_days', 14);
 
             return $shippingDateSet
                 && $createdDateUnix > 0

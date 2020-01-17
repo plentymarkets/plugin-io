@@ -11,7 +11,6 @@ use IO\Helper\MemoryCache;
 use Plenty\Modules\Accounting\Contracts\AccountingLocationRepositoryContract;
 use Plenty\Modules\Basket\Contracts\BasketRepositoryContract;
 use Plenty\Modules\Basket\Events\Basket\AfterBasketChanged;
-use Plenty\Modules\Basket\Models\Basket;
 use Plenty\Modules\Frontend\Contracts\Checkout;
 use Plenty\Modules\Frontend\Contracts\CurrencyExchangeRepositoryContract;
 use Plenty\Modules\Frontend\Events\ValidateCheckoutEvent;
@@ -22,6 +21,7 @@ use Plenty\Modules\Order\Currency\Contracts\CurrencyRepositoryContract;
 use Plenty\Modules\Order\Shipping\Contracts\ParcelServicePresetRepositoryContract;
 use Plenty\Modules\Payment\Events\Checkout\GetPaymentMethodContent;
 use Plenty\Modules\Payment\Method\Contracts\PaymentMethodRepositoryContract;
+use Plenty\Modules\Webshop\Template\Contracts\TemplateConfigRepositoryContract;
 use Plenty\Plugin\ConfigRepository;
 use Plenty\Plugin\Events\Dispatcher;
 use Plenty\Plugin\Log\Loggable;
@@ -455,11 +455,10 @@ class CheckoutService
             $vatService = pluginApp(VatService::class);
             $showNetPrice   = $this->customerService->showNetPrices();
 
-            /** @var TemplateConfigService $templateConfigService */
-            $templateConfigService = pluginApp( TemplateConfigService::class );
+            /** @var TemplateConfigRepositoryContract $templateConfigRepo */
+            $templateConfigRepo = pluginApp( TemplateConfigRepositoryContract::class );
 
-            $showAllShippingProfiles = $templateConfigService->get('checkout.show_all_shipping_profiles', false);
-            $showAllShippingProfiles = ($showAllShippingProfiles == '1' || $showAllShippingProfiles === 'true');
+            $showAllShippingProfiles = $templateConfigRepo->getBoolean('checkout.show_all_shipping_profiles', false);
 
             $webstoreId = Utils::getWebstoreId();
             $params  = [

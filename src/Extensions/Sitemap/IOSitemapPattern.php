@@ -2,10 +2,9 @@
 
 namespace IO\Extensions\Sitemap;
 
-use IO\Services\TemplateConfigService;
 use Plenty\Modules\Plugin\Events\LoadSitemapPattern;
-use Plenty\Modules\Plugin\Models\Plugin;
 use Plenty\Modules\Plugin\Services\PluginSeoSitemapService;
+use Plenty\Modules\Webshop\Template\Contracts\TemplateConfigRepositoryContract;
 use Plenty\Plugin\ConfigRepository;
 
 class IOSitemapPattern
@@ -27,9 +26,9 @@ class IOSitemapPattern
         /** @var PluginSeoSitemapService $seoSitemapService */
         $seoSitemapService = pluginApp(PluginSeoSitemapService::class);
 
-        /** @var TemplateConfigService $templateConfigService */
-        $templateConfigService = pluginApp(TemplateConfigService::class);
-        $enableOldURLPattern = $templateConfigService->getBoolean('global.enableOldUrlPattern');
+        /** @var TemplateConfigRepositoryContract $templateConfigRepo */
+        $templateConfigRepo = pluginApp(TemplateConfigRepositoryContract::class);
+        $enableOldURLPattern = $templateConfigRepo->getBoolean('global.enableOldUrlPattern');
 
         if(!$enableOldURLPattern)
         {
@@ -40,7 +39,7 @@ class IOSitemapPattern
         }else
         {
             $itemPattern = [
-                'onlyMainVariation' => $templateConfigService->get('item.variation_show_type', 'all') === 'main'
+                'onlyMainVariation' => $templateConfigRepo->get('item.variation_show_type', 'all') === 'main'
             ];
         }
 

@@ -5,10 +5,10 @@ namespace IO\Middlewares;
 use IO\Helper\Utils;
 use IO\Services\CheckoutService;
 use IO\Services\LocalizationService;
-use IO\Services\TemplateConfigService;
 use IO\Services\TemplateService;
 use IO\Services\WebstoreConfigurationService;
 use Plenty\Modules\System\Models\WebstoreConfiguration;
+use Plenty\Modules\Webshop\Template\Contracts\TemplateConfigRepositoryContract;
 use Plenty\Plugin\Http\Request;
 use Plenty\Plugin\Http\Response;
 use Plenty\Plugin\Middleware;
@@ -75,9 +75,9 @@ class DetectLanguage extends Middleware
         $service = pluginApp(LocalizationService::class);
         $service->setLanguage($language);
 
-        /** @var TemplateConfigService $templateConfigService */
-        $templateConfigService = pluginApp(TemplateConfigService::class);
-        $enabledCurrencies = explode(', ', $templateConfigService->get('currency.available_currencies'));
+        /** @var TemplateConfigRepositoryContract $templateConfigRepo */
+        $templateConfigRepo = pluginApp(TemplateConfigRepositoryContract::class);
+        $enabledCurrencies = explode(', ', $templateConfigRepo->get('currency.available_currencies'));
         $currency = $webstoreConfig->defaultCurrencyList[$language];
         if (!is_null($currency) && (in_array(
                     $currency,
