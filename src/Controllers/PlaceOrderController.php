@@ -3,13 +3,13 @@
 namespace IO\Controllers;
 
 use IO\Constants\LogLevel;
-use IO\Constants\SessionStorageKeys;
 use IO\Extensions\Constants\ShopUrls;
 use IO\Services\NotificationService;
 use IO\Services\OrderService;
 use IO\Services\SessionStorageService;
 use IO\Services\UrlBuilder\UrlQuery;
 use Plenty\Modules\Basket\Exceptions\BasketItemCheckException;
+use Plenty\Modules\Webshop\Contracts\SessionStorageRepositoryContract;
 use Plenty\Plugin\Http\Request;
 use Plenty\Plugin\Log\Loggable;
 
@@ -38,7 +38,7 @@ class PlaceOrderController extends LayoutController
         ShopUrls $shopUrls)
     {
         //check if an order has already been placed in the last 30 seconds
-        $lastPlaceOrderTry = $sessionStorageService->getSessionValue(SessionStorageKeys::LAST_PLACE_ORDER_TRY);
+        $lastPlaceOrderTry = $sessionStorageService->getSessionValue(SessionStorageRepositoryContract::LAST_PLACE_ORDER_TRY);
 
         if (!is_null($lastPlaceOrderTry) && time() < (int)$lastPlaceOrderTry + self::ORDER_RETRY_INTERVAL)
         {
@@ -46,7 +46,7 @@ class PlaceOrderController extends LayoutController
             $notificationService->addNotificationCode(LogLevel::ERROR, 115);
             return $this->urlService->redirectTo($shopUrls->checkout);
         }
-        $sessionStorageService->setSessionValue(SessionStorageKeys::LAST_PLACE_ORDER_TRY, time());
+        $sessionStorageService->setSessionValue(SessionStorageRepositoryContract::LAST_PLACE_ORDER_TRY, time());
 
         try
         {
@@ -91,7 +91,7 @@ class PlaceOrderController extends LayoutController
             $urlParams['redirectParam'] = $redirectParam;
         }
 
-        if ($sessionStorageService->getSessionValue(SessionStorageKeys::READONLY_CHECKOUT) === true)
+        if ($sessionStorageService->getSessionValue(SessionStorageRepositoryContract::READONLY_CHECKOUT) === true)
         {
             $urlParams['readonlyCheckout'] = true;
         }

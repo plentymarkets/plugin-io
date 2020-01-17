@@ -2,8 +2,8 @@
 
 namespace IO\Api\Resources;
 
-use IO\Constants\SessionStorageKeys;
 use IO\Services\SessionStorageService;
+use Plenty\Modules\Webshop\Contracts\SessionStorageRepositoryContract;
 use Plenty\Plugin\Http\Response;
 use Plenty\Plugin\Http\Request;
 use IO\Api\ApiResource;
@@ -17,31 +17,36 @@ use IO\Api\ResponseCode;
 class OrderAdditionalInformationResource extends ApiResource
 {
 
-    private $sessionStorage;
+    private $sessionStorageRepository;
 
-    public function __construct(Request $request, ApiResponse $response, SessionStorageService $sessionStorage)
-    {
+    public function __construct(
+        Request $request,
+        ApiResponse $response,
+        SessionStorageRepositoryContract $sessionStorageRepository
+    ) {
         parent::__construct($request, $response);
-        $this->sessionStorage = $sessionStorage;
+        $this->sessionStorageRepository = $sessionStorageRepository;
     }
 
-    public function store():Response
+    public function store(): Response
     {
         $this->setContactWish();
         $this->setCustomerSign();
         $this->setShippingPrivacyHint();
         $this->setNewsletterSubscriptions();
 
-        return $this->response->create('', ResponseCode::CREATED );
+        return $this->response->create('', ResponseCode::CREATED);
     }
 
     private function setContactWish()
     {
         $orderContactWish = $this->request->get('orderContactWish', '');
 
-        if(strlen($orderContactWish))
-        {
-            $this->sessionStorage->setSessionValue(SessionStorageKeys::ORDER_CONTACT_WISH, $orderContactWish);
+        if (strlen($orderContactWish)) {
+            $this->sessionStorageRepository->setSessionValue(
+                SessionStorageRepositoryContract::ORDER_CONTACT_WISH,
+                $orderContactWish
+            );
         }
     }
 
@@ -49,23 +54,26 @@ class OrderAdditionalInformationResource extends ApiResource
     {
         $orderCustomerSign = $this->request->get('orderCustomerSign', '');
 
-        if(strlen($orderCustomerSign))
-        {
-            $this->sessionStorage->setSessionValue(SessionStorageKeys::ORDER_CUSTOMER_SIGN, $orderCustomerSign);
+        if (strlen($orderCustomerSign)) {
+            $this->sessionStorageRepository->setSessionValue(
+                SessionStorageRepositoryContract::ORDER_CUSTOMER_SIGN,
+                $orderCustomerSign
+            );
         }
     }
 
     private function setShippingPrivacyHint()
     {
-        $this->sessionStorage->setSessionValue(
-            SessionStorageKeys::SHIPPING_PRIVACY_HINT_ACCEPTED,
-            $this->request->get('shippingPrivacyHintAccepted', 'false'));
+        $this->sessionStorageRepository->setSessionValue(
+            SessionStorageRepositoryContract::SHIPPING_PRIVACY_HINT_ACCEPTED,
+            $this->request->get('shippingPrivacyHintAccepted', 'false')
+        );
     }
 
     private function setNewsletterSubscriptions()
     {
-        $this->sessionStorage->setSessionValue(
-            SessionStorageKeys::NEWSLETTER_SUBSCRIPTIONS,
+        $this->sessionStorageRepository->setSessionValue(
+            SessionStorageRepositoryContract::NEWSLETTER_SUBSCRIPTIONS,
             $this->request->get('newsletterSubscriptions', [])
         );
     }

@@ -1,7 +1,6 @@
 <?php //strict
 namespace IO\Controllers;
 
-use IO\Constants\SessionStorageKeys;
 use IO\Extensions\Constants\ShopUrls;
 use IO\Helper\RouteConfig;
 use IO\Models\LocalizedOrder;
@@ -35,7 +34,7 @@ class OrderReturnController extends LayoutController
     {
         /** @var SessionStorageRepositoryContract $sessionStorageRepository */
         $sessionStorageRepository = pluginApp(SessionStorageRepositoryContract::class);
-        $sessionOrder = $sessionStorageRepository->getSessionValue(SessionStorageKeys::LAST_ACCESSED_ORDER);
+        $sessionOrder = $sessionStorageRepository->getSessionValue(SessionStorageRepositoryContract::LAST_ACCESSED_ORDER);
 
         if ((int)$sessionOrder['orderId'] == (int)$orderId) {
             $orderAccessKey = $sessionOrder['accessKey'];

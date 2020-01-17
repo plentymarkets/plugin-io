@@ -3,7 +3,6 @@
 namespace IO\Controllers;
 
 use IO\Api\ResponseCode;
-use IO\Constants\SessionStorageKeys;
 use IO\Middlewares\CheckNotFound;
 use IO\Services\CustomerService;
 use Plenty\Modules\Authorization\Services\AuthHelper;
@@ -38,7 +37,7 @@ class DocumentController extends LayoutController
         if ($requestOrderId <= 0 || !strlen($requestAccessKey)) {
             /** @var SessionStorageRepositoryContract $sessionStorageRepository */
             $sessionStorageRepository = pluginApp(SessionStorageRepositoryContract::class);
-            $sessionOrder = $sessionStorageRepository->getSessionValue(SessionStorageKeys::LAST_ACCESSED_ORDER);
+            $sessionOrder = $sessionStorageRepository->getSessionValue(SessionStorageRepositoryContract::LAST_ACCESSED_ORDER);
 
             $requestOrderId = $sessionOrder['orderId'];
             $requestAccessKey = $sessionOrder['accessKey'];

@@ -2,7 +2,6 @@
 
 namespace IO\Controllers;
 
-use IO\Constants\SessionStorageKeys;
 use IO\Extensions\Constants\ShopUrls;
 use IO\Helper\RouteConfig;
 use IO\Services\CustomerService;
@@ -48,7 +47,7 @@ class CheckoutController extends LayoutController
         $shopBuilderRequest->setMainContentType('checkout');
 
         if (!$shopBuilderRequest->isShopBuilder()) {
-            if ($sessionStorageRepository->getSessionValue(SessionStorageKeys::GUEST_EMAIL) == null
+            if ($sessionStorageRepository->getSessionValue(SessionStorageRepositoryContract::GUEST_EMAIL) == null
                 && $customerService->getContactId() <= 0) {
                 $this->getLogger(__CLASS__)->info("IO::Debug.CheckoutController_notLoggedIn");
                 AuthGuard::redirect(

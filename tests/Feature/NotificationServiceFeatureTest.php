@@ -3,7 +3,6 @@
 namespace IO\Tests\Feature;
 
 use IO\Constants\LogLevel;
-use IO\Constants\SessionStorageKeys;
 use IO\Middlewares\ClearNotifications;
 use IO\Services\NotificationService;
 use IO\Tests\TestCase;
@@ -26,7 +25,7 @@ class NotificationServiceFeatureTest extends TestCase
     /* @var Response $response */
     protected $response;
 
-    /* @var ClearNotifications $clearNotifications*/
+    /* @var ClearNotifications $clearNotifications */
     protected $clearNotifications;
 
     protected function setUp()
@@ -46,20 +45,26 @@ class NotificationServiceFeatureTest extends TestCase
     public function it_checks_addNotification_sets_session_storage_entry($message, $type, $code)
     {
         $this->notificationService->{$type}($message, $code);
-        $sessionNotifications = json_decode($this->sessionStorageRepository->getSessionValue(SessionStorageKeys::NOTIFICATIONS),true);
-        $this->assertEquals($code,$sessionNotifications[$type]['code']);
-        $this->assertEquals($message,$sessionNotifications[$type]['message']);
+        $sessionNotifications = json_decode(
+            $this->sessionStorageRepository->getSessionValue(SessionStorageRepositoryContract::NOTIFICATIONS),
+            true
+        );
+        $this->assertEquals($code, $sessionNotifications[$type]['code']);
+        $this->assertEquals($message, $sessionNotifications[$type]['message']);
     }
 
     /** @test */
     public function it_checks_getNotification_true_clears_session_storage_entry()
     {
         $expectedEmptyArray = [];
-        $this->notificationService->log($this->fake->text,200);
+        $this->notificationService->log($this->fake->text, 200);
         $this->notificationService->getNotifications(true);
-        $this->clearNotifications->after($this->request,$this->response);
-        $notifications = json_decode($this->sessionStorageRepository->getSessionValue(SessionStorageKeys::NOTIFICATIONS), true);
-        $this->assertEquals($expectedEmptyArray,$notifications);
+        $this->clearNotifications->after($this->request, $this->response);
+        $notifications = json_decode(
+            $this->sessionStorageRepository->getSessionValue(SessionStorageRepositoryContract::NOTIFICATIONS),
+            true
+        );
+        $this->assertEquals($expectedEmptyArray, $notifications);
     }
 
     public function dataProviderAddNotificationData()

@@ -4,10 +4,8 @@ namespace IO\Tests\Feature;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use IO\Builder\Order\AddressType;
-use IO\Constants\SessionStorageKeys;
 use IO\Services\BasketService;
 use IO\Services\CustomerService;
-use IO\Services\SessionStorageService;
 use IO\Tests\TestCase;
 use Plenty\Modules\Account\Address\Models\Address;
 use Plenty\Modules\Frontend\Services\CheckoutService;
@@ -83,18 +81,16 @@ class CustomerServiceFeatureTest extends TestCase
         /** @var SessionStorageRepositoryContract $sessionStorageRepository */
         $sessionStorageRepository = pluginApp(SessionStorageRepositoryContract::class);
 
-        $sessionStorageRepository->setSessionValue(SessionStorageKeys::GUEST_EMAIL, $this->fake->email);
+        $sessionStorageRepository->setSessionValue(SessionStorageRepositoryContract::GUEST_EMAIL, $this->fake->email);
 
         if ($addressType === AddressType::BILLING) {
             $this->checkoutService
                 ->shouldReceive('setCustomerInvoiceAddressId')
                 ->andReturn(null);
-        } else {
-            if ($addressType === AddressType::DELIVERY) {
-                $this->checkoutService
-                    ->shouldReceive('setCustomerShippingAddressId')
-                    ->andReturn(null);
-            }
+        } elseif ($addressType === AddressType::DELIVERY) {
+            $this->checkoutService
+                ->shouldReceive('setCustomerShippingAddressId')
+                ->andReturn(null);
         }
 
         $newAddress = $this->customerService->createAddress($addressData, $addressType);
@@ -151,7 +147,7 @@ class CustomerServiceFeatureTest extends TestCase
         /** @var SessionStorageRepositoryContract $sessionStorageRepository */
         $sessionStorageRepository = pluginApp(SessionStorageRepositoryContract::class);
 
-        $sessionStorageRepository->setSessionValue(SessionStorageKeys::GUEST_EMAIL, $this->fake->email);
+        $sessionStorageRepository->setSessionValue(SessionStorageRepositoryContract::GUEST_EMAIL, $this->fake->email);
 
         /** @var BasketService $basketService */
         $basketService = pluginApp(BasketService::class);
@@ -168,12 +164,10 @@ class CustomerServiceFeatureTest extends TestCase
             $this->checkoutService
                 ->shouldReceive('setCustomerInvoiceAddressId')
                 ->andReturn(null);
-        } else {
-            if ($addressType === AddressType::DELIVERY) {
-                $this->checkoutService
-                    ->shouldReceive('setCustomerShippingAddressId')
-                    ->andReturn(null);
-            }
+        } elseif ($addressType === AddressType::DELIVERY) {
+            $this->checkoutService
+                ->shouldReceive('setCustomerShippingAddressId')
+                ->andReturn(null);
         }
 
         $address = $this->customerService->createAddress($addressData, $addressType);
@@ -226,21 +220,19 @@ class CustomerServiceFeatureTest extends TestCase
 
     private function updateAddress($addressDataCreate, $addressDataUpdate, $addressType)
     {
-        /** @var SessionStorageRepositoryContract $sessionStorageRepository  */
+        /** @var SessionStorageRepositoryContract $sessionStorageRepository */
         $sessionStorageRepository = pluginApp(SessionStorageRepositoryContract::class);
 
-        $sessionStorageRepository->setSessionValue(SessionStorageKeys::GUEST_EMAIL, $this->fake->email);
+        $sessionStorageRepository->setSessionValue(SessionStorageRepositoryContract::GUEST_EMAIL, $this->fake->email);
 
         if ($addressType === AddressType::BILLING) {
             $this->checkoutService
                 ->shouldReceive('setCustomerInvoiceAddressId')
                 ->andReturn(null);
-        } else {
-            if ($addressType === AddressType::DELIVERY) {
-                $this->checkoutService
-                    ->shouldReceive('setCustomerShippingAddressId')
-                    ->andReturn(null);
-            }
+        } elseif ($addressType === AddressType::DELIVERY) {
+            $this->checkoutService
+                ->shouldReceive('setCustomerShippingAddressId')
+                ->andReturn(null);
         }
 
         $this->dispatcher->shouldReceive('fire');

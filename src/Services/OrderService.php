@@ -8,7 +8,6 @@ use IO\Builder\Order\OrderItemType;
 use IO\Builder\Order\OrderType;
 use IO\Builder\Order\OrderOptionSubType;
 use IO\Constants\OrderPaymentStatus;
-use IO\Constants\SessionStorageKeys;
 use IO\Extensions\Constants\ShopUrls;
 use IO\Extensions\Mail\SendMail;
 use IO\Helper\RouteConfig;
@@ -29,6 +28,7 @@ use Plenty\Modules\Order\Property\Models\OrderPropertyType;
 use Plenty\Modules\Order\Status\Contracts\OrderStatusRepositoryContract;
 use Plenty\Modules\Payment\Contracts\PaymentRepositoryContract;
 use Plenty\Modules\Payment\Method\Contracts\PaymentMethodRepositoryContract;
+use Plenty\Modules\Webshop\Contracts\SessionStorageRepositoryContract;
 use Plenty\Modules\Webshop\Template\Contracts\TemplateConfigRepositoryContract;
 use Plenty\Plugin\Log\Loggable;
 use Plenty\Repositories\Models\PaginatedResult;
@@ -52,9 +52,9 @@ class OrderService
 	 */
 	private $basketService;
     /**
-     * @var SessionStorageService
+     * @var SessionStorageRepositoryContract
      */
-    private $sessionStorage;
+    private $sessionStorageRepository;
 
     /**
      * @var FrontendPaymentMethodRepositoryContract
@@ -91,7 +91,7 @@ class OrderService
      * OrderService constructor.
      * @param OrderRepositoryContract $orderRepository
      * @param BasketService $basketService
-     * @param \IO\Services\SessionStorageService $sessionStorage
+     * @param SessionStorageRepositoryContract $sessionStorageRepository
      * @param FrontendPaymentMethodRepositoryContract $frontendPaymentMethodRepository
      * @param AddressRepositoryContract $addressRepository
      * @param \IO\Services\UrlService $urlService
@@ -101,7 +101,7 @@ class OrderService
 	public function __construct(
 		OrderRepositoryContract $orderRepository,
 		BasketService $basketService,
-        SessionStorageService $sessionStorage,
+        SessionStorageRepositoryContract $sessionStorageRepository,
         FrontendPaymentMethodRepositoryContract $frontendPaymentMethodRepository,
         AddressRepositoryContract $addressRepository,
         UrlService $urlService,
@@ -110,7 +110,7 @@ class OrderService
 	{
 		$this->orderRepository = $orderRepository;
 		$this->basketService   = $basketService;
-        $this->sessionStorage  = $sessionStorage;
+        $this->sessionStorageRepository  = $sessionStorageRepository;
         $this->frontendPaymentMethodRepository = $frontendPaymentMethodRepository;
         $this->addressRepository = $addressRepository;
         $this->urlService = $urlService;
@@ -131,7 +131,7 @@ class OrderService
             $couponCode = $basket->couponCode;
         }
 
-        $isShippingPrivacyHintAccepted = $this->sessionStorage->getSessionValue(SessionStorageKeys::SHIPPING_PRIVACY_HINT_ACCEPTED);
+        $isShippingPrivacyHintAccepted = $this->sessionStorageRepository->getSessionValue(SessionStorageRepositoryContract::SHIPPING_PRIVACY_HINT_ACCEPTED);
 
         if (is_null($isShippingPrivacyHintAccepted) || !strlen($isShippingPrivacyHintAccepted))
         {
@@ -148,10 +148,11 @@ class OrderService
             ->withAddressId($this->checkoutService->getDeliveryAddressId(), AddressType::DELIVERY)
             ->withOrderProperty(OrderPropertyType::PAYMENT_METHOD, OrderOptionSubType::MAIN_VALUE, $this->checkoutService->getMethodOfPaymentId())
             ->withOrderProperty(OrderPropertyType::SHIPPING_PROFILE, OrderOptionSubType::MAIN_VALUE, $this->checkoutService->getShippingProfileId())
+            //TODO VDI MEYER
             ->withOrderProperty(OrderPropertyType::DOCUMENT_LANGUAGE, OrderOptionSubType::MAIN_VALUE, $this->sessionStorage->getLang())
             ->withOrderProperty(OrderPropertyType::SHIPPING_PRIVACY_HINT_ACCEPTED, OrderOptionSubType::MAIN_VALUE, $isShippingPrivacyHintAccepted)
-            ->withOrderProperty(OrderPropertyType::CUSTOMER_SIGN, OrderOptionSubType::MAIN_VALUE, $this->sessionStorage->getSessionValue(SessionStorageKeys::ORDER_CUSTOMER_SIGN))
-            ->withComment(true, $this->sessionStorage->getSessionValue(SessionStorageKeys::ORDER_CONTACT_WISH))
+            ->withOrderProperty(OrderPropertyType::CUSTOMER_SIGN, OrderOptionSubType::MAIN_VALUE, $this->sessionStorageRepository->getSessionValue(SessionStorageRepositoryContract::ORDER_CUSTOMER_SIGN))
+            ->withComment(true, $this->sessionStorageRepository->getSessionValue(SessionStorageRepositoryContract::ORDER_CONTACT_WISH))
             ->done();
 
         try
@@ -185,7 +186,7 @@ class OrderService
     {
         /** @var CustomerNewsletterService $customerNewsletterService $email */
         $customerNewsletterService = pluginApp(CustomerNewsletterService::class);
-        $newsletterSubscriptions = $this->sessionStorage->getSessionValue(SessionStorageKeys::NEWSLETTER_SUBSCRIPTIONS);
+        $newsletterSubscriptions = $this->sessionStorageRepository->getSessionValue(SessionStorageRepositoryContract::NEWSLETTER_SUBSCRIPTIONS);
 
         if (count($newsletterSubscriptions) && strlen($email))
         {
@@ -216,7 +217,7 @@ class OrderService
             $customerNewsletterService->saveMultipleNewsletterData($email, $newsletterSubscriptions, $firstName, $lastName);
         }
 
-        $this->sessionStorage->setSessionValue(SessionStorageKeys::NEWSLETTER_SUBSCRIPTIONS, null);
+        $this->sessionStorageRepository->setSessionValue(SessionStorageRepositoryContract::NEWSLETTER_SUBSCRIPTIONS, null);
     }
 
     /**
@@ -275,6 +276,7 @@ class OrderService
 
         if($wrap)
         {
+            //TODO VDI MEYER
             return LocalizedOrder::wrap($order, $this->sessionStorage->getLang());
         }
 
@@ -316,7 +318,7 @@ class OrderService
                 }
             }
         }
-
+        //TODO VDI MEYER
         return LocalizedOrder::wrap($order, $this->sessionStorage->getLang());
     }
 
@@ -346,6 +348,7 @@ class OrderService
 
         if($wrapped)
         {
+            //TODO VDI MEYER
             $orders = LocalizedOrder::wrapPaginated( $orders, $this->sessionStorage->getLang() );
         }
 
@@ -451,11 +454,12 @@ class OrderService
         }
         else
         {
-            $order = $this->orderRepository->findOrderById($this->sessionStorage->getSessionValue(SessionStorageKeys::LATEST_ORDER_ID));
+            $order = $this->orderRepository->findOrderById($this->sessionStorageRepository->getSessionValue(SessionStorageRepositoryContract::LATEST_ORDER_ID));
         }
 
         if(!is_null($order))
         {
+            //TODO VDI MEYER
             return LocalizedOrder::wrap( $order, $this->sessionStorage->getLang() );
         }
 
@@ -627,6 +631,7 @@ class OrderService
      */
     public function getPaymentMethodListForSwitch($currentPaymentMethodId = 0, $orderId = null)
     {
+        //TODO VDI MEYER
         return $this->frontendPaymentMethodRepository->getCurrentPaymentMethodsListForSwitch($currentPaymentMethodId, $orderId, $this->sessionStorage->getLang());
     }
 
@@ -722,6 +727,7 @@ class OrderService
 
                     if(!is_null($order))
                     {
+                        //TODO VDI MEYER
                         return LocalizedOrder::wrap( $order, $this->sessionStorage->getLang() );
                     }
                 }
@@ -746,6 +752,7 @@ class OrderService
                 $params = [
                     'orderId' => $order->id,
                     'webstoreId' => Utils::getWebstoreId(),
+                    //TODO VDI MEYER
                     'language' => $this->sessionStorage->getLang()
                 ];
                 $this->sendMail(AutomaticEmailTemplate::SHOP_ORDER ,AutomaticEmailOrder::class, $params);
@@ -781,11 +788,11 @@ class OrderService
             $this->handleThrowable($throwable, "IO::Debug.OrderService_orderCompleteErrorSubscribeNewsletter");
         }
 
-        $this->sessionStorage->setSessionValue(SessionStorageKeys::ORDER_CONTACT_WISH, null);
-        $this->sessionStorage->setSessionValue(SessionStorageKeys::ORDER_CUSTOMER_SIGN, null);
+        $this->sessionStorageRepository->setSessionValue(SessionStorageRepositoryContract::ORDER_CONTACT_WISH, null);
+        $this->sessionStorageRepository->setSessionValue(SessionStorageRepositoryContract::ORDER_CUSTOMER_SIGN, null);
         if ($this->customerService->getContactId() <= 0)
         {
-            $this->sessionStorage->setSessionValue(SessionStorageKeys::LATEST_ORDER_ID, $order->id);
+            $this->sessionStorageRepository->setSessionValue(SessionStorageRepositoryContract::LATEST_ORDER_ID, $order->id);
         }
     }
 

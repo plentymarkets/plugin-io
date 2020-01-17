@@ -2,9 +2,9 @@
 
 namespace IO\Services;
 
-use IO\Constants\SessionStorageKeys;
 use IO\Constants\LogLevel;
 use IO\Middlewares\ClearNotifications;
+use Plenty\Modules\Webshop\Contracts\SessionStorageRepositoryContract;
 
 /**
  * Class BasketService
@@ -19,34 +19,36 @@ class NotificationService
 
     /**
      * BasketService constructor.
-     * @param \IO\Services\SessionStorageService $sessionStorageService
+     *
+     * @param SessionStorageRepositoryContract $sessionStorageRepository
      */
-    public function __construct(SessionStorageService $sessionStorageService)
+    public function __construct(SessionStorageRepositoryContract $sessionStorageRepository)
     {
-        $this->sessionStorageService = $sessionStorageService;
+        $this->sessionStorageRepository = $sessionStorageRepository;
     }
 
     /**
      * @param bool $clear
      * @return array
      */
-    public function getNotifications($clear = true):array
+    public function getNotifications($clear = true): array
     {
-        $notifications = json_decode($this->sessionStorageService->getSessionValue(SessionStorageKeys::NOTIFICATIONS), true);
+        $notifications = json_decode(
+            $this->sessionStorageRepository->getSessionValue(SessionStorageRepositoryContract::NOTIFICATIONS),
+            true
+        );
 
-        if ($notifications == null || !is_array($notifications) || !count($notifications) )
-        {
+        if ($notifications == null || !is_array($notifications) || !count($notifications)) {
             $notifications = [
-                "error"     => null,
-                "warn"      => null,
-                "info"      => null,
-                "success"   => null,
-                "log"       => null
+                "error" => null,
+                "warn" => null,
+                "info" => null,
+                "success" => null,
+                "log" => null
             ];
         }
 
-        if ($clear)
-        {
+        if ($clear) {
             ClearNotifications::$CLEAR_NOTIFICATIONS = true;
         }
 
@@ -62,29 +64,30 @@ class NotificationService
     private function addNotification(string $message, string $type, int $code = 0, array $placeholder = null)
     {
         $notifications = $this->getNotifications(false);
-        if ( !array_key_exists($type, $notifications) )
-        {
+        if (!array_key_exists($type, $notifications)) {
             $type = LogLevel::ERROR;
         }
 
         $notification = [
-            'message'       => $message,
-            'code'          => $code,
-            'stackTrace'    => [],
-            'placeholder'          => $placeholder
+            'message' => $message,
+            'code' => $code,
+            'stackTrace' => [],
+            'placeholder' => $placeholder
         ];
         $lastNotification = $notifications[$type];
 
-        if ( !is_null($lastNotification) )
-        {
+        if (!is_null($lastNotification)) {
             $notification['stackTrace'] = $lastNotification['stackTrace'];
             $lastNotification['stackTrace'] = [];
-            array_push( $notification['stackTrace'], $lastNotification );
+            array_push($notification['stackTrace'], $lastNotification);
         }
 
         $notifications[$type] = $notification;
 
-        $this->sessionStorageService->setSessionValue(SessionStorageKeys::NOTIFICATIONS, json_encode($notifications));
+        $this->sessionStorageRepository->setSessionValue(
+            SessionStorageRepositoryContract::NOTIFICATIONS,
+            json_encode($notifications)
+        );
     }
 
     /**

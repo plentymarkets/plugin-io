@@ -3,12 +3,12 @@
 namespace IO\Tests\Feature;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use IO\Constants\SessionStorageKeys;
 use IO\Services\CheckoutService;
 use IO\Tests\TestCase;
 use Plenty\Modules\Frontend\Session\Storage\Contracts\FrontendSessionStorageFactoryContract;
 use Plenty\Modules\Plugin\PluginSet\Models\PluginSet;
 use Plenty\Modules\System\Models\Webstore;
+use Plenty\Modules\Webshop\Contracts\SessionStorageRepositoryContract;
 use Plenty\Plugin\ConfigRepository;
 
 /**
@@ -22,11 +22,15 @@ class CheckoutServiceCurrencyConfigTest extends TestCase
     /** @var CheckoutService $basketService */
     protected $checkoutService;
 
+    /** @var SessionStorageRepositoryContract $sessionStorageRepository */
+    protected $sessionStorageRepository;
+
     protected function setUp()
     {
         parent::setUp();
         $this->createApplication();
 
+        $this->sessionStorageRepository = pluginApp(SessionStorageRepositoryContract::class);
         $this->checkoutService = pluginApp(CheckoutService::class);
 
     }
@@ -37,9 +41,7 @@ class CheckoutServiceCurrencyConfigTest extends TestCase
 
         $expectedCurrency = $this->fake->currencyCode;
 
-        /** @var FrontendSessionStorageFactoryContract $sessionStorage */
-        $sessionStorage = pluginApp(FrontendSessionStorageFactoryContract::class);
-        $sessionStorage->getPlugin()->setValue(SessionStorageKeys::CURRENCY, $expectedCurrency);
+        $this->sessionStorageRepository->setSessionValue(SessionStorageRepositoryContract::CURRENCY, $expectedCurrency);
 
         $currency = $this->checkoutService->getCurrency();
 
@@ -85,9 +87,7 @@ class CheckoutServiceCurrencyConfigTest extends TestCase
         $expectedCurrency = "EUR";
         $expectedSymbol = "€";
 
-        /** @var FrontendSessionStorageFactoryContract $sessionStorage */
-        $sessionStorage = pluginApp(FrontendSessionStorageFactoryContract::class);
-        $sessionStorage->getPlugin()->setValue(SessionStorageKeys::CURRENCY, $expectedCurrency);
+        $this->sessionStorageRepository->setSessionValue(SessionStorageRepositoryContract::CURRENCY, $expectedCurrency);
 
 
         $currencyData = $this->checkoutService->getCurrencyData();
@@ -108,7 +108,7 @@ class CheckoutServiceCurrencyConfigTest extends TestCase
 
         /** @var FrontendSessionStorageFactoryContract $sessionStorage */
         $sessionStorage = pluginApp(FrontendSessionStorageFactoryContract::class);
-        $sessionStorage->getPlugin()->setValue(SessionStorageKeys::CURRENCY, "USD");
+        $sessionStorage->getPlugin()->setValue(SessionStorageRepositoryContract::CURRENCY, "USD");
         $sessionStorage->getLocaleSettings()->language = 'de';
         $currencyPattern = $this->checkoutService->getCurrencyPattern();
 
@@ -129,7 +129,7 @@ class CheckoutServiceCurrencyConfigTest extends TestCase
 
         /** @var FrontendSessionStorageFactoryContract $sessionStorage */
         $sessionStorage = pluginApp(FrontendSessionStorageFactoryContract::class);
-        $sessionStorage->getPlugin()->setValue(SessionStorageKeys::CURRENCY, "USD");
+        $sessionStorage->getPlugin()->setValue(SessionStorageRepositoryContract::CURRENCY, "USD");
         $sessionStorage->getLocaleSettings()->language = 'en';
 
         /** @var ConfigRepository $configRepository */

@@ -8,7 +8,7 @@ use Plenty\Plugin\ConfigRepository;
 /**
  * Class TemplateConfigService
  * @package IO\Services
- * @deprecated since 5.0.0 will be deleted in 6.0.0
+ * @deprecated since 5.0.0 will be removed in 6.0.0
  * @see \Plenty\Modules\Webshop\Template\Contracts\TemplateConfigRepositoryContract
  */
 class TemplateConfigService
@@ -31,7 +31,7 @@ class TemplateConfigService
      * @param $key
      * @param null $default
      * @return mixed|null
-     * @deprecated since 5.0.0 will be deleted in 6.0.0
+     * @deprecated since 5.0.0 will be removed in 6.0.0
      * @see \Plenty\Modules\Webshop\Template\Contracts\TemplateConfigRepositoryContract::get()
      */
     public function get($key, $default = null)
@@ -43,7 +43,7 @@ class TemplateConfigService
      * @param $key
      * @param bool $default
      * @return mixed
-     * @deprecated since 5.0.0 will be deleted in 6.0.0
+     * @deprecated since 5.0.0 will be removed in 6.0.0
      * @see \Plenty\Modules\Webshop\Template\Contracts\TemplateConfigRepositoryContract::getBoolean()
      */
     public function getBoolean($key, $default = false)
@@ -55,7 +55,7 @@ class TemplateConfigService
      * @param $key
      * @param int $default
      * @return mixed
-     * @deprecated since 5.0.0 will be deleted in 6.0.0
+     * @deprecated since 5.0.0 will be removed in 6.0.0
      * @see \Plenty\Modules\Webshop\Template\Contracts\TemplateConfigRepositoryContract::getInteger()
      */
     public function getInteger($key, $default = 0)

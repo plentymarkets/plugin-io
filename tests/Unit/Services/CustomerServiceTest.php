@@ -3,7 +3,6 @@
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use IO\Api\Resources\CustomerAddressResource;
 use IO\Builder\Order\AddressType;
-use IO\Constants\SessionStorageKeys;
 use IO\Services\BasketService;
 use IO\Services\CustomerService;
 use IO\Services\WebstoreConfigurationService;
@@ -30,7 +29,6 @@ class CustomerServiceTest extends TestCase
     protected $addressRepositoryMock;
     /** @var BasketService $basketServiceMock */
     protected $basketServiceMock;
-
     /** @var AccountService */
     protected $accountServiceMock;
     /** @var ContactAddressRepository $contactAddressRepositoryMock */
@@ -107,7 +105,7 @@ class CustomerServiceTest extends TestCase
 
         $this->sessionStorageRepositoryMock
             ->shouldReceive('getSessionValue')
-            ->with(SessionStorageKeys::GUEST_EMAIL)
+            ->with(SessionStorageRepositoryContract::GUEST_EMAIL)
             ->andReturn('test@test.de')
             ->once();
 
@@ -146,7 +144,7 @@ class CustomerServiceTest extends TestCase
 
         $this->sessionStorageRepositoryMock
             ->shouldReceive('getSessionValue')
-            ->with(SessionStorageKeys::GUEST_EMAIL)
+            ->with(SessionStorageRepositoryContract::GUEST_EMAIL)
             ->andReturn('test@test.de')
             ->once();
 
@@ -565,7 +563,7 @@ class CustomerServiceTest extends TestCase
             ->shouldReceive('getSessionValue')
             ->andReturnUsing(
                 function ($args) {
-                    if ($args == SessionStorageKeys::GUEST_EMAIL) {
+                    if ($args == SessionStorageRepositoryContract::GUEST_EMAIL) {
                         return 'test@test.de';
                     }
 

@@ -5,7 +5,6 @@ namespace IO\Services;
 use IO\Api\Resources\CustomerAddressResource;
 use IO\Builder\Order\AddressType;
 use IO\Builder\Order\OrderType;
-use IO\Constants\SessionStorageKeys;
 use IO\Constants\ShippingCountry;
 use IO\Extensions\Filters\PropertyNameFilter;
 use IO\Extensions\Mail\SendMail;
@@ -241,14 +240,14 @@ class CustomerService
         $newDeliveryAddress = null;
 
         $guestBillingAddress = null;
-        //$guestBillingAddressId = $this->sessionStorageRepository->getSessionValue(SessionStorageKeys::BILLING_ADDRESS_ID);
+        //$guestBillingAddressId = $this->sessionStorageRepository->getSessionValue(SessionStorageRepositoryContract::BILLING_ADDRESS_ID);
         $guestBillingAddressId = $basketService->getBillingAddressId();
         if ((int)$guestBillingAddressId > 0) {
             $guestBillingAddress = $this->addressRepository->findAddressById($guestBillingAddressId);
         }
 
         $guestDeliveryAddress = null;
-        //$guestDeliveryAddressId = $this->sessionStorageRepository->getSessionValue(SessionStorageKeys::DELIVERY_ADDRESS_ID);
+        //$guestDeliveryAddressId = $this->sessionStorageRepository->getSessionValue(SessionStorageRepositoryContract::DELIVERY_ADDRESS_ID);
         $guestDeliveryAddressId = $basketService->getDeliveryAddressId();
         if ((int)$guestDeliveryAddressId > 0) {
             $guestDeliveryAddress = $this->addressRepository->findAddressById($guestDeliveryAddressId);
@@ -265,7 +264,7 @@ class CustomerService
                     $guestBillingAddress->toArray(),
                     AddressType::BILLING
                 );
-                //$this->sessionStorageRepository->setSessionValue(SessionStorageKeys::BILLING_ADDRESS_ID, $newBillingAddress->id);
+                //$this->sessionStorageRepository->setSessionValue(SessionStorageRepositoryContract::BILLING_ADDRESS_ID, $newBillingAddress->id);
                 $basketService->setBillingAddressId($newBillingAddress->id);
             }
 
@@ -274,19 +273,19 @@ class CustomerService
                     $guestDeliveryAddress->toArray(),
                     AddressType::DELIVERY
                 );
-                //$this->sessionStorageRepository->setSessionValue(SessionStorageKeys::DELIVERY_ADDRESS_ID, $newDeliveryAddress->id);
+                //$this->sessionStorageRepository->setSessionValue(SessionStorageRepositoryContract::DELIVERY_ADDRESS_ID, $newDeliveryAddress->id);
                 $basketService->setDeliveryAddressId($newDeliveryAddress->id);
             }
 
             if ($billingAddressData !== null) {
                 $newBillingAddress = $this->createAddress($billingAddressData, AddressType::BILLING);
-                //$this->sessionStorageRepository->setSessionValue(SessionStorageKeys::BILLING_ADDRESS_ID, $newBillingAddress->id);
+                //$this->sessionStorageRepository->setSessionValue(SessionStorageRepositoryContract::BILLING_ADDRESS_ID, $newBillingAddress->id);
                 $basketService->setBillingAddressId($newBillingAddress->id);
             }
 
             if ($deliveryAddressData !== null) {
                 $newDeliveryAddress = $this->createAddress($deliveryAddressData, AddressType::DELIVERY);
-                //$this->sessionStorageRepository->setSessionValue(SessionStorageKeys::DELIVERY_ADDRESS_ID, $newDeliveryAddress->id);
+                //$this->sessionStorageRepository->setSessionValue(SessionStorageRepositoryContract::DELIVERY_ADDRESS_ID, $newDeliveryAddress->id);
                 $basketService->setDeliveryAddressId($newDeliveryAddress->id);
             }
 
@@ -734,7 +733,7 @@ class CustomerService
         if ($isGuest) {
             /** @var SessionStorageRepositoryContract $sessionStorageRepository */
             $sessionStorageRepository = pluginApp(SessionStorageRepositoryContract::class);
-            $email = $sessionStorageRepository->getSessionValue(SessionStorageKeys::GUEST_EMAIL);
+            $email = $sessionStorageRepository->getSessionValue(SessionStorageRepositoryContract::GUEST_EMAIL);
 
             if (!strlen($email)) {
                 throw new \Exception('no guest email address found', 11);
@@ -1066,7 +1065,7 @@ class CustomerService
             $basketService->setBillingAddressId(0);
             $basketService->setDeliveryAddressId(0);
 
-            $this->sessionStorageRepository->setSessionValue(SessionStorageKeys::GUEST_EMAIL, null);
+            $this->sessionStorageRepository->setSessionValue(SessionStorageRepositoryContract::GUEST_EMAIL, null);
         }
     }
 
@@ -1079,7 +1078,7 @@ class CustomerService
         if ($contact instanceof Contact) {
             $email = $contact->email;
         } else {
-            $email = $this->sessionStorageRepository->getSessionValue(SessionStorageKeys::GUEST_EMAIL);
+            $email = $this->sessionStorageRepository->getSessionValue(SessionStorageRepositoryContract::GUEST_EMAIL);
         }
 
         if (is_null($email)) {

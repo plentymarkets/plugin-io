@@ -2,7 +2,6 @@
 
 namespace IO\Tests\Unit;
 
-use IO\Constants\SessionStorageKeys;
 use IO\Services\NotificationService;
 use IO\Tests\TestCase;
 use Mockery;
@@ -39,7 +38,7 @@ class NotificationServiceTest extends TestCase
 
         $this->sessionStorageRepositoryMock
             ->shouldReceive("getSessionValue")
-            ->with(SessionStorageKeys::NOTIFICATIONS)
+            ->with(SessionStorageRepositoryContract::NOTIFICATIONS)
             ->andReturn(json_encode($notifications));
 
 
@@ -63,7 +62,7 @@ class NotificationServiceTest extends TestCase
 
         $this->sessionStorageRepositoryMock
             ->shouldReceive("getSessionValue")
-            ->with(SessionStorageKeys::NOTIFICATIONS)
+            ->with(SessionStorageRepositoryContract::NOTIFICATIONS)
             ->andReturn(json_encode($notifications));
 
         $this->sessionStorageRepositoryMock

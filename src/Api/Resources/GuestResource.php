@@ -9,7 +9,6 @@ use Plenty\Plugin\Http\Request;
 use IO\Api\ApiResource;
 use IO\Api\ApiResponse;
 use IO\Api\ResponseCode;
-use IO\Constants\SessionStorageKeys;
 
 class GuestResource extends ApiResource
 {
@@ -28,13 +27,13 @@ class GuestResource extends ApiResource
         $sessionStorageRepository = pluginApp(SessionStorageRepositoryContract::class);
 
         $email = $this->request->get('email', '');
-        $existingEmail = $sessionStorageRepository->getSessionValue(SessionStorageKeys::GUEST_EMAIL);
+        $existingEmail = $sessionStorageRepository->getSessionValue(SessionStorageRepositoryContract::GUEST_EMAIL);
 
         if (!is_null($existingEmail) && strlen($existingEmail) && $email !== $existingEmail) {
             $this->customerService->deleteGuestAddresses();
         }
 
-        $sessionStorageRepository->setSessionValue(SessionStorageKeys::GUEST_EMAIL, $email);
+        $sessionStorageRepository->setSessionValue(SessionStorageRepositoryContract::GUEST_EMAIL, $email);
 
         return $this->response->create($email, ResponseCode::OK);
     }

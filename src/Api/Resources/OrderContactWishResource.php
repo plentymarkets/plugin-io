@@ -8,7 +8,6 @@ use Plenty\Plugin\Http\Request;
 use IO\Api\ApiResource;
 use IO\Api\ApiResponse;
 use IO\Api\ResponseCode;
-use IO\Constants\SessionStorageKeys;
 
 /**
  * Class OrderContactWishResource
@@ -34,7 +33,7 @@ class OrderContactWishResource extends ApiResource
         $sessionStorageRepository = pluginApp(SessionStorageRepositoryContract::class);
 
         if (strlen($orderContactWish)) {
-            $sessionStorageRepository->setSessionValue(SessionStorageKeys::ORDER_CONTACT_WISH, $orderContactWish);
+            $sessionStorageRepository->setSessionValue(SessionStorageRepositoryContract::ORDER_CONTACT_WISH, $orderContactWish);
         }
 
         return $this->response->create($orderContactWish, ResponseCode::CREATED);

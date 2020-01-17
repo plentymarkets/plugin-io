@@ -2,7 +2,6 @@
 
 namespace IO\Tests\Unit;
 
-use IO\Constants\SessionStorageKeys;
 use IO\Helper\MemoryCache;
 use IO\Services\CheckoutService;
 use IO\Services\WebstoreConfigurationService;
@@ -11,7 +10,6 @@ use IO\Tests\TestCase;
 use Plenty\Modules\Frontend\Contracts\Checkout;
 use Plenty\Modules\Frontend\Session\Storage\Contracts\FrontendSessionStorageFactoryContract;
 use Plenty\Modules\Plugin\Models\Plugin;
-
 use Illuminate\Support\Facades\Session;
 use Plenty\Modules\System\Models\WebstoreConfiguration;
 use Plenty\Modules\Webshop\Contracts\SessionStorageRepositoryContract;
@@ -72,7 +70,7 @@ class CheckoutServiceCurrencyTest extends TestCase
     {
         $expectedCurrency = $this->fake->currencyCode;
 
-        $this->pluginMock->shouldReceive('getValue')->with(SessionStorageKeys::CURRENCY)->andReturn($expectedCurrency);
+        $this->pluginMock->shouldReceive('getValue')->with(SessionStorageRepositoryContract::CURRENCY)->andReturn($expectedCurrency);
         $this->sessionStorageMock->shouldReceive('getPlugin')->andReturn($this->pluginMock);
 
         $currency = $this->checkoutService->getCurrency();
@@ -89,7 +87,7 @@ class CheckoutServiceCurrencyTest extends TestCase
 
         $expectedCurrency = $webstoreConfiguration->defaultCurrency;
 
-        $this->pluginMock->shouldReceive('getValue')->with(SessionStorageKeys::CURRENCY)->andReturn(null);
+        $this->pluginMock->shouldReceive('getValue')->with(SessionStorageRepositoryContract::CURRENCY)->andReturn(null);
         $this->pluginMock->shouldReceive('setValue')->andReturn();
         $this->sessionStorageMock->shouldReceive('getPlugin')->andReturn($this->pluginMock);
 
@@ -117,7 +115,7 @@ class CheckoutServiceCurrencyTest extends TestCase
 
         $expectedCurrency = "EUR";
 
-        $this->pluginMock->shouldReceive('getValue')->with(SessionStorageKeys::CURRENCY)->andReturn(null);
+        $this->pluginMock->shouldReceive('getValue')->with(SessionStorageRepositoryContract::CURRENCY)->andReturn(null);
         $this->pluginMock->shouldReceive('setValue')->andReturn();
         $this->sessionStorageMock->shouldReceive('getPlugin')->andReturn($this->pluginMock);
 

@@ -2,9 +2,7 @@
 
 namespace IO\Services;
 
-use IO\Constants\SessionStorageKeys;
 use IO\Services\ItemSearch\Factories\VariationSearchResultFactory;
-use IO\Services\ItemSearch\Helper\ResultFieldTemplate;
 use IO\Services\ItemSearch\SearchPresets\BasketItems;
 use IO\Services\ItemSearch\SearchPresets\CategoryItems;
 use IO\Services\ItemSearch\SearchPresets\CrossSellingItems;
@@ -12,9 +10,9 @@ use IO\Services\ItemSearch\SearchPresets\ManufacturerItems;
 use IO\Services\ItemSearch\SearchPresets\TagItems;
 use IO\Services\ItemSearch\SearchPresets\VariationList;
 use IO\Services\ItemSearch\Services\ItemSearchService;
-use IO\Services\ItemWishListService;
 use Plenty\Modules\Basket\Contracts\BasketRepositoryContract;
 use Plenty\Modules\ShopBuilder\Helper\ShopBuilderRequest;
+use Plenty\Modules\Webshop\Contracts\SessionStorageRepositoryContract;
 use Plenty\Plugin\CachingRepository;
 
 class ItemListService
@@ -51,7 +49,7 @@ class ItemListService
                 $cachingRepository = pluginApp(CachingRepository::class);
                 $basketRepository = pluginApp(BasketRepositoryContract::class);
 
-                $variationIds = $cachingRepository->get(SessionStorageKeys::LAST_SEEN_ITEMS . '_' . $basketRepository->load()->id);
+                $variationIds = $cachingRepository->get(SessionStorageRepositoryContract::LAST_SEEN_ITEMS . '_' . $basketRepository->load()->id);
                 $variationIds = array_slice($variationIds, 0, $maxItems);
 
                 if ( !is_null($variationIds) && count($variationIds) > 0 )

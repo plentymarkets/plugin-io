@@ -2,7 +2,6 @@
 
 namespace IO\Providers;
 
-use IO\Constants\SessionStorageKeys;
 use IO\Extensions\Basket\IOFrontendShippingProfileChanged;
 use IO\Extensions\Basket\IOFrontendUpdateDeliveryAddress;
 use IO\Extensions\ContentCache\IOAfterBuildPlugins;
@@ -74,6 +73,7 @@ use Plenty\Modules\Payment\Events\Checkout\ExecutePayment;
 use Plenty\Modules\Plugin\Events\AfterBuildPlugins;
 use Plenty\Modules\Plugin\Events\LoadSitemapPattern;
 use Plenty\Modules\Plugin\Events\PluginSendMail;
+use Plenty\Modules\Webshop\Contracts\SessionStorageRepositoryContract;
 use Plenty\Plugin\ServiceProvider;
 use Plenty\Plugin\Templates\Twig;
 use Plenty\Plugin\Events\Dispatcher;
@@ -240,7 +240,7 @@ class IOServiceProvider extends ServiceProvider
             FrontendCurrencyChanged::class,
             function ($event) {
                 $sessionStorage = pluginApp(FrontendSessionStorageFactoryContract::class);
-                $sessionStorage->getPlugin()->setValue(SessionStorageKeys::CURRENCY, $event->getCurrency());
+                $sessionStorage->getPlugin()->setValue(SessionStorageRepositoryContract::CURRENCY, $event->getCurrency());
             }
         );
 

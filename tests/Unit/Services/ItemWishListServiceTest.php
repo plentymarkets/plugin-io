@@ -1,6 +1,5 @@
 <?php
 
-use IO\Constants\SessionStorageKeys;
 use IO\Repositories\ItemWishListGuestRepository;
 use IO\Repositories\ItemWishListRepository;
 use IO\Services\CustomerService;
@@ -34,7 +33,7 @@ class ItemWishListServiceTest extends SimpleTestCase
 
         $this->sessionStorageRepositoryMock = Mockery::mock(SessionStorageRepositoryContract::class);
         $this->sessionStorageRepositoryMock->shouldReceive('getSessionValue')->with(
-            SessionStorageKeys::GUEST_WISHLIST_MIGRATION
+            SessionStorageRepositoryContract::GUEST_WISHLIST_MIGRATION
         )->andReturnFalse();
         $this->replaceInstanceByMock(SessionStorageRepositoryContract::class, $this->sessionStorageRepositoryMock);
     }

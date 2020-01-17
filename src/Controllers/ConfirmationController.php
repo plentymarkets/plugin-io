@@ -8,7 +8,6 @@ use IO\Middlewares\CheckNotFound;
 use IO\Services\CategoryService;
 use IO\Services\CustomerService;
 use IO\Services\OrderService;
-use IO\Constants\SessionStorageKeys;
 use IO\Models\LocalizedOrder;
 use Plenty\Modules\Category\Models\Category;
 use Plenty\Modules\Order\Models\Order;
@@ -83,7 +82,7 @@ class ConfirmationController extends LayoutController
 
             if (!is_null($order) && $order instanceof LocalizedOrder) {
                 $sessionStorageRepository->setSessionValue(
-                    SessionStorageKeys::LAST_ACCESSED_ORDER,
+                    SessionStorageRepositoryContract::LAST_ACCESSED_ORDER,
                     ['orderId' => $orderId, 'accessKey' => $orderAccesskey]
                 );
             }
@@ -109,7 +108,7 @@ class ConfirmationController extends LayoutController
         }
 
         if (is_null($order)) {
-            $lastAccessedOrder = $sessionStorageRepository->getSessionValue(SessionStorageKeys::LAST_ACCESSED_ORDER);
+            $lastAccessedOrder = $sessionStorageRepository->getSessionValue(SessionStorageRepositoryContract::LAST_ACCESSED_ORDER);
             if (!is_null($lastAccessedOrder) && is_array($lastAccessedOrder)) {
                 try {
                     $order = $orderService->findOrderByAccessKey(

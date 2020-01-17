@@ -1,6 +1,5 @@
 <?php
 
-use IO\Constants\SessionStorageKeys;
 use IO\DBModels\ItemWishList;
 use IO\Repositories\ItemWishListGuestRepository;
 use Plenty\Modules\Webshop\Contracts\SessionStorageRepositoryContract;
@@ -11,7 +10,8 @@ use PluginTests\SimpleTestCase;
  * User: lukasmatzen
  * Date: 02.10.18
  */
-class ItemWishListGuestRepositoryTest extends SimpleTestCase {
+class ItemWishListGuestRepositoryTest extends SimpleTestCase
+{
 
     /** @var SessionStorageRepositoryContract $sessionStorageRepositoryMock */
     protected $sessionStorageRepositoryMock;
@@ -41,12 +41,12 @@ class ItemWishListGuestRepositoryTest extends SimpleTestCase {
     {
         $this->sessionStorageRepositoryMock
             ->shouldReceive('getSessionValue')
-            ->with(SessionStorageKeys::GUEST_WISHLIST)
+            ->with(SessionStorageRepositoryContract::GUEST_WISHLIST)
             ->andReturn(null);
 
         $this->sessionStorageRepositoryMock
             ->shouldReceive('setSessionValue')
-            ->with(SessionStorageKeys::GUEST_WISHLIST, Mockery::any())
+            ->with(SessionStorageRepositoryContract::GUEST_WISHLIST, Mockery::any())
             ->once()
             ->andReturn(null);
 
@@ -63,12 +63,14 @@ class ItemWishListGuestRepositoryTest extends SimpleTestCase {
     {
         $this->sessionStorageRepositoryMock
             ->shouldReceive('getSessionValue')
-            ->with(SessionStorageKeys::GUEST_WISHLIST)
-            ->andReturn('{"1":{"1001":{"id":null,"contactId":0,"plentyId":"1","variationId":1001,"quantity":0,"createdAt":"2018-10-04 15:27:02"}}}');
+            ->with(SessionStorageRepositoryContract::GUEST_WISHLIST)
+            ->andReturn(
+                '{"1":{"1001":{"id":null,"contactId":0,"plentyId":"1","variationId":1001,"quantity":0,"createdAt":"2018-10-04 15:27:02"}}}'
+            );
 
         $this->sessionStorageRepositoryMock
             ->shouldReceive('setSessionValue')
-            ->with(SessionStorageKeys::GUEST_WISHLIST, Mockery::any())
+            ->with(SessionStorageRepositoryContract::GUEST_WISHLIST, Mockery::any())
             ->once()
             ->andReturn(null);
 
@@ -85,12 +87,14 @@ class ItemWishListGuestRepositoryTest extends SimpleTestCase {
     {
         $this->sessionStorageRepositoryMock
             ->shouldReceive('getSessionValue')
-            ->with(SessionStorageKeys::GUEST_WISHLIST)
-            ->andReturn('{"1":{"1000":{"id":null,"contactId":0,"plentyId":"1","variationId":1000,"quantity":1,"createdAt":"2018-10-04 15:27:02"}}}');
+            ->with(SessionStorageRepositoryContract::GUEST_WISHLIST)
+            ->andReturn(
+                '{"1":{"1000":{"id":null,"contactId":0,"plentyId":"1","variationId":1000,"quantity":1,"createdAt":"2018-10-04 15:27:02"}}}'
+            );
 
         $this->sessionStorageRepositoryMock
             ->shouldReceive('setSessionValue')
-            ->with(SessionStorageKeys::GUEST_WISHLIST, Mockery::any())
+            ->with(SessionStorageRepositoryContract::GUEST_WISHLIST, Mockery::any())
             ->once()
             ->andReturn(null);
 
@@ -107,12 +111,14 @@ class ItemWishListGuestRepositoryTest extends SimpleTestCase {
     {
         $this->sessionStorageRepositoryMock
             ->shouldReceive('getSessionValue')
-            ->with(SessionStorageKeys::GUEST_WISHLIST)
-            ->andReturn('{"1":{"1000":{"id":null,"contactId":0,"plentyId":"1","variationId":1000,"quantity":1,"createdAt":"2018-10-04 15:27:02"}}}');
+            ->with(SessionStorageRepositoryContract::GUEST_WISHLIST)
+            ->andReturn(
+                '{"1":{"1000":{"id":null,"contactId":0,"plentyId":"1","variationId":1000,"quantity":1,"createdAt":"2018-10-04 15:27:02"}}}'
+            );
 
         $this->sessionStorageRepositoryMock
             ->shouldReceive('setSessionValue')
-            ->with(SessionStorageKeys::GUEST_WISHLIST, Mockery::any())
+            ->with(SessionStorageRepositoryContract::GUEST_WISHLIST, Mockery::any())
             ->once()
             ->andReturn(null);
 
@@ -126,12 +132,12 @@ class ItemWishListGuestRepositoryTest extends SimpleTestCase {
     {
         $this->sessionStorageRepositoryMock
             ->shouldReceive('getSessionValue')
-            ->with(SessionStorageKeys::GUEST_WISHLIST)
+            ->with(SessionStorageRepositoryContract::GUEST_WISHLIST)
             ->andReturn(null);
 
         $this->sessionStorageRepositoryMock
             ->shouldReceive('setSessionValue')
-            ->with(SessionStorageKeys::GUEST_WISHLIST, Mockery::any())
+            ->with(SessionStorageRepositoryContract::GUEST_WISHLIST, Mockery::any())
             ->andReturn(null);
 
         $response = $this->wishListGuestRepository->removeItemWishListEntry(1000);
