@@ -6,12 +6,12 @@ use IO\Helper\Utils;
 use IO\Services\CategoryService;
 use IO\Services\ItemSearch\Contracts\FacetExtension;
 use IO\Services\SessionStorageService;
-use IO\Services\TemplateConfigService;
 use IO\Services\TemplateService;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Search\Aggregation\AggregationInterface;
 use Plenty\Modules\Item\Search\Aggregations\CategoryAllTermsAggregation;
 use Plenty\Modules\Item\Search\Aggregations\CategoryProcessor;
 use Plenty\Modules\Item\Search\Filter\CategoryFilter;
+use Plenty\Modules\Webshop\Template\Contracts\TemplateConfigRepositoryContract;
 
 class CategoryFacet implements FacetExtension
 {
@@ -38,10 +38,10 @@ class CategoryFacet implements FacetExtension
         /** @var TemplateService $templateService */
         $templateService = pluginApp(TemplateService::class);
 
-        /** @var TemplateConfigService $templateConfigService */
-        $templateConfigService = pluginApp(TemplateConfigService::class);
+        /** @var TemplateConfigRepositoryContract $templateConfigRepo */
+        $templateConfigRepo = pluginApp(TemplateConfigRepositoryContract::class);
 
-        if(!$templateService->isCurrentTemplate('tpl.category.item') && $templateConfigService->get('item.show_category_filter') == 'true')
+        if(!$templateService->isCurrentTemplate('tpl.category.item') && $templateConfigRepo->getBoolean('item.show_category_filter'))
         {
             if(count($result))
             {

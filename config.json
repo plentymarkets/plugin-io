@@ -5,6 +5,7 @@
             "label": "Config.TemplateTab",
             "formFields": {
                 "template.template_plugin_name": {
+                    "deprecated": true,
                     "type": "inputText",
                     "required": false,
                     "label": "Config.templateTemplatePluginNameLabel",

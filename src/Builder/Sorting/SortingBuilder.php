@@ -3,7 +3,7 @@
 namespace IO\Builder\Sorting;
 
 use IO\Helper\Utils;
-use IO\Services\TemplateConfigService;
+use Plenty\Modules\Webshop\Template\Contracts\TemplateConfigRepositoryContract;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Sorting\SingleSorting;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Sorting\MultipleSorting;
 use Plenty\Modules\Item\Search\Sort\NameSorting;
@@ -34,13 +34,13 @@ class SortingBuilder
     public static function buildDefaultSortingSearch()
     {
         /**
-         * @var TemplateConfigService $templateConfigService
+         * @var TemplateConfigRepositoryContract $templateConfigRepo
          */
-        $templateConfigService = pluginApp(TemplateConfigService::class);
+        $templateConfigRepo = pluginApp(TemplateConfigRepositoryContract::class);
 
-        $usedSortingPrioritySearch1 = $templateConfigService->get('sorting.prioritySearch1');
-        $usedSortingPrioritySearch2 = $templateConfigService->get('sorting.prioritySearch2');
-        $usedSortingPrioritySearch3 = $templateConfigService->get('sorting.prioritySearch3');
+        $usedSortingPrioritySearch1 = $templateConfigRepo->get('sorting.prioritySearch1');
+        $usedSortingPrioritySearch2 = $templateConfigRepo->get('sorting.prioritySearch2');
+        $usedSortingPrioritySearch3 = $templateConfigRepo->get('sorting.prioritySearch3');
 
         if($usedSortingPrioritySearch2 == 'notSelected' && $usedSortingPrioritySearch3 == 'notSelected')
         {
@@ -101,13 +101,13 @@ class SortingBuilder
     public static function buildDefaultSortingCategory()
     {
         /**
-         * @var TemplateConfigService $templateConfigService
+         * @var TemplateConfigRepositoryContract $templateConfigRepo
          */
-        $templateConfigService = pluginApp(TemplateConfigService::class);
+        $templateConfigRepo = pluginApp(TemplateConfigRepositoryContract::class);
 
-        $usedSortingPriorityCategory1 = $templateConfigService->get('sorting.priorityCategory1');
-        $usedSortingPriorityCategory2 = $templateConfigService->get('sorting.priorityCategory2');
-        $usedSortingPriorityCategory3 = $templateConfigService->get('sorting.priorityCategory3');
+        $usedSortingPriorityCategory1 = $templateConfigRepo->get('sorting.priorityCategory1');
+        $usedSortingPriorityCategory2 = $templateConfigRepo->get('sorting.priorityCategory2');
+        $usedSortingPriorityCategory3 = $templateConfigRepo->get('sorting.priorityCategory3');
 
         if($usedSortingPriorityCategory2 == 'notSelected' && $usedSortingPriorityCategory3 == 'notSelected')
         {
@@ -144,8 +144,9 @@ class SortingBuilder
         $sortingParameter1 = self::filterSortingString($usedSortingPriority);
         if(strpos($sortingParameter1["sortingPath"], 'texts.name') !== false)
         {
-            $templateConfigService = pluginApp(TemplateConfigService::class);
-            $usedItemName = $templateConfigService->get('item.name');
+            /** @var TemplateConfigRepositoryContract $templateConfigRepo */
+            $templateConfigRepo = pluginApp(TemplateConfigRepositoryContract::class);
+            $usedItemName = $templateConfigRepo->get('item.name');
 
             if(strlen($usedItemName))
             {

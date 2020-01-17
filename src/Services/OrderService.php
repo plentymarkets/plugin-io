@@ -29,6 +29,7 @@ use Plenty\Modules\Order\Property\Models\OrderPropertyType;
 use Plenty\Modules\Order\Status\Contracts\OrderStatusRepositoryContract;
 use Plenty\Modules\Payment\Contracts\PaymentRepositoryContract;
 use Plenty\Modules\Payment\Method\Contracts\PaymentMethodRepositoryContract;
+use Plenty\Modules\Webshop\Template\Contracts\TemplateConfigRepositoryContract;
 use Plenty\Plugin\Log\Loggable;
 use Plenty\Repositories\Models\PaginatedResult;
 use Plenty\Modules\Order\Models\Order;
@@ -283,10 +284,10 @@ class OrderService
 	public function findOrderByAccessKey($orderId, $orderAccessKey)
     {
         /**
-         * @var TemplateConfigService $templateConfigService
+         * @var TemplateConfigRepositoryContract $templateConfigRepo
          */
-        $templateConfigService = pluginApp(TemplateConfigService::class);
-        $redirectToLogin = $templateConfigService->getBoolean('my_account.confirmation_link_login_redirect');
+        $templateConfigRepo = pluginApp(TemplateConfigRepositoryContract::class);
+        $redirectToLogin = $templateConfigRepo->getBoolean('my_account.confirmation_link_login_redirect');
 
         $order = $this->orderRepository->findOrderByAccessKey($orderId, $orderAccessKey);
 
@@ -636,9 +637,9 @@ class OrderService
      */
 	public function allowPaymentMethodSwitchFrom($paymentMethodId, $orderId = null)
 	{
-		/** @var TemplateConfigService $config */
-		$config = pluginApp(TemplateConfigService::class);
-		if (!$config->getBoolean('my_account.change_payment'))
+		/** @var TemplateConfigRepositoryContract $templateConfigRepo */
+		$templateConfigRepo = pluginApp(TemplateConfigRepositoryContract::class);
+		if (!$templateConfigRepo->getBoolean('my_account.change_payment'))
 		{
 			return false;
 		}
@@ -855,9 +856,9 @@ class OrderService
 
     private function getReturnOrderStatus()
     {
-        /** @var TemplateConfigService $templateConfigService */
-        $templateConfigService = pluginApp(TemplateConfigService::class);
-        $returnStatus = $templateConfigService->get('my_account.order_return_initial_status', 9.0);
+        /** @var TemplateConfigRepositoryContract $templateConfigRepo */
+        $templateConfigRepo = pluginApp(TemplateConfigRepositoryContract::class);
+        $returnStatus = $templateConfigRepo->get('my_account.order_return_initial_status', 9.0);
 
         if (strlen($returnStatus) && (float)$returnStatus > 0) {
             $returnStatus = (float)$returnStatus;

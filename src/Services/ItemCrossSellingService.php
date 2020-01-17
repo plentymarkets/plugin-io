@@ -3,8 +3,9 @@
 namespace IO\Services;
 
 use IO\Constants\SessionStorageKeys;
-use IO\Contracts\SortingContract as SortingHelper;
+use Plenty\Modules\Webshop\ItemSearch\Helper\SortingHelper;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\ElasticSearch;
+use Plenty\Modules\Webshop\Template\Contracts\TemplateConfigRepositoryContract;
 
 /**
  * Class ItemCrossSellingService
@@ -14,22 +15,22 @@ class ItemCrossSellingService
 {
     private $sessionStorage;
     
-    /** @var TemplateConfigService */
-    private $templateConfigService;
+    /** @var TemplateConfigRepositoryContract */
+    private $templateConfigRepo;
     
-    /** @var SortingContract */
+    /** @var SortingHelper */
     private $sortingHelper;
     
     /**
      * ItemLastSeenService constructor.
      * @param SessionStorageService $sessionStorage
-     * @param TemplateConfigService $templateConfigService
-     * @param SortingContract $sortingHelper
+     * @param TemplateConfigRepositoryContract $templateConfigRepo
+     * @param SortingHelper $sortingHelper
      */
-    public function __construct(SessionStorageService $sessionStorage, TemplateConfigService $templateConfigService, SortingHelper $sortingHelper)
+    public function __construct(SessionStorageService $sessionStorage, TemplateConfigRepositoryContract $templateConfigRepo, SortingHelper $sortingHelper)
     {
         $this->sessionStorage = $sessionStorage;
-        $this->templateConfigService = $templateConfigService;
+        $this->templateConfigRepo = $templateConfigRepo;
         $this->sortingHelper = $sortingHelper;
     }
     
@@ -46,7 +47,7 @@ class ItemCrossSellingService
     
     public function getType()
     {
-        return $this->templateConfigService->get('item.lists.cross_selling_type', 'Similar');
+        return $this->templateConfigRepo->get('item.lists.cross_selling_type', 'Similar');
     }
     
     public function setSorting($sorting)
@@ -61,7 +62,7 @@ class ItemCrossSellingService
     
     public function getSorting()
     {
-        $sorting = $this->templateConfigService->get('item.lists.cross_selling_sorting');
+        $sorting = $this->templateConfigRepo->get('item.lists.cross_selling_sorting');
         
         if(is_null($sorting) || !strlen($sorting))
         {
