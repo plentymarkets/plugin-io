@@ -34,6 +34,7 @@ use Plenty\Modules\Helper\AutomaticEmail\Models\AutomaticEmailTemplate;
 use Plenty\Modules\Helper\AutomaticEmail\Models\AutomaticEmailContact;
 use Plenty\Modules\System\Contracts\WebstoreConfigurationRepositoryContract;
 use Plenty\Modules\System\Models\WebstoreConfiguration;
+use Plenty\Modules\Webshop\Contracts\SessionStorageRepositoryContract;
 use Plenty\Plugin\Events\Dispatcher;
 
 /**
@@ -60,8 +61,8 @@ class CustomerService
     /** @var ContactClassRepositoryContract */
     private $contactClassRepository;
 
-    /** @var SessionStorageService */
-    private $sessionStorage;
+    /** @var SessionStorageRepositoryContract */
+    private $sessionStorageRepository;
 
     /**
      * CustomerService constructor.
@@ -70,7 +71,7 @@ class CustomerService
      * @param ContactAddressRepositoryContract $contactAddressRepository
      * @param AddressRepositoryContract $addressRepository
      * @param ContactClassRepositoryContract $contactClassRepository
-     * @param \IO\Services\SessionStorageService $sessionStorage
+     * @param SessionStorageRepositoryContract $sessionStorage
      */
     public function __construct(
         ContactAccountRepositoryContract $accountRepository,
@@ -78,14 +79,14 @@ class CustomerService
         ContactAddressRepositoryContract $contactAddressRepository,
         AddressRepositoryContract $addressRepository,
         ContactClassRepositoryContract $contactClassRepository,
-        SessionStorageService $sessionStorage
+        SessionStorageRepositoryContract $sessionStorageRepository
     ) {
         $this->accountRepository = $accountRepository;
         $this->contactRepository = $contactRepository;
         $this->contactAddressRepository = $contactAddressRepository;
         $this->addressRepository = $addressRepository;
         $this->contactClassRepository = $contactClassRepository;
-        $this->sessionStorage = $sessionStorage;
+        $this->sessionStorageRepository = $sessionStorageRepository;
     }
 
     /**
@@ -134,9 +135,9 @@ class CustomerService
             'showNetPrices',
             function () {
                 $customerShowNet = false;
-                /** @var SessionStorageService $sessionStorageService */
-                $sessionStorageService = pluginApp(SessionStorageService::class);
-                $customer = $sessionStorageService->getCustomer();
+                /** @var SessionStorageRepositoryContract $sessionStorageRepository */
+                $sessionStorageRepository = pluginApp(SessionStorageRepositoryContract::class);
+                $customer = $sessionStorageRepository->getCustomer();
                 if ($customer !== null) {
                     $customerShowNet = $customer->showNetPrice;
                 }
@@ -239,14 +240,14 @@ class CustomerService
         $newDeliveryAddress = null;
 
         $guestBillingAddress = null;
-        //$guestBillingAddressId = $this->sessionStorage->getSessionValue(SessionStorageKeys::BILLING_ADDRESS_ID);
+        //$guestBillingAddressId = $this->sessionStorageRepository->getSessionValue(SessionStorageKeys::BILLING_ADDRESS_ID);
         $guestBillingAddressId = $basketService->getBillingAddressId();
         if ((int)$guestBillingAddressId > 0) {
             $guestBillingAddress = $this->addressRepository->findAddressById($guestBillingAddressId);
         }
 
         $guestDeliveryAddress = null;
-        //$guestDeliveryAddressId = $this->sessionStorage->getSessionValue(SessionStorageKeys::DELIVERY_ADDRESS_ID);
+        //$guestDeliveryAddressId = $this->sessionStorageRepository->getSessionValue(SessionStorageKeys::DELIVERY_ADDRESS_ID);
         $guestDeliveryAddressId = $basketService->getDeliveryAddressId();
         if ((int)$guestDeliveryAddressId > 0) {
             $guestDeliveryAddress = $this->addressRepository->findAddressById($guestDeliveryAddressId);
@@ -263,7 +264,7 @@ class CustomerService
                     $guestBillingAddress->toArray(),
                     AddressType::BILLING
                 );
-                //$this->sessionStorage->setSessionValue(SessionStorageKeys::BILLING_ADDRESS_ID, $newBillingAddress->id);
+                //$this->sessionStorageRepository->setSessionValue(SessionStorageKeys::BILLING_ADDRESS_ID, $newBillingAddress->id);
                 $basketService->setBillingAddressId($newBillingAddress->id);
             }
 
@@ -272,19 +273,19 @@ class CustomerService
                     $guestDeliveryAddress->toArray(),
                     AddressType::DELIVERY
                 );
-                //$this->sessionStorage->setSessionValue(SessionStorageKeys::DELIVERY_ADDRESS_ID, $newDeliveryAddress->id);
+                //$this->sessionStorageRepository->setSessionValue(SessionStorageKeys::DELIVERY_ADDRESS_ID, $newDeliveryAddress->id);
                 $basketService->setDeliveryAddressId($newDeliveryAddress->id);
             }
 
             if ($billingAddressData !== null) {
                 $newBillingAddress = $this->createAddress($billingAddressData, AddressType::BILLING);
-                //$this->sessionStorage->setSessionValue(SessionStorageKeys::BILLING_ADDRESS_ID, $newBillingAddress->id);
+                //$this->sessionStorageRepository->setSessionValue(SessionStorageKeys::BILLING_ADDRESS_ID, $newBillingAddress->id);
                 $basketService->setBillingAddressId($newBillingAddress->id);
             }
 
             if ($deliveryAddressData !== null) {
                 $newDeliveryAddress = $this->createAddress($deliveryAddressData, AddressType::DELIVERY);
-                //$this->sessionStorage->setSessionValue(SessionStorageKeys::DELIVERY_ADDRESS_ID, $newDeliveryAddress->id);
+                //$this->sessionStorageRepository->setSessionValue(SessionStorageKeys::DELIVERY_ADDRESS_ID, $newDeliveryAddress->id);
                 $basketService->setDeliveryAddressId($newDeliveryAddress->id);
             }
 
@@ -298,6 +299,7 @@ class CustomerService
                 'contactId' => $contact->id,
                 'clientId' => Utils::getWebstoreId(),
                 'password' => $contactData['password'],
+                //TODO VDI MEYER
                 'language' => $this->sessionStorage->getLang()
             ];
 
@@ -352,6 +354,7 @@ class CustomerService
         $contactData['plentyId'] = Utils::getPlentyId();
 
         if (!isset($contactData['lang']) || is_null($contactData['lang'])) {
+            //TODO VDI MEYER
             $contactData['lang'] = $this->sessionStorage->getLang();
         }
 
@@ -536,6 +539,7 @@ class CustomerService
             $params = [
                 'contactId' => $contact->id,
                 'clientId' => $webstoreConfiguration->webstoreId,
+                //TODO VDI MEYER
                 'language' => $this->sessionStorage->getLang()
             ];
 
@@ -727,9 +731,9 @@ class CustomerService
     private function buildAddressEmailOptions(array $options = [], $isGuest = false, $addressData = []): array
     {
         if ($isGuest) {
-            /** @var SessionStorageService $sessionStorage */
-            $sessionStorage = pluginApp(SessionStorageService::class);
-            $email = $sessionStorage->getSessionValue(SessionStorageKeys::GUEST_EMAIL);
+            /** @var SessionStorageRepositoryContract $sessionStorageRepository */
+            $sessionStorageRepository = pluginApp(SessionStorageRepositoryContract::class);
+            $email = $sessionStorageRepository->getSessionValue(SessionStorageKeys::GUEST_EMAIL);
 
             if (!strlen($email)) {
                 throw new \Exception('no guest email address found', 11);
@@ -1061,7 +1065,7 @@ class CustomerService
             $basketService->setBillingAddressId(0);
             $basketService->setDeliveryAddressId(0);
 
-            $this->sessionStorage->setSessionValue(SessionStorageKeys::GUEST_EMAIL, null);
+            $this->sessionStorageRepository->setSessionValue(SessionStorageKeys::GUEST_EMAIL, null);
         }
     }
 
@@ -1074,7 +1078,7 @@ class CustomerService
         if ($contact instanceof Contact) {
             $email = $contact->email;
         } else {
-            $email = $this->sessionStorage->getSessionValue(SessionStorageKeys::GUEST_EMAIL);
+            $email = $this->sessionStorageRepository->getSessionValue(SessionStorageKeys::GUEST_EMAIL);
         }
 
         if (is_null($email)) {

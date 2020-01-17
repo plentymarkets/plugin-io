@@ -5,7 +5,6 @@ namespace IO\Extensions\Filters;
 use IO\Extensions\AbstractFilter;
 use IO\Helper\Utils;
 use IO\Services\ItemService;
-use IO\Services\SessionStorageService;
 use IO\Services\UrlBuilder\ItemUrlBuilder;
 use IO\Services\UrlBuilder\VariationUrlBuilder;
 use IO\Services\WebstoreConfigurationService;
@@ -22,11 +21,6 @@ class URLFilter extends AbstractFilter
     private $itemService;
 
     /**
-     * @var SessionStorageService $sessionStorageService
-     */
-    private $sessionStorageService;
-
-    /**
      * @var WebstoreConfigurationService $webstoreConfigurationService
      */
     private $webstoreConfigurationService;
@@ -39,7 +33,6 @@ class URLFilter extends AbstractFilter
     {
         parent::__construct();
         $this->itemService = $itemService;
-        $this->sessionStorageService = pluginApp(SessionStorageService::class);
         $this->webstoreConfigurationService = pluginApp(WebstoreConfigurationService::class);
     }
 

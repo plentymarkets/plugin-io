@@ -61,6 +61,7 @@ class CategoryController extends LayoutController
 
     public function showCategoryById($categoryId, $params = [])
     {
+        //TODO VDI MEYER
         /** @var SessionStorageService $sessionService */
         $sessionService = pluginApp(SessionStorageService::class);
         $lang = $sessionService->getLang();
@@ -73,6 +74,7 @@ class CategoryController extends LayoutController
 
     public function redirectToCategory($categoryId, $defaultUrl = '', $params = [])
     {
+        //TODO VDI MEYER
         /** @var SessionStorageService $sessionService */
         $sessionService = pluginApp(SessionStorageService::class);
         $lang = $sessionService->getLang();

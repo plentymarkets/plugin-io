@@ -39,6 +39,8 @@ class CategoryDescriptionResource extends ApiResource
         $description2 = (int)$this->request->get('description2', 0);
 
         $categoryService = pluginApp(CategoryService::class);
+
+        //TODO VDI MEYER
         $sessionStorageService = pluginApp(SessionStorageService::class);
 
         $category = $categoryService->get($categoryId, $sessionStorageService->getLang());
@@ -46,14 +48,14 @@ class CategoryDescriptionResource extends ApiResource
         if($category instanceof Category)
         {
             $categoryDetails = $categoryService->getDetails($category, $sessionStorageService->getLang());
-    
+
             if($categoryDetails instanceof CategoryDetails)
             {
                 if($description1)
                 {
                     $response['description1'] = $categoryDetails->description;
                 }
-        
+
                 if($description2)
                 {
                     $response['description2'] = $categoryDetails->description2;

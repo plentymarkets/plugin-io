@@ -8,7 +8,6 @@ use IO\Middlewares\CheckNotFound;
 use IO\Services\CategoryService;
 use IO\Services\CustomerService;
 use IO\Services\OrderService;
-use IO\Services\SessionStorageService;
 use IO\Constants\SessionStorageKeys;
 use IO\Models\LocalizedOrder;
 use IO\Services\TemplateConfigService;
@@ -16,6 +15,7 @@ use Plenty\Modules\Category\Models\Category;
 use Plenty\Modules\Order\Date\Models\OrderDateType;
 use Plenty\Modules\Order\Models\Order;
 use Plenty\Modules\ShopBuilder\Helper\ShopBuilderRequest;
+use Plenty\Modules\Webshop\Contracts\SessionStorageRepositoryContract;
 use Plenty\Plugin\ConfigRepository;
 use Plenty\Plugin\Http\Response;
 use Plenty\Plugin\Log\Loggable;
@@ -35,45 +35,40 @@ class ConfirmationController extends LayoutController
     public function showConfirmation(int $orderId = 0, $orderAccesskey = '', $category = null)
     {
         $order = null;
-    
-        /** @var SessionStorageService $sessionStorageService */
-        $sessionStorageService = pluginApp(SessionStorageService::class);
+
+        /** @var SessionStorageRepositoryContract $sessionStorageRepository */
+        $sessionStorageRepository = pluginApp(SessionStorageRepositoryContract::class);
 
         /** @var ShopBuilderRequest $shopBuilderRequest */
         $shopBuilderRequest = pluginApp(ShopBuilderRequest::class);
         $shopBuilderRequest->setMainContentType('checkout');
-    
+
         /**
          * @var CustomerService $customerService
          */
         $customerService = pluginApp(CustomerService::class);
-    
+
         /**
          * @var OrderService $orderService
          */
         $orderService = pluginApp(OrderService::class);
 
-        if($shopBuilderRequest->isShopBuilder() && !is_null($category))
-        {
+        if ($shopBuilderRequest->isShopBuilder() && !is_null($category)) {
             return $this->renderTemplate(
-            "tpl.confirmation",
-            [
-                "category" => $category,
-                "data" => null,
-                "showAdditionalPaymentInformation" => true
-            ],
-            false
-        );
+                "tpl.confirmation",
+                [
+                    "category" => $category,
+                    "data" => null,
+                    "showAdditionalPaymentInformation" => true
+                ],
+                false
+            );
         }
-        
-        if(strlen($orderAccesskey) && (int)$orderId > 0)
-        {
-            try
-            {
+
+        if (strlen($orderAccesskey) && (int)$orderId > 0) {
+            try {
                 $order = $orderService->findOrderByAccessKey($orderId, $orderAccesskey);
-            }
-            catch(\Exception $e)
-            {
+            } catch (\Exception $e) {
                 $this->getLogger(__CLASS__)->warning(
                     "IO::Debug.ConfirmationController_cannotFindOrderByAccessKey",
                     [
@@ -87,26 +82,20 @@ class ConfirmationController extends LayoutController
                 );
             }
 
-            if(!is_null($order) && $order instanceof LocalizedOrder)
-            {
-                $sessionStorageService->setSessionValue(SessionStorageKeys::LAST_ACCESSED_ORDER, ['orderId' => $orderId, 'accessKey' => $orderAccesskey]);
+            if (!is_null($order) && $order instanceof LocalizedOrder) {
+                $sessionStorageRepository->setSessionValue(
+                    SessionStorageKeys::LAST_ACCESSED_ORDER,
+                    ['orderId' => $orderId, 'accessKey' => $orderAccesskey]
+                );
             }
-        }
-        else
-        {
-            try
-            {
-                if($orderId > 0)
-                {
+        } else {
+            try {
+                if ($orderId > 0) {
                     $order = $orderService->findOrderById($orderId);
-                }
-                else
-                {
+                } else {
                     $order = $customerService->getLatestOrder();
                 }
-            }
-            catch(\Exception $e)
-            {
+            } catch (\Exception $e) {
                 $this->getLogger(__CLASS__)->warning(
                     "IO::Debug.ConfirmationController_cannotFindOrder",
                     [
@@ -119,50 +108,44 @@ class ConfirmationController extends LayoutController
                 );
             }
         }
-        
-        if(is_null($order))
-        {
-            $lastAccessedOrder = $sessionStorageService->getSessionValue(SessionStorageKeys::LAST_ACCESSED_ORDER);
-            if(!is_null($lastAccessedOrder) && is_array($lastAccessedOrder))
-            {
-                try
-                {
-                    $order = $orderService->findOrderByAccessKey($lastAccessedOrder['orderId'], $lastAccessedOrder['accessKey']);
-                }
-                catch(\Exception $e)
-                {
+
+        if (is_null($order)) {
+            $lastAccessedOrder = $sessionStorageRepository->getSessionValue(SessionStorageKeys::LAST_ACCESSED_ORDER);
+            if (!is_null($lastAccessedOrder) && is_array($lastAccessedOrder)) {
+                try {
+                    $order = $orderService->findOrderByAccessKey(
+                        $lastAccessedOrder['orderId'],
+                        $lastAccessedOrder['accessKey']
+                    );
+                } catch (\Exception $e) {
                     $this->getLogger(__CLASS__)->warning(
                         "IO::Debug.ConfirmationController_cannotFindLastOrderByAccessKey",
                         [
-                            "orderId"        => $lastAccessedOrder['orderId'],
+                            "orderId" => $lastAccessedOrder['orderId'],
                             "orderAccessKey" => $lastAccessedOrder['accessKey'],
                             "error" => [
-                                "code"      => $e->getCode(),
-                                "message"   => $e->getMessage()
+                                "code" => $e->getCode(),
+                                "message" => $e->getMessage()
                             ]
                         ]
                     );
                 }
             }
         }
-        
-        if(!is_null($order) && $order instanceof LocalizedOrder)
-        {
-            if($this->checkValidity($order->order))
-            {
-                if($category instanceof Category && $customerService->getContactId() <= 0)
-                {
+
+        if (!is_null($order) && $order instanceof LocalizedOrder) {
+            if ($this->checkValidity($order->order)) {
+                if ($category instanceof Category && $customerService->getContactId() <= 0) {
                     /** @var ConfigRepository $config */
                     $config = pluginApp(ConfigRepository::class);
                     $categoryGuestId = (int)$config->get('IO.routing.category_confirmation-guest', 0);
-                    if($categoryGuestId > 0)
-                    {
+                    if ($categoryGuestId > 0) {
                         /** @var CategoryService $categoryService */
                         $categoryService = pluginApp(CategoryService::class);
                         $category = $categoryService->get($categoryGuestId);
                     }
                 }
-                
+
                 return $this->renderTemplate(
                     "tpl.confirmation",
                     [
@@ -172,24 +155,18 @@ class ConfirmationController extends LayoutController
                     ],
                     false
                 );
-            }
-            else
-            {
+            } else {
                 /** @var Response $response */
                 $response = pluginApp(Response::class);
                 $response->forceStatus(ResponseCode::NOT_FOUND);
-    
+
                 CheckNotFound::$FORCE_404 = true;
-    
+
                 return $response;
             }
-        }
-        elseif(!$order instanceof LocalizedOrder && !is_null($order))
-        {
+        } elseif (!$order instanceof LocalizedOrder && !is_null($order)) {
             return $order;
-        }
-        else
-        {
+        } else {
             $this->getLogger(__CLASS__)->warning("IO::Debug.ConfirmationController_orderNotFound");
             /** @var Response $response */
             $response = pluginApp(Response::class);
@@ -200,36 +177,36 @@ class ConfirmationController extends LayoutController
             return $response;
         }
     }
-    
+
     private function checkValidity(Order $order)
     {
         /** @var TemplateConfigService $templateConfigService */
         $templateConfigService = pluginApp(TemplateConfigService::class);
         $expiration = $templateConfigService->get('my_account.confirmation_link_expiration', 'always');
-        
-        if($expiration !== 'always')
-        {
+
+        if ($expiration !== 'always') {
             $now = time();
-    
+
             $orderDates = $order->dates;
-            $orderCreationDate = $orderDates->filter(function($date){
-                return $date->typeId == OrderDateType::ORDER_ENTRY_AT;
-            })->first()->date->timestamp;
-    
-            if($now > $orderCreationDate + ((int)$expiration * (24 * 60 * 60)))
-            {
+            $orderCreationDate = $orderDates->filter(
+                function ($date) {
+                    return $date->typeId == OrderDateType::ORDER_ENTRY_AT;
+                }
+            )->first()->date->timestamp;
+
+            if ($now > $orderCreationDate + ((int)$expiration * (24 * 60 * 60))) {
                 $this->getLogger(__CLASS__)->warning(
                     "IO::Debug.ConfirmationController_confirmationLinkExpired",
                     [
-                        "order"           => $order,
-                        "creationDate"    => $orderCreationDate,
-                        "expiration"      => $expiration
+                        "order" => $order,
+                        "creationDate" => $orderCreationDate,
+                        "expiration" => $expiration
                     ]
                 );
                 return false;
             }
         }
-        
+
         return true;
     }
 
@@ -237,8 +214,7 @@ class ConfirmationController extends LayoutController
     {
         $confirmationParams = [];
 
-        if((int)$orderId > 0 && strlen($accessKey))
-        {
+        if ((int)$orderId > 0 && strlen($accessKey)) {
             $confirmationParams['orderId'] = $orderId;
             $confirmationParams['accessKey'] = $accessKey;
         }
@@ -246,6 +222,10 @@ class ConfirmationController extends LayoutController
         /** @var CategoryController $categoryController */
         $categoryController = pluginApp(CategoryController::class);
 
-        return $categoryController->redirectToCategory(RouteConfig::getCategoryId(RouteConfig::CONFIRMATION), '/confirmation', $confirmationParams);
+        return $categoryController->redirectToCategory(
+            RouteConfig::getCategoryId(RouteConfig::CONFIRMATION),
+            '/confirmation',
+            $confirmationParams
+        );
     }
 }

@@ -3,25 +3,25 @@
 namespace IO\Tests\Unit;
 
 use IO\Constants\SessionStorageKeys;
-use IO\Services\SessionStorageService;
 use IO\Services\NotificationService;
 use IO\Tests\TestCase;
 use Mockery;
+use Plenty\Modules\Webshop\Contracts\SessionStorageRepositoryContract;
 
 
 class NotificationServiceTest extends TestCase
 {
-    /* @var SessionStorageService $sessionStorageServiceMock*/
-    protected $sessionStorageServiceMock;
+    /* @var SessionStorageRepositoryContract $sessionStorageRepositoryMock */
+    protected $sessionStorageRepositoryMock;
 
-    /* @var NotificationService $notificationService*/
+    /* @var NotificationService $notificationService */
     protected $notificationService;
 
     protected function setUp()
     {
         parent::setUp();
-        $this->sessionStorageServiceMock = Mockery::mock(SessionStorageService::class);
-        $this->replaceInstanceByMock(SessionStorageService::class, $this->sessionStorageServiceMock);
+        $this->sessionStorageRepositoryMock = Mockery::mock(SessionStorageRepositoryContract::class);
+        $this->replaceInstanceByMock(SessionStorageRepositoryContract::class, $this->sessionStorageRepositoryMock);
 
         $this->notificationService = pluginApp(NotificationService::class);
     }
@@ -30,46 +30,46 @@ class NotificationServiceTest extends TestCase
     public function it_checks_if_getNotifications_gets_cleared_when_true()
     {
         $notifications = [
-            "error"     => null,
-            "warn"      => null,
-            "info"      => null,
-            "success"   => null,
-            "log"       => null
+            "error" => null,
+            "warn" => null,
+            "info" => null,
+            "success" => null,
+            "log" => null
         ];
 
-        $this->sessionStorageServiceMock
+        $this->sessionStorageRepositoryMock
             ->shouldReceive("getSessionValue")
             ->with(SessionStorageKeys::NOTIFICATIONS)
             ->andReturn(json_encode($notifications));
 
 
-        $this->sessionStorageServiceMock
+        $this->sessionStorageRepositoryMock
             ->shouldReceive("setSessionValue")
             ->andReturn();
 
-        $this->assertEquals($notifications,$this->notificationService->getNotifications(true));
+        $this->assertEquals($notifications, $this->notificationService->getNotifications(true));
     }
 
     /** @test */
     public function it_checks_if_getNotifications_with_false_parameter_does_not_clear_notifications()
     {
         $notifications = [
-            "error"     => null,
-            "warn"      => null,
-            "info"      => null,
-            "success"   => null,
-            "log"       => ['test' => 'test']
+            "error" => null,
+            "warn" => null,
+            "info" => null,
+            "success" => null,
+            "log" => ['test' => 'test']
         ];
 
-        $this->sessionStorageServiceMock
+        $this->sessionStorageRepositoryMock
             ->shouldReceive("getSessionValue")
             ->with(SessionStorageKeys::NOTIFICATIONS)
             ->andReturn(json_encode($notifications));
 
-        $this->sessionStorageServiceMock
+        $this->sessionStorageRepositoryMock
             ->shouldReceive("setSessionValue")
             ->andReturn();
 
-        $this->assertEquals($notifications,$this->notificationService->getNotifications(false));
+        $this->assertEquals($notifications, $this->notificationService->getNotifications(false));
     }
 }

@@ -20,18 +20,19 @@ class LocalizedOrderFaker extends AbstractFaker
     {
         /** @var Translator $translator */
         $translator = pluginApp(Translator::class);
-        
+
+        //TODO VDI MEYER
         /** @var SessionStorageService $sessionStorageService */
         $sessionStorageService = pluginApp(SessionStorageService::class);
         $lang = $sessionStorageService->getLang();
-    
+
         $paymentMethodName = '';
         $paymentMethodIcon = '';
-        
+
         /** @var FrontendPaymentMethodRepositoryContract $frontentPaymentRepository */
         $frontendPaymentRepository = pluginApp( FrontendPaymentMethodRepositoryContract::class );
         $paymentMethodList = $frontendPaymentRepository->getCurrentPaymentMethodsList();
-        
+
         if(count($paymentMethodList))
         {
             $paymentMethod = $this->rand($paymentMethodList);
@@ -45,15 +46,15 @@ class LocalizedOrderFaker extends AbstractFaker
         {
             $paymentMethodName = $translator->trans('IO::Faker.paymentMethodName');
         }
-        
+
         $shippingProfileName = '';
         $shippingProvider = '';
-        
+
         /**
          * @var ParcelServicePresetRepositoryContract $parcelServicePresetRepository
          */
         $parcelServicePresetRepository = pluginApp(ParcelServicePresetRepositoryContract::class);
-    
+
         $shippingProfileList = $parcelServicePresetRepository->getPresetList();
         $shippingProfile = $this->rand($shippingProfileList);
         foreach( $shippingProfile->parcelServicePresetNames as $name )
@@ -64,7 +65,7 @@ class LocalizedOrderFaker extends AbstractFaker
                 break;
             }
         }
-    
+
         foreach( $shippingProfile->parcelServiceNames as $name )
         {
             if( $name->lang === $lang )
@@ -73,19 +74,19 @@ class LocalizedOrderFaker extends AbstractFaker
                 break;
             }
         }
-    
+
         $orderStatusName = '';
-        
+
         /** @var OrderStatusRepositoryContract $orderStatusRepo */
         $orderStatusRepo = pluginApp(OrderStatusRepositoryContract::class);
-    
+
         /** @var AuthHelper $authHelper */
         $authHelper = pluginApp(AuthHelper::class);
-    
+
         $orderStatusList = $authHelper->processUnguarded(function() use ($orderStatusRepo){
             return $orderStatusRepo->all();
         });
-    
+
         if(count($orderStatusList))
         {
             $orderStatus = $this->rand($orderStatusList);
@@ -98,7 +99,7 @@ class LocalizedOrderFaker extends AbstractFaker
         {
             $orderStatusName = $translator->trans('IO::Faker.orderStatusName');
         }
-    
+
         /** @var ItemImagesFilter $imageFilter */
         $imageFilter = pluginApp(ItemImagesFilter::class);
 
@@ -110,7 +111,7 @@ class LocalizedOrderFaker extends AbstractFaker
                 $itemImages[$variationId] = $imageFilter->getFirstItemImageUrl( $variations[$variationId]['images'], 'urlMiddle' );
             }
         }
-        
+
         $default = [
             'paymentMethodName'   => $paymentMethodName,
             'paymentMethodIcon'   => $paymentMethodIcon,
@@ -120,7 +121,7 @@ class LocalizedOrderFaker extends AbstractFaker
             'itemImages'          => $itemImages,
             'variations'          => $variations
         ];
-        
+
         $this->merge($data, $default);
         return $data;
     }

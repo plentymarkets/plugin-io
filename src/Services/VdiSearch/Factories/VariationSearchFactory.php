@@ -555,6 +555,7 @@ class VariationSearchFactory extends BaseSearchFactory implements VariationSearc
     {
         if ( $lang === null )
         {
+            //TODO VDI MEYER
             $lang = pluginApp( SessionStorageService::class )->getLang();
         }
 
@@ -575,6 +576,7 @@ class VariationSearchFactory extends BaseSearchFactory implements VariationSearc
     {
         if ( $lang === null )
         {
+            //TODO VDI MEYER
             $lang = pluginApp( SessionStorageService::class )->getLang();
         }
 

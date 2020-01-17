@@ -25,12 +25,12 @@ class OrderTemplateResource extends ApiResource
      * @var OrderRepositoryContract
      */
     private $orderRepository;
-    
+
     /**
      * @var TemplateService
      */
     private $templateService;
-    
+
     /**
      * OrderTemplateResource constructor.
      * @param Request $request
@@ -41,25 +41,27 @@ class OrderTemplateResource extends ApiResource
     public function __construct(Request $request, ApiResponse $response, OrderRepositoryContract $orderRepository, TemplateService $templateService)
     {
         parent::__construct($request, $response);
-        
+
         $this->orderRepository = $orderRepository;
         $this->templateService = $templateService;
     }
-    
+
     /**
      * Return the given rendered order template
      * @return Response
      */
     public function index():Response
     {
+
+        //TODO VDI MEYER
         /** @var SessionStorageService $sessionStorageService */
         $sessionStorageService = pluginApp(SessionStorageService::class);
 
         $renderedTemplate = '';
-        
+
         $template = $this->request->get('template', '');
         $orderId = $this->request->get('orderId', 0);
-        
+
         if((int)$orderId > 0)
         {
             $order = $this->orderRepository->findOrderById($orderId);
@@ -73,8 +75,8 @@ class OrderTemplateResource extends ApiResource
                 ]);
             }
         }
-        
+
         return $this->response->create($renderedTemplate, ResponseCode::OK);
     }
-    
+
 }

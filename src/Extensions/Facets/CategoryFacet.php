@@ -45,6 +45,7 @@ class CategoryFacet implements FacetExtension
         {
             if(count($result))
             {
+                //TODO VDI MEYER
                  /** @var SessionStorageService $sessionStorage */
                 $sessionStorage = pluginApp(SessionStorageService::class);
 
@@ -114,17 +115,17 @@ class CategoryFacet implements FacetExtension
                     $categoryIds[] = $e[1];
                 }
             }
-            
+
             if(count($categoryIds))
             {
                 /** @var CategoryFilter $categoryFilter */
                 $categoryFilter = pluginApp(CategoryFilter::class);
                 $categoryFilter->isInAtLeastOneCategory($categoryIds);
-                
+
                 return $categoryFilter;
             }
         }
-        
+
         return null;
     }
 }

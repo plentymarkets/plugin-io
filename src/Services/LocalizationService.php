@@ -10,11 +10,12 @@ class LocalizationService
 {
     public function __construct()
     {
-        
+
     }
 
     public function getLocalizationData()
     {
+        //TODO VDI MEYER EVENTUELL SOGAR DIE LANG METHODE HIER REIN ?
         $sessionStorage = pluginApp(SessionStorageService::class);
         $country        = pluginApp(CountryService::class);
         $webstoreConfig = pluginApp(WebstoreConfigurationService::class);
@@ -69,6 +70,7 @@ class LocalizationService
 
     public function hasCountryStates($countryId): bool
     {
+        //TODO VDI MEYER
         $sessionStorage = pluginApp(SessionStorageService::class);
         $webstoreConfig = pluginApp(WebstoreConfigurationService::class);
         $country = pluginApp(CountryService::class);

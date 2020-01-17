@@ -168,6 +168,7 @@ class CheckoutService
     {
         $currency = (string)$this->sessionStorage->getPlugin()->getValue(SessionStorageKeys::CURRENCY);
         if ($currency === null || $currency === '') {
+            //TODO VDI MEYER
             /** @var SessionStorageService $sessionService */
             $sessionService = pluginApp(SessionStorageService::class);
 

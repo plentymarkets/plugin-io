@@ -5,7 +5,7 @@ use IO\Repositories\ItemWishListGuestRepository;
 use IO\Repositories\ItemWishListRepository;
 use IO\Services\CustomerService;
 use IO\Services\ItemWishListService;
-use IO\Services\SessionStorageService;
+use Plenty\Modules\Webshop\Contracts\SessionStorageRepositoryContract;
 use PluginTests\SimpleTestCase;
 
 /**
@@ -20,7 +20,7 @@ class ItemWishListServiceTest extends SimpleTestCase
     protected $itemWishListRepositoryMock;
     protected $itemWishListGuestRepositoryMock;
     protected $customerServiceMock;
-    protected $sessionStorageServiceMock;
+    protected $sessionStorageRepositoryMock;
 
     /**
      *
@@ -32,9 +32,11 @@ class ItemWishListServiceTest extends SimpleTestCase
         $this->customerServiceMock = Mockery::mock(CustomerService::class);
         $this->replaceInstanceByMock(CustomerService::class, $this->customerServiceMock);
 
-        $this->sessionStorageServiceMock = Mockery::mock(SessionStorageService::class);
-        $this->sessionStorageServiceMock->shouldReceive('getSessionValue')->with(SessionStorageKeys::GUEST_WISHLIST_MIGRATION)->andReturnFalse();
-        $this->replaceInstanceByMock(SessionStorageService::class, $this->sessionStorageServiceMock);
+        $this->sessionStorageRepositoryMock = Mockery::mock(SessionStorageRepositoryContract::class);
+        $this->sessionStorageRepositoryMock->shouldReceive('getSessionValue')->with(
+            SessionStorageKeys::GUEST_WISHLIST_MIGRATION
+        )->andReturnFalse();
+        $this->replaceInstanceByMock(SessionStorageRepositoryContract::class, $this->sessionStorageRepositoryMock);
     }
 
     /** @test */

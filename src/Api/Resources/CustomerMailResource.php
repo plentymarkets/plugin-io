@@ -92,6 +92,8 @@ class CustomerMailResource extends ApiResource
         /** @var string $domain */
         $domain = $webstoreConfiguration->domainSsl;
         $defaultLang = $webstoreConfiguration->defaultLanguage;
+
+        //TODO VDI MEYER
         /** @var SessionStorageService $sessionService */
         $sessionService = pluginApp(SessionStorageService::class);
         $lang = $sessionService->getLang();

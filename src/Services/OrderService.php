@@ -376,6 +376,7 @@ class OrderService
             /** @var OrderTrackingService $orderTrackingService */
             $orderTrackingService = pluginApp(OrderTrackingService::class);
 
+            //TODO VDI MEYER
             /** @var SessionStorageService $sessionStorageService */
             $sessionStorageService = pluginApp(SessionStorageService::class);
             $lang = $sessionStorageService->getLang();

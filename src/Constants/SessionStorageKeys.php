@@ -8,6 +8,7 @@ namespace IO\Constants;
  */
 class SessionStorageKeys
 {
+    //TODO VDI MOVE TO CORE MODULE
 	const DELIVERY_ADDRESS_ID            = "deliveryAddressId";
 	const BILLING_ADDRESS_ID             = "billingAddressId";
 	const CURRENCY                       = "currency";

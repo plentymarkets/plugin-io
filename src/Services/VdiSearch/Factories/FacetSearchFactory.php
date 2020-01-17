@@ -49,8 +49,9 @@ class FacetSearchFactory extends VariationSearchFactory
     protected function prepareSearch()
     {
         $plentyId   = pluginApp( Application::class )->getPlentyId();
+        //TODO VDI MEYER
         $lang       = pluginApp( SessionStorageService::class )->getLang();
-    
+
         /** @var FacetHelper $facetHelper */
         $facetHelper = app(FacetHelper::class, ['facetValuesSelected' => $this->facetValues, 'collapse' => true, 'lang' => $lang, 'plentyId' => $plentyId]);
         return $facetHelper->createVdiContext();

@@ -716,6 +716,7 @@ class BasketService
          * @var VariationDescriptionRepositoryContract $variationDescriptionRepository
          */
 
+        //TODO VDI MEYER
         $sessionStorageService = pluginApp(SessionStorageService::class);
         /**
          * @var SessionStorageService $sessionStorageService

@@ -12,6 +12,7 @@ trait FakeLanguage
         /** @var WebstoreConfigurationService $webstoreConfigService */
         $webstoreConfigService = pluginApp(WebstoreConfigurationService::class);
 
+        //TODO VDI MEYER
         /** @var SessionStorageService $sessionStorageService */
         $sessionStorageService = pluginApp(SessionStorageService::class);
         $lang = $sessionStorageService->getLang();

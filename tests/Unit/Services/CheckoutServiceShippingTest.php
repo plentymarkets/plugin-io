@@ -12,7 +12,6 @@ namespace IO\Tests\Unit;
 use IO\Services\BasketService;
 use IO\Services\CheckoutService;
 use IO\Services\CustomerService;
-use IO\Services\SessionStorageService;
 use IO\Services\WebstoreConfigurationService;
 use IO\Tests\TestCase;
 use Mockery;
@@ -25,6 +24,7 @@ use Plenty\Modules\Frontend\PaymentMethod\Contracts\FrontendPaymentMethodReposit
 use Plenty\Modules\Frontend\Services\VatService;
 use Plenty\Modules\Order\Shipping\Contracts\ParcelServicePresetRepositoryContract;
 use Plenty\Modules\Payment\Method\Models\PaymentMethod;
+use Plenty\Modules\Webshop\Contracts\SessionStorageRepositoryContract;
 use Plenty\Plugin\Application;
 
 class CheckoutServiceShippingTest extends TestCase
@@ -41,9 +41,9 @@ class CheckoutServiceShippingTest extends TestCase
     private $webstoreConfigurationServiceMock;
 
     /**
-     * @var SessionStorageService $sessionStorageServiceMock ;
+     * @var SessionStorageRepositoryContract $sessionStorageRepositoryMock ;
      */
-    private $sessionStorageServiceMock;
+    private $sessionStorageRepositoryMock;
 
     /**
      * @var AccountRepositoryContract $accountRepositoryMock
@@ -103,8 +103,8 @@ class CheckoutServiceShippingTest extends TestCase
         $this->webstoreConfigurationServiceMock = Mockery::mock(WebstoreConfigurationService::class);
         $this->replaceInstanceByMock(WebstoreConfigurationService::class, $this->webstoreConfigurationServiceMock);
 
-        $this->sessionStorageServiceMock = Mockery::mock(SessionStorageService::class);
-        $this->replaceInstanceByMock(SessionStorageService::class, $this->sessionStorageServiceMock);
+        $this->sessionStorageRepositoryMock = Mockery::mock(SessionStorageRepositoryContract::class);
+        $this->replaceInstanceByMock(SessionStorageRepositoryContract::class, $this->sessionStorageRepositoryMock);
 
         $this->accountRepositoryMock = Mockery::mock(AccountingLocationRepositoryContract::class);
         $this->replaceInstanceByMock(AccountingLocationRepositoryContract::class, $this->accountRepositoryMock);
@@ -170,13 +170,14 @@ class CheckoutServiceShippingTest extends TestCase
             ]
         );
 
-        $this->sessionStorageServiceMock->shouldReceive('getCustomer')
+        $this->sessionStorageRepositoryMock->shouldReceive('getCustomer')
             ->andReturn((object)[
                 'showNetPrice' => false,
                 'accountContactClassId' => 1
             ]);
 
-         $this->sessionStorageServiceMock->shouldReceive('getLang')
+        //TODO VDI MEYER
+        $this->sessionStorageServiceMock->shouldReceive('getLang')
             ->andReturn('de');
 
         $this->customerServiceMock->shouldReceive('showNetPrices')

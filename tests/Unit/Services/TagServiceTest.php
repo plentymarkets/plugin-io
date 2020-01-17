@@ -2,13 +2,13 @@
 
 namespace IO\Tests\Services;
 
-use IO\Services\SessionStorageService;
 use IO\Services\TagService;
 use IO\Tests\TestCase;
 use Plenty\Modules\Authorization\Services\AuthHelper;
 use Plenty\Modules\Tag\Models\Tag;
 use Mockery;
 use Plenty\Modules\Tag\Models\TagName;
+use Plenty\Modules\Webshop\Contracts\SessionStorageRepositoryContract;
 
 class TagServiceTest extends TestCase
 {
@@ -18,8 +18,8 @@ class TagServiceTest extends TestCase
     /** @var AuthHelper */
     private $authHelperMock;
 
-    /** @var SessionStorageService */
-    private $sessionStorageMock;
+    /** @var SessionStorageRepositoryContract */
+    private $sessionStorageRepositoryMock;
 
     const TAG_ID = 42;
     const TAG_NAME_DE = "Test Tag DE";
@@ -33,8 +33,8 @@ class TagServiceTest extends TestCase
         $this->authHelperMock = Mockery::mock(AuthHelper::class);
         app()->instance(AuthHelper::class, $this->authHelperMock);
 
-        $this->sessionStorageMock = Mockery::mock(SessionStorageService::class);
-        app()->instance(SessionStorageService::class, $this->sessionStorageMock);
+        $this->sessionStorageRepositoryMock = Mockery::mock(SessionStorageRepositoryContract::class);
+        app()->instance(SessionStorageRepositoryContract::class, $this->sessionStorageRepositoryMock);
     }
 
     /** @test */
@@ -65,6 +65,7 @@ class TagServiceTest extends TestCase
                 "tagName"   => $tagName
             ]));
 
+        //TODO VDI MEYER
         $this->sessionStorageMock->shouldReceive("getLang");
 
         $this->assertEquals($tagName, $this->tagService->getTagName(self::TAG_ID));
@@ -89,6 +90,7 @@ class TagServiceTest extends TestCase
                 ]),
             ]));
 
+        //TODO VDI MEYER
         $this->sessionStorageMock
             ->shouldReceive("getLang")
             ->andReturn("de");
@@ -117,6 +119,7 @@ class TagServiceTest extends TestCase
                 ]),
             ]));
 
+        //TODO VDI MEYER
         $this->sessionStorageMock->shouldNotReceive("getLang");
 
         $tagName = $this->tagService->getTagName(self::TAG_ID, "en");
@@ -145,6 +148,7 @@ class TagServiceTest extends TestCase
                 ]),
             ]));
 
+        //TODO VDI MEYER
         $this->sessionStorageMock->shouldNotReceive("getLang");
 
         $this->assertEquals($tagName, $this->tagService->getTagName(self::TAG_ID, "fr"));
@@ -156,7 +160,7 @@ class TagServiceTest extends TestCase
         $this->authHelperMock
             ->shouldReceive("processUnguarded")
             ->andReturn(null);
-
+        //TODO VDI MEYER
         $this->sessionStorageMock->shouldReceive("getLang");
 
         $this->assertEquals("", $this->tagService->getTagName(self::TAG_ID));

@@ -27,13 +27,13 @@ use IO\Services\OrderService;
 use IO\Services\OrderTotalsService;
 use IO\Services\PropertyFileService;
 use IO\Services\SalesPriceService;
-use IO\Services\SessionStorageService;
 use IO\Services\TagService;
 use IO\Services\TemplateService;
 use IO\Services\UnitService;
 use IO\Services\UrlService;
 use IO\Services\UserDataHashService;
 use IO\Services\WebstoreConfigurationService;
+use Plenty\Modules\Webshop\Contracts\SessionStorageRepositoryContract;
 
 class TwigServiceContainer
 {
@@ -82,9 +82,9 @@ class TwigServiceContainer
         return pluginApp(OrderService::class);
     }
 
-    public function getSessionStorage(): SessionStorageService
+    public function getSessionStorage(): SessionStorageRepositoryContract
     {
-        return pluginApp(SessionStorageService::class);
+        return pluginApp(SessionStorageRepositoryContract::class);
     }
 
     public function getUnit(): UnitService

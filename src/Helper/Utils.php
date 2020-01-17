@@ -29,6 +29,7 @@ class Utils
 
     public static function getLang()
     {
+        //TODO VDI MEYER
         /** @var SessionStorageService $sessionStorage */
         $sessionStorage = pluginApp(SessionStorageService::class);
         return $sessionStorage->getLang();

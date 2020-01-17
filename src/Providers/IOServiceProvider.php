@@ -123,7 +123,7 @@ class IOServiceProvider extends ServiceProvider
         $this->getApplication()->bind('IO\Builder\Item\ItemColumnBuilder');
         $this->getApplication()->bind('IO\Builder\Item\ItemFilterBuilder');
         $this->getApplication()->bind('IO\Builder\Item\ItemParamsBuilder');
-        
+
         // Register services
         $this->registerSingletons([
             AuthenticationService::class,
@@ -148,7 +148,6 @@ class IOServiceProvider extends ServiceProvider
             OrderTotalsService::class,
             PriceDetectService::class,
             SalesPriceService::class,
-            SessionStorageService::class,
             ShippingService::class,
             TemplateConfigService::class,
             TemplateService::class,
@@ -161,7 +160,7 @@ class IOServiceProvider extends ServiceProvider
         ]);
 
         $this->getApplication()->singleton(FacetExtensionContainer::class);
-    
+
         $this->bindItemSearchClasses();
     }
 
@@ -266,7 +265,7 @@ class IOServiceProvider extends ServiceProvider
         /** @var ConfigRepository $config */
         $config = pluginApp(ConfigRepository::class);
         $vdiSearchActive = $config->get('IO.item_search.vdi_active');
-    
+
         if($vdiSearchActive == 'true')
         {
             $this->getApplication()->bind(VariationSearchFactoryContract::class, VariationSearchFactoryVdi::class);

@@ -12,6 +12,7 @@ use IO\Tests\TestCase;
 use Plenty\Modules\Account\Address\Models\Address;
 use Plenty\Modules\Frontend\Services\CheckoutService;
 use \Mockery;
+use Plenty\Modules\Webshop\Contracts\SessionStorageRepositoryContract;
 use Plenty\Plugin\Events\Dispatcher;
 
 class CustomerServiceFeatureTest extends TestCase
@@ -60,7 +61,7 @@ class CustomerServiceFeatureTest extends TestCase
      */
     public function should_add_a_new_address_as_logged_in_user($addressData, $addressType)
     {
-        $email    = $this->fake->email;
+        $email = $this->fake->email;
         $password = $this->fake->password;
 
         $this->checkoutService
@@ -79,25 +80,21 @@ class CustomerServiceFeatureTest extends TestCase
 
     private function createAddress($addressData, $addressType)
     {
+        /** @var SessionStorageRepositoryContract $sessionStorageRepository */
+        $sessionStorageRepository = pluginApp(SessionStorageRepositoryContract::class);
 
-        /**
-         * @var $sessionStorage SessionStorageService
-         */
-        $sessionStorage = pluginApp(SessionStorageService::class);
+        $sessionStorageRepository->setSessionValue(SessionStorageKeys::GUEST_EMAIL, $this->fake->email);
 
-        $sessionStorage->setSessionValue(SessionStorageKeys::GUEST_EMAIL, $this->fake->email);
-
-        if ( $addressType === AddressType::BILLING )
-        {
+        if ($addressType === AddressType::BILLING) {
             $this->checkoutService
                 ->shouldReceive('setCustomerInvoiceAddressId')
                 ->andReturn(null);
-        }
-        else if ( $addressType === AddressType::DELIVERY )
-        {
-            $this->checkoutService
-                ->shouldReceive('setCustomerShippingAddressId')
-                ->andReturn(null);
+        } else {
+            if ($addressType === AddressType::DELIVERY) {
+                $this->checkoutService
+                    ->shouldReceive('setCustomerShippingAddressId')
+                    ->andReturn(null);
+            }
         }
 
         $newAddress = $this->customerService->createAddress($addressData, $addressType);
@@ -133,7 +130,7 @@ class CustomerServiceFeatureTest extends TestCase
      */
     public function should_delete_an_address_as_logged_in_user($addressData, $addressType)
     {
-        $email    = $this->fake->email;
+        $email = $this->fake->email;
         $password = $this->fake->password;
 
         $this->checkoutService
@@ -151,13 +148,10 @@ class CustomerServiceFeatureTest extends TestCase
 
     private function deleteAddress($addressData, $addressType)
     {
+        /** @var SessionStorageRepositoryContract $sessionStorageRepository */
+        $sessionStorageRepository = pluginApp(SessionStorageRepositoryContract::class);
 
-        /**
-         * @var $sessionStorage SessionStorageService
-         */
-        $sessionStorage = pluginApp(SessionStorageService::class);
-
-        $sessionStorage->setSessionValue(SessionStorageKeys::GUEST_EMAIL, $this->fake->email);
+        $sessionStorageRepository->setSessionValue(SessionStorageKeys::GUEST_EMAIL, $this->fake->email);
 
         /** @var BasketService $basketService */
         $basketService = pluginApp(BasketService::class);
@@ -170,17 +164,16 @@ class CustomerServiceFeatureTest extends TestCase
             ->shouldReceive('getCustomerShippingAddressId')
             ->andReturn(null);
 
-        if ( $addressType === AddressType::BILLING )
-        {
+        if ($addressType === AddressType::BILLING) {
             $this->checkoutService
                 ->shouldReceive('setCustomerInvoiceAddressId')
                 ->andReturn(null);
-        }
-        else if ( $addressType === AddressType::DELIVERY )
-        {
-            $this->checkoutService
-                ->shouldReceive('setCustomerShippingAddressId')
-                ->andReturn(null);
+        } else {
+            if ($addressType === AddressType::DELIVERY) {
+                $this->checkoutService
+                    ->shouldReceive('setCustomerShippingAddressId')
+                    ->andReturn(null);
+            }
         }
 
         $address = $this->customerService->createAddress($addressData, $addressType);
@@ -214,17 +207,17 @@ class CustomerServiceFeatureTest extends TestCase
      */
     public function should_update_an_address_as_logged_in_user($addressDataCreate, $addressDataUpdate, $addressType)
     {
-        $email    = $this->fake->email;
+        $email = $this->fake->email;
         $password = $this->fake->password;
 
-         $this->checkoutService
-                ->shouldReceive('getCustomerShippingAddressId')
-                ->andReturn($addressDataCreate['countryId']);
+        $this->checkoutService
+            ->shouldReceive('getCustomerShippingAddressId')
+            ->andReturn($addressDataCreate['countryId']);
 
 
-         $this->checkoutService
-                ->shouldReceive('getCustomerInvoiceAddressId')
-                ->andReturn($addressDataCreate['countryId']);
+        $this->checkoutService
+            ->shouldReceive('getCustomerInvoiceAddressId')
+            ->andReturn($addressDataCreate['countryId']);
 
         $this->createContact($email, $password);
         $this->performLogin($email, $password);
@@ -233,30 +226,26 @@ class CustomerServiceFeatureTest extends TestCase
 
     private function updateAddress($addressDataCreate, $addressDataUpdate, $addressType)
     {
+        /** @var SessionStorageRepositoryContract $sessionStorageRepository  */
+        $sessionStorageRepository = pluginApp(SessionStorageRepositoryContract::class);
 
-        /**
-         * @var $sessionStorage SessionStorageService
-         */
-        $sessionStorage = pluginApp(SessionStorageService::class);
+        $sessionStorageRepository->setSessionValue(SessionStorageKeys::GUEST_EMAIL, $this->fake->email);
 
-        $sessionStorage->setSessionValue(SessionStorageKeys::GUEST_EMAIL, $this->fake->email);
-
-        if ( $addressType === AddressType::BILLING )
-        {
+        if ($addressType === AddressType::BILLING) {
             $this->checkoutService
                 ->shouldReceive('setCustomerInvoiceAddressId')
                 ->andReturn(null);
-        }
-        else if ( $addressType === AddressType::DELIVERY )
-        {
-            $this->checkoutService
-                ->shouldReceive('setCustomerShippingAddressId')
-                ->andReturn(null);
+        } else {
+            if ($addressType === AddressType::DELIVERY) {
+                $this->checkoutService
+                    ->shouldReceive('setCustomerShippingAddressId')
+                    ->andReturn(null);
+            }
         }
 
         $this->dispatcher->shouldReceive('fire');
 
-        $address        = $this->customerService->createAddress($addressDataCreate, $addressType);
+        $address = $this->customerService->createAddress($addressDataCreate, $addressType);
 
         $updatedAddress = $this->customerService->updateAddress($address->id, $addressDataUpdate, $addressType);
 
@@ -278,17 +267,17 @@ class CustomerServiceFeatureTest extends TestCase
             [
                 [
                     // Billing address with company and empty gender and stateId
-                    'gender'     => '',
-                    'name1'      => $this->fake->company,
-                    'name2'      => '',
-                    'name3'      => '',
-                    'name4'      => '',
-                    'address1'   => $this->fake->streetName,
-                    'address2'   => $this->fake->streetAddress,
+                    'gender' => '',
+                    'name1' => $this->fake->company,
+                    'name2' => '',
+                    'name3' => '',
+                    'name4' => '',
+                    'address1' => $this->fake->streetName,
+                    'address2' => $this->fake->streetAddress,
                     'postalCode' => $this->fake->postcode,
-                    'town'       => $this->fake->city,
-                    'countryId'  => 1,
-                    'stateId'    => '',
+                    'town' => $this->fake->city,
+                    'countryId' => 1,
+                    'stateId' => '',
                     'contactPerson' => $this->fake->name
                 ],
                 AddressType::BILLING,
@@ -297,17 +286,17 @@ class CustomerServiceFeatureTest extends TestCase
             [
                 [
                     // Billing address
-                    'gender'     => $this->fake->randomElement($this->genders),
-                    'name1'      => '',
-                    'name2'      => $this->fake->firstName,
-                    'name3'      => $this->fake->lastName,
-                    'name4'      => '',
-                    'address1'   => $this->fake->streetName,
-                    'address2'   => $this->fake->streetAddress,
+                    'gender' => $this->fake->randomElement($this->genders),
+                    'name1' => '',
+                    'name2' => $this->fake->firstName,
+                    'name3' => $this->fake->lastName,
+                    'name4' => '',
+                    'address1' => $this->fake->streetName,
+                    'address2' => $this->fake->streetAddress,
                     'postalCode' => $this->fake->postcode,
-                    'town'       => $this->fake->city,
-                    'countryId'  => 1,
-                    'stateId'    => '',
+                    'town' => $this->fake->city,
+                    'countryId' => 1,
+                    'stateId' => '',
                 ],
                 AddressType::BILLING,
             ],
@@ -315,16 +304,16 @@ class CustomerServiceFeatureTest extends TestCase
             [
                 [
                     // Delivery address with company
-                    'gender'     => '',
-                    'name1'      => $this->fake->company,
-                    'name2'      => '',
-                    'name3'      => '',
-                    'name4'      => '',
-                    'address1'   => $this->fake->streetName,
-                    'address2'   => $this->fake->streetAddress,
+                    'gender' => '',
+                    'name1' => $this->fake->company,
+                    'name2' => '',
+                    'name3' => '',
+                    'name4' => '',
+                    'address1' => $this->fake->streetName,
+                    'address2' => $this->fake->streetAddress,
                     'postalCode' => $this->fake->postcode,
-                    'town'       => $this->fake->city,
-                    'countryId'  => 1,
+                    'town' => $this->fake->city,
+                    'countryId' => 1,
                     'contactPerson' => $this->fake->name
                 ],
                 AddressType::DELIVERY,
@@ -333,16 +322,16 @@ class CustomerServiceFeatureTest extends TestCase
             [
                 [
                     // Delivery address to 'Packstation'
-                    'gender'     => $this->fake->randomElement($this->genders),
-                    'name1'      => $this->fake->company,
-                    'name2'      => $this->fake->firstName,
-                    'name3'      => $this->fake->lastName,
-                    'name4'      => '',
-                    'address1'   => 'PACKSTATION',
-                    'address2'   => $this->fake->streetAddress,
+                    'gender' => $this->fake->randomElement($this->genders),
+                    'name1' => $this->fake->company,
+                    'name2' => $this->fake->firstName,
+                    'name3' => $this->fake->lastName,
+                    'name4' => '',
+                    'address1' => 'PACKSTATION',
+                    'address2' => $this->fake->streetAddress,
                     'postalCode' => $this->fake->postcode,
-                    'town'       => $this->fake->city,
-                    'countryId'  => 1,
+                    'town' => $this->fake->city,
+                    'countryId' => 1,
                 ],
                 AddressType::DELIVERY,
             ],
@@ -350,16 +339,16 @@ class CustomerServiceFeatureTest extends TestCase
             [
                 [
                     // Delivery address to 'Postfiliale'
-                    'gender'     => $this->fake->randomElement($this->genders),
-                    'name1'      => $this->fake->company,
-                    'name2'      => $this->fake->firstName,
-                    'name3'      => $this->fake->lastName,
-                    'name4'      => '',
-                    'address1'   => 'POSTFILIALE',
-                    'address2'   => $this->fake->streetAddress,
+                    'gender' => $this->fake->randomElement($this->genders),
+                    'name1' => $this->fake->company,
+                    'name2' => $this->fake->firstName,
+                    'name3' => $this->fake->lastName,
+                    'name4' => '',
+                    'address1' => 'POSTFILIALE',
+                    'address2' => $this->fake->streetAddress,
                     'postalCode' => $this->fake->postcode,
-                    'town'       => $this->fake->city,
-                    'countryId'  => 1,
+                    'town' => $this->fake->city,
+                    'countryId' => 1,
                 ],
                 AddressType::DELIVERY,
             ]
@@ -373,16 +362,16 @@ class CustomerServiceFeatureTest extends TestCase
             [
                 [
                     // Billing address with company
-                    'gender'     => $this->fake->randomElement($this->genders),
-                    'name1'      => $this->fake->company,
-                    'name2'      => $this->fake->firstName,
-                    'name3'      => $this->fake->lastName,
-                    'name4'      => '',
-                    'address1'   => $this->fake->streetName,
-                    'address2'   => $this->fake->streetAddress,
+                    'gender' => $this->fake->randomElement($this->genders),
+                    'name1' => $this->fake->company,
+                    'name2' => $this->fake->firstName,
+                    'name3' => $this->fake->lastName,
+                    'name4' => '',
+                    'address1' => $this->fake->streetName,
+                    'address2' => $this->fake->streetAddress,
                     'postalCode' => $this->fake->postcode,
-                    'town'       => $this->fake->city,
-                    'countryId'  => 1,
+                    'town' => $this->fake->city,
+                    'countryId' => 1,
                 ],
                 AddressType::BILLING,
             ],
@@ -390,16 +379,16 @@ class CustomerServiceFeatureTest extends TestCase
             [
                 [
                     // Billing address with company
-                    'gender'     => $this->fake->randomElement($this->genders),
-                    'name1'      => $this->fake->company,
-                    'name2'      => $this->fake->firstName,
-                    'name3'      => $this->fake->lastName,
-                    'name4'      => '',
-                    'address1'   => $this->fake->streetName,
-                    'address2'   => $this->fake->streetAddress,
+                    'gender' => $this->fake->randomElement($this->genders),
+                    'name1' => $this->fake->company,
+                    'name2' => $this->fake->firstName,
+                    'name3' => $this->fake->lastName,
+                    'name4' => '',
+                    'address1' => $this->fake->streetName,
+                    'address2' => $this->fake->streetAddress,
                     'postalCode' => $this->fake->postcode,
-                    'town'       => $this->fake->city,
-                    'countryId'  => 1,
+                    'town' => $this->fake->city,
+                    'countryId' => 1,
                 ],
                 AddressType::DELIVERY,
             ],
@@ -411,90 +400,90 @@ class CustomerServiceFeatureTest extends TestCase
         return [
             [
                 [
-                    'gender'     => $this->fake->randomElement($this->genders),
-                    'name1'      => 'change',
-                    'name2'      => 'change',
-                    'name3'      => 'change',
-                    'name4'      => 'change',
-                    'address1'   => 'change',
-                    'address2'   => 'change',
+                    'gender' => $this->fake->randomElement($this->genders),
+                    'name1' => 'change',
+                    'name2' => 'change',
+                    'name3' => 'change',
+                    'name4' => 'change',
+                    'address1' => 'change',
+                    'address2' => 'change',
                     'postalCode' => 'change',
-                    'town'       => 'change',
-                    'countryId'  => 1,
-                    'stateId'    => '',
+                    'town' => 'change',
+                    'countryId' => 1,
+                    'stateId' => '',
                 ],
                 [
-                    'gender'     => $this->fake->randomElement($this->genders),
-                    'name1'      => $this->fake->company,
-                    'name2'      => $this->fake->firstName,
-                    'name3'      => $this->fake->lastName,
-                    'name4'      => '',
-                    'address1'   => $this->fake->streetName,
-                    'address2'   => $this->fake->streetAddress,
+                    'gender' => $this->fake->randomElement($this->genders),
+                    'name1' => $this->fake->company,
+                    'name2' => $this->fake->firstName,
+                    'name3' => $this->fake->lastName,
+                    'name4' => '',
+                    'address1' => $this->fake->streetName,
+                    'address2' => $this->fake->streetAddress,
                     'postalCode' => $this->fake->postcode,
-                    'town'       => $this->fake->city,
-                    'countryId'  => 1,
-                    'stateId'    => '',
+                    'town' => $this->fake->city,
+                    'countryId' => 1,
+                    'stateId' => '',
                 ],
                 AddressType::BILLING,
             ],
 
             [
                 [
-                    'gender'     => $this->fake->randomElement($this->genders),
-                    'name1'      => 'change',
-                    'name2'      => 'change',
-                    'name3'      => 'change',
-                    'name4'      => 'change',
-                    'address1'   => 'change',
-                    'address2'   => 'change',
+                    'gender' => $this->fake->randomElement($this->genders),
+                    'name1' => 'change',
+                    'name2' => 'change',
+                    'name3' => 'change',
+                    'name4' => 'change',
+                    'address1' => 'change',
+                    'address2' => 'change',
                     'postalCode' => 'change',
-                    'town'       => 'change',
-                    'countryId'  => 1,
-                    'stateId'    => '',
+                    'town' => 'change',
+                    'countryId' => 1,
+                    'stateId' => '',
                 ],
                 [
-                    'gender'     => $this->fake->randomElement($this->genders),
-                    'name1'      => $this->fake->company,
-                    'name2'      => $this->fake->firstName,
-                    'name3'      => $this->fake->lastName,
-                    'name4'      => '',
-                    'address1'   => 'PACKSTATION',
-                    'address2'   => $this->fake->streetAddress,
+                    'gender' => $this->fake->randomElement($this->genders),
+                    'name1' => $this->fake->company,
+                    'name2' => $this->fake->firstName,
+                    'name3' => $this->fake->lastName,
+                    'name4' => '',
+                    'address1' => 'PACKSTATION',
+                    'address2' => $this->fake->streetAddress,
                     'postalCode' => $this->fake->postcode,
-                    'town'       => $this->fake->city,
-                    'countryId'  => 1,
-                    'stateId'    => '',
+                    'town' => $this->fake->city,
+                    'countryId' => 1,
+                    'stateId' => '',
                 ],
                 AddressType::DELIVERY,
             ],
 
             [
                 [
-                    'gender'     => $this->fake->randomElement($this->genders),
-                    'name1'      => 'change',
-                    'name2'      => 'change',
-                    'name3'      => 'change',
-                    'name4'      => 'change',
-                    'address1'   => 'change',
-                    'address2'   => 'change',
+                    'gender' => $this->fake->randomElement($this->genders),
+                    'name1' => 'change',
+                    'name2' => 'change',
+                    'name3' => 'change',
+                    'name4' => 'change',
+                    'address1' => 'change',
+                    'address2' => 'change',
                     'postalCode' => 'change',
-                    'town'       => 'change',
-                    'countryId'  => 1,
-                    'stateId'    => '',
+                    'town' => 'change',
+                    'countryId' => 1,
+                    'stateId' => '',
                 ],
                 [
-                    'gender'     => $this->fake->randomElement($this->genders),
-                    'name1'      => $this->fake->company,
-                    'name2'      => $this->fake->firstName,
-                    'name3'      => $this->fake->lastName,
-                    'name4'      => '',
-                    'address1'   => 'POSTFILIALE',
-                    'address2'   => $this->fake->streetAddress,
+                    'gender' => $this->fake->randomElement($this->genders),
+                    'name1' => $this->fake->company,
+                    'name2' => $this->fake->firstName,
+                    'name3' => $this->fake->lastName,
+                    'name4' => '',
+                    'address1' => 'POSTFILIALE',
+                    'address2' => $this->fake->streetAddress,
                     'postalCode' => $this->fake->postcode,
-                    'town'       => $this->fake->city,
-                    'countryId'  => 1,
-                    'stateId'    => '',
+                    'town' => $this->fake->city,
+                    'countryId' => 1,
+                    'stateId' => '',
                 ],
                 AddressType::DELIVERY,
             ],
