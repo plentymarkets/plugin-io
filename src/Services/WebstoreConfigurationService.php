@@ -3,8 +3,8 @@
 namespace IO\Services;
 
 use IO\Helper\Utils;
-use Plenty\Modules\System\Contracts\WebstoreConfigurationRepositoryContract;
 use Plenty\Modules\System\Models\WebstoreConfiguration;
+use Plenty\Modules\Webshop\Contracts\WebstoreConfigurationRepositoryContract;
 use Plenty\Modules\Webshop\Template\Contracts\TemplateConfigRepositoryContract;
 use Plenty\Plugin\Application;
 
@@ -40,17 +40,9 @@ class WebstoreConfigurationService
      */
     public function getWebstoreConfig(): WebstoreConfiguration
     {
-        if ($this->webstoreConfig === null) {
-            /** @var WebstoreConfigurationRepositoryContract $webstoreConfig */
-            $webstoreConfig = pluginApp(WebstoreConfigurationRepositoryContract::class);
-
-            /** @var Application $app */
-            $app = pluginApp(Application::class);
-
-            $this->webstoreConfig = $webstoreConfig->findByWebstoreId($app->getWebstoreId());
-        }
-
-        return $this->webstoreConfig;
+        /** @var WebstoreConfigurationRepositoryContract $webstoreConfigurationRepository */
+        $webstoreConfigurationRepository = pluginApp(WebstoreConfigurationRepositoryContract::class);
+        return $webstoreConfigurationRepository->getWebstoreConfiguration();
     }
 
     /**
