@@ -6,10 +6,10 @@ use Plenty\Plugin\Events\Dispatcher;
 
 /**
  * Class ResultFieldTemplate
- *
  * Emit events to request templates to be used for result fields.
- *
  * @package IO\Services\ItemSearch\Helper
+ * @deprecated since 5.0.0 will be deleted in 6.0.0
+ * @see \Plenty\Modules\Webshop\ItemSearch\Helper\ResultFieldTemplate
  */
 class ResultFieldTemplate
 {
@@ -39,10 +39,9 @@ class ResultFieldTemplate
 
     /**
      * Get the path to result fields file from template/ theme
-     *
      * @param string    $template   Event to be emitted to templates/ themes
-     *
      * @return string
+     * @deprecated since 5.0.0 will be deleted in 6.0.0
      */
     public static function get( $template )
     {
@@ -51,6 +50,11 @@ class ResultFieldTemplate
         return $container->templates[$template];
     }
 
+    /**
+     * @param $template
+     * @return array
+     * @deprecated since 5.0.0 will be deleted in 6.0.0
+     */
     public static function load( $template )
     {
         $container = self::init( $template );
@@ -79,6 +83,7 @@ class ResultFieldTemplate
      *
      * @param string    $event      The event to set the template for.
      * @param string    $template   Path to the template to read result fields from.
+     * @deprecated since 5.0.0 will be deleted in 6.0.0
      */
     public function setTemplate( $event, $template )
     {
@@ -87,8 +92,8 @@ class ResultFieldTemplate
 
     /**
      * Set multiple templates to read result fields from.
-     *
      * @param $templateMap
+     * @deprecated since 5.0.0 will be deleted in 6.0.0
      */
     public function setTemplates( $templateMap )
     {
@@ -106,6 +111,8 @@ class ResultFieldTemplate
      *                                  or a map between template events and list of required fields
      * @param string|array  $field      If first parameter describes a single template event
      *                                  this parameter may contain a single result field or a list of field to require.
+     *
+     * @deprecated since 5.0.0 will be deleted in 6.0.0
      */
     public function requireFields( $event, $field = null )
     {

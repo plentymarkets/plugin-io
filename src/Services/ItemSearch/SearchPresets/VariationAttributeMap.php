@@ -8,9 +8,14 @@ use IO\Services\ItemSearch\Helper\ResultFieldTemplate;
 /**
  * Class VariationAttributeMap
  * @package IO\Services\ItemSearch\SearchPresets
+ * @deprecated since 5.0.0 will be deleted in 6.0.0
+ * @see \Plenty\Modules\Webshop\ItemSearch\SearchPresets\VariationAttributeMap
  */
 class VariationAttributeMap implements SearchPreset
 {
+    /**
+     * @inheritDoc
+     */
     public static function getSearchFactory($options)
     {
         /** @var VariationSearchFactory $searchFactory */

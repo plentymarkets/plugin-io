@@ -17,6 +17,9 @@ use IO\Contracts\SortingContract as SortingHelper;
  * - relation:  The relation to consider when getting cross selling items
  *
  * @package IO\Services\ItemSearch\SearchPresets
+ *
+ * @deprecated since 5.0.0 will be deleted in 6.0.0
+ * @see \Plenty\Modules\Webshop\ItemSearch\SearchPresets\CrossSellingItems
  */
 class CrossSellingItems implements SearchPreset
 {

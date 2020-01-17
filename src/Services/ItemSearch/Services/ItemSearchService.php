@@ -15,6 +15,9 @@ use Plenty\Plugin\Log\Loggable;
  * Execute elastic search requests.
  *
  * @package IO\Services\ItemSearch\Services
+ *
+ * @deprecated since 5.0.0 will be deleted in 6.0.0
+ * @see \Plenty\Modules\Webshop\ItemSearch\Services\ItemSearchService
  */
 class ItemSearchService
 {
@@ -22,10 +25,10 @@ class ItemSearchService
     
     /**
      * Get search results for multiple search requests.
-     *
      * @param array     $searches   Map of search factories to execute.
-     *
      * @return array                Results of multisearch request. Keys will be used from input search map.
+     * @deprecated since 5.0.0 will be deleted in 6.0.0
+     * @see \Plenty\Modules\Webshop\ItemSearch\Services\ItemSearchService::getResults()
      */
     public function getResults( $searches )
     {
@@ -61,16 +64,22 @@ class ItemSearchService
 
     /**
      * Get result of a single search factory;
-     *
      * @param BaseSearchFactory $searchFactory    The factory to get results for.
-     *
      * @return array
+     * @deprecated since 5.0.0 will be deleted in 6.0.0
+     * @see \Plenty\Modules\Webshop\ItemSearch\Services\ItemSearchService::getResult()
      */
     public function getResult( $searchFactory )
     {
         return $this->getResults([$searchFactory])[0];
     }
 
+    /**
+     * @param $result
+     * @return mixed
+     * @deprecated since 5.0.0 will be deleted in 6.0.0
+     * @see \Plenty\Modules\Webshop\ItemSearch\Services\ItemSearchService::normalizeResult()
+     */
     private function normalizeResult($result)
     {
         if( count($result['documents']) )

@@ -8,20 +8,20 @@ use IO\Services\TemplateConfigService;
 
 /**
  * Class SortingHelper
- *
  * Generate sorting values from plugin configuration.
- *
  * @package IO\Services\ItemSearch\Helper
+ * @deprecated since 5.0.0 will be deleted in 6.0.0
+ * @see \Plenty\Modules\Webshop\ItemSearch\Helper\SortingHelper
  */
 class SortingHelper implements SortingContract
 {
     /**
      * Get sorting values from plugin configuration
-     *
      * @param string    $sortingConfig  The configuration value from plugin
      * @param bool      $isCategory     Get default sorting configuration for category or for search
-     *
      * @return array
+     * @deprecated since 5.0.0 will be deleted in 6.0.0
+     * @see \Plenty\Modules\Webshop\ItemSearch\Helper\SortingHelper::getSorting()
      */
     public function getSorting( $sortingConfig = null, $isCategory = true )
     {
@@ -64,9 +64,10 @@ class SortingHelper implements SortingContract
 
     /**
      * Get sorting values for categories from config
-     *
      * @param string $sortingConfig     The configuration value
      * @return array
+     * @deprecated since 5.0.0 will be deleted in 6.0.0
+     * @see \Plenty\Modules\Webshop\ItemSearch\Helper\SortingHelper::getCategorySorting()
      */
     public function getCategorySorting( $sortingConfig = null )
     {
@@ -75,9 +76,10 @@ class SortingHelper implements SortingContract
 
     /**
      * Get sorting values for searches from config
-     *
      * @param string $sortingConfig     The configuration value
      * @return array
+     * @deprecated since 5.0.0 will be deleted in 6.0.0
+     * @see \Plenty\Modules\Webshop\ItemSearch\Helper\SortingHelper::getSearchSorting()
      */
     public function getSearchSorting( $sortingConfig = null )
     {
@@ -86,6 +88,8 @@ class SortingHelper implements SortingContract
     
     /**
      * @return string
+     * @deprecated since 5.0.0 will be deleted in 6.0.0
+     * @see \Plenty\Modules\Webshop\ItemSearch\Helper\SortingHelper::getUsedItemName()
      */
     public function getUsedItemName()
     {
@@ -101,7 +105,13 @@ class SortingHelper implements SortingContract
         
         return $usedItemName;
     }
-    
+
+    /**
+     * @param $sorting
+     * @return array
+     * @deprecated since 5.0.0 will be deleted in 6.0.0
+     * @see \Plenty\Modules\Webshop\ItemSearch\Helper\SortingHelper::splitPathAndOrder()
+     */
     public function splitPathAndOrder($sorting)
     {
         $e = explode('_', $sorting);

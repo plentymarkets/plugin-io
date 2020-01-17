@@ -2,7 +2,7 @@
 
 namespace IO\Services\ItemSearch\SearchPresets;
 
-use IO\Contracts\VariationSearchFactoryContract as VariationSearchFactory;
+use IO\SerivVariationSearchFactory;
 use IO\Services\ItemSearch\Helper\ResultFieldTemplate;
 use IO\Contracts\SortingContract as SortingHelper;
 
@@ -20,6 +20,9 @@ use IO\Contracts\SortingContract as SortingHelper;
  * - priceMax       Maximum price of the variations
  *
  * @package IO\Services\ItemSearch\SearchPresets
+ *
+ * @deprecated since 5.0.0 will be deleted in 6.0.0
+ * @see \Plenty\Modules\Webshop\ItemSearch\SearchPresets\CategoryItems
  */
 class CategoryItems implements SearchPreset
 {
@@ -31,7 +34,7 @@ class CategoryItems implements SearchPreset
         $categoryId     = $options['categoryId'];
         $facets         = $options['facets'];
         
-        /** @var SortingContract $sortingHelper */
+        /** @var SortingHelper $sortingHelper */
         $sortingHelper = pluginApp(SortingHelper::class);
         $sorting        = $sortingHelper->getCategorySorting( $options['sorting'] );
 

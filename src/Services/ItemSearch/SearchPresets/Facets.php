@@ -15,9 +15,15 @@ use IO\Contracts\FacetSearchFactoryContract;
  * - autocomplete:  Flag indicating if autocomplete search should be used (boolean). Will only be used if 'query' is defined.
  *
  * @package IO\Services\ItemSearch\SearchPresets
+ *
+ * @deprecated since 5.0.0 will be deleted in 6.0.0
+ * @see \Plenty\Modules\Webshop\ItemSearch\SearchPresets\Facets
  */
 class Facets implements SearchPreset
 {
+    /**
+     * @inheritDoc
+     */
     public static function getSearchFactory($options)
     {
         /** @var FacetSearchFactoryContract $searchFactory */

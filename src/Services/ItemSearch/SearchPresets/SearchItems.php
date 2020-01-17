@@ -22,9 +22,15 @@ use IO\Contracts\SortingContract as SortingHelper;
  *
  *
  * @package IO\Services\ItemSearch\SearchPresets
+ *
+ * @deprecated since 5.0.0 will be deleted in 6.0.0
+ * @see \Plenty\Modules\Webshop\ItemSearch\SearchPresets\SearchItems
  */
 class SearchItems implements SearchPreset
 {
+    /**
+     * @inheritDoc
+     */
     public static function getSearchFactory($options)
     {
         $query  = $options['query'];

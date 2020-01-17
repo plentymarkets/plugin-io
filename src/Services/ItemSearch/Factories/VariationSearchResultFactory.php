@@ -28,6 +28,14 @@ use IO\Services\ItemSearch\Factories\Faker\VariationFaker;
 use IO\Services\ItemSearch\Factories\Faker\VariationPropertyFaker;
 use IO\Services\ItemSearch\Helper\LoadResultFields;
 
+
+/**
+ * Class VariationSearchResultFactory
+ * @package IO\Services\ItemSearch\Factories
+ *
+ * @deprecated since 5.0.0 will be deleted in 6.0.0
+ * @see //TODO
+ */
 class VariationSearchResultFactory
 {
     const FAKER_MAP = [

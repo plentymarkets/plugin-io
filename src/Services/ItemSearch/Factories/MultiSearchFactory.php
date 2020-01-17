@@ -16,7 +16,9 @@ use Plenty\Plugin\Log\Loggable;
  * Factory to build an elastic search multisearch request by collecting multiple search factory instances.
  *
  * @package IO\Services\ItemSearch\Factories
- * @deprecated use instead IO\Contracts\MultiSearchFactoryContract
+ *
+ * @deprecated since 5.0.0 will be deleted in 6.0.0
+ * @see \Plenty\Modules\Webshop\ItemSearch\Factories\MultiSearchFactory
  */
 class MultiSearchFactory implements MultiSearchFactoryContract
 {
@@ -32,6 +34,9 @@ class MultiSearchFactory implements MultiSearchFactoryContract
      * Get all registered searches
      *
      * @return array
+     *
+     * @deprecated since 5.0.0 will be deleted in 6.0.0
+     * @see \Plenty\Modules\Webshop\ItemSearch\Factories\MultiSearchFactory::getSearches()
      */
     public function getSearches()
     {
@@ -42,6 +47,9 @@ class MultiSearchFactory implements MultiSearchFactoryContract
      * Get all registered extensions
      *
      * @return array
+     *
+     * @deprecated since 5.0.0 will be deleted in 6.0.0
+     * @see \Plenty\Modules\Webshop\ItemSearch\Factories\MultiSearchFactory::getExtensions()
      */
     public function getExtensions()
     {
@@ -55,6 +63,9 @@ class MultiSearchFactory implements MultiSearchFactoryContract
      * @param BaseSearchFactory $searchBuilder  A search factory
      *
      * @return MultiSearchFactory
+     *
+     * @deprecated since 5.0.0 will be deleted in 6.0.0
+     * @see \Plenty\Modules\Webshop\ItemSearch\Factories\MultiSearchFactory::addSearch()
      */
     public function addSearch( $resultName, $searchBuilder )
     {
@@ -95,6 +106,9 @@ class MultiSearchFactory implements MultiSearchFactoryContract
      * Execute the multisearch and collect results.
      *
      * @return array
+     *
+     * @deprecated since 5.0.0 will be deleted in 6.0.0
+     * @see \Plenty\Modules\Webshop\ItemSearch\Factories\MultiSearchFactory::getResults()
      */
     public function getResults()
     {

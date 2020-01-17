@@ -16,9 +16,15 @@ use IO\Services\TemplateConfigService;
  * - setCategory:   Flag indicating if item should be set as current item to be displayed in breadcrumbs
  *
  * @package IO\Services\ItemSearch\SearchPresets
+ *
+ * @deprecated since 5.0.0 will be deleted in 6.0.0
+ * @see \Plenty\Modules\Webshop\ItemSearch\SearchPresets\SingleItem
  */
 class SingleItem implements SearchPreset
 {
+    /**
+     * @inheritDoc
+     */
     public static function getSearchFactory($options)
     {
         /** @var VariationSearchFactory $searchFactory */

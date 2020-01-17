@@ -20,9 +20,15 @@ use IO\Contracts\SortingContract as SortingHelper;
  * - excludeFromCache:  Set to true if results should not be linked to response
  *
  * @package IO\Services\ItemSearch\SearchPresets
+ *
+ * @deprecated since 5.0.0 will be deleted in 6.0.0
+ * @see \Plenty\Modules\Webshop\ItemSearch\SearchPresets\VariationList
  */
 class VariationList implements SearchPreset
 {
+    /**
+     * @inheritDoc
+     */
     public static function getSearchFactory($options)
     {
         $variationIds = [];

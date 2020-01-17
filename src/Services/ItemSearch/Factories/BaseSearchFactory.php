@@ -31,6 +31,9 @@ use Plenty\Plugin\Log\Loggable;
  * Base factory to build elastic search requests.
  *
  * @package IO\Services\ItemSearch\Factories
+ *
+ * @deprecated since 5.0.0 will be deleted in 6.0.0
+ * @see \Plenty\Modules\Webshop\ItemSearch\Factories\BaseSearchFactory
  */
 class BaseSearchFactory
 {
@@ -78,6 +81,9 @@ class BaseSearchFactory
      *
      * @return BaseSearchFactory
      * @throws \ErrorException
+     *
+     * @deprecated since 5.0.0 will be deleted in 6.0.0
+     * @see \Plenty\Modules\Webshop\ItemSearch\Factories\BaseSearchFactory::inherit()
      */
     public function inherit( $inheritedProperties = null )
     {
@@ -145,6 +151,9 @@ class BaseSearchFactory
      * @param MutatorInterface $mutator
      *
      * @return $this
+     *
+     * @deprecated since 5.0.0 will be deleted in 6.0.0
+     * @see \Plenty\Modules\Webshop\ItemSearch\Factories\BaseSearchFactory::withMutator()
      */
     public function withMutator( $mutator )
     {
@@ -158,6 +167,9 @@ class BaseSearchFactory
      * @param string    $filterClass
      *
      * @return TypeInterface
+     *
+     * @deprecated since 5.0.0 will be deleted in 6.0.0
+     * @see \Plenty\Modules\Webshop\ItemSearch\Factories\BaseSearchFactory::createFilter()
      */
     public function createFilter( $filterClass )
     {
@@ -176,6 +188,9 @@ class BaseSearchFactory
      * @param TypeInterface $filter
      *
      * @return $this
+     *
+     * @deprecated since 5.0.0 will be deleted in 6.0.0
+     * @see \Plenty\Modules\Webshop\ItemSearch\Factories\BaseSearchFactory::withFilter()
      */
     public function withFilter( $filter )
     {
@@ -192,6 +207,9 @@ class BaseSearchFactory
      * @param string|string[]   $fields     Reference to a json file to load fields from or a list of field names.
      *
      * @return BaseSearchFactory
+     *
+     * @deprecated since 5.0.0 will be deleted in 6.0.0
+     * @see \Plenty\Modules\Webshop\ItemSearch\Factories\BaseSearchFactory::withResultFields()
      */
     public function withResultFields( $fields )
     {
@@ -208,6 +226,12 @@ class BaseSearchFactory
         return $this;
     }
 
+    /**
+     * @return array
+     *
+     * @deprecated since 5.0.0 will be deleted in 6.0.0
+     * @see \Plenty\Modules\Webshop\ItemSearch\Factories\BaseSearchFactory::getResultFields()
+     */
     public function getResultFields()
     {
         return $this->resultFields;
@@ -219,6 +243,9 @@ class BaseSearchFactory
      * @param string    $extensionClass     Extension class to add.
      * @param array     $extensionParams    Additional parameters to pass to extensions constructor
      * @return $this
+     *
+     * @deprecated since 5.0.0 will be deleted in 6.0.0
+     * @see \Plenty\Modules\Webshop\ItemSearch\Factories\BaseSearchFactory::withExtension()
      */
     public function withExtension( $extensionClass, $extensionParams = [] )
     {
@@ -230,6 +257,9 @@ class BaseSearchFactory
      * Get all registered extensions
      *
      * @return ItemSearchExtension[]
+     *
+     * @deprecated since 5.0.0 will be deleted in 6.0.0
+     * @see \Plenty\Modules\Webshop\ItemSearch\Factories\BaseSearchFactory::getExtensions()
      */
     public function getExtensions()
     {
@@ -242,6 +272,9 @@ class BaseSearchFactory
      * @param AggregationInterface $aggregation
      *
      * @return $this
+     *
+     * @deprecated since 5.0.0 will be deleted in 6.0.0
+     * @see \Plenty\Modules\Webshop\ItemSearch\Factories\BaseSearchFactory::withAggregation()
      */
     public function withAggregation( AggregationInterface $aggregation )
     {
@@ -256,6 +289,9 @@ class BaseSearchFactory
      * @param int   $itemsPerPage
      *
      * @return $this
+     *
+     * @deprecated since 5.0.0 will be deleted in 6.0.0
+     * @see \Plenty\Modules\Webshop\ItemSearch\Factories\BaseSearchFactory::setPage()
      */
     public function setPage( $page, $itemsPerPage )
     {
@@ -271,6 +307,9 @@ class BaseSearchFactory
      * @param string    $order      Direction to order results. Possible values: 'asc' or 'desc'
      *
      * @return $this
+     *
+     * @deprecated since 5.0.0 will be deleted in 6.0.0
+     * @see \Plenty\Modules\Webshop\ItemSearch\Factories\BaseSearchFactory::sortBy()
      */
     public function sortBy( $field, $order = VariationSearchFactoryContract::SORTING_ORDER_DESC )
     {
@@ -326,6 +365,9 @@ class BaseSearchFactory
      * @param array     $sortingList    List of sorting parameters. Each entry should have a 'field' and an 'order' property.
      *
      * @return $this
+     *
+     * @deprecated since 5.0.0 will be deleted in 6.0.0
+     * @see \Plenty\Modules\Webshop\ItemSearch\Factories\BaseSearchFactory::sortByMultiple()
      */
     public function sortByMultiple( $sortingList )
     {
@@ -337,6 +379,13 @@ class BaseSearchFactory
         return $this;
     }
 
+    /**
+     * @param array $idList
+     * @return $this
+     *
+     * @deprecated since 5.0.0 will be deleted in 6.0.0
+     * @see \Plenty\Modules\Webshop\ItemSearch\Factories\BaseSearchFactory::setOrder()
+     */
     public function setOrder( $idList )
     {
         return $this->withExtension(SortExtension::class, [
@@ -350,6 +399,9 @@ class BaseSearchFactory
      * @param string    $field  The field to group properties by.
      *
      * @return $this
+     *
+     * @deprecated since 5.0.0 will be deleted in 6.0.0
+     * @see \Plenty\Modules\Webshop\ItemSearch\Factories\BaseSearchFactory::groupBy()
      */
     public function groupBy( $field )
     {
@@ -361,6 +413,9 @@ class BaseSearchFactory
      * Build the elastic search request.
      *
      * @return DocumentSearch
+     *
+     * @deprecated since 5.0.0 will be deleted in 6.0.0
+     * @see \Plenty\Modules\Webshop\ItemSearch\Factories\BaseSearchFactory::build()
      */
     public function build()
     {
@@ -445,6 +500,9 @@ class BaseSearchFactory
      *
      * @param IncludeSource $source
      * @return DocumentSearch
+     *
+     * @deprecated since 5.0.0 will be deleted in 6.0.0
+     * @see \Plenty\Modules\Webshop\ItemSearch\Factories\BaseSearchFactory::prepareSearch()
      */
     protected function prepareSearch($source)
     {
@@ -497,7 +555,14 @@ class BaseSearchFactory
         
         return $search;
     }
-    
+
+    /**
+     * @param $sortingField
+     * @return string
+     *
+     * @deprecated since 5.0.0 will be deleted in 6.0.0
+     * @see \Plenty\Modules\Webshop\ItemSearch\Factories\BaseSearchFactory::checkRandomSorting()
+     */
     private function checkRandomSorting($sortingField)
     {
         if($sortingField == 'item.random')
