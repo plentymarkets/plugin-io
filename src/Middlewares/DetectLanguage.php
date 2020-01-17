@@ -6,8 +6,8 @@ use IO\Helper\Utils;
 use IO\Services\CheckoutService;
 use IO\Services\LocalizationService;
 use IO\Services\TemplateService;
-use IO\Services\WebstoreConfigurationService;
 use Plenty\Modules\System\Models\WebstoreConfiguration;
+use Plenty\Modules\Webshop\Contracts\WebstoreConfigurationRepositoryContract;
 use Plenty\Modules\Webshop\Template\Contracts\TemplateConfigRepositoryContract;
 use Plenty\Plugin\Http\Request;
 use Plenty\Plugin\Http\Response;
@@ -25,9 +25,9 @@ class DetectLanguage extends Middleware
     public function before(Request $request)
     {
         if (substr($request->getRequestUri(), 0, strlen(self::WEB_AJAX_BASE)) !== self::WEB_AJAX_BASE) {
-            /** @var WebstoreConfigurationService $webstoreService */
-            $webstoreService = pluginApp(WebstoreConfigurationService::class);
-            $webstoreConfig = $webstoreService->getWebstoreConfig();
+            /** @var WebstoreConfigurationRepositoryContract $webstoreConfigurationRepository */
+            $webstoreConfigurationRepository = pluginApp(WebstoreConfigurationRepositoryContract::class);
+            $webstoreConfig = $webstoreConfigurationRepository->getWebstoreConfiguration();
             $splittedURL = explode('/', $request->get('plentyMarkets'));
 
             // request uri is not "/webAjaxBase.php"

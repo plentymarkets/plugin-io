@@ -11,6 +11,9 @@ use Plenty\Plugin\Application;
 /**
  * Class WebstoreConfigurationService
  * @package IO\Services
+ *
+ * @deprecated since 5.0.0 will be removed in 6.0.0
+ * @see \Plenty\Modules\Webshop\Contracts\WebstoreConfigurationRepositoryContract
  */
 class WebstoreConfigurationService
 {
@@ -19,11 +22,10 @@ class WebstoreConfigurationService
      */
     private $webstoreConfig;
 
-
     /**
      * Get the plenty-id
      * @deprecated since 4.3.0
-     * Use IO\Helper\Utils::getPlentyId() instead
+     * @see \IO\Helper\Utils::getPlentyId() instead
      */
     public function getPlentyId()
     {
@@ -32,11 +34,13 @@ class WebstoreConfigurationService
 
     /**
      * Get the webstore configuraion
+     *
+     * @deprecated since 5.0.0 will be removed in 6.0.0
+     * @see \Plenty\Modules\Webshop\Contracts\WebstoreConfigurationRepositoryContract::getWebstoreConfiguration()
      */
-	public function getWebstoreConfig():WebstoreConfiguration
+    public function getWebstoreConfig(): WebstoreConfiguration
     {
-        if( $this->webstoreConfig === null )
-        {
+        if ($this->webstoreConfig === null) {
             /** @var WebstoreConfigurationRepositoryContract $webstoreConfig */
             $webstoreConfig = pluginApp(WebstoreConfigurationRepositoryContract::class);
 
@@ -49,41 +53,48 @@ class WebstoreConfigurationService
         return $this->webstoreConfig;
     }
 
-	/**
-	 * Get the activate languages of the webstore
-	 */
+    /**
+     * Get the activate languages of the webstore
+     *
+     * @deprecated since 5.0.0 will be removed in 6.0.0
+     * @see \Plenty\Modules\Webshop\Contracts\WebstoreConfigurationRepositoryContract::getActiveLanguageList()
+     */
     public function getActiveLanguageList()
-	{
+    {
         $activeLanguages = [];
 
         /** @var TemplateConfigRepositoryContract $templateConfigRepo */
         $templateConfigRepo = pluginApp(TemplateConfigRepositoryContract::class);
         $languages = $templateConfigRepo->get('language.active_languages');
 
-        if(!is_null($languages) && strlen($languages))
-        {
+        if (!is_null($languages) && strlen($languages)) {
             $activeLanguages = explode(', ', $languages);
         }
 
-        if(!in_array($this->getWebstoreConfig()->defaultLanguage, $activeLanguages))
-        {
+        if (!in_array($this->getWebstoreConfig()->defaultLanguage, $activeLanguages)) {
             $activeLanguages[] = $this->getWebstoreConfig()->defaultLanguage;
         }
 
-		return $activeLanguages;
-	}
+        return $activeLanguages;
+    }
 
-	/**
-	 * Get the default language of the webstore
-	 */
+    /**
+     * Get the default language of the webstore
+     *
+     * @deprecated since 5.0.0 will be removed in 6.0.0
+     * @see \Plenty\Modules\Webshop\Contracts\WebstoreConfigurationRepositoryContract::getDefaultLanguage()
+     */
     public function getDefaultLanguage()
     {
         return $this->getWebstoreConfig()->defaultLanguage;
     }
 
     /**
-	 * Get the default parcel-service-Id of the webstore
-	 */
+     * Get the default parcel-service-Id of the webstore
+     *
+     * @deprecated since 5.0.0 will be removed in 6.0.0
+     * @see \Plenty\Modules\Webshop\Contracts\WebstoreConfigurationRepositoryContract::getDefaultParcelServiceId()
+     */
     public function getDefaultParcelServiceId()
     {
         return $this->getWebstoreConfig()->defaultParcelServiceId;
@@ -91,6 +102,9 @@ class WebstoreConfigurationService
 
     /**
      * Get the default parcel-service-preset-Id of the webstore
+     *
+     * @deprecated since 5.0.0 will be removed in 6.0.0
+     * @see \Plenty\Modules\Webshop\Contracts\WebstoreConfigurationRepositoryContract::getDefaultParcelServicePresetId()
      */
     public function getDefaultParcelServicePresetId()
     {
@@ -99,6 +113,9 @@ class WebstoreConfigurationService
 
     /**
      * Get the default shipping-country-Id of the webstore
+     *
+     * @deprecated since 5.0.0 will be removed in 6.0.0
+     * @see \Plenty\Modules\Webshop\Contracts\WebstoreConfigurationRepositoryContract::getDefaultShippingCountryId()
      */
     public function getDefaultShippingCountryId()
     {
@@ -106,8 +123,7 @@ class WebstoreConfigurationService
         $sessionService = pluginApp(SessionStorageService::class);
         $defaultShippingCountryId = $this->getWebstoreConfig()->defaultShippingCountryList[$sessionService->getLang()];
 
-        if($defaultShippingCountryId <= 0)
-        {
+        if ($defaultShippingCountryId <= 0) {
             $defaultShippingCountryId = $this->getWebstoreConfig()->defaultShippingCountryId;
         }
 

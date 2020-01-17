@@ -34,6 +34,7 @@ use Plenty\Modules\Helper\AutomaticEmail\Models\AutomaticEmailContact;
 use Plenty\Modules\System\Contracts\WebstoreConfigurationRepositoryContract;
 use Plenty\Modules\System\Models\WebstoreConfiguration;
 use Plenty\Modules\Webshop\Contracts\SessionStorageRepositoryContract;
+use Plenty\Modules\Webshop\Repositories\WebstoreConfigurationRepository;
 use Plenty\Modules\Webshop\Template\Contracts\TemplateConfigRepositoryContract;
 use Plenty\Plugin\Events\Dispatcher;
 
@@ -406,10 +407,10 @@ class CustomerService
      */
     private function getDefaultContactClassId(): int
     {
-        /** @var WebstoreConfigurationService $webstoreConfigService */
-        $webstoreConfigService = pluginApp(WebstoreConfigurationService::class);
+        /** @var WebstoreConfigurationRepository $webstoreConfigurationRepository */
+        $webstoreConfigurationRepository = pluginApp(WebstoreConfigurationRepository::class);
 
-        return $webstoreConfigService->getWebstoreConfig()->defaultCustomerClassId ?? 0;
+        return $webstoreConfigurationRepository->getWebstoreConfiguration()->defaultCustomerClassId ?? 0;
     }
 
     /**

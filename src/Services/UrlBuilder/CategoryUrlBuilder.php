@@ -4,34 +4,32 @@ namespace IO\Services\UrlBuilder;
 
 use IO\Helper\Utils;
 use IO\Services\CategoryService;
-use IO\Services\WebstoreConfigurationService;
+use Plenty\Modules\Webshop\Contracts\WebstoreConfigurationRepositoryContract;
 use Plenty\Plugin\Log\Loggable;
 
 class CategoryUrlBuilder
 {
     use Loggable;
 
-    public function buildUrl( int $categoryId, string $lang = null, int $webstoreId = null): UrlQuery
+    public function buildUrl(int $categoryId, string $lang = null, int $webstoreId = null): UrlQuery
     {
-        if ( $lang === null )
-        {
+        if ($lang === null) {
             $lang = Utils::getLang();
         }
 
         /** @var CategoryService $categoryService */
-        $categoryService = pluginApp( CategoryService::class );
-        $category = $categoryService->get( $categoryId, $lang );
+        $categoryService = pluginApp(CategoryService::class);
+        $category = $categoryService->get($categoryId, $lang);
 
-        if ( $category !== null )
-        {
-            if(is_null($webstoreId)){
-                /** @var WebstoreConfigurationService $webstoreService */
-                $webstoreService = pluginApp(WebstoreConfigurationService::class);
-                $webstoreId = $webstoreService->getWebstoreConfig()->webstoreId;
+        if ($category !== null) {
+            if (is_null($webstoreId)) {
+                /** @var WebstoreConfigurationRepositoryContract $webstoreConfigurationRepository */
+                $webstoreConfigurationRepository = pluginApp(WebstoreConfigurationRepositoryContract::class);
+                $webstoreId = $webstoreConfigurationRepository->getWebstoreConfiguration()->webstoreId;
             }
 
             return $this->buildUrlQuery(
-                $categoryService->getURL( $category, $lang, $webstoreId ),
+                $categoryService->getURL($category, $lang, $webstoreId),
                 $lang
             );
         }
@@ -40,16 +38,15 @@ class CategoryUrlBuilder
             'IO::Debug.CategoryUrlBuilder_categoryNotFound',
             [
                 'categoryId' => $categoryId,
-                'lang'       => $lang
+                'lang' => $lang
             ]
         );
-        return $this->buildUrlQuery( '', $lang );
+        return $this->buildUrlQuery('', $lang);
     }
 
-    private function buildUrlQuery( $path, $lang ): UrlQuery
+    private function buildUrlQuery($path, $lang): UrlQuery
     {
-        if(substr($path, 0, 4) === '/'.$lang.'/')
-        {
+        if (substr($path, 0, 4) === '/' . $lang . '/') {
             // FIX: category url already contains language, if it is different to default language
             $path = substr($path, 4);
         }

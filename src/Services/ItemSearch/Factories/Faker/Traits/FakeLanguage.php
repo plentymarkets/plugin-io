@@ -3,14 +3,14 @@
 namespace IO\Services\ItemSearch\Factories\Faker\Traits;
 
 use IO\Services\SessionStorageService;
-use IO\Services\WebstoreConfigurationService;
+use Plenty\Modules\Webshop\Contracts\WebstoreConfigurationRepositoryContract;
 
 trait FakeLanguage
 {
     protected function shopLanguage($skipActiveLang = false)
     {
-        /** @var WebstoreConfigurationService $webstoreConfigService */
-        $webstoreConfigService = pluginApp(WebstoreConfigurationService::class);
+        /** @var WebstoreConfigurationRepositoryContract $webstoreConfigurationRepository */
+        $webstoreConfigurationRepository = pluginApp(WebstoreConfigurationRepositoryContract::class);
 
         //TODO VDI MEYER
         /** @var SessionStorageService $sessionStorageService */
@@ -18,16 +18,13 @@ trait FakeLanguage
         $lang = $sessionStorageService->getLang();
 
         $languages = [];
-        foreach($webstoreConfigService->getActiveLanguageList() as $language)
-        {
-            if ($language !== $lang || !$skipActiveLang)
-            {
+        foreach ($webstoreConfigurationRepository->getActiveLanguageList() as $language) {
+            if ($language !== $lang || !$skipActiveLang) {
                 $languages[] = $language;
             }
         }
 
-        if (!count($languages))
-        {
+        if (!count($languages)) {
             return $lang !== 'en' ? 'en' : 'de';
         }
 

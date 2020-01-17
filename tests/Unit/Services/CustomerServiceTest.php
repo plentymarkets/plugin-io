@@ -5,7 +5,6 @@ use IO\Api\Resources\CustomerAddressResource;
 use IO\Builder\Order\AddressType;
 use IO\Services\BasketService;
 use IO\Services\CustomerService;
-use IO\Services\WebstoreConfigurationService;
 use IO\Tests\TestCase;
 use Plenty\Modules\Account\Address\Models\Address;
 use Plenty\Modules\Account\Address\Repositories\AddressRepository;
@@ -17,6 +16,8 @@ use Plenty\Modules\Account\Models\Account;
 use Plenty\Modules\Frontend\Services\AccountService;
 use Plenty\Modules\System\Models\WebstoreConfiguration;
 use Plenty\Modules\Webshop\Contracts\SessionStorageRepositoryContract;
+use Plenty\Modules\Webshop\Contracts\WebstoreConfigurationRepositoryContract;
+use Plenty\Modules\Webshop\Repositories\WebstoreConfigurationRepository;
 use Plenty\Plugin\Events\Dispatcher;
 
 class CustomerServiceTest extends TestCase
@@ -39,8 +40,8 @@ class CustomerServiceTest extends TestCase
     protected $contactAccountRepositoryMock;
     /** @var SessionStorageRepositoryContract $sessionStorageRepositoryMock */
     protected $sessionStorageRepositoryMock;
-    /** @var WebstoreConfigurationService $webstoreConfigServiceMock */
-    protected $webstoreConfigServiceMock;
+    /** @var WebstoreConfigurationRepository $webstoreConfigurationRepositoryMock */
+    protected $webstoreConfigurationRepositoryMock;
     /** @var Dispatcher $dispatcherMock */
     protected $dispatcherMock;
 
@@ -70,8 +71,8 @@ class CustomerServiceTest extends TestCase
         $this->sessionStorageRepositoryMock = Mockery::mock(SessionStorageRepositoryContract::class);
         $this->replaceInstanceByMock(SessionStorageRepositoryContract::class, $this->sessionStorageRepositoryMock);
 
-        $this->webstoreConfigServiceMock = Mockery::mock(WebstoreConfigurationService::class);
-        $this->replaceInstanceByMock(WebstoreConfigurationService::class, $this->webstoreConfigServiceMock);
+        $this->webstoreConfigurationRepositoryMock = Mockery::mock(WebstoreConfigurationRepositoryContract::class);
+        $this->replaceInstanceByMock(WebstoreConfigurationRepositoryContract::class, $this->webstoreConfigurationRepositoryMock);
 
         $this->dispatcherMock = Mockery::mock(Dispatcher::class);
         $this->replaceInstanceByMock(Dispatcher::class, $this->dispatcherMock);
@@ -239,7 +240,7 @@ class CustomerServiceTest extends TestCase
 
         $this->contactAccountRepositoryMock->shouldReceive('createAccount')->andReturn($account)->once();
 
-        $this->webstoreConfigServiceMock->shouldReceive('getWebstoreConfig')->andReturn($webstoreConfig);
+        $this->webstoreConfigurationRepositoryMock->shouldReceive('getWebstoreConfiguration')->andReturn($webstoreConfig);
 
         $this->contactAddressRepositoryMock
             ->shouldReceive('createAddress')
@@ -297,7 +298,7 @@ class CustomerServiceTest extends TestCase
 
         $this->contactAccountRepositoryMock->shouldReceive('createAccount')->andReturn($account)->once();
 
-        $this->webstoreConfigServiceMock->shouldReceive('getWebstoreConfig')->andReturn($webstoreConfig);
+        $this->webstoreConfigurationRepositoryMock->shouldReceive('getWebstoreConfiguration')->andReturn($webstoreConfig);
 
         $this->contactAddressRepositoryMock
             ->shouldReceive('createAddress')
@@ -353,7 +354,7 @@ class CustomerServiceTest extends TestCase
 
         $this->contactAccountRepositoryMock->shouldReceive('createAccount')->andReturn($account)->once();
 
-        $this->webstoreConfigServiceMock->shouldReceive('getWebstoreConfig')->andReturn($webstoreConfig);
+        $this->webstoreConfigurationRepositoryMock->shouldReceive('getWebstoreConfiguration')->andReturn($webstoreConfig);
 
         $this->contactAddressRepositoryMock
             ->shouldReceive('createAddress')
@@ -669,7 +670,7 @@ class CustomerServiceTest extends TestCase
 
         $webstoreConfig = factory(WebstoreConfiguration::class)->make();
 
-        $this->webstoreConfigServiceMock->shouldReceive('getWebstoreConfig')->andReturn($webstoreConfig);
+        $this->webstoreConfigurationRepositoryMock->shouldReceive('getWebstoreConfiguration')->andReturn($webstoreConfig);
 
         $this->contactRepositoryMock->shouldReceive('findContactById')->with($contact->id)->andReturn($contact);
         $this->accountServiceMock->shouldReceive('getAccountContactId')->andReturn($contactId);

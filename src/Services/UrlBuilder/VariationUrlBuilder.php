@@ -8,10 +8,10 @@ use IO\Helper\Utils;
 use IO\Services\CategoryService;
 use IO\Services\ItemSearch\Services\ItemSearchService;
 use IO\Services\TemplateConfigService;
-use IO\Services\WebstoreConfigurationService;
 use Plenty\Log\Contracts\LoggerContract;
 use Plenty\Modules\Authorization\Services\AuthHelper;
 use Plenty\Modules\Item\VariationDescription\Contracts\VariationDescriptionRepositoryContract;
+use Plenty\Modules\Webshop\Contracts\WebstoreConfigurationRepositoryContract;
 use Plenty\Plugin\Log\Loggable;
 
 class VariationUrlBuilder
@@ -217,10 +217,10 @@ class VariationUrlBuilder
         /** @var TemplateConfigService $templateConfigService */
         $templateConfigService = pluginApp(TemplateConfigService::class);
 
-        /** @var WebstoreConfigurationService $webstoreConfigService */
-        $webstoreConfigService = pluginApp(WebstoreConfigurationService::class);
+        /** @var WebstoreConfigurationRepositoryContract $webstoreConfigurationRepository */
+        $webstoreConfigurationRepository = pluginApp(WebstoreConfigurationRepositoryContract::class);
 
-        $urlPattern = $webstoreConfigService->getWebstoreConfig()->urlItemContent;
+        $urlPattern = $webstoreConfigurationRepository->getWebstoreConfiguration()->urlItemContent;
         if (!$templateConfigService->getBoolean('global.enableOldUrlPattern')) {
             $urlPattern = 'all';
         }

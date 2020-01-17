@@ -4,8 +4,8 @@ namespace IO\Services\ItemSearch\Extensions;
 
 use IO\Contracts\VariationSearchFactoryContract as VariationSearchFactory;
 use IO\Services\UrlBuilder\VariationUrlBuilder;
-use IO\Services\WebstoreConfigurationService;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Source\Mutator\BuiltIn\LanguageMutator;
+use Plenty\Modules\Webshop\Contracts\WebstoreConfigurationRepositoryContract;
 
 /**
  * Class ItemUrlExtension
@@ -20,14 +20,14 @@ class ItemUrlExtension implements ItemSearchExtension
     /**
      * @inheritdoc
      */
-    public function getSearch( $parentSearchBuilder )
+    public function getSearch($parentSearchBuilder)
     {
-        /** @var WebstoreConfigurationService $webstoreConfigService */
-        $webstoreConfigService = pluginApp( WebstoreConfigurationService::class );
+        /** @var WebstoreConfigurationRepositoryContract $webstoreConfigurationRepository */
+        $webstoreConfigurationRepository = pluginApp(WebstoreConfigurationRepositoryContract::class);
 
         $languageMutator = pluginApp(
             LanguageMutator::class,
-            [ "languages" => $webstoreConfigService->getActiveLanguageList() ]
+            ["languages" => $webstoreConfigurationRepository->getActiveLanguageList()]
         );
 
         return $parentSearchBuilder->inherit(
@@ -37,14 +37,17 @@ class ItemUrlExtension implements ItemSearchExtension
                 VariationSearchFactory::INHERIT_COLLAPSE,
                 VariationSearchFactory::INHERIT_AGGREGATIONS,
                 VariationSearchFactory::INHERIT_SORTING
-            ])
-            ->withResultFields([
-                'item.id',
-                'variation.id',
-                'texts.*',
-                'defaultCategories'
-            ])
-            ->withMutator( $languageMutator );
+            ]
+        )
+            ->withResultFields(
+                [
+                    'item.id',
+                    'variation.id',
+                    'texts.*',
+                    'defaultCategories'
+                ]
+            )
+            ->withMutator($languageMutator);
     }
 
     /**
@@ -53,15 +56,13 @@ class ItemUrlExtension implements ItemSearchExtension
     public function transformResult($baseResult, $extensionResult)
     {
         /** @var VariationUrlBuilder $itemUrlBuilder */
-        $itemUrlBuilder = pluginApp( VariationUrlBuilder::class );
-        foreach( $extensionResult['documents'] as $key => $urlDocument )
-        {
-            VariationUrlBuilder::fillItemUrl( $urlDocument['data'] );
+        $itemUrlBuilder = pluginApp(VariationUrlBuilder::class);
+        foreach ($extensionResult['documents'] as $key => $urlDocument) {
+            VariationUrlBuilder::fillItemUrl($urlDocument['data']);
             $document = $baseResult['documents'][$key];
-            if ( count( $document )
-                && count( $document['data']['texts'] )
-                && strlen( $document['data']['texts']['urlPath'] ) <= 0 )
-            {
+            if (count($document)
+                && count($document['data']['texts'])
+                && strlen($document['data']['texts']['urlPath']) <= 0) {
                 // attach generated item url if not defined
                 $itemUrl = $itemUrlBuilder->buildUrl(
                     $urlDocument['data']['item']['id'],
@@ -70,7 +71,6 @@ class ItemUrlExtension implements ItemSearchExtension
 
                 $baseResult['documents'][$key]['data']['texts']['urlPath'] = $itemUrl;
             }
-
         }
 
         return $baseResult;

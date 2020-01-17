@@ -21,6 +21,7 @@ use Plenty\Modules\Order\Shipping\Contracts\ParcelServicePresetRepositoryContrac
 use Plenty\Modules\Payment\Events\Checkout\GetPaymentMethodContent;
 use Plenty\Modules\Payment\Method\Contracts\PaymentMethodRepositoryContract;
 use Plenty\Modules\Webshop\Contracts\SessionStorageRepositoryContract;
+use Plenty\Modules\Webshop\Contracts\WebstoreConfigurationRepositoryContract;
 use Plenty\Modules\Webshop\Template\Contracts\TemplateConfigRepositoryContract;
 use Plenty\Plugin\ConfigRepository;
 use Plenty\Plugin\Events\Dispatcher;
@@ -77,10 +78,8 @@ class CheckoutService
     /** @var SessionStorageRepositoryContract */
     private $sessionStorageRepository;
 
-    /**
-     * @var WebstoreConfigurationService
-     */
-    private $webstoreConfigurationService;
+    /** @var WebstoreConfigurationRepositoryContract */
+    private $webstoreConfigurationRepository;
 
     /**
      * CheckoutService constructor.
@@ -94,6 +93,7 @@ class CheckoutService
      * @param BasketService $basketService
      * @param SessionStorageRepositoryContract $sessionStorageRepository
      * @param WebstoreConfigurationService $webstoreConfigurationService
+     * @param Dispatcher $dispatcher
      */
     public function __construct(
         FrontendPaymentMethodRepositoryContract $frontendPaymentMethodRepository,
@@ -105,7 +105,7 @@ class CheckoutService
         CurrencyExchangeRepositoryContract $currencyExchangeRepo,
         BasketService $basketService,
         SessionStorageRepositoryContract $sessionStorageRepository,
-        WebstoreConfigurationService $webstoreConfigurationService,
+        WebstoreConfigurationRepositoryContract $webstoreConfigurationRepository,
         Dispatcher $dispatcher
     ) {
         $this->frontendPaymentMethodRepository = $frontendPaymentMethodRepository;
@@ -117,7 +117,7 @@ class CheckoutService
         $this->currencyExchangeRepo = $currencyExchangeRepo;
         $this->basketService = $basketService;
         $this->sessionStorageRepository = $sessionStorageRepository;
-        $this->webstoreConfigurationService = $webstoreConfigurationService;
+        $this->webstoreConfigurationRepository = $webstoreConfigurationRepository;
         $dispatcher->listen(
             AfterBasketChanged::class,
             function ($event) {
@@ -163,22 +163,25 @@ class CheckoutService
      */
     public function getCurrency(): string
     {
-        $currency = (string)$this->sessionStorageRepository->getSessionValue(SessionStorageRepositoryContract::CURRENCY);
+        $currency = (string)$this->sessionStorageRepository->getSessionValue(
+            SessionStorageRepositoryContract::CURRENCY
+        );
         if ($currency === null || $currency === '') {
             //TODO VDI MEYER
             /** @var SessionStorageService $sessionService */
             $sessionService = pluginApp(SessionStorageService::class);
 
-            /** @var WebstoreConfigurationService $webstoreConfig */
-            $webstoreConfig = pluginApp(WebstoreConfigurationService::class);
-
             $currency = 'EUR';
 
             if (
-                is_array($webstoreConfig->getWebstoreConfig()->defaultCurrencyList) &&
-                array_key_exists($sessionService->getLang(), $webstoreConfig->getWebstoreConfig()->defaultCurrencyList)
+                is_array($this->webstoreConfigurationRepository->getWebstoreConfiguration()->defaultCurrencyList) &&
+                array_key_exists(
+                    $sessionService->getLang(),
+                    $this->webstoreConfigurationRepository->getWebstoreConfiguration()->defaultCurrencyList
+                )
             ) {
-                $currency = $webstoreConfig->getWebstoreConfig()->defaultCurrencyList[$sessionService->getLang()];
+                $currency = $this->webstoreConfigurationRepository->getWebstoreConfiguration(
+                )->defaultCurrencyList[$sessionService->getLang()];
             }
             $this->setCurrency($currency);
         }
@@ -191,7 +194,7 @@ class CheckoutService
      */
     public function setCurrency(string $currency)
     {
-        $this->sessionStorageRepository->setValue(SessionStorageRepositoryContract::CURRENCY, $currency);
+        $this->sessionStorageRepository->setSessionValue(SessionStorageRepositoryContract::CURRENCY, $currency);
         $this->checkout->setCurrency($currency);
     }
 
@@ -343,7 +346,7 @@ class CheckoutService
             $translator = pluginApp(Translator::class);
             if ($translator instanceof Translator) {
                 $errors = [];
-                $webstoreConfiguration = $this->webstoreConfigurationService->getWebstoreConfig();
+                $webstoreConfiguration = $this->webstoreConfigurationRepository->getWebstoreConfiguration();
                 foreach ($validateCheckoutEvent->getErrorKeysList() as $errorKey) {
                     switch ($errorKey) {
                         case 'frontend/checkout/validation.minimum_order_value':
@@ -537,7 +540,6 @@ class CheckoutService
                     }
                 }
 
-
                 return $list;
             }
         );
@@ -571,9 +573,7 @@ class CheckoutService
     {
         $currentShippingCountryId = (int)$this->checkout->getShippingCountryId();
         if ($currentShippingCountryId <= 0) {
-            /** @var WebstoreConfigurationService $webstoreConfigurationService */
-            $webstoreConfigurationService = pluginApp(WebstoreConfigurationService::class);
-            return $webstoreConfigurationService->getDefaultShippingCountryId();
+            return $this->webstoreConfigurationRepository->getDefaultShippingCountryId();
         }
 
         return $currentShippingCountryId;
@@ -658,10 +658,7 @@ class CheckoutService
 
     public function setDefaultShippingCountryId()
     {
-        /** @var WebstoreConfigurationService $webstoreConfig */
-        $webstoreConfigService = pluginApp(WebstoreConfigurationService::class);
-        $defaultShippingCountryId = $webstoreConfigService->getDefaultShippingCountryId();
-
+        $defaultShippingCountryId = $this->webstoreConfigurationRepository->getDefaultShippingCountryId();
         $this->setShippingCountryId($defaultShippingCountryId);
     }
 

@@ -55,7 +55,6 @@ use IO\Services\TemplateConfigService;
 use IO\Services\TemplateService;
 use IO\Services\UnitService;
 use IO\Services\UrlService;
-use IO\Services\WebstoreConfigurationService;
 use Plenty\Modules\Authentication\Events\AfterAccountAuthentication;
 use Plenty\Modules\Authentication\Events\AfterAccountContactLogout;
 use IO\Events\Basket\BeforeBasketItemToOrderItem;
@@ -143,7 +142,6 @@ class IOServiceProvider extends ServiceProvider
                 TemplateService::class,
                 UnitService::class,
                 UrlService::class,
-                WebstoreConfigurationService::class,
                 LiveShoppingService::class,
                 FakerService::class,
                 PropertyFileService::class

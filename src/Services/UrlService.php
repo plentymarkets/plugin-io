@@ -10,6 +10,7 @@ use IO\Helper\Utils;
 use IO\Services\UrlBuilder\CategoryUrlBuilder;
 use IO\Services\UrlBuilder\UrlQuery;
 use IO\Services\UrlBuilder\VariationUrlBuilder;
+use Plenty\Modules\Webshop\Contracts\WebstoreConfigurationRepositoryContract;
 use Plenty\Plugin\Http\Request;
 use Plenty\Plugin\Http\Response;
 
@@ -23,23 +24,20 @@ class UrlService
      */
     private $sessionStorage;
 
-    /**
-     * @var WebstoreConfigurationService $webstoreConfigurationService
-     */
-    private $webstoreConfigurationService;
+    /** @var WebstoreConfigurationRepositoryContract $webstoreConfigurationRepository */
+    private $webstoreConfigurationRepository;
 
     /**
      * UrlService constructor.
      * @param SessionStorageService $sessionStorage
-     * @param WebstoreConfigurationService $webstoreConfigurationService
+     * @param WebstoreConfigurationRepositoryContract $webstoreConfigurationRepository
      */
     public function __construct(
         SessionStorageService $sessionStorage,
-        WebstoreConfigurationService $webstoreConfigurationService
-    )
-    {
+        WebstoreConfigurationRepositoryContract $webstoreConfigurationRepository
+    ) {
         $this->sessionStorage = $sessionStorage;
-        $this->webstoreConfigurationService = $webstoreConfigurationService;
+        $this->webstoreConfigurationRepository = $webstoreConfigurationRepository;
     }
 
     /**
@@ -48,18 +46,18 @@ class UrlService
      * @param string|null $lang
      * @return UrlQuery
      */
-    public function getCategoryURL( $categoryId, $lang = null)
+    public function getCategoryURL($categoryId, $lang = null)
     {
-        if ( $lang === null )
-        {
+        if ($lang === null) {
+            //TODO VDI MEYER
             $lang = $this->sessionStorage->getLang();
         }
         $categoryUrl = $this->fromMemoryCache(
             "categoryUrl.$categoryId.$lang",
-            function() use ($categoryId, $lang) {
+            function () use ($categoryId, $lang) {
                 /** @var CategoryUrlBuilder $categoryUrlBuilder */
-                $categoryUrlBuilder = pluginApp( CategoryUrlBuilder::class );
-                return $categoryUrlBuilder->buildUrl( $categoryId, $lang );
+                $categoryUrlBuilder = pluginApp(CategoryUrlBuilder::class);
+                return $categoryUrlBuilder->buildUrl($categoryId, $lang);
             }
         );
 
@@ -68,29 +66,28 @@ class UrlService
 
     /**
      * Get canonical url for a variation
-     * @param int           $itemId
-     * @param int           $variationId
-     * @param string|null   $lang
+     * @param int $itemId
+     * @param int $variationId
+     * @param string|null $lang
      * @return UrlQuery
      */
-    public function getVariationURL( $itemId, $variationId, $lang = null )
+    public function getVariationURL($itemId, $variationId, $lang = null)
     {
-        if ( $lang === null )
-        {
+        if ($lang === null) {
+            //TODO VDI MEYER
             $lang = $this->sessionStorage->getLang();
         }
 
         $variationUrl = $this->fromMemoryCache(
             "variationUrl.$itemId.$variationId.$lang",
-            function() use ($itemId, $variationId, $lang) {
+            function () use ($itemId, $variationId, $lang) {
                 /** @var VariationUrlBuilder $variationUrlBuilder */
-                $variationUrlBuilder = pluginApp( VariationUrlBuilder::class );
-                $variationUrl = $variationUrlBuilder->buildUrl( $itemId, $variationId, $lang );
+                $variationUrlBuilder = pluginApp(VariationUrlBuilder::class);
+                $variationUrl = $variationUrlBuilder->buildUrl($itemId, $variationId, $lang);
 
-                if ( $variationUrl->getPath() !== null )
-                {
+                if ($variationUrl->getPath() !== null) {
                     $variationUrl->append(
-                        $variationUrlBuilder->getSuffix( $itemId, $variationId )
+                        $variationUrlBuilder->getSuffix($itemId, $variationId)
                     );
                 }
 
@@ -103,61 +100,57 @@ class UrlService
 
     /**
      * Get canonical url for current page
-     * @param string|null   $lang
+     * @param string|null $lang
      * @param bool $ignoreCanonical
      * @return string|null
      */
-    public function getCanonicalURL( $lang = null, $ignoreCanonical = false)
+    public function getCanonicalURL($lang = null, $ignoreCanonical = false)
     {
-        $defaultLanguage = $this->webstoreConfigurationService->getDefaultLanguage();
+        $defaultLanguage = $this->webstoreConfigurationRepository->getDefaultLanguage();
 
-        if ( $lang === null )
-        {
+        if ($lang === null) {
+            //TODO VDI MEYER
             $lang = $this->sessionStorage->getLang();
         }
 
         $canonicalUrl = $this->fromMemoryCache(
             "canonicalUrl.$lang.$ignoreCanonical",
-            function() use ($lang, $defaultLanguage, $ignoreCanonical) {
+            function () use ($lang, $defaultLanguage, $ignoreCanonical) {
                 $includeLanguage = $lang !== null && $lang !== $defaultLanguage;
                 /** @var CategoryService $categoryService */
-                $categoryService = pluginApp( CategoryService::class );
-                if ( TemplateService::$currentTemplate === 'tpl.item' )
-                {
+                $categoryService = pluginApp(CategoryService::class);
+                if (TemplateService::$currentTemplate === 'tpl.item') {
                     $currentItem = $categoryService->getCurrentItem();
-                    if ( count($currentItem) > 0 )
-                    {
+                    if (count($currentItem) > 0) {
                         return $this
-                            ->getVariationURL( $currentItem['item']['id'], $currentItem['variation']['id'], $lang )
+                            ->getVariationURL($currentItem['item']['id'], $currentItem['variation']['id'], $lang)
                             ->toAbsoluteUrl($includeLanguage);
                     }
 
                     return null;
                 }
 
-                if ( substr(TemplateService::$currentTemplate,0, 12) === 'tpl.category' )
-                {
+                if (substr(TemplateService::$currentTemplate, 0, 12) === 'tpl.category') {
                     $currentCategory = $categoryService->getCurrentCategory();
 
-                    if ( $currentCategory !== null )
-                    {
-                        $categoryDetails = $categoryService->getDetails( $currentCategory, $lang );
+                    if ($currentCategory !== null) {
+                        $categoryDetails = $categoryService->getDetails($currentCategory, $lang);
 
-                        if($categoryDetails !== null && strlen($categoryDetails->canonicalLink) > 0 && $ignoreCanonical === false)
-                        {
+                        if ($categoryDetails !== null && strlen(
+                                $categoryDetails->canonicalLink
+                            ) > 0 && $ignoreCanonical === false) {
                             return $categoryDetails->canonicalLink;
                         }
 
                         return $this
-                            ->getCategoryURL( $currentCategory->id, $lang )
+                            ->getCategoryURL($currentCategory->id, $lang)
                             ->toAbsoluteUrl($includeLanguage);
                     }
                     return null;
                 }
 
-                if ( TemplateService::$currentTemplate === 'tpl.home' || TemplateService::$currentTemplate === 'tpl.home.category' )
-                {
-                    return pluginApp( UrlQuery::class, ['path' => "", 'lang' => $lang])
+                if (TemplateService::$currentTemplate === 'tpl.home' || TemplateService::$currentTemplate === 'tpl.home.category') {
+                    return pluginApp(UrlQuery::class, ['path' => "", 'lang' => $lang])
                         ->toAbsoluteUrl($includeLanguage);
                 }
 
@@ -175,19 +168,19 @@ class UrlService
      */
     public function isCanonical($lang = null)
     {
-        $defaultLanguage = $this->webstoreConfigurationService->getDefaultLanguage();
+        $defaultLanguage = $this->webstoreConfigurationRepository->getDefaultLanguage();
 
-        if($lang === null)
-        {
+        if ($lang === null) {
+            //TODO VDI MEYER
             $lang = $this->sessionStorage->getLang();
         }
 
         /** @var Request $request */
-        $request    = pluginApp(Request::class);
+        $request = pluginApp(Request::class);
         $requestUri = $request->getRequestUri();
 
         /** @var UrlQuery $urlQuery */
-        $urlQuery   = pluginApp( UrlQuery::class, ['path' => $requestUri]);
+        $urlQuery = pluginApp(UrlQuery::class, ['path' => $requestUri]);
         $requestUrl = $urlQuery->toAbsoluteUrl($lang !== $defaultLanguage);
         $canonical = $this->getCanonicalURL($lang);
 
@@ -202,23 +195,20 @@ class UrlService
     {
         $languageUrls = $this->fromMemoryCache(
             "languageUrls",
-            function() {
+            function () {
                 $result = [];
 
-                $defaultLanguage = $this->webstoreConfigurationService->getDefaultLanguage();
+                $defaultLanguage = $this->webstoreConfigurationRepository->getDefaultLanguage();
 
-                $defaultUrl = $this->getCanonicalURL( $defaultLanguage );
+                $defaultUrl = $this->getCanonicalURL($defaultLanguage);
 
-                if ( $defaultUrl !== null )
-                {
+                if ($defaultUrl !== null) {
                     $result["x-default"] = $defaultUrl;
                 }
 
-                foreach($this->webstoreConfigurationService->getActiveLanguageList() as $language )
-                {
-                    $url = $this->getCanonicalURL( $language );
-                    if ( $url !== null )
-                    {
+                foreach ($this->webstoreConfigurationRepository->getActiveLanguageList() as $language) {
+                    $url = $this->getCanonicalURL($language);
+                    if ($url !== null) {
                         $languageISO = LanguageMap::getLanguageCode($language);
                         $result[$languageISO] = $url;
                     }
@@ -252,11 +242,13 @@ class UrlService
      */
     public function redirectTo($redirectURL)
     {
-        if(strpos($redirectURL, 'http:') !== 0 && strpos($redirectURL, 'https:') !== 0)
-        {
+        if (strpos($redirectURL, 'http:') !== 0 && strpos($redirectURL, 'https:') !== 0) {
             /** @var UrlQuery $query */
             $query = pluginApp(UrlQuery::class, ['path' => $redirectURL]);
-            $redirectURL = $query->toAbsoluteUrl($this->webstoreConfigurationService->getDefaultLanguage() !== $this->sessionStorage->getLang());
+            $redirectURL = $query->toAbsoluteUrl(
+                //TODO VDI MEYER
+                $this->webstoreConfigurationRepository->getDefaultLanguage() !== $this->sessionStorage->getLang()
+            );
         }
 
         /** @var Response $response */

@@ -4,7 +4,6 @@ namespace IO\Tests\Unit;
 
 use IO\Helper\MemoryCache;
 use IO\Services\CheckoutService;
-use IO\Services\WebstoreConfigurationService;
 use Mockery;
 use IO\Tests\TestCase;
 use Plenty\Modules\Frontend\Contracts\Checkout;
@@ -13,6 +12,7 @@ use Plenty\Modules\Plugin\Models\Plugin;
 use Illuminate\Support\Facades\Session;
 use Plenty\Modules\System\Models\WebstoreConfiguration;
 use Plenty\Modules\Webshop\Contracts\SessionStorageRepositoryContract;
+use Plenty\Modules\Webshop\Contracts\WebstoreConfigurationRepositoryContract;
 
 /**
  * User: mklaes
@@ -27,10 +27,8 @@ class CheckoutServiceCurrencyTest extends TestCase
     protected $sessionStorageMock;
     /** @var Plugin $pluginMock */
     protected $pluginMock;
-    /** @var WebstoreConfigurationService $webstoreConfigServiceMock */
-    protected $webstoreConfigServiceMock;
-    /** @var WebstoreConfiguration $webstoreConfiguration */
-    protected $webstoreConfigurationMock;
+    /** @var WebstoreConfigurationRepositoryContract $webstoreConfigurationRepositoryMock */
+    protected $webstoreConfigurationRepositoryMock;
     /** @var Checkout $checkoutMock */
     protected $checkoutMock;
     /** @var SessionStorageRepositoryContract $sessionStorageRepositoryMock */
@@ -51,10 +49,11 @@ class CheckoutServiceCurrencyTest extends TestCase
         $this->pluginMock = Mockery::mock(Plugin::class);
         $this->replaceInstanceByMock(Plugin::class, $this->pluginMock);
 
-        $this->webstoreConfigurationMock = $this->mockWebstoreConfiguration();
-
-        $this->webstoreConfigServiceMock = Mockery::mock(WebstoreConfigurationService::class);
-        $this->replaceInstanceByMock(WebstoreConfigurationService::class, $this->webstoreConfigServiceMock);
+        $this->webstoreConfigurationRepositoryMock = Mockery::mock(WebstoreConfigurationRepositoryContract::class);
+        $this->replaceInstanceByMock(
+            WebstoreConfigurationRepositoryContract::class,
+            $this->webstoreConfigurationRepositoryMock
+        );
 
         $this->checkoutMock = Mockery::mock(Checkout::class);
         $this->replaceInstanceByMock(Checkout::class, $this->checkoutMock);
@@ -70,7 +69,9 @@ class CheckoutServiceCurrencyTest extends TestCase
     {
         $expectedCurrency = $this->fake->currencyCode;
 
-        $this->pluginMock->shouldReceive('getValue')->with(SessionStorageRepositoryContract::CURRENCY)->andReturn($expectedCurrency);
+        $this->pluginMock->shouldReceive('getValue')->with(SessionStorageRepositoryContract::CURRENCY)->andReturn(
+            $expectedCurrency
+        );
         $this->sessionStorageMock->shouldReceive('getPlugin')->andReturn($this->pluginMock);
 
         $currency = $this->checkoutService->getCurrency();
@@ -94,7 +95,9 @@ class CheckoutServiceCurrencyTest extends TestCase
         //TODO VDI MEYER
         $this->sessionStorageServiceMock->shouldReceive("getLang")->andReturn($webstoreConfiguration->defaultLanguage);
 
-        $this->webstoreConfigServiceMock->shouldReceive('getWebstoreConfig')->andReturn($webstoreConfiguration);
+        $this->webstoreConfigurationRepositoryMock->shouldReceive('getWebstoreConfiguration')->andReturn(
+            $webstoreConfiguration
+        );
 
         $this->checkoutMock->shouldReceive('setCurrency')->andReturn();
 
@@ -122,7 +125,7 @@ class CheckoutServiceCurrencyTest extends TestCase
         Session::shouldReceive('getLang')
             ->andReturn("");
 
-        $this->webstoreConfigServiceMock->shouldReceive('getWebstoreConfig')->andReturn($webstoreConfiguration);
+        $this->webstoreConfigurationRepositoryMock->shouldReceive('getWebstoreConfiguration')->andReturn($webstoreConfiguration);
 
         $this->checkoutMock->shouldReceive('setCurrency')->andReturn();
 

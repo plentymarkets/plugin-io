@@ -7,7 +7,6 @@ use IO\Helper\Utils;
 use IO\Services\ItemService;
 use IO\Services\UrlBuilder\ItemUrlBuilder;
 use IO\Services\UrlBuilder\VariationUrlBuilder;
-use IO\Services\WebstoreConfigurationService;
 
 /**
  * Class URLFilter
@@ -21,30 +20,24 @@ class URLFilter extends AbstractFilter
     private $itemService;
 
     /**
-     * @var WebstoreConfigurationService $webstoreConfigurationService
-     */
-    private $webstoreConfigurationService;
-
-    /**
      * URLFilter constructor.
      * @param ItemService $itemService
      */
-    public function __construct(ItemService $itemService )
+    public function __construct(ItemService $itemService)
     {
         parent::__construct();
         $this->itemService = $itemService;
-        $this->webstoreConfigurationService = pluginApp(WebstoreConfigurationService::class);
     }
 
     /**
      * Return the available filter methods
      * @return array
      */
-    public function getFilters():array
+    public function getFilters(): array
     {
         return [
-            "itemURL" => "buildItemURL",
-            "variationURL" => "buildVariationURL"
+            'itemURL' => 'buildItemURL',
+            'variationURL' => 'buildVariationURL'
         ];
     }
 
@@ -54,31 +47,27 @@ class URLFilter extends AbstractFilter
      * @param bool $withVariationId
      * @return string
      */
-    public function buildItemURL($itemData, $withVariationId = true):string
+    public function buildItemURL($itemData, $withVariationId = true): string
     {
         $itemId = $itemData['item']['id'];
         $variationId = $itemData['variation']['id'];
 
-        if ( $itemId === null || $itemId <= 0 )
-        {
+        if ($itemId === null || $itemId <= 0) {
             return "";
         }
 
         $includeLanguage = Utils::getLang() !== Utils::getDefaultLang();
-        if ( $variationId === null || $variationId <= 0 )
-        {
+        if ($variationId === null || $variationId <= 0) {
             /** @var ItemUrlBuilder $itemUrlBuilder */
-            $itemUrlBuilder = pluginApp( ItemUrlBuilder::class );
-            return $itemUrlBuilder->buildUrl( $itemId )->toRelativeUrl($includeLanguage);
-        }
-        else
-        {
+            $itemUrlBuilder = pluginApp(ItemUrlBuilder::class);
+            return $itemUrlBuilder->buildUrl($itemId)->toRelativeUrl($includeLanguage);
+        } else {
             /** @var VariationUrlBuilder $variationUrlBuilder */
-            $variationUrlBuilder = pluginApp( VariationUrlBuilder::class );
-            $url = $variationUrlBuilder->buildUrl( $itemId, $variationId );
+            $variationUrlBuilder = pluginApp(VariationUrlBuilder::class);
+            $url = $variationUrlBuilder->buildUrl($itemId, $variationId);
 
             return $url->append(
-                $variationUrlBuilder->getSuffix( $itemId, $variationId, $withVariationId )
+                $variationUrlBuilder->getSuffix($itemId, $variationId, $withVariationId)
             )->toRelativeUrl($includeLanguage);
         }
     }
@@ -89,10 +78,10 @@ class URLFilter extends AbstractFilter
      *
      * @deprecated
      */
-    public function buildVariationURL($variationId = 0):string
+    public function buildVariationURL($variationId = 0): string
     {
-        $variation = $this->itemService->getVariation( $variationId );
-        return $this->buildItemURL( $variation['documents'][0]['data'], true );
+        $variation = $this->itemService->getVariation($variationId);
+        return $this->buildItemURL($variation['documents'][0]['data'], true);
     }
 
 }
