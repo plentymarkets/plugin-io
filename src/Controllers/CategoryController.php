@@ -8,7 +8,6 @@ use IO\Helper\RouteConfig;
 use IO\Guards\AuthGuard;
 use IO\Helper\Utils;
 use IO\Services\CustomerService;
-use IO\Services\SessionStorageService;
 use IO\Services\UrlService;
 use Plenty\Modules\ShopBuilder\Helper\ShopBuilderRequest;
 use Plenty\Plugin\Http\Request;
@@ -61,10 +60,7 @@ class CategoryController extends LayoutController
 
     public function showCategoryById($categoryId, $params = [])
     {
-        //TODO VDI MEYER
-        /** @var SessionStorageService $sessionService */
-        $sessionService = pluginApp(SessionStorageService::class);
-        $lang = $sessionService->getLang();
+        $lang = Utils::getLang();
 
         return $this->renderCategory(
             $this->categoryRepo->get($categoryId, $lang),
@@ -74,10 +70,7 @@ class CategoryController extends LayoutController
 
     public function redirectToCategory($categoryId, $defaultUrl = '', $params = [])
     {
-        //TODO VDI MEYER
-        /** @var SessionStorageService $sessionService */
-        $sessionService = pluginApp(SessionStorageService::class);
-        $lang = $sessionService->getLang();
+        $lang = Utils::getLang();
 
         /** @var UrlService $urlService */
         $urlService = pluginApp(UrlService::class);

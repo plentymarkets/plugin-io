@@ -2,8 +2,8 @@
 
 namespace IO\Api\Resources;
 
+use IO\Helper\Utils;
 use IO\Models\LocalizedOrder;
-use Plenty\Plugin\Templates\Twig;
 use Plenty\Plugin\Http\Response;
 use Plenty\Plugin\Http\Request;
 use Plenty\Modules\Order\Models\Order;
@@ -13,7 +13,6 @@ use IO\Api\ApiResource;
 use IO\Api\ApiResponse;
 use IO\Api\ResponseCode;
 use IO\Services\TemplateService;
-use IO\Services\SessionStorageService;
 
 /**
  * Class OrderTemplateResource
@@ -52,11 +51,6 @@ class OrderTemplateResource extends ApiResource
      */
     public function index():Response
     {
-
-        //TODO VDI MEYER
-        /** @var SessionStorageService $sessionStorageService */
-        $sessionStorageService = pluginApp(SessionStorageService::class);
-
         $renderedTemplate = '';
 
         $template = $this->request->get('template', '');
@@ -70,7 +64,7 @@ class OrderTemplateResource extends ApiResource
                 /** @var OrderTotalsService $orderTotalsService */
                 $orderTotalsService = pluginApp(OrderTotalsService::class);
                 $renderedTemplate = $this->templateService->renderTemplate($template, [
-                    'orderData' => LocalizedOrder::wrap($order, $sessionStorageService->getLang())->toArray(),
+                    'orderData' => LocalizedOrder::wrap($order, Utils::getLang())->toArray(),
                     'totals'    => $orderTotalsService->getAllTotals($order)
                 ]);
             }

@@ -92,9 +92,6 @@ class CheckoutServiceCurrencyTest extends TestCase
         $this->pluginMock->shouldReceive('setValue')->andReturn();
         $this->sessionStorageMock->shouldReceive('getPlugin')->andReturn($this->pluginMock);
 
-        //TODO VDI MEYER
-        $this->sessionStorageServiceMock->shouldReceive("getLang")->andReturn($webstoreConfiguration->defaultLanguage);
-
         $this->webstoreConfigurationRepositoryMock->shouldReceive('getWebstoreConfiguration')->andReturn(
             $webstoreConfiguration
         );

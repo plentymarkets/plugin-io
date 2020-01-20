@@ -15,13 +15,11 @@ class LocalizationService
 
     public function getLocalizationData()
     {
-        //TODO VDI MEYER EVENTUELL SOGAR DIE LANG METHODE HIER REIN ?
-        $sessionStorage = pluginApp(SessionStorageService::class);
         $country = pluginApp(CountryService::class);
         $webstoreConfigurationRepository = pluginApp(WebstoreConfigurationRepositoryContract::class);
         $checkout = pluginApp(CheckoutService::class);
 
-        $lang = $sessionStorage->getLang();
+        $lang = Utils::getLang();
         if (is_null($lang) || !strlen($lang)) {
             $lang = $webstoreConfigurationRepository->getDefaultLanguage();
         }
@@ -64,12 +62,10 @@ class LocalizationService
 
     public function hasCountryStates($countryId): bool
     {
-        //TODO VDI MEYER
-        $sessionStorage = pluginApp(SessionStorageService::class);
         /** @var WebstoreConfigurationRepositoryContract $webstoreConfigurationRepository */
         $webstoreConfigurationRepository = pluginApp(WebstoreConfigurationRepositoryContract::class);
         $country = pluginApp(CountryService::class);
-        $lang = $sessionStorage->getLang();
+        $lang = Utils::getLang();
 
         if (is_null($lang) || !strlen($lang)) {
             $lang = $webstoreConfigurationRepository->getDefaultLanguage();

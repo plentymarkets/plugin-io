@@ -148,8 +148,7 @@ class OrderService
             ->withAddressId($this->checkoutService->getDeliveryAddressId(), AddressType::DELIVERY)
             ->withOrderProperty(OrderPropertyType::PAYMENT_METHOD, OrderOptionSubType::MAIN_VALUE, $this->checkoutService->getMethodOfPaymentId())
             ->withOrderProperty(OrderPropertyType::SHIPPING_PROFILE, OrderOptionSubType::MAIN_VALUE, $this->checkoutService->getShippingProfileId())
-            //TODO VDI MEYER
-            ->withOrderProperty(OrderPropertyType::DOCUMENT_LANGUAGE, OrderOptionSubType::MAIN_VALUE, $this->sessionStorage->getLang())
+            ->withOrderProperty(OrderPropertyType::DOCUMENT_LANGUAGE, OrderOptionSubType::MAIN_VALUE, Utils::getLang())
             ->withOrderProperty(OrderPropertyType::SHIPPING_PRIVACY_HINT_ACCEPTED, OrderOptionSubType::MAIN_VALUE, $isShippingPrivacyHintAccepted)
             ->withOrderProperty(OrderPropertyType::CUSTOMER_SIGN, OrderOptionSubType::MAIN_VALUE, $this->sessionStorageRepository->getSessionValue(SessionStorageRepositoryContract::ORDER_CUSTOMER_SIGN))
             ->withComment(true, $this->sessionStorageRepository->getSessionValue(SessionStorageRepositoryContract::ORDER_CONTACT_WISH))
@@ -173,7 +172,7 @@ class OrderService
             'basket' => $basket
         ]);
 
-        return LocalizedOrder::wrap( $order, $this->sessionStorage->getLang() );
+        return LocalizedOrder::wrap( $order, Utils::getLang() );
 	}
 
     /**
@@ -276,8 +275,7 @@ class OrderService
 
         if($wrap)
         {
-            //TODO VDI MEYER
-            return LocalizedOrder::wrap($order, $this->sessionStorage->getLang());
+            return LocalizedOrder::wrap($order, Utils::getLang());
         }
 
         return $order;
@@ -318,8 +316,7 @@ class OrderService
                 }
             }
         }
-        //TODO VDI MEYER
-        return LocalizedOrder::wrap($order, $this->sessionStorage->getLang());
+        return LocalizedOrder::wrap($order, Utils::getLang());
     }
 
     /**
@@ -348,8 +345,7 @@ class OrderService
 
         if($wrapped)
         {
-            //TODO VDI MEYER
-            $orders = LocalizedOrder::wrapPaginated( $orders, $this->sessionStorage->getLang() );
+            $orders = LocalizedOrder::wrapPaginated( $orders, Utils::getLang() );
         }
 
         return $orders;
@@ -380,10 +376,7 @@ class OrderService
             /** @var OrderTrackingService $orderTrackingService */
             $orderTrackingService = pluginApp(OrderTrackingService::class);
 
-            //TODO VDI MEYER
-            /** @var SessionStorageService $sessionStorageService */
-            $sessionStorageService = pluginApp(SessionStorageService::class);
-            $lang = $sessionStorageService->getLang();
+            $lang = Utils::getLang();
 
             $orders = [];
             foreach($orderResult->getResult() as $order)
@@ -459,8 +452,7 @@ class OrderService
 
         if(!is_null($order))
         {
-            //TODO VDI MEYER
-            return LocalizedOrder::wrap( $order, $this->sessionStorage->getLang() );
+            return LocalizedOrder::wrap( $order, Utils::getLang() );
         }
 
         return null;
@@ -631,8 +623,7 @@ class OrderService
      */
     public function getPaymentMethodListForSwitch($currentPaymentMethodId = 0, $orderId = null)
     {
-        //TODO VDI MEYER
-        return $this->frontendPaymentMethodRepository->getCurrentPaymentMethodsListForSwitch($currentPaymentMethodId, $orderId, $this->sessionStorage->getLang());
+        return $this->frontendPaymentMethodRepository->getCurrentPaymentMethodsListForSwitch($currentPaymentMethodId, $orderId, Utils::getLang());
     }
 
     /**
@@ -727,8 +718,7 @@ class OrderService
 
                     if(!is_null($order))
                     {
-                        //TODO VDI MEYER
-                        return LocalizedOrder::wrap( $order, $this->sessionStorage->getLang() );
+                        return LocalizedOrder::wrap( $order, Utils::getLang() );
                     }
                 }
             }
@@ -752,8 +742,7 @@ class OrderService
                 $params = [
                     'orderId' => $order->id,
                     'webstoreId' => Utils::getWebstoreId(),
-                    //TODO VDI MEYER
-                    'language' => $this->sessionStorage->getLang()
+                    'language' => Utils::getLang()
                 ];
                 $this->sendMail(AutomaticEmailTemplate::SHOP_ORDER ,AutomaticEmailOrder::class, $params);
 

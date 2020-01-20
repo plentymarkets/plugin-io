@@ -300,8 +300,7 @@ class CustomerService
                 'contactId' => $contact->id,
                 'clientId' => Utils::getWebstoreId(),
                 'password' => $contactData['password'],
-                //TODO VDI MEYER
-                'language' => $this->sessionStorage->getLang()
+                'language' => Utils::getLang()
             ];
 
             $this->sendMail(AutomaticEmailTemplate::CONTACT_REGISTRATION, AutomaticEmailContact::class, $params);
@@ -355,8 +354,7 @@ class CustomerService
         $contactData['plentyId'] = Utils::getPlentyId();
 
         if (!isset($contactData['lang']) || is_null($contactData['lang'])) {
-            //TODO VDI MEYER
-            $contactData['lang'] = $this->sessionStorage->getLang();
+            $contactData['lang'] = Utils::getLang();
         }
 
         try {
@@ -540,8 +538,7 @@ class CustomerService
             $params = [
                 'contactId' => $contact->id,
                 'clientId' => $webstoreConfiguration->webstoreId,
-                //TODO VDI MEYER
-                'language' => $this->sessionStorage->getLang()
+                'language' => Utils::getLang()
             ];
 
             $this->sendMail(

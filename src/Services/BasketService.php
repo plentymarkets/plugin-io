@@ -2,6 +2,7 @@
 
 namespace IO\Services;
 
+use IO\Helper\Utils;
 use IO\Services\ItemSearch\SearchPresets\BasketItems;
 use IO\Services\ItemSearch\Services\ItemSearchService;
 use Plenty\Modules\Accounting\Contracts\DetermineShopCountryContract;
@@ -688,12 +689,7 @@ class BasketService
          * @var VariationDescriptionRepositoryContract $variationDescriptionRepository
          */
 
-        //TODO VDI MEYER
-        $sessionStorageService = pluginApp(SessionStorageService::class);
-        /**
-         * @var SessionStorageService $sessionStorageService
-         */
-        $lang = $sessionStorageService->getLang();
+        $lang = Utils::getLang();
 
         /** @var AuthHelper $authHelper */
         $authHelper = pluginApp(AuthHelper::class);

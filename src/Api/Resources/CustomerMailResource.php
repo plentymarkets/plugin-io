@@ -12,7 +12,6 @@ use IO\Helper\RouteConfig;
 use IO\Helper\Utils;
 use IO\Services\AuthenticationService;
 use IO\Services\CustomerService;
-use IO\Services\SessionStorageService;
 use IO\Services\UserDataHashService;
 use Plenty\Modules\Account\Contact\Contracts\ContactRepositoryContract;
 use Plenty\Modules\Account\Contact\Models\Contact;
@@ -22,7 +21,6 @@ use Plenty\Modules\Helper\AutomaticEmail\Models\AutomaticEmailContact;
 use Plenty\Modules\Helper\AutomaticEmail\Models\AutomaticEmailTemplate;
 use Plenty\Modules\System\Contracts\WebstoreConfigurationRepositoryContract;
 use Plenty\Modules\System\Models\WebstoreConfiguration;
-use Plenty\Plugin\Application;
 use Plenty\Plugin\Http\Request;
 use Plenty\Plugin\Http\Response;
 use Plenty\Plugin\Log\Loggable;
@@ -93,10 +91,7 @@ class CustomerMailResource extends ApiResource
         $domain = $webstoreConfiguration->domainSsl;
         $defaultLang = $webstoreConfiguration->defaultLanguage;
 
-        //TODO VDI MEYER
-        /** @var SessionStorageService $sessionService */
-        $sessionService = pluginApp(SessionStorageService::class);
-        $lang = $sessionService->getLang();
+        $lang = Utils::getLang();
         /** @var ShopUrls $shopUrls */
         $shopUrls = pluginApp(ShopUrls::class);
         $newEmailLink = "";
@@ -112,7 +107,7 @@ class CustomerMailResource extends ApiResource
             'clientId' => Utils::getWebstoreId(),
             'password' => null,
             'newEmailLink' => $newEmailLink,
-            'language' => $sessionService->getLang()
+            'language' => Utils::getLang()
         ];
 
         $this->sendMail(AutomaticEmailTemplate::CONTACT_NEW_EMAIL, AutomaticEmailContact::class, $params);

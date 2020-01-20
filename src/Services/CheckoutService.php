@@ -167,21 +167,17 @@ class CheckoutService
             SessionStorageRepositoryContract::CURRENCY
         );
         if ($currency === null || $currency === '') {
-            //TODO VDI MEYER
-            /** @var SessionStorageService $sessionService */
-            $sessionService = pluginApp(SessionStorageService::class);
-
             $currency = 'EUR';
 
             if (
                 is_array($this->webstoreConfigurationRepository->getWebstoreConfiguration()->defaultCurrencyList) &&
                 array_key_exists(
-                    $sessionService->getLang(),
+                    Utils::getLang(),
                     $this->webstoreConfigurationRepository->getWebstoreConfiguration()->defaultCurrencyList
                 )
             ) {
                 $currency = $this->webstoreConfigurationRepository->getWebstoreConfiguration(
-                )->defaultCurrencyList[$sessionService->getLang()];
+                )->defaultCurrencyList[Utils::getLang()];
             }
             $this->setCurrency($currency);
         }
@@ -424,8 +420,7 @@ class CheckoutService
             function () {
                 $paymentDataList = array();
                 $mopList = $this->getMethodOfPaymentList();
-                //TODO VDI MEYER
-                $lang = $this->sessionStorageService->getLang();
+                $lang = Utils::getLang();
                 foreach ($mopList as $paymentMethod) {
                     $paymentData = array();
                     $paymentData['id'] = $paymentMethod->id;

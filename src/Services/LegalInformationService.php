@@ -2,11 +2,10 @@
 
 namespace IO\Services;
 
+use IO\Helper\Utils;
 use Plenty\Modules\Frontend\LegalInformation\Contracts\LegalInformationRepositoryContract;
 use Plenty\Modules\Frontend\LegalInformation\Models\LegalInformation;
 use Plenty\Plugin\Application;
-use IO\Services\SessionStorageService;
-
 
 class LegalInformationService
 {
@@ -16,11 +15,11 @@ class LegalInformationService
     
     private $plentyId;
     
-    public function __construct(LegalInformationRepositoryContract $legalInformationRepo, Application $app, SessionStorageService $sessionStorage)
+    public function __construct(LegalInformationRepositoryContract $legalInformationRepo, Application $app)
     {
         $this->legalInformationRepo = $legalInformationRepo;
         $this->plentyId = $app->getPlentyId();
-        $this->lang = $sessionStorage->getLang();
+        $this->lang = Utils::getLang();
     }
     
     public function getTermsAndConditions():LegalInformation

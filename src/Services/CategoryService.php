@@ -35,11 +35,6 @@ class CategoryService
     /** @var WebstoreConfigurationRepositoryContract */
     private $webstoreConfigurationRepository;
 
-    /**
-     * @var SessionStorageService
-     */
-    private $sessionStorageService;
-
     // is set from controllers
     /**
      * @var Category
@@ -66,12 +61,10 @@ class CategoryService
     public function __construct(
         CategoryRepositoryContract $categoryRepository,
         WebstoreConfigurationRepositoryContract $webstoreConfigurationRepository,
-        SessionStorageService $sessionStorageService,
         AuthGuard $authGuard
     ) {
         $this->categoryRepository = $categoryRepository;
         $this->webstoreConfigurationRepository = $webstoreConfigurationRepository;
-        $this->sessionStorageService = $sessionStorageService;
         $this->authGuard = $authGuard;
         $this->webstoreId = Utils::getWebstoreId();
     }
@@ -82,9 +75,8 @@ class CategoryService
      */
     public function setCurrentCategoryID(int $catID = 0)
     {
-        //TODO VDI MEYER
         $this->setCurrentCategory(
-            $this->categoryRepository->get($catID, $this->sessionStorageService->getLang(), $this->webstoreId)
+            $this->categoryRepository->get($catID, Utils::getLang(), $this->webstoreId)
         );
     }
 
@@ -94,8 +86,7 @@ class CategoryService
      */
     public function setCurrentCategory($cat)
     {
-        //TODO VDI MEYER
-        $lang = $this->sessionStorageService->getLang();
+        $lang = Utils::getLang();
         $this->currentCategory = null;
         $this->currentCategoryTree = [];
 
@@ -128,8 +119,7 @@ class CategoryService
     public function get($catID = 0, $lang = null)
     {
         if ($lang === null) {
-            //TODO VDI MEYER
-            $lang = $this->sessionStorageService->getLang();
+            $lang = Utils::getLang();
         }
 
         $webstoreId = $this->webstoreId;
@@ -173,8 +163,7 @@ class CategoryService
     public function getChildren($categoryId, $lang = null)
     {
         if ($lang === null) {
-            //TODO VDI MEYER
-            $lang = $this->sessionStorageService->getLang();
+            $lang = Utils::getLang();
         }
 
         $children = $this->fromMemoryCache(
@@ -202,8 +191,7 @@ class CategoryService
         $branches = ArrayHelper::toArray($category->branch);
         $children = $this->getNavigationTree(
             $templateConfigService->get('header.showCategoryTypes'),
-            //TODO VDI MEYER
-            $this->sessionStorageService->getLang(),
+            Utils::getLang(),
             $category->level + 1,
             $customerService->getContactClassId()
         );
@@ -235,8 +223,7 @@ class CategoryService
     {
         $defaultLanguage = $this->webstoreConfigurationRepository->getDefaultLanguage();
         if ($lang === null) {
-            //TODO VDI MEYER
-            $lang = $this->sessionStorageService->getLang();
+            $lang = Utils::getLang();
         }
 
         if (is_null($webstoreId)) {
@@ -266,8 +253,7 @@ class CategoryService
     public function getURLById($categoryId, $lang = null)
     {
         if ($lang === null) {
-            //TODO VDI MEYER
-            $lang = $this->sessionStorageService->getLang();
+            $lang = Utils::getLang();
         }
         return $this->getURL($this->get($categoryId, $lang), $lang);
     }
@@ -379,8 +365,7 @@ class CategoryService
         int $customerClassId = 0
     ): array {
         if ($lang === null) {
-            //TODO VDI MEYER
-            $lang = $this->sessionStorageService->getLang();
+            $lang = Utils::getLang();
         }
 
         if (is_null($type)) {
@@ -442,8 +427,7 @@ class CategoryService
 
             $tree = $this->getNavigationTree(
                 $type,
-                //TODO VDI MEYER
-                $this->sessionStorageService->getLang(),
+                Utils::getLang(),
                 $maxLevel,
                 $customerService->getContactClassId()
             );
@@ -467,8 +451,7 @@ class CategoryService
         } else {
             $tree = $this->getNavigationTree(
                 $type,
-                //TODO VDI MEYER
-                $this->sessionStorageService->getLang(),
+                Utils::getLang(),
                 3,
                 $customerService->getContactClassId()
             );
@@ -574,8 +557,7 @@ class CategoryService
     public function getNavigationList($type = "all", string $lang = null): array
     {
         if ($lang === null) {
-            //TODO VDI MEYER
-            $lang = $this->sessionStorageService->getLang();
+            $lang = Utils::getLang();
         }
 
         $list = $this->filterCategoriesByTypes(

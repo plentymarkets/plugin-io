@@ -111,9 +111,7 @@ class WebstoreConfigurationService
      */
     public function getDefaultShippingCountryId()
     {
-        //TODO VDI MEYER
-        $sessionService = pluginApp(SessionStorageService::class);
-        $defaultShippingCountryId = $this->getWebstoreConfig()->defaultShippingCountryList[$sessionService->getLang()];
+        $defaultShippingCountryId = $this->getWebstoreConfig()->defaultShippingCountryList[Utils::getLang()];
 
         if ($defaultShippingCountryId <= 0) {
             $defaultShippingCountryId = $this->getWebstoreConfig()->defaultShippingCountryId;

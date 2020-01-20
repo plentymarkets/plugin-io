@@ -7,7 +7,6 @@ use IO\Helper\RouteConfig;
 use IO\Helper\Utils;
 use IO\Services\CategoryService;
 use IO\Services\OrderTrackingService;
-use IO\Services\SessionStorageService;
 use IO\Services\UrlBuilder\CategoryUrlBuilder;
 use IO\Services\UrlBuilder\UrlQuery;
 use Plenty\Modules\Authorization\Services\AuthHelper;
@@ -20,11 +19,6 @@ use Plenty\Plugin\Http\Request;
 class ShopUrls
 {
     use MemoryCache;
-
-    /**
-     * @var SessionStorageService $sessionStorageService
-     */
-    private $sessionStorageService;
 
     private $urlMap = [
         RouteConfig::ORDER_RETURN => 'returns',
@@ -60,11 +54,9 @@ class ShopUrls
     public $newsletterOptOut = '';
     public $orderDocument = '';
 
-    public function __construct(Dispatcher $dispatcher, SessionStorageService $sessionStorageService)
+    public function __construct(Dispatcher $dispatcher)
     {
-        //TODO VDI MEYER
-        $this->sessionStorageService = $sessionStorageService;
-        $this->init($sessionStorageService->getLang());
+        $this->init(Utils::getLang());
         $dispatcher->listen(
             FrontendLanguageChanged::class,
             function (FrontendLanguageChanged $event) {
@@ -152,8 +144,7 @@ class ShopUrls
 
     public function tracking($orderId)
     {
-        //TODO VDI MEYER
-        $lang = $this->sessionStorageService->getLang();
+        $lang = Utils::getLang();
         return $this->fromMemoryCache(
             "tracking.{$orderId}",
             function () use ($orderId, $lang) {

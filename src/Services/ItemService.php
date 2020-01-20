@@ -17,6 +17,7 @@ use IO\Constants\Language;
 use IO\Helper\EventDispatcher;
 use IO\Helper\MemoryCache;
 use IO\Extensions\Filters\ItemImagesFilter;
+use IO\Helper\Utils;
 use IO\Services\ItemSearch\SearchPresets\SingleItem;
 use IO\Services\ItemSearch\SearchPresets\VariationList;
 use IO\Services\ItemSearch\Services\ItemSearchService;
@@ -219,8 +220,7 @@ class ItemService
             /** @var ItemParamsBuilder $paramsBuilder */
             $paramsBuilder = pluginApp(ItemParamsBuilder::class);
             $params = $paramsBuilder
-                //TODO VDI MEYER
-                ->withParam(ItemColumnsParams::LANGUAGE, $this->sessionStorage->getLang())
+                ->withParam(ItemColumnsParams::LANGUAGE, Utils::getLang())
                 ->withParam(ItemColumnsParams::PLENTY_ID, $this->app->getPlentyId())
                 ->build();
             $variations = $this->itemRepository->search($columns, $filter, $params);
@@ -418,8 +418,7 @@ class ItemService
                     /** @var ItemParamsBuilder $paramsBuilder */
                     $paramsBuilder = pluginApp(ItemParamsBuilder::class);
                     $params = $paramsBuilder
-                        //TODO VDI MEYER
-                        ->withParam(ItemColumnsParams::LANGUAGE, $this->sessionStorage->getLang())
+                        ->withParam(ItemColumnsParams::LANGUAGE, Utils::getLang())
                         ->withParam(ItemColumnsParams::PLENTY_ID, $this->app->getPlentyId())
                         ->withParam(ItemColumnsParams::CUSTOMER_CLASS, $contactClassId)
                         ->withParam(ItemColumnsParams::REFERRER_ID, $referrerId)
@@ -495,8 +494,7 @@ class ItemService
         $customerService = pluginApp(CustomerService::class);
         $params = $paramsBuilder
             ->withParam(ItemColumnsParams::TYPE, 'virtual')
-            //TODO VDI MEYER
-            ->withParam(ItemColumnsParams::LANGUAGE, $this->sessionStorage->getLang())
+            ->withParam(ItemColumnsParams::LANGUAGE, Utils::getLang())
             ->withParam(ItemColumnsParams::PLENTY_ID, $this->app->getPlentyId())
             ->withParam(ItemColumnsParams::CUSTOMER_CLASS, $customerService->getContactClassId())
             ->build();
@@ -564,8 +562,7 @@ class ItemService
             /** @var ItemParamsBuilder $paramsBuilder */
             $paramsBuilder = pluginApp(ItemParamsBuilder::class);
             $params = $paramsBuilder
-                //TODO VDI MEYER
-                ->withParam(ItemColumnsParams::LANGUAGE, $this->sessionStorage->getLang())
+                ->withParam(ItemColumnsParams::LANGUAGE, Utils::getLang())
                 ->withParam(ItemColumnsParams::PLENTY_ID, $this->app->getPlentyId())
                 ->withParam(ItemColumnsParams::CUSTOMER_CLASS, $contactClassId)
                 ->withParam(ItemColumnsParams::REFERRER_ID, $referrerId)
@@ -601,8 +598,7 @@ class ItemService
                 if (!in_array($unitCombinationId, $unitList)) {
                     $unitData = $authHelper->processUnguarded(
                         function () use ($unitId, $unitNameRepo) {
-                            //TODO VDI MEYER
-                            return $unitNameRepo->findOne($unitId, $this->sessionStorage->getLang());
+                            return $unitNameRepo->findOne($unitId, Utils::getLang());
                         }
                     );
 
@@ -651,8 +647,7 @@ class ItemService
         /** @var ItemParamsBuilder $paramsBuilder */
         $paramsBuilder = pluginApp(ItemParamsBuilder::class);
         $params = $paramsBuilder
-            //TODO VDI MEYER
-            ->withParam(ItemColumnsParams::LANGUAGE, $this->sessionStorage->getLang())
+            ->withParam(ItemColumnsParams::LANGUAGE, Utils::getLang())
             ->withParam(ItemColumnsParams::PLENTY_ID, $this->app->getPlentyId())
             ->build();
 
@@ -674,8 +669,7 @@ class ItemService
                 $attributeNameRepository = pluginApp(AttributeNameRepositoryContract::class);
 
                 $name = '';
-                //TODO VDI MEYER
-                $attribute = $attributeNameRepository->findOne($attributeId, $this->sessionStorage->getLang());
+                $attribute = $attributeNameRepository->findOne($attributeId, Utils::getLang());
 
                 if (!is_null($attribute)) {
                     $name = $attribute->name;
@@ -704,8 +698,7 @@ class ItemService
                 $name = '';
                 $attributeValue = $attributeValueNameRepository->findOne(
                     $attributeValueId,
-                    //TODO VDI MEYER
-                    $this->sessionStorage->getLang()
+                    Utils::getLang()
                 );
                 if (!is_null($attributeValue)) {
                     $name = $attributeValue->name;
@@ -753,8 +746,7 @@ class ItemService
                 /** @var ItemParamsBuilder $paramsBuilder */
                 $paramsBuilder = pluginApp(ItemParamsBuilder::class);
                 $params = $paramsBuilder
-                    //TODO VDI MEYER
-                    ->withParam(ItemColumnsParams::LANGUAGE, $this->sessionStorage->getLang())
+                    ->withParam(ItemColumnsParams::LANGUAGE, Utils::getLang())
                     ->withParam(ItemColumnsParams::PLENTY_ID, $this->app->getPlentyId())
                     ->build();
 
@@ -816,8 +808,7 @@ class ItemService
         $filter = $filterBuilder->build();
 
         $params = $paramBuilder
-            //TODO VDI MEYER
-            ->withParam(ItemColumnsParams::LANGUAGE, $this->sessionStorage->getLang())
+            ->withParam(ItemColumnsParams::LANGUAGE, Utils::getLang())
             ->withParam(ItemColumnsParams::PLENTY_ID, $this->app->getPlentyId())
             ->withParam(ItemColumnsParams::ORDER_BY, ["orderBy.variationCreateTimestamp" => "desc"])
             ->withParam(ItemColumnsParams::LIMIT, $limit)
@@ -834,12 +825,7 @@ class ItemService
      */
     public function searchItems(string $searchString, $params = [], int $page = 1): array
     {
-        //TODO VDI MEYER WARUM NICHT ÜBER this an dieser Stelle ?
-        /**
-         * @var SessionStorageService $sessionStorage
-         */
-        $sessionStorage = pluginApp(SessionStorageService::class);
-        $lang = $sessionStorage->getLang();
+        $lang = Utils::getLang();
 
         $documentProcessor = pluginApp(DocumentProcessor::class);
         $documentSearch = pluginApp(DocumentSearch::class, [$documentProcessor]);

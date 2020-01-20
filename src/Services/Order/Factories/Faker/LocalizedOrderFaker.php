@@ -3,8 +3,8 @@
 namespace IO\Services\Order\Factories\Faker;
 
 use IO\Extensions\Filters\ItemImagesFilter;
+use IO\Helper\Utils;
 use IO\Services\ItemSearch\Factories\Faker\AbstractFaker;
-use IO\Services\SessionStorageService;
 use Plenty\Modules\Authorization\Services\AuthHelper;
 use Plenty\Modules\Frontend\PaymentMethod\Contracts\FrontendPaymentMethodRepositoryContract;
 use Plenty\Modules\Order\Shipping\Contracts\ParcelServicePresetRepositoryContract;
@@ -20,10 +20,7 @@ class LocalizedOrderFaker extends AbstractFaker
         /** @var Translator $translator */
         $translator = pluginApp(Translator::class);
 
-        //TODO VDI MEYER
-        /** @var SessionStorageService $sessionStorageService */
-        $sessionStorageService = pluginApp(SessionStorageService::class);
-        $lang = $sessionStorageService->getLang();
+        $lang = Utils::getLang();
 
         $paymentMethodName = '';
         $paymentMethodIcon = '';

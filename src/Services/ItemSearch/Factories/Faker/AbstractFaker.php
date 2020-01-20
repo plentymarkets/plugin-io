@@ -2,6 +2,7 @@
 
 namespace IO\Services\ItemSearch\Factories\Faker;
 
+use IO\Helper\Utils;
 use IO\Services\ItemSearch\Factories\Faker\Traits\FakeBoolean;
 use IO\Services\ItemSearch\Factories\Faker\Traits\FakeCountry;
 use IO\Services\ItemSearch\Factories\Faker\Traits\FakeDate;
@@ -11,7 +12,6 @@ use IO\Services\ItemSearch\Factories\Faker\Traits\FakeNumber;
 use IO\Services\ItemSearch\Factories\Faker\Traits\FakeString;
 use IO\Services\ItemSearch\Factories\Faker\Traits\FakeUnit;
 use IO\Services\ItemSearch\Factories\Faker\Traits\HandleNestedArray;
-use IO\Services\SessionStorageService;
 use Plenty\Plugin\Application;
 
 abstract class AbstractFaker
@@ -47,9 +47,9 @@ abstract class AbstractFaker
 
     private static $globals = [];
 
-    public function __construct(SessionStorageService $sessionStorageService, Application $app)
+    public function __construct(Application $app)
     {
-        $this->lang     = $sessionStorageService->getLang();
+        $this->lang     = Utils::getLang();
         $this->esLang   = self::ES_LANGUAGES[$this->lang] ?? 'english';
         $this->plentyId = $app->getPlentyId();
     }

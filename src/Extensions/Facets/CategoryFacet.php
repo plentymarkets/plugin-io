@@ -5,7 +5,6 @@ namespace IO\Extensions\Facets;
 use IO\Helper\Utils;
 use IO\Services\CategoryService;
 use IO\Services\ItemSearch\Contracts\FacetExtension;
-use IO\Services\SessionStorageService;
 use IO\Services\TemplateService;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Search\Aggregation\AggregationInterface;
 use Plenty\Modules\Item\Search\Aggregations\CategoryAllTermsAggregation;
@@ -45,10 +44,6 @@ class CategoryFacet implements FacetExtension
         {
             if(count($result))
             {
-                //TODO VDI MEYER
-                 /** @var SessionStorageService $sessionStorage */
-                $sessionStorage = pluginApp(SessionStorageService::class);
-
                 $categoryFacet = [
                     'id' => 'category',
                     'name' => 'Categories',
@@ -67,8 +62,7 @@ class CategoryFacet implements FacetExtension
 
                 foreach($result as $categoryId => $count)
                 {
-                    $category = $categoryService->getForPlentyId($categoryId, $sessionStorage->getLang());
-
+                    $category = $categoryService->getForPlentyId($categoryId, Utils::getLang());
 
                     if ( !is_null($category) && (!$categoryService->isHidden($category->id) || $loggedIn || Utils::isAdminPreview()) )
                     {

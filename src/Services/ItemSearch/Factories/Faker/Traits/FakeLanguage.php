@@ -2,7 +2,7 @@
 
 namespace IO\Services\ItemSearch\Factories\Faker\Traits;
 
-use IO\Services\SessionStorageService;
+use IO\Helper\Utils;
 use Plenty\Modules\Webshop\Contracts\WebstoreConfigurationRepositoryContract;
 
 trait FakeLanguage
@@ -12,10 +12,7 @@ trait FakeLanguage
         /** @var WebstoreConfigurationRepositoryContract $webstoreConfigurationRepository */
         $webstoreConfigurationRepository = pluginApp(WebstoreConfigurationRepositoryContract::class);
 
-        //TODO VDI MEYER
-        /** @var SessionStorageService $sessionStorageService */
-        $sessionStorageService = pluginApp(SessionStorageService::class);
-        $lang = $sessionStorageService->getLang();
+        $lang = Utils::getLang();
 
         $languages = [];
         foreach ($webstoreConfigurationRepository->getActiveLanguageList() as $language) {

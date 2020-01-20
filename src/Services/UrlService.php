@@ -19,24 +19,16 @@ class UrlService
 {
     use MemoryCache;
 
-    /**
-     * @var SessionStorageService $sessionStorage
-     */
-    private $sessionStorage;
-
     /** @var WebstoreConfigurationRepositoryContract $webstoreConfigurationRepository */
     private $webstoreConfigurationRepository;
 
     /**
      * UrlService constructor.
-     * @param SessionStorageService $sessionStorage
      * @param WebstoreConfigurationRepositoryContract $webstoreConfigurationRepository
      */
     public function __construct(
-        SessionStorageService $sessionStorage,
         WebstoreConfigurationRepositoryContract $webstoreConfigurationRepository
     ) {
-        $this->sessionStorage = $sessionStorage;
         $this->webstoreConfigurationRepository = $webstoreConfigurationRepository;
     }
 
@@ -49,8 +41,7 @@ class UrlService
     public function getCategoryURL($categoryId, $lang = null)
     {
         if ($lang === null) {
-            //TODO VDI MEYER
-            $lang = $this->sessionStorage->getLang();
+            $lang = Utils::getLang();
         }
         $categoryUrl = $this->fromMemoryCache(
             "categoryUrl.$categoryId.$lang",
@@ -74,8 +65,7 @@ class UrlService
     public function getVariationURL($itemId, $variationId, $lang = null)
     {
         if ($lang === null) {
-            //TODO VDI MEYER
-            $lang = $this->sessionStorage->getLang();
+            $lang = Utils::getLang();
         }
 
         $variationUrl = $this->fromMemoryCache(
@@ -109,8 +99,7 @@ class UrlService
         $defaultLanguage = $this->webstoreConfigurationRepository->getDefaultLanguage();
 
         if ($lang === null) {
-            //TODO VDI MEYER
-            $lang = $this->sessionStorage->getLang();
+            $lang = Utils::getLang();
         }
 
         $canonicalUrl = $this->fromMemoryCache(
@@ -171,8 +160,7 @@ class UrlService
         $defaultLanguage = $this->webstoreConfigurationRepository->getDefaultLanguage();
 
         if ($lang === null) {
-            //TODO VDI MEYER
-            $lang = $this->sessionStorage->getLang();
+            $lang = Utils::getLang();
         }
 
         /** @var Request $request */
@@ -246,8 +234,7 @@ class UrlService
             /** @var UrlQuery $query */
             $query = pluginApp(UrlQuery::class, ['path' => $redirectURL]);
             $redirectURL = $query->toAbsoluteUrl(
-                //TODO VDI MEYER
-                $this->webstoreConfigurationRepository->getDefaultLanguage() !== $this->sessionStorage->getLang()
+                $this->webstoreConfigurationRepository->getDefaultLanguage() !== Utils::getLang()
             );
         }
 
