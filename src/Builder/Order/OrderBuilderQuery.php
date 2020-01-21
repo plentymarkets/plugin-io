@@ -87,7 +87,7 @@ class OrderBuilderQuery
 
 		return $this;
 	}
-    
+
     /**
      * Add the lang to the order
      * @param string $lang
@@ -203,12 +203,12 @@ class OrderBuilderQuery
 	public function withContactId(int $customerId):OrderBuilderQuery
 	{
 		$this->withRelation(ReferenceType::CONTACT, $customerId, RelationType::RECEIVER);
-		
+
 		if((int)$customerId <= 0)
         {
             $this->withLang(Utils::getLang());
         }
-		
+
 		return $this;
 	}
 
@@ -217,9 +217,10 @@ class OrderBuilderQuery
      * @param int $type
      * @param int $subType
      * @param $value
+     * @param $optional
      * @return OrderBuilderQuery
      */
-	public function withOrderProperty(int $type, int $subType, $value):OrderBuilderQuery
+	public function withOrderProperty(int $type, int $subType, $value, $optional = false):OrderBuilderQuery
 	{
 		if($this->order["properties"] === null)
 		{
@@ -232,8 +233,12 @@ class OrderBuilderQuery
 			"value"     => (string)$value
 		];
 
-		array_push($this->order["properties"], $option);
-		return $this;
+		if (!$optional || $optional && strlen($value) > 0)
+        {
+            array_push($this->order["properties"], $option);
+        }
+
+        return $this;
 	}
 
     /**
