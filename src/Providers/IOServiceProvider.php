@@ -31,6 +31,7 @@ use IO\Services\CategoryService;
 use IO\Services\CheckoutService;
 use IO\Services\ContactBankService;
 use IO\Services\ContactMailService;
+use IO\Services\ContactMapService;
 use IO\Services\CountryService;
 use IO\Services\CouponService;
 use IO\Services\CustomerService;
@@ -143,7 +144,8 @@ class IOServiceProvider extends ServiceProvider
             WebstoreConfigurationService::class,
             LiveShoppingService::class,
             FakerService::class,
-            PropertyFileService::class
+            PropertyFileService::class,
+            ContactMapService::class
         ]);
 
         $this->getApplication()->singleton(FacetExtensionContainer::class);
