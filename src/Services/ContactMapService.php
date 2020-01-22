@@ -24,20 +24,20 @@ class ContactMapService
         return $this->cachingRepository->remember(
             self::COORD_CACHE_KEY,
             60,
-            function() use($street, $zip, $apiKey)
-            {
+            function () use ($street, $zip, $apiKey) {
+                $location = [
+                    'location' => [
+                        'lat' => 0,
+                        'lng' => 0
+                    ]
+                ];
+
                 if (empty($street) || empty($apiKey)) {
-                    return [
-                        'location' => [
-                            'lat' => 0,
-                            'lng' => 0
-                        ]
-                    ];
+                    return $location;
                 }
 
                 // If zip is not empty, concat it to street
-                if($zip !== null)
-                {
+                if ($zip !== null) {
                     $street = $zip . ' ' . $street;
                 }
 
@@ -65,12 +65,9 @@ class ContactMapService
                 $lng = $result['results'][0]['geometry']['location']['lng'] ?? '';
 
                 if ($lat && $lng) {
-                    return [
-                        'location' => [
-                            'lat' => $lat,
-                            'lng' => $lng
-                        ]
-                    ];
+                    $location['location']['lat'] = $lat;
+                    $location['location']['lng'] = $lng;
+                    return $location;
                 }
 
                 if (isset($result['error_message'])) {
@@ -83,12 +80,7 @@ class ContactMapService
                     );
                 }
 
-                return [
-                    'location' => [
-                        'lat' => 0,
-                        'lng' => 0
-                    ]
-                ];
+                return $location;
             }
         );
     }
