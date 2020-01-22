@@ -7,9 +7,9 @@ use IO\Extensions\Constants\ShopUrls;
 use IO\Helper\RouteConfig;
 use IO\Guards\AuthGuard;
 use IO\Helper\Utils;
-use IO\Services\CustomerService;
 use IO\Services\UrlService;
 use Plenty\Modules\ShopBuilder\Helper\ShopBuilderRequest;
+use Plenty\Modules\Webshop\Contracts\ContactRepositoryContract;
 use Plenty\Plugin\Http\Request;
 use Plenty\Plugin\Http\Response;
 use Plenty\Plugin\Log\Loggable;
@@ -194,10 +194,10 @@ class CategoryController extends LayoutController
             );
             RouteConfig::overrideCategoryId(RouteConfig::CONFIRMATION, $category->id);
 
-            /** @var CustomerService $customerService */
-            $customerService = pluginApp(CustomerService::class);
+            /** @var ContactRepositoryContract $contactRepository */
+            $contactRepository = pluginApp(ContactRepositoryContract::class);
 
-            if ($request->get('contentLinkId', false) && $customerService->getContactId() <= 0) {
+            if ($request->get('contentLinkId', false) && $contactRepository->getContactId() <= 0) {
                 /** @var ShopUrls $shopUrls */
                 $shopUrls = pluginApp(ShopUrls::class);
                 /** @var AuthGuard $guard */
@@ -216,10 +216,10 @@ class CategoryController extends LayoutController
 
         if (RouteConfig::getCategoryId(RouteConfig::LOGIN) === $category->id
             || RouteConfig::getCategoryId(RouteConfig::REGISTER) === $category->id) {
-            /** @var CustomerService $customerService */
-            $customerService = pluginApp(CustomerService::class);
+            /** @var ContactRepositoryContract $contactRepository */
+            $contactRepository = pluginApp(ContactRepositoryContract::class);
 
-            if ($customerService->getContactId() > 0 && !$shopBuilderRequest->isShopBuilder()) {
+            if ($contactRepository->getContactId() > 0 && !$shopBuilderRequest->isShopBuilder()) {
                 /** @var ShopUrls $shopUrls */
                 $shopUrls = pluginApp(ShopUrls::class);
                 AuthGuard::redirect($shopUrls->home);

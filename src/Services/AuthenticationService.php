@@ -2,7 +2,7 @@
 
 namespace IO\Services;
 
-use Plenty\Modules\Account\Contact\Contracts\ContactRepositoryContract;
+use Plenty\Modules\Webshop\Contracts\ContactRepositoryContract;
 use Plenty\Modules\Account\Contact\Models\Contact;
 use Plenty\Modules\Authentication\Contracts\ContactAuthenticationRepositoryContract;
 use Plenty\Modules\Webshop\Contracts\SessionStorageRepositoryContract;
@@ -96,9 +96,10 @@ class AuthenticationService
      */
     public function checkPassword($password): bool
     {
-        /** @var CustomerService $customerService */
-        $customerService = pluginApp(CustomerService::class);
-        $contact = $customerService->getContact();
+        /** @var ContactRepositoryContract $contactRepository */
+        $contactRepository = pluginApp(ContactRepositoryContract::class);
+
+        $contact = $contactRepository->getContact();
         if ($contact instanceof Contact) {
             try {
                 $this->login(
@@ -124,10 +125,10 @@ class AuthenticationService
      */
     public function isLoggedIn(): bool
     {
-        /** @var CustomerService $customerService */
-        $customerService = pluginApp(CustomerService::class);
+        /** @var ContactRepositoryContract $contactRepository */
+        $contactRepository = pluginApp(ContactRepositoryContract::class);
 
-        $contactId = $customerService->getContactId();
+        $contactId = $contactRepository->getContactId();
         $email = $this->sessionStorageRepository->getSessionValue(SessionStorageRepositoryContract::GUEST_EMAIL);
 
         return $contactId > 0 || !empty(trim($email));

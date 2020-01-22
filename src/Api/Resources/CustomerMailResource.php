@@ -11,9 +11,8 @@ use IO\Extensions\Mail\SendMail;
 use IO\Helper\RouteConfig;
 use IO\Helper\Utils;
 use IO\Services\AuthenticationService;
-use IO\Services\CustomerService;
 use IO\Services\UserDataHashService;
-use Plenty\Modules\Account\Contact\Contracts\ContactRepositoryContract;
+use Plenty\Modules\Account\Contact\Contracts\ContactRepositoryContract as CoreContactRepositoryContract;
 use Plenty\Modules\Account\Contact\Models\Contact;
 use Plenty\Modules\Account\Contact\Models\ContactOption;
 use Plenty\Modules\Authorization\Services\AuthHelper;
@@ -21,6 +20,7 @@ use Plenty\Modules\Helper\AutomaticEmail\Models\AutomaticEmailContact;
 use Plenty\Modules\Helper\AutomaticEmail\Models\AutomaticEmailTemplate;
 use Plenty\Modules\System\Contracts\WebstoreConfigurationRepositoryContract;
 use Plenty\Modules\System\Models\WebstoreConfiguration;
+use Plenty\Modules\Webshop\Contracts\ContactRepositoryContract;
 use Plenty\Plugin\Http\Request;
 use Plenty\Plugin\Http\Response;
 use Plenty\Plugin\Log\Loggable;
@@ -45,11 +45,11 @@ class CustomerMailResource extends ApiResource
         $newMail = $this->request->get('newMail', null);
         $newMail2 = $this->request->get('newMail2', null);
 
-        /** @var CustomerService $customerService */
-        $customerService = pluginApp(CustomerService::class);
+        /** @var ContactRepositoryContract $contactRepository */
+        $contactRepository = pluginApp(ContactRepositoryContract::class);
 
         /** @var Contact $contact */
-        $contact = $customerService->getContact();
+        $contact = $contactRepository->getContact();
 
         if (is_null($contact)) {
             return $this->response->create(null, ResponseCode::UNAUTHORIZED);
@@ -63,9 +63,9 @@ class CustomerMailResource extends ApiResource
             return $this->response->create(null, ResponseCode::NOT_MODIFIED);
         }
 
-        /** @var ContactRepositoryContract $contactRepository */
-        $contactRepository = pluginApp(ContactRepositoryContract::class);
-        $contactByMail = $contactRepository->getContactIdByEmail($newMail);
+        /** @var CoreContactRepositoryContract $coreContactRepository */
+        $coreContactRepository = pluginApp(CoreContactRepositoryContract::class);
+        $contactByMail = $coreContactRepository->getContactIdByEmail($newMail);
 
         if (!is_null($contactByMail)) {
             return $this->response->create(null, ResponseCode::BAD_REQUEST);
@@ -154,9 +154,9 @@ class CustomerMailResource extends ApiResource
             $authHelper = pluginApp(AuthHelper::class);
             $contact = $authHelper->processUnguarded(
                 function () use ($contactId, $hashData) {
-                    /** @var ContactRepositoryContract $contactRepository */
-                    $contactRepository = pluginApp(ContactRepositoryContract::class);
-                    $result = $contactRepository->updateContact(
+                    /** @var CoreContactRepositoryContract $coreContactRepository */
+                    $coreContactRepository = pluginApp(CoreContactRepositoryContract::class);
+                    $result = $coreContactRepository->updateContact(
                         [
                             'options' => [
                                 [

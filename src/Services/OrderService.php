@@ -28,6 +28,7 @@ use Plenty\Modules\Order\Property\Models\OrderPropertyType;
 use Plenty\Modules\Order\Status\Contracts\OrderStatusRepositoryContract;
 use Plenty\Modules\Payment\Contracts\PaymentRepositoryContract;
 use Plenty\Modules\Payment\Method\Contracts\PaymentMethodRepositoryContract;
+use Plenty\Modules\Webshop\Contracts\ContactRepositoryContract;
 use Plenty\Modules\Webshop\Contracts\SessionStorageRepositoryContract;
 use Plenty\Modules\Webshop\Template\Contracts\TemplateConfigRepositoryContract;
 use Plenty\Plugin\Log\Loggable;
@@ -75,6 +76,8 @@ class OrderService
     /** @var CustomerService $customerService */
     private $customerService;
 
+    /** @var ContactRepositoryContract $contactRepository */
+    private $contactRepository;
 
     /**
      * The OrderItem types that will be wrapped. All other OrderItems will be stripped from the order.
@@ -94,9 +97,10 @@ class OrderService
      * @param SessionStorageRepositoryContract $sessionStorageRepository
      * @param FrontendPaymentMethodRepositoryContract $frontendPaymentMethodRepository
      * @param AddressRepositoryContract $addressRepository
-     * @param \IO\Services\UrlService $urlService
-     * @param \IO\Services\CheckoutService $checkoutService
-     * @param \IO\Services\CustomerService $customerService
+     * @param UrlService $urlService
+     * @param CheckoutService $checkoutService
+     * @param CustomerService $customerService
+     * @param ContactRepositoryContract $contactRepository
      */
 	public function __construct(
 		OrderRepositoryContract $orderRepository,
@@ -106,7 +110,8 @@ class OrderService
         AddressRepositoryContract $addressRepository,
         UrlService $urlService,
         CheckoutService $checkoutService,
-        CustomerService $customerService)
+        CustomerService $customerService,
+        ContactRepositoryContract $contactRepository)
 	{
 		$this->orderRepository = $orderRepository;
 		$this->basketService   = $basketService;
@@ -116,6 +121,7 @@ class OrderService
         $this->urlService = $urlService;
         $this->checkoutService = $checkoutService;
         $this->customerService = $customerService;
+        $this->contactRepository = $contactRepository;
 	}
 
     /**
@@ -143,7 +149,7 @@ class OrderService
 
         $order = $orderBuilder->prepare(OrderType::ORDER)
             ->fromBasket()
-            ->withContactId($this->customerService->getContactId())
+            ->withContactId($this->contactRepository->getContactId())
             ->withAddressId($this->checkoutService->getBillingAddressId(), AddressType::BILLING)
             ->withAddressId($this->checkoutService->getDeliveryAddressId(), AddressType::DELIVERY)
             ->withOrderProperty(OrderPropertyType::PAYMENT_METHOD, OrderOptionSubType::MAIN_VALUE, $this->checkoutService->getMethodOfPaymentId())
@@ -304,13 +310,13 @@ class OrderService
 
             if ((int)$orderContactId > 0)
             {
-                if ((int)$this->customerService->getContactId() <= 0)
+                if ((int)$this->contactRepository->getContactId() <= 0)
                 {
                     /** @var ShopUrls $shopUrls */
                     $shopUrls = pluginApp(ShopUrls::class);
                     return $this->urlService->redirectTo($shopUrls->login . '?backlink=' . $shopUrls->confirmation . '/' . $orderId . '/' . $orderAccessKey);
                 }
-                elseif ((int)$orderContactId !== (int)$this->customerService->getContactId())
+                elseif ((int)$orderContactId !== (int)$this->contactRepository->getContactId())
                 {
                     return null;
                 }
@@ -354,7 +360,7 @@ class OrderService
     public function getOrdersCompact(int $page = 1, int $items = 50)
     {
         $orderResult = null;
-        $contactId = $this->customerService->getContactId();
+        $contactId = $this->contactRepository->getContactId();
 
         if($contactId > 0)
         {
@@ -779,7 +785,7 @@ class OrderService
 
         $this->sessionStorageRepository->setSessionValue(SessionStorageRepositoryContract::ORDER_CONTACT_WISH, null);
         $this->sessionStorageRepository->setSessionValue(SessionStorageRepositoryContract::ORDER_CUSTOMER_SIGN, null);
-        if ($this->customerService->getContactId() <= 0)
+        if ($this->contactRepository->getContactId() <= 0)
         {
             $this->sessionStorageRepository->setSessionValue(SessionStorageRepositoryContract::LATEST_ORDER_ID, $order->id);
         }

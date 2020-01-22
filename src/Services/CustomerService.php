@@ -19,7 +19,7 @@ use Plenty\Modules\Account\Address\Models\AddressOption;
 use Plenty\Modules\Account\Contact\Contracts\ContactAddressRepositoryContract;
 use Plenty\Modules\Account\Contact\Contracts\ContactAccountRepositoryContract;
 use Plenty\Modules\Account\Contact\Contracts\ContactClassRepositoryContract;
-use Plenty\Modules\Account\Contact\Contracts\ContactRepositoryContract;
+use Plenty\Modules\Account\Contact\Contracts\ContactRepositoryContract as CoreContactRepositoryContract;
 use Plenty\Modules\Account\Contact\Models\Contact;
 use Plenty\Modules\Account\Contact\Models\ContactOption;
 use Plenty\Modules\Account\Models\Account;
@@ -33,6 +33,7 @@ use Plenty\Modules\Helper\AutomaticEmail\Models\AutomaticEmailTemplate;
 use Plenty\Modules\Helper\AutomaticEmail\Models\AutomaticEmailContact;
 use Plenty\Modules\System\Contracts\WebstoreConfigurationRepositoryContract;
 use Plenty\Modules\System\Models\WebstoreConfiguration;
+use Plenty\Modules\Webshop\Contracts\ContactRepositoryContract;
 use Plenty\Modules\Webshop\Contracts\SessionStorageRepositoryContract;
 use Plenty\Modules\Webshop\Repositories\WebstoreConfigurationRepository;
 use Plenty\Modules\Webshop\Template\Contracts\TemplateConfigRepositoryContract;
@@ -49,6 +50,9 @@ class CustomerService
 
     /** @var ContactAccountRepositoryContract $accountRepository */
     private $accountRepository;
+
+    /** @var CoreContactRepositoryContract */
+    private $coreContactRepository;
 
     /** @var ContactRepositoryContract */
     private $contactRepository;
@@ -68,14 +72,16 @@ class CustomerService
     /**
      * CustomerService constructor.
      * @param ContactAccountRepositoryContract $accountRepository
+     * @param CoreContactRepositoryContract $coreContactRepository
      * @param ContactRepositoryContract $contactRepository
      * @param ContactAddressRepositoryContract $contactAddressRepository
      * @param AddressRepositoryContract $addressRepository
      * @param ContactClassRepositoryContract $contactClassRepository
-     * @param SessionStorageRepositoryContract $sessionStorage
+     * @param SessionStorageRepositoryContract $sessionStorageRepository
      */
     public function __construct(
         ContactAccountRepositoryContract $accountRepository,
+        CoreContactRepositoryContract $coreContactRepository,
         ContactRepositoryContract $contactRepository,
         ContactAddressRepositoryContract $contactAddressRepository,
         AddressRepositoryContract $addressRepository,
@@ -83,6 +89,7 @@ class CustomerService
         SessionStorageRepositoryContract $sessionStorageRepository
     ) {
         $this->accountRepository = $accountRepository;
+        $this->coreContactRepository = $coreContactRepository;
         $this->contactRepository = $contactRepository;
         $this->contactAddressRepository = $contactAddressRepository;
         $this->addressRepository = $addressRepository;
@@ -93,38 +100,23 @@ class CustomerService
     /**
      * Get the ID of the current contact from the session
      * @return int
+     * @deprecated since 5.0.0 will be removed in 6.0.0
+     * @see \Plenty\Modules\Webshop\Contracts\ContactRepositoryContract::getContactId()
      */
     public function getContactId(): int
     {
-        /** @var AccountService $accountService */
-        $accountService = pluginApp(AccountService::class);
-        return $accountService->getAccountContactId();
+        return $this->contactRepository->getContactId();
     }
 
     /**
      * @param int $contactClassId
      * @return array|null
+     * @deprecated since 5.0.0 will be removed in 6.0.0
+     * @see \Plenty\Modules\Webshop\Contracts\ContactRepositoryContract::getContactClassData()
      */
     public function getContactClassData($contactClassId)
     {
-        return $this->fromMemoryCache(
-            "contactClassData.$contactClassId",
-            function () use ($contactClassId) {
-                /** @var ContactClassRepositoryContract $contactClassRepo */
-                $contactClassRepo = pluginApp(ContactClassRepositoryContract::class);
-
-                /** @var AuthHelper $authHelper */
-                $authHelper = pluginApp(AuthHelper::class);
-
-                $contactClass = $authHelper->processUnguarded(
-                    function () use ($contactClassRepo, $contactClassId) {
-                        return $contactClassRepo->findContactClassDataById($contactClassId);
-                    }
-                );
-
-                return $contactClass;
-            }
-        );
+        return $this->contactRepository->getContactClassData();
     }
 
     /**
@@ -148,9 +140,9 @@ class CustomerService
                 }
 
                 $contactClassShowNet = false;
-                $contactClassId = $this->getContactClassId();
+                $contactClassId = $this->contactRepository->getContactClassId();
                 if ($contactClassId !== null) {
-                    $contactClass = $this->getContactClassData($contactClassId);
+                    $contactClass = $this->contactRepository->getContactClassData($contactClassId);
                     if ($contactClass !== null) {
                         $contactClassShowNet = $contactClass['showNetPrice'];
                     }
@@ -176,20 +168,20 @@ class CustomerService
                 if ($contactId > 0) {
                     $contact = $authHelper->processUnguarded(
                         function () use ($contactId) {
-                            return $this->contactRepository->findContactById($contactId);
+                            return $this->coreContactRepository->findContactById($contactId);
                         }
                     );
 
                     if ($contact !== null) {
-                        $contactClass = $this->getContactClassData($contact->classId);
+                        $contactClass = $this->contactRepository->getContactClassData($contact->classId);
 
                         if ($contactClass !== null) {
                             return $contactClass['showNetPrice'];
                         }
                     }
                 } else {
-                    $contactClassId = $this->getDefaultContactClassId();
-                    $contactClass = $this->getContactClassData($contactClassId);
+                    $contactClassId = $this->contactRepository->getDefaultContactClassId();
+                    $contactClass = $this->contactRepository->getContactClassData($contactClassId);
 
                     if ($contactClass !== null) {
                         return $contactClass['showNetPrice'];
@@ -206,12 +198,12 @@ class CustomerService
      */
     public function getContactClassMinimumOrderQuantity(): int
     {
-        $contact = $this->getContact();
+        $contact = $this->contactRepository->getContact();
 
         if ($contact instanceof Contact) {
             $contactClassId = $contact->classId;
 
-            $contactClass = $this->getContactClassData($contactClassId);
+            $contactClass = $this->contactRepository->getContactClassData($contactClassId);
 
             if (is_array($contactClass) && count($contactClass) && isset($contactClass['minItemQuantity'])) {
                 return (int)$contactClass['minItemQuantity'];
@@ -318,7 +310,7 @@ class CustomerService
     {
         /** @var AuthHelper $authHelper */
         $authHelper = pluginApp(AuthHelper::class);
-        $contactId = $this->getContactId();
+        $contactId = $this->contactRepository->getContactId();
         $accountRepo = $this->accountRepository;
 
         return $authHelper->processUnguarded(
@@ -358,7 +350,7 @@ class CustomerService
         }
 
         try {
-            $contact = $this->contactRepository->createContact($contactData);
+            $contact = $this->coreContactRepository->createContact($contactData);
         } catch (\Exception $e) {
             $contact = [
                 'code' => 1,
@@ -372,43 +364,32 @@ class CustomerService
     /**
      * Find the current contact by ID
      * @return null|Contact
+     * @deprecated since 5.0.0 will be removed in 6.0.0
+     * @see \Plenty\Modules\Webshop\Contracts\ContactRepositoryContract::getContact()
      */
     public function getContact()
     {
-        $contactId = $this->getContactId();
-        if ($contactId > 0) {
-            return $this->fromMemoryCache(
-                "contact.$contactId",
-                function () use ($contactId) {
-                    return $this->contactRepository->findContactById($this->getContactId());
-                }
-            );
-        }
-        return null;
+        return $this->contactRepository->getContact();
     }
 
     /**
      * @return int
+     * @deprecated since 5.0.0 will be removed in 6.0.0
+     * @see \Plenty\Modules\Webshop\Contracts\ContactRepositoryContract::getContactClassId()
      */
     public function getContactClassId(): int
     {
-        $contact = $this->getContact();
-        if ($contact !== null && $contact->classId !== null) {
-            return $contact->classId;
-        } else {
-            return $this->getDefaultContactClassId();
-        }
+        return $this->contactRepository->getContactClassId();
     }
 
     /**
      * @return int
+     * @deprecated since 5.0.0 will be removed in 6.0.0
+     * @see \Plenty\Modules\Webshop\Contracts\ContactRepositoryContract::getDefaultContactClassId()
      */
     private function getDefaultContactClassId(): int
     {
-        /** @var WebstoreConfigurationRepository $webstoreConfigurationRepository */
-        $webstoreConfigurationRepository = pluginApp(WebstoreConfigurationRepository::class);
-
-        return $webstoreConfigurationRepository->getWebstoreConfiguration()->defaultCustomerClassId ?? 0;
+        return $this->contactRepository->getDefaultContactClassId();
     }
 
     /**
@@ -419,8 +400,8 @@ class CustomerService
      */
     public function updateContact(array $contactData)
     {
-        if ($this->getContactId() > 0) {
-            return $this->contactRepository->updateContact($contactData, $this->getContactId());
+        if ($this->contactRepository->getContactId() > 0) {
+            return $this->coreContactRepository->updateContact($contactData, $this->contactRepository->getContactId());
         }
 
         return null;
@@ -502,10 +483,10 @@ class CustomerService
         $hashService = pluginApp(UserDataHashService::class);
         $hashData = $hashService->getData($hash, $contactId);
 
-        if ((int)$this->getContactId() <= 0 && !is_null($hashData)) {
+        if ((int)$this->contactRepository->getContactId() <= 0 && !is_null($hashData)) {
             /** @var AuthHelper $authHelper */
             $authHelper = pluginApp(AuthHelper::class);
-            $contactRepo = $this->contactRepository;
+            $contactRepo = $this->coreContactRepository;
 
             $contact = $authHelper->processUnguarded(
                 function () use ($newPassword, $contactId, $contactRepo) {
@@ -558,8 +539,8 @@ class CustomerService
      */
     public function getAddresses($typeId = null)
     {
-        if ($this->getContactId() > 0) {
-            $addresses = $this->contactAddressRepository->getAddresses($this->getContactId(), $typeId);
+        if ($this->contactRepository->getContactId() > 0) {
+            $addresses = $this->contactAddressRepository->getAddresses($this->contactRepository->getContactId(), $typeId);
 
             if (count($addresses)) {
                 foreach ($addresses as $key => $address) {
@@ -605,8 +586,8 @@ class CustomerService
     {
         $address = null;
 
-        if ($this->getContactId() > 0) {
-            $address = $this->contactAddressRepository->getAddress($addressId, $this->getContactId(), $typeId);
+        if ($this->contactRepository->getContactId() > 0) {
+            $address = $this->contactAddressRepository->getAddress($addressId, $this->contactRepository->getContactId(), $typeId);
         } else {
             /**
              * @var BasketService $basketService
@@ -656,12 +637,12 @@ class CustomerService
         }
 
         $newAddress = null;
-        $contact = $this->getContact();
+        $contact = $this->contactRepository->getContact();
         if (!is_null($contact)) {
             $addressData['options'] = $this->buildAddressEmailOptions([], false, $addressData);
             $newAddress = $this->contactAddressRepository->createAddress(
                 $addressData,
-                $this->getContactId(),
+                $this->contactRepository->getContactId(),
                 $typeId
             );
 
@@ -677,7 +658,7 @@ class CustomerService
                     $classId = $templateConfigRepository->getInteger('global.default_contact_class_b2b');
 
                     if (is_null($classId) || (int)$classId <= 0) {
-                        $classId = $this->getDefaultContactClassId();
+                        $classId = $this->contactRepository->getDefaultContactClassId();
                     }
 
                     if (!is_null($classId) && (int)$classId > 0) {
@@ -690,7 +671,7 @@ class CustomerService
                 }
             }
 
-            $existingContact = $this->getContact();
+            $existingContact = $this->contactRepository->getContact();
             if ($typeId == AddressType::BILLING && !strlen($existingContact->firstName) && !strlen(
                     $existingContact->lastName
                 )) {
@@ -737,7 +718,7 @@ class CustomerService
                 throw new \Exception('no guest email address found', 11);
             }
         } else {
-            $email = $this->getContact()->email;
+            $email = $this->contactRepository->getContact()->email;
         }
 
         if (strlen($email)) {
@@ -824,7 +805,7 @@ class CustomerService
             unset($addressData['checkedAt']);
         }
 
-        if ((int)$this->getContactId() > 0) {
+        if ((int)$this->contactRepository->getContactId() > 0) {
             $addressData['options'] = $this->buildAddressEmailOptions([], false, $addressData);
 
             if ($typeId == AddressType::BILLING && isset($addressData['name1']) && strlen($addressData['name1'])) {
@@ -841,13 +822,13 @@ class CustomerService
             $newAddress = $this->contactAddressRepository->updateAddress(
                 $addressData,
                 $addressId,
-                $this->getContactId(),
+                $this->contactRepository->getContactId(),
                 $typeId
             );
 
             if ($typeId == AddressType::BILLING) {
                 $firstStoredAddress = $this->contactAddressRepository->findContactAddressByTypeId(
-                    (int)$this->getContactId(),
+                    (int)$this->contactRepository->getContactId(),
                     $typeId,
                     false
                 );
@@ -924,14 +905,14 @@ class CustomerService
         /** @var BasketService $basketService */
         $basketService = pluginApp(BasketService::class);
 
-        if ($this->getContactId() > 0) {
+        if ($this->contactRepository->getContactId() > 0) {
             $firstStoredAddress = $this->contactAddressRepository->findContactAddressByTypeId(
-                (int)$this->getContactId(),
+                (int)$this->contactRepository->getContactId(),
                 $typeId,
                 false
             );
 
-            $this->contactAddressRepository->deleteAddress($addressId, $this->getContactId(), $typeId);
+            $this->contactAddressRepository->deleteAddress($addressId, $this->contactRepository->getContactId(), $typeId);
 
             if ($typeId == AddressType::BILLING) {
                 $basketService->setBillingAddressId(0);
@@ -941,7 +922,7 @@ class CustomerService
 
             if ($firstStoredAddress instanceof Address && $firstStoredAddress->id === $addressId) {
                 $firstStoredAddress = $this->contactAddressRepository->findContactAddressByTypeId(
-                    (int)$this->getContactId(),
+                    (int)$this->contactRepository->getContactId(),
                     $typeId,
                     false
                 );
@@ -975,7 +956,7 @@ class CustomerService
             /** @var OrderService $orderService */
             $orderService = pluginApp(OrderService::class);
             $orders = $orderService->getOrdersForContact(
-                $this->getContactId(),
+                $this->contactRepository->getContactId(),
                 $page,
                 $items,
                 $filters,
@@ -1015,7 +996,7 @@ class CustomerService
         $filters['orderType'] = OrderType::RETURNS;
 
         $returnOrders = $orderService->getOrdersForContact(
-            $this->getContactId(),
+            $this->contactRepository->getContactId(),
             $page,
             $items,
             $filters,
@@ -1051,13 +1032,13 @@ class CustomerService
         $orderService = pluginApp(OrderService::class);
 
         return $orderService->getLatestOrderForContact(
-            $this->getContactId()
+            $this->contactRepository->getContactId()
         );
     }
 
     public function resetGuestAddresses(): void
     {
-        if ($this->getContactId() <= 0) {
+        if ($this->contactRepository->getContactId() <= 0) {
             /** @var BasketService $basketService */
             $basketService = pluginApp(BasketService::class);
             $basketService->setBillingAddressId(0);
@@ -1072,7 +1053,7 @@ class CustomerService
      */
     public function getEmail(): string
     {
-        $contact = $this->getContact();
+        $contact = $this->contactRepository->getContact();
         if ($contact instanceof Contact) {
             $email = $contact->email;
         } else {
@@ -1095,7 +1076,7 @@ class CustomerService
     {
         /** @var AuthHelper $authHelper */
         $authHelper = pluginApp(AuthHelper::class);
-        $contactRepo = $this->contactRepository;
+        $contactRepo = $this->coreContactRepository;
 
         try {
             $contact = $authHelper->processUnguarded(

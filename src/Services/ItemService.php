@@ -37,6 +37,7 @@ use Plenty\Modules\Item\Search\Filter\SearchFilter;
 use Plenty\Modules\Item\Search\Filter\VariationBaseFilter;
 use Plenty\Modules\Item\Unit\Contracts\UnitNameRepositoryContract;
 use Plenty\Modules\Item\UnitCombination\Contracts\UnitCombinationRepositoryContract;
+use Plenty\Modules\Webshop\Contracts\ContactRepositoryContract;
 use Plenty\Modules\Webshop\Contracts\SessionStorageRepositoryContract;
 use Plenty\Plugin\Application;
 
@@ -490,13 +491,14 @@ class ItemService
         /** @var ItemParamsBuilder $paramsBuilder */
         $paramsBuilder = pluginApp(ItemParamsBuilder::class);
 
-        /** @var CustomerService $customerService */
-        $customerService = pluginApp(CustomerService::class);
+        /** @var ContactRepositoryContract $contactRepository */
+        $contactRepository = pluginApp(ContactRepositoryContract::class);
+
         $params = $paramsBuilder
             ->withParam(ItemColumnsParams::TYPE, 'virtual')
             ->withParam(ItemColumnsParams::LANGUAGE, Utils::getLang())
             ->withParam(ItemColumnsParams::PLENTY_ID, $this->app->getPlentyId())
-            ->withParam(ItemColumnsParams::CUSTOMER_CLASS, $customerService->getContactClassId())
+            ->withParam(ItemColumnsParams::CUSTOMER_CLASS, $contactRepository->getContactClassId())
             ->build();
 
         $record = $this->itemRepository->search($columns, $filter, $params)->current();

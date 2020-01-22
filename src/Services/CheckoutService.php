@@ -20,6 +20,7 @@ use Plenty\Modules\Order\Currency\Contracts\CurrencyRepositoryContract;
 use Plenty\Modules\Order\Shipping\Contracts\ParcelServicePresetRepositoryContract;
 use Plenty\Modules\Payment\Events\Checkout\GetPaymentMethodContent;
 use Plenty\Modules\Payment\Method\Contracts\PaymentMethodRepositoryContract;
+use Plenty\Modules\Webshop\Contracts\CheckoutRepositoryContract;
 use Plenty\Modules\Webshop\Contracts\SessionStorageRepositoryContract;
 use Plenty\Modules\Webshop\Contracts\WebstoreConfigurationRepositoryContract;
 use Plenty\Modules\Webshop\Template\Contracts\TemplateConfigRepositoryContract;
@@ -81,6 +82,9 @@ class CheckoutService
     /** @var WebstoreConfigurationRepositoryContract */
     private $webstoreConfigurationRepository;
 
+    /** @var CheckoutRepositoryContract $checkoutRepository */
+    private $checkoutRepository;
+
     /**
      * CheckoutService constructor.
      * @param FrontendPaymentMethodRepositoryContract $frontendPaymentMethodRepository
@@ -94,6 +98,7 @@ class CheckoutService
      * @param SessionStorageRepositoryContract $sessionStorageRepository
      * @param WebstoreConfigurationService $webstoreConfigurationService
      * @param Dispatcher $dispatcher
+     * @param CheckoutRepositoryContract $checkoutRepository
      */
     public function __construct(
         FrontendPaymentMethodRepositoryContract $frontendPaymentMethodRepository,
@@ -106,7 +111,8 @@ class CheckoutService
         BasketService $basketService,
         SessionStorageRepositoryContract $sessionStorageRepository,
         WebstoreConfigurationRepositoryContract $webstoreConfigurationRepository,
-        Dispatcher $dispatcher
+        Dispatcher $dispatcher,
+        CheckoutRepositoryContract $checkoutRepository
     ) {
         $this->frontendPaymentMethodRepository = $frontendPaymentMethodRepository;
         $this->checkout = $checkout;
@@ -118,6 +124,7 @@ class CheckoutService
         $this->basketService = $basketService;
         $this->sessionStorageRepository = $sessionStorageRepository;
         $this->webstoreConfigurationRepository = $webstoreConfigurationRepository;
+        $this->checkoutRepository = $checkoutRepository;
         $dispatcher->listen(
             AfterBasketChanged::class,
             function ($event) {
@@ -136,7 +143,7 @@ class CheckoutService
     {
         try {
             return [
-                "currency" => $this->getCurrency(),
+                "currency" => $this->checkoutRepository->getCurrency(),
                 "currencyList" => $this->getCurrencyList(),
                 "methodOfPaymentId" => $this->getMethodOfPaymentId(),
                 "methodOfPaymentList" => $this->getMethodOfPaymentList(),
@@ -160,38 +167,23 @@ class CheckoutService
     /**
      * Get the current currency from the session
      * @return string
+     * @deprecated since 5.0.0 will be removed in 6.0.0
+     * @see \Plenty\Modules\Webshop\Contracts\CheckoutRepositoryContract::getCurrency()
      */
     public function getCurrency(): string
     {
-        $currency = (string)$this->sessionStorageRepository->getSessionValue(
-            SessionStorageRepositoryContract::CURRENCY
-        );
-        if ($currency === null || $currency === '') {
-            $currency = 'EUR';
-
-            if (
-                is_array($this->webstoreConfigurationRepository->getWebstoreConfiguration()->defaultCurrencyList) &&
-                array_key_exists(
-                    Utils::getLang(),
-                    $this->webstoreConfigurationRepository->getWebstoreConfiguration()->defaultCurrencyList
-                )
-            ) {
-                $currency = $this->webstoreConfigurationRepository->getWebstoreConfiguration(
-                )->defaultCurrencyList[Utils::getLang()];
-            }
-            $this->setCurrency($currency);
-        }
-        return $currency;
+        return $this->checkoutRepository->getCurrency();
     }
 
     /**
      * Set the current currency from the session
      * @param string $currency
+     * @deprecated since 5.0.0 will be removed in 6.0.0
+     * @see \Plenty\Modules\Webshop\Contracts\CheckoutRepositoryContract::setCurrency()
      */
     public function setCurrency(string $currency)
     {
-        $this->sessionStorageRepository->setSessionValue(SessionStorageRepositoryContract::CURRENCY, $currency);
-        $this->checkout->setCurrency($currency);
+        $this->checkoutRepository->setCurrency($currency);
     }
 
     public function getCurrencyList()
@@ -221,7 +213,7 @@ class CheckoutService
         return $this->fromMemoryCache(
             "currencyData",
             function () {
-                $currency = $this->getCurrency();
+                $currency = $this->checkoutRepository->getCurrency();
                 $locale = LanguageMap::getLocale();
 
                 $formatter = numfmt_create(
@@ -239,7 +231,7 @@ class CheckoutService
 
     public function getCurrencyPattern()
     {
-        $currency = $this->getCurrency();
+        $currency = $this->checkoutRepository->getCurrency();
         $locale = LanguageMap::getLocale();
         $configRepository = pluginApp(ConfigRepository::class);
 
@@ -563,15 +555,12 @@ class CheckoutService
     /**
      * Get the ID of the current shipping country
      * @return int
+     * @deprecated since 5.0.0 will be removed in 6.0.0
+     * @see \Plenty\Modules\Webshop\Contracts\CheckoutRepositoryContract::getShippingCountryId()
      */
     public function getShippingCountryId()
     {
-        $currentShippingCountryId = (int)$this->checkout->getShippingCountryId();
-        if ($currentShippingCountryId <= 0) {
-            return $this->webstoreConfigurationRepository->getDefaultShippingCountryId();
-        }
-
-        return $currentShippingCountryId;
+        return $this->checkoutRepository->getShippingCountryId();
     }
 
     /**

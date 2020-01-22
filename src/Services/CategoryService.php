@@ -15,6 +15,7 @@ use Plenty\Modules\Category\Models\Category;
 use Plenty\Modules\Category\Contracts\CategoryRepositoryContract;
 use Plenty\Modules\Category\Models\CategoryClient;
 use Plenty\Modules\Category\Models\CategoryDetails;
+use Plenty\Modules\Webshop\Contracts\ContactRepositoryContract;
 use Plenty\Modules\Webshop\Contracts\WebstoreConfigurationRepositoryContract;
 use Plenty\Repositories\Models\PaginatedResult;
 
@@ -34,6 +35,9 @@ class CategoryService
 
     /** @var WebstoreConfigurationRepositoryContract */
     private $webstoreConfigurationRepository;
+
+    /** @var ContactRepositoryContract $contactRepository */
+    private $contactRepository;
 
     // is set from controllers
     /**
@@ -56,17 +60,22 @@ class CategoryService
 
     /**
      * CategoryService constructor.
-     * @param CategoryRepositoryContract $category
+     * @param CategoryRepositoryContract $categoryRepository
+     * @param WebstoreConfigurationRepositoryContract $webstoreConfigurationRepository
+     * @param AuthGuard $authGuard
+     * @param ContactRepositoryContract $contactRepository
      */
     public function __construct(
         CategoryRepositoryContract $categoryRepository,
         WebstoreConfigurationRepositoryContract $webstoreConfigurationRepository,
-        AuthGuard $authGuard
+        AuthGuard $authGuard,
+        ContactRepositoryContract $contactRepository
     ) {
         $this->categoryRepository = $categoryRepository;
         $this->webstoreConfigurationRepository = $webstoreConfigurationRepository;
         $this->authGuard = $authGuard;
         $this->webstoreId = Utils::getWebstoreId();
+        $this->contactRepository = $contactRepository;
     }
 
     /**
@@ -182,9 +191,6 @@ class CategoryService
 
     public function getCurrentCategoryChildren()
     {
-        /** @var CustomerService $customerService */
-        $customerService = pluginApp(CustomerService::class);
-
         /** @var TemplateConfigService $templateConfigService */
         $templateConfigService = pluginApp(TemplateConfigService::class);
         $category = $this->getCurrentCategory();
@@ -193,7 +199,7 @@ class CategoryService
             $templateConfigService->get('header.showCategoryTypes'),
             Utils::getLang(),
             $category->level + 1,
-            $customerService->getContactClassId()
+            $this->contactRepository->getContactClassId()
         );
 
         for ($level = 1; $level <= 6; $level++) {
@@ -418,8 +424,6 @@ class CategoryService
 
     public function getPartialTree($categoryId = 0, $type = CategoryType::ALL)
     {
-        /** @var CustomerService $customerService */
-        $customerService = pluginApp(CustomerService::class);
         if ($categoryId > 0) {
             $currentCategory = $this->get($categoryId);
             $branch = $currentCategory->branch->toArray();
@@ -429,7 +433,7 @@ class CategoryService
                 $type,
                 Utils::getLang(),
                 $maxLevel,
-                $customerService->getContactClassId()
+                $this->contactRepository->getContactClassId()
             );
 
             // Filter categories not having texts in current language
@@ -453,7 +457,7 @@ class CategoryService
                 $type,
                 Utils::getLang(),
                 3,
-                $customerService->getContactClassId()
+                $this->contactRepository->getContactClassId()
             );
 
             // Filter categories not having texts in current language

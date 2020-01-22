@@ -3,6 +3,7 @@
 namespace IO\Services;
 
 use Plenty\Modules\Document\Contracts\DocumentRepositoryContract;
+use Plenty\Modules\Webshop\Contracts\ContactRepositoryContract;
 
 /**
  * Class DocumentService
@@ -32,9 +33,9 @@ class DocumentService
         
         if((int)$orderId > 0)
         {
-            /** @var CustomerService $customerService */
-            $customerService = pluginApp(CustomerService::class);
-            $contactId = $customerService->getContactId();
+            /** @var ContactRepositoryContract $contactRepository */
+            $contactRepository = pluginApp(ContactRepositoryContract::class);
+            $contactId = $contactRepository->getContactId();
             
             if((int)$contactId > 0)
             {

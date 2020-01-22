@@ -4,12 +4,12 @@ namespace IO\Controllers;
 
 use IO\Api\ResponseCode;
 use IO\Middlewares\CheckNotFound;
-use IO\Services\CustomerService;
 use Plenty\Modules\Authorization\Services\AuthHelper;
 use Plenty\Modules\Cloud\Storage\Models\StorageObject;
 use Plenty\Modules\Document\Contracts\DocumentRepositoryContract;
 use Plenty\Modules\Document\Models\Document;
 use Plenty\Modules\Order\Contracts\OrderRepositoryContract;
+use Plenty\Modules\Webshop\Contracts\ContactRepositoryContract;
 use Plenty\Modules\Webshop\Contracts\SessionStorageRepositoryContract;
 use Plenty\Plugin\Http\Request;
 use Plenty\Plugin\Http\Response;
@@ -43,8 +43,8 @@ class DocumentController extends LayoutController
             $requestAccessKey = $sessionOrder['accessKey'];
         }
 
-        /** @var CustomerService $customerService */
-        $customerService = pluginApp(CustomerService::class);
+        /** @var ContactRepositoryContract $contactRepository */
+        $contactRepository = pluginApp(ContactRepositoryContract::class);
 
         /** @var DocumentRepositoryContract $documentRepo */
         $documentRepo = pluginApp(DocumentRepositoryContract::class);
@@ -59,7 +59,7 @@ class DocumentController extends LayoutController
             if ($order instanceof Order) {
                 $orderContactId = $order->relations->where('referenceType', 'contact')->first()->referenceId;
 
-                if ((int)$orderContactId > 0 && $orderContactId == $customerService->getContactId()) {
+                if ((int)$orderContactId > 0 && $orderContactId == $contactRepository->getContactId()) {
                     //document is matching with the logged in contact
                     $documentStorageObject = $documentRepo->getDocumentStorageObject($document->path);
                 } elseif (!is_null($requestOrderId)

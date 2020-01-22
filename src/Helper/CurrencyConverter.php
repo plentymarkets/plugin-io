@@ -2,8 +2,8 @@
 
 namespace IO\Helper;
 
-use IO\Services\CheckoutService;
 use Plenty\Modules\Frontend\Contracts\CurrencyExchangeRepositoryContract;
+use Plenty\Modules\Webshop\Contracts\CheckoutRepositoryContract;
 
 /**
  * Class CurrencyConverter
@@ -49,9 +49,9 @@ class CurrencyConverter
      */
     public function getCurrentCurrency()
     {
-        /** @var CheckoutService $checkoutService */
-        $checkoutService = pluginApp(CheckoutService::class);
-        return $checkoutService->getCurrency();
+        /** @var  CheckoutRepositoryContract $checkoutRepository */
+        $checkoutRepository = pluginApp(CheckoutRepositoryContract::class);
+        return $checkoutRepository->getCurrency();
     }
 
     /**

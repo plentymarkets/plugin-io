@@ -17,6 +17,7 @@ use Plenty\Modules\Accounting\Vat\Contracts\VatRepositoryContract;
 use Plenty\Modules\Order\Property\Models\OrderPropertyType;
 use Plenty\Modules\System\Contracts\WebstoreRepositoryContract;
 use Plenty\Modules\Accounting\Vat\Models\Vat;
+use Plenty\Modules\Webshop\Contracts\CheckoutRepositoryContract;
 use Plenty\Plugin\Events\Dispatcher;
 
 /**
@@ -29,6 +30,9 @@ class OrderItemBuilder
 	 * @var CheckoutService
 	 */
 	private $checkoutService;
+
+	/** @var CheckoutRepositoryContract $checkoutRepository */
+	private $checkoutRepository;
 
     /**
      * @var VatService
@@ -62,6 +66,7 @@ class OrderItemBuilder
      * @param WebstoreRepositoryContract $webstoreRepository
      * @param VatRepositoryContract $vatRepository
      * @param CustomerService $customerService
+     * @param CheckoutRepositoryContract $checkoutRepository
      */
 	public function __construct(
 	    CheckoutService $checkoutService,
@@ -69,7 +74,8 @@ class OrderItemBuilder
         ItemNameFilter $itemNameFilter,
         WebstoreRepositoryContract $webstoreRepository,
         VatRepositoryContract $vatRepository,
-        CustomerService $customerService)
+        CustomerService $customerService,
+        CheckoutRepositoryContract $checkoutRepository)
 	{
 		$this->checkoutService = $checkoutService;
 		$this->vatService = $vatService;
@@ -77,6 +83,7 @@ class OrderItemBuilder
         $this->vatRepository = $vatRepository;
         $this->itemNameFilter = $itemNameFilter;
         $this->customerService = $customerService;
+        $this->checkoutRepository = $checkoutRepository;
 	}
 
 	/**
@@ -128,7 +135,7 @@ class OrderItemBuilder
                                     "orderItemName"   => $property['property']['backendName'] ?? 'tax free item',
                                     "amounts"         => [
                                         [
-                                            "currency"           => $this->checkoutService->getCurrency(),
+                                            "currency"           => $this->checkoutRepository->getCurrency(),
                                             "priceOriginalGross" => $property['property']['surcharge']
                                         ]
                                     ]
@@ -209,7 +216,7 @@ class OrderItemBuilder
             'vatField'      => $this->getVatField($this->vatService->getVat(), $maxVatRate),
             "amounts"       => [
                 [
-                    "currency"              => $this->checkoutService->getCurrency(),
+                    "currency"              => $this->checkoutRepository->getCurrency(),
                     "priceOriginalGross"    => $shippingAmount
                 ]
             ]
@@ -229,7 +236,7 @@ class OrderItemBuilder
             'vatField'      => $this->getVatField($this->vatService->getVat(), $maxVatRate),
             "amounts"       => [
 				[
-					"currency"           => $this->checkoutService->getCurrency(),
+					"currency"           => $this->checkoutRepository->getCurrency(),
 					"priceOriginalGross" => $paymentFee
 				]
 			]
@@ -333,7 +340,7 @@ class OrderItemBuilder
             "properties"        => $properties,
 			"amounts"           => [
 				[
-					"currency"              => $this->checkoutService->getCurrency(),
+					"currency"              => $this->checkoutRepository->getCurrency(),
 					"priceOriginalGross"    => $priceOriginal,
                     "surcharge"             => $attributeTotalMarkup,
 					"discount"	            => $rebate,

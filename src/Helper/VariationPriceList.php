@@ -4,21 +4,17 @@ namespace IO\Helper;
 
 use IO\Extensions\Filters\NumberFormatFilter;
 use IO\Services\BasketService;
-use IO\Services\CheckoutService;
 use IO\Services\CustomerService;
-use IO\Services\SessionStorageService;
 use IO\Services\UnitService;
 use Plenty\Legacy\Services\Item\Variation\SalesPriceService;
 use Plenty\Modules\Account\Contact\Models\Contact;
-use Plenty\Modules\Authorization\Services\AuthHelper;
 use Plenty\Modules\Item\SalesPrice\Contracts\SalesPriceSearchRepositoryContract;
 use Plenty\Modules\Item\SalesPrice\Models\SalesPriceSearchRequest;
 use Plenty\Modules\Item\SalesPrice\Models\SalesPriceSearchResponse;
-use Plenty\Modules\Item\Unit\Contracts\UnitNameRepositoryContract;
-use Plenty\Modules\Item\Unit\Contracts\UnitRepositoryContract;
 use Plenty\Modules\LiveShopping\Contracts\LiveShoppingRepositoryContract;
+use Plenty\Modules\Webshop\Contracts\CheckoutRepositoryContract;
+use Plenty\Modules\Webshop\Contracts\ContactRepositoryContract;
 use Plenty\Plugin\Application;
-use Plenty\Plugin\CachingRepository;
 
 class VariationPriceList
 {
@@ -331,15 +327,16 @@ class VariationPriceList
                 $salesPriceSearchRequest = pluginApp(SalesPriceSearchRequest::class);
                 $salesPriceSearchRequest->accountId   = 0;
 
-                /** @var CustomerService $customerService */
-                $customerService = pluginApp( CustomerService::class );
-                $contact = $customerService->getContact();
+                /** @var ContactRepositoryContract $contactRepository */
+                $contactRepository = pluginApp(ContactRepositoryContract::class);
+
+                $contact = $contactRepository->getContact();
 
                 if ( $contact instanceof Contact )
                 {
                     $salesPriceSearchRequest->accountType = $contact->singleAccess;
                 }
-                $salesPriceSearchRequest->customerClassId = $customerService->getContactClassId();
+                $salesPriceSearchRequest->customerClassId = $contactRepository->getContactClassId();
 
                 /** @var BasketService $basketService */
                 $basketService = pluginApp( BasketService::class );
@@ -353,11 +350,11 @@ class VariationPriceList
             }
         );
 
-         /** @var CheckoutService $checkoutService */
-        $checkoutService = pluginApp( CheckoutService::class );
+        /** @var  CheckoutRepositoryContract $checkoutRepository */
+        $checkoutRepository = pluginApp(CheckoutRepositoryContract::class);
 
-        $salesPriceSearchRequest->countryId = $checkoutService->getShippingCountryId();
-        $salesPriceSearchRequest->currency  = $checkoutService->getCurrency();
+        $salesPriceSearchRequest->countryId = $checkoutRepository->getShippingCountryId();
+        $salesPriceSearchRequest->currency  = $checkoutRepository->getCurrency();
         $salesPriceSearchRequest->variationId = $variationId;
         $salesPriceSearchRequest->quantity    = $quantity;
         $salesPriceSearchRequest->type        = $type;

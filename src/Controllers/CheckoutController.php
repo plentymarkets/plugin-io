@@ -9,6 +9,7 @@ use Plenty\Modules\Basket\Contracts\BasketItemRepositoryContract;
 use IO\Guards\AuthGuard;
 use Plenty\Modules\Category\Models\Category;
 use Plenty\Modules\ShopBuilder\Helper\ShopBuilderRequest;
+use Plenty\Modules\Webshop\Contracts\ContactRepositoryContract;
 use Plenty\Modules\Webshop\Contracts\SessionStorageRepositoryContract;
 use Plenty\Plugin\Log\Loggable;
 
@@ -36,8 +37,8 @@ class CheckoutController extends LayoutController
         /** @var SessionStorageRepositoryContract $sessionStorageRepository */
         $sessionStorageRepository = pluginApp(SessionStorageRepositoryContract::class);
 
-        /** @var CustomerService $customerService */
-        $customerService = pluginApp(CustomerService::class);
+        /** @var ContactRepositoryContract $contactRepository */
+        $contactRepository = pluginApp(ContactRepositoryContract::class);
 
         /** @var ShopUrls $shopUrls */
         $shopUrls = pluginApp(ShopUrls::class);
@@ -48,7 +49,7 @@ class CheckoutController extends LayoutController
 
         if (!$shopBuilderRequest->isShopBuilder()) {
             if ($sessionStorageRepository->getSessionValue(SessionStorageRepositoryContract::GUEST_EMAIL) == null
-                && $customerService->getContactId() <= 0) {
+                && $contactRepository->getContactId() <= 0) {
                 $this->getLogger(__CLASS__)->info("IO::Debug.CheckoutController_notLoggedIn");
                 AuthGuard::redirect(
                     $shopUrls->login,

@@ -6,6 +6,7 @@ use IO\DBModels\UserDataHash;
 use IO\Helper\Utils;
 use Plenty\Modules\Plugin\DataBase\Contracts\DataBase;
 use Plenty\Modules\Plugin\DataBase\Contracts\Model;
+use Plenty\Modules\Webshop\Contracts\ContactRepositoryContract;
 use Plenty\Modules\Webshop\Template\Contracts\TemplateConfigRepositoryContract;
 
 class UserDataHashService
@@ -263,9 +264,9 @@ class UserDataHashService
 
     private function getContactId()
     {
-        /** @var CustomerService $customerService */
-        $customerService = pluginApp(CustomerService::class);
-        return $customerService->getContactId();
+        /** @var ContactRepositoryContract $contactRepository */
+        $contactRepository = pluginApp(ContactRepositoryContract::class);
+        return $contactRepository->getContactId();
     }
 
 }

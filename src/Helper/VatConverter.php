@@ -2,8 +2,8 @@
 
 namespace IO\Helper;
 
-use IO\Services\CustomerService;
 use Plenty\Modules\Accounting\Vat\Contracts\VatRepositoryContract;
+use Plenty\Modules\Webshop\Contracts\ContactRepositoryContract;
 
 /**
  * Class VatConverter
@@ -43,9 +43,9 @@ class VatConverter
      */
     public function convertToGross($amount)
     {
-        /** @var CustomerService $customerService */
-        $customerService = pluginApp(CustomerService::class);
-        $contactClassData = $customerService->getContactClassData($customerService->getContactClassId());
+        /** @var ContactRepositoryContract $contactRepository */
+        $contactRepository = pluginApp(ContactRepositoryContract::class);
+        $contactClassData = $contactRepository->getContactClassData($contactRepository->getContactClassId());
 
         if(isset($contactClassData['showNetPrice']) && $contactClassData['showNetPrice'])
         {

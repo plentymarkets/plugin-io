@@ -8,6 +8,7 @@ use IO\Tests\TestCase;
 use Plenty\Modules\Frontend\Session\Storage\Contracts\FrontendSessionStorageFactoryContract;
 use Plenty\Modules\Plugin\PluginSet\Models\PluginSet;
 use Plenty\Modules\System\Models\Webstore;
+use Plenty\Modules\Webshop\Contracts\CheckoutRepositoryContract;
 use Plenty\Modules\Webshop\Contracts\SessionStorageRepositoryContract;
 use Plenty\Plugin\ConfigRepository;
 
@@ -22,6 +23,9 @@ class CheckoutServiceCurrencyConfigTest extends TestCase
     /** @var CheckoutService $basketService */
     protected $checkoutService;
 
+    /** @var CheckoutRepositoryContract $checkoutRepository */
+    protected $checkoutRepository;
+
     /** @var SessionStorageRepositoryContract $sessionStorageRepository */
     protected $sessionStorageRepository;
 
@@ -32,7 +36,7 @@ class CheckoutServiceCurrencyConfigTest extends TestCase
 
         $this->sessionStorageRepository = pluginApp(SessionStorageRepositoryContract::class);
         $this->checkoutService = pluginApp(CheckoutService::class);
-
+        $this->checkoutRepository = pluginApp(CheckoutRepositoryContract::class);
     }
 
     /** @test */
@@ -43,7 +47,7 @@ class CheckoutServiceCurrencyConfigTest extends TestCase
 
         $this->sessionStorageRepository->setSessionValue(SessionStorageRepositoryContract::CURRENCY, $expectedCurrency);
 
-        $currency = $this->checkoutService->getCurrency();
+        $currency = $this->checkoutRepository->getCurrency();
 
         $this->assertNotNull($currency);
         $this->assertEquals($expectedCurrency, $currency);
@@ -65,7 +69,7 @@ class CheckoutServiceCurrencyConfigTest extends TestCase
         );
         $expectedCurrency = "EUR";
 
-        $currency = $this->checkoutService->getCurrency();
+        $currency = $this->checkoutRepository->getCurrency();
 
         $this->assertNotNull($currency);
         $this->assertEquals($expectedCurrency, $currency);

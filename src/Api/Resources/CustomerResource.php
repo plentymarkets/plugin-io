@@ -4,6 +4,7 @@ namespace IO\Api\Resources;
 
 use IO\Helper\ReCaptcha;
 use Plenty\Modules\Account\Contact\Models\Contact;
+use Plenty\Modules\Webshop\Contracts\ContactRepositoryContract;
 use Plenty\Plugin\Http\Response;
 use Plenty\Plugin\Http\Request;
 use IO\Api\ApiResource;
@@ -22,16 +23,20 @@ class CustomerResource extends ApiResource
 	 */
 	private $customerService;
 
+	/** @var ContactRepositoryContract $contactRepository */
+	private $contactRepository;
+
     /**
      * CustomerResource constructor.
      * @param Request $request
      * @param ApiResponse $response
      * @param CustomerService $customerService
      */
-	public function __construct(Request $request, ApiResponse $response, CustomerService $customerService)
+	public function __construct(Request $request, ApiResponse $response, CustomerService $customerService, ContactRepositoryContract $contactRepository)
 	{
 		parent::__construct($request, $response);
 		$this->customerService = $customerService;
+		$this->contactRepository = $contactRepository;
 	}
 
     /**
@@ -40,7 +45,7 @@ class CustomerResource extends ApiResource
      */
 	public function index():Response
 	{
-		$contact = $this->customerService->getContact();
+		$contact = $this->contactRepository->getContact();
 		return $this->response->create($contact, ResponseCode::OK);
 	}
 

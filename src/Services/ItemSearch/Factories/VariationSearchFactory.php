@@ -39,6 +39,7 @@ use Plenty\Modules\Item\Search\Helper\SearchHelper;
 use Plenty\Modules\Item\Search\Mutators\ImageDomainMutator;
 use Plenty\Modules\Item\Search\Mutators\ImageMutator;
 use Plenty\Modules\Item\Search\Mutators\VariationPropertyGroupMutator;
+use Plenty\Modules\Webshop\Contracts\PriceDetectRepositoryContract;
 use Plenty\Plugin\Application;
 
 /**
@@ -480,9 +481,10 @@ class VariationSearchFactory extends BaseSearchFactory implements VariationSearc
     {
         if(!$this->isAdminPreview)
         {
-            /** @var PriceDetectService $priceDetectService */
-            $priceDetectService = pluginApp( PriceDetectService::class );
-            $this->hasAtLeastOnePrice( $priceDetectService->getPriceIdsForCustomer() );
+            /** @var PriceDetectRepositoryContract $priceDetectRepository */
+            $priceDetectRepository = pluginApp(PriceDetectRepositoryContract::class);
+
+            $this->hasAtLeastOnePrice( $priceDetectRepository->getPriceIdsForCustomer() );
         }
 
         return $this;

@@ -12,6 +12,7 @@ use IO\Models\LocalizedOrder;
 use Plenty\Modules\Category\Models\Category;
 use Plenty\Modules\Order\Models\Order;
 use Plenty\Modules\ShopBuilder\Helper\ShopBuilderRequest;
+use Plenty\Modules\Webshop\Contracts\ContactRepositoryContract;
 use Plenty\Modules\Webshop\Contracts\SessionStorageRepositoryContract;
 use Plenty\Modules\Webshop\Template\Contracts\TemplateConfigRepositoryContract;
 use Plenty\Plugin\ConfigRepository;
@@ -45,6 +46,9 @@ class ConfirmationController extends LayoutController
          * @var CustomerService $customerService
          */
         $customerService = pluginApp(CustomerService::class);
+
+        /** @var ContactRepositoryContract $contactRepository */
+        $contactRepository = pluginApp(ContactRepositoryContract::class);
 
         /**
          * @var OrderService $orderService
@@ -133,7 +137,7 @@ class ConfirmationController extends LayoutController
 
         if (!is_null($order) && $order instanceof LocalizedOrder) {
             if ($this->checkValidity($order->order)) {
-                if ($category instanceof Category && $customerService->getContactId() <= 0) {
+                if ($category instanceof Category && $contactRepository->getContactId() <= 0) {
                     /** @var ConfigRepository $config */
                     $config = pluginApp(ConfigRepository::class);
                     $categoryGuestId = (int)$config->get('IO.routing.category_confirmation-guest', 0);

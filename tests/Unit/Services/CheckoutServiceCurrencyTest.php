@@ -3,7 +3,6 @@
 namespace IO\Tests\Unit;
 
 use IO\Helper\MemoryCache;
-use IO\Services\CheckoutService;
 use Mockery;
 use IO\Tests\TestCase;
 use Plenty\Modules\Frontend\Contracts\Checkout;
@@ -11,6 +10,7 @@ use Plenty\Modules\Frontend\Session\Storage\Contracts\FrontendSessionStorageFact
 use Plenty\Modules\Plugin\Models\Plugin;
 use Illuminate\Support\Facades\Session;
 use Plenty\Modules\System\Models\WebstoreConfiguration;
+use Plenty\Modules\Webshop\Contracts\CheckoutRepositoryContract;
 use Plenty\Modules\Webshop\Contracts\SessionStorageRepositoryContract;
 use Plenty\Modules\Webshop\Contracts\WebstoreConfigurationRepositoryContract;
 
@@ -21,8 +21,8 @@ use Plenty\Modules\Webshop\Contracts\WebstoreConfigurationRepositoryContract;
 class CheckoutServiceCurrencyTest extends TestCase
 {
 
-    /** @var CheckoutService $basketService */
-    protected $checkoutService;
+    /** @var CheckoutRepositoryContract $checkoutRepository */
+    protected $checkoutRepository;
     /** @var FrontendSessionStorageFactoryContract */
     protected $sessionStorageMock;
     /** @var Plugin $pluginMock */
@@ -61,7 +61,7 @@ class CheckoutServiceCurrencyTest extends TestCase
         $this->sessionStorageRepositoryMock = Mockery::mock(SessionStorageRepositoryContract::class);
         $this->replaceInstanceByMock(SessionStorageRepositoryContract::class, $this->sessionStorageRepositoryMock);
 
-        $this->checkoutService = pluginApp(CheckoutService::class);
+        $this->checkoutRepository = pluginApp(CheckoutRepositoryContract::class);
     }
 
     /** @test */
@@ -74,7 +74,7 @@ class CheckoutServiceCurrencyTest extends TestCase
         );
         $this->sessionStorageMock->shouldReceive('getPlugin')->andReturn($this->pluginMock);
 
-        $currency = $this->checkoutService->getCurrency();
+        $currency = $this->checkoutRepository->getCurrency();
 
         $this->assertNotNull($currency);
         $this->assertEquals($expectedCurrency, $currency);
@@ -98,7 +98,7 @@ class CheckoutServiceCurrencyTest extends TestCase
 
         $this->checkoutMock->shouldReceive('setCurrency')->andReturn();
 
-        $currency = $this->checkoutService->getCurrency();
+        $currency = $this->checkoutRepository->getCurrency();
 
         $this->assertNotNull($currency);
         $this->assertEquals($expectedCurrency, $currency);
@@ -126,7 +126,7 @@ class CheckoutServiceCurrencyTest extends TestCase
 
         $this->checkoutMock->shouldReceive('setCurrency')->andReturn();
 
-        $currency = $this->checkoutService->getCurrency();
+        $currency = $this->checkoutRepository->getCurrency();
 
         $this->assertNotNull($currency);
         $this->assertEquals($expectedCurrency, $currency);

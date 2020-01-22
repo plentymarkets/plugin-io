@@ -9,6 +9,7 @@ namespace IO\Services;
 
 use IO\Repositories\ItemWishListRepository;
 use IO\Repositories\ItemWishListGuestRepository;
+use Plenty\Modules\Webshop\Contracts\ContactRepositoryContract;
 use Plenty\Modules\Webshop\Contracts\SessionStorageRepositoryContract;
 
 /**
@@ -31,12 +32,10 @@ class ItemWishListService
             );
         }
 
-        /**
-         * @var CustomerService $customerService
-         */
-        $customerService = pluginApp(CustomerService::class);
+        /** @var ContactRepositoryContract $contactRepository */
+        $contactRepository = pluginApp(ContactRepositoryContract::class);
 
-        if ((int)$customerService->getContactId() > 0) {
+        if ((int)$contactRepository->getContactId() > 0) {
             $itemWishListRepo = pluginApp(ItemWishListRepository::class);
         } else {
             $itemWishListRepo = pluginApp(ItemWishListGuestRepository::class);
