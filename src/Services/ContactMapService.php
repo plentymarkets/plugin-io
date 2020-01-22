@@ -23,7 +23,7 @@ class ContactMapService
     {
         return $this->cachingRepository->remember(
             self::COORD_CACHE_KEY,
-            60,
+            24 * 60,
             function () use ($street, $zip, $apiKey) {
                 $location = [
                     'location' => [
