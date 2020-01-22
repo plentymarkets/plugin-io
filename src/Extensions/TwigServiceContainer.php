@@ -9,6 +9,7 @@ use IO\Services\CategoryService;
 use IO\Services\CheckoutService;
 use IO\Services\ContactBankService;
 use IO\Services\ContactMailService;
+use IO\Services\ContactMapService;
 use IO\Services\CountryService;
 use IO\Services\CouponService;
 use IO\Services\CustomerService;
@@ -195,5 +196,10 @@ class TwigServiceContainer
     public function getFacet(): FacetService
     {
         return pluginApp(FacetService::class);
+    }
+
+    public function getContactMap() : ContactMapService
+    {
+        return pluginApp(ContactMapService::class);
     }
 }
