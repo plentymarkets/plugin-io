@@ -217,10 +217,10 @@ class OrderBuilderQuery
      * @param int $type
      * @param int $subType
      * @param $value
-     * @param $optional
+     * @param $required
      * @return OrderBuilderQuery
      */
-	public function withOrderProperty(int $type, int $subType, $value, $optional = false):OrderBuilderQuery
+	public function withOrderProperty(int $type, int $subType, $value, $required = true):OrderBuilderQuery
 	{
 		if($this->order["properties"] === null)
 		{
@@ -233,7 +233,7 @@ class OrderBuilderQuery
 			"value"     => (string)$value
 		];
 
-		if (!$optional || $optional && strlen($value) > 0)
+		if ($required || !$required && strlen($value) > 0)
         {
             array_push($this->order["properties"], $option);
         }
