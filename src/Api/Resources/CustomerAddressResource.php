@@ -41,7 +41,7 @@ class CustomerAddressResource extends ApiResource
      * Get the address type from the request
      * @return int
      */
-    private function getAddressType():int
+    private function getAddressType(): int
     {
         return (INT)$this->request->get("typeId", null);
     }
@@ -50,9 +50,9 @@ class CustomerAddressResource extends ApiResource
      * Get an address by type
      * @return Response
      */
-    public function index():Response
+    public function index(): Response
     {
-        $type      = $this->getAddressType();
+        $type = $this->getAddressType();
         $addresses = $this->customerService->getAddresses($type);
         return $this->response->create($addresses, ResponseCode::OK);
     }
@@ -61,7 +61,7 @@ class CustomerAddressResource extends ApiResource
      * Create an address with the given type
      * @return Response
      */
-    public function store():Response
+    public function store(): Response
     {
         $address = null;
 
@@ -69,29 +69,23 @@ class CustomerAddressResource extends ApiResource
         $addressId = $address['id'];
         $type = $this->getAddressType();
 
-        if(is_null($type))
-        {
+        if (is_null($type)) {
             $this->response->error(0, "Missing type id.");
             return $this->response->create(null, ResponseCode::BAD_REQUEST);
         }
 
-        try
-        {
-            if(!is_null($addressId) && (int)$addressId > 0)
-            {
+        try {
+            if (!is_null($addressId) && (int)$addressId > 0) {
                 $newAddress = $this->customerService->updateAddress((int)$addressId, $address, (int)$type);
-            }
-            else
-            {
+            } else {
                 $newAddress = $this->customerService->createAddress($address, $type);
             }
-        } 
-        catch(\Plenty\Exceptions\ValidationException $validationException)
-        {
+        } catch (\Plenty\Exceptions\ValidationException $validationException) {
             throw $validationException;
-        }
-        catch(\Exception $exception)
-        {
+        } catch (\Exception $exception) {
+            if (in_array($exception->getCode(), [210, 211])) {
+                throw $exception;
+            }
             $this->response->error(0, $exception->getMessage());
             return $this->response->create($exception, ResponseCode::BAD_REQUEST);
         }
@@ -104,11 +98,10 @@ class CustomerAddressResource extends ApiResource
      * @param string $addressId
      * @return Response
      */
-    public function update(string $addressId):Response
+    public function update(string $addressId): Response
     {
         $type = $this->getAddressType();
-        if(is_null($type))
-        {
+        if (is_null($type)) {
             $this->response->error(0, "Missing type id.");
             return $this->response->create(null, ResponseCode::BAD_REQUEST);
         }
@@ -118,14 +111,10 @@ class CustomerAddressResource extends ApiResource
          */
         $basketService = pluginApp(BasketService::class);
 
-        if((int)$addressId > 0 || (int)$addressId == static::ADDRESS_NOT_SET)
-        {
-            if($type == AddressType::BILLING)
-            {
+        if ((int)$addressId > 0 || (int)$addressId == static::ADDRESS_NOT_SET) {
+            if ($type == AddressType::BILLING) {
                 $basketService->setBillingAddressId((int)$addressId);
-            }
-            elseif($type == AddressType::DELIVERY)
-            {
+            } elseif ($type == AddressType::DELIVERY) {
                 $basketService->setDeliveryAddressId((int)$addressId);
             }
         }
@@ -138,11 +127,10 @@ class CustomerAddressResource extends ApiResource
      * @param string $addressId
      * @return Response
      */
-    public function destroy(string $addressId):Response
+    public function destroy(string $addressId): Response
     {
         $type = $this->getAddressType();
-        if(is_null($type))
-        {
+        if (is_null($type)) {
             $this->response->error(0, "Missing type id.");
             return $this->response->create(null, ResponseCode::BAD_REQUEST);
         }

@@ -34,6 +34,7 @@ use Plenty\Modules\Helper\AutomaticEmail\Models\AutomaticEmailTemplate;
 use Plenty\Modules\Helper\AutomaticEmail\Models\AutomaticEmailContact;
 use Plenty\Modules\System\Contracts\WebstoreConfigurationRepositoryContract;
 use Plenty\Modules\System\Models\WebstoreConfiguration;
+use Plenty\Modules\Webshop\Events\ValidateVatNumber;
 use Plenty\Plugin\Events\Dispatcher;
 
 /**
@@ -639,6 +640,14 @@ class CustomerService
      */
     public function createAddress(array $addressData, int $typeId): Address
     {
+        if (isset($addressData['vatNumber'])) {
+            /** @var Dispatcher $eventDispatcher */
+            $eventDispatcher = pluginApp(Dispatcher::class);
+            /** @var ValidateVatNumber $val */
+            $val = pluginApp(ValidateVatNumber::class, [$addressData['vatNumber']]);
+            $eventDispatcher->fire($val);
+        }
+
         if ((isset($addressData['gender']) && empty($addressData['gender'])) || $addressData['gender'] == 'company') {
             $addressData['gender'] = null;
         }
@@ -807,6 +816,14 @@ class CustomerService
      */
     public function updateAddress(int $addressId, array $addressData, int $typeId): Address
     {
+        if (isset($addressData['vatNumber'])) {
+            /** @var Dispatcher $eventDispatcher */
+            $eventDispatcher = pluginApp(Dispatcher::class);
+            /** @var ValidateVatNumber $val */
+            $val = pluginApp(ValidateVatNumber::class, [$addressData['vatNumber']]);
+            $eventDispatcher->fire($val);
+        }
+
         if ((isset($addressData['gender']) && empty($addressData['gender'])) || $addressData['gender'] == 'company') {
             $addressData['gender'] = null;
         }
