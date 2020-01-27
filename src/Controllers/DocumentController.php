@@ -5,7 +5,9 @@ namespace IO\Controllers;
 use IO\Api\ResponseCode;
 use IO\Constants\SessionStorageKeys;
 use IO\Middlewares\CheckNotFound;
+use IO\Models\LocalizedOrder;
 use IO\Services\CustomerService;
+use IO\Services\OrderService;
 use IO\Services\SessionStorageService;
 use Plenty\Modules\Authorization\Services\AuthHelper;
 use Plenty\Modules\Cloud\Storage\Models\StorageObject;
@@ -31,38 +33,48 @@ class DocumentController extends LayoutController
     {
         /** @var Request $request */
         $request = pluginApp(Request::class);
-        
+
         $requestOrderId = $request->get('orderId', 0);
         $requestAccessKey = $request->get('accessKey', '');
-        
+
+        $guestOrder = null;
+
         if($requestOrderId <= 0 || !strlen($requestAccessKey))
         {
             /** @var SessionStorageService $sessionStorageService */
             $sessionStorageService = pluginApp(SessionStorageService::class);
             $sessionOrder = $sessionStorageService->getSessionValue(SessionStorageKeys::LAST_ACCESSED_ORDER);
-            
+
+            if (is_null($sessionOrder))
+            {
+                /** @var OrderService $orderService */
+                $orderService = pluginApp(OrderService::class);
+
+                $guestOrder = $orderService->getLatestOrderForContact(0);
+            }
+
             $requestOrderId = $sessionOrder['orderId'];
             $requestAccessKey = $sessionOrder['accessKey'];
         }
-        
+
         /** @var CustomerService $customerService */
         $customerService = pluginApp(CustomerService::class);
-        
+
         /** @var DocumentRepositoryContract $documentRepo */
         $documentRepo = pluginApp(DocumentRepositoryContract::class);
         $document = $documentRepo->findById($documentId);
-        
+
         $documentStorageObject = null;
-        
+
         if($document instanceof Document)
         {
             /** @var Order $order */
             $order = $document->orders->first();
-            
+
             if($order instanceof Order)
             {
                 $orderContactId = $order->relations->where('referenceType', 'contact')->first()->referenceId;
-                
+
                 if((int)$orderContactId > 0 && $orderContactId == $customerService->getContactId())
                 {
                     //document is matching with the logged in contact
@@ -75,22 +87,26 @@ class DocumentController extends LayoutController
                 {
                     /** @var AuthHelper $authHelper */
                     $authHelper = pluginApp(AuthHelper::class);
-                    
+
                     /** @var OrderRepositoryContract $orderRepo */
                     $orderRepo = pluginApp(OrderRepositoryContract::class);
                     $orderAccessKey = $authHelper->processUnguarded(function() use ($order, $orderRepo) {
                         return $orderRepo->generateAccessKey($order->id);
                     });
-                    
+
                     if($requestOrderId == $order->id && $requestAccessKey == $orderAccessKey)
                     {
                         //orderId and accessKey are matching with the documents order
                         $documentStorageObject = $documentRepo->getDocumentStorageObject($document->path);
                     }
                 }
+                elseif($guestOrder instanceof LocalizedOrder && $order->id === $guestOrder->order->id)
+                {
+                    $documentStorageObject = $documentRepo->getDocumentStorageObject($document->path);
+                }
             }
         }
-        
+
         if($documentStorageObject instanceof StorageObject)
         {
             $response = $response->make(
@@ -109,7 +125,7 @@ class DocumentController extends LayoutController
             $response->forceStatus(ResponseCode::NOT_FOUND);
             CheckNotFound::$FORCE_404 = true;
         }
-        
+
         return $response;
     }
 }
