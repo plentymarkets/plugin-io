@@ -42,10 +42,6 @@ class ItemController extends LayoutController
         int $variationId = 0,
         $category = null
     ) {
-        if (!is_null($category)) {
-            pluginApp(CategoryService::class)->setCurrentCategory($category);
-        }
-
         $start = microtime(true);
 
         $itemSearchOptions = [
@@ -82,6 +78,17 @@ class ItemController extends LayoutController
             /** @var CategoryService $categoryService */
             $categoryService = pluginApp(CategoryService::class);
             $categoryService->setCurrentCategory($category);
+        }
+
+        if(isset($itemResult['item']['documents'][0]['data']['currentData'])) {
+            /** @var CategoryService $categoryService */
+            $categoryService = pluginApp(CategoryService::class);
+            if(!is_null($category))
+            {
+                $categoryService->setCurrentCategory($itemResult['item']['documents'][0]['data']['currentData']['category']);
+            }
+            $categoryService->setCurrentItem($itemResult['item']['documents'][0]['data']['currentData']['item']);
+            unset($itemResult['item']['documents'][0]['data']['currentData']);
         }
 
         /** @var ShopBuilderRequest $shopBuilderRequest */
