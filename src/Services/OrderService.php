@@ -156,7 +156,7 @@ class OrderService
             ->withOrderProperty(OrderPropertyType::SHIPPING_PROFILE, OrderOptionSubType::MAIN_VALUE, $this->checkoutService->getShippingProfileId())
             ->withOrderProperty(OrderPropertyType::DOCUMENT_LANGUAGE, OrderOptionSubType::MAIN_VALUE, Utils::getLang())
             ->withOrderProperty(OrderPropertyType::SHIPPING_PRIVACY_HINT_ACCEPTED, OrderOptionSubType::MAIN_VALUE, $isShippingPrivacyHintAccepted)
-            ->withOrderProperty(OrderPropertyType::CUSTOMER_SIGN, OrderOptionSubType::MAIN_VALUE, $this->sessionStorageRepository->getSessionValue(SessionStorageRepositoryContract::ORDER_CUSTOMER_SIGN))
+            ->withOrderProperty(OrderPropertyType::CUSTOMER_SIGN, OrderOptionSubType::MAIN_VALUE, $this->sessionStorageRepository->getSessionValue(SessionStorageRepositoryContract::ORDER_CUSTOMER_SIGN), false)
             ->withComment(true, $this->sessionStorageRepository->getSessionValue(SessionStorageRepositoryContract::ORDER_CONTACT_WISH))
             ->done();
 
