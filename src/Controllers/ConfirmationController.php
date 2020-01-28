@@ -13,6 +13,7 @@ use IO\Constants\SessionStorageKeys;
 use IO\Models\LocalizedOrder;
 use IO\Services\TemplateConfigService;
 use Plenty\Modules\Category\Models\Category;
+use Plenty\Modules\Order\Contracts\OrderRepositoryContract;
 use Plenty\Modules\Order\Date\Models\OrderDateType;
 use Plenty\Modules\Order\Models\Order;
 use Plenty\Modules\ShopBuilder\Helper\ShopBuilderRequest;
@@ -103,6 +104,16 @@ class ConfirmationController extends LayoutController
                 else
                 {
                     $order = $customerService->getLatestOrder();
+                }
+
+                if ($order instanceof LocalizedOrder) {
+                    /** @var OrderRepositoryContract $orderRepository */
+                    $orderRepository = pluginApp(OrderRepositoryContract::class);
+                    $orderAccessKey = $orderRepository->generateAccessKey($order->order->id);
+                    $sessionStorageService->setSessionValue(
+                        SessionStorageKeys::LAST_ACCESSED_ORDER,
+                        ['orderId' => $order->order->id, 'accessKey' => $orderAccessKey]
+                    );
                 }
             }
             catch(\Exception $e)
