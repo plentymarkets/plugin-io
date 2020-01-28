@@ -33,7 +33,7 @@ class Utils
     {
         /** @var LocalizationRepositoryContract $localizationRepository */
         $localizationRepository = pluginApp(LocalizationRepositoryContract::class);
-        return $localizationRepository->getLang();
+        return $localizationRepository->getLanguage();
     }
 
     public static function getDefaultLang()

@@ -3,13 +3,13 @@
 namespace IO\Services;
 
 use IO\Extensions\Constants\ShopUrls;
-use IO\Helper\LanguageMap;
 use IO\Helper\MemoryCache;
 use IO\Helper\RouteConfig;
 use IO\Helper\Utils;
 use IO\Services\UrlBuilder\CategoryUrlBuilder;
 use IO\Services\UrlBuilder\UrlQuery;
 use IO\Services\UrlBuilder\VariationUrlBuilder;
+use Plenty\Modules\Webshop\Contracts\LocalizationRepositoryContract;
 use Plenty\Modules\Webshop\Contracts\WebstoreConfigurationRepositoryContract;
 use Plenty\Plugin\Http\Request;
 use Plenty\Plugin\Http\Response;
@@ -197,7 +197,9 @@ class UrlService
                 foreach ($this->webstoreConfigurationRepository->getActiveLanguageList() as $language) {
                     $url = $this->getCanonicalURL($language);
                     if ($url !== null) {
-                        $languageISO = LanguageMap::getLanguageCode($language);
+                        /** @var LocalizationRepositoryContract $localizationRepository */
+                        $localizationRepository = pluginApp(LocalizationRepositoryContract::class);
+                        $languageISO = $localizationRepository->getLanguageCode($language);
                         $result[$languageISO] = $url;
                     }
                 }

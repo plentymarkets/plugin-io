@@ -5,7 +5,6 @@ namespace IO\Services;
 use IO\Builder\Order\AddressType;
 use IO\Events\Checkout\CheckoutReadonlyChanged;
 use IO\Helper\ArrayHelper;
-use IO\Helper\LanguageMap;
 use IO\Helper\MemoryCache;
 use Plenty\Modules\Accounting\Contracts\AccountingLocationRepositoryContract;
 use Plenty\Modules\Basket\Contracts\BasketRepositoryContract;
@@ -22,6 +21,7 @@ use Plenty\Modules\Payment\Events\Checkout\GetPaymentMethodContent;
 use Plenty\Modules\Payment\Method\Contracts\PaymentMethodRepositoryContract;
 use Plenty\Modules\Webshop\Contracts\CheckoutRepositoryContract;
 use Plenty\Modules\Webshop\Contracts\ContactRepositoryContract;
+use Plenty\Modules\Webshop\Contracts\LocalizationRepositoryContract;
 use Plenty\Modules\Webshop\Contracts\SessionStorageRepositoryContract;
 use Plenty\Modules\Webshop\Contracts\WebstoreConfigurationRepositoryContract;
 use Plenty\Modules\Webshop\Template\Contracts\TemplateConfigRepositoryContract;
@@ -200,7 +200,9 @@ class CheckoutService
         $currencyRepository = pluginApp(CurrencyRepositoryContract::class);
 
         $currencyList = [];
-        $locale = LanguageMap::getLocale();
+        /** @var LocalizationRepositoryContract $localizationRepository */
+        $localizationRepository = pluginApp(LocalizationRepositoryContract::class);
+        $locale = $localizationRepository->getLocale();
 
         foreach ($currencyRepository->getCurrencyList() as $currency) {
             $formatter = numfmt_create(
@@ -222,7 +224,9 @@ class CheckoutService
             "currencyData",
             function () {
                 $currency = $this->checkoutRepository->getCurrency();
-                $locale = LanguageMap::getLocale();
+                /** @var LocalizationRepositoryContract $localizationRepository */
+                $localizationRepository = pluginApp(LocalizationRepositoryContract::class);
+                $locale = $localizationRepository->getLocale();
 
                 $formatter = numfmt_create(
                     $locale . "@currency=" . $currency,
@@ -240,7 +244,9 @@ class CheckoutService
     public function getCurrencyPattern()
     {
         $currency = $this->checkoutRepository->getCurrency();
-        $locale = LanguageMap::getLocale();
+        /** @var LocalizationRepositoryContract $localizationRepository */
+        $localizationRepository = pluginApp(LocalizationRepositoryContract::class);
+        $locale = $localizationRepository->getLocale();
         $configRepository = pluginApp(ConfigRepository::class);
 
         $formatter = numfmt_create(

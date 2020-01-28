@@ -3,7 +3,7 @@
 namespace IO\Services\ItemSearch\Extensions;
 
 use IO\Extensions\Filters\ItemImagesFilter;
-use IO\Extensions\Filters\NumberFormatFilter;
+use Plenty\Modules\Webshop\Filters\NumberFormatFilter;
 
 class VariationAttributeMapExtension implements ItemSearchExtension
 {
@@ -14,7 +14,7 @@ class VariationAttributeMapExtension implements ItemSearchExtension
     {
         return null;
     }
-    
+
     /**
      * @inheritdoc
      */
@@ -24,16 +24,16 @@ class VariationAttributeMapExtension implements ItemSearchExtension
             'attributes' => [],
             'variations' => []
         ];
-        
+
         if(count($baseResult['documents']))
         {
             /** @var NumberFormatFilter $numberFormatFilter */
             $numberFormatFilter = pluginApp(NumberFormatFilter::class);
-            
+
             foreach( $baseResult['documents'] as $key => $extensionDocument )
             {
                 $numberFormatDecimals = (floor($extensionDocument['data']['unit']['content']) !== $extensionDocument['data']['unit']['content'] ? -1 : 0);
-                
+
                 $newResult['variations'][$extensionDocument['id']] = [
                     'variationId'       => $extensionDocument['id'],
                     'unitId'            => $extensionDocument['data']['unit']['id'],
@@ -43,7 +43,7 @@ class VariationAttributeMapExtension implements ItemSearchExtension
                     'isSalable'         => $extensionDocument['data']['filter']['isSalable'],
                     'attributes'        => [],
                 ];
-                
+
                 if(count($extensionDocument['data']['attributes']))
                 {
                     foreach($extensionDocument['data']['attributes'] as $attribute)
@@ -52,7 +52,7 @@ class VariationAttributeMapExtension implements ItemSearchExtension
                             'attributeId'      => $attribute['attributeId'],
                             'attributeValueId' => $attribute['value']['id']
                         ];
-                        
+
                         if(!array_key_exists($attribute['attributeId'], $newResult['attributes']))
                         {
                             $newResult['attributes'][$attribute['attributeId']] = [
@@ -63,9 +63,9 @@ class VariationAttributeMapExtension implements ItemSearchExtension
                                 'values'      => []
                             ];
                         }
-                        
-                        
-                        
+
+
+
                         $attributeImageUrl = '';
                         if(strlen($attribute['value']['image']))
                         {
@@ -77,7 +77,7 @@ class VariationAttributeMapExtension implements ItemSearchExtension
                             $itemImageFilter = pluginApp(ItemImagesFilter::class);
                             $attributeImageUrl = $itemImageFilter->getFirstItemImageUrl($extensionDocument['data']['images'], 'urlPreview');
                         }
-                        
+
                         $newResult['attributes'][$attribute['attributeId']]['values'][$attribute['value']['id']] = [
                             'attributeValueId' => $attribute['value']['id'],
                             'position'         => $attribute['value']['position'],
@@ -90,13 +90,13 @@ class VariationAttributeMapExtension implements ItemSearchExtension
 
                 }
             }
-            
+
             if(count($newResult['attributes']))
             {
                 usort($newResult['attributes'], function($attribute1, $attribute2) {
                     return $attribute1['position'] <=> $attribute2['position'];
                 });
-                
+
                 foreach($newResult['attributes'] as $attributeKey => $attribute)
                 {
                     usort($newResult['attributes'][$attributeKey]['values'], function($attributeValue1, $attributeValue2) {
@@ -105,9 +105,9 @@ class VariationAttributeMapExtension implements ItemSearchExtension
                 }
             }
         }
-        
+
         $newResult['variations'] = array_values($newResult['variations']);
-        
+
         return $newResult;
     }
 }

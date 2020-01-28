@@ -2,7 +2,6 @@
 
 namespace IO\Tests\Services;
 
-use IO\Helper\LanguageMap;
 use Mockery;
 use IO\Services\UrlBuilder\UrlQuery;
 use IO\Tests\TestCase;

@@ -5,12 +5,16 @@ namespace IO\Extensions\Filters;
 use IO\Helper\LanguageMap;
 use IO\Helper\MemoryCache;
 use IO\Services\TemplateConfigService;
+use Plenty\Modules\Webshop\Contracts\LocalizationRepositoryContract;
 use Plenty\Plugin\ConfigRepository;
 use IO\Extensions\AbstractFilter;
 
 /**
  * Class NumberFormatFilter
  * @package IO\Extensions\Filters
+ *
+ * @deprecated since 5.0.0 will be deleted in 6.0.0
+ * @see \Plenty\Modules\Webshop\Filters\NumberFormatFilter
  */
 class NumberFormatFilter extends AbstractFilter
 {
@@ -108,8 +112,9 @@ class NumberFormatFilter extends AbstractFilter
             $formatter = $this->fromMemoryCache(
                 "formatter.$currencyISO",
                 function() use ($currencyISO) {
-                    $locale            = LanguageMap::getLocale();
-
+                    /** @var LocalizationRepositoryContract $localizationRepository */
+                    $localizationRepository = pluginApp(LocalizationRepositoryContract::class);
+                    $locale = $localizationRepository->getLocale();
                     $formatter = numfmt_create($locale, \NumberFormatter::CURRENCY);
 
                     /** @var TemplateConfigService $templateConfigService */

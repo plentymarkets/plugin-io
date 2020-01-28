@@ -69,7 +69,7 @@ class SessionStorageService
      * @return string
      *
      * @deprecated since 5.0.0 will be removed in 6.0.0
-     * @see \Plenty\Modules\Webshop\Contracts\LocalizationRepositoryContract::getLang()
+     * @see \Plenty\Modules\Webshop\Contracts\LocalizationRepositoryContract::getLanguage()
      */
 	public function getLang()
 	{
