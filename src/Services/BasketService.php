@@ -25,6 +25,8 @@ use Plenty\Modules\Item\VariationDescription\Contracts\VariationDescriptionRepos
 use Plenty\Modules\Item\VariationDescription\Models\VariationDescription;
 use Plenty\Modules\Order\Shipping\Contracts\EUCountryCodesServiceContract;
 use Plenty\Modules\Webshop\Contracts\CheckoutRepositoryContract;
+use Plenty\Modules\Webshop\Contracts\ContactRepositoryContract;
+use Plenty\Modules\Webshop\Contracts\UnitRepositoryContract;
 use Plenty\Modules\Webshop\Contracts\WebstoreConfigurationRepositoryContract;
 use Plenty\Plugin\Log\Loggable;
 
@@ -57,9 +59,9 @@ class BasketService
     private $vatService;
 
     /**
-     * @var CustomerService
+     * @var ContactRepositoryContract $contactRepository
      */
-    private $customerService;
+    private $contactRepository;
 
     /**
      * @var CouponService $couponService
@@ -77,7 +79,7 @@ class BasketService
      * @param BasketItemRepositoryContract $basketItemRepository
      * @param Checkout $checkout
      * @param VatService $vatService
-     * @param CustomerService $customerService
+     * @param ContactRepositoryContract $contactRepository
      * @param BasketRepositoryContract $basketRepository
      * @param VatInitContract $vatInitService
      * @param CouponService $couponService
@@ -87,7 +89,7 @@ class BasketService
         BasketItemRepositoryContract $basketItemRepository,
         Checkout $checkout,
         VatService $vatService,
-        CustomerService $customerService,
+        ContactRepositoryContract $contactRepository,
         BasketRepositoryContract $basketRepository,
         VatInitContract $vatInitService,
         CouponService $couponService,
@@ -96,7 +98,7 @@ class BasketService
         $this->basketItemRepository = $basketItemRepository;
         $this->checkout = $checkout;
         $this->vatService = $vatService;
-        $this->customerService = $customerService;
+        $this->contactRepository = $contactRepository;
         $this->basketRepository = $basketRepository;
         $this->couponService = $couponService;
         $this->webstoreConfigurationRepository = $webstoreConfigurationRepository;
@@ -331,7 +333,7 @@ class BasketService
      */
     private function addVariationData($basketItems, $basketItemData, $sortOrderItems = false): array
     {
-        $showNetPrice = $this->customerService->showNetPrices();
+        $showNetPrice = $this->contactRepository->showNetPrices();
         $result = [];
         foreach ($basketItems as $basketItem) {
             if ($showNetPrice) {
@@ -661,7 +663,7 @@ class BasketService
         foreach ($items['documents'] as $item) {
             $variationId = $item['data']['variation']['id'];
             $result[$variationId] = $item;
-            $result[$variationId]['data']['unit']['htmlUnit'] = UnitService::getHTML4Unit(
+            $result[$variationId]['data']['unit']['htmlUnit'] = UnitRepositoryContract::getHTML4Unit(
                 $result[$variationId]['data']['unit']['unitOfMeasurement']
             );
         }

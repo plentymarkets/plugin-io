@@ -21,6 +21,7 @@ use Plenty\Modules\Order\Shipping\Contracts\ParcelServicePresetRepositoryContrac
 use Plenty\Modules\Payment\Events\Checkout\GetPaymentMethodContent;
 use Plenty\Modules\Payment\Method\Contracts\PaymentMethodRepositoryContract;
 use Plenty\Modules\Webshop\Contracts\CheckoutRepositoryContract;
+use Plenty\Modules\Webshop\Contracts\ContactRepositoryContract;
 use Plenty\Modules\Webshop\Contracts\SessionStorageRepositoryContract;
 use Plenty\Modules\Webshop\Contracts\WebstoreConfigurationRepositoryContract;
 use Plenty\Modules\Webshop\Template\Contracts\TemplateConfigRepositoryContract;
@@ -85,6 +86,9 @@ class CheckoutService
     /** @var CheckoutRepositoryContract $checkoutRepository */
     private $checkoutRepository;
 
+    /** @var ContactRepositoryContract $contactRepository */
+    private $contactRepository;
+
     /**
      * CheckoutService constructor.
      * @param FrontendPaymentMethodRepositoryContract $frontendPaymentMethodRepository
@@ -99,6 +103,7 @@ class CheckoutService
      * @param WebstoreConfigurationService $webstoreConfigurationService
      * @param Dispatcher $dispatcher
      * @param CheckoutRepositoryContract $checkoutRepository
+     * @param ContactRepositoryContract $contactRepository
      */
     public function __construct(
         FrontendPaymentMethodRepositoryContract $frontendPaymentMethodRepository,
@@ -112,7 +117,8 @@ class CheckoutService
         SessionStorageRepositoryContract $sessionStorageRepository,
         WebstoreConfigurationRepositoryContract $webstoreConfigurationRepository,
         Dispatcher $dispatcher,
-        CheckoutRepositoryContract $checkoutRepository
+        CheckoutRepositoryContract $checkoutRepository,
+        ContactRepositoryContract $contactRepository
     ) {
         $this->frontendPaymentMethodRepository = $frontendPaymentMethodRepository;
         $this->checkout = $checkout;
@@ -125,6 +131,8 @@ class CheckoutService
         $this->sessionStorageRepository = $sessionStorageRepository;
         $this->webstoreConfigurationRepository = $webstoreConfigurationRepository;
         $this->checkoutRepository = $checkoutRepository;
+        $this->contactRepository = $contactRepository;
+
         $dispatcher->listen(
             AfterBasketChanged::class,
             function ($event) {
@@ -456,7 +464,7 @@ class CheckoutService
                 $accountRepo = pluginApp(AccountingLocationRepositoryContract::class);
                 /** @var VatService $vatService */
                 $vatService = pluginApp(VatService::class);
-                $showNetPrice = $this->customerService->showNetPrices();
+                $showNetPrice = $this->contactRepository->showNetPrices();
 
                 /** @var TemplateConfigRepositoryContract $templateConfigRepo */
                 $templateConfigRepo = pluginApp(TemplateConfigRepositoryContract::class);

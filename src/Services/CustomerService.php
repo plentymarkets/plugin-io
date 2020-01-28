@@ -121,36 +121,12 @@ class CustomerService
 
     /**
      * @return bool
+     * @deprecated since 5.0.0 will be removed in 6.0.0
+     * @see \Plenty\Modules\Webshop\Contracts\ContactRepositoryContract::showNetPrices()
      */
     public function showNetPrices(): bool
     {
-        return $this->fromMemoryCache(
-            'showNetPrices',
-            function () {
-                $customerShowNet = false;
-                /** @var SessionStorageRepositoryContract $sessionStorageRepository */
-                $sessionStorageRepository = pluginApp(SessionStorageRepositoryContract::class);
-                $customer = $sessionStorageRepository->getCustomer();
-                if ($customer !== null) {
-                    $customerShowNet = $customer->showNetPrice;
-                }
-
-                if ($customerShowNet) {
-                    return true;
-                }
-
-                $contactClassShowNet = false;
-                $contactClassId = $this->contactRepository->getContactClassId();
-                if ($contactClassId !== null) {
-                    $contactClass = $this->contactRepository->getContactClassData($contactClassId);
-                    if ($contactClass !== null) {
-                        $contactClassShowNet = $contactClass['showNetPrice'];
-                    }
-                }
-
-                return $contactClassShowNet;
-            }
-        );
+        return $this->contactRepository->showNetPrices();
     }
 
     /**

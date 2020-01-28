@@ -4,7 +4,6 @@ namespace IO\Builder\Order;
 
 use IO\Extensions\Filters\ItemNameFilter;
 use IO\Services\BasketService;
-use IO\Services\CustomerService;
 use IO\Events\Basket\BeforeBasketItemToOrderItem;
 use Plenty\Modules\Basket\Exceptions\BasketItemCheckException;
 use Plenty\Modules\Basket\Models\Basket;
@@ -18,6 +17,7 @@ use Plenty\Modules\Order\Property\Models\OrderPropertyType;
 use Plenty\Modules\System\Contracts\WebstoreRepositoryContract;
 use Plenty\Modules\Accounting\Vat\Models\Vat;
 use Plenty\Modules\Webshop\Contracts\CheckoutRepositoryContract;
+use Plenty\Modules\Webshop\Contracts\ContactRepositoryContract;
 use Plenty\Plugin\Events\Dispatcher;
 
 /**
@@ -27,7 +27,7 @@ use Plenty\Plugin\Events\Dispatcher;
 class OrderItemBuilder
 {
 	/**
-	 * @var CheckoutService
+	 * @var CheckoutService $checkoutService
 	 */
 	private $checkoutService;
 
@@ -35,27 +35,27 @@ class OrderItemBuilder
 	private $checkoutRepository;
 
     /**
-     * @var VatService
+     * @var VatService $vatService
      */
 	private $vatService;
 
-	/** @var ItemNameFilter */
+	/** @var ItemNameFilter $itemNameFilter */
 	private $itemNameFilter;
 
     /**
-     * @var VatRepositoryContract
+     * @var VatRepositoryContract $vatRepository
      */
     private $vatRepository;
 
     /**
-     * @var WebstoreRepositoryContract
+     * @var WebstoreRepositoryContract $webstoreRepository
      */
     private $webstoreRepository;
 
     /**
-     * @var CustomerService
+     * @var ContactRepositoryContract $contactRepository
      */
-    private $customerService;
+    private $contactRepository;
 
     /**
      * OrderItemBuilder constructor.
@@ -65,7 +65,7 @@ class OrderItemBuilder
      * @param ItemNameFilter $itemNameFilter
      * @param WebstoreRepositoryContract $webstoreRepository
      * @param VatRepositoryContract $vatRepository
-     * @param CustomerService $customerService
+     * @param ContactRepositoryContract $contactRepository
      * @param CheckoutRepositoryContract $checkoutRepository
      */
 	public function __construct(
@@ -74,7 +74,7 @@ class OrderItemBuilder
         ItemNameFilter $itemNameFilter,
         WebstoreRepositoryContract $webstoreRepository,
         VatRepositoryContract $vatRepository,
-        CustomerService $customerService,
+        ContactRepositoryContract $contactRepository,
         CheckoutRepositoryContract $checkoutRepository)
 	{
 		$this->checkoutService = $checkoutService;
@@ -82,7 +82,7 @@ class OrderItemBuilder
         $this->webstoreRepository = $webstoreRepository;
         $this->vatRepository = $vatRepository;
         $this->itemNameFilter = $itemNameFilter;
-        $this->customerService = $customerService;
+        $this->contactRepository = $contactRepository;
         $this->checkoutRepository = $checkoutRepository;
 	}
 
@@ -305,7 +305,7 @@ class OrderItemBuilder
         }
 
         $priceOriginal = $basketItem['price'];
-		if ( $this->customerService->showNetPrices() )
+		if ( $this->contactRepository->showNetPrices() )
         {
             $priceOriginal = $basketItem['price'] * (100.0 + $basketItem['vat']) / 100.0;
         }

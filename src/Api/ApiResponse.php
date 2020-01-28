@@ -8,6 +8,7 @@ use IO\Services\CheckoutService;
 use IO\Services\LocalizationService;
 use IO\Services\NotificationService;
 use Plenty\Modules\Item\Stock\Events\BasketItemWarnOversell;
+use Plenty\Modules\Webshop\Contracts\ContactRepositoryContract;
 use Plenty\Plugin\Http\Response;
 use Plenty\Modules\Account\Events\FrontendUpdateCustomerSettings;
 use Plenty\Modules\Authentication\Events\AfterAccountAuthentication;
@@ -25,7 +26,6 @@ use Plenty\Modules\Frontend\Events\FrontendShippingProfileChanged;
 use Plenty\Modules\Basket\Events\Basket\AfterBasketChanged;
 use Plenty\Modules\Basket\Events\Basket\AfterBasketCreate;
 use Plenty\Plugin\Events\Dispatcher;
-use IO\Services\CustomerService;
 
 /**
  * Class ApiResponse
@@ -330,14 +330,14 @@ class ApiResponse
             /** @var BasketService $basketService */
             $basketService = pluginApp(BasketService::class);
 
-            /** @var CustomerService $customerService */
-            $customerService = pluginApp(CustomerService::class);
+            /** @var ContactRepositoryContract $contactRepository */
+            $contactRepository = pluginApp(ContactRepositoryContract::class);
 
             /** @var CheckoutService $checkoutService */
             $checkoutService = pluginApp(CheckoutService::class);
 
             $responseData['events']['AfterBasketChanged']['basket'] = $basketService->getBasketForTemplate();
-            $responseData['events']['AfterBasketChanged']['showNetPrices'] = $customerService->showNetPrices();
+            $responseData['events']['AfterBasketChanged']['showNetPrices'] = $contactRepository->showNetPrices();
             $responseData['events']['AfterBasketChanged']['basketItems'] = $basketService->getBasketItemsForTemplate(
                 '',
                 false
