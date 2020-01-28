@@ -1,5 +1,11 @@
 # Release Notes for IO
 
+## v4.5.1 (2020-01-28) <a href="https://github.com/plentymarkets/plugin-io/compare/4.5.0...4.5.1" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
+
+### Fixed 
+
+- Order documents of guest account orders can now be accessed again via the link in the order confirmation.
+
 ## v4.5.0 (2019-12-19) <a href="https://github.com/plentymarkets/plugin-io/compare/4.4.3...4.4.0" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
 
 ### Added 

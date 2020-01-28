@@ -1,5 +1,11 @@
 # Release Notes für IO
 
+## v4.5.1 (2020-01-28) <a href="https://github.com/plentymarkets/plugin-io/compare/4.5.0...4.5.1" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
+
+### Behoben
+
+- Auftragsdokumente für Gastbestellungen können nun wieder über die Weiterleitung in der Bestellbestätigung aufgerufen werden.
+
 ## v4.5.0 (2019-12-19) <a href="https://github.com/plentymarkets/plugin-io/compare/4.4.3...4.5.0" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
 
 ### TODO
