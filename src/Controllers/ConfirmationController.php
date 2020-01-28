@@ -100,10 +100,10 @@ class ConfirmationController extends LayoutController
                 if ($order instanceof LocalizedOrder) {
                     /** @var OrderRepositoryContract $orderRepository */
                     $orderRepository = pluginApp(OrderRepositoryContract::class);
-                    $orderAccessKey = $orderRepository->generateAccessKey($orderId);
+                    $orderAccessKey = $orderRepository->generateAccessKey($order->order->id);
                     $sessionStorageService->setSessionValue(
                         SessionStorageKeys::LAST_ACCESSED_ORDER,
-                        ['orderId' => $orderId, 'accessKey' => $orderAccessKey]
+                        ['orderId' => $order->order->id, 'accessKey' => $orderAccessKey]
                     );
                 }
             } catch (\Exception $e) {
