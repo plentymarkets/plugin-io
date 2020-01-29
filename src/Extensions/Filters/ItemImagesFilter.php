@@ -2,7 +2,7 @@
 
 namespace IO\Extensions\Filters;
 
-use Plenty\Modules\Webshop\Filters\AbstractFilter;
+use IO\Extensions\AbstractFilter;
 
 /**
  * Class ItemImagesFilter

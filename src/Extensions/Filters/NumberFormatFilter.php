@@ -2,10 +2,10 @@
 
 namespace IO\Extensions\Filters;
 
+use IO\Extensions\AbstractFilter;
 use IO\Helper\MemoryCache;
 use IO\Services\TemplateConfigService;
 use Plenty\Modules\Webshop\Contracts\LocalizationRepositoryContract;
-use Plenty\Modules\Webshop\Filters\AbstractFilter;
 use Plenty\Plugin\ConfigRepository;
 
 /**

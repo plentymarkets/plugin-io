@@ -6,13 +6,9 @@ use IO\Extensions\Constants\ShopUrls;
 
 use IO\Extensions\Filters\PropertyNameFilter;
 use IO\Extensions\Functions\GetCdnMetadata;
-use Plenty\Modules\Webshop\Filters\AbstractFilter;
-use Plenty\Modules\Webshop\Filters\ItemImagesFilter;
-use Plenty\Modules\Webshop\Filters\NumberFormatFilter;
 use Plenty\Plugin\Http\Request;
 use Plenty\Plugin\Templates\Extensions\Twig_Extension;
 use Plenty\Plugin\Templates\Factories\TwigFactory;
-
 use IO\Extensions\Filters\AddressOptionTypeFilter;
 use IO\Extensions\Filters\ItemNameFilter;
 use IO\Extensions\Filters\OrderByKeyFilter;
@@ -22,7 +18,6 @@ use IO\Extensions\Filters\ShuffleFilter;
 use IO\Extensions\Filters\SpecialOfferFilter;
 use IO\Extensions\Filters\URLFilter;
 use IO\Extensions\Filters\TabFilter;
-
 use IO\Extensions\Functions\AdditionalResources;
 use IO\Extensions\Functions\Component;
 use IO\Extensions\Functions\ExternalContent;
@@ -52,7 +47,6 @@ class TwigIOExtension extends Twig_Extension
         TwigFactory $twig,
         Request $request,
         PatternFilter $patternFilter,
-        NumberFormatFilter $numberFormatFilter,
         URLFilter $urlFilter,
         GetBasePrice $getBasePrice,
         Component $component,
@@ -62,7 +56,6 @@ class TwigIOExtension extends Twig_Extension
         Partial $partial,
         QueryString $queryString,
         UniqueId $uniqueId,
-        ItemImagesFilter $itemImagesFilter,
         OrderByKeyFilter $orderByKeyFilter,
         ShuffleFilter $shuffleFilter,
         ResultFieldsFilter $resultFieldsFilter,
