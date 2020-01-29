@@ -23,6 +23,9 @@ class ItemImagesFilter extends AbstractFilter
 
     /**
      * @return array
+     *
+     * @deprecated since 5.0.0 will be deleted in 6.0.0
+     * @see \Plenty\Modules\Webshop\Filters\ItemImagesFilter::getFilters()
      */
     public function getFilters(): array
     {
@@ -37,6 +40,9 @@ class ItemImagesFilter extends AbstractFilter
      * @param $images
      * @param string $imageAccessor
      * @return array
+     *
+     * @deprecated since 5.0.0 will be deleted in 6.0.0
+     * @see \Plenty\Modules\Webshop\Filters\ItemImagesFilter::getItemImages()
      */
     public function getItemImages($images, string $imageAccessor = 'url'): array
     {
@@ -55,6 +61,10 @@ class ItemImagesFilter extends AbstractFilter
         return $imageUrls;
     }
 
+   /**
+    * @deprecated since 5.0.0 will be deleted in 6.0.0
+    * @see \Plenty\Modules\Webshop\Filters\ItemImagesFilter::getFirstItemImage()
+    */
     public function getFirstItemImage($images, $imageAccessor = 'url')
     {
         $images = $this->getItemImages($images, $imageAccessor);
@@ -68,6 +78,10 @@ class ItemImagesFilter extends AbstractFilter
         return $itemImage;
     }
 
+    /**
+     * @deprecated since 5.0.0 will be deleted in 6.0.0
+     * @see \Plenty\Modules\Webshop\Filters\ItemImagesFilter::getFirstItemImageUrl()
+     */
     public function getFirstItemImageUrl($images, $imageAccessor = 'url')
     {
         $itemImage = $this->getFirstItemImage($images, $imageAccessor);
