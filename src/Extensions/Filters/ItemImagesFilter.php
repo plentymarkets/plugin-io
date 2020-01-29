@@ -2,11 +2,14 @@
 
 namespace IO\Extensions\Filters;
 
-use IO\Extensions\AbstractFilter;
+use Plenty\Modules\Webshop\Filters\AbstractFilter;
 
 /**
  * Class ItemImagesFilter
+ *
  * @package IO\Extensions\Filters
+ * @deprecated since 5.0.0 will be deleted in 6.0.0
+ * @see \Plenty\Modules\Webshop\Filters\ItemImagesFilter
  */
 class ItemImagesFilter extends AbstractFilter
 {

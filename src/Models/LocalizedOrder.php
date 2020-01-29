@@ -4,7 +4,6 @@ namespace IO\Models;
 
 use IO\Builder\Order\OrderItemType;
 use IO\Builder\Order\OrderType;
-use IO\Extensions\Filters\ItemImagesFilter;
 use IO\Contracts\VariationSearchFactoryContract as VariationSearchFactory;
 use IO\Services\ItemSearch\Helper\ResultFieldTemplate;
 use IO\Services\ItemSearch\Services\ItemSearchService;
@@ -18,6 +17,7 @@ use Plenty\Modules\Order\Property\Models\OrderPropertyType;
 use Plenty\Modules\Frontend\PaymentMethod\Contracts\FrontendPaymentMethodRepositoryContract;
 use Plenty\Modules\Order\Shipping\Contracts\ParcelServicePresetRepositoryContract;
 use IO\Extensions\Filters\URLFilter;
+use Plenty\Modules\Webshop\Filters\ItemImagesFilter;
 use Plenty\Modules\Webshop\Template\Contracts\TemplateConfigRepositoryContract;
 
 class LocalizedOrder extends ModelWrapper

@@ -16,7 +16,6 @@ use IO\Constants\ItemConditionTexts;
 use IO\Constants\Language;
 use IO\Helper\EventDispatcher;
 use IO\Helper\MemoryCache;
-use IO\Extensions\Filters\ItemImagesFilter;
 use IO\Helper\Utils;
 use IO\Services\ItemSearch\SearchPresets\SingleItem;
 use IO\Services\ItemSearch\SearchPresets\VariationList;
@@ -39,6 +38,7 @@ use Plenty\Modules\Item\Unit\Contracts\UnitNameRepositoryContract;
 use Plenty\Modules\Item\UnitCombination\Contracts\UnitCombinationRepositoryContract;
 use Plenty\Modules\Webshop\Contracts\ContactRepositoryContract;
 use Plenty\Modules\Webshop\Contracts\SessionStorageRepositoryContract;
+use Plenty\Modules\Webshop\Filters\ItemImagesFilter;
 use Plenty\Plugin\Application;
 
 

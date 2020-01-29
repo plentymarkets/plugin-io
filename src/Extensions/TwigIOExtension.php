@@ -7,13 +7,13 @@ use IO\Extensions\Constants\ShopUrls;
 use IO\Extensions\Filters\PropertyNameFilter;
 use IO\Extensions\Functions\GetCdnMetadata;
 use Plenty\Modules\Webshop\Filters\AbstractFilter;
+use Plenty\Modules\Webshop\Filters\ItemImagesFilter;
 use Plenty\Modules\Webshop\Filters\NumberFormatFilter;
 use Plenty\Plugin\Http\Request;
 use Plenty\Plugin\Templates\Extensions\Twig_Extension;
 use Plenty\Plugin\Templates\Factories\TwigFactory;
 
 use IO\Extensions\Filters\AddressOptionTypeFilter;
-use IO\Extensions\Filters\ItemImagesFilter;
 use IO\Extensions\Filters\ItemNameFilter;
 use IO\Extensions\Filters\OrderByKeyFilter;
 use IO\Extensions\Filters\PatternFilter;
