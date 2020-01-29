@@ -6,7 +6,6 @@ use IO\Contracts\VariationSearchFactoryContract;
 use IO\Helper\Utils;
 use IO\Services\ItemSearch\Extensions\ItemSearchExtension;
 use IO\Services\ItemSearch\Extensions\SortExtension;
-use IO\Services\ItemSearch\Helper\LoadResultFields;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Collapse\BaseCollapse;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Collapse\InnerHit\BaseInnerHit;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Processor\DocumentInnerHitsToRootProcessor;
@@ -23,6 +22,7 @@ use Plenty\Modules\Item\Search\Aggregations\ItemAttributeValueCardinalityAggrega
 use Plenty\Modules\Item\Search\Aggregations\ItemAttributeValueCardinalityAggregationProcessor;
 use Plenty\Modules\Item\Search\Filter\SearchFilter;
 use Plenty\Modules\Item\Search\Sort\NameSorting;
+use Plenty\Modules\Webshop\ItemSearch\Helper\LoadResultFields;
 use Plenty\Plugin\Log\Loggable;
 
 /**
@@ -63,7 +63,7 @@ class BaseSearchFactory
 
     /** @var MultipleSorting */
     private $sorting = null;
-    
+
     /** @var RandomScore */
     private $randomScoreModifier = null;
 
@@ -450,7 +450,7 @@ class BaseSearchFactory
                 $search->addFilter( $filter );
             }
         }
-    
+
         // ADD RANDOM MODIFIER
         if($this->randomScoreModifier instanceof RandomScore)
         {
@@ -469,7 +469,7 @@ class BaseSearchFactory
         {
             $search->setSorting( $this->sorting );
         }
-        
+
         if ( $this->itemsPerPage < 0 )
         {
             $this->itemsPerPage = 1000;
@@ -515,17 +515,17 @@ class BaseSearchFactory
             $counterAggregationProcessor = pluginApp( ItemAttributeValueCardinalityAggregationProcessor::class );
             $counterAggregation = pluginApp( ItemAttributeValueCardinalityAggregation::class, [$counterAggregationProcessor, $this->collapseField] );
             $this->withAggregation( $counterAggregation );
-            
+
             /** @var BaseInnerHit $innerHit */
             $innerHit = pluginApp(BaseInnerHit::class, ['cheapest']);
             $innerHit->setSorting(pluginApp(SingleSorting::class, ['sorting.price.avg', 'asc']));
             $innerHit->setSource($source);
             $collapse->addInnerHit($innerHit);
-    
+
             /** @var DocumentInnerHitsToRootProcessor $docProcessor */
             $processor = pluginApp(DocumentInnerHitsToRootProcessor::class, [$innerHit->getName()]);
             $search = pluginApp(DocumentSearch::class, [$processor]);
-    
+
             // Group By Item Id
             $search->setCollapse($collapse);
         }
@@ -536,7 +536,7 @@ class BaseSearchFactory
             /** @var DocumentSearch $search */
             $search = pluginApp( DocumentSearch::class, [$processor] );
         }
-    
+
         // ADD MUTATORS
         $mutatorClasses = [];
         foreach( $this->mutators as $mutator )
@@ -552,7 +552,7 @@ class BaseSearchFactory
                 "mutators"      => $mutatorClasses
             ]
         );
-        
+
         return $search;
     }
 

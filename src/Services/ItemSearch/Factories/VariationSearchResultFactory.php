@@ -26,7 +26,7 @@ use IO\Services\ItemSearch\Factories\Faker\TextFaker;
 use IO\Services\ItemSearch\Factories\Faker\UnitFaker;
 use IO\Services\ItemSearch\Factories\Faker\VariationFaker;
 use IO\Services\ItemSearch\Factories\Faker\VariationPropertyFaker;
-use IO\Services\ItemSearch\Helper\LoadResultFields;
+use Plenty\Modules\Webshop\ItemSearch\Helper\LoadResultFields;
 
 
 /**
@@ -72,12 +72,12 @@ class VariationSearchResultFactory
     {
         $resultFields   = is_null($resultFieldsTemplate) ? [] : $this->loadResultFields($resultFieldsTemplate);
         $entries        = [];
-        
+
         if(!count($resultFields))
         {
             $resultFields = array_keys(self::FAKER_MAP);
         }
-        
+
         foreach($resultFields as $resultField)
         {
             if (strpos($resultField,"."))
@@ -151,8 +151,8 @@ class VariationSearchResultFactory
             {
                 $document['data'][$entry] = $this->runFaker($fakerClass, $document['data'][$entry] ?? []);
             }
-            
-            
+
+
         }
 
         foreach(self::MANDATORY_FAKER_MAP as $entry => $fakerClass)
