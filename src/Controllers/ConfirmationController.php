@@ -10,6 +10,8 @@ use IO\Services\CustomerService;
 use IO\Services\OrderService;
 use IO\Models\LocalizedOrder;
 use Plenty\Modules\Category\Models\Category;
+use Plenty\Modules\Order\Contracts\OrderRepositoryContract;
+use Plenty\Modules\Order\Date\Models\OrderDateType;
 use Plenty\Modules\Order\Models\Order;
 use Plenty\Modules\ShopBuilder\Helper\ShopBuilderRequest;
 use Plenty\Modules\Webshop\Contracts\ContactRepositoryContract;
@@ -96,6 +98,17 @@ class ConfirmationController extends LayoutController
                     $order = $orderService->findOrderById($orderId);
                 } else {
                     $order = $customerService->getLatestOrder();
+                }
+
+
+                if ($order instanceof LocalizedOrder) {
+                    /** @var OrderRepositoryContract $orderRepository */
+                    $orderRepository = pluginApp(OrderRepositoryContract::class);
+                    $orderAccessKey = $orderRepository->generateAccessKey($order->order->id);
+                    $sessionStorageRepository->setSessionValue(
+                        SessionStorageRepositoryContract::LAST_ACCESSED_ORDER,
+                        ['orderId' => $order->order->id, 'accessKey' => $orderAccessKey]
+                    );
                 }
             } catch (\Exception $e) {
                 $this->getLogger(__CLASS__)->warning(
