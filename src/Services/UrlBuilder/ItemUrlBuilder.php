@@ -2,12 +2,25 @@
 
 namespace IO\Services\UrlBuilder;
 
-use IO\Contracts\VariationSearchFactoryContract as VariationSearchFactory;
+use Plenty\Modules\Webshop\ItemSearch\Factories\VariationSearchFactory;
 use IO\Helper\Utils;
-use IO\Services\ItemSearch\Services\ItemSearchService;
+use Plenty\Modules\Webshop\ItemSearch\Services\ItemSearchService;
 
+/**
+ * Class ItemUrlBuilder
+ * @package IO\Services\UrlBuilder
+ * @deprecated since 5.0.0 will be removed in 6.0.0
+ * @see \Plenty\Modules\Webshop\Contracts\ItemUrlBuilderRepositoryContract
+ */
 class ItemUrlBuilder
 {
+    /**
+     * @param int $itemId
+     * @param string|null $lang
+     * @return UrlQuery|mixed
+     * @deprecated since 5.0.0 will be removed in 6.0.0
+     * @see \Plenty\Modules\Webshop\Contracts\ItemUrlBuilderRepositoryContract::buildUrl()
+     */
     public function buildUrl(int $itemId, string $lang = null )
     {
         if ( $lang === null )

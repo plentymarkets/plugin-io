@@ -3,7 +3,7 @@
 namespace IO\Tests\Services;
 
 use Mockery;
-use IO\Services\UrlBuilder\UrlQuery;
+use Plenty\Modules\Webshop\Helpers\UrlQuery;
 use IO\Tests\TestCase;
 use Plenty\Plugin\ConfigRepository;
 

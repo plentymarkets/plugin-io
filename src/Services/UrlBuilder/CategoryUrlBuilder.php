@@ -7,10 +7,24 @@ use IO\Services\CategoryService;
 use Plenty\Modules\Webshop\Contracts\WebstoreConfigurationRepositoryContract;
 use Plenty\Plugin\Log\Loggable;
 
+/**
+ * Class CategoryUrlBuilder
+ * @package IO\Services\UrlBuilder
+ * @deprecated since 5.0.0 will be removed in 6.0.0
+ * @see \Plenty\Modules\Webshop\Contracts\CategoryUrlBuilderRepositoryContract
+ */
 class CategoryUrlBuilder
 {
     use Loggable;
 
+    /**
+     * @param int $categoryId
+     * @param string|null $lang
+     * @param int|null $webstoreId
+     * @return UrlQuery
+     * @deprecated since 5.0.0 will be removed in 6.0.0
+     * @see \Plenty\Modules\Webshop\Contracts\CategoryUrlBuilderRepositoryContract::buildUrl()
+     */
     public function buildUrl(int $categoryId, string $lang = null, int $webstoreId = null): UrlQuery
     {
         if ($lang === null) {

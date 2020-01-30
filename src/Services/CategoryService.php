@@ -9,7 +9,7 @@ use IO\Helper\CategoryDataFilter;
 use IO\Helper\MemoryCache;
 use IO\Helper\Utils;
 use IO\Services\ItemSearch\Helper\ResultFieldTemplate;
-use IO\Services\UrlBuilder\UrlQuery;
+use Plenty\Modules\Webshop\Helpers\UrlQuery;
 use Plenty\Modules\Category\Models\Category;
 use Plenty\Modules\Category\Contracts\CategoryRepositoryContract;
 use Plenty\Modules\Category\Models\CategoryClient;

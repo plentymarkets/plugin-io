@@ -1,9 +1,10 @@
-<?php //strict
+<?php
+
 namespace IO\Controllers;
 
 use IO\Extensions\Constants\ShopUrls;
 use IO\Helper\RouteConfig;
-use IO\Services\UrlBuilder\UrlQuery;
+use Plenty\Modules\Webshop\Helpers\UrlQuery;
 
 /**
  * Class ConfirmationEmailController

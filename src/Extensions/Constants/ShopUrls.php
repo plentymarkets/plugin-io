@@ -7,7 +7,7 @@ use IO\Helper\RouteConfig;
 use IO\Helper\Utils;
 use IO\Services\CategoryService;
 use IO\Services\OrderTrackingService;
-use IO\Services\UrlBuilder\CategoryUrlBuilder;
+use Plenty\Modules\Webshop\Contracts\CategoryUrlBuilderRepositoryContract;
 use IO\Services\UrlBuilder\UrlQuery;
 use Plenty\Modules\Authorization\Services\AuthHelper;
 use Plenty\Modules\Frontend\Events\FrontendLanguageChanged;
@@ -186,11 +186,11 @@ class ShopUrls
                     $category = $categoryService->get($categoryId);
 
                     if ($category !== null) {
-                        /** @var CategoryUrlBuilder $categoryUrlBuilder */
-                        $categoryUrlBuilder = pluginApp(CategoryUrlBuilder::class);
+                        /** @var CategoryUrlBuilderRepositoryContract $categoryUrlBuilderRepository */
+                        $categoryUrlBuilderRepository = pluginApp(CategoryUrlBuilderRepositoryContract::class);
 
                         return $this->applyParams(
-                            $categoryUrlBuilder->buildUrl($category->id),
+                            $categoryUrlBuilderRepository->buildUrl($category->id),
                             $routeParams,
                             $urlParams
                         );

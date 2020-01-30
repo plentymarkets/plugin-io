@@ -14,6 +14,12 @@ use Plenty\Modules\Item\VariationDescription\Contracts\VariationDescriptionRepos
 use Plenty\Modules\Webshop\Contracts\WebstoreConfigurationRepositoryContract;
 use Plenty\Plugin\Log\Loggable;
 
+/**
+ * Class VariationUrlBuilder
+ * @package IO\Services\UrlBuilder
+ * @deprecated since 5.0.0 will be removed in 6.0.0
+ * @see \Plenty\Modules\Webshop\Contracts\VariationUrlBuilderRepositoryContract
+ */
 class VariationUrlBuilder
 {
     use Loggable;
@@ -21,6 +27,11 @@ class VariationUrlBuilder
     public static $urlPathMap;
     public static $requestedItems;
 
+    /**
+     * @param array $itemData
+     * @deprecated since 5.0.0 will be removed in 6.0.0
+     * @see \Plenty\Modules\Webshop\Contracts\VariationUrlBuilderRepositoryContract::fillItemUrl()
+     */
     public static function fillItemUrl($itemData): void
     {
         $itemId = $itemData['item']['id'];
@@ -64,6 +75,8 @@ class VariationUrlBuilder
      * @param int $variationId
      * @param string|null $lang
      * @return UrlQuery
+     * @deprecated since 5.0.0 will be removed in 6.0.0
+     * @see \Plenty\Modules\Webshop\Contracts\VariationUrlBuilderRepositoryContract::buildUrl()
      */
     public function buildUrl(int $itemId, int $variationId, string $lang = null): UrlQuery
     {
@@ -151,6 +164,8 @@ class VariationUrlBuilder
      * @param int $variationId
      * @param bool $withVariationId
      * @return string
+     * @deprecated since 5.0.0 will be removed in 6.0.0
+     * @see \Plenty\Modules\Webshop\Contracts\VariationUrlBuilderRepositoryContract::getSuffix()
      */
     public function getSuffix($itemId, $variationId, $withVariationId = true): string
     {
