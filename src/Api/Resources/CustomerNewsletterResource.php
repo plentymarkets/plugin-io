@@ -27,7 +27,7 @@ class CustomerNewsletterResource extends ApiResource
      */
     public function store(): Response
     {
-        // Make an early exit in case of triggering the honeypot
+        // Honeypot check
         if($this->request->get('phone') !== '')
         {
             // We can potentially expand on the honeypot handling with sending reports to spam protect services
@@ -52,6 +52,12 @@ class CustomerNewsletterResource extends ApiResource
      */
     public function destroy(string $selector): Response
     {
+        // Honeypot check
+        if($this->request->get('firstName') !== '')
+        {
+            return $this->response->create(true, ResponseCode::OK);
+        }
+
         $emailFolder = $this->request->get('emailFolder', 0);
 
         $success = $this->newsletterService->deleteNewsletterDataByEmail($selector, (int) $emailFolder);
