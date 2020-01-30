@@ -2,11 +2,11 @@
 
 namespace IO\Services;
 
-use IO\Contracts\SortingContract as SortingHelper;
 use IO\Services\ItemSearch\SearchPresets\LiveShoppingItems;
 use IO\Services\ItemSearch\Services\ItemSearchService;
 use Plenty\Modules\LiveShopping\Contracts\LiveShoppingRepositoryContract;
 use Plenty\Modules\LiveShopping\Models\LiveShopping;
+use Plenty\Modules\Webshop\ItemSearch\Helper\SortingHelper;
 
 /**
  * Class LiveShoppingService
@@ -58,7 +58,7 @@ class LiveShoppingService
 
     public function getLiveShoppingVariations($itemId, $sorting)
     {
-        /** @var SortingContract $sortingHelper */
+        /** @var SortingHelper $sortingHelper */
         $sortingHelper = pluginApp(SortingHelper::class);
 
         $itemSearchOptions = [

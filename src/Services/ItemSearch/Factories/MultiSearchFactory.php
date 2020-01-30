@@ -2,7 +2,6 @@
 
 namespace IO\Services\ItemSearch\Factories;
 
-use IO\Contracts\MultiSearchFactoryContract;
 use IO\Services\ItemSearch\Extensions\ItemSearchExtension;
 use IO\Services\ItemSearch\Helper\FacetExtensionContainer;
 use IO\Services\TemplateService;
@@ -20,7 +19,7 @@ use Plenty\Plugin\Log\Loggable;
  * @deprecated since 5.0.0 will be deleted in 6.0.0
  * @see \Plenty\Modules\Webshop\ItemSearch\Factories\MultiSearchFactory
  */
-class MultiSearchFactory implements MultiSearchFactoryContract
+class MultiSearchFactory
 {
     use Loggable;
 
@@ -88,7 +87,7 @@ class MultiSearchFactory implements MultiSearchFactoryContract
                     $secondarySearch->setName( $resultName . "__" . $i );
                     $secondarySearches[] = $secondarySearch;
                 }
-    
+
                 $this->extensions[$resultName][] = $extension;
             }
 
@@ -179,11 +178,11 @@ class MultiSearchFactory implements MultiSearchFactoryContract
                 $results[$searchName] = $result;
             }
         }
-    
+
         /** @var FacetExtensionContainer $facetExtensionContainer */
         $facetExtensionContainer = pluginApp(FacetExtensionContainer::class);
         $facetExtensions = $facetExtensionContainer->getFacetExtensions();
-    
+
         if(isset($results['facets']) && count($facetExtensions))
         {
             foreach($results as $searchName => $searchData)

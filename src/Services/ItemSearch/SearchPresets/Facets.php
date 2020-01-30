@@ -2,7 +2,7 @@
 
 namespace IO\Services\ItemSearch\SearchPresets;
 
-use IO\Contracts\FacetSearchFactoryContract;
+use Plenty\Modules\Webshop\ItemSearch\Factories\FacetSearchFactory;
 
 /**
  * Class Facets
@@ -26,8 +26,8 @@ class Facets implements SearchPreset
      */
     public static function getSearchFactory($options)
     {
-        /** @var FacetSearchFactoryContract $searchFactory */
-        $searchFactory = pluginApp(FacetSearchFactoryContract::class)->create( $options['facets'] );
+        /** @var FacetSearchFactory $searchFactory */
+        $searchFactory = pluginApp(FacetSearchFactory::class)->create( $options['facets'] );
         $searchFactory
             ->withMinimumCount()
             ->isVisibleForClient()

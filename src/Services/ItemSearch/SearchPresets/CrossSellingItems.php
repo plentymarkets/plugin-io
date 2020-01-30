@@ -4,9 +4,9 @@ namespace IO\Services\ItemSearch\SearchPresets;
 
 use IO\Services\CategoryService;
 use IO\Services\ItemCrossSellingService;
-use IO\Contracts\VariationSearchFactoryContract as VariationSearchFactory;
 use IO\Services\ItemSearch\Helper\ResultFieldTemplate;
-use IO\Contracts\SortingContract as SortingHelper;
+use Plenty\Modules\Webshop\ItemSearch\Factories\VariationSearchFactory;
+use Plenty\Modules\Webshop\ItemSearch\Helper\SortingHelper;
 
 /**
  * Class CrossSellingItems
@@ -46,10 +46,10 @@ class CrossSellingItems implements SearchPreset
         {
             $relation = $crossSellingService->getType();
         }
-    
-        /** @var SortingContract $sortingHelper */
+
+        /** @var SortingHelper $sortingHelper */
         $sortingHelper = pluginApp(SortingHelper::class);
-        
+
         if(is_null($sorting))
         {
             $sorting = $sortingHelper->splitPathAndOrder($crossSellingService->getSorting());
@@ -63,7 +63,7 @@ class CrossSellingItems implements SearchPreset
         $searchFactory->withResultFields(
                 ResultFieldTemplate::load( ResultFieldTemplate::TEMPLATE_LIST_ITEM )
             );
-        
+
         $searchFactory
             ->withLanguage()
             ->withUrls()

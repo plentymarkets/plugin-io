@@ -2,9 +2,9 @@
 
 namespace IO\Services\ItemSearch\SearchPresets;
 
-use IO\Contracts\VariationSearchFactoryContract as VariationSearchFactory;
 use IO\Services\ItemSearch\Helper\ResultFieldTemplate;
-use IO\Contracts\SortingContract as SortingHelper;
+use Plenty\Modules\Webshop\ItemSearch\Factories\VariationSearchFactory;
+use Plenty\Modules\Webshop\ItemSearch\Helper\SortingHelper;
 
 /**
  * Class VariationList
@@ -43,7 +43,7 @@ class VariationList implements SearchPreset
         $searchFactory->withResultFields(
             ResultFieldTemplate::load( ResultFieldTemplate::TEMPLATE_LIST_ITEM )
         );
-        
+
         $searchFactory
             ->withImages()
             ->withPrices()
@@ -74,7 +74,7 @@ class VariationList implements SearchPreset
             }
             else
             {
-                /** @var SortingContract $sortingHelper */
+                /** @var SortingHelper $sortingHelper */
                 $sortingHelper = pluginApp(SortingHelper::class);
                 $sorting = $sortingHelper->getSearchSorting( $options['sorting'] );
                 $searchFactory->sortByMultiple( $sorting );

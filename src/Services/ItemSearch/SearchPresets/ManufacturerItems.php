@@ -2,8 +2,8 @@
 
 namespace IO\Services\ItemSearch\SearchPresets;
 
-use IO\Contracts\VariationSearchFactoryContract as VariationSearchFactory;
-use IO\Contracts\SortingContract as SortingHelper;
+use Plenty\Modules\Webshop\ItemSearch\Factories\VariationSearchFactory;
+use Plenty\Modules\Webshop\ItemSearch\Helper\SortingHelper;
 
 /**
  * Class ManufacturerItems
@@ -23,11 +23,11 @@ class ManufacturerItems implements SearchPreset
         {
             $page = (int) $options['page'];
         }
-       
+
         $sorting = '';
         if ( array_key_exists( 'sorting', $options ) )
         {
-            /** @var SortingContract $sortingHelper */
+            /** @var SortingHelper $sortingHelper */
             $sortingHelper = pluginApp(SortingHelper::class);
             $sorting = $sortingHelper->getSorting( $options['sorting'] );
         }

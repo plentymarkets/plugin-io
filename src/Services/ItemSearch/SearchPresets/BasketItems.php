@@ -2,8 +2,8 @@
 
 namespace IO\Services\ItemSearch\SearchPresets;
 
-use IO\Contracts\VariationSearchFactoryContract as VariationSearchFactory;
 use IO\Services\ItemSearch\Helper\ResultFieldTemplate;
+use Plenty\Modules\Webshop\ItemSearch\Factories\VariationSearchFactory;
 
 /**
  * Class BasketItems

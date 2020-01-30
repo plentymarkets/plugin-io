@@ -2,9 +2,9 @@
 
 namespace IO\Services\ItemSearch\SearchPresets;
 
-use IO\SerivVariationSearchFactory;
 use IO\Services\ItemSearch\Helper\ResultFieldTemplate;
-use IO\Contracts\SortingContract as SortingHelper;
+use Plenty\Modules\Webshop\ItemSearch\Factories\VariationSearchFactory;
+use Plenty\Modules\Webshop\ItemSearch\Helper\SortingHelper;
 
 /**
  * Class CategoryItems
@@ -33,7 +33,7 @@ class CategoryItems implements SearchPreset
     {
         $categoryId     = $options['categoryId'];
         $facets         = $options['facets'];
-        
+
         /** @var SortingHelper $sortingHelper */
         $sortingHelper = pluginApp(SortingHelper::class);
         $sorting        = $sortingHelper->getCategorySorting( $options['sorting'] );

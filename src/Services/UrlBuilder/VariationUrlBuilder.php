@@ -3,7 +3,6 @@
 namespace IO\Services\UrlBuilder;
 
 use IO\Helper\StringUtils;
-use IO\Contracts\VariationSearchFactoryContract as VariationSearchFactory;
 use IO\Helper\Utils;
 use IO\Services\CategoryService;
 use IO\Services\ItemSearch\Services\ItemSearchService;
@@ -12,6 +11,7 @@ use Plenty\Log\Contracts\LoggerContract;
 use Plenty\Modules\Authorization\Services\AuthHelper;
 use Plenty\Modules\Item\VariationDescription\Contracts\VariationDescriptionRepositoryContract;
 use Plenty\Modules\Webshop\Contracts\WebstoreConfigurationRepositoryContract;
+use Plenty\Modules\Webshop\ItemSearch\Factories\VariationSearchFactory;
 use Plenty\Plugin\Log\Loggable;
 
 /**

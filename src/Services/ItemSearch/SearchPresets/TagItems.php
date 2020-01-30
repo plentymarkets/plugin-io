@@ -2,7 +2,7 @@
 
 namespace IO\Services\ItemSearch\SearchPresets;
 
-use IO\Contracts\VariationSearchFactoryContract as VariationSearchFactory;
+use Plenty\Modules\Webshop\ItemSearch\Factories\VariationSearchFactory;
 
 /**
  * Class TagItems
@@ -28,7 +28,7 @@ class TagItems extends VariationList
         {
             $tagIds = $options['tagIds'];
         }
-        
+
         /** @var VariationSearchFactory $factory */
         $factory = parent::getSearchFactory($options)
             ->hasAnyTag($tagIds)

@@ -2,9 +2,8 @@
 
 namespace IO\Services\ItemSearch\SearchPresets;
 
-use IO\Contracts\VariationSearchFactoryContract as VariationSearchFactory;
 use IO\Services\ItemSearch\Helper\ResultFieldTemplate;
-use IO\Services\TemplateConfigService;
+use Plenty\Modules\Webshop\ItemSearch\Factories\VariationSearchFactory;
 
 /**
  * Class SingleItem
@@ -65,7 +64,7 @@ class SingleItem implements SearchPreset
         }
         else
         {
-            $searchFactory->groupByTemplateConfig('ids.itemId');
+            $searchFactory->groupByTemplateConfig();
         }
 
         if ( array_key_exists( 'setCategory', $options ) && $options['setCategory'] === true )

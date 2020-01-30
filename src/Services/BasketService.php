@@ -17,7 +17,6 @@ use Plenty\Modules\Basket\Models\Basket;
 use Plenty\Modules\Basket\Models\BasketItem;
 use Plenty\Modules\Frontend\Contracts\Checkout;
 use Plenty\Modules\Frontend\Services\VatService;
-use IO\Contracts\VariationSearchFactoryContract as VariationSearchFactory;
 use IO\Constants\LogLevel;
 use Plenty\Modules\Item\Variation\Contracts\VariationRepositoryContract;
 use Plenty\Modules\Item\Variation\Models\Variation;
@@ -28,6 +27,7 @@ use Plenty\Modules\Webshop\Contracts\CheckoutRepositoryContract;
 use Plenty\Modules\Webshop\Contracts\ContactRepositoryContract;
 use Plenty\Modules\Webshop\Contracts\UnitRepositoryContract;
 use Plenty\Modules\Webshop\Contracts\WebstoreConfigurationRepositoryContract;
+use Plenty\Modules\Webshop\ItemSearch\Factories\VariationSearchFactory;
 use Plenty\Plugin\Log\Loggable;
 
 /**

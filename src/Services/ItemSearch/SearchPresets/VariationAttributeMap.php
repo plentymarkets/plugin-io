@@ -2,8 +2,8 @@
 
 namespace IO\Services\ItemSearch\SearchPresets;
 
-use IO\Contracts\VariationSearchFactoryContract as VariationSearchFactory;
 use IO\Services\ItemSearch\Helper\ResultFieldTemplate;
+use Plenty\Modules\Webshop\ItemSearch\Factories\VariationSearchFactory;
 
 /**
  * Class VariationAttributeMap
@@ -20,11 +20,11 @@ class VariationAttributeMap implements SearchPreset
     {
         /** @var VariationSearchFactory $searchFactory */
         $searchFactory = pluginApp( VariationSearchFactory::class );
-        
+
         $searchFactory->withResultFields(
             ResultFieldTemplate::load( ResultFieldTemplate::TEMPLATE_VARIATION_ATTRIBUTE_MAP )
         );
-        
+
         $searchFactory
             ->withAttributes()
             ->withLanguage()
@@ -41,7 +41,7 @@ class VariationAttributeMap implements SearchPreset
         {
             $searchFactory->hasItemId($options['itemId']);
         }
-        
+
         return $searchFactory;
     }
 }
