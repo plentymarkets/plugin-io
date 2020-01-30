@@ -2,11 +2,9 @@
 
 namespace IO\Services\ItemSearch\Services;
 
-use IO\Contracts\MultiSearchFactoryContract;
 use IO\Helper\DefaultSearchResult;
 use IO\Services\ItemSearch\Factories\BaseSearchFactory;
 use IO\Services\ItemSearch\Factories\MultiSearchFactory;
-use IO\Services\TemplateService;
 use Plenty\Plugin\Log\Loggable;
 
 /**
@@ -33,7 +31,7 @@ class ItemSearchService
     public function getResults( $searches )
     {
         /** @var MultiSearchFactory $multiSearchFactory */
-        $multiSearchFactory = pluginApp( MultiSearchFactoryContract::class );
+        $multiSearchFactory = pluginApp( MultiSearchFactory::class );
 
         if ( is_array( $searches ) )
         {

@@ -61,7 +61,7 @@ class MultiSearchFactory
      * @param string            $resultName     An unique name for the search. Results of this search will be accessible by this key.
      * @param BaseSearchFactory $searchBuilder  A search factory
      *
-     * @return MultiSearchFactory
+     * @return $this
      *
      * @deprecated since 5.0.0 will be deleted in 6.0.0
      * @see \Plenty\Modules\Webshop\ItemSearch\Factories\MultiSearchFactory::addSearch()
@@ -70,7 +70,6 @@ class MultiSearchFactory
     {
         if ( !array_key_exists( $resultName, $this->searches ) )
         {
-            /** @var DocumentSearch $search */
             $search = $searchBuilder->build();
             $search->setName( $resultName );
 
@@ -80,7 +79,13 @@ class MultiSearchFactory
             {
                 $extension = pluginApp($extensionContainer['class'], $extensionContainer['params']);
                 // collect secondary searches required by registered extensions
-                $secondarySearch = $extension->getSearch( $searchBuilder );
+
+                $secondarySearch = null;
+                if($extension instanceof ItemSearchExtension)
+                {
+                    $secondarySearch = $extension->getSearch( $searchBuilder );
+                }
+
                 if ( $secondarySearch !== null )
                 {
                     $secondarySearch = $secondarySearch->build();

@@ -2,7 +2,6 @@
 
 namespace IO\Services\ItemSearch\Factories;
 
-use IO\Contracts\VariationSearchFactoryContract;
 use IO\Helper\CurrencyConverter;
 use IO\Helper\Utils;
 use IO\Helper\VatConverter;
@@ -51,7 +50,7 @@ use Plenty\Plugin\Application;
  * @deprecated since 5.0.0 will be deleted in 6.0.0
  * @see \Plenty\Modules\Webshop\ItemSearch\Factories\VariationSearchFactory
  */
-class VariationSearchFactory extends BaseSearchFactory implements VariationSearchFactoryContract
+class VariationSearchFactory extends BaseSearchFactory
 {
     private $isAdminPreview = false;
 
