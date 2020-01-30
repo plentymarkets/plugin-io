@@ -29,22 +29,22 @@ class OrderTotalsService
      */
     public function getAllTotals(Order $order)
     {
-        $itemSumGross       = 0;
-        $itemSumNet         = 0;
-        $shippingGross      = 0;
-        $shippingNet        = 0;
-        $vats               = [];
-        $couponValue        = 0;
-        $couponCode         = '';
-        $openAmount         = 0;
-        $couponType         = '';
-        $amountId           = $this->getCustomerAmountId($order->amounts);
-        $totalNet           = $order->amounts[$amountId]->netTotal;
-        $totalGross         = $order->amounts[$amountId]->grossTotal;
-        $currency           = $order->amounts[$amountId]->currency;
-        $isNet              = $order->amounts[$amountId]->isNet;
+        $itemSumGross = 0;
+        $itemSumNet = 0;
+        $shippingGross = 0;
+        $shippingNet = 0;
+        $vats = [];
+        $couponValue = 0;
+        $couponCode = '';
+        $openAmount = 0;
+        $couponType = '';
+        $amountId = $this->getCustomerAmountId($order->amounts);
+        $totalNet = $order->amounts[$amountId]->netTotal;
+        $totalGross = $order->amounts[$amountId]->grossTotal;
+        $currency = $order->amounts[$amountId]->currency;
+        $isNet = $order->amounts[$amountId]->isNet;
         $itemSumRebateGross = 0;
-        $itemSumRebateNet   = 0;
+        $itemSumRebateNet = 0;
 
         $orderItems = $order->orderItems;
 
@@ -72,8 +72,10 @@ class OrderTotalsService
                     $shippingGross += $firstAmount->priceGross;
                     $shippingNet += $firstAmount->priceNet;
 
-                    if ((bool)$accountSettings->showShippingVat && $euCountryCodesServiceContract->isExportDelivery($order->deliveryAddress->countryId, $item->countryVatId))
-                    {
+                    if ((bool)$accountSettings->showShippingVat && $euCountryCodesServiceContract->isExportDelivery(
+                            $order->deliveryAddress->countryId,
+                            $item->countryVatId
+                        )) {
                         $shippingNet = $shippingGross;
                     }
                     break;
@@ -81,22 +83,18 @@ class OrderTotalsService
                 case OrderItemType::GIFT_CARD:
                     $couponType = $item->typeId;
                     $couponValue += $firstAmount->priceGross;
-                    $itemNameArray = explode(' ', $item->orderItemName);
-                    $couponCode =  end($itemNameArray);
+                    $itemNameArray = explode(' ', rtrim($item->orderItemName));
+                    $couponCode = end($itemNameArray);
                     break;
                 default:
                     // noop
             }
 
-            if ( $firstAmount->discount > 0 )
-            {
-                if ($firstAmount->isPercentage)
-                {
+            if ($firstAmount->discount > 0) {
+                if ($firstAmount->isPercentage) {
                     $itemSumRebateGross += $item->quantity * $firstAmount->priceOriginalGross * $firstAmount->discount / 100;
-                    $itemSumRebateNet   += $item->quantity * $firstAmount->priceOriginalNet * $firstAmount->discount / 100;
-                }
-                else
-                {
+                    $itemSumRebateNet += $item->quantity * $firstAmount->priceOriginalNet * $firstAmount->discount / 100;
+                } else {
                     $itemSumRebateGross += $item->quantity * $firstAmount->discount;
                 }
             }
@@ -109,18 +107,15 @@ class OrderTotalsService
             ];
         }
 
-        if ( $isNet )
-        {
-            $itemSumGross   = $itemSumNet;
-            $totalGross     = $totalNet;
+        if ($isNet) {
+            $itemSumGross = $itemSumNet;
+            $totalGross = $totalNet;
         }
 
-        if($couponType == OrderItemType::GIFT_CARD)
-        {
+        if ($couponType == OrderItemType::GIFT_CARD) {
             $couponType = 'sales';
             $openAmount = $totalGross + $couponValue;
-        }elseif($couponType == OrderItemType::PROMOTIONAL_COUPON)
-        {
+        } elseif ($couponType == OrderItemType::PROMOTIONAL_COUPON) {
             $couponType = 'promotional';
         }
 
@@ -143,12 +138,10 @@ class OrderTotalsService
         );
     }
 
-    private function getCustomerAmountId( $amounts )
+    private function getCustomerAmountId($amounts)
     {
-        foreach( $amounts as $index => $amount )
-        {
-            if ( !$amount->isSystemCurrency )
-            {
+        foreach ($amounts as $index => $amount) {
+            if (!$amount->isSystemCurrency) {
                 return $index;
             }
         }
@@ -156,15 +149,13 @@ class OrderTotalsService
         return 0;
     }
 
-    public function highlightNetPrices(Order $order):bool
+    public function highlightNetPrices(Order $order): bool
     {
         $isOrderNet = $order->amounts[0]->isNet;
 
         $orderContactId = 0;
-        foreach ($order->relations as $relation)
-        {
-            if ($relation['referenceType'] == 'contact' && (int)$relation['referenceId'] > 0)
-            {
+        foreach ($order->relations as $relation) {
+            if ($relation['referenceType'] === 'contact' && (int)$relation['referenceId'] > 0) {
                 $orderContactId = $relation['referenceId'];
             }
         }
