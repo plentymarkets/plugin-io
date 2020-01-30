@@ -127,7 +127,7 @@ class PriceDetectService
      */
     public function getPriceIdsForCustomer()
     {
-        $accountType = $this->accountType;
+        $accountType = $this->singleAccess;
         $shippingCountryId = $this->shippingCountryId;
         $currency = $this->currency;
         $customerClassId = $this->classId;
