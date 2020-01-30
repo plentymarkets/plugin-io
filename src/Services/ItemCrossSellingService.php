@@ -24,7 +24,7 @@ class ItemCrossSellingService
 
     /**
      * ItemLastSeenService constructor.
-     * @param SessionStorageRepositoryContract $sessionStorage
+     * @param SessionStorageRepositoryContract $sessionStorageRepository
      * @param TemplateConfigRepositoryContract $templateConfigRepository
      * @param SortingHelper $sortingHelper
      */

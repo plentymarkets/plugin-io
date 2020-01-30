@@ -12,10 +12,8 @@ use Plenty\Modules\Webshop\Contracts\SessionStorageRepositoryContract;
  */
 class NotificationService
 {
-    /**
-     * @var SessionStorageService
-     */
-    private $sessionStorageService;
+    /** @var SessionStorageRepositoryContract */
+    private $sessionStorageRepository;
 
     /**
      * BasketService constructor.

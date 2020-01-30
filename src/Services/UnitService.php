@@ -63,7 +63,7 @@ class UnitService
      */
 	public function getUnitById(int $unitId, string $lang = "de"):UnitName
 	{
-		return $this->unitRepository->getUnitById();
+		return $this->unitRepository->getUnitById($unitId, $lang);
 	}
 
     /**

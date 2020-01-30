@@ -116,7 +116,7 @@ class CustomerService
      */
     public function getContactClassData($contactClassId)
     {
-        return $this->contactRepository->getContactClassData();
+        return $this->contactRepository->getContactClassData($contactClassId);
     }
 
     /**

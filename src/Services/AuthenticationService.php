@@ -2,6 +2,7 @@
 
 namespace IO\Services;
 
+use Plenty\Modules\Account\Contact\Contracts\ContactRepositoryContract as CoreContactRepositoryContract;
 use Plenty\Modules\Webshop\Contracts\ContactRepositoryContract;
 use Plenty\Modules\Account\Contact\Models\Contact;
 use Plenty\Modules\Authentication\Contracts\ContactAuthenticationRepositoryContract;
@@ -58,8 +59,8 @@ class AuthenticationService
         $this->contactAuthRepository->authenticateWithContactEmail($email, $password);
         $this->sessionStorageRepository->setSessionValue(SessionStorageRepositoryContract::GUEST_WISHLIST_MIGRATION, true);
 
-        /** @var ContactRepositoryContract $contactRepository */
-        $contactRepository = pluginApp(ContactRepositoryContract::class);
+        /** @var CoreContactRepositoryContract $contactRepository */
+        $contactRepository = pluginApp(CoreContactRepositoryContract::class);
 
         return $contactRepository->getContactIdByEmail($email);
     }

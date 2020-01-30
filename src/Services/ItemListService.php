@@ -81,15 +81,15 @@ class ItemListService
                 ]);
                 break;
             case self::TYPE_CROSS_SELLER:
-                if(!isset($itemId) || !strlen($itemId)) {
+                if(!isset($id) || !strlen($id)) {
                     /** @var CategoryService $categoryService */
-                    $categoryService = app(CategoryService::class);
+                    $categoryService = pluginApp(CategoryService::class);
 
                     $currentItem = $categoryService->getCurrentItem();
                     $id = $currentItem['item']['id'] ?? 0;
                 }
                 $searchFactory = CrossSellingItems::getSearchFactory([
-                    'itemId' => $id ,
+                    'itemId' => $id,
                     'relation' => $crossSellingRelationType,
                     'sorting' => $sorting
                 ]);
