@@ -4,7 +4,7 @@ namespace IO\Models;
 
 use IO\Builder\Order\OrderItemType;
 use IO\Builder\Order\OrderType;
-use IO\Contracts\VariationSearchFactoryContract as VariationSearchFactory;
+use Plenty\Modules\Webshop\ItemSearch\Factories\VariationSearchFactory;
 use IO\Services\ItemSearch\Helper\ResultFieldTemplate;
 use IO\Services\ItemSearch\Services\ItemSearchService;
 use IO\Services\OrderService;
