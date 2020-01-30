@@ -67,8 +67,12 @@ class PlaceOrderController extends LayoutController
             $deliveryAddressId = $basketService->getDeliveryAddressId();
             if (!is_null($deliveryAddressId)) {
                 $deliveryAddressData = $customerService->getAddress($deliveryAddressId, AddressType::DELIVERY);
-                $val = pluginApp(ValidateVatNumber::class, [$deliveryAddressData['vatNumber']]);
-                $eventDispatcher->fire($val);
+                $vatOption = $deliveryAddressData->options->where('typeId', AddressOption::TYPE_VAT_NUMBER)->first();
+                if(!is_null($vatOption))
+                {
+                    $val = pluginApp(ValidateVatNumber::class, [$vatOption->value]);
+                    $eventDispatcher->fire($val);
+                }
             }
         } catch (\Exception $exception) {
             return $this->handlePlaceOrderException($exception);
