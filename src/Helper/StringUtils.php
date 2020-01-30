@@ -2,8 +2,6 @@
 
 namespace IO\Helper;
 
-use Plenty\Modules\Webshop\Helpers\StringUtils as NewStringUtils;
-
 /**
  * Class StringUtils
  * @package IO\Helper
@@ -20,6 +18,6 @@ class StringUtils
      */
     public static function string4URL( $n )
     {
-        return NewStringUtils::string4URL($n);
+        return \Plenty\Modules\Webshop\Helpers\StringUtils::string4URL($n);
     }
 }
