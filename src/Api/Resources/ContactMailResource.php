@@ -22,7 +22,7 @@ class ContactMailResource extends ApiResource
     private $contactMailService;
 
     private $templateConfigService;
-    
+
     /**
      * ContactMailResource constructor.
      * @param Request $request
@@ -38,9 +38,16 @@ class ContactMailResource extends ApiResource
         $this->contactMailService = $contactMailService;
         $this->templateConfigService = $templateConfigService;
     }
-    
+
     public function store():Response
     {
+        // Honeypot check
+
+        if($this->request->get('data')['phone-number']['value']!== '')
+        {
+            return $this->response->create(true, ResponseCode::OK);
+        }
+
         $mailTemplate = TemplateContainer::get('tpl.mail.contact')->getTemplate();
 
         if( !ReCaptcha::verify($this->request->get('recaptchaToken', null)) )
@@ -61,7 +68,7 @@ class ContactMailResource extends ApiResource
         {
             return $this->response->create($response, ResponseCode::BAD_REQUEST);
         }
-        
+
     }
 
     public function verifyRecaptcha( $secret, $token )
