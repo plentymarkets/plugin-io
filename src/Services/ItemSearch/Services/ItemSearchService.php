@@ -37,7 +37,10 @@ class ItemSearchService
         {
             foreach( $searches as $resultName => $search )
             {
-                $multiSearchFactory->addSearch( $resultName, $search );
+                if($search instanceof BaseSearchFactory)
+                {
+                    $multiSearchFactory->addSearch( $resultName, $search );
+                }
             }
             $results = $multiSearchFactory->getResults();
 
