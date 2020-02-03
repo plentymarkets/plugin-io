@@ -18,7 +18,6 @@ use IO\Services\ItemSearch\Extensions\ReduceDataExtension;
 use IO\Services\ItemSearch\Extensions\TagExtension;
 use IO\Services\ItemSearch\Extensions\VariationAttributeMapExtension;
 use IO\Services\ItemSearch\Extensions\VariationPropertyExtension;
-use IO\Services\ItemSearch\Helper\FacetExtensionContainer;
 use IO\Services\ItemSearch\Mutators\OrderPropertySelectionValueMutator;
 use IO\Services\PriceDetectService;
 use IO\Services\TemplateConfigService;
@@ -39,6 +38,7 @@ use Plenty\Modules\Item\Search\Mutators\ImageDomainMutator;
 use Plenty\Modules\Item\Search\Mutators\ImageMutator;
 use Plenty\Modules\Item\Search\Mutators\VariationPropertyGroupMutator;
 use Plenty\Modules\Webshop\Contracts\PriceDetectRepositoryContract;
+use Plenty\Modules\Webshop\ItemSearch\Helper\FacetExtensionContainer;
 use Plenty\Plugin\Application;
 
 /**

@@ -38,7 +38,6 @@ use IO\Services\FacetService;
 use IO\Services\FakerService;
 use IO\Services\ItemCrossSellingService;
 use IO\Services\ItemLastSeenService;
-use IO\Services\ItemSearch\Helper\FacetExtensionContainer;
 use IO\Services\ItemService;
 use IO\Services\ItemWishListService;
 use IO\Services\LegalInformationService;
@@ -74,6 +73,7 @@ use Plenty\Modules\Plugin\Events\AfterBuildPlugins;
 use Plenty\Modules\Plugin\Events\LoadSitemapPattern;
 use Plenty\Modules\Plugin\Events\PluginSendMail;
 use Plenty\Modules\Webshop\Contracts\SessionStorageRepositoryContract;
+use Plenty\Modules\Webshop\ItemSearch\Helper\FacetExtensionContainer;
 use Plenty\Plugin\ServiceProvider;
 use Plenty\Plugin\Templates\Twig;
 use Plenty\Plugin\Events\Dispatcher;
@@ -149,8 +149,6 @@ class IOServiceProvider extends ServiceProvider
                 ContactMapService::class
             ]
         );
-
-        $this->getApplication()->singleton(FacetExtensionContainer::class);
     }
 
     /**

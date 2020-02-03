@@ -4,12 +4,12 @@ namespace IO\Extensions\Facets;
 
 use IO\Helper\Utils;
 use IO\Services\CategoryService;
-use IO\Services\ItemSearch\Contracts\FacetExtension;
 use IO\Services\TemplateService;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Search\Aggregation\AggregationInterface;
 use Plenty\Modules\Item\Search\Aggregations\CategoryAllTermsAggregation;
 use Plenty\Modules\Item\Search\Aggregations\CategoryProcessor;
 use Plenty\Modules\Item\Search\Filter\CategoryFilter;
+use Plenty\Modules\Webshop\ItemSearch\Contracts\FacetExtension;
 use Plenty\Modules\Webshop\Template\Contracts\TemplateConfigRepositoryContract;
 
 class CategoryFacet implements FacetExtension
