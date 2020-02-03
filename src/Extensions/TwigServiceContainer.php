@@ -33,6 +33,7 @@ use IO\Services\TemplateService;
 use IO\Services\UnitService;
 use IO\Services\UrlService;
 use IO\Services\UserDataHashService;
+use IO\Services\WebstoreConfigurationService;
 use Plenty\Modules\Webshop\Contracts\SessionStorageRepositoryContract;
 use Plenty\Modules\Webshop\Contracts\WebstoreConfigurationRepositoryContract;
 
@@ -113,9 +114,10 @@ class TwigServiceContainer
         return pluginApp(NotificationService::class);
     }
 
-    public function getWebstoreConfig(): WebstoreConfigurationRepositoryContract
+    //TODO does not work with WebstoreConfigurationRepositoryContract
+    public function getWebstoreConfig(): WebstoreConfigurationService
     {
-        return pluginApp(WebstoreConfigurationRepositoryContract::class);
+        return pluginApp(WebstoreConfigurationService::class);
     }
 
     public function getLocalization(): LocalizationService
