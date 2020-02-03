@@ -5,6 +5,7 @@ namespace IO\Extensions\Functions;
 use IO\Extensions\AbstractFunction;
 use IO\Helper\ComponentContainer;
 use IO\Helper\EventDispatcher;
+use IO\Helper\OverrideComponents;
 
 /**
  * Class Component
@@ -16,7 +17,7 @@ class Component extends AbstractFunction
      * @var array
      */
     private $components = array();
-    
+
     /**
      * Return the available filter methods
      * @return array
@@ -26,7 +27,9 @@ class Component extends AbstractFunction
         return [
             "component" => "component",
             "has_component_template" => "hasComponentTemplate",
-            "get_component_template" => "getComponentTemplate"
+            "get_component_template" => "getComponentTemplate",
+            "override_component" => "overrideComponent",
+            "get_overridden_components" => "getOverriddenComponents"
         ];
     }
 
@@ -67,4 +70,20 @@ class Component extends AbstractFunction
         return array_shift($this->components);
     }
 
+    /**
+     * @param string $componentTag
+     * @param string $templateId
+     */
+    public function overrideComponent(string $componentTag, string $templateId)
+    {
+        OverrideComponents::overrideComponent($componentTag, $templateId);
+    }
+
+    /**
+     * 
+     */
+    public function getOverriddenComponents():array
+    {
+        return OverrideComponents::getOverriddenComponents();
+    }
 }
