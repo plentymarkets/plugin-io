@@ -3,16 +3,16 @@
 namespace IO\Services;
 
 use IO\Services\ItemSearch\Factories\VariationSearchResultFactory;
-use IO\Services\ItemSearch\SearchPresets\BasketItems;
-use IO\Services\ItemSearch\SearchPresets\CategoryItems;
-use IO\Services\ItemSearch\SearchPresets\CrossSellingItems;
-use IO\Services\ItemSearch\SearchPresets\ManufacturerItems;
-use IO\Services\ItemSearch\SearchPresets\TagItems;
-use IO\Services\ItemSearch\SearchPresets\VariationList;
-use IO\Services\ItemSearch\Services\ItemSearchService;
 use Plenty\Modules\Basket\Contracts\BasketRepositoryContract;
 use Plenty\Modules\ShopBuilder\Helper\ShopBuilderRequest;
 use Plenty\Modules\Webshop\Contracts\SessionStorageRepositoryContract;
+use Plenty\Modules\Webshop\ItemSearch\SearchPresets\BasketItems;
+use Plenty\Modules\Webshop\ItemSearch\SearchPresets\CategoryItems;
+use Plenty\Modules\Webshop\ItemSearch\SearchPresets\CrossSellingItems;
+use Plenty\Modules\Webshop\ItemSearch\SearchPresets\ManufacturerItems;
+use Plenty\Modules\Webshop\ItemSearch\SearchPresets\TagItems;
+use Plenty\Modules\Webshop\ItemSearch\SearchPresets\VariationList;
+use Plenty\Modules\Webshop\ItemSearch\Services\ItemSearchService;
 use Plenty\Plugin\CachingRepository;
 
 class ItemListService
