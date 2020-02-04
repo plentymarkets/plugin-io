@@ -114,10 +114,9 @@ class TwigServiceContainer
         return pluginApp(NotificationService::class);
     }
 
-    //TODO does not work with WebstoreConfigurationRepositoryContract
-    public function getWebstoreConfig(): WebstoreConfigurationService
+    public function getWebstoreConfig(): WebstoreConfigurationRepositoryContract
     {
-        return pluginApp(WebstoreConfigurationService::class);
+        return pluginApp(WebstoreConfigurationRepositoryContract::class);
     }
 
     public function getLocalization(): LocalizationService
