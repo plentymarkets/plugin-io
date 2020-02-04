@@ -30,6 +30,10 @@ class CategoryFacet implements FacetExtension
         return $categoryAggregation;
     }
 
+    /**
+     * @param array $result
+     * @return array
+     */
     public function mergeIntoFacetsList($result): array
     {
         $categoryFacet = [];
@@ -40,10 +44,10 @@ class CategoryFacet implements FacetExtension
         /** @var TemplateConfigRepositoryContract $templateConfigRepo */
         $templateConfigRepo = pluginApp(TemplateConfigRepositoryContract::class);
 
-        if(!$templateService->isCurrentTemplate('tpl.category.item') && $templateConfigRepo->getBoolean('item.show_category_filter'))
-        {
-            if(count($result))
-            {
+        if (!$templateService->isCurrentTemplate('tpl.category.item') && $templateConfigRepo->getBoolean(
+                'item.show_category_filter'
+            )) {
+            if (count($result)) {
                 $categoryFacet = [
                     'id' => 'category',
                     'name' => 'Categories',
@@ -60,34 +64,29 @@ class CategoryFacet implements FacetExtension
                 /** @var CategoryService $categoryService */
                 $categoryService = pluginApp(CategoryService::class);
 
-                foreach($result as $categoryId => $count)
-                {
+                foreach ($result as $categoryId => $count) {
                     $category = $categoryService->getForPlentyId($categoryId, Utils::getLang());
 
-                    if ( !is_null($category) && (!$categoryService->isHidden($category->id) || $loggedIn || Utils::isAdminPreview()) )
-                    {
+                    if (!is_null($category) && (!$categoryService->isHidden(
+                                $category->id
+                            ) || $loggedIn || Utils::isAdminPreview())) {
                         $categoryFacet['values'][] = [
                             'id' => 'category-' . $categoryId,
                             'name' => $category->details[0]->name,
                             'count' => $count,
                         ];
 
-                        if ( count($categoryFacet['values']) === self::MAX_RESULT_COUNT )
-                        {
+                        if (count($categoryFacet['values']) === self::MAX_RESULT_COUNT) {
                             break;
                         }
                     }
-
                 }
             }
 
 
-            if(count($categoryFacet['values']) > 0)
-            {
+            if (count($categoryFacet['values']) > 0) {
                 $categoryFacet['count'] = count($categoryFacet['values']);
-            }
-            else
-            {
+            } else {
                 $categoryFacet = [];
             }
         }
@@ -95,23 +94,23 @@ class CategoryFacet implements FacetExtension
         return $categoryFacet;
     }
 
+    /**
+     * @param array $filtersList
+     * @return mixed|CategoryFilter|null
+     */
     public function extractFilterParams($filtersList)
     {
         $categoryIds = [];
 
-        if(count($filtersList))
-        {
-            foreach ($filtersList as $filter)
-            {
-                if(strpos($filter, 'category-') === 0)
-                {
+        if (count($filtersList)) {
+            foreach ($filtersList as $filter) {
+                if (strpos($filter, 'category-') === 0) {
                     $e = explode('-', $filter);
                     $categoryIds[] = $e[1];
                 }
             }
 
-            if(count($categoryIds))
-            {
+            if (count($categoryIds)) {
                 /** @var CategoryFilter $categoryFilter */
                 $categoryFilter = pluginApp(CategoryFilter::class);
                 $categoryFilter->isInAtLeastOneCategory($categoryIds);
