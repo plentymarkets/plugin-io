@@ -5,6 +5,7 @@ namespace IO\Services;
 use Plenty\Modules\Item\Unit\Contracts\UnitNameRepositoryContract;
 use Plenty\Modules\Item\Unit\Models\UnitName;
 use Plenty\Modules\Webshop\Contracts\UnitRepositoryContract;
+use Plenty\Modules\Webshop\Helpers\UnitUtils;
 
 /**
  * Class UnitService
@@ -84,11 +85,11 @@ class UnitService
 	 * @param string $sUnit	The unit to be checked
 	 * @return boolean
      * @deprecated since 5.0.0 will be removed in 6.0.0
-     * @see \Plenty\Modules\Webshop\Contracts\UnitRepositoryContract::isValidUnit()
+     * @see \Plenty\Modules\Webshop\Helpers\UnitUtils::isValidUnit()
 	 */
 	public static function isValidUnit($sUnit)
 	{
-		return UnitRepositoryContract::isValidUnit($sUnit);
+		return UnitUtils::isValidUnit($sUnit);
 	}
 
 	/**
@@ -96,10 +97,10 @@ class UnitService
 	 * @param string $sUnit	One of 'MTK', 'SCM', 'SMM'
 	 * @return string
      * @deprecated since 5.0.0 will be removed in 6.0.0
-     * @see \Plenty\Modules\Webshop\Contracts\UnitRepositoryContract::getHTML4Unit()
+     * @see \Plenty\Modules\Webshop\Helpers\UnitUtils::getHTML4Unit()
 	 */
 	public static function getHTML4Unit($sUnit='SMM')
 	{
-		return UnitRepositoryContract::getHTML4Unit($sUnit);
+		return UnitUtils::getHTML4Unit($sUnit);
 	}
 }

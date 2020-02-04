@@ -3,8 +3,6 @@
 namespace IO\Services;
 
 use IO\Helper\Utils;
-use IO\Services\ItemSearch\SearchPresets\BasketItems;
-use IO\Services\ItemSearch\Services\ItemSearchService;
 use Plenty\Modules\Accounting\Contracts\DetermineShopCountryContract;
 use Plenty\Modules\Accounting\Vat\Contracts\VatInitContract;
 use Plenty\Modules\Accounting\Vat\Models\VatRate;
@@ -27,7 +25,10 @@ use Plenty\Modules\Webshop\Contracts\CheckoutRepositoryContract;
 use Plenty\Modules\Webshop\Contracts\ContactRepositoryContract;
 use Plenty\Modules\Webshop\Contracts\UnitRepositoryContract;
 use Plenty\Modules\Webshop\Contracts\WebstoreConfigurationRepositoryContract;
+use Plenty\Modules\Webshop\Helpers\UnitUtils;
 use Plenty\Modules\Webshop\ItemSearch\Factories\VariationSearchFactory;
+use Plenty\Modules\Webshop\ItemSearch\SearchPresets\BasketItems;
+use Plenty\Modules\Webshop\ItemSearch\Services\ItemSearchService;
 use Plenty\Plugin\Log\Loggable;
 
 /**
@@ -663,7 +664,7 @@ class BasketService
         foreach ($items['documents'] as $item) {
             $variationId = $item['data']['variation']['id'];
             $result[$variationId] = $item;
-            $result[$variationId]['data']['unit']['htmlUnit'] = UnitRepositoryContract::getHTML4Unit(
+            $result[$variationId]['data']['unit']['htmlUnit'] = UnitUtils::getHTML4Unit(
                 $result[$variationId]['data']['unit']['unitOfMeasurement']
             );
         }
