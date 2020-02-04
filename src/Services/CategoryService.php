@@ -8,7 +8,6 @@ use IO\Helper\ArrayHelper;
 use IO\Helper\CategoryDataFilter;
 use IO\Helper\MemoryCache;
 use IO\Helper\Utils;
-use IO\Services\ItemSearch\Helper\ResultFieldTemplate;
 use Plenty\Modules\Webshop\Helpers\UrlQuery;
 use Plenty\Modules\Category\Models\Category;
 use Plenty\Modules\Category\Contracts\CategoryRepositoryContract;
@@ -17,6 +16,7 @@ use Plenty\Modules\Category\Models\CategoryDetails;
 use Plenty\Modules\Webshop\Contracts\ContactRepositoryContract;
 use Plenty\Modules\Webshop\Contracts\WebstoreConfigurationRepositoryContract;
 use Plenty\Modules\Webshop\ItemSearch\Helper\LoadResultFields;
+use Plenty\Modules\Webshop\ItemSearch\Helper\ResultFieldTemplate;
 use Plenty\Repositories\Models\PaginatedResult;
 
 /**
