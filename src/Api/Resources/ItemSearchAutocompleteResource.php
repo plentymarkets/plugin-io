@@ -2,8 +2,8 @@
 
 namespace IO\Api\Resources;
 
-use IO\Services\ItemSearch\SearchPresets\SearchItems;
-use IO\Services\ItemSearch\Services\ItemSearchService;
+use Plenty\Modules\Webshop\ItemSearch\SearchPresets\SearchItems;
+use Plenty\Modules\Webshop\ItemSearch\Services\ItemSearchService;
 use Plenty\Plugin\Http\Response;
 use Plenty\Plugin\Http\Request;
 use IO\Api\ApiResource;
@@ -25,7 +25,7 @@ class ItemSearchAutocompleteResource extends ApiResource
     {
         parent::__construct($request, $response);
     }
-    
+
     /**
      * Search items
      * @return Response
@@ -33,7 +33,7 @@ class ItemSearchAutocompleteResource extends ApiResource
     public function index():Response
     {
         $searchString = $this->request->get('query', '');
-        
+
         if(strlen($searchString))
         {
             /** @var ItemSearchService $itemSearchService */
@@ -52,6 +52,6 @@ class ItemSearchAutocompleteResource extends ApiResource
         {
             return $this->response->create( null, ResponseCode::BAD_REQUEST );
         }
-        
+
     }
 }
