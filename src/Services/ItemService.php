@@ -17,9 +17,6 @@ use IO\Constants\Language;
 use IO\Helper\EventDispatcher;
 use IO\Helper\MemoryCache;
 use IO\Helper\Utils;
-use IO\Services\ItemSearch\SearchPresets\SingleItem;
-use IO\Services\ItemSearch\SearchPresets\VariationList;
-use IO\Services\ItemSearch\Services\ItemSearchService;
 use Plenty\Modules\Authorization\Services\AuthHelper;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\ElasticSearch;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Processor\DocumentProcessor;
@@ -39,6 +36,9 @@ use Plenty\Modules\Item\UnitCombination\Contracts\UnitCombinationRepositoryContr
 use Plenty\Modules\Webshop\Contracts\ContactRepositoryContract;
 use Plenty\Modules\Webshop\Contracts\SessionStorageRepositoryContract;
 use Plenty\Modules\Webshop\Filters\ItemImagesFilter;
+use Plenty\Modules\Webshop\ItemSearch\SearchPresets\SingleItem;
+use Plenty\Modules\Webshop\ItemSearch\SearchPresets\VariationList;
+use Plenty\Modules\Webshop\ItemSearch\Services\ItemSearchService;
 use Plenty\Plugin\Application;
 
 

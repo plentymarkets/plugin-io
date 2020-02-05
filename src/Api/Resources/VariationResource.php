@@ -2,9 +2,9 @@
 
 namespace IO\Api\Resources;
 
-use IO\Services\ItemSearch\SearchPresets\SingleItem;
-use IO\Services\ItemSearch\SearchPresets\VariationList;
-use IO\Services\ItemSearch\Services\ItemSearchService;
+use Plenty\Modules\Webshop\ItemSearch\SearchPresets\SingleItem;
+use Plenty\Modules\Webshop\ItemSearch\SearchPresets\VariationList;
+use Plenty\Modules\Webshop\ItemSearch\Services\ItemSearchService;
 use Plenty\Plugin\Http\Request;
 use Plenty\Plugin\Http\Response;
 use IO\Api\ApiResource;

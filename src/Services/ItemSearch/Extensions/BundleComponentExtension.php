@@ -3,11 +3,11 @@
 namespace IO\Services\ItemSearch\Extensions;
 
 use IO\Contracts\VariationSearchFactoryContract as VariationSearchFactory;
-use IO\Services\ItemSearch\SearchPresets\BasketItems;
-use IO\Services\ItemSearch\Services\ItemSearchService;
 use IO\Services\TemplateConfigService;
 use Plenty\Modules\Authorization\Services\AuthHelper;
 use Plenty\Modules\Item\VariationBundle\Contracts\VariationBundleRepositoryContract;
+use Plenty\Modules\Webshop\ItemSearch\SearchPresets\BasketItems;
+use Plenty\Modules\Webshop\ItemSearch\Services\ItemSearchService;
 
 class BundleComponentExtension implements ItemSearchExtension
 {

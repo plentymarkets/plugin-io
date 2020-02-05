@@ -3,12 +3,12 @@
 namespace IO\Repositories;
 
 use IO\Helper\Utils;
-use IO\Services\ItemSearch\SearchPresets\VariationList;
-use IO\Services\ItemSearch\Services\ItemSearchService;
 use Plenty\Modules\Plugin\DataBase\Contracts\DataBase;
 use Plenty\Modules\Plugin\DataBase\Contracts\Query;
 use IO\DBModels\ItemWishList;
 use Plenty\Modules\Webshop\Contracts\ContactRepositoryContract;
+use Plenty\Modules\Webshop\ItemSearch\SearchPresets\VariationList;
+use Plenty\Modules\Webshop\ItemSearch\Services\ItemSearchService;
 
 
 class ItemWishListRepository
