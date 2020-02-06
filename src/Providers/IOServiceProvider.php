@@ -228,7 +228,7 @@ class IOServiceProvider extends ServiceProvider
         $dispatcher->listen(AfterBuildPlugins::class, IOAfterBuildPlugins::class);
 
         $dispatcher->listen(
-            'IO.initFacetExtensions',
+            'Webshop.initFacetExtensions',
             function (FacetExtensionContainer $facetExtensionContainer) {
                 $facetExtensionContainer->addFacetExtension(pluginApp(CategoryFacet::class));
             }

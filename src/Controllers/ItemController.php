@@ -20,6 +20,7 @@ use Plenty\Plugin\Log\Loggable;
 
 /**
  * Class ItemController
+ *
  * @package IO\Controllers
  */
 class ItemController extends LayoutController
@@ -42,8 +43,6 @@ class ItemController extends LayoutController
         int $variationId = 0,
         $category = null
     ) {
-        $start = microtime(true);
-
         $itemSearchOptions = [
             'itemId' => $itemId,
             'variationId' => $variationId,
@@ -70,22 +69,19 @@ class ItemController extends LayoutController
         $itemSearchService = pluginApp(ItemSearchService::class);
         $itemResult = $itemSearchService->getResults($searches);
 
-        $end = microtime(true);
-        $executionTime = $end - $start;
-        $this->getLogger('Performance')->error('ES: ' . $executionTime . ' Sekunden');
-
         if (!is_null($category)) {
             /** @var CategoryService $categoryService */
             $categoryService = pluginApp(CategoryService::class);
             $categoryService->setCurrentCategory($category);
         }
 
-        if(isset($itemResult['item']['documents'][0]['data']['currentData'])) {
+        if (isset($itemResult['item']['documents'][0]['data']['currentData'])) {
             /** @var CategoryService $categoryService */
             $categoryService = pluginApp(CategoryService::class);
-            if(!is_null($category))
-            {
-                $categoryService->setCurrentCategory($itemResult['item']['documents'][0]['data']['currentData']['category']);
+            if (is_null($category)) {
+                $categoryService->setCurrentCategory(
+                    $itemResult['item']['documents'][0]['data']['currentData']['category']
+                );
             }
             $categoryService->setCurrentItem($itemResult['item']['documents'][0]['data']['currentData']['item']);
             unset($itemResult['item']['documents'][0]['data']['currentData']);
