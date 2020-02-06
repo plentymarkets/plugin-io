@@ -38,7 +38,7 @@ use Plenty\Modules\Item\Search\Mutators\ImageDomainMutator;
 use Plenty\Modules\Item\Search\Mutators\ImageMutator;
 use Plenty\Modules\Item\Search\Mutators\VariationPropertyGroupMutator;
 use Plenty\Modules\Webshop\Contracts\PriceDetectRepositoryContract;
-use Plenty\Modules\Webshop\ItemSearch\Helper\FacetExtensionContainer;
+use Plenty\Modules\Webshop\ItemSearch\Helpers\FacetExtensionContainer;
 use Plenty\Plugin\Application;
 
 /**

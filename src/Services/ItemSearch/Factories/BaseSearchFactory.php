@@ -22,7 +22,7 @@ use Plenty\Modules\Item\Search\Aggregations\ItemAttributeValueCardinalityAggrega
 use Plenty\Modules\Item\Search\Aggregations\ItemAttributeValueCardinalityAggregationProcessor;
 use Plenty\Modules\Item\Search\Filter\SearchFilter;
 use Plenty\Modules\Item\Search\Sort\NameSorting;
-use Plenty\Modules\Webshop\ItemSearch\Helper\LoadResultFields;
+use Plenty\Modules\Webshop\ItemSearch\Helpers\LoadResultFields;
 use Plenty\Plugin\Log\Loggable;
 
 /**

@@ -6,7 +6,7 @@ use IO\Services\ItemSearch\Extensions\ItemSearchExtension;
 use IO\Services\TemplateService;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Search\Document\DocumentSearch;
 use Plenty\Modules\Item\Search\Contracts\VariationElasticSearchMultiSearchRepositoryContract;
-use Plenty\Modules\Webshop\ItemSearch\Helper\FacetExtensionContainer;
+use Plenty\Modules\Webshop\ItemSearch\Helpers\FacetExtensionContainer;
 use Plenty\Plugin\Log\Loggable;
 
 /**

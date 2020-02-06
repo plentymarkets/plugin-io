@@ -3,7 +3,7 @@
 namespace IO\Services\ItemSearch\SearchPresets;
 
 use Plenty\Modules\Webshop\ItemSearch\Factories\VariationSearchFactory;
-use Plenty\Modules\Webshop\ItemSearch\Helper\SortingHelper;
+use Plenty\Modules\Webshop\ItemSearch\Helpers\SortingHelper;
 
 /**
  * Class ManufacturerItems

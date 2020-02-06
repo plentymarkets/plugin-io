@@ -6,7 +6,7 @@ use IO\Services\CategoryService;
 use IO\Services\ItemCrossSellingService;
 use IO\Services\ItemSearch\Helper\ResultFieldTemplate;
 use Plenty\Modules\Webshop\ItemSearch\Factories\VariationSearchFactory;
-use Plenty\Modules\Webshop\ItemSearch\Helper\SortingHelper;
+use Plenty\Modules\Webshop\ItemSearch\Helpers\SortingHelper;
 
 /**
  * Class CrossSellingItems

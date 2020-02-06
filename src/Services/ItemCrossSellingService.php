@@ -3,7 +3,7 @@
 namespace IO\Services;
 
 use Plenty\Modules\Webshop\Contracts\SessionStorageRepositoryContract;
-use Plenty\Modules\Webshop\ItemSearch\Helper\SortingHelper;
+use Plenty\Modules\Webshop\ItemSearch\Helpers\SortingHelper;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\ElasticSearch;
 use Plenty\Modules\Webshop\Template\Contracts\TemplateConfigRepositoryContract;
 

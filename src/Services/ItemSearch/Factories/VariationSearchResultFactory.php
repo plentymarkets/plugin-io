@@ -26,7 +26,7 @@ use IO\Services\ItemSearch\Factories\Faker\TextFaker;
 use IO\Services\ItemSearch\Factories\Faker\UnitFaker;
 use IO\Services\ItemSearch\Factories\Faker\VariationFaker;
 use IO\Services\ItemSearch\Factories\Faker\VariationPropertyFaker;
-use Plenty\Modules\Webshop\ItemSearch\Helper\LoadResultFields;
+use Plenty\Modules\Webshop\ItemSearch\Helpers\LoadResultFields;
 
 
 /**

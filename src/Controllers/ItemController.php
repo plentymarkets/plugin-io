@@ -10,7 +10,7 @@ use IO\Services\ItemSearch\Factories\VariationSearchResultFactory;
 use Plenty\Modules\Category\Models\Category;
 use Plenty\Modules\ShopBuilder\Helper\ShopBuilderRequest;
 use Plenty\Modules\Webshop\Contracts\WebstoreConfigurationRepositoryContract;
-use Plenty\Modules\Webshop\ItemSearch\Helper\ResultFieldTemplate;
+use Plenty\Modules\Webshop\ItemSearch\Helpers\ResultFieldTemplate;
 use Plenty\Modules\Webshop\ItemSearch\SearchPresets\SingleItem;
 use Plenty\Modules\Webshop\ItemSearch\SearchPresets\VariationAttributeMap;
 use Plenty\Modules\Webshop\ItemSearch\Services\ItemSearchService;

@@ -11,7 +11,7 @@ use IO\Services\TemplateConfigService;
  * Generate sorting values from plugin configuration.
  * @package IO\Services\ItemSearch\Helper
  * @deprecated since 5.0.0 will be deleted in 6.0.0
- * @see \Plenty\Modules\Webshop\ItemSearch\Helper\SortingHelper
+ * @see \Plenty\Modules\Webshop\ItemSearch\Helpers\SortingHelper
  */
 class SortingHelper implements SortingContract
 {
@@ -21,7 +21,7 @@ class SortingHelper implements SortingContract
      * @param bool      $isCategory     Get default sorting configuration for category or for search
      * @return array
      * @deprecated since 5.0.0 will be deleted in 6.0.0
-     * @see \Plenty\Modules\Webshop\ItemSearch\Helper\SortingHelper::getSorting()
+     * @see \Plenty\Modules\Webshop\ItemSearch\Helpers\SortingHelper::getSorting()
      */
     public function getSorting( $sortingConfig = null, $isCategory = true )
     {
@@ -67,7 +67,7 @@ class SortingHelper implements SortingContract
      * @param string $sortingConfig     The configuration value
      * @return array
      * @deprecated since 5.0.0 will be deleted in 6.0.0
-     * @see \Plenty\Modules\Webshop\ItemSearch\Helper\SortingHelper::getCategorySorting()
+     * @see \Plenty\Modules\Webshop\ItemSearch\Helpers\SortingHelper::getCategorySorting()
      */
     public function getCategorySorting( $sortingConfig = null )
     {
@@ -79,30 +79,30 @@ class SortingHelper implements SortingContract
      * @param string $sortingConfig     The configuration value
      * @return array
      * @deprecated since 5.0.0 will be deleted in 6.0.0
-     * @see \Plenty\Modules\Webshop\ItemSearch\Helper\SortingHelper::getSearchSorting()
+     * @see \Plenty\Modules\Webshop\ItemSearch\Helpers\SortingHelper::getSearchSorting()
      */
     public function getSearchSorting( $sortingConfig = null )
     {
         return self::getSorting( $sortingConfig, false );
     }
-    
+
     /**
      * @return string
      * @deprecated since 5.0.0 will be deleted in 6.0.0
-     * @see \Plenty\Modules\Webshop\ItemSearch\Helper\SortingHelper::getUsedItemName()
+     * @see \Plenty\Modules\Webshop\ItemSearch\Helpers\SortingHelper::getUsedItemName()
      */
     public function getUsedItemName()
     {
         $templateConfigService = pluginApp(TemplateConfigService::class);
-    
+
         $usedItemNameIndex = $templateConfigService->get('item.name');
-        
+
         $usedItemName = [
             'texts.name1',
             'texts.name2',
             'texts.name3'
         ][$usedItemNameIndex];
-        
+
         return $usedItemName;
     }
 
@@ -110,22 +110,22 @@ class SortingHelper implements SortingContract
      * @param $sorting
      * @return array
      * @deprecated since 5.0.0 will be deleted in 6.0.0
-     * @see \Plenty\Modules\Webshop\ItemSearch\Helper\SortingHelper::splitPathAndOrder()
+     * @see \Plenty\Modules\Webshop\ItemSearch\Helpers\SortingHelper::splitPathAndOrder()
      */
     public function splitPathAndOrder($sorting)
     {
         $e = explode('_', $sorting);
-        
+
         $sorting = [
             'path' => $e[0],
             'order'=> $e[1]
         ];
-        
+
         if($sorting['path'] == 'texts.name')
         {
             $sorting['path'] = self::getUsedItemName();
         }
-        
+
         return $sorting;
     }
 }

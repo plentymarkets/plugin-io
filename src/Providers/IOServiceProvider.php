@@ -73,7 +73,7 @@ use Plenty\Modules\Plugin\Events\AfterBuildPlugins;
 use Plenty\Modules\Plugin\Events\LoadSitemapPattern;
 use Plenty\Modules\Plugin\Events\PluginSendMail;
 use Plenty\Modules\Webshop\Contracts\SessionStorageRepositoryContract;
-use Plenty\Modules\Webshop\ItemSearch\Helper\FacetExtensionContainer;
+use Plenty\Modules\Webshop\ItemSearch\Helpers\FacetExtensionContainer;
 use Plenty\Plugin\ServiceProvider;
 use Plenty\Plugin\Templates\Twig;
 use Plenty\Plugin\Events\Dispatcher;

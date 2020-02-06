@@ -4,7 +4,7 @@ namespace IO\Services\Basket\Factories;
 
 use IO\Services\Basket\Factories\Faker\BasketFaker;
 use IO\Services\Basket\Factories\Faker\BasketItemFaker;
-use Plenty\Modules\Webshop\ItemSearch\Helper\ResultFieldTemplate;
+use Plenty\Modules\Webshop\ItemSearch\Helpers\ResultFieldTemplate;
 use Plenty\Modules\Webshop\ItemSearch\SearchPresets\VariationList;
 use Plenty\Modules\Webshop\ItemSearch\Services\ItemSearchService;
 

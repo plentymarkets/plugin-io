@@ -4,7 +4,7 @@ namespace IO\Services;
 
 use Plenty\Modules\LiveShopping\Contracts\LiveShoppingRepositoryContract;
 use Plenty\Modules\LiveShopping\Models\LiveShopping;
-use Plenty\Modules\Webshop\ItemSearch\Helper\SortingHelper;
+use Plenty\Modules\Webshop\ItemSearch\Helpers\SortingHelper;
 use Plenty\Modules\Webshop\ItemSearch\SearchPresets\LiveShoppingItems;
 use Plenty\Modules\Webshop\ItemSearch\Services\ItemSearchService;
 

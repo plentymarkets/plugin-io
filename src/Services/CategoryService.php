@@ -15,8 +15,8 @@ use Plenty\Modules\Category\Models\CategoryClient;
 use Plenty\Modules\Category\Models\CategoryDetails;
 use Plenty\Modules\Webshop\Contracts\ContactRepositoryContract;
 use Plenty\Modules\Webshop\Contracts\WebstoreConfigurationRepositoryContract;
-use Plenty\Modules\Webshop\ItemSearch\Helper\LoadResultFields;
-use Plenty\Modules\Webshop\ItemSearch\Helper\ResultFieldTemplate;
+use Plenty\Modules\Webshop\ItemSearch\Helpers\LoadResultFields;
+use Plenty\Modules\Webshop\ItemSearch\Helpers\ResultFieldTemplate;
 use Plenty\Repositories\Models\PaginatedResult;
 
 /**

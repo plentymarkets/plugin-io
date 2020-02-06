@@ -9,7 +9,7 @@ use Plenty\Plugin\Log\LoggerFactory;
  * Trait LoadResultFields
  * @package IO\Services\ItemSearch\Helper
  * @deprecated since 5.0.0 will be deleted in 6.0.0
- * @see \Plenty\Modules\Webshop\ItemSearch\Helper\LoadResultFields
+ * @see \Plenty\Modules\Webshop\ItemSearch\Helpers\LoadResultFields
  */
 trait LoadResultFields
 {
@@ -17,7 +17,7 @@ trait LoadResultFields
 	 * @param string $fullTemplateName
 	 * @return array
      * @deprecated since 5.0.0 will be deleted in 6.0.0
-     * @see \Plenty\Modules\Webshop\ItemSearch\Helper\LoadResultFields::loadResultFields()
+     * @see \Plenty\Modules\Webshop\ItemSearch\Helpers\LoadResultFields::loadResultFields()
 	 */
 	private function loadResultFields($fullTemplateName)
 	{

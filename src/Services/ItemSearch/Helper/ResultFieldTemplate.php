@@ -3,13 +3,13 @@
 namespace IO\Services\ItemSearch\Helper;
 
 use Plenty\Plugin\Events\Dispatcher;
-use Plenty\Modules\Webshop\ItemSearch\Helper\LoadResultFields;
+use Plenty\Modules\Webshop\ItemSearch\Helpers\LoadResultFields;
 /**
  * Class ResultFieldTemplate
  * Emit events to request templates to be used for result fields.
  * @package IO\Services\ItemSearch\Helper
  * @deprecated since 5.0.0 will be deleted in 6.0.0
- * @see \Plenty\Modules\Webshop\ItemSearch\Helper\ResultFieldTemplate
+ * @see \Plenty\Modules\Webshop\ItemSearch\Helpers\ResultFieldTemplate
  */
 class ResultFieldTemplate
 {
