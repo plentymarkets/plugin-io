@@ -10,6 +10,7 @@ use Plenty\Modules\Basket\Contracts\BasketItemRepositoryContract;
 use IO\Guards\AuthGuard;
 use Plenty\Modules\Category\Models\Category;
 use Plenty\Modules\ShopBuilder\Helper\ShopBuilderRequest;
+use Plenty\Plugin\Http\Request;
 use Plenty\Plugin\Log\Loggable;
 
 /**
@@ -45,13 +46,14 @@ class CheckoutController extends LayoutController
 
         if ( !$shopBuilderRequest->isShopBuilder() )
         {
-            if( !$sessionStorage->getSessionValue("skipLogin")  && (!$sessionStorage->getSessionValue("usedLoginPage") || $customerService->getContactId() <= 0) )
+            $request = pluginApp(Request::class);
+
+            if( !$sessionStorage->getSessionValue("skipLogin")  && ($request->get("isGuest") == 0 && $customerService->getContactId() <= 0))
             {
                 $this->getLogger(__CLASS__)->info("IO::Debug.CheckoutController_notLoggedIn", [
                     "skipLogin" => $sessionStorage->getSessionValue("skipLogin"),
-                    "usedLoginPage" => $sessionStorage->getSessionValue("usedLoginPage")
+                    "isGuest" => $request->get("isGuest")
                 ]);
-                $sessionStorage->setSessionValue("usedLoginPage", true);
                 AuthGuard::redirect(
                     $shopUrls->login,
                     ["backlink" => AuthGuard::getUrl()]
