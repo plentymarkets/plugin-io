@@ -50,10 +50,7 @@ class CheckoutController extends LayoutController
 
             if( !$sessionStorage->getSessionValue("skipLogin")  && ($request->get("isGuest") == 0 && $customerService->getContactId() <= 0))
             {
-                $this->getLogger(__CLASS__)->info("IO::Debug.CheckoutController_notLoggedIn", [
-                    "skipLogin" => $sessionStorage->getSessionValue("skipLogin"),
-                    "isGuest" => $request->get("isGuest")
-                ]);
+                $this->getLogger(__CLASS__)->info("IO::Debug.CheckoutController_notLoggedIn");
                 AuthGuard::redirect(
                     $shopUrls->login,
                     ["backlink" => AuthGuard::getUrl()]
