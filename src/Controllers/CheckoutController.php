@@ -45,7 +45,7 @@ class CheckoutController extends LayoutController
 
         if ( !$shopBuilderRequest->isShopBuilder() )
         {
-            if( !$sessionStorage->getSessionValue("skipLogin")  && !$sessionStorage->getSessionValue("usedLoginPage") && $customerService->getContactId() <= 0 )
+            if( !$sessionStorage->getSessionValue("skipLogin")  && (!$sessionStorage->getSessionValue("usedLoginPage") || $customerService->getContactId() <= 0) )
             {
                 $this->getLogger(__CLASS__)->info("IO::Debug.CheckoutController_notLoggedIn", [
                     "skipLogin" => $sessionStorage->getSessionValue("skipLogin"),
