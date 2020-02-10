@@ -64,6 +64,10 @@ class CustomerChangeMailController extends LayoutController
 
     public function redirect($contactId, $hash)
     {
+        if(!is_null($categoryByUrl = $this->checkForExistingCategory())) {
+            return $categoryByUrl;
+        }
+
         $changeMailParams = [];
 
         if((int)$contactId > 0 && strlen($hash))
