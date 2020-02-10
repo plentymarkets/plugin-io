@@ -60,10 +60,9 @@ class CategoryFacet implements FacetExtension
                 /** @var CategoryService $categoryService */
                 $categoryService = pluginApp(CategoryService::class);
 
-                $categoryHierarchy = $categoryService->getHierarchy($categoryService->getCurrentCategory()->id);
                 $categoryHierarchy = array_map(function ($value) {
                     return $value->id;
-                }, $categoryHierarchy);
+                }, $categoryService->getHierarchy($categoryService->getCurrentCategory()->id));
 
                 foreach($result as $categoryId => $count)
                 {
