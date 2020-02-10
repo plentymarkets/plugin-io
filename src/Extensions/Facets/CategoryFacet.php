@@ -60,15 +60,14 @@ class CategoryFacet implements FacetExtension
                 /** @var CategoryService $categoryService */
                 $categoryService = pluginApp(CategoryService::class);
 
-                $categoryHierarchy = array_map(function ($value) {
-                    return $value->id;
-                }, $categoryService->getHierarchy($categoryService->getCurrentCategory()->id));
+                $categoryBranch = $categoryService->getCurrentCategory()->branch()->get()[0];
+                $categoryBranch = array_unique(array_values($categoryBranch->toArray()));
 
                 foreach($result as $categoryId => $count)
                 {
                     $category = $categoryService->getForPlentyId($categoryId, $sessionStorage->getLang());
 
-                    if ( !is_null($category) && !in_array($category->id, $categoryHierarchy) && (!$categoryService->isHidden($category->id) || $loggedIn || Utils::isAdminPreview()) )
+                    if ( !is_null($category) && !in_array($categoryId, $categoryBranch) && (!$categoryService->isHidden($category->id) || $loggedIn || Utils::isAdminPreview()) )
                     {
                         $categoryFacet['values'][] = [
                             'id' => 'category-' . $categoryId,
