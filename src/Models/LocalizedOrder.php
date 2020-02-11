@@ -271,7 +271,7 @@ class LocalizedOrder extends ModelWrapper
     {
         $order = $this->order->toArray();
 
-        if($order['typeId'] === OrderType::ORDER)
+        if($order['typeId'] === OrderType::ORDER || $order['typeId'] == OrderType::WARRANTY)
         {
             $orderItems = count($this->orderData)
                 ? $this->orderData['orderItems']
