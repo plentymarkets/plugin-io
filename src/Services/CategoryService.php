@@ -375,7 +375,7 @@ class CategoryService
         int $maxLevel = 2,
         int $customerClassId = 0
     ): array {
-        if (is_array($type) && count($type) == 0) {
+        if (is_array($type) && count($type) === 0) {
             return [];
         }
 
