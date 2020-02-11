@@ -57,11 +57,14 @@ use IO\Services\TemplateService;
 use IO\Services\UnitService;
 use IO\Services\UrlService;
 use IO\Services\WebstoreConfigurationService;
+use Plenty\Modules\Account\Address\Models\AddressRelationType;
+use Plenty\Modules\Account\Contact\Contracts\ContactAddressRepositoryContract;
 use Plenty\Modules\Authentication\Events\AfterAccountAuthentication;
 use Plenty\Modules\Authentication\Events\AfterAccountContactLogout;
 use IO\Events\Basket\BeforeBasketItemToOrderItem;
 use Plenty\Modules\Basket\Events\Basket\AfterBasketChanged;
 use Plenty\Modules\Cron\Services\CronContainer;
+use Plenty\Modules\Frontend\Contracts\Checkout;
 use Plenty\Modules\Frontend\Events\FrontendCurrencyChanged;
 use Plenty\Modules\Frontend\Events\FrontendLanguageChanged;
 use Plenty\Modules\Frontend\Events\FrontendShippingProfileChanged;
@@ -170,6 +173,33 @@ class IOServiceProvider extends ServiceProvider
             $checkoutService = pluginApp(CheckoutService::class);
             //validate methodOfPayment
             $methodOfPaymentId = $checkoutService->getMethodOfPaymentId();
+
+            /** @var  $contactAddressRepository */
+            $contactAddressRepository = pluginApp(ContactAddressRepositoryContract::class);
+
+            /** @var Checkout $checkout */
+            $checkout = pluginApp(Checkout::class);
+
+            $contactId = $event->getAccountContact()->id;
+
+            foreach ([AddressRelationType::BILLING_ADDRESS, AddressRelationType::DELIVERY_ADDRESS] as $addressRelationType) {
+                $addresses = $contactAddressRepository->getAddresses($contactId, $addressRelationType);
+
+                foreach ($addresses as $address) {
+                    $isAddressPrimary = $address->contactRelations()->get()[0]->isPrimary;
+
+                    if ($isAddressPrimary) {
+                        switch ($addressRelationType) {
+                            case AddressRelationType::BILLING_ADDRESS:
+                                $checkout->setCustomerInvoiceAddressId($address->id);
+                                break;
+                            case AddressRelationType::DELIVERY_ADDRESS:
+                                $checkout->setCustomerShippingAddressId($address->id);
+                                break;
+                        }
+                    }
+                }
+            }
         });
 
         $dispatcher->listen(BeforeBasketItemToOrderItem::class, CheckItemStock::class);
