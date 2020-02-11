@@ -37,6 +37,10 @@ class ItemSearchController extends LayoutController
      */
     public function redirectToSearch(): void
     {
+        if(!is_null($categoryByUrl = $this->checkForExistingCategory())) {
+            return $categoryByUrl;
+        }
+
         /** @var Request $request */
         $request = pluginApp(Request::class);
         /** @var ShopUrls $shopUrl */
