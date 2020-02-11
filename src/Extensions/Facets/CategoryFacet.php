@@ -7,7 +7,6 @@ use IO\Services\CategoryService;
 use IO\Services\ItemSearch\Contracts\FacetExtension;
 use IO\Services\SessionStorageService;
 use IO\Services\TemplateConfigService;
-use IO\Services\TemplateService;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Search\Aggregation\AggregationInterface;
 use Plenty\Modules\Item\Search\Aggregations\CategoryAllTermsAggregation;
 use Plenty\Modules\Item\Search\Aggregations\CategoryProcessor;
@@ -35,13 +34,10 @@ class CategoryFacet implements FacetExtension
     {
         $categoryFacet = [];
 
-        /** @var TemplateService $templateService */
-        $templateService = pluginApp(TemplateService::class);
-
         /** @var TemplateConfigService $templateConfigService */
         $templateConfigService = pluginApp(TemplateConfigService::class);
 
-        if(!$templateService->isCurrentTemplate('tpl.category.item') && $templateConfigService->get('item.show_category_filter') == 'true')
+        if($templateConfigService->get('item.show_category_filter') == 'true')
         {
             if(count($result))
             {
@@ -64,12 +60,14 @@ class CategoryFacet implements FacetExtension
                 /** @var CategoryService $categoryService */
                 $categoryService = pluginApp(CategoryService::class);
 
+                $categoryBranch = $categoryService->getCurrentCategory()->branch()->get()[0];
+                $categoryBranch = array_unique(array_values($categoryBranch->toArray()));
+
                 foreach($result as $categoryId => $count)
                 {
                     $category = $categoryService->getForPlentyId($categoryId, $sessionStorage->getLang());
 
-
-                    if ( !is_null($category) && (!$categoryService->isHidden($category->id) || $loggedIn || Utils::isAdminPreview()) )
+                    if ( !is_null($category) && !in_array($categoryId, $categoryBranch) && (!$categoryService->isHidden($category->id) || $loggedIn || Utils::isAdminPreview()) )
                     {
                         $categoryFacet['values'][] = [
                             'id' => 'category-' . $categoryId,
@@ -114,17 +112,17 @@ class CategoryFacet implements FacetExtension
                     $categoryIds[] = $e[1];
                 }
             }
-            
+
             if(count($categoryIds))
             {
                 /** @var CategoryFilter $categoryFilter */
                 $categoryFilter = pluginApp(CategoryFilter::class);
                 $categoryFilter->isInAtLeastOneCategory($categoryIds);
-                
+
                 return $categoryFilter;
             }
         }
-        
+
         return null;
     }
 }

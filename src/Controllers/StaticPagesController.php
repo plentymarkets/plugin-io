@@ -29,7 +29,7 @@ class StaticPagesController extends LayoutController
      */
     public function redirectCancellationRights()
     {
-        return pluginApp(CategoryController::class)->redirectRoute(RouteConfig::CANCELLATION_RIGHTS);
+        return $this->redirect(RouteConfig::CANCELLATION_RIGHTS);
     }
 
     /**
@@ -52,9 +52,7 @@ class StaticPagesController extends LayoutController
      */
     public function redirectCancellationForm()
     {
-        /** @var CategoryController $categoryController */
-        $categoryController = pluginApp(CategoryController::class);
-        return $categoryController->redirectRoute(RouteConfig::CANCELLATION_FORM);
+        return $this->redirect(RouteConfig::CANCELLATION_FORM);
     }
 
     /**
@@ -77,9 +75,7 @@ class StaticPagesController extends LayoutController
      */
     public function redirectLegalDisclosure()
     {
-        /** @var CategoryController $categoryController */
-        $categoryController = pluginApp(CategoryController::class);
-        return $categoryController->redirectRoute(RouteConfig::LEGAL_DISCLOSURE);
+        return $this->redirect(RouteConfig::LEGAL_DISCLOSURE);
     }
 
     /**
@@ -102,9 +98,7 @@ class StaticPagesController extends LayoutController
      */
     public function redirectPrivacyPolicy()
     {
-        /** @var CategoryController $categoryController */
-        $categoryController = pluginApp(CategoryController::class);
-        return $categoryController->redirectRoute(RouteConfig::PRIVACY_POLICY);
+        return $this->redirect(RouteConfig::PRIVACY_POLICY);
     }
 
     /**
@@ -127,9 +121,7 @@ class StaticPagesController extends LayoutController
      */
     public function redirectTermsAndConditions()
     {
-        /** @var CategoryController $categoryController */
-        $categoryController = pluginApp(CategoryController::class);
-        return $categoryController->redirectRoute(RouteConfig::TERMS_CONDITIONS);
+        return $this->redirect(RouteConfig::TERMS_CONDITIONS);
     }
 
     /**
@@ -156,5 +148,16 @@ class StaticPagesController extends LayoutController
         /** @var CategoryController $categoryController */
         $categoryController = pluginApp(CategoryController::class);
         return $categoryController->redirectRoute(RouteConfig::PAGE_NOT_FOUND);
+    }
+
+    private function redirect($route)
+    {
+        if(!is_null($categoryByUrl = $this->checkForExistingCategory())) {
+            return $categoryByUrl;
+        }
+
+        /** @var CategoryController $categoryController */
+        $categoryController = pluginApp(CategoryController::class);
+        return $categoryController->redirectRoute($route);
     }
 }
