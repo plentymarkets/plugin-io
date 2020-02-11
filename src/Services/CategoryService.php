@@ -370,6 +370,10 @@ class CategoryService
         int $maxLevel = 2,
         int $customerClassId = 0
     ): array {
+        if (is_array($type) && count($type) === 0) {
+            return [];
+        }
+
         if ($lang === null) {
             $lang = Utils::getLang();
         }

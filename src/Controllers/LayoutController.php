@@ -6,15 +6,18 @@ use IO\Api\ResponseCode;
 use IO\Helper\ArrayHelper;
 use IO\Helper\CategoryMap;
 use IO\Helper\TemplateContainer;
+use IO\Helper\Utils;
 use IO\Middlewares\CheckNotFound;
 use IO\Services\CategoryService;
 use IO\Services\TemplateService;
 use IO\Services\UrlService;
 use Plenty\Modules\Category\Contracts\CategoryRepositoryContract;
+use Plenty\Modules\Category\Models\Category;
 use Plenty\Modules\ContentCache\Contracts\ContentCacheRepositoryContract;
 use Plenty\Plugin\Application;
 use Plenty\Plugin\Controller;
 use Plenty\Plugin\Events\Dispatcher;
+use Plenty\Plugin\Http\Request;
 use Plenty\Plugin\Http\Response;
 use Plenty\Plugin\Log\Loggable;
 use Plenty\Plugin\Templates\Twig;
@@ -230,5 +233,36 @@ abstract class LayoutController extends Controller
         CheckNotFound::$FORCE_404 = true;
 
         return $response;
+    }
+
+    protected function checkForExistingCategory($url = null)
+    {
+        if(is_null($url)) {
+            /** @var Request $request */
+            $request = pluginApp(Request::class);
+            list($url, $queryString) = explode("?", $request->getRequestUri());
+        }
+
+        $branch = explode("/", trim($url, "/"));
+        $lang = Utils::getLang();
+        $webstoreId = Utils::getWebstoreId();
+        $category = $this->categoryRepo->findCategoryByUrl(
+            $branch[0],
+            $branch[1],
+            $branch[2],
+            $branch[3],
+            $branch[4],
+            $branch[5],
+            $webstoreId,
+            $lang
+        );
+
+        if($category instanceof Category) {
+            /** @var CategoryController $categoryController */
+            $categoryController = pluginApp(CategoryController::class);
+            return $categoryController->showCategoryById($category->id);
+        }
+
+        return null;
     }
 }

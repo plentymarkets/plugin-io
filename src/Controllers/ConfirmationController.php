@@ -227,6 +227,10 @@ class ConfirmationController extends LayoutController
 
     public function redirect($orderId = 0, $accessKey = '')
     {
+        if(!is_null($categoryByUrl = $this->checkForExistingCategory())) {
+            return $categoryByUrl;
+        }
+
         $confirmationParams = [];
 
         if ((int)$orderId > 0 && strlen($accessKey)) {

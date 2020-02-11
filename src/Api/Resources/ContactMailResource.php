@@ -20,7 +20,8 @@ class ContactMailResource extends ApiResource
 {
     private $contactMailService;
 
-    private $templateConfigRepo;
+    /** @var TemplateConfigRepositoryContract */
+    private $templateConfigRepository;
 
     /**
      * ContactMailResource constructor.
@@ -31,15 +32,20 @@ class ContactMailResource extends ApiResource
         Request $request,
         ApiResponse $response,
         ContactMailService $contactMailService,
-        TemplateConfigRepositoryContract $templateConfigRepo
+        TemplateConfigRepositoryContract $templateConfigRepository
     ) {
         parent::__construct($request, $response);
         $this->contactMailService = $contactMailService;
-        $this->templateConfigRepo = $templateConfigRepo;
+        $this->templateConfigRepository = $templateConfigRepository;
     }
 
     public function store(): Response
     {
+        // Honeypot check
+        if (strlen($this->request->get('data')['username']['value'])) {
+            return $this->response->create(true, ResponseCode::OK);
+        }
+
         $mailTemplate = TemplateContainer::get('tpl.mail.contact')->getTemplate();
 
         if (!ReCaptcha::verify($this->request->get('recaptchaToken', null))) {
@@ -53,25 +59,24 @@ class ContactMailResource extends ApiResource
 
         if ($response) {
             return $this->response->create($response, ResponseCode::CREATED);
-        } else {
-            return $this->response->create($response, ResponseCode::BAD_REQUEST);
         }
+
+        return $this->response->create($response, ResponseCode::BAD_REQUEST);
     }
 
     public function verifyRecaptcha($secret, $token)
     {
         if (!strlen($secret)) {
             return true;
-        } else {
-            if (!strlen($token)) {
-                return false;
-            }
+        } elseif (!strlen($token)) {
+            return false;
         }
 
         $params = [
-            "secret" => $secret,
-            "response" => $token
+            'secret' => $secret,
+            'response' => $token
         ];
+
         $options = array(
             CURLOPT_URL => "https://www.google.com/recaptcha/api/siteverify?secret=$secret&response=$token",
             CURLOPT_RETURNTRANSFER => true,
@@ -90,9 +95,9 @@ class ContactMailResource extends ApiResource
 
         $result = json_decode($content, true);
 
-        return $result["success"]
+        return $result['success']
             && (!array_key_exists('score', $result)
-                || $result['score'] >= $this->templateConfigRepo->get('global.google_recaptcha_threshold')
+                || $result['score'] >= $this->templateConfigRepository->get('global.google_recaptcha_threshold')
             );
     }
 }
