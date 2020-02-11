@@ -28,7 +28,7 @@ class CustomerNewsletterResource extends ApiResource
     public function store(): Response
     {
         // Honeypot check
-        if($this->request->get('phone') !== '')
+        if(strlen($this->request->get('honeypot')))
         {
             // We can potentially expand on the honeypot handling with sending reports to spam protect services
             return $this->response->create('', ResponseCode::OK);
@@ -53,7 +53,7 @@ class CustomerNewsletterResource extends ApiResource
     public function destroy(string $selector): Response
     {
         // Honeypot check
-        if($this->request->get('firstName') !== '')
+        if(strlen($this->request->get('honeypot')))
         {
             return $this->response->create(true, ResponseCode::OK);
         }

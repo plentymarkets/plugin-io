@@ -51,7 +51,7 @@ class CustomerResource extends ApiResource
     public function store(): Response
     {
         // Honeypot check
-        if ($this->request->get('pin') !== '') {
+        if (strlen($this->request->get('honeypot'))) {
             return $this->response->create(true, ResponseCode::OK);
         }
 

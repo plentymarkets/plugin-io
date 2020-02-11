@@ -43,7 +43,7 @@ class ContactMailResource extends ApiResource
     {
         // Honeypot check
 
-        if($this->request->get('data')['phone-number']['value']!== '')
+        if(strlen($this->request->get('data')['username']['value']))
         {
             return $this->response->create(true, ResponseCode::OK);
         }
