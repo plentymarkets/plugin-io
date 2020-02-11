@@ -37,15 +37,20 @@ class CustomerPasswordResetResource extends ApiResource
     {
         parent::__construct($request, $response);
     }
-    
+
     /**
      * Set the password for the contact
      * @return Response
      */
     public function store():Response
     {
-        $email = $this->request->get('email', '');
+        // Honeypot check
+        if(strlen($this->request->get('honeypot')))
+        {
+            return $this->response->create(true, ResponseCode::OK);
+        }
 
+        $email = $this->request->get('email', '');
 
         /** @var AuthHelper $authHelper */
         $authHelper = pluginApp(AuthHelper::class);
@@ -80,7 +85,7 @@ class CustomerPasswordResetResource extends ApiResource
         return $this->response->create(null, ResponseCode::BAD_REQUEST);
 
     }
-    
+
 }
 
 
