@@ -5,6 +5,8 @@ namespace IO\Api\Resources;
 use IO\Helper\ReCaptcha;
 use Plenty\Modules\Account\Contact\Models\Contact;
 use Plenty\Modules\Webshop\Contracts\ContactRepositoryContract;
+use Plenty\Modules\Webshop\Events\ValidateVatNumber;
+use Plenty\Plugin\Events\Dispatcher;
 use Plenty\Plugin\Http\Response;
 use Plenty\Plugin\Http\Request;
 use IO\Api\ApiResource;
@@ -81,12 +83,23 @@ class CustomerResource extends ApiResource
             return $this->response->create(null, ResponseCode::BAD_REQUEST);
         }
 
+         /** @var Dispatcher $eventDispatcher */
+        $eventDispatcher = pluginApp(Dispatcher::class);
+
         if (count($billingAddressData) === 0) {
             $billingAddressData = null;
+        } elseif (isset($billingAddressData['vatNumber'])) {
+            /** @var ValidateVatNumber $val */
+            $val = pluginApp(ValidateVatNumber::class, [$billingAddressData['vatNumber']]);
+            $eventDispatcher->fire($val);
         }
 
         if (count($deliveryAddressData) === 0) {
             $deliveryAddressData = null;
+        } elseif (isset($deliveryAddressData['vatNumber'])) {
+            /** @var ValidateVatNumber $val */
+            $val = pluginApp(ValidateVatNumber::class, [$deliveryAddressData['vatNumber']]);
+            $eventDispatcher->fire($val);
         }
 
         $contact = $this->customerService->registerCustomer(
