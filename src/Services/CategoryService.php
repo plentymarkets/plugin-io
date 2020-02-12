@@ -65,14 +65,17 @@ class CategoryService
      * CategoryService constructor.
      * @param CategoryRepositoryContract $category
      */
-    public function __construct(CategoryRepositoryContract $categoryRepository, WebstoreConfigurationService $webstoreConfig, SessionStorageService $sessionStorageService, AuthGuard $authGuard)
-    {
-        $this->categoryRepository    = $categoryRepository;
-        $this->webstoreConfig 		 = $webstoreConfig;
+    public function __construct(
+        CategoryRepositoryContract $categoryRepository,
+        WebstoreConfigurationService $webstoreConfig,
+        SessionStorageService $sessionStorageService,
+        AuthGuard $authGuard
+    ) {
+        $this->categoryRepository = $categoryRepository;
+        $this->webstoreConfig = $webstoreConfig;
         $this->sessionStorageService = $sessionStorageService;
-        $this->authGuard             = $authGuard;
-        $this->webstoreId            = Utils::getWebstoreId();
-
+        $this->authGuard = $authGuard;
+        $this->webstoreId = Utils::getWebstoreId();
     }
 
     /**
@@ -93,20 +96,18 @@ class CategoryService
     public function setCurrentCategory($cat)
     {
         $lang = $this->sessionStorageService->getLang();
-        $this->currentCategory     = null;
+        $this->currentCategory = null;
         $this->currentCategoryTree = [];
 
-        if($cat === null)
-        {
+        if ($cat === null) {
             return;
         }
 
         // List parent/open categories
         $this->currentCategory = $cat;
-        while($cat !== null)
-        {
+        while ($cat !== null) {
             $this->currentCategoryTree[$cat->level] = $cat;
-            $cat                                    = $this->categoryRepository->get($cat->parentCategoryId, $lang, $this->webstoreId);
+            $cat = $this->categoryRepository->get($cat->parentCategoryId, $lang, $this->webstoreId);
         }
     }
 
@@ -126,15 +127,14 @@ class CategoryService
      */
     public function get($catID = 0, $lang = null)
     {
-        if ( $lang === null )
-        {
+        if ($lang === null) {
             $lang = $this->sessionStorageService->getLang();
         }
 
         $webstoreId = $this->webstoreId;
         $category = $this->fromMemoryCache(
             "category.$catID.$lang",
-            function() use ($catID, $lang, $webstoreId) {
+            function () use ($catID, $lang, $webstoreId) {
                 $category = $this->categoryRepository->get($catID, $lang, $webstoreId);
                 return $category;
             }
@@ -145,19 +145,15 @@ class CategoryService
 
     public function getForPlentyId($catID = 0, $lang = null, $plentyId = null)
     {
-        $category = $this->get( $catID, $lang );
-        if ( is_null($plentyId) )
-        {
+        $category = $this->get($catID, $lang);
+        if (is_null($plentyId)) {
             $plentyId = Utils::getPlentyId();
         }
 
-        if ( !is_null($category) )
-        {
+        if (!is_null($category)) {
             /** @var CategoryClient $categoryClient */
-            foreach ( $category->clients as $categoryClient )
-            {
-                if ( $categoryClient->plentyId === (int)$plentyId )
-                {
+            foreach ($category->clients as $categoryClient) {
+                if ($categoryClient->plentyId === (int)$plentyId) {
                     return $category;
                 }
             }
@@ -175,16 +171,14 @@ class CategoryService
      */
     public function getChildren($categoryId, $lang = null)
     {
-        if ( $lang === null )
-        {
+        if ($lang === null) {
             $lang = $this->sessionStorageService->getLang();
         }
 
         $children = $this->fromMemoryCache(
             "categoryChildren.$categoryId.$lang",
-            function() use ($categoryId, $lang) {
-                if($categoryId > 0)
-                {
+            function () use ($categoryId, $lang) {
+                if ($categoryId > 0) {
                     return $this->categoryRepository->getChildren($categoryId, $lang);
                 }
 
@@ -204,14 +198,15 @@ class CategoryService
         $templateConfigService = pluginApp(TemplateConfigService::class);
         $category = $this->getCurrentCategory();
         $branches = ArrayHelper::toArray($category->branch);
-        $children = $this->getNavigationTree($templateConfigService->get('header.showCategoryTypes'),
+        $children = $this->getNavigationTree(
+            $templateConfigService->get('header.showCategoryTypes'),
             $this->sessionStorageService->getLang(),
             $category->level + 1,
-            $customerService->getContactClassId());
+            $customerService->getContactClassId()
+        );
 
         for ($level = 1; $level <= 6; $level++) {
-            if (!is_null($branches) && $branches['category' . $level. 'Id'] > 0) {
-
+            if (!is_null($branches) && $branches['category' . $level . 'Id'] > 0) {
                 foreach ($children as $childrenCategory) {
                     if ($childrenCategory['id'] === $branches['category' . $level . 'Id']) {
                         $children = $childrenCategory['children'];
@@ -236,13 +231,11 @@ class CategoryService
     public function getURL($category, $lang = null, $webstoreId = null)
     {
         $defaultLanguage = $this->webstoreConfig->getDefaultLanguage();
-        if ( $lang === null )
-        {
+        if ($lang === null) {
             $lang = $this->sessionStorageService->getLang();
         }
 
-        if(is_null($webstoreId))
-        {
+        if (is_null($webstoreId)) {
             /** @var WebstoreConfigurationService $webstoreService */
             $webstoreService = pluginApp(WebstoreConfigurationService::class);
             $webstoreId = $webstoreService->getWebstoreConfig()->webstoreId;
@@ -250,14 +243,16 @@ class CategoryService
 
         $categoryUrl = $this->fromMemoryCache(
             "categoryUrl.$category->id.$lang.$webstoreId",
-            function() use ($category, $lang, $defaultLanguage, $webstoreId) {
-                if(!$category instanceof Category || $category->details->first() === null)
-                {
+            function () use ($category, $lang, $defaultLanguage, $webstoreId) {
+                if (!$category instanceof Category || $category->details->first() === null) {
                     return null;
                 }
                 $categoryURL = pluginApp(
                     UrlQuery::class,
-                    ['path' => $this->categoryRepository->getUrl($category->id, $lang, false, $webstoreId), 'lang' => $lang]
+                    [
+                        'path' => $this->categoryRepository->getUrl($category->id, $lang, false, $webstoreId),
+                        'lang' => $lang
+                    ]
                 );
                 return $categoryURL->toRelativeUrl($lang !== $defaultLanguage);
             }
@@ -268,8 +263,7 @@ class CategoryService
 
     public function getURLById($categoryId, $lang = null)
     {
-        if ( $lang === null )
-        {
+        if ($lang === null) {
             $lang = $this->sessionStorageService->getLang();
         }
         return $this->getURL($this->get($categoryId, $lang), $lang);
@@ -282,16 +276,13 @@ class CategoryService
      */
     public function getDetails($category, $lang)
     {
-        if ( $category === null )
-        {
+        if ($category === null) {
             return null;
         }
 
         /** @var CategoryDetails $catDetail */
-        foreach( $category->details as $catDetail )
-        {
-            if ( $catDetail->lang == $lang )
-            {
+        foreach ($category->details as $catDetail) {
+            if ($catDetail->lang == $lang) {
                 return $catDetail;
             }
         }
@@ -302,13 +293,12 @@ class CategoryService
 
     /**
      * Check whether a category is referenced by the current route
-     * @param mixed $category   The category to check
+     * @param mixed $category The category to check
      * @return bool
      */
-    public function isCurrent($category):bool
+    public function isCurrent($category): bool
     {
-        if($this->currentCategory === null)
-        {
+        if ($this->currentCategory === null) {
             return false;
         }
 
@@ -319,22 +309,19 @@ class CategoryService
 
     /**
      * Check whether any child of a category is referenced by the current route
-     * @param mixed $category   The category to check
+     * @param mixed $category The category to check
      * @return bool
      */
-    public function isOpen($category):bool
+    public function isOpen($category): bool
     {
-        if($this->currentCategory === null)
-        {
+        if ($this->currentCategory === null) {
             return false;
         }
 
         $categoryId = ($category instanceof Category) ? $category->id : $category['id'];
 
-        foreach($this->currentCategoryTree as $lvl => $categoryBranch)
-        {
-            if($categoryBranch->id === $categoryId)
-            {
+        foreach ($this->currentCategoryTree as $lvl => $categoryBranch) {
+            if ($categoryBranch->id === $categoryId) {
                 return true;
             }
         }
@@ -343,10 +330,10 @@ class CategoryService
 
     /**
      * Check whether a category or any of its children is referenced by the current route
-     * @param mixed $category   The category to check
+     * @param mixed $category The category to check
      * @return bool
      */
-    public function isActive($category = null):bool
+    public function isActive($category = null): bool
     {
         return $category !== null && ($this->isCurrent($category) || $this->isOpen($category));
     }
@@ -357,15 +344,13 @@ class CategoryService
      * @param int $page
      * @return null|PaginatedResult
      */
-    public function getItems( $category = null, array $params = [], int $page = 1 )
+    public function getItems($category = null, array $params = [], int $page = 1)
     {
-        if( $category == null )
-        {
+        if ($category == null) {
             $category = $this->currentCategory;
         }
 
-        if( $category == null || $params == null )
-        {
+        if ($category == null || $params == null) {
             return null;
         }
 
@@ -373,58 +358,68 @@ class CategoryService
          * @var ItemService $itemService
          */
         $itemService = pluginApp(ItemService::class);
-        return $itemService->getItemForCategory( $category->id, $params, $page );
+        return $itemService->getItemForCategory($category->id, $params, $page);
     }
 
     /**
      * Return the sitemap tree as an array
-     * @param string|array   $type     Only return categories of given types
-     * @param string         $lang     The language to get sitemap tree for
-     * @param int|null       $maxLevel The deepest category level to load
+     * @param string|array $type Only return categories of given types
+     * @param string $lang The language to get sitemap tree for
+     * @param int|null $maxLevel The deepest category level to load
      * @param int $customerClassId The customer class id to get tree
      * @return array
      */
-    public function getNavigationTree($type = null, string $lang = null, int $maxLevel = 2, int $customerClassId = 0):array
-    {
-        if ( $lang === null )
-        {
+    public function getNavigationTree(
+        $type = null,
+        string $lang = null,
+        int $maxLevel = 2,
+        int $customerClassId = 0
+    ): array {
+        if (is_array($type) && count($type) === 0) {
+            return [];
+        }
+
+        if ($lang === null) {
             $lang = $this->sessionStorageService->getLang();
         }
 
-        if ( is_null( $type ) )
-        {
+        if (is_null($type)) {
             $type = CategoryType::ALL;
         }
 
-        $tree = $this->categoryRepository->getArrayTree($type, $lang, $this->webstoreConfig->getWebstoreConfig()->webstoreId, $maxLevel, $customerClassId, function($category) {
-            return $category['linklist'] == 'Y';
-        });
+        $tree = $this->categoryRepository->getArrayTree(
+            $type,
+            $lang,
+            $this->webstoreConfig->getWebstoreConfig()->webstoreId,
+            $maxLevel,
+            $customerClassId,
+            function ($category) {
+                return $category['linklist'] == 'Y';
+            }
+        );
 
-        if(Utils::isContactLoggedIn() === false && Utils::isAdminPreview() === false)
-        {
+        if (Utils::isContactLoggedIn() === false && Utils::isAdminPreview() === false) {
             $tree = $this->filterVisibleCategories($tree);
         }
 
         $categoryDataFilter = pluginApp(CategoryDataFilter::class);
         return $categoryDataFilter->applyResultFields(
             $tree,
-            ResultFieldTemplate::load( ResultFieldTemplate::TEMPLATE_CATEGORY_TREE )
+            ResultFieldTemplate::load(ResultFieldTemplate::TEMPLATE_CATEGORY_TREE)
         );
     }
 
-    private function filterVisibleCategories( $categoryList = [])
+    private function filterVisibleCategories($categoryList = [])
     {
         $result = array_filter(
             $categoryList,
-            function($category)
-            {
+            function ($category) {
                 return $category['right'] !== 'customer';
             }
         );
 
         $result = array_map(
-            function($category)
-            {
+            function ($category) {
                 /** @var $category Category */
                 $category->children = $this->filterVisibleCategories($category->children);
 
@@ -440,8 +435,7 @@ class CategoryService
     {
         /** @var CustomerService $customerService */
         $customerService = pluginApp(CustomerService::class);
-        if($categoryId > 0)
-        {
+        if ($categoryId > 0) {
             $currentCategory = $this->get($categoryId);
             $branch = $currentCategory->branch->toArray();
             $maxLevel = max($currentCategory->level + 3, 6);
@@ -454,25 +448,22 @@ class CategoryService
             );
 
             // Filter categories not having texts in current language
-            $tree = array_filter($tree, function($category)
-            {
-                return count($category['details']);
-            });
+            $tree = array_filter(
+                $tree,
+                function ($category) {
+                    return count($category['details']);
+                }
+            );
 
             $tree = array_values($tree);
             $filteredTree = $this->filterBranchEntries($tree, $branch);
 
-            if(count($filteredTree))
-            {
+            if (count($filteredTree)) {
                 return $filteredTree;
-            }
-            else
-            {
+            } else {
                 return $this->getPartialTree(null, $type);
             }
-        }
-        else
-        {
+        } else {
             $tree = $this->getNavigationTree(
                 $type,
                 $this->sessionStorageService->getLang(),
@@ -481,16 +472,17 @@ class CategoryService
             );
 
             // Filter categories not having texts in current language
-            $tree = array_filter($tree, function($category)
-            {
-                return count($category['details']);
-            });
+            $tree = array_filter(
+                $tree,
+                function ($category) {
+                    return count($category['details']);
+                }
+            );
 
             $tree = array_values($tree);
             $siblingCount = count($tree);
 
-            foreach($tree as $i => $category)
-            {
+            foreach ($tree as $i => $category) {
                 $this->appendBranchFields($tree[$i], $siblingCount, '', 1);
             }
 
@@ -501,31 +493,34 @@ class CategoryService
 
     private function filterBranchEntries($tree, $branch = [], $level = 1, $urlPrefix = '')
     {
-        $branchKey      = "category".$level."Id";
+        $branchKey = "category" . $level . "Id";
         $isCurrentLevel = $branch[$branchKey] === $branch["categoryId"];
-        $result         = [];
-        $siblingCount   = count($tree);
+        $result = [];
+        $siblingCount = count($tree);
 
-        foreach($tree as $category)
-        {
+        foreach ($tree as $category) {
             $isInBranch = $category['id'] === $branch[$branchKey];
 
             // filter children by current branch
-            if($isInBranch && !$isCurrentLevel)
-            {
+            if ($isInBranch && !$isCurrentLevel) {
                 $this->appendBranchFields($category, $siblingCount, $urlPrefix, 6);
-                $category['children'] = $this->filterBranchEntries($category['children'], $branch, $level+1, $category['url']);
+                $category['children'] = $this->filterBranchEntries(
+                    $category['children'],
+                    $branch,
+                    $level + 1,
+                    $category['url']
+                );
                 $result[] = $category;
-            }
-            else if($isInBranch && $isCurrentLevel)
-            {
-                $this->appendBranchFields($category, $siblingCount, $urlPrefix, 2);
-                $result[] = $category;
-            }
-            else if(!$isInBranch && $isCurrentLevel)
-            {
-                $this->appendBranchFields($category, $siblingCount, $urlPrefix, 0);
-                $result[] = $category;
+            } else {
+                if ($isInBranch && $isCurrentLevel) {
+                    $this->appendBranchFields($category, $siblingCount, $urlPrefix, 2);
+                    $result[] = $category;
+                } else {
+                    if (!$isInBranch && $isCurrentLevel) {
+                        $this->appendBranchFields($category, $siblingCount, $urlPrefix, 0);
+                        $result[] = $category;
+                    }
+                }
             }
         }
 
@@ -535,10 +530,12 @@ class CategoryService
     private function appendBranchFields(&$category, $siblingCount = 1, $urlPrefix = '', $depth = 6)
     {
         // Filter children not having texts in current language
-        $category['children'] = array_filter($category['children'], function($child)
-        {
-            return count($child['details']);
-        });
+        $category['children'] = array_filter(
+            $category['children'],
+            function ($child) {
+                return count($child['details']);
+            }
+        );
         $category['children'] = array_values($category['children']);
 
         // add flags for lazy loading
@@ -552,60 +549,60 @@ class CategoryService
         $urlQuery = pluginApp(UrlQuery::class, ['path' => $urlPrefix]);
         $category['url'] = $urlQuery->join($details['nameUrl'])->toRelativeUrl();
 
-        if(count($category['children']) && $depth > 0)
-        {
-            foreach($category['children'] as $i => $child)
-            {
-                $this->appendBranchFields($category['children'][$i], $category['childCount'], $category['url'], $depth - 1);
+        if (count($category['children']) && $depth > 0) {
+            foreach ($category['children'] as $i => $child) {
+                $this->appendBranchFields(
+                    $category['children'][$i],
+                    $category['childCount'],
+                    $category['url'],
+                    $depth - 1
+                );
             }
-        }
-        else
-        {
+        } else {
             unset($category['children']);
         }
     }
 
     /**
      * Return the sitemap list as an array
-     * @param string|array  $type Only return categories of given type
-     * @param string        $lang The language to get sitemap list for
+     * @param string|array $type Only return categories of given type
+     * @param string $lang The language to get sitemap list for
      * @return array
      */
-    public function getNavigationList($type = "all", string $lang = null):array
+    public function getNavigationList($type = "all", string $lang = null): array
     {
-        if ( $lang === null )
-        {
+        if ($lang === null) {
             $lang = $this->sessionStorageService->getLang();
         }
 
         $list = $this->filterCategoriesByTypes(
-            $this->categoryRepository->getLinklistList($type, $lang, $this->webstoreConfig->getWebstoreConfig()->webstoreId)
+            $this->categoryRepository->getLinklistList(
+                $type,
+                $lang,
+                $this->webstoreConfig->getWebstoreConfig()->webstoreId
+            )
         );
 
         /** @var CategoryDataFilter $filter */
-        $filter = pluginApp( CategoryDataFilter::class );
+        $filter = pluginApp(CategoryDataFilter::class);
 
         return $filter->applyResultFields(
             $list,
-            ResultFieldTemplate::load( ResultFieldTemplate::TEMPLATE_CATEGORY_TREE )
+            ResultFieldTemplate::load(ResultFieldTemplate::TEMPLATE_CATEGORY_TREE)
         );
     }
 
-    private function filterCategoriesByTypes( $categoryList = [], $types = CategoryType::ALL )
+    private function filterCategoriesByTypes($categoryList = [], $types = CategoryType::ALL)
     {
-        if ( is_string($types) )
-        {
-            if ( $types === CategoryType::ALL )
-            {
+        if (is_string($types)) {
+            if ($types === CategoryType::ALL) {
                 $types = [
                     CategoryType::BLOG,
                     CategoryType::CONTAINER,
                     CategoryType::CONTENT,
                     CategoryType::ITEM
                 ];
-            }
-            else
-            {
+            } else {
                 $types = [$types];
             }
         }
@@ -614,15 +611,16 @@ class CategoryService
         $result = array_filter(
             $categoryList,
 
-            function($category) use ($types, $loggedIn)
-            {
-                return in_array($category->type, $types) && ($category->right !== 'customer' || $loggedIn || Utils::isAdminPreview());
+            function ($category) use ($types, $loggedIn) {
+                return in_array(
+                        $category->type,
+                        $types
+                    ) && ($category->right !== 'customer' || $loggedIn || Utils::isAdminPreview());
             }
         );
 
         $result = array_map(
-            function($category) use ($types)
-            {
+            function ($category) use ($types) {
                 /** @var $category Category */
                 $category->children = $this->filterCategoriesByTypes($category->children, $types);
 
@@ -636,16 +634,15 @@ class CategoryService
 
     /**
      * Returns a list of all parent categories including given category
-     * @param int   $catID      The category Id to get the parents for or 0 to use current category
-     * @param bool  $bottomUp   Set true to order result from bottom (deepest category) to top (= level 1)
-     * @param bool  $filterCategories Filter categories
+     * @param int $catID The category Id to get the parents for or 0 to use current category
+     * @param bool $bottomUp Set true to order result from bottom (deepest category) to top (= level 1)
+     * @param bool $filterCategories Filter categories
      * @return array            The parents of the category
      */
-    public function getHierarchy( int $catID = 0, bool $bottomUp = false, bool $filterCategories = false):array
+    public function getHierarchy(int $catID = 0, bool $bottomUp = false, bool $filterCategories = false): array
     {
-        if( $catID > 0 )
-        {
-            $this->setCurrentCategoryID( $catID );
+        if ($catID > 0) {
+            $this->setCurrentCategoryID($catID);
         }
 
         $hierarchy = [];
@@ -654,47 +651,41 @@ class CategoryService
         /**
          * @var Category $category
          */
-        foreach ( $this->currentCategoryTree as $lvl => $category )
-        {
-            if($filterCategories == false  || $category->right === 'all' || $loggedIn || Utils::isAdminPreview())
-            {
-                array_push( $hierarchy, $category );
-            }else
-            {
+        foreach ($this->currentCategoryTree as $lvl => $category) {
+            if ($filterCategories == false || $category->right === 'all' || $loggedIn || Utils::isAdminPreview()) {
+                array_push($hierarchy, $category);
+            } else {
                 $hierarchy = [];
             }
         }
 
-        if( $bottomUp === false )
-        {
-            $hierarchy = array_reverse( $hierarchy );
+        if ($bottomUp === false) {
+            $hierarchy = array_reverse($hierarchy);
         }
 
-        if(count($this->currentItem))
-        {
+        if (count($this->currentItem)) {
             $lang = Utils::getLang();
-            array_push( $hierarchy, $this->currentItem['texts'][$lang] );
+            array_push($hierarchy, $this->currentItem['texts'][$lang]);
         }
 
         return $hierarchy;
     }
 
-    public function isVisibleForWebstore( $category, $webstoreId = null, $lang = null )
+    public function isVisibleForWebstore($category, $webstoreId = null, $lang = null)
     {
-        if ( is_null($lang) )
-        {
+        if (is_null($lang)) {
             $lang = Utils::getLang();
         }
 
-        if ( is_null($webstoreId) )
-        {
+        if (is_null($webstoreId)) {
             /** @var WebstoreConfigurationService $webstoreService */
             $webstoreService = pluginApp(WebstoreConfigurationService::class);
             $webstoreId = $webstoreService->getWebstoreConfig()->webstoreId;
         }
 
 
-        return $category->clients->where('plenty_webstore_category_link_webstore_id', $webstoreId)->first() instanceof CategoryClient
+        return $category->clients->where('plenty_webstore_category_link_webstore_id', $webstoreId)->first(
+            ) instanceof CategoryClient
             && $category->details->where('lang', $lang)->first() instanceof CategoryDetails;
     }
 
@@ -708,16 +699,14 @@ class CategoryService
         return $this->currentItem;
     }
 
-    public function isHidden($id){
-
-        if(Utils::isAdminPreview())
-        {
+    public function isHidden($id)
+    {
+        if (Utils::isAdminPreview()) {
             return false;
         }
         $isHidden = false;
         foreach ($this->getHierarchy($id) as $category) {
-            if ($category->right === 'customer')
-            {
+            if ($category->right === 'customer') {
                 $isHidden = true;
                 break;
             }
