@@ -87,6 +87,14 @@ class OrderService
     ];
 
     /**
+     * The default visible order types
+     */
+    const VISIBLE_ORDER_TYPES = [
+        OrderType::ORDER,
+        OrderType::WARRANTY
+    ];
+
+    /**
      * OrderService constructor.
      * @param OrderRepositoryContract $orderRepository
      * @param BasketService $basketService
@@ -331,7 +339,7 @@ class OrderService
     {
         if(!isset($filters['orderType']) && !isset($filters['orderTypes']))
         {
-            $filters['orderType'] = OrderType::ORDER;
+            $filters['orderTypes'] = self::VISIBLE_ORDER_TYPES;
         }
 
         $this->orderRepository->setFilters($filters);
@@ -357,7 +365,7 @@ class OrderService
 
         if($contactId > 0)
         {
-            $this->orderRepository->setFilters(['orderTypes' => [OrderType::ORDER, OrderType::WARRANTY]]);
+            $this->orderRepository->setFilters(['orderTypes' => self::VISIBLE_ORDER_TYPES]);
 
             /** @var PaginatedResult $orderResult */
             $orderResult = $this->orderRepository->allOrdersByContact(
