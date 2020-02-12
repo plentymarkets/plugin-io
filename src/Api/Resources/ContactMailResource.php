@@ -2,16 +2,17 @@
 
 namespace IO\Api\Resources;
 
-use IO\Helper\ReCaptcha;
-use IO\Helper\TemplateContainer;
-use IO\Extensions\Functions\ExternalContent;
-use IO\Services\TemplateConfigService;
-use Plenty\Plugin\Http\Response;
-use Plenty\Plugin\Http\Request;
 use IO\Api\ApiResource;
 use IO\Api\ApiResponse;
 use IO\Api\ResponseCode;
+use IO\Constants\LogLevel;
+use IO\Helper\ReCaptcha;
+use IO\Helper\TemplateContainer;
 use IO\Services\ContactMailService;
+use IO\Services\NotificationService;
+use IO\Services\TemplateConfigService;
+use Plenty\Plugin\Http\Request;
+use Plenty\Plugin\Http\Response;
 
 /**
  * Class ContactMailResource
@@ -52,6 +53,12 @@ class ContactMailResource extends ApiResource
 
         if( !ReCaptcha::verify($this->request->get('recaptchaToken', null)) )
         {
+            /**
+            * @var NotificationService $notificationService
+            */
+            $notificationService = pluginApp(NotificationService::class);
+            $notificationService->addNotificationCode(LogLevel::ERROR, 13);
+
             return $this->response->create("", ResponseCode::BAD_REQUEST);
         }
 
