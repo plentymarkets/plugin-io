@@ -75,6 +75,9 @@ class CustomerResource extends ApiResource
             return $this->response->create(null, ResponseCode::BAD_REQUEST);
         }
 
+         /** @var Dispatcher $eventDispatcher */
+        $eventDispatcher = pluginApp(Dispatcher::class);
+        
         if (count($billingAddressData) === 0) {
             $billingAddressData = null;
         } elseif (isset($billingAddressData['vatNumber'])) {
