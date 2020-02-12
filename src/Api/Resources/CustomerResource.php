@@ -52,25 +52,28 @@ class CustomerResource extends ApiResource
      */
     public function store(): Response
     {
-        if (!ReCaptcha::verify($this->request->get("recaptcha", null))) {
-            return $this->response->create("", ResponseCode::BAD_REQUEST);
+        // Honeypot check
+        if (strlen($this->request->get('honeypot'))) {
+            return $this->response->create(true, ResponseCode::OK);
         }
 
-        $contactData = $this->request->get("contact", null);
-        $billingAddressData = $this->request->get("billingAddress", []);
-        $deliveryAddressData = $this->request->get("deliveryAddress", []);
+        if (!ReCaptcha::verify($this->request->get('recaptcha', null))) {
+            return $this->response->create('', ResponseCode::BAD_REQUEST);
+        }
+
+        $contactData = $this->request->get('contact', null);
+        $billingAddressData = $this->request->get('billingAddress', []);
+        $deliveryAddressData = $this->request->get('deliveryAddress', []);
 
         if ($contactData === null || !is_array($contactData)) {
-            $this->response->error(0, "Missing contact data or unexpected format.");
+            $this->response->error(0, 'Missing contact data or unexpected format.');
             return $this->response->create(null, ResponseCode::BAD_REQUEST);
         }
 
         if (!is_array($billingAddressData) || !is_array($deliveryAddressData)) {
-            $this->response->error(0, "Unexpected address format.");
+            $this->response->error(0, 'Unexpected address format.');
             return $this->response->create(null, ResponseCode::BAD_REQUEST);
         }
-        /** @var Dispatcher $eventDispatcher */
-        $eventDispatcher = pluginApp(Dispatcher::class);
 
         if (count($billingAddressData) === 0) {
             $billingAddressData = null;

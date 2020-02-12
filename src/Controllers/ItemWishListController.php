@@ -26,6 +26,10 @@ class ItemWishListController extends LayoutController
 
     public function redirect()
     {
+        if(!is_null($categoryByUrl = $this->checkForExistingCategory())) {
+            return $categoryByUrl;
+        }
+
         /** @var CategoryController $categoryController */
         $categoryController = pluginApp(CategoryController::class);
         return $categoryController->redirectRoute(RouteConfig::WISH_LIST);

@@ -94,6 +94,10 @@ class OrderReturnController extends LayoutController
 
     public function redirect($orderId = 0, $accessKey = '')
     {
+        if(!is_null($categoryByUrl = $this->checkForExistingCategory())) {
+            return $categoryByUrl;
+        }
+
         $returnsParams = [];
         $returnsParams['orderId'] = $orderId;
 
