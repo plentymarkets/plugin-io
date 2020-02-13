@@ -6,6 +6,7 @@ use IO\Helper\RouteConfig;
 use IO\Helper\TemplateContainer;
 use IO\Services\CustomerService;
 use Plenty\Modules\ShopBuilder\Helper\ShopBuilderRequest;
+use Plenty\Plugin\Http\Request;
 use Plenty\Plugin\Log\Loggable;
 
 /**
@@ -45,8 +46,11 @@ class LoginController extends LayoutController
 
     public function redirect()
     {
+        /** @var Request $request */
+        $request = pluginApp(Request::class);
+
         /** @var CategoryController $categoryController */
         $categoryController = pluginApp(CategoryController::class);
-        return $categoryController->redirectRoute(RouteConfig::LOGIN);
+        return $categoryController->redirectRoute(RouteConfig::LOGIN, ['backlink' => $request->get('backlink', '')]);
     }
 }
