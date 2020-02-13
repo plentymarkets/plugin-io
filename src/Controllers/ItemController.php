@@ -54,10 +54,10 @@ class ItemController extends LayoutController
             'item' => SingleItem::getSearchFactory($itemSearchOptions),
             'variationAttributeMap' => VariationAttributeMap::getSearchFactory($itemSearchOptions)
         ];
-        
+
         /** @var TemplateConfigService $templateConfigService */
         $templateConfigService = pluginApp(TemplateConfigService::class);
-        
+
         if ($variationId > 0 && (int)$templateConfigService->get('item.show_please_select') == 1) {
             unset($itemSearchOptions['variationId']);
             $searches['dynamic'] = SingleItem::getSearchFactory($itemSearchOptions);
@@ -111,7 +111,9 @@ class ItemController extends LayoutController
         /** @var WebstoreConfigurationService $webstoreConfigService */
         $webstoreConfigService = pluginApp(WebstoreConfigurationService::class);
         $webstoreConfig = $webstoreConfigService->getWebstoreConfig();
-        $itemResult['initPleaseSelectOption'] = $variationId <= 0 && $webstoreConfig->attributeSelectDefaultOption === 1;
+
+        $attributeSelectDefaultOption = (int)$webstoreConfig->attributeSelectDefaultOption;
+        $itemResult['initPleaseSelectOption'] = $variationId <= 0 && $attributeSelectDefaultOption === 1;
         return $this->renderTemplate(
             'tpl.item',
             $itemResult
