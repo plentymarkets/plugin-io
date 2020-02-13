@@ -640,7 +640,7 @@ class CustomerService
      */
     public function createAddress(array $addressData, int $typeId): Address
     {
-        if (isset($addressData['vatNumber'])) {
+        if (isset($addressData['vatNumber']) && strlen($addressData['vatNumber'] > 0)) {
             /** @var Dispatcher $eventDispatcher */
             $eventDispatcher = pluginApp(Dispatcher::class);
             /** @var ValidateVatNumber $val */
@@ -816,7 +816,7 @@ class CustomerService
      */
     public function updateAddress(int $addressId, array $addressData, int $typeId): Address
     {
-        if (isset($addressData['vatNumber'])) {
+        if (isset($addressData['vatNumber']) && strlen($addressData['vatNumber'] > 0)) {
             /** @var Dispatcher $eventDispatcher */
             $eventDispatcher = pluginApp(Dispatcher::class);
             /** @var ValidateVatNumber $val */
