@@ -2,7 +2,9 @@
 
 namespace IO\Api\Resources;
 
+use IO\Constants\LogLevel;
 use IO\Helper\ReCaptcha;
+use IO\Services\NotificationService;
 use Plenty\Modules\Account\Contact\Models\Contact;
 use Plenty\Modules\Webshop\Events\ValidateVatNumber;
 use Plenty\Plugin\Events\Dispatcher;
@@ -58,6 +60,12 @@ class CustomerResource extends ApiResource
         }
 
         if (!ReCaptcha::verify($this->request->get('recaptcha', null))) {
+            /**
+            * @var NotificationService $notificationService
+            */
+            $notificationService = pluginApp(NotificationService::class);
+            $notificationService->addNotificationCode(LogLevel::ERROR, 13);
+
             return $this->response->create('', ResponseCode::BAD_REQUEST);
         }
 
