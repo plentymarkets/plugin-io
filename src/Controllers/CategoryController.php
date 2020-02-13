@@ -103,11 +103,12 @@ class CategoryController extends LayoutController
         );
     }
 
-    public function redirectRoute($route)
+    public function redirectRoute($route, $params = [])
     {
         return $this->redirectToCategory(
             RouteConfig::getCategoryId($route),
-            "/".$route
+            "/".$route,
+            $params
         );
     }
 
