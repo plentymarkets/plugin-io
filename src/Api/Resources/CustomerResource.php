@@ -85,10 +85,10 @@ class CustomerResource extends ApiResource
 
          /** @var Dispatcher $eventDispatcher */
         $eventDispatcher = pluginApp(Dispatcher::class);
-        
+
         if (count($billingAddressData) === 0) {
             $billingAddressData = null;
-        } elseif (isset($billingAddressData['vatNumber'])) {
+        } elseif (isset($billingAddressData['vatNumber']) && strlen($billingAddressData['vatNumber']) > 0) {
             /** @var ValidateVatNumber $val */
             $val = pluginApp(ValidateVatNumber::class, [$billingAddressData['vatNumber']]);
             $eventDispatcher->fire($val);
@@ -96,7 +96,7 @@ class CustomerResource extends ApiResource
 
         if (count($deliveryAddressData) === 0) {
             $deliveryAddressData = null;
-        } elseif (isset($deliveryAddressData['vatNumber'])) {
+        } elseif (isset($deliveryAddressData['vatNumber']) && strlen($deliveryAddressData['vatNumber']) > 0) {
             /** @var ValidateVatNumber $val */
             $val = pluginApp(ValidateVatNumber::class, [$deliveryAddressData['vatNumber']]);
             $eventDispatcher->fire($val);
