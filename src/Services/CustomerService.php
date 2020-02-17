@@ -79,7 +79,8 @@ class CustomerService
         ContactAddressRepositoryContract $contactAddressRepository,
         AddressRepositoryContract $addressRepository,
         ContactClassRepositoryContract $contactClassRepository,
-        SessionStorageService $sessionStorage
+        SessionStorageService $sessionStorage,
+        Dispatcher $dispatcher
     ) {
         $this->accountRepository = $accountRepository;
         $this->contactRepository = $contactRepository;
@@ -87,6 +88,10 @@ class CustomerService
         $this->addressRepository = $addressRepository;
         $this->contactClassRepository = $contactClassRepository;
         $this->sessionStorage = $sessionStorage;
+        $dispatcher->listen(AfterBasketChanged::class, function()
+        {
+            $this->resetMemoryCache();
+        });
     }
 
     /**
