@@ -77,6 +77,7 @@ class CustomerServiceTest extends TestCase
 
         $this->dispatcherMock = Mockery::mock(Dispatcher::class);
         $this->replaceInstanceByMock(Dispatcher::class, $this->dispatcherMock);
+        $this->dispatcherMock->makePartial();
 
         $this->customerService = pluginApp(CustomerService::class);
     }
