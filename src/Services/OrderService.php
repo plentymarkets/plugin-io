@@ -87,6 +87,14 @@ class OrderService
     ];
 
     /**
+     * The default visible order types
+     */
+    const VISIBLE_ORDER_TYPES = [
+        OrderType::ORDER,
+        OrderType::WARRANTY
+    ];
+
+    /**
      * OrderService constructor.
      * @param OrderRepositoryContract $orderRepository
      * @param BasketService $basketService
@@ -330,9 +338,9 @@ class OrderService
      */
     public function getOrdersForContact(int $contactId, int $page = 1, int $items = 50, array $filters = [], $wrapped = true)
     {
-        if(!isset($filters['orderType']))
+        if(!isset($filters['orderType']) && !isset($filters['orderTypes']))
         {
-            $filters['orderType'] = OrderType::ORDER;
+            $filters['orderTypes'] = self::VISIBLE_ORDER_TYPES;
         }
 
         $this->orderRepository->setFilters($filters);
@@ -358,7 +366,7 @@ class OrderService
 
         if($contactId > 0)
         {
-            $this->orderRepository->setFilters(['orderType' => OrderType::ORDER]);
+            $this->orderRepository->setFilters(['orderTypes' => self::VISIBLE_ORDER_TYPES]);
 
             /** @var PaginatedResult $orderResult */
             $orderResult = $this->orderRepository->allOrdersByContact(
@@ -407,12 +415,14 @@ class OrderService
                     }
 
                     $orders[] = [
-                        'id'           => $order->id,
-                        'total'        => $highlightNetPrices ? $totals['totalNet'] : $totals['totalGross'],
-                        'status'       => $orderStatusName,
-                        'creationDate' => $creationDate,
-                        'shippingDate' => $shippingDate,
-                        'trackingURL'  => $orderTrackingService->getTrackingURL($order, $lang)
+                        'id'            => $order->id,
+                        'parentOrderId' => $order->parentOrder->id,
+                        'type'          => $order->typeId,
+                        'total'         => $highlightNetPrices ? $totals['totalNet'] : $totals['totalGross'],
+                        'status'        => $orderStatusName,
+                        'creationDate'  => $creationDate,
+                        'shippingDate'  => $shippingDate,
+                        'trackingURL'   => $orderTrackingService->getTrackingURL($order, $lang)
                     ];
                 }
             };
@@ -511,6 +521,7 @@ class OrderService
             ];
             $returnOrderData['statusId']          = (float) $returnStatus;
             $returnOrderData['typeId']            = OrderType::RETURNS;
+            $returnOrderData['orderReferences'] = [];
             $returnOrderData['orderReferences'][] = [
                 'referenceOrderId'  => $localizedOrder->order->id,
                 'referenceType'     => 'parent'

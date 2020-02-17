@@ -48,12 +48,14 @@ class LiveShoppingService
             $this->checkStockLimit($liveShoppingData, $liveShoppingItem);
 
             unset($liveShoppingItem['stock'], $liveShoppingItem['variation']['stockLimitation']);
+
+            return [
+                'item' => $liveShoppingItem,
+                'liveShopping' => $liveShoppingData
+            ];
         }
 
-        return [
-            'item' => $liveShoppingItem,
-            'liveShopping' => $liveShoppingData
-        ];
+        return null;
     }
 
     public function getLiveShoppingVariations($itemId, $sorting)
