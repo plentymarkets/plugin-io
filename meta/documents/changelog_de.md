@@ -1,5 +1,35 @@
 # Release Notes für IO
 
+## v4.6.0 (2020-02-17) <a href="https://github.com/plentymarkets/plugin-io/compare/4.5.1...4.6.0" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
+
+### TODO
+
+- Google reCAPTCHA wird ab sofort erst nach der Zustimmung zur Verwendung der entsprechenden Cookies durch den Webshop-Besucher ausgeführt. Daher können Formulare, die über das reCAPTCHA abgesichert sind, auch erst nach Zustimmung des Benutzers abgeschickt werden. Dazu zählen das Kontaktformular und die Kundenregistrierung.
+
+### Hinzugefügt
+
+- Bei der Auftragsanlage kann nun ein Bezugszeichen des Kunden angegeben werden.
+- Der Assistent enthält nun eine Einstellung mit der man die Umsatzsteueridentifikationsnummerprüfung für die Anlage/Änderung von Addressen und den Bestellabschluss aktivieren kann.
+
+### Geändert
+
+- Der OrderReturnController.php übergibt nun die Kategorie an das Frontend, falls im ShopBuilder eine Kategorie für die Retourenseite verknüpft ist.
+- Eigenschaften werden nun in den Datensätzen für Artikellisten nicht mehr ausgegeben, um die Datenmenge zu reduzieren.
+- Die übertragenen Daten bei Artikeln mit Bestellmerkmalen wurden optimiert.
+- Der ItemImageFilter gibt nun auch Alternativtext und Namen des Bildes aus.
+- Das Live-Shopping-Widget zeigt nun das Angebot als beendet an, wenn ein Artikel auf Netto-Warenbestand beschränkt und dieser Bestand erschöpft ist.
+- Bei auftretenden Fehler im Zusammenhang mit Google reCAPTCHA werden nun Fehlermeldungen ausgegeben.
+
+### Behoben
+
+- Es wurde eine feste Abhängigkeit zum Plugin Ceres entfernt.
+- Falls beim Aktualisieren von Artikelmengen im Warenkorb der Mindestbestellwert unterschritten wurde, wurden bereits eingelöste Gutscheine mit Mindestbestellwert nicht entfernt. Dies wurde behoben.
+- Im Navigationsbaum wurden die Einstellungen für Innenabstände nicht auf nachgeladene Listenelemente angewandt. Dies wurde behoben.
+- Es werden nun keine Kategorien mehr in der Navigationsleiste ausgegeben, wenn alle Kategorietypen in der Ceres-Einstellung **Kategorietypen, die in der Navigationsleiste angezeigt werden** deaktiviert sind.
+- Unter bestimmten Umständen wurde der eingelöste Coupon-Code nicht korrekt am Auftrag im Frontend ausgegeben. Dies wurde behoben.
+- Aufträge vom Typ Gewährleistung werden jetzt im Mein Konto-Bereich angezeigt und können retourniert werden.
+- Bei der Weiterleitung zu einer im ShopBuilder erstellen Login-Seite wurde nach dem Login nicht korrekt auf den Checkout weitergeleitet. Dies wurde behoben.
+
 ## v4.5.1 (2020-01-28) <a href="https://github.com/plentymarkets/plugin-io/compare/4.5.0...4.5.1" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
 
 ### Behoben
