@@ -1,5 +1,36 @@
 # Release Notes for IO
 
+## v4.6.0 (2020-02-17) <a href="https://github.com/plentymarkets/plugin-io/compare/4.5.1...4.6.0" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
+
+### TODO
+
+- Google reCAPTCHA is now only carried out after the online store user accepts the corresponding cookies. Forms that are subject to reCAPTCHA, such as the contact form or the customer registration, can therefore only be sent after the user's consent.
+
+### Added 
+
+- You can now add a reference numeral for customers when creating orders.
+- The assistant now contains a setting via which you can activate the VAT number verification for the checkout, the creation of new addresses and changes to existing addresses.
+
+### Changed
+
+- The OrderReturnController.php now passes the category on to the frontend if a category has been linked to the returns page in the ShopBuilder.
+- Properties are no longer output in the data set for item lists in order to reduce the quantity of data.
+- The transmitted data for items with order characteristics has been optimised.
+- The ItemImageFilter now also outputs the alternative text and name of the image.
+- The live shopping widget now displays an offer as ended if the corresponding item's stock is limited to net stock and the stock is depleted.
+- If a Google reCAPTCHA-related error occurs, a corresponding error notification is displayed.
+
+### Fixed 
+
+- A permanent dependency to the Ceres plugin has been removed.
+- Updating the number of items in the shopping cart did not remove redeemed coupons with minimum order value. This behaviour has been fixed.
+- The settings for paddings did not affect list elements of the navigation tree widget that were loaded at a later time. This has been fixed.
+- The navigation bar no longer displays categories if no category type has been activated in the Ceres setting **Type of categories rendered in the navigation**.
+- Under certain circumstances, a redeemed coupon code was not included in the order in the frontend. This has been fixed.
+- Orders of the type warranty are now displayed and can be returned in the my account area.
+- When a user was redirected to a login page that had been created with the ShopBuilder, the user was not redirected to the checkout after they have logged in. This has been fixed.
+
+
 ## v4.5.1 (2020-01-28) <a href="https://github.com/plentymarkets/plugin-io/compare/4.5.0...4.5.1" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
 
 ### Fixed 
