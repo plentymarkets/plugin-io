@@ -64,7 +64,7 @@ class PlaceOrderController extends LayoutController
             }
 
             $deliveryAddressId = $basketService->getDeliveryAddressId();
-            if (!is_null($deliveryAddressId)) {
+            if (!is_null($deliveryAddressId) && $deliveryAddressId > 0) {
                 $deliveryAddressData = $customerService->getAddress($deliveryAddressId, AddressType::DELIVERY);
                 $vatOption = $deliveryAddressData->options->where('typeId', AddressOption::TYPE_VAT_NUMBER)->first();
                 if(!is_null($vatOption))
