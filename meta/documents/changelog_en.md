@@ -1,5 +1,12 @@
 # Release Notes for IO
 
+## v4.6.1 (2020-02-18) <a href="https://github.com/plentymarkets/plugin-io/compare/4.6.0...4.6.1" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
+
+### Fixed
+
+- Due to an error, search results were not output correctly if no page for search results had been linked via the ShopBuilder. This has been fixed.
+- Due to an error pertaining to delivery addresses, customers with guest accounts were unable to place orders in the checkout. This has been fixed.
+
 ## v4.6.0 (2020-02-17) <a href="https://github.com/plentymarkets/plugin-io/compare/4.5.1...4.6.0" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
 
 ### TODO
