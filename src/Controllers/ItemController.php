@@ -77,12 +77,22 @@ class ItemController extends LayoutController
         $shopBuilderRequest = pluginApp(ShopBuilderRequest::class);
 
         $defaultCategories = $itemResult['item']['documents'][0]['data']['defaultCategories'];
-        $defaultCategory = array_filter($defaultCategories, function ($category) {
-            return $category['plentyId'] == $this->plentyId;
-        });
+        $defaultCategory = array_filter(
+            $defaultCategories,
+            function ($category) {
+                return $category['plentyId'] == $this->plentyId;
+            }
+        );
 
         $shopBuilderRequest->setMainCategory($defaultCategory[0]['id']);
         $shopBuilderRequest->setMainContentType('singleitem');
+        $itemResult['isItemSet'] = false;
+
+        if ($itemResult['item']['documents'][0]['data']['item']['itemType'] == 'set' || $itemResult['item']['documents'][0]['data']['item']['itemType'] == 'multiPack') {
+            $shopBuilderRequest->setMainContentType('itemset');
+            $itemResult['isItemSet'] = true;
+        }
+
         if ($shopBuilderRequest->isShopBuilder()) {
             /** @var VariationSearchResultFactory $searchResultFactory */
             $searchResultFactory = pluginApp(VariationSearchResultFactory::class);
