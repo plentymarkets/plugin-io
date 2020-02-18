@@ -6,9 +6,8 @@ use IO\Extensions\Constants\ShopUrls;
 use IO\Helper\MemoryCache;
 use IO\Helper\RouteConfig;
 use IO\Helper\Utils;
+use Plenty\Modules\Webshop\Contracts\UrlBuilderRepositoryContract;
 use Plenty\Modules\Webshop\Helpers\UrlQuery;
-use Plenty\Modules\Webshop\Contracts\CategoryUrlBuilderRepositoryContract;
-use Plenty\Modules\Webshop\Contracts\VariationUrlBuilderRepositoryContract;
 use Plenty\Modules\Webshop\Contracts\LocalizationRepositoryContract;
 use Plenty\Modules\Webshop\Contracts\WebstoreConfigurationRepositoryContract;
 use Plenty\Plugin\Http\Request;
@@ -46,9 +45,10 @@ class UrlService
         $categoryUrl = $this->fromMemoryCache(
             "categoryUrl.$categoryId.$lang",
             function () use ($categoryId, $lang) {
-                /** @var CategoryUrlBuilderRepositoryContract $categoryUrlBuilderRepository */
-                $categoryUrlBuilderRepository = pluginApp(CategoryUrlBuilderRepositoryContract::class);
-                return $categoryUrlBuilderRepository->buildUrl($categoryId, $lang);
+                        /** @var UrlBuilderRepositoryContract $urlBuilderRepository */
+                        $urlBuilderRepository = pluginApp(UrlBuilderRepositoryContract::class);
+
+                return $urlBuilderRepository->buildCategoryUrl($categoryId, $lang);
             }
         );
 
@@ -71,13 +71,13 @@ class UrlService
         $variationUrl = $this->fromMemoryCache(
             "variationUrl.$itemId.$variationId.$lang",
             function () use ($itemId, $variationId, $lang) {
-                /** @var VariationUrlBuilderRepositoryContract $variationUrlBuilderRepository */
-                $variationUrlBuilderRepository = pluginApp(VariationUrlBuilderRepositoryContract::class);
-                $variationUrl = $variationUrlBuilderRepository->buildUrl($itemId, $variationId, $lang);
+                /** @var UrlBuilderRepositoryContract $urlBuilderRepository */
+                $urlBuilderRepository = pluginApp(UrlBuilderRepositoryContract::class);
+                $variationUrl = $urlBuilderRepository->buildVariationUrl($itemId, $variationId, $lang);
 
                 if ($variationUrl->getPath() !== null) {
                     $variationUrl->append(
-                        $variationUrlBuilderRepository->getSuffix($itemId, $variationId)
+                        $urlBuilderRepository->getSuffix($itemId, $variationId)
                     );
                 }
 

@@ -5,6 +5,7 @@ namespace IO\Services\ItemSearch\Extensions;
 use IO\Contracts\VariationSearchFactoryContract as VariationSearchFactory;
 use IO\Services\UrlBuilder\VariationUrlBuilder;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Source\Mutator\BuiltIn\LanguageMutator;
+use Plenty\Modules\Webshop\Contracts\UrlBuilderRepositoryContract;
 use Plenty\Modules\Webshop\Contracts\WebstoreConfigurationRepositoryContract;
 
 /**
@@ -55,8 +56,9 @@ class ItemUrlExtension implements ItemSearchExtension
      */
     public function transformResult($baseResult, $extensionResult)
     {
-        /** @var VariationUrlBuilder $itemUrlBuilder */
-        $itemUrlBuilder = pluginApp(VariationUrlBuilder::class);
+        /** @var UrlBuilderRepositoryContract $urlBuilderRepository */
+        $urlBuilderRepository = pluginApp(UrlBuilderRepositoryContract::class);
+
         foreach ($extensionResult['documents'] as $key => $urlDocument) {
             VariationUrlBuilder::fillItemUrl($urlDocument['data']);
             $document = $baseResult['documents'][$key];
@@ -64,7 +66,7 @@ class ItemUrlExtension implements ItemSearchExtension
                 && count($document['data']['texts'])
                 && strlen($document['data']['texts']['urlPath']) <= 0) {
                 // attach generated item url if not defined
-                $itemUrl = $itemUrlBuilder->buildUrl(
+                $itemUrl = $urlBuilderRepository->buildVariationUrl(
                     $urlDocument['data']['item']['id'],
                     $urlDocument['data']['variation']['id']
                 )->getPath();

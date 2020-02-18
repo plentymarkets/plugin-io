@@ -10,7 +10,7 @@ use Plenty\Modules\Webshop\ItemSearch\Services\ItemSearchService;
  * Class ItemUrlBuilder
  * @package IO\Services\UrlBuilder
  * @deprecated since 5.0.0 will be removed in 6.0.0
- * @see \Plenty\Modules\Webshop\Contracts\ItemUrlBuilderRepositoryContract
+ * @see \Plenty\Modules\Webshop\Contracts\UrlBuilderRepositoryContract
  */
 class ItemUrlBuilder
 {
@@ -19,7 +19,7 @@ class ItemUrlBuilder
      * @param string|null $lang
      * @return UrlQuery|mixed
      * @deprecated since 5.0.0 will be removed in 6.0.0
-     * @see \Plenty\Modules\Webshop\Contracts\ItemUrlBuilderRepositoryContract::buildUrl()
+     * @see \Plenty\Modules\Webshop\Contracts\UrlBuilderRepositoryContract::buildItemUrl()
      */
     public function buildUrl(int $itemId, string $lang = null )
     {

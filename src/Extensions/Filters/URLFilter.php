@@ -1,12 +1,11 @@
-<?php //strict
+<?php
 
 namespace IO\Extensions\Filters;
 
 use IO\Extensions\AbstractFilter;
 use IO\Helper\Utils;
 use IO\Services\ItemService;
-use Plenty\Modules\Webshop\Contracts\ItemUrlBuilderRepositoryContract;
-use Plenty\Modules\Webshop\Contracts\VariationUrlBuilderRepositoryContract;
+use Plenty\Modules\Webshop\Contracts\UrlBuilderRepositoryContract;
 
 /**
  * Class URLFilter
@@ -56,18 +55,17 @@ class URLFilter extends AbstractFilter
             return "";
         }
 
+        /** @var UrlBuilderRepositoryContract $urlBuilderRepository */
+        $urlBuilderRepository = pluginApp(UrlBuilderRepositoryContract::class);
+
         $includeLanguage = Utils::getLang() !== Utils::getDefaultLang();
         if ($variationId === null || $variationId <= 0) {
-            /** @var ItemUrlBuilderRepositoryContract $itemUrlBuilderRepository */
-            $itemUrlBuilderRepository = pluginApp(ItemUrlBuilderRepositoryContract::class);
-            return $itemUrlBuilderRepository->buildUrl($itemId)->toRelativeUrl($includeLanguage);
+            return $urlBuilderRepository->buildItemUrl($itemId)->toRelativeUrl($includeLanguage);
         } else {
-            /** @var VariationUrlBuilderRepositoryContract $variationUrlBuilderRepository */
-            $variationUrlBuilderRepository = pluginApp(VariationUrlBuilderRepositoryContract::class);
-            $url = $variationUrlBuilderRepository->buildUrl($itemId, $variationId);
+            $url = $urlBuilderRepository->buildVariationUrl($itemId, $variationId);
 
             return $url->append(
-                $variationUrlBuilderRepository->getSuffix($itemId, $variationId, $withVariationId)
+                $urlBuilderRepository->getSuffix($itemId, $variationId, $withVariationId)
             )->toRelativeUrl($includeLanguage);
         }
     }
