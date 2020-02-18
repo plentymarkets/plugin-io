@@ -2,8 +2,7 @@
 
 namespace IO\Controllers;
 
-use IO\Extensions\Constants\ShopUrls;
-use IO\Guards\AuthGuard;
+use IO\Helper\RouteConfig;
 use Plenty\Plugin\Http\Request;
 
 class ItemSearchController extends LayoutController
@@ -16,12 +15,12 @@ class ItemSearchController extends LayoutController
         return $this->renderTemplate(
             "tpl.search",
             [
-                'category'      => $category,
-                'page'          => $request->get('page', null),
-                'itemsPerPage'  => $request->get('items', null),
-                'query'         => $request->get('query', null),
-                'sorting'       => $request->get('sorting', null),
-                'facets'        => $request->get('facets', '' )
+                'category' => $category,
+                'page' => $request->get('page', null),
+                'itemsPerPage' => $request->get('items', null),
+                'query' => $request->get('query', null),
+                'sorting' => $request->get('sorting', null),
+                'facets' => $request->get('facets', '')
             ],
             false
         );
@@ -30,20 +29,19 @@ class ItemSearchController extends LayoutController
     /**
      * Redirect to new search url from category when search route
      * is enabled and called.
-     *
-     * @return void
      */
-    public function redirectToSearch(): void
+    public function redirectToSearch()
     {
-        if(!is_null($categoryByUrl = $this->checkForExistingCategory())) {
+        if (!is_null($categoryByUrl = $this->checkForExistingCategory())) {
             return $categoryByUrl;
         }
 
         /** @var Request $request */
         $request = pluginApp(Request::class);
-        /** @var ShopUrls $shopUrl */
-        $shopUrl = pluginApp(ShopUrls::class);
 
-        AuthGuard::redirect($shopUrl->search, ['query' => $request->get('query', null)]);
+        /** @var CategoryController $categoryController */
+        $categoryController = pluginApp(CategoryController::class);
+
+        return $categoryController->redirectRoute(RouteConfig::SEARCH, ['query' => $request->get('query', null)]);
     }
 }

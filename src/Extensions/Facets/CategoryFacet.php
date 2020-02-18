@@ -41,6 +41,7 @@ class CategoryFacet implements FacetExtension
         /** @var TemplateConfigRepositoryContract $templateConfigRepo */
         $templateConfigRepo = pluginApp(TemplateConfigRepositoryContract::class);
 
+
         if ($templateConfigRepo->get('item.show_category_filter') == 'true') {
             if (count($result)) {
                 /** @var LocalizationRepositoryContract $localizationRepository */
@@ -61,14 +62,21 @@ class CategoryFacet implements FacetExtension
                 /** @var CategoryService $categoryService */
                 $categoryService = pluginApp(CategoryService::class);
 
+                $currentCategory = $categoryService->getCurrentCategory();
 
-                $categoryBranch = $categoryService->getCurrentCategory()->branch()->get()[0];
-                $categoryBranch = array_unique(array_values($categoryBranch->toArray()));
+                $categoryBranch = null;
+                if (!is_null($currentCategory)) {
+                    $categoryBranch = $currentCategory->branch()->get()[0];
+                    $categoryBranch = array_unique(array_values($categoryBranch->toArray()));
+                }
 
                 foreach ($result as $categoryId => $count) {
-                    $category = $categoryService->getForPlentyId($categoryId, $localizationRepository->getLanguage());
+                    $category = $categoryService->getForPlentyId($categoryId, Utils::getLang());
 
-                    if (!is_null($category) && !in_array($categoryId, $categoryBranch) && (!$categoryService->isHidden(
+                    if (!is_null($category) && (!is_null($categoryBranch) || !in_array(
+                                $categoryId,
+                                $categoryBranch
+                            )) && (!$categoryService->isHidden(
                                 $category->id
                             ) || $loggedIn || Utils::isAdminPreview())) {
                         $categoryFacet['values'][] = [

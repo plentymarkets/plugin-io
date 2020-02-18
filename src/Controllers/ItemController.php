@@ -128,7 +128,9 @@ class ItemController extends LayoutController
         /** @var WebstoreConfigurationRepositoryContract $webstoreConfigurationRepository */
         $webstoreConfigurationRepository = pluginApp(WebstoreConfigurationRepositoryContract::class);
         $webstoreConfiguration = $webstoreConfigurationRepository->getWebstoreConfiguration();
-        $itemResult['initPleaseSelectOption'] = $variationId <= 0 && $webstoreConfiguration->attributeSelectDefaultOption === 1;
+
+        $attributeSelectDefaultOption = (int)$webstoreConfiguration->attributeSelectDefaultOption;
+        $itemResult['initPleaseSelectOption'] = $variationId <= 0 && $attributeSelectDefaultOption === 1;
         return $this->renderTemplate(
             'tpl.item',
             $itemResult

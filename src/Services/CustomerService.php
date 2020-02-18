@@ -85,7 +85,8 @@ class CustomerService
         ContactAddressRepositoryContract $contactAddressRepository,
         AddressRepositoryContract $addressRepository,
         ContactClassRepositoryContract $contactClassRepository,
-        SessionStorageRepositoryContract $sessionStorageRepository
+        SessionStorageRepositoryContract $sessionStorageRepository,
+        Dispatcher $dispatcher
     ) {
         $this->accountRepository = $accountRepository;
         $this->coreContactRepository = $coreContactRepository;
@@ -94,6 +95,11 @@ class CustomerService
         $this->addressRepository = $addressRepository;
         $this->contactClassRepository = $contactClassRepository;
         $this->sessionStorageRepository = $sessionStorageRepository;
+
+        $dispatcher->listen(AfterBasketChanged::class, function()
+        {
+            $this->resetMemoryCache();
+        });
     }
 
     /**
@@ -597,7 +603,7 @@ class CustomerService
      */
     public function createAddress(array $addressData, int $typeId): Address
     {
-        if (isset($addressData['vatNumber'])) {
+        if (isset($addressData['vatNumber']) && strlen($addressData['vatNumber']) > 0) {
             /** @var Dispatcher $eventDispatcher */
             $eventDispatcher = pluginApp(Dispatcher::class);
             /** @var ValidateVatNumber $val */
@@ -773,7 +779,7 @@ class CustomerService
      */
     public function updateAddress(int $addressId, array $addressData, int $typeId): Address
     {
-        if (isset($addressData['vatNumber'])) {
+        if (isset($addressData['vatNumber']) && strlen($addressData['vatNumber']) > 0) {
             /** @var Dispatcher $eventDispatcher */
             $eventDispatcher = pluginApp(Dispatcher::class);
             /** @var ValidateVatNumber $val */
