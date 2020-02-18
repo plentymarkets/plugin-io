@@ -37,11 +37,9 @@ class CategoryFacet implements FacetExtension
         /** @var TemplateConfigService $templateConfigService */
         $templateConfigService = pluginApp(TemplateConfigService::class);
 
-        if($templateConfigService->get('item.show_category_filter') == 'true')
-        {
-            if(count($result))
-            {
-                 /** @var SessionStorageService $sessionStorage */
+        if ($templateConfigService->get('item.show_category_filter') == 'true') {
+            if (count($result)) {
+                /** @var SessionStorageService $sessionStorage */
                 $sessionStorage = pluginApp(SessionStorageService::class);
 
                 $categoryFacet = [
@@ -60,37 +58,40 @@ class CategoryFacet implements FacetExtension
                 /** @var CategoryService $categoryService */
                 $categoryService = pluginApp(CategoryService::class);
 
-                $categoryBranch = $categoryService->getCurrentCategory()->branch()->get()[0];
-                $categoryBranch = array_unique(array_values($categoryBranch->toArray()));
+                $currentCategory = $categoryService->getCurrentCategory();
 
-                foreach($result as $categoryId => $count)
-                {
+                $categoryBranch = null;
+                if (!is_null($currentCategory)) {
+                    $categoryBranch = $categoryService->getCurrentCategory()->branch()->get()[0];
+                    $categoryBranch = array_unique(array_values($categoryBranch->toArray()));
+                }
+
+                foreach ($result as $categoryId => $count) {
                     $category = $categoryService->getForPlentyId($categoryId, $sessionStorage->getLang());
 
-                    if ( !is_null($category) && !in_array($categoryId, $categoryBranch) && (!$categoryService->isHidden($category->id) || $loggedIn || Utils::isAdminPreview()) )
-                    {
+                    if (!is_null($category) && (!is_null($categoryBranch) || !in_array(
+                                $categoryId,
+                                $categoryBranch
+                            )) && (!$categoryService->isHidden(
+                                $category->id
+                            ) || $loggedIn || Utils::isAdminPreview())) {
                         $categoryFacet['values'][] = [
                             'id' => 'category-' . $categoryId,
                             'name' => $category->details[0]->name,
                             'count' => $count,
                         ];
 
-                        if ( count($categoryFacet['values']) === self::MAX_RESULT_COUNT )
-                        {
+                        if (count($categoryFacet['values']) === self::MAX_RESULT_COUNT) {
                             break;
                         }
                     }
-
                 }
             }
 
 
-            if(count($categoryFacet['values']) > 0)
-            {
+            if (count($categoryFacet['values']) > 0) {
                 $categoryFacet['count'] = count($categoryFacet['values']);
-            }
-            else
-            {
+            } else {
                 $categoryFacet = [];
             }
         }
@@ -102,19 +103,15 @@ class CategoryFacet implements FacetExtension
     {
         $categoryIds = [];
 
-        if(count($filtersList))
-        {
-            foreach ($filtersList as $filter)
-            {
-                if(strpos($filter, 'category-') === 0)
-                {
+        if (count($filtersList)) {
+            foreach ($filtersList as $filter) {
+                if (strpos($filter, 'category-') === 0) {
                     $e = explode('-', $filter);
                     $categoryIds[] = $e[1];
                 }
             }
 
-            if(count($categoryIds))
-            {
+            if (count($categoryIds)) {
                 /** @var CategoryFilter $categoryFilter */
                 $categoryFilter = pluginApp(CategoryFilter::class);
                 $categoryFilter->isInAtLeastOneCategory($categoryIds);
