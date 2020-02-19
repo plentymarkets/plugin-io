@@ -36,6 +36,8 @@ class ItemSearchAutocompleteResource extends ApiResource
         $searchString = $this->request->get('query', '');
 
         if (strlen($searchString)) {
+            $searchTypes = $this->request->get('types', []);
+
             /** @var ItemSearchService $itemSearchService */
             $itemSearchService = pluginApp(ItemSearchService::class);
             $response = $itemSearchService->getResults(
@@ -44,7 +46,9 @@ class ItemSearchAutocompleteResource extends ApiResource
                         'query' => $searchString,
                         'autocomplete' => true,
                         'page' => 1,
-                        'itemsPerPage' => 20
+                        'itemsPerPage' => 20,
+                        'withCategories' => in_array('category', $searchTypes),
+                        'withSuggestions' => in_array('suggestions', $searchTypes)
                     ]
                 )
             );

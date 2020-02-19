@@ -34,7 +34,6 @@ class ItemSearchResource extends ApiResource
     public function index(): Response
     {
         $searchString = $this->request->get('query', '');
-        $searchTypes = $this->request->get('types', []);
 
         if (strlen($searchString)) {
             $itemListOptions = [
@@ -45,8 +44,6 @@ class ItemSearchResource extends ApiResource
                 'query' => $searchString,
                 'priceMin' => $this->request->get('priceMin', 0),
                 'priceMax' => $this->request->get('priceMax', 0),
-                'withCategories' => in_array('category', $searchTypes),
-                'withSuggestions' => in_array('suggestions', $searchTypes)
             ];
 
             /** @var ItemSearchService $itemSearchService */
