@@ -7,7 +7,6 @@ use IO\Helper\Utils;
 use Plenty\Modules\Plugin\DataBase\Contracts\DataBase;
 use Plenty\Modules\Plugin\DataBase\Contracts\Model;
 use Plenty\Modules\Webshop\Contracts\ContactRepositoryContract;
-use Plenty\Modules\Webshop\Template\Contracts\TemplateConfigRepositoryContract;
 
 class UserDataHashService
 {
@@ -19,12 +18,12 @@ class UserDataHashService
      * UserDataHashService constructor.
      *
      * @param DataBase              $dataBase
-     * @param TemplateConfigRepositoryContract $templateConfigRepo
+     * @param TemplateConfigService $templateConfigService
      */
-    public function __construct(DataBase $dataBase, TemplateConfigRepositoryContract $templateConfigRepo)
+    public function __construct(DataBase $dataBase, TemplateConfigService $templateConfigService)
     {
         $this->db = $dataBase;
-        $this->defaultTTL = $templateConfigRepo->getInteger('global.user_data_hash_max_age', 24);
+        $this->defaultTTL = $templateConfigService->getInteger('global.user_data_hash_max_age', 24);
     }
 
     /**

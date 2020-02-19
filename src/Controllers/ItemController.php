@@ -7,6 +7,7 @@ use IO\Helper\Utils;
 use IO\Services\CategoryService;
 use IO\Services\ItemListService;
 use IO\Services\ItemSearch\Factories\VariationSearchResultFactory;
+use IO\Services\TemplateConfigService;
 use Plenty\Modules\Category\Models\Category;
 use Plenty\Modules\ShopBuilder\Helper\ShopBuilderRequest;
 use Plenty\Modules\Webshop\Contracts\WebstoreConfigurationRepositoryContract;
@@ -14,7 +15,6 @@ use Plenty\Modules\Webshop\ItemSearch\Helpers\ResultFieldTemplate;
 use Plenty\Modules\Webshop\ItemSearch\SearchPresets\SingleItem;
 use Plenty\Modules\Webshop\ItemSearch\SearchPresets\VariationAttributeMap;
 use Plenty\Modules\Webshop\ItemSearch\Services\ItemSearchService;
-use Plenty\Modules\Webshop\Template\Contracts\TemplateConfigRepositoryContract;
 use Plenty\Plugin\Http\Response;
 use Plenty\Plugin\Log\Loggable;
 
@@ -56,10 +56,10 @@ class ItemController extends LayoutController
             'variationAttributeMap' => VariationAttributeMap::getSearchFactory($itemSearchOptions)
         ];
 
-        /** @var TemplateConfigRepositoryContract $templateConfigRepo */
-        $templateConfigRepo = pluginApp(TemplateConfigRepositoryContract::class);
+        /** @var TemplateConfigService $templateConfigService */
+        $templateConfigService = pluginApp(TemplateConfigService::class);
 
-        if ($variationId > 0 && (int)$templateConfigRepo->getInteger('item.show_please_select') == 1) {
+        if ($variationId > 0 && (int)$templateConfigService->getInteger('item.show_please_select') == 1) {
             unset($itemSearchOptions['variationId']);
             $searches['dynamic'] = SingleItem::getSearchFactory($itemSearchOptions);
         }

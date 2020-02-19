@@ -24,7 +24,6 @@ use Plenty\Modules\Webshop\Contracts\ContactRepositoryContract;
 use Plenty\Modules\Webshop\Contracts\LocalizationRepositoryContract;
 use Plenty\Modules\Webshop\Contracts\SessionStorageRepositoryContract;
 use Plenty\Modules\Webshop\Contracts\WebstoreConfigurationRepositoryContract;
-use Plenty\Modules\Webshop\Template\Contracts\TemplateConfigRepositoryContract;
 use Plenty\Plugin\ConfigRepository;
 use Plenty\Plugin\Events\Dispatcher;
 use Plenty\Plugin\Log\Loggable;
@@ -472,10 +471,10 @@ class CheckoutService
                 $vatService = pluginApp(VatService::class);
                 $showNetPrice = $this->contactRepository->showNetPrices();
 
-                /** @var TemplateConfigRepositoryContract $templateConfigRepo */
-                $templateConfigRepo = pluginApp(TemplateConfigRepositoryContract::class);
+                /** @var TemplateConfigService $templateConfigService */
+                $templateConfigService = pluginApp(TemplateConfigService::class);
 
-                $showAllShippingProfiles = $templateConfigRepo->getBoolean(
+                $showAllShippingProfiles = $templateConfigService->getBoolean(
                     'checkout.show_all_shipping_profiles',
                     false
                 );

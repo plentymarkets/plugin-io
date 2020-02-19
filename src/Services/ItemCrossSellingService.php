@@ -2,10 +2,10 @@
 
 namespace IO\Services;
 
+use IO\Helper\Utils;
 use Plenty\Modules\Webshop\Contracts\SessionStorageRepositoryContract;
 use Plenty\Modules\Webshop\ItemSearch\Helpers\SortingHelper;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\ElasticSearch;
-use Plenty\Modules\Webshop\Template\Contracts\TemplateConfigRepositoryContract;
 
 /**
  * Class ItemCrossSellingService
@@ -16,25 +16,19 @@ class ItemCrossSellingService
     /** @var SessionStorageRepositoryContract $sessionStorageRepository */
     private $sessionStorageRepository;
 
-    /** @var TemplateConfigRepositoryContract */
-    private $templateConfigRepository;
-
     /** @var SortingHelper */
     private $sortingHelper;
 
     /**
      * ItemLastSeenService constructor.
      * @param SessionStorageRepositoryContract $sessionStorageRepository
-     * @param TemplateConfigRepositoryContract $templateConfigRepository
      * @param SortingHelper $sortingHelper
      */
     public function __construct(
         SessionStorageRepositoryContract $sessionStorageRepository,
-        TemplateConfigRepositoryContract $templateConfigRepository,
         SortingHelper $sortingHelper
     ) {
         $this->sessionStorageRepository = $sessionStorageRepository;
-        $this->templateConfigRepository = $templateConfigRepository;
         $this->sortingHelper = $sortingHelper;
     }
 
@@ -53,7 +47,7 @@ class ItemCrossSellingService
 
     public function getType()
     {
-        return $this->templateConfigRepository->get('item.lists.cross_selling_type', 'Similar');
+        return Utils::getTemplateConfig('item.lists.cross_selling_type', 'Similar');
     }
 
     public function setSorting($sorting)
@@ -70,7 +64,7 @@ class ItemCrossSellingService
 
     public function getSorting()
     {
-        $sorting = $this->templateConfigRepository->get('item.lists.cross_selling_sorting');
+        $sorting = Utils::getTemplateConfig('item.lists.cross_selling_sorting');
 
         if (is_null($sorting) || !strlen($sorting)) {
             $sorting = 'texts.' . $this->sortingHelper->getUsedItemName() . '_' . ElasticSearch::SORTING_ORDER_ASC;
