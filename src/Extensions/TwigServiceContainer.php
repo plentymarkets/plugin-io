@@ -28,6 +28,7 @@ use IO\Services\OrderService;
 use IO\Services\OrderTotalsService;
 use IO\Services\PropertyFileService;
 use IO\Services\SalesPriceService;
+use IO\Services\SessionStorageService;
 use IO\Services\TagService;
 use IO\Services\TemplateService;
 use IO\Services\UnitService;
@@ -85,9 +86,14 @@ class TwigServiceContainer
         return pluginApp(OrderService::class);
     }
 
-    public function getSessionStorage(): SessionStorageRepositoryContract
+    public function getSessionStorageRepository(): SessionStorageRepositoryContract
     {
         return pluginApp(SessionStorageRepositoryContract::class);
+    }
+
+    public function getSessionStorage(): SessionStorageService
+    {
+        return pluginApp(SessionStorageService::class);
     }
 
     public function getUnit(): UnitService
