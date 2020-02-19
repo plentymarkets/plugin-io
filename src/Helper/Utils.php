@@ -3,15 +3,13 @@
 namespace IO\Helper;
 
 use IO\Services\SessionStorageService;
+use IO\Services\TemplateConfigService;
 use IO\Services\UrlBuilder\UrlQuery;
 use Plenty\Modules\Frontend\Services\AccountService;
 use Plenty\Modules\ShopBuilder\Helper\ShopBuilderRequest;
 use Plenty\Modules\Webshop\Contracts\LocalizationRepositoryContract;
-use Plenty\Modules\Webshop\Contracts\WebstoreConfigurationRepositoryContract;
-use Plenty\Modules\Webshop\Template\Contracts\TemplateConfigRepositoryContract;
 use Plenty\Plugin\Application;
 use Plenty\Plugin\Translation\Translator;
-use Zend\Soap\Client\Local;
 
 class Utils
 {
@@ -73,9 +71,9 @@ class Utils
 
     public static function getTemplateConfig($key, $default = null)
     {
-        /** @var TemplateConfigRepositoryContract $templateConfigRepo */
-        $templateConfigRepo = pluginApp(TemplateConfigRepositoryContract::class);
-        return $templateConfigRepo->get($key, $default);
+        /** @var TemplateConfigService $templateConfigService */
+        $templateConfigService = pluginApp(TemplateConfigService::class);
+        return $templateConfigService->get($key, $default);
     }
 
     public static function translate($key, $params = [], $locale = null)

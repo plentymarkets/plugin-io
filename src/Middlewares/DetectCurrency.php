@@ -3,8 +3,8 @@
 namespace IO\Middlewares;
 
 use IO\Services\CheckoutService;
+use IO\Services\TemplateConfigService;
 use IO\Services\TemplateService;
-use Plenty\Modules\Webshop\Template\Contracts\TemplateConfigRepositoryContract;
 use Plenty\Plugin\Http\Request;
 use Plenty\Plugin\Http\Response;
 use Plenty\Plugin\Middleware;
@@ -20,9 +20,9 @@ class DetectCurrency extends Middleware
         $currency = !is_null($currency) ? $currency : $request->get('Currency', null);
 
         if (!is_null($currency)) {
-            /** @var TemplateConfigRepositoryContract $templateConfigRepo */
-            $templateConfigRepo = pluginApp(TemplateConfigRepositoryContract::class);
-            $enabledCurrencies = explode(', ', $templateConfigRepo->get('currency.available_currencies'));
+            /** @var TemplateConfigService $templateConfigService */
+            $templateConfigService = pluginApp(TemplateConfigService::class);
+            $enabledCurrencies = explode(', ', $templateConfigService->get('currency.available_currencies'));
 
             if (in_array($currency, $enabledCurrencies) || array_pop($enabledCurrencies) == 'all') {
                 /** @var CheckoutService $checkoutService */

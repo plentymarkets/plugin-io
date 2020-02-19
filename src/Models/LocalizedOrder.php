@@ -4,6 +4,7 @@ namespace IO\Models;
 
 use IO\Builder\Order\OrderItemType;
 use IO\Builder\Order\OrderType;
+use IO\Services\TemplateConfigService;
 use Plenty\Modules\Webshop\ItemSearch\Factories\VariationSearchFactory;
 use IO\Services\OrderService;
 use IO\Services\OrderStatusService;
@@ -18,7 +19,6 @@ use IO\Extensions\Filters\URLFilter;
 use Plenty\Modules\Webshop\Filters\ItemImagesFilter;
 use Plenty\Modules\Webshop\ItemSearch\Helpers\ResultFieldTemplate;
 use Plenty\Modules\Webshop\ItemSearch\Services\ItemSearchService;
-use Plenty\Modules\Webshop\Template\Contracts\TemplateConfigRepositoryContract;
 
 class LocalizedOrder extends ModelWrapper
 {
@@ -306,9 +306,9 @@ class LocalizedOrder extends ModelWrapper
                 }
             }
 
-            /**  @var TemplateConfigRepositoryContract $templateConfigRepo */
-            $templateConfigRepo = pluginApp(TemplateConfigRepositoryContract::class);
-            $returnTime = $templateConfigRepo->getInteger('my_account.order_return_days', 14);
+            /**  @var TemplateConfigService $templateConfigService */
+            $templateConfigService = pluginApp(TemplateConfigService::class);
+            $returnTime = $templateConfigService->getInteger('my_account.order_return_days', 14);
 
             return $shippingDateSet
                 && $createdDateUnix > 0

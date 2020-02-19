@@ -34,7 +34,6 @@ use Plenty\Modules\System\Contracts\WebstoreConfigurationRepositoryContract;
 use Plenty\Modules\System\Models\WebstoreConfiguration;
 use Plenty\Modules\Webshop\Contracts\ContactRepositoryContract;
 use Plenty\Modules\Webshop\Contracts\SessionStorageRepositoryContract;
-use Plenty\Modules\Webshop\Template\Contracts\TemplateConfigRepositoryContract;
 use Plenty\Modules\Webshop\Events\ValidateVatNumber;
 use Plenty\Plugin\Events\Dispatcher;
 
@@ -642,9 +641,9 @@ class CustomerService
                     && (int)$account->id > 0
                     && count($contact->addresses) === 1
                     && $contact->addresses[0]->id === $newAddress->id) {
-                    /** @var TemplateConfigRepositoryContract $templateConfigRepository */
-                    $templateConfigRepository = pluginApp(TemplateConfigRepositoryContract::class);
-                    $classId = $templateConfigRepository->getInteger('global.default_contact_class_b2b');
+                    /** @var TemplateConfigService $templateConfigService */
+                    $templateConfigService = pluginApp(TemplateConfigService::class);
+                    $classId = $templateConfigService->getInteger('global.default_contact_class_b2b');
 
                     if (is_null($classId) || (int)$classId <= 0) {
                         $classId = $this->contactRepository->getDefaultContactClassId();

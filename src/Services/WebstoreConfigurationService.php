@@ -5,7 +5,6 @@ namespace IO\Services;
 use IO\Helper\Utils;
 use Plenty\Modules\System\Models\WebstoreConfiguration;
 use Plenty\Modules\Webshop\Contracts\WebstoreConfigurationRepositoryContract;
-use Plenty\Modules\Webshop\Template\Contracts\TemplateConfigRepositoryContract;
 use Plenty\Plugin\Application;
 
 /**
@@ -55,9 +54,7 @@ class WebstoreConfigurationService
     {
         $activeLanguages = [];
 
-        /** @var TemplateConfigRepositoryContract $templateConfigRepo */
-        $templateConfigRepo = pluginApp(TemplateConfigRepositoryContract::class);
-        $languages = $templateConfigRepo->get('language.active_languages');
+        $languages = Utils::getTemplateConfig('language.active_languages');
 
         if (!is_null($languages) && strlen($languages)) {
             $activeLanguages = explode(', ', $languages);
