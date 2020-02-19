@@ -2,6 +2,7 @@
 
 namespace IO\Providers;
 
+use IO\Events\Basket\BeforeBasketItemToOrderItem;
 use IO\Extensions\Basket\IOFrontendShippingProfileChanged;
 use IO\Extensions\Basket\IOFrontendUpdateDeliveryAddress;
 use IO\Extensions\ContentCache\IOAfterBuildPlugins;
@@ -49,7 +50,6 @@ use IO\Services\OrderTotalsService;
 use IO\Services\PriceDetectService;
 use IO\Services\PropertyFileService;
 use IO\Services\SalesPriceService;
-use IO\Services\SessionStorageService;
 use IO\Services\ShippingService;
 use IO\Services\TemplateConfigService;
 use IO\Services\TemplateService;
@@ -57,7 +57,6 @@ use IO\Services\UnitService;
 use IO\Services\UrlService;
 use Plenty\Modules\Authentication\Events\AfterAccountAuthentication;
 use Plenty\Modules\Authentication\Events\AfterAccountContactLogout;
-use IO\Events\Basket\BeforeBasketItemToOrderItem;
 use Plenty\Modules\Basket\Events\Basket\AfterBasketChanged;
 use Plenty\Modules\Cron\Services\CronContainer;
 use Plenty\Modules\Frontend\Events\FrontendCurrencyChanged;
@@ -74,9 +73,9 @@ use Plenty\Modules\Plugin\Events\LoadSitemapPattern;
 use Plenty\Modules\Plugin\Events\PluginSendMail;
 use Plenty\Modules\Webshop\Contracts\SessionStorageRepositoryContract;
 use Plenty\Modules\Webshop\ItemSearch\Helpers\FacetExtensionContainer;
+use Plenty\Plugin\Events\Dispatcher;
 use Plenty\Plugin\ServiceProvider;
 use Plenty\Plugin\Templates\Twig;
-use Plenty\Plugin\Events\Dispatcher;
 
 /**
  * Class IOServiceProvider
@@ -107,7 +106,6 @@ class IOServiceProvider extends ServiceProvider
         $this->getApplication()->register(IORouteServiceProvider::class);
 
         $this->getApplication()->singleton('IO\Helper\TemplateContainer');
-        $this->getApplication()->singleton('IO\Contracts\SortingContract');
 
         $this->getApplication()->bind('IO\Builder\Item\ItemColumnBuilder');
         $this->getApplication()->bind('IO\Builder\Item\ItemFilterBuilder');

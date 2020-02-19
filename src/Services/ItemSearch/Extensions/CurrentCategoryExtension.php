@@ -4,8 +4,8 @@ namespace IO\Services\ItemSearch\Extensions;
 
 use IO\Helper\Utils;
 use IO\Services\CategoryService;
-use IO\Contracts\VariationSearchFactoryContract as VariationSearchFactory;
 use Plenty\Modules\Category\Contracts\CategoryRepositoryContract;
+use Plenty\Modules\Webshop\ItemSearch\Factories\VariationSearchFactory;
 
 /**
  * Class CurrentCategoryExtension

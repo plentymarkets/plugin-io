@@ -2,13 +2,18 @@
 
 namespace IO\Services\ItemSearch\Extensions;
 
-use IO\Contracts\VariationSearchFactoryContract as VariationSearchFactory;
 use IO\Services\TemplateConfigService;
 use Plenty\Modules\Authorization\Services\AuthHelper;
 use Plenty\Modules\Item\VariationBundle\Contracts\VariationBundleRepositoryContract;
+use Plenty\Modules\Webshop\ItemSearch\Factories\VariationSearchFactory;
 use Plenty\Modules\Webshop\ItemSearch\SearchPresets\BasketItems;
 use Plenty\Modules\Webshop\ItemSearch\Services\ItemSearchService;
 
+/**
+ * Class BundleComponentExtension
+ * @package IO\Services\ItemSearch\Extensions
+ * @deprecated since 5.0.0 will be removed in 6.0.0
+ */
 class BundleComponentExtension implements ItemSearchExtension
 {
     /**

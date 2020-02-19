@@ -45,8 +45,8 @@ class UrlService
         $categoryUrl = $this->fromMemoryCache(
             "categoryUrl.$categoryId.$lang",
             function () use ($categoryId, $lang) {
-                        /** @var UrlBuilderRepositoryContract $urlBuilderRepository */
-                        $urlBuilderRepository = pluginApp(UrlBuilderRepositoryContract::class);
+                /** @var UrlBuilderRepositoryContract $urlBuilderRepository */
+                $urlBuilderRepository = pluginApp(UrlBuilderRepositoryContract::class);
 
                 return $urlBuilderRepository->buildCategoryUrl($categoryId, $lang);
             }

@@ -2,7 +2,6 @@
 
 namespace IO\Services\ItemSearch\Factories;
 
-use IO\Contracts\VariationSearchFactoryContract;
 use IO\Helper\Utils;
 use IO\Services\ItemSearch\Extensions\ItemSearchExtension;
 use IO\Services\ItemSearch\Extensions\SortExtension;
@@ -24,7 +23,7 @@ use Plenty\Modules\Item\Search\Filter\SearchFilter;
 use Plenty\Modules\Item\Search\Sort\NameSorting;
 use Plenty\Modules\Webshop\ItemSearch\Helpers\LoadResultFields;
 use Plenty\Plugin\Log\Loggable;
-
+use Plenty\Modules\Webshop\ItemSearch\Factories\VariationSearchFactory AS VariationSearchFactoryContract;
 /**
  * Class BaseSearchFactory
  *

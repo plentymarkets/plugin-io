@@ -2,9 +2,8 @@
 
 namespace IO\Services\ItemSearch\Helper;
 
-use IO\Contracts\SortingContract;
-use IO\Contracts\VariationSearchFactoryContract;
 use IO\Services\TemplateConfigService;
+use Plenty\Modules\Webshop\ItemSearch\Factories\VariationSearchFactory;
 
 /**
  * Class SortingHelper
@@ -13,7 +12,7 @@ use IO\Services\TemplateConfigService;
  * @deprecated since 5.0.0 will be deleted in 6.0.0
  * @see \Plenty\Modules\Webshop\ItemSearch\Helpers\SortingHelper
  */
-class SortingHelper implements SortingContract
+class SortingHelper
 {
     /**
      * Get sorting values from plugin configuration
@@ -48,7 +47,7 @@ class SortingHelper implements SortingContract
             if ( $sortingField === 'item.score' )
             {
                 $sortingField = '_score';
-                $sortingOrder = VariationSearchFactoryContract::SORTING_ORDER_DESC;
+                $sortingOrder = VariationSearchFactory::SORTING_ORDER_DESC;
             }
 
             else if ( $sortingField === 'texts.name' )

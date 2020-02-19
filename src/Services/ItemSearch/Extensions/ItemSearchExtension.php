@@ -4,6 +4,11 @@ namespace IO\Services\ItemSearch\Extensions;
 
 use IO\Services\ItemSearch\Factories\BaseSearchFactory;
 
+/**
+ * Interface ItemSearchExtension
+ * @package IO\Services\ItemSearch\Extensions
+ * @deprecated since 5.0.0 will be removed in 6.0.0
+ */
 interface ItemSearchExtension
 {
     /**
