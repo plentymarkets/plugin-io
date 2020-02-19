@@ -6,7 +6,6 @@ use IO\Helper\Utils;
 use Plenty\Modules\System\Models\WebstoreConfiguration;
 use Plenty\Modules\Webshop\Contracts\WebstoreConfigurationRepositoryContract;
 use Plenty\Modules\Webshop\Template\Contracts\TemplateConfigRepositoryContract;
-use Plenty\Plugin\Application;
 
 /**
  * Class WebstoreConfigurationService
@@ -17,11 +16,6 @@ use Plenty\Plugin\Application;
  */
 class WebstoreConfigurationService
 {
-    /**
-     * @var WebstoreConfiguration
-     */
-    private $webstoreConfig;
-
     /**
      * Get the plenty-id
      * @deprecated since 4.3.0

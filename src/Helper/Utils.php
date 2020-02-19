@@ -2,16 +2,13 @@
 
 namespace IO\Helper;
 
-use IO\Services\SessionStorageService;
 use IO\Services\UrlBuilder\UrlQuery;
 use Plenty\Modules\Frontend\Services\AccountService;
 use Plenty\Modules\ShopBuilder\Helper\ShopBuilderRequest;
 use Plenty\Modules\Webshop\Contracts\LocalizationRepositoryContract;
-use Plenty\Modules\Webshop\Contracts\WebstoreConfigurationRepositoryContract;
 use Plenty\Modules\Webshop\Template\Contracts\TemplateConfigRepositoryContract;
 use Plenty\Plugin\Application;
 use Plenty\Plugin\Translation\Translator;
-use Zend\Soap\Client\Local;
 
 class Utils
 {

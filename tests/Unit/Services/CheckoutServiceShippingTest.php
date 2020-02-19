@@ -141,7 +141,7 @@ class CheckoutServiceShippingTest extends TestCase
     {
         $this->checkoutMock->shouldReceive('getShippingCountryId')->andReturn($shippingCountryId);
 
-        $this->webstoreConfigurationRepositoryMock->shouldReceive('getDefaultShippingCountryId')->andReturn(0);
+        $this->webstoreConfigurationRepositoryMock->shouldReceive('getWebstoreConfiguration')->andReturn(null);
 
         $checkoutShippingCountryId = $this->checkoutService->getShippingCountryId();
 

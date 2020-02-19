@@ -16,12 +16,13 @@ class LocalizationService
     public function getLocalizationData()
     {
         $country = pluginApp(CountryService::class);
+        /** @var WebstoreConfigurationRepositoryContract $webstoreConfigurationRepository */
         $webstoreConfigurationRepository = pluginApp(WebstoreConfigurationRepositoryContract::class);
         $checkout = pluginApp(CheckoutService::class);
 
         $lang = Utils::getLang();
         if (is_null($lang) || !strlen($lang)) {
-            $lang = $webstoreConfigurationRepository->getDefaultLanguage();
+            $lang = $webstoreConfigurationRepository->getWebstoreConfiguration()->defaultLanguage;
         }
 
         $currentShippingCountryId = $checkout->getShippingCountryId();
@@ -68,7 +69,7 @@ class LocalizationService
         $lang = Utils::getLang();
 
         if (is_null($lang) || !strlen($lang)) {
-            $lang = $webstoreConfigurationRepository->getDefaultLanguage();
+            $lang = $webstoreConfigurationRepository->getWebstoreConfiguration()->defaultLanguage;
         }
 
         $activeCountries = $country->getActiveCountriesList($lang);

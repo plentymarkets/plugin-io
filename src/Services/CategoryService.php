@@ -227,7 +227,7 @@ class CategoryService
      */
     public function getURL($category, $lang = null, $webstoreId = null)
     {
-        $defaultLanguage = $this->webstoreConfigurationRepository->getDefaultLanguage();
+        $defaultLanguage = $this->webstoreConfigurationRepository->getWebstoreConfiguration()->defaultLanguage;
         if ($lang === null) {
             $lang = Utils::getLang();
         }
