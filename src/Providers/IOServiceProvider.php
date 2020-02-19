@@ -2,6 +2,7 @@
 
 namespace IO\Providers;
 
+use IO\Config\IOConfig;
 use IO\Events\Basket\BeforeBasketItemToOrderItem;
 use IO\Extensions\Basket\IOFrontendShippingProfileChanged;
 use IO\Extensions\Basket\IOFrontendUpdateDeliveryAddress;
@@ -73,6 +74,7 @@ use Plenty\Modules\Plugin\Events\LoadSitemapPattern;
 use Plenty\Modules\Plugin\Events\PluginSendMail;
 use Plenty\Modules\Webshop\Contracts\SessionStorageRepositoryContract;
 use Plenty\Modules\Webshop\ItemSearch\Helpers\FacetExtensionContainer;
+use Plenty\Modules\Webshop\Template\Contracts\TemplateConfigRepositoryContract;
 use Plenty\Plugin\Events\Dispatcher;
 use Plenty\Plugin\ServiceProvider;
 use Plenty\Plugin\Templates\Twig;
@@ -155,6 +157,8 @@ class IOServiceProvider extends ServiceProvider
      */
     public function boot(Twig $twig, Dispatcher $dispatcher, CronContainer $cronContainer)
     {
+        $this->registerConfigValues();
+
         $twig->addExtension(TwigServiceProvider::class);
         $twig->addExtension(TwigIOExtension::class);
         $twig->addExtension(TwigTemplateContextExtension::class);
@@ -265,5 +269,20 @@ class IOServiceProvider extends ServiceProvider
         foreach ($middlewares as $middleware) {
             $this->addGlobalMiddleware($middleware);
         }
+    }
+
+    private function registerConfigValues()
+    {
+        /** @var IOConfig $ioConfig */
+        $ioConfig = pluginApp(IOConfig::class);
+
+        /** @var TemplateConfigRepositoryContract $templateConfigRepo */
+        $templateConfigRepo = pluginApp(TemplateConfigRepositoryContract::class);
+
+        $templateConfigRepo
+            ->registerConfigValue('format.number_decimals', $ioConfig->format->numberDecimals)
+            ->registerConfigValue('format.separator_decimal', $ioConfig->format->separatorDecimal)
+            ->registerConfigValue('format.separator_thousands', $ioConfig->format->separatorThousands)
+            ->registerConfigValue('format.use_locale_currency_format', $ioConfig->format->useLocaleCurrencyFormat);
     }
 }
