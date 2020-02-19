@@ -1,4 +1,4 @@
-<?php // strict
+<?php
 
 namespace IO\Providers;
 
@@ -227,12 +227,9 @@ class IOServiceProvider extends ServiceProvider
         $dispatcher->listen(PluginSendMail::class, IOSendMail::class);
         $dispatcher->listen(AfterBuildPlugins::class, IOAfterBuildPlugins::class);
 
-        $dispatcher->listen(
-            'Webshop.initFacetExtensions',
-            function (FacetExtensionContainer $facetExtensionContainer) {
-                $facetExtensionContainer->addFacetExtension(pluginApp(CategoryFacet::class));
-            }
-        );
+        $facetExtensionContainer = pluginApp(FacetExtensionContainer::class);
+        $facetExtensionContainer->addFacetExtension(pluginApp(CategoryFacet::class));
+
 
         $dispatcher->listen(
             FrontendCurrencyChanged::class,
