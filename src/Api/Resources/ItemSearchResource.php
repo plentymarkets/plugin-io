@@ -43,7 +43,9 @@ class ItemSearchResource extends ApiResource
                 'facets' => $this->request->get('facets', ''),
                 'query' => $searchString,
                 'priceMin' => $this->request->get('priceMin', 0),
-                'priceMax' => $this->request->get('priceMax', 0)
+                'priceMax' => $this->request->get('priceMax', 0),
+                'withCategories' => $this->request->get('withCategories', false),
+                'withSuggestions' => $this->request->get('withSuggestions', false)
             ];
 
             /** @var ItemSearchService $itemSearchService */
