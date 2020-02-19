@@ -7,6 +7,7 @@ use IO\Services\UrlBuilder\UrlQuery;
 use Plenty\Modules\Frontend\Services\AccountService;
 use Plenty\Modules\ShopBuilder\Helper\ShopBuilderRequest;
 use Plenty\Modules\Webshop\Contracts\LocalizationRepositoryContract;
+use Plenty\Modules\Webshop\Contracts\WebstoreConfigurationRepositoryContract;
 use Plenty\Plugin\Application;
 use Plenty\Plugin\Translation\Translator;
 
@@ -35,16 +36,16 @@ class Utils
 
     public static function getDefaultLang()
     {
-        /** @var LocalizationRepositoryContract $localizationRepository */
-        $localizationRepository = pluginApp(LocalizationRepositoryContract::class);
-        return $localizationRepository->getDefaultLanguage();
+        /** @var WebstoreConfigurationRepositoryContract $webstoreConfigurationRepository */
+        $webstoreConfigurationRepository = pluginApp(WebstoreConfigurationRepositoryContract::class);
+        return $webstoreConfigurationRepository->getWebstoreConfiguration()->defaultLanguage;
     }
 
     public static function getLanguageList()
     {
-        /** @var LocalizationRepositoryContract $localizationRepository */
-        $localizationRepository = pluginApp(LocalizationRepositoryContract::class);
-        return $localizationRepository->getActiveLanguageList();
+        /** @var WebstoreConfigurationRepositoryContract $webstoreConfigurationRepository */
+        $webstoreConfigurationRepository = pluginApp(WebstoreConfigurationRepositoryContract::class);
+        return $webstoreConfigurationRepository->getActiveLanguageList();
     }
 
     public static function isAdminPreview()
