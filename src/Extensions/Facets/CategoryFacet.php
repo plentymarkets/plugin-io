@@ -88,6 +88,9 @@ class CategoryFacet implements FacetExtension
                 }
             }
 
+            if (!is_null($currentCategory)) {
+                $categoryService->setCurrentCategoryID($currentCategory->id);
+            }
 
             if (count($categoryFacet['values']) > 0) {
                 $categoryFacet['count'] = count($categoryFacet['values']);
