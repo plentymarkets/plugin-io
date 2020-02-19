@@ -88,7 +88,7 @@ class ItemController extends LayoutController
         $shopBuilderRequest->setMainContentType('singleitem');
         $itemResult['isItemSet'] = false;
 
-        if ($itemResult['item']['documents'][0]['data']['item']['itemType'] == 'set') {
+        if ($itemResult['item']['documents'][0]['data']['item']['itemType'] === 'set') {
             $shopBuilderRequest->setMainContentType('itemset');
             $itemResult['isItemSet'] = true;
         }
