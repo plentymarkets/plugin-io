@@ -1,5 +1,11 @@
 # Release Notes for IO
 
+## v4.6.2 (2020-02-19) <a href="https://github.com/plentymarkets/plugin-io/compare/4.6.1...4.6.2" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
+
+### Fixed
+
+- Due to an error pertaining to the category filter, the pagination was not working as intended. This has been fixed.
+
 ## v4.6.1 (2020-02-18) <a href="https://github.com/plentymarkets/plugin-io/compare/4.6.0...4.6.1" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
 
 ### Fixed

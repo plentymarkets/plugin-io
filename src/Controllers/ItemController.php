@@ -100,6 +100,13 @@ class ItemController extends LayoutController
 
         $shopBuilderRequest->setMainCategory($defaultCategory[0]['id']);
         $shopBuilderRequest->setMainContentType('singleitem');
+        $itemResult['isItemSet'] = false;
+
+        if ($itemResult['item']['documents'][0]['data']['item']['itemType'] === 'set') {
+            $shopBuilderRequest->setMainContentType('itemset');
+            $itemResult['isItemSet'] = true;
+        }
+
         if ($shopBuilderRequest->isShopBuilder()) {
             /** @var VariationSearchResultFactory $searchResultFactory */
             $searchResultFactory = pluginApp(VariationSearchResultFactory::class);
