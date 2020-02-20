@@ -48,7 +48,7 @@ class ItemSearchAutocompleteResource extends ApiResource
                         'page' => 1,
                         'itemsPerPage' => 20,
                         'withCategories' => in_array('category', $searchTypes),
-                        'withSuggestions' => in_array('suggestions', $searchTypes)
+                        'withSuggestions' => in_array('suggestion', $searchTypes)
                     ]
                 )
             );
