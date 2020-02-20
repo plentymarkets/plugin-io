@@ -2,19 +2,23 @@
 
 namespace IO\Services;
 
+use IO\Helper\Utils;
 use Plenty\Modules\Item\Unit\Contracts\UnitNameRepositoryContract;
 use Plenty\Modules\Item\Unit\Models\UnitName;
-use Plenty\Modules\Webshop\Contracts\UnitRepositoryContract;
 use Plenty\Modules\Webshop\Helpers\UnitUtils;
+use Plenty\Modules\Authorization\Services\AuthHelper;
+use Plenty\Modules\Item\Unit\Contracts\UnitRepositoryContract;
+use IO\Helper\MemoryCache;
 
 /**
  * Class UnitService
  * @package IO\Services
  * @deprecated since 5.0.0 will be removed in 6.0.0
- * @see \Plenty\Modules\Webshop\Contracts\UnitRepositoryContract
  */
 class UnitService
 {
+    use MemoryCache;
+
     const METER = 1;
     const DECIMETER = 2;
     const CENTIMETER = 3;
@@ -71,11 +75,36 @@ class UnitService
      * @param null $lang
      * @return mixed
      * @deprecated since 5.0.0 will be removed in 6.0.0
-     * @see \Plenty\Modules\Webshop\Contracts\UnitRepositoryContract::getUnitNameByKey()
      */
     public function getUnitNameByKey($unitKey, $lang = null)
     {
-        return $this->unitRepository->getUnitNameByKey($unitKey, $lang);
+        if ($lang === null) {
+            $lang = Utils::getLang();
+        }
+
+        return $this->fromMemoryCache(
+            "unitName.$unitKey.$lang",
+            function () use ($unitKey, $lang) {
+                /**
+                 * @var UnitRepositoryContract $unitRepository
+                 */
+                $unitRepository = pluginApp(UnitRepositoryContract::class);
+
+                /** @var AuthHelper $authHelper */
+                $authHelper = pluginApp(AuthHelper::class);
+
+                $unitData = $authHelper->processUnguarded(
+                    function () use ($unitRepository, $unitKey) {
+                        $unitRepository->setFilters(['unitOfMeasurement' => $unitKey]);
+                        return $unitRepository->all(['*'], 1, 1);
+                    }
+                );
+
+                $unitId = $unitData->getResult()->first()->id;
+
+                return $this->unitNameRepository->findOne($unitId, $lang)->name;
+            }
+        );
     }
 
     // copy from PlentyDimension.class.php
@@ -85,7 +114,6 @@ class UnitService
      * @param string $sUnit The unit to be checked
      * @return boolean
      * @deprecated since 5.0.0 will be removed in 6.0.0
-     * @see \Plenty\Modules\Webshop\Helpers\UnitUtils::isValidUnit()
      */
     public static function isValidUnit($sUnit)
     {
