@@ -16,7 +16,7 @@ use Plenty\Modules\Order\Property\Models\OrderPropertyType;
 use Plenty\Modules\Frontend\PaymentMethod\Contracts\FrontendPaymentMethodRepositoryContract;
 use Plenty\Modules\Order\Shipping\Contracts\ParcelServicePresetRepositoryContract;
 use IO\Extensions\Filters\URLFilter;
-use Plenty\Modules\Webshop\Filters\ItemImagesFilter;
+use IO\Extensions\Filters\ItemImagesFilter;
 use Plenty\Modules\Webshop\ItemSearch\Helpers\ResultFieldTemplate;
 use Plenty\Modules\Webshop\ItemSearch\Services\ItemSearchService;
 

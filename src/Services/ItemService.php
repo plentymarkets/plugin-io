@@ -35,7 +35,7 @@ use Plenty\Modules\Item\Unit\Contracts\UnitNameRepositoryContract;
 use Plenty\Modules\Item\UnitCombination\Contracts\UnitCombinationRepositoryContract;
 use Plenty\Modules\Webshop\Contracts\ContactRepositoryContract;
 use Plenty\Modules\Webshop\Contracts\SessionStorageRepositoryContract;
-use Plenty\Modules\Webshop\Filters\ItemImagesFilter;
+use IO\Extensions\Filters\ItemImagesFilter;
 use Plenty\Modules\Webshop\ItemSearch\SearchPresets\SingleItem;
 use Plenty\Modules\Webshop\ItemSearch\SearchPresets\VariationList;
 use Plenty\Modules\Webshop\ItemSearch\Services\ItemSearchService;
