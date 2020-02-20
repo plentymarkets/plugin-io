@@ -2,8 +2,9 @@
 
 namespace IO\Services\ItemSearch\Extensions;
 
-use Plenty\Modules\Webshop\Filters\ItemImagesFilter;
-use Plenty\Modules\Webshop\Filters\NumberFormatFilter;
+
+use IO\Extensions\Filters\ItemImagesFilter;
+use IO\Extensions\Filters\NumberFormatFilter;
 
 class VariationAttributeMapExtension implements ItemSearchExtension
 {
