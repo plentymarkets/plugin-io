@@ -117,7 +117,7 @@ class UnitService
      */
     public static function isValidUnit($sUnit)
     {
-        return UnitUtils::isValidUnit($sUnit);
+        return in_array($sUnit, array_keys(self::$aMeasureUnits));
     }
 
     /**
