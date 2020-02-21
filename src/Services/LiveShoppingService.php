@@ -31,7 +31,6 @@ class LiveShoppingService
         $liveShopping = $liveShoppingRepo->getLiveShopping($liveShoppingId);
 
         $liveShoppingItem = [];
-        $liveShoppingData = [];
 
         if ($liveShopping instanceof LiveShopping) {
             $itemList = $this->getLiveShoppingVariations($liveShopping->itemId, $sorting);
@@ -75,10 +74,7 @@ class LiveShoppingService
             ]
         );
 
-
-        //TODO vdi
-        return [];
-        //return $this->filterLiveShoppingVariations($itemList);
+        return $this->filterLiveShoppingVariations($itemList);
     }
 
     /**
