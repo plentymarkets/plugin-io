@@ -48,7 +48,7 @@ class VariationList implements SearchPreset
             ->isActive()
             ->isHiddenInCategoryList( false )
             ->hasPriceForCustomer()
-            ->withReducedResults(true);
+            ->withReducedResults();
 
         if ( !array_key_exists('excludeFromCache', $options) || $options['excludeFromCache'] === false )
         {
