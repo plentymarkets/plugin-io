@@ -14,6 +14,8 @@ use Plenty\Modules\Frontend\PaymentMethod\Contracts\FrontendPaymentMethodReposit
 use Plenty\Modules\Frontend\Services\OrderPropertyFileService;
 use Plenty\Modules\Frontend\Services\VatService;
 use Plenty\Modules\Accounting\Vat\Contracts\VatRepositoryContract;
+use Plenty\Modules\Order\Coupon\Campaign\Contracts\CouponCampaignRepositoryContract;
+use Plenty\Modules\Order\Coupon\Campaign\Models\CouponCampaign;
 use Plenty\Modules\Order\Property\Models\OrderPropertyType;
 use Plenty\Modules\System\Contracts\WebstoreRepositoryContract;
 use Plenty\Modules\Accounting\Vat\Models\Vat;
@@ -94,7 +96,7 @@ class OrderItemBuilder
         $itemsWithoutStock          = [];
 
         $taxFreeItems = [];
-        
+
         foreach($items as $item)
 		{
             if($maxVatRate < $item['vat'])
@@ -105,7 +107,7 @@ class OrderItemBuilder
             try
             {
                 array_push($orderItems, $this->basketItemToOrderItem($item, $basket->basketRebate));
-    
+
                 //convert tax free properties to order items
                 if(count($item['variation']['data']['properties']))
                 {
@@ -133,7 +135,7 @@ class OrderItemBuilder
                                         ]
                                     ]
                                 ];
-                                
+
                                 $taxFreeItems[$property['propertyId']] = $taxFreeItem;
                             }
                         }
@@ -187,7 +189,7 @@ class OrderItemBuilder
         {
             throw pluginApp(BasketItemCheckException::class, [BasketItemCheckException::COUPON_REQUIRED]);
         }
-        
+
 		// add tax free items
         if(count($taxFreeItems))
         {
@@ -196,8 +198,31 @@ class OrderItemBuilder
                 array_push($orderItems, $taxFreeOrderItem);
             }
         }
-        
+
 		$shippingAmount = $basket->shippingAmount;
+
+        if (strlen($basket->couponCode) > 0 &&
+            $this->isPlusShippingCosts($basket->couponCode) &&
+            $basket->itemSum <= (-1 * $basket->couponDiscount)) {
+            $maybeDiscount = $basket->couponDiscount + $basket->itemSum;
+            $maybeDiscount = (float)number_format($maybeDiscount, 2);
+            $shippingProfiles = $this->checkoutService->getShippingProfileList();
+            $selectedShippingProfile = null;
+            foreach ($shippingProfiles as $shippingProfile) {
+                if ($shippingProfile['parcelServicePresetId'] === $basket->shippingProfileId) {
+                    $selectedShippingProfile = $shippingProfile;
+                    break;
+                }
+            }
+
+            if (!is_null($selectedShippingProfile)) {
+                $amount = (float)$selectedShippingProfile['shippingAmount'];
+
+                if ($basket->basketAmount === $amount + $maybeDiscount) {
+                    $shippingAmount -= $maybeDiscount;
+                }
+            }
+        }
 
 		// add shipping costs
         $shippingCosts = [
@@ -238,6 +263,25 @@ class OrderItemBuilder
 
 		return $orderItems;
 	}
+
+	private function isPlusShippingCosts(string $couponCode): bool
+    {
+        /** @var CouponCampaignRepositoryContract $couponCampaignRepository */
+        $couponCampaignRepository = pluginApp(CouponCampaignRepositoryContract::class);
+
+        $campaign = $couponCampaignRepository->findByCouponCode($couponCode);
+
+        $disposableTypes = [CouponCampaign::COUPON_TYPE_SALES, CouponCampaign::DISCOUNT_TYPE_FIXED, CouponCampaign::DISCOUNT_TYPE_PERCENT];
+
+        if ((($campaign->includeShipping && $campaign->discountType === CouponCampaign::DISCOUNT_TYPE_FIXED) ||
+            $campaign->discountType === CouponCampaign::DISCOUNT_TYPE_SHIPPING) &&
+            !in_array($campaign->couponType, $disposableTypes)) {
+
+            return true;
+        }
+
+        return false;
+    }
 
 	/**
 	 * Add a basket item to the order
