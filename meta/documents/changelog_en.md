@@ -1,5 +1,11 @@
 # Release Notes for IO
 
+## v4.6.3 (2020-02-24) <a href="https://github.com/plentymarkets/plugin-io/compare/4.6.2...4.6.3" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
+
+### Fixed 
+
+- Properties are now included again in the item data for all view. Property data had previously been removed from all views except the single item view.
+
 ## v4.6.2 (2020-02-19) <a href="https://github.com/plentymarkets/plugin-io/compare/4.6.1...4.6.2" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
 
 ### Fixed
