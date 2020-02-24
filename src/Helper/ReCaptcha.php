@@ -15,7 +15,7 @@ class ReCaptcha
         $consentRepository = pluginApp(ConsentRepositoryContract::class);
 
         $secret = $templateConfigService->get('global.google_recaptcha_secret');
-        $blockCookies = $templateConfigService->get('global.block_cookies');
+        $blockCookies = $templateConfigService->getBoolean('global.block_cookies');
         $isConsented = $consentRepository->isConsented('media.reCaptcha');
 
         if ( !strlen( $secret ) )
@@ -23,7 +23,7 @@ class ReCaptcha
             // No secret defined in config => skip reCAPTCHA validation
             return true;
         }
-        else if ($blockCookies == "true" && !$isConsented)
+        else if ($blockCookies && !$isConsented)
         {
             // site has to operate without cookies
             return true;
