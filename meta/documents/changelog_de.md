@@ -1,5 +1,11 @@
 # Release Notes für IO
 
+## v4.6.3 (2020-02-24) <a href="https://github.com/plentymarkets/plugin-io/compare/4.6.2...4.6.3" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
+
+### Behoben
+
+- Merkmale sind nun wieder Teil der Artikeldaten für alle Ansichten. Zuvor wurden Merkmaldaten von allen Ansichten außer der Artikeleinzelansicht entfernt. 
+
 ## v4.6.2 (2020-02-19) <a href="https://github.com/plentymarkets/plugin-io/compare/4.6.1...4.6.2" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
 
 ### Behoben
