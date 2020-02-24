@@ -69,11 +69,7 @@ class CheckoutServiceCurrencyTest extends TestCase
     {
         $expectedCurrency = $this->fake->currencyCode;
 
-        $this->pluginMock->shouldReceive('getValue')->with(SessionStorageRepositoryContract::CURRENCY)->andReturn(
-            $expectedCurrency
-        );
-        $this->sessionStorageMock->shouldReceive('getPlugin')->andReturn($this->pluginMock);
-
+        $this->sessionStorageRepositoryMock->shouldReceive('getSessionValue')->with(SessionStorageRepositoryContract::CURRENCY)->andReturn($expectedCurrency);
         $currency = $this->checkoutRepository->getCurrency();
 
         $this->assertNotNull($currency);
@@ -88,9 +84,7 @@ class CheckoutServiceCurrencyTest extends TestCase
 
         $expectedCurrency = $webstoreConfiguration->defaultCurrency;
 
-        $this->pluginMock->shouldReceive('getValue')->with(SessionStorageRepositoryContract::CURRENCY)->andReturn(null);
-        $this->pluginMock->shouldReceive('setValue')->andReturn();
-        $this->sessionStorageMock->shouldReceive('getPlugin')->andReturn($this->pluginMock);
+        $this->sessionStorageRepositoryMock->shouldReceive('getSessionValue')->andReturn(null);
 
         $this->webstoreConfigurationRepositoryMock->shouldReceive('getWebstoreConfiguration')->andReturn(
             $webstoreConfiguration

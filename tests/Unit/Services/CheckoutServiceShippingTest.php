@@ -16,6 +16,8 @@ use Plenty\Modules\Frontend\PaymentMethod\Contracts\FrontendPaymentMethodReposit
 use Plenty\Modules\Frontend\Services\VatService;
 use Plenty\Modules\Order\Shipping\Contracts\ParcelServicePresetRepositoryContract;
 use Plenty\Modules\Payment\Method\Models\PaymentMethod;
+use Plenty\Modules\System\Models\WebstoreConfiguration;
+use Plenty\Modules\Webshop\Contracts\LocalizationRepositoryContract;
 use Plenty\Modules\Webshop\Contracts\SessionStorageRepositoryContract;
 use Plenty\Modules\Webshop\Contracts\WebstoreConfigurationRepositoryContract;
 use Plenty\Plugin\Application;
@@ -37,6 +39,11 @@ class CheckoutServiceShippingTest extends TestCase
      * @var SessionStorageRepositoryContract $sessionStorageRepositoryMock ;
      */
     private $sessionStorageRepositoryMock;
+
+    /**
+     * @var LocalizationRepositoryContract $localizationRepositoryMock
+     */
+    private $localizationRepositoryMock;
 
     /**
      * @var AccountRepositoryContract $accountRepositoryMock
@@ -102,6 +109,9 @@ class CheckoutServiceShippingTest extends TestCase
         $this->sessionStorageRepositoryMock = Mockery::mock(SessionStorageRepositoryContract::class);
         $this->replaceInstanceByMock(SessionStorageRepositoryContract::class, $this->sessionStorageRepositoryMock);
 
+        $this->localizationRepositoryMock = Mockery::mock(LocalizationRepositoryContract::class);
+        $this->replaceInstanceByMock(LocalizationRepositoryContract::class, $this->localizationRepositoryMock);
+
         $this->accountRepositoryMock = Mockery::mock(AccountingLocationRepositoryContract::class);
         $this->replaceInstanceByMock(AccountingLocationRepositoryContract::class, $this->accountRepositoryMock);
 
@@ -143,6 +153,8 @@ class CheckoutServiceShippingTest extends TestCase
 
         $this->webstoreConfigurationRepositoryMock->shouldReceive('getWebstoreConfiguration')->andReturn(null);
 
+        $this->webstoreConfigurationRepositoryMock->shouldReceive('getDefaultShippingCountryId')->andReturn($shippingCountryId);
+
         $checkoutShippingCountryId = $this->checkoutService->getShippingCountryId();
 
         $this->assertEquals($shippingCountryId, $checkoutShippingCountryId);
@@ -160,6 +172,14 @@ class CheckoutServiceShippingTest extends TestCase
             ]
         );
 
+        $webstoreConfiguration = factory(WebstoreConfiguration::class)->make(
+            [
+                "defaultCurrencyList" => "",
+            ]
+        );
+
+        $this->webstoreConfigurationRepositoryMock->shouldReceive('getWebstoreConfiguration')->andReturn($webstoreConfiguration);
+
         $this->sessionStorageRepositoryMock->shouldReceive('getCustomer')
             ->andReturn(
                 (object)[
@@ -167,9 +187,7 @@ class CheckoutServiceShippingTest extends TestCase
                     'accountContactClassId' => 1
                 ]
             );
-
-        //TODO VDI MEYER
-        $this->sessionStorageServiceMock->shouldReceive('getLang')
+        $this->localizationRepositoryMock->shouldReceive('getLanguage')
             ->andReturn('de');
 
         $this->customerServiceMock->shouldReceive('showNetPrices')

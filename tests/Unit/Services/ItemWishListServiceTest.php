@@ -2,8 +2,8 @@
 
 use IO\Repositories\ItemWishListGuestRepository;
 use IO\Repositories\ItemWishListRepository;
-use IO\Services\CustomerService;
 use IO\Services\ItemWishListService;
+use Plenty\Modules\Webshop\Contracts\ContactRepositoryContract;
 use Plenty\Modules\Webshop\Contracts\SessionStorageRepositoryContract;
 use PluginTests\SimpleTestCase;
 
@@ -18,7 +18,7 @@ class ItemWishListServiceTest extends SimpleTestCase
 
     protected $itemWishListRepositoryMock;
     protected $itemWishListGuestRepositoryMock;
-    protected $customerServiceMock;
+    protected $contactRepositoryMock;
     protected $sessionStorageRepositoryMock;
 
     /**
@@ -28,8 +28,8 @@ class ItemWishListServiceTest extends SimpleTestCase
     {
         parent::setUp();
 
-        $this->customerServiceMock = Mockery::mock(CustomerService::class);
-        $this->replaceInstanceByMock(CustomerService::class, $this->customerServiceMock);
+        $this->contactRepositoryMock = Mockery::mock(ContactRepositoryContract::class);
+        $this->replaceInstanceByMock(ContactRepositoryContract::class, $this->contactRepositoryMock);
 
         $this->sessionStorageRepositoryMock = Mockery::mock(SessionStorageRepositoryContract::class);
         $this->sessionStorageRepositoryMock->shouldReceive('getSessionValue')->with(
@@ -51,7 +51,7 @@ class ItemWishListServiceTest extends SimpleTestCase
         $this->replaceInstanceByMock(ItemWishListGuestRepository::class, $this->itemWishListGuestRepositoryMock);
 
 
-        $this->customerServiceMock->shouldReceive('getContactId')->once()->andReturn(1);
+        $this->contactRepositoryMock->shouldReceive('getContactId')->once()->andReturn(1);
 
         $this->wishListService = pluginApp(ItemWishListService::class);
 
@@ -70,7 +70,7 @@ class ItemWishListServiceTest extends SimpleTestCase
         $this->itemWishListRepositoryMock->shouldReceive('getItemWishList')->andReturn(true);
         $this->itemWishListGuestRepositoryMock->shouldReceive('getItemWishList')->andReturn(false);
 
-        $this->customerServiceMock->shouldReceive('getContactId')->once()->andReturn(0);
+        $this->contactRepositoryMock->shouldReceive('getContactId')->once()->andReturn(0);
 
         $this->wishListService = pluginApp(ItemWishListService::class);
 
