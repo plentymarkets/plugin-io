@@ -30,7 +30,7 @@ class TagItems extends VariationList
             ->hasAnyTag($tagIds)
             ->groupByTemplateConfig()
             ->withGroupedAttributeValues()
-            ->withReducedResults(true);
+            ->withReducedResults();
 
         return $factory;
     }
