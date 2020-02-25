@@ -39,26 +39,11 @@ class ItemSearchAutocompleteResource extends ApiResource
         if (strlen($searchString)) {
             $searchTypes = $this->request->get('types', []);
 
-            /** @var ItemSearchService $itemSearchService */
-            $itemSearchService = pluginApp(ItemSearchService::class);
-            $response = $itemSearchService->getResults(
-                SearchItems::getSearchFactory(
-                    [
-                        'query' => $searchString,
-                        'autocomplete' => true,
-                        'page' => 1,
-                        'itemsPerPage' => 20,
-                        'withCategories' => in_array('category', $searchTypes),
-                        'withSuggestions' => in_array('suggestion', $searchTypes)
-                    ]
-                )
-            );
-
             /** @var ItemSearchAutocompleteService $itemSearchAutocompleteService */
             $itemSearchAutocompleteService = pluginApp(ItemSearchAutocompleteService::class);
-            $transformedResult = $itemSearchAutocompleteService->transformResult($response);
+            $response = $itemSearchAutocompleteService->getResults($searchString, $searchTypes);
 
-            return $this->response->create($transformedResult, ResponseCode::OK);
+            return $this->response->create($response, ResponseCode::OK);
         }
 
         return $this->response->create(null, ResponseCode::BAD_REQUEST);

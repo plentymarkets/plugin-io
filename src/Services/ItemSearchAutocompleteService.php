@@ -8,6 +8,8 @@ use Plenty\Modules\Category\Models\Category;
 use Plenty\Modules\Webshop\Contracts\LocalizationRepositoryContract;
 use Plenty\Modules\Webshop\Contracts\UrlBuilderRepositoryContract;
 use Plenty\Modules\Webshop\ItemSearch\Helpers\SortingHelper;
+use Plenty\Modules\Webshop\ItemSearch\SearchPresets\SearchItems;
+use Plenty\Modules\Webshop\ItemSearch\Services\ItemSearchService;
 use Plenty\Plugin\Application;
 
 /**
@@ -24,6 +26,26 @@ class ItemSearchAutocompleteService
         $this->urlBuilderRepository = $urlBuilderRepository;
     }
 
+    public function getResults($searchString, $searchTypes)
+    {
+        /** @var ItemSearchService $itemSearchService */
+        $itemSearchService = pluginApp(ItemSearchService::class);
+        $response = $itemSearchService->getResults(
+            SearchItems::getSearchFactory(
+                [
+                    'query' => $searchString,
+                    'autocomplete' => true,
+                    'page' => 1,
+                    'itemsPerPage' => 20,
+                    'withCategories' => in_array('category', $searchTypes),
+                    'withSuggestions' => in_array('suggestion', $searchTypes)
+                ]
+            )
+        );
+
+        return $this->transformResult($response);
+    }
+
     /**
      * @param array $itemSearchResult
      * @return array
@@ -31,8 +53,8 @@ class ItemSearchAutocompleteService
     public function transformResult($itemSearchResult)
     {
         $newResult = [
-            'item'        => $this->getItems($itemSearchResult['documents']),
-            'category'    => $this->getCategories($itemSearchResult['categories.all']),
+            'item'       => $this->getItems($itemSearchResult['documents']),
+            'category'   => $this->getCategories($itemSearchResult['categories.all']),
             'suggestion' => $this->getSuggestions([])
         ];
 
