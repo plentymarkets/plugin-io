@@ -4,13 +4,13 @@ namespace IO\Extensions\Facets;
 
 use IO\Helper\Utils;
 use IO\Services\CategoryService;
+use IO\Services\TemplateConfigService;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Search\Aggregation\AggregationInterface;
 use Plenty\Modules\Item\Search\Aggregations\CategoryAllTermsAggregation;
 use Plenty\Modules\Item\Search\Aggregations\CategoryProcessor;
 use Plenty\Modules\Item\Search\Filter\CategoryFilter;
 use Plenty\Modules\Webshop\Contracts\LocalizationRepositoryContract;
 use Plenty\Modules\Webshop\ItemSearch\Contracts\FacetExtension;
-use Plenty\Modules\Webshop\Template\Contracts\TemplateConfigRepositoryContract;
 
 class CategoryFacet implements FacetExtension
 {
@@ -38,11 +38,11 @@ class CategoryFacet implements FacetExtension
     {
         $categoryFacet = [];
 
-        /** @var TemplateConfigRepositoryContract $templateConfigRepo */
-        $templateConfigRepo = pluginApp(TemplateConfigRepositoryContract::class);
+        /** @var TemplateConfigService $templateConfigService */
+        $templateConfigService = pluginApp(TemplateConfigService::class);
 
 
-        if ($templateConfigRepo->get('item.show_category_filter') == 'true') {
+        if ($templateConfigService->get('item.show_category_filter') == 'true') {
             if (count($result)) {
                 /** @var LocalizationRepositoryContract $localizationRepository */
                 $localizationRepository = pluginApp(LocalizationRepositoryContract::class);
@@ -92,6 +92,9 @@ class CategoryFacet implements FacetExtension
                 }
             }
 
+            if (!is_null($currentCategory)) {
+                $categoryService->setCurrentCategoryID($currentCategory->id);
+            }
 
             if (count($categoryFacet['values']) > 0) {
                 $categoryFacet['count'] = count($categoryFacet['values']);

@@ -11,9 +11,6 @@ use Plenty\Plugin\ConfigRepository;
 /**
  * Class NumberFormatFilter
  * @package IO\Extensions\Filters
- *
- * @deprecated since 5.0.0 will be deleted in 6.0.0
- * @see \Plenty\Modules\Webshop\Filters\NumberFormatFilter
  */
 class NumberFormatFilter extends AbstractFilter
 {
@@ -37,9 +34,6 @@ class NumberFormatFilter extends AbstractFilter
     /**
      * Return the available filter methods
      * @return array
-     *
-     * @deprecated since 5.0.0 will be deleted in 6.0.0
-     * @see \Plenty\Modules\Webshop\Filters\NumberFormatFilter::getFilters()
      */
 	public function getFilters():array
 	{
@@ -55,8 +49,6 @@ class NumberFormatFilter extends AbstractFilter
      * Format incorrect JSON ENCODED dateTimeFormat
      * @param $value
      * @return string
-     * @deprecated since 5.0.0 will be deleted in 6.0.0
-     * @see \Plenty\Modules\Webshop\Filters\NumberFormatFilter::formatDateTime()
      */
     public function formatDateTime($value):string
     {
@@ -72,8 +64,6 @@ class NumberFormatFilter extends AbstractFilter
      * Trim newlines from string
      * @param string $value
      * @return string
-     * @deprecated since 5.0.0 will be deleted in 6.0.0
-     * @see \Plenty\Modules\Webshop\Filters\NumberFormatFilter::trimNewlines()
      */
     public function trimNewlines($value):string
     {
@@ -85,8 +75,6 @@ class NumberFormatFilter extends AbstractFilter
      * @param float $value
      * @param int $decimal_places
      * @return string
-     * @deprecated since 5.0.0 will be deleted in 6.0.0
-     * @see \Plenty\Modules\Webshop\Filters\NumberFormatFilter::formatDecimal()
      */
 	public function formatDecimal($value, int $decimal_places = -1):string
 	{
@@ -109,8 +97,6 @@ class NumberFormatFilter extends AbstractFilter
      * @param $value
      * @param $currencyISO
      * @return string
-     * @deprecated since 5.0.0 will be deleted in 6.0.0
-     * @see \Plenty\Modules\Webshop\Filters\NumberFormatFilter::formatMonetary()
      */
     public function formatMonetary($value, $currencyISO):string
     {

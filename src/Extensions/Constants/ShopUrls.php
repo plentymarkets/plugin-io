@@ -72,7 +72,7 @@ class ShopUrls
         $this->resetMemoryCache();
         $this->appendTrailingSlash = UrlQuery::shouldAppendTrailingSlash();
         $this->trailingSlashSuffix = $this->appendTrailingSlash ? '/' : '';
-        $this->includeLanguage = $lang !== $webstoreConfigurationRepository->getDefaultLanguage();
+        $this->includeLanguage = $lang !== $webstoreConfigurationRepository->getWebstoreConfiguration()->defaultLanguage;
 
         $this->basket = $this->getShopUrl(RouteConfig::BASKET);
         $this->cancellationForm = $this->getShopUrl(RouteConfig::CANCELLATION_FORM);

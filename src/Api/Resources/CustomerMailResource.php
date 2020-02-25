@@ -18,9 +18,9 @@ use Plenty\Modules\Account\Contact\Models\ContactOption;
 use Plenty\Modules\Authorization\Services\AuthHelper;
 use Plenty\Modules\Helper\AutomaticEmail\Models\AutomaticEmailContact;
 use Plenty\Modules\Helper\AutomaticEmail\Models\AutomaticEmailTemplate;
-use Plenty\Modules\System\Contracts\WebstoreConfigurationRepositoryContract;
 use Plenty\Modules\System\Models\WebstoreConfiguration;
 use Plenty\Modules\Webshop\Contracts\ContactRepositoryContract;
+use Plenty\Modules\Webshop\Contracts\WebstoreConfigurationRepositoryContract;
 use Plenty\Plugin\Http\Request;
 use Plenty\Plugin\Http\Response;
 use Plenty\Plugin\Log\Loggable;
@@ -85,7 +85,7 @@ class CustomerMailResource extends ApiResource
         $clientId = Utils::getPlentyId();
 
         /**  @var WebstoreConfiguration $webstoreConfiguration */
-        $webstoreConfiguration = $webstoreConfigurationRepository->findByPlentyId($clientId);
+        $webstoreConfiguration = $webstoreConfigurationRepository->getWebstoreConfiguration();
 
         /** @var string $domain */
         $domain = $webstoreConfiguration->domainSsl;

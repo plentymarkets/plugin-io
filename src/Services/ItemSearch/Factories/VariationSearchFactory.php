@@ -480,10 +480,10 @@ class VariationSearchFactory extends BaseSearchFactory
     {
         if(!$this->isAdminPreview)
         {
-            /** @var PriceDetectRepositoryContract $priceDetectRepository */
-            $priceDetectRepository = pluginApp(PriceDetectRepositoryContract::class);
+            /** @var PriceDetectService $priceDetectService */
+            $priceDetectService = pluginApp(PriceDetectService::class);
 
-            $this->hasAtLeastOnePrice( $priceDetectRepository->getPriceIdsForCustomer() );
+            $this->hasAtLeastOnePrice( $priceDetectService->getPriceIdsForCustomer() );
         }
 
         return $this;

@@ -45,8 +45,8 @@ class UrlService
         $categoryUrl = $this->fromMemoryCache(
             "categoryUrl.$categoryId.$lang",
             function () use ($categoryId, $lang) {
-                        /** @var UrlBuilderRepositoryContract $urlBuilderRepository */
-                        $urlBuilderRepository = pluginApp(UrlBuilderRepositoryContract::class);
+                /** @var UrlBuilderRepositoryContract $urlBuilderRepository */
+                $urlBuilderRepository = pluginApp(UrlBuilderRepositoryContract::class);
 
                 return $urlBuilderRepository->buildCategoryUrl($categoryId, $lang);
             }
@@ -96,7 +96,7 @@ class UrlService
      */
     public function getCanonicalURL($lang = null, $ignoreCanonical = false)
     {
-        $defaultLanguage = $this->webstoreConfigurationRepository->getDefaultLanguage();
+        $defaultLanguage = $this->webstoreConfigurationRepository->getWebstoreConfiguration()->defaultLanguage;
 
         if ($lang === null) {
             $lang = Utils::getLang();
@@ -157,7 +157,7 @@ class UrlService
      */
     public function isCanonical($lang = null)
     {
-        $defaultLanguage = $this->webstoreConfigurationRepository->getDefaultLanguage();
+        $defaultLanguage = $this->webstoreConfigurationRepository->getWebstoreConfiguration()->defaultLanguage;
 
         if ($lang === null) {
             $lang = Utils::getLang();
@@ -186,7 +186,7 @@ class UrlService
             function () {
                 $result = [];
 
-                $defaultLanguage = $this->webstoreConfigurationRepository->getDefaultLanguage();
+                $defaultLanguage = $this->webstoreConfigurationRepository->getWebstoreConfiguration()->defaultLanguage;
 
                 $defaultUrl = $this->getCanonicalURL($defaultLanguage);
 
@@ -236,7 +236,7 @@ class UrlService
             /** @var UrlQuery $query */
             $query = pluginApp(UrlQuery::class, ['path' => $redirectURL]);
             $redirectURL = $query->toAbsoluteUrl(
-                $this->webstoreConfigurationRepository->getDefaultLanguage() !== Utils::getLang()
+                $this->webstoreConfigurationRepository->getWebstoreConfiguration()->defaultLanguage !== Utils::getLang()
             );
         }
 

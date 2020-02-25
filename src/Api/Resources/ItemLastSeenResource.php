@@ -39,24 +39,24 @@ class ItemLastSeenResource extends ApiResource
         /** @var Twig $twig */
         $twig = pluginApp(Twig::class);
 
-        $items = $this->request->get("items", 20);
+        $items = $this->request->get('items', 20);
         $lastSeenItems = $itemListService->getItemList(ItemListService::TYPE_LAST_SEEN, null, null, $items);
         $lastSeenContainers = [];
 
-        foreach ($lastSeenItems["documents"] as $item) {
-            $lastSeenContainers[$item["id"]]["beforePrices"] = $twig->renderString(
+        foreach ($lastSeenItems['documents'] as $item) {
+            $lastSeenContainers[$item['id']]['beforePrices'] = $twig->renderString(
                 "{% for content in container('Ceres::CategoryItem.BeforePrices', item) %}{{ content.result | raw }}{% endfor %}",
-                ['item' => $item["data"]]
+                ['item' => $item['data']]
             );
 
-            $lastSeenContainers[$item["id"]]["afterPrices"] = $twig->renderString(
+            $lastSeenContainers[$item['id']]['afterPrices'] = $twig->renderString(
                 "{% for content in container('Ceres::CategoryItem.AfterPrices', item) %}{{ content.result | raw }}{% endfor %}",
-                ['item' => $item["data"]]
+                ['item' => $item['data']]
             );
         }
 
         return $this->response->create(
-            ["lastSeenItems" => $lastSeenItems, "containers" => $lastSeenContainers],
+            ['lastSeenItems' => $lastSeenItems, 'containers' => $lastSeenContainers],
             ResponseCode::OK
         );
     }

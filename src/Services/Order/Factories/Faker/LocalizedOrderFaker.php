@@ -2,6 +2,7 @@
 
 namespace IO\Services\Order\Factories\Faker;
 
+use IO\Extensions\Filters\ItemImagesFilter;
 use IO\Helper\Utils;
 use IO\Services\ItemSearch\Factories\Faker\AbstractFaker;
 use Plenty\Modules\Authorization\Services\AuthHelper;
@@ -10,7 +11,6 @@ use Plenty\Modules\Order\Shipping\Contracts\ParcelServicePresetRepositoryContrac
 use Plenty\Modules\Order\Status\Contracts\OrderStatusRepositoryContract;
 use Plenty\Modules\Order\Status\Models\OrderStatus;
 use Plenty\Modules\Payment\Method\Models\PaymentMethod;
-use Plenty\Modules\Webshop\Filters\ItemImagesFilter;
 use Plenty\Plugin\Translation\Translator;
 
 class LocalizedOrderFaker extends AbstractFaker

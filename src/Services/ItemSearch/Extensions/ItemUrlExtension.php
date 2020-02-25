@@ -2,11 +2,11 @@
 
 namespace IO\Services\ItemSearch\Extensions;
 
-use IO\Contracts\VariationSearchFactoryContract as VariationSearchFactory;
 use IO\Services\UrlBuilder\VariationUrlBuilder;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Source\Mutator\BuiltIn\LanguageMutator;
 use Plenty\Modules\Webshop\Contracts\UrlBuilderRepositoryContract;
 use Plenty\Modules\Webshop\Contracts\WebstoreConfigurationRepositoryContract;
+use Plenty\Modules\Webshop\ItemSearch\Factories\VariationSearchFactory;
 
 /**
  * Class ItemUrlExtension
@@ -15,6 +15,7 @@ use Plenty\Modules\Webshop\Contracts\WebstoreConfigurationRepositoryContract;
  * Otherwise generate item url and store url for later usage.
  *
  * @package IO\Services\ItemSearch\Extensions
+ * @deprecated since 5.0.0 will be removed in 6.0.0
  */
 class ItemUrlExtension implements ItemSearchExtension
 {

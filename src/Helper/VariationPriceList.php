@@ -2,6 +2,7 @@
 
 namespace IO\Helper;
 
+use IO\Extensions\Filters\NumberFormatFilter;
 use IO\Services\BasketService;
 use Plenty\Legacy\Services\Item\Variation\SalesPriceService;
 use Plenty\Modules\Account\Contact\Models\Contact;
@@ -12,7 +13,6 @@ use Plenty\Modules\LiveShopping\Contracts\LiveShoppingRepositoryContract;
 use Plenty\Modules\Webshop\Contracts\CheckoutRepositoryContract;
 use Plenty\Modules\Webshop\Contracts\ContactRepositoryContract;
 use Plenty\Modules\Webshop\Contracts\UnitRepositoryContract;
-use Plenty\Modules\Webshop\Filters\NumberFormatFilter;
 use Plenty\Plugin\Application;
 
 /**

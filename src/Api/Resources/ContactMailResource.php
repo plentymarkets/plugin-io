@@ -10,7 +10,7 @@ use IO\Helper\ReCaptcha;
 use IO\Helper\TemplateContainer;
 use IO\Services\ContactMailService;
 use IO\Services\NotificationService;
-use Plenty\Modules\Webshop\Template\Contracts\TemplateConfigRepositoryContract;
+use IO\Services\TemplateConfigService;
 use Plenty\Plugin\Http\Request;
 use Plenty\Plugin\Http\Response;
 
@@ -22,8 +22,8 @@ class ContactMailResource extends ApiResource
 {
     private $contactMailService;
 
-    /** @var TemplateConfigRepositoryContract */
-    private $templateConfigRepository;
+    /** @var TemplateConfigService */
+    private $templateConfigService;
 
     /**
      * ContactMailResource constructor.
@@ -34,11 +34,11 @@ class ContactMailResource extends ApiResource
         Request $request,
         ApiResponse $response,
         ContactMailService $contactMailService,
-        TemplateConfigRepositoryContract $templateConfigRepository
+        TemplateConfigService $templateConfigService
     ) {
         parent::__construct($request, $response);
         $this->contactMailService = $contactMailService;
-        $this->templateConfigRepository = $templateConfigRepository;
+        $this->templateConfigService = $templateConfigService;
     }
 
     public function store(): Response
@@ -105,7 +105,7 @@ class ContactMailResource extends ApiResource
 
         return $result['success']
             && (!array_key_exists('score', $result)
-                || $result['score'] >= $this->templateConfigRepository->get('global.google_recaptcha_threshold')
+                || $result['score'] >= $this->templateConfigService->get('global.google_recaptcha_threshold')
             );
     }
 }

@@ -4,6 +4,8 @@ namespace IO\Extensions;
 
 use IO\Extensions\Constants\ShopUrls;
 
+use IO\Extensions\Filters\ItemImagesFilter;
+use IO\Extensions\Filters\NumberFormatFilter;
 use IO\Extensions\Filters\PropertyNameFilter;
 use IO\Extensions\Functions\GetCdnMetadata;
 use Plenty\Plugin\Http\Request;
@@ -47,6 +49,7 @@ class TwigIOExtension extends Twig_Extension
         TwigFactory $twig,
         Request $request,
         PatternFilter $patternFilter,
+        NumberFormatFilter $numberFormatFilter,
         URLFilter $urlFilter,
         GetBasePrice $getBasePrice,
         Component $component,
@@ -56,6 +59,7 @@ class TwigIOExtension extends Twig_Extension
         Partial $partial,
         QueryString $queryString,
         UniqueId $uniqueId,
+        ItemImagesFilter $itemImagesFilter,
         OrderByKeyFilter $orderByKeyFilter,
         ShuffleFilter $shuffleFilter,
         ResultFieldsFilter $resultFieldsFilter,

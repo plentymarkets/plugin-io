@@ -2,8 +2,8 @@
 
 namespace IO\Services\ItemSearch\Factories\Faker;
 
+use IO\Extensions\Filters\NumberFormatFilter;
 use Plenty\Modules\Webshop\Contracts\CheckoutRepositoryContract;
-use Plenty\Modules\Webshop\Filters\NumberFormatFilter;
 
 class PriceFaker extends AbstractFaker
 {

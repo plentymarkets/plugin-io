@@ -8,6 +8,7 @@ use IO\Services\BasketService;
 use IO\Services\CustomerService;
 use IO\Tests\TestCase;
 use Plenty\Modules\Account\Address\Models\Address;
+use Plenty\Modules\Authorization\Services\AuthHelper;
 use Plenty\Modules\Frontend\Services\CheckoutService;
 use \Mockery;
 use Plenty\Modules\Webshop\Contracts\SessionStorageRepositoryContract;
@@ -137,6 +138,10 @@ class CustomerServiceFeatureTest extends TestCase
             ->shouldReceive('getCustomerInvoiceAddressId')
             ->andReturn(null);
 
+        $this->checkoutService
+            ->shouldReceive('getShippingCountryId')
+            ->andReturn(null);
+
         $this->createContact($email, $password);
         $this->performLogin($email, $password);
         $this->deleteAddress($addressData, $addressType);
@@ -160,6 +165,7 @@ class CustomerServiceFeatureTest extends TestCase
             ->shouldReceive('getCustomerShippingAddressId')
             ->andReturn(null);
 
+
         if ($addressType === AddressType::BILLING) {
             $this->checkoutService
                 ->shouldReceive('setCustomerInvoiceAddressId')
@@ -171,7 +177,12 @@ class CustomerServiceFeatureTest extends TestCase
         }
 
         $address = $this->customerService->createAddress($addressData, $addressType);
-        $this->customerService->deleteAddress($address->id, $addressType);
+        /** @var AuthHelper $authHelper */
+        $authHelper = pluginApp(AuthHelper::class);
+
+        $authHelper->processUnguarded(function () use ($address, $addressType) {
+            $this->customerService->deleteAddress($address->id, $addressType);
+        });
 
         if ($addressType == AddressType::BILLING) {
             $this->assertEquals($basketService->getBillingAddressId(), 0);
@@ -213,6 +224,10 @@ class CustomerServiceFeatureTest extends TestCase
             ->shouldReceive('getCustomerInvoiceAddressId')
             ->andReturn($addressDataCreate['countryId']);
 
+        $this->checkoutService
+            ->shouldReceive('getShippingCountryId')
+            ->andReturn(null);
+
         $this->createContact($email, $password);
         $this->performLogin($email, $password);
         $this->updateAddress($addressDataCreate, $addressDataUpdate, $addressType);
@@ -239,7 +254,12 @@ class CustomerServiceFeatureTest extends TestCase
 
         $address = $this->customerService->createAddress($addressDataCreate, $addressType);
 
-        $updatedAddress = $this->customerService->updateAddress($address->id, $addressDataUpdate, $addressType);
+        /** @var AuthHelper $authHelper */
+        $authHelper = pluginApp(AuthHelper::class);
+        $updatedAddress = null;
+        $authHelper->processUnguarded(function () use(&$updatedAddress, $address, $addressDataUpdate, $addressType) {
+                $updatedAddress = $this->customerService->updateAddress($address->id, $addressDataUpdate, $addressType);
+        });
 
         $this->assertNotNull($updatedAddress);
         $this->assertInstanceOf(Address::class, $updatedAddress);
