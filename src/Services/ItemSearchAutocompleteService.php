@@ -5,16 +5,28 @@ namespace IO\Services;
 use IO\Extensions\Filters\ItemImagesFilter;
 use Plenty\Modules\Category\Contracts\CategoryRepositoryContract;
 use Plenty\Modules\Category\Models\Category;
-use Plenty\Modules\Webshop\Contracts\CategoryUrlBuilderRepositoryContract;
 use Plenty\Modules\Webshop\Contracts\LocalizationRepositoryContract;
-use Plenty\Modules\Webshop\Contracts\VariationUrlBuilderRepositoryContract;
+use Plenty\Modules\Webshop\Contracts\UrlBuilderRepositoryContract;
 use Plenty\Modules\Webshop\ItemSearch\Helpers\SortingHelper;
 use Plenty\Plugin\Application;
 
+/**
+ * Class ItemSearchAutocompleteService
+ * @package IO\Services
+ */
 class ItemSearchAutocompleteService
 {
+    /** @var UrlBuilderRepositoryContract $urlBuilderRepository */
+    private $urlBuilderRepository;
+
+    public function __construct(UrlBuilderRepositoryContract $urlBuilderRepository)
+    {
+        $this->urlBuilderRepository = $urlBuilderRepository;
+    }
+
     /**
-     * @inheritdoc
+     * @param array $itemSearchResult
+     * @return array
      */
     public function transformResult($itemSearchResult)
     {
@@ -27,6 +39,10 @@ class ItemSearchAutocompleteService
         return $newResult;
     }
 
+    /**
+     * @param array $items
+     * @return array
+     */
     private function getItems($items)
     {
         $itemResult = [];
@@ -36,9 +52,6 @@ class ItemSearchAutocompleteService
 
             /** @var ItemImagesFilter $itemImageFilter */
             $itemImageFilter = pluginApp(ItemImagesFilter::class);
-
-            /** @var VariationUrlBuilderRepositoryContract $variationUrlBuilderRepository */
-            $variationUrlBuilderRepository = pluginApp(VariationUrlBuilderRepositoryContract::class);
 
             foreach ($items as $variation) {
                 $itemId = $variation['data']['item']['id'];
@@ -55,8 +68,8 @@ class ItemSearchAutocompleteService
                         $variation['data']['images'],
                         'urlPreview'
                     ),
-                    $variationUrlBuilderRepository->buildUrl($itemId, $variationId)->append(
-                        $variationUrlBuilderRepository->getSuffix($itemId, $variationId)
+                    $this->urlBuilderRepository->buildVariationUrl($itemId, $variationId)->append(
+                        $this->urlBuilderRepository->getSuffix($itemId, $variationId)
                     )->toRelativeUrl(),
                     '',
                     '',
@@ -68,6 +81,10 @@ class ItemSearchAutocompleteService
         return $itemResult;
     }
 
+    /**
+     * @param array $categories
+     * @return array
+     */
     private function getCategories($categories)
     {
         $categoryResult = [];
@@ -87,13 +104,10 @@ class ItemSearchAutocompleteService
                     /** @var Category $categoryData */
                     $categoryData = $categoryRepository->get($categoryId);
 
-                    /** @var CategoryUrlBuilderRepositoryContract $categoryUrlRepository */
-                    $categoryUrlBuilderRepository = pluginApp(CategoryUrlBuilderRepositoryContract::class);
-
                     $categoryResult[] = $this->buildResult(
                         $categoryData->details[0]->name,
                         $categoryData->details[0]->imagePath,
-                        $categoryUrlBuilderRepository->buildUrl(
+                        $this->urlBuilderRepository->buildCategoryUrl(
                             (int)$categoryId,
                             $localizationRepository->getLanguage(),
                             $app->getWebstoreId()
@@ -109,12 +123,25 @@ class ItemSearchAutocompleteService
         return $categoryResult;
     }
 
+    /**
+     * @param array $suggestions
+     * @return array
+     */
     private function getSuggestions($suggestions)
     {
         //TODO implement suggestion result
         return [];
     }
 
+    /**
+     * @param string $label
+     * @param string $image
+     * @param string $url
+     * @param string $beforeLabel
+     * @param string $afterLabel
+     * @param int $count
+     * @return array
+     */
     private function buildResult($label, $image, $url, $beforeLabel, $afterLabel, $count)
     {
         return [
