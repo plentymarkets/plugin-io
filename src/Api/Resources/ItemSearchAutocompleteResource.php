@@ -41,7 +41,7 @@ class ItemSearchAutocompleteResource extends ApiResource
 
             /** @var ItemSearchAutocompleteService $itemSearchAutocompleteService */
             $itemSearchAutocompleteService = pluginApp(ItemSearchAutocompleteService::class);
-            $response = $itemSearchAutocompleteService->getResults($searchString, $searchTypes);
+            $response = $itemSearchAutocompleteService->transformResult($itemSearchAutocompleteService->getResults($searchString, $searchTypes));
 
             return $this->response->create($response, ResponseCode::OK);
         }

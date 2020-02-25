@@ -30,7 +30,7 @@ class ItemSearchAutocompleteService
     {
         /** @var ItemSearchService $itemSearchService */
         $itemSearchService = pluginApp(ItemSearchService::class);
-        $response = $itemSearchService->getResults(
+        $result = $itemSearchService->getResults(
             SearchItems::getSearchFactory(
                 [
                     'query' => $searchString,
@@ -43,7 +43,7 @@ class ItemSearchAutocompleteService
             )
         );
 
-        return $this->transformResult($response);
+        return $result;
     }
 
     /**
