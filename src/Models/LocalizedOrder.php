@@ -170,7 +170,7 @@ class LocalizedOrder extends ModelWrapper
         }
 
         $resultFields = ResultFieldTemplate::load( ResultFieldTemplate::TEMPLATE_LIST_ITEM );
-        foreach( ['attributes.attribute.names.*', 'attributes.value.names.*', 'images.all.urlPreview', 'images.variation.urlPreview'] as $field )
+        foreach( ['attributes.attribute.names.*', 'attributes.value.names.*', 'images.all.urlPreview', 'images.variation.urlPreview', 'variationProperties.*'] as $field )
         {
             if (!in_array($field, $resultFields))
             {
@@ -187,6 +187,7 @@ class LocalizedOrder extends ModelWrapper
             $searchFactory
                 ->withLanguage()
                 ->withImages()
+                ->withPropertyGroups()
                 ->withDefaultImage()
                 ->withUrls()
                 ->withBundleComponents()
@@ -220,6 +221,7 @@ class LocalizedOrder extends ModelWrapper
                     }
 
                     $orderItem['attributes'] = $attributes;
+                    $orderItem['variationProperties'] = $orderVariation['data']['variationProperties'];
                 }
             }
         }
