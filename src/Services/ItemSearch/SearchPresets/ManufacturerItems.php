@@ -64,7 +64,7 @@ class ManufacturerItems implements SearchPreset
             ->setPage( $page, $itemsPerPage )
             ->groupByTemplateConfig()
             ->withLinkToContent()
-            ->withReducedResults(true);
+            ->withReducedResults();
 
         return $searchFactory;
     }
