@@ -187,7 +187,7 @@ class LocalizedOrder extends ModelWrapper
             $searchFactory
                 ->withLanguage()
                 ->withImages()
-                ->withPropertyGroups()
+                ->withPropertyGroups(['displayInOrderProcess'])
                 ->withDefaultImage()
                 ->withUrls()
                 ->withBundleComponents()
