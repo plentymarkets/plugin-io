@@ -11,6 +11,7 @@ use Plenty\Modules\Plugin\Models\Plugin;
 use Illuminate\Support\Facades\Session;
 use Plenty\Modules\System\Models\WebstoreConfiguration;
 use Plenty\Modules\Webshop\Contracts\CheckoutRepositoryContract;
+use Plenty\Modules\Webshop\Contracts\LocalizationRepositoryContract;
 use Plenty\Modules\Webshop\Contracts\SessionStorageRepositoryContract;
 use Plenty\Modules\Webshop\Contracts\WebstoreConfigurationRepositoryContract;
 
@@ -33,6 +34,8 @@ class CheckoutServiceCurrencyTest extends TestCase
     protected $checkoutMock;
     /** @var SessionStorageRepositoryContract $sessionStorageRepositoryMock */
     protected $sessionStorageRepositoryMock;
+    /** @var LocalizationRepositoryContract $localozationRepositoryMock */
+    protected $localozationRepositoryMock;
     /** @var MemoryCache $memoryCacheMock */
     protected $memoryCacheMock;
 
@@ -53,6 +56,12 @@ class CheckoutServiceCurrencyTest extends TestCase
         $this->replaceInstanceByMock(
             WebstoreConfigurationRepositoryContract::class,
             $this->webstoreConfigurationRepositoryMock
+        );
+
+        $this->localozationRepositoryMock = Mockery::mock(LocalizationRepositoryContract::class);
+        $this->replaceInstanceByMock(
+            LocalizationRepositoryContract::class,
+            $this->localozationRepositoryMock
         );
 
         $this->checkoutMock = Mockery::mock(Checkout::class);
@@ -80,11 +89,12 @@ class CheckoutServiceCurrencyTest extends TestCase
     /** @test */
     public function it_returns_the_currency_not_from_session_storage_and_webstore_config()
     {
-        $webstoreConfiguration = factory(WebstoreConfiguration::class)->make();
+        $webstoreConfiguration = factory(WebstoreConfiguration::class)->make(['defaultCurrency' => 'GBP', 'defaultLanguage' => 'en', 'defaultCurrencyList' => ['de' => 'EUR', 'en' => 'GBP']]);
 
         $expectedCurrency = $webstoreConfiguration->defaultCurrency;
 
         $this->sessionStorageRepositoryMock->shouldReceive('getSessionValue')->andReturn(null);
+        $this->sessionStorageRepositoryMock->shouldIgnoreMissing();
 
         $this->webstoreConfigurationRepositoryMock->shouldReceive('getWebstoreConfiguration')->andReturn(
             $webstoreConfiguration
@@ -92,6 +102,7 @@ class CheckoutServiceCurrencyTest extends TestCase
 
         $this->checkoutMock->shouldReceive('setCurrency')->andReturn();
 
+        $this->localozationRepositoryMock->shouldReceive('getLanguage')->andReturn($webstoreConfiguration->defaultLanguage);
         $currency = $this->checkoutRepository->getCurrency();
 
         $this->assertNotNull($currency);
@@ -112,6 +123,8 @@ class CheckoutServiceCurrencyTest extends TestCase
         $this->pluginMock->shouldReceive('getValue')->with(SessionStorageRepositoryContract::CURRENCY)->andReturn(null);
         $this->pluginMock->shouldReceive('setValue')->andReturn();
         $this->sessionStorageMock->shouldReceive('getPlugin')->andReturn($this->pluginMock);
+        $this->sessionStorageRepositoryMock->shouldIgnoreMissing();
+
 
         Session::shouldReceive('getLang')
             ->andReturn("");
