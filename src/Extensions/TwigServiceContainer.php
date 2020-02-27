@@ -18,6 +18,7 @@ use IO\Services\FakerService;
 use IO\Services\ItemCrossSellingService;
 use IO\Services\ItemLastSeenService;
 use IO\Services\ItemListService;
+use IO\Services\ItemSearchAutocompleteService;
 use IO\Services\ItemService;
 use IO\Services\ItemWishListService;
 use IO\Services\LegalInformationService;
@@ -219,5 +220,10 @@ class TwigServiceContainer
     public function getContactMap() : ContactMapService
     {
         return pluginApp(ContactMapService::class);
+    }
+
+    public function getSearchAutocomplete()
+    {
+        return pluginApp(ItemSearchAutocompleteService::class);
     }
 }
