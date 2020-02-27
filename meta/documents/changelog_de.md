@@ -1,5 +1,11 @@
 # Release Notes für IO
 
+## v4.6.4 (2020-02-27) <a href="https://github.com/plentymarkets/plugin-io/compare/4.6.3...4.6.4" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
+
+### Behoben
+
+- Registrierungs- und Kontaktformulare konnten nicht abgeschickt werden, wenn Google reCAPTCHA und die Ceres-Einstellung **Nicht akzeptierte Cookies blockieren** aktiv waren und der reCAPTCHA-Cookie nicht akzeptiert wurde. Dieses Verhalten wurde behoben.
+
 ## v4.6.3 (2020-02-24) <a href="https://github.com/plentymarkets/plugin-io/compare/4.6.2...4.6.3" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
 
 ### Behoben
