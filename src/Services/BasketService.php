@@ -659,13 +659,15 @@ class BasketService
             )
         );
 
-        $result = array();
-        foreach ($items['documents'] as $item) {
-            $variationId = $item['data']['variation']['id'];
-            $result[$variationId] = $item;
-            $result[$variationId]['data']['unit']['htmlUnit'] = UnitUtils::getHTML4Unit(
-                $result[$variationId]['data']['unit']['unitOfMeasurement']
-            );
+        $result = [];
+        if (isset($items['documents']) && is_array($items['documents'])) {
+            foreach ($items['documents'] as $item) {
+                $variationId = $item['data']['variation']['id'];
+                $result[$variationId] = $item;
+                $result[$variationId]['data']['unit']['htmlUnit'] = UnitUtils::getHTML4Unit(
+                    $result[$variationId]['data']['unit']['unitOfMeasurement']
+                );
+            }
         }
 
         return $result;
