@@ -13,7 +13,6 @@ use Plenty\Modules\Item\SalesPrice\Models\SalesPriceSearchResponse;
 use Plenty\Modules\LiveShopping\Contracts\LiveShoppingRepositoryContract;
 use Plenty\Modules\Webshop\Contracts\CheckoutRepositoryContract;
 use Plenty\Modules\Webshop\Contracts\ContactRepositoryContract;
-use Plenty\Modules\Webshop\Contracts\UnitRepositoryContract;
 use Plenty\Plugin\Application;
 
 /**
@@ -53,8 +52,8 @@ class VariationPriceList
     /** @var NumberFormatFilter $numberFormatFilter */
     private $numberFormatFilter;
 
-    /** @var UnitRepositoryContract $unitRepository */
-    private $unitRepository;
+    /** @var UnitService $unitService */
+    private $unitService;
 
     /** @var LiveShoppingRepositoryContract $liveShoppingRepo */
     private $liveShoppingRepo;
