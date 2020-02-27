@@ -59,7 +59,7 @@ class ItemController extends LayoutController
         /** @var TemplateConfigService $templateConfigService */
         $templateConfigService = pluginApp(TemplateConfigService::class);
 
-        if ($variationId > 0 && (int)$templateConfigService->getInteger('item.show_please_select') == 1) {
+        if ($variationId > 0 && $templateConfigService->getInteger('item.show_please_select') == 1) {
             unset($itemSearchOptions['variationId']);
             $searches['dynamic'] = SingleItem::getSearchFactory($itemSearchOptions);
         }
