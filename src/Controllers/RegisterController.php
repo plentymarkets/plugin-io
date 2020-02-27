@@ -7,7 +7,7 @@ use IO\Helper\RouteConfig;
 use IO\Services\UrlService;
 use Plenty\Modules\ShopBuilder\Helper\ShopBuilderRequest;
 use IO\Guards\AuthGuard;
-use IO\Services\CustomerService;
+use Plenty\Modules\Webshop\Contracts\ContactRepositoryContract;
 use Plenty\Plugin\Log\Loggable;
 
 /**
@@ -20,15 +20,15 @@ class RegisterController extends LayoutController
 
     /**
      * Prepare and render the data for the registration
-     * @param CustomerService $customerService
+     * @param ContactRepositoryContract $contactRepository
      * @param UrlService $urlService
      * @return string
      */
-	public function showRegister(CustomerService $customerService, UrlService $urlService): string
+	public function showRegister(ContactRepositoryContract $contactRepository, UrlService $urlService): string
 	{
         /** @var ShopBuilderRequest $shopBuilderRequest */
         $shopBuilderRequest = pluginApp(ShopBuilderRequest::class);
-	    if($customerService->getContactId() > 0 && !$shopBuilderRequest->isShopBuilder())
+	    if($contactRepository->getContactId() > 0 && !$shopBuilderRequest->isShopBuilder())
         {
             $this->getLogger(__CLASS__)->info("IO::Debug.RegisterController_alreadyLoggedIn");
             AuthGuard::redirect($urlService->getHomepageURL(), []);

@@ -7,6 +7,8 @@ use Plenty\Plugin\Events\Dispatcher;
 /**
  * Class FacetExtensionContainer
  * @package IO\Services\ItemSearch\Helper
+ * @deprecated since 5.0.0 will be deleted in 6.0.0
+ * @see \Plenty\Modules\Webshop\ItemSearch\Helpers\FacetExtensionContainer
  */
 class FacetExtensionContainer
 {
@@ -31,6 +33,8 @@ class FacetExtensionContainer
 
     /**
      * @return FacetExtension[]
+     * @deprecated since 5.0.0 will be deleted in 6.0.0
+     * @see \Plenty\Modules\Webshop\ItemSearch\Helpers\FacetExtensionContainer::getFacetExtensions()
      */
     public function getFacetExtensions()
     {
@@ -43,6 +47,8 @@ class FacetExtensionContainer
 
     /**
      * @param FacetExtension $facetExtension
+     * @deprecated since 5.0.0 will be deleted in 6.0.0
+     * @see \Plenty\Modules\Webshop\ItemSearch\Helpers\FacetExtensionContainer::addFacetExtension()
      */
     public function addFacetExtension(FacetExtension $facetExtension)
     {

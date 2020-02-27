@@ -4,6 +4,10 @@ namespace IO\Services;
 
 use Plenty\Plugin\ConfigRepository;
 
+/**
+ * Class TemplateConfigService
+ * @package IO\Services
+ */
 class TemplateConfigService
 {
     private $configRepository;
@@ -15,16 +19,21 @@ class TemplateConfigService
         $this->templatePluginName = $this->configRepository->get('IO.template.template_plugin_name');
     }
 
+    /**
+     * @param $key
+     * @param null $default
+     * @return mixed|null
+     */
     public function get($key, $default = null)
     {
-        if(strlen($this->templatePluginName))
-        {
-            return $this->configRepository->get($this->templatePluginName.'.'.$key, $default);
-        }
-
-        return null;
+        return $this->configRepository->get($this->templatePluginName .'.'.$key, $default);
     }
 
+    /**
+     * @param $key
+     * @param bool $default
+     * @return mixed
+     */
     public function getBoolean($key, $default = false)
     {
         $value = $this->get($key);
@@ -37,6 +46,11 @@ class TemplateConfigService
         return $default;
     }
 
+    /**
+     * @param $key
+     * @param int $default
+     * @return mixed
+     */
     public function getInteger($key, $default = 0)
     {
         return intval($this->get($key, $default));

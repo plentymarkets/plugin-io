@@ -4,21 +4,21 @@ namespace IO\Models;
 
 use IO\Builder\Order\OrderItemType;
 use IO\Builder\Order\OrderType;
-use IO\Extensions\Filters\ItemImagesFilter;
-use IO\Services\ItemSearch\Factories\VariationSearchFactory;
-use IO\Services\ItemSearch\Helper\ResultFieldTemplate;
-use IO\Services\ItemSearch\Services\ItemSearchService;
+use IO\Services\TemplateConfigService;
+use Plenty\Modules\Webshop\ItemSearch\Factories\VariationSearchFactory;
 use IO\Services\OrderService;
 use IO\Services\OrderStatusService;
 use IO\Services\OrderTotalsService;
 use IO\Services\OrderTrackingService;
-use IO\Services\TemplateConfigService;
 use Plenty\Modules\Order\Models\Order;
 use Plenty\Modules\Order\Property\Models\OrderProperty;
 use Plenty\Modules\Order\Property\Models\OrderPropertyType;
 use Plenty\Modules\Frontend\PaymentMethod\Contracts\FrontendPaymentMethodRepositoryContract;
 use Plenty\Modules\Order\Shipping\Contracts\ParcelServicePresetRepositoryContract;
 use IO\Extensions\Filters\URLFilter;
+use IO\Extensions\Filters\ItemImagesFilter;
+use Plenty\Modules\Webshop\ItemSearch\Helpers\ResultFieldTemplate;
+use Plenty\Modules\Webshop\ItemSearch\Services\ItemSearchService;
 
 class LocalizedOrder extends ModelWrapper
 {
@@ -183,18 +183,18 @@ class LocalizedOrder extends ModelWrapper
         /** @var VariationSearchFactory $searchFactory */
         $searchFactory = pluginApp( VariationSearchFactory::class );
         $searchFactory->setPage(1, count($orderVariationIds));
-        $orderVariations = $itemSearchService->getResult(
+        $orderVariations = $itemSearchService->getResults([
             $searchFactory
                 ->withLanguage()
                 ->withImages()
                 ->withDefaultImage()
                 ->withUrls()
                 ->withBundleComponents()
-                ->hasVariationIds( $orderVariationIds )
                 ->withResultFields(
                     $resultFields
                 )
-        );
+                ->hasVariationIds( $orderVariationIds )])[0];
+
 
         foreach( $orderVariations['documents'] as $orderVariation )
         {
@@ -308,7 +308,7 @@ class LocalizedOrder extends ModelWrapper
 
             /**  @var TemplateConfigService $templateConfigService */
             $templateConfigService = pluginApp(TemplateConfigService::class);
-            $returnTime = (int)$templateConfigService->get('my_account.order_return_days', 14);
+            $returnTime = $templateConfigService->getInteger('my_account.order_return_days', 14);
 
             return $shippingDateSet
                 && $createdDateUnix > 0

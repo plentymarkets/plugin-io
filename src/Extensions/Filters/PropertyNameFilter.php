@@ -4,7 +4,7 @@ namespace IO\Extensions\Filters;
 
 use IO\Extensions\AbstractFilter;
 use IO\Helper\MemoryCache;
-use IO\Services\SessionStorageService;
+use IO\Helper\Utils;
 use Plenty\Modules\Authorization\Services\AuthHelper;
 use Plenty\Modules\Item\Property\Contracts\PropertyRepositoryContract;
 use Plenty\Modules\Item\Property\Contracts\PropertySelectionRepositoryContract;
@@ -26,23 +26,17 @@ class PropertyNameFilter extends AbstractFilter
     /** @var PropertySelectionRepositoryContract */
     private $propertySelectionRepository;
 
-    /** @var SessionStorageService $sessionStorageService */
-    private $sessionStorageService;
-
     /**
      * PropertySelectionValueNameFilter constructor.
      * @param AuthHelper $authHelper
-     * @param SessionStorageService $sessionStorageService
      */
     public function __construct(
-        AuthHelper $authHelper,
-        SessionStorageService $sessionStorageService
+        AuthHelper $authHelper
     )
     {
         parent::__construct();
 
         $this->authHelper                   = $authHelper;
-        $this->sessionStorageService        = $sessionStorageService;
     }
 
     /**
@@ -61,7 +55,7 @@ class PropertyNameFilter extends AbstractFilter
     {
         if ($lang === null)
         {
-            $lang = $this->sessionStorageService->getLang();
+            $lang = Utils::getLang();
         }
 
         if (is_null($this->propertyRepository))
@@ -94,7 +88,7 @@ class PropertyNameFilter extends AbstractFilter
 
         if ($lang === null)
         {
-            $lang = $this->sessionStorageService->getLang();
+            $lang = Utils::getLang();
         }
 
         if (is_null($this->propertySelectionRepository))

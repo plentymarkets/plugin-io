@@ -2,10 +2,11 @@
 
 namespace IO\Services;
 
-use Plenty\Modules\Account\Contact\Contracts\ContactRepositoryContract;
+use Plenty\Modules\Account\Contact\Contracts\ContactRepositoryContract as CoreContactRepositoryContract;
+use Plenty\Modules\Webshop\Contracts\ContactRepositoryContract;
 use Plenty\Modules\Account\Contact\Models\Contact;
 use Plenty\Modules\Authentication\Contracts\ContactAuthenticationRepositoryContract;
-use IO\Constants\SessionStorageKeys;
+use Plenty\Modules\Webshop\Contracts\SessionStorageRepositoryContract;
 use Plenty\Plugin\Log\Loggable;
 
 /**
@@ -22,9 +23,9 @@ class AuthenticationService
     private $contactAuthRepository;
 
     /**
-     * @var SessionStorageService $sessionStorage
+     * @var SessionStorageRepositoryContract $sessionStorageRepository
      */
-    private $sessionStorage;
+    private $sessionStorageRepository;
 
     /** @var CustomerService */
     private $customerService;
@@ -32,15 +33,15 @@ class AuthenticationService
     /**
      * AuthenticationService constructor.
      * @param ContactAuthenticationRepositoryContract $contactAuthRepository
-     * @param \IO\Services\SessionStorageService $sessionStorage
+     * @param SessionStorageRepositoryContract $sessionStorageRepository
      */
     public function __construct(
         ContactAuthenticationRepositoryContract $contactAuthRepository,
-        SessionStorageService $sessionStorage,
+        SessionStorageRepositoryContract $sessionStorageRepository,
         CustomerService $customerService
     ) {
         $this->contactAuthRepository = $contactAuthRepository;
-        $this->sessionStorage = $sessionStorage;
+        $this->sessionStorageRepository = $sessionStorageRepository;
         $this->customerService = $customerService;
     }
 
@@ -56,10 +57,10 @@ class AuthenticationService
         $this->customerService->resetGuestAddresses();
 
         $this->contactAuthRepository->authenticateWithContactEmail($email, $password);
-        $this->sessionStorage->setSessionValue(SessionStorageKeys::GUEST_WISHLIST_MIGRATION, true);
+        $this->sessionStorageRepository->setSessionValue(SessionStorageRepositoryContract::GUEST_WISHLIST_MIGRATION, true);
 
-        /** @var ContactRepositoryContract $contactRepository */
-        $contactRepository = pluginApp(ContactRepositoryContract::class);
+        /** @var CoreContactRepositoryContract $contactRepository */
+        $contactRepository = pluginApp(CoreContactRepositoryContract::class);
 
         return $contactRepository->getContactIdByEmail($email);
     }
@@ -72,7 +73,7 @@ class AuthenticationService
     public function loginWithContactId(int $contactId, string $password): void
     {
         $this->contactAuthRepository->authenticateWithContactId($contactId, $password);
-        $this->sessionStorage->setSessionValue(SessionStorageKeys::GUEST_WISHLIST_MIGRATION, true);
+        $this->sessionStorageRepository->setSessionValue(SessionStorageRepositoryContract::GUEST_WISHLIST_MIGRATION, true);
     }
 
     /**
@@ -96,9 +97,10 @@ class AuthenticationService
      */
     public function checkPassword($password): bool
     {
-        /** @var CustomerService $customerService */
-        $customerService = pluginApp(CustomerService::class);
-        $contact = $customerService->getContact();
+        /** @var ContactRepositoryContract $contactRepository */
+        $contactRepository = pluginApp(ContactRepositoryContract::class);
+
+        $contact = $contactRepository->getContact();
         if ($contact instanceof Contact) {
             try {
                 $this->login(
@@ -124,11 +126,11 @@ class AuthenticationService
      */
     public function isLoggedIn(): bool
     {
-        /** @var CustomerService $customerService */
-        $customerService = pluginApp(CustomerService::class);
+        /** @var ContactRepositoryContract $contactRepository */
+        $contactRepository = pluginApp(ContactRepositoryContract::class);
 
-        $contactId = $customerService->getContactId();
-        $email = $this->sessionStorage->getSessionValue(SessionStorageKeys::GUEST_EMAIL);
+        $contactId = $contactRepository->getContactId();
+        $email = $this->sessionStorageRepository->getSessionValue(SessionStorageRepositoryContract::GUEST_EMAIL);
 
         return $contactId > 0 || !empty(trim($email));
     }

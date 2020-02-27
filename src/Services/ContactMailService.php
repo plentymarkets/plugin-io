@@ -2,6 +2,7 @@
 
 namespace IO\Services;
 
+use IO\Helper\Utils;
 use Plenty\Plugin\Log\Loggable;
 use Plenty\Plugin\Mail\Contracts\MailerContract;
 use Plenty\Plugin\Mail\Models\ReplyTo;
@@ -18,9 +19,7 @@ class ContactMailService
 
         if ( !strlen($recipient) )
         {
-            /** @var TemplateConfigService $templateConfigService */
-            $templateConfigService = pluginApp(TemplateConfigService::class);
-            $recipient = $templateConfigService->get('contact.shop_mail');
+            $recipient = Utils::getTemplateConfig('contact.shop_mail');
         }
 
         if(!strlen($recipient) || !strlen($mailTemplate))

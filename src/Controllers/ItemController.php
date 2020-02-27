@@ -7,19 +7,20 @@ use IO\Helper\Utils;
 use IO\Services\CategoryService;
 use IO\Services\ItemListService;
 use IO\Services\ItemSearch\Factories\VariationSearchResultFactory;
-use IO\Services\ItemSearch\Helper\ResultFieldTemplate;
-use IO\Services\ItemSearch\SearchPresets\SingleItem;
-use IO\Services\ItemSearch\SearchPresets\VariationAttributeMap;
-use IO\Services\ItemSearch\Services\ItemSearchService;
 use IO\Services\TemplateConfigService;
-use IO\Services\WebstoreConfigurationService;
 use Plenty\Modules\Category\Models\Category;
 use Plenty\Modules\ShopBuilder\Helper\ShopBuilderRequest;
+use Plenty\Modules\Webshop\Contracts\WebstoreConfigurationRepositoryContract;
+use Plenty\Modules\Webshop\ItemSearch\Helpers\ResultFieldTemplate;
+use Plenty\Modules\Webshop\ItemSearch\SearchPresets\SingleItem;
+use Plenty\Modules\Webshop\ItemSearch\SearchPresets\VariationAttributeMap;
+use Plenty\Modules\Webshop\ItemSearch\Services\ItemSearchService;
 use Plenty\Plugin\Http\Response;
 use Plenty\Plugin\Log\Loggable;
 
 /**
  * Class ItemController
+ *
  * @package IO\Controllers
  */
 class ItemController extends LayoutController
@@ -58,12 +59,13 @@ class ItemController extends LayoutController
         /** @var TemplateConfigService $templateConfigService */
         $templateConfigService = pluginApp(TemplateConfigService::class);
 
-        if ($variationId > 0 && (int)$templateConfigService->get('item.show_please_select') == 1) {
+        if ($variationId > 0 && $templateConfigService->getInteger('item.show_please_select') == 1) {
             unset($itemSearchOptions['variationId']);
             $searches['dynamic'] = SingleItem::getSearchFactory($itemSearchOptions);
         }
 
         /** @var ItemSearchService $itemSearchService */
+
         $itemSearchService = pluginApp(ItemSearchService::class);
         $itemResult = $itemSearchService->getResults($searches);
 
@@ -71,6 +73,18 @@ class ItemController extends LayoutController
             /** @var CategoryService $categoryService */
             $categoryService = pluginApp(CategoryService::class);
             $categoryService->setCurrentCategory($category);
+        }
+
+        if (isset($itemResult['item']['documents'][0]['data']['currentData'])) {
+            /** @var CategoryService $categoryService */
+            $categoryService = pluginApp(CategoryService::class);
+            if (is_null($category)) {
+                $categoryService->setCurrentCategory(
+                    $itemResult['item']['documents'][0]['data']['currentData']['category']
+                );
+            }
+            $categoryService->setCurrentItem($itemResult['item']['documents'][0]['data']['currentData']['item']);
+            unset($itemResult['item']['documents'][0]['data']['currentData']);
         }
 
         /** @var ShopBuilderRequest $shopBuilderRequest */
@@ -118,11 +132,11 @@ class ItemController extends LayoutController
             return $response;
         }
 
-        /** @var WebstoreConfigurationService $webstoreConfigService */
-        $webstoreConfigService = pluginApp(WebstoreConfigurationService::class);
-        $webstoreConfig = $webstoreConfigService->getWebstoreConfig();
+        /** @var WebstoreConfigurationRepositoryContract $webstoreConfigurationRepository */
+        $webstoreConfigurationRepository = pluginApp(WebstoreConfigurationRepositoryContract::class);
+        $webstoreConfiguration = $webstoreConfigurationRepository->getWebstoreConfiguration();
 
-        $attributeSelectDefaultOption = (int)$webstoreConfig->attributeSelectDefaultOption;
+        $attributeSelectDefaultOption = (int)$webstoreConfiguration->attributeSelectDefaultOption;
         $itemResult['initPleaseSelectOption'] = $variationId <= 0 && $attributeSelectDefaultOption === 1;
         return $this->renderTemplate(
             'tpl.item',
@@ -154,7 +168,6 @@ class ItemController extends LayoutController
         if (is_null($itemId)) {
             $itemId = $name;
         }
-
         return $this->showItem("", (int)$itemId, 0);
     }
 

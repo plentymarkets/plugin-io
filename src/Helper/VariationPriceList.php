@@ -4,22 +4,23 @@ namespace IO\Helper;
 
 use IO\Extensions\Filters\NumberFormatFilter;
 use IO\Services\BasketService;
-use IO\Services\CheckoutService;
-use IO\Services\CustomerService;
-use IO\Services\SessionStorageService;
-use IO\Services\UnitService;
 use Plenty\Legacy\Services\Item\Variation\SalesPriceService;
 use Plenty\Modules\Account\Contact\Models\Contact;
-use Plenty\Modules\Authorization\Services\AuthHelper;
 use Plenty\Modules\Item\SalesPrice\Contracts\SalesPriceSearchRepositoryContract;
 use Plenty\Modules\Item\SalesPrice\Models\SalesPriceSearchRequest;
 use Plenty\Modules\Item\SalesPrice\Models\SalesPriceSearchResponse;
-use Plenty\Modules\Item\Unit\Contracts\UnitNameRepositoryContract;
-use Plenty\Modules\Item\Unit\Contracts\UnitRepositoryContract;
 use Plenty\Modules\LiveShopping\Contracts\LiveShoppingRepositoryContract;
+use Plenty\Modules\Webshop\Contracts\CheckoutRepositoryContract;
+use Plenty\Modules\Webshop\Contracts\ContactRepositoryContract;
+use Plenty\Modules\Webshop\Contracts\UnitRepositoryContract;
 use Plenty\Plugin\Application;
-use Plenty\Plugin\CachingRepository;
 
+/**
+ * Class VariationPriceList
+ * @package IO\Helper
+ * @deprecated since 5.0.0 will be removed in 6.0.0
+ * @see \Plenty\Modules\Webshop\Helpers\VariationPriceList
+ */
 class VariationPriceList
 {
     use MemoryCache;
@@ -51,8 +52,8 @@ class VariationPriceList
     /** @var NumberFormatFilter $numberFormatFilter */
     private $numberFormatFilter;
 
-    /** @var UnitService $unitService */
-    private $unitService;
+    /** @var UnitRepositoryContract $unitRepository */
+    private $unitRepository;
 
     /** @var LiveShoppingRepositoryContract $liveShoppingRepo */
     private $liveShoppingRepo;
@@ -64,16 +65,27 @@ class VariationPriceList
 
     public function __construct(
         NumberFormatFilter $numberFormatFilter,
-        UnitService $unitService,
+        UnitRepositoryContract $unitRepository,
         LiveShoppingRepositoryContract $liveShoppingRepo,
-        CustomerService $customerService )
+        ContactRepositoryContract $contactRepository )
     {
         $this->numberFormatFilter   = $numberFormatFilter;
-        $this->unitService          = $unitService;
-        $this->showNetPrice         = $customerService->showNetPrices();
+        $this->unitRepository       = $unitRepository;
+        $this->showNetPrice         = $contactRepository->showNetPrices();
         $this->liveShoppingRepo     = $liveShoppingRepo;
     }
 
+    /**
+     * @param int $variationId
+     * @param int $itemId
+     * @param int $minimumOrderQuantity
+     * @param null $maximumOrderQuantity
+     * @param int $lot
+     * @param null $unit
+     * @return VariationPriceList
+     * @deprecated since 5.0.0 will be removed in 6.0.0
+     * @see \Plenty\Modules\Webshop\Helpers\VariationPriceList::create()
+     */
     public static function create( int $variationId, int $itemId, $minimumOrderQuantity = 0, $maximumOrderQuantity = null, $lot = 0, $unit = null )
     {
         if ( $minimumOrderQuantity === null )
@@ -103,6 +115,13 @@ class VariationPriceList
         return $instance;
     }
 
+    /**
+     * @param float $quantity
+     * @param string $type
+     * @return mixed|SalesPriceSearchResponse|null
+     * @deprecated since 5.0.0 will be removed in 6.0.0
+     * @see \Plenty\Modules\Webshop\Helpers\VariationPriceList::findPriceForQuantity()
+     */
     public function findPriceForQuantity( float $quantity, $type = self::TYPE_DEFAULT )
     {
         $result = null;
@@ -121,6 +140,12 @@ class VariationPriceList
         return $result;
     }
 
+    /**
+     * @param bool $showNetPrice
+     * @return array
+     * @deprecated since 5.0.0 will be removed in 6.0.0
+     * @see \Plenty\Modules\Webshop\Helpers\VariationPriceList::getGraduatedPrices()
+     */
     public function getGraduatedPrices( $showNetPrice = false )
     {
         $graduatedPrices = [];
@@ -136,6 +161,14 @@ class VariationPriceList
         return $graduatedPrices;
     }
 
+    /**
+     * @param $unitPrice
+     * @param $currency
+     * @param null $lang
+     * @return string
+     * @deprecated since 5.0.0 will be removed in 6.0.0
+     * @see \Plenty\Modules\Webshop\Helpers\VariationPriceList::getBasePrice()
+     */
     public function getBasePrice( $unitPrice, $currency, $lang = null )
     {
         /** @var SalesPriceService $basePriceService */
@@ -155,7 +188,7 @@ class VariationPriceList
                 self::$basePrices[(string)$this->lot][(string)$unitPrice][$this->unit] = $basePrice;
             }
 
-            $unitName = $this->unitService->getUnitNameByKey( $basePrice['unitKey'], $lang );
+            $unitName = $this->unitRepository->getUnitNameByKey( $basePrice['unitKey'], $lang );
 
             $basePriceString = $this->numberFormatFilter->formatMonetary($basePrice['price'], $currency).' / '.($basePrice['lot'] > 1 ? $basePrice['lot'].' ' : '').$unitName;
         }
@@ -163,6 +196,12 @@ class VariationPriceList
         return $basePriceString;
     }
 
+    /**
+     * @param null $quantity
+     * @return array
+     * @deprecated since 5.0.0 will be removed in 6.0.0
+     * @see \Plenty\Modules\Webshop\Helpers\VariationPriceList::toArray()
+     */
     public function toArray( $quantity = null )
     {
         if ( $quantity === null )
@@ -186,6 +225,12 @@ class VariationPriceList
         ];
     }
 
+    /**
+     * @param null $quantity
+     * @return array
+     * @deprecated since 5.0.0 will be removed in 6.0.0
+     * @see \Plenty\Modules\Webshop\Helpers\VariationPriceList::getCalculatedPrices()
+     */
     public function getCalculatedPrices( $quantity = null)
     {
         if ( $quantity === null )
@@ -231,6 +276,12 @@ class VariationPriceList
         ];
     }
 
+    /**
+     * @param $value
+     * @return float|int
+     * @deprecated since 5.0.0 will be removed in 6.0.0
+     * @see \Plenty\Modules\Webshop\Helpers\VariationPriceList::convertCurrency()
+     */
     public function convertCurrency( $value )
     {
         $defaultPrice = $this->getDefaultPrice();
@@ -255,6 +306,11 @@ class VariationPriceList
         return $value;
     }
 
+    /**
+     * @return mixed|SalesPriceSearchResponse|null
+     * @deprecated since 5.0.0 will be removed in 6.0.0
+     * @see \Plenty\Modules\Webshop\Helpers\VariationPriceList::getDefaultPrice()
+     */
     public function getDefaultPrice()
     {
         if ( is_null($this->defaultPrice) )
@@ -331,15 +387,16 @@ class VariationPriceList
                 $salesPriceSearchRequest = pluginApp(SalesPriceSearchRequest::class);
                 $salesPriceSearchRequest->accountId   = 0;
 
-                /** @var CustomerService $customerService */
-                $customerService = pluginApp( CustomerService::class );
-                $contact = $customerService->getContact();
+                /** @var ContactRepositoryContract $contactRepository */
+                $contactRepository = pluginApp(ContactRepositoryContract::class);
+
+                $contact = $contactRepository->getContact();
 
                 if ( $contact instanceof Contact )
                 {
                     $salesPriceSearchRequest->accountType = $contact->singleAccess;
                 }
-                $salesPriceSearchRequest->customerClassId = $customerService->getContactClassId();
+                $salesPriceSearchRequest->customerClassId = $contactRepository->getContactClassId();
 
                 /** @var BasketService $basketService */
                 $basketService = pluginApp( BasketService::class );
@@ -353,11 +410,11 @@ class VariationPriceList
             }
         );
 
-         /** @var CheckoutService $checkoutService */
-        $checkoutService = pluginApp( CheckoutService::class );
+        /** @var  CheckoutRepositoryContract $checkoutRepository */
+        $checkoutRepository = pluginApp(CheckoutRepositoryContract::class);
 
-        $salesPriceSearchRequest->countryId = $checkoutService->getShippingCountryId();
-        $salesPriceSearchRequest->currency  = $checkoutService->getCurrency();
+        $salesPriceSearchRequest->countryId = $checkoutRepository->getShippingCountryId();
+        $salesPriceSearchRequest->currency  = $checkoutRepository->getCurrency();
         $salesPriceSearchRequest->variationId = $variationId;
         $salesPriceSearchRequest->quantity    = $quantity;
         $salesPriceSearchRequest->type        = $type;

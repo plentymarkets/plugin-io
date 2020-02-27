@@ -1,15 +1,14 @@
 <?php //strict
 namespace IO\Controllers;
 
-use IO\Constants\SessionStorageKeys;
 use IO\Extensions\Constants\ShopUrls;
 use IO\Helper\RouteConfig;
 use IO\Models\LocalizedOrder;
 use IO\Services\CustomerService;
 use IO\Services\OrderService;
 use IO\Guards\AuthGuard;
-use IO\Services\SessionStorageService;
 use Plenty\Modules\Category\Models\Category;
+use Plenty\Modules\Webshop\Contracts\SessionStorageRepositoryContract;
 use Plenty\Plugin\Http\Response;
 use Plenty\Plugin\Log\Loggable;
 
@@ -33,9 +32,9 @@ class OrderReturnController extends LayoutController
      */
     public function showOrderReturn($orderId, $orderAccessKey = null, $category = null)
     {
-        /** @var SessionStorageService $sessionStorageService */
-        $sessionStorageService = pluginApp(SessionStorageService::class);
-        $sessionOrder = $sessionStorageService->getSessionValue(SessionStorageKeys::LAST_ACCESSED_ORDER);
+        /** @var SessionStorageRepositoryContract $sessionStorageRepository */
+        $sessionStorageRepository = pluginApp(SessionStorageRepositoryContract::class);
+        $sessionOrder = $sessionStorageRepository->getSessionValue(SessionStorageRepositoryContract::LAST_ACCESSED_ORDER);
 
         if ((int)$sessionOrder['orderId'] == (int)$orderId) {
             $orderAccessKey = $sessionOrder['accessKey'];
@@ -66,7 +65,6 @@ class OrderReturnController extends LayoutController
                 );
                 return $this->notFound();
             }
-
         } catch (\Exception $e) {
             $this->getLogger(__CLASS__)->warning(
                 "IO::Debug.OrderReturnController_cannotPrepareReturn",
@@ -108,7 +106,10 @@ class OrderReturnController extends LayoutController
         /** @var CategoryController $categoryController */
         $categoryController = pluginApp(CategoryController::class);
 
-        return $categoryController->redirectToCategory(RouteConfig::getCategoryId(RouteConfig::ORDER_RETURN),
-            '/returns', $returnsParams);
+        return $categoryController->redirectToCategory(
+            RouteConfig::getCategoryId(RouteConfig::ORDER_RETURN),
+            '/returns',
+            $returnsParams
+        );
     }
 }

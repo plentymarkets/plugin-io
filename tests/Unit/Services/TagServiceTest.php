@@ -2,13 +2,14 @@
 
 namespace IO\Tests\Services;
 
-use IO\Services\SessionStorageService;
 use IO\Services\TagService;
 use IO\Tests\TestCase;
 use Plenty\Modules\Authorization\Services\AuthHelper;
 use Plenty\Modules\Tag\Models\Tag;
 use Mockery;
 use Plenty\Modules\Tag\Models\TagName;
+use Plenty\Modules\Webshop\Contracts\LocalizationRepositoryContract;
+use Plenty\Modules\Webshop\Contracts\SessionStorageRepositoryContract;
 
 class TagServiceTest extends TestCase
 {
@@ -18,8 +19,8 @@ class TagServiceTest extends TestCase
     /** @var AuthHelper */
     private $authHelperMock;
 
-    /** @var SessionStorageService */
-    private $sessionStorageMock;
+    /** @var LocalizationRepositoryContract */
+    private $localizationRepositoryMock;
 
     const TAG_ID = 42;
     const TAG_NAME_DE = "Test Tag DE";
@@ -33,8 +34,8 @@ class TagServiceTest extends TestCase
         $this->authHelperMock = Mockery::mock(AuthHelper::class);
         app()->instance(AuthHelper::class, $this->authHelperMock);
 
-        $this->sessionStorageMock = Mockery::mock(SessionStorageService::class);
-        app()->instance(SessionStorageService::class, $this->sessionStorageMock);
+        $this->localizationRepositoryMock = Mockery::mock(SessionStorageRepositoryContract::class);
+        app()->instance(LocalizationRepositoryContract::class, $this->localizationRepositoryMock);
     }
 
     /** @test */
@@ -42,9 +43,13 @@ class TagServiceTest extends TestCase
     {
         $this->authHelperMock
             ->shouldReceive("processUnguarded")
-            ->andReturn(factory(Tag::class)->make([
-                "id"        => self::TAG_ID
-            ]));
+            ->andReturn(
+                factory(Tag::class)->make(
+                    [
+                        "id" => self::TAG_ID
+                    ]
+                )
+            );
 
         $tag = $this->tagService->getTagById(self::TAG_ID);
 
@@ -60,12 +65,16 @@ class TagServiceTest extends TestCase
 
         $this->authHelperMock
             ->shouldReceive("processUnguarded")
-            ->andReturn(factory(Tag::class)->make([
-                "id"        => self::TAG_ID,
-                "tagName"   => $tagName
-            ]));
+            ->andReturn(
+                factory(Tag::class)->make(
+                    [
+                        "id" => self::TAG_ID,
+                        "tagName" => $tagName
+                    ]
+                )
+            );
 
-        $this->sessionStorageMock->shouldReceive("getLang");
+        $this->localizationRepositoryMock->shouldReceive("getLanguage");
 
         $this->assertEquals($tagName, $this->tagService->getTagName(self::TAG_ID));
     }
@@ -75,23 +84,31 @@ class TagServiceTest extends TestCase
     {
         $this->authHelperMock
             ->shouldReceive("processUnguarded")
-            ->andReturn(factory(Tag::class)->make([
-                "id"        => self::TAG_ID,
-                "names"     => collect([
-                    factory(TagName::class)->make([
-                        "tagLang" => "de",
-                        "tagName" => self::TAG_NAME_DE
-                    ]),
-                    factory(TagName::class)->make([
-                        "tagLang" => "en",
-                        "tagName" => self::TAG_NAME_EN
-                    ])
-                ]),
-            ]));
+            ->andReturn(
+                factory(Tag::class)->make(
+                    [
+                        "id" => self::TAG_ID,
+                        "names" => collect(
+                            [
+                                factory(TagName::class)->make(
+                                    [
+                                        "tagLang" => "de",
+                                        "tagName" => self::TAG_NAME_DE
+                                    ]
+                                ),
+                                factory(TagName::class)->make(
+                                    [
+                                        "tagLang" => "en",
+                                        "tagName" => self::TAG_NAME_EN
+                                    ]
+                                )
+                            ]
+                        ),
+                    ]
+                )
+            );
 
-        $this->sessionStorageMock
-            ->shouldReceive("getLang")
-            ->andReturn("de");
+        $this->localizationRepositoryMock->shouldReceive("getLanguage")->andReturn("de");
 
         $tagName = $this->tagService->getTagName(self::TAG_ID);
 
@@ -103,21 +120,31 @@ class TagServiceTest extends TestCase
     {
         $this->authHelperMock
             ->shouldReceive("processUnguarded")
-            ->andReturn(factory(Tag::class)->make([
-                "id"        => self::TAG_ID,
-                "names"     => collect([
-                    factory(TagName::class)->make([
-                        "tagLang" => "de",
-                        "tagName" => self::TAG_NAME_DE
-                    ]),
-                    factory(TagName::class)->make([
-                        "tagLang" => "en",
-                        "tagName" => self::TAG_NAME_EN
-                    ])
-                ]),
-            ]));
+            ->andReturn(
+                factory(Tag::class)->make(
+                    [
+                        "id" => self::TAG_ID,
+                        "names" => collect(
+                            [
+                                factory(TagName::class)->make(
+                                    [
+                                        "tagLang" => "de",
+                                        "tagName" => self::TAG_NAME_DE
+                                    ]
+                                ),
+                                factory(TagName::class)->make(
+                                    [
+                                        "tagLang" => "en",
+                                        "tagName" => self::TAG_NAME_EN
+                                    ]
+                                )
+                            ]
+                        ),
+                    ]
+                )
+            );
 
-        $this->sessionStorageMock->shouldNotReceive("getLang");
+        $this->localizationRepositoryMock->shouldReceive("getLanguage");
 
         $tagName = $this->tagService->getTagName(self::TAG_ID, "en");
 
@@ -130,22 +157,32 @@ class TagServiceTest extends TestCase
         $tagName = "Test Tag";
         $this->authHelperMock
             ->shouldReceive("processUnguarded")
-            ->andReturn(factory(Tag::class)->make([
-                "id"        => self::TAG_ID,
-                "tagName"   => $tagName,
-                "names"     => collect([
-                    factory(TagName::class)->make([
-                        "tagLang" => "de",
-                        "tagName" => self::TAG_NAME_DE
-                    ]),
-                    factory(TagName::class)->make([
-                        "tagLang" => "en",
-                        "tagName" => self::TAG_NAME_EN
-                    ])
-                ]),
-            ]));
+            ->andReturn(
+                factory(Tag::class)->make(
+                    [
+                        "id" => self::TAG_ID,
+                        "tagName" => $tagName,
+                        "names" => collect(
+                            [
+                                factory(TagName::class)->make(
+                                    [
+                                        "tagLang" => "de",
+                                        "tagName" => self::TAG_NAME_DE
+                                    ]
+                                ),
+                                factory(TagName::class)->make(
+                                    [
+                                        "tagLang" => "en",
+                                        "tagName" => self::TAG_NAME_EN
+                                    ]
+                                )
+                            ]
+                        ),
+                    ]
+                )
+            );
 
-        $this->sessionStorageMock->shouldNotReceive("getLang");
+        $this->localizationRepositoryMock->shouldReceive("getLanguage");
 
         $this->assertEquals($tagName, $this->tagService->getTagName(self::TAG_ID, "fr"));
     }
@@ -157,7 +194,8 @@ class TagServiceTest extends TestCase
             ->shouldReceive("processUnguarded")
             ->andReturn(null);
 
-        $this->sessionStorageMock->shouldReceive("getLang");
+        $this->localizationRepositoryMock->shouldReceive("getLanguage");
+
 
         $this->assertEquals("", $this->tagService->getTagName(self::TAG_ID));
     }

@@ -2,18 +2,21 @@
 
 namespace IO\Helper;
 
-use IO\Services\CheckoutService;
 use Plenty\Modules\Frontend\Contracts\CurrencyExchangeRepositoryContract;
+use Plenty\Modules\Webshop\Contracts\CheckoutRepositoryContract;
 
 /**
  * Class CurrencyConverter
+ *
  * @package IO\Helper
+ *
+ * @depreacted since 5.0.0 will be removed in 6.0.0
  */
 class CurrencyConverter
 {
     /** @var CurrencyExchangeRepositoryContract $currencyExchcangeRepo */
     private $currencyExchcangeRepo;
-    
+
     /**
      * CurrencyConverter constructor.
      * @param CurrencyExchangeRepositoryContract $currencyExchangeRepo
@@ -22,7 +25,7 @@ class CurrencyConverter
     {
         $this->currencyExchcangeRepo= $currencyExchangeRepo;
     }
-    
+
     /**
      * @return bool
      * @throws \ErrorException
@@ -31,7 +34,7 @@ class CurrencyConverter
     {
         return $this->getCurrentCurrency() == $this->getDefaultCurrency();
     }
-    
+
     /**
      * @return string
      */
@@ -39,18 +42,18 @@ class CurrencyConverter
     {
         return $this->currencyExchcangeRepo->getDefaultCurrency();
     }
-    
+
     /**
      * @return string
      * @throws \ErrorException
      */
     public function getCurrentCurrency()
     {
-        /** @var CheckoutService $checkoutService */
-        $checkoutService = pluginApp(CheckoutService::class);
-        return $checkoutService->getCurrency();
+        /** @var  CheckoutRepositoryContract $checkoutRepository */
+        $checkoutRepository = pluginApp(CheckoutRepositoryContract::class);
+        return $checkoutRepository->getCurrency();
     }
-    
+
     /**
      * @param float $amount
      * @return float
@@ -62,7 +65,7 @@ class CurrencyConverter
         {
             return $this->currencyExchcangeRepo->convertToDefaultCurrency($this->getCurrentCurrency(), $amount);
         }
-        
+
         return $amount;
     }
 }

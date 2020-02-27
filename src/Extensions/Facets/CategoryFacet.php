@@ -4,13 +4,13 @@ namespace IO\Extensions\Facets;
 
 use IO\Helper\Utils;
 use IO\Services\CategoryService;
-use IO\Services\ItemSearch\Contracts\FacetExtension;
-use IO\Services\SessionStorageService;
 use IO\Services\TemplateConfigService;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Search\Aggregation\AggregationInterface;
 use Plenty\Modules\Item\Search\Aggregations\CategoryAllTermsAggregation;
 use Plenty\Modules\Item\Search\Aggregations\CategoryProcessor;
 use Plenty\Modules\Item\Search\Filter\CategoryFilter;
+use Plenty\Modules\Webshop\Contracts\LocalizationRepositoryContract;
+use Plenty\Modules\Webshop\ItemSearch\Contracts\FacetExtension;
 
 class CategoryFacet implements FacetExtension
 {
@@ -30,6 +30,10 @@ class CategoryFacet implements FacetExtension
         return $categoryAggregation;
     }
 
+    /**
+     * @param array $result
+     * @return array
+     */
     public function mergeIntoFacetsList($result): array
     {
         $categoryFacet = [];
@@ -37,11 +41,11 @@ class CategoryFacet implements FacetExtension
         /** @var TemplateConfigService $templateConfigService */
         $templateConfigService = pluginApp(TemplateConfigService::class);
 
+
         if ($templateConfigService->get('item.show_category_filter') == 'true') {
             if (count($result)) {
-                /** @var SessionStorageService $sessionStorage */
-                $sessionStorage = pluginApp(SessionStorageService::class);
-
+                /** @var LocalizationRepositoryContract $localizationRepository */
+                $localizationRepository = pluginApp(LocalizationRepositoryContract::class);
                 $categoryFacet = [
                     'id' => 'category',
                     'name' => 'Categories',
@@ -62,12 +66,12 @@ class CategoryFacet implements FacetExtension
 
                 $categoryBranch = null;
                 if (!is_null($currentCategory)) {
-                    $categoryBranch = $categoryService->getCurrentCategory()->branch()->get()[0];
+                    $categoryBranch = $currentCategory->branch()->get()[0];
                     $categoryBranch = array_unique(array_values($categoryBranch->toArray()));
                 }
 
                 foreach ($result as $categoryId => $count) {
-                    $category = $categoryService->getForPlentyId($categoryId, $sessionStorage->getLang());
+                    $category = $categoryService->getForPlentyId($categoryId, Utils::getLang());
 
                     if (!is_null($category) && (!is_null($categoryBranch) || !in_array(
                                 $categoryId,
@@ -102,6 +106,10 @@ class CategoryFacet implements FacetExtension
         return $categoryFacet;
     }
 
+    /**
+     * @param array $filtersList
+     * @return mixed|CategoryFilter|null
+     */
     public function extractFilterParams($filtersList)
     {
         $categoryIds = [];

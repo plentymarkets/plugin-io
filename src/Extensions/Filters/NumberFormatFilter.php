@@ -2,11 +2,11 @@
 
 namespace IO\Extensions\Filters;
 
-use IO\Helper\LanguageMap;
+use IO\Extensions\AbstractFilter;
 use IO\Helper\MemoryCache;
 use IO\Services\TemplateConfigService;
+use Plenty\Modules\Webshop\Contracts\LocalizationRepositoryContract;
 use Plenty\Plugin\ConfigRepository;
-use IO\Extensions\AbstractFilter;
 
 /**
  * Class NumberFormatFilter
@@ -108,8 +108,9 @@ class NumberFormatFilter extends AbstractFilter
             $formatter = $this->fromMemoryCache(
                 "formatter.$currencyISO",
                 function() use ($currencyISO) {
-                    $locale            = LanguageMap::getLocale();
-
+                    /** @var LocalizationRepositoryContract $localizationRepository */
+                    $localizationRepository = pluginApp(LocalizationRepositoryContract::class);
+                    $locale = $localizationRepository->getLocale();
                     $formatter = numfmt_create($locale, \NumberFormatter::CURRENCY);
 
                     /** @var TemplateConfigService $templateConfigService */

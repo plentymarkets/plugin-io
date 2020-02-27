@@ -2,7 +2,7 @@
 
 namespace IO\Services\ItemSearch\SearchPresets;
 
-use IO\Services\ItemSearch\Factories\FacetSearchFactory;
+use Plenty\Modules\Webshop\ItemSearch\Factories\FacetSearchFactory;
 
 /**
  * Class Facets
@@ -15,13 +15,19 @@ use IO\Services\ItemSearch\Factories\FacetSearchFactory;
  * - autocomplete:  Flag indicating if autocomplete search should be used (boolean). Will only be used if 'query' is defined.
  *
  * @package IO\Services\ItemSearch\SearchPresets
+ *
+ * @deprecated since 5.0.0 will be deleted in 6.0.0
+ * @see \Plenty\Modules\Webshop\ItemSearch\SearchPresets\Facets
  */
 class Facets implements SearchPreset
 {
+    /**
+     * @inheritDoc
+     */
     public static function getSearchFactory($options)
     {
         /** @var FacetSearchFactory $searchFactory */
-        $searchFactory = FacetSearchFactory::create( $options['facets'] );
+        $searchFactory = pluginApp(FacetSearchFactory::class)->create( $options['facets'] );
         $searchFactory
             ->withMinimumCount()
             ->isVisibleForClient()

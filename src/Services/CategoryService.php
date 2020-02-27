@@ -2,20 +2,21 @@
 
 namespace IO\Services;
 
-use Illuminate\Support\Collection;
 use IO\Constants\CategoryType;
 use IO\Guards\AuthGuard;
 use IO\Helper\ArrayHelper;
 use IO\Helper\CategoryDataFilter;
 use IO\Helper\MemoryCache;
 use IO\Helper\Utils;
-use IO\Services\ItemSearch\Helper\LoadResultFields;
-use IO\Services\ItemSearch\Helper\ResultFieldTemplate;
-use IO\Services\UrlBuilder\UrlQuery;
+use Plenty\Modules\Webshop\Helpers\UrlQuery;
 use Plenty\Modules\Category\Models\Category;
 use Plenty\Modules\Category\Contracts\CategoryRepositoryContract;
 use Plenty\Modules\Category\Models\CategoryClient;
 use Plenty\Modules\Category\Models\CategoryDetails;
+use Plenty\Modules\Webshop\Contracts\ContactRepositoryContract;
+use Plenty\Modules\Webshop\Contracts\WebstoreConfigurationRepositoryContract;
+use Plenty\Modules\Webshop\ItemSearch\Helpers\LoadResultFields;
+use Plenty\Modules\Webshop\ItemSearch\Helpers\ResultFieldTemplate;
 use Plenty\Repositories\Models\PaginatedResult;
 
 /**
@@ -32,15 +33,11 @@ class CategoryService
      */
     private $categoryRepository;
 
-    /**
-     * @var WebstoreConfigurationService
-     */
-    private $webstoreConfig;
+    /** @var WebstoreConfigurationRepositoryContract */
+    private $webstoreConfigurationRepository;
 
-    /**
-     * @var SessionStorageService
-     */
-    private $sessionStorageService;
+    /** @var ContactRepositoryContract $contactRepository */
+    private $contactRepository;
 
     // is set from controllers
     /**
@@ -63,19 +60,22 @@ class CategoryService
 
     /**
      * CategoryService constructor.
-     * @param CategoryRepositoryContract $category
+     * @param CategoryRepositoryContract $categoryRepository
+     * @param WebstoreConfigurationRepositoryContract $webstoreConfigurationRepository
+     * @param AuthGuard $authGuard
+     * @param ContactRepositoryContract $contactRepository
      */
     public function __construct(
         CategoryRepositoryContract $categoryRepository,
-        WebstoreConfigurationService $webstoreConfig,
-        SessionStorageService $sessionStorageService,
-        AuthGuard $authGuard
+        WebstoreConfigurationRepositoryContract $webstoreConfigurationRepository,
+        AuthGuard $authGuard,
+        ContactRepositoryContract $contactRepository
     ) {
         $this->categoryRepository = $categoryRepository;
-        $this->webstoreConfig = $webstoreConfig;
-        $this->sessionStorageService = $sessionStorageService;
+        $this->webstoreConfigurationRepository = $webstoreConfigurationRepository;
         $this->authGuard = $authGuard;
         $this->webstoreId = Utils::getWebstoreId();
+        $this->contactRepository = $contactRepository;
     }
 
     /**
@@ -85,7 +85,7 @@ class CategoryService
     public function setCurrentCategoryID(int $catID = 0)
     {
         $this->setCurrentCategory(
-            $this->categoryRepository->get($catID, $this->sessionStorageService->getLang(), $this->webstoreId)
+            $this->categoryRepository->get($catID, Utils::getLang(), $this->webstoreId)
         );
     }
 
@@ -95,7 +95,7 @@ class CategoryService
      */
     public function setCurrentCategory($cat)
     {
-        $lang = $this->sessionStorageService->getLang();
+        $lang = Utils::getLang();
         $this->currentCategory = null;
         $this->currentCategoryTree = [];
 
@@ -128,7 +128,7 @@ class CategoryService
     public function get($catID = 0, $lang = null)
     {
         if ($lang === null) {
-            $lang = $this->sessionStorageService->getLang();
+            $lang = Utils::getLang();
         }
 
         $webstoreId = $this->webstoreId;
@@ -172,7 +172,7 @@ class CategoryService
     public function getChildren($categoryId, $lang = null)
     {
         if ($lang === null) {
-            $lang = $this->sessionStorageService->getLang();
+            $lang = Utils::getLang();
         }
 
         $children = $this->fromMemoryCache(
@@ -191,18 +191,15 @@ class CategoryService
 
     public function getCurrentCategoryChildren()
     {
-        /** @var CustomerService $customerService */
-        $customerService = pluginApp(CustomerService::class);
-
         /** @var TemplateConfigService $templateConfigService */
         $templateConfigService = pluginApp(TemplateConfigService::class);
         $category = $this->getCurrentCategory();
         $branches = ArrayHelper::toArray($category->branch);
         $children = $this->getNavigationTree(
             $templateConfigService->get('header.showCategoryTypes'),
-            $this->sessionStorageService->getLang(),
+            Utils::getLang(),
             $category->level + 1,
-            $customerService->getContactClassId()
+            $this->contactRepository->getContactClassId()
         );
 
         for ($level = 1; $level <= 6; $level++) {
@@ -230,15 +227,13 @@ class CategoryService
      */
     public function getURL($category, $lang = null, $webstoreId = null)
     {
-        $defaultLanguage = $this->webstoreConfig->getDefaultLanguage();
+        $defaultLanguage = $this->webstoreConfigurationRepository->getWebstoreConfiguration()->defaultLanguage;
         if ($lang === null) {
-            $lang = $this->sessionStorageService->getLang();
+            $lang = Utils::getLang();
         }
 
         if (is_null($webstoreId)) {
-            /** @var WebstoreConfigurationService $webstoreService */
-            $webstoreService = pluginApp(WebstoreConfigurationService::class);
-            $webstoreId = $webstoreService->getWebstoreConfig()->webstoreId;
+            $webstoreId = $this->webstoreConfigurationRepository->getWebstoreConfiguration()->webstoreId;
         }
 
         $categoryUrl = $this->fromMemoryCache(
@@ -264,7 +259,7 @@ class CategoryService
     public function getURLById($categoryId, $lang = null)
     {
         if ($lang === null) {
-            $lang = $this->sessionStorageService->getLang();
+            $lang = Utils::getLang();
         }
         return $this->getURL($this->get($categoryId, $lang), $lang);
     }
@@ -380,7 +375,7 @@ class CategoryService
         }
 
         if ($lang === null) {
-            $lang = $this->sessionStorageService->getLang();
+            $lang = Utils::getLang();
         }
 
         if (is_null($type)) {
@@ -390,7 +385,7 @@ class CategoryService
         $tree = $this->categoryRepository->getArrayTree(
             $type,
             $lang,
-            $this->webstoreConfig->getWebstoreConfig()->webstoreId,
+            $this->webstoreConfigurationRepository->getWebstoreConfiguration()->webstoreId,
             $maxLevel,
             $customerClassId,
             function ($category) {
@@ -433,8 +428,6 @@ class CategoryService
 
     public function getPartialTree($categoryId = 0, $type = CategoryType::ALL)
     {
-        /** @var CustomerService $customerService */
-        $customerService = pluginApp(CustomerService::class);
         if ($categoryId > 0) {
             $currentCategory = $this->get($categoryId);
             $branch = $currentCategory->branch->toArray();
@@ -442,9 +435,9 @@ class CategoryService
 
             $tree = $this->getNavigationTree(
                 $type,
-                $this->sessionStorageService->getLang(),
+                Utils::getLang(),
                 $maxLevel,
-                $customerService->getContactClassId()
+                $this->contactRepository->getContactClassId()
             );
 
             // Filter categories not having texts in current language
@@ -466,9 +459,9 @@ class CategoryService
         } else {
             $tree = $this->getNavigationTree(
                 $type,
-                $this->sessionStorageService->getLang(),
+                Utils::getLang(),
                 3,
-                $customerService->getContactClassId()
+                $this->contactRepository->getContactClassId()
             );
 
             // Filter categories not having texts in current language
@@ -572,14 +565,14 @@ class CategoryService
     public function getNavigationList($type = "all", string $lang = null): array
     {
         if ($lang === null) {
-            $lang = $this->sessionStorageService->getLang();
+            $lang = Utils::getLang();
         }
 
         $list = $this->filterCategoriesByTypes(
             $this->categoryRepository->getLinklistList(
                 $type,
                 $lang,
-                $this->webstoreConfig->getWebstoreConfig()->webstoreId
+                $this->webstoreConfigurationRepository->getWebstoreConfiguration()->webstoreId
             )
         );
 
@@ -678,9 +671,7 @@ class CategoryService
         }
 
         if (is_null($webstoreId)) {
-            /** @var WebstoreConfigurationService $webstoreService */
-            $webstoreService = pluginApp(WebstoreConfigurationService::class);
-            $webstoreId = $webstoreService->getWebstoreConfig()->webstoreId;
+            $webstoreId = $this->webstoreConfigurationRepository->getWebstoreConfiguration()->webstoreId;
         }
 
 

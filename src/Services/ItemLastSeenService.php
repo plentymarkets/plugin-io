@@ -2,7 +2,7 @@
 
 namespace IO\Services;
 
-use IO\Constants\SessionStorageKeys;
+use Plenty\Modules\Webshop\Contracts\SessionStorageRepositoryContract;
 use Plenty\Plugin\CachingRepository;
 use Plenty\Modules\Basket\Contracts\BasketRepositoryContract;
 
@@ -31,7 +31,7 @@ class ItemLastSeenService
      */
     public function setLastSeenItem(int $variationId)
     {
-        $lastSeenItems = $this->cachingRepository->get(SessionStorageKeys::LAST_SEEN_ITEMS . '_' . $this->basketRepository->load()->id);
+        $lastSeenItems = $this->cachingRepository->get(SessionStorageRepositoryContract::LAST_SEEN_ITEMS . '_' . $this->basketRepository->load()->id);
 
         if(is_null($lastSeenItems))
         {
@@ -46,7 +46,7 @@ class ItemLastSeenService
             }
 
             array_unshift($lastSeenItems, $variationId);
-            $this->cachingRepository->put(SessionStorageKeys::LAST_SEEN_ITEMS . '_' . $this->basketRepository->load()->id, $lastSeenItems,60);
+            $this->cachingRepository->put(SessionStorageRepositoryContract::LAST_SEEN_ITEMS . '_' . $this->basketRepository->load()->id, $lastSeenItems,60);
         }
     }
 }

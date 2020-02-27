@@ -3,7 +3,7 @@
 namespace IO\Services\ItemSearch\Factories\Faker;
 
 use IO\Extensions\Filters\NumberFormatFilter;
-use IO\Services\CheckoutService;
+use Plenty\Modules\Webshop\Contracts\CheckoutRepositoryContract;
 
 class PriceFaker extends AbstractFaker
 {
@@ -16,9 +16,10 @@ class PriceFaker extends AbstractFaker
 
     public function fill($data)
     {
-        /** @var CheckoutService $checkoutService */
-        $checkoutService = pluginApp(CheckoutService::class);
-        $this->currency             = $checkoutService->getCurrency() ?? 'EUR';
+        /** @var  CheckoutRepositoryContract $checkoutRepository */
+        $checkoutRepository = pluginApp(CheckoutRepositoryContract::class);
+
+        $this->currency             = $checkoutRepository->getCurrency() ?? 'EUR';
         $this->numberFormatFilter   = pluginApp(NumberFormatFilter::class);
         $this->showNetPrice         = $this->boolean();
         $defaultPrice               = $this->makePrice(0);

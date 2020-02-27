@@ -4,8 +4,8 @@ namespace IO\Services\ItemSearch\Extensions;
 
 use IO\Helper\Utils;
 use IO\Services\CategoryService;
-use IO\Services\ItemSearch\Factories\VariationSearchFactory;
 use Plenty\Modules\Category\Contracts\CategoryRepositoryContract;
+use Plenty\Modules\Webshop\ItemSearch\Factories\VariationSearchFactory;
 
 /**
  * Class CurrentCategoryExtension
@@ -21,8 +21,7 @@ class CurrentCategoryExtension implements ItemSearchExtension
      */
     public function getSearch( $parentSearchBuilder )
     {
-        return VariationSearchFactory::inherit(
-            $parentSearchBuilder,
+        return $parentSearchBuilder->inherit(
             [
                 VariationSearchFactory::INHERIT_FILTERS,
                 VariationSearchFactory::INHERIT_MUTATORS,
@@ -36,8 +35,7 @@ class CurrentCategoryExtension implements ItemSearchExtension
                 'variation.id',
                 'texts.*',
                 'defaultCategories'
-            ])
-            ->build();
+            ]);
     }
 
     /**

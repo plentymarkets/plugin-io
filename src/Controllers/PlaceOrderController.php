@@ -4,16 +4,15 @@ namespace IO\Controllers;
 
 use IO\Builder\Order\AddressType;
 use IO\Constants\LogLevel;
-use IO\Constants\SessionStorageKeys;
 use IO\Extensions\Constants\ShopUrls;
 use IO\Services\BasketService;
 use IO\Services\CustomerService;
 use IO\Services\NotificationService;
 use IO\Services\OrderService;
-use IO\Services\SessionStorageService;
 use IO\Services\UrlBuilder\UrlQuery;
 use Plenty\Modules\Account\Address\Models\AddressOption;
 use Plenty\Modules\Basket\Exceptions\BasketItemCheckException;
+use Plenty\Modules\Webshop\Contracts\SessionStorageRepositoryContract;
 use Plenty\Modules\Webshop\Events\ValidateVatNumber;
 use Plenty\Plugin\Events\Dispatcher;
 use Plenty\Plugin\Http\Request;
@@ -40,7 +39,7 @@ class PlaceOrderController extends LayoutController
     public function placeOrder(
         OrderService $orderService,
         NotificationService $notificationService,
-        SessionStorageService $sessionStorageService,
+        SessionStorageRepositoryContract $sessionStorageRepository,
         ShopUrls $shopUrls
     ) {
         try {
@@ -79,14 +78,14 @@ class PlaceOrderController extends LayoutController
         }
 
         //check if an order has already been placed in the last 30 seconds
-        $lastPlaceOrderTry = $sessionStorageService->getSessionValue(SessionStorageKeys::LAST_PLACE_ORDER_TRY);
+        $lastPlaceOrderTry = $sessionStorageRepository->getSessionValue(SessionStorageRepositoryContract::LAST_PLACE_ORDER_TRY);
 
         if (!is_null($lastPlaceOrderTry) && time() < (int)$lastPlaceOrderTry + self::ORDER_RETRY_INTERVAL) {
             //place order has been called a second time in a time frame of 30 seconds
             $notificationService->addNotificationCode(LogLevel::ERROR, 115);
             return $this->urlService->redirectTo($shopUrls->checkout);
         }
-        $sessionStorageService->setSessionValue(SessionStorageKeys::LAST_PLACE_ORDER_TRY, time());
+        $sessionStorageRepository->setSessionValue(SessionStorageRepositoryContract::LAST_PLACE_ORDER_TRY, time());
 
         try {
             $orderData = $orderService->placeOrder();
@@ -124,7 +123,7 @@ class PlaceOrderController extends LayoutController
             $urlParams['redirectParam'] = $redirectParam;
         }
 
-        if ($sessionStorageService->getSessionValue(SessionStorageKeys::READONLY_CHECKOUT) === true) {
+        if ($sessionStorageRepository->getSessionValue(SessionStorageRepositoryContract::READONLY_CHECKOUT) === true) {
             $urlParams['readonlyCheckout'] = true;
         }
 

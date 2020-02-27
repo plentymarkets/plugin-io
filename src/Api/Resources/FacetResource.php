@@ -2,10 +2,10 @@
 
 namespace IO\Api\Resources;
 
-use IO\Services\ItemSearch\SearchPresets\CategoryItems;
-use IO\Services\ItemSearch\SearchPresets\Facets;
-use IO\Services\ItemSearch\SearchPresets\SearchItems;
-use IO\Services\ItemSearch\Services\ItemSearchService;
+use Plenty\Modules\Webshop\ItemSearch\SearchPresets\CategoryItems;
+use Plenty\Modules\Webshop\ItemSearch\SearchPresets\Facets;
+use Plenty\Modules\Webshop\ItemSearch\SearchPresets\SearchItems;
+use Plenty\Modules\Webshop\ItemSearch\Services\ItemSearchService;
 use Plenty\Plugin\Http\Response;
 use Plenty\Plugin\Http\Request;
 use IO\Api\ApiResource;

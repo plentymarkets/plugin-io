@@ -5,15 +5,21 @@ namespace IO\Services\UrlBuilder;
 use IO\Helper\StringUtils;
 use IO\Helper\Utils;
 use IO\Services\CategoryService;
-use IO\Services\ItemSearch\Factories\VariationSearchFactory;
 use IO\Services\ItemSearch\Services\ItemSearchService;
 use IO\Services\TemplateConfigService;
-use IO\Services\WebstoreConfigurationService;
 use Plenty\Log\Contracts\LoggerContract;
 use Plenty\Modules\Authorization\Services\AuthHelper;
 use Plenty\Modules\Item\VariationDescription\Contracts\VariationDescriptionRepositoryContract;
+use Plenty\Modules\Webshop\Contracts\WebstoreConfigurationRepositoryContract;
+use Plenty\Modules\Webshop\ItemSearch\Factories\VariationSearchFactory;
 use Plenty\Plugin\Log\Loggable;
 
+/**
+ * Class VariationUrlBuilder
+ * @package IO\Services\UrlBuilder
+ * @deprecated since 5.0.0 will be removed in 6.0.0
+ * @see \Plenty\Modules\Webshop\Contracts\UrlBuilderRepositoryContract
+ */
 class VariationUrlBuilder
 {
     use Loggable;
@@ -21,6 +27,11 @@ class VariationUrlBuilder
     public static $urlPathMap;
     public static $requestedItems;
 
+    /**
+     * @param array $itemData
+     * @deprecated since 5.0.0 will be removed in 6.0.0
+     * @see \Plenty\Modules\Webshop\Contracts\UrlBuilderRepositoryContract::fillItemUrl()
+     */
     public static function fillItemUrl($itemData): void
     {
         $itemId = $itemData['item']['id'];
@@ -64,6 +75,8 @@ class VariationUrlBuilder
      * @param int $variationId
      * @param string|null $lang
      * @return UrlQuery
+     * @deprecated since 5.0.0 will be removed in 6.0.0
+     * @see \Plenty\Modules\Webshop\Contracts\UrlBuilderRepositoryContract::buildVariationUrl()
      */
     public function buildUrl(int $itemId, int $variationId, string $lang = null): UrlQuery
     {
@@ -151,6 +164,8 @@ class VariationUrlBuilder
      * @param int $variationId
      * @param bool $withVariationId
      * @return string
+     * @deprecated since 5.0.0 will be removed in 6.0.0
+     * @see \Plenty\Modules\Webshop\Contracts\UrlBuilderRepositoryContract::getSuffix()
      */
     public function getSuffix($itemId, $variationId, $withVariationId = true): string
     {
@@ -190,7 +205,7 @@ class VariationUrlBuilder
                 ->hasItemId($itemId)
                 ->hasVariationId($variationId);
 
-            $itemSearchService->getResult($searchFactory);
+            return $itemSearchService->getResults([$searchFactory])[0];
         }
         return [];
     }
@@ -217,10 +232,10 @@ class VariationUrlBuilder
         /** @var TemplateConfigService $templateConfigService */
         $templateConfigService = pluginApp(TemplateConfigService::class);
 
-        /** @var WebstoreConfigurationService $webstoreConfigService */
-        $webstoreConfigService = pluginApp(WebstoreConfigurationService::class);
+        /** @var WebstoreConfigurationRepositoryContract $webstoreConfigurationRepository */
+        $webstoreConfigurationRepository = pluginApp(WebstoreConfigurationRepositoryContract::class);
 
-        $urlPattern = $webstoreConfigService->getWebstoreConfig()->urlItemContent;
+        $urlPattern = $webstoreConfigurationRepository->getWebstoreConfiguration()->urlItemContent;
         if (!$templateConfigService->getBoolean('global.enableOldUrlPattern')) {
             $urlPattern = 'all';
         }

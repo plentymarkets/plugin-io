@@ -7,24 +7,18 @@ use IO\Helper\RouteConfig;
 use IO\Helper\Utils;
 use IO\Services\CategoryService;
 use IO\Services\OrderTrackingService;
-use IO\Services\SessionStorageService;
-use IO\Services\UrlBuilder\CategoryUrlBuilder;
 use IO\Services\UrlBuilder\UrlQuery;
-use IO\Services\WebstoreConfigurationService;
 use Plenty\Modules\Authorization\Services\AuthHelper;
 use Plenty\Modules\Frontend\Events\FrontendLanguageChanged;
 use Plenty\Modules\Order\Contracts\OrderRepositoryContract;
+use Plenty\Modules\Webshop\Contracts\UrlBuilderRepositoryContract;
+use Plenty\Modules\Webshop\Contracts\WebstoreConfigurationRepositoryContract;
 use Plenty\Plugin\Events\Dispatcher;
 use Plenty\Plugin\Http\Request;
 
 class ShopUrls
 {
     use MemoryCache;
-
-    /**
-     * @var SessionStorageService $sessionStorageService
-     */
-    private $sessionStorageService;
 
     private $urlMap = [
         RouteConfig::ORDER_RETURN => 'returns',
@@ -60,10 +54,9 @@ class ShopUrls
     public $newsletterOptOut = '';
     public $orderDocument = '';
 
-    public function __construct(Dispatcher $dispatcher, SessionStorageService $sessionStorageService)
+    public function __construct(Dispatcher $dispatcher)
     {
-        $this->sessionStorageService = $sessionStorageService;
-        $this->init($sessionStorageService->getLang());
+        $this->init(Utils::getLang());
         $dispatcher->listen(
             FrontendLanguageChanged::class,
             function (FrontendLanguageChanged $event) {
@@ -74,12 +67,12 @@ class ShopUrls
 
     private function init($lang)
     {
-        /** @var WebstoreConfigurationService $webstoreConfigurationService */
-        $webstoreConfigurationService = pluginApp(WebstoreConfigurationService::class);
+        /** @var WebstoreConfigurationRepositoryContract $webstoreConfigurationRepository */
+        $webstoreConfigurationRepository = pluginApp(WebstoreConfigurationRepositoryContract::class);
         $this->resetMemoryCache();
         $this->appendTrailingSlash = UrlQuery::shouldAppendTrailingSlash();
         $this->trailingSlashSuffix = $this->appendTrailingSlash ? '/' : '';
-        $this->includeLanguage = $lang !== $webstoreConfigurationService->getDefaultLanguage();
+        $this->includeLanguage = $lang !== $webstoreConfigurationRepository->getWebstoreConfiguration()->defaultLanguage;
 
         $this->basket = $this->getShopUrl(RouteConfig::BASKET);
         $this->cancellationForm = $this->getShopUrl(RouteConfig::CANCELLATION_FORM);
@@ -151,7 +144,7 @@ class ShopUrls
 
     public function tracking($orderId)
     {
-        $lang = $this->sessionStorageService->getLang();
+        $lang = Utils::getLang();
         return $this->fromMemoryCache(
             "tracking.{$orderId}",
             function () use ($orderId, $lang) {
@@ -193,11 +186,11 @@ class ShopUrls
                     $category = $categoryService->get($categoryId);
 
                     if ($category !== null) {
-                        /** @var CategoryUrlBuilder $categoryUrlBuilder */
-                        $categoryUrlBuilder = pluginApp(CategoryUrlBuilder::class);
+                        /** @var UrlBuilderRepositoryContract $urlBuilderRepository */
+                        $urlBuilderRepository = pluginApp(UrlBuilderRepositoryContract::class);
 
                         return $this->applyParams(
-                            $categoryUrlBuilder->buildUrl($category->id),
+                            $urlBuilderRepository->buildCategoryUrl($category->id),
                             $routeParams,
                             $urlParams
                         );

@@ -2,13 +2,20 @@
 
 namespace IO\Services\ItemSearch\SearchPresets;
 
-use IO\Services\ItemSearch\Factories\VariationSearchFactory;
 use IO\Services\ItemSearch\Helper\ResultFieldTemplate;
-use IO\Services\TemplateConfigService;
+use Plenty\Modules\Webshop\ItemSearch\Factories\VariationSearchFactory;
 
-
+/**
+ * Class LiveShoppingItems
+ * @package IO\Services\ItemSearch\SearchPresets
+ * @deprecated since 5.0.0 will be deleted in 6.0.0
+ * @see \Plenty\Modules\Webshop\ItemSearch\SearchPresets\LiveShoppingItems
+ */
 class LiveShoppingItems implements SearchPreset
 {
+    /**
+     * @inheritDoc
+     */
     public static function getSearchFactory($options)
     {
         /** @var VariationSearchFactory $searchFactory */

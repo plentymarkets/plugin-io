@@ -22,6 +22,7 @@ class ContactMailResource extends ApiResource
 {
     private $contactMailService;
 
+    /** @var TemplateConfigService */
     private $templateConfigService;
 
     /**
@@ -33,29 +34,26 @@ class ContactMailResource extends ApiResource
         Request $request,
         ApiResponse $response,
         ContactMailService $contactMailService,
-        TemplateConfigService $templateConfigService)
-    {
+        TemplateConfigService $templateConfigService
+    ) {
         parent::__construct($request, $response);
         $this->contactMailService = $contactMailService;
         $this->templateConfigService = $templateConfigService;
     }
 
-    public function store():Response
+    public function store(): Response
     {
         // Honeypot check
-
-        if(strlen($this->request->get('data')['username']['value']))
-        {
+        if (strlen($this->request->get('data')['username']['value'])) {
             return $this->response->create(true, ResponseCode::OK);
         }
 
         $mailTemplate = TemplateContainer::get('tpl.mail.contact')->getTemplate();
 
-        if( !ReCaptcha::verify($this->request->get('recaptchaToken', null)) )
-        {
+        if (!ReCaptcha::verify($this->request->get('recaptchaToken', null))) {
             /**
-            * @var NotificationService $notificationService
-            */
+             * @var NotificationService $notificationService
+             */
             $notificationService = pluginApp(NotificationService::class);
             $notificationService->addNotificationCode(LogLevel::ERROR, 13);
 
@@ -67,32 +65,26 @@ class ContactMailResource extends ApiResource
             $this->request->all()
         );
 
-        if($response)
-        {
+        if ($response) {
             return $this->response->create($response, ResponseCode::CREATED);
         }
-        else
-        {
-            return $this->response->create($response, ResponseCode::BAD_REQUEST);
-        }
 
+        return $this->response->create($response, ResponseCode::BAD_REQUEST);
     }
 
-    public function verifyRecaptcha( $secret, $token )
+    public function verifyRecaptcha($secret, $token)
     {
-        if ( !strlen( $secret ) )
-        {
+        if (!strlen($secret)) {
             return true;
-        }
-        else if ( !strlen( $token ) )
-        {
+        } elseif (!strlen($token)) {
             return false;
         }
 
         $params = [
-            "secret" => $secret,
-            "response" => $token
+            'secret' => $secret,
+            'response' => $token
         ];
+
         $options = array(
             CURLOPT_URL => "https://www.google.com/recaptcha/api/siteverify?secret=$secret&response=$token",
             CURLOPT_RETURNTRANSFER => true,
@@ -102,8 +94,7 @@ class ContactMailResource extends ApiResource
 
         $ch = curl_init();
 
-        foreach($options as $option => $value)
-        {
+        foreach ($options as $option => $value) {
             curl_setopt($ch, $option, $value);
         }
 
@@ -112,7 +103,7 @@ class ContactMailResource extends ApiResource
 
         $result = json_decode($content, true);
 
-        return $result["success"]
+        return $result['success']
             && (!array_key_exists('score', $result)
                 || $result['score'] >= $this->templateConfigService->get('global.google_recaptcha_threshold')
             );

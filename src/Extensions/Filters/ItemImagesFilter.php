@@ -6,6 +6,7 @@ use IO\Extensions\AbstractFilter;
 
 /**
  * Class ItemImagesFilter
+ *
  * @package IO\Extensions\Filters
  */
 class ItemImagesFilter extends AbstractFilter

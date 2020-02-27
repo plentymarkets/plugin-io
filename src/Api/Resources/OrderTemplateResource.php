@@ -2,8 +2,8 @@
 
 namespace IO\Api\Resources;
 
+use IO\Helper\Utils;
 use IO\Models\LocalizedOrder;
-use Plenty\Plugin\Templates\Twig;
 use Plenty\Plugin\Http\Response;
 use Plenty\Plugin\Http\Request;
 use Plenty\Modules\Order\Models\Order;
@@ -13,7 +13,6 @@ use IO\Api\ApiResource;
 use IO\Api\ApiResponse;
 use IO\Api\ResponseCode;
 use IO\Services\TemplateService;
-use IO\Services\SessionStorageService;
 
 /**
  * Class OrderTemplateResource
@@ -25,12 +24,12 @@ class OrderTemplateResource extends ApiResource
      * @var OrderRepositoryContract
      */
     private $orderRepository;
-    
+
     /**
      * @var TemplateService
      */
     private $templateService;
-    
+
     /**
      * OrderTemplateResource constructor.
      * @param Request $request
@@ -41,25 +40,22 @@ class OrderTemplateResource extends ApiResource
     public function __construct(Request $request, ApiResponse $response, OrderRepositoryContract $orderRepository, TemplateService $templateService)
     {
         parent::__construct($request, $response);
-        
+
         $this->orderRepository = $orderRepository;
         $this->templateService = $templateService;
     }
-    
+
     /**
      * Return the given rendered order template
      * @return Response
      */
     public function index():Response
     {
-        /** @var SessionStorageService $sessionStorageService */
-        $sessionStorageService = pluginApp(SessionStorageService::class);
-
         $renderedTemplate = '';
-        
+
         $template = $this->request->get('template', '');
         $orderId = $this->request->get('orderId', 0);
-        
+
         if((int)$orderId > 0)
         {
             $order = $this->orderRepository->findOrderById($orderId);
@@ -68,13 +64,13 @@ class OrderTemplateResource extends ApiResource
                 /** @var OrderTotalsService $orderTotalsService */
                 $orderTotalsService = pluginApp(OrderTotalsService::class);
                 $renderedTemplate = $this->templateService->renderTemplate($template, [
-                    'orderData' => LocalizedOrder::wrap($order, $sessionStorageService->getLang())->toArray(),
+                    'orderData' => LocalizedOrder::wrap($order, Utils::getLang())->toArray(),
                     'totals'    => $orderTotalsService->getAllTotals($order)
                 ]);
             }
         }
-        
+
         return $this->response->create($renderedTemplate, ResponseCode::OK);
     }
-    
+
 }

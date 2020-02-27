@@ -3,8 +3,12 @@
 namespace IO\Services\ItemSearch\Extensions;
 
 use IO\Services\ItemSearch\Factories\BaseSearchFactory;
-use Plenty\Modules\Cloud\ElasticSearch\Lib\Search\Document\DocumentSearch;
 
+/**
+ * Interface ItemSearchExtension
+ * @package IO\Services\ItemSearch\Extensions
+ * @deprecated since 5.0.0 will be removed in 6.0.0
+ */
 interface ItemSearchExtension
 {
     /**
@@ -12,7 +16,7 @@ interface ItemSearchExtension
      * required for this extension when extending the original item result.
      *
      * @param  BaseSearchFactory $parentSearchBuilder    Search factory of the parent elastic search request. Can be used to inherit active filters, mutators or pagination settings
-     * @return DocumentSearch
+     * @return mixed
      */
     public function getSearch( $parentSearchBuilder );
 
@@ -25,5 +29,4 @@ interface ItemSearchExtension
      * @return  mixed
      */
     public function transformResult( $baseResult, $extensionResult );
-
 }

@@ -6,6 +6,7 @@ use IO\DBModels\UserDataHash;
 use IO\Helper\Utils;
 use Plenty\Modules\Plugin\DataBase\Contracts\DataBase;
 use Plenty\Modules\Plugin\DataBase\Contracts\Model;
+use Plenty\Modules\Webshop\Contracts\ContactRepositoryContract;
 
 class UserDataHashService
 {
@@ -22,7 +23,7 @@ class UserDataHashService
     public function __construct(DataBase $dataBase, TemplateConfigService $templateConfigService)
     {
         $this->db = $dataBase;
-        $this->defaultTTL = $templateConfigService->get('global.user_data_hash_max_age', 24);
+        $this->defaultTTL = $templateConfigService->getInteger('global.user_data_hash_max_age', 24);
     }
 
     /**
@@ -262,9 +263,9 @@ class UserDataHashService
 
     private function getContactId()
     {
-        /** @var CustomerService $customerService */
-        $customerService = pluginApp(CustomerService::class);
-        return $customerService->getContactId();
+        /** @var ContactRepositoryContract $contactRepository */
+        $contactRepository = pluginApp(ContactRepositoryContract::class);
+        return $contactRepository->getContactId();
     }
 
 }

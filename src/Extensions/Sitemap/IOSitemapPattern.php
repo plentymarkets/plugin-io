@@ -4,7 +4,6 @@ namespace IO\Extensions\Sitemap;
 
 use IO\Services\TemplateConfigService;
 use Plenty\Modules\Plugin\Events\LoadSitemapPattern;
-use Plenty\Modules\Plugin\Models\Plugin;
 use Plenty\Modules\Plugin\Services\PluginSeoSitemapService;
 use Plenty\Plugin\ConfigRepository;
 

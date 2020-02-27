@@ -15,10 +15,10 @@ use IO\Services\BasketService;
  */
 class BasketItemResource extends ApiResource
 {
-	/**
-	 * @var BasketService
-	 */
-	private $basketService;
+    /**
+     * @var BasketService
+     */
+    private $basketService;
 
     /**
      * BasketItemResource constructor.
@@ -26,82 +26,90 @@ class BasketItemResource extends ApiResource
      * @param ApiResponse $response
      * @param BasketService $basketService
      */
-	public function __construct(Request $request, ApiResponse $response, BasketService $basketService)
-	{
-		parent::__construct($request, $response);
-		$this->basketService = $basketService;
-	}
+    public function __construct(Request $request, ApiResponse $response, BasketService $basketService)
+    {
+        parent::__construct($request, $response);
+        $this->basketService = $basketService;
+    }
 
     /**
      * List basket items
      * @return Response
      */
-	public function index():Response
-	{
-		$basketItems = $this->basketService->getBasketItemsForTemplate($this->request->get('template', ''));
-		return $this->response->create($basketItems, ResponseCode::OK);
-	}
+    public function index(): Response
+    {
+        $basketItems = $this->basketService->getBasketItemsForTemplate($this->request->get('template', ''));
+        return $this->response->create($basketItems, ResponseCode::OK);
+    }
 
-	// Post
+    // Post
+
     /**
      * Add an item to the basket
      * @return Response
      */
-	public function store():Response
-	{
+    public function store(): Response
+    {
         $this->basketService->setTemplate($this->request->get('template', ''));
-		$result = $this->basketService->addBasketItem($this->request->all());
+        $result = $this->basketService->addBasketItem($this->request->all());
 
-        if(array_key_exists("code", $result))
-        {
-            return $this->response->create(["exceptionCode" => $result["code"], 'placeholder' => $result['placeholder']], ResponseCode::BAD_REQUEST);
+        if (array_key_exists("code", $result)) {
+            return $this->response->create(
+                ["exceptionCode" => $result["code"], 'placeholder' => $result['placeholder']],
+                ResponseCode::BAD_REQUEST
+            );
         }
 
-		return $this->response->create(true, ResponseCode::CREATED);
+        return $this->response->create(true, ResponseCode::CREATED);
     }
 
-	// Get
+    // Get
+
     /**
      * Get a basket item
      * @param string $selector
      * @return Response
      */
-	public function show(string $selector):Response
-	{
+    public function show(string $selector): Response
+    {
         $this->basketService->setTemplate($this->request->get('template', ''));
-		$basketItem = $this->basketService->getBasketItem((int)$selector);
-		return $this->response->create($basketItem, ResponseCode::OK);
-	}
+        $basketItem = $this->basketService->getBasketItem((int)$selector);
+        return $this->response->create($basketItem, ResponseCode::OK);
+    }
 
-	// Put/patch
+    // Put/patch
+
     /**
      * Update the basket item
      * @param string $selector
      * @return Response
      */
-	public function update(string $selector):Response
-	{
+    public function update(string $selector): Response
+    {
         $this->basketService->setTemplate($this->request->get('template', ''));
-		$result = $this->basketService->updateBasketItem((int)$selector, $this->request->all());
+        $result = $this->basketService->updateBasketItem((int)$selector, $this->request->all());
 
-        if(array_key_exists("code", $result))
-        {
-            return $this->response->create(["exceptionCode" => $result["code"], 'placeholder' => $result['placeholder']], ResponseCode::BAD_REQUEST);
+        if (array_key_exists("code", $result)) {
+            return $this->response->create(
+                ["exceptionCode" => $result["code"], 'placeholder' => $result['placeholder']],
+                ResponseCode::BAD_REQUEST
+            );
         }
 
-		return $this->response->create(true, ResponseCode::OK);
-	}
+        return $this->response->create(true, ResponseCode::OK);
+    }
 
-	// Delete
+    // Delete
+
     /**
      * Delete an item from the basket
      * @param string $selector
      * @return Response
      */
-	public function destroy(string $selector):Response
-	{
+    public function destroy(string $selector): Response
+    {
         $this->basketService->setTemplate($this->request->get('template', ''));
-		$this->basketService->deleteBasketItem((int)$selector);
-		return $this->response->create(true, ResponseCode::OK);
-	}
+        $this->basketService->deleteBasketItem((int)$selector);
+        return $this->response->create(true, ResponseCode::OK);
+    }
 }

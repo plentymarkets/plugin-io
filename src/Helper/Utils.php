@@ -2,12 +2,12 @@
 
 namespace IO\Helper;
 
-use IO\Services\SessionStorageService;
 use IO\Services\TemplateConfigService;
 use IO\Services\UrlBuilder\UrlQuery;
-use IO\Services\WebstoreConfigurationService;
 use Plenty\Modules\Frontend\Services\AccountService;
 use Plenty\Modules\ShopBuilder\Helper\ShopBuilderRequest;
+use Plenty\Modules\Webshop\Contracts\LocalizationRepositoryContract;
+use Plenty\Modules\Webshop\Contracts\WebstoreConfigurationRepositoryContract;
 use Plenty\Plugin\Application;
 use Plenty\Plugin\Translation\Translator;
 
@@ -17,35 +17,35 @@ class Utils
     {
         /** @var Application $app */
         $app = pluginApp(Application::class);
-        return (int) $app->getPlentyId();
+        return (int)$app->getPlentyId();
     }
 
     public static function getWebstoreId()
     {
         /** @var Application $app */
         $app = pluginApp(Application::class);
-        return (int) $app->getWebstoreId();
+        return (int)$app->getWebstoreId();
     }
 
     public static function getLang()
     {
-        /** @var SessionStorageService $sessionStorage */
-        $sessionStorage = pluginApp(SessionStorageService::class);
-        return $sessionStorage->getLang();
+        /** @var LocalizationRepositoryContract $localizationRepository */
+        $localizationRepository = pluginApp(LocalizationRepositoryContract::class);
+        return $localizationRepository->getLanguage();
     }
 
     public static function getDefaultLang()
     {
-        /** @var WebstoreConfigurationService $webstoreConfigService */
-        $webstoreConfigService = pluginApp(WebstoreConfigurationService::class);
-        return $webstoreConfigService->getDefaultLanguage();
+        /** @var WebstoreConfigurationRepositoryContract $webstoreConfigurationRepository */
+        $webstoreConfigurationRepository = pluginApp(WebstoreConfigurationRepositoryContract::class);
+        return $webstoreConfigurationRepository->getWebstoreConfiguration()->defaultLanguage;
     }
 
     public static function getLanguageList()
     {
-        /** @var WebstoreConfigurationService $webstoreConfigService */
-        $webstoreConfigService = pluginApp(WebstoreConfigurationService::class);
-        return $webstoreConfigService->getActiveLanguageList();
+        /** @var WebstoreConfigurationRepositoryContract $webstoreConfigurationRepository */
+        $webstoreConfigurationRepository = pluginApp(WebstoreConfigurationRepositoryContract::class);
+        return $webstoreConfigurationRepository->getActiveLanguageList();
     }
 
     public static function isAdminPreview()

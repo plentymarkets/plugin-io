@@ -7,8 +7,21 @@ use Plenty\Modules\Authorization\Services\AuthHelper;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Source\Mutator\BaseMutator;
 use Plenty\Modules\Item\Property\Contracts\PropertySelectionRepositoryContract;
 
+/**
+ * Class OrderPropertySelectionValueMutator
+ * @package IO\Services\ItemSearch\Mutators
+ * @deprecated since 5.0.0 will be deleted in 6.0.0
+ * @see \Plenty\Modules\Webshop\ItemSearch\Mutators\OrderPropertySelectionValueMutator
+ */
 class OrderPropertySelectionValueMutator extends BaseMutator
 {
+    /**
+     * @param array $data
+     * @return array
+     * @throws \Throwable
+     * @deprecated since 5.0.0 will be deleted in 6.0.0
+     * @see \Plenty\Modules\Webshop\ItemSearch\Mutators\OrderPropertySelectionValueMutator::mutate()
+     */
     public function mutate(array $data)
     {
         $lang = Utils::getLang();

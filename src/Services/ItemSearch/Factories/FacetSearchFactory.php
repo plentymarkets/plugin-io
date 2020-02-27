@@ -14,6 +14,9 @@ use Plenty\Modules\Item\Search\Helper\SearchHelper;
  * Concrete factory to build facet searches.
  *
  * @package IO\Services\ItemSearch\Factories
+ *
+ * @deprecated since 5.0.0 will be deleted in 6.0.0
+ * @see \Plenty\Modules\Webshop\ItemSearch\Factories\FacetSearchFactory
  */
 class FacetSearchFactory extends VariationSearchFactory
 {
@@ -24,8 +27,11 @@ class FacetSearchFactory extends VariationSearchFactory
      * @param string|array      $facets     List of active facet values. If string is given, it will be exploded by ',' to a list of values.
      *
      * @return FacetSearchFactory
+     *
+     * @deprecated since 5.0.0 will be deleted in 6.0.0
+     * @see \Plenty\Modules\Webshop\ItemSearch\Factories\FacetSearchFactory::create()
      */
-    public static function create( $facets )
+    public function create( $facets )
     {
         /** @var FacetSearchFactory $instance */
         $instance = pluginApp( FacetSearchFactory::class );
@@ -38,7 +44,7 @@ class FacetSearchFactory extends VariationSearchFactory
             $instance->facetValues = explode(",", (string)$facets );
         }
 
-        return $instance;
+        return $this;
     }
 
     /**
@@ -46,6 +52,9 @@ class FacetSearchFactory extends VariationSearchFactory
      *
      * @param IncludeSource $source
      * @return DocumentSearch
+     *
+     * @deprecated since 5.0.0 will be deleted in 6.0.0
+     * @see \Plenty\Modules\Webshop\ItemSearch\Factories\FacetSearchFactory::prepareSearch()
      */
     protected function prepareSearch($source)
     {
@@ -61,6 +70,9 @@ class FacetSearchFactory extends VariationSearchFactory
      * Register extension to filter facets by minimum hit count.
      *
      * @return $this
+     *
+     * @deprecated since 5.0.0 will be deleted in 6.0.0
+     * @see \Plenty\Modules\Webshop\ItemSearch\Factories\FacetSearchFactory::withMinimumCount()
      */
     public function withMinimumCount()
     {

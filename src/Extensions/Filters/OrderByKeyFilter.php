@@ -5,7 +5,7 @@ namespace IO\Extensions\Filters;
 use IO\Extensions\AbstractFilter;
 
 /**
- * Class ItemImagesFilter
+ * Class OrderByKeyFilter
  * @package IO\Extensions\Filters
  */
 class OrderByKeyFilter extends AbstractFilter

@@ -8,8 +8,6 @@ use IO\Middlewares\CheckNotFound;
 use IO\Services\CategoryService;
 use IO\Services\CustomerService;
 use IO\Services\OrderService;
-use IO\Services\SessionStorageService;
-use IO\Constants\SessionStorageKeys;
 use IO\Models\LocalizedOrder;
 use IO\Services\TemplateConfigService;
 use Plenty\Modules\Category\Models\Category;
@@ -17,6 +15,8 @@ use Plenty\Modules\Order\Contracts\OrderRepositoryContract;
 use Plenty\Modules\Order\Date\Models\OrderDateType;
 use Plenty\Modules\Order\Models\Order;
 use Plenty\Modules\ShopBuilder\Helper\ShopBuilderRequest;
+use Plenty\Modules\Webshop\Contracts\ContactRepositoryContract;
+use Plenty\Modules\Webshop\Contracts\SessionStorageRepositoryContract;
 use Plenty\Plugin\ConfigRepository;
 use Plenty\Plugin\Http\Response;
 use Plenty\Plugin\Log\Loggable;
@@ -37,8 +37,8 @@ class ConfirmationController extends LayoutController
     {
         $order = null;
 
-        /** @var SessionStorageService $sessionStorageService */
-        $sessionStorageService = pluginApp(SessionStorageService::class);
+        /** @var SessionStorageRepositoryContract $sessionStorageRepository */
+        $sessionStorageRepository = pluginApp(SessionStorageRepositoryContract::class);
 
         /** @var ShopBuilderRequest $shopBuilderRequest */
         $shopBuilderRequest = pluginApp(ShopBuilderRequest::class);
@@ -48,6 +48,9 @@ class ConfirmationController extends LayoutController
          * @var CustomerService $customerService
          */
         $customerService = pluginApp(CustomerService::class);
+
+        /** @var ContactRepositoryContract $contactRepository */
+        $contactRepository = pluginApp(ContactRepositoryContract::class);
 
         /**
          * @var OrderService $orderService
@@ -84,8 +87,8 @@ class ConfirmationController extends LayoutController
             }
 
             if (!is_null($order) && $order instanceof LocalizedOrder) {
-                $sessionStorageService->setSessionValue(
-                    SessionStorageKeys::LAST_ACCESSED_ORDER,
+                $sessionStorageRepository->setSessionValue(
+                    SessionStorageRepositoryContract::LAST_ACCESSED_ORDER,
                     ['orderId' => $orderId, 'accessKey' => $orderAccesskey]
                 );
             }
@@ -97,12 +100,13 @@ class ConfirmationController extends LayoutController
                     $order = $customerService->getLatestOrder();
                 }
 
+
                 if ($order instanceof LocalizedOrder) {
                     /** @var OrderRepositoryContract $orderRepository */
                     $orderRepository = pluginApp(OrderRepositoryContract::class);
                     $orderAccessKey = $orderRepository->generateAccessKey($order->order->id);
-                    $sessionStorageService->setSessionValue(
-                        SessionStorageKeys::LAST_ACCESSED_ORDER,
+                    $sessionStorageRepository->setSessionValue(
+                        SessionStorageRepositoryContract::LAST_ACCESSED_ORDER,
                         ['orderId' => $order->order->id, 'accessKey' => $orderAccessKey]
                     );
                 }
@@ -121,7 +125,7 @@ class ConfirmationController extends LayoutController
         }
 
         if (is_null($order)) {
-            $lastAccessedOrder = $sessionStorageService->getSessionValue(SessionStorageKeys::LAST_ACCESSED_ORDER);
+            $lastAccessedOrder = $sessionStorageRepository->getSessionValue(SessionStorageRepositoryContract::LAST_ACCESSED_ORDER);
             if (!is_null($lastAccessedOrder) && is_array($lastAccessedOrder)) {
                 try {
                     $order = $orderService->findOrderByAccessKey(
@@ -146,7 +150,7 @@ class ConfirmationController extends LayoutController
 
         if (!is_null($order) && $order instanceof LocalizedOrder) {
             if ($this->checkValidity($order->order)) {
-                if ($category instanceof Category && $customerService->getContactId() <= 0) {
+                if ($category instanceof Category && $contactRepository->getContactId() <= 0) {
                     /** @var ConfigRepository $config */
                     $config = pluginApp(ConfigRepository::class);
                     $categoryGuestId = (int)$config->get('IO.routing.category_confirmation-guest', 0);

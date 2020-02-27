@@ -144,6 +144,7 @@ class SortingBuilder
         $sortingParameter1 = self::filterSortingString($usedSortingPriority);
         if(strpos($sortingParameter1["sortingPath"], 'texts.name') !== false)
         {
+            /** @var TemplateConfigService $templateConfigService */
             $templateConfigService = pluginApp(TemplateConfigService::class);
             $usedItemName = $templateConfigService->get('item.name');
 

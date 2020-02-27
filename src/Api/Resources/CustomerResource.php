@@ -6,6 +6,7 @@ use IO\Constants\LogLevel;
 use IO\Helper\ReCaptcha;
 use IO\Services\NotificationService;
 use Plenty\Modules\Account\Contact\Models\Contact;
+use Plenty\Modules\Webshop\Contracts\ContactRepositoryContract;
 use Plenty\Modules\Webshop\Events\ValidateVatNumber;
 use Plenty\Plugin\Events\Dispatcher;
 use Plenty\Plugin\Http\Response;
@@ -21,10 +22,11 @@ use IO\Services\CustomerService;
  */
 class CustomerResource extends ApiResource
 {
-    /**
-     * @var CustomerService
-     */
+    /** @var CustomerService */
     private $customerService;
+
+    /** @var ContactRepositoryContract $contactRepository */
+    private $contactRepository;
 
     /**
      * CustomerResource constructor.
@@ -32,10 +34,15 @@ class CustomerResource extends ApiResource
      * @param ApiResponse $response
      * @param CustomerService $customerService
      */
-    public function __construct(Request $request, ApiResponse $response, CustomerService $customerService)
-    {
+    public function __construct(
+        Request $request,
+        ApiResponse $response,
+        CustomerService $customerService,
+        ContactRepositoryContract $contactRepository
+    ) {
         parent::__construct($request, $response);
         $this->customerService = $customerService;
+        $this->contactRepository = $contactRepository;
     }
 
     /**
@@ -44,13 +51,14 @@ class CustomerResource extends ApiResource
      */
     public function index(): Response
     {
-        $contact = $this->customerService->getContact();
+        $contact = $this->contactRepository->getContact();
         return $this->response->create($contact, ResponseCode::OK);
     }
 
     /**
      * Save the contact
      * @return Response
+     * @throws \Plenty\Exceptions\ValidationException
      */
     public function store(): Response
     {

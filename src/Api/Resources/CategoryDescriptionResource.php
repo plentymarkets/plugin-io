@@ -1,5 +1,6 @@
 <?php //strict
 namespace IO\Api\Resources;
+use IO\Helper\Utils;
 use Plenty\Modules\Category\Models\CategoryDetails;
 use Plenty\Plugin\Http\Response;
 use Plenty\Plugin\Http\Request;
@@ -8,7 +9,6 @@ use IO\Api\ApiResource;
 use IO\Api\ApiResponse;
 use IO\Api\ResponseCode;
 use IO\Services\CategoryService;
-use IO\Services\SessionStorageService;
 
 /**
  * Class CategoryDescriptionResource
@@ -39,21 +39,20 @@ class CategoryDescriptionResource extends ApiResource
         $description2 = (int)$this->request->get('description2', 0);
 
         $categoryService = pluginApp(CategoryService::class);
-        $sessionStorageService = pluginApp(SessionStorageService::class);
 
-        $category = $categoryService->get($categoryId, $sessionStorageService->getLang());
+        $category = $categoryService->get($categoryId, Utils::getLang());
 
         if($category instanceof Category)
         {
-            $categoryDetails = $categoryService->getDetails($category, $sessionStorageService->getLang());
-    
+            $categoryDetails = $categoryService->getDetails($category, Utils::getLang());
+
             if($categoryDetails instanceof CategoryDetails)
             {
                 if($description1)
                 {
                     $response['description1'] = $categoryDetails->description;
                 }
-        
+
                 if($description2)
                 {
                     $response['description2'] = $categoryDetails->description2;

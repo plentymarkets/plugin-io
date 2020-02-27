@@ -2,6 +2,12 @@
 
 namespace IO\Helper;
 
+/**
+ * Class DefaultSearchResult
+ * @package IO\Helper
+ * @deprecated since 5.0.0 will be deleted in 6.0.0
+ * @see \Plenty\Modules\Webshop\ItemSearch\Helpers\DefaultSearchResult
+ */
 class DefaultSearchResult
 {
     const DEFAULT_RESULT = [

@@ -35,6 +35,9 @@ use IO\Services\UnitService;
 use IO\Services\UrlService;
 use IO\Services\UserDataHashService;
 use IO\Services\WebstoreConfigurationService;
+use Plenty\Modules\Webshop\Contracts\LocalizationRepositoryContract;
+use Plenty\Modules\Webshop\Contracts\SessionStorageRepositoryContract;
+use Plenty\Modules\Webshop\Contracts\WebstoreConfigurationRepositoryContract;
 
 class TwigServiceContainer
 {
@@ -83,6 +86,11 @@ class TwigServiceContainer
         return pluginApp(OrderService::class);
     }
 
+    public function getSessionStorageRepository(): SessionStorageRepositoryContract
+    {
+        return pluginApp(SessionStorageRepositoryContract::class);
+    }
+
     public function getSessionStorage(): SessionStorageService
     {
         return pluginApp(SessionStorageService::class);
@@ -113,6 +121,11 @@ class TwigServiceContainer
         return pluginApp(NotificationService::class);
     }
 
+    public function getWebstoreConfigurationRepository(): WebstoreConfigurationRepositoryContract
+    {
+        return pluginApp(WebstoreConfigurationRepositoryContract::class);
+    }
+
     public function getWebstoreConfig(): WebstoreConfigurationService
     {
         return pluginApp(WebstoreConfigurationService::class);
@@ -121,6 +134,11 @@ class TwigServiceContainer
     public function getLocalization(): LocalizationService
     {
         return pluginApp(LocalizationService::class);
+    }
+
+    public function getLocalizationRepository(): LocalizationRepositoryContract
+    {
+        return pluginApp(LocalizationRepositoryContract::class);
     }
 
     public function getCoupon(): CouponService

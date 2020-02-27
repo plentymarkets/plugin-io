@@ -2,9 +2,9 @@
 
 namespace IO\Services\ItemSearch\SearchPresets;
 
-use IO\Services\ItemSearch\Factories\VariationSearchFactory;
 use IO\Services\ItemSearch\Helper\ResultFieldTemplate;
-use IO\Services\ItemSearch\Helper\SortingHelper;
+use Plenty\Modules\Webshop\ItemSearch\Factories\VariationSearchFactory;
+use Plenty\Modules\Webshop\ItemSearch\Helpers\SortingHelper;
 
 /**
  * Class SearchItems
@@ -22,14 +22,23 @@ use IO\Services\ItemSearch\Helper\SortingHelper;
  *
  *
  * @package IO\Services\ItemSearch\SearchPresets
+ *
+ * @deprecated since 5.0.0 will be deleted in 6.0.0
+ * @see \Plenty\Modules\Webshop\ItemSearch\SearchPresets\SearchItems
  */
 class SearchItems implements SearchPreset
 {
+    /**
+     * @inheritDoc
+     */
     public static function getSearchFactory($options)
     {
         $query  = $options['query'];
         $facets = $options['facets'];
-        $sorting= SortingHelper::getSearchSorting( $options['sorting'] );
+
+        /** @var SortingHelper $sortingHelper */
+        $sortingHelper = pluginApp(SortingHelper::class);
+        $sorting= $sortingHelper->getSearchSorting( $options['sorting'] );
 
         $page = 1;
         if ( array_key_exists('page', $options ) )
@@ -64,7 +73,8 @@ class SearchItems implements SearchPreset
         {
             $searchFactory->withResultFields(
                 ResultFieldTemplate::load( ResultFieldTemplate::TEMPLATE_AUTOCOMPLETE_ITEM_LIST )
-            );        }
+            );
+        }
         else
         {
             $searchFactory

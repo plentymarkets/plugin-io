@@ -11,18 +11,16 @@ use IO\Extensions\Mail\SendMail;
 use IO\Helper\RouteConfig;
 use IO\Helper\Utils;
 use IO\Services\AuthenticationService;
-use IO\Services\CustomerService;
-use IO\Services\SessionStorageService;
 use IO\Services\UserDataHashService;
-use Plenty\Modules\Account\Contact\Contracts\ContactRepositoryContract;
+use Plenty\Modules\Account\Contact\Contracts\ContactRepositoryContract as CoreContactRepositoryContract;
 use Plenty\Modules\Account\Contact\Models\Contact;
 use Plenty\Modules\Account\Contact\Models\ContactOption;
 use Plenty\Modules\Authorization\Services\AuthHelper;
 use Plenty\Modules\Helper\AutomaticEmail\Models\AutomaticEmailContact;
 use Plenty\Modules\Helper\AutomaticEmail\Models\AutomaticEmailTemplate;
-use Plenty\Modules\System\Contracts\WebstoreConfigurationRepositoryContract;
 use Plenty\Modules\System\Models\WebstoreConfiguration;
-use Plenty\Plugin\Application;
+use Plenty\Modules\Webshop\Contracts\ContactRepositoryContract;
+use Plenty\Modules\Webshop\Contracts\WebstoreConfigurationRepositoryContract;
 use Plenty\Plugin\Http\Request;
 use Plenty\Plugin\Http\Response;
 use Plenty\Plugin\Log\Loggable;
@@ -42,38 +40,34 @@ class CustomerMailResource extends ApiResource
         parent::__construct($request, $response);
     }
 
-    public function store():Response
+    public function store(): Response
     {
-        $newMail  = $this->request->get('newMail', null);
+        $newMail = $this->request->get('newMail', null);
         $newMail2 = $this->request->get('newMail2', null);
-
-        /** @var CustomerService $customerService */
-        $customerService = pluginApp(CustomerService::class);
-
-        /** @var Contact $contact */
-        $contact = $customerService->getContact();
-
-        if ( is_null($contact) )
-        {
-            return $this->response->create(null, ResponseCode::UNAUTHORIZED );
-        }
-
-        if ( strlen($newMail) <= 0 || strlen($newMail2) <= 0 || $newMail !== $newMail2 )
-        {
-            return $this->response->create(null, ResponseCode::BAD_REQUEST);
-        }
-
-        if ( $newMail === $contact->email )
-        {
-            return $this->response->create(null, ResponseCode::NOT_MODIFIED);
-        }
 
         /** @var ContactRepositoryContract $contactRepository */
         $contactRepository = pluginApp(ContactRepositoryContract::class);
-        $contactByMail = $contactRepository->getContactIdByEmail($newMail);
 
-        if (!is_null($contactByMail))
-        {
+        /** @var Contact $contact */
+        $contact = $contactRepository->getContact();
+
+        if (is_null($contact)) {
+            return $this->response->create(null, ResponseCode::UNAUTHORIZED);
+        }
+
+        if (strlen($newMail) <= 0 || strlen($newMail2) <= 0 || $newMail !== $newMail2) {
+            return $this->response->create(null, ResponseCode::BAD_REQUEST);
+        }
+
+        if ($newMail === $contact->email) {
+            return $this->response->create(null, ResponseCode::NOT_MODIFIED);
+        }
+
+        /** @var CoreContactRepositoryContract $coreContactRepository */
+        $coreContactRepository = pluginApp(CoreContactRepositoryContract::class);
+        $contactByMail = $coreContactRepository->getContactIdByEmail($newMail);
+
+        if (!is_null($contactByMail)) {
             return $this->response->create(null, ResponseCode::BAD_REQUEST);
         }
 
@@ -91,23 +85,20 @@ class CustomerMailResource extends ApiResource
         $clientId = Utils::getPlentyId();
 
         /**  @var WebstoreConfiguration $webstoreConfiguration */
-        $webstoreConfiguration = $webstoreConfigurationRepository->findByPlentyId($clientId);
+        $webstoreConfiguration = $webstoreConfigurationRepository->getWebstoreConfiguration();
 
         /** @var string $domain */
         $domain = $webstoreConfiguration->domainSsl;
         $defaultLang = $webstoreConfiguration->defaultLanguage;
-        /** @var SessionStorageService $sessionService */
-        $sessionService = pluginApp(SessionStorageService::class);
-        $lang = $sessionService->getLang();
+
+        $lang = Utils::getLang();
         /** @var ShopUrls $shopUrls */
         $shopUrls = pluginApp(ShopUrls::class);
         $newEmailLink = "";
 
-        if(RouteConfig::getCategoryId(RouteConfig::CHANGE_MAIL) <= 0) {
-            $newEmailLink = $domain . ($lang != $defaultLang ? '/' . $lang : ''). '/change-mail/'. $userDataHash->contactId . '/' . $userDataHash->hash;
-        }
-        else
-        {
+        if (RouteConfig::getCategoryId(RouteConfig::CHANGE_MAIL) <= 0) {
+            $newEmailLink = $domain . ($lang != $defaultLang ? '/' . $lang : '') . '/change-mail/' . $userDataHash->contactId . '/' . $userDataHash->hash;
+        } else {
             $newEmailLink = $shopUrls->changeMail . '?contactId=' . $userDataHash->contactId . '&hash=' . $userDataHash->hash;
         }
 
@@ -116,41 +107,36 @@ class CustomerMailResource extends ApiResource
             'clientId' => Utils::getWebstoreId(),
             'password' => null,
             'newEmailLink' => $newEmailLink,
-            'language' => $sessionService->getLang()
+            'language' => Utils::getLang()
         ];
 
-        $this->sendMail(AutomaticEmailTemplate::CONTACT_NEW_EMAIL , AutomaticEmailContact::class, $params);
+        $this->sendMail(AutomaticEmailTemplate::CONTACT_NEW_EMAIL, AutomaticEmailContact::class, $params);
 
         return $this->response->create(null, ResponseCode::OK);
     }
 
-    public function update(string $contactId):Response
+    public function update(string $contactId): Response
     {
-        $password  = $this->request->get('password');
-        $hash      = $this->request->get('hash');
+        $password = $this->request->get('password');
+        $hash = $this->request->get('hash');
 
-        if(!strlen($password))
-        {
+        if (!strlen($password)) {
             return $this->response->create(null, ResponseCode::UNAUTHORIZED);
         }
 
         /** @var UserDataHashService $hashService */
         $hashService = pluginApp(UserDataHashService::class);
-        $hashData = $hashService->getData( $hash, $contactId );
+        $hashData = $hashService->getData($hash, $contactId);
 
-        if (is_null($hashData))
-        {
+        if (is_null($hashData)) {
             return $this->response->create(null, ResponseCode::NOT_FOUND);
         }
 
-        try
-        {
+        try {
             /** @var AuthenticationService $authService */
             $authService = pluginApp(AuthenticationService::class);
             $authService->loginWithContactId($contactId, (string)$password);
-        }
-        catch(\Exception $exception)
-        {
+        } catch (\Exception $exception) {
             $this->getLogger(__CLASS__)->warning(
                 "IO::Debug.CustomerMailResource_loginFailed",
                 [
@@ -163,30 +149,32 @@ class CustomerMailResource extends ApiResource
         }
 
         $contact = null;
-        if ( $contactId > 0 )
-        {
+        if ($contactId > 0) {
             /** @var AuthHelper $authHelper */
             $authHelper = pluginApp(AuthHelper::class);
-            $contact = $authHelper->processUnguarded(function() use ($contactId, $hashData)
-            {
-                /** @var ContactRepositoryContract $contactRepository */
-                $contactRepository = pluginApp(ContactRepositoryContract::class);
-                $result = $contactRepository->updateContact([
-                    'options' => [
+            $contact = $authHelper->processUnguarded(
+                function () use ($contactId, $hashData) {
+                    /** @var CoreContactRepositoryContract $coreContactRepository */
+                    $coreContactRepository = pluginApp(CoreContactRepositoryContract::class);
+                    $result = $coreContactRepository->updateContact(
                         [
-                            'typeId'    => ContactOption::TYPE_MAIL,
-                            'subTypeId' => ContactOption::SUBTYPE_PRIVATE,
-                            'value'     => $hashData['newMail'],
-                            'priority'  => 0
-                        ]
-                    ]
-                ], $contactId);
+                            'options' => [
+                                [
+                                    'typeId' => ContactOption::TYPE_MAIL,
+                                    'subTypeId' => ContactOption::SUBTYPE_PRIVATE,
+                                    'value' => $hashData['newMail'],
+                                    'priority' => 0
+                                ]
+                            ]
+                        ],
+                        $contactId
+                    );
 
-                return $result;
-            });
+                    return $result;
+                }
+            );
 
-            $hashService->delete( $hash );
-
+            $hashService->delete($hash);
         }
         return $this->response->create($contact, ResponseCode::OK);
     }

@@ -5,10 +5,8 @@ namespace IO\Services\ItemSearch\Factories;
 use IO\Helper\Utils;
 use IO\Services\ItemSearch\Extensions\ItemSearchExtension;
 use IO\Services\ItemSearch\Extensions\SortExtension;
-use IO\Services\ItemSearch\Helper\LoadResultFields;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Collapse\BaseCollapse;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Collapse\InnerHit\BaseInnerHit;
-use Plenty\Modules\Cloud\ElasticSearch\Lib\ElasticSearch;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Processor\DocumentInnerHitsToRootProcessor;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Processor\DocumentProcessor;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Query\Type\ScoreModifier\RandomScore;
@@ -23,31 +21,23 @@ use Plenty\Modules\Item\Search\Aggregations\ItemAttributeValueCardinalityAggrega
 use Plenty\Modules\Item\Search\Aggregations\ItemAttributeValueCardinalityAggregationProcessor;
 use Plenty\Modules\Item\Search\Filter\SearchFilter;
 use Plenty\Modules\Item\Search\Sort\NameSorting;
+use Plenty\Modules\Webshop\ItemSearch\Helpers\LoadResultFields;
 use Plenty\Plugin\Log\Loggable;
-
+use Plenty\Modules\Webshop\ItemSearch\Factories\VariationSearchFactory AS VariationSearchFactoryContract;
 /**
  * Class BaseSearchFactory
  *
  * Base factory to build elastic search requests.
  *
  * @package IO\Services\ItemSearch\Factories
+ *
+ * @deprecated since 5.0.0 will be deleted in 6.0.0
+ * @see \Plenty\Modules\Webshop\ItemSearch\Factories\BaseSearchFactory
  */
 class BaseSearchFactory
 {
     use LoadResultFields;
     use Loggable;
-
-    const SORTING_ORDER_ASC     = ElasticSearch::SORTING_ORDER_ASC;
-    const SORTING_ORDER_DESC    = ElasticSearch::SORTING_ORDER_DESC;
-
-    const INHERIT_AGGREGATIONS  = 'aggregations';
-    const INHERIT_COLLAPSE      = 'collapse';
-    const INHERIT_EXTENSIONS    = 'extensions';
-    const INHERIT_FILTERS       = 'filters';
-    const INHERIT_MUTATORS      = 'mutators';
-    const INHERIT_PAGINATION    = 'pagination';
-    const INHERIT_RESULT_FIELDS = 'resultFields';
-    const INHERIT_SORTING       = 'sorting';
 
     /** @var AggregationInterface[] */
     private $aggregations = [];
@@ -72,7 +62,7 @@ class BaseSearchFactory
 
     /** @var MultipleSorting */
     private $sorting = null;
-    
+
     /** @var RandomScore */
     private $randomScoreModifier = null;
 
@@ -90,60 +80,65 @@ class BaseSearchFactory
      *
      * @return BaseSearchFactory
      * @throws \ErrorException
+     *
+     * @deprecated since 5.0.0 will be deleted in 6.0.0
+     * @see \Plenty\Modules\Webshop\ItemSearch\Factories\BaseSearchFactory::inherit()
      */
-    public static function inherit( $searchBuilder, $inheritedProperties = null )
+    public function inherit( $inheritedProperties = null )
     {
         /** @var BaseSearchFactory $newBuilder */
         $newBuilder = pluginApp( self::class );
 
-        if ( $searchBuilder !== null )
+        /*if ( $inheritedProperties === null || in_array(VariationSearchFactoryContract::INHERIT_COLLAPSE, $inheritedProperties ) )
         {
-            if ( $inheritedProperties === null || in_array(self::INHERIT_COLLAPSE, $inheritedProperties ) && !is_null($searchBuilder->collapseField))
-            {
-                $newBuilder->groupBy($searchBuilder->collapseField);
-            }
+            $newBuilder->collapse = $this->collapse;
+        }
 
-            if ( $inheritedProperties === null || in_array(self::INHERIT_EXTENSIONS, $inheritedProperties ) )
-            {
-                $newBuilder->extensions = $searchBuilder->extensions;
-            }
+        if ( $inheritedProperties === null || in_array(VariationSearchFactoryContract::INHERIT_COLLAPSE, $inheritedProperties ) && !is_null($newBuilder->collapseField))
+        {
+            $newBuilder->groupBy($newBuilder->collapseField);
+        }*/
 
-            if ( $inheritedProperties === null || in_array( self::INHERIT_FILTERS, $inheritedProperties ) )
-            {
-                foreach( $searchBuilder->filters as $filter )
-                {
-                    $newBuilder->withFilter( $filter );
-                }
-            }
+        if ( $inheritedProperties === null || in_array(VariationSearchFactoryContract::INHERIT_EXTENSIONS, $inheritedProperties ) )
+        {
+            $newBuilder->extensions = $this->extensions;
+        }
 
-            if ( $inheritedProperties === null || in_array(self::INHERIT_MUTATORS, $inheritedProperties ) )
+        if ( $inheritedProperties === null || in_array( VariationSearchFactoryContract::INHERIT_FILTERS, $inheritedProperties ) )
+        {
+            foreach( $this->filters as $filter )
             {
-                foreach( $searchBuilder->mutators as $mutator )
-                {
-                    $newBuilder->withMutator( $mutator );
-                }
+                $newBuilder->withFilter( $filter );
             }
+        }
 
-            if ( $inheritedProperties === null || in_array( self::INHERIT_PAGINATION, $inheritedProperties ) )
+        if ( $inheritedProperties === null || in_array(VariationSearchFactoryContract::INHERIT_MUTATORS, $inheritedProperties ) )
+        {
+            foreach( $this->mutators as $mutator )
             {
-                $newBuilder->setPage(
-                    $searchBuilder->page,
-                    $searchBuilder->itemsPerPage
-                );
+                $newBuilder->withMutator( $mutator );
             }
+        }
 
-            if ( $inheritedProperties === null || in_array( self::INHERIT_RESULT_FIELDS, $inheritedProperties ) )
-            {
-                $newBuilder->withResultFields(
-                    $searchBuilder->resultFields
-                );
-            }
+        if ( $inheritedProperties === null || in_array( VariationSearchFactoryContract::INHERIT_PAGINATION, $inheritedProperties ) )
+        {
+            $newBuilder->setPage(
+                $this->page,
+                $this->itemsPerPage
+            );
+        }
 
-            if ( $inheritedProperties === null || in_array( self::INHERIT_SORTING, $inheritedProperties ) )
-            {
-                $newBuilder->sorting = $searchBuilder->sorting;
-                $newBuilder->randomScoreModifier = $searchBuilder->randomScoreModifier;
-            }
+        if ( $inheritedProperties === null || in_array( VariationSearchFactoryContract::INHERIT_RESULT_FIELDS, $inheritedProperties ) )
+        {
+            $newBuilder->withResultFields(
+                $this->resultFields
+            );
+        }
+
+        if ( $inheritedProperties === null || in_array( VariationSearchFactoryContract::INHERIT_SORTING, $inheritedProperties ) )
+        {
+            $newBuilder->sorting = $this->sorting;
+            $newBuilder->randomScoreModifier = $this->randomScoreModifier;
         }
 
         return $newBuilder;
@@ -155,6 +150,9 @@ class BaseSearchFactory
      * @param MutatorInterface $mutator
      *
      * @return $this
+     *
+     * @deprecated since 5.0.0 will be deleted in 6.0.0
+     * @see \Plenty\Modules\Webshop\ItemSearch\Factories\BaseSearchFactory::withMutator()
      */
     public function withMutator( $mutator )
     {
@@ -168,6 +166,9 @@ class BaseSearchFactory
      * @param string    $filterClass
      *
      * @return TypeInterface
+     *
+     * @deprecated since 5.0.0 will be deleted in 6.0.0
+     * @see \Plenty\Modules\Webshop\ItemSearch\Factories\BaseSearchFactory::createFilter()
      */
     public function createFilter( $filterClass )
     {
@@ -186,6 +187,9 @@ class BaseSearchFactory
      * @param TypeInterface $filter
      *
      * @return $this
+     *
+     * @deprecated since 5.0.0 will be deleted in 6.0.0
+     * @see \Plenty\Modules\Webshop\ItemSearch\Factories\BaseSearchFactory::withFilter()
      */
     public function withFilter( $filter )
     {
@@ -202,6 +206,9 @@ class BaseSearchFactory
      * @param string|string[]   $fields     Reference to a json file to load fields from or a list of field names.
      *
      * @return BaseSearchFactory
+     *
+     * @deprecated since 5.0.0 will be deleted in 6.0.0
+     * @see \Plenty\Modules\Webshop\ItemSearch\Factories\BaseSearchFactory::withResultFields()
      */
     public function withResultFields( $fields )
     {
@@ -218,6 +225,12 @@ class BaseSearchFactory
         return $this;
     }
 
+    /**
+     * @return array
+     *
+     * @deprecated since 5.0.0 will be deleted in 6.0.0
+     * @see \Plenty\Modules\Webshop\ItemSearch\Factories\BaseSearchFactory::getResultFields()
+     */
     public function getResultFields()
     {
         return $this->resultFields;
@@ -229,10 +242,13 @@ class BaseSearchFactory
      * @param string    $extensionClass     Extension class to add.
      * @param array     $extensionParams    Additional parameters to pass to extensions constructor
      * @return $this
+     *
+     * @deprecated since 5.0.0 will be deleted in 6.0.0
+     * @see \Plenty\Modules\Webshop\ItemSearch\Factories\BaseSearchFactory::withExtension()
      */
     public function withExtension( $extensionClass, $extensionParams = [] )
     {
-        $this->extensions[] = pluginApp( $extensionClass, $extensionParams );
+        $this->extensions[] = ['class' => $extensionClass, 'params' => $extensionParams];
         return $this;
     }
 
@@ -240,6 +256,9 @@ class BaseSearchFactory
      * Get all registered extensions
      *
      * @return ItemSearchExtension[]
+     *
+     * @deprecated since 5.0.0 will be deleted in 6.0.0
+     * @see \Plenty\Modules\Webshop\ItemSearch\Factories\BaseSearchFactory::getExtensions()
      */
     public function getExtensions()
     {
@@ -252,6 +271,9 @@ class BaseSearchFactory
      * @param AggregationInterface $aggregation
      *
      * @return $this
+     *
+     * @deprecated since 5.0.0 will be deleted in 6.0.0
+     * @see \Plenty\Modules\Webshop\ItemSearch\Factories\BaseSearchFactory::withAggregation()
      */
     public function withAggregation( AggregationInterface $aggregation )
     {
@@ -266,6 +288,9 @@ class BaseSearchFactory
      * @param int   $itemsPerPage
      *
      * @return $this
+     *
+     * @deprecated since 5.0.0 will be deleted in 6.0.0
+     * @see \Plenty\Modules\Webshop\ItemSearch\Factories\BaseSearchFactory::setPage()
      */
     public function setPage( $page, $itemsPerPage )
     {
@@ -281,8 +306,11 @@ class BaseSearchFactory
      * @param string    $order      Direction to order results. Possible values: 'asc' or 'desc'
      *
      * @return $this
+     *
+     * @deprecated since 5.0.0 will be deleted in 6.0.0
+     * @see \Plenty\Modules\Webshop\ItemSearch\Factories\BaseSearchFactory::sortBy()
      */
-    public function sortBy( $field, $order = self::SORTING_ORDER_DESC )
+    public function sortBy( $field, $order = VariationSearchFactoryContract::SORTING_ORDER_DESC )
     {
         $field = $this->checkRandomSorting($field);
         if ( $this->sorting === null )
@@ -290,9 +318,9 @@ class BaseSearchFactory
             $this->sorting = pluginApp( MultipleSorting::class );
         }
 
-        if ( $order !== self::SORTING_ORDER_ASC && $order !== self::SORTING_ORDER_DESC )
+        if ( $order !== VariationSearchFactoryContract::SORTING_ORDER_ASC && $order !== VariationSearchFactoryContract::SORTING_ORDER_DESC )
         {
-            $order = self::SORTING_ORDER_DESC;
+            $order = VariationSearchFactoryContract::SORTING_ORDER_DESC;
         }
 
         $sortingInterface = null;
@@ -336,6 +364,9 @@ class BaseSearchFactory
      * @param array     $sortingList    List of sorting parameters. Each entry should have a 'field' and an 'order' property.
      *
      * @return $this
+     *
+     * @deprecated since 5.0.0 will be deleted in 6.0.0
+     * @see \Plenty\Modules\Webshop\ItemSearch\Factories\BaseSearchFactory::sortByMultiple()
      */
     public function sortByMultiple( $sortingList )
     {
@@ -347,6 +378,13 @@ class BaseSearchFactory
         return $this;
     }
 
+    /**
+     * @param array $idList
+     * @return $this
+     *
+     * @deprecated since 5.0.0 will be deleted in 6.0.0
+     * @see \Plenty\Modules\Webshop\ItemSearch\Factories\BaseSearchFactory::setOrder()
+     */
     public function setOrder( $idList )
     {
         return $this->withExtension(SortExtension::class, [
@@ -360,6 +398,9 @@ class BaseSearchFactory
      * @param string    $field  The field to group properties by.
      *
      * @return $this
+     *
+     * @deprecated since 5.0.0 will be deleted in 6.0.0
+     * @see \Plenty\Modules\Webshop\ItemSearch\Factories\BaseSearchFactory::groupBy()
      */
     public function groupBy( $field )
     {
@@ -371,6 +412,9 @@ class BaseSearchFactory
      * Build the elastic search request.
      *
      * @return DocumentSearch
+     *
+     * @deprecated since 5.0.0 will be deleted in 6.0.0
+     * @see \Plenty\Modules\Webshop\ItemSearch\Factories\BaseSearchFactory::build()
      */
     public function build()
     {
@@ -405,7 +449,7 @@ class BaseSearchFactory
                 $search->addFilter( $filter );
             }
         }
-    
+
         // ADD RANDOM MODIFIER
         if($this->randomScoreModifier instanceof RandomScore)
         {
@@ -424,7 +468,7 @@ class BaseSearchFactory
         {
             $search->setSorting( $this->sorting );
         }
-        
+
         if ( $this->itemsPerPage < 0 )
         {
             $this->itemsPerPage = 1000;
@@ -455,6 +499,9 @@ class BaseSearchFactory
      *
      * @param IncludeSource $source
      * @return DocumentSearch
+     *
+     * @deprecated since 5.0.0 will be deleted in 6.0.0
+     * @see \Plenty\Modules\Webshop\ItemSearch\Factories\BaseSearchFactory::prepareSearch()
      */
     protected function prepareSearch($source)
     {
@@ -467,17 +514,17 @@ class BaseSearchFactory
             $counterAggregationProcessor = pluginApp( ItemAttributeValueCardinalityAggregationProcessor::class );
             $counterAggregation = pluginApp( ItemAttributeValueCardinalityAggregation::class, [$counterAggregationProcessor, $this->collapseField] );
             $this->withAggregation( $counterAggregation );
-            
+
             /** @var BaseInnerHit $innerHit */
             $innerHit = pluginApp(BaseInnerHit::class, ['cheapest']);
             $innerHit->setSorting(pluginApp(SingleSorting::class, ['sorting.price.avg', 'asc']));
             $innerHit->setSource($source);
             $collapse->addInnerHit($innerHit);
-    
+
             /** @var DocumentInnerHitsToRootProcessor $docProcessor */
             $processor = pluginApp(DocumentInnerHitsToRootProcessor::class, [$innerHit->getName()]);
             $search = pluginApp(DocumentSearch::class, [$processor]);
-    
+
             // Group By Item Id
             $search->setCollapse($collapse);
         }
@@ -488,7 +535,7 @@ class BaseSearchFactory
             /** @var DocumentSearch $search */
             $search = pluginApp( DocumentSearch::class, [$processor] );
         }
-    
+
         // ADD MUTATORS
         $mutatorClasses = [];
         foreach( $this->mutators as $mutator )
@@ -504,10 +551,17 @@ class BaseSearchFactory
                 "mutators"      => $mutatorClasses
             ]
         );
-        
+
         return $search;
     }
-    
+
+    /**
+     * @param $sortingField
+     * @return string
+     *
+     * @deprecated since 5.0.0 will be deleted in 6.0.0
+     * @see \Plenty\Modules\Webshop\ItemSearch\Factories\BaseSearchFactory::checkRandomSorting()
+     */
     private function checkRandomSorting($sortingField)
     {
         if($sortingField == 'item.random')

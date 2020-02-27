@@ -2,11 +2,7 @@
 
 namespace IO\Controllers;
 
-use IO\Extensions\Constants\ShopUrls;
-use IO\Guards\AuthGuard;
 use IO\Helper\RouteConfig;
-use IO\Services\SessionStorageService;
-use IO\Services\WebstoreConfigurationService;
 use Plenty\Plugin\Http\Request;
 
 class ItemSearchController extends LayoutController
