@@ -25,7 +25,7 @@ class ItemListService
     const TYPE_CROSS_SELLER = 'cross_selling';
     const TYPE_WISH_LIST    = 'wish_list';
 
-    public function getItemList( $type, $id = null, $sorting = null, $maxItems = 0, $crossSellingRelationType = null)
+    public function getItemList( $type, $id = null, $sorting = null, $maxItems = 0, $crossSellingRelationType = null, $withCategories = false)
     {
         /** @var ItemSearchService $searchService */
         $searchService = pluginApp( ItemSearchService::class );
@@ -112,6 +112,10 @@ class ItemListService
         if ( is_null($searchFactory) )
         {
             return null;
+        }
+
+        if($withCategories) {
+            $searchFactory->withCategories();
         }
 
         if ( $maxItems > 0 )

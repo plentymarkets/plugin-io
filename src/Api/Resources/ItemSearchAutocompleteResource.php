@@ -2,6 +2,7 @@
 
 namespace IO\Api\Resources;
 
+use IO\Services\ItemSearchAutocompleteService;
 use Plenty\Modules\Webshop\ItemSearch\SearchPresets\SearchItems;
 use Plenty\Modules\Webshop\ItemSearch\Services\ItemSearchService;
 use Plenty\Plugin\Http\Response;
@@ -36,18 +37,12 @@ class ItemSearchAutocompleteResource extends ApiResource
         $searchString = $this->request->get('query', '');
 
         if (strlen($searchString)) {
-            /** @var ItemSearchService $itemSearchService */
-            $itemSearchService = pluginApp(ItemSearchService::class);
-            $response = $itemSearchService->getResults(
-                SearchItems::getSearchFactory(
-                    [
-                        'query' => $searchString,
-                        'autocomplete' => true,
-                        'page' => 1,
-                        'itemsPerPage' => 20
-                    ]
-                )
-            );
+            $searchTypes = $this->request->get('types', []);
+
+            /** @var ItemSearchAutocompleteService $itemSearchAutocompleteService */
+            $itemSearchAutocompleteService = pluginApp(ItemSearchAutocompleteService::class);
+            $response = $itemSearchAutocompleteService->transformResult($itemSearchAutocompleteService->getResults($searchString, $searchTypes));
+
             return $this->response->create($response, ResponseCode::OK);
         }
 
