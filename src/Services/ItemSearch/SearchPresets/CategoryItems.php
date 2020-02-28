@@ -88,7 +88,7 @@ class CategoryItems implements SearchPreset
             ->groupByTemplateConfig()
             ->withLinkToContent()
             ->withGroupedAttributeValues()
-            ->withReducedResults(true);
+            ->withReducedResults();
 
         return $searchFactory;
     }

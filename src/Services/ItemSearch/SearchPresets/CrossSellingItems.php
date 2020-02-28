@@ -80,7 +80,7 @@ class CrossSellingItems implements SearchPreset
             ->sortBy($sorting['path'], $sorting['order'])
             ->withLinkToContent()
             ->withGroupedAttributeValues()
-            ->withReducedResults(true);
+            ->withReducedResults();
 
         return $searchFactory;
     }

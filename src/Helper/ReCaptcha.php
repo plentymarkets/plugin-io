@@ -3,6 +3,7 @@
 namespace IO\Helper;
 
 use IO\Services\TemplateConfigService;
+use Plenty\Modules\Webshop\Consent\Contracts\ConsentRepositoryContract;
 
 class ReCaptcha
 {
@@ -10,11 +11,21 @@ class ReCaptcha
     {
         /** @var TemplateConfigService $templateConfigService */
         $templateConfigService = pluginApp(TemplateConfigService::class);
+        /** @var ConsentRepositoryContract $consentRepository */
+        $consentRepository = pluginApp(ConsentRepositoryContract::class);
+
         $secret = $templateConfigService->get('global.google_recaptcha_secret');
+        $blockCookies = $templateConfigService->getBoolean('global.block_cookies');
+        $isConsented = $consentRepository->isConsented('media.reCaptcha');
 
         if ( !strlen( $secret ) )
         {
             // No secret defined in config => skip reCAPTCHA validation
+            return true;
+        }
+        else if ($blockCookies && !$isConsented)
+        {
+            // site has to operate without cookies
             return true;
         }
         else if ( !strlen( $token ) )
