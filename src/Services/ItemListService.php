@@ -10,6 +10,7 @@ use Plenty\Modules\Webshop\ItemSearch\SearchPresets\BasketItems;
 use Plenty\Modules\Webshop\ItemSearch\SearchPresets\CategoryItems;
 use Plenty\Modules\Webshop\ItemSearch\SearchPresets\CrossSellingItems;
 use Plenty\Modules\Webshop\ItemSearch\SearchPresets\ManufacturerItems;
+use Plenty\Modules\Webshop\ItemSearch\SearchPresets\SearchSuggestions;
 use Plenty\Modules\Webshop\ItemSearch\SearchPresets\TagItems;
 use Plenty\Modules\Webshop\ItemSearch\SearchPresets\VariationList;
 use Plenty\Modules\Webshop\ItemSearch\Services\ItemSearchService;
@@ -17,13 +18,14 @@ use Plenty\Plugin\CachingRepository;
 
 class ItemListService
 {
-    const TYPE_CATEGORY     = 'category';
-    const TYPE_LAST_SEEN    = 'last_seen';
-    const TYPE_TAG          = 'tag_list';
-    const TYPE_RANDOM       = 'random';
-    const TYPE_MANUFACTURER = 'manufacturer';
-    const TYPE_CROSS_SELLER = 'cross_selling';
-    const TYPE_WISH_LIST    = 'wish_list';
+    const TYPE_CATEGORY           = 'category';
+    const TYPE_LAST_SEEN          = 'last_seen';
+    const TYPE_TAG                = 'tag_list';
+    const TYPE_RANDOM             = 'random';
+    const TYPE_MANUFACTURER       = 'manufacturer';
+    const TYPE_CROSS_SELLER       = 'cross_selling';
+    const TYPE_WISH_LIST          = 'wish_list';
+    const TYPE_SEARCH_SUGGESTIONS = 'search_suggestions';
 
     public function getItemList( $type, $id = null, $sorting = null, $maxItems = 0, $crossSellingRelationType = null, $withCategories = false)
     {
@@ -31,7 +33,7 @@ class ItemListService
         $searchService = pluginApp( ItemSearchService::class );
         $searchFactory = null;
 
-        if ( !$this->isValidId( $id ) && !(in_array($type, [self::TYPE_LAST_SEEN, self::TYPE_CROSS_SELLER, self::TYPE_WISH_LIST] )))
+        if ( !$this->isValidId( $id ) && !(in_array($type, [self::TYPE_LAST_SEEN, self::TYPE_CROSS_SELLER, self::TYPE_WISH_LIST, self::TYPE_SEARCH_SUGGESTIONS] )))
         {
             $type = self::TYPE_RANDOM;
         }
@@ -103,6 +105,11 @@ class ItemListService
                     'variationIds'  => $wishListVariationIds,
                     'quantities'    => 1,
                     'itemsPerPage'  => count($wishListVariationIds)
+                ]);
+                break;
+            case self::TYPE_SEARCH_SUGGESTIONS:
+                $searchFactory = SearchSuggestions::getSearchFactory([
+                    'query'  => '',
                 ]);
                 break;
             default:
