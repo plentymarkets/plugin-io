@@ -29,6 +29,7 @@ use IO\Services\OrderService;
 use IO\Services\OrderTotalsService;
 use IO\Services\PropertyFileService;
 use IO\Services\SalesPriceService;
+use IO\Services\SeoService;
 use IO\Services\SessionStorageService;
 use IO\Services\TagService;
 use IO\Services\TemplateService;
@@ -217,7 +218,7 @@ class TwigServiceContainer
         return pluginApp(FacetService::class);
     }
 
-    public function getContactMap() : ContactMapService
+    public function getContactMap(): ContactMapService
     {
         return pluginApp(ContactMapService::class);
     }
@@ -225,5 +226,10 @@ class TwigServiceContainer
     public function getSearchAutocomplete()
     {
         return pluginApp(ItemSearchAutocompleteService::class);
+    }
+
+    public function getSEO(): SeoService
+    {
+        return pluginApp(SeoService::class);
     }
 }
