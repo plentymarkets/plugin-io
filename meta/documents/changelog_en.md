@@ -1,5 +1,11 @@
 # Release Notes for IO
 
+## v4.6.4 (2020-02-27) <a href="https://github.com/plentymarkets/plugin-io/compare/4.6.3...4.6.4" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
+
+### Fixed
+
+- The registration and contact forms could not be sent if Google reCAPTCHA and the Ceres setting **Block unaccepted cookies** were active and the user had not yet accepted the reCAPTCHA cookie. This behaviour has been fixed. 
+
 ## v4.6.3 (2020-02-24) <a href="https://github.com/plentymarkets/plugin-io/compare/4.6.2...4.6.3" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
 
 ### Fixed 

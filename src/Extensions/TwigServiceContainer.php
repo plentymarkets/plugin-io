@@ -18,6 +18,7 @@ use IO\Services\FakerService;
 use IO\Services\ItemCrossSellingService;
 use IO\Services\ItemLastSeenService;
 use IO\Services\ItemListService;
+use IO\Services\ItemSearchAutocompleteService;
 use IO\Services\ItemService;
 use IO\Services\ItemWishListService;
 use IO\Services\LegalInformationService;
@@ -28,6 +29,7 @@ use IO\Services\OrderService;
 use IO\Services\OrderTotalsService;
 use IO\Services\PropertyFileService;
 use IO\Services\SalesPriceService;
+use IO\Services\SeoService;
 use IO\Services\SessionStorageService;
 use IO\Services\TagService;
 use IO\Services\TemplateService;
@@ -216,8 +218,18 @@ class TwigServiceContainer
         return pluginApp(FacetService::class);
     }
 
-    public function getContactMap() : ContactMapService
+    public function getContactMap(): ContactMapService
     {
         return pluginApp(ContactMapService::class);
+    }
+
+    public function getSearchAutocomplete()
+    {
+        return pluginApp(ItemSearchAutocompleteService::class);
+    }
+
+    public function getSEO(): SeoService
+    {
+        return pluginApp(SeoService::class);
     }
 }

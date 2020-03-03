@@ -4,6 +4,7 @@ namespace IO\Helper;
 
 use IO\Extensions\Filters\NumberFormatFilter;
 use IO\Services\BasketService;
+use IO\Services\UnitService;
 use Plenty\Legacy\Services\Item\Variation\SalesPriceService;
 use Plenty\Modules\Account\Contact\Models\Contact;
 use Plenty\Modules\Item\SalesPrice\Contracts\SalesPriceSearchRepositoryContract;
@@ -12,7 +13,6 @@ use Plenty\Modules\Item\SalesPrice\Models\SalesPriceSearchResponse;
 use Plenty\Modules\LiveShopping\Contracts\LiveShoppingRepositoryContract;
 use Plenty\Modules\Webshop\Contracts\CheckoutRepositoryContract;
 use Plenty\Modules\Webshop\Contracts\ContactRepositoryContract;
-use Plenty\Modules\Webshop\Contracts\UnitRepositoryContract;
 use Plenty\Plugin\Application;
 
 /**
@@ -52,8 +52,8 @@ class VariationPriceList
     /** @var NumberFormatFilter $numberFormatFilter */
     private $numberFormatFilter;
 
-    /** @var UnitRepositoryContract $unitRepository */
-    private $unitRepository;
+    /** @var UnitService $unitService */
+    private $unitService;
 
     /** @var LiveShoppingRepositoryContract $liveShoppingRepo */
     private $liveShoppingRepo;
@@ -65,12 +65,12 @@ class VariationPriceList
 
     public function __construct(
         NumberFormatFilter $numberFormatFilter,
-        UnitRepositoryContract $unitRepository,
+        UnitService $unitService,
         LiveShoppingRepositoryContract $liveShoppingRepo,
         ContactRepositoryContract $contactRepository )
     {
         $this->numberFormatFilter   = $numberFormatFilter;
-        $this->unitRepository       = $unitRepository;
+        $this->unitService       = $unitService;
         $this->showNetPrice         = $contactRepository->showNetPrices();
         $this->liveShoppingRepo     = $liveShoppingRepo;
     }
@@ -188,7 +188,7 @@ class VariationPriceList
                 self::$basePrices[(string)$this->lot][(string)$unitPrice][$this->unit] = $basePrice;
             }
 
-            $unitName = $this->unitRepository->getUnitNameByKey( $basePrice['unitKey'], $lang );
+            $unitName = $this->unitService->getUnitNameByKey($basePrice['unitKey'], $lang );
 
             $basePriceString = $this->numberFormatFilter->formatMonetary($basePrice['price'], $currency).' / '.($basePrice['lot'] > 1 ? $basePrice['lot'].' ' : '').$unitName;
         }
