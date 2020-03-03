@@ -27,6 +27,7 @@ use IO\Services\OrderService;
 use IO\Services\OrderTotalsService;
 use IO\Services\PropertyFileService;
 use IO\Services\SalesPriceService;
+use IO\Services\SeoService;
 use IO\Services\SessionStorageService;
 use IO\Services\TagService;
 use IO\Services\TemplateService;
@@ -195,5 +196,10 @@ class TwigServiceContainer
     public function getFacet(): FacetService
     {
         return pluginApp(FacetService::class);
+    }
+
+    public function getSEO(): SeoService
+    {
+        return pluginApp(SeoService::class);
     }
 }
