@@ -41,11 +41,12 @@ class ItemSearchAutocompleteService
             )
         ];
 
-        if(in_array('suggestion', $searchTypes))
-        {
-            $searchFactories['suggestions'] = SearchSuggestions::getSearchFactory([
-                'query' => $searchString,
-            ]);
+        if (in_array('suggestion', $searchTypes)) {
+            $searchFactories['suggestions'] = SearchSuggestions::getSearchFactory(
+                [
+                    'query' => $searchString,
+                ]
+            );
         }
 
         /** @var ItemSearchService $itemSearchService */
@@ -62,8 +63,8 @@ class ItemSearchAutocompleteService
     public function transformResult($itemSearchResult)
     {
         $newResult = [
-            'item'       => $this->getItems($itemSearchResult['items']['documents']),
-            'category'   => $this->getCategories($itemSearchResult['items']['categories.all']),
+            'item' => $this->getItems($itemSearchResult['items']['documents']),
+            'category' => $this->getCategories($itemSearchResult['items']['categories.all']),
             'suggestion' => $this->getSuggestions($itemSearchResult['suggestions']['searchSuggestions'])
         ];
 
@@ -77,7 +78,7 @@ class ItemSearchAutocompleteService
     private function getItems($items)
     {
         $itemResult = [];
-        if (count($items)) {
+        if (is_array($items) && count($items)) {
             /** @var SortingHelper $sortingHelper */
             $sortingHelper = pluginApp(SortingHelper::class);
 
@@ -129,7 +130,7 @@ class ItemSearchAutocompleteService
         /** @var Application $app */
         $app = pluginApp(Application::class);
 
-        if (count($categories)) {
+        if (is_array($categories) && count($categories)) {
             foreach ($categories as $categoryId => $count) {
                 if ((int)$categoryId > 0) {
                     /** @var Category $categoryData */
@@ -161,10 +162,8 @@ class ItemSearchAutocompleteService
     private function getSuggestions($suggestions)
     {
         $suggestionResult = [];
-        if(count($suggestions))
-        {
-            foreach($suggestions as $suggestion => $count)
-            {
+        if (is_array($suggestions) && count($suggestions)) {
+            foreach ($suggestions as $suggestion => $count) {
                 $suggestionResult[] = $this->buildResult(
                     $suggestion,
                     '',
