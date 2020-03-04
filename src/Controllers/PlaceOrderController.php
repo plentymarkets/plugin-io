@@ -49,14 +49,17 @@ class PlaceOrderController extends LayoutController
             $eventDispatcher = pluginApp(Dispatcher::class);
             /** @var ValidateVatNumber $val */
 
-            $eventDispatcher->listen(AfterBasketItemToOrderItem::class, function($event) {
-                /** @var ItemNameFilter $itemNameFilter */
-                $itemNameFilter = pluginApp(ItemNameFilter::class);
-                $basketItem = $event->getBasketItem();
-                $orderItem = $event->getOrderItem();
-                $orderItem['orderItemName'] = $itemNameFilter->itemName($basketItem['variation']['data']);
-                return $orderItem;
-            });
+            $eventDispatcher->listen(
+                AfterBasketItemToOrderItem::class,
+                function ($event) {
+                    /** @var ItemNameFilter $itemNameFilter */
+                    $itemNameFilter = pluginApp(ItemNameFilter::class);
+                    $basketItem = $event->getBasketItem();
+                    $orderItem = $event->getOrderItem();
+                    $orderItem['orderItemName'] = $itemNameFilter->itemName($basketItem['variation']['data']);
+                    return $orderItem;
+                }
+            );
 
             /** @var CustomerService $customerService */
             $customerService = pluginApp(CustomerService::class);
@@ -78,8 +81,7 @@ class PlaceOrderController extends LayoutController
             if (!is_null($deliveryAddressId) && $deliveryAddressId > 0) {
                 $deliveryAddressData = $customerService->getAddress($deliveryAddressId, AddressType::DELIVERY);
                 $vatOption = $deliveryAddressData->options->where('typeId', AddressOption::TYPE_VAT_NUMBER)->first();
-                if(!is_null($vatOption))
-                {
+                if (!is_null($vatOption)) {
                     $val = pluginApp(ValidateVatNumber::class, [$vatOption->value]);
                     $eventDispatcher->fire($val);
                 }
@@ -89,7 +91,9 @@ class PlaceOrderController extends LayoutController
         }
 
         //check if an order has already been placed in the last 30 seconds
-        $lastPlaceOrderTry = $sessionStorageRepository->getSessionValue(SessionStorageRepositoryContract::LAST_PLACE_ORDER_TRY);
+        $lastPlaceOrderTry = $sessionStorageRepository->getSessionValue(
+            SessionStorageRepositoryContract::LAST_PLACE_ORDER_TRY
+        );
 
         if (!is_null($lastPlaceOrderTry) && time() < (int)$lastPlaceOrderTry + self::ORDER_RETRY_INTERVAL) {
             //place order has been called a second time in a time frame of 30 seconds
