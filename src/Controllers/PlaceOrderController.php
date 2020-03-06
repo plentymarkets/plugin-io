@@ -5,7 +5,6 @@ namespace IO\Controllers;
 use IO\Builder\Order\AddressType;
 use IO\Constants\LogLevel;
 use IO\Extensions\Constants\ShopUrls;
-use IO\Extensions\Filters\ItemNameFilter;
 use IO\Services\BasketService;
 use IO\Services\CustomerService;
 use IO\Services\NotificationService;
@@ -14,7 +13,6 @@ use IO\Services\UrlBuilder\UrlQuery;
 use Plenty\Modules\Account\Address\Models\AddressOption;
 use Plenty\Modules\Basket\Exceptions\BasketItemCheckException;
 use Plenty\Modules\Webshop\Contracts\SessionStorageRepositoryContract;
-use Plenty\Modules\Webshop\Events\AfterBasketItemToOrderItem;
 use Plenty\Modules\Webshop\Events\ValidateVatNumber;
 use Plenty\Plugin\Events\Dispatcher;
 use Plenty\Plugin\Http\Request;
@@ -33,7 +31,7 @@ class PlaceOrderController extends LayoutController
     /**
      * @param OrderService $orderService
      * @param NotificationService $notificationService
-     * @param SessionStorageRepositoryContract $sessionStorageRepository
+     * @param SessionStorageService $sessionStorageService
      * @param ShopUrls $shopUrls
      *
      * @return \Symfony\Component\HttpFoundation\Response
@@ -48,18 +46,6 @@ class PlaceOrderController extends LayoutController
             /** @var Dispatcher $eventDispatcher */
             $eventDispatcher = pluginApp(Dispatcher::class);
             /** @var ValidateVatNumber $val */
-
-            $eventDispatcher->listen(
-                AfterBasketItemToOrderItem::class,
-                function ($event) {
-                    /** @var ItemNameFilter $itemNameFilter */
-                    $itemNameFilter = pluginApp(ItemNameFilter::class);
-                    $basketItem = $event->getBasketItem();
-                    $orderItem = $event->getOrderItem();
-                    $orderItem['orderItemName'] = $itemNameFilter->itemName($basketItem['variation']['data']);
-                    return $orderItem;
-                }
-            );
 
             /** @var CustomerService $customerService */
             $customerService = pluginApp(CustomerService::class);
@@ -81,7 +67,8 @@ class PlaceOrderController extends LayoutController
             if (!is_null($deliveryAddressId) && $deliveryAddressId > 0) {
                 $deliveryAddressData = $customerService->getAddress($deliveryAddressId, AddressType::DELIVERY);
                 $vatOption = $deliveryAddressData->options->where('typeId', AddressOption::TYPE_VAT_NUMBER)->first();
-                if (!is_null($vatOption)) {
+                if(!is_null($vatOption))
+                {
                     $val = pluginApp(ValidateVatNumber::class, [$vatOption->value]);
                     $eventDispatcher->fire($val);
                 }
@@ -91,9 +78,7 @@ class PlaceOrderController extends LayoutController
         }
 
         //check if an order has already been placed in the last 30 seconds
-        $lastPlaceOrderTry = $sessionStorageRepository->getSessionValue(
-            SessionStorageRepositoryContract::LAST_PLACE_ORDER_TRY
-        );
+        $lastPlaceOrderTry = $sessionStorageRepository->getSessionValue(SessionStorageRepositoryContract::LAST_PLACE_ORDER_TRY);
 
         if (!is_null($lastPlaceOrderTry) && time() < (int)$lastPlaceOrderTry + self::ORDER_RETRY_INTERVAL) {
             //place order has been called a second time in a time frame of 30 seconds
@@ -252,35 +237,6 @@ class PlaceOrderController extends LayoutController
                 $notificationService->warn('not enough stock for item', 9);
             } elseif ($exception->getCode() == BasketItemCheckException::COUPON_REQUIRED) {
                 $notificationService->error('promotion coupon required', 501);
-            } elseif ($exception->getCode() == BasketItemCheckException::NOT_ENOUGH_STOCK_FOR_VARIATIONS) {
-                $additionalData = $exception->getAdditionalData();
-                $itemsWithoutStock = $additionalData['itemsWithoutStock'];
-                $basketItems = $additionalData['basketItems'];
-
-                /** @var BasketService $basketService */
-                $basketService = pluginApp(BasketService::class);
-
-                foreach ($itemsWithoutStock as $itemWithoutStock) {
-                    $updatedItem = array_shift(
-                        array_filter(
-                            $basketItems,
-                            function ($filterItem) use ($itemWithoutStock) {
-                                return $filterItem['id'] == $itemWithoutStock['item']['id'];
-                            }
-                        )
-                    );
-
-                    $quantity = $itemWithoutStock['stockNet'];
-
-                    if ($quantity <= 0 && (int)$updatedItem['id'] > 0) {
-                        $basketService->deleteBasketItem($updatedItem['id']);
-                    } elseif ((int)$updatedItem['id'] > 0) {
-                        $updatedItem['quantity'] = $quantity;
-                        $basketService->updateBasketItem($updatedItem['id'], $updatedItem);
-                    }
-                }
-
-                $notificationService->warn('not enough stock for item', 9);
             }
         } elseif ($exception->getCode() === 15) {
             // No baskets items found because basket has already been cleared after previous try of placing an order.
