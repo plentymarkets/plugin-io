@@ -33,6 +33,7 @@ use Plenty\Modules\Webshop\Contracts\SessionStorageRepositoryContract;
 use Plenty\Plugin\Log\Loggable;
 use Plenty\Repositories\Models\PaginatedResult;
 use Plenty\Modules\Order\Models\Order;
+use Plenty\Modules\Webshop\Order\Contracts\OrderRepositoryContract as WebshopOrderRepositoryContract;
 
 /**
  * Class OrderService
@@ -137,80 +138,9 @@ class OrderService
      */
     public function placeOrder(): LocalizedOrder
     {
-        $basket = $this->basketService->getBasket();
-        $couponCode = null;
-        if (strlen($basket->couponCode)) {
-            $couponCode = $basket->couponCode;
-        }
-
-        $isShippingPrivacyHintAccepted = $this->sessionStorageRepository->getSessionValue(
-            SessionStorageRepositoryContract::SHIPPING_PRIVACY_HINT_ACCEPTED
-        );
-
-        if (is_null($isShippingPrivacyHintAccepted) || !strlen($isShippingPrivacyHintAccepted)) {
-            $isShippingPrivacyHintAccepted = 'false';
-        }
-
-        /** @var OrderBuilder $orderBuilder */
-        $orderBuilder = pluginApp(OrderBuilder::class);
-
-        $order = $orderBuilder->prepare(OrderType::ORDER)
-            ->fromBasket()
-            ->withContactId($this->contactRepository->getContactId())
-            ->withAddressId($this->checkoutService->getBillingAddressId(), AddressType::BILLING)
-            ->withAddressId($this->checkoutService->getDeliveryAddressId(), AddressType::DELIVERY)
-            ->withOrderProperty(
-                OrderPropertyType::PAYMENT_METHOD,
-                OrderOptionSubType::MAIN_VALUE,
-                $this->checkoutService->getMethodOfPaymentId()
-            )
-            ->withOrderProperty(
-                OrderPropertyType::SHIPPING_PROFILE,
-                OrderOptionSubType::MAIN_VALUE,
-                $this->checkoutService->getShippingProfileId()
-            )
-            ->withOrderProperty(OrderPropertyType::DOCUMENT_LANGUAGE, OrderOptionSubType::MAIN_VALUE, Utils::getLang())
-            ->withOrderProperty(
-                OrderPropertyType::SHIPPING_PRIVACY_HINT_ACCEPTED,
-                OrderOptionSubType::MAIN_VALUE,
-                $isShippingPrivacyHintAccepted
-            )
-            ->withOrderProperty(
-                OrderPropertyType::CUSTOMER_SIGN,
-                OrderOptionSubType::MAIN_VALUE,
-                $this->sessionStorageRepository->getSessionValue(
-                    SessionStorageRepositoryContract::ORDER_CUSTOMER_SIGN
-                ),
-                false
-            )
-            ->withComment(
-                true,
-                $this->sessionStorageRepository->getSessionValue(
-                    SessionStorageRepositoryContract::ORDER_CONTACT_WISH
-                )
-            )
-            ->done();
-
-        try {
-            $order = $this->orderRepository->createOrder($order, $couponCode);
-        } catch (\Exception $exception) {
-            $this->getLogger(__CLASS__)->error(
-                "IO::Debug.OrderService_orderValidationError",
-                [
-                    'code' => $exception->getCode(),
-                    'message' => $exception->getMessage()
-                ]
-            );
-            throw $exception;
-        }
-
-        $this->getLogger(__CLASS__)->debug(
-            'IO::Debug.OrderService_placeOrder',
-            [
-                'order' => $order,
-                'basket' => $basket
-            ]
-        );
+        /** @var WebshopOrderRepositoryContract $webshopOrderRepository */
+        $webshopOrderRepository = pluginApp(WebshopOrderRepositoryContract::class);
+        $order = $webshopOrderRepository->placeOrder();
 
         return LocalizedOrder::wrap($order, Utils::getLang());
     }
