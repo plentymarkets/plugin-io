@@ -78,12 +78,19 @@ class ItemController extends LayoutController
         if (isset($itemResult['item']['documents'][0]['data']['currentData'])) {
             /** @var CategoryService $categoryService */
             $categoryService = pluginApp(CategoryService::class);
-            if (is_null($category)) {
+            if (is_null($category) && isset($itemResult['item']['documents'][0]['data']['currentData']['category'])) {
                 $categoryService->setCurrentCategory(
                     $itemResult['item']['documents'][0]['data']['currentData']['category']
                 );
             }
-            $categoryService->setCurrentItem($itemResult['item']['documents'][0]['data']['currentData']['item']);
+            if (isset($itemResult['item']['documents'][0]['data']['currentData']['item'])) {
+                $categoryService->setCurrentItem($itemResult['item']['documents'][0]['data']['currentData']['item']);
+            }
+
+            if (isset($itemResult['item']['documents'][0]['data']['currentData']['setComponents'])) {
+                $itemResult['setComponents'] = $itemResult['item']['documents'][0]['data']['currentData']['setComponents'];
+            }
+
             unset($itemResult['item']['documents'][0]['data']['currentData']);
         }
 
