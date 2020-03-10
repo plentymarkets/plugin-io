@@ -6,14 +6,12 @@ use IO\Extensions\Filters\ItemImagesFilter;
 use IO\Helper\Utils;
 use Plenty\Modules\Category\Contracts\CategoryRepositoryContract;
 use Plenty\Modules\Category\Models\Category;
-use Plenty\Modules\Category\Models\CategoryBranch;
 use Plenty\Modules\Webshop\Contracts\LocalizationRepositoryContract;
 use Plenty\Modules\Webshop\Contracts\UrlBuilderRepositoryContract;
 use Plenty\Modules\Webshop\ItemSearch\Helpers\SortingHelper;
 use Plenty\Modules\Webshop\ItemSearch\SearchPresets\SearchItems;
 use Plenty\Modules\Webshop\ItemSearch\Services\ItemSearchService;
 use Plenty\Plugin\Application;
-use Plenty\Plugin\Translation\Translator;
 
 /**
  * Class ItemSearchAutocompleteService
