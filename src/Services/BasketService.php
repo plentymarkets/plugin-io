@@ -224,6 +224,7 @@ class BasketService
         $basketItems = $this->getBasketItemsRaw();
         $basketItemData = $appendItemData ? $this->getBasketItemData($basketItems) : [];
         $basketItems = $this->addVariationData($basketItems, $basketItemData, true);
+        $basketItems = $this->filterSetItems($basketItems);
 
         $basketItems = array_map(
             function ($basketItem) {
@@ -812,18 +813,46 @@ class BasketService
         return $this->basketItems;
     }
 
+    private function filterSetItems($basketItems)
+    {
+        $setComponents = [];
+
+        // remove set components from basket items
+        $basketItems = array_filter($basketItems, function($basketItem) use (&$setComponents) {
+            if($basketItem['itemType'] === BasketItem::BASKET_ITEM_TYPE_ITEM_SET_COMPONENT) {
+                // store set components to add them to the parent item later
+                $bundleRowId = $basketItem['itemBundleRowId'];
+                $setComponents[$bundleRowId] = $setComponents[$bundleRowId] ?? [];
+                $setComponents[$bundleRowId][] = $basketItem;
+                return false;
+            }
+            return true;
+        });
+
+        // append set components
+        foreach($basketItems as &$basketItem) {
+            if($basketItem['itemType'] === BasketItem::BASKET_ITEM_TYPE_ITEM_SET && array_key_exists($basketItem['id'], $setComponents)) {
+                $basketItem['setComponents'] = $setComponents[$basketItem['id']];
+            }
+        }
+
+        // array_filter preserves keys of entries. array_values generates a new array with new keys from 0..n
+        return array_values($basketItems);
+    }
+
     private function reduceBasketItem($basketItem)
     {
         return [
-            "id" => $basketItem["id"],
-            "quantity" => $basketItem["quantity"],
-            "price" => $basketItem["price"],
-            "itemId" => $basketItem["itemId"],
-            "variation" => $basketItem["variation"],
-            "variationId" => $basketItem["variationId"],
-            "basketItemOrderParams" => $basketItem["basketItemOrderParams"] ?? null,
-            "inputLength" => $basketItem["inputLength"] ?? 0,
-            "inputWidth" => $basketItem["inputWidth"] ?? 0
+            'id' => $basketItem['id'],
+            'quantity' => $basketItem['quantity'],
+            'price' => $basketItem['price'],
+            'itemId' => $basketItem['itemId'],
+            'variation' => $basketItem['variation'],
+            'variationId' => $basketItem['variationId'],
+            'basketItemOrderParams' => $basketItem['basketItemOrderParams'] ?? null,
+            'inputLength' => $basketItem['inputLength'] ?? 0,
+            'inputWidth' => $basketItem['inputWidth'] ?? 0,
+            'setComponents' => $basketItem['setComponents'] ?? []
         ];
     }
 }
