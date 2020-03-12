@@ -817,7 +817,7 @@ class BasketService
 
         // remove set components from basket items
         $basketItems = array_filter($basketItems, function($basketItem) use (&$setComponents) {
-            if($basketItem['itemType'] === 4) {
+            if($basketItem['itemType'] === BasketItem::BASKET_ITEM_TYPE_ITEM_SET_COMPONENT) {
                 // store set components to add them to the parent item later
                 $bundleRowId = $basketItem['itemBundleRowId'];
                 $setComponents[$bundleRowId] = $setComponents[$bundleRowId] ?? [];
@@ -829,7 +829,7 @@ class BasketService
 
         // append set components
         foreach($basketItems as &$basketItem) {
-            if($basketItem['itemType'] === 3 && array_key_exists($basketItem['id'], $setComponents)) {
+            if($basketItem['itemType'] === BasketItem::BASKET_ITEM_TYPE_ITEM_SET && array_key_exists($basketItem['id'], $setComponents)) {
                 $basketItem['setComponents'] = $setComponents[$basketItem['id']];
             }
         }
