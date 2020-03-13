@@ -78,6 +78,7 @@ class UrlService
                 if ($variationUrl->getPath() !== null) {
                     $variationUrl->append(
                         $urlBuilderRepository->getSuffix($itemId, $variationId)
+
                     );
                 }
 
@@ -148,6 +149,42 @@ class UrlService
         );
 
         return $canonicalUrl;
+    }
+
+    /**
+     * Get query string from uri, return an empty string if its an canonical link from category details
+     * @return  string
+     */
+    public function getCanonicalQueryString(): string
+    {
+        $lang = Utils::getLang();
+
+        if (substr(TemplateService::$currentTemplate, 0, 12) === 'tpl.category') {
+            /** @var CategoryService $categoryService */
+            $categoryService = pluginApp(CategoryService::class);
+            $currentCategory = $categoryService->getCurrentCategory();
+
+            if ($currentCategory !== null) {
+                $categoryDetails = $categoryService->getDetails($currentCategory, $lang);
+
+                if ($categoryDetails !== null &&
+                    strlen($categoryDetails->canonicalLink) > 0) {
+                    return '';
+                }
+            }
+        }
+
+        /** @var Request $request */
+        $request = pluginApp(Request::class);
+        $queryParameters = $request->all();
+        unset($queryParameters['plentyMarkets']);
+
+        if (!is_array($queryParameters)) {
+            return '';
+        }
+
+        $queryParameters = http_build_query($queryParameters);
+        return strlen($queryParameters) > 0 ? '?' . $queryParameters : '';
     }
 
     /**
