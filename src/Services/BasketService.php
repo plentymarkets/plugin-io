@@ -481,7 +481,10 @@ class BasketService
                     break;
                 case BasketItemCheckException::NOT_ENOUGH_STOCK_FOR_VARIATION:
                     $code = 111;
-                    $placeholder = ['stock' => $e->getStockNet()];
+                    $placeholder = ['stock' => $e->getStockNet(), 'variationId' => $e->getVariationId()];
+                    break;
+                case BasketItemCheckException::ITEM_SET_COMPONENT_MISMATCH:
+                    $code = 1;
                     break;
                 default:
                     $code = 0;
