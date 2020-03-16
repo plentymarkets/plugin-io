@@ -3,6 +3,7 @@
 namespace IO\Services;
 
 use IO\Extensions\Filters\ItemImagesFilter;
+use IO\Helper\Utils;
 use Plenty\Modules\Category\Contracts\CategoryRepositoryContract;
 use Plenty\Modules\Category\Models\Category;
 use Plenty\Modules\Webshop\Contracts\LocalizationRepositoryContract;
@@ -84,6 +85,15 @@ class ItemSearchAutocompleteService
                     $usedItemName = 'name1';
                 }
 
+                $defaultCategoryId = 0;
+                if(count($variation['data']['defaultCategories'])) {
+                    foreach ($variation['data']['defaultCategories'] as $defaultCategory) {
+                        if ((int)$defaultCategory['plentyId'] == Utils::getPlentyId()) {
+                            $defaultCategoryId = $defaultCategory['id'];
+                        }
+                    }
+                }
+
                 $itemResult[] = $this->buildResult(
                     $variation['data']['texts'][$usedItemName],
                     $itemImageFilter->getFirstItemImageUrl(
@@ -93,7 +103,7 @@ class ItemSearchAutocompleteService
                     $this->urlBuilderRepository->buildVariationUrl($itemId, $variationId)->append(
                         $this->urlBuilderRepository->getSuffix($itemId, $variationId)
                     )->toRelativeUrl(),
-                    '',
+                    $this->getCategoryBranch($defaultCategoryId),
                     '',
                     0
                 );
@@ -134,7 +144,7 @@ class ItemSearchAutocompleteService
                             $localizationRepository->getLanguage(),
                             $app->getWebstoreId()
                         )->toRelativeUrl(),
-                        '',
+                        $this->getCategoryBranch($categoryData->id),
                         '',
                         $count
                     );
@@ -174,5 +184,32 @@ class ItemSearchAutocompleteService
             'afterLabel' => $afterLabel,
             'count' => $count
         ];
+    }
+
+    /**
+     * @param int $categoryId
+     * @return string
+     */
+    private function getCategoryBranch($categoryId)
+    {
+        if($categoryId <= 0) {
+            return '';
+        }
+        /** @var CategoryService $categoryService */
+        $categoryService = pluginApp(CategoryService::class);
+        $category = $categoryService->get($categoryId);
+        $branch = $category->branch->toArray();
+        $result = [];
+
+        for($i = 1; $i <= 6; $i++) {
+            if(!is_null($branch["category{$i}Id"])) {
+                $cat = $categoryService->get($branch["category{$i}Id"]);
+                if(isset($cat->details[0])) {
+                    $result[] = $cat->details[0]->name;
+                }
+            }
+        }
+
+        return implode(' » ', $result);
     }
 }
