@@ -3,12 +3,14 @@
 namespace IO\Services;
 
 use IO\Extensions\Filters\ItemImagesFilter;
+use IO\Helper\Utils;
 use Plenty\Modules\Category\Contracts\CategoryRepositoryContract;
 use Plenty\Modules\Category\Models\Category;
 use Plenty\Modules\Webshop\Contracts\LocalizationRepositoryContract;
 use Plenty\Modules\Webshop\Contracts\UrlBuilderRepositoryContract;
 use Plenty\Modules\Webshop\ItemSearch\Helpers\SortingHelper;
 use Plenty\Modules\Webshop\ItemSearch\SearchPresets\SearchItems;
+use Plenty\Modules\Webshop\ItemSearch\SearchPresets\SearchSuggestions;
 use Plenty\Modules\Webshop\ItemSearch\Services\ItemSearchService;
 use Plenty\Plugin\Application;
 
@@ -28,22 +30,31 @@ class ItemSearchAutocompleteService
 
     public function getResults($searchString, $searchTypes)
     {
-        /** @var ItemSearchService $itemSearchService */
-        $itemSearchService = pluginApp(ItemSearchService::class);
-        $result = $itemSearchService->getResults(
-            SearchItems::getSearchFactory(
+        $searchFactories = [
+            'items' => SearchItems::getSearchFactory(
                 [
                     'query' => $searchString,
                     'autocomplete' => true,
                     'page' => 1,
                     'itemsPerPage' => 20,
                     'withCategories' => in_array('category', $searchTypes),
-                    'withSuggestions' => in_array('suggestion', $searchTypes)
                 ]
             )
-        );
+        ];
 
-        return $result;
+        if (in_array('suggestion', $searchTypes)) {
+            $searchFactories['suggestions'] = SearchSuggestions::getSearchFactory(
+                [
+                    'query' => $searchString,
+                ]
+            );
+        }
+
+        /** @var ItemSearchService $itemSearchService */
+        $itemSearchService = pluginApp(ItemSearchService::class);
+        $results = $itemSearchService->getResults($searchFactories);
+
+        return $results;
     }
 
     /**
@@ -53,9 +64,9 @@ class ItemSearchAutocompleteService
     public function transformResult($itemSearchResult)
     {
         $newResult = [
-            'item'       => $this->getItems($itemSearchResult['documents']),
-            'category'   => $this->getCategories($itemSearchResult['categories.all']),
-            'suggestion' => $this->getSuggestions([])
+            'item' => $this->getItems($itemSearchResult['items']['documents']),
+            'category' => $this->getCategories($itemSearchResult['items']['categories.all']),
+            'suggestion' => $this->getSuggestions($itemSearchResult['suggestions']['searchSuggestions'])
         ];
 
         return $newResult;
@@ -68,7 +79,7 @@ class ItemSearchAutocompleteService
     private function getItems($items)
     {
         $itemResult = [];
-        if (count($items)) {
+        if (is_array($items) && count($items)) {
             /** @var SortingHelper $sortingHelper */
             $sortingHelper = pluginApp(SortingHelper::class);
 
@@ -84,6 +95,15 @@ class ItemSearchAutocompleteService
                     $usedItemName = 'name1';
                 }
 
+                $defaultCategoryId = 0;
+                if(count($variation['data']['defaultCategories'])) {
+                    foreach ($variation['data']['defaultCategories'] as $defaultCategory) {
+                        if ((int)$defaultCategory['plentyId'] == Utils::getPlentyId()) {
+                            $defaultCategoryId = $defaultCategory['id'];
+                        }
+                    }
+                }
+
                 $itemResult[] = $this->buildResult(
                     $variation['data']['texts'][$usedItemName],
                     $itemImageFilter->getFirstItemImageUrl(
@@ -93,7 +113,7 @@ class ItemSearchAutocompleteService
                     $this->urlBuilderRepository->buildVariationUrl($itemId, $variationId)->append(
                         $this->urlBuilderRepository->getSuffix($itemId, $variationId)
                     )->toRelativeUrl(),
-                    '',
+                    $this->getCategoryBranch($defaultCategoryId),
                     '',
                     0
                 );
@@ -120,7 +140,7 @@ class ItemSearchAutocompleteService
         /** @var Application $app */
         $app = pluginApp(Application::class);
 
-        if (count($categories)) {
+        if (is_array($categories) && count($categories)) {
             foreach ($categories as $categoryId => $count) {
                 if ((int)$categoryId > 0) {
                     /** @var Category $categoryData */
@@ -134,7 +154,7 @@ class ItemSearchAutocompleteService
                             $localizationRepository->getLanguage(),
                             $app->getWebstoreId()
                         )->toRelativeUrl(),
-                        '',
+                        $this->getCategoryBranch($categoryData->id),
                         '',
                         $count
                     );
@@ -151,8 +171,20 @@ class ItemSearchAutocompleteService
      */
     private function getSuggestions($suggestions)
     {
-        //TODO implement suggestion result
-        return [];
+        $suggestionResult = [];
+        if (is_array($suggestions) && count($suggestions)) {
+            foreach ($suggestions as $suggestion => $count) {
+                $suggestionResult[] = $this->buildResult(
+                    $suggestion,
+                    '',
+                    '',
+                    '',
+                    '',
+                    $count
+                );
+            }
+        }
+        return $suggestionResult;
     }
 
     /**
@@ -174,5 +206,32 @@ class ItemSearchAutocompleteService
             'afterLabel' => $afterLabel,
             'count' => $count
         ];
+    }
+
+    /**
+     * @param int $categoryId
+     * @return string
+     */
+    private function getCategoryBranch($categoryId)
+    {
+        if($categoryId <= 0) {
+            return '';
+        }
+        /** @var CategoryService $categoryService */
+        $categoryService = pluginApp(CategoryService::class);
+        $category = $categoryService->get($categoryId);
+        $branch = $category->branch->toArray();
+        $result = [];
+
+        for($i = 1; $i <= 6; $i++) {
+            if(!is_null($branch["category{$i}Id"])) {
+                $cat = $categoryService->get($branch["category{$i}Id"]);
+                if(isset($cat->details[0])) {
+                    $result[] = $cat->details[0]->name;
+                }
+            }
+        }
+
+        return implode(' » ', $result);
     }
 }
