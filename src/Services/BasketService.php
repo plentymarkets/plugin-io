@@ -265,19 +265,39 @@ class BasketService
         return $newParams;
     }
 
-    public function checkBasketItemsLang($template = '')
+    public function checkBasketItemsLang($language = '')
     {
         $basketItems = $this->getBasketItemsRaw();
-        $basketItemData = $this->getBasketItemData($basketItems);
+        $basketItemData = $this->getBasketItemData($basketItems, $language);
+        $basketItems = $this->addVariationData($basketItems, $basketItemData, true);
+
         $showWarning = [];
 
+        $basketItemIds = [];
         foreach ($basketItems as $basketItem) {
-            if (!array_key_exists($basketItem->variationId, $basketItemData)) {
-                $this->deleteBasketItem($basketItem->id);
+            if($basketItem['itemType'] === BasketItem::BASKET_ITEM_TYPE_ITEM_SET_COMPONENT) {
+                $basketItemId = $basketItem['itemBundleRowId'];
+            } else {
+                $basketItemId = $basketItem['id'];
+            }
+
+            $delete = false;
+            if (!isset($basketItem['variation']['id'])) {
                 $showWarning[] = 9;
-            } elseif (!$this->hasTexts($basketItemData[$basketItem->variationId]['data'])) {
-                $this->deleteBasketItem($basketItem->id);
+                $delete = true;
+            } elseif (!$this->hasTexts($basketItem['variation']['data'])) {
                 $showWarning[] = 10;
+                $delete = true;
+            }
+
+            if($delete && !in_array($basketItemId, $basketItemIds)) {
+                $basketItemIds[] = $basketItemId;
+            }
+        }
+
+        if(count($basketItemIds)) {
+            foreach($basketItemIds as $basketItemId) {
+                $this->deleteBasketItem($basketItemId);
             }
         }
 
@@ -633,7 +653,7 @@ class BasketService
      * @param BasketItem[] $basketItems
      * @return array
      */
-    private function getBasketItemData($basketItems = array(), string $template = ''): array
+    private function getBasketItemData($basketItems = array(), string $language = ''): array
     {
         if (count($basketItems) <= 0) {
             return array();
@@ -658,7 +678,8 @@ class BasketService
             BasketItems::getSearchFactory(
                 [
                     'variationIds' => $basketItemVariationIds,
-                    'quantities' => $basketVariationQuantities
+                    'quantities' => $basketVariationQuantities,
+                    'language' => $language
                 ]
             )
         );
