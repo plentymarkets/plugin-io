@@ -10,6 +10,7 @@ use Plenty\Modules\Webshop\Contracts\LocalizationRepositoryContract;
 use Plenty\Modules\Webshop\Contracts\UrlBuilderRepositoryContract;
 use Plenty\Modules\Webshop\ItemSearch\Helpers\SortingHelper;
 use Plenty\Modules\Webshop\ItemSearch\SearchPresets\SearchItems;
+use Plenty\Modules\Webshop\ItemSearch\SearchPresets\SearchSuggestions;
 use Plenty\Modules\Webshop\ItemSearch\Services\ItemSearchService;
 use Plenty\Plugin\Application;
 
@@ -29,22 +30,31 @@ class ItemSearchAutocompleteService
 
     public function getResults($searchString, $searchTypes)
     {
-        /** @var ItemSearchService $itemSearchService */
-        $itemSearchService = pluginApp(ItemSearchService::class);
-        $result = $itemSearchService->getResults(
-            SearchItems::getSearchFactory(
+        $searchFactories = [
+            'items' => SearchItems::getSearchFactory(
                 [
                     'query' => $searchString,
                     'autocomplete' => true,
                     'page' => 1,
                     'itemsPerPage' => 20,
                     'withCategories' => in_array('category', $searchTypes),
-                    'withSuggestions' => in_array('suggestion', $searchTypes)
                 ]
             )
-        );
+        ];
 
-        return $result;
+        if (in_array('suggestion', $searchTypes)) {
+            $searchFactories['suggestions'] = SearchSuggestions::getSearchFactory(
+                [
+                    'query' => $searchString,
+                ]
+            );
+        }
+
+        /** @var ItemSearchService $itemSearchService */
+        $itemSearchService = pluginApp(ItemSearchService::class);
+        $results = $itemSearchService->getResults($searchFactories);
+
+        return $results;
     }
 
     /**
@@ -54,9 +64,9 @@ class ItemSearchAutocompleteService
     public function transformResult($itemSearchResult)
     {
         $newResult = [
-            'item'       => $this->getItems($itemSearchResult['documents']),
-            'category'   => $this->getCategories($itemSearchResult['categories.all']),
-            'suggestion' => $this->getSuggestions([])
+            'item' => $this->getItems($itemSearchResult['items']['documents']),
+            'category' => $this->getCategories($itemSearchResult['items']['categories.all']),
+            'suggestion' => $this->getSuggestions($itemSearchResult['suggestions']['searchSuggestions'])
         ];
 
         return $newResult;
@@ -69,7 +79,7 @@ class ItemSearchAutocompleteService
     private function getItems($items)
     {
         $itemResult = [];
-        if (count($items)) {
+        if (is_array($items) && count($items)) {
             /** @var SortingHelper $sortingHelper */
             $sortingHelper = pluginApp(SortingHelper::class);
 
@@ -130,7 +140,7 @@ class ItemSearchAutocompleteService
         /** @var Application $app */
         $app = pluginApp(Application::class);
 
-        if (count($categories)) {
+        if (is_array($categories) && count($categories)) {
             foreach ($categories as $categoryId => $count) {
                 if ((int)$categoryId > 0) {
                     /** @var Category $categoryData */
@@ -161,8 +171,20 @@ class ItemSearchAutocompleteService
      */
     private function getSuggestions($suggestions)
     {
-        //TODO implement suggestion result
-        return [];
+        $suggestionResult = [];
+        if (is_array($suggestions) && count($suggestions)) {
+            foreach ($suggestions as $suggestion => $count) {
+                $suggestionResult[] = $this->buildResult(
+                    $suggestion,
+                    '',
+                    '',
+                    '',
+                    '',
+                    $count
+                );
+            }
+        }
+        return $suggestionResult;
     }
 
     /**

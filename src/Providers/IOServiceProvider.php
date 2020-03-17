@@ -178,7 +178,15 @@ class IOServiceProvider extends ServiceProvider
             }
         );
 
+        /**
+         * @deprecated since 5.0.0 will be removed in 6.0.0
+         * @see \Plenty\Modules\Webshop\Events\BeforeBasketItemToOrderItem
+         */
         $dispatcher->listen(BeforeBasketItemToOrderItem::class, CheckItemStock::class);
+        /**
+         * @deprecated since 5.0.0 will be removed in 6.0.0
+         * @see \Plenty\Modules\Webshop\Events\BeforeBasketItemToOrderItem
+         */
         $dispatcher->listen(BeforeBasketItemToOrderItem::class, CheckItemRestriction::class);
 
         $dispatcher->listen(
