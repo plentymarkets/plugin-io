@@ -265,7 +265,7 @@ class BasketService
         return $newParams;
     }
 
-    public function checkBasketItemsLang($language)
+    public function checkBasketItemsLang($language = '')
     {
         $basketItems = $this->getBasketItemsRaw();
         $basketItemData = $this->getBasketItemData($basketItems, $language);
