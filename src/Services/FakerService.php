@@ -39,15 +39,4 @@ class FakerService
 
         return $selectedFacetIds;
     }
-
-    public function getSearchResult($resultFieldTemplate = ResultFieldTemplate::TEMPLATE_SINGLE_ITEM, $numberOfEntries = 1)
-    {
-        /** @var VariationSearchResultFactory $searchResultFactory */
-        $searchResultFactory = pluginApp(VariationSearchResultFactory::class);
-        return $searchResultFactory->fillSearchResults(
-            [],
-            ResultFieldTemplate::get(ResultFieldTemplate::TEMPLATE_SINGLE_ITEM),
-            $numberOfEntries
-        );
-    }
 }
