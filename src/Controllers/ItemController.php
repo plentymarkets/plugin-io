@@ -121,6 +121,25 @@ class ItemController extends LayoutController
                 $itemResult['item'],
                 ResultFieldTemplate::get(ResultFieldTemplate::TEMPLATE_SINGLE_ITEM)
             );
+
+            if($shopBuilderRequest->getPreviewContentType() === 'itemset')
+            {
+                $previewSetComponentId = $itemResult['item']['documents'][0]['data']['setComponentVariationIds'][0];
+                $previewSetComponent = $itemResult['setComponents'][0] ?? [
+                        'variation' => [
+                            'id' => $previewSetComponentId
+                        ]
+                    ];
+
+                $itemResult['setComponents'] = [];
+                $itemResult['setComponents'][] = $searchResultFactory->fillSearchResults(
+                    [
+                        'documents' => [
+                            ['data' => $previewSetComponent]
+                        ]
+                    ]
+                )['documents'][0]['data'];
+            }
         }
 
         if (empty($itemResult['item']['documents'])) {

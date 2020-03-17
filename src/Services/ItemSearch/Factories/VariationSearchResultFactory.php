@@ -18,6 +18,7 @@ use IO\Services\ItemSearch\Factories\Faker\OrderPropertyFaker;
 use IO\Services\ItemSearch\Factories\Faker\PriceFaker;
 use IO\Services\ItemSearch\Factories\Faker\PropertyFaker;
 use IO\Services\ItemSearch\Factories\Faker\SalesPriceFaker;
+use IO\Services\ItemSearch\Factories\Faker\SetComponentIdFaker;
 use IO\Services\ItemSearch\Factories\Faker\SkuFaker;
 use IO\Services\ItemSearch\Factories\Faker\SortingFaker;
 use IO\Services\ItemSearch\Factories\Faker\StockFaker;
@@ -63,7 +64,8 @@ class VariationSearchResultFactory
     ];
 
     const MANDATORY_FAKER_MAP = [
-        "prices"                => PriceFaker::class
+        "prices"                    => PriceFaker::class,
+        "setComponentVariationIds"  => SetComponentIdFaker::class
     ];
 
     use LoadResultFields;
