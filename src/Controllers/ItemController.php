@@ -91,6 +91,10 @@ class ItemController extends LayoutController
                 $itemResult['setComponents'] = $itemResult['item']['documents'][0]['data']['currentData']['setComponents'];
             }
 
+            if (isset($itemResult['item']['documents'][0]['data']['currentData']['setAttributeMap'])) {
+                $itemResult['setAttributeMap'] = $itemResult['item']['documents'][0]['data']['currentData']['setAttributeMap'];
+            }
+
             unset($itemResult['item']['documents'][0]['data']['currentData']);
         }
 
@@ -109,7 +113,7 @@ class ItemController extends LayoutController
         $shopBuilderRequest->setMainContentType('singleitem');
         $itemResult['isItemSet'] = false;
 
-        if ($itemResult['item']['documents'][0]['data']['item']['itemType'] === 'set') {
+        if ($itemResult['item']['documents'][0]['data']['item']['itemType'] === 'set' || $shopBuilderRequest->getPreviewContentType() === 'itemset') {
             $shopBuilderRequest->setMainContentType('itemset');
             $itemResult['isItemSet'] = true;
         }
