@@ -23,6 +23,8 @@ use Plenty\Modules\Item\VariationDescription\Models\VariationDescription;
 use Plenty\Modules\Order\Shipping\Contracts\EUCountryCodesServiceContract;
 use Plenty\Modules\Webshop\Contracts\CheckoutRepositoryContract;
 use Plenty\Modules\Webshop\Contracts\ContactRepositoryContract;
+use Plenty\Modules\Webshop\Contracts\CouponRepositoryContract;
+use Plenty\Modules\Webshop\Contracts\SessionStorageRepositoryContract;
 use Plenty\Modules\Webshop\Contracts\WebstoreConfigurationRepositoryContract;
 use Plenty\Modules\Webshop\Helpers\UnitUtils;
 use Plenty\Modules\Webshop\ItemSearch\Factories\VariationSearchFactory;
@@ -134,7 +136,22 @@ class BasketService
             $basket["totalVats"] = [];
         }
 
+        /** @var SessionStorageRepositoryContract $sessionStorageRepository */
+        $sessionStorageRepository = app(SessionStorageRepositoryContract::class);
+        $customer = $sessionStorageRepository->getCustomer();
+        $isNet = false;
+        if ($customer !== null) {
+            $isNet = $customer->showNetPrice;
+        }
 
+        /** @var CouponRepositoryContract $couponRepository */
+        $couponRepository = pluginApp(CouponRepositoryContract::class);
+        $couponValidation = $couponRepository->getCouponCodeValidation();
+
+        if(!is_null($couponValidation)) {
+            $basket['shippingAmountNet'] += -$couponValidation->shippingDiscountNet;
+            $basket['shippingAmount'] += -$couponValidation->shippingDiscount;
+        }
         if (count($basket['totalVats']) <= 0) {
             $basket["itemSum"] = $basket["itemSumNet"];
             $basket["basketAmount"] = $basket["basketAmountNet"];
