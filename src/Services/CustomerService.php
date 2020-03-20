@@ -760,35 +760,35 @@ class CustomerService
         }
 
         if (count($addressData)) {
-            if (isset($addressData['vatNumber'])) {
+            if (isset($addressData['vatNumber']) && strlen($addressData['vatNumber'])) {
                 $options[] = [
                     'typeId' => AddressOption::TYPE_VAT_NUMBER,
                     'value' => $addressData['vatNumber']
                 ];
             }
 
-            if (isset($addressData['birthday'])) {
+            if (isset($addressData['birthday']) && strlen($addressData['birthday'])) {
                 $options[] = [
                     'typeId' => AddressOption::TYPE_BIRTHDAY,
                     'value' => $addressData['birthday']
                 ];
             }
 
-            if (isset($addressData['title'])) {
+            if (isset($addressData['title']) && strlen($addressData['title'])) {
                 $options[] = [
                     'typeId' => AddressOption::TYPE_TITLE,
                     'value' => $addressData['title']
                 ];
             }
 
-            if (isset($addressData['telephone'])) {
+            if (isset($addressData['telephone']) && strlen($addressData['telephone'])) {
                 $options[] = [
                     'typeId' => AddressOption::TYPE_TELEPHONE,
                     'value' => $addressData['telephone']
                 ];
             }
 
-            if (isset($addressData['contactPerson'])) {
+            if (isset($addressData['contactPerson']) && strlen($addressData['contactPerson'])) {
                 $options[] = [
                     'typeId' => AddressOption::TYPE_CONTACT_PERSON,
                     'value' => $addressData['contactPerson']
