@@ -28,6 +28,26 @@ class ItemSearchAutocompleteService
         $this->urlBuilderRepository = $urlBuilderRepository;
     }
 
+    public function getDidYouMeanSuggestionSearchString($searchString, $suggestions)
+    {
+        if(is_array($suggestions)) {
+            foreach ($suggestions['didYouMean'] as $suggestion) {
+                $selectedSuggestion = $suggestion['suggestions'][0];
+                if(count($suggestion['suggestions']) > 1) {
+                    foreach ($suggestion['suggestions'] as $suggestionData) {
+                        if($suggestionData['score'] > $selectedSuggestion['score']) {
+                            $selectedSuggestion = $suggestionData;
+                        }
+                    }
+                }
+
+                $searchString = str_replace($suggestion['text'], $selectedSuggestion['text'], $searchString);
+            }
+        }
+
+        return $searchString;
+    }
+
     public function getResults($searchString, $searchTypes)
     {
         $searchFactories = [
