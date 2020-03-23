@@ -757,7 +757,10 @@ class BasketService
         $this->basketRepository->removeCouponCode();
         $basketItems = $this->getBasketItemsRaw();
         foreach ($basketItems as $basketItem) {
-            $this->basketItemRepository->removeBasketItem($basketItem->id);
+
+            if($basketItem->itemType !== BasketItem::BASKET_ITEM_TYPE_ITEM_SET_COMPONENT) {
+                $this->basketItemRepository->removeBasketItem($basketItem->id);
+            }
         }
     }
 
