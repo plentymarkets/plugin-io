@@ -34,7 +34,8 @@ class LocalizedOrder extends ModelWrapper
         OrderItemType::TYPE_SHIPPING_COSTS,
         OrderItemType::TYPE_UNASSIGEND_VARIATION,
         OrderItemType::TYPE_ITEM_SET,
-        OrderItemType::TYPE_SET_COMPONENT];
+        OrderItemType::TYPE_SET_COMPONENT
+    ];
     /**
      * @var Order
      */
@@ -67,10 +68,9 @@ class LocalizedOrder extends ModelWrapper
      * @param array ...$data
      * @return LocalizedOrder
      */
-    public static function wrap( $order, ...$data ):LocalizedOrder
+    public static function wrap($order, ...$data): LocalizedOrder
     {
-        if( $order == null )
-        {
+        if ($order == null) {
             return null;
         }
         /** @var ParcelServicePresetRepositoryContract $parcelServicePresetRepository */
@@ -91,32 +91,27 @@ class LocalizedOrder extends ModelWrapper
         /** @var OrderStatusService $orderStatusService */
         $orderStatusService = pluginApp(OrderStatusService::class);
 
-        list( $lang ) = $data;
+        list($lang) = $data;
 
-        $instance = pluginApp( self::class );
+        $instance = pluginApp(self::class);
         $instance->order = $order;
 
         $instance->status = [];
         $instance->totals = $orderTotalsService->getAllTotals($order);
 
 
-        try
-        {
-            $shippingProfile = $parcelServicePresetRepository->getPresetById( $order->shippingProfileId );
+        try {
+            $shippingProfile = $parcelServicePresetRepository->getPresetById($order->shippingProfileId);
             $instance->shippingProfileId = (int)$order->shippingProfileId;
-            foreach( $shippingProfile->parcelServicePresetNames as $name )
-            {
-                if( $name->lang === $lang )
-                {
+            foreach ($shippingProfile->parcelServicePresetNames as $name) {
+                if ($name->lang === $lang) {
                     $instance->shippingProfileName = $name->name;
                     break;
                 }
             }
 
-            foreach( $shippingProfile->parcelServiceNames as $name )
-            {
-                if( $name->lang === $lang )
-                {
+            foreach ($shippingProfile->parcelServiceNames as $name) {
+                if ($name->lang === $lang) {
                     $instance->shippingProvider = $name->name;
                     break;
                 }
@@ -125,95 +120,105 @@ class LocalizedOrder extends ModelWrapper
             /** @var OrderTrackingService $orderTrackingService */
             $orderTrackingService = pluginApp(OrderTrackingService::class);
             $instance->trackingURL = $orderTrackingService->getTrackingURL($order, $lang);
+        } catch (\Exception $e) {
         }
-        catch(\Exception $e)
-        {}
 
-        $frontentPaymentRepository = pluginApp( FrontendPaymentMethodRepositoryContract::class );
+        $frontentPaymentRepository = pluginApp(FrontendPaymentMethodRepositoryContract::class);
 
-        try
-        {
-            $instance->paymentMethodName = $frontentPaymentRepository->getPaymentMethodNameById( $order->methodOfPaymentId, $lang );
-            $instance->paymentMethodIcon = $frontentPaymentRepository->getPaymentMethodIconById( $order->methodOfPaymentId, $lang );
+        try {
+            $instance->paymentMethodName = $frontentPaymentRepository->getPaymentMethodNameById(
+                $order->methodOfPaymentId,
+                $lang
+            );
+            $instance->paymentMethodIcon = $frontentPaymentRepository->getPaymentMethodIconById(
+                $order->methodOfPaymentId,
+                $lang
+            );
+        } catch (\Exception $e) {
         }
-        catch(\Exception $e)
-        {}
 
         $paymentStatusProperty = $order->properties->firstWhere('typeId', OrderPropertyType::PAYMENT_STATUS);
-        if($paymentStatusProperty instanceof OrderProperty)
-        {
+        if ($paymentStatusProperty instanceof OrderProperty) {
             $instance->paymentStatus = $paymentStatusProperty->value;
         }
 
         $paymentMethodIdProperty = $order->properties->firstWhere('typeId', OrderPropertyType::PAYMENT_METHOD);
-        if($paymentMethodIdProperty instanceof OrderProperty)
-        {
-            $instance->allowPaymentMethodSwitchFrom = $orderService->allowPaymentMethodSwitchFrom($paymentMethodIdProperty->value, $order->id);
-            $instance->paymentMethodListForSwitch = $orderService->getPaymentMethodListForSwitch($paymentMethodIdProperty->value, $order->id);
+        if ($paymentMethodIdProperty instanceof OrderProperty) {
+            $instance->allowPaymentMethodSwitchFrom = $orderService->allowPaymentMethodSwitchFrom(
+                $paymentMethodIdProperty->value,
+                $order->id
+            );
+            $instance->paymentMethodListForSwitch = $orderService->getPaymentMethodListForSwitch(
+                $paymentMethodIdProperty->value,
+                $order->id
+            );
         }
 
         $instance->status = $orderStatusService->getOrderStatus($order->id, $order->statusId);
 
         $orderVariationIds = [];
-        foreach( $order->orderItems as $key => $orderItem )
-        {
-            if(in_array((int)$orderItem->typeId, self::WRAPPED_ORDERITEM_TYPES))
-            {
-                if( $orderItem->itemVariationId !== 0 )
-                {
+        foreach ($order->orderItems as $key => $orderItem) {
+            if (in_array((int)$orderItem->typeId, self::WRAPPED_ORDERITEM_TYPES)) {
+                if ($orderItem->itemVariationId !== 0) {
                     $orderVariationIds[] = $orderItem->itemVariationId;
                 }
-            }
-            else
-            {
+            } else {
                 unset($order->orderItems[$key]);
             }
         }
 
-        $resultFields = ResultFieldTemplate::load( ResultFieldTemplate::TEMPLATE_LIST_ITEM );
-        foreach( ['attributes.attribute.names.*', 'attributes.value.names.*', 'images.all.urlPreview', 'images.variation.urlPreview', 'variationProperties.*'] as $field )
-        {
-            if (!in_array($field, $resultFields))
-            {
+        $resultFields = ResultFieldTemplate::load(ResultFieldTemplate::TEMPLATE_LIST_ITEM);
+        foreach (
+            [
+                'attributes.attribute.names.*',
+                'attributes.value.names.*',
+                'images.all.urlPreview',
+                'images.variation.urlPreview',
+                'variationProperties.*'
+            ] as $field
+        ) {
+            if (!in_array($field, $resultFields)) {
                 $resultFields[] = $field;
             }
         }
 
         /** @var ItemSearchService $itemSearchService */
-        $itemSearchService = pluginApp( ItemSearchService::class );
+        $itemSearchService = pluginApp(ItemSearchService::class);
         /** @var VariationSearchFactory $searchFactory */
-        $searchFactory = pluginApp( VariationSearchFactory::class );
+        $searchFactory = pluginApp(VariationSearchFactory::class);
         $searchFactory->setPage(1, count($orderVariationIds));
-        $orderVariations = $itemSearchService->getResults([
-            $searchFactory
-                ->withLanguage()
-                ->withImages()
-                ->withPropertyGroups(['displayInOrderProcess'])
-                ->withDefaultImage()
-                ->withUrls()
-                ->withBundleComponents()
-                ->withResultFields(
-                    $resultFields
-                )
-                ->hasVariationIds( $orderVariationIds )])[0];
+        $orderVariations = $itemSearchService->getResults(
+            [
+                $searchFactory
+                    ->withLanguage()
+                    ->withImages()
+                    ->withPropertyGroups(['displayInOrderProcess'])
+                    ->withDefaultImage()
+                    ->withUrls()
+                    ->withBundleComponents()
+                    ->withResultFields(
+                        $resultFields
+                    )
+                    ->hasVariationIds($orderVariationIds)
+            ]
+        )[0];
 
-        foreach( $orderVariations['documents'] as $orderVariation )
-        {
-            $variationId =  $orderVariation['data']['variation']['id'];
+        foreach ($orderVariations['documents'] as $orderVariation) {
+            $variationId = $orderVariation['data']['variation']['id'];
             $instance->variations[$variationId] = $orderVariation['data'];
-            $instance->itemURLs[$variationId]   = $urlFilter->buildItemURL( $orderVariation['data'] );
-            $instance->itemImages[$variationId] = $imageFilter->getFirstItemImageUrl( $orderVariation['data']['images'], 'urlPreview' );
+            $instance->itemURLs[$variationId] = $urlFilter->buildItemURL($orderVariation['data']);
+            $instance->itemImages[$variationId] = $imageFilter->getFirstItemImageUrl(
+                $orderVariation['data']['images'],
+                'urlPreview'
+            );
 
-            foreach( $instance->order->relations['orderItems'] as $orderItem)
-            {
-                if($orderItem['itemVariationId'] == $orderVariation['data']['variation']['id'])
-                {
+            foreach ($instance->order->relations['orderItems'] as $orderItem) {
+                if ($orderItem['itemVariationId'] == $orderVariation['data']['variation']['id']) {
                     $orderItem['bundleComponents'] = $orderVariation['data']['bundleComponents'];
                     $orderItem['bundleType'] = $orderVariation['data']['variation']['bundleType'];
                     $attributes = [];
 
-                    foreach($orderVariation['data']['attributes'] as $attribute)
-                    {
+                    foreach ($orderVariation['data']['attributes'] as $attribute) {
                         $attributes[] = [
                             'name' => $attribute['attribute']['names']['name'],
                             'value' => $attribute['value']['names']['name']
@@ -227,15 +232,18 @@ class LocalizedOrder extends ModelWrapper
         }
 
         $setComponentKeys = [];
-        foreach( $instance->order->relations['orderItems'] as $key => $orderItem) {
-            if($orderItem->typeId === OrderItemType::TYPE_ITEM_SET) {
-                $orderItem['setComponents'] = self::filterSetComponents($orderItem->id, $instance->order->relations['orderItems']);
-            } elseif($orderItem->typeId === OrderItemType::TYPE_SET_COMPONENT) {
+        foreach ($instance->order->relations['orderItems'] as $key => $orderItem) {
+            if ($orderItem->typeId === OrderItemType::TYPE_ITEM_SET) {
+                $orderItem['setComponents'] = self::filterSetComponents(
+                    $orderItem->id,
+                    $instance->order->relations['orderItems']
+                );
+            } elseif ($orderItem->typeId === OrderItemType::TYPE_SET_COMPONENT) {
                 $setComponentKeys[] = $key;
             }
         }
 
-        foreach($setComponentKeys as $setComponentKey) {
+        foreach ($setComponentKeys as $setComponentKey) {
             unset($instance->order->relations[$setComponentKey]);
             unset($instance->order->orderItems[$setComponentKey]);
         }
@@ -250,15 +258,14 @@ class LocalizedOrder extends ModelWrapper
     /**
      * @return array
      */
-    public function toArray():array
+    public function toArray(): array
     {
         $order = $this->order->toArray();
         $order['billingAddress'] = $this->order->billingAddress->toArray();
         $order['deliveryAddress'] = $this->order->deliveryAddress->toArray();
         $order['documents'] = $this->order->documents->toArray();
 
-        if ( count( $this->orderData ) )
-        {
+        if (count($this->orderData)) {
             $order = $this->orderData;
         }
         $data = [
@@ -287,22 +294,19 @@ class LocalizedOrder extends ModelWrapper
     {
         $order = $this->order->toArray();
 
-        if(in_array($order['typeId'], OrderService::VISIBLE_ORDER_TYPES))
-        {
+        if (in_array($order['typeId'], OrderService::VISIBLE_ORDER_TYPES)) {
             $orderItems = count($this->orderData)
                 ? $this->orderData['orderItems']
                 : $order['orderItems'];
 
-            if(!count($orderItems))
-            {
+            if (!count($orderItems)) {
                 return false;
             }
 
             /** @var OrderService $orderService */
             $orderService = pluginApp(OrderService::class);
             $returnableItems = $orderService->getReturnableItems($this->order);
-            if(!count($returnableItems))
-            {
+            if (!count($returnableItems)) {
                 return false;
             }
 
@@ -310,14 +314,10 @@ class LocalizedOrder extends ModelWrapper
             $createdDateUnix = 0;
 
             $dates = count($this->orderData) ? $this->orderData['dates'] : $order['dates'];
-            foreach($dates as $date)
-            {
-                if($date['typeId'] === 5 && strlen($date['date']))
-                {
+            foreach ($dates as $date) {
+                if ($date['typeId'] === 5 && strlen($date['date'])) {
                     $shippingDateSet = true;
-                }
-                elseif($date['typeId'] === 2 && strlen($date['date']))
-                {
+                } elseif ($date['typeId'] === 2 && strlen($date['date'])) {
                     $createdDateUnix = strtotime($date['date']);
                 }
             }
@@ -330,7 +330,6 @@ class LocalizedOrder extends ModelWrapper
                 && $createdDateUnix > 0
                 && $returnTime > 0
                 && time() < $createdDateUnix + ($returnTime * 24 * 60 * 60);
-
         }
 
         return false;
@@ -344,12 +343,12 @@ class LocalizedOrder extends ModelWrapper
     private static function filterSetComponents($setOrderItemId, $orderItems)
     {
         return $orderItems->filter(
-            function($oItem) use ($setOrderItemId) {
+            function ($oItem) use ($setOrderItemId) {
                 /** @var OrderItem $oItem */
                 return $oItem->references
-                    ->where('referenceType', 'set')
-                    ->where('referenceOrderItemId', $setOrderItemId)
-                    ->count() > 0;
+                        ->where('referenceType', 'set')
+                        ->where('referenceOrderItemId', $setOrderItemId)
+                        ->count() > 0;
             }
         );
     }
