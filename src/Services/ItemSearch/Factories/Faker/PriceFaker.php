@@ -28,7 +28,7 @@ class PriceFaker extends AbstractFaker
             'rrp'               => $this->makePrice(0),
             'specialOffer'      => $this->boolean() ? $this->makePrice(0) : null,
             'graduatedPrices'   => $this->makeGraduatedPrices($defaultPrice)
-        ];;
+        ];
 
         $this->merge($data, $default);
         return $data;
