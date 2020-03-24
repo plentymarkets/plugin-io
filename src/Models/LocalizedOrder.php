@@ -2,9 +2,9 @@
 
 namespace IO\Models;
 
-use IO\Builder\Order\OrderItemType;
-use IO\Builder\Order\OrderType;
 use IO\Services\TemplateConfigService;
+use Plenty\Modules\Order\Models\OrderItemType;
+use Plenty\Modules\Order\Report\Models\OrderItems;
 use Plenty\Modules\Webshop\ItemSearch\Factories\VariationSearchFactory;
 use IO\Services\OrderService;
 use IO\Services\OrderStatusService;
@@ -26,13 +26,15 @@ class LocalizedOrder extends ModelWrapper
      * The OrderItem types that will be wrapped. All other OrderItems will be stripped from the order.
      */
     const WRAPPED_ORDERITEM_TYPES = [
-        OrderItemType::VARIATION,
-        OrderItemType::ITEM_BUNDLE,
-        OrderItemType::BUNDLE_COMPONENT,
-        OrderItemType::PROMOTIONAL_COUPON,
-        OrderItemType::GIFT_CARD,
-        OrderItemType::SHIPPING_COSTS,
-        OrderItemType::UNASSIGNED_VARIATION];
+        OrderItemType::TYPE_VARIATION,
+        OrderItemType::TYPE_ITEM_BUNDLE,
+        OrderItemType::TYPE_BUNDLE_COMPONENT,
+        OrderItemType::TYPE_PROMOTIONAL_COUPON,
+        OrderItemType::TYPE_GIFT_CARD,
+        OrderItemType::TYPE_SHIPPING_COSTS,
+        OrderItemType::TYPE_UNASSIGEND_VARIATION,
+        OrderItemType::TYPE_ITEM_SET,
+        OrderItemType::TYPE_SET_COMPONENT];
     /**
      * @var Order
      */
@@ -157,7 +159,6 @@ class LocalizedOrder extends ModelWrapper
         {
             if(in_array((int)$orderItem->typeId, self::WRAPPED_ORDERITEM_TYPES))
             {
-
                 if( $orderItem->itemVariationId !== 0 )
                 {
                     $orderVariationIds[] = $orderItem->itemVariationId;
@@ -196,7 +197,6 @@ class LocalizedOrder extends ModelWrapper
                 )
                 ->hasVariationIds( $orderVariationIds )])[0];
 
-
         foreach( $orderVariations['documents'] as $orderVariation )
         {
             $variationId =  $orderVariation['data']['variation']['id'];
@@ -224,6 +224,20 @@ class LocalizedOrder extends ModelWrapper
                     $orderItem['variationProperties'] = $orderVariation['data']['variationProperties'];
                 }
             }
+        }
+
+        $setComponentKeys = [];
+        foreach( $instance->order->relations['orderItems'] as $key => $orderItem) {
+            if($orderItem->typeId === OrderItemType::TYPE_ITEM_SET) {
+                $orderItem['setComponents'] = self::filterSetComponents($orderItem->id, $instance->order->relations['orderItems']);
+            } elseif($orderItem->typeId === OrderItemType::TYPE_SET_COMPONENT) {
+                $setComponentKeys[] = $key;
+            }
+        }
+
+        foreach($setComponentKeys as $setComponentKey) {
+            unset($instance->order->relations[$setComponentKey]);
+            unset($instance->order->orderItems[$setComponentKey]);
         }
 
         /** @var OrderTotalsService $orderTotalsService */
@@ -320,5 +334,22 @@ class LocalizedOrder extends ModelWrapper
         }
 
         return false;
+    }
+
+    /**
+     * @param int $setOrderItemId
+     * @param OrderItems $orderItems
+     * @return array
+     */
+    private static function filterSetComponents($setOrderItemId, $orderItems)
+    {
+        return $orderItems->filter(function($filterOrderItem) use ($setOrderItemId) {
+            if(count($filterOrderItem->relations['references']) > 0) {
+                return count($filterOrderItem->relations['references']->filter(function($reference) use ($setOrderItemId){
+                        return $reference->referenceOrderItemId == $setOrderItemId && $reference->referenceType === 'set';
+                    })) > 0;
+            }
+            return false;
+        });
     }
 }
