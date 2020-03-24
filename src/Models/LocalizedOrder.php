@@ -3,8 +3,8 @@
 namespace IO\Models;
 
 use IO\Services\TemplateConfigService;
+use Plenty\Modules\Order\Models\OrderItem;
 use Plenty\Modules\Order\Models\OrderItemType;
-use Plenty\Modules\Order\Report\Models\OrderItems;
 use Plenty\Modules\Webshop\ItemSearch\Factories\VariationSearchFactory;
 use IO\Services\OrderService;
 use IO\Services\OrderStatusService;
@@ -338,7 +338,7 @@ class LocalizedOrder extends ModelWrapper
 
     /**
      * @param int $setOrderItemId
-     * @param OrderItems $orderItems
+     * @param OrderItem[] $orderItems
      * @return array
      */
     private static function filterSetComponents($setOrderItemId, $orderItems)
