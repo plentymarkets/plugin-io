@@ -343,13 +343,14 @@ class LocalizedOrder extends ModelWrapper
      */
     private static function filterSetComponents($setOrderItemId, $orderItems)
     {
-        return $orderItems->filter(function($filterOrderItem) use ($setOrderItemId) {
-            if(count($filterOrderItem->relations['references']) > 0) {
-                return count($filterOrderItem->relations['references']->filter(function($reference) use ($setOrderItemId){
-                        return $reference->referenceOrderItemId == $setOrderItemId && $reference->referenceType === 'set';
-                    })) > 0;
+        return $orderItems->filter(
+            function($oItem) use ($setOrderItemId) {
+                /** @var OrderItem $oItem */
+                return $oItem->references
+                    ->where('referenceType', 'set')
+                    ->where('referenceOrderItemId', $setOrderItemId)
+                    ->count() > 0;
             }
-            return false;
-        });
+        );
     }
 }
