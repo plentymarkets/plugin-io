@@ -13,6 +13,7 @@ use Plenty\Modules\Webshop\ItemSearch\SearchPresets\SearchItems;
 use Plenty\Modules\Webshop\ItemSearch\SearchPresets\SearchSuggestions;
 use Plenty\Modules\Webshop\ItemSearch\Services\ItemSearchService;
 use Plenty\Plugin\Application;
+use Plenty\Plugin\Log\Loggable;
 
 /**
  * Class ItemSearchAutocompleteService
@@ -20,6 +21,8 @@ use Plenty\Plugin\Application;
  */
 class ItemSearchAutocompleteService
 {
+    use Loggable;
+
     /** @var UrlBuilderRepositoryContract $urlBuilderRepository */
     private $urlBuilderRepository;
 
@@ -240,6 +243,18 @@ class ItemSearchAutocompleteService
         /** @var CategoryService $categoryService */
         $categoryService = pluginApp(CategoryService::class);
         $category = $categoryService->get($categoryId);
+        if(is_null($category->branch))
+        {
+            $this->getLogger(__CLASS__)->error(
+                'IO::Debug.ItemSearchAutocompleteService_getCategoryBranch',
+                [
+                    'category' => $category,
+                    'branch' => $category->branch,
+                    'branchRelation' => $category->branch()
+                ]
+            );
+            return '';
+        }
         $branch = $category->branch->toArray();
         $result = [];
 
