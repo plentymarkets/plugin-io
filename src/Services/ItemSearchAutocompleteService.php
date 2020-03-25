@@ -250,7 +250,6 @@ class ItemSearchAutocompleteService
                 [
                     'category' => $category,
                     'branch' => $category->branch,
-                    'branchRelation' => $category->branch()
                 ]
             );
             return '';
