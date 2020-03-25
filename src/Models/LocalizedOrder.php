@@ -244,7 +244,7 @@ class LocalizedOrder extends ModelWrapper
         }
 
         foreach ($setComponentKeys as $setComponentKey) {
-            unset($instance->order->relations[$setComponentKey]);
+            unset($instance->order->relations['orderItems'][$setComponentKey]);
             unset($instance->order->orderItems[$setComponentKey]);
         }
 
