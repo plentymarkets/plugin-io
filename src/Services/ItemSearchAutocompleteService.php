@@ -13,7 +13,6 @@ use Plenty\Modules\Webshop\ItemSearch\SearchPresets\SearchItems;
 use Plenty\Modules\Webshop\ItemSearch\SearchPresets\SearchSuggestions;
 use Plenty\Modules\Webshop\ItemSearch\Services\ItemSearchService;
 use Plenty\Plugin\Application;
-use Plenty\Plugin\Log\Loggable;
 
 /**
  * Class ItemSearchAutocompleteService
@@ -21,8 +20,6 @@ use Plenty\Plugin\Log\Loggable;
  */
 class ItemSearchAutocompleteService
 {
-    use Loggable;
-
     /** @var UrlBuilderRepositoryContract $urlBuilderRepository */
     private $urlBuilderRepository;
 
@@ -240,6 +237,7 @@ class ItemSearchAutocompleteService
         if($categoryId <= 0) {
             return '';
         }
+
         /** @var CategoryService $categoryService */
         $categoryService = pluginApp(CategoryService::class);
         $category = $categoryService->get($categoryId);
