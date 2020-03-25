@@ -248,6 +248,7 @@ class ItemSearchAutocompleteService
             $this->getLogger(__CLASS__)->error(
                 'IO::Debug.ItemSearchAutocompleteService_getCategoryBranch',
                 [
+                    'categoryId' => $categoryId,
                     'category' => $category,
                     'branch' => $category->branch,
                 ]
