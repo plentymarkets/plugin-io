@@ -234,17 +234,17 @@ class LocalizedOrder extends ModelWrapper
         $setComponentKeys = [];
         foreach ($instance->order->relations['orderItems'] as $key => $orderItem) {
             if ($orderItem->typeId === OrderItemType::TYPE_ITEM_SET) {
-                $orderItem['setComponents'] = self::filterSetComponents(
+                $instance->order->orderItems[$key]['setComponents'] = array_values(self::filterSetComponents(
                     $orderItem->id,
                     $instance->order->relations['orderItems']
-                );
+                )->toArray());
             } elseif ($orderItem->typeId === OrderItemType::TYPE_SET_COMPONENT) {
                 $setComponentKeys[] = $key;
             }
         }
 
         foreach ($setComponentKeys as $setComponentKey) {
-            unset($instance->order->relations[$setComponentKey]);
+            unset($instance->order->relations['orderItems'][$setComponentKey]);
             unset($instance->order->orderItems[$setComponentKey]);
         }
 
