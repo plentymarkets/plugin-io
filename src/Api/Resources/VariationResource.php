@@ -42,7 +42,8 @@ class VariationResource extends ApiResource
                 'sortingField' => $this->request->get('sortingField'),
                 'sortingOrder' => $this->request->get('sortingOrder'),
                 'page' => $this->request->get('page'),
-                'itemsPerPage' => $this->request->get('itemsPerPage')
+                'itemsPerPage' => $this->request->get('itemsPerPage'),
+                'setPriceOnly' => $this->request->get('setPriceOnly') === 'true'
             ]
         );
 
