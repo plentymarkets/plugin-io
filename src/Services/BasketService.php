@@ -275,7 +275,7 @@ class BasketService
 
         $basketItemIds = [];
         foreach ($basketItems as $basketItem) {
-            if($basketItem['itemType'] === BasketItem::BASKET_ITEM_TYPE_ITEM_SET_COMPONENT) {
+            if ($basketItem['itemType'] === BasketItem::BASKET_ITEM_TYPE_ITEM_SET_COMPONENT) {
                 $basketItemId = $basketItem['itemBundleRowId'];
             } else {
                 $basketItemId = $basketItem['id'];
@@ -290,13 +290,13 @@ class BasketService
                 $delete = true;
             }
 
-            if($delete && !in_array($basketItemId, $basketItemIds)) {
+            if ($delete && !in_array($basketItemId, $basketItemIds)) {
                 $basketItemIds[] = $basketItemId;
             }
         }
 
-        if(count($basketItemIds)) {
-            foreach($basketItemIds as $basketItemId) {
+        if (count($basketItemIds)) {
+            foreach ($basketItemIds as $basketItemId) {
                 $this->deleteBasketItem($basketItemId);
             }
         }
@@ -339,6 +339,12 @@ class BasketService
         $basketItemData = $appendVariation ? $this->getBasketItemData([$basketItem]) : [];
         $basketItems = $this->addVariationData([$basketItem], $basketItemData);
         $basketItem = array_pop($basketItems);
+
+        if ($basketItem['itemType'] === BasketItem::BASKET_ITEM_TYPE_ITEM_SET && (!isset($basketItem['setComponents']) || !count(
+                    $basketItem['setComponents']
+                ))) {
+            $basketItem['setComponents'] = $this->getSetComponents($basketItem['id'], $appendVariation);
+        }
 
         return $this->reduceBasketItem($basketItem);
     }
@@ -757,8 +763,7 @@ class BasketService
         $this->basketRepository->removeCouponCode();
         $basketItems = $this->getBasketItemsRaw();
         foreach ($basketItems as $basketItem) {
-
-            if($basketItem->itemType !== BasketItem::BASKET_ITEM_TYPE_ITEM_SET_COMPONENT) {
+            if ($basketItem->itemType !== BasketItem::BASKET_ITEM_TYPE_ITEM_SET_COMPONENT) {
                 $this->basketItemRepository->removeBasketItem($basketItem->id);
             }
         }
@@ -843,26 +848,43 @@ class BasketService
         $setComponents = [];
 
         // remove set components from basket items
-        $basketItems = array_filter($basketItems, function($basketItem) use (&$setComponents) {
-            if($basketItem['itemType'] === BasketItem::BASKET_ITEM_TYPE_ITEM_SET_COMPONENT) {
-                // store set components to add them to the parent item later
-                $bundleRowId = $basketItem['itemBundleRowId'];
-                $setComponents[$bundleRowId] = $setComponents[$bundleRowId] ?? [];
-                $setComponents[$bundleRowId][] = $basketItem;
-                return false;
+        $basketItems = array_filter(
+            $basketItems,
+            function ($basketItem) use (&$setComponents) {
+                if ($basketItem['itemType'] === BasketItem::BASKET_ITEM_TYPE_ITEM_SET_COMPONENT) {
+                    // store set components to add them to the parent item later
+                    $bundleRowId = $basketItem['itemBundleRowId'];
+                    $setComponents[$bundleRowId] = $setComponents[$bundleRowId] ?? [];
+                    $setComponents[$bundleRowId][] = $basketItem;
+                    return false;
+                }
+                return true;
             }
-            return true;
-        });
+        );
 
         // append set components
-        foreach($basketItems as &$basketItem) {
-            if($basketItem['itemType'] === BasketItem::BASKET_ITEM_TYPE_ITEM_SET && array_key_exists($basketItem['id'], $setComponents)) {
+        foreach ($basketItems as &$basketItem) {
+            if ($basketItem['itemType'] === BasketItem::BASKET_ITEM_TYPE_ITEM_SET && array_key_exists(
+                    $basketItem['id'],
+                    $setComponents
+                )) {
                 $basketItem['setComponents'] = $setComponents[$basketItem['id']];
             }
         }
 
         // array_filter preserves keys of entries. array_values generates a new array with new keys from 0..n
         return array_values($basketItems);
+    }
+
+    private function getSetComponents($basketItemId, $appendVariation = true)
+    {
+        $basketItems = $appendVariation ? $this->getBasketItems() : $this->getBasketItemsRaw()->toArray();
+        return array_filter(
+            $basketItems,
+            function ($bItem) use ($basketItemId) {
+                return $bItem['itemBundleRowId'] == $basketItemId && $bItem['itemType'] === BasketItem::BASKET_ITEM_TYPE_ITEM_SET_COMPONENT;
+            }
+        );
     }
 
     private function reduceBasketItem($basketItem)
