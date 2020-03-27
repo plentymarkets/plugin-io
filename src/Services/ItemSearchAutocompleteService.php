@@ -237,9 +237,14 @@ class ItemSearchAutocompleteService
         if($categoryId <= 0) {
             return '';
         }
+
         /** @var CategoryService $categoryService */
         $categoryService = pluginApp(CategoryService::class);
         $category = $categoryService->get($categoryId);
+        if(is_null($category) || is_null($category->branch)) {
+            return '';
+        }
+
         $branch = $category->branch->toArray();
         $result = [];
 
