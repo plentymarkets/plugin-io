@@ -343,7 +343,7 @@ class BasketService
         if ($basketItem['itemType'] === BasketItem::BASKET_ITEM_TYPE_ITEM_SET && (!isset($basketItem['setComponents']) || !count(
                     $basketItem['setComponents']
                 ))) {
-            $basketItem['setComponents'] = $this->getSetComponents($basketItem['id'], $appendVariation);
+            $basketItem['setComponents'] = array_values($this->getSetComponents($basketItem['id'], $appendVariation));
         }
 
         return $this->reduceBasketItem($basketItem);
