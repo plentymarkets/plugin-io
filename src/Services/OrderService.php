@@ -87,7 +87,8 @@ class OrderService
             OrderItemType::VARIATION,
             OrderItemType::ITEM_BUNDLE,
             OrderItemType::BUNDLE_COMPONENT,
-            OrderItemType::UNASSIGNED_VARIATION
+            OrderItemType::UNASSIGNED_VARIATION,
+            OrderItemType::TYPE_ITEM_SET
         ];
 
     /**
