@@ -3,10 +3,8 @@
 namespace IO\Services;
 
 use IO\Builder\Order\AddressType;
-use IO\Builder\Order\OrderBuilder;
 use IO\Builder\Order\OrderItemType;
 use IO\Builder\Order\OrderType;
-use IO\Builder\Order\OrderOptionSubType;
 use IO\Constants\OrderPaymentStatus;
 use IO\Extensions\Constants\ShopUrls;
 use IO\Extensions\Mail\SendMail;
@@ -503,16 +501,20 @@ class OrderService
                 ];
             }
 
+
+            /** @var WebshopOrderRepositoryContract $webshopOrderRepository */
+            $webshopOrderRepository = pluginApp(WebshopOrderRepositoryContract::class);
+
             if (strlen($orderAccessKey)) {
                 /** @var AuthHelper $authHelper */
                 $authHelper = pluginApp(AuthHelper::class);
                 $createdReturn = $authHelper->processUnguarded(
-                    function () use ($returnOrderData) {
-                        $this->orderRepository->createOrder($returnOrderData);
+                    function () use ($webshopOrderRepository, $returnOrderData) {
+                        $webshopOrderRepository->createReturnOrder($returnOrderData);
                     }
                 );
             } else {
-                $createdReturn = $this->orderRepository->createOrder($returnOrderData);
+                $createdReturn = $webshopOrderRepository->createReturnOrder($returnOrderData);
             }
 
 
