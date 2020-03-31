@@ -71,7 +71,8 @@ class VariationResource extends ApiResource
         $variation = $itemSearchService->getResults(
             SingleItem::getSearchFactory(
                 [
-                    'variationId' => $variationId
+                    'variationId' => $variationId,
+                    'setPriceOnly' => $this->request->get('setPriceOnly') === 'true'
                 ]
             )
         );
