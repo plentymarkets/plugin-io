@@ -11,7 +11,13 @@ class SetComponentIdFaker extends AbstractFaker
         }
 
         return [
-            $this->number()
+            [
+                'defaultVariationId' => $this->number(),
+                'itemId' => $this->number(),
+                'minimumOrderQuantity' => 1,
+                'maximumOrderQuantity' => null,
+                'orderQuantityPossible' => true
+            ]
         ];
     }
 }

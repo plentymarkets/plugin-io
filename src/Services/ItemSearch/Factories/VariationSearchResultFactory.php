@@ -65,7 +65,7 @@ class VariationSearchResultFactory
 
     const MANDATORY_FAKER_MAP = [
         "prices"                    => PriceFaker::class,
-        "setComponentVariationIds"  => SetComponentIdFaker::class
+        "setComponents"             => SetComponentIdFaker::class
     ];
 
     use LoadResultFields;
