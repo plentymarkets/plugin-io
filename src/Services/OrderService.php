@@ -449,18 +449,28 @@ class OrderService
 
                 if ($returnQuantity > 0) {
                     $returnOrderData['orderItems'][$i]['quantity'] = $returnQuantity;
+                    $returnOrderData['orderItems'][$i]['references'] = [];
                     $returnOrderData['orderItems'][$i]['references'][] = [
                         'referenceOrderItemId' => $orderItem['id'],
                         'referenceType' => 'parent'
                     ];
 
                     if($orderItem['typeId'] === OrderItemType::TYPE_ITEM_SET && count($orderItem['setComponents']) > 0) {
-                        $returnOrderData['orderItems'][$i]['externalHash'] = 'setItem_' . $orderItem['id'];
+                        $returnOrderData['orderItems'][$i]['metaData'] = [
+                            'externalHash' => 'setItem_' . $orderItem['id']
+                        ];
 
                         foreach($orderItem['setComponents'] as $setComponentOrderItem) {
-                            $setComponentOrderItem['externalHash'] = 'setComponent_' . $setComponentOrderItem['id'];
-                            $setComponentOrderItem['internalReferences'] = [
-                                'set' => 'setItem_' . $orderItem['id']
+                            $setComponentOrderItem['metaData'] = [
+                                'externalHash' => 'setComponent_' . $setComponentOrderItem['id'],
+                                'internalReferences' => [
+                                    'set' => 'setItem_' . $orderItem['id']
+                                ]
+                            ];
+                            $setComponentOrderItem['references'] = [];
+                            $setComponentOrderItem['references'][] = [
+                                'referenceOrderItemId' => $setComponentOrderItem['id'],
+                                'referenceType' => 'parent'
                             ];
 
                             unset($setComponentOrderItem['id']);
