@@ -3,10 +3,8 @@
 namespace IO\Services;
 
 use IO\Builder\Order\AddressType;
-use IO\Builder\Order\OrderBuilder;
 use IO\Builder\Order\OrderItemType;
 use IO\Builder\Order\OrderType;
-use IO\Builder\Order\OrderOptionSubType;
 use IO\Constants\OrderPaymentStatus;
 use IO\Extensions\Constants\ShopUrls;
 use IO\Extensions\Mail\SendMail;
@@ -451,10 +449,35 @@ class OrderService
 
                 if ($returnQuantity > 0) {
                     $returnOrderData['orderItems'][$i]['quantity'] = $returnQuantity;
+                    $returnOrderData['orderItems'][$i]['references'] = [];
                     $returnOrderData['orderItems'][$i]['references'][] = [
                         'referenceOrderItemId' => $orderItem['id'],
                         'referenceType' => 'parent'
                     ];
+
+                    if($orderItem['typeId'] === OrderItemType::TYPE_ITEM_SET && count($orderItem['setComponents']) > 0) {
+                        $returnOrderData['orderItems'][$i]['metaData'] = [
+                            'externalHash' => 'setItem_' . $orderItem['id']
+                        ];
+
+                        foreach($orderItem['setComponents'] as $setComponentOrderItem) {
+                            $setComponentOrderItem['metaData'] = [
+                                'externalHash' => 'setComponent_' . $setComponentOrderItem['id'],
+                                'internalReferences' => [
+                                    'set' => 'setItem_' . $orderItem['id']
+                                ]
+                            ];
+                            $setComponentOrderItem['references'] = [];
+                            $setComponentOrderItem['references'][] = [
+                                'referenceOrderItemId' => $setComponentOrderItem['id'],
+                                'referenceType' => 'parent'
+                            ];
+
+                            unset($setComponentOrderItem['id']);
+                            unset($setComponentOrderItem['orderId']);
+                            $returnOrderData['orderItems'][] = $setComponentOrderItem;
+                        }
+                    }
 
                     unset($returnOrderData['orderItems'][$i]['id']);
                     unset($returnOrderData['orderItems'][$i]['orderId']);
@@ -488,16 +511,20 @@ class OrderService
                 ];
             }
 
+
+            /** @var WebshopOrderRepositoryContract $webshopOrderRepository */
+            $webshopOrderRepository = pluginApp(WebshopOrderRepositoryContract::class);
+
             if (strlen($orderAccessKey)) {
                 /** @var AuthHelper $authHelper */
                 $authHelper = pluginApp(AuthHelper::class);
                 $createdReturn = $authHelper->processUnguarded(
-                    function () use ($returnOrderData) {
-                        $this->orderRepository->createOrder($returnOrderData);
+                    function () use ($webshopOrderRepository, $returnOrderData) {
+                        $webshopOrderRepository->createReturnOrder($returnOrderData);
                     }
                 );
             } else {
-                $createdReturn = $this->orderRepository->createOrder($returnOrderData);
+                $createdReturn = $webshopOrderRepository->createReturnOrder($returnOrderData);
             }
 
 
