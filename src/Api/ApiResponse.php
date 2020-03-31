@@ -110,6 +110,7 @@ class ApiResponse
                 /** @var BasketService $basketService */
                 $basketService = pluginApp(BasketService::class);
                 $basketItem = $event->getBasketItem();
+                $basketItem->price = $basketItem->price ?? $basketItem->givenPrice;
                 $this->eventData["AfterBasketItemAdd"]["basketItems"][] = $basketService->getBasketItem($basketItem);
             },
             0
