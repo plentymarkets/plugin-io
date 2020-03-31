@@ -456,6 +456,21 @@ class OrderService
                         'referenceType' => 'parent'
                     ];
 
+                    if($orderItem['typeId'] === OrderItemType::TYPE_ITEM_SET && count($orderItem['setComponents']) > 0) {
+                        $returnOrderData['orderItems'][$i]['externalHash'] = 'setItem_' . $orderItem['id'];
+
+                        foreach($orderItem['setComponents'] as $setComponentOrderItem) {
+                            $setComponentOrderItem['externalHash'] = 'setComponent_' . $setComponentOrderItem['id'];
+                            $setComponentOrderItem['internalReferences'] = [
+                                'set' => 'setItem_' . $orderItem['id']
+                            ];
+
+                            unset($setComponentOrderItem['id']);
+                            unset($setComponentOrderItem['orderId']);
+                            $returnOrderData['orderItems'][] = $setComponentOrderItem;
+                        }
+                    }
+
                     unset($returnOrderData['orderItems'][$i]['id']);
                     unset($returnOrderData['orderItems'][$i]['orderId']);
                 } else {
