@@ -113,7 +113,7 @@ class ApiResponse
                 $basketItem = $event->getBasketItem();
 
                 if ($basketItem->itemType === BasketItem::BASKET_ITEM_TYPE_ITEM_SET) {
-                    $basketItem->price = $basketItem->price ?? $basketItem->givenPrice + $basketItem->attributeTotalMarkup;
+                    $basketItem->price = $basketItem->givenPrice + $basketItem->attributeTotalMarkup;
                 }
                 $this->eventData["AfterBasketItemAdd"]["basketItems"][] = $basketService->getBasketItem($basketItem);
             },
