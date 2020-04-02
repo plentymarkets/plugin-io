@@ -73,7 +73,7 @@ class OrderBuilderQuery
 			throw new \Exception("Error while instantiating OrderItemBuilder.");
 		}
 
-		$items = $this->basketService->getBasketItemsForOrder();
+		$items = $this->basketService->getBasketItemsForOrder($basket->shippingCountryId ?? config('defaultCountry'));
 
 		if (!is_array($items)) {
 			throw new \Exception("Error while reading item data from basket");

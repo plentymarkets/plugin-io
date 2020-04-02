@@ -28,6 +28,7 @@ use Plenty\Modules\Webshop\Helpers\UnitUtils;
 use Plenty\Modules\Webshop\ItemSearch\Factories\VariationSearchFactory;
 use Plenty\Modules\Webshop\ItemSearch\SearchPresets\BasketItems;
 use Plenty\Modules\Webshop\ItemSearch\Services\ItemSearchService;
+use Plenty\Modules\Order\TaricVatAssignment\Facades\TaricVatServiceFacade;
 use Plenty\Plugin\Log\Loggable;
 
 /**
@@ -207,12 +208,15 @@ class BasketService
     /**
      * List the basket items for order
      *
+     * @param int $shippingCountryId
+     * 
      * @return array
+     * @throws \Throwable
      */
-    public function getBasketItemsForOrder(): array
+    public function getBasketItemsForOrder(int $shippingCountryId): array
     {
         $basketItems = $this->getBasketItemsRaw();
-        $basketItemData = $this->getOrderItemData($basketItems);
+        $basketItemData = $this->getOrderItemData($basketItems, $shippingCountryId);
         $basketItems = $this->addVariationData($basketItems, $basketItemData);
 
         return $basketItems;
@@ -676,9 +680,11 @@ class BasketService
     /**
      * Get the data of the basket items
      * @param BasketItem[] $basketItems
+     * @param int $shippingCountryId
      * @return array
+     * @throws \Throwable
      */
-    private function getOrderItemData($basketItems = array()): array
+    private function getOrderItemData($basketItems = array(), int $shippingCountryId): array
     {
         if (count($basketItems) <= 0) {
             return array();
@@ -719,7 +725,7 @@ class BasketService
             $result[$basketItem->variationId]['data']['texts']['name1'] = $texts->name ?? '';
             $result[$basketItem->variationId]['data']['texts']['name2'] = $texts->name2 ?? '';
             $result[$basketItem->variationId]['data']['texts']['name3'] = $texts->name3 ?? '';
-            $result[$basketItem->variationId]['data']['variation']['vatId'] = $variation->vatId ?? $variation->parent->vatId;
+            $result[$basketItem->variationId]['data']['variation']['vatId'] = TaricVatServiceFacade::getVatFieldByCountry($variation->id, $shippingCountryId);
             $result[$basketItem->variationId]['data']['properties'] = $variation->variationProperties->toArray();
             $result[$basketItem->variationId]['data']['basketItemOrderParams'] = $basketItem->basketItemOrderParams;
         }
