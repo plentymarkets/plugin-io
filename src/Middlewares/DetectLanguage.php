@@ -2,6 +2,7 @@
 
 namespace IO\Middlewares;
 
+use IO\Controllers\CategoryController;
 use IO\Helper\Utils;
 use IO\Services\CheckoutService;
 use IO\Services\LocalizationService;
@@ -36,6 +37,13 @@ class DetectLanguage extends Middleware
                 $this->setLanguage(self::$DETECTED_LANGUAGE, $webstoreConfig);
 
                 if ($splittedURL[0] !== self::$DETECTED_LANGUAGE) {
+                    $isValidLang = array_key_exists($splittedURL[0], Utils::getLanguageList());
+                    if($isValidLang)
+                    {
+                        CategoryController::$LANGUAGE_FROM_URL = $splittedURL[0];
+                    } else {
+                        CategoryController::$LANGUAGE_FROM_URL = Utils::getDefaultLang();
+                    }
                     // Do not cache content if detected language does not match the language of the url
                     TemplateService::$shouldBeCached = false;
                 }

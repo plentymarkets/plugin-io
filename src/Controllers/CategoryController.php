@@ -21,7 +21,7 @@ use Plenty\Plugin\Log\Loggable;
 class CategoryController extends LayoutController
 {
     use Loggable;
-
+    static $LANGUAGE_FROM_URL = null;
     /**
      * Prepare and render the data for categories
      * @param string $lvl1 Level 1 of category url. Will be null at root page
@@ -44,6 +44,12 @@ class CategoryController extends LayoutController
         $webstoreId = Utils::getWebstoreId();
         $category = $this->categoryRepo->findCategoryByUrl($lvl1, $lvl2, $lvl3, $lvl4, $lvl5, $lvl6, $webstoreId,
             $lang);
+
+        if($category === null)
+        {
+            $category = $this->categoryRepo->findCategoryByUrl($lvl1, $lvl2, $lvl3, $lvl4, $lvl5, $lvl6, $webstoreId,
+               self::$LANGUAGE_FROM_URL);
+        }
 
         /** @var ShopBuilderRequest $shopBuilderRequest */
         $shopBuilderRequest = pluginApp(ShopBuilderRequest::class);
