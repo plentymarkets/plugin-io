@@ -78,12 +78,23 @@ class ItemController extends LayoutController
         if (isset($itemResult['item']['documents'][0]['data']['currentData'])) {
             /** @var CategoryService $categoryService */
             $categoryService = pluginApp(CategoryService::class);
-            if (is_null($category)) {
+            if (is_null($category) && isset($itemResult['item']['documents'][0]['data']['currentData']['category'])) {
                 $categoryService->setCurrentCategory(
                     $itemResult['item']['documents'][0]['data']['currentData']['category']
                 );
             }
-            $categoryService->setCurrentItem($itemResult['item']['documents'][0]['data']['currentData']['item']);
+            if (isset($itemResult['item']['documents'][0]['data']['currentData']['item'])) {
+                $categoryService->setCurrentItem($itemResult['item']['documents'][0]['data']['currentData']['item']);
+            }
+
+            if (isset($itemResult['item']['documents'][0]['data']['currentData']['setComponents'])) {
+                $itemResult['setComponents'] = $itemResult['item']['documents'][0]['data']['currentData']['setComponents'];
+            }
+
+            if (isset($itemResult['item']['documents'][0]['data']['currentData']['setAttributeMap'])) {
+                $itemResult['setAttributeMap'] = $itemResult['item']['documents'][0]['data']['currentData']['setAttributeMap'];
+            }
+
             unset($itemResult['item']['documents'][0]['data']['currentData']);
         }
 
@@ -102,7 +113,7 @@ class ItemController extends LayoutController
         $shopBuilderRequest->setMainContentType('singleitem');
         $itemResult['isItemSet'] = false;
 
-        if ($itemResult['item']['documents'][0]['data']['item']['itemType'] === 'set') {
+        if ($itemResult['item']['documents'][0]['data']['item']['itemType'] === 'set' || $shopBuilderRequest->getPreviewContentType() === 'itemset') {
             $shopBuilderRequest->setMainContentType('itemset');
             $itemResult['isItemSet'] = true;
         }
@@ -114,6 +125,25 @@ class ItemController extends LayoutController
                 $itemResult['item'],
                 ResultFieldTemplate::get(ResultFieldTemplate::TEMPLATE_SINGLE_ITEM)
             );
+
+            if($shopBuilderRequest->getPreviewContentType() === 'itemset')
+            {
+                $previewSetComponentId = $itemResult['item']['documents'][0]['data']['setComponentVariationIds'][0];
+                $previewSetComponent = $itemResult['setComponents'][0] ?? [
+                        'variation' => [
+                            'id' => $previewSetComponentId
+                        ]
+                    ];
+
+                $itemResult['setComponents'] = [];
+                $itemResult['setComponents'][] = $searchResultFactory->fillSearchResults(
+                    [
+                        'documents' => [
+                            ['data' => $previewSetComponent]
+                        ]
+                    ]
+                )['documents'][0]['data'];
+            }
         }
 
         if (empty($itemResult['item']['documents'])) {

@@ -47,7 +47,7 @@ class CategoryController extends LayoutController
 
         /** @var ShopBuilderRequest $shopBuilderRequest */
         $shopBuilderRequest = pluginApp(ShopBuilderRequest::class);
-        if ($shopBuilderRequest->isShopBuilder() && ($shopBuilderRequest->getPreviewContentType() === 'singleitem')) {
+        if ($shopBuilderRequest->isShopBuilder() && ($shopBuilderRequest->getPreviewContentType() === 'singleitem' || $shopBuilderRequest->getPreviewContentType() === 'itemset')) {
             /** @var ItemController $itemController */
             $itemController = pluginApp(ItemController::class);
             return $itemController->showItemForCategory($category);

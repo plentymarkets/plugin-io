@@ -241,6 +241,7 @@ class BasketService
         $basketItems = $this->getBasketItemsRaw();
         $basketItemData = $appendItemData ? $this->getBasketItemData($basketItems) : [];
         $basketItems = $this->addVariationData($basketItems, $basketItemData, true);
+        $basketItems = $this->filterSetItems($basketItems);
 
         $basketItems = array_map(
             function ($basketItem) {
@@ -281,19 +282,39 @@ class BasketService
         return $newParams;
     }
 
-    public function checkBasketItemsLang($template = '')
+    public function checkBasketItemsLang($language = '')
     {
         $basketItems = $this->getBasketItemsRaw();
-        $basketItemData = $this->getBasketItemData($basketItems);
+        $basketItemData = $this->getBasketItemData($basketItems, $language);
+        $basketItems = $this->addVariationData($basketItems, $basketItemData, true);
+
         $showWarning = [];
 
+        $basketItemIds = [];
         foreach ($basketItems as $basketItem) {
-            if (!array_key_exists($basketItem->variationId, $basketItemData)) {
-                $this->deleteBasketItem($basketItem->id);
+            if ($basketItem['itemType'] === BasketItem::BASKET_ITEM_TYPE_ITEM_SET_COMPONENT) {
+                $basketItemId = $basketItem['itemBundleRowId'];
+            } else {
+                $basketItemId = $basketItem['id'];
+            }
+
+            $delete = false;
+            if (!isset($basketItem['variation']['id'])) {
                 $showWarning[] = 9;
-            } elseif (!$this->hasTexts($basketItemData[$basketItem->variationId]['data'])) {
-                $this->deleteBasketItem($basketItem->id);
+                $delete = true;
+            } elseif (!$this->hasTexts($basketItem['variation']['data'])) {
                 $showWarning[] = 10;
+                $delete = true;
+            }
+
+            if ($delete && !in_array($basketItemId, $basketItemIds)) {
+                $basketItemIds[] = $basketItemId;
+            }
+        }
+
+        if (count($basketItemIds)) {
+            foreach ($basketItemIds as $basketItemId) {
+                $this->deleteBasketItem($basketItemId);
             }
         }
 
@@ -335,6 +356,12 @@ class BasketService
         $basketItemData = $appendVariation ? $this->getBasketItemData([$basketItem]) : [];
         $basketItems = $this->addVariationData([$basketItem], $basketItemData);
         $basketItem = array_pop($basketItems);
+
+        if ($basketItem['itemType'] === BasketItem::BASKET_ITEM_TYPE_ITEM_SET && (!isset($basketItem['setComponents']) || !count(
+                    $basketItem['setComponents']
+                ))) {
+            $basketItem['setComponents'] = array_values($this->getSetComponents($basketItem['id'], $appendVariation));
+        }
 
         return $this->reduceBasketItem($basketItem);
     }
@@ -497,7 +524,10 @@ class BasketService
                     break;
                 case BasketItemCheckException::NOT_ENOUGH_STOCK_FOR_VARIATION:
                     $code = 111;
-                    $placeholder = ['stock' => $e->getStockNet()];
+                    $placeholder = ['stock' => $e->getStockNet(), 'variationId' => $e->getVariationId()];
+                    break;
+                case BasketItemCheckException::ITEM_SET_COMPONENT_MISMATCH:
+                    $code = 1;
                     break;
                 default:
                     $code = 0;
@@ -646,7 +676,7 @@ class BasketService
      * @param BasketItem[] $basketItems
      * @return array
      */
-    private function getBasketItemData($basketItems = array(), string $template = ''): array
+    private function getBasketItemData($basketItems = array(), string $language = ''): array
     {
         if (count($basketItems) <= 0) {
             return array();
@@ -671,7 +701,8 @@ class BasketService
             BasketItems::getSearchFactory(
                 [
                     'variationIds' => $basketItemVariationIds,
-                    'quantities' => $basketVariationQuantities
+                    'quantities' => $basketVariationQuantities,
+                    'language' => $language
                 ]
             )
         );
@@ -749,7 +780,9 @@ class BasketService
         $this->basketRepository->removeCouponCode();
         $basketItems = $this->getBasketItemsRaw();
         foreach ($basketItems as $basketItem) {
-            $this->basketItemRepository->removeBasketItem($basketItem->id);
+            if ($basketItem->itemType !== BasketItem::BASKET_ITEM_TYPE_ITEM_SET_COMPONENT) {
+                $this->basketItemRepository->removeBasketItem($basketItem->id);
+            }
         }
     }
 
@@ -827,18 +860,64 @@ class BasketService
         return $this->basketItems;
     }
 
+    private function filterSetItems($basketItems)
+    {
+        $setComponents = [];
+
+        // remove set components from basket items
+        $basketItems = array_filter(
+            $basketItems,
+            function ($basketItem) use (&$setComponents) {
+                if ($basketItem['itemType'] === BasketItem::BASKET_ITEM_TYPE_ITEM_SET_COMPONENT) {
+                    // store set components to add them to the parent item later
+                    $bundleRowId = $basketItem['itemBundleRowId'];
+                    $setComponents[$bundleRowId] = $setComponents[$bundleRowId] ?? [];
+                    $setComponents[$bundleRowId][] = $basketItem;
+                    return false;
+                }
+                return true;
+            }
+        );
+
+        // append set components
+        foreach ($basketItems as &$basketItem) {
+            if ($basketItem['itemType'] === BasketItem::BASKET_ITEM_TYPE_ITEM_SET && array_key_exists(
+                    $basketItem['id'],
+                    $setComponents
+                )) {
+                $basketItem['setComponents'] = $setComponents[$basketItem['id']];
+            }
+        }
+
+        // array_filter preserves keys of entries. array_values generates a new array with new keys from 0..n
+        return array_values($basketItems);
+    }
+
+    private function getSetComponents($basketItemId, $appendVariation = true)
+    {
+        $basketItems = $appendVariation ? $this->getBasketItems() : $this->basketRepository->load()->toArray();
+
+        return array_filter(
+            $basketItems,
+            function ($bItem) use ($basketItemId) {
+                return $bItem['itemBundleRowId'] == $basketItemId && $bItem['itemType'] === BasketItem::BASKET_ITEM_TYPE_ITEM_SET_COMPONENT;
+            }
+        );
+    }
+
     private function reduceBasketItem($basketItem)
     {
         return [
-            "id" => $basketItem["id"],
-            "quantity" => $basketItem["quantity"],
-            "price" => $basketItem["price"],
-            "itemId" => $basketItem["itemId"],
-            "variation" => $basketItem["variation"],
-            "variationId" => $basketItem["variationId"],
-            "basketItemOrderParams" => $basketItem["basketItemOrderParams"] ?? null,
-            "inputLength" => $basketItem["inputLength"] ?? 0,
-            "inputWidth" => $basketItem["inputWidth"] ?? 0
+            'id' => $basketItem['id'],
+            'quantity' => $basketItem['quantity'],
+            'price' => $basketItem['price'],
+            'itemId' => $basketItem['itemId'],
+            'variation' => $basketItem['variation'],
+            'variationId' => $basketItem['variationId'],
+            'basketItemOrderParams' => $basketItem['basketItemOrderParams'] ?? null,
+            'inputLength' => $basketItem['inputLength'] ?? 0,
+            'inputWidth' => $basketItem['inputWidth'] ?? 0,
+            'setComponents' => $basketItem['setComponents'] ?? []
         ];
     }
 }
