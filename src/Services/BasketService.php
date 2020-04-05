@@ -137,7 +137,7 @@ class BasketService
         }
 
         /** @var SessionStorageRepositoryContract $sessionStorageRepository */
-        $sessionStorageRepository = app(SessionStorageRepositoryContract::class);
+        $sessionStorageRepository = pluginApp(SessionStorageRepositoryContract::class);
         $customer = $sessionStorageRepository->getCustomer();
         $isNet = false;
         if ($customer !== null) {
