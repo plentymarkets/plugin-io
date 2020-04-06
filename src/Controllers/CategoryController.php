@@ -45,8 +45,7 @@ class CategoryController extends LayoutController
         $category = $this->categoryRepo->findCategoryByUrl($lvl1, $lvl2, $lvl3, $lvl4, $lvl5, $lvl6, $webstoreId,
             $lang);
 
-        if($category === null)
-        {
+        if ($category === null) {
             $category = $this->categoryRepo->findCategoryByUrl($lvl1, $lvl2, $lvl3, $lvl4, $lvl5, $lvl6, $webstoreId,
                self::$LANGUAGE_FROM_URL);
         }

@@ -38,8 +38,7 @@ class DetectLanguage extends Middleware
 
                 if ($splittedURL[0] !== self::$DETECTED_LANGUAGE) {
                     $isValidLang = array_key_exists($splittedURL[0], Utils::getLanguageList());
-                    if($isValidLang)
-                    {
+                    if ($isValidLang) {
                         CategoryController::$LANGUAGE_FROM_URL = $splittedURL[0];
                     } else {
                         CategoryController::$LANGUAGE_FROM_URL = Utils::getDefaultLang();
