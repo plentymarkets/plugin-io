@@ -149,10 +149,10 @@ class BasketService
         $couponValidation = $couponRepository->getCouponCodeValidation();
 
         if(!is_null($couponValidation)) {
-            $basket['shippingAmountNet'] += -$couponValidation->shippingDiscountNet;
-            $basket['shippingAmount'] += -$couponValidation->shippingDiscount;
+            $basket['shippingAmountNet'] -= $couponValidation->shippingDiscountNet;
+            $basket['shippingAmount'] -= $couponValidation->shippingDiscount;
         }
-        if (count($basket['totalVats']) <= 0) {
+        if (count($basket['totalVats']) <= 0 && $isNet) {
             $basket["itemSum"] = $basket["itemSumNet"];
             $basket["basketAmount"] = $basket["basketAmountNet"];
             $basket["shippingAmount"] = $basket["shippingAmountNet"];
