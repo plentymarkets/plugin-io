@@ -7,6 +7,7 @@ use IO\Services\BasketService;
 use IO\Services\CheckoutService;
 use IO\Services\LocalizationService;
 use IO\Services\NotificationService;
+use Plenty\Modules\Basket\Models\BasketItem;
 use Plenty\Modules\Item\Stock\Events\BasketItemWarnOversell;
 use Plenty\Modules\Webshop\Contracts\ContactRepositoryContract;
 use Plenty\Plugin\Http\Response;
@@ -110,6 +111,10 @@ class ApiResponse
                 /** @var BasketService $basketService */
                 $basketService = pluginApp(BasketService::class);
                 $basketItem = $event->getBasketItem();
+
+                if ($basketItem->itemType === BasketItem::BASKET_ITEM_TYPE_ITEM_SET) {
+                    $basketItem->price = $basketItem->givenPrice + $basketItem->attributeTotalMarkup;
+                }
                 $this->eventData["AfterBasketItemAdd"]["basketItems"][] = $basketService->getBasketItem($basketItem);
             },
             0
