@@ -6,6 +6,7 @@ use IO\Services\ItemSearch\Factories\VariationSearchResultFactory;
 use Plenty\Modules\Basket\Contracts\BasketRepositoryContract;
 use Plenty\Modules\ShopBuilder\Helper\ShopBuilderRequest;
 use Plenty\Modules\Webshop\Contracts\SessionStorageRepositoryContract;
+use Plenty\Modules\Webshop\ItemSearch\Helpers\ResultFieldTemplate;
 use Plenty\Modules\Webshop\ItemSearch\SearchPresets\BasketItems;
 use Plenty\Modules\Webshop\ItemSearch\SearchPresets\CategoryItems;
 use Plenty\Modules\Webshop\ItemSearch\SearchPresets\CrossSellingItems;
@@ -104,6 +105,9 @@ class ItemListService
                         'sorting' => $sorting
                     ]
                 );
+                $searchFactory->withResultFields(
+                ResultFieldTemplate::load(ResultFieldTemplate::TEMPLATE_LIST_ITEM)
+            );
                 break;
             case self::TYPE_CROSS_SELLER:
                 if (!isset($id) || !strlen($id)) {
