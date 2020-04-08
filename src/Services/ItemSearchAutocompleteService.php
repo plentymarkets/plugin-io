@@ -12,7 +12,6 @@ use Plenty\Modules\Webshop\ItemSearch\Helpers\SortingHelper;
 use Plenty\Modules\Webshop\ItemSearch\SearchPresets\SearchItems;
 use Plenty\Modules\Webshop\ItemSearch\SearchPresets\SearchSuggestions;
 use Plenty\Modules\Webshop\ItemSearch\Services\ItemSearchService;
-use Plenty\Plugin\Application;
 
 /**
  * Class ItemSearchAutocompleteService
@@ -157,14 +156,12 @@ class ItemSearchAutocompleteService
         /** @var LocalizationRepositoryContract $localizationRepository */
         $localizationRepository = pluginApp(LocalizationRepositoryContract::class);
 
-        /** @var Application $app */
-        $app = pluginApp(Application::class);
 
         if (is_array($categories) && count($categories)) {
             foreach ($categories as $categoryId => $count) {
                 if ((int)$categoryId > 0) {
                     /** @var Category $categoryData */
-                    $categoryData = $categoryRepository->get($categoryId, $localizationRepository->getLanguage(), $app->getWebstoreId());
+                    $categoryData = $categoryRepository->get($categoryId, $localizationRepository->getLanguage(), Utils::getWebstoreId());
 
                     $categoryResult[] = $this->buildResult(
                         $categoryData->details[0]->name,
@@ -172,7 +169,7 @@ class ItemSearchAutocompleteService
                         $this->urlBuilderRepository->buildCategoryUrl(
                             (int)$categoryId,
                             $localizationRepository->getLanguage(),
-                            $app->getWebstoreId()
+                            Utils::getWebstoreId()
                         )->toRelativeUrl(),
                         $this->getCategoryBranch($categoryData->id),
                         '',
