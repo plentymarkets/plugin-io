@@ -164,7 +164,7 @@ class ItemSearchAutocompleteService
             foreach ($categories as $categoryId => $count) {
                 if ((int)$categoryId > 0) {
                     /** @var Category $categoryData */
-                    $categoryData = $categoryRepository->get($categoryId);
+                    $categoryData = $categoryRepository->get($categoryId, $localizationRepository->getLanguage(), $app->getWebstoreId());
 
                     $categoryResult[] = $this->buildResult(
                         $categoryData->details[0]->name,
