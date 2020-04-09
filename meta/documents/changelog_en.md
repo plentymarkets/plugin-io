@@ -1,5 +1,21 @@
 # Release Notes for IO
 
+## v5.0.0 (2020-04-14) <a href="https://github.com/plentymarkets/plugin-io/compare/4.6.4...5.0.0" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
+
+### Added
+
+- An additional search is now carried out for misspelled search terms. The search results page now provides an alternative search term in the "Did you mean...?" message.
+
+### Changed
+
+- The behaviour of the canonical tag and the robots information on category and search result pages has been revised.
+- Variation properties are now included in the data of the order confirmation page.
+
+### Fixed
+
+- Changing the currency could lead to errors in the sum calculation of the shopping cart if no price had been stored for the item in the corresponding currency. These items are now removed from the shopping cart and a corresponding message is displayed.
+- The browser language is set as the online store language upon the initial loading of the online store. If the browser language differs from the default online store language and a URL without a language abbreviation affix (e.g. /de or /en) is opened, the corresponding page could not be found. This behaviour has been fixed.
+
 ## v4.6.4 (2020-02-27) <a href="https://github.com/plentymarkets/plugin-io/compare/4.6.3...4.6.4" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
 
 ### Fixed
