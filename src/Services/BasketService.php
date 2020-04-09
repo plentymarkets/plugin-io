@@ -312,6 +312,50 @@ class BasketService
         }
     }
 
+    public function checkBasketItemsCurrency()
+    {
+        $basketItems = $this->getBasketItemsRaw();
+        $basketItemData = $this->getBasketItemData($basketItems);
+        $basketItems = $this->addVariationData($basketItems, $basketItemData, true);
+
+        $showWarning = [];
+
+        $basketItemIds = [];
+        foreach ($basketItems as $basketItem) {
+            if ($basketItem['itemType'] === BasketItem::BASKET_ITEM_TYPE_ITEM_SET_COMPONENT) {
+                $basketItemId = $basketItem['itemBundleRowId'];
+            } else {
+                $basketItemId = $basketItem['id'];
+            }
+
+            $delete = false;
+            if (!isset($basketItem['variation']['data']['price']['default']) || is_null($basketItem['variation']['data']['price']['default'])) {
+                $showWarning[] = 14;
+                $delete = true;
+            }
+
+            if ($delete && !in_array($basketItemId, $basketItemIds)) {
+                $basketItemIds[] = $basketItemId;
+            }
+        }
+
+        if (count($basketItemIds)) {
+            foreach ($basketItemIds as $basketItemId) {
+                $this->deleteBasketItem($basketItemId);
+            }
+        }
+
+        if (count($showWarning) > 0) {
+            $showWarning = array_unique($showWarning);
+
+            foreach ($showWarning as $warning) {
+                /** @var NotificationService $notificationService */
+                $notificationService = pluginApp(NotificationService::class);
+                $notificationService->warn(LogLevel::WARN, $warning);
+            }
+        }
+    }
+
     private function hasTexts($basketItemData)
     {
         return count($basketItemData['texts']) && (strlen($basketItemData['texts']['name1']) || strlen(
