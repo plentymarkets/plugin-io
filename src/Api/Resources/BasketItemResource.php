@@ -8,6 +8,7 @@ use IO\Api\ApiResource;
 use IO\Api\ApiResponse;
 use IO\Api\ResponseCode;
 use IO\Services\BasketService;
+use Plenty\Plugin\Log\Loggable;
 
 /**
  * Class BasketItemResource
@@ -15,6 +16,9 @@ use IO\Services\BasketService;
  */
 class BasketItemResource extends ApiResource
 {
+
+    use Loggable;
+
 	/**
 	 * @var BasketService
 	 */
@@ -49,6 +53,13 @@ class BasketItemResource extends ApiResource
      */
 	public function store():Response
 	{
+        $this->getLogger(__CLASS__)->debug(
+            "BaskedItemResource Store",
+            [
+                "requestdata" => $this->request->all()
+            ]
+        );
+
         $this->basketService->setTemplate($this->request->get('template', ''));
 		$basketItems = $this->basketService->addBasketItem($this->request->all());
 
