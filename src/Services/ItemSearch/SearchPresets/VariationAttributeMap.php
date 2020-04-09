@@ -26,7 +26,7 @@ class VariationAttributeMap implements SearchPreset
         );
 
         $searchFactory
-            ->withAttributes()
+            ->withVariationAttributeMap()
             ->withLanguage()
             ->withUrls()
             ->withImages()
