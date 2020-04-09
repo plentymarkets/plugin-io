@@ -197,6 +197,11 @@ class IOServiceProvider extends ServiceProvider
                 $checkoutService->setDefaultShippingCountryId();
                 //validate methodOfPayment
                 $methodOfPaymentId = $checkoutService->getMethodOfPaymentId();
+
+                /** @var SessionStorageRepositoryContract $sessionStorageRepostory */
+                $sessionStorageRepostory = pluginApp(SessionStorageRepositoryContract::class);
+                $sessionStorageRepostory->setSessionValue(SessionStorageRepositoryContract::LAST_ACCESSED_ORDER, null);
+                $sessionStorageRepostory->setSessionValue(SessionStorageRepositoryContract::LATEST_ORDER_ID, null);
             }
         );
 
