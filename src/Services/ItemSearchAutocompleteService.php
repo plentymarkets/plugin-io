@@ -6,8 +6,10 @@ use IO\Extensions\Filters\ItemImagesFilter;
 use IO\Helper\Utils;
 use Plenty\Modules\Category\Contracts\CategoryRepositoryContract;
 use Plenty\Modules\Category\Models\Category;
+use Plenty\Modules\System\Models\WebstoreConfiguration;
 use Plenty\Modules\Webshop\Contracts\LocalizationRepositoryContract;
 use Plenty\Modules\Webshop\Contracts\UrlBuilderRepositoryContract;
+use Plenty\Modules\Webshop\Contracts\WebstoreConfigurationRepositoryContract;
 use Plenty\Modules\Webshop\ItemSearch\Helpers\SortingHelper;
 use Plenty\Modules\Webshop\ItemSearch\SearchPresets\SearchItems;
 use Plenty\Modules\Webshop\ItemSearch\SearchPresets\SearchSuggestions;
@@ -105,6 +107,17 @@ class ItemSearchAutocompleteService
             /** @var ItemImagesFilter $itemImageFilter */
             $itemImageFilter = pluginApp(ItemImagesFilter::class);
 
+
+
+            /** @var WebstoreConfigurationRepositoryContract $webstoreConfigurationRepository */
+            $webstoreConfigurationRepository = pluginApp(WebstoreConfigurationRepositoryContract::class);
+            /** @var WebstoreConfiguration $webstoreConfiguration */
+            $webstoreConfiguration = $webstoreConfigurationRepository->getWebstoreConfiguration();
+            /** @var TemplateConfigService $templateConfigService */
+             $templateConfigService = pluginApp(TemplateConfigService::class);
+
+            $urlWithVariationId = $templateConfigService->getInteger('item.show_please_select') == 0 || $webstoreConfiguration->attributeSelectDefaultOption == 0;
+
             foreach ($items as $variation) {
                 $itemId = $variation['data']['item']['id'];
                 $variationId = $variation['data']['variation']['id'];
@@ -130,7 +143,7 @@ class ItemSearchAutocompleteService
                         'urlPreview'
                     ),
                     $this->urlBuilderRepository->buildVariationUrl($itemId, $variationId)->append(
-                        $this->urlBuilderRepository->getSuffix($itemId, $variationId)
+                        $this->urlBuilderRepository->getSuffix($itemId, $variationId, $urlWithVariationId)
                     )->toRelativeUrl(),
                     $this->getCategoryBranch($defaultCategoryId),
                     '',
