@@ -93,7 +93,6 @@ class IOServiceProvider extends ServiceProvider
         $this->registerMiddlewares(
             [
                 AuthenticateWithToken::class,
-                CheckNotFound::class,
                 DetectCurrency::class,
                 DetectLanguage::class,
                 DetectLegacySearch::class,
@@ -102,7 +101,8 @@ class IOServiceProvider extends ServiceProvider
                 DetectShippingCountry::class,
                 HandleNewsletter::class,
                 HandleOrderPreviewUrl::class,
-                ClearNotifications::class
+                ClearNotifications::class,
+                CheckNotFound::class
             ]
         );
         $this->getApplication()->register(IORouteServiceProvider::class);
@@ -246,6 +246,9 @@ class IOServiceProvider extends ServiceProvider
             function ($event) {
                 $sessionStorage = pluginApp(FrontendSessionStorageFactoryContract::class);
                 $sessionStorage->getPlugin()->setValue(SessionStorageRepositoryContract::CURRENCY, $event->getCurrency());
+                 /** @var BasketService $basketService */
+                $basketService = pluginApp(BasketService::class);
+                $basketService->checkBasketItemsCurrency();
             }
         );
 
