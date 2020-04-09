@@ -5,6 +5,7 @@ namespace IO\Models;
 use IO\Services\TemplateConfigService;
 use Plenty\Modules\Order\Models\OrderItem;
 use Plenty\Modules\Order\Models\OrderItemType;
+use Plenty\Modules\Webshop\Contracts\GiftCardRepositoryContract;
 use Plenty\Modules\Webshop\ItemSearch\Factories\VariationSearchFactory;
 use IO\Services\OrderService;
 use IO\Services\OrderStatusService;
@@ -90,6 +91,9 @@ class LocalizedOrder extends ModelWrapper
 
         /** @var OrderStatusService $orderStatusService */
         $orderStatusService = pluginApp(OrderStatusService::class);
+
+        /** @var GiftCardRepositoryContract $giftCardRepository */
+        $giftCardRepository = pluginApp(GiftCardRepositoryContract::class);
 
         list($lang) = $data;
 
@@ -216,6 +220,18 @@ class LocalizedOrder extends ModelWrapper
                 if ($orderItem['itemVariationId'] == $orderVariation['data']['variation']['id']) {
                     $orderItem['bundleComponents'] = $orderVariation['data']['bundleComponents'];
                     $orderItem['bundleType'] = $orderVariation['data']['variation']['bundleType'];
+
+                    $giftCardInformation = $giftCardRepository->getGiftCardInformation($orderItem['id']);
+                    $giftItem = [];
+                    $giftItem['isGiftCard'] = count($giftCardInformation) ? true : false;
+                    $giftItem['information'] = $giftCardInformation;
+                    $giftItem['hasPdf'] = count($giftCardInformation) ? $giftCardRepository->hasGiftCardPdf(
+                        $order->id,
+                        $orderItem['id'],
+                        $giftCardInformation[0]['id']
+                    ) : false;
+
+                    $orderItem['giftCard'] = $giftItem;
                     $attributes = [];
 
                     foreach ($orderVariation['data']['attributes'] as $attribute) {
@@ -234,10 +250,12 @@ class LocalizedOrder extends ModelWrapper
         $setComponentKeys = [];
         foreach ($instance->order->relations['orderItems'] as $key => $orderItem) {
             if ($orderItem->typeId === OrderItemType::TYPE_ITEM_SET) {
-                $instance->order->orderItems[$key]['setComponents'] = array_values(self::filterSetComponents(
-                    $orderItem->id,
-                    $instance->order->relations['orderItems']
-                )->toArray());
+                $instance->order->orderItems[$key]['setComponents'] = array_values(
+                    self::filterSetComponents(
+                        $orderItem->id,
+                        $instance->order->relations['orderItems']
+                    )->toArray()
+                );
             } elseif ($orderItem->typeId === OrderItemType::TYPE_SET_COMPONENT) {
                 $setComponentKeys[] = $key;
             }
@@ -269,22 +287,22 @@ class LocalizedOrder extends ModelWrapper
             $order = $this->orderData;
         }
         $data = [
-            "order"                        => $order,
-            "status"                       => $this->status,
-            "totals"                       => $this->totals,
-            "shippingProfileId"            => $this->shippingProfileId,
-            "shippingProvider"             => $this->shippingProvider,
-            "shippingProfileName"          => $this->shippingProfileName,
-            "paymentMethodName"            => $this->paymentMethodName,
-            "paymentMethodIcon"            => $this->paymentMethodIcon,
-            "paymentStatus"                => $this->paymentStatus,
+            "order" => $order,
+            "status" => $this->status,
+            "totals" => $this->totals,
+            "shippingProfileId" => $this->shippingProfileId,
+            "shippingProvider" => $this->shippingProvider,
+            "shippingProfileName" => $this->shippingProfileName,
+            "paymentMethodName" => $this->paymentMethodName,
+            "paymentMethodIcon" => $this->paymentMethodIcon,
+            "paymentStatus" => $this->paymentStatus,
             "allowPaymentMethodSwitchFrom" => $this->allowPaymentMethodSwitchFrom,
-            "paymentMethodListForSwitch"   => $this->paymentMethodListForSwitch,
-            "itemURLs"                     => $this->itemURLs,
-            "itemImages"                   => $this->itemImages,
-            "variations"                   => $this->variations,
-            "isReturnable"                 => $this->isReturnable(),
-            "highlightNetPrices"           => $this->highlightNetPrices
+            "paymentMethodListForSwitch" => $this->paymentMethodListForSwitch,
+            "itemURLs" => $this->itemURLs,
+            "itemImages" => $this->itemImages,
+            "variations" => $this->variations,
+            "isReturnable" => $this->isReturnable(),
+            "highlightNetPrices" => $this->highlightNetPrices
         ];
 
         return $data;

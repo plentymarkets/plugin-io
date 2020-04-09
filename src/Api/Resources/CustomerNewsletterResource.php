@@ -31,7 +31,7 @@ class CustomerNewsletterResource extends ApiResource
         if(strlen($this->request->get('honeypot')))
         {
             // We can potentially expand on the honeypot handling with sending reports to spam protect services
-            return $this->response->create('', ResponseCode::OK);
+            return $this->response->create(['containsHoneypot' => true], ResponseCode::OK);
         }
 
         $email = $this->request->get('email', '');
