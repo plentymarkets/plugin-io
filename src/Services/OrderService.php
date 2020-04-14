@@ -27,6 +27,7 @@ use Plenty\Modules\Order\Status\Contracts\OrderStatusRepositoryContract;
 use Plenty\Modules\Payment\Contracts\PaymentRepositoryContract;
 use Plenty\Modules\Payment\Method\Contracts\PaymentMethodRepositoryContract;
 use Plenty\Modules\Webshop\Contracts\ContactRepositoryContract;
+use Plenty\Modules\Webshop\Contracts\GiftCardRepositoryContract;
 use Plenty\Modules\Webshop\Contracts\SessionStorageRepositoryContract;
 use Plenty\Plugin\Log\Loggable;
 use Plenty\Repositories\Models\PaginatedResult;
@@ -77,6 +78,8 @@ class OrderService
     /** @var ContactRepositoryContract $contactRepository */
     private $contactRepository;
 
+    /** @var GiftCardRepositoryContract $giftCardRepository */
+    private $giftCardRepository;
     /**
      * The OrderItem types that will be wrapped. All other OrderItems will be stripped from the order.
      */
@@ -108,6 +111,7 @@ class OrderService
      * @param CheckoutService $checkoutService
      * @param CustomerService $customerService
      * @param ContactRepositoryContract $contactRepository
+     * @param GiftCardRepositoryContract $giftCardRepository
      */
     public function __construct(
         OrderRepositoryContract $orderRepository,
@@ -118,7 +122,8 @@ class OrderService
         UrlService $urlService,
         CheckoutService $checkoutService,
         CustomerService $customerService,
-        ContactRepositoryContract $contactRepository
+        ContactRepositoryContract $contactRepository,
+        GiftCardRepositoryContract $giftCardRepository
     ) {
         $this->orderRepository = $orderRepository;
         $this->basketService = $basketService;
@@ -129,6 +134,7 @@ class OrderService
         $this->checkoutService = $checkoutService;
         $this->customerService = $customerService;
         $this->contactRepository = $contactRepository;
+        $this->giftCardRepository = $giftCardRepository;
     }
 
     /**
@@ -447,6 +453,11 @@ class OrderService
                 $variationId = $orderItem['itemVariationId'];
                 $returnQuantity = max((int)$items[$variationId], $orderItem->quantity);
 
+                $minQuantityToReturn = $this->giftCardRepository->getReturnQuantity($orderItem['id']);
+                if ($minQuantityToReturn > 0 && $returnQuantity !== $minQuantityToReturn)  {
+                    throw new \Exception("GiftCard is not returnable with this quantity", 502);
+                }
+
                 if ($returnQuantity > 0) {
                     $returnOrderData['orderItems'][$i]['quantity'] = $returnQuantity;
                     $returnOrderData['orderItems'][$i]['references'] = [];
@@ -590,8 +601,10 @@ class OrderService
 
             if ($newQuantity > 0
                 && in_array($orderItem->typeId, self::WRAPPED_ORDERITEM_TYPES)
-                && !($orderItem->bundleType === 'bundle_item' && count($orderItem->references) > 0)) {
+                && !($orderItem->bundleType === 'bundle_item' && count($orderItem->references) > 0)
+                && $this->giftCardRepository->isReturnable($orderItem->id)) {
                 $orderItemData = $orderItem->toArray();
+                $orderItemData['minQuantity'] = $this->giftCardRepository->getReturnQuantity($orderItem->id);
                 $orderItemData['quantity'] = $newQuantity;
                 $newOrderItems[] = $orderItemData;
             }
