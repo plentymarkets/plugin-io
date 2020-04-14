@@ -138,13 +138,13 @@ class BasketService
 
         /** @var SessionStorageRepositoryContract $sessionStorageRepository */
         $sessionStorageRepository = pluginApp(SessionStorageRepositoryContract::class);
-        $customer = $sessionStorageRepository->getCustomer();
+        $order = $sessionStorageRepository->getOrder();
+
         $isNet = false;
-        if (!is_null($customer)) {
-            $isNet = $customer->showNetPrice;
+        if (!is_null($order)) {
+            $isNet = $order->isNet;
         }
 
-        $order = $sessionStorageRepository->getOrder();
         $couponValidation = $order->couponCodeValidation;
 
         if(!is_null($couponValidation)) {
