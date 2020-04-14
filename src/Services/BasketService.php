@@ -20,6 +20,7 @@ use Plenty\Modules\Item\Variation\Contracts\VariationRepositoryContract;
 use Plenty\Modules\Item\Variation\Models\Variation;
 use Plenty\Modules\Item\VariationDescription\Contracts\VariationDescriptionRepositoryContract;
 use Plenty\Modules\Item\VariationDescription\Models\VariationDescription;
+use Plenty\Modules\Order\Coupon\Campaign\Contracts\CouponCampaignRepositoryContract;
 use Plenty\Modules\Order\Shipping\Contracts\EUCountryCodesServiceContract;
 use Plenty\Modules\Webshop\Contracts\CheckoutRepositoryContract;
 use Plenty\Modules\Webshop\Contracts\ContactRepositoryContract;
@@ -140,18 +141,28 @@ class BasketService
         $sessionStorageRepository = pluginApp(SessionStorageRepositoryContract::class);
         $customer = $sessionStorageRepository->getCustomer();
         $isNet = false;
-        if ($customer !== null) {
+        if (!is_null($customer)) {
             $isNet = $customer->showNetPrice;
         }
 
-        /** @var CouponRepositoryContract $couponRepository */
-        $couponRepository = pluginApp(CouponRepositoryContract::class);
-        $couponValidation = $couponRepository->getCouponCodeValidation();
+        $order = $sessionStorageRepository->getOrder();
+        $couponValidation = $order->couponCodeValidation;
 
         if(!is_null($couponValidation)) {
-            $basket['shippingAmountNet'] -= $couponValidation->shippingDiscountNet;
-            $basket['shippingAmount'] -= $couponValidation->shippingDiscount;
+
+            /** @var CouponCampaignRepositoryContract $campaignRepository */
+            $campaignRepository = pluginApp(CouponCampaignRepositoryContract::class);
+            $campaign = $campaignRepository->findById($couponValidation->campaignId);
+
+            /** @var \Plenty\Modules\Order\Coupon\Services\CouponService $couponService */
+            $couponService = new \Plenty\Modules\Order\Coupon\Services\CouponService();
+
+            if($couponService->effectsOnShippingCosts($campaign)) {
+                $basket['shippingAmountNet'] -= $couponValidation->shippingDiscountNet;
+                $basket['shippingAmount'] -= $couponValidation->shippingDiscount;
+            }
         }
+
         if (count($basket['totalVats']) <= 0 && $isNet) {
             $basket["itemSum"] = $basket["itemSumNet"];
             $basket["basketAmount"] = $basket["basketAmountNet"];
