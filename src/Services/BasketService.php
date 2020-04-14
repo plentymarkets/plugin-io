@@ -24,7 +24,6 @@ use Plenty\Modules\Order\Coupon\Campaign\Contracts\CouponCampaignRepositoryContr
 use Plenty\Modules\Order\Shipping\Contracts\EUCountryCodesServiceContract;
 use Plenty\Modules\Webshop\Contracts\CheckoutRepositoryContract;
 use Plenty\Modules\Webshop\Contracts\ContactRepositoryContract;
-use Plenty\Modules\Webshop\Contracts\CouponRepositoryContract;
 use Plenty\Modules\Webshop\Contracts\SessionStorageRepositoryContract;
 use Plenty\Modules\Webshop\Contracts\WebstoreConfigurationRepositoryContract;
 use Plenty\Modules\Webshop\Helpers\UnitUtils;
@@ -154,10 +153,8 @@ class BasketService
             $campaignRepository = pluginApp(CouponCampaignRepositoryContract::class);
             $campaign = $campaignRepository->findById($couponValidation->campaignId);
 
-            /** @var \Plenty\Modules\Order\Coupon\Services\CouponService $couponService */
-            $couponService = new \Plenty\Modules\Order\Coupon\Services\CouponService();
 
-            if($couponService->effectsOnShippingCosts($campaign)) {
+            if ($this->couponService->effectsOnShippingCosts($campaign)) {
                 $basket['shippingAmountNet'] -= $couponValidation->shippingDiscountNet;
                 $basket['shippingAmount'] -= $couponValidation->shippingDiscount;
             }
