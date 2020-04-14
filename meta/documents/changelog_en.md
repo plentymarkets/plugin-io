@@ -14,7 +14,7 @@
 ### Fixed
 
 - Changing the currency could lead to errors in the sum calculation of the shopping cart if no price had been stored for the item in the corresponding currency. These items are now removed from the shopping cart and a corresponding message is displayed.
-- The browser language is set as the online store language upon the initial loading of the online store. If the browser language differs from the default online store language and a URL without a language abbreviation affix (e.g. /de or /en) is opened, the corresponding page could not be found. This behaviour has been fixed.
+- The browser language is set as the online store language upon the initial loading of the online store. If the browser language differed from the default online store language and a URL without a language abbreviation affix (e.g. /de or /en) was opened, the corresponding page could not be found. This behaviour has been fixed.
 
 ## v4.6.4 (2020-02-27) <a href="https://github.com/plentymarkets/plugin-io/compare/4.6.3...4.6.4" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
 
