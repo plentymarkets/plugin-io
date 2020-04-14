@@ -5,7 +5,6 @@ namespace IO\Services;
 use IO\Extensions\Constants\ShopUrls;
 use IO\Helper\RouteConfig;
 use Plenty\Modules\Webshop\ItemSearch\Helpers\SortingHelper;
-use Plenty\Modules\Webshop\Template\Contracts\TemplateConfigRepositoryContract;
 use Plenty\Plugin\Http\Request;
 use Plenty\Plugin\Templates\Twig;
 
@@ -140,8 +139,8 @@ class TemplateService
 
     public function isCheapestSorting()
     {
-        /** @var TemplateConfigRepositoryContract $templateConfigRepository */
-        $templateConfigRepository = pluginApp(TemplateConfigRepositoryContract::class);
+        /** @var TemplateConfigService $templateConfigRepository */
+        $templateConfigRepository = pluginApp(TemplateConfigService::class);
 
         $sorting = pluginApp(Request::class)->get('sorting', '');
         if (strlen($sorting) === 0) {
