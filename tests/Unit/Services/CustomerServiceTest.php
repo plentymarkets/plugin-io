@@ -18,6 +18,7 @@ use Plenty\Modules\System\Models\WebstoreConfiguration;
 use Plenty\Modules\Webshop\Contracts\SessionStorageRepositoryContract;
 use Plenty\Modules\Webshop\Contracts\WebstoreConfigurationRepositoryContract;
 use Plenty\Modules\Webshop\Repositories\WebstoreConfigurationRepository;
+use Plenty\Modules\Webshop\Repositories\ContactRepository as WebshopContactRepository;
 use Plenty\Plugin\Events\Dispatcher;
 
 class CustomerServiceTest extends TestCase
@@ -36,6 +37,8 @@ class CustomerServiceTest extends TestCase
     protected $contactAddressRepositoryMock;
     /** @var ContactRepository $contactRepositoryMock */
     protected $contactRepositoryMock;
+    /** @var WebshopContactRepository $webshopContactRepository */
+    protected $webshopContactRepository;
     /** @var ContactAccountRepositoryContract $contactAccountRepositoryMock */
     protected $contactAccountRepositoryMock;
     /** @var SessionStorageRepositoryContract $sessionStorageRepositoryMock */
@@ -64,6 +67,9 @@ class CustomerServiceTest extends TestCase
 
         $this->contactRepositoryMock = Mockery::mock(ContactRepository::class);
         $this->replaceInstanceByMock(ContactRepository::class, $this->contactRepositoryMock);
+
+        $this->webshopContactRepository = Mockery::mock(WebshopContactRepository::class);
+        $this->replaceInstanceByMock(WebshopContactRepository::class, $this->webshopContactRepository);
 
         $this->contactAccountRepositoryMock = Mockery::mock(ContactAccountRepositoryContract::class);
         $this->replaceInstanceByMock(ContactAccountRepositoryContract::class, $this->contactAccountRepositoryMock);
@@ -111,7 +117,7 @@ class CustomerServiceTest extends TestCase
             ->andReturn('test@test.de')
             ->once();
 
-        $this->accountServiceMock->shouldReceive('getAccountContactId')->andReturn(0);
+        $this->webshopContactRepository->shouldReceive('getContact')->andReturn(null);
 
         $this->basketServiceMock->shouldReceive('setBillingAddressId')->with($address->id)->andReturnNull()->once();
 
@@ -150,7 +156,7 @@ class CustomerServiceTest extends TestCase
             ->andReturn('test@test.de')
             ->once();
 
-        $this->accountServiceMock->shouldReceive('getAccountContactId')->andReturn(0);
+        $this->webshopContactRepository->shouldReceive('getContact')->andReturn(null);
 
         $this->basketServiceMock->shouldReceive('setDeliveryAddressId')->with($address->id)->andReturnNull()->once();
 
@@ -189,7 +195,8 @@ class CustomerServiceTest extends TestCase
 
         $this->accountServiceMock->shouldReceive('getAccountContactId')->andReturn($contact->id);
 
-        $this->contactRepositoryMock->shouldReceive('findContactById')->with($contact->id)->andReturn($contact);
+        $this->webshopContactRepository->shouldReceive('getContact')->andReturn($contact);
+        $this->webshopContactRepository->shouldReceive('getContactId')->andReturn($contact->id);
 
         $this->contactAddressRepositoryMock
             ->shouldReceive('createAddress')
@@ -235,9 +242,8 @@ class CustomerServiceTest extends TestCase
 
         $this->basketServiceMock->shouldReceive('setBillingAddressId')->with($address->id)->andReturnNull()->once();
 
-        $this->accountServiceMock->shouldReceive('getAccountContactId')->andReturn($contact->id);
-
-        $this->contactRepositoryMock->shouldReceive('findContactById')->with($contact->id)->andReturn($contact);
+        $this->webshopContactRepository->shouldReceive('getContact')->andReturn($contact);
+        $this->webshopContactRepository->shouldReceive('getContactId')->andReturn($contact->id);
 
         $this->contactAccountRepositoryMock->shouldReceive('createAccount')->andReturn($account)->once();
 
@@ -294,7 +300,9 @@ class CustomerServiceTest extends TestCase
 
         $this->accountServiceMock->shouldReceive('getAccountContactId')->andReturn($contact->id);
 
-        $this->contactRepositoryMock->shouldReceive('findContactById')->with($contact->id)->andReturn($contact);
+        $this->webshopContactRepository->shouldReceive('getContact')->andReturn($contact);
+        $this->webshopContactRepository->shouldReceive('getContactId')->andReturn($contact->id);
+
         $this->contactRepositoryMock->shouldReceive('updateContact')->andReturn($contact)->once();
 
         $this->contactAccountRepositoryMock->shouldReceive('createAccount')->andReturn($account)->once();
@@ -306,61 +314,10 @@ class CustomerServiceTest extends TestCase
             ->andReturn($address)
             ->once();
 
-        $response = $this->customerService->createAddress($addressArray, AddressType::BILLING);
-
-        $this->assertInstanceOf(Address::class, $response);
-        $this->assertEquals($response->id, $addressId);
-    }
-
-    /** @test */
-    public function it_updates_the_contact_class_id_while_creating_an_address()
-    {
-        $addressId = 100;
-        $contactId = 1;
-        $accountId = 1;
-
-        /** @var Address $address */
-        $address = factory(Address::class)->make(
-            [
-                'id' => $addressId,
-                'gender' => 'male'
-            ]
-        );
-
-        $addressArray = $address->toArray();
-
-        $contact = factory(Contact::class)->make(
-            [
-                'id' => $contactId,
-                'firstName' => "",
-                'lastName' => "",
-            ]
-        );
-
-
-        $account = factory(Account::class)->make(
-            [
-                "id" => $accountId,
-            ]
-        );
-
-        $webstoreConfig = factory(WebstoreConfiguration::class)->make();
-
-        $this->basketServiceMock->shouldReceive('setBillingAddressId')->with($address->id)->andReturnNull()->once();
-
-        $this->accountServiceMock->shouldReceive('getAccountContactId')->andReturn($contact->id);
-
-        $this->contactRepositoryMock->shouldReceive('findContactById')->with($contact->id)->andReturn($contact);
-        $this->contactRepositoryMock->shouldReceive('updateContact')->andReturn($contact)->once();
-
-        $this->contactAccountRepositoryMock->shouldReceive('createAccount')->andReturn($account)->once();
-
-        $this->webstoreConfigurationRepositoryMock->shouldReceive('getWebstoreConfiguration')->andReturn($webstoreConfig);
-
-        $this->contactAddressRepositoryMock
-            ->shouldReceive('createAddress')
-            ->andReturn($address)
-            ->once();
+        $this->sessionStorageRepositoryMock
+            ->shouldReceive('getSessionValue')
+            ->withArgs([SessionStorageRepositoryContract::GUEST_EMAIL])
+            ->andReturn('test@test.com');
 
         $response = $this->customerService->createAddress($addressArray, AddressType::BILLING);
 
@@ -403,7 +360,8 @@ class CustomerServiceTest extends TestCase
             ->with(CustomerAddressResource::ADDRESS_NOT_SET)
             ->andReturn();
 
-        $this->accountServiceMock->shouldReceive('getAccountContactId')->andReturn(0);
+        $this->webshopContactRepository->shouldReceive('getContact')->andReturn(null);
+        $this->webshopContactRepository->shouldReceive('getContactId')->andReturn(0);
 
         try {
             $this->customerService->deleteAddress($address->id, AddressType::BILLING);
@@ -448,7 +406,9 @@ class CustomerServiceTest extends TestCase
             ->with(0)
             ->andReturn();
 
-        $this->accountServiceMock->shouldReceive('getAccountContactId')->andReturn($contactId);
+        $this->webshopContactRepository->shouldReceive('getContact')->andReturn($contact);
+        $this->webshopContactRepository->shouldReceive('getContactId')->andReturn($contactId);
+
 
         $this->contactAddressRepositoryMock->shouldReceive('findContactAddressByTypeId')
             ->with($contactId, AddressType::BILLING, false)
@@ -503,7 +463,7 @@ class CustomerServiceTest extends TestCase
             ->with(CustomerAddressResource::ADDRESS_NOT_SET)
             ->andReturn();
 
-        $this->accountServiceMock->shouldReceive('getAccountContactId')->andReturn($contactId);
+        $this->webshopContactRepository->shouldReceive('getContactId')->andReturn($contactId);
 
         $this->contactAddressRepositoryMock->shouldReceive('findContactAddressByTypeId')
             ->with($contactId, AddressType::DELIVERY, false)
@@ -540,7 +500,8 @@ class CustomerServiceTest extends TestCase
             ]
         );
 
-        $this->accountServiceMock->shouldReceive('getAccountContactId')->andReturn(0);
+        $this->webshopContactRepository->shouldReceive('getContact')->andReturn(null);
+        $this->webshopContactRepository->shouldReceive('getContactId')->andReturn(0);
 
         $address2 = $address->replicate();
         $address2->name1 = 'update';
@@ -607,8 +568,8 @@ class CustomerServiceTest extends TestCase
             ]
         );
 
-        $this->contactRepositoryMock->shouldReceive('findContactById')->with($contact->id)->andReturn($contact);
-        $this->accountServiceMock->shouldReceive('getAccountContactId')->andReturn($contactId);
+        $this->webshopContactRepository->shouldReceive('getContact')->andReturn($contact);
+        $this->webshopContactRepository->shouldReceive('getContactId')->andReturn($contactId);
 
         $address2 = $address->replicate();
         $address2->name1 = 'update';
@@ -673,8 +634,8 @@ class CustomerServiceTest extends TestCase
 
         $this->webstoreConfigurationRepositoryMock->shouldReceive('getWebstoreConfiguration')->andReturn($webstoreConfig);
 
-        $this->contactRepositoryMock->shouldReceive('findContactById')->with($contact->id)->andReturn($contact);
-        $this->accountServiceMock->shouldReceive('getAccountContactId')->andReturn($contactId);
+        $this->webshopContactRepository->shouldReceive('getContact')->andReturn($contact);
+        $this->webshopContactRepository->shouldReceive('getContactId')->andReturn($contactId);
 
         $this->contactAccountRepositoryMock->shouldReceive('createAccount')->andReturn($account)->once();
 
@@ -744,8 +705,8 @@ class CustomerServiceTest extends TestCase
             ]
         );
 
-        $this->contactRepositoryMock->shouldReceive('findContactById')->with($contact->id)->andReturn($contact);
-        $this->accountServiceMock->shouldReceive('getAccountContactId')->andReturn($contactId);
+        $this->webshopContactRepository->shouldReceive('getContact')->andReturn($contact);
+        $this->webshopContactRepository->shouldReceive('getContactId')->andReturn($contactId);
 
         $address2 = $address->replicate();
         $address2->name1 = 'update';
