@@ -51,7 +51,7 @@ class LiveShoppingService
             $this->checkStockLimit($liveShoppingData, $liveShoppingItem);
 
             if ($this->ownStock) {
-                unset($liveShoppingItem['stock']);
+                unset($liveShoppingItem['stock']['net']);
             }
 
             if ($this->ownLimitation) {
