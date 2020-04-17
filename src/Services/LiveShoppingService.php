@@ -50,13 +50,11 @@ class LiveShoppingService
 
             $this->checkStockLimit($liveShoppingData, $liveShoppingItem);
 
-            if($this->ownStock)
-            {
+            if ($this->ownStock) {
                 unset($liveShoppingItem['stock']);
             }
 
-            if($this->ownLimitation)
-            {
+            if ($this->ownLimitation) {
                 unset($liveShoppingItem['variation']['stockLimitation']);
             }
 
@@ -133,14 +131,12 @@ class LiveShoppingService
     {
         $resultFields = ResultFieldTemplate::load(ResultFieldTemplate::TEMPLATE_LIST_ITEM);
 
-        if(!(in_array('stock.net', $resultFields) || in_array('stock.*', $resultFields)))
-        {
+        if (!(in_array('stock.net', $resultFields) || in_array('stock.*', $resultFields))) {
             $resultFields[] = 'stock.net';
             $this->ownStock = true;
         }
 
-        if(!(in_array('variation.stockLimitation', $resultFields) || in_array('variation.*', $resultFields)))
-        {
+        if (!(in_array('variation.stockLimitation', $resultFields) || in_array('variation.*', $resultFields))) {
             $resultFields[] = 'variation.stockLimitation';
             $this->ownLimitation = true;
         }
