@@ -148,7 +148,7 @@ class NotificationService
         $this->addNotification("", $type, $code, $placeholder);
     }
 
-    private function hasNotifications()
+    public function hasNotifications()
     {
         $notifications = json_decode(
             $this->sessionStorageRepository->getSessionValue(SessionStorageRepositoryContract::NOTIFICATIONS),
