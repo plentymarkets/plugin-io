@@ -15,7 +15,6 @@ use IO\Services\UrlService;
 use Plenty\Modules\Category\Contracts\CategoryRepositoryContract;
 use Plenty\Modules\Category\Models\Category;
 use Plenty\Modules\ContentCache\Contracts\ContentCacheRepositoryContract;
-use Plenty\Modules\Webshop\Contracts\SessionStorageRepositoryContract;
 use Plenty\Plugin\Application;
 use Plenty\Plugin\Controller;
 use Plenty\Plugin\Events\Dispatcher;
@@ -146,7 +145,6 @@ abstract class LayoutController extends Controller
 	{
         TemplateService::$currentTemplate = $templateEvent;
 		$templateContainer = $this->buildTemplateContainer($templateEvent, $controllerData);
-
 		if($templateContainer->hasTemplate())
 		{
 			TemplateService::$currentTemplate = $templateEvent;
