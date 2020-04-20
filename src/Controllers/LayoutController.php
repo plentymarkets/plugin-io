@@ -9,6 +9,7 @@ use IO\Helper\TemplateContainer;
 use IO\Helper\Utils;
 use IO\Middlewares\CheckNotFound;
 use IO\Services\CategoryService;
+use IO\Services\NotificationService;
 use IO\Services\TemplateService;
 use IO\Services\UrlService;
 use Plenty\Modules\Category\Contracts\CategoryRepositoryContract;
@@ -155,12 +156,8 @@ abstract class LayoutController extends Controller
 			$renderedTemplate = $this->renderTemplateContainer($templateContainer, $controllerData);
 
 			// activate content cache
-            /** @var SessionStorageRepositoryContract $SessionStorageRepository */
-            $sessionStorageRepository = pluginApp(SessionStorageRepositoryContract::class);
-            $notifications = json_decode($sessionStorageRepository->getSessionValue(SessionStorageRepositoryContract::NOTIFICATIONS), true);
-            //do not cache if notifications are present in the session
-            $hasNotifications = is_array($notifications) && count($notifications) > 0;
-            if ( TemplateService::$shouldBeCached && !$hasNotifications )
+            $notificationService = pluginApp(NotificationService::class);
+            if ( TemplateService::$shouldBeCached && !$notificationService->hasNotifications() )
             {
                 $this->getLogger(__CLASS__)->info(
                     "IO::Debug.LayoutController_enableContentCache",
