@@ -14,6 +14,7 @@ use IO\Services\UrlService;
 use Plenty\Modules\Category\Contracts\CategoryRepositoryContract;
 use Plenty\Modules\Category\Models\Category;
 use Plenty\Modules\ContentCache\Contracts\ContentCacheRepositoryContract;
+use Plenty\Modules\Webshop\Contracts\SessionStorageRepositoryContract;
 use Plenty\Plugin\Application;
 use Plenty\Plugin\Controller;
 use Plenty\Plugin\Events\Dispatcher;
@@ -144,7 +145,7 @@ abstract class LayoutController extends Controller
 	{
         TemplateService::$currentTemplate = $templateEvent;
 		$templateContainer = $this->buildTemplateContainer($templateEvent, $controllerData);
-		
+
 		if($templateContainer->hasTemplate())
 		{
 			TemplateService::$currentTemplate = $templateEvent;
@@ -152,9 +153,14 @@ abstract class LayoutController extends Controller
 			TemplateService::$shouldBeCached = $cacheContent;
 
 			$renderedTemplate = $this->renderTemplateContainer($templateContainer, $controllerData);
-			
+
 			// activate content cache
-            if ( TemplateService::$shouldBeCached )
+            /** @var SessionStorageRepositoryContract $SessionStorageRepository */
+            $sessionStorageRepository = pluginApp(SessionStorageRepositoryContract::class);
+            $notifications = json_decode($sessionStorageRepository->getSessionValue(SessionStorageRepositoryContract::NOTIFICATIONS), true);
+            //do not cache if notifications are present in the session
+            $hasNotifications = is_array($notifications) && count($notifications) > 0;
+            if ( TemplateService::$shouldBeCached && !$hasNotifications )
             {
                 $this->getLogger(__CLASS__)->info(
                     "IO::Debug.LayoutController_enableContentCache",
