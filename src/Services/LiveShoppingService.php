@@ -131,21 +131,18 @@ class LiveShoppingService
     {
         $resultFields = ResultFieldTemplate::load(ResultFieldTemplate::TEMPLATE_LIST_ITEM);
 
-        if (!(in_array('stock.net', $resultFields) || in_array('stock.*', $resultFields) || in_array(
-                '*',
-                $resultFields
-            ))) {
+        $stockNet = ['*', 'stock.*', 'stock.net'];
+        if (empty(array_intersect($stockNet, $resultFields))) {
             $resultFields[] = 'stock.net';
             $this->ownStock = true;
         }
 
-        if (!(in_array('variation.stockLimitation', $resultFields) || in_array(
-                'variation.*',
-                $resultFields
-            ) || in_array('*', $resultFields))) {
+        $stockLimitation = ['*', 'variation.*', 'variation.stockLimitation'];
+        if (empty(array_intersect($stockLimitation, $resultFields))) {
             $resultFields[] = 'variation.stockLimitation';
             $this->ownLimitation = true;
         }
+
 
         return $resultFields;
     }
