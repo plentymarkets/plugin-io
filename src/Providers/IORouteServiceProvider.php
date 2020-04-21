@@ -179,6 +179,11 @@ class IORouteServiceProvider extends RouteServiceProvider
             $this->registerSingleCategoryRoute($router, RouteConfig::CONFIRMATION, $shopUrls->confirmation);
         }
 
+        if (RouteConfig::getCategoryId(RouteConfig::ORDER_RETURN) > 0 && !RouteConfig::isActive(RouteConfig::CATEGORY))
+        {
+            $this->registerSingleCategoryRoute($router, RouteConfig::ORDER_RETURN, $shopUrls->returns);
+        }
+
         // CONTACT
         $this->registerRedirectedRoute(
             $router,
