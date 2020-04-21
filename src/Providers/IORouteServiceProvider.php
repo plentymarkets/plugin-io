@@ -185,6 +185,11 @@ class IORouteServiceProvider extends RouteServiceProvider
             );
         }
 
+        if (RouteConfig::getCategoryId(RouteConfig::ORDER_RETURN) > 0 && !RouteConfig::isActive(RouteConfig::CATEGORY))
+        {
+            $this->registerSingleCategoryRoute($router, RouteConfig::ORDER_RETURN, $shopUrls->returns);
+        }
+
         // CONTACT
         $this->registerRedirectedRoute(
             $router,
