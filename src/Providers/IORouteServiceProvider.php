@@ -176,7 +176,13 @@ class IORouteServiceProvider extends RouteServiceProvider
 
         if(RouteConfig::getCategoryId(RouteConfig::CONFIRMATION) > 0 && !RouteConfig::isActive(RouteConfig::CATEGORY))
         {
-            $this->registerSingleCategoryRoute($router, RouteConfig::CONFIRMATION, $shopUrls->confirmation);
+            $this->registerRedirectedRoute(
+                $router,
+                RouteConfig::CONFIRMATION,
+                $shopUrls->confirmation,
+                'IO\Controllers\ConfirmationController@showContact',
+                'IO\Controllers\ConfirmationController@redirect'
+            );
         }
 
         if (RouteConfig::getCategoryId(RouteConfig::ORDER_RETURN) > 0 && !RouteConfig::isActive(RouteConfig::CATEGORY))
@@ -451,14 +457,18 @@ class IORouteServiceProvider extends RouteServiceProvider
             // remove language from shop url before registering the route
             $shopUrl = substr($shopUrl, strlen("/{$lang}/"));
         }
-        $router->get(
-            Utils::makeRelativeUrl($shopUrl, false),
-            function() use ($route)
-            {
-                /** @var CategoryController $categoryController */
-                $categoryController = pluginApp(CategoryController::class);
-                return $categoryController->showCategoryById( RouteConfig::getCategoryId($route) );
-            }
-        );
+
+        if($shopUrl !== '/' && $shopUrl !== '/'.$lang)
+        {
+            $router->get(
+                Utils::makeRelativeUrl($shopUrl, false),
+                function() use ($route)
+                {
+                    /** @var CategoryController $categoryController */
+                    $categoryController = pluginApp(CategoryController::class);
+                    return $categoryController->showCategoryById( RouteConfig::getCategoryId($route) );
+                }
+            );
+        }
     }
 }
