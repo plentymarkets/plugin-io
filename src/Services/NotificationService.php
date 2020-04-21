@@ -147,4 +147,16 @@ class NotificationService
     {
         $this->addNotification("", $type, $code, $placeholder);
     }
+
+    /**
+     * @return bool
+     */
+    public function hasNotifications()
+    {
+        $notifications = json_decode(
+            $this->sessionStorageRepository->getSessionValue(SessionStorageRepositoryContract::NOTIFICATIONS),
+            true
+        );
+        return is_array($notifications) && count($notifications) > 0;
+    }
 }
