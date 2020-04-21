@@ -4,6 +4,7 @@ namespace IO\Services;
 
 use Plenty\Modules\LiveShopping\Contracts\LiveShoppingRepositoryContract;
 use Plenty\Modules\LiveShopping\Models\LiveShopping;
+use Plenty\Modules\Webshop\ItemSearch\Helpers\ResultFieldTemplate;
 use Plenty\Modules\Webshop\ItemSearch\Helpers\SortingHelper;
 use Plenty\Modules\Webshop\ItemSearch\SearchPresets\LiveShoppingItems;
 use Plenty\Modules\Webshop\ItemSearch\Services\ItemSearchService;
@@ -14,6 +15,9 @@ use Plenty\Modules\Webshop\ItemSearch\Services\ItemSearchService;
  */
 class LiveShoppingService
 {
+    private $ownStock = false;
+    private $ownLimitation = false;
+
     /**
      * @param $liveShoppingId
      * @param $sorting
@@ -46,7 +50,13 @@ class LiveShoppingService
 
             $this->checkStockLimit($liveShoppingData, $liveShoppingItem);
 
-            unset($liveShoppingItem['stock'], $liveShoppingItem['variation']['stockLimitation']);
+            if ($this->ownStock) {
+                unset($liveShoppingItem['stock']['net']);
+            }
+
+            if ($this->ownLimitation) {
+                unset($liveShoppingItem['variation']['stockLimitation']);
+            }
 
             return [
                 'item' => $liveShoppingItem,
@@ -64,7 +74,8 @@ class LiveShoppingService
 
         $itemSearchOptions = [
             'itemId' => $itemId,
-            'sorting' => $sortingHelper->splitPathAndOrder($sorting)
+            'sorting' => $sortingHelper->splitPathAndOrder($sorting),
+            'resultFields' => $this->buildResultFields()
         ];
         /** @var ItemSearchService $itemSearchService */
         $itemSearchService = pluginApp(ItemSearchService::class);
@@ -114,5 +125,25 @@ class LiveShoppingService
         if ($isStockLimited && $isNetStockLess) {
             $data['quantitySold'] = $data['quantityMax'] - $item['stock']['net'];
         }
+    }
+
+    private function buildResultFields()
+    {
+        $resultFields = ResultFieldTemplate::load(ResultFieldTemplate::TEMPLATE_LIST_ITEM);
+
+        $stockNet = ['*', 'stock.*', 'stock.net'];
+        if (empty(array_intersect($stockNet, $resultFields))) {
+            $resultFields[] = 'stock.net';
+            $this->ownStock = true;
+        }
+
+        $stockLimitation = ['*', 'variation.*', 'variation.stockLimitation'];
+        if (empty(array_intersect($stockLimitation, $resultFields))) {
+            $resultFields[] = 'variation.stockLimitation';
+            $this->ownLimitation = true;
+        }
+
+
+        return $resultFields;
     }
 }
