@@ -148,6 +148,9 @@ class NotificationService
         $this->addNotification("", $type, $code, $placeholder);
     }
 
+    /**
+     * @return bool
+     */
     public function hasNotifications()
     {
         $notifications = json_decode(
