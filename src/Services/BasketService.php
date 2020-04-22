@@ -20,9 +20,11 @@ use Plenty\Modules\Item\Variation\Contracts\VariationRepositoryContract;
 use Plenty\Modules\Item\Variation\Models\Variation;
 use Plenty\Modules\Item\VariationDescription\Contracts\VariationDescriptionRepositoryContract;
 use Plenty\Modules\Item\VariationDescription\Models\VariationDescription;
+use Plenty\Modules\Order\Coupon\Campaign\Contracts\CouponCampaignRepositoryContract;
 use Plenty\Modules\Order\Shipping\Contracts\EUCountryCodesServiceContract;
 use Plenty\Modules\Webshop\Contracts\CheckoutRepositoryContract;
 use Plenty\Modules\Webshop\Contracts\ContactRepositoryContract;
+use Plenty\Modules\Webshop\Contracts\SessionStorageRepositoryContract;
 use Plenty\Modules\Webshop\Contracts\WebstoreConfigurationRepositoryContract;
 use Plenty\Modules\Webshop\Helpers\UnitUtils;
 use Plenty\Modules\Webshop\ItemSearch\Factories\VariationSearchFactory;
@@ -134,8 +136,31 @@ class BasketService
             $basket["totalVats"] = [];
         }
 
+        /** @var SessionStorageRepositoryContract $sessionStorageRepository */
+        $sessionStorageRepository = pluginApp(SessionStorageRepositoryContract::class);
+        $order = $sessionStorageRepository->getOrder();
 
-        if (count($basket['totalVats']) <= 0) {
+        $isNet = false;
+        if (!is_null($order)) {
+            $isNet = $order->isNet;
+        }
+
+        $couponValidation = $order->couponCodeValidation;
+
+        if(!is_null($couponValidation)) {
+
+            /** @var CouponCampaignRepositoryContract $campaignRepository */
+            $campaignRepository = pluginApp(CouponCampaignRepositoryContract::class);
+            $campaign = $campaignRepository->findById($couponValidation->campaignId);
+
+
+            if ($this->couponService->effectsOnShippingCosts($campaign)) {
+                $basket['shippingAmountNet'] -= $couponValidation->shippingDiscountNet;
+                $basket['shippingAmount'] -= $couponValidation->shippingDiscount;
+            }
+        }
+
+        if (count($basket['totalVats']) <= 0 && $isNet) {
             $basket["itemSum"] = $basket["itemSumNet"];
             $basket["basketAmount"] = $basket["basketAmountNet"];
             $basket["shippingAmount"] = $basket["shippingAmountNet"];
@@ -287,6 +312,50 @@ class BasketService
                 $delete = true;
             } elseif (!$this->hasTexts($basketItem['variation']['data'])) {
                 $showWarning[] = 10;
+                $delete = true;
+            }
+
+            if ($delete && !in_array($basketItemId, $basketItemIds)) {
+                $basketItemIds[] = $basketItemId;
+            }
+        }
+
+        if (count($basketItemIds)) {
+            foreach ($basketItemIds as $basketItemId) {
+                $this->deleteBasketItem($basketItemId);
+            }
+        }
+
+        if (count($showWarning) > 0) {
+            $showWarning = array_unique($showWarning);
+
+            foreach ($showWarning as $warning) {
+                /** @var NotificationService $notificationService */
+                $notificationService = pluginApp(NotificationService::class);
+                $notificationService->warn(LogLevel::WARN, $warning);
+            }
+        }
+    }
+
+    public function checkBasketItemsCurrency()
+    {
+        $basketItems = $this->getBasketItemsRaw();
+        $basketItemData = $this->getBasketItemData($basketItems);
+        $basketItems = $this->addVariationData($basketItems, $basketItemData, true);
+
+        $showWarning = [];
+
+        $basketItemIds = [];
+        foreach ($basketItems as $basketItem) {
+            if ($basketItem['itemType'] === BasketItem::BASKET_ITEM_TYPE_ITEM_SET_COMPONENT) {
+                $basketItemId = $basketItem['itemBundleRowId'];
+            } else {
+                $basketItemId = $basketItem['id'];
+            }
+
+            $delete = false;
+            if (!isset($basketItem['variation']['data']['price']['default']) || is_null($basketItem['variation']['data']['price']['default'])) {
+                $showWarning[] = 14;
                 $delete = true;
             }
 

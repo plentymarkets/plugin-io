@@ -6,13 +6,14 @@ use IO\Extensions\Filters\ItemImagesFilter;
 use IO\Helper\Utils;
 use Plenty\Modules\Category\Contracts\CategoryRepositoryContract;
 use Plenty\Modules\Category\Models\Category;
+use Plenty\Modules\System\Models\WebstoreConfiguration;
 use Plenty\Modules\Webshop\Contracts\LocalizationRepositoryContract;
 use Plenty\Modules\Webshop\Contracts\UrlBuilderRepositoryContract;
+use Plenty\Modules\Webshop\Contracts\WebstoreConfigurationRepositoryContract;
 use Plenty\Modules\Webshop\ItemSearch\Helpers\SortingHelper;
 use Plenty\Modules\Webshop\ItemSearch\SearchPresets\SearchItems;
 use Plenty\Modules\Webshop\ItemSearch\SearchPresets\SearchSuggestions;
 use Plenty\Modules\Webshop\ItemSearch\Services\ItemSearchService;
-use Plenty\Plugin\Application;
 
 /**
  * Class ItemSearchAutocompleteService
@@ -106,6 +107,17 @@ class ItemSearchAutocompleteService
             /** @var ItemImagesFilter $itemImageFilter */
             $itemImageFilter = pluginApp(ItemImagesFilter::class);
 
+
+
+            /** @var WebstoreConfigurationRepositoryContract $webstoreConfigurationRepository */
+            $webstoreConfigurationRepository = pluginApp(WebstoreConfigurationRepositoryContract::class);
+            /** @var WebstoreConfiguration $webstoreConfiguration */
+            $webstoreConfiguration = $webstoreConfigurationRepository->getWebstoreConfiguration();
+            /** @var TemplateConfigService $templateConfigService */
+             $templateConfigService = pluginApp(TemplateConfigService::class);
+
+            $urlWithVariationId = $templateConfigService->getInteger('item.show_please_select') == 0 || $webstoreConfiguration->attributeSelectDefaultOption == 0;
+
             foreach ($items as $variation) {
                 $itemId = $variation['data']['item']['id'];
                 $variationId = $variation['data']['variation']['id'];
@@ -131,7 +143,7 @@ class ItemSearchAutocompleteService
                         'urlPreview'
                     ),
                     $this->urlBuilderRepository->buildVariationUrl($itemId, $variationId)->append(
-                        $this->urlBuilderRepository->getSuffix($itemId, $variationId)
+                        $this->urlBuilderRepository->getSuffix($itemId, $variationId, $urlWithVariationId)
                     )->toRelativeUrl(),
                     $this->getCategoryBranch($defaultCategoryId),
                     '',
@@ -157,14 +169,12 @@ class ItemSearchAutocompleteService
         /** @var LocalizationRepositoryContract $localizationRepository */
         $localizationRepository = pluginApp(LocalizationRepositoryContract::class);
 
-        /** @var Application $app */
-        $app = pluginApp(Application::class);
 
         if (is_array($categories) && count($categories)) {
             foreach ($categories as $categoryId => $count) {
                 if ((int)$categoryId > 0) {
                     /** @var Category $categoryData */
-                    $categoryData = $categoryRepository->get($categoryId);
+                    $categoryData = $categoryRepository->get($categoryId, $localizationRepository->getLanguage(), Utils::getWebstoreId());
 
                     $categoryResult[] = $this->buildResult(
                         $categoryData->details[0]->name,
@@ -172,7 +182,7 @@ class ItemSearchAutocompleteService
                         $this->urlBuilderRepository->buildCategoryUrl(
                             (int)$categoryId,
                             $localizationRepository->getLanguage(),
-                            $app->getWebstoreId()
+                            Utils::getWebstoreId()
                         )->toRelativeUrl(),
                         $this->getCategoryBranch($categoryData->id),
                         '',

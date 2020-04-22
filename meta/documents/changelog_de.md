@@ -1,5 +1,21 @@
 # Release Notes für IO
 
+## v5.0.0 (2020-04-14) <a href="https://github.com/plentymarkets/plugin-io/compare/4.6.4...5.0.0" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
+
+### Hinzugefügt
+
+- Bei falsch geschriebenen Suchbegriffen wird nun eine zusätzliche Suche ausgeführt. Auf der Suchergebnisseite wird nun ein alternativer Suchbegriff unter "Meinten Sie...?" vorgeschlagen.
+
+### Geändert 
+
+- Das Verhalten des Canonical-Tags und der Robots-Informationen auf Kategorie- und Suchergebnisseiten wurde überarbeitet.
+- Die Daten auf der Bestellbestätigungseite enthalten nun die Varianteneigenschaften.
+
+### Behoben
+
+- Beim Wechsel der Währung kam es zu Fehlern bei der Summenberechnung im Warenkorb, wenn für die im Webshop ausgewählte Währung kein Preis am Artikel hinterlegt war. Betroffene Artikel werden nun aus dem Warenkorb entfernt und ein entsprechender Warnhinweis wird angezeigt.
+- Beim ersten Laden des Webshops wird die Browsersprache als Webshop-Sprache gesetzt. Wenn die Browsersprache nicht der voreingestellten Standardsprache des Webshops entspricht und eine URL ohne Sprachkürzel aufgerufen wurde, konnte die entsprechende Seite nicht gefunden werden. Dieses Verhalten wurde behoben.
+
 ## v4.6.4 (2020-02-27) <a href="https://github.com/plentymarkets/plugin-io/compare/4.6.3...4.6.4" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
 
 ### Behoben
