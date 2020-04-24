@@ -67,9 +67,9 @@ class LocalizedOrder extends ModelWrapper
     /**
      * @param Order $order
      * @param array ...$data
-     * @return LocalizedOrder
+     * @return LocalizedOrder|null
      */
-    public static function wrap($order, ...$data): LocalizedOrder
+    public static function wrap($order, ...$data)
     {
         if ($order == null) {
             return null;
