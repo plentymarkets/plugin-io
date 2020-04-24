@@ -7,6 +7,7 @@ use IO\Builder\Order\OrderItemType;
 use IO\Builder\Order\OrderType;
 use IO\Constants\OrderPaymentStatus;
 use IO\Extensions\Constants\ShopUrls;
+use IO\Extensions\Filters\PropertyNameFilter;
 use IO\Extensions\Mail\SendMail;
 use IO\Helper\RouteConfig;
 use IO\Helper\Utils;
@@ -561,6 +562,23 @@ class OrderService
 
         $orderData = $order->toArray();
         $orderData['orderItems'] = $this->getReturnableItems($order);
+
+        /** @var PropertyNameFilter $propertyNameFilter */
+        $propertyNameFilter = pluginApp(PropertyNameFilter::class);
+
+        foreach ($orderData['orderItems'] as &$orderItem) {
+            foreach ($orderItem['orderProperties'] as &$orderProperty) {
+                $orderProperty['name'] = $propertyNameFilter->getPropertyName($orderProperty);
+                if ($orderProperty->type === 'selection') {
+                    $orderProperty->selectionValueName = $propertyNameFilter->getPropertySelectionValueName(
+                        $orderProperty
+                    );
+                }
+            }
+            unset($orderProperty);
+        }
+        unset($orderItem);
+
         $localizedOrder->orderData = $orderData;
 
         return $localizedOrder;
