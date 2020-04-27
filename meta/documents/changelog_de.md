@@ -1,5 +1,17 @@
 # Release Notes für IO
 
+## v5.0.1 (2020-04-27) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.0...5.0.1" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
+
+### Geändert
+
+- Die als deprecated markierte Route **/io/facets** und die dazugehörige Ressource **FacetResource** wurden aus dem Plugin entfernt.
+
+### Behoben
+
+- Retourenseiten, die mit dem ShopBuilder erstellt wurden, können jetzt auch dann dargestellt werden, wenn die Einstellung **Category routes** in IO deaktiviert ist.
+- Seiten, auf denen Erfolgs-, Fehler- oder Warnmeldungen angezeigt werden, werden nicht mehr vom ShopBooster in den Cache geschrieben.
+- Durch einen Fehler wurde für mehrsprachige Startseiten eine 404-Seite angezeigt, wenn im ShopBuilder eine Kategorie ohne URL verknüpft war. Dieses Verhalten wurde behoben.
+
 ## v5.0.0 (2020-04-14) <a href="https://github.com/plentymarkets/plugin-io/compare/4.6.4...5.0.0" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
 
 ### Hinzugefügt
