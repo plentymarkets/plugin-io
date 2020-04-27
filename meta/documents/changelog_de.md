@@ -11,7 +11,8 @@
 - Retourenseiten, die mit dem ShopBuilder erstellt wurden, können jetzt auch dann dargestellt werden, wenn die Einstellung **Category routes** in IO deaktiviert ist.
 - Seiten, auf denen Erfolgs-, Fehler- oder Warnmeldungen angezeigt werden, werden nicht mehr vom ShopBooster in den Cache geschrieben.
 - Durch einen Fehler wurde für mehrsprachige Startseiten eine 404-Seite angezeigt, wenn im ShopBuilder eine Kategorie ohne URL verknüpft war. Dieses Verhalten wurde behoben.
-- Durch einen Fehler wurden Artikel aus dem Warenkorb entfernt, wenn ein Kunde sich abgemeldet hat. Dieses Verhalten wurde behoben. 
+- Durch einen Fehler wurden Artikel aus dem Warenkorb entfernt, wenn ein Kunde sich abgemeldet hat. Dieses Verhalten wurde behoben.
+- Bei einem fehlerhaften Login-Versuch wurde fälschlicherweise eine Benachrichtung zur Versandkostenberechnung angezeigt. Dies wurde behoben.
 
 ## v5.0.0 (2020-04-14) <a href="https://github.com/plentymarkets/plugin-io/compare/4.6.4...5.0.0" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
 
