@@ -12,6 +12,7 @@
 - Pages which display success, error, or warning notifications are no longer written into the cache by the ShoBooster.
 - Due to an error, a 404 page was displayed for multilingual homepages if a category without a URL had been linked in the ShopBuilder. This behaviour has been fixed.
 - Due to an error, items were removed from the shopping cart when a customer logged out of the online store. This behaviour has been fixed.
+- Upon a failed attempt to login, a notification regarding shipping cost calculation was displayed. This has been fixed.
 
 ## v5.0.0 (2020-04-14) <a href="https://github.com/plentymarkets/plugin-io/compare/4.6.4...5.0.0" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
 
