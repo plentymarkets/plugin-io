@@ -354,7 +354,7 @@ class BasketService
             }
 
             $delete = false;
-            if (!isset($basketItem['variation']['data']['price']['default']) || is_null($basketItem['variation']['data']['price']['default'])) {
+            if (!isset($basketItem['variation']['data']['prices']['default']) || is_null($basketItem['variation']['data']['prices']['default'])) {
                 $showWarning[] = 14;
                 $delete = true;
             }
