@@ -2,7 +2,7 @@
 
 namespace IO\Middlewares;
 
-use Plenty\Modules\Webshop\Contracts\SessionStorageRepositoryContract;
+use IO\Services\NotificationService;
 use Plenty\Plugin\Http\Request;
 use Plenty\Plugin\Http\Response;
 use Plenty\Plugin\Middleware;
@@ -26,9 +26,9 @@ class ClearNotifications extends Middleware
     public function after(Request $request, Response $response)
     {
         if (self::$CLEAR_NOTIFICATIONS) {
-             /** @var SessionStorageRepositoryContract $sessionStorageRepository */
-            $sessionStorageRepository = pluginApp(SessionStorageRepositoryContract::class);
-            $sessionStorageRepository->setSessionValue(SessionStorageRepositoryContract::NOTIFICATIONS, json_encode([]));
+             /** @var NotificationService $notificationService */
+            $notificationService = pluginApp(NotificationService::class);
+            $notificationService->clearNotifications();
         }
 
         return $response;
