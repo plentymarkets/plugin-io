@@ -159,4 +159,12 @@ class NotificationService
         );
         return is_array($notifications) && count($notifications) > 0;
     }
+
+    /**
+     * Clear existing notifications
+     */
+    public function clearNotifications()
+    {
+        $this->sessionStorageRepository->setSessionValue(SessionStorageRepositoryContract::NOTIFICATIONS, json_encode([]));
+    }
 }

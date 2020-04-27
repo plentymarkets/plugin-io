@@ -197,7 +197,7 @@ class ShopUrls
                     }
                 }
 
-                $url = $overrideUrl ?? $this->urlMap[$route];
+                $url = $overrideUrl ?? $this->urlMap[$route] ?? null;
                 return $this->applyParams(
                     pluginApp(UrlQuery::class, ['path' => ($url ?? $route)]),
                     $routeParams,
