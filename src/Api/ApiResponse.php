@@ -352,6 +352,7 @@ class ApiResponse
 
         $responseData["data"] = $data;
 
+        $this->notificationService->clearNotifications();
         return $this->response->make(json_encode($responseData), $code, $this->headers);
     }
 
