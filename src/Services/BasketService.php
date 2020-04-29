@@ -258,7 +258,25 @@ class BasketService
             $basketItems
         );
 
+        if ($appendItemData) {
+            $basketItems = $this->fixBasketItems($basketItems);
+        }
+
         return $basketItems;
+    }
+
+    private function fixBasketItems($basketItems = [])
+    {
+        foreach ($basketItems as $basketItem)
+        {
+            if (is_null($basketItem['variation']))
+            {
+                $this->basketItemRepository->removeBasketItem($basketItem['id']);
+                unset($basketItems[array_search($basketItem, $basketItems)]);
+            }
+        }
+
+        return array_values($basketItems);
     }
 
     private function getSortedBasketItemOrderParams($basketItem): array
