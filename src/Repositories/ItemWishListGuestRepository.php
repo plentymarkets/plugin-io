@@ -2,31 +2,29 @@
 
 namespace IO\Repositories;
 
-use IO\Constants\SessionStorageKeys;
-use Plenty\Modules\Plugin\DataBase\Contracts\Query;
 use IO\Services\SessionStorageService;
-use IO\Services\CustomerService;
 use IO\DBModels\ItemWishList;
+use Plenty\Modules\Webshop\Contracts\SessionStorageRepositoryContract;
 use Plenty\Plugin\Application;
 
 class ItemWishListGuestRepository
 {
-    /** @var  SessionStorageService */
-    private $sessionStorage;
-    
+    /** @var  SessionStorageRepositoryContract */
+    private $sessionStorageRepository;
+
     private $plentyId;
-    
+
     /**
      * ItemWishListGuestRepository constructor.
-     * @param SessionStorageService $sessionStorage
+     * @param SessionStorageRepositoryContract $sessionStorageRepository
      * @param Application $app
      */
-    public function __construct(SessionStorageService $sessionStorage, Application $app)
+    public function __construct(SessionStorageRepositoryContract $sessionStorageRepository, Application $app)
     {
-        $this->sessionStorage = $sessionStorage;
+        $this->sessionStorageRepository = $sessionStorageRepository;
         $this->plentyId       = $app->getPlentyId();
     }
-    
+
     /**
      * List all watched variationIds for contact
      * @return array
@@ -49,12 +47,12 @@ class ItemWishListGuestRepository
         $wishList = $this->getItemWishListForAllPlentyIds();
         return $wishList[$this->plentyId];
     }
-    
+
     public function getItemWishListForAllPlentyIds()
     {
-        return json_decode($this->sessionStorage->getSessionValue(SessionStorageKeys::GUEST_WISHLIST), true);
+        return json_decode($this->sessionStorageRepository->getSessionValue(SessionStorageRepositoryContract::GUEST_WISHLIST), true);
     }
-    
+
     /**
      * Get count WishList entries
      * @return int
@@ -63,7 +61,7 @@ class ItemWishListGuestRepository
     {
         return count($this->getItemWishList());
     }
-    
+
     /**
      * @param int $variationId
      * @return bool
@@ -71,7 +69,7 @@ class ItemWishListGuestRepository
     public function isItemInWishList(int $variationId = 0)
     {
         $wishList = $this->getItemWishList();
-        
+
         if(!is_array($wishList))
         {
             return false;
@@ -81,7 +79,7 @@ class ItemWishListGuestRepository
             return in_array($variationId, $wishList);
         }
     }
-    
+
     /**
      * @param int $variationId
      * @param int $quantity
@@ -103,13 +101,13 @@ class ItemWishListGuestRepository
         {
             $wishListEntry->quantity += $wishList[$variationId]['quantity'];
         }
-        
+
         $wishListComplete[$this->plentyId][$variationId] = $wishListEntry;
-        $this->sessionStorage->setSessionValue(SessionStorageKeys::GUEST_WISHLIST, json_encode($wishListComplete));
-        
+        $this->sessionStorageRepository->setSessionValue(SessionStorageRepositoryContract::GUEST_WISHLIST, json_encode($wishListComplete));
+
         return $wishListEntry;
     }
-    
+
     /**
      * @param int $variationId
      * @return bool - true if variation was found and deleted. false if no variation was found.
@@ -117,21 +115,21 @@ class ItemWishListGuestRepository
     public function removeItemWishListEntry(int $variationId)
     {
         $wishListComplete = $this->getItemWishListForAllPlentyIds();
-        
+
         if(isset($wishListComplete) && array_key_exists($variationId, $wishListComplete[$this->plentyId]))
         {
             unset($wishListComplete[$this->plentyId][$variationId]);
-            $this->sessionStorage->setSessionValue(SessionStorageKeys::GUEST_WISHLIST, json_encode($wishListComplete));
+            $this->sessionStorageRepository->setSessionValue(SessionStorageRepositoryContract::GUEST_WISHLIST, json_encode($wishListComplete));
             return true;
         }
 
         return false;
     }
-    
+
     public function resetItemWishList()
     {
         $wishListComplete = $this->getItemWishListForAllPlentyIds();
         $wishListComplete[$this->plentyId] = [];
-        $this->sessionStorage->setSessionValue(SessionStorageKeys::GUEST_WISHLIST, json_encode($wishListComplete));
+        $this->sessionStorageRepository->setSessionValue(SessionStorageRepositoryContract::GUEST_WISHLIST, json_encode($wishListComplete));
     }
 }

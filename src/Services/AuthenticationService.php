@@ -2,10 +2,12 @@
 
 namespace IO\Services;
 
-use Plenty\Modules\Account\Contact\Contracts\ContactRepositoryContract;
+use Plenty\Modules\Account\Contact\Contracts\ContactRepositoryContract as CoreContactRepositoryContract;
+use Plenty\Modules\Webshop\Contracts\ContactRepositoryContract;
 use Plenty\Modules\Account\Contact\Models\Contact;
 use Plenty\Modules\Authentication\Contracts\ContactAuthenticationRepositoryContract;
-use IO\Constants\SessionStorageKeys;
+use Plenty\Modules\Webshop\Contracts\SessionStorageRepositoryContract;
+use Plenty\Plugin\Log\Loggable;
 
 /**
  * Class AuthenticationService
@@ -13,61 +15,72 @@ use IO\Constants\SessionStorageKeys;
  */
 class AuthenticationService
 {
-	/**
-	 * @var ContactAuthenticationRepositoryContract
-	 */
-	private $contactAuthRepository;
-    
+    use Loggable;
+
     /**
-     * @var SessionStorageService $sessionStorage
+     * @var ContactAuthenticationRepositoryContract
      */
-	private $sessionStorage;
-    
+    private $contactAuthRepository;
+
+    /**
+     * @var SessionStorageRepositoryContract $sessionStorageRepository
+     */
+    private $sessionStorageRepository;
+
+    /** @var CustomerService */
+    private $customerService;
+
     /**
      * AuthenticationService constructor.
      * @param ContactAuthenticationRepositoryContract $contactAuthRepository
-     * @param \IO\Services\SessionStorageService $sessionStorage
+     * @param SessionStorageRepositoryContract $sessionStorageRepository
      */
-	public function __construct(ContactAuthenticationRepositoryContract $contactAuthRepository, SessionStorageService $sessionStorage)
-	{
-		$this->contactAuthRepository = $contactAuthRepository;
-		$this->sessionStorage = $sessionStorage;
-	}
+    public function __construct(
+        ContactAuthenticationRepositoryContract $contactAuthRepository,
+        SessionStorageRepositoryContract $sessionStorageRepository,
+        CustomerService $customerService
+    ) {
+        $this->contactAuthRepository = $contactAuthRepository;
+        $this->sessionStorageRepository = $sessionStorageRepository;
+        $this->customerService = $customerService;
+    }
 
     /**
      * Perform the login with email and password
      * @param string $email
      * @param string $password
-     *
-     * @return int
+     * @return int|null
      */
-	public function login(string $email, string $password)
-	{
-		$this->contactAuthRepository->authenticateWithContactEmail($email, $password);
-		$this->sessionStorage->setSessionValue(SessionStorageKeys::GUEST_WISHLIST_MIGRATION, true);
+    public function login(string $email, string $password)
+    {
+        $this->customerService->deleteGuestAddresses();
+        $this->customerService->resetGuestAddresses();
 
-        /** @var ContactRepositoryContract $contactRepository */
-        $contactRepository = pluginApp(ContactRepositoryContract::class);
+        $this->contactAuthRepository->authenticateWithContactEmail($email, $password);
+        $this->sessionStorageRepository->setSessionValue(SessionStorageRepositoryContract::GUEST_WISHLIST_MIGRATION, true);
+
+        /** @var CoreContactRepositoryContract $contactRepository */
+        $contactRepository = pluginApp(CoreContactRepositoryContract::class);
 
         return $contactRepository->getContactIdByEmail($email);
-	}
+    }
 
     /**
      * Perform the login with customer ID and password
      * @param int $contactId
      * @param string $password
      */
-	public function loginWithContactId(int $contactId, string $password)
-	{
-		$this->contactAuthRepository->authenticateWithContactId($contactId, $password);
-        $this->sessionStorage->setSessionValue(SessionStorageKeys::GUEST_WISHLIST_MIGRATION, true);
-	}
+    public function loginWithContactId(int $contactId, string $password): void
+    {
+        $this->contactAuthRepository->authenticateWithContactId($contactId, $password);
+        $this->sessionStorageRepository->setSessionValue(SessionStorageRepositoryContract::GUEST_WISHLIST_MIGRATION, true);
+    }
 
     /**
      * Log out the customer
      */
-	public function logout()
-	{
+    public function logout(): void
+    {
         $this->contactAuthRepository->logout();
 
         /**
@@ -76,29 +89,49 @@ class AuthenticationService
         $basketService = pluginApp(BasketService::class);
         $basketService->setBillingAddressId(0);
         $basketService->setDeliveryAddressId(0);
-	}
+    }
 
-	public function checkPassword($password)
+    /**
+     * @param string $password
+     * @return bool
+     */
+    public function checkPassword($password): bool
     {
-        /** @var CustomerService $customerService */
-        $customerService = pluginApp(CustomerService::class);
-        $contact = $customerService->getContact();
-        if ($contact instanceof Contact)
-        {
-            try
-            {
+        /** @var ContactRepositoryContract $contactRepository */
+        $contactRepository = pluginApp(ContactRepositoryContract::class);
+
+        $contact = $contactRepository->getContact();
+        if ($contact instanceof Contact) {
+            try {
                 $this->login(
                     $contact->email,
                     $password
                 );
                 return true;
-            }
-            catch( \Exception $e )
-            {
-                return false;
+            } catch (\Exception $e) {
+                $this->getLogger(__CLASS__)->info(
+                    'IO::Debug.AuthenticationService_invalidPassword',
+                    [
+                        'contactId' => $contact->id
+                    ]
+                );
             }
         }
 
         return false;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isLoggedIn(): bool
+    {
+        /** @var ContactRepositoryContract $contactRepository */
+        $contactRepository = pluginApp(ContactRepositoryContract::class);
+
+        $contactId = $contactRepository->getContactId();
+        $email = $this->sessionStorageRepository->getSessionValue(SessionStorageRepositoryContract::GUEST_EMAIL);
+
+        return $contactId > 0 || !empty(trim($email));
     }
 }

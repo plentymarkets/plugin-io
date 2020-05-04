@@ -2,9 +2,9 @@
 
 namespace IO\Services\ItemSearch\SearchPresets;
 
-use IO\Services\ItemSearch\Factories\VariationSearchFactory;
 use IO\Services\ItemSearch\Helper\ResultFieldTemplate;
-use IO\Services\ItemSearch\Helper\SortingHelper;
+use Plenty\Modules\Webshop\ItemSearch\Factories\VariationSearchFactory;
+use Plenty\Modules\Webshop\ItemSearch\Helpers\SortingHelper;
 
 /**
  * Class CategoryItems
@@ -20,6 +20,9 @@ use IO\Services\ItemSearch\Helper\SortingHelper;
  * - priceMax       Maximum price of the variations
  *
  * @package IO\Services\ItemSearch\SearchPresets
+ *
+ * @deprecated since 5.0.0 will be deleted in 6.0.0
+ * @see \Plenty\Modules\Webshop\ItemSearch\SearchPresets\CategoryItems
  */
 class CategoryItems implements SearchPreset
 {
@@ -30,7 +33,10 @@ class CategoryItems implements SearchPreset
     {
         $categoryId     = $options['categoryId'];
         $facets         = $options['facets'];
-        $sorting        = SortingHelper::getCategorySorting( $options['sorting'] );
+
+        /** @var SortingHelper $sortingHelper */
+        $sortingHelper = pluginApp(SortingHelper::class);
+        $sorting        = $sortingHelper->getCategorySorting( $options['sorting'] );
 
         $page = 1;
         if ( array_key_exists('page', $options ) )
@@ -60,8 +66,8 @@ class CategoryItems implements SearchPreset
         $searchFactory = pluginApp(VariationSearchFactory::class);
 
         $searchFactory->withResultFields(
-                ResultFieldTemplate::load( ResultFieldTemplate::TEMPLATE_LIST_ITEM )
-            );
+            ResultFieldTemplate::load( ResultFieldTemplate::TEMPLATE_LIST_ITEM )
+        );
 
         $searchFactory
             ->withLanguage()

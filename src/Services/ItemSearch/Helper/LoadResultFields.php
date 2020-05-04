@@ -8,12 +8,16 @@ use Plenty\Plugin\Log\LoggerFactory;
  * Created by ptopczewski, 09.01.17 11:07
  * Trait LoadResultFields
  * @package IO\Services\ItemSearch\Helper
+ * @deprecated since 5.0.0 will be deleted in 6.0.0
+ * @see \Plenty\Modules\Webshop\ItemSearch\Helpers\LoadResultFields
  */
 trait LoadResultFields
 {
 	/**
 	 * @param string $fullTemplateName
 	 * @return array
+     * @deprecated since 5.0.0 will be deleted in 6.0.0
+     * @see \Plenty\Modules\Webshop\ItemSearch\Helpers\LoadResultFields::loadResultFields()
 	 */
 	private function loadResultFields($fullTemplateName)
 	{
@@ -27,7 +31,9 @@ trait LoadResultFields
 			return $resource->load($resourceName . '.fields')->getData();
 		}
 
-        pluginApp(LoggerFactory::class)
+		/** @var LoggerFactory $loggerFactory */
+		$loggerFactory = pluginApp(LoggerFactory::class);
+		$loggerFactory
             ->getLogger("IO", __CLASS__)
             ->warning(
                 "IO::Debug.LoadResultFields_notFound",

@@ -2,9 +2,8 @@
 
 namespace IO\Services\ItemSearch\SearchPresets;
 
-use IO\Services\ItemSearch\Factories\VariationSearchFactory;
 use IO\Services\ItemSearch\Helper\ResultFieldTemplate;
-use IO\Services\TemplateConfigService;
+use Plenty\Modules\Webshop\ItemSearch\Factories\VariationSearchFactory;
 
 /**
  * Class SingleItem
@@ -16,14 +15,20 @@ use IO\Services\TemplateConfigService;
  * - setCategory:   Flag indicating if item should be set as current item to be displayed in breadcrumbs
  *
  * @package IO\Services\ItemSearch\SearchPresets
+ *
+ * @deprecated since 5.0.0 will be deleted in 6.0.0
+ * @see \Plenty\Modules\Webshop\ItemSearch\SearchPresets\SingleItem
  */
 class SingleItem implements SearchPreset
 {
+    /**
+     * @inheritDoc
+     */
     public static function getSearchFactory($options)
     {
         /** @var VariationSearchFactory $searchFactory */
         $searchFactory = pluginApp( VariationSearchFactory::class );
-        
+
         $searchFactory->withResultFields(
             ResultFieldTemplate::load( ResultFieldTemplate::TEMPLATE_SINGLE_ITEM )
         );
@@ -33,16 +38,20 @@ class SingleItem implements SearchPreset
             ->withImages()
             ->withPropertyGroups()
             ->withOrderPropertySelectionValues()
+            ->withVariationProperties()
             ->withUrls()
             ->withPrices()
             ->withDefaultImage()
             ->withBundleComponents()
+            ->withAvailability()
             ->isVisibleForClient()
             ->isActive()
             ->hasNameInLanguage()
             ->hasPriceForCustomer()
             ->withLinkToContent()
-            ->withReducedResults();
+            ->withReducedResults()
+            ->withTags()
+            ->setPage(1, 1);
 
         if(array_key_exists('itemId', $options) && $options['itemId'] != 0)
         {
@@ -55,16 +64,7 @@ class SingleItem implements SearchPreset
         }
         else
         {
-            $templateConfigService = pluginApp( TemplateConfigService::class );
-            $variationShowType = $templateConfigService->get('item.variation_show_type');
-            if($variationShowType == 'main')
-            {
-                $searchFactory->isMain();
-            }
-            elseif($variationShowType == 'child')
-            {
-                $searchFactory->isChild();
-            }
+            $searchFactory->groupByTemplateConfig();
         }
 
         if ( array_key_exists( 'setCategory', $options ) && $options['setCategory'] === true )

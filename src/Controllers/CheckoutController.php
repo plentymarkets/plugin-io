@@ -1,17 +1,16 @@
 <?php //strict
+
 namespace IO\Controllers;
 
-use IO\Api\ResponseCode;
-use IO\Constants\SessionStorageKeys;
 use IO\Extensions\Constants\ShopUrls;
+use IO\Helper\RouteConfig;
 use IO\Services\CustomerService;
-use IO\Services\SessionStorageService;
-use IO\Services\UrlService;
 use Plenty\Modules\Basket\Contracts\BasketItemRepositoryContract;
 use IO\Guards\AuthGuard;
 use Plenty\Modules\Category\Models\Category;
 use Plenty\Modules\ShopBuilder\Helper\ShopBuilderRequest;
-use Plenty\Plugin\Http\Response;
+use Plenty\Modules\Webshop\Contracts\ContactRepositoryContract;
+use Plenty\Modules\Webshop\Contracts\SessionStorageRepositoryContract;
 use Plenty\Plugin\Log\Loggable;
 
 /**
@@ -24,46 +23,48 @@ class CheckoutController extends LayoutController
 
     /**
      * Prepare and render the data for the checkout
+     *
      * @param Category $category
+     *
      * @return string
+     * @throws \ErrorException
      */
     public function showCheckout($category = null)
     {
         /** @var BasketItemRepositoryContract $basketItemRepository */
         $basketItemRepository = pluginApp(BasketItemRepositoryContract::class);
 
-        /** @var SessionStorageService $sessionStorage */
-        $sessionStorage = pluginApp(SessionStorageService::class);
+        /** @var SessionStorageRepositoryContract $sessionStorageRepository */
+        $sessionStorageRepository = pluginApp(SessionStorageRepositoryContract::class);
 
-        /** @var CustomerService $customerService */
-        $customerService = pluginApp(CustomerService::class);
+        /** @var ContactRepositoryContract $contactRepository */
+        $contactRepository = pluginApp(ContactRepositoryContract::class);
+
+        /** @var ShopUrls $shopUrls */
+        $shopUrls = pluginApp(ShopUrls::class);
 
         /** @var ShopBuilderRequest $shopBuilderRequest */
         $shopBuilderRequest = pluginApp(ShopBuilderRequest::class);
+        $shopBuilderRequest->setMainContentType('checkout');
 
-        if ( !$shopBuilderRequest->isShopBuilder() )
-        {
-            if( $sessionStorage->getSessionValue(SessionStorageKeys::GUEST_EMAIL) == null
-                && $customerService->getContactId() <= 0 )
-            {
+        if (!$shopBuilderRequest->isShopBuilder()) {
+            if ($sessionStorageRepository->getSessionValue(SessionStorageRepositoryContract::GUEST_EMAIL) == null
+                && $contactRepository->getContactId() <= 0) {
                 $this->getLogger(__CLASS__)->info("IO::Debug.CheckoutController_notLoggedIn");
                 AuthGuard::redirect(
-                    pluginApp(ShopUrls::class)->login,
+                    $shopUrls->login,
                     ["backlink" => AuthGuard::getUrl()]
                 );
-            }
-            else if(!count($basketItemRepository->all()))
-            {
+            } elseif (!count($basketItemRepository->all())) {
                 $this->getLogger(__CLASS__)->info("IO::Debug.CheckoutController_emptyBasket");
-                AuthGuard::redirect(pluginApp(ShopUrls::class)->home, []);
+                AuthGuard::redirect($shopUrls->home, []);
             }
-        }
-        else if ( is_null($category) )
-        {
+        } elseif (is_null($category)) {
+            /** @var CategoryController $categoryController */
             $categoryController = pluginApp(CategoryController::class);
             return $categoryController->showCategory("checkout");
         }
-        
+
 
         return $this->renderTemplate(
             "tpl.checkout",
@@ -72,5 +73,15 @@ class CheckoutController extends LayoutController
             ],
             false
         );
+    }
+
+    public function redirect()
+    {
+        if(!is_null($categoryByUrl = $this->checkForExistingCategory())) {
+            return $categoryByUrl;
+        }
+        /** @var CategoryController $categoryController */
+        $categoryController = pluginApp(CategoryController::class);
+        return $categoryController->redirectRoute(RouteConfig::CHECKOUT);
     }
 }

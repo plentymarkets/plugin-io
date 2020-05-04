@@ -2,7 +2,6 @@
 
 namespace IO\Helper;
 
-use Plenty\Modules\ShopBuilder\Helper\ShopBuilderRequest;
 use Plenty\Plugin\ConfigRepository;
 
 class RouteConfig
@@ -34,6 +33,38 @@ class RouteConfig
     const TERMS_CONDITIONS          = "gtc";
     const WISH_LIST                 = "wish-list";
     const PAGE_NOT_FOUND            = "page-not-found";
+    const TAGS                      = "tags";
+
+    const ALL = [
+        self::BASKET,
+        self::CANCELLATION_RIGHTS,
+        self::CANCELLATION_FORM,
+        self::CATEGORY,
+        self::CHANGE_MAIL,
+        self::CHECKOUT,
+        self::CONFIRMATION,
+        self::CONTACT,
+        self::HOME,
+        self::ITEM,
+        self::LEGAL_DISCLOSURE,
+        self::LOGIN,
+        self::MY_ACCOUNT,
+        self::NEWSLETTER_OPT_IN,
+        self::NEWSLETTER_OPT_OUT,
+        self::ORDER_DOCUMENT,
+        self::ORDER_PROPERTY_FILE,
+        self::ORDER_RETURN,
+        self::ORDER_RETURN_CONFIRMATION,
+        self::PASSWORD_RESET,
+        self::PLACE_ORDER,
+        self::PRIVACY_POLICY,
+        self::REGISTER,
+        self::SEARCH,
+        self::TAGS,
+        self::TERMS_CONDITIONS,
+        self::WISH_LIST,
+        self::PAGE_NOT_FOUND
+    ];
 
     private static $enabledRoutes = null;
     private static $overrides = [];
@@ -45,36 +76,9 @@ class RouteConfig
             $config = pluginApp(ConfigRepository::class);
             $configValue = $config->get("IO.routing.enabled_routes");
 
-            if ( $configValue === "all" || pluginApp(ShopBuilderRequest::class)->isShopBuilder() )
+            if ( $configValue === "all" || Utils::isShopBuilder() )
             {
-                self::$enabledRoutes = [
-                    self::BASKET,
-                    self::CANCELLATION_RIGHTS,
-                    self::CANCELLATION_FORM,
-                    self::CATEGORY,
-                    self::CHANGE_MAIL,
-                    self::CHECKOUT,
-                    self::CONFIRMATION,
-                    self::CONTACT,
-                    self::HOME,
-                    self::ITEM,
-                    self::LEGAL_DISCLOSURE,
-                    self::LOGIN,
-                    self::MY_ACCOUNT,
-                    self::NEWSLETTER_OPT_IN,
-                    self::NEWSLETTER_OPT_OUT,
-                    self::ORDER_PROPERTY_FILE,
-                    self::ORDER_RETURN,
-                    self::ORDER_RETURN_CONFIRMATION,
-                    self::PASSWORD_RESET,
-                    self::PLACE_ORDER,
-                    self::PRIVACY_POLICY,
-                    self::REGISTER,
-                    self::SEARCH,
-                    self::TERMS_CONDITIONS,
-                    self::WISH_LIST,
-                    self::PAGE_NOT_FOUND
-                ];
+                self::$enabledRoutes = self::ALL;
             }
             else
             {

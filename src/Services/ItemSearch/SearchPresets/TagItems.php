@@ -2,9 +2,7 @@
 
 namespace IO\Services\ItemSearch\SearchPresets;
 
-use IO\Services\ItemSearch\Extensions\ContentCacheVariationLinkExtension;
-use IO\Services\ItemSearch\Factories\VariationSearchFactory;
-use IO\Services\ItemSearch\Helper\SortingHelper;
+use Plenty\Modules\Webshop\ItemSearch\Factories\VariationSearchFactory;
 
 /**
  * Class TagItems
@@ -14,9 +12,15 @@ use IO\Services\ItemSearch\Helper\SortingHelper;
  * - tagIds: List of tag ids to get assigned items for
  *
  * @package IO\Services\ItemSearch\SearchPresets
+ *
+ * @deprecated since 5.0.0 will be deleted in 6.0.0
+ * @see \Plenty\Modules\Webshop\ItemSearch\SearchPresets\TagItems
  */
 class TagItems extends VariationList
 {
+    /**
+     * @inheritDoc
+     */
     public static function getSearchFactory($options)
     {
         $tagIds = [];
@@ -24,7 +28,7 @@ class TagItems extends VariationList
         {
             $tagIds = $options['tagIds'];
         }
-        
+
         /** @var VariationSearchFactory $factory */
         $factory = parent::getSearchFactory($options)
             ->hasAnyTag($tagIds)

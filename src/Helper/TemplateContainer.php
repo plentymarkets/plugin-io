@@ -1,6 +1,6 @@
 <?php
 namespace IO\Helper;
-use IO\Helper\ContextInterface;
+
 use Plenty\Plugin\Log\Loggable;
 
 /**
@@ -11,6 +11,19 @@ use Plenty\Plugin\Log\Loggable;
 class TemplateContainer
 {
     use Loggable;
+
+    public static function get($templateKey, $data = [])
+    {
+        $container = pluginApp(self::class);
+        $container->setTemplateKey($templateKey);
+
+        EventDispatcher::fire($templateKey, [
+            $container,
+            $data
+        ]);
+
+        return $container;
+    }
 
 	/**
 	 * @var string

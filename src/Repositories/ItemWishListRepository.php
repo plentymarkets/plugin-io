@@ -2,13 +2,13 @@
 
 namespace IO\Repositories;
 
-use IO\Services\ItemSearch\SearchPresets\VariationList;
-use IO\Services\ItemSearch\Services\ItemSearchService;
+use IO\Helper\Utils;
 use Plenty\Modules\Plugin\DataBase\Contracts\DataBase;
 use Plenty\Modules\Plugin\DataBase\Contracts\Query;
-use IO\Services\CustomerService;
 use IO\DBModels\ItemWishList;
-use Plenty\Plugin\Application;
+use Plenty\Modules\Webshop\Contracts\ContactRepositoryContract;
+use Plenty\Modules\Webshop\ItemSearch\SearchPresets\VariationList;
+use Plenty\Modules\Webshop\ItemSearch\Services\ItemSearchService;
 
 
 class ItemWishListRepository
@@ -16,18 +16,18 @@ class ItemWishListRepository
     /** @var  DataBase */
     private $db;
 
-    /** @var  CustomerService */
-    private $customer;
+    /** @var  ContactRepositoryContract $contactRepository */
+    private $contactRepository;
 
     /**
      * ItemWishListRepository constructor.
      * @param DataBase $dataBase
-     * @param CustomerService $customerService
+     * @param ContactRepositoryContract $contactRepository
      */
-    public function __construct(DataBase $dataBase, CustomerService $customerService)
+    public function __construct(DataBase $dataBase, ContactRepositoryContract $contactRepository)
     {
-        $this->db 		= $dataBase;
-        $this->customer = $customerService;
+        $this->db = $dataBase;
+        $this->contactRepository = $contactRepository;
     }
 
     /**
@@ -38,12 +38,12 @@ class ItemWishListRepository
     {
         $variationIds = [];
         $tempVariationIds = [];
-        $plentyId = pluginApp(Application::class)->getPlentyID();
+        $plentyId = Utils::getPlentyId();
 
         /** @var Query $query */
         $query = $this->db->query(ItemWishList::NAMESPACE);
 
-        $contactId = $this->customer->getContactId();
+        $contactId = $this->contactRepository->getContactId();
 
         if($contactId > 0)
         {
@@ -93,8 +93,8 @@ class ItemWishListRepository
      */
     public function isItemInWishList(int $variationId = 0)
     {
-        $contactId = $this->customer->getContactId();
-        $plentyId = pluginApp(Application::class)->getPlentyID();
+        $contactId = $this->contactRepository->getContactId();
+        $plentyId  = Utils::getPlentyId();
 
         if($variationId > 0)
         {
@@ -121,8 +121,8 @@ class ItemWishListRepository
      */
     public function addItemWishListEntry(int $variationId, int $quantity = 1)
     {
-        $contactId = $this->customer->getContactId();
-        $plentyId = pluginApp(Application::class)->getPlentyID();
+        $contactId = $this->contactRepository->getContactId();
+        $plentyId  = Utils::getPlentyId();
 
         if($contactId > 0 && $variationId > 0)
         {
@@ -166,9 +166,9 @@ class ItemWishListRepository
      */
     public function removeItemWishListEntry(int $variationId)
     {
-        $response = false;
-        $contactId = $this->customer->getContactId();
-        $plentyId = pluginApp(Application::class)->getPlentyID();
+        $response  = false;
+        $contactId = $this->contactRepository->getContactId();
+        $plentyId  = Utils::getPlentyId();
 
         if($contactId > 0 && $variationId > 0)
         {

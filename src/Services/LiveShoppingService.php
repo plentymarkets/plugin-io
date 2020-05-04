@@ -2,11 +2,12 @@
 
 namespace IO\Services;
 
-use IO\Services\ItemSearch\Helper\SortingHelper;
-use IO\Services\ItemSearch\SearchPresets\LiveShoppingItems;
-use IO\Services\ItemSearch\Services\ItemSearchService;
 use Plenty\Modules\LiveShopping\Contracts\LiveShoppingRepositoryContract;
 use Plenty\Modules\LiveShopping\Models\LiveShopping;
+use Plenty\Modules\Webshop\ItemSearch\Helpers\ResultFieldTemplate;
+use Plenty\Modules\Webshop\ItemSearch\Helpers\SortingHelper;
+use Plenty\Modules\Webshop\ItemSearch\SearchPresets\LiveShoppingItems;
+use Plenty\Modules\Webshop\ItemSearch\Services\ItemSearchService;
 
 /**
  * Class LiveShoppingService
@@ -14,6 +15,9 @@ use Plenty\Modules\LiveShopping\Models\LiveShopping;
  */
 class LiveShoppingService
 {
+    private $ownStock = false;
+    private $ownLimitation = false;
+
     /**
      * @param $liveShoppingId
      * @param $sorting
@@ -21,71 +25,80 @@ class LiveShoppingService
      */
     public function getLiveShoppingData($liveShoppingId, $sorting = null)
     {
-        if(is_null($sorting))
-        {
+        if (is_null($sorting)) {
             $sorting = 'sorting.price.avg_asc';
         }
-        
+
         /** @var LiveShoppingRepositoryContract $liveShoppingRepo */
         $liveShoppingRepo = pluginApp(LiveShoppingRepositoryContract::class);
         /** @var LiveShopping $liveShopping */
         $liveShopping = $liveShoppingRepo->getLiveShopping($liveShoppingId);
-        
+
         $liveShoppingItem = [];
-        $liveShoppingData = [];
-        
-        if($liveShopping instanceof LiveShopping)
-        {
+
+        if ($liveShopping instanceof LiveShopping) {
             $itemList = $this->getLiveShoppingVariations($liveShopping->itemId, $sorting);
-            
-            if(count($itemList[0]['documents']))
-            {
+
+            if (count($itemList[0]['documents'])) {
                 $liveShoppingItem = array_slice($itemList[0]['documents'], 0, 1);
+                $liveShoppingItem = $liveShoppingItem[0]['data'];
             }
-            
+
             $liveShoppingData = $liveShopping->toArray();
-            $liveShoppingData['quantitySold'] = $liveShoppingData['quantitySold'] + $liveShoppingData['quantitySoldReal'];
+            $liveShoppingData['quantitySold'] += $liveShoppingData['quantitySoldReal'];
             unset($liveShoppingData['quantitySoldReal']);
+
+            $this->checkStockLimit($liveShoppingData, $liveShoppingItem);
+
+            if ($this->ownStock) {
+                unset($liveShoppingItem['stock']['net']);
+            }
+
+            if ($this->ownLimitation) {
+                unset($liveShoppingItem['variation']['stockLimitation']);
+            }
+
+            return [
+                'item' => $liveShoppingItem,
+                'liveShopping' => $liveShoppingData
+            ];
         }
-        
-        return [
-            'item' => $liveShoppingItem[0]['data'],
-            'liveShopping' => $liveShoppingData
-        ];
+
+        return null;
     }
-    
+
     public function getLiveShoppingVariations($itemId, $sorting)
     {
+        /** @var SortingHelper $sortingHelper */
+        $sortingHelper = pluginApp(SortingHelper::class);
+
         $itemSearchOptions = [
-            'itemId'        => $itemId,
-            'sorting'       => SortingHelper::splitPathAndOrder($sorting)
+            'itemId' => $itemId,
+            'sorting' => $sortingHelper->splitPathAndOrder($sorting),
+            'resultFields' => $this->buildResultFields()
         ];
         /** @var ItemSearchService $itemSearchService */
-        $itemSearchService = pluginApp( ItemSearchService::class );
-        $itemList = $itemSearchService->getResults([
-                                                       LiveShoppingItems::getSearchFactory( $itemSearchOptions )
-                                                   ]);
-        
-       
+        $itemSearchService = pluginApp(ItemSearchService::class);
+        $itemList = $itemSearchService->getResults(
+            [
+                LiveShoppingItems::getSearchFactory($itemSearchOptions)
+            ]
+        );
+
         return $this->filterLiveShoppingVariations($itemList);
     }
-    
+
     /**
      * @param $itemList
      * @return array
      */
     public function filterLiveShoppingVariations($itemList)
     {
-        if(count($itemList))
-        {
-            foreach($itemList as $listKey => $list)
-            {
-                if(count($list['documents']))
-                {
-                    foreach($list['documents'] as $key => $variation)
-                    {
-                        if(is_null($variation['data']['prices']['specialOffer']))
-                        {
+        if (count($itemList)) {
+            foreach ($itemList as $listKey => $list) {
+                if (count($list['documents'])) {
+                    foreach ($list['documents'] as $key => $variation) {
+                        if (is_null($variation['data']['prices']['specialOffer'])) {
                             unset($itemList[$listKey]['documents'][$key]);
                             $itemList[$listKey]['documents'][] = $variation;
                         }
@@ -93,7 +106,44 @@ class LiveShoppingService
                 }
             }
         }
-        
+
         return $itemList;
+    }
+
+
+    /**
+     * Check if item is limited to net stock and modify quantitySold to reflect the limited stock
+     *
+     * @param $data
+     * @param $item
+     */
+    private function checkStockLimit(&$data, $item)
+    {
+        $isStockLimited = $item['variation']['stockLimitation'] === 1;
+        $isNetStockLess = (int)$item['stock']['net'] < $data['quantityMax'] - $data['quantitySold'];
+
+        if ($isStockLimited && $isNetStockLess) {
+            $data['quantitySold'] = $data['quantityMax'] - $item['stock']['net'];
+        }
+    }
+
+    private function buildResultFields()
+    {
+        $resultFields = ResultFieldTemplate::load(ResultFieldTemplate::TEMPLATE_LIST_ITEM);
+
+        $stockNet = ['*', 'stock.*', 'stock.net'];
+        if (empty(array_intersect($stockNet, $resultFields))) {
+            $resultFields[] = 'stock.net';
+            $this->ownStock = true;
+        }
+
+        $stockLimitation = ['*', 'variation.*', 'variation.stockLimitation'];
+        if (empty(array_intersect($stockLimitation, $resultFields))) {
+            $resultFields[] = 'variation.stockLimitation';
+            $this->ownLimitation = true;
+        }
+
+
+        return $resultFields;
     }
 }

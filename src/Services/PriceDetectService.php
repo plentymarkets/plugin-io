@@ -2,104 +2,156 @@
 
 namespace IO\Services;
 
+use IO\Helper\MemoryCache;
+use Plenty\Legacy\Services\Accounting\VatInitService;
 use Plenty\Legacy\Services\Item\Variation\DetectSalesPriceService;
 use Plenty\Modules\Account\Contact\Models\Contact;
+use Plenty\Modules\Accounting\Vat\Contracts\VatInitContract;
+use Plenty\Modules\Frontend\Services\VatService;
+use Plenty\Modules\Webshop\Contracts\CheckoutRepositoryContract;
+use Plenty\Modules\Webshop\Contracts\ContactRepositoryContract;
+use Plenty\Modules\Webshop\Repositories\ContactRepository;
 use Plenty\Plugin\Application;
-use IO\Services\CustomerService;
-use IO\Services\BasketService;
 
 
 /**
  * Class PriceDetectService
  * @package IO\Services
+ * @deprecated since 5.0.0 will be removed in 6.0.0
+ * @see \Plenty\Modules\Webshop\Contracts\PriceDetectRepositoryContract
+ *
  */
 class PriceDetectService
 {
+    use MemoryCache;
+
+
     private $classId = null;
     private $singleAccess = null;
     private $currency = null;
     private $plentyId = null;
     private $shippingCountryId = null;
-    
+
     /**
      * @var DetectSalesPriceService
      */
     private $detectSalesPriceService;
-    
+
     /**
-     * @var CustomerService
+     * @var ContactRepository $contactRepository
      */
-    private $customerService;
-    
+    private $contactRepository;
+
     /**
      * @var Application
      */
     private $app;
-    
+
     /**
-     * @var CheckoutService
+     * @var CheckoutRepositoryContract $checkoutRepository
      */
-    private $checkoutService;
-    
+    private $checkoutRepository;
+
     /**
      * @var BasketService $basketService
      */
     private $basketService;
-    
+
+    /**
+     * @var VatService $vatService
+     */
+    private $vatService;
+
+    /**
+     * @var VatInitService $vatService
+     */
+    private $vatInitService;
+
     private $referrerId;
-    
+
     /**
      * PriceDetectService constructor.
      * @param DetectSalesPriceService $detectSalesPriceService
-     * @param \IO\Services\CustomerService $customerService
+     * @param ContactRepositoryContract $contactRepository
      * @param Application $app
-     * @param CheckoutService $checkoutService
+     * @param CheckoutRepositoryContract $checkoutRepository
+     * @param BasketService $basketService
+     * @param VatInitContract $vatInitService
+     * @param VatService $vatService
      */
     public function __construct(DetectSalesPriceService $detectSalesPriceService,
-                                CustomerService $customerService,
+                                ContactRepositoryContract $contactRepository,
                                 Application $app,
-                                CheckoutService $checkoutService,
-                                BasketService $basketService)
+                                CheckoutRepositoryContract $checkoutRepository,
+                                BasketService $basketService,
+                                VatInitContract $vatInitService,
+                                VatService $vatService)
     {
         $this->detectSalesPriceService = $detectSalesPriceService;
-        $this->customerService = $customerService;
+        $this->contactRepository = $contactRepository;
         $this->app = $app;
-        $this->checkoutService = $checkoutService;
+        $this->checkoutRepository = $checkoutRepository;
         $this->basketService = $basketService;
-        
+        $this->vatInitService = $vatInitService;
+        $this->vatService = $vatService;
+
         $this->init();
     }
-    
+
     private function init()
     {
-        $contact = $this->customerService->getContact();
-        
+        $contact = $this->contactRepository->getContact();
+
         if ($contact instanceof Contact) {
             $this->singleAccess = $contact->singleAccess;
         }
 
-        $this->classId           = $this->customerService->getContactClassId();
-        $this->currency          = $this->checkoutService->getCurrency();
-        $this->shippingCountryId = $this->checkoutService->getShippingCountryId();
+        $this->classId           = $this->contactRepository->getContactClassId();
+        $this->currency          = $this->checkoutRepository->getCurrency();
+        $this->shippingCountryId = $this->checkoutRepository->getShippingCountryId();
         $this->plentyId          = $this->app->getPlentyId();
-        
+
         $referrerId = (int)$this->basketService->getBasket()->referrerId;
         $this->referrerId        = ((int)$referrerId > 0 ? $referrerId : 1);
+
+        if(!$this->vatInitService->isInitialized())
+        {
+            $vat = $this->vatService->getVat();
+        }
     }
-    
+
+    /**
+     * @return array
+     * @deprecated since 5.0.0 will be removed in 6.0.0
+     * @see \Plenty\Modules\Webshop\Contracts\PriceDetectRepositoryContract::getPriceIdsForCustomer()
+     */
     public function getPriceIdsForCustomer()
     {
-        $this->detectSalesPriceService
-            ->setAccountId(0)
-            ->setAccountType($this->singleAccess)
-            ->setCountryOfDelivery($this->shippingCountryId)
-            ->setCurrency($this->currency)
-            ->setCustomerClass($this->classId)
-            ->setOrderReferrer($this->referrerId)
-            ->setPlentyId($this->plentyId)
-            ->setQuantity(-1)
-            ->setType(DetectSalesPriceService::PRICE_TYPE_DEFAULT);
-        
-        return $this->detectSalesPriceService->detect();
+        $accountType = $this->singleAccess;
+        $shippingCountryId = $this->shippingCountryId;
+        $currency = $this->currency;
+        $customerClassId = $this->classId;
+        $referrerId = $this->referrerId;
+        $plentyId = $this->plentyId;
+        $detectSalesPriceService = $this->detectSalesPriceService;
+
+        $priceIds = $this->fromMemoryCache(
+	        "detectPriceIds.$accountType.$shippingCountryId.$currency.$customerClassId.$referrerId.$plentyId",
+            function() use ($accountType, $shippingCountryId, $currency, $customerClassId, $referrerId, $plentyId, $detectSalesPriceService)
+            {
+               $detectSalesPriceService->setAccountId(0)
+                ->setAccountType($accountType)
+                ->setCountryOfDelivery($shippingCountryId)
+                ->setCurrency($currency)
+                ->setCustomerClass($customerClassId)
+                ->setOrderReferrer($referrerId)
+                ->setPlentyId($plentyId)
+                ->setQuantity(-1)
+                ->setType(DetectSalesPriceService::PRICE_TYPE_DEFAULT);
+               return $detectSalesPriceService->detect();
+            }
+        );
+
+	    return $priceIds;
     }
 }

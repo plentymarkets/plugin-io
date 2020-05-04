@@ -3,9 +3,10 @@
 namespace IO\Services;
 
 use IO\DBModels\UserDataHash;
+use IO\Helper\Utils;
 use Plenty\Modules\Plugin\DataBase\Contracts\DataBase;
 use Plenty\Modules\Plugin\DataBase\Contracts\Model;
-use Plenty\Plugin\Application;
+use Plenty\Modules\Webshop\Contracts\ContactRepositoryContract;
 
 class UserDataHashService
 {
@@ -22,7 +23,7 @@ class UserDataHashService
     public function __construct(DataBase $dataBase, TemplateConfigService $templateConfigService)
     {
         $this->db = $dataBase;
-        $this->defaultTTL = $templateConfigService->get('global.user_data_hash_max_age', 24);
+        $this->defaultTTL = $templateConfigService->getInteger('global.user_data_hash_max_age', 24);
     }
 
     /**
@@ -38,12 +39,12 @@ class UserDataHashService
     {
         if ( is_null($plentyId) )
         {
-            $plentyId = pluginApp(Application::class)->getPlentyId();
+            $plentyId = Utils::getPlentyId();
         }
 
         if ( is_null($contactId) )
         {
-            $contactId = pluginApp(CustomerService::class)->getContactId();
+            $contactId = $this->getContactId();
         }
 
         if ( is_null($contactId) || $contactId <= 0 )
@@ -81,12 +82,12 @@ class UserDataHashService
     {
         if ( is_null($plentyId) )
         {
-            $plentyId = pluginApp(Application::class)->getPlentyId();
+            $plentyId = Utils::getPlentyId();
         }
 
         if ( is_null($contactId) )
         {
-            $contactId = pluginApp(CustomerService::class)->getContactId();
+            $contactId = $this->getContactId();
         }
 
         if ( is_null($contactId) || $contactId <= 0 )
@@ -147,12 +148,12 @@ class UserDataHashService
     {
         if ( is_null($plentyId) )
         {
-            $plentyId = pluginApp(Application::class)->getPlentyId();
+            $plentyId = Utils::getPlentyId();
         }
 
         if ( is_null($contactId) )
         {
-            $contactId = pluginApp(CustomerService::class)->getContactId();
+            $contactId = $this->getContactId();
         }
 
         if ( is_null($contactId) || $contactId <= 0 )
@@ -235,12 +236,12 @@ class UserDataHashService
     {
         if ( is_null($plentyId) )
         {
-            $plentyId = pluginApp(Application::class)->getPlentyId();
+            $plentyId = Utils::getPlentyId();
         }
 
         if ( is_null($contactId) )
         {
-            $contactId = pluginApp(CustomerService::class)->getContactId();
+            $contactId = $this->getContactId();
         }
 
         if ( is_null($contactId) || $contactId <= 0 )
@@ -259,4 +260,12 @@ class UserDataHashService
 
         return $query->delete();
     }
+
+    private function getContactId()
+    {
+        /** @var ContactRepositoryContract $contactRepository */
+        $contactRepository = pluginApp(ContactRepositoryContract::class);
+        return $contactRepository->getContactId();
+    }
+
 }

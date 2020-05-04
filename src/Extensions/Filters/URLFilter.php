@@ -1,15 +1,11 @@
-<?php //strict
+<?php
 
 namespace IO\Extensions\Filters;
 
 use IO\Extensions\AbstractFilter;
+use IO\Helper\Utils;
 use IO\Services\ItemService;
-use IO\Services\SessionStorageService;
-use IO\Services\TemplateConfigService;
-use IO\Services\UrlBuilder\ItemUrlBuilder;
-use IO\Services\UrlBuilder\VariationUrlBuilder;
-use IO\Services\UrlService;
-use IO\Services\WebstoreConfigurationService;
+use Plenty\Modules\Webshop\Contracts\UrlBuilderRepositoryContract;
 
 /**
  * Class URLFilter
@@ -23,36 +19,24 @@ class URLFilter extends AbstractFilter
     private $itemService;
 
     /**
-     * @var SessionStorageService $sessionStorageService
-     */
-    private $sessionStorageService;
-
-    /**
-     * @var WebstoreConfigurationService $webstoreConfigurationService
-     */
-    private $webstoreConfigurationService;
-
-    /**
      * URLFilter constructor.
      * @param ItemService $itemService
      */
-    public function __construct(ItemService $itemService )
+    public function __construct(ItemService $itemService)
     {
         parent::__construct();
         $this->itemService = $itemService;
-        $this->sessionStorageService = pluginApp(SessionStorageService::class);
-        $this->webstoreConfigurationService = pluginApp(WebstoreConfigurationService::class);
     }
 
     /**
      * Return the available filter methods
      * @return array
      */
-    public function getFilters():array
+    public function getFilters(): array
     {
         return [
-            "itemURL" => "buildItemURL",
-            "variationURL" => "buildVariationURL"
+            'itemURL' => 'buildItemURL',
+            'variationURL' => 'buildVariationURL'
         ];
     }
 
@@ -62,31 +46,26 @@ class URLFilter extends AbstractFilter
      * @param bool $withVariationId
      * @return string
      */
-    public function buildItemURL($itemData, $withVariationId = true):string
+    public function buildItemURL($itemData, $withVariationId = true): string
     {
         $itemId = $itemData['item']['id'];
         $variationId = $itemData['variation']['id'];
 
-        if ( $itemId === null || $itemId <= 0 )
-        {
+        if ($itemId === null || $itemId <= 0) {
             return "";
         }
 
-        $includeLanguage = pluginApp(SessionStorageService::class)->getLang() !== pluginApp(WebstoreConfigurationService::class)->getDefaultLanguage();
-        if ( $variationId === null || $variationId <= 0 )
-        {
-            /** @var ItemUrlBuilder $itemUrlBuilder */
-            $itemUrlBuilder = pluginApp( ItemUrlBuilder::class );
-            return $itemUrlBuilder->buildUrl( $itemId )->toRelativeUrl($includeLanguage);
-        }
-        else
-        {
-            /** @var VariationUrlBuilder $variationUrlBuilder */
-            $variationUrlBuilder = pluginApp( VariationUrlBuilder::class );
-            $url = $variationUrlBuilder->buildUrl( $itemId, $variationId );
+        /** @var UrlBuilderRepositoryContract $urlBuilderRepository */
+        $urlBuilderRepository = pluginApp(UrlBuilderRepositoryContract::class);
+
+        $includeLanguage = Utils::getLang() !== Utils::getDefaultLang();
+        if ($variationId === null || $variationId <= 0) {
+            return $urlBuilderRepository->buildItemUrl($itemId)->toRelativeUrl($includeLanguage);
+        } else {
+            $url = $urlBuilderRepository->buildVariationUrl($itemId, $variationId);
 
             return $url->append(
-                $variationUrlBuilder->getSuffix( $itemId, $variationId, $withVariationId )
+                $urlBuilderRepository->getSuffix($itemId, $variationId, $withVariationId)
             )->toRelativeUrl($includeLanguage);
         }
     }
@@ -97,10 +76,10 @@ class URLFilter extends AbstractFilter
      *
      * @deprecated
      */
-    public function buildVariationURL($variationId = 0):string
+    public function buildVariationURL($variationId = 0): string
     {
-        $variation = $this->itemService->getVariation( $variationId );
-        return $this->buildItemURL( $variation['documents'][0]['data'], true );
+        $variation = $this->itemService->getVariation($variationId);
+        return $this->buildItemURL($variation['documents'][0]['data'], true);
     }
 
 }

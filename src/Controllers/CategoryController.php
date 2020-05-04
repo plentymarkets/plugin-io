@@ -3,12 +3,13 @@
 namespace IO\Controllers;
 
 use IO\Api\ResponseCode;
+use IO\Extensions\Constants\ShopUrls;
 use IO\Helper\RouteConfig;
 use IO\Guards\AuthGuard;
-use IO\Services\SessionStorageService;
+use IO\Helper\Utils;
 use IO\Services\UrlService;
 use Plenty\Modules\ShopBuilder\Helper\ShopBuilderRequest;
-use Plenty\Plugin\Application;
+use Plenty\Modules\Webshop\Contracts\ContactRepositoryContract;
 use Plenty\Plugin\Http\Request;
 use Plenty\Plugin\Http\Response;
 use Plenty\Plugin\Log\Loggable;
@@ -20,7 +21,7 @@ use Plenty\Plugin\Log\Loggable;
 class CategoryController extends LayoutController
 {
     use Loggable;
-
+    static $LANGUAGE_FROM_URL = null;
     /**
      * Prepare and render the data for categories
      * @param string $lvl1 Level 1 of category url. Will be null at root page
@@ -37,65 +38,84 @@ class CategoryController extends LayoutController
         $lvl3 = null,
         $lvl4 = null,
         $lvl5 = null,
-        $lvl6 = null)
-    {
-        /** @var SessionStorageService $sessionService */
-        $sessionService  = pluginApp(SessionStorageService::class);
-        $lang = $sessionService->getLang();
-        $webstoreId = pluginApp(Application::class)->getWebstoreId();
+        $lvl6 = null
+    ) {
+        $lang = Utils::getLang();
+        $webstoreId = Utils::getWebstoreId();
+        $category = $this->categoryRepo->findCategoryByUrl($lvl1, $lvl2, $lvl3, $lvl4, $lvl5, $lvl6, $webstoreId,
+            $lang);
+
+        if ($category === null) {
+            $category = $this->categoryRepo->findCategoryByUrl($lvl1, $lvl2, $lvl3, $lvl4, $lvl5, $lvl6, $webstoreId,
+               self::$LANGUAGE_FROM_URL);
+        }
+
+        /** @var ShopBuilderRequest $shopBuilderRequest */
+        $shopBuilderRequest = pluginApp(ShopBuilderRequest::class);
+        if ($shopBuilderRequest->isShopBuilder() && ($shopBuilderRequest->getPreviewContentType() === 'singleitem' || $shopBuilderRequest->getPreviewContentType() === 'itemset')) {
+            /** @var ItemController $itemController */
+            $itemController = pluginApp(ItemController::class);
+            return $itemController->showItemForCategory($category);
+        }
 
         return $this->renderCategory(
-            $this->categoryRepo->findCategoryByUrl($lvl1, $lvl2, $lvl3, $lvl4, $lvl5, $lvl6, $webstoreId, $lang)
-        );
-	}
-
-	public function showCategoryById($categoryId)
-    {
-        /** @var SessionStorageService $sessionService */
-        $sessionService  = pluginApp(SessionStorageService::class);
-        $lang = $sessionService->getLang();
-
-        return $this->renderCategory(
-            $this->categoryRepo->get( $categoryId, $lang )
+            $category
         );
     }
 
-    public function redirectToCategory( $categoryUrl )
+    public function showCategoryById($categoryId, $params = [])
     {
-        // Check if category can be displayed
-        $categoryLevels = array_filter(
-            explode("/", $categoryUrl),
-            function($lvl)
-            {
-                return strlen($lvl);
-            }
+        $lang = Utils::getLang();
+
+        return $this->renderCategory(
+            $this->categoryRepo->get($categoryId, $lang),
+            $params
         );
-        $categoryResponse = $this->showCategory(
-            $categoryLevels[0],
-            $categoryLevels[1],
-            $categoryLevels[2],
-            $categoryLevels[3],
-            $categoryLevels[4],
-            $categoryLevels[5]
-        );
-        if (!($categoryResponse instanceof Response && $categoryResponse->status() == ResponseCode::NOT_FOUND))
-        {
-            // category cannot be displayed. Return 404
-            return $categoryResponse;
-        }
+    }
+
+    public function redirectToCategory($categoryId, $defaultUrl = '', $params = [])
+    {
+        $lang = Utils::getLang();
 
         /** @var UrlService $urlService */
         $urlService = pluginApp(UrlService::class);
-        return $urlService->redirectTo($categoryUrl);
+        $categoryUrl = $urlService->getCategoryURL((int)$categoryId, $lang);
+        if ($categoryUrl->equals($defaultUrl)) {
+            // category url equals legacy route name
+            return $this->showCategoryById($categoryId, $params);
+        }
+
+        $category = $this->categoryRepo->get($categoryId, $lang);
+
+        if (is_null($category)) {
+            /** @var Response $response */
+            $response = pluginApp(Response::class);
+            $response->forceStatus(ResponseCode::NOT_FOUND);
+
+            return $response;
+        }
+
+        $urlParams = http_build_query($params);
+        return $urlService->redirectTo(
+            $categoryUrl->toRelativeUrl() . (strlen($urlParams) ? '?' . $urlParams : '')
+        );
     }
 
-	private function renderCategory($category)
+    public function redirectRoute($route, $params = [])
+    {
+        return $this->redirectToCategory(
+            RouteConfig::getCategoryId($route),
+            "/" . $route,
+            $params
+        );
+    }
+
+    private function renderCategory($category, $params = [])
     {
         /** @var Request $request */
         $request = pluginApp(Request::class);
 
-        if ($category === null || (($category->clients->count() == 0 || $category->details->count() == 0) && !$this->app->isAdminPreview()))
-        {
+        if ($category === null || (($category->clients->count() == 0 || $category->details->count() == 0) && !$this->app->isAdminPreview())) {
             $this->getLogger(__CLASS__)->warning(
                 "IO::Debug.CategoryController_cannotDisplayCategory",
                 [
@@ -116,14 +136,15 @@ class CategoryController extends LayoutController
         $this->categoryService->setCurrentCategory($category);
         if ($this->categoryService->isHidden($category->id)) {
             $guard = pluginApp(AuthGuard::class);
-            $guard->assertOrRedirect( true, '/login');
+            $guard->assertOrRedirect(true, '/login');
         }
 
         /** @var ShopBuilderRequest $shopBuilderRequest */
         $shopBuilderRequest = pluginApp(ShopBuilderRequest::class);
+        $shopBuilderRequest->setMainContentType($category->type);
+        $shopBuilderRequest->setMainCategory($category->id);
 
-        if ( RouteConfig::getCategoryId( RouteConfig::CHECKOUT ) === $category->id || $shopBuilderRequest->getPreviewContentType() === 'checkout')
-        {
+        if (RouteConfig::getCategoryId(RouteConfig::CHECKOUT) === $category->id || $shopBuilderRequest->getPreviewContentType() === 'checkout') {
             $this->getLogger(__CLASS__)->info(
                 "IO::Debug.CategoryController_showCheckoutCategory",
                 [
@@ -135,11 +156,10 @@ class CategoryController extends LayoutController
 
             /** @var CheckoutController $checkoutController */
             $checkoutController = pluginApp(CheckoutController::class);
-            return $checkoutController->showCheckout( $category );
+            return $checkoutController->showCheckout($category);
         }
 
-        if ( RouteConfig::getCategoryId( RouteConfig::MY_ACCOUNT ) === $category->id || $shopBuilderRequest->getPreviewContentType() === 'myaccount')
-        {
+        if (RouteConfig::getCategoryId(RouteConfig::MY_ACCOUNT) === $category->id || $shopBuilderRequest->getPreviewContentType() === 'myaccount') {
             $this->getLogger(__CLASS__)->info(
                 "IO::Debug.CategoryController_showMyAccountCategory",
                 [
@@ -151,17 +171,95 @@ class CategoryController extends LayoutController
 
             /** @var MyAccountController $myAccountController */
             $myAccountController = pluginApp(MyAccountController::class);
-            return $myAccountController->showMyAccount( $category );
+            return $myAccountController->showMyAccount($category);
+        }
+
+        if (RouteConfig::getCategoryId(RouteConfig::SEARCH) === $category->id || $shopBuilderRequest->getPreviewContentType() === 'itemsearch') {
+            $this->getLogger(__CLASS__)->info(
+                "IO::Debug.CategoryController_showMyAccountCategory",
+                [
+                    "category" => $category,
+                    "previewContentType" => $shopBuilderRequest->getPreviewContentType()
+                ]
+            );
+            RouteConfig::overrideCategoryId(RouteConfig::SEARCH, $category->id);
+
+            /** @var ItemSearchController $itemSearchController */
+            $itemSearchController = pluginApp(ItemSearchController::class);
+
+            return $itemSearchController->showSearch($category);
+        }
+
+        if (RouteConfig::getCategoryId(RouteConfig::CONFIRMATION) === $category->id) {
+            $this->getLogger(__CLASS__)->info(
+                "IO::Debug.CategoryController_showConfirmationCategory",
+                [
+                    "category" => $category,
+                    "previewContentType" => $shopBuilderRequest->getPreviewContentType()
+                ]
+            );
+            RouteConfig::overrideCategoryId(RouteConfig::CONFIRMATION, $category->id);
+
+            /** @var ContactRepositoryContract $contactRepository */
+            $contactRepository = pluginApp(ContactRepositoryContract::class);
+
+            if ($request->get('contentLinkId', false) && $contactRepository->getContactId() <= 0) {
+                /** @var ShopUrls $shopUrls */
+                $shopUrls = pluginApp(ShopUrls::class);
+                /** @var AuthGuard $guard */
+                $guard = pluginApp(AuthGuard::class);
+                $guard->assertOrRedirect(true, $shopUrls->login);
+            }
+
+            /** @var ConfirmationController $confirmationController */
+            $confirmationController = pluginApp(ConfirmationController::class);
+            return $confirmationController->showConfirmation(
+                $params['orderId'] ?? $request->get('orderId', 0),
+                $params['accessKey'] ?? $request->get('accessKey', ''),
+                $category
+            );
+        }
+
+        if (RouteConfig::getCategoryId(RouteConfig::LOGIN) === $category->id
+            || RouteConfig::getCategoryId(RouteConfig::REGISTER) === $category->id) {
+            /** @var ContactRepositoryContract $contactRepository */
+            $contactRepository = pluginApp(ContactRepositoryContract::class);
+
+            if ($contactRepository->getContactId() > 0 && !$shopBuilderRequest->isShopBuilder()) {
+                /** @var ShopUrls $shopUrls */
+                $shopUrls = pluginApp(ShopUrls::class);
+                AuthGuard::redirect($shopUrls->home);
+            }
+        }
+
+        if (RouteConfig::getCategoryId(RouteConfig::ORDER_RETURN) === $category->id) {
+            /** @var OrderReturnController $orderReturnController */
+            $orderReturnController = pluginApp(OrderReturnController::class);
+
+            $orderId = $request->get('orderId', 0);
+            if ($orderId > 0) {
+                return $orderReturnController->showOrderReturn(
+                    $orderId,
+                    $request->get('orderAccessKey', null),
+                    $category
+                );
+            } elseif (!$shopBuilderRequest->isShopBuilder()) {
+                /** @var Response $response */
+                $response = pluginApp(Response::class);
+                $response->forceStatus(ResponseCode::NOT_FOUND);
+
+                return $response;
+            }
         }
 
         return $this->renderTemplate(
             "tpl.category." . $category->type,
             [
-                'category'      => $category,
-                'sorting'       => $request->get('sorting', null),
-                'itemsPerPage'  => $request->get('items', null),
-                'page'          => $request->get('page', null),
-                'facets'        => $request->get('facets', '')
+                'category' => $category,
+                'sorting' => $request->get('sorting', null),
+                'itemsPerPage' => $request->get('items', null),
+                'page' => $request->get('page', null),
+                'facets' => $request->get('facets', '')
             ]
         );
     }

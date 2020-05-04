@@ -2,6 +2,7 @@
 namespace IO\Controllers;
 
 use IO\Constants\LogLevel;
+use IO\Helper\RouteConfig;
 use IO\Services\NotificationService;
 use IO\Services\UserDataHashService;
 
@@ -39,15 +40,33 @@ class CustomerPasswordResetController extends LayoutController
              */
             $notificationService = pluginApp(NotificationService::class);
             $notificationService->addNotificationCode(LogLevel::ERROR,3);
-            
-            return $this->renderTemplate(
-                "tpl.home",
-                [
-                    "data" => ""
-                ],
-                false
-            );
+    
+            /** @var HomepageController $homepageController */
+            $homepageController = pluginApp(HomepageController::class);
+    
+            if(RouteConfig::getCategoryId(RouteConfig::HOME) > 0)
+            {
+                return $homepageController->showHomepageCategory();
+            }
+    
+            return $homepageController->showHomepage();
         }
         
+    }
+
+    public function redirect($contactId, $hash)
+    {
+        $passwordResetParams = [];
+
+        if((int)$contactId > 0 && strlen($hash))
+        {
+            $passwordResetParams['contactId'] = $contactId;
+            $passwordResetParams['hash'] = $hash;
+        }
+
+        /** @var CategoryController $categoryController */
+        $categoryController = pluginApp(CategoryController::class);
+
+        return $categoryController->redirectToCategory(RouteConfig::getCategoryId(RouteConfig::PASSWORD_RESET), '/password-reset', $passwordResetParams);
     }
 }

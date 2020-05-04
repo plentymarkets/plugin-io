@@ -2,10 +2,14 @@
 
 namespace IO\Services\ItemSearch\Extensions;
 
-use IO\Services\ItemSearch\Factories\VariationSearchFactory;
-use IO\Services\SessionStorageService;
-use IO\Services\TemplateConfigService;
+use IO\Helper\Utils;
+use Plenty\Modules\Webshop\ItemSearch\Factories\VariationSearchFactory;
 
+/**
+ * Class GroupedAttributeValuesExtension
+ * @package IO\Services\ItemSearch\Extensions
+ * @deprecated since 5.0.0 will be removed in 6.0.0
+ */
 class GroupedAttributeValuesExtension implements ItemSearchExtension
 {
     /**
@@ -13,8 +17,7 @@ class GroupedAttributeValuesExtension implements ItemSearchExtension
      */
     public function getSearch($parentSearchBuilder)
     {
-        return VariationSearchFactory::inherit(
-            $parentSearchBuilder,
+        return $parentSearchBuilder->inherit(
             [
                 VariationSearchFactory::INHERIT_FILTERS,
                 VariationSearchFactory::INHERIT_PAGINATION,
@@ -24,8 +27,7 @@ class GroupedAttributeValuesExtension implements ItemSearchExtension
             ])
             ->withResultFields([
                 'attributes.*'
-            ])
-            ->build();
+            ]);
     }
 
     /**
@@ -33,8 +35,7 @@ class GroupedAttributeValuesExtension implements ItemSearchExtension
      */
     public function transformResult($baseResult, $extensionResult)
     {
-        $lang = pluginApp(SessionStorageService::class)->getLang();
-        $variationShowType = pluginApp(TemplateConfigService::class)->get('item.variation_show_type');
+        $lang = Utils::getLang();
 
         foreach( $baseResult["documents"] as $i => $document )
         {
@@ -44,7 +45,7 @@ class GroupedAttributeValuesExtension implements ItemSearchExtension
             {
                 foreach( $attributes as $attribute )
                 {
-                    if ( $attribute["attribute"]["isGroupable"] || $variationShowType !== 'combined' )
+                    if ( $attribute["attribute"]["isGroupable"] )
                     {
                         $name = "";
                         foreach( $attribute["attribute"]["names"] as $attrName )

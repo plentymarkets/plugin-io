@@ -2,6 +2,10 @@
 
 namespace IO\Services;
 
+use IO\Extensions\Constants\ShopUrls;
+use IO\Helper\RouteConfig;
+use Plenty\Modules\Webshop\ItemSearch\Helpers\SortingHelper;
+use Plenty\Plugin\Http\Request;
 use Plenty\Plugin\Templates\Twig;
 
 /**
@@ -13,6 +17,8 @@ class TemplateService
     public static $currentTemplate = "";
 
     public static $currentTemplateData = [];
+
+    public static $shouldBeCached = true;
 
     public $forceNoIndex = false;
 
@@ -26,77 +32,149 @@ class TemplateService
         return $this->forceNoIndex;
     }
 
-    public function getCurrentTemplate():string
+    public function shouldBeCached()
+    {
+        return self::$shouldBeCached;
+    }
+
+    public function disableCacheForTemplate()
+    {
+        self::$shouldBeCached = false;
+    }
+
+    public function getCurrentTemplate(): string
     {
         return TemplateService::$currentTemplate;
     }
 
-    public function isCurrentTemplate($templateToCheck):bool
+    public function setCurrentTemplate($template)
+    {
+        self::$currentTemplate = $template;
+    }
+
+    /**
+     * @param $templateToCheck
+     * @return bool
+     * @deprecated Use ShopUrls::is() instead
+     */
+    public function isCurrentTemplate($templateToCheck): bool
     {
         return TemplateService::$currentTemplate == $templateToCheck;
     }
 
     /**
-     * @deprecated use isCurrentTemplate('tpl.home') instead
+     * @deprecated Use ShopUrls::is(RouteConfig::HOME) instead
      */
-    public function isHome():bool
+    public function isHome(): bool
     {
-        return TemplateService::$currentTemplate == "tpl.home";
+        /** @var ShopUrls $shopUrls */
+        $shopUrls = pluginApp(ShopUrls::class);
+        return $shopUrls->is(RouteConfig::HOME);
     }
 
     /**
-     * @deprecated use isCurrentTemplate('tpl.item') instead
+     * @deprecated Use ShopUrls::is(RouteConfig::ITEM) instead
      */
-    public function isItem():bool
+    public function isItem(): bool
     {
-        return TemplateService::$currentTemplate == "tpl.item";
+        /** @var ShopUrls $shopUrls */
+        $shopUrls = pluginApp(ShopUrls::class);
+        return $shopUrls->is(RouteConfig::ITEM);
     }
 
     /**
-     * @deprecated use isCurrentTemplate('tpl.my-account') instead
+     * @deprecated Use ShopUrls::is(RouteConfig::MY_ACCOUNT) instead
      */
-    public function isMyAccount():bool
+    public function isMyAccount(): bool
     {
-        return TemplateService::$currentTemplate == "tpl.my-account";
+        /** @var ShopUrls $shopUrls */
+        $shopUrls = pluginApp(ShopUrls::class);
+        return $shopUrls->is(RouteConfig::MY_ACCOUNT);
     }
 
     /**
-     * @deprecated use isCurrentTemplate('tpl.checkout') instead
+     * @deprecated Use ShopUrls::is(RouteConfig::CHECKOUT) instead
      */
-    public function isCheckout():bool
+    public function isCheckout(): bool
     {
-        return TemplateService::$currentTemplate == "tpl.checkout";
+        /** @var ShopUrls $shopUrls */
+        $shopUrls = pluginApp(ShopUrls::class);
+        return $shopUrls->is(RouteConfig::CHECKOUT);
     }
 
     /**
-     * @deprecated use isCurrentTemplate('tpl.search') instead
+     * @deprecated Use ShopUrls::is(RouteConfig::SEARCH) instead
      */
-    public function isSearch():bool
+    public function isSearch(): bool
     {
-        return TemplateService::$currentTemplate == "tpl.search";
+        /** @var ShopUrls $shopUrls */
+        $shopUrls = pluginApp(ShopUrls::class);
+        return $shopUrls->is(RouteConfig::SEARCH);
     }
 
     /**
-     * @deprecated use isCurrentTemplate('tpl.category.item') instead
+     * @deprecated Use ShopUrls::is(RouteConfig::CATEGORY) instead
      */
-    public function isCategory():bool
+    public function isCategory(): bool
     {
-        return TemplateService::$currentTemplate == "tpl.category.item" || TemplateService::$currentTemplate == "tpl.category.content";
+        /** @var ShopUrls $shopUrls */
+        $shopUrls = pluginApp(ShopUrls::class);
+        return $shopUrls->is(RouteConfig::CATEGORY);
     }
-    
+
     public function renderTemplate($template, $params)
     {
         $renderedTemplate = '';
-    
-        if (strlen($template))
-        {
+
+        if (strlen($template)) {
             /**
              * @var Twig $twig
              */
-            $twig             = pluginApp(Twig::class);
+            $twig = pluginApp(Twig::class);
             $renderedTemplate = $twig->render($template, $params);
         }
-        
+
         return $renderedTemplate;
+    }
+
+    public function isCheapestSorting()
+    {
+        /** @var TemplateConfigService $templateConfigRepository */
+        $templateConfigRepository = pluginApp(TemplateConfigService::class);
+
+        $sorting = pluginApp(Request::class)->get('sorting', '');
+        if (strlen($sorting) === 0) {
+            /** @var ShopUrls $shopUrls */
+            $shopUrls = pluginApp(ShopUrls::class);
+            if ($shopUrls->is(RouteConfig::SEARCH)) {
+                $sorting = $templateConfigRepository->get('sort.defaultSortingSearch', 'item.score');
+            } else {
+                $sorting = $templateConfigRepository->get('sort.defaultSorting', 'texts.name1_asc');
+            }
+        }
+
+        /** @var SortingHelper $sortingHelper */
+        $sortingHelper = pluginApp(SortingHelper::class);
+        $sorting = $sortingHelper->mapToInnerSorting($sorting);
+
+        $dynamicInheritSorting = $templateConfigRepository->get('sorting.dynamicInherit', []);
+        if (in_array($sorting, $dynamicInheritSorting)) {
+            if ($sorting === 'filter.prices.price_asc') {
+                return true;
+            }
+            return false;
+        }
+
+        $dynamicPrio1 = $templateConfigRepository->get('sorting.dynamicPrio1', 'filter.prices.price_asc');
+        if ($dynamicPrio1 === 'filter.prices.price_asc') {
+            return true;
+        }
+
+        $dynamicPrio2 = $templateConfigRepository->get('sorting.dynamicPrio2', 'variationId_asc');
+        if ($dynamicPrio1 === 'filter.isMain_desc' && $dynamicPrio2 === 'filter.prices.price_asc') {
+            return true;
+        }
+
+        return false;
     }
 }

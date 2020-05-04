@@ -1,9 +1,7 @@
 <?php //strict
 namespace IO\Controllers;
 
-use IO\Helper\TemplateContainer;
-use IO\Services\ItemWishListService;
-use Plenty\Plugin\ConfigRepository;
+use IO\Helper\RouteConfig;
 
 /**
  * Class WishListController
@@ -15,26 +13,25 @@ class ItemWishListController extends LayoutController
      * Render the wish list
      * @return string
      */
-    public function showWishList(ItemWishListService $itemWishListService):string
+    public function showWishList():string
     {
-        $itemWishList = [];
-    
-        /**
-         * @var ConfigRepository $configRepo
-         */
-        $configRepo = pluginApp(ConfigRepository::class);
-        $enabledRoutes = explode(", ",  $configRepo->get("IO.routing.enabled_routes") );
-        if(in_array('wish-list', $enabledRoutes) || in_array("all", $enabledRoutes))
-        {
-            $itemWishList = $itemWishListService->getItemWishList();
-        }
-        
         return $this->renderTemplate(
 			"tpl.wish-list",
 			[
-                "wishList" => ( is_array($itemWishList) ? $itemWishList : [] )
-			],
-            false
+                "object" => ""
+            ],
+            true
 		);
+    }
+
+    public function redirect()
+    {
+        if(!is_null($categoryByUrl = $this->checkForExistingCategory())) {
+            return $categoryByUrl;
+        }
+
+        /** @var CategoryController $categoryController */
+        $categoryController = pluginApp(CategoryController::class);
+        return $categoryController->redirectRoute(RouteConfig::WISH_LIST);
     }
 }

@@ -2,11 +2,20 @@
 
 namespace IO\Services\ItemSearch\SearchPresets;
 
-use IO\Services\ItemSearch\Factories\VariationSearchFactory;
-use IO\Services\ItemSearch\Helper\SortingHelper;
+use Plenty\Modules\Webshop\ItemSearch\Factories\VariationSearchFactory;
+use Plenty\Modules\Webshop\ItemSearch\Helpers\SortingHelper;
 
+/**
+ * Class ManufacturerItems
+ * @package IO\Services\ItemSearch\SearchPresets
+ * @deprecated since 5.0.0 will be deleted in 6.0.0
+ * @see \Plenty\Modules\Webshop\ItemSearch\SearchPresets\ManufacturerItems
+ */
 class ManufacturerItems implements SearchPreset
 {
+    /**
+     * @inheritDoc
+     */
     public static function getSearchFactory($options)
     {
         $page = 1;
@@ -14,11 +23,13 @@ class ManufacturerItems implements SearchPreset
         {
             $page = (int) $options['page'];
         }
-       
+
         $sorting = '';
         if ( array_key_exists( 'sorting', $options ) )
         {
-            $sorting = SortingHelper::getSorting( $options['sorting'] );
+            /** @var SortingHelper $sortingHelper */
+            $sortingHelper = pluginApp(SortingHelper::class);
+            $sorting = $sortingHelper->getSorting( $options['sorting'] );
         }
 
         $itemsPerPage = 20;

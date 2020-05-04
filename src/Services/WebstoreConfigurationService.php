@@ -2,84 +2,82 @@
 
 namespace IO\Services;
 
-use Plenty\Modules\System\Contracts\WebstoreConfigurationRepositoryContract;
+use IO\Helper\Utils;
 use Plenty\Modules\System\Models\WebstoreConfiguration;
-use Plenty\Plugin\Application;
+use Plenty\Modules\Webshop\Contracts\WebstoreConfigurationRepositoryContract;
 
 /**
  * Class WebstoreConfigurationService
  * @package IO\Services
+ *
+ * @deprecated since 5.0.0 will be removed in 6.0.0
+ * @see \Plenty\Modules\Webshop\Contracts\WebstoreConfigurationRepositoryContract
  */
 class WebstoreConfigurationService
 {
     /**
-     * @var WebstoreConfiguration
-     */
-    private $webstoreConfig;
-
-
-    /**
      * Get the plenty-id
+     * @deprecated since 4.3.0
+     * @see \IO\Helper\Utils::getPlentyId() instead
      */
     public function getPlentyId()
     {
-        return pluginApp(Application::class)->getPlentyId();
+        return Utils::getPlentyId();
     }
 
     /**
      * Get the webstore configuraion
+     *
+     * @deprecated since 5.0.0 will be removed in 6.0.0
+     * @see \Plenty\Modules\Webshop\Contracts\WebstoreConfigurationRepositoryContract::getWebstoreConfiguration()
      */
-	public function getWebstoreConfig():WebstoreConfiguration
+    public function getWebstoreConfig(): WebstoreConfiguration
     {
-        if( $this->webstoreConfig === null )
-        {
-            /** @var WebstoreConfigurationRepositoryContract $webstoreConfig */
-            $webstoreConfig = pluginApp(WebstoreConfigurationRepositoryContract::class);
-
-            /** @var Application $app */
-            $app = pluginApp(Application::class);
-
-            $this->webstoreConfig = $webstoreConfig->findByWebstoreId($app->getWebstoreId());
-        }
-
-        return $this->webstoreConfig;
+        /** @var WebstoreConfigurationRepositoryContract $webstoreConfigurationRepository */
+        $webstoreConfigurationRepository = pluginApp(WebstoreConfigurationRepositoryContract::class);
+        return $webstoreConfigurationRepository->getWebstoreConfiguration();
     }
 
-	/**
-	 * Get the activate languages of the webstore
-	 */
+    /**
+     * Get the activate languages of the webstore
+     *
+     * @deprecated since 5.0.0 will be removed in 6.0.0
+     * @see \Plenty\Modules\Webshop\Contracts\WebstoreConfigurationRepositoryContract::getActiveLanguageList()
+     */
     public function getActiveLanguageList()
-	{
+    {
         $activeLanguages = [];
-        
-        /** @var TemplateConfigService $templateConfigService */
-        $templateConfigService = pluginApp(TemplateConfigService::class);
-        $languages = $templateConfigService->get('language.active_languages');
-        
-        if(!is_null($languages) && strlen($languages))
-        {
+
+        $languages = Utils::getTemplateConfig('language.active_languages');
+
+        if (!is_null($languages) && strlen($languages)) {
             $activeLanguages = explode(', ', $languages);
         }
 
-        if(!in_array($this->webstoreConfig->defaultLanguage, $activeLanguages))
-        {
-            $activeLanguages[] = $this->webstoreConfig->defaultLanguage;
+        if (!in_array($this->getWebstoreConfig()->defaultLanguage, $activeLanguages)) {
+            $activeLanguages[] = $this->getWebstoreConfig()->defaultLanguage;
         }
-        
-		return $activeLanguages;
-	}
 
-	/**
-	 * Get the default language of the webstore
-	 */
+        return $activeLanguages;
+    }
+
+    /**
+     * Get the default language of the webstore
+     *
+     * @deprecated since 5.0.0 will be removed in 6.0.0
+     * @see \Plenty\Modules\Webshop\Contracts\WebstoreConfigurationRepositoryContract::getDefaultLanguage()
+     */
     public function getDefaultLanguage()
     {
         return $this->getWebstoreConfig()->defaultLanguage;
     }
 
     /**
-	 * Get the default parcel-service-Id of the webstore
-	 */
+     * Get the default parcel-service-Id of the webstore
+     *
+     * @deprecated since 5.0.0 will be removed in 6.0.0
+     * @see \Plenty\Modules\Webshop\Contracts\WebstoreConfigurationRepositoryContract::getDefaultParcelServiceId()
+     */
     public function getDefaultParcelServiceId()
     {
         return $this->getWebstoreConfig()->defaultParcelServiceId;
@@ -87,6 +85,9 @@ class WebstoreConfigurationService
 
     /**
      * Get the default parcel-service-preset-Id of the webstore
+     *
+     * @deprecated since 5.0.0 will be removed in 6.0.0
+     * @see \Plenty\Modules\Webshop\Contracts\WebstoreConfigurationRepositoryContract::getDefaultParcelServicePresetId()
      */
     public function getDefaultParcelServicePresetId()
     {
@@ -95,14 +96,15 @@ class WebstoreConfigurationService
 
     /**
      * Get the default shipping-country-Id of the webstore
+     *
+     * @deprecated since 5.0.0 will be removed in 6.0.0
+     * @see \Plenty\Modules\Webshop\Contracts\WebstoreConfigurationRepositoryContract::getDefaultShippingCountryId()
      */
     public function getDefaultShippingCountryId()
     {
-        $sessionService = pluginApp(SessionStorageService::class);
-        $defaultShippingCountryId = $this->getWebstoreConfig()->defaultShippingCountryList[$sessionService->getLang()];
+        $defaultShippingCountryId = $this->getWebstoreConfig()->defaultShippingCountryList[Utils::getLang()];
 
-        if($defaultShippingCountryId <= 0)
-        {
+        if ($defaultShippingCountryId <= 0) {
             $defaultShippingCountryId = $this->getWebstoreConfig()->defaultShippingCountryId;
         }
 

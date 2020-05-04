@@ -2,11 +2,14 @@
 
 namespace IO\Services;
 
-use IO\Helper\LanguageMap;
+use IO\Extensions\Constants\ShopUrls;
 use IO\Helper\MemoryCache;
-use IO\Services\UrlBuilder\CategoryUrlBuilder;
-use IO\Services\UrlBuilder\UrlQuery;
-use IO\Services\UrlBuilder\VariationUrlBuilder;
+use IO\Helper\RouteConfig;
+use IO\Helper\Utils;
+use Plenty\Modules\Webshop\Contracts\UrlBuilderRepositoryContract;
+use Plenty\Modules\Webshop\Helpers\UrlQuery;
+use Plenty\Modules\Webshop\Contracts\LocalizationRepositoryContract;
+use Plenty\Modules\Webshop\Contracts\WebstoreConfigurationRepositoryContract;
 use Plenty\Plugin\Http\Request;
 use Plenty\Plugin\Http\Response;
 
@@ -15,44 +18,37 @@ class UrlService
 {
     use MemoryCache;
 
-    /**
-     * @var SessionStorageService $sessionStorage
-     */
-    private $sessionStorage;
-
-    /**
-     * @var WebstoreConfigurationService $webstoreConfigurationService
-     */
-    private $webstoreConfigurationService;
+    /** @var WebstoreConfigurationRepositoryContract $webstoreConfigurationRepository */
+    private $webstoreConfigurationRepository;
 
     /**
      * UrlService constructor.
+     * @param WebstoreConfigurationRepositoryContract $webstoreConfigurationRepository
      */
-    public function __construct()
-    {
-        $this->sessionStorage = pluginApp(SessionStorageService::class);
-        $this->webstoreConfigurationService = pluginApp(WebstoreConfigurationService::class);
+    public function __construct(
+        WebstoreConfigurationRepositoryContract $webstoreConfigurationRepository
+    ) {
+        $this->webstoreConfigurationRepository = $webstoreConfigurationRepository;
     }
 
     /**
      * Get canonical url for a category
-     * @param int           $categoryId
-     * @param string|null   $lang
-     * @param int | null $webstoreId
+     * @param int $categoryId
+     * @param string|null $lang
      * @return UrlQuery
      */
-    public function getCategoryURL( $categoryId, $lang = null)
+    public function getCategoryURL($categoryId, $lang = null)
     {
-        if ( $lang === null )
-        {
-            $lang = $this->sessionStorage->getLang();
+        if ($lang === null) {
+            $lang = Utils::getLang();
         }
         $categoryUrl = $this->fromMemoryCache(
             "categoryUrl.$categoryId.$lang",
-            function() use ($categoryId, $lang) {
-                /** @var CategoryUrlBuilder $categoryUrlBuilder */
-                $categoryUrlBuilder = pluginApp( CategoryUrlBuilder::class );
-                return $categoryUrlBuilder->buildUrl( $categoryId, $lang );
+            function () use ($categoryId, $lang) {
+                /** @var UrlBuilderRepositoryContract $urlBuilderRepository */
+                $urlBuilderRepository = pluginApp(UrlBuilderRepositoryContract::class);
+
+                return $urlBuilderRepository->buildCategoryUrl($categoryId, $lang);
             }
         );
 
@@ -61,29 +57,28 @@ class UrlService
 
     /**
      * Get canonical url for a variation
-     * @param int           $itemId
-     * @param int           $variationId
-     * @param string|null   $lang
+     * @param int $itemId
+     * @param int $variationId
+     * @param string|null $lang
      * @return UrlQuery
      */
-    public function getVariationURL( $itemId, $variationId, $lang = null )
+    public function getVariationURL($itemId, $variationId, $lang = null)
     {
-        if ( $lang === null )
-        {
-            $lang = $this->sessionStorage->getLang();
+        if ($lang === null) {
+            $lang = Utils::getLang();
         }
 
         $variationUrl = $this->fromMemoryCache(
             "variationUrl.$itemId.$variationId.$lang",
-            function() use ($itemId, $variationId, $lang) {
-                /** @var VariationUrlBuilder $variationUrlBuilder */
-                $variationUrlBuilder = pluginApp( VariationUrlBuilder::class );
-                $variationUrl = $variationUrlBuilder->buildUrl( $itemId, $variationId, $lang );
+            function () use ($itemId, $variationId, $lang) {
+                /** @var UrlBuilderRepositoryContract $urlBuilderRepository */
+                $urlBuilderRepository = pluginApp(UrlBuilderRepositoryContract::class);
+                $variationUrl = $urlBuilderRepository->buildVariationUrl($itemId, $variationId, $lang);
 
-                if ( $variationUrl->getPath() !== null )
-                {
+                if ($variationUrl->getPath() !== null) {
                     $variationUrl->append(
-                        $variationUrlBuilder->getSuffix( $itemId, $variationId )
+                        $urlBuilderRepository->getSuffix($itemId, $variationId)
+
                     );
                 }
 
@@ -96,61 +91,56 @@ class UrlService
 
     /**
      * Get canonical url for current page
-     * @param string|null   $lang
+     * @param string|null $lang
      * @param bool $ignoreCanonical
      * @return string|null
      */
-    public function getCanonicalURL( $lang = null, $ignoreCanonical = false)
+    public function getCanonicalURL($lang = null, $ignoreCanonical = false)
     {
-        $defaultLanguage = $this->webstoreConfigurationService->getDefaultLanguage();
+        $defaultLanguage = $this->webstoreConfigurationRepository->getWebstoreConfiguration()->defaultLanguage;
 
-        if ( $lang === null )
-        {
-            $lang = $this->sessionStorage->getLang();
+        if ($lang === null) {
+            $lang = Utils::getLang();
         }
 
         $canonicalUrl = $this->fromMemoryCache(
             "canonicalUrl.$lang.$ignoreCanonical",
-            function() use ($lang, $defaultLanguage, $ignoreCanonical) {
+            function () use ($lang, $defaultLanguage, $ignoreCanonical) {
                 $includeLanguage = $lang !== null && $lang !== $defaultLanguage;
                 /** @var CategoryService $categoryService */
-                $categoryService = pluginApp( CategoryService::class );
-                if ( TemplateService::$currentTemplate === 'tpl.item' )
-                {
+                $categoryService = pluginApp(CategoryService::class);
+                if (TemplateService::$currentTemplate === 'tpl.item') {
                     $currentItem = $categoryService->getCurrentItem();
-                    if ( count($currentItem) > 0 )
-                    {
+                    if (count($currentItem) > 0) {
                         return $this
-                            ->getVariationURL( $currentItem['item']['id'], $currentItem['variation']['id'], $lang )
+                            ->getVariationURL($currentItem['item']['id'], $currentItem['variation']['id'], $lang)
                             ->toAbsoluteUrl($includeLanguage);
                     }
 
                     return null;
                 }
 
-                if ( substr(TemplateService::$currentTemplate,0, 12) === 'tpl.category' )
-                {
+                if (substr(TemplateService::$currentTemplate, 0, 12) === 'tpl.category') {
                     $currentCategory = $categoryService->getCurrentCategory();
 
-                    if ( $currentCategory !== null )
-                    {
-                        $categoryDetails = $categoryService->getDetails( $currentCategory, $lang );
+                    if ($currentCategory !== null) {
+                        $categoryDetails = $categoryService->getDetails($currentCategory, $lang);
 
-                        if($categoryDetails !== null && strlen($categoryDetails->canonicalLink) > 0 && $ignoreCanonical === false)
-                        {
+                        if ($categoryDetails !== null && strlen(
+                                $categoryDetails->canonicalLink
+                            ) > 0 && $ignoreCanonical === false) {
                             return $categoryDetails->canonicalLink;
                         }
 
                         return $this
-                            ->getCategoryURL( $currentCategory->id, $lang )
+                            ->getCategoryURL($currentCategory->id, $lang)
                             ->toAbsoluteUrl($includeLanguage);
                     }
                     return null;
                 }
 
-                if ( TemplateService::$currentTemplate === 'tpl.home' )
-                {
-                    return pluginApp( UrlQuery::class, ['path' => "", 'lang' => $lang])
+                if (TemplateService::$currentTemplate === 'tpl.home' || TemplateService::$currentTemplate === 'tpl.home.category') {
+                    return pluginApp(UrlQuery::class, ['path' => "", 'lang' => $lang])
                         ->toAbsoluteUrl($includeLanguage);
                 }
 
@@ -159,20 +149,64 @@ class UrlService
         );
 
         return $canonicalUrl;
-
     }
 
-    public function isCanonical($lang = null)
+    /**
+     * Get query string from uri, return an empty string if its an canonical link from category details
+     * @return  string
+     */
+    public function getCanonicalQueryString(): string
     {
-        $defaultLanguage = $this->webstoreConfigurationService->getDefaultLanguage();
+        $lang = Utils::getLang();
 
-        if($lang === null)
-        {
-            $lang = $this->sessionStorage->getLang();
+        if (substr(TemplateService::$currentTemplate, 0, 12) === 'tpl.category') {
+            /** @var CategoryService $categoryService */
+            $categoryService = pluginApp(CategoryService::class);
+            $currentCategory = $categoryService->getCurrentCategory();
+
+            if ($currentCategory !== null) {
+                $categoryDetails = $categoryService->getDetails($currentCategory, $lang);
+
+                if ($categoryDetails !== null &&
+                    strlen($categoryDetails->canonicalLink) > 0) {
+                    return '';
+                }
+            }
         }
 
-        $requestUri = pluginApp(Request::class)->getRequestUri();
-        $requestUrl = pluginApp( UrlQuery::class, ['path' => $requestUri])->toAbsoluteUrl($lang !== $defaultLanguage);
+        /** @var Request $request */
+        $request = pluginApp(Request::class);
+        $queryParameters = $request->all();
+        unset($queryParameters['plentyMarkets']);
+
+        if (!is_array($queryParameters)) {
+            return '';
+        }
+
+        $queryParameters = http_build_query($queryParameters);
+        return strlen($queryParameters) > 0 ? '?' . $queryParameters : '';
+    }
+
+    /**
+     * Check if the current URL is canonical
+     * @param null $lang
+     * @return bool
+     */
+    public function isCanonical($lang = null)
+    {
+        $defaultLanguage = $this->webstoreConfigurationRepository->getWebstoreConfiguration()->defaultLanguage;
+
+        if ($lang === null) {
+            $lang = Utils::getLang();
+        }
+
+        /** @var Request $request */
+        $request = pluginApp(Request::class);
+        $requestUri = $request->getRequestUri();
+
+        /** @var UrlQuery $urlQuery */
+        $urlQuery = pluginApp(UrlQuery::class, ['path' => $requestUri]);
+        $requestUrl = $urlQuery->toAbsoluteUrl($lang !== $defaultLanguage);
         $canonical = $this->getCanonicalURL($lang);
 
         return $requestUrl === $canonical;
@@ -186,21 +220,23 @@ class UrlService
     {
         $languageUrls = $this->fromMemoryCache(
             "languageUrls",
-            function() {
+            function () {
                 $result = [];
-                $defaultUrl = $this->getCanonicalURL();
 
-                if ( $defaultUrl !== null )
-                {
+                $defaultLanguage = $this->webstoreConfigurationRepository->getWebstoreConfiguration()->defaultLanguage;
+
+                $defaultUrl = $this->getCanonicalURL($defaultLanguage);
+
+                if ($defaultUrl !== null) {
                     $result["x-default"] = $defaultUrl;
                 }
 
-                foreach($this->webstoreConfigurationService->getActiveLanguageList() as $language )
-                {
-                    $url = $this->getCanonicalURL( $language );
-                    if ( $url !== null )
-                    {
-                        $languageISO = LanguageMap::getLanguageCode($language);
+                foreach ($this->webstoreConfigurationRepository->getActiveLanguageList() as $language) {
+                    $url = $this->getCanonicalURL($language);
+                    if ($url !== null) {
+                        /** @var LocalizationRepositoryContract $localizationRepository */
+                        $localizationRepository = pluginApp(LocalizationRepositoryContract::class);
+                        $languageISO = $localizationRepository->getLanguageCode($language);
                         $result[$languageISO] = $url;
                     }
                 }
@@ -216,21 +252,43 @@ class UrlService
     /**
      * Get language specific homepage url
      * @return string
+     * @deprecated since 4.3.0
+     * Use IO\Extensions\Constants\ShopUrls::$home instead.
      */
     public function getHomepageURL()
     {
-        return pluginApp(UrlQuery::class,
-            ['path' => '/'])->toRelativeUrl($this->webstoreConfigurationService->getDefaultLanguage() !== $this->sessionStorage->getLang());
+        /** @var ShopUrls $shopUrrls */
+        $shopUrls = pluginApp(ShopUrls::class);
+        return $shopUrls->home;
     }
 
+    /**
+     * Redirects to the given URL
+     * @param $redirectURL
+     * @return mixed
+     */
     public function redirectTo($redirectURL)
     {
-        if(strpos($redirectURL, 'http:') !== 0 && strpos($redirectURL, 'https:') !== 0)
-        {
-            $redirectURL = pluginApp( UrlQuery::class, ['path' => $redirectURL])
-                ->toRelativeUrl($this->webstoreConfigurationService->getDefaultLanguage() !== $this->sessionStorage->getLang() );
+        if (strpos($redirectURL, 'http:') !== 0 && strpos($redirectURL, 'https:') !== 0) {
+            /** @var UrlQuery $query */
+            $query = pluginApp(UrlQuery::class, ['path' => $redirectURL]);
+            $redirectURL = $query->toAbsoluteUrl(
+                $this->webstoreConfigurationRepository->getWebstoreConfiguration()->defaultLanguage !== Utils::getLang()
+            );
         }
 
-        return pluginApp(Response::class)->redirectTo($redirectURL);
+        /** @var Response $response */
+        $response = pluginApp(Response::class);
+        return $response->redirectTo($redirectURL);
+    }
+
+    /**
+     * Check if route is enabled or category is linked to route.
+     * @param $route
+     * @return bool
+     */
+    public function isRouteEnabled($route)
+    {
+        return in_array($route, RouteConfig::getEnabledRoutes()) || RouteConfig::getCategoryId($route) > 0;
     }
 }

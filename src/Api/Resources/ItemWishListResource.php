@@ -8,6 +8,7 @@
 
 namespace IO\Api\Resources;
 
+use IO\Services\ItemListService;
 use IO\Services\ItemWishListService;
 use Plenty\Plugin\Http\Response;
 use Plenty\Plugin\Http\Request;
@@ -45,8 +46,11 @@ class ItemWishListResource extends ApiResource
      */
     public function index():Response
     {
-        $itemWishList = $this->itemWishListService->getItemWishList();
-        return $this->response->create($itemWishList, ResponseCode::OK);
+        /** @var ItemListService $itemListService */
+        $itemListService = pluginApp(ItemListService::class);
+        $items = $itemListService->getItemList(ItemListService::TYPE_WISH_LIST);
+
+        return $this->response->create($items, ResponseCode::OK);
     }
 
     // Post

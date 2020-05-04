@@ -1,17 +1,16 @@
 <?php
+
 namespace IO\Extensions\Facets;
+
+use IO\Helper\Utils;
 use IO\Services\CategoryService;
-use IO\Services\ItemSearch\Contracts\FacetExtension;
-use IO\Services\SessionStorageService;
 use IO\Services\TemplateConfigService;
-use IO\Services\TemplateService;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Search\Aggregation\AggregationInterface;
 use Plenty\Modules\Item\Search\Aggregations\CategoryAllTermsAggregation;
 use Plenty\Modules\Item\Search\Aggregations\CategoryProcessor;
 use Plenty\Modules\Item\Search\Filter\CategoryFilter;
-use IO\Helper\UserSession;
-use Plenty\Plugin\Application;
-
+use Plenty\Modules\Webshop\Contracts\LocalizationRepositoryContract;
+use Plenty\Modules\Webshop\ItemSearch\Contracts\FacetExtension;
 
 class CategoryFacet implements FacetExtension
 {
@@ -31,23 +30,22 @@ class CategoryFacet implements FacetExtension
         return $categoryAggregation;
     }
 
+    /**
+     * @param array $result
+     * @return array
+     */
     public function mergeIntoFacetsList($result): array
     {
         $categoryFacet = [];
 
-        /** @var TemplateService $templateService */
-        $templateService = pluginApp(TemplateService::class);
-
         /** @var TemplateConfigService $templateConfigService */
         $templateConfigService = pluginApp(TemplateConfigService::class);
 
-        if(!$templateService->isCurrentTemplate('tpl.category.item') && $templateConfigService->get('item.show_category_filter') == 'true')
-        {
-            if(count($result))
-            {
-                 /** @var SessionStorageService $sessionStorage */
-                $sessionStorage = pluginApp(SessionStorageService::class);
 
+        if ($templateConfigService->get('item.show_category_filter') == 'true') {
+            if (count($result)) {
+                /** @var LocalizationRepositoryContract $localizationRepository */
+                $localizationRepository = pluginApp(LocalizationRepositoryContract::class);
                 $categoryFacet = [
                     'id' => 'category',
                     'name' => 'Categories',
@@ -55,42 +53,52 @@ class CategoryFacet implements FacetExtension
                     'position' => 0,
                     'values' => [],
                     'minHitCount' => 1,
-                    'maxResultCount' => self::MAX_RESULT_COUNT
+                    'maxResultCount' => self::MAX_RESULT_COUNT,
+                    'type' => 'category'
                 ];
-                $loggedIn = pluginApp(UserSession::class)->isContactLoggedIn();
+
+                $loggedIn = Utils::isContactLoggedIn();
 
                 /** @var CategoryService $categoryService */
                 $categoryService = pluginApp(CategoryService::class);
 
-                foreach($result as $categoryId => $count)
-                {
-                    $category = $categoryService->getForPlentyId($categoryId, $sessionStorage->getLang());
+                $currentCategory = $categoryService->getCurrentCategory();
 
+                $categoryBranch = null;
+                if (!is_null($currentCategory)) {
+                    $categoryBranch = $currentCategory->branch()->get()[0];
+                    $categoryBranch = array_unique(array_values($categoryBranch->toArray()));
+                }
 
-                    if ( !is_null($category) && (!$categoryService->isHidden($category->id) || $loggedIn || pluginApp(Application::class)->isAdminPreview()) )
-                    {
+                foreach ($result as $categoryId => $count) {
+                    $category = $categoryService->getForPlentyId($categoryId, Utils::getLang());
+
+                    if (!is_null($category) && (!is_null($categoryBranch) || !in_array(
+                                $categoryId,
+                                $categoryBranch
+                            )) && (!$categoryService->isHidden(
+                                $category->id
+                            ) || $loggedIn || Utils::isAdminPreview())) {
                         $categoryFacet['values'][] = [
                             'id' => 'category-' . $categoryId,
                             'name' => $category->details[0]->name,
                             'count' => $count,
                         ];
 
-                        if ( count($categoryFacet['values']) === self::MAX_RESULT_COUNT )
-                        {
+                        if (count($categoryFacet['values']) === self::MAX_RESULT_COUNT) {
                             break;
                         }
                     }
-
                 }
             }
 
-
-            if(count($categoryFacet['values']) > 0)
-            {
-                $categoryFacet['count'] = count($categoryFacet['values']);
+            if (!is_null($currentCategory)) {
+                $categoryService->setCurrentCategoryID($currentCategory->id);
             }
-            else
-            {
+
+            if (count($categoryFacet['values']) > 0) {
+                $categoryFacet['count'] = count($categoryFacet['values']);
+            } else {
                 $categoryFacet = [];
             }
         }
@@ -98,31 +106,31 @@ class CategoryFacet implements FacetExtension
         return $categoryFacet;
     }
 
+    /**
+     * @param array $filtersList
+     * @return mixed|CategoryFilter|null
+     */
     public function extractFilterParams($filtersList)
     {
         $categoryIds = [];
 
-        if(count($filtersList))
-        {
-            foreach ($filtersList as $filter)
-            {
-                if(strpos($filter, 'category-') === 0)
-                {
+        if (count($filtersList)) {
+            foreach ($filtersList as $filter) {
+                if (strpos($filter, 'category-') === 0) {
                     $e = explode('-', $filter);
                     $categoryIds[] = $e[1];
                 }
             }
-            
-            if(count($categoryIds))
-            {
+
+            if (count($categoryIds)) {
                 /** @var CategoryFilter $categoryFilter */
                 $categoryFilter = pluginApp(CategoryFilter::class);
                 $categoryFilter->isInAtLeastOneCategory($categoryIds);
-                
+
                 return $categoryFilter;
             }
         }
-        
+
         return null;
     }
 }

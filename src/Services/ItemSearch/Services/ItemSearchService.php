@@ -5,6 +5,7 @@ namespace IO\Services\ItemSearch\Services;
 use IO\Helper\DefaultSearchResult;
 use IO\Services\ItemSearch\Factories\BaseSearchFactory;
 use IO\Services\ItemSearch\Factories\MultiSearchFactory;
+use Plenty\Plugin\Log\Loggable;
 
 /**
  * Class ItemSearchService
@@ -12,15 +13,20 @@ use IO\Services\ItemSearch\Factories\MultiSearchFactory;
  * Execute elastic search requests.
  *
  * @package IO\Services\ItemSearch\Services
+ *
+ * @deprecated since 5.0.0 will be deleted in 6.0.0
+ * @see \Plenty\Modules\Webshop\ItemSearch\Services\ItemSearchService
  */
 class ItemSearchService
 {
+    use Loggable;
+    
     /**
      * Get search results for multiple search requests.
-     *
      * @param array     $searches   Map of search factories to execute.
-     *
      * @return array                Results of multisearch request. Keys will be used from input search map.
+     * @deprecated since 5.0.0 will be deleted in 6.0.0
+     * @see \Plenty\Modules\Webshop\ItemSearch\Services\ItemSearchService::getResults()
      */
     public function getResults( $searches )
     {
@@ -31,7 +37,10 @@ class ItemSearchService
         {
             foreach( $searches as $resultName => $search )
             {
-                $multiSearchFactory->addSearch( $resultName, $search );
+                if($search instanceof BaseSearchFactory)
+                {
+                    $multiSearchFactory->addSearch( $resultName, $search );
+                }
             }
             $results = $multiSearchFactory->getResults();
 
@@ -39,7 +48,7 @@ class ItemSearchService
             {
                 $results[$resultName] = $this->normalizeResult( $result );
             }
-
+            
             return $results;
 
         }
@@ -56,16 +65,22 @@ class ItemSearchService
 
     /**
      * Get result of a single search factory;
-     *
      * @param BaseSearchFactory $searchFactory    The factory to get results for.
-     *
      * @return array
+     * @deprecated since 5.0.0 will be deleted in 6.0.0
+     * @see \Plenty\Modules\Webshop\ItemSearch\Services\ItemSearchService::getResult()
      */
     public function getResult( $searchFactory )
     {
         return $this->getResults([$searchFactory])[0];
     }
 
+    /**
+     * @param $result
+     * @return mixed
+     * @deprecated since 5.0.0 will be deleted in 6.0.0
+     * @see \Plenty\Modules\Webshop\ItemSearch\Services\ItemSearchService::normalizeResult()
+     */
     private function normalizeResult($result)
     {
         if( count($result['documents']) )

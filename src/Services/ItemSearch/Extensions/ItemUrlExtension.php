@@ -2,10 +2,11 @@
 
 namespace IO\Services\ItemSearch\Extensions;
 
-use IO\Services\ItemSearch\Factories\VariationSearchFactory;
 use IO\Services\UrlBuilder\VariationUrlBuilder;
-use IO\Services\WebstoreConfigurationService;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Source\Mutator\BuiltIn\LanguageMutator;
+use Plenty\Modules\Webshop\Contracts\UrlBuilderRepositoryContract;
+use Plenty\Modules\Webshop\Contracts\WebstoreConfigurationRepositoryContract;
+use Plenty\Modules\Webshop\ItemSearch\Factories\VariationSearchFactory;
 
 /**
  * Class ItemUrlExtension
@@ -14,39 +15,41 @@ use Plenty\Modules\Cloud\ElasticSearch\Lib\Source\Mutator\BuiltIn\LanguageMutato
  * Otherwise generate item url and store url for later usage.
  *
  * @package IO\Services\ItemSearch\Extensions
+ * @deprecated since 5.0.0 will be removed in 6.0.0
  */
 class ItemUrlExtension implements ItemSearchExtension
 {
     /**
      * @inheritdoc
      */
-    public function getSearch( $parentSearchBuilder )
+    public function getSearch($parentSearchBuilder)
     {
-        /** @var WebstoreConfigurationService $webstoreConfigService */
-        $webstoreConfigService = pluginApp( WebstoreConfigurationService::class );
+        /** @var WebstoreConfigurationRepositoryContract $webstoreConfigurationRepository */
+        $webstoreConfigurationRepository = pluginApp(WebstoreConfigurationRepositoryContract::class);
 
         $languageMutator = pluginApp(
             LanguageMutator::class,
-            [ "languages" => $webstoreConfigService->getActiveLanguageList() ]
+            ["languages" => $webstoreConfigurationRepository->getActiveLanguageList()]
         );
 
-        return VariationSearchFactory::inherit(
-            $parentSearchBuilder,
+        return $parentSearchBuilder->inherit(
             [
                 VariationSearchFactory::INHERIT_FILTERS,
                 VariationSearchFactory::INHERIT_PAGINATION,
                 VariationSearchFactory::INHERIT_COLLAPSE,
                 VariationSearchFactory::INHERIT_AGGREGATIONS,
                 VariationSearchFactory::INHERIT_SORTING
-            ])
-            ->withResultFields([
-                'item.id',
-                'variation.id',
-                'texts.*',
-                'defaultCategories'
-            ])
-            ->withMutator( $languageMutator )
-            ->build();
+            ]
+        )
+            ->withResultFields(
+                [
+                    'item.id',
+                    'variation.id',
+                    'texts.*',
+                    'defaultCategories'
+                ]
+            )
+            ->withMutator($languageMutator);
     }
 
     /**
@@ -54,25 +57,23 @@ class ItemUrlExtension implements ItemSearchExtension
      */
     public function transformResult($baseResult, $extensionResult)
     {
-        /** @var VariationUrlBuilder $itemUrlBuilder */
-        $itemUrlBuilder = pluginApp( VariationUrlBuilder::class );
-        foreach( $extensionResult['documents'] as $key => $urlDocument )
-        {
-            VariationUrlBuilder::fillItemUrl( $urlDocument['data'] );
+        /** @var UrlBuilderRepositoryContract $urlBuilderRepository */
+        $urlBuilderRepository = pluginApp(UrlBuilderRepositoryContract::class);
+
+        foreach ($extensionResult['documents'] as $key => $urlDocument) {
+            VariationUrlBuilder::fillItemUrl($urlDocument['data']);
             $document = $baseResult['documents'][$key];
-            if ( count( $document )
-                && count( $document['data']['texts'] )
-                && strlen( $document['data']['texts']['urlPath'] ) <= 0 )
-            {
+            if (count($document)
+                && count($document['data']['texts'])
+                && strlen($document['data']['texts']['urlPath']) <= 0) {
                 // attach generated item url if not defined
-                $itemUrl = $itemUrlBuilder->buildUrl(
+                $itemUrl = $urlBuilderRepository->buildVariationUrl(
                     $urlDocument['data']['item']['id'],
                     $urlDocument['data']['variation']['id']
                 )->getPath();
 
                 $baseResult['documents'][$key]['data']['texts']['urlPath'] = $itemUrl;
             }
-
         }
 
         return $baseResult;

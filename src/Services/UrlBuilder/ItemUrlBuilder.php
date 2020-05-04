@@ -2,17 +2,30 @@
 
 namespace IO\Services\UrlBuilder;
 
-use IO\Services\ItemSearch\Factories\VariationSearchFactory;
-use IO\Services\ItemSearch\Services\ItemSearchService;
-use IO\Services\SessionStorageService;
+use Plenty\Modules\Webshop\ItemSearch\Factories\VariationSearchFactory;
+use IO\Helper\Utils;
+use Plenty\Modules\Webshop\ItemSearch\Services\ItemSearchService;
 
+/**
+ * Class ItemUrlBuilder
+ * @package IO\Services\UrlBuilder
+ * @deprecated since 5.0.0 will be removed in 6.0.0
+ * @see \Plenty\Modules\Webshop\Contracts\UrlBuilderRepositoryContract
+ */
 class ItemUrlBuilder
 {
+    /**
+     * @param int $itemId
+     * @param string|null $lang
+     * @return UrlQuery|mixed
+     * @deprecated since 5.0.0 will be removed in 6.0.0
+     * @see \Plenty\Modules\Webshop\Contracts\UrlBuilderRepositoryContract::buildItemUrl()
+     */
     public function buildUrl(int $itemId, string $lang = null )
     {
         if ( $lang === null )
         {
-            $lang = pluginApp( SessionStorageService::class )->getLang();
+            $lang = Utils::getLang();
         }
 
         $variationId = 0;
@@ -48,7 +61,7 @@ class ItemUrlBuilder
             ->withUrls()
             ->hasItemId( $itemId );
 
-        $itemSearchService->getResult($searchFactory);
+        $itemSearchService->getResults([$searchFactory])[0];
 
         return 0;
     }

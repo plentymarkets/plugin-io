@@ -2,18 +2,23 @@
 
 namespace IO\Extensions;
 
+use IO\Services\AuthenticationService;
 use IO\Services\AvailabilityService;
 use IO\Services\BasketService;
 use IO\Services\CategoryService;
 use IO\Services\CheckoutService;
 use IO\Services\ContactBankService;
 use IO\Services\ContactMailService;
+use IO\Services\ContactMapService;
 use IO\Services\CountryService;
 use IO\Services\CouponService;
 use IO\Services\CustomerService;
+use IO\Services\FacetService;
+use IO\Services\FakerService;
 use IO\Services\ItemCrossSellingService;
 use IO\Services\ItemLastSeenService;
 use IO\Services\ItemListService;
+use IO\Services\ItemSearchAutocompleteService;
 use IO\Services\ItemService;
 use IO\Services\ItemWishListService;
 use IO\Services\LegalInformationService;
@@ -22,148 +27,209 @@ use IO\Services\LocalizationService;
 use IO\Services\NotificationService;
 use IO\Services\OrderService;
 use IO\Services\OrderTotalsService;
+use IO\Services\PropertyFileService;
 use IO\Services\SalesPriceService;
+use IO\Services\SeoService;
 use IO\Services\SessionStorageService;
 use IO\Services\TagService;
 use IO\Services\TemplateService;
 use IO\Services\UnitService;
 use IO\Services\UrlService;
+use IO\Services\UserDataHashService;
 use IO\Services\WebstoreConfigurationService;
+use Plenty\Modules\Webshop\Contracts\LocalizationRepositoryContract;
+use Plenty\Modules\Webshop\Contracts\SessionStorageRepositoryContract;
+use Plenty\Modules\Webshop\Contracts\WebstoreConfigurationRepositoryContract;
 
 class TwigServiceContainer
 {
-    public function getAvailability()
+    public function getAvailability(): AvailabilityService
     {
-        return pluginApp( AvailabilityService::class );
+        return pluginApp(AvailabilityService::class);
     }
 
-    public function getBasket()
+    public function getBasket(): BasketService
     {
-        return pluginApp( BasketService::class );
+        return pluginApp(BasketService::class);
     }
 
-    public function getCategory()
+    public function getCategory(): CategoryService
     {
-        return pluginApp( CategoryService::class );
+        return pluginApp(CategoryService::class);
     }
 
-    public function getCheckout()
+    public function getCheckout(): CheckoutService
     {
-        return pluginApp( CheckoutService::class );
+        return pluginApp(CheckoutService::class);
     }
 
-    public function getCountry()
+    public function getCountry(): CountryService
     {
-        return pluginApp( CountryService::class );
+        return pluginApp(CountryService::class);
     }
 
-    public function getCustomer()
+    public function getCustomer(): CustomerService
     {
-        return pluginApp( CustomerService::class );
+        return pluginApp(CustomerService::class);
     }
 
-    public function getItem()
+    public function getItem(): ItemService
     {
-        return pluginApp( ItemService::class );
+        return pluginApp(ItemService::class);
     }
 
-    public function getItemList()
+    public function getItemList(): ItemListService
     {
-        return pluginApp( ItemListService::class );
+        return pluginApp(ItemListService::class);
     }
 
-    public function getOrder()
+    public function getOrder(): OrderService
     {
-        return pluginApp( OrderService::class );
+        return pluginApp(OrderService::class);
     }
 
-    public function getSessionStorage()
+    public function getSessionStorageRepository(): SessionStorageRepositoryContract
     {
-        return pluginApp( SessionStorageService::class );
+        return pluginApp(SessionStorageRepositoryContract::class);
     }
 
-    public function getUnit()
+    public function getSessionStorage(): SessionStorageService
     {
-        return pluginApp( UnitService::class );
+        return pluginApp(SessionStorageService::class);
     }
 
-    public function getContactBank()
+    public function getUnit(): UnitService
     {
-        return pluginApp( ContactBankService::class );
+        return pluginApp(UnitService::class);
     }
 
-    public function getTag()
+    public function getContactBank(): ContactBankService
     {
-        return pluginApp( TagService::class );
+        return pluginApp(ContactBankService::class);
     }
 
-    public function getTemplate()
+    public function getTag(): TagService
     {
-        return pluginApp( TemplateService::class );
+        return pluginApp(TagService::class);
     }
 
-    public function getNotifications()
+    public function getTemplate(): TemplateService
     {
-        return pluginApp( NotificationService::class );
+        return pluginApp(TemplateService::class);
     }
 
-    public function getWebstoreConfig()
+    public function getNotifications(): NotificationService
     {
-        return pluginApp( WebstoreConfigurationService::class );
+        return pluginApp(NotificationService::class);
     }
 
-    public function getLocalization()
+    public function getWebstoreConfigurationRepository(): WebstoreConfigurationRepositoryContract
     {
-        return pluginApp( LocalizationService::class );
+        return pluginApp(WebstoreConfigurationRepositoryContract::class);
     }
 
-    public function getCoupon()
+    public function getWebstoreConfig(): WebstoreConfigurationService
     {
-        return pluginApp( CouponService::class );
+        return pluginApp(WebstoreConfigurationService::class);
     }
 
-    public function getLegalInformation()
+    public function getLocalization(): LocalizationService
     {
-        return pluginApp( LegalInformationService::class );
+        return pluginApp(LocalizationService::class);
     }
 
-    public function getSalesPrice()
+    public function getLocalizationRepository(): LocalizationRepositoryContract
     {
-        return pluginApp( SalesPriceService::class );
+        return pluginApp(LocalizationRepositoryContract::class);
     }
 
-    public function getLastSeen()
+    public function getCoupon(): CouponService
     {
-        return pluginApp( ItemLastSeenService::class );
+        return pluginApp(CouponService::class);
     }
 
-    public function getCrossSelling()
+    public function getLegalInformation(): LegalInformationService
     {
-        return pluginApp( ItemCrossSellingService::class );
+        return pluginApp(LegalInformationService::class);
     }
 
-    public function getWishList()
+    public function getSalesPrice(): SalesPriceService
     {
-        return pluginApp( ItemWishListService::class );
+        return pluginApp(SalesPriceService::class);
     }
 
-    public function getContactMail()
+    public function getLastSeen(): ItemLastSeenService
     {
-        return pluginApp( ContactMailService::class );
+        return pluginApp(ItemLastSeenService::class);
     }
 
-    public function getTotalsService()
+    public function getCrossSelling(): ItemCrossSellingService
     {
-        return pluginApp( OrderTotalsService::class );
+        return pluginApp(ItemCrossSellingService::class);
     }
 
-    public function getUrl()
+    public function getWishList(): ItemWishListService
     {
-        return pluginApp( UrlService::class );
+        return pluginApp(ItemWishListService::class);
     }
-    
-    public function getLiveShopping()
+
+    public function getContactMail(): ContactMailService
     {
-        return pluginApp( LiveShoppingService::class );
+        return pluginApp(ContactMailService::class);
+    }
+
+    public function getTotalsService(): OrderTotalsService
+    {
+        return pluginApp(OrderTotalsService::class);
+    }
+
+    public function getUrl(): UrlService
+    {
+        return pluginApp(UrlService::class);
+    }
+
+    public function getLiveShopping(): LiveShoppingService
+    {
+        return pluginApp(LiveShoppingService::class);
+    }
+
+    public function getAuthentication(): AuthenticationService
+    {
+        return pluginApp(AuthenticationService::class);
+    }
+
+    public function getUserDataHash(): UserDataHashService
+    {
+        return pluginApp(UserDataHashService::class);
+    }
+
+    public function getFaker(): FakerService
+    {
+        return pluginApp(FakerService::class);
+    }
+
+    public function getPropertyFile(): PropertyFileService
+    {
+        return pluginApp(PropertyFileService::class);
+    }
+
+    public function getFacet(): FacetService
+    {
+        return pluginApp(FacetService::class);
+    }
+
+    public function getContactMap(): ContactMapService
+    {
+        return pluginApp(ContactMapService::class);
+    }
+
+    public function getSearchAutocomplete()
+    {
+        return pluginApp(ItemSearchAutocompleteService::class);
+    }
+
+    public function getSEO(): SeoService
+    {
+        return pluginApp(SeoService::class);
     }
 }

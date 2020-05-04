@@ -2,8 +2,8 @@
 
 namespace IO\Services\ItemSearch\SearchPresets;
 
-use IO\Services\ItemSearch\Factories\VariationSearchFactory;
 use IO\Services\ItemSearch\Helper\ResultFieldTemplate;
+use Plenty\Modules\Webshop\ItemSearch\Factories\VariationSearchFactory;
 
 /**
  * Class BasketItems
@@ -14,6 +14,9 @@ use IO\Services\ItemSearch\Helper\ResultFieldTemplate;
  * - quantities:   Quantity of each item to be considered when searching prices
  *
  * @package IO\Services\ItemSearch\SearchPresets
+ *
+ * @deprecated since 5.0.0 will be deleted in 6.0.0
+ * @see \Plenty\Modules\Webshop\ItemSearch\SearchPresets\BasketItems
  */
 class BasketItems implements SearchPreset
 {
@@ -26,8 +29,8 @@ class BasketItems implements SearchPreset
         $quantities     = $options['quantities'];
 
         /** @var VariationSearchFactory $searchFactory */
-        $searchFactory = pluginApp( VariationSearchFactory::class )
-            ->withResultFields(
+        $searchFactory = pluginApp( VariationSearchFactory::class );
+        $searchFactory->withResultFields(
                 ResultFieldTemplate::load( ResultFieldTemplate::TEMPLATE_BASKET_ITEM )
             );
 

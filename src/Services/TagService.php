@@ -2,6 +2,7 @@
 
 namespace IO\Services;
 
+use IO\Helper\Utils;
 use Plenty\Modules\Authorization\Services\AuthHelper;
 use Plenty\Modules\Tag\Contracts\TagRepositoryContract;
 use Plenty\Modules\Tag\Models\Tag;
@@ -56,19 +57,21 @@ class TagService
     {
         if ( $lang === null )
         {
-            $lang = pluginApp(SessionStorageService::class)->getLang();
+            $lang = Utils::getLang();
         }
 
         $tag = $this->getTagById($tagId);
 
-        if ( !is_null($tag) )
+        if( is_null($tag) )
         {
-            foreach( $tag->names as $tagName )
+            return "";
+        }
+
+        foreach( $tag->names as $tagName )
+        {
+            if ( $tagName->tagLang === $lang )
             {
-                if ( $tagName->tagLang === $lang )
-                {
-                    return $tagName->tagName;
-                }
+                return $tagName->tagName;
             }
         }
 

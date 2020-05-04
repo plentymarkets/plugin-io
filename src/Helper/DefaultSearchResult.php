@@ -2,8 +2,12 @@
 
 namespace IO\Helper;
 
-use Plenty\Plugin\Application;
-
+/**
+ * Class DefaultSearchResult
+ * @package IO\Helper
+ * @deprecated since 5.0.0 will be deleted in 6.0.0
+ * @see \Plenty\Modules\Webshop\ItemSearch\Helpers\DefaultSearchResult
+ */
 class DefaultSearchResult
 {
     const DEFAULT_RESULT = [
@@ -57,7 +61,7 @@ class DefaultSearchResult
     public static function merge( $data )
     {
         $defaults = self::DEFAULT_RESULT;
-        if ( pluginApp(Application::class)->isAdminPreview() )
+        if ( Utils::isAdminPreview() )
         {
             $defaults = self::mergeValues( $defaults, self::ADMIN_PREVIEW_DEFAULT_RESULT );
         }

@@ -2,9 +2,9 @@
 
 namespace IO\Services\ItemSearch\SearchPresets;
 
-use IO\Services\ItemSearch\Factories\VariationSearchFactory;
 use IO\Services\ItemSearch\Helper\ResultFieldTemplate;
-use IO\Services\ItemSearch\Helper\SortingHelper;
+use Plenty\Modules\Webshop\ItemSearch\Factories\VariationSearchFactory;
+use Plenty\Modules\Webshop\ItemSearch\Helpers\SortingHelper;
 
 /**
  * Class VariationList
@@ -20,9 +20,15 @@ use IO\Services\ItemSearch\Helper\SortingHelper;
  * - excludeFromCache:  Set to true if results should not be linked to response
  *
  * @package IO\Services\ItemSearch\SearchPresets
+ *
+ * @deprecated since 5.0.0 will be deleted in 6.0.0
+ * @see \Plenty\Modules\Webshop\ItemSearch\SearchPresets\VariationList
  */
 class VariationList implements SearchPreset
 {
+    /**
+     * @inheritDoc
+     */
     public static function getSearchFactory($options)
     {
         $variationIds = [];
@@ -35,8 +41,8 @@ class VariationList implements SearchPreset
         $searchFactory = pluginApp( VariationSearchFactory::class );
 
         $searchFactory->withResultFields(
-                ResultFieldTemplate::load( ResultFieldTemplate::TEMPLATE_LIST_ITEM )
-            );
+            ResultFieldTemplate::load( ResultFieldTemplate::TEMPLATE_LIST_ITEM )
+        );
 
         $searchFactory
             ->withImages()
@@ -46,6 +52,7 @@ class VariationList implements SearchPreset
             ->withDefaultImage()
             ->isVisibleForClient()
             ->isActive()
+            ->isHiddenInCategoryList( false )
             ->hasPriceForCustomer()
             ->withReducedResults();
 
@@ -67,7 +74,9 @@ class VariationList implements SearchPreset
             }
             else
             {
-                $sorting = SortingHelper::getSearchSorting( $options['sorting'] );
+                /** @var SortingHelper $sortingHelper */
+                $sortingHelper = pluginApp(SortingHelper::class);
+                $sorting = $sortingHelper->getSearchSorting( $options['sorting'] );
                 $searchFactory->sortByMultiple( $sorting );
             }
         }

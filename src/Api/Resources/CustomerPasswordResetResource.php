@@ -13,9 +13,6 @@ use Plenty\Modules\Account\Contact\Models\Contact;
 use Plenty\Modules\Authorization\Services\AuthHelper;
 use Plenty\Modules\Helper\AutomaticEmail\Models\AutomaticEmailContact;
 use Plenty\Modules\Helper\AutomaticEmail\Models\AutomaticEmailTemplate;
-use Plenty\Modules\System\Contracts\WebstoreConfigurationRepositoryContract;
-use Plenty\Modules\System\Models\WebstoreConfiguration;
-use Plenty\Plugin\Application;
 use Plenty\Plugin\Http\Request;
 use Plenty\Plugin\Http\Response;
 
@@ -36,50 +33,52 @@ class CustomerPasswordResetResource extends ApiResource
     {
         parent::__construct($request, $response);
     }
-    
+
     /**
      * Set the password for the contact
      * @return Response
      */
-    public function store():Response
+    public function store(): Response
     {
-        $email = $this->request->get('email', '');
+        // Honeypot check
+        if (strlen($this->request->get('honeypot'))) {
+            return $this->response->create(true, ResponseCode::OK);
+        }
 
+        $email = $this->request->get('email', '');
 
         /** @var AuthHelper $authHelper */
         $authHelper = pluginApp(AuthHelper::class);
 
-        $contact = $authHelper->processUnguarded(function() use ($email)
-        {
-            /** @var ContactRepositoryContract $contactRepository */
-            $contactRepository = pluginApp(ContactRepositoryContract::class);
+        $contact = $authHelper->processUnguarded(
+            function () use ($email) {
+                /** @var ContactRepositoryContract $contactRepository */
+                $contactRepository = pluginApp(ContactRepositoryContract::class);
 
-            $contactId = $contactRepository->getContactIdByEmail($email);
+                $contactId = $contactRepository->getContactIdByEmail($email);
 
-            if ( $contactId > 0 )
-            {
-                return $contactRepository->findContactById($contactId);
+                if ($contactId > 0) {
+                    return $contactRepository->findContactById($contactId);
+                }
+
+                return null;
             }
+        );
 
-            return null;
-        });
-
-        if ($contact instanceof Contact && $contact->id > 0)
-        {
+        if ($contact instanceof Contact && $contact->id > 0) {
             /** @var UserDataHashService $hashService */
             $hashService = pluginApp(UserDataHashService::class);
             $hashService->create(['mail' => $email], UserDataHash::TYPE_RESET_PASSWORD, null, $contact->id);
 
-            $params = ['contactId' => $contact->id, 'clientId' => pluginApp(Application::class)->getWebstoreId()];
+            $params = ['contactId' => $contact->id];
             $this->sendMail(AutomaticEmailTemplate::CONTACT_NEW_PASSWORD, AutomaticEmailContact::class, $params);
 
             return $this->response->create(true, ResponseCode::OK);
         }
 
         return $this->response->create(null, ResponseCode::BAD_REQUEST);
-
     }
-    
+
 }
 
 

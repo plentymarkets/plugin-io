@@ -2,13 +2,18 @@
 
 namespace IO\Services\ItemSearch\Extensions;
 
-use IO\Services\ItemSearch\Factories\VariationSearchFactory;
-use IO\Services\ItemSearch\SearchPresets\BasketItems;
-use IO\Services\ItemSearch\Services\ItemSearchService;
 use IO\Services\TemplateConfigService;
 use Plenty\Modules\Authorization\Services\AuthHelper;
 use Plenty\Modules\Item\VariationBundle\Contracts\VariationBundleRepositoryContract;
+use Plenty\Modules\Webshop\ItemSearch\Factories\VariationSearchFactory;
+use Plenty\Modules\Webshop\ItemSearch\SearchPresets\BasketItems;
+use Plenty\Modules\Webshop\ItemSearch\Services\ItemSearchService;
 
+/**
+ * Class BundleComponentExtension
+ * @package IO\Services\ItemSearch\Extensions
+ * @deprecated since 5.0.0 will be removed in 6.0.0
+ */
 class BundleComponentExtension implements ItemSearchExtension
 {
     /**
@@ -16,8 +21,7 @@ class BundleComponentExtension implements ItemSearchExtension
      */
     public function getSearch($parentSearchBuilder)
     {
-        return VariationSearchFactory::inherit(
-            $parentSearchBuilder,
+        return $parentSearchBuilder->inherit(
             [
                 VariationSearchFactory::INHERIT_FILTERS,
                 VariationSearchFactory::INHERIT_PAGINATION,
@@ -28,8 +32,7 @@ class BundleComponentExtension implements ItemSearchExtension
             ->withResultFields([
                 'variation.bundleType',
                 'variation.id'
-            ])
-            ->build();
+            ]);
     }
 
     /**
@@ -73,11 +76,11 @@ class BundleComponentExtension implements ItemSearchExtension
 
                 /** @var ItemSearchService $itemSearchService */
                 $itemSearchService = pluginApp( ItemSearchService::class );
-                $bundleVariations  = $itemSearchService->getResult(
+                $bundleVariations  = $itemSearchService->getResults([
                     BasketItems::getSearchFactory([
                         'variationIds' => $bundleVariationIds
                     ])
-                );
+                ])[0];
 
                 $bundleComponents = [];
                 foreach( $bundleVariations['documents'] as $bundleVariation )

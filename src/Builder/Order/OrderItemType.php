@@ -19,4 +19,6 @@ class OrderItemType
 	const UNASSIGNED_VARIATION = 9;
 	const DEPOSIT              = 10;
 	const ORDER                = 11;
+    const TYPE_ITEM_SET        = 13;
+    const TYPE_SET_COMPONENT   = 14;
 }

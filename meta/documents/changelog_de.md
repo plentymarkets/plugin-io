@@ -1,5 +1,293 @@
 # Release Notes für IO
 
+## v5.0.1 (2020-04-27) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.0...5.0.1" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
+
+### Geändert
+
+- Die als deprecated markierte Route **/io/facets** und die dazugehörige Ressource **FacetResource** wurden aus dem Plugin entfernt.
+
+### Behoben
+
+- Retourenseiten, die mit dem ShopBuilder erstellt wurden, können jetzt auch dann dargestellt werden, wenn die Einstellung **Category routes** in IO deaktiviert ist.
+- Seiten, auf denen Erfolgs-, Fehler- oder Warnmeldungen angezeigt werden, werden nicht mehr vom ShopBooster in den Cache geschrieben.
+- Durch einen Fehler wurde für mehrsprachige Startseiten eine 404-Seite angezeigt, wenn im ShopBuilder eine Kategorie ohne URL verknüpft war. Dieses Verhalten wurde behoben.
+- Durch einen Fehler wurden Artikel aus dem Warenkorb entfernt, wenn ein Kunde sich abgemeldet hat. Dieses Verhalten wurde behoben.
+- Bei einem fehlerhaften Login-Versuch wurde fälschlicherweise eine Benachrichtung zur Versandkostenberechnung angezeigt. Dies wurde behoben.
+
+## v5.0.0 (2020-04-14) <a href="https://github.com/plentymarkets/plugin-io/compare/4.6.4...5.0.0" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
+
+### Hinzugefügt
+
+- Bei falsch geschriebenen Suchbegriffen wird nun eine zusätzliche Suche ausgeführt. Auf der Suchergebnisseite wird nun ein alternativer Suchbegriff unter "Meinten Sie...?" vorgeschlagen.
+
+### Geändert 
+
+- Das Verhalten des Canonical-Tags und der Robots-Informationen auf Kategorie- und Suchergebnisseiten wurde überarbeitet.
+- Die Daten auf der Bestellbestätigungseite enthalten nun die Varianteneigenschaften.
+
+### Behoben
+
+- Beim Wechsel der Währung kam es zu Fehlern bei der Summenberechnung im Warenkorb, wenn für die im Webshop ausgewählte Währung kein Preis am Artikel hinterlegt war. Betroffene Artikel werden nun aus dem Warenkorb entfernt und ein entsprechender Warnhinweis wird angezeigt.
+- Beim ersten Laden des Webshops wird die Browsersprache als Webshop-Sprache gesetzt. Wenn die Browsersprache nicht der voreingestellten Standardsprache des Webshops entspricht und eine URL ohne Sprachkürzel aufgerufen wurde, konnte die entsprechende Seite nicht gefunden werden. Dieses Verhalten wurde behoben.
+
+## v4.6.4 (2020-02-27) <a href="https://github.com/plentymarkets/plugin-io/compare/4.6.3...4.6.4" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
+
+### Behoben
+
+- Registrierungs- und Kontaktformulare konnten nicht abgeschickt werden, wenn Google reCAPTCHA und die Ceres-Einstellung **Nicht akzeptierte Cookies blockieren** aktiv waren und der reCAPTCHA-Cookie nicht akzeptiert wurde. Dieses Verhalten wurde behoben.
+
+## v4.6.3 (2020-02-24) <a href="https://github.com/plentymarkets/plugin-io/compare/4.6.2...4.6.3" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
+
+### Behoben
+
+- Merkmale sind nun wieder Teil der Artikeldaten für alle Ansichten. Zuvor wurden Merkmaldaten von allen Ansichten außer der Artikeleinzelansicht entfernt. 
+
+## v4.6.2 (2020-02-19) <a href="https://github.com/plentymarkets/plugin-io/compare/4.6.1...4.6.2" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
+
+### Behoben
+
+- Durch einen Fehler im Kategoriefilter funktionierte die Seitennummerierung nicht wie beabsichtigt. Dies wurde behoben.
+
+## v4.6.1 (2020-02-18) <a href="https://github.com/plentymarkets/plugin-io/compare/4.6.0...4.6.1" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
+
+### Behoben
+
+- Durch einen Fehler wurden keine Suchergebnisse ausgegeben, wenn keine Seite für Suchergebnisse über den ShopBuilder verknüpft wurde. Dies wurde behoben.
+- Durch ein Fehler im Zusammenhang mit Lieferadressen konnte der Bestellvorgang für Gastbestellungen nicht ausgeführt werden. Dieses Verhalten wurde behoben.
+
+## v4.6.0 (2020-02-17) <a href="https://github.com/plentymarkets/plugin-io/compare/4.5.1...4.6.0" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
+
+### TODO
+
+- Google reCAPTCHA wird ab sofort erst nach der Zustimmung zur Verwendung der entsprechenden Cookies durch den Webshop-Besucher ausgeführt. Daher können Formulare, die über das reCAPTCHA abgesichert sind, auch erst nach Zustimmung des Benutzers abgeschickt werden. Dazu zählen das Kontaktformular und die Kundenregistrierung.
+
+### Hinzugefügt
+
+- Bei der Auftragsanlage kann nun ein Bezugszeichen des Kunden angegeben werden.
+- Der Assistent enthält nun eine Einstellung mit der man die Umsatzsteueridentifikationsnummerprüfung für die Anlage/Änderung von Addressen und den Bestellabschluss aktivieren kann.
+
+### Geändert
+
+- Der OrderReturnController.php übergibt nun die Kategorie an das Frontend, falls im ShopBuilder eine Kategorie für die Retourenseite verknüpft ist.
+- Eigenschaften werden nun in den Datensätzen für Artikellisten nicht mehr ausgegeben, um die Datenmenge zu reduzieren.
+- Die übertragenen Daten bei Artikeln mit Bestellmerkmalen wurden optimiert.
+- Der ItemImageFilter gibt nun auch Alternativtext und Namen des Bildes aus.
+- Das Live-Shopping-Widget zeigt nun das Angebot als beendet an, wenn ein Artikel auf Netto-Warenbestand beschränkt und dieser Bestand erschöpft ist.
+- Bei auftretenden Fehler im Zusammenhang mit Google reCAPTCHA werden nun Fehlermeldungen ausgegeben.
+
+### Behoben
+
+- Es wurde eine feste Abhängigkeit zum Plugin Ceres entfernt.
+- Falls beim Aktualisieren von Artikelmengen im Warenkorb der Mindestbestellwert unterschritten wurde, wurden bereits eingelöste Gutscheine mit Mindestbestellwert nicht entfernt. Dies wurde behoben.
+- Im Navigationsbaum wurden die Einstellungen für Innenabstände nicht auf nachgeladene Listenelemente angewandt. Dies wurde behoben.
+- Es werden nun keine Kategorien mehr in der Navigationsleiste ausgegeben, wenn alle Kategorietypen in der Ceres-Einstellung **Kategorietypen, die in der Navigationsleiste angezeigt werden** deaktiviert sind.
+- Unter bestimmten Umständen wurde der eingelöste Coupon-Code nicht korrekt am Auftrag im Frontend ausgegeben. Dies wurde behoben.
+- Aufträge vom Typ Gewährleistung werden jetzt im Mein Konto-Bereich angezeigt und können retourniert werden.
+- Bei der Weiterleitung zu einer im ShopBuilder erstellen Login-Seite wurde nach dem Login nicht korrekt auf den Checkout weitergeleitet. Dies wurde behoben.
+
+## v4.5.1 (2020-01-28) <a href="https://github.com/plentymarkets/plugin-io/compare/4.5.0...4.5.1" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
+
+### Behoben
+
+- Auftragsdokumente für Gastbestellungen können nun wieder über die Weiterleitung in der Bestellbestätigung aufgerufen werden.
+
+## v4.5.0 (2019-12-19) <a href="https://github.com/plentymarkets/plugin-io/compare/4.4.3...4.5.0" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
+
+### TODO
+
+### Hinzugefügt
+
+- Der Ceres-Assistent enthält jetzt Einstellungen für die Variantenauswahl, mit denen die "Bitte wählen"-Option hinzugefügt und vorausgewählt werden kann.
+- Die Route `/rest/io/categorytree/template_for_children` wurde hinzugefügt, welche gerendertes Markup des Navigationsbaum-Widgets zurückgibt.
+- Die Route `/rest/io/categorytree/children` wurde hinzugefügt, welche die Unterkategorien einer Kategorie zurückgibt.
+
+### Geändert
+
+- Die Route `io/facet` wurde als `deprecated` markiert.
+- Facettenwerte werden nun sortiert ausgeliefert.
+
+### Behoben
+
+- In der Addressauswahl wurde keine Adresse vorausgewählt. Dieses Verhalten wurde behoben.
+- Es kam zu einem Fehler bei der Generierung von Artikel-URLs. Dieses Verhalten wurde behoben.
+- Es kam zu Routing-Problemen, wenn Kategorien über den ShopBuilder verknüpft waren, deren Übersetzungen in anderen Sprachen fehlten. Dieses Verhalten wurde behoben.
+- Es kam zu einem Anzeigefehler im Warenkorb, wenn sich Lieferland und Währung aufgrund eines Sprachwechsels änderten. Dieses Verhalten wurde behoben.
+
+## v4.4.3 (2019-11-29) <a href="https://github.com/plentymarkets/plugin-io/compare/4.4.2...4.4.3" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
+
+### Behoben 
+
+- Durch einen Fehler konnten Artikelkategorieseiten nicht mehr vom ShopBooster in den Cache geschrieben werden. Dies wurde behoben.
+
+## v4.4.2 (2019-11-28) <a href="https://github.com/plentymarkets/plugin-io/compare/4.4.1...4.4.2" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
+
+### Behoben 
+
+- Durch einen Fehler konnten Artikelkategorieseiten nicht mehr vom ShopBooster in den Cache geschrieben werden. Dies wurde behoben.
+
+## v4.4.1 (2019-11-19) <a href="https://github.com/plentymarkets/plugin-io/compare/4.4.0...4.4.1" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
+
+### Behoben 
+
+- Bestellmerkmale wurden im Warenkorb und im Checkout erst nach einem erneuten Laden der Seite angezeigt und nicht am Auftrag mitgegeben. Dieses Verhalten wurde behoben.
+
+## v4.4.0 (2019-11-14) <a href="https://github.com/plentymarkets/plugin-io/compare/4.3.4...4.4.0" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
+
+### Hinzugefügt
+
+- Über den ShopBuilder ist es nun möglich, Eigenschaften vom Typ **Datei** in der Artikelansicht anzuzeigen.
+
+### Geändert
+
+- Beim Bestellabschluss werden die benötigten Artikeldaten nun aus der Datenbank gelesen, um Fehleranfälligkeit zu reduzieren.
+- Das Event **AfterBasketChanged** enthält nun auch basketItems.
+
+### Behoben
+
+- Wenn ein Auftrag durch eine Ereignisaktion aufgeteilt wurde, wurde nicht der korrekte Auftrag auf der Bestätigungsseite angezeigt. Dies wurde behoben.
+- Artikel, für die die Einstellung **Aktionsgutschein/POS-Rabatt: Nur mit Gutschein kaufbar** aktiv ist, können nun nicht mehr gekauft werden, wenn kein Aktionsgutschein eingelöst wurde.
+- Bei aktiviertem Trailing Slash kam es auf der Bestellbestätigungsseite zu einem Weiterleitungsfehler. Dies wurde behoben.
+- Durch einen Fehler wurden keine Kategorien in der mobilen Navigation ausgegeben, wenn nicht alle Kategorien des betreffenden Asts in der Linkliste enthalten waren. Nun werden die Kategorien der ersten Ebene angezeigt.
+- Merkmale, für die die Option "Als Zusatzkosten darstellen" (Pfand) aktiv ist, werden nun korrekt als Auftragspositionen übernommen und auf die Gesamtsumme des Auftrags addiert.
+- Wenn ein Fehler beim Laden von Artikeldaten auftritt, schreibt der ShopBooster das betreffende Template nicht mehr in den Cache.
+- Metadaten werden jetzt korrekt ausgegeben.
+- Es kam unter bestimmten Umständen zu einer falschen Anzeige der Versandkosten. Dieses Verhalten wurde behoben.
+- Es wurde fälschlicherweise ein Trailing Slash an URLs angehängt, die Query-Parameter enthielten. Dieses Verhalten wurde behoben.
+- Unter bestimmten Umständen konnte es zu doppelten Aufträgen kommen. Dieses Verhalten wurde behoben.
+- Bei der Nutzung von Callisto mit eingebundenem Ceres-Checkout konnte die Auftragsbestätigung nicht angezeigt werden, wenn diese über den ShopBuilder erstellt wurde. Dies wurde behoben.
+- Bei Verwendung einer ShopBuilder-Kategorie als Startseite wurde unter bestimmten Umständen ein falscher Header geladen. Dies wurde behoben.
+
+## v4.3.4 (2019-10-30) <a href="https://github.com/plentymarkets/plugin-io/compare/4.3.3...4.3.4" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
+
+### Behoben
+
+- Bei zwei aufeinanderfolgenden Bestellungen im Webshop wurde die Liste der Zahlungsarten beim Aufruf des Checkouts nicht korrekt geladen. Dieses Verhalten wurde behoben.
+
+## v4.3.3 (2019-10-17) <a href="https://github.com/plentymarkets/plugin-io/compare/4.3.2...4.3.3" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
+
+### TODO
+
+- Für die Verwendung von IO 4.3.3 muss das Plugin Ceres auf die aktuelle Version 4.3.4 aktualisiert werden.
+
+### Behoben
+
+- Im ShopBuilder wurde eine 404-Seite angezeigt, wenn eine Kategorie für die Retourenseite verknüpft war. Dies wurde behoben.
+- Durch einen Fehler wurde die Auftragsbestätigungsseite nicht angezeigt, wenn eine ShopBuilder-Kategorie mit der Route "/confirmation" angelegt und verknüpft wurde.
+- Durch einen Fehler funktionierte Verlinkung auf die Retourenseite nicht, wenn diese ohne zusätzliche Parameter aufgerufen wurde. Dies wurde behoben.
+- Auftragsdokumente konnten nicht für Gastbestellungen angezeigt werden. Dies wurde behoben.
+- Checkboxen, die über den Assistenten gespeichert wurden, konnten nicht korrekt ausgelesen werden. Dieses Verhalten wurde behoben.
+- Es kam unter bestimmten Voraussetzungen zu einer erhöhten Anzahl an Log-Einträgen. Dieses Verhalten wurde behoben.
+- Beim Aufsplitten von Artikelpaketen kam es zu einer fehlerhaften Anzeige. Dies wurde behoben. 
+
+## v4.3.2 (2019-10-02) <a href="https://github.com/plentymarkets/plugin-io/compare/4.3.1...4.3.2" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
+
+### Behoben
+
+- Durch einen Fehler war die Registrierungsseite nicht mehr über den Header des Shops erreichbar. Dies wurde behoben.
+
+## v4.3.1 (2019-10-1) <a href="https://github.com/plentymarkets/plugin-io/compare/4.3.0...4.3.01" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
+
+### Behoben
+
+- Ein Fehler führte dazu, dass sprachspezifische URLs nicht korrekt ermittelt werden konnten. Dies wurde behoben.
+- Ein Fehler führte dazu, dass die mobile Navigation nicht richtig geladen wurde. Dies wurde behoben.
+
+
+## v4.3.0 (2019-09-26) <a href="https://github.com/plentymarkets/plugin-io/compare/4.2.0...4.3.0" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
+
+### Hinzugefügt
+
+- Retouren können jetzt auch für Gastbestellungen angelegt werden.
+- Das Link-Button-Widget wurde zum ShopBuilder hinzugefügt. Dieses stellt Links zu Retouren und Sendungsverfolgung als Schaltflächen zur Verfügung.
+- Es wurde eine REST-Route zum Abmelden von einzelnen Newslettern hinzugefügt.
+
+### Geändert
+
+- Die Daten der Klasse **LocalizedOrder** enthalten nun auch die Attribute der Variante.
+- Die Menge der übertragenen Daten beim Bearbeiten des Warenkorbs wurde minimiert, um die Performance des Webshops zu verbessern.
+- Über pluginApp erzeugte Objekte werden nun vor der weiteren Verwendung in eigene Variablen gespeichert. Die direkte Verwendung neuer Instanzen führte in einzelnen Fällen zu Fehlern während der Plugin-Bereitstellung.
+- Die Funktion `getBasketForTemplate` fügt dem Warenkorb nun das Feld "isExportDelivery" hinzu. Dieses enthält die Information, ob es sich bei der aktuellen Kombination aus Shop-Standort und ausgewähltem Lieferland um eine Ausfuhrlieferung handelt.
+- Die REST-Route `io/itemWishList` gibt nun die gesamten Artikeldaten der Varianten auf der Wunschliste anstatt der Varianten-IDs zurück.
+- Die Warenkorbdaten enthalten nun die IDs der Wunschliste.
+- Die Wunschlistenansicht wird nun vom ShopBooster gecached.
+- Die Newsletter-Abmeldung meldet den Kunden nicht mehr aus allen Newslettern gleichzeitig ab, sondern nur aus dem, der angefordert wurde.
+
+### Behoben 
+
+- Bei der dynamischen Gruppierung von Varianten werden die Ergebnisfelder wieder korrekt berücksichtigt und keine unnötigen Daten mehr geladen.
+- Im ShopBuilder sind jetzt mehr als 50 Eigenschaften pro Gruppe als Platzhalter verfügbar.
+- Durch einen Fehler wurden doppelte Werte in URL-Parametern entfernt. Dies wurde behoben.
+- In Cross-Selling-Listen wurden Varianten angezeigt, für die die Option "unsichtbar in Artikellisten" aktiv war. Dieses Verhalten wurde behoben.
+- Es wurden Facettenwerte angezeigt, die nicht die minimale Trefferzahl erreichten. Dieses Verhalten wurde behoben.
+- Interne Weiterleitungen erfolgen ab sofort immer auf die gesicherte HTTPS-Domain, sofern diese verfügbar ist.
+- Beim Laden der mobilen Navigation werden Kategorien ohne Namen nun aus dem Ergebnis gefiltert.
+- Durch einen Fehler konnten manche Attribute in der Artikelansicht nicht ausgewählt werden. Dies wurde behoben.
+
+## v4.2.0 (2019-08-21) <a href="https://github.com/plentymarkets/plugin-io/compare/4.1.2...4.2.0" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
+
+### Hinzugefügt
+
+- Die statischen Seiten für Widerrufsformular, Widerrufsrecht, AGB, Datenschutzerklärung und Impressum können nun mit dem ShopBuilder erstellt und bearbeitet werden.
+
+### Behoben
+
+- Bei der Darstellung von Grundpreisen konnte es zu Problemen kommen. Dieses Verhalten wurde behoben.
+- Änderungen der Artikelmenge im Warenkorb in Verbindung mit einem Gutschein führten zu Problemen, wenn der Mindestbestellwert unterschritten wurde. Dies wurde behoben.
+- Bei manchen Sprachen wurde im Warenkorb kein Leerzeichen zwischen dem ISO-Code der Währung und dem Wert ausgegeben. Dies wurde behoben.
+- Beim Entfernen von Artikeln konnte es zu Fehlern kommen, wenn bereits ein Gutschein eingelöst wurde. Das Verhalten wurde behoben.
+- Es wurde ein Fehler bei der Adressvalidierung behoben, durch welchen bei der Eingabe von Firmenadressen unter bestimmten Umständen eine Fehlermeldung im Shop angezeigt und die Adresse nicht gespeichert wurde.
+- Versandarten wurden beim Wechsel des Lieferlandes nicht aktualisiert. Dies wurde behoben.
+
+## v4.1.2 (2019-07-16) <a href="https://github.com/plentymarkets/plugin-io/compare/4.1.1...4.1.2" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
+
+### Hinzugefügt
+
+- Wir haben die neue REST-Route 'rest/io/categorytree' hinzugefügt, um Kategorien der mobilen Navigation zu laden.
+
+### Geändert
+
+- Attribute von Varianten ohne Bestand werden nun angezeigt, wenn an der Variante die Optionen "Automatisch verfügbar, wenn Netto-WB positiv" und "Automatisch nicht verfügbar, wenn kein Netto-WB" deaktiviert sind.
+
+## v4.1.1 (2019-07-10) <a href="https://github.com/plentymarkets/plugin-io/compare/4.1.0...4.1.1" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
+
+### Behoben
+
+- Durch einen Fehler wurde die IO-Route “Seite nicht gefunden” im Bereich **Routing** bei der Bereitstellung der Plugins auch für Callisto-Webshops mit Ceres-Checkout aktiviert. Dieses Verhalten wurde behoben.
+
+## v4.1.0 (2019-07-08) <a href="https://github.com/plentymarkets/plugin-io/compare/4.0.1...4.1.0" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
+
+### Hinzugefügt
+
+- Plugins können ab sofort zusätzliche Datenfelder angeben, die unabhängig vom Result Fields-Template immer geladen werden.
+- Metainformationen von Dateien, die im neuen Webspace abgelegt werden, können ab sofort im Template mithilfe der Twig-Funktion `cdn_metadata()` ausgelesen werden.
+- Der TWIG-Filter 'propertySelectionValueName' wurde hinzugefügt. Dieser gibt den Namen eines Werts innerhalb eines Bestellmerkmals vom Typ **Auswahl** aus.
+- Es kann nun über den Tab Routing in der IO-Konfiguration gesteuert werden, ob die 404 Seite von IO ausgegeben werden soll.
+
+### Geändert
+
+- Die Variantenauswahl in der Artikeleinzelansicht wurde auf die ElasticSearch-Technologie umgebaut, um bessere Performance bieten zu können.
+- Die "Passwort ändern"-Funktion im Mein Konto-Bereich validiert nun serverseitig das Passwort entlang unserer Vorgaben.
+- Die Fehlermeldung, die bei Nichterreichen des Mindestbestellwerts angezeigt wird, wurde angepasst und um den benötigten Wert erweitert.
+- Die Einstellung "Variantenauswahl für Varianten ohne Bestand in der Varianten-Dropdown-Liste aktivieren" wurde in der Ceres-Konfiguration als "deprecated" markiert und wird im Variantenauswahl-Widget nicht mehr berücksichtigt.
+
+### Behoben
+
+- Das Eingabefeld für Datum wird nun serverseitig korrekt validiert.
+- Durch einen Fehler wurde bei Klick auf die Schaltfläche "Auftragsabwicklung" in der Auftragsübersicht keine Seite geöffnet, wenn die Startseite deaktiviert war. Dies wurde behoben.
+- Die Mengenangabe auf der Wunschliste hat auch inaktive Artikel mitgezählt. Dieses Verhalten wurde behoben.
+- Artikellisten-Widgets, bei denen mit die Einstellung **Hersteller** aktiv waren, hat die Sortierung ignoriert. Dieses Verhalten wurde behoben.
+- Durch einen Fehler wurden URLs von Kategorien nicht richtig generiert, wenn der Kategoriename mit den Buchstaben des Sprachkürzels der aktuell ausgewählten Sprache begann. Dies wurde behoben.
+- In der Auftragsübersicht konnte es zu dem Fehler "Resource not Found" kommen, wenn das am Auftrag hinterlegte Versandprofil nicht mehr im System vorhanden war. Das Verhalten wurde behoben.
+- In der Auftragsübersicht konnte es zu dem Fehler "Resource not Found" kommen, wenn der am Auftrag hinterlegte Status kein Systemstatus war. Das Verhalten wurde behoben.
+- Die Bezeichnungen von Bestellmerkmalen werden nun in der richtigen Sprache ausgegeben.
+- Es kam bei der Berechnung von Staffelpreisen bei Varianten mit Bestellmerkmalen zu Problemen. Dieses Verhalten wurde behoben.
+- Es kam zu Fehlern bei der Anzeige von Netto- und Bruttopreisen im Zusammenhang mit der USt.-ID an der Rechnungsadresse. Dieses Verhalten wurde behoben.
+- Wenn nach dem Abschließen eines Auftrags während der Zahlung ein Fehler auftritt, kann der Auftrag erst nach 30 Sekunden erneut abgeschlossen werden. Dies verhindert das Anlegen von doppelten und somit ungültigen Aufträgen.
+- Bei Aufrufen von Kategorien die mit a-XXX enden kam es zur Anzeige einer 404 Seite oder einer Artikeldetailansicht. Dieses Verhalten wurde behoben.
+- Es wurde ein Fehler behoben, der die Weiterleitung von den Routen /checkout und /my-account auf den entprechenden ShopBuilder-Inhalt verhinderte.
+- Die Sprache der aus dem Shop versendeten E-Mails stimmt nun mit der aktuell gewählten Sprache im Shop überein.
+- Es wurde ein Fehler behoben, der das Ausliefern der Seite verhindert hat, wenn die Twig-Funktion `queryString` mit einem ungültigen Parameter aufgerufen wurde.
+
 ## v4.0.1 (2019-05-14) <a href="https://github.com/plentymarkets/plugin-io/compare/4.0.0...4.0.1" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
 
 ### Geändert

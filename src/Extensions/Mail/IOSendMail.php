@@ -3,6 +3,7 @@
 namespace IO\Extensions\Mail;
 
 use IO\DBModels\UserDataHash;
+use IO\Extensions\Constants\ShopUrls;
 use IO\Helper\RouteConfig;
 use IO\Services\TemplateConfigService;
 use IO\Services\UserDataHashService;
@@ -47,15 +48,16 @@ class IOSendMail
                 $this->setPlaceholderValue('Link_TermsCondition', '');
             }
 
+            /** @var TemplateConfigService $templateConfig */
             $templateConfig = pluginApp(TemplateConfigService::class);
-            $enableOldURLPattern = $templateConfig->get('global.enableOldUrlPattern');
-            if( RouteConfig::isActive(RouteConfig::ITEM) && (!strlen($enableOldURLPattern) || $enableOldURLPattern == 'false')) {
+            $enableOldURLPattern = $templateConfig->getBoolean('global.enableOldUrlPattern');
+            if( RouteConfig::isActive(RouteConfig::ITEM) && !$enableOldURLPattern) {
                 $this->setPlaceholderValue('Link_Item', '_{itemId}_{variationId}');
             } else {
                 $this->setPlaceholderValue('Link_Item', '');
             }
 
-            if (RouteConfig::isActive(RouteConfig::PASSWORD_RESET)  && strlen($pluginSendMail->getContactEmail())) {
+            if (in_array(RouteConfig::PASSWORD_RESET, RouteConfig::getEnabledRoutes())  && strlen($pluginSendMail->getContactEmail())) {
                 /** @var ContactRepositoryContract $contactRepository */
                 $contactRepository = pluginApp(ContactRepositoryContract::class);
                 $contactId = $contactRepository->getContactIdByEmail($pluginSendMail->getContactEmail());
@@ -79,7 +81,21 @@ class IOSendMail
                         );
                         $hash = $hashEntry->hash;
                     }
-                    $this->setPlaceholderValue('Link_ChangePassword', 'password-reset/'.$contactId. '/'  . $hash);
+
+                    if (RouteConfig::getCategoryId( RouteConfig::PASSWORD_RESET ) === 0)
+                    {
+                        // Build legacy route
+                        $this->setPlaceholderValue('Link_ChangePassword', 'password-reset/'.$contactId. '/'  . $hash);
+                    }
+                    else
+                    {
+                        /** @var ShopUrls $shopUrls */
+                        $shopUrls = pluginApp(ShopUrls::class);
+                        // Because of the placeholder structure, we need to remove a slash from the front of the link
+                        $passwordResetLink = $shopUrls->passwordReset . '?contactId=' . $contactId . '&hash=' . $hash;
+                        $passwordResetLink = ltrim($passwordResetLink, '/');
+                        $this->setPlaceholderValue('Link_ChangePassword', $passwordResetLink);
+                    }
                 }
 
             } else {

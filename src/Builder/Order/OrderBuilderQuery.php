@@ -1,6 +1,8 @@
 <?php
 namespace IO\Builder\Order;
+use IO\Helper\Utils;
 use IO\Services\BasketService;
+use IO\Services\SessionStorageService;
 use Plenty\Modules\Basket\Models\Basket;
 use Plenty\Plugin\Application;
 
@@ -71,7 +73,7 @@ class OrderBuilderQuery
 			throw new \Exception("Error while instantiating OrderItemBuilder.");
 		}
 
-		$items = $this->basketService->getBasketItems();
+		$items = $this->basketService->getBasketItemsForOrder();
 
 		if (!is_array($items)) {
 			throw new \Exception("Error while reading item data from basket");
@@ -85,6 +87,15 @@ class OrderBuilderQuery
 
 		return $this;
 	}
+
+    /**
+     * Add the lang to the order
+     * @param string $lang
+     */
+	public function withLang(string $lang)
+    {
+        $this->order['lang'] = $lang;
+    }
 
     /**
      * Add the status to the order
@@ -192,6 +203,12 @@ class OrderBuilderQuery
 	public function withContactId(int $customerId):OrderBuilderQuery
 	{
 		$this->withRelation(ReferenceType::CONTACT, $customerId, RelationType::RECEIVER);
+
+		if((int)$customerId <= 0)
+        {
+            $this->withLang(Utils::getLang());
+        }
+
 		return $this;
 	}
 
@@ -200,9 +217,10 @@ class OrderBuilderQuery
      * @param int $type
      * @param int $subType
      * @param $value
+     * @param $required
      * @return OrderBuilderQuery
      */
-	public function withOrderProperty(int $type, int $subType, $value):OrderBuilderQuery
+	public function withOrderProperty(int $type, int $subType, $value, $required = true):OrderBuilderQuery
 	{
 		if($this->order["properties"] === null)
 		{
@@ -215,8 +233,12 @@ class OrderBuilderQuery
 			"value"     => (string)$value
 		];
 
-		array_push($this->order["properties"], $option);
-		return $this;
+		if ($required || !$required && strlen($value) > 0)
+        {
+            array_push($this->order["properties"], $option);
+        }
+
+        return $this;
 	}
 
     /**

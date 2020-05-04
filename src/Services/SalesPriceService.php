@@ -4,20 +4,20 @@ namespace IO\Services;
 
 use Plenty\Modules\Account\Contact\Models\Contact;
 use Plenty\Modules\Item\SalesPrice\Contracts\SalesPriceSearchRepositoryContract;
-use Plenty\Modules\Item\SalesPrice\Models\SalesPrice;
 use Plenty\Modules\Item\SalesPrice\Models\SalesPriceSearchRequest;
 use Plenty\Modules\Item\SalesPrice\Models\SalesPriceSearchResponse;
+use Plenty\Modules\Webshop\Contracts\CheckoutRepositoryContract;
+use Plenty\Modules\Webshop\Contracts\ContactRepositoryContract;
 use Plenty\Plugin\Application;
-use IO\Services\CustomerService;
-use IO\Services\CheckoutService;
-use IO\Services\BasketService;
 
 class SalesPriceService
 {
     private $app;
     private $salesPriceSearchRepo;
-    private $customerService;
-    private $checkoutService;
+    /** @var ContactRepositoryContract $contactRepository */
+    private $contactRepository;
+    /** @var CheckoutRepositoryContract $checkoutRepository */
+    private $checkoutRepository;
     private $basketService;
 
     private $classId = null;
@@ -31,21 +31,22 @@ class SalesPriceService
      * SalesPriceService constructor.
      * @param Application $app
      * @param SalesPriceSearchRepositoryContract $salesPriceSearchRepo
-     * @param CustomerService $customerService
-     * @param CheckoutService $checkoutService
+     * @param ContactRepositoryContract $contactRepository
+     * @param CheckoutRepositoryContract $checkoutRepository
+     * @param BasketService $basketService
      */
     public function __construct(
         Application $app,
         SalesPriceSearchRepositoryContract $salesPriceSearchRepo,
-        CustomerService $customerService,
-        CheckoutService $checkoutService,
+        ContactRepositoryContract $contactRepository,
+        CheckoutRepositoryContract $checkoutRepository,
         BasketService $basketService
     )
     {
         $this->app                  = $app;
         $this->salesPriceSearchRepo = $salesPriceSearchRepo;
-        $this->customerService      = $customerService;
-        $this->checkoutService      = $checkoutService;
+        $this->contactRepository    = $contactRepository;
+        $this->checkoutRepository   = $checkoutRepository;
         $this->basketService        = $basketService;
 
         $this->init();
@@ -83,15 +84,15 @@ class SalesPriceService
 
     private function init()
     {
-        $contact = $this->customerService->getContact();
+        $contact = $this->contactRepository->getContact();
 
         if ($contact instanceof Contact) {
             $this->classId      = $contact->classId;
             $this->singleAccess = $contact->singleAccess;
         }
 
-        $this->currency          = $this->checkoutService->getCurrency();
-        $this->shippingCountryId = $this->checkoutService->getShippingCountryId();
+        $this->currency          = $this->checkoutRepository->getCurrency();
+        $this->shippingCountryId = $this->checkoutRepository->getShippingCountryId();
         $this->plentyId          = $this->app->getPlentyId();
         $this->referrerId        = $this->basketService->getBasket()->referrerId;
     }

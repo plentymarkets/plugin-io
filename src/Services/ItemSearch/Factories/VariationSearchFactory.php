@@ -3,8 +3,10 @@
 namespace IO\Services\ItemSearch\Factories;
 
 use IO\Helper\CurrencyConverter;
+use IO\Helper\Utils;
 use IO\Helper\VatConverter;
 use IO\Services\ItemSearch\Contracts\FacetExtension;
+use IO\Services\ItemSearch\Extensions\AvailabilityExtension;
 use IO\Services\ItemSearch\Extensions\GroupedAttributeValuesExtension;
 use IO\Services\ItemSearch\Extensions\BundleComponentExtension;
 use IO\Services\ItemSearch\Extensions\ContentCacheVariationLinkExtension;
@@ -13,10 +15,11 @@ use IO\Services\ItemSearch\Extensions\ItemDefaultImage;
 use IO\Services\ItemSearch\Extensions\ItemUrlExtension;
 use IO\Services\ItemSearch\Extensions\PriceSearchExtension;
 use IO\Services\ItemSearch\Extensions\ReduceDataExtension;
-use IO\Services\ItemSearch\Helper\FacetExtensionContainer;
+use IO\Services\ItemSearch\Extensions\TagExtension;
+use IO\Services\ItemSearch\Extensions\VariationAttributeMapExtension;
+use IO\Services\ItemSearch\Extensions\VariationPropertyExtension;
 use IO\Services\ItemSearch\Mutators\OrderPropertySelectionValueMutator;
 use IO\Services\PriceDetectService;
-use IO\Services\SessionStorageService;
 use IO\Services\TemplateConfigService;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\ElasticSearch;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Source\Mutator\BuiltIn\LanguageMutator;
@@ -34,6 +37,8 @@ use Plenty\Modules\Item\Search\Helper\SearchHelper;
 use Plenty\Modules\Item\Search\Mutators\ImageDomainMutator;
 use Plenty\Modules\Item\Search\Mutators\ImageMutator;
 use Plenty\Modules\Item\Search\Mutators\VariationPropertyGroupMutator;
+use Plenty\Modules\Webshop\Contracts\PriceDetectRepositoryContract;
+use Plenty\Modules\Webshop\ItemSearch\Helpers\FacetExtensionContainer;
 use Plenty\Plugin\Application;
 
 /**
@@ -42,28 +47,33 @@ use Plenty\Plugin\Application;
  * Concrete factory to build variation searches
  *
  * @package IO\Services\ItemSearch\Factories
+ * @deprecated since 5.0.0 will be deleted in 6.0.0
+ * @see \Plenty\Modules\Webshop\ItemSearch\Factories\VariationSearchFactory
  */
 class VariationSearchFactory extends BaseSearchFactory
 {
     private $isAdminPreview = false;
-    
+
     public function __construct()
     {
         /** @var Application $app */
         $app = pluginApp(Application::class);
         $this->isAdminPreview = $app->isAdminPreview();
     }
-    
+
     /**
      * @param $isAdminPreview
      * @return $this
+     *
+     * @deprecated since 5.0.0 will be deleted in 6.0.0
+     * @see \Plenty\Modules\Webshop\ItemSearch\Factories\VariationSearchFactory::setAdminPreview()
      */
     public function setAdminPreview($isAdminPreview)
     {
         $this->isAdminPreview = $isAdminPreview;
         return $this;
     }
-    
+
     //
     // VARIATION BASE FILTERS
     //
@@ -71,6 +81,9 @@ class VariationSearchFactory extends BaseSearchFactory
      * Filter active variations
      *
      * @return $this
+     *
+     * @deprecated since 5.0.0 will be deleted in 6.0.0
+     * @see \Plenty\Modules\Webshop\ItemSearch\Factories\VariationSearchFactory::isActive()
      */
     public function isActive()
     {
@@ -80,7 +93,7 @@ class VariationSearchFactory extends BaseSearchFactory
             $variationFilter = $this->createFilter( VariationBaseFilter::class );
             $variationFilter->isActive();
         }
-        
+
         return $this;
     }
 
@@ -88,6 +101,9 @@ class VariationSearchFactory extends BaseSearchFactory
      * Filter inactive variations
      *
      * @return $this
+     *
+     * @deprecated since 5.0.0 will be deleted in 6.0.0
+     * @see \Plenty\Modules\Webshop\ItemSearch\Factories\VariationSearchFactory::isInactive()
      */
     public function isInactive()
     {
@@ -97,7 +113,7 @@ class VariationSearchFactory extends BaseSearchFactory
             $variationFilter = $this->createFilter( VariationBaseFilter::class );
             $variationFilter->isInactive();
         }
-        
+
         return $this;
     }
 
@@ -107,6 +123,9 @@ class VariationSearchFactory extends BaseSearchFactory
      * @param int   $itemId   Item id to filter by.
      *
      * @return $this
+     *
+     * @deprecated since 5.0.0 will be deleted in 6.0.0
+     * @see \Plenty\Modules\Webshop\ItemSearch\Factories\VariationSearchFactory::hasItemId()
      */
     public function hasItemId( $itemId )
     {
@@ -122,6 +141,9 @@ class VariationSearchFactory extends BaseSearchFactory
      * @param int[]     $itemIds    List of item ids to filter by.
      *
      * @return $this
+     *
+     * @deprecated since 5.0.0 will be deleted in 6.0.0
+     * @see \Plenty\Modules\Webshop\ItemSearch\Factories\VariationSearchFactory::hasItemIds()
      */
     public function hasItemIds( $itemIds )
     {
@@ -137,6 +159,9 @@ class VariationSearchFactory extends BaseSearchFactory
      * @param int   $variationId    The variation id to filter by.
      *
      * @return $this
+     *
+     * @deprecated since 5.0.0 will be deleted in 6.0.0
+     * @see \Plenty\Modules\Webshop\ItemSearch\Factories\VariationSearchFactory::hasVariationId()
      */
     public function hasVariationId( $variationId )
     {
@@ -152,6 +177,9 @@ class VariationSearchFactory extends BaseSearchFactory
      * @param int[]     $variationIds   List of variation ids to filter by.
      *
      * @return $this
+     *
+     * @deprecated since 5.0.0 will be deleted in 6.0.0
+     * @see \Plenty\Modules\Webshop\ItemSearch\Factories\VariationSearchFactory::hasVariationIds()
      */
     public function hasVariationIds( $variationIds )
     {
@@ -167,6 +195,9 @@ class VariationSearchFactory extends BaseSearchFactory
      * @param int[]   $availabilityIds    List of availability ids to filter by.
      *
      * @return $this
+     *
+     * @deprecated since 5.0.0 will be deleted in 6.0.0
+     * @see \Plenty\Modules\Webshop\ItemSearch\Factories\VariationSearchFactory::hasAtLeastOneAvailability()
      */
     public function hasAtLeastOneAvailability( $availabilityIds )
     {
@@ -182,6 +213,9 @@ class VariationSearchFactory extends BaseSearchFactory
      * @param int     $supplierId     The supplier id to filter by.
      *
      * @return $this
+     *
+     * @deprecated since 5.0.0 will be deleted in 6.0.0
+     * @see \Plenty\Modules\Webshop\ItemSearch\Factories\VariationSearchFactory::hasSupplier()
      */
     public function hasSupplier( $supplierId )
     {
@@ -197,6 +231,9 @@ class VariationSearchFactory extends BaseSearchFactory
      * @param int $manufacturerId To filter by manufacturer
      *
      * @return $this
+     *
+     * @deprecated since 5.0.0 will be deleted in 6.0.0
+     * @see \Plenty\Modules\Webshop\ItemSearch\Factories\VariationSearchFactory::hasManufacturer()
      */
     public function hasManufacturer( $manufacturerId )
     {
@@ -212,6 +249,9 @@ class VariationSearchFactory extends BaseSearchFactory
      * @param int[]     $propertyIds     The property ids to filter by.
      *
      * @return $this
+     *
+     * @deprecated since 5.0.0 will be deleted in 6.0.0
+     * @see \Plenty\Modules\Webshop\ItemSearch\Factories\VariationSearchFactory::hasEachProperty()
      */
     public function hasEachProperty( $propertyIds )
     {
@@ -225,6 +265,9 @@ class VariationSearchFactory extends BaseSearchFactory
      * Filter only main variations
      *
      * @return $this
+     *
+     * @deprecated since 5.0.0 will be deleted in 6.0.0
+     * @see \Plenty\Modules\Webshop\ItemSearch\Factories\VariationSearchFactory::isMain()
      */
     public function isMain()
     {
@@ -238,6 +281,9 @@ class VariationSearchFactory extends BaseSearchFactory
      * Filter only child variations
      *
      * @return $this
+     *
+     * @deprecated since 5.0.0 will be deleted in 6.0.0
+     * @see \Plenty\Modules\Webshop\ItemSearch\Factories\VariationSearchFactory::isChild()
      */
     public function isChild()
     {
@@ -253,6 +299,9 @@ class VariationSearchFactory extends BaseSearchFactory
      * @param bool    $isHidden     Visibility in category list to filter by.
      *
      * @return $this
+     *
+     * @deprecated since 5.0.0 will be deleted in 6.0.0
+     * @see \Plenty\Modules\Webshop\ItemSearch\Factories\VariationSearchFactory::isHiddenInCategoryList()
      */
     public function isHiddenInCategoryList( $isHidden = true )
     {
@@ -262,7 +311,24 @@ class VariationSearchFactory extends BaseSearchFactory
             $variationFilter = $this->createFilter( VariationBaseFilter::class );
             $variationFilter->isHiddenInCategoryList( $isHidden );
         }
-        
+
+        return $this;
+    }
+
+    /**
+     * Filter variations by isSalable flag
+     *
+     * @return $this
+     *
+     * @deprecated since 5.0.0 will be deleted in 6.0.0
+     * @see \Plenty\Modules\Webshop\ItemSearch\Factories\VariationSearchFactory::isSalable()
+     */
+    public function isSalable()
+    {
+        /** @var VariationBaseFilter $variationFilter */
+        $variationFilter = $this->createFilter( VariationBaseFilter::class );
+        $variationFilter->isSalable();
+
         return $this;
     }
 
@@ -275,6 +341,9 @@ class VariationSearchFactory extends BaseSearchFactory
      * @param null|int  $clientId   The client id to filter by. If null, default client id on application will be used.
      *
      * @return $this
+     *
+     * @deprecated since 5.0.0 will be deleted in 6.0.0
+     * @see \Plenty\Modules\Webshop\ItemSearch\Factories\VariationSearchFactory::isVisibleForClient()
      */
     public function isVisibleForClient( $clientId = null )
     {
@@ -282,13 +351,13 @@ class VariationSearchFactory extends BaseSearchFactory
         {
             if ( $clientId === null )
             {
-                $clientId = pluginApp( Application::class )->getPlentyId();
+                $clientId = Utils::getPlentyId();
             }
             /** @var ClientFilter $clientFilter */
             $clientFilter = $this->createFilter( ClientFilter::class );
             $clientFilter->isVisibleForClient( $clientId );
         }
-        
+
         return $this;
     }
 
@@ -302,6 +371,9 @@ class VariationSearchFactory extends BaseSearchFactory
      * @param null|string   $lang   The language to filter by. If null, language defined in session will be used.
      *
      * @return $this
+     *
+     * @deprecated since 5.0.0 will be deleted in 6.0.0
+     * @see \Plenty\Modules\Webshop\ItemSearch\Factories\VariationSearchFactory::hasNameInLanguage()
      */
     public function hasNameInLanguage( $type = TextFilter::FILTER_ANY_NAME, $lang = null)
     {
@@ -309,9 +381,9 @@ class VariationSearchFactory extends BaseSearchFactory
         {
             if ( $lang === null )
             {
-                $lang = pluginApp(SessionStorageService::class)->getLang();
+                $lang = Utils::getLang();
             }
-    
+
             $langMap = [
                 'de' => 'german',
                 'en' => 'english',
@@ -333,7 +405,7 @@ class VariationSearchFactory extends BaseSearchFactory
                 //'cn' => '',
                 //'vn' => '',
             ];
-    
+
             if ( array_key_exists( $lang, $langMap ) )
             {
                 $lang = $langMap[$lang];
@@ -346,7 +418,7 @@ class VariationSearchFactory extends BaseSearchFactory
             $textFilter = $this->createFilter(TextFilter::class);
             $textFilter->hasNameInLanguage( $lang, $type );
         }
-        
+
         return $this;
     }
 
@@ -359,6 +431,9 @@ class VariationSearchFactory extends BaseSearchFactory
      * @param int   $categoryId     A category id to filter variations by.
      *
      * @return $this
+     *
+     * @deprecated since 5.0.0 will be deleted in 6.0.0
+     * @see \Plenty\Modules\Webshop\ItemSearch\Factories\VariationSearchFactory::isInCategory()
      */
     public function isInCategory( $categoryId )
     {
@@ -377,6 +452,9 @@ class VariationSearchFactory extends BaseSearchFactory
      * @param int[]     $priceIds   List of price ids to filter variations by
      *
      * @return $this
+     *
+     * @deprecated since 5.0.0 will be deleted in 6.0.0
+     * @see \Plenty\Modules\Webshop\ItemSearch\Factories\VariationSearchFactory::hasAtLeastOnePrice()
      */
     public function hasAtLeastOnePrice( $priceIds )
     {
@@ -386,7 +464,7 @@ class VariationSearchFactory extends BaseSearchFactory
             $priceFilter = $this->createFilter( SalesPriceFilter::class );
             $priceFilter->hasAtLeastOnePrice( $priceIds );
         }
-        
+
         return $this;
     }
 
@@ -394,50 +472,77 @@ class VariationSearchFactory extends BaseSearchFactory
      * Filter variations having at least one price accessible by current customer.
      *
      * @return $this
+     *
+     * @deprecated since 5.0.0 will be deleted in 6.0.0
+     * @see \Plenty\Modules\Webshop\ItemSearch\Factories\VariationSearchFactory::hasPriceForCustomer()
      */
     public function hasPriceForCustomer()
     {
         if(!$this->isAdminPreview)
         {
             /** @var PriceDetectService $priceDetectService */
-            $priceDetectService = pluginApp( PriceDetectService::class );
+            $priceDetectService = pluginApp(PriceDetectService::class);
+
             $this->hasAtLeastOnePrice( $priceDetectService->getPriceIdsForCustomer() );
         }
-        
+
         return $this;
     }
-    
+
+    /**
+     * @param $priceMin
+     * @param $priceMax
+     * @return $this
+     * @throws \ErrorException
+     *
+     * @deprecated since 5.0.0 will be deleted in 6.0.0
+     * @see \Plenty\Modules\Webshop\ItemSearch\Factories\VariationSearchFactory::hasPriceInRange()
+     */
     public function hasPriceInRange($priceMin, $priceMax)
     {
         if( !( (float)$priceMin == 0 && (float)$priceMax == 0 ) )
         {
             /** @var CurrencyConverter $currencyConverter */
             $currencyConverter = pluginApp(CurrencyConverter::class);
-            
+
             /** @var VatConverter $vatConverter */
             $vatConverter = pluginApp(VatConverter::class);
-            
+
             $priceMin = $vatConverter->convertToGross($currencyConverter->convertToDefaultCurrency((float)$priceMin));
             $priceMax = $vatConverter->convertToGross($currencyConverter->convertToDefaultCurrency((float)$priceMax));
-    
+
             if((float)$priceMax == 0)
             {
                 $priceMax = null;
             }
-            
+
             /** @var PriceFilter $priceRangeFilter */
             $priceRangeFilter = $this->createFilter(PriceFilter::class);
-            $priceRangeFilter->betweenByClient($priceMin, $priceMax, pluginApp(Application::class)->getPlentyId());
+            $priceRangeFilter->betweenByClient($priceMin, $priceMax, Utils::getPlentyId());
         }
-        
+
         return $this;
     }
 
+    /**
+     * @param $tagId
+     * @return $this
+     *
+     * @deprecated since 5.0.0 will be deleted in 6.0.0
+     * @see \Plenty\Modules\Webshop\ItemSearch\Factories\VariationSearchFactory::hasTag()
+     */
     public function hasTag($tagId)
     {
         return $this->hasAnyTag([$tagId]);
     }
 
+    /**
+     * @param $tagIds
+     * @return $this
+     *
+     * @deprecated since 5.0.0 will be deleted in 6.0.0
+     * @see \Plenty\Modules\Webshop\ItemSearch\Factories\VariationSearchFactory::hasAnyTag()
+     */
     public function hasAnyTag($tagIds)
     {
         /** @var TagFilter $tagFilter */
@@ -456,27 +561,15 @@ class VariationSearchFactory extends BaseSearchFactory
     /**
      * Group results depending on a config value.
      *
-     * @param string $configKey     The config key containing the grouping method: ('all', 'combined', 'main', 'child')
-     *
+     * @param string $key
      * @return $this
+     *
+     * @deprecated since 5.0.0 will be deleted in 6.0.0
+     * @see \Plenty\Modules\Webshop\ItemSearch\Factories\VariationSearchFactory::groupByTemplateConfig()
      */
-    public function groupByTemplateConfig( $configKey = 'item.variation_show_type' )
+    public function groupByTemplateConfig($key = 'ids.itemAttributeValue')
     {
-        /** @var TemplateConfigService $templateConfigService */
-        $templateConfigService = pluginApp(TemplateConfigService::class);
-        $variationShowType = $templateConfigService->get($configKey);
-        if ($variationShowType === 'combined')
-        {
-            $this->groupBy( 'ids.itemAttributeValue' );
-        }
-        else if ( $variationShowType === 'main' )
-        {
-            $this->isMain();
-        }
-        else if ( $variationShowType === 'child' )
-        {
-            $this->isChild();
-        }
+        $this->groupBy($key);
 
         return $this;
     }
@@ -488,6 +581,9 @@ class VariationSearchFactory extends BaseSearchFactory
      * @param string    $relation   The relation of cross selling items.
      *
      * @return $this
+     *
+     * @deprecated since 5.0.0 will be deleted in 6.0.0
+     * @see \Plenty\Modules\Webshop\ItemSearch\Factories\VariationSearchFactory::isCrossSellingItem()
      */
     public function isCrossSellingItem( $itemId, $relation )
     {
@@ -509,29 +605,35 @@ class VariationSearchFactory extends BaseSearchFactory
      * @param string         $lang          Language to filter facets by. If null, active language from session will be used.
      *
      * @return $this
+     *
+     * @deprecated since 5.0.0 will be deleted in 6.0.0
+     * @see \Plenty\Modules\Webshop\ItemSearch\Factories\VariationSearchFactory::hasFacets()
      */
     public function hasFacets( $facetValues, $clientId = null, $lang = null )
     {
         if ( $clientId === null )
         {
-            $clientId = pluginApp( Application::class )->getPlentyId();
+            $clientId = Utils::getPlentyId();
         }
 
         if ( $lang === null )
         {
-            $lang = pluginApp( SessionStorageService::class )->getLang();
+            $lang = Utils::getLang();
         }
 
         if ( is_string( $facetValues ) )
         {
             $facetValues = explode(",", $facetValues );
         }
-        
+
         /** @var SearchHelper $searchHelper */
         $searchHelper = pluginApp( SearchHelper::class, [$facetValues, $clientId, 'item', $lang] );
         $this->withFilter( $searchHelper->getFacetFilter() );
 
-        $facetExtensions = pluginApp( FacetExtensionContainer::class )->getFacetExtensions();
+        /** @var FacetExtensionContainer $facetExtensionContainer */
+        $facetExtensionContainer = pluginApp(FacetExtensionContainer::class);
+
+        $facetExtensions = $facetExtensionContainer->getFacetExtensions();
         foreach( $facetExtensions as $facetExtension )
         {
             if ( $facetExtension instanceof FacetExtension )
@@ -564,12 +666,15 @@ class VariationSearchFactory extends BaseSearchFactory
      * @param string    $operator   Operator ot be used for search
      *
      * @return $this
+     *
+     * @deprecated since 5.0.0 will be deleted in 6.0.0
+     * @see \Plenty\Modules\Webshop\ItemSearch\Factories\VariationSearchFactory::hasSearchString()
      */
     public function hasSearchString( $query, $lang = null, $searchType = ElasticSearch::SEARCH_TYPE_EXACT, $operator = ElasticSearch::OR_OPERATOR )
     {
         if ( $lang === null )
         {
-            $lang = pluginApp( SessionStorageService::class )->getLang();
+            $lang = Utils::getLang();
         }
 
         if ( $searchType !== ElasticSearch::SEARCH_TYPE_FUZZY
@@ -598,12 +703,15 @@ class VariationSearchFactory extends BaseSearchFactory
      * @param string    $lang   Language to apply search on. If null, default language from session will be used.
      *
      * @return $this
+     *
+     * @deprecated since 5.0.0 will be deleted in 6.0.0
+     * @see \Plenty\Modules\Webshop\ItemSearch\Factories\VariationSearchFactory::hasNameString()
      */
     public function hasNameString( $query, $lang = null )
     {
         if ( $lang === null )
         {
-            $lang = pluginApp( SessionStorageService::class )->getLang();
+            $lang = Utils::getLang();
         }
 
         /** @var SearchFilter $searchFilter */
@@ -622,12 +730,15 @@ class VariationSearchFactory extends BaseSearchFactory
      * @param string    $lang   Language to get texts for. If null, default language from session will be used.
      *
      * @return $this
+     *
+     * @deprecated since 5.0.0 will be deleted in 6.0.0
+     * @see \Plenty\Modules\Webshop\ItemSearch\Factories\VariationSearchFactory::withLanguage()
      */
     public function withLanguage( $lang = null )
     {
         if ( $lang === null )
         {
-            $lang = pluginApp( SessionStorageService::class )->getLang();
+            $lang = Utils::getLang();
         }
         $languageMutator = pluginApp(LanguageMutator::class, ["languages" => [$lang]]);
         $this->withMutator( $languageMutator );
@@ -641,12 +752,15 @@ class VariationSearchFactory extends BaseSearchFactory
      * @param int   $clientId   The client id to get images for. If null, default client id from application will be used.
      *
      * @return $this
+     *
+     * @deprecated since 5.0.0 will be deleted in 6.0.0
+     * @see \Plenty\Modules\Webshop\ItemSearch\Factories\VariationSearchFactory::withImages()
      */
     public function withImages( $clientId = null )
     {
         if ( $clientId === null )
         {
-            $clientId = pluginApp( Application::class )->getPlentyId();
+            $clientId = Utils::getPlentyId();
         }
 
         $imageMutator = pluginApp(ImageMutator::class);
@@ -664,20 +778,60 @@ class VariationSearchFactory extends BaseSearchFactory
 
         return $this;
     }
-    
+
+    /**
+     * Includes VariatonAttributeMap for variation select
+     *
+     * @return $this
+     *
+     * @deprecated since 5.0.0 will be deleted in 6.0.0
+     * @see \Plenty\Modules\Webshop\ItemSearch\Factories\VariationSearchFactory::withAttributes()
+     */
+    public function withAttributes()
+    {
+        $this->withExtension( VariationAttributeMapExtension::class );
+
+        return $this;
+    }
+
+    /**
+     * @return $this
+     *
+     * @deprecated since 5.0.0 will be deleted in 6.0.0
+     * @see \Plenty\Modules\Webshop\ItemSearch\Factories\VariationSearchFactory::withPropertyGroups()
+     */
     public function withPropertyGroups()
     {
         $propertyGroupMutator = pluginApp(VariationPropertyGroupMutator::class);
         $this->withMutator($propertyGroupMutator);
-        
+
         return $this;
     }
-    
+
+    /**
+     * @return $this
+     *
+     * @deprecated since 5.0.0 will be deleted in 6.0.0
+     * @see \Plenty\Modules\Webshop\ItemSearch\Factories\VariationSearchFactory::withOrderPropertySelectionValues()
+     */
     public function withOrderPropertySelectionValues()
     {
         $orderPropertySelectionValueMutator = pluginApp(OrderPropertySelectionValueMutator::class);
         $this->withMutator($orderPropertySelectionValueMutator);
-        
+
+        return $this;
+    }
+
+    /**
+     * @return $this
+     *
+     * @deprecated since 5.0.0 will be deleted in 6.0.0
+     * @see \Plenty\Modules\Webshop\ItemSearch\Factories\VariationSearchFactory::withVariationProperties()
+     */
+    public function withVariationProperties()
+    {
+        $this->withExtension(VariationPropertyExtension::class);
+
         return $this;
     }
 
@@ -689,6 +843,9 @@ class VariationSearchFactory extends BaseSearchFactory
      * If not URL is stored in item result, a new URL will be generated and written to item data.
      *
      * @return $this
+     *
+     * @deprecated since 5.0.0 will be deleted in 6.0.0
+     * @see \Plenty\Modules\Webshop\ItemSearch\Factories\VariationSearchFactory::withUrls()
      */
     public function withUrls()
     {
@@ -702,6 +859,9 @@ class VariationSearchFactory extends BaseSearchFactory
      * @param array $params     Params to be passed to price search.
      *
      * @return $this
+     *
+     * @deprecated since 5.0.0 will be deleted in 6.0.0
+     * @see \Plenty\Modules\Webshop\ItemSearch\Factories\VariationSearchFactory::withPrices()
      */
     public function withPrices( $quantities = [] )
     {
@@ -715,6 +875,9 @@ class VariationSearchFactory extends BaseSearchFactory
      * Set result as current category
      *
      * @return $this
+     *
+     * @deprecated since 5.0.0 will be deleted in 6.0.0
+     * @see \Plenty\Modules\Webshop\ItemSearch\Factories\VariationSearchFactory::withCurrentCategory()
      */
     public function withCurrentCategory()
     {
@@ -726,6 +889,9 @@ class VariationSearchFactory extends BaseSearchFactory
      * Append default item image if images are requested by result fields and item does not have any image
      *
      * @return $this
+     *
+     * @deprecated since 5.0.0 will be deleted in 6.0.0
+     * @see \Plenty\Modules\Webshop\ItemSearch\Factories\VariationSearchFactory::withDefaultImage()
      */
     public function withDefaultImage()
     {
@@ -733,28 +899,78 @@ class VariationSearchFactory extends BaseSearchFactory
         return $this;
     }
 
+    /**
+     * @return $this
+     *
+     * @deprecated since 5.0.0 will be deleted in 6.0.0
+     * @see \Plenty\Modules\Webshop\ItemSearch\Factories\VariationSearchFactory::withBundleComponents()
+     */
     public function withBundleComponents()
     {
         $this->withExtension( BundleComponentExtension::class );
         return $this;
     }
 
+    /**
+     * @return $this
+     *
+     * @deprecated since 5.0.0 will be deleted in 6.0.0
+     * @see \Plenty\Modules\Webshop\ItemSearch\Factories\VariationSearchFactory::withLinkToContent()
+     */
     public function withLinkToContent()
     {
         $this->withExtension( ContentCacheVariationLinkExtension::class );
         return $this;
     }
 
+    /**
+     * @return $this
+     *
+     * @deprecated since 5.0.0 will be deleted in 6.0.0
+     * @see \Plenty\Modules\Webshop\ItemSearch\Factories\VariationSearchFactory::withGroupedAttributeValues()
+     */
     public function withGroupedAttributeValues()
     {
         $this->withExtension( GroupedAttributeValuesExtension::class );
         return $this;
     }
 
-    public function withReducedResults()
+    /**
+     * @param bool $removeProperties
+     * @return $this
+     *
+     * @deprecated since 5.0.0 will be deleted in 6.0.0
+     * @see \Plenty\Modules\Webshop\ItemSearch\Factories\VariationSearchFactory::withReducedResults()
+     */
+    public function withReducedResults($removeProperties = false)
     {
-        $this->withExtension(ReduceDataExtension::class);
+        $this->withExtension(ReduceDataExtension::class, ['removeProperties' => $removeProperties]);
         return $this;
     }
+
+    /**
+     * @return $this
+     *
+     * @deprecated since 5.0.0 will be deleted in 6.0.0
+     * @see \Plenty\Modules\Webshop\ItemSearch\Factories\VariationSearchFactory::withAvailability()
+     */
+    public function withAvailability()
+    {
+        $this->withExtension(AvailabilityExtension::class);
+        return $this;
+    }
+
+    /**
+     * @return $this
+     *
+     * @deprecated since 5.0.0 will be deleted in 6.0.0
+     * @see \Plenty\Modules\Webshop\ItemSearch\Factories\VariationSearchFactory::withTags()
+     */
+    public function withTags()
+    {
+        $this->withExtension(TagExtension::class);
+        return $this;
+    }
+
 }
 

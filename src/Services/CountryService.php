@@ -2,6 +2,7 @@
 
 namespace IO\Services;
 
+use IO\Helper\Utils;
 use Plenty\Modules\Order\Shipping\Countries\Contracts\CountryRepositoryContract;
 use Plenty\Modules\Order\Shipping\Countries\Models\Country;
 use Plenty\Modules\Frontend\Contracts\Checkout;
@@ -16,11 +17,6 @@ class CountryService
 	 * @var CountryRepositoryContract
 	 */
     private $countryRepository;
-    
-    /**
-     * @var SessionStorageService
-     */
-    private $sessionStorageService;
 
     /**
      * @var Country[][]
@@ -30,12 +26,10 @@ class CountryService
     /**
      * CountryService constructor.
      * @param CountryRepositoryContract $countryRepository
-     * @param SessionStorageService $sessionStorageService
      */
-	public function __construct(CountryRepositoryContract $countryRepository, SessionStorageService $sessionStorageService)
+	public function __construct(CountryRepositoryContract $countryRepository)
 	{
 		$this->countryRepository = $countryRepository;
-		$this->sessionStorageService = $sessionStorageService;
 	}
 
     /**
@@ -47,7 +41,7 @@ class CountryService
     {
         if ( $lang === null )
         {
-            $lang = $this->sessionStorageService->getLang();
+            $lang = Utils::getLang();
         }
 
         if (!isset(self::$activeCountries[$lang])) {
@@ -86,7 +80,9 @@ class CountryService
      */
   public function getShippingCountryId()
   {
-    return pluginApp(Checkout::class)->getShippingCountryId();
+      /** @var Checkout $checkout */
+      $checkout = pluginApp(Checkout::class);
+      return $checkout->getShippingCountryId();
   }
 
     /**
@@ -95,7 +91,9 @@ class CountryService
      */
 	public function setShippingCountryId(int $shippingCountryId)
 	{
-		pluginApp(Checkout::class)->setShippingCountryId($shippingCountryId);
+        /** @var Checkout $checkout */
+        $checkout = pluginApp(Checkout::class);
+        $checkout->setShippingCountryId($shippingCountryId);
 	}
 
     /**
@@ -118,7 +116,7 @@ class CountryService
 	{
         if ( $lang === null )
         {
-            $lang = $this->sessionStorageService->getLang();
+            $lang = Utils::getLang();
         }
 
 		$country = $this->countryRepository->getCountryById($countryId);

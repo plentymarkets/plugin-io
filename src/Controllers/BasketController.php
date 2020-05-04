@@ -2,7 +2,9 @@
 
 namespace IO\Controllers;
 
+use IO\Helper\RouteConfig;
 use IO\Services\BasketService;
+use Plenty\Modules\ShopBuilder\Helper\ShopBuilderRequest;
 
 /**
  * Class BasketController
@@ -19,6 +21,10 @@ class BasketController extends LayoutController
 	{
 		$basket = $basketService->getBasketForTemplate();
 
+        /** @var ShopBuilderRequest $shopBuilderRequest */
+        $shopBuilderRequest = pluginApp(ShopBuilderRequest::class);
+        $shopBuilderRequest->setMainContentType('checkout');
+
 		return $this->renderTemplate(
 		    'tpl.basket',
 			[
@@ -27,4 +33,15 @@ class BasketController extends LayoutController
             false
 		);
 	}
+
+	public function redirect()
+    {
+        if(!is_null($categoryByUrl = $this->checkForExistingCategory())) {
+            return $categoryByUrl;
+        }
+
+        /** @var CategoryController $categoryController */
+        $categoryController = pluginApp(CategoryController::class);
+        return $categoryController->redirectRoute(RouteConfig::BASKET);
+    }
 }

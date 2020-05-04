@@ -2,10 +2,11 @@
 
 namespace IO\Services\ItemSearch\SearchPresets;
 
+use IO\Services\CategoryService;
 use IO\Services\ItemCrossSellingService;
-use IO\Services\ItemSearch\Factories\VariationSearchFactory;
 use IO\Services\ItemSearch\Helper\ResultFieldTemplate;
-use IO\Services\ItemSearch\Helper\SortingHelper;
+use Plenty\Modules\Webshop\ItemSearch\Factories\VariationSearchFactory;
+use Plenty\Modules\Webshop\ItemSearch\Helpers\SortingHelper;
 
 /**
  * Class CrossSellingItems
@@ -16,6 +17,9 @@ use IO\Services\ItemSearch\Helper\SortingHelper;
  * - relation:  The relation to consider when getting cross selling items
  *
  * @package IO\Services\ItemSearch\SearchPresets
+ *
+ * @deprecated since 5.0.0 will be deleted in 6.0.0
+ * @see \Plenty\Modules\Webshop\ItemSearch\SearchPresets\CrossSellingItems
  */
 class CrossSellingItems implements SearchPreset
 {
@@ -27,7 +31,14 @@ class CrossSellingItems implements SearchPreset
         $itemId = $options['itemId'];
         $relation = $options['relation'];
         $sorting = $options['sorting'];
-    
+
+
+        if(!isset($itemId) || !strlen($itemId))
+        {
+            $categoryService = pluginApp(CategoryService::class);
+            $currentItem = $categoryService->getCurrentItem();
+            $itemId = $currentItem['item']['id'] ?? 0;
+        }
         /** @var ItemCrossSellingService $crossSellingService */
         $crossSellingService = pluginApp( ItemCrossSellingService::class );
 
@@ -35,15 +46,21 @@ class CrossSellingItems implements SearchPreset
         {
             $relation = $crossSellingService->getType();
         }
-        
-        if(is_null($sorting) || !strlen($sorting))
+
+        /** @var SortingHelper $sortingHelper */
+        $sortingHelper = pluginApp(SortingHelper::class);
+
+        if(is_null($sorting))
         {
-            $sorting = SortingHelper::splitPathAndOrder($crossSellingService->getSorting());
+            $sorting = $sortingHelper->splitPathAndOrder($crossSellingService->getSorting());
+        }elseif(strlen($sorting))
+        {
+            $sorting = $sortingHelper->getSorting($sorting);
         }
-        
+
         /** @var VariationSearchFactory $searchFactory */
-        $searchFactory = pluginApp( VariationSearchFactory::class )
-            ->withResultFields(
+        $searchFactory = pluginApp( VariationSearchFactory::class );
+        $searchFactory->withResultFields(
                 ResultFieldTemplate::load( ResultFieldTemplate::TEMPLATE_LIST_ITEM )
             );
 
@@ -55,6 +72,7 @@ class CrossSellingItems implements SearchPreset
             ->withDefaultImage()
             ->isVisibleForClient()
             ->isActive()
+            ->isHiddenInCategoryList( false )
             ->groupByTemplateConfig()
             ->isCrossSellingItem( $itemId, $relation )
             ->hasNameInLanguage()
