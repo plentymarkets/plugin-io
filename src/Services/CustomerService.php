@@ -1,4 +1,4 @@
-<?php //strict
+<?php
 
 namespace IO\Services;
 
@@ -97,7 +97,7 @@ class CustomerService
 
         $dispatcher->listen(AfterBasketChanged::class, function()
         {
-            $this->resetMemoryCache();
+                $this->resetMemoryCache();
         });
     }
 
@@ -1089,15 +1089,17 @@ class CustomerService
 
     public function deleteGuestAddresses(): void
     {
-        $addressList[AddressType::BILLING] = $this->getAddresses(AddressType::BILLING);
-        $addressList[AddressType::DELIVERY] = $this->getAddresses(AddressType::DELIVERY);
+        if ($this->contactRepository->getContactId() <= 0) {
+            $addressList[AddressType::BILLING] = $this->getAddresses(AddressType::BILLING);
+            $addressList[AddressType::DELIVERY] = $this->getAddresses(AddressType::DELIVERY);
 
-        foreach ($addressList as $typeId => $addresses) {
-            $addresses = ArrayHelper::toArray($addresses);
-            if (is_array($addresses) && count($addresses) > 0) {
-                foreach ($addresses as $address) {
-                    if (!count($address['contactRelations'])) {
-                        $this->deleteAddress($address['id'], $typeId);
+            foreach ($addressList as $typeId => $addresses) {
+                $addresses = ArrayHelper::toArray($addresses);
+                if (is_array($addresses) && count($addresses) > 0) {
+                    foreach ($addresses as $address) {
+                        if (!count($address['contactRelations'])) {
+                            $this->deleteAddress($address['id'], $typeId);
+                        }
                     }
                 }
             }
