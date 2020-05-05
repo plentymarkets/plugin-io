@@ -42,7 +42,6 @@ class CheckoutServiceCurrencyConfigTest extends TestCase
     /** @test */
     public function check_method_get_currency_session_storage()
     {
-
         $expectedCurrency = $this->fake->currencyCode;
 
         $this->sessionStorageRepository->setSessionValue(SessionStorageRepositoryContract::CURRENCY, $expectedCurrency);
@@ -51,14 +50,11 @@ class CheckoutServiceCurrencyConfigTest extends TestCase
 
         $this->assertNotNull($currency);
         $this->assertEquals($expectedCurrency, $currency);
-
-
     }
 
     /** @test */
     public function check_method_get_currency_webstore_config()
     {
-
         /** @var PluginSet $pluginSet */
         $pluginSet = factory(PluginSet::class)->create();
 
@@ -73,7 +69,6 @@ class CheckoutServiceCurrencyConfigTest extends TestCase
 
         $this->assertNotNull($currency);
         $this->assertEquals($expectedCurrency, $currency);
-
     }
 
     /** @test */
@@ -100,7 +95,6 @@ class CheckoutServiceCurrencyConfigTest extends TestCase
         $this->assertTrue(is_array($currencyData));
         $this->assertEquals($expectedCurrency, $currencyData['name']);
         $this->assertEquals($expectedSymbol, $currencyData['symbol']);
-
     }
 
     /** @test */
@@ -142,7 +136,6 @@ class CheckoutServiceCurrencyConfigTest extends TestCase
         $configRepository->set('IO.format.separator_decimal', $expectedSeparatorDecimal);
         $configRepository->set('IO.format.separator_thousands', $expectedSeparatorThousands);
 
-
         $currencyPattern = $this->checkoutService->getCurrencyPattern();
 
         $this->assertNotNull($currencyPattern);
@@ -150,7 +143,6 @@ class CheckoutServiceCurrencyConfigTest extends TestCase
         $this->assertEquals($expectedSeparatorDecimal, $currencyPattern['separator_decimal']);
         $this->assertEquals($expectedSeparatorThousands, $currencyPattern['separator_thousands']);
         $this->assertEquals($expectedPattern, $currencyPattern['pattern']);
-
     }
 
 }
