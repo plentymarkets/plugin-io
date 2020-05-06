@@ -228,13 +228,15 @@ class IOServiceProvider extends ServiceProvider
         $dispatcher->listen(
             ExecutePayment::class,
             function ($event) {
+                try {
+                     /** @var BasketService $basketService */
+                    $basketService = pluginApp(BasketService::class);
+                    $basketService->resetBasket();
+                } catch (\Exception $exception) { } // Nothing to do}
+
                 /** @var CustomerService $customerService */
                 $customerService = pluginApp(CustomerService::class);
                 $customerService->resetGuestAddresses();
-
-                /** @var BasketService $basketService */
-                $basketService = pluginApp(BasketService::class);
-                $basketService->resetBasket();
             }
         );
 
