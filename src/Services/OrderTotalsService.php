@@ -62,8 +62,8 @@ class OrderTotalsService
             switch ($item->typeId) {
                 case OrderItemType::VARIATION:
                 case OrderItemType::ITEM_BUNDLE:
-                    $itemSumGross += $firstAmount->priceOriginalGross * $item->quantity;
-                    $itemSumNet += $firstAmount->priceOriginalNet * $item->quantity;
+                    $itemSumGross += $firstAmount->priceGross * $item->quantity;
+                    $itemSumNet += $firstAmount->priceNet * $item->quantity;
                     break;
                 case OrderItemType::SHIPPING_COSTS:
                     $locationId = $vatService->getLocationId($item->countryVatId);
