@@ -9,6 +9,7 @@ use Plenty\Modules\Accounting\Vat\Models\VatRate;
 use Plenty\Modules\Authorization\Services\AuthHelper;
 use Plenty\Modules\Basket\Contracts\BasketRepositoryContract;
 use Plenty\Modules\Basket\Contracts\BasketItemRepositoryContract;
+use Plenty\Modules\Basket\Events\Basket\AfterBasketChanged;
 use Plenty\Modules\Basket\Exceptions\BasketItemCheckException;
 use Plenty\Modules\Basket\Exceptions\BasketItemQuantityCheckException;
 use Plenty\Modules\Basket\Models\Basket;
@@ -30,6 +31,7 @@ use Plenty\Modules\Webshop\Helpers\UnitUtils;
 use Plenty\Modules\Webshop\ItemSearch\Factories\VariationSearchFactory;
 use Plenty\Modules\Webshop\ItemSearch\SearchPresets\BasketItems;
 use Plenty\Modules\Webshop\ItemSearch\Services\ItemSearchService;
+use Plenty\Plugin\Events\Dispatcher;
 use Plenty\Plugin\Log\Loggable;
 
 /**
@@ -845,14 +847,28 @@ class BasketService
         return $result;
     }
 
+    /**
+     * Reset basket after execute payment / order created
+     *
+     */
     public function resetBasket()
     {
         $this->basketRepository->removeCouponCode();
         $basketItems = $this->getBasketItemsRaw();
+
         foreach ($basketItems as $basketItem) {
             if ($basketItem->itemType !== BasketItem::BASKET_ITEM_TYPE_ITEM_SET_COMPONENT) {
-                $this->basketItemRepository->removeBasketItem($basketItem->id);
+                // dont fire events at this place
+                $this->basketItemRepository->removeBasketItem($basketItem->id, false);
             }
+        }
+
+        $contactId = $this->contactRepository->getContactId();
+        if ($contactId > 0) {
+            /*  if a regular contact created the order fire now the ignored event. */
+            /** @var Dispatcher $dispatcher */
+            $dispatcher = pluginApp(Dispatcher::class);
+            $dispatcher->fire(pluginApp(AfterBasketChanged::class));
         }
     }
 
