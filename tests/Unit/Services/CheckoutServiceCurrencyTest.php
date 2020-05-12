@@ -40,7 +40,7 @@ class CheckoutServiceCurrencyTest extends TestCase
     protected $memoryCacheMock;
 
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
