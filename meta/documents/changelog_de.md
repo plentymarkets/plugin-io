@@ -9,7 +9,7 @@
 ### Behoben
 
 - Beim Aufrufen einer über den ShopBuilder erstellten Seite zum Ändern der E-Mail-Adresse oder des Passworts wurde der Kunde nicht automatisch ausgeloggt, wodurch Eingabefelder nicht angezeigt wurden. Dies wurde behoben.
-- Wenn ein Nutzer im Webshop angemeldet war und die Route zur Login-Seite mehrmals aufgerufen wurde, konnte es unter bestimmten Umständen dazu kommen, dass Adressen gelöscht wurden. Dieses Verhalten wurde behoben.
+- Wenn ein Nutzer bereits im Webshop angemeldet war, konnte es bei weiteren Anmeldeversuchen unter bestimmten Umständen dazu kommen, dass Adressen gelöscht wurden. Dieses Verhalten wurde behoben.
 - Auf der Auftragsbestätigungsseite wurden Aufpreise nicht für den Warenwert berücksichtig. Dieses Verhalten wurde behoben.
 
 ## v5.0.1 (2020-04-27) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.0...5.0.1" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
