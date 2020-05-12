@@ -252,6 +252,27 @@ class CategoryController extends LayoutController
             }
         }
 
+        if (RouteConfig::getCategoryId(RouteConfig::CHANGE_MAIL) === $category->id) {
+            /** @var CustomerChangeMailController $customerChangeMailController */
+            $customerChangeMailController = pluginApp(CustomerChangeMailController::class);
+            return $customerChangeMailController->show(
+                $request->get('contactId'),
+                $request->get('hash'),
+                $category
+            );
+        }
+
+        if (RouteConfig::getCategoryId(RouteConfig::PASSWORD_RESET) === $category->id) {
+
+            /** @var CustomerPasswordResetController $customerPasswordResetController */
+            $customerPasswordResetController = pluginApp(CustomerPasswordResetController::class);
+            return $customerPasswordResetController->showReset(
+                $request->get('contactId'),
+                $request->get('hash'),
+                $category
+            );
+        }
+
         return $this->renderTemplate(
             "tpl.category." . $category->type,
             [
