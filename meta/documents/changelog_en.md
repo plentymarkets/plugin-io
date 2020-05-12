@@ -9,7 +9,7 @@
 ### Fixed 
 
 - When a customer accessed a page for changing their email address or password that had been created with the ShopBuilder, the customer was not automatically logged out. As a result, input fields were not visible. This has been fixed.
-- If a user was logged in and the route to the login page was accessed repeatedly, certain circumstances could lead to the deletion of addresses. This behaviour has been fixed.
+- If a user was already logged in, additional attempts to log into the online store could, under certain circumstances, lead to the deletion of addresses. This behaviour has been fixed.
 - Surcharges were not taken into account for the value of items on the order confirmation page. This behaviour has been fixed.
 
 ## v5.0.1 (2020-04-27) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.0...5.0.1" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
