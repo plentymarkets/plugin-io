@@ -12,7 +12,7 @@ class UrlQueryTest extends TestCase
     /** @var ConfigRepository $configRepoMock */
     private $configRepoMock;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

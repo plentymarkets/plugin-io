@@ -36,7 +36,7 @@ class BasketServiceItemRepoTest extends TestCase
 
     protected $basketRepoMock;
 
-    protected function setUp()
+    protected function setUp(): void
     {
        parent::setUp();
 

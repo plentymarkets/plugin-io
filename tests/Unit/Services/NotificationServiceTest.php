@@ -16,7 +16,7 @@ class NotificationServiceTest extends TestCase
     /* @var NotificationService $notificationService */
     protected $notificationService;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
         $this->sessionStorageRepositoryMock = Mockery::mock(SessionStorageRepositoryContract::class);

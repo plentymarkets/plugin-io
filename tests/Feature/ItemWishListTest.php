@@ -27,7 +27,7 @@ class ItemWishListTest extends TestCase
     /** @var SessionStorageRepositoryContract $sessionStorageRepository */
     protected $sessionStorageRepository;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
         $this->plentyId = pluginApp(Application::class)->getPlentyId();

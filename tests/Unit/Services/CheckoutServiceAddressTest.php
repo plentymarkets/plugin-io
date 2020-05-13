@@ -19,7 +19,7 @@ class CheckoutServiceAddressTest extends TestCase
     /** @var BasketService $basketServiceMock */
     protected $basketServiceMock;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
