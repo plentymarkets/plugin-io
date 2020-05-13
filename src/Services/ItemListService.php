@@ -45,7 +45,8 @@ class ItemListService
                     self::TYPE_LAST_SEEN,
                     self::TYPE_CROSS_SELLER,
                     self::TYPE_WISH_LIST,
-                    self::TYPE_SEARCH_SUGGESTIONS
+                    self::TYPE_SEARCH_SUGGESTIONS,
+                    self::TYPE_TAG
                 ]
             ))) {
             $type = self::TYPE_RANDOM;
