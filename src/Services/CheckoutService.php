@@ -144,9 +144,9 @@ class CheckoutService
     /**
      * Get the relevant data for the checkout
      * @param bool $retry Try loading checkout again on failure (e.g. problems during calculating totals)
-     * @return array
+     * @return null|array
      */
-    public function getCheckout($retry = true): array
+    public function getCheckout($retry = true): ?array
     {
         try {
             return [

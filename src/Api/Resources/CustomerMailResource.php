@@ -101,7 +101,7 @@ class CustomerMailResource extends ApiResource
         if (RouteConfig::getCategoryId(RouteConfig::CHANGE_MAIL) <= 0) {
             $newEmailLink = $domain . ($lang != $defaultLang ? '/' . $lang : '') . '/change-mail/' . $userDataHash->contactId . '/' . $userDataHash->hash;
         } else {
-            $newEmailLink = $shopUrls->changeMail . '?contactId=' . $userDataHash->contactId . '&hash=' . $userDataHash->hash;
+            $newEmailLink = $domain . $shopUrls->changeMail . '?contactId=' . $userDataHash->contactId . '&hash=' . $userDataHash->hash;
         }
 
         $params = [
