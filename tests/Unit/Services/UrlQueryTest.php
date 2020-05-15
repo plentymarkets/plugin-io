@@ -33,7 +33,7 @@ class UrlQueryTest extends TestCase
         $urlQuery->join($path2);
         $expected = '/' . str_replace('/', '', $path1) . '/' . str_replace('/', '', $path2);
             $this->assertEquals($expected, $urlQuery->toRelativeUrl());
-        $this->assertNotContains('//', $urlQuery->toRelativeUrl());
+        $this->assertStringNotContainsString('//', $urlQuery->toRelativeUrl());
     }
 
     /**
