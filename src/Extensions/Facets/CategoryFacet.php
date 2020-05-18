@@ -6,9 +6,9 @@ use IO\Helper\Utils;
 use IO\Services\CategoryService;
 use IO\Services\TemplateConfigService;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Search\Aggregation\AggregationInterface;
-use Plenty\Modules\Pim\SearchService\Aggregations\CategoryAllTermsAggregation;
-use Plenty\Modules\Pim\SearchService\Aggregations\Processors\CategoryAllTermsAggregationProcessor;
-use Plenty\Modules\Pim\SearchService\Filter\CategoryFilter;
+use Plenty\Modules\Item\Search\Aggregations\CategoryAllTermsAggregation;
+use Plenty\Modules\Item\Search\Aggregations\CategoryProcessor;
+use Plenty\Modules\Item\Search\Filter\CategoryFilter;
 use Plenty\Modules\Webshop\Contracts\LocalizationRepositoryContract;
 use Plenty\Modules\Webshop\ItemSearch\Contracts\FacetExtension;
 
@@ -19,10 +19,13 @@ class CategoryFacet implements FacetExtension
 
     public function getAggregation(): AggregationInterface
     {
-        /** @var CategoryAllTermsAggregationProcessor $categoryProcessor */
-        $categoryProcessor = pluginApp(CategoryAllTermsAggregationProcessor::class);
+        /** @var CategoryProcessor $categoryProcessor */
+        $categoryProcessor = pluginApp(CategoryProcessor::class);
         /** @var CategoryAllTermsAggregation $categoryAggregation */
         $categoryAggregation = pluginApp(CategoryAllTermsAggregation::class, [$categoryProcessor]);
+
+        // FIX Set count to '-1' to get all categories. Categories will be filtered when merging results.
+        $categoryAggregation->setSize(-1);
 
         return $categoryAggregation;
     }
