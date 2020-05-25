@@ -5,12 +5,14 @@ namespace IO\Api\Resources;
 use IO\Api\ApiResource;
 use IO\Api\ApiResponse;
 use IO\Api\ResponseCode;
+use IO\Builder\Order\AddressType;
 use IO\DBModels\UserDataHash;
 use IO\Extensions\Constants\ShopUrls;
 use IO\Extensions\Mail\SendMail;
 use IO\Helper\RouteConfig;
 use IO\Helper\Utils;
 use IO\Services\AuthenticationService;
+use IO\Services\CustomerService;
 use IO\Services\UserDataHashService;
 use Plenty\Modules\Account\Contact\Contracts\ContactRepositoryContract as CoreContactRepositoryContract;
 use Plenty\Modules\Account\Contact\Models\Contact;
@@ -173,6 +175,21 @@ class CustomerMailResource extends ApiResource
                     return $result;
                 }
             );
+
+            //update all addresses of the contact with the new email
+
+            /** @var CustomerService $customerService */
+            $customerService = pluginApp(CustomerService::class);
+
+            $billingAddressList = $customerService->getAddresses(AddressType::BILLING);
+            foreach ($billingAddressList as $billingAddress) {
+                $customerService->updateAddress($billingAddress->id, $billingAddress->toArray(), AddressType::BILLING);
+            }
+
+            $deliveryAddressList = $customerService->getAddresses(AddressType::DELIVERY);
+            foreach ($deliveryAddressList as $deliveryAddress) {
+                $customerService->updateAddress($deliveryAddress->id, $deliveryAddress->toArray(), AddressType::DELIVERY);
+            }
 
             $hashService->delete($hash);
         }
