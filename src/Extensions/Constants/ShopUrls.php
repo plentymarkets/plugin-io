@@ -259,6 +259,9 @@ class ShopUrls
         } elseif (preg_match('/_t\d+\/?$/m', $url) === 1) {
             return RouteConfig::TAGS;
         }
+        elseif (preg_match('/confirmation\/\d+\/([A-Z]|\d)+\/?/m', $url) === 1) {
+            return RouteConfig::CONFIRMATION;
+        }
 
         // template type cannot be determined
         return RouteConfig::CATEGORY;
