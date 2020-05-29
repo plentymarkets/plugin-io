@@ -259,7 +259,7 @@ class ShopUrls
             return RouteConfig::ITEM;
         } elseif (preg_match('/_t\d+\/?$/m', $url) === 1) {
             return RouteConfig::TAGS;
-        } elseif (preg_match('/confirmation\/\d+\/([A-Z]|\d)+\/?/m', $url) === 1) {
+        } elseif (preg_match('/confirmation\/\d+\/([A-Za-z]|\d)+\/?/m', $url) === 1) {
             return RouteConfig::CONFIRMATION;
         }
 
