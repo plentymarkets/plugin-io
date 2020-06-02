@@ -165,6 +165,18 @@ class ShopUrls
         );
     }
 
+    public function orderConfirmation($orderId)
+    {
+        if (RouteConfig::getCategoryId(RouteConfig::CONFIRMATION) > 0) {
+            $suffix = '?orderId=' . $orderId;
+        } else {
+            // if there is no trailing slash we must add a slash before the orderID to divide the suffix
+            // from the given url path else we have to add ad slasg after the orderID to show a correct url
+            $suffix = $this->appendTrailingSlash ? $orderId . '/' : '/' . $orderId;
+        }
+        return $this->confirmation . $suffix;
+    }
+
     private function getShopUrl($route, $routeParams = [], $urlParams = [], $overrideUrl = null)
     {
         $key = $route;
