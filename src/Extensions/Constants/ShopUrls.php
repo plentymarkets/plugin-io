@@ -72,7 +72,8 @@ class ShopUrls
         $this->resetMemoryCache();
         $this->appendTrailingSlash = UrlQuery::shouldAppendTrailingSlash();
         $this->trailingSlashSuffix = $this->appendTrailingSlash ? '/' : '';
-        $this->includeLanguage = $lang !== $webstoreConfigurationRepository->getWebstoreConfiguration()->defaultLanguage;
+        $this->includeLanguage = $lang !== $webstoreConfigurationRepository->getWebstoreConfiguration(
+            )->defaultLanguage;
 
         $this->basket = $this->getShopUrl(RouteConfig::BASKET);
         $this->cancellationForm = $this->getShopUrl(RouteConfig::CANCELLATION_FORM);
@@ -258,6 +259,8 @@ class ShopUrls
             return RouteConfig::ITEM;
         } elseif (preg_match('/_t\d+\/?$/m', $url) === 1) {
             return RouteConfig::TAGS;
+        } elseif (preg_match('/confirmation\/\d+\/([A-Za-z]|\d)+\/?/m', $url) === 1) {
+            return RouteConfig::CONFIRMATION;
         }
 
         // template type cannot be determined
