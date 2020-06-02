@@ -1,5 +1,14 @@
 # Release Notes für IO
 
+## v5.0.3 (2020-06-02) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.2...5.0.3" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
+
+### Behoben
+
+- Nach dem Ändern der E-Mail-Adresse über den Mein Konto-Bereich konnte es dazu kommen, dass abgeschlossene Aufträge noch mit der vorherigen E-Mail-Adresse angelegt wurden. Dieses Verhalten wurde behoben.
+- Der Typ des aktuellen Templates wird jetzt auch für URLs mit Trailing-Slash erkannt.
+- Auf Bestellbestätigungsseiten, die nicht über den ShopBuilder angelegt wurden, kam es vor, dass nicht alle Layout-Container von Zahlungsanbieter-Plugins gefüllt wurden. Dies wurde behoben.
+- Im Mein-Konto-Bereich wurde die Verlinkung auf die Bestellbestätigungsseite falsch gesetzt, wenn die Bestellbestätigungsseite nicht über den ShopBuilder erstellt wurde.
+
 ## v5.0.2 (2020-05-12) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.1...5.0.2" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
 
 ### Geändert
