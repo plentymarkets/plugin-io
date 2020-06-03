@@ -358,6 +358,8 @@ class OrderService
             $lang = Utils::getLang();
 
             $orders = [];
+            /** @var ShopUrls $shopUrls */
+            $shopUrls = pluginApp(ShopUrls::class);
             foreach ($orderResult->getResult() as $order) {
                 if ($order instanceof Order) {
                     $totals = $orderTotalsService->getAllTotals($order);
@@ -387,7 +389,8 @@ class OrderService
                         'status' => $orderStatusName,
                         'creationDate' => $creationDate,
                         'shippingDate' => $shippingDate,
-                        'trackingURL' => $orderTrackingService->getTrackingURL($order, $lang)
+                        'trackingURL' => $orderTrackingService->getTrackingURL($order, $lang),
+                        'confirmationURL' => $shopUrls->orderConfirmation($order->id)
                     ];
                 }
             };

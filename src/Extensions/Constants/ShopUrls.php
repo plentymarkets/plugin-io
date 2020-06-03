@@ -72,7 +72,8 @@ class ShopUrls
         $this->resetMemoryCache();
         $this->appendTrailingSlash = UrlQuery::shouldAppendTrailingSlash();
         $this->trailingSlashSuffix = $this->appendTrailingSlash ? '/' : '';
-        $this->includeLanguage = $lang !== $webstoreConfigurationRepository->getWebstoreConfiguration()->defaultLanguage;
+        $this->includeLanguage = $lang !== $webstoreConfigurationRepository->getWebstoreConfiguration(
+            )->defaultLanguage;
 
         $this->basket = $this->getShopUrl(RouteConfig::BASKET);
         $this->cancellationForm = $this->getShopUrl(RouteConfig::CANCELLATION_FORM);
@@ -162,6 +163,18 @@ class ShopUrls
                 return $trackingURL;
             }
         );
+    }
+
+    public function orderConfirmation($orderId)
+    {
+        if (RouteConfig::getCategoryId(RouteConfig::CONFIRMATION) > 0) {
+            $suffix = '?orderId=' . $orderId;
+        } else {
+            // if there is no trailing slash we must add a slash before the orderID to divide the suffix
+            // from the given url path else we have to add ad slasg after the orderID to show a correct url
+            $suffix = $this->appendTrailingSlash ? $orderId . '/' : '/' . $orderId;
+        }
+        return $this->confirmation . $suffix;
     }
 
     private function getShopUrl($route, $routeParams = [], $urlParams = [], $overrideUrl = null)
@@ -254,10 +267,12 @@ class ShopUrls
         }
 
         // match url pattern
-        if (preg_match('/(?:a\-\d+|_\d+|_\d+_\d+)$/m', $url) === 1) {
+        if (preg_match('/(?:a\-\d+|_\d+|_\d+_\d+)\/?$/m', $url) === 1) {
             return RouteConfig::ITEM;
-        } elseif (preg_match('/_t\d+$/m', $url) === 1) {
+        } elseif (preg_match('/_t\d+\/?$/m', $url) === 1) {
             return RouteConfig::TAGS;
+        } elseif (preg_match('/confirmation\/\d+\/([A-Za-z]|\d)+\/?/m', $url) === 1) {
+            return RouteConfig::CONFIRMATION;
         }
 
         // template type cannot be determined

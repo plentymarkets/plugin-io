@@ -1,5 +1,14 @@
 # Release Notes for IO
 
+## v5.0.3 (2020-06-02) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.2...5.0.3" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
+
+### Fixed
+
+- After changing the email address in the My Account area, it was possible that orders were created with the former email address. This behaviour has been fixed.
+- The type of the current template is now also recognised for URLs with a trailing slash.
+- Under certain circumstances, not all layout containers were filled by payment plugins on order confirmation pages that had not been created via the ShopBuilder. This has been fixed.
+- The link to the order confirmation page in the My Account area was incorrect if the order confirmation page had not been created via the ShopBuilder. This has been fixed.
+
 ## v5.0.2 (2020-05-12) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.1...5.0.2" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
 
 ### Changed
