@@ -1,5 +1,12 @@
 # Release Notes for IO
 
+## v5.0.4 (2020-06-08) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.3...5.0.4" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
+
+
+### Fixed
+
+- The additional costs for deliveries outside of the European Union Customs Union were displayed incorrectly. This behaviour has been fixed.
+
 ## v5.0.3 (2020-06-02) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.2...5.0.3" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
 
 ### Fixed
