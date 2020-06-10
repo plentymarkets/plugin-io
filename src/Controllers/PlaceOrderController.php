@@ -13,6 +13,7 @@ use IO\Services\OrderService;
 use IO\Services\UrlBuilder\UrlQuery;
 use Plenty\Modules\Account\Address\Models\AddressOption;
 use Plenty\Modules\Basket\Exceptions\BasketItemCheckException;
+use Plenty\Modules\Basket\Models\BasketItem;
 use Plenty\Modules\Webshop\Contracts\SessionStorageRepositoryContract;
 use Plenty\Modules\Webshop\Events\AfterBasketItemToOrderItem;
 use Plenty\Modules\Webshop\Events\ValidateVatNumber;
@@ -261,22 +262,24 @@ class PlaceOrderController extends LayoutController
                 $basketService = pluginApp(BasketService::class);
 
                 foreach ($itemsWithoutStock as $itemWithoutStock) {
-                    $updatedItem = array_shift(
-                        array_filter(
-                            $basketItems,
-                            function ($filterItem) use ($itemWithoutStock) {
-                                return $filterItem['id'] == $itemWithoutStock['item']['id'];
-                            }
-                        )
-                    );
+                    if ($itemWithoutStock['item']['itemType'] !== BasketItem::BASKET_ITEM_TYPE_ITEM_SET_COMPONENT && $itemWithoutStock['item']['itemType'] !== BasketItem::BASKET_ITEM_TYPE_BUNDLE_COMPONENT) {
+                        $updatedItem = array_shift(
+                            array_filter(
+                                $basketItems,
+                                function ($filterItem) use ($itemWithoutStock) {
+                                    return $filterItem['id'] == $itemWithoutStock['item']['id'];
+                                }
+                            )
+                        );
 
-                    $quantity = $itemWithoutStock['stockNet'];
+                        $quantity = $itemWithoutStock['stockNet'];
 
-                    if ($quantity <= 0 && (int)$updatedItem['id'] > 0) {
-                        $basketService->deleteBasketItem($updatedItem['id']);
-                    } elseif ((int)$updatedItem['id'] > 0) {
-                        $updatedItem['quantity'] = $quantity;
-                        $basketService->updateBasketItem($updatedItem['id'], $updatedItem);
+                        if ($quantity <= 0 && (int)$updatedItem['id'] > 0) {
+                            $basketService->deleteBasketItem($updatedItem['id']);
+                        } elseif ((int)$updatedItem['id'] > 0 && $quantity !== $itemWithoutStock['item']['quantity']) {
+                            $updatedItem['quantity'] = $quantity;
+                            $basketService->updateBasketItem($updatedItem['id'], $updatedItem);
+                        }
                     }
                 }
 
