@@ -29,7 +29,7 @@ class CheckoutServiceCurrencyConfigTest extends TestCase
     /** @var SessionStorageRepositoryContract $sessionStorageRepository */
     protected $sessionStorageRepository;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
         $this->createApplication();
