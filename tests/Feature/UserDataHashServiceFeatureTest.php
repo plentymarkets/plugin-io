@@ -12,7 +12,7 @@ class UserDataHashServiceFeatureTest extends TestCase
     /** @var UserDataHashService $hashService */
     private $hashService;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
         $this->hashService = pluginApp(UserDataHashService::class);

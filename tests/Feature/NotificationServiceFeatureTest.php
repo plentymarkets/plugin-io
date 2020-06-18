@@ -28,7 +28,7 @@ class NotificationServiceFeatureTest extends TestCase
     /* @var ClearNotifications $clearNotifications */
     protected $clearNotifications;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
         $this->sessionStorageRepository = pluginApp(SessionStorageRepositoryContract::class);
