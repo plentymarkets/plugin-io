@@ -24,19 +24,30 @@ class ItemSearchAutocompleteService
     /** @var UrlBuilderRepositoryContract $urlBuilderRepository */
     private $urlBuilderRepository;
 
-    public function __construct(UrlBuilderRepositoryContract $urlBuilderRepository)
-    {
+    /** @var LocalizationRepositoryContract $localizationRepository */
+    private $localizationRepository;
+
+    /** @var WebstoreConfiguration $webstoreConfiguration */
+    private $webstoreConfiguration;
+
+    public function __construct(
+        UrlBuilderRepositoryContract $urlBuilderRepository,
+        LocalizationRepositoryContract $localizationRepository,
+        WebstoreConfigurationRepositoryContract $webstoreConfigurationRepository
+    ) {
         $this->urlBuilderRepository = $urlBuilderRepository;
+        $this->localizationRepository = $localizationRepository;
+        $this->webstoreConfiguration = $webstoreConfigurationRepository->getWebstoreConfiguration();
     }
 
     public function getDidYouMeanSuggestionSearchString($searchString, $suggestions)
     {
-        if(is_array($suggestions)) {
+        if (is_array($suggestions)) {
             foreach ($suggestions['didYouMean'] as $suggestion) {
                 $selectedSuggestion = $suggestion['suggestions'][0];
-                if(count($suggestion['suggestions']) > 1) {
+                if (count($suggestion['suggestions']) > 1) {
                     foreach ($suggestion['suggestions'] as $suggestionData) {
-                        if($suggestionData['score'] > $selectedSuggestion['score']) {
+                        if ($suggestionData['score'] > $selectedSuggestion['score']) {
                             $selectedSuggestion = $suggestionData;
                         }
                     }
@@ -107,16 +118,12 @@ class ItemSearchAutocompleteService
             /** @var ItemImagesFilter $itemImageFilter */
             $itemImageFilter = pluginApp(ItemImagesFilter::class);
 
-
-
-            /** @var WebstoreConfigurationRepositoryContract $webstoreConfigurationRepository */
-            $webstoreConfigurationRepository = pluginApp(WebstoreConfigurationRepositoryContract::class);
-            /** @var WebstoreConfiguration $webstoreConfiguration */
-            $webstoreConfiguration = $webstoreConfigurationRepository->getWebstoreConfiguration();
             /** @var TemplateConfigService $templateConfigService */
-             $templateConfigService = pluginApp(TemplateConfigService::class);
+            $templateConfigService = pluginApp(TemplateConfigService::class);
 
-            $urlWithVariationId = $templateConfigService->getInteger('item.show_please_select') == 0 || $webstoreConfiguration->attributeSelectDefaultOption == 0;
+            $urlWithVariationId = $templateConfigService->getInteger(
+                    'item.show_please_select'
+                ) == 0 || $this->webstoreConfiguration->attributeSelectDefaultOption == 0;
 
             foreach ($items as $variation) {
                 $itemId = $variation['data']['item']['id'];
@@ -128,7 +135,7 @@ class ItemSearchAutocompleteService
                 }
 
                 $defaultCategoryId = 0;
-                if(count($variation['data']['defaultCategories'])) {
+                if (count($variation['data']['defaultCategories'])) {
                     foreach ($variation['data']['defaultCategories'] as $defaultCategory) {
                         if ((int)$defaultCategory['plentyId'] == Utils::getPlentyId()) {
                             $defaultCategoryId = $defaultCategory['id'];
@@ -142,9 +149,15 @@ class ItemSearchAutocompleteService
                         $variation['data']['images'],
                         'urlPreview'
                     ),
-                    $this->urlBuilderRepository->buildVariationUrl($itemId, $variationId)->append(
+                    $this->urlBuilderRepository->buildVariationUrl(
+                        $itemId,
+                        $variationId,
+                        $this->localizationRepository->getLanguage()
+                    )->append(
                         $this->urlBuilderRepository->getSuffix($itemId, $variationId, $urlWithVariationId)
-                    )->toRelativeUrl(),
+                    )->toRelativeUrl(
+                        $this->localizationRepository->getLanguage() !== $this->webstoreConfiguration->defaultLanguage
+                    ),
                     $this->getCategoryBranch($defaultCategoryId),
                     '',
                     0
@@ -166,24 +179,27 @@ class ItemSearchAutocompleteService
         /** @var CategoryRepositoryContract $categoryRepository */
         $categoryRepository = pluginApp(CategoryRepositoryContract::class);
 
-        /** @var LocalizationRepositoryContract $localizationRepository */
-        $localizationRepository = pluginApp(LocalizationRepositoryContract::class);
-
-
         if (is_array($categories) && count($categories)) {
             foreach ($categories as $categoryId => $count) {
                 if ((int)$categoryId > 0) {
                     /** @var Category $categoryData */
-                    $categoryData = $categoryRepository->get($categoryId, $localizationRepository->getLanguage(), Utils::getWebstoreId());
+                    $categoryData = $categoryRepository->get(
+                        $categoryId,
+                        $this->localizationRepository->getLanguage(),
+                        Utils::getWebstoreId()
+                    );
 
                     $categoryResult[] = $this->buildResult(
                         $categoryData->details[0]->name,
                         $categoryData->details[0]->imagePath,
                         $this->urlBuilderRepository->buildCategoryUrl(
                             (int)$categoryId,
-                            $localizationRepository->getLanguage(),
+                            $this->localizationRepository->getLanguage(),
                             Utils::getWebstoreId()
-                        )->toRelativeUrl(),
+                        )->toRelativeUrl(
+                            $this->localizationRepository->getLanguage(
+                            ) !== $this->webstoreConfiguration->defaultLanguage
+                        ),
                         $this->getCategoryBranch($categoryData->id),
                         '',
                         $count
@@ -244,24 +260,24 @@ class ItemSearchAutocompleteService
      */
     private function getCategoryBranch($categoryId)
     {
-        if($categoryId <= 0) {
+        if ($categoryId <= 0) {
             return '';
         }
 
         /** @var CategoryService $categoryService */
         $categoryService = pluginApp(CategoryService::class);
         $category = $categoryService->get($categoryId);
-        if(is_null($category) || is_null($category->branch)) {
+        if (is_null($category) || is_null($category->branch)) {
             return '';
         }
 
         $branch = $category->branch->toArray();
         $result = [];
 
-        for($i = 1; $i <= 6; $i++) {
-            if(!is_null($branch["category{$i}Id"])) {
+        for ($i = 1; $i <= 6; $i++) {
+            if (!is_null($branch["category{$i}Id"])) {
                 $cat = $categoryService->get($branch["category{$i}Id"]);
-                if(isset($cat->details[0])) {
+                if (isset($cat->details[0])) {
                     $result[] = $cat->details[0]->name;
                 }
             }
