@@ -821,18 +821,7 @@ class CustomerService
                 $this->contactRepository->getContactId(),
                 $typeId
             );
-
-            if ($typeId == AddressType::BILLING) {
-                $firstStoredAddress = $this->contactAddressRepository->findContactAddressByTypeId(
-                    (int)$this->contactRepository->getContactId(),
-                    $typeId,
-                    false
-                );
-
-                if ($addressId == $firstStoredAddress->id) {
-                    $this->updateContactWithAddressData($newAddress);
-                }
-            }
+            
         } else {
             //case for guests
             $addressData['options'] = $this->buildAddressEmailOptions([], true, $addressData);
@@ -914,18 +903,6 @@ class CustomerService
                 $basketService->setBillingAddressId(0);
             } elseif ($typeId == AddressType::DELIVERY) {
                 $basketService->setDeliveryAddressId(CustomerAddressResource::ADDRESS_NOT_SET);
-            }
-
-            if ($firstStoredAddress instanceof Address && $firstStoredAddress->id === $addressId) {
-                $firstStoredAddress = $this->contactAddressRepository->findContactAddressByTypeId(
-                    (int)$this->contactRepository->getContactId(),
-                    $typeId,
-                    false
-                );
-
-                if ($firstStoredAddress instanceof Address) {
-                    $this->updateContactWithAddressData($firstStoredAddress);
-                }
             }
         } else {
             $this->addressRepository->deleteAddress($addressId);
