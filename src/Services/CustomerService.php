@@ -641,20 +641,23 @@ class CustomerService
                     && (int)$account->id > 0
                     && count($contact->addresses) === 1
                     && $contact->addresses[0]->id === $newAddress->id) {
-                    /** @var TemplateConfigService $templateConfigService */
-                    $templateConfigService = pluginApp(TemplateConfigService::class);
-                    $classId = $templateConfigService->getInteger('global.default_contact_class_b2b');
 
-                    if (is_null($classId) || (int)$classId <= 0) {
-                        $classId = $this->contactRepository->getDefaultContactClassId();
-                    }
+                    $defaultClassId = (int)$this->contactRepository->getDefaultContactClassId();
 
-                    if (!is_null($classId) && (int)$classId > 0) {
-                        $this->updateContact(
-                            [
-                                'classId' => $classId
-                            ]
-                        );
+                    // update contact class id only when current class id on contact is the default contact class id
+                    // default contact class id is set by default to contact
+                    if ($defaultClassId  > 0 && $contact->classId === $defaultClassId) {
+                        /** @var TemplateConfigService $templateConfigService */
+                        $templateConfigService = pluginApp(TemplateConfigService::class);
+                        $classId = $templateConfigService->getInteger('global.default_contact_class_b2b');
+
+                        if (!is_null($classId) && (int)$classId > 0 && $classId !== $defaultClassId) {
+                            $this->updateContact(
+                                [
+                                    'classId' => $classId
+                                ]
+                            );
+                        }
                     }
                 }
             }
