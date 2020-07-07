@@ -176,34 +176,39 @@ class ItemSearchAutocompleteService
     {
         $categoryResult = [];
 
-        /** @var CategoryRepositoryContract $categoryRepository */
-        $categoryRepository = pluginApp(CategoryRepositoryContract::class);
+        /** @var CategoryService $categoryService */
+        $categoryService = pluginApp(CategoryService::class);
 
         if (is_array($categories) && count($categories)) {
             foreach ($categories as $categoryId => $count) {
                 if ((int)$categoryId > 0) {
                     /** @var Category $categoryData */
-                    $categoryData = $categoryRepository->get(
+                    $categoryData = $categoryService->get(
                         $categoryId,
-                        $this->localizationRepository->getLanguage(),
-                        Utils::getWebstoreId()
+                        $this->localizationRepository->getLanguage()
                     );
 
-                    $categoryResult[] = $this->buildResult(
-                        $categoryData->details[0]->name,
-                        $categoryData->details[0]->imagePath,
-                        $this->urlBuilderRepository->buildCategoryUrl(
-                            (int)$categoryId,
-                            $this->localizationRepository->getLanguage(),
-                            Utils::getWebstoreId()
-                        )->toRelativeUrl(
-                            $this->localizationRepository->getLanguage(
-                            ) !== $this->webstoreConfiguration->defaultLanguage
-                        ),
-                        $this->getCategoryBranch($categoryData->id),
-                        '',
-                        $count
-                    );
+                    if ($categoryService->isVisibleForWebstore(
+                        $categoryData,
+                        Utils::getWebstoreId(),
+                        $this->localizationRepository->getLanguage()
+                    )) {
+                        $categoryResult[] = $this->buildResult(
+                            $categoryData->details[0]->name,
+                            $categoryData->details[0]->imagePath,
+                            $this->urlBuilderRepository->buildCategoryUrl(
+                                (int)$categoryId,
+                                $this->localizationRepository->getLanguage(),
+                                Utils::getWebstoreId()
+                            )->toRelativeUrl(
+                                $this->localizationRepository->getLanguage(
+                                ) !== $this->webstoreConfiguration->defaultLanguage
+                            ),
+                            $this->getCategoryBranch($categoryData->id),
+                            '',
+                            $count
+                        );
+                    }
                 }
             }
         }
