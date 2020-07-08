@@ -824,7 +824,7 @@ class CustomerService
                 $this->contactRepository->getContactId(),
                 $typeId
             );
-            
+
         } else {
             //case for guests
             $addressData['options'] = $this->buildAddressEmailOptions([], true, $addressData);
@@ -1074,11 +1074,10 @@ class CustomerService
             $addressList[AddressType::DELIVERY] = $this->getAddresses(AddressType::DELIVERY);
 
             foreach ($addressList as $typeId => $addresses) {
-                $addresses = ArrayHelper::toArray($addresses);
-                if (is_array($addresses) && count($addresses) > 0) {
+                if (count($addresses) > 0) {
                     foreach ($addresses as $address) {
-                        if (!count($address['contactRelations'])) {
-                            $this->deleteAddress($address['id'], $typeId);
+                        if (!count($address->contactRelations)) {
+                            $this->deleteAddress($address->id, $typeId);
                         }
                     }
                 }
