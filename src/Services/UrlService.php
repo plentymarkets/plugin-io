@@ -279,7 +279,7 @@ class UrlService
 
         /** @var Response $response */
         $response = pluginApp(Response::class);
-        return $response->redirectTo($redirectURL);
+        return $response->redirectTo($redirectURL, Response::HTTP_MOVED_PERMANENTLY);
     }
 
     /**
