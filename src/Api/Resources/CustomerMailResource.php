@@ -137,7 +137,7 @@ class CustomerMailResource extends ApiResource
         try {
             /** @var AuthenticationService $authService */
             $authService = pluginApp(AuthenticationService::class);
-            $authService->loginWithContactId($contactId, (string)$password);
+            $authService->loginWithContactId((int)$contactId, (string)$password);
         } catch (\Exception $exception) {
             $this->getLogger(__CLASS__)->warning(
                 "IO::Debug.CustomerMailResource_loginFailed",
