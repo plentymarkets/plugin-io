@@ -1076,7 +1076,7 @@ class CustomerService
             foreach ($addressList as $typeId => $addresses) {
                 if (count($addresses) > 0) {
                     foreach ($addresses as $address) {
-                        if (!count($address->contactRelations)) {
+                        if (!count($address->contactRelations) && !count($address->orderRelations)) {
                             $this->deleteAddress($address->id, $typeId);
                         }
                     }
