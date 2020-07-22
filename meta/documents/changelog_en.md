@@ -1,5 +1,12 @@
 # Release Notes for IO
 
+## v5.0.6 (2020-07-21) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.5...5.0.6" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
+
+### Fixed 
+
+- Search suggestions also included categories that were not visible for the current client. This behaviour has been fixed.
+- URL redirections in the online store are now executed with the HTTP status code 301. Priorly, redirections had been executed with the HTTP status code 302.
+
 ## v5.0.5 (2020-06-30) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.4...5.0.5" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
 
 ### Fixed
