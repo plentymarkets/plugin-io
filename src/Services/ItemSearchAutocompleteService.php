@@ -188,7 +188,7 @@ class ItemSearchAutocompleteService
                         $this->localizationRepository->getLanguage()
                     );
 
-                    if ($categoryService->isVisibleForWebstore(
+                    if (!is_null($categoryData) && $categoryService->isVisibleForWebstore(
                         $categoryData,
                         Utils::getWebstoreId(),
                         $this->localizationRepository->getLanguage()
