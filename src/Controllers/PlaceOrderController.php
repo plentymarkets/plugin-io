@@ -1,4 +1,5 @@
-<?php //strict
+<?php
+//strict
 
 namespace IO\Controllers;
 
@@ -263,14 +264,15 @@ class PlaceOrderController extends LayoutController
 
                 foreach ($itemsWithoutStock as $itemWithoutStock) {
                     if ($itemWithoutStock['item']['itemType'] !== BasketItem::BASKET_ITEM_TYPE_ITEM_SET_COMPONENT && $itemWithoutStock['item']['itemType'] !== BasketItem::BASKET_ITEM_TYPE_BUNDLE_COMPONENT) {
-                        $updatedItem = array_shift(
-                            array_filter(
-                                $basketItems,
-                                function ($filterItem) use ($itemWithoutStock) {
-                                    return $filterItem['id'] == $itemWithoutStock['item']['id'];
-                                }
-                            )
+
+                        $updatedArray = array_filter(
+                            $basketItems,
+                            function ($filterItem) use ($itemWithoutStock) {
+                                return $filterItem['id'] == $itemWithoutStock['item']['id'];
+                            }
                         );
+
+                        $updatedItem = array_shift($updatedArray);
 
                         $quantity = $itemWithoutStock['stockNet'];
 
