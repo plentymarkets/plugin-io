@@ -641,20 +641,23 @@ class CustomerService
                     && (int)$account->id > 0
                     && count($contact->addresses) === 1
                     && $contact->addresses[0]->id === $newAddress->id) {
-                    /** @var TemplateConfigService $templateConfigService */
-                    $templateConfigService = pluginApp(TemplateConfigService::class);
-                    $classId = $templateConfigService->getInteger('global.default_contact_class_b2b');
 
-                    if (is_null($classId) || (int)$classId <= 0) {
-                        $classId = $this->contactRepository->getDefaultContactClassId();
-                    }
+                    $defaultClassId = (int)$this->contactRepository->getDefaultContactClassId();
 
-                    if (!is_null($classId) && (int)$classId > 0) {
-                        $this->updateContact(
-                            [
-                                'classId' => $classId
-                            ]
-                        );
+                    // update contact class id only when current class id on contact is the default contact class id
+                    // default contact class id is set by default to contact
+                    if ($defaultClassId  > 0 && $contact->classId === $defaultClassId) {
+                        /** @var TemplateConfigService $templateConfigService */
+                        $templateConfigService = pluginApp(TemplateConfigService::class);
+                        $classId = $templateConfigService->getInteger('global.default_contact_class_b2b');
+
+                        if (!is_null($classId) && (int)$classId > 0 && $classId !== $defaultClassId) {
+                            $this->updateContact(
+                                [
+                                    'classId' => $classId
+                                ]
+                            );
+                        }
                     }
                 }
             }
@@ -822,17 +825,6 @@ class CustomerService
                 $typeId
             );
 
-            if ($typeId == AddressType::BILLING) {
-                $firstStoredAddress = $this->contactAddressRepository->findContactAddressByTypeId(
-                    (int)$this->contactRepository->getContactId(),
-                    $typeId,
-                    false
-                );
-
-                if ($addressId == $firstStoredAddress->id) {
-                    $this->updateContactWithAddressData($newAddress);
-                }
-            }
         } else {
             //case for guests
             $addressData['options'] = $this->buildAddressEmailOptions([], true, $addressData);
@@ -914,18 +906,6 @@ class CustomerService
                 $basketService->setBillingAddressId(0);
             } elseif ($typeId == AddressType::DELIVERY) {
                 $basketService->setDeliveryAddressId(CustomerAddressResource::ADDRESS_NOT_SET);
-            }
-
-            if ($firstStoredAddress instanceof Address && $firstStoredAddress->id === $addressId) {
-                $firstStoredAddress = $this->contactAddressRepository->findContactAddressByTypeId(
-                    (int)$this->contactRepository->getContactId(),
-                    $typeId,
-                    false
-                );
-
-                if ($firstStoredAddress instanceof Address) {
-                    $this->updateContactWithAddressData($firstStoredAddress);
-                }
             }
         } else {
             $this->addressRepository->deleteAddress($addressId);
@@ -1094,11 +1074,10 @@ class CustomerService
             $addressList[AddressType::DELIVERY] = $this->getAddresses(AddressType::DELIVERY);
 
             foreach ($addressList as $typeId => $addresses) {
-                $addresses = ArrayHelper::toArray($addresses);
-                if (is_array($addresses) && count($addresses) > 0) {
+                if (count($addresses) > 0) {
                     foreach ($addresses as $address) {
-                        if (!count($address['contactRelations'])) {
-                            $this->deleteAddress($address['id'], $typeId);
+                        if (!count($address->contactRelations) && !count($address->orderRelations)) {
+                            $this->deleteAddress($address->id, $typeId);
                         }
                     }
                 }

@@ -1,5 +1,21 @@
 # Release Notes for IO
 
+## v5.0.6 (2020-07-21) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.5...5.0.6" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
+
+### Fixed 
+
+- Search suggestions also included categories that were not visible for the current client. This behaviour has been fixed.
+- URL redirections in the online store are now executed with the HTTP status code 301. Priorly, redirections had been executed with the HTTP status code 302.
+
+## v5.0.5 (2020-06-30) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.4...5.0.5" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
+
+### Fixed
+
+- The URLs for search suggestions for items and categories were generated without taking the currently selected online store language into account. This has been fixed.
+- Under certain circumstances, the customer class of a contact could reset to the default customer class. This has been fixed.
+- Under certain circumstances, contact data could be overwritten by address data. This has been fixed.
+- Static pages were included in the sitemap even if these pages had already been linked to a ShopBuilder category. This behaviour has been fixed.
+
 ## v5.0.4 (2020-06-08) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.3...5.0.4" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
 
 

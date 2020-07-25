@@ -49,7 +49,7 @@ class CustomerServiceTest extends TestCase
     protected $dispatcherMock;
 
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
