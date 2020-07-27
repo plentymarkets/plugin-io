@@ -66,6 +66,12 @@ class CategoryController extends LayoutController
     public function showCategoryById($categoryId, $params = [], $webstoreId = null)
     {
         $lang = Utils::getLang();
+
+        if(is_null($webstoreId))
+        {
+            $webstoreId = Utils::getWebstoreId();
+        }
+
         return $this->renderCategory(
             $this->categoryRepo->get($categoryId, $lang, $webstoreId),
             $params
