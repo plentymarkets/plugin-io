@@ -6,6 +6,7 @@ use IO\Config\IOConfig;
 use IO\Events\Basket\BeforeBasketItemToOrderItem;
 use IO\Extensions\Basket\IOFrontendShippingProfileChanged;
 use IO\Extensions\Basket\IOFrontendUpdateDeliveryAddress;
+use IO\Extensions\Constants\ShopUrls;
 use IO\Extensions\ContentCache\IOAfterBuildPlugins;
 use IO\Extensions\Facets\CategoryFacet;
 use IO\Extensions\Mail\IOSendMail;
@@ -116,6 +117,7 @@ class IOServiceProvider extends ServiceProvider
         // Register services
         $this->registerSingletons(
             [
+                ShopUrls::class,
                 AuthenticationService::class,
                 AvailabilityService::class,
                 BasketService::class,
