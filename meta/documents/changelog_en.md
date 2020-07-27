@@ -11,7 +11,7 @@
 - If a header or footer content was linked to all categories of the type **Item category**, the header or footer was not displayed. This has been fixed.
 - Due to an error, the quick search could lead to the ShopBuilder not loading. This behaviour has been fixed.
 - When a user changed the country of delivery, net and gross prices were displayed incorrectly in some cases. This has been fixed.
-- Static pages of second clients used the meta description and meta keywords of the main client if the route /category was deactivated. This has been fixed.
+- Static pages of second clients used the meta description and meta keywords of the main client if the category routes were deactivated. This has been fixed.
 
 ## v5.0.6 (2020-07-21) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.5...5.0.6" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
 
