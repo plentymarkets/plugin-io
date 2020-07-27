@@ -123,7 +123,7 @@ class ShopUrls
             );
             $this->orderDocument = $dataForCache['orderDocument'] = $this->getShopUrl(RouteConfig::ORDER_DOCUMENT);
 
-            $this->cachingRepository->put('shopUrls_'. $lang, $dataForCache, 15);
+            $this->cachingRepository->put('shopUrls_'. $lang, $dataForCache, 5);
         }
     }
 
