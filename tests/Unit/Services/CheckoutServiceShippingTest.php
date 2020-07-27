@@ -187,6 +187,14 @@ class CheckoutServiceShippingTest extends TestCase
                     'accountContactClassId' => 1
                 ]
             );
+
+        $this->sessionStorageRepositoryMock->shouldReceive('getOrder')
+            ->andReturn(
+                (object)[
+                    'isNet' => false,
+                ]
+            );
+
         $this->localizationRepositoryMock->shouldReceive('getLanguage')
             ->andReturn('de');
 
