@@ -67,8 +67,7 @@ class CategoryController extends LayoutController
     {
         $lang = Utils::getLang();
 
-        if(is_null($webstoreId))
-        {
+        if(is_null($webstoreId)) {
             $webstoreId = Utils::getWebstoreId();
         }
 
