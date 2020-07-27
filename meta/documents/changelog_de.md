@@ -1,5 +1,12 @@
 # Release Notes für IO
 
+## v5.0.6 (2020-07-21) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.5...5.0.6" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
+
+### Behoben
+
+- Bei Suchvorschlägen wurden auch Kategorien angezeigt, die für den aktuellen Mandanten nicht sichtbar waren. Dieses Verhalten wurde behoben.
+- Weiterleitungen im Webshop werden nun mit dem HTTP-Statuscode 301 ausgeführt. Zuvor wurden Weiterleitungen mit dem HTTP-Statuscode 302 ausgeführt.
+
 ## v5.0.5 (2020-06-30) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.4...5.0.5" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
 
 ### Behoben
