@@ -11,7 +11,7 @@
 - Wurde ein Header- oder Footer-Inhalt für alle Kategorien vom Typ **Artikelkategorie** verknüpft, wurden diese nicht ausgegeben. Dies wurde behoben.
 - Durch einen Fehler konnte die Schnellsuche dazu führen, dass der ShopBuilder nicht geladen wurde. Dieses Verhalten wurde behoben.
 - Beim Wechsel des Lieferlands kam es teilweise zur falschen Darstellung von Netto- und Bruttopreisen. Dies wurde behoben.
-- Bei zweiten Mandanten wurden auf statischen Seiten die Meta-Beschreibung und Meta-Keywords des Hauptmandanten genutzt, wenn die Route /category deaktiviert war. Dieses Verhalten wurde behoben.
+- Bei zweiten Mandanten wurden auf statischen Seiten die Meta-Beschreibung und Meta-Keywords des Hauptmandanten genutzt, wenn die Kategorierouten deaktiviert waren. Dieses Verhalten wurde behoben.
 
 ## v5.0.6 (2020-07-21) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.5...5.0.6" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
 
