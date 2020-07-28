@@ -1,6 +1,6 @@
 # Release Notes for IO
 
-## v5.0.7 (2020-07-27) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.6...5.0.7" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
+## v5.0.7 (2020-07-28) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.6...5.0.7" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
 
 ### Changed
 
