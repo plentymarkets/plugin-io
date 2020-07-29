@@ -75,6 +75,9 @@ class BasketService
     /** @var WebstoreConfigurationRepositoryContract $webstoreConfigurationRepository */
     private $webstoreConfigurationRepository;
 
+    /** @var SessionStorageRepositoryContract $sessionStorageRepository */
+    private $sessionStorageRepository;
+
     private $basketItems;
     private $template = '';
 
@@ -88,6 +91,7 @@ class BasketService
      * @param VatInitContract $vatInitService
      * @param CouponService $couponService
      * @param WebstoreConfigurationRepositoryContract $webstoreConfigurationRepository
+     * @param SessionStorageRepositoryContract $sessionStorageRepository
      */
     public function __construct(
         BasketItemRepositoryContract $basketItemRepository,
@@ -97,7 +101,8 @@ class BasketService
         BasketRepositoryContract $basketRepository,
         VatInitContract $vatInitService,
         CouponService $couponService,
-        WebstoreConfigurationRepositoryContract $webstoreConfigurationRepository
+        WebstoreConfigurationRepositoryContract $webstoreConfigurationRepository,
+        SessionStorageRepositoryContract $sessionStorageRepository
     ) {
         $this->basketItemRepository = $basketItemRepository;
         $this->checkout = $checkout;
@@ -106,6 +111,7 @@ class BasketService
         $this->basketRepository = $basketRepository;
         $this->couponService = $couponService;
         $this->webstoreConfigurationRepository = $webstoreConfigurationRepository;
+        $this->sessionStorageRepository = $sessionStorageRepository;
 
         if (!$vatInitService->isInitialized()) {
             $vat = $this->vatService->getVat();
@@ -138,9 +144,7 @@ class BasketService
             $basket["totalVats"] = [];
         }
 
-        /** @var SessionStorageRepositoryContract $sessionStorageRepository */
-        $sessionStorageRepository = pluginApp(SessionStorageRepositoryContract::class);
-        $order = $sessionStorageRepository->getOrder();
+        $order = $this->sessionStorageRepository->getOrder();
 
         $isNet = false;
         if (!is_null($order)) {
@@ -431,10 +435,16 @@ class BasketService
      */
     private function addVariationData($basketItems, $basketItemData, $sortOrderItems = false): array
     {
+
+        $order = $this->sessionStorageRepository->getOrder();
+        $isNet = false;
+        if (!is_null($order)) {
+            $isNet = $order->isNet;
+        }
         $showNetPrice = $this->contactRepository->showNetPrices();
         $result = [];
         foreach ($basketItems as $basketItem) {
-            if ($showNetPrice) {
+            if ($isNet || $showNetPrice) {
                 $basketItem->price = round($basketItem->price * 100 / (100.0 + $basketItem->vat), 2);
             }
 

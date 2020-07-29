@@ -1,5 +1,18 @@
 # Release Notes für IO
 
+## v5.0.7 (2020-07-28) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.6...5.0.7" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
+
+### Geändert
+
+- Es gab eine Änderung um die Webshop-Performance zu optimieren. Diese führt dazu, dass die Verknüpfung zwischen Kategorie-ID und ShopBuilder-Inhalt, die in den IO- oder ShopBuilder-Einstellungen vorgenommen wird, für 5 Minuten in den Cache geschrieben wird. Dadurch werden Änderungen an der Verknüpfung oder an URLs verknüpfter Seiten zeitversetzt im Webshop angezeigt.
+
+### Behoben
+
+- Wurde ein Header- oder Footer-Inhalt für alle Kategorien vom Typ **Artikelkategorie** verknüpft, wurden diese nicht ausgegeben. Dies wurde behoben.
+- Durch einen Fehler konnte die Schnellsuche dazu führen, dass der ShopBuilder nicht geladen wurde. Dieses Verhalten wurde behoben.
+- Beim Wechsel des Lieferlands kam es teilweise zur falschen Darstellung von Netto- und Bruttopreisen. Dies wurde behoben.
+- Bei zweiten Mandanten wurden auf statischen Seiten die Meta-Beschreibung und Meta-Keywords des Hauptmandanten genutzt, wenn die Kategorierouten deaktiviert waren. Dieses Verhalten wurde behoben.
+
 ## v5.0.6 (2020-07-21) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.5...5.0.6" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
 
 ### Behoben
