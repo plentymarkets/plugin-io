@@ -1,4 +1,4 @@
-<?php //strict
+<?php
 
 namespace IO\Services;
 
@@ -189,22 +189,32 @@ class CategoryService
         return $children;
     }
 
-    public function getCurrentCategoryChildren()
+    public function getCurrentCategoryChildren($categoryId = null)
     {
+        $category = $this->getCurrentCategory();
+
+        if (is_null($category)) {
+            $category = $this->get((int)$categoryId);
+            if (is_null($category)) {
+                return [];
+            }
+        }
+
+        $branches = ArrayHelper::toArray($category->branch);
         /** @var TemplateConfigService $templateConfigService */
         $templateConfigService = pluginApp(TemplateConfigService::class);
-        $category = $this->getCurrentCategory();
-        $branches = ArrayHelper::toArray($category->branch);
-        $children = $this->getNavigationTree(
+
+        $tree = $this->getNavigationTree(
             $templateConfigService->get('header.showCategoryTypes'),
             Utils::getLang(),
             $category->level + 1,
             $this->contactRepository->getContactClassId()
         );
 
+        $children = [];
         for ($level = 1; $level <= 6; $level++) {
             if (!is_null($branches) && $branches['category' . $level . 'Id'] > 0) {
-                foreach ($children as $childrenCategory) {
+                foreach ($tree as $childrenCategory) {
                     if ($childrenCategory['id'] === $branches['category' . $level . 'Id']) {
                         $children = $childrenCategory['children'];
                         break;
