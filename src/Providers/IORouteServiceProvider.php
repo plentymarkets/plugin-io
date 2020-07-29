@@ -337,7 +337,8 @@ class IORouteServiceProvider extends RouteServiceProvider
         }
 
         // SEARCH
-        if ( RouteConfig::isActive(RouteConfig::SEARCH) )
+        if ( RouteConfig::isActive(RouteConfig::SEARCH) || in_array(RouteConfig::SEARCH, RouteConfig::getEnabledRoutes())
+            || RouteConfig::getCategoryId(RouteConfig::SEARCH) > 0)
         {
             //Callisto Tag route
             $router->get('tag/{tagName}', 'IO\Controllers\ItemSearchController@redirectToSearch');
