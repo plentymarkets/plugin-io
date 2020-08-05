@@ -343,13 +343,11 @@ class BasketService
         }
     }
 
-    public function checkBasketItemsCurrency()
+    public function checkBasketItemsByPrice()
     {
         $basketItems = $this->getBasketItemsRaw();
         $basketItemData = $this->getBasketItemData($basketItems);
         $basketItems = $this->addVariationData($basketItems, $basketItemData, true);
-
-        $showWarning = [];
 
         $basketItemIds = [];
         foreach ($basketItems as $basketItem) {
@@ -376,15 +374,7 @@ class BasketService
             }
         }
 
-        if (count($showWarning) > 0) {
-            $showWarning = array_unique($showWarning);
-
-            foreach ($showWarning as $warning) {
-                /** @var NotificationService $notificationService */
-                $notificationService = pluginApp(NotificationService::class);
-                $notificationService->warn(LogLevel::WARN, $warning);
-            }
-        }
+        return count($basketItemIds);
     }
 
     private function hasTexts($basketItemData)
