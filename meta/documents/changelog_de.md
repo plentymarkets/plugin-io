@@ -1,12 +1,13 @@
 # Release Notes für IO
 
-## v5.0.8 (2020-08-04) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.7...5.0.8" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
+## v5.0.8 (2020-08-05) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.7...5.0.8" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
 
 ### Behoben
 
 - Die Tag-Route wurde nur bei aktivierter Standardsuche registriert. Bei einer Kategorie, die für die Suche verknüpft war, wurde diese Route nicht registriert. Dieses Verhalten wurde behoben.
 - Das Widget Step-By-Step-Navigation rendert nun keine Platzhalter mehr, wenn keine Kinderelemente vorhanden sind.
 - In Version 5.0.7 wurde ein Caching für Webshop-URLs eingebaut. Dies konnte bei Systemen mit mehreren Mandanten zu Problemen führen. Das Verhalten des Cachings wurde angepasst.
+- Beim Wechsel der Herkunft werden nun alle Artikel aus dem Warenkorb entfernt, für die kein Verkaufspreis für die neue Herkunft hinterlegt ist.
 
 ## v5.0.7 (2020-07-28) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.6...5.0.7" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
 
