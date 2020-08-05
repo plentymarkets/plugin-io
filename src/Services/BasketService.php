@@ -343,6 +343,22 @@ class BasketService
         }
     }
 
+    /**
+     * @deprecated Use checkBasketItemsByPrice instead
+     */
+    public function checkBasketItemsCurrency()
+    {
+        if($this->checkBasketItemsByPrice() > 0) {
+            /** @var NotificationService $notificationService */
+            $notificationService = pluginApp(NotificationService::class);
+            $notificationService->warn(LogLevel::WARN, 14);
+        }
+    }
+
+    /**
+     * Remove basket items not having a valid price for the current basket configuration (referrer, currency,...)
+     * @return int number of removed basket items.
+     */
     public function checkBasketItemsByPrice()
     {
         $basketItems = $this->getBasketItemsRaw();
@@ -359,7 +375,6 @@ class BasketService
 
             $delete = false;
             if (!isset($basketItem['variation']['data']['prices']['default']) || is_null($basketItem['variation']['data']['prices']['default'])) {
-                $showWarning[] = 14;
                 $delete = true;
             }
 
