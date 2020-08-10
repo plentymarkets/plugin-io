@@ -256,6 +256,7 @@ class BasketService
         $basketItemData = $appendItemData ? $this->getBasketItemData($basketItems) : [];
         $basketItems = $this->addVariationData($basketItems, $basketItemData, true);
         $basketItems = $this->filterSetItems($basketItems);
+        $basketItems = $this->filterVariationOrderProperties($basketItems);
 
         $basketItems = array_map(
             function ($basketItem) {
@@ -937,7 +938,37 @@ class BasketService
 
         return $this->basketItems;
     }
+    private function filterVariationOrderProperties(array $basketItems)
+    {
+        $variationProperties = [];
+        // remove variation order properties from basket items
+        $basketItems = array_filter(
+            $basketItems,
+            function ($basketItem) use (&$variationProperties) {
+                if ($basketItem['itemType'] === BasketItem::BASKET_ITEM_TYPE_VARIATION_ORDER_PROPERTY) {
+                    // store set components to add them to the parent item later
+                    $bundleRowId = $basketItem['itemBundleRowId'];
+                    $variationProperties[$bundleRowId] = $variationProperties[$bundleRowId] ?? [];
+                    $variationProperties[$bundleRowId][] = $basketItem;
+                    return false;
+                }
+                return true;
+            }
+        );
 
+        // append set components
+        foreach ($basketItems as &$basketItem) {
+            if (isset($variationProperties[$basketItem['id']])) {
+                foreach ($variationProperties[$basketItem['id']] as $variationProperty) {
+                    $basketItem['price'] += $variationProperty['price'];
+                    $basketItem['attributeTotalMarkup'] += $variationProperty['price'];
+                }
+            }
+        }
+
+        // array_filter preserves keys of entries. array_values generates a new array with new keys from 0..n
+        return array_values($basketItems);
+    }
     private function filterSetItems($basketItems)
     {
         $setComponents = [];
