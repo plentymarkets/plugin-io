@@ -265,23 +265,29 @@ class BasketService
         );
 
         if ($appendItemData) {
-            $basketItems = $this->fixBasketItems($basketItems);
+            $basketItems = $this->removeInactiveBasketItems($basketItems);
         }
 
         return $basketItems;
     }
 
-    private function fixBasketItems($basketItems = [])
+    private function removeInactiveBasketItems($basketItems = [])
     {
-        foreach ($basketItems as $basketItem)
-        {
-            if (is_null($basketItem['variation']))
-            {
+        $deleted = false;
+        foreach ($basketItems as $basketItem) {
+            if (is_null($basketItem['variation'])) {
                 $this->basketItemRepository->removeBasketItem($basketItem['id']);
                 unset($basketItems[array_search($basketItem, $basketItems)]);
+                $deleted = true;
             }
         }
 
+        if ($deleted) {
+            /** @var Dispatcher $pluginEventDispatcher */
+            $pluginEventDispatcher = pluginApp(Dispatcher::class);
+            $pluginEventDispatcher->fire(pluginApp(AfterBasketChanged::class), []);
+        }
+        
         return array_values($basketItems);
     }
 
