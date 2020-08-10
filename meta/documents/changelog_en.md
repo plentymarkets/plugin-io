@@ -1,5 +1,14 @@
 # Release Notes for IO
 
+## v5.0.8 (2020-08-05) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.7...5.0.8" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
+
+### Fixed
+
+- The tag route was only registered for the activated default search. If a category was linked to the search, the route was not registered. This behaviour has been fixed.
+- The widget step by step navigation no longer renders placeholders if no child categories exist for the current category.
+- In version 5.0.7 we added caching for online store URLs. This could lead to problems for systems with multiple clients. The caching behaviour has been adjusted.
+- If the referrer is changed in the frontend, all items, for which no sales price has been stored for the new referrer, are now removed from the shopping cart.
+
 ## v5.0.7 (2020-07-28) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.6...5.0.7" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
 
 ### Changed
