@@ -67,37 +67,88 @@ class ShopUrls
 
     private function init($lang)
     {
-        /** @var WebstoreConfigurationRepositoryContract $webstoreConfigurationRepository */
-        $webstoreConfigurationRepository = pluginApp(WebstoreConfigurationRepositoryContract::class);
-        $this->resetMemoryCache();
-        $this->appendTrailingSlash = UrlQuery::shouldAppendTrailingSlash();
-        $this->trailingSlashSuffix = $this->appendTrailingSlash ? '/' : '';
-        $this->includeLanguage = $lang !== $webstoreConfigurationRepository->getWebstoreConfiguration()->defaultLanguage;
+        $shopUrls = Utils::getCacheKey('shopUrls_' . $lang, null);
 
-        $this->basket = $this->getShopUrl(RouteConfig::BASKET);
-        $this->cancellationForm = $this->getShopUrl(RouteConfig::CANCELLATION_FORM);
-        $this->cancellationRights = $this->getShopUrl(RouteConfig::CANCELLATION_RIGHTS);
-        $this->checkout = $this->getShopUrl(RouteConfig::CHECKOUT);
-        $this->confirmation = $this->getShopUrl(RouteConfig::CONFIRMATION);
-        $this->contact = $this->getShopUrl(RouteConfig::CONTACT);
-        $this->gtc = $this->getShopUrl(RouteConfig::TERMS_CONDITIONS);
+        if (!is_null($shopUrls)) {
+            $this->initByCache($shopUrls);
+        } else {
+            /** @var WebstoreConfigurationRepositoryContract $webstoreConfigurationRepository */
+            $webstoreConfigurationRepository = pluginApp(WebstoreConfigurationRepositoryContract::class);
+            $this->resetMemoryCache();
+            $dataForCache = [];
+            $this->appendTrailingSlash = $dataForCache['appendTrailingSlash'] = UrlQuery::shouldAppendTrailingSlash();
+            $this->trailingSlashSuffix = $dataForCache['trailingSlashSuffix'] = $this->appendTrailingSlash ? '/' : '';
+            $this->includeLanguage = $dataForCache['includeLanguage'] = $lang !== $webstoreConfigurationRepository->getWebstoreConfiguration(
+                )->defaultLanguage;
 
-        // Homepage URL may not be used from category. Even if linked to category, the homepage url should be '/'
-        $this->home = Utils::makeRelativeUrl('/', $this->includeLanguage);
-        $this->legalDisclosure = $this->getShopUrl(RouteConfig::LEGAL_DISCLOSURE);
-        $this->login = $this->getShopUrl(RouteConfig::LOGIN);
-        $this->myAccount = $this->getShopUrl(RouteConfig::MY_ACCOUNT);
-        $this->passwordReset = $this->getShopUrl(RouteConfig::PASSWORD_RESET);
-        $this->privacyPolicy = $this->getShopUrl(RouteConfig::PRIVACY_POLICY);
-        $this->registration = $this->getShopUrl(RouteConfig::REGISTER);
-        $this->search = $this->getShopUrl(RouteConfig::SEARCH);
-        $this->termsConditions = $this->getShopUrl(RouteConfig::TERMS_CONDITIONS);
-        $this->wishList = $this->getShopUrl(RouteConfig::WISH_LIST);
-        $this->returns = $this->getShopUrl(RouteConfig::ORDER_RETURN);
-        $this->returnConfirmation = $this->getShopUrl(RouteConfig::ORDER_RETURN_CONFIRMATION);
-        $this->changeMail = $this->getShopUrl(RouteConfig::CHANGE_MAIL);
-        $this->newsletterOptOut = $this->getShopUrl(RouteConfig::NEWSLETTER_OPT_OUT);
-        $this->orderDocument = $this->getShopUrl(RouteConfig::ORDER_DOCUMENT);
+            $this->basket = $dataForCache['basket'] = $this->getShopUrl(RouteConfig::BASKET);
+            $this->cancellationForm = $dataForCache['cancellationForm'] = $this->getShopUrl(
+                RouteConfig::CANCELLATION_FORM
+            );
+            $this->cancellationRights = $dataForCache['cancellationRights'] = $this->getShopUrl(
+                RouteConfig::CANCELLATION_RIGHTS
+            );
+            $this->checkout = $dataForCache['checkout'] = $this->getShopUrl(RouteConfig::CHECKOUT);
+            $this->confirmation = $dataForCache['confirmation'] = $this->getShopUrl(RouteConfig::CONFIRMATION);
+            $this->contact = $dataForCache['contact'] = $this->getShopUrl(RouteConfig::CONTACT);
+            $this->gtc = $dataForCache['gtc'] = $this->getShopUrl(RouteConfig::TERMS_CONDITIONS);
+
+            // Homepage URL may not be used from category. Even if linked to category, the homepage url should be '/'
+            $this->home = $dataForCache['home'] = Utils::makeRelativeUrl('/', $this->includeLanguage);
+            $this->legalDisclosure = $dataForCache['legalDisclosure'] = $this->getShopUrl(
+                RouteConfig::LEGAL_DISCLOSURE
+            );
+            $this->login = $dataForCache['login'] = $this->getShopUrl(RouteConfig::LOGIN);
+            $this->myAccount = $dataForCache['myAccount'] = $this->getShopUrl(RouteConfig::MY_ACCOUNT);
+            $this->passwordReset = $dataForCache['passwordReset'] = $this->getShopUrl(RouteConfig::PASSWORD_RESET);
+            $this->privacyPolicy = $dataForCache['privacyPolicy'] = $this->getShopUrl(RouteConfig::PRIVACY_POLICY);
+            $this->registration = $dataForCache['registration'] = $this->getShopUrl(RouteConfig::REGISTER);
+            $this->search = $dataForCache['search'] = $this->getShopUrl(RouteConfig::SEARCH);
+            $this->termsConditions = $dataForCache['termsConditions'] = $this->getShopUrl(
+                RouteConfig::TERMS_CONDITIONS
+            );
+            $this->wishList = $dataForCache['wishList'] = $this->getShopUrl(RouteConfig::WISH_LIST);
+            $this->returns = $dataForCache['returns'] = $this->getShopUrl(RouteConfig::ORDER_RETURN);
+            $this->returnConfirmation = $dataForCache['returnConfirmation'] = $this->getShopUrl(
+                RouteConfig::ORDER_RETURN_CONFIRMATION
+            );
+            $this->changeMail = $dataForCache['changeMail'] = $this->getShopUrl(RouteConfig::CHANGE_MAIL);
+            $this->newsletterOptOut = $dataForCache['newsletterOptOut'] = $this->getShopUrl(
+                RouteConfig::NEWSLETTER_OPT_OUT
+            );
+            $this->orderDocument = $dataForCache['orderDocument'] = $this->getShopUrl(RouteConfig::ORDER_DOCUMENT);
+
+            Utils::putCacheKey('shopUrls_'. $lang, $dataForCache, 5);
+        }
+    }
+
+    private function initByCache(array $dataFromCache)
+    {
+        $this->appendTrailingSlash = $dataFromCache['appendTrailingSlash'];
+        $this->trailingSlashSuffix = $dataFromCache['trailingSlashSuffix'];
+        $this->includeLanguage = $dataFromCache['includeLanguage'];
+        $this->basket = $dataFromCache['basket'];
+        $this->cancellationForm = $dataFromCache['cancellationForm'];
+        $this->cancellationRights = $dataFromCache['cancellationRights'];
+        $this->checkout = $dataFromCache['checkout'];
+        $this->confirmation = $dataFromCache['confirmation'];
+        $this->contact = $dataFromCache['contact'];
+        $this->gtc = $dataFromCache['gtc'];
+        $this->home = $dataFromCache['home'];
+        $this->legalDisclosure = $dataFromCache['legalDisclosure'];
+        $this->login = $dataFromCache['login'];
+        $this->myAccount = $dataFromCache['myAccount'];
+        $this->passwordReset = $dataFromCache['passwordReset'];
+        $this->privacyPolicy = $dataFromCache['privacyPolicy'];
+        $this->registration = $dataFromCache['registration'];
+        $this->search = $dataFromCache['search'];
+        $this->termsConditions = $dataFromCache['termsConditions'];
+        $this->wishList = $dataFromCache['wishList'];
+        $this->returns = $dataFromCache['returns'];
+        $this->returnConfirmation = $dataFromCache['returnConfirmation'];
+        $this->changeMail = $dataFromCache['changeMail'];
+        $this->newsletterOptOut = $dataFromCache['newsletterOptOut'];
+        $this->orderDocument = $dataFromCache['orderDocument'];
     }
 
     public function returns($orderId, $orderAccessKey = null)
@@ -162,6 +213,18 @@ class ShopUrls
                 return $trackingURL;
             }
         );
+    }
+
+    public function orderConfirmation($orderId)
+    {
+        if (RouteConfig::getCategoryId(RouteConfig::CONFIRMATION) > 0) {
+            $suffix = '?orderId=' . $orderId;
+        } else {
+            // if there is no trailing slash we must add a slash before the orderID to divide the suffix
+            // from the given url path else we have to add ad slasg after the orderID to show a correct url
+            $suffix = $this->appendTrailingSlash ? $orderId . '/' : '/' . $orderId;
+        }
+        return $this->confirmation . $suffix;
     }
 
     private function getShopUrl($route, $routeParams = [], $urlParams = [], $overrideUrl = null)
@@ -254,10 +317,12 @@ class ShopUrls
         }
 
         // match url pattern
-        if (preg_match('/(?:a\-\d+|_\d+|_\d+_\d+)$/m', $url) === 1) {
+        if (preg_match('/(?:a\-\d+|_\d+|_\d+_\d+)\/?$/m', $url) === 1) {
             return RouteConfig::ITEM;
-        } elseif (preg_match('/_t\d+$/m', $url) === 1) {
+        } elseif (preg_match('/_t\d+\/?$/m', $url) === 1) {
             return RouteConfig::TAGS;
+        } elseif (preg_match('/confirmation\/\d+\/([A-Za-z]|\d)+\/?/m', $url) === 1) {
+            return RouteConfig::CONFIRMATION;
         }
 
         // template type cannot be determined

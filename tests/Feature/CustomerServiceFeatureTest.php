@@ -29,7 +29,7 @@ class CustomerServiceFeatureTest extends TestCase
 
     protected $genders = ['male', 'female', 'diverse'];
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

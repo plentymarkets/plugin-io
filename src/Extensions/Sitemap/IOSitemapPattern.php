@@ -2,22 +2,22 @@
 
 namespace IO\Extensions\Sitemap;
 
+use IO\Helper\RouteConfig;
 use IO\Services\TemplateConfigService;
 use Plenty\Modules\Plugin\Events\LoadSitemapPattern;
 use Plenty\Modules\Plugin\Services\PluginSeoSitemapService;
-use Plenty\Plugin\ConfigRepository;
 
 class IOSitemapPattern
 {
     private $contentRoutes = [
-        'cancellation-rights',
-        'cancellation-form',
-        'legal-disclosure',
-        'privacy-policy',
-        'gtc',
-        'contact'
+        RouteConfig::CANCELLATION_RIGHTS,
+        RouteConfig::CANCELLATION_FORM,
+        RouteConfig::LEGAL_DISCLOSURE,
+        RouteConfig::PRIVACY_POLICY,
+        RouteConfig::TERMS_CONDITIONS,
+        RouteConfig::CONTACT
     ];
-    
+
     /**
      * @param LoadSitemapPattern $sitemapPattern
      */
@@ -30,14 +30,12 @@ class IOSitemapPattern
         $templateConfigService = pluginApp(TemplateConfigService::class);
         $enableOldURLPattern = $templateConfigService->getBoolean('global.enableOldUrlPattern');
 
-        if(!$enableOldURLPattern)
-        {
+        if (!$enableOldURLPattern) {
             $itemPattern = [
                 'pattern' => '_{itemId}_{variationId?}',
                 'container' => ''
             ];
-        }else
-        {
+        } else {
             $itemPattern = [
                 'onlyMainVariation' => $templateConfigService->get('item.variation_show_type', 'all') === 'main'
             ];
@@ -45,24 +43,14 @@ class IOSitemapPattern
 
         $seoSitemapService->setItemPattern($itemPattern);
 
-        /** @var ConfigRepository $configRepository */
-        $configRepository = pluginApp(ConfigRepository::class);
-
         $contentRoutes = [];
-        $enabledRoutes = explode(', ', $configRepository->get('IO.routing.enabled_routes', ''));
-        if(count($enabledRoutes))
-        {
-            foreach($this->contentRoutes as $route)
-            {
-                if(in_array($route, $enabledRoutes))
-                {
-                    $contentRoutes[] = ['url' => $route];
-                }
+        foreach ($this->contentRoutes as $route) {
+            if (RouteConfig::isActive($route)) {
+                $contentRoutes[] = ['url' => $route];
             }
         }
 
-        if(count($contentRoutes))
-        {
+        if (count($contentRoutes)) {
             $seoSitemapService->setContentCategoryPattern(['pattern' => '', 'container' => $contentRoutes]);
         }
     }

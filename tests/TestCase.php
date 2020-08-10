@@ -13,8 +13,8 @@ use PluginTests\BrowserKitTestCase;
  */
 abstract class TestCase extends BrowserKitTestCase
 {
-    protected function setUp()
-	{
+    protected function setUp(): void
+    {
 		parent::setUp();
 
 		// make sure, at least 1 plugin set exists

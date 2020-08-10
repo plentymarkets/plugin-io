@@ -9,6 +9,7 @@ use Plenty\Modules\ShopBuilder\Helper\ShopBuilderRequest;
 use Plenty\Modules\Webshop\Contracts\LocalizationRepositoryContract;
 use Plenty\Modules\Webshop\Contracts\WebstoreConfigurationRepositoryContract;
 use Plenty\Plugin\Application;
+use Plenty\Plugin\CachingRepository;
 use Plenty\Plugin\Translation\Translator;
 
 class Utils
@@ -88,5 +89,29 @@ class Utils
         /** @var UrlQuery $query */
         $query = pluginApp(UrlQuery::class, ['path' => $path]);
         return $query->toRelativeUrl($includeLanguage);
+    }
+
+
+    public static function putCacheKey($key, $value, $timeInMinutes)
+    {
+         /** @var Application $app */
+        $app = pluginApp(Application::class);
+
+        /** @var CachingRepository $cachingRepository */
+        $cachingRepository = pluginApp(CachingRepository::class);
+
+        $key = $app->getPlentyId() . '_' . pluginSetId() . '_' . $key;
+        $cachingRepository->put($key,$value, $timeInMinutes);
+    }
+
+    public static function getCacheKey($key, $defaultValue = null)
+    {
+         /** @var Application $app */
+        $app = pluginApp(Application::class);
+        /** @var CachingRepository $cachingRepository */
+        $cachingRepository = pluginApp(CachingRepository::class);
+
+        $key = $app->getPlentyId() . '_' . pluginSetId() . '_' . $key;
+        return $cachingRepository->get($key, $defaultValue);
     }
 }

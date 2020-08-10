@@ -92,7 +92,7 @@ class CheckoutServiceShippingTest extends TestCase
      */
     private $currencyExchangeRepoMock;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -187,6 +187,14 @@ class CheckoutServiceShippingTest extends TestCase
                     'accountContactClassId' => 1
                 ]
             );
+
+        $this->sessionStorageRepositoryMock->shouldReceive('getOrder')
+            ->andReturn(
+                (object)[
+                    'isNet' => false,
+                ]
+            );
+
         $this->localizationRepositoryMock->shouldReceive('getLanguage')
             ->andReturn('de');
 

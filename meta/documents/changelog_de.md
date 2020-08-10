@@ -1,5 +1,58 @@
 # Release Notes für IO
 
+## v5.0.8 (2020-08-05) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.7...5.0.8" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
+
+### Behoben
+
+- Die Tag-Route wurde nur bei aktivierter Standardsuche registriert. Bei einer Kategorie, die für die Suche verknüpft war, wurde diese Route nicht registriert. Dieses Verhalten wurde behoben.
+- Das Widget Step-By-Step-Navigation rendert nun keine Platzhalter mehr, wenn keine Kinderelemente vorhanden sind.
+- In Version 5.0.7 wurde ein Caching für Webshop-URLs eingebaut. Dies konnte bei Systemen mit mehreren Mandanten zu Problemen führen. Das Verhalten des Cachings wurde angepasst.
+- Beim Wechsel der Herkunft werden nun alle Artikel aus dem Warenkorb entfernt, für die kein Verkaufspreis für die neue Herkunft hinterlegt ist.
+
+## v5.0.7 (2020-07-28) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.6...5.0.7" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
+
+### Geändert
+
+- Es gab eine Änderung um die Webshop-Performance zu optimieren. Diese führt dazu, dass die Verknüpfung zwischen Kategorie-ID und ShopBuilder-Inhalt, die in den IO- oder ShopBuilder-Einstellungen vorgenommen wird, für 5 Minuten in den Cache geschrieben wird. Dadurch werden Änderungen an der Verknüpfung oder an URLs verknüpfter Seiten zeitversetzt im Webshop angezeigt.
+
+### Behoben
+
+- Wurde ein Header- oder Footer-Inhalt für alle Kategorien vom Typ **Artikelkategorie** verknüpft, wurden diese nicht ausgegeben. Dies wurde behoben.
+- Durch einen Fehler konnte die Schnellsuche dazu führen, dass der ShopBuilder nicht geladen wurde. Dieses Verhalten wurde behoben.
+- Beim Wechsel des Lieferlands kam es teilweise zur falschen Darstellung von Netto- und Bruttopreisen. Dies wurde behoben.
+- Bei zweiten Mandanten wurden auf statischen Seiten die Meta-Beschreibung und Meta-Keywords des Hauptmandanten genutzt, wenn die Kategorierouten deaktiviert waren. Dieses Verhalten wurde behoben.
+
+## v5.0.6 (2020-07-21) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.5...5.0.6" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
+
+### Behoben
+
+- Bei Suchvorschlägen wurden auch Kategorien angezeigt, die für den aktuellen Mandanten nicht sichtbar waren. Dieses Verhalten wurde behoben.
+- Weiterleitungen im Webshop werden nun mit dem HTTP-Statuscode 301 ausgeführt. Zuvor wurden Weiterleitungen mit dem HTTP-Statuscode 302 ausgeführt.
+
+## v5.0.5 (2020-06-30) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.4...5.0.5" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
+
+### Behoben
+
+- Bei Suchvorschlägen für Artikel und Kategorien wurden URLs nicht unter Berücksichtigung der aktuellen Sprachauswahl erzeugt. Dies wurde behoben.
+- Unter bestimmten Umständen wurde die Kundenklasse eines Kontakts fehlerhafterweise auf die Standardkundenklasse zurückgesetzt. Dieses Verhalten wurde behoben.
+- Unter bestimmten Umständen konnten Daten eines Kontakts durch Adressdaten überschrieben werden. Dies wurde behoben.
+- In der Sitemap wurden statische Seiten aufgelistet, auch wenn diese bereits mit einer ShopBuilder-Kategorie verknüpft waren. Dieses Verhalten wurde behoben.
+
+## v5.0.4 (2020-06-08) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.3...5.0.4" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
+
+### Geändert
+
+- Die zusätzlichen Kosten für Lieferungen außerhalb der Europäischen Zollunion wurden nicht korrekt angezeigt. Dieses Verhalten wurde behoben.
+
+## v5.0.3 (2020-06-02) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.2...5.0.3" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
+
+### Behoben
+
+- Nach dem Ändern der E-Mail-Adresse über den Mein Konto-Bereich konnte es dazu kommen, dass abgeschlossene Aufträge noch mit der vorherigen E-Mail-Adresse angelegt wurden. Dieses Verhalten wurde behoben.
+- Der Typ des aktuellen Templates wird jetzt auch für URLs mit Trailing-Slash erkannt.
+- Auf Bestellbestätigungsseiten, die nicht über den ShopBuilder angelegt wurden, kam es vor, dass nicht alle Layout-Container von Zahlungsanbieter-Plugins gefüllt wurden. Dies wurde behoben.
+- Im Mein-Konto-Bereich wurde die Verlinkung auf die Bestellbestätigungsseite falsch gesetzt, wenn die Bestellbestätigungsseite nicht über den ShopBuilder erstellt wurde.
+
 ## v5.0.2 (2020-05-12) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.1...5.0.2" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
 
 ### Geändert

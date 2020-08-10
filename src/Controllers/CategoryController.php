@@ -63,12 +63,16 @@ class CategoryController extends LayoutController
         );
     }
 
-    public function showCategoryById($categoryId, $params = [])
+    public function showCategoryById($categoryId, $params = [], $webstoreId = null)
     {
         $lang = Utils::getLang();
 
+        if(is_null($webstoreId)) {
+            $webstoreId = Utils::getWebstoreId();
+        }
+
         return $this->renderCategory(
-            $this->categoryRepo->get($categoryId, $lang),
+            $this->categoryRepo->get($categoryId, $lang, $webstoreId),
             $params
         );
     }
@@ -76,16 +80,17 @@ class CategoryController extends LayoutController
     public function redirectToCategory($categoryId, $defaultUrl = '', $params = [])
     {
         $lang = Utils::getLang();
+        $webstoreId = Utils::getWebstoreId();
 
         /** @var UrlService $urlService */
         $urlService = pluginApp(UrlService::class);
-        $categoryUrl = $urlService->getCategoryURL((int)$categoryId, $lang);
+        $categoryUrl = $urlService->getCategoryURL((int)$categoryId, $lang, $webstoreId);
         if ($categoryUrl->equals($defaultUrl)) {
             // category url equals legacy route name
-            return $this->showCategoryById($categoryId, $params);
+            return $this->showCategoryById($categoryId, $params, $webstoreId);
         }
 
-        $category = $this->categoryRepo->get($categoryId, $lang);
+        $category = $this->categoryRepo->get($categoryId, $lang, $webstoreId);
 
         if (is_null($category)) {
             /** @var Response $response */
@@ -141,7 +146,14 @@ class CategoryController extends LayoutController
 
         /** @var ShopBuilderRequest $shopBuilderRequest */
         $shopBuilderRequest = pluginApp(ShopBuilderRequest::class);
-        $shopBuilderRequest->setMainContentType($category->type);
+
+        if ($category->type === 'item') {
+            // the shopbuilder type for item categories is 'categoryitem'
+            $shopBuilderRequest->setMainContentType('categoryitem');
+        }
+        else {
+            $shopBuilderRequest->setMainContentType($category->type);
+        }
         $shopBuilderRequest->setMainCategory($category->id);
 
         if (RouteConfig::getCategoryId(RouteConfig::CHECKOUT) === $category->id || $shopBuilderRequest->getPreviewContentType() === 'checkout') {

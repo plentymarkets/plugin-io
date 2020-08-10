@@ -1,6 +1,10 @@
 <?php
 
-$dotenv = new \Dotenv\Dotenv(__DIR__ . '/../');
+if (interface_exists(\Dotenv\Loader\LoaderInterface::class)) {
+    $dotenv = \Dotenv\Dotenv::createMutable(__DIR__.'/../');
+} else {
+    $dotenv = Dotenv\Dotenv::create(__DIR__.'/../');
+}
 $dotenv->load();
 
 if (getenv('TEST_SUITE_DIR')) {

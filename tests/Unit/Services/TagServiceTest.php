@@ -26,7 +26,7 @@ class TagServiceTest extends TestCase
     const TAG_NAME_DE = "Test Tag DE";
     const TAG_NAME_EN = "Test Tag EN";
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
         $this->tagService = pluginApp(TagService::class);

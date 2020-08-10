@@ -35,20 +35,25 @@ class UrlService
      * Get canonical url for a category
      * @param int $categoryId
      * @param string|null $lang
+     * @param int|null $webstoreId
      * @return UrlQuery
      */
-    public function getCategoryURL($categoryId, $lang = null)
+    public function getCategoryURL($categoryId, $lang = null, $webstoreId = null)
     {
         if ($lang === null) {
             $lang = Utils::getLang();
         }
+
+        if ($webstoreId === null)
+        {
+            $webstoreId = Utils::getWebstoreId();
+        }
         $categoryUrl = $this->fromMemoryCache(
-            "categoryUrl.$categoryId.$lang",
-            function () use ($categoryId, $lang) {
+            "categoryUrl.$categoryId.$lang.$webstoreId",
+            function () use ($categoryId, $lang, $webstoreId) {
                 /** @var UrlBuilderRepositoryContract $urlBuilderRepository */
                 $urlBuilderRepository = pluginApp(UrlBuilderRepositoryContract::class);
-
-                return $urlBuilderRepository->buildCategoryUrl($categoryId, $lang);
+                return $urlBuilderRepository->buildCategoryUrl($categoryId, $lang, $webstoreId);
             }
         );
 
@@ -279,7 +284,7 @@ class UrlService
 
         /** @var Response $response */
         $response = pluginApp(Response::class);
-        return $response->redirectTo($redirectURL);
+        return $response->redirectTo($redirectURL, Response::HTTP_MOVED_PERMANENTLY);
     }
 
     /**

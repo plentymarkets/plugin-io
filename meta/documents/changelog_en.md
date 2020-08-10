@@ -1,5 +1,59 @@
 # Release Notes for IO
 
+## v5.0.8 (2020-08-05) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.7...5.0.8" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
+
+### Fixed
+
+- The tag route was only registered for the activated default search. If a category was linked to the search, the route was not registered. This behaviour has been fixed.
+- The widget step by step navigation no longer renders placeholders if no child categories exist for the current category.
+- In version 5.0.7 we added caching for online store URLs. This could lead to problems for systems with multiple clients. The caching behaviour has been adjusted.
+- If the referrer is changed in the frontend, all items, for which no sales price has been stored for the new referrer, are now removed from the shopping cart.
+
+## v5.0.7 (2020-07-28) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.6...5.0.7" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
+
+### Changed
+
+- We've made a change that improves the online store performance. Due to this change, the link between category ID and ShopBuilder page, which is set up in the IO or ShopBuilder settings, will be cached for 5 minutes. Because of this, changes to the link or to the URLs of linked pages can be displayed in the online store with a delay.
+
+### Fixed
+
+- If a header or footer content was linked to all categories of the type **Item category**, the header or footer was not displayed. This has been fixed.
+- Due to an error, the quick search could lead to the ShopBuilder not loading. This behaviour has been fixed.
+- When a user changed the country of delivery, net and gross prices were displayed incorrectly in some cases. This has been fixed.
+- Static pages of second clients used the meta description and meta keywords of the main client if the category routes were deactivated. This has been fixed.
+
+## v5.0.6 (2020-07-21) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.5...5.0.6" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
+
+### Fixed 
+
+- Search suggestions also included categories that were not visible for the current client. This behaviour has been fixed.
+- URL redirections in the online store are now executed with the HTTP status code 301. Priorly, redirections had been executed with the HTTP status code 302.
+
+## v5.0.5 (2020-06-30) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.4...5.0.5" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
+
+### Fixed
+
+- The URLs for search suggestions for items and categories were generated without taking the currently selected online store language into account. This has been fixed.
+- Under certain circumstances, the customer class of a contact could reset to the default customer class. This has been fixed.
+- Under certain circumstances, contact data could be overwritten by address data. This has been fixed.
+- Static pages were included in the sitemap even if these pages had already been linked to a ShopBuilder category. This behaviour has been fixed.
+
+## v5.0.4 (2020-06-08) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.3...5.0.4" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
+
+
+### Fixed
+
+- The additional costs for deliveries outside of the European Union Customs Union were displayed incorrectly. This behaviour has been fixed.
+
+## v5.0.3 (2020-06-02) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.2...5.0.3" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
+
+### Fixed
+
+- After changing the email address in the My Account area, it was possible that orders were created with the former email address. This behaviour has been fixed.
+- The type of the current template is now also recognised for URLs with a trailing slash.
+- Under certain circumstances, not all layout containers were filled by payment plugins on order confirmation pages that had not been created via the ShopBuilder. This has been fixed.
+- The link to the order confirmation page in the My Account area was incorrect if the order confirmation page had not been created via the ShopBuilder. This has been fixed.
+
 ## v5.0.2 (2020-05-12) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.1...5.0.2" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
 
 ### Changed

@@ -144,9 +144,9 @@ class CheckoutService
     /**
      * Get the relevant data for the checkout
      * @param bool $retry Try loading checkout again on failure (e.g. problems during calculating totals)
-     * @return array
+     * @return null|array
      */
-    public function getCheckout($retry = true): array
+    public function getCheckout($retry = true)
     {
         try {
             return [
@@ -469,7 +469,6 @@ class CheckoutService
                 $accountRepo = pluginApp(AccountingLocationRepositoryContract::class);
                 /** @var VatService $vatService */
                 $vatService = pluginApp(VatService::class);
-                $showNetPrice = $this->contactRepository->showNetPrices();
 
                 /** @var TemplateConfigService $templateConfigService */
                 $templateConfigService = pluginApp(TemplateConfigService::class);
@@ -514,7 +513,14 @@ class CheckoutService
                 $locationId = $vatService->getLocationId($this->getShippingCountryId());
                 $accountSettings = $accountRepo->getSettings($locationId);
 
-                if ($showNetPrice && !(bool)$accountSettings->showShippingVat) {
+                $showNetPrice = $this->contactRepository->showNetPrices();
+
+                $order = $this->sessionStorageRepository->getOrder();
+                $isNet = false;
+                if (!is_null($order)) {
+                    $isNet = $order->isNet;
+                }
+                if (($isNet && !(bool)$accountSettings->showShippingVat) ||  $showNetPrice) {
                     $maxVatValue = $this->basketService->getMaxVatValue();
 
                     if (is_array($list)) {
