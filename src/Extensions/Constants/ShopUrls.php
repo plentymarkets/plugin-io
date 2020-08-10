@@ -13,7 +13,6 @@ use Plenty\Modules\Frontend\Events\FrontendLanguageChanged;
 use Plenty\Modules\Order\Contracts\OrderRepositoryContract;
 use Plenty\Modules\Webshop\Contracts\UrlBuilderRepositoryContract;
 use Plenty\Modules\Webshop\Contracts\WebstoreConfigurationRepositoryContract;
-use Plenty\Plugin\CachingRepository;
 use Plenty\Plugin\Events\Dispatcher;
 use Plenty\Plugin\Http\Request;
 
@@ -55,12 +54,8 @@ class ShopUrls
     public $newsletterOptOut = '';
     public $orderDocument = '';
 
-    /** @var CachingRepository $cachingRepository */
-    private $cachingRepository;
-
-    public function __construct(Dispatcher $dispatcher, CachingRepository $cachingRepository)
+    public function __construct(Dispatcher $dispatcher)
     {
-        $this->cachingRepository = $cachingRepository;
         $this->init(Utils::getLang());
         $dispatcher->listen(
             FrontendLanguageChanged::class,
@@ -72,7 +67,7 @@ class ShopUrls
 
     private function init($lang)
     {
-        $shopUrls = $this->cachingRepository->get('shopUrls_' . $lang, null);
+        $shopUrls = Utils::getCacheKey('shopUrls_' . $lang, null);
 
         if (!is_null($shopUrls)) {
             $this->initByCache($shopUrls);
@@ -123,7 +118,7 @@ class ShopUrls
             );
             $this->orderDocument = $dataForCache['orderDocument'] = $this->getShopUrl(RouteConfig::ORDER_DOCUMENT);
 
-            $this->cachingRepository->put('shopUrls_'. $lang, $dataForCache, 5);
+            Utils::putCacheKey('shopUrls_'. $lang, $dataForCache, 5);
         }
     }
 
