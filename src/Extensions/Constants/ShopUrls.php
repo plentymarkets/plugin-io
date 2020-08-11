@@ -338,12 +338,15 @@ class ShopUrls
     {
         $currentRoute = $this->getTemplateType();
 
-        foreach (RouteConfig::LEGAL_PAGES as $routeKey) {
-            if ($currentRoute === $routeKey) {
-                return true;
-            }
-        }
-
-        return false;
+        return in_array(
+            $currentRoute,
+            [
+                RouteConfig::CANCELLATION_RIGHTS,
+                RouteConfig::CANCELLATION_FORM,
+                RouteConfig::LEGAL_DISCLOSURE,
+                RouteConfig::TERMS_CONDITIONS,
+                RouteConfig::PRIVACY_POLICY
+            ]
+        );
     }
 }
