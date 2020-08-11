@@ -137,13 +137,6 @@ class TemplateService
         return $renderedTemplate;
     }
 
-    public function isLegalPage(): bool {
-        /** @var ShopUrls $shopUrls */
-        $shopUrls = pluginApp(ShopUrls::class);
-
-        return $shopUrls->isLegalPage();
-    }
-
     public function isCheapestSorting()
     {
         /** @var TemplateConfigService $templateConfigRepository */

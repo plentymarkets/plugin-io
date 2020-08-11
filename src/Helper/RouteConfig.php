@@ -66,14 +66,6 @@ class RouteConfig
         self::PAGE_NOT_FOUND
     ];
 
-    const LEGAL_PAGES = [
-        self::CANCELLATION_RIGHTS,
-        self::CANCELLATION_FORM,
-        self::LEGAL_DISCLOSURE,
-        self::TERMS_CONDITIONS,
-        self::PRIVACY_POLICY
-    ];
-
     private static $enabledRoutes = null;
     private static $overrides = [];
 
