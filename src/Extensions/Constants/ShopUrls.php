@@ -333,4 +333,17 @@ class ShopUrls
     {
         return $this->getTemplateType() === $routeKey;
     }
+
+    public function isLegalPage()
+    {
+        $currentRoute = $this->getTemplateType();
+
+        foreach (RouteConfig::LEGAL_PAGES as $routeKey) {
+            if ($currentRoute === $routeKey) {
+                return true;
+            }
+        }
+
+        return false;
+    }
 }
