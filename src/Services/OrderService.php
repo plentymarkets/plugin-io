@@ -480,6 +480,13 @@ class OrderService
 
             $returnOrder['statusId'] = $this->getReturnOrderStatus();
 
+            if (!is_null($returnNote) && strlen($returnNote)) {
+                $returnOrder["comments"][] = [
+                    "isVisibleForContact" => true,
+                    "text" => $returnNote
+                ];
+            }
+
             /** @var WebshopOrderRepositoryContract $webshopOrderRepository */
             $webshopOrderRepository = pluginApp(WebshopOrderRepositoryContract::class);
 
