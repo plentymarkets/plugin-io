@@ -640,7 +640,7 @@ class OrderService
                 return false;
             }
         }
-        return $this->frontendPaymentMethodRepository->getPaymentMethodSwitchFromById($paymentMethodId, $orderId);
+        return $this->frontendPaymentMethodRepository->getPaymentMethodSwitchableFromById($paymentMethodId, $orderId);
     }
 
 
