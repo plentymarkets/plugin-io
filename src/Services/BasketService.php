@@ -514,19 +514,15 @@ class BasketService
                     $basketData['quantity'] = $bundleComponent['quantity'];
                     $basketData['template'] = $data['template'];
 
-                    $this->addDataToBasket($basketData);
+                    $componentData = $this->addDataToBasket($basketData);
+                    if(count($componentData)) {
+                        return $componentData;
+                    }
                 }
-            } else {
-                $this->addDataToBasket($data);
-            }
-        } else {
-            $error = $this->addDataToBasket($data);
-            if (is_array($error) && array_key_exists("code", $error)) {
-                return $error;
+                return [];
             }
         }
-
-        return [];
+        return $this->addDataToBasket($data);
     }
 
     /**
@@ -613,6 +609,7 @@ class BasketService
             );
             return ["code" => $e->getCode()];
         }
+        return [];
     }
 
     /**
