@@ -98,6 +98,7 @@ class CouponService
      * Validate the basket for the coupon, and remove the coupon if invalid
      * @param Basket $basket
      * @param array $basketItem Current basketItem
+     * @deprecated since 5.0.9. Validation is handled b the plentymarkets core from now.
      */
     public function validateBasketItemDelete($basket, $basketItem)
     {
@@ -121,6 +122,7 @@ class CouponService
      * @param Basket $basket
      * @param array $data New basketItem
      * @param array $basketItem Current basketItem
+     * @deprecated since 5.0.9. Validation is handled b the plentymarkets core from now.
      */
     public function validateBasketItemUpdate($basket, $data, $basketItem)
     {

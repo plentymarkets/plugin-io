@@ -2,6 +2,7 @@
 
 namespace IO\Providers;
 
+use Illuminate\Support\MessageBag;
 use IO\Config\IOConfig;
 use IO\Events\Basket\BeforeBasketItemToOrderItem;
 use IO\Extensions\Basket\IOFrontendShippingProfileChanged;
@@ -221,10 +222,16 @@ class IOServiceProvider extends ServiceProvider
 
         $dispatcher->listen(
             AfterBasketChanged::class,
-            function ($event) {
+            function (/** @var AfterBasketChanged $event */ $event) {
                 /** @var CheckoutService $checkoutService */
                 $checkoutService = pluginApp(CheckoutService::class);
                 $checkoutService->setReadOnlyCheckout(false);
+
+                if(($errors = $event->getCouponValidationErrors()) instanceof MessageBag) {
+                    /** @var NotificationService $notificationService */
+                    $notificationService = pluginApp(NotificationService::class);
+                    $notificationService->warn($errors->first(), 1000 + $errors->keys()[0]);
+                }
             }
         );
 
