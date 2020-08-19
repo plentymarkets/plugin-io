@@ -34,13 +34,14 @@ class ItemSearchResource extends ApiResource
     public function index(): Response
     {
         $searchString = $this->request->get('query', '');
+        $facets  = $this->request->get('facets', '');
 
-        if (strlen($searchString)) {
+        if (strlen($searchString) || strlen($facets)) {
             $itemListOptions = [
                 'page' => $this->request->get('page', 1),
                 'itemsPerPage' => $this->request->get('items', 20),
                 'sorting' => $this->request->get('sorting', ''),
-                'facets' => $this->request->get('facets', ''),
+                'facets' => $facets,
                 'query' => $searchString,
                 'priceMin' => $this->request->get('priceMin', 0),
                 'priceMax' => $this->request->get('priceMax', 0),
