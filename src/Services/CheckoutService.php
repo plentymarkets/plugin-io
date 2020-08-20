@@ -513,14 +513,16 @@ class CheckoutService
                 $locationId = $vatService->getLocationId($this->getShippingCountryId());
                 $accountSettings = $accountRepo->getSettings($locationId);
 
-                $showNetPrice = $this->contactRepository->showNetPrices();
+                $classId = $this->contactRepository->getContactClassId();
+                $contactClassData = $this->contactRepository->getContactClassData($classId);
+                $showNetPrice = isset($contactClassData['showNetPrice']) && $contactClassData['showNetPrice'];
 
                 $order = $this->sessionStorageRepository->getOrder();
                 $isNet = false;
                 if (!is_null($order)) {
                     $isNet = $order->isNet;
                 }
-                if (($isNet && !(bool)$accountSettings->showShippingVat) ||  $showNetPrice) {
+                if (($isNet && !(bool)$accountSettings->showShippingVat) ||  (!$isNet && $showNetPrice)) {
                     $maxVatValue = $this->basketService->getMaxVatValue();
 
                     if (is_array($list)) {
