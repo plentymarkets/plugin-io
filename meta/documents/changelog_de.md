@@ -5,13 +5,13 @@
 ### Geändert
 
 - Der Meta-Titel für die Artikelansicht kann jetzt mit einer neuen Einstellung im Ceres-Assistenten auf einen der 3 Artikelnamen festgelegt werden. Diese Einstellung steuert auch, welcher der Artikelnamen beim Generieren der Artikel-URL verwendet wird.
-- Es wurde die Einstellung "/blog in Callisto darstellen" hinzugefügt, um trotz aktiver Kategorie-Route weiterhin den Blog aus dem alten CMS anzuzeigen.
+- Es wurde die Einstellung **/blog in Callisto darstellen** hinzugefügt, um trotz aktiver Kategorie-Route weiterhin den Blog aus dem alten CMS anzuzeigen.
 
 ### Behoben
 
 - Bei der Tag-Suche wurden die Filter nicht angezeigt. Zudem hat die Sortierung nicht korrekt funktioniert. Dies wurde behoben.
-- Durch einen Fehler wurden nicht alle Daten im Retouren-Widget angezeigt. Dies wurde behoben.
-- Bei aktiver Einstellung, dass Artikelpakete aufgeteilt werden sollen, wurde auf der Artikelseite kein Fehler ausgegeben, wenn versucht wurde, mehr Bestand eines Artikels in den Warenkorb zu legen, als verfügbar war. Das Verhalten wurde behoben.
+- Durch einen Fehler wurden nicht alle Daten im **Retouren**-Widget angezeigt. Dies wurde behoben.
+- Bei aktiver Einstellung, dass Artikelpakete aufgeteilt werden sollen, wurde auf der Artikelseite kein Fehler ausgegeben, wenn versucht wurde, mehr Bestand eines Artikels in den Warenkorb zu legen als verfügbar war. Das Verhalten wurde behoben.
 - Auf der Bestellbestätigungsseite konnte es dazu kommen, dass bei Bezahlung mit einer Fremdwährung die falsche Umsatzsteuer angezeigt wurde. Das Verhalten wurde behoben.
 - In der Liste der Versandprofile konnte es unter einer bestimmten Konstellation dazu kommen, dass falsche Preise angezeigt wurden. Das Verhalten wurde behoben.
 

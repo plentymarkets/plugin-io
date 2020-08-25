@@ -5,12 +5,12 @@
 ### Changed
 
 - The meta title for the item view can now be set to one of the 3 item names using a new setting in the Ceres assistant. This setting also controls which of the item names is used when generating the item URL.
-- The setting "pass through /blog to Callisto" was added to still display the blog from the old CMS despite the active category route.
+- The setting **pass through /blog to Callisto** was added to still display the blog from the old CMS despite the active category route.
 
 ### Fixed
 
 - Filters were not displayed in the tag search and the sorting did not work correctly. This has been fixed.
-- Due to an error not all data was displayed in the order return widget. This has been fixed.
+- Due to an error not all data was displayed in the **Order return** widget. This has been fixed.
 - If the setting to split item bundles is active, no error was displayed on the item page if an attempt was made to put more stock of an item into the basket than was available. This behavior has been fixed.
 - On the order confirmation page, it could happen that the wrong sales tax was displayed when paying with a foreign currency. This behavior has been fixed.
 - In the list of shipping profiles, under a certain constellation, it could happen that wrong prices were displayed. This behavior has been fixed.
