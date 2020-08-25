@@ -344,13 +344,27 @@ class BasketService
         }
     }
 
+    /**
+     * @deprecated Use checkBasketItemsByPrice instead
+     */
     public function checkBasketItemsCurrency()
+    {
+        if($this->checkBasketItemsByPrice() > 0) {
+            /** @var NotificationService $notificationService */
+            $notificationService = pluginApp(NotificationService::class);
+            $notificationService->warn(LogLevel::WARN, 14);
+        }
+    }
+
+    /**
+     * Remove basket items not having a valid price for the current basket configuration (referrer, currency,...)
+     * @return int number of removed basket items.
+     */
+    public function checkBasketItemsByPrice()
     {
         $basketItems = $this->getBasketItemsRaw();
         $basketItemData = $this->getBasketItemData($basketItems);
         $basketItems = $this->addVariationData($basketItems, $basketItemData, true);
-
-        $showWarning = [];
 
         $basketItemIds = [];
         foreach ($basketItems as $basketItem) {
@@ -362,7 +376,6 @@ class BasketService
 
             $delete = false;
             if (!isset($basketItem['variation']['data']['prices']['default']) || is_null($basketItem['variation']['data']['prices']['default'])) {
-                $showWarning[] = 14;
                 $delete = true;
             }
 
@@ -377,15 +390,7 @@ class BasketService
             }
         }
 
-        if (count($showWarning) > 0) {
-            $showWarning = array_unique($showWarning);
-
-            foreach ($showWarning as $warning) {
-                /** @var NotificationService $notificationService */
-                $notificationService = pluginApp(NotificationService::class);
-                $notificationService->warn(LogLevel::WARN, $warning);
-            }
-        }
+        return count($basketItemIds);
     }
 
     private function hasTexts($basketItemData)
@@ -510,19 +515,15 @@ class BasketService
                     $basketData['quantity'] = $bundleComponent['quantity'];
                     $basketData['template'] = $data['template'];
 
-                    $this->addDataToBasket($basketData);
+                    $componentData = $this->addDataToBasket($basketData);
+                    if(count($componentData)) {
+                        return $componentData;
+                    }
                 }
-            } else {
-                $this->addDataToBasket($data);
-            }
-        } else {
-            $error = $this->addDataToBasket($data);
-            if (is_array($error) && array_key_exists("code", $error)) {
-                return $error;
+                return [];
             }
         }
-
-        return [];
+        return $this->addDataToBasket($data);
     }
 
     /**
@@ -609,6 +610,7 @@ class BasketService
             );
             return ["code" => $e->getCode()];
         }
+        return [];
     }
 
     /**
