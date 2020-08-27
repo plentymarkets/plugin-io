@@ -399,15 +399,24 @@ class IORouteServiceProvider extends RouteServiceProvider
         }
 
         // CATEGORY ROUTES
-        if ( RouteConfig::isActive(RouteConfig::CATEGORY) )
+        if ( RouteConfig::isActive(RouteConfig::CATEGORY))
         {
-            $router->get('{level1?}/{level2?}/{level3?}/{level4?}/{level5?}/{level6?}', 'IO\Controllers\CategoryController@showCategory');
+            $categoryRoute = $router->get('{level1?}/{level2?}/{level3?}/{level4?}/{level5?}/{level6?}', 'IO\Controllers\CategoryController@showCategory');
+
+            if (RouteConfig::passThroughBlogRoutes()) {
+                // do not catch legacy blog-routes
+                $categoryRoute->where('level1', '(?:(?!blog)[^\/]*|[^\/]*(?<!blog))');
+            }
         }
 
         // NOT FOUND
         if ( RouteConfig::isActive(RouteConfig::PAGE_NOT_FOUND) )
         {
-            $router->get('{anything?}', 'IO\Controllers\StaticPagesController@showPageNotFound');
+            $fallbackRoute = $router->get('{anything?}', 'IO\Controllers\StaticPagesController@showPageNotFound');
+            if (RouteConfig::passThroughBlogRoutes()) {
+                // do not catch legacy blog-routes
+                $fallbackRoute->where('anything', '(?:(?!blog).*|.*(?<!blog))');
+            }
         }
 	}
 
