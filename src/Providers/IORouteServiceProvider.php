@@ -416,6 +416,8 @@ class IORouteServiceProvider extends RouteServiceProvider
             if (RouteConfig::passThroughBlogRoutes()) {
                 // do not catch legacy blog-routes
                 $fallbackRoute->where('anything', '(?:(?!blog).*|.*(?<!blog))');
+            } else {
+                $fallbackRoute->where('anything', '.*');
             }
         }
 	}
