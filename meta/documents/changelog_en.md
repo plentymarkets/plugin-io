@@ -1,5 +1,11 @@
 # Release Notes for IO
 
+## v5.0.10 (2020-08-27) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.9...5.0.10" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
+
+### Fixed
+
+- URLs with more than 6 segments are correctly recognized and displayed as 404 pages.
+
 ## v5.0.9 (2020-08-25) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.8...5.0.9" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
 
 ### Changed
