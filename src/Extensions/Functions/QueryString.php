@@ -40,9 +40,10 @@ class QueryString extends AbstractFunction
      */
     public function getQueryString($params = [])
     {
+        /** @var Request $request */
         $request = pluginApp(Request::class);
 
-        // FIX use $request->query() instead of $request->all() to avoid appending params from request body while rendering twig via POST calls, e.g. via the shop builder
+        // FIX use $request->query() instead of $request->all() to avoid appending params from request body while rendering twig via POST calls, e.g. via the shop builder.
         $queryParameters = $request->query();
         unset($queryParameters['plentyMarkets']);
         $queryParameters = array_replace($queryParameters, $params);
