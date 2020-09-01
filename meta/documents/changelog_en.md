@@ -1,5 +1,11 @@
 # Release Notes for IO
 
+## v5.0.11 (2020-09-01) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.10...5.0.11" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
+
+### Fixed
+
+- Blog entries of the Callisto blog were not correctly displayed if the route "Page not found" had been activated. This has been fixed.
+
 ## v5.0.10 (2020-08-27) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.9...5.0.10" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
 
 ### Fixed
