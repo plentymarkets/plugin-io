@@ -30,7 +30,7 @@ class QueryString extends AbstractFunction
     {
         $request = pluginApp(Request::class);
 
-        $queryParameters = $request->all();
+        $queryParameters = $request->query();
         unset($queryParameters['plentyMarkets']);
         $queryParameters = array_replace($queryParameters, $params);
 
