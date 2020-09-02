@@ -111,4 +111,11 @@ class RouteConfig
     {
         self::$overrides[$route] = $categoryId;
     }
+
+    public static function passThroughBlogRoutes()
+    {
+        $config = pluginApp(ConfigRepository::class);
+        $value = $config->get('IO.routing.pass_through_blog');
+        return $value === "true" || $value === "1" || $value === 1;
+    }
 }
