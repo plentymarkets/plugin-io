@@ -95,10 +95,12 @@ class CustomerService
         $this->contactClassRepository = $contactClassRepository;
         $this->sessionStorageRepository = $sessionStorageRepository;
 
-        $dispatcher->listen(AfterBasketChanged::class, function()
-        {
+        $dispatcher->listen(
+            AfterBasketChanged::class,
+            function () {
                 $this->resetMemoryCache();
-        });
+            }
+        );
     }
 
     /**
@@ -214,11 +216,11 @@ class CustomerService
         $newBillingAddress = null;
         $newDeliveryAddress = null;
 
-        $newBillingAddressData =  $this->determineNewCustomerAddress(AddressType::BILLING, $billingAddressData);
+        $newBillingAddressData = $this->determineNewCustomerAddress(AddressType::BILLING, $billingAddressData);
         $newDeliveryAddressData = $this->determineNewCustomerAddress(AddressType::DELIVERY, $deliveryAddressData);
 
         try {
-            if(!is_null($newBillingAddressData)) {
+            if (!is_null($newBillingAddressData)) {
                 AddressValidator::validateOrFail($newBillingAddressData);
             }
 
@@ -262,14 +264,14 @@ class CustomerService
 
     private function determineNewCustomerAddress($typeId, $addressData)
     {
-        if(!is_null($addressData)) {
+        if (!is_null($addressData)) {
             return $addressData;
         }
 
         /** @var BasketService $basketService */
         $basketService = pluginApp(BasketService::class); //TODO class member
 
-        if($typeId === AddressType::BILLING) {
+        if ($typeId === AddressType::BILLING) {
             $guestBillingAddressId = $basketService->getBillingAddressId();
             if ((int)$guestBillingAddressId > 0) {
                 return $this->addressRepository->findAddressById($guestBillingAddressId)->toArray();
@@ -523,7 +525,10 @@ class CustomerService
     public function getAddresses($typeId = null)
     {
         if ($this->contactRepository->getContactId() > 0) {
-            $addresses = $this->contactAddressRepository->getAddresses($this->contactRepository->getContactId(), $typeId);
+            $addresses = $this->contactAddressRepository->getAddresses(
+                $this->contactRepository->getContactId(),
+                $typeId
+            );
 
             if (count($addresses)) {
                 foreach ($addresses as $key => $address) {
@@ -570,7 +575,11 @@ class CustomerService
         $address = null;
 
         if ($this->contactRepository->getContactId() > 0) {
-            $address = $this->contactAddressRepository->getAddress($addressId, $this->contactRepository->getContactId(), $typeId);
+            $address = $this->contactAddressRepository->getAddress(
+                $addressId,
+                $this->contactRepository->getContactId(),
+                $typeId
+            );
         } else {
             /**
              * @var BasketService $basketService
@@ -644,12 +653,11 @@ class CustomerService
                     && (int)$account->id > 0
                     && count($contact->addresses) === 1
                     && $contact->addresses[0]->id === $newAddress->id) {
-
                     $defaultClassId = (int)$this->contactRepository->getDefaultContactClassId();
 
                     // update contact class id only when current class id on contact is the default contact class id
                     // default contact class id is set by default to contact
-                    if ($defaultClassId  > 0 && $contact->classId === $defaultClassId) {
+                    if ($defaultClassId > 0 && $contact->classId === $defaultClassId) {
                         /** @var TemplateConfigService $templateConfigService */
                         $templateConfigService = pluginApp(TemplateConfigService::class);
                         $classId = $templateConfigService->getInteger('global.default_contact_class_b2b');
@@ -827,7 +835,6 @@ class CustomerService
                 $this->contactRepository->getContactId(),
                 $typeId
             );
-
         } else {
             //case for guests
             $addressData['options'] = $this->buildAddressEmailOptions([], true, $addressData);
@@ -903,7 +910,11 @@ class CustomerService
                 false
             );
 
-            $this->contactAddressRepository->deleteAddress($addressId, $this->contactRepository->getContactId(), $typeId);
+            $this->contactAddressRepository->deleteAddress(
+                $addressId,
+                $this->contactRepository->getContactId(),
+                $typeId
+            );
 
             if ($typeId == AddressType::BILLING) {
                 $basketService->setBillingAddressId(0);
