@@ -1,8 +1,14 @@
 # Release Notes für IO
 
+## v5.0.11 (2020-09-01) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.10...5.0.11" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
+
+### Behoben
+
+- Beiträge des Callisto-Blogs wurden nicht korrekt angezeigt, wenn die Route "Seite nicht gefunden" aktiviert war. Dies wurde behoben.
+
 ## v5.0.10 (2020-08-27) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.9...5.0.10" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
 
-### Fixed
+### Behoben
 
 - URLs mit mehr als 6 Segmenten werden nun korrekt erkannt und als 404-Seite dargestellt.
 
