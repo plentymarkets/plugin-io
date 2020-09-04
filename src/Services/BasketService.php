@@ -961,9 +961,14 @@ class BasketService
         // append set components
         foreach ($basketItems as &$basketItem) {
             if (isset($variationProperties[$basketItem['id']])) {
+                $basketItem['basketItemOrderParams'] = $basketItem['basketItemOrderParams'] ?? [];
+
                 foreach ($variationProperties[$basketItem['id']] as $variationProperty) {
                     $basketItem['price'] += $variationProperty['price'];
                     $basketItem['attributeTotalMarkup'] += $variationProperty['price'];
+                    // map order params from variation property item to origin basket item
+                    // each variation property basket item contains exactly one order param
+                    $basketItem['basketItemOrderParams'][] = $variationProperty['basketItemOrderParams'][0];
                 }
             }
         }
