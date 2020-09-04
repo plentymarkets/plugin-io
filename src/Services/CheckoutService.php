@@ -161,7 +161,8 @@ class CheckoutService
                 "billingAddressId" => $this->getBillingAddressId(),
                 "paymentDataList" => $this->getCheckoutPaymentDataList(),
                 "maxDeliveryDays" => $this->getMaxDeliveryDays(),
-                "readOnly" => $this->getReadOnlyCheckout()
+                "readOnly" => $this->getReadOnlyCheckout(),
+                "contactWish" => $this->getContactWish()
             ];
         } catch (\Exception $e) {
             /** @var NotificationService $notificationService */
@@ -693,5 +694,17 @@ class CheckoutService
             SessionStorageRepositoryContract::READONLY_CHECKOUT
         );
         return (!is_null($readOnlyCheckout) ? $readOnlyCheckout : false);
+    }
+
+    /**
+     * Returns the given contact wish
+     *
+     * @return mixed
+     */
+    public function getContactWish()
+    {
+       return $this->sessionStorageRepository->getSessionValue(
+            SessionStorageRepositoryContract::ORDER_CONTACT_WISH
+        );
     }
 }
