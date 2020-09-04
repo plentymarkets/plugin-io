@@ -111,14 +111,6 @@ class ApiResponse
                 /** @var BasketService $basketService */
                 $basketService = pluginApp(BasketService::class);
                 $basketItem = $event->getBasketItem();
-
-                if (count($basketItem->basketItemVariationProperties) > 0 ) {
-                    foreach ($basketItem->basketItemVariationProperties as $basketItemVariationProperty) {
-                        $basketItem->price += $basketItemVariationProperty->givenPrice;
-                    }
-                } elseif ($basketItem->itemType === BasketItem::BASKET_ITEM_TYPE_ITEM_SET) {
-                    $basketItem->price = $basketItem->givenPrice + $basketItem->attributeTotalMarkup;
-                }
                 $this->eventData["AfterBasketItemAdd"]["basketItems"][] = $basketService->getBasketItem($basketItem);
             },
             0
