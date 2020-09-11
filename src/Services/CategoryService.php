@@ -189,6 +189,11 @@ class CategoryService
         return $children;
     }
 
+    /**
+     * Gets the children of the given categoryId or the current category if no categoryId is given.
+     * @param null $categoryId
+     * @return array|mixed|null
+     */
     public function getCurrentCategoryChildren($categoryId = null)
     {
         $category = $this->getCurrentCategory();
@@ -200,7 +205,6 @@ class CategoryService
             }
         }
 
-        $branches = ArrayHelper::toArray($category->branch);
         /** @var TemplateConfigService $templateConfigService */
         $templateConfigService = pluginApp(TemplateConfigService::class);
 
@@ -211,21 +215,30 @@ class CategoryService
             $this->contactRepository->getContactClassId()
         );
 
-        $children = [];
-        for ($level = 1; $level <= 6; $level++) {
-            if (!is_null($branches) && $branches['category' . $level . 'Id'] > 0) {
-                foreach ($tree as $childrenCategory) {
-                    if ($childrenCategory['id'] === $branches['category' . $level . 'Id']) {
-                        $children = $childrenCategory['children'];
-                        break;
-                    }
-                }
-            } else {
+        $foundCategory = $this->findInCategoryTree($tree, $category->id);
+        return $foundCategory['children'];
+    }
+
+    /**
+     * @param $categoryTree
+     * @param $categoryId
+     */
+    protected function findInCategoryTree($categoryTree, $categoryId)
+    {
+        $result = null;
+
+        foreach ($categoryTree as $category) {
+            if ($category['id'] == $categoryId) {
+                $result = $category;
                 break;
+            }
+
+            if (is_null($result) && count($category['children'])) {
+                $result = $this->findInCategoryTree($category['children'], $categoryId);
             }
         }
 
-        return $children;
+        return $result;
     }
 
     /**
