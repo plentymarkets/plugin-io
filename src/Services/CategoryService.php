@@ -220,8 +220,10 @@ class CategoryService
     }
 
     /**
+     * Is called recursive to iterate threw category tree and return the category with the given id.
      * @param $categoryTree
      * @param $categoryId
+     * @return mixed|null
      */
     protected function findInCategoryTree($categoryTree, $categoryId)
     {
