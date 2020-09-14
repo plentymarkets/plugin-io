@@ -215,28 +215,33 @@ class CategoryService
             $this->contactRepository->getContactClassId()
         );
 
-        $foundCategory = $this->findInCategoryTree($tree, $category->id);
+        $foundCategory = $this->findInCategoryTree($tree, $category->branch->toArray());
         return $foundCategory['children'];
     }
 
     /**
      * Is called recursive to iterate threw category tree and return the category with the given id.
      * @param $categoryTree
-     * @param $categoryId
+     * @param array $branch
+     * @param int $level
      * @return mixed|null
      */
-    protected function findInCategoryTree($categoryTree, $categoryId)
+    protected function findInCategoryTree($categoryTree, $branch = [], $level = 1)
     {
         $result = null;
+        $branchKey = 'category' . $level . 'Id';
+        $categoryId = $branch['categoryId'];
 
         foreach ($categoryTree as $category) {
-            if ($category['id'] == $categoryId) {
+            $isInBranch = $category['id'] === $branch[$branchKey];
+
+            if ($isInBranch && $category['id'] == $categoryId) {
                 $result = $category;
                 break;
             }
 
-            if (is_null($result) && count($category['children'])) {
-                $result = $this->findInCategoryTree($category['children'], $categoryId);
+            if ($isInBranch && count($category['children'])) {
+                $result = $this->findInCategoryTree($category['children'], $branch, $level + 1);
             }
         }
 
