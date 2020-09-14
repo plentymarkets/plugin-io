@@ -100,6 +100,9 @@ class OrderTotalsService
             }
         }
 
+        $itemSumGross += $itemSumRebateGross;
+        $itemSumNet += $itemSumRebateNet;
+
         foreach ($order->amounts[$amountId]->vats as $vat) {
             $vats[] = [
                 'rate' => $vat->vatRate,
