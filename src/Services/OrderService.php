@@ -25,6 +25,7 @@ use Plenty\Modules\Order\Models\OrderReference;
 use Plenty\Modules\Order\Property\Contracts\OrderPropertyRepositoryContract;
 use Plenty\Modules\Order\Property\Models\OrderPropertyType;
 use Plenty\Modules\Order\Status\Contracts\OrderStatusRepositoryContract;
+use Plenty\Modules\Order\Status\Models\OrderStatus;
 use Plenty\Modules\Payment\Contracts\PaymentRepositoryContract;
 use Plenty\Modules\Payment\Method\Contracts\PaymentMethodRepositoryContract;
 use Plenty\Modules\Webshop\Contracts\ContactRepositoryContract;
@@ -464,84 +465,38 @@ class OrderService
 
                 if ($returnQuantity > 0) {
                     $returnOrderData['orderItems'][$i]['quantity'] = $returnQuantity;
-                    $returnOrderData['orderItems'][$i]['references'] = [];
-                    $returnOrderData['orderItems'][$i]['references'][] = [
-                        'referenceOrderItemId' => $orderItem['id'],
-                        'referenceType' => 'parent'
-                    ];
-
-                    if($orderItem['typeId'] === OrderItemType::TYPE_ITEM_SET && count($orderItem['setComponents']) > 0) {
-                        $returnOrderData['orderItems'][$i]['metaData'] = [
-                            'externalHash' => 'setItem_' . $orderItem['id']
-                        ];
-
-                        foreach($orderItem['setComponents'] as $setComponentOrderItem) {
-                            $setComponentOrderItem['metaData'] = [
-                                'externalHash' => 'setComponent_' . $setComponentOrderItem['id'],
-                                'internalReferences' => [
-                                    'set' => 'setItem_' . $orderItem['id']
-                                ]
-                            ];
-                            $setComponentOrderItem['references'] = [];
-                            $setComponentOrderItem['references'][] = [
-                                'referenceOrderItemId' => $setComponentOrderItem['id'],
-                                'referenceType' => 'parent'
-                            ];
-
-                            unset($setComponentOrderItem['id']);
-                            unset($setComponentOrderItem['orderId']);
-                            $returnOrderData['orderItems'][] = $setComponentOrderItem;
-                        }
-                    }
-
-                    unset($returnOrderData['orderItems'][$i]['id']);
-                    unset($returnOrderData['orderItems'][$i]['orderId']);
                 } else {
                     unset($returnOrderData['orderItems'][$i]);
                 }
             }
 
-            $returnStatus = $this->getReturnOrderStatus();
+            $returnOrder = [];
+            $returnOrder['quantities'] = array_map(function($returnOrderItem) {
+                return [
+                    'orderItemId' => $returnOrderItem['id'],
+                    'quantity' => $returnOrderItem['quantity']
+                ];
+            }, $returnOrderData['orderItems']);
 
-            $returnOrderData['properties'][] = [
-                "typeId" => OrderPropertyType::NEW_RETURNS_MY_ACCOUNT,
-                "value" => "1"
-            ];
-            $returnOrderData['statusId'] = (float)$returnStatus;
-            $returnOrderData['typeId'] = OrderType::RETURNS;
-            $returnOrderData['orderReferences'] = [];
-            $returnOrderData['orderReferences'][] = [
-                'referenceOrderId' => $localizedOrder->order->id,
-                'referenceType' => 'parent'
-            ];
-
-            unset($returnOrderData['id']);
-            unset($returnOrderData['dates']);
-            unset($returnOrderData['lockStatus']);
+            $returnOrder['statusId'] = $this->getReturnOrderStatus();
 
             if (!is_null($returnNote) && strlen($returnNote)) {
-                $returnOrderData["comments"][] = [
+                $returnOrder["comments"][] = [
                     "isVisibleForContact" => true,
                     "text" => $returnNote
                 ];
             }
 
-
             /** @var WebshopOrderRepositoryContract $webshopOrderRepository */
             $webshopOrderRepository = pluginApp(WebshopOrderRepositoryContract::class);
 
-            if (strlen($orderAccessKey)) {
-                /** @var AuthHelper $authHelper */
-                $authHelper = pluginApp(AuthHelper::class);
-                $createdReturn = $authHelper->processUnguarded(
-                    function () use ($webshopOrderRepository, $returnOrderData) {
-                        $webshopOrderRepository->createReturnOrder($returnOrderData);
-                    }
-                );
-            } else {
-                $createdReturn = $webshopOrderRepository->createReturnOrder($returnOrderData);
-            }
-
+            /** @var AuthHelper $authHelper */
+            $authHelper = pluginApp(AuthHelper::class);
+            $createdReturn = $authHelper->processUnguarded(
+                function () use ($webshopOrderRepository, $returnOrder, $orderId) {
+                    return $webshopOrderRepository->createReturnOrder($returnOrder, (int)$orderId);
+                }
+            );
 
             return $createdReturn;
         }
