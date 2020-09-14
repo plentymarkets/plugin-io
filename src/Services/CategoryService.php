@@ -242,6 +242,7 @@ class CategoryService
 
             if ($isInBranch && count($category['children'])) {
                 $result = $this->findInCategoryTree($category['children'], $branch, $level + 1);
+                break;
             }
         }
 
