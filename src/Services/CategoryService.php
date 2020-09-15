@@ -216,7 +216,11 @@ class CategoryService
         );
 
         $foundCategory = $this->findInCategoryTree($tree, $category->branch->toArray());
-        return $foundCategory['children'];
+        if (isset($foundCategory) && isset($foundCategory['children'])) {
+            return $foundCategory['children'];
+        }
+
+        return null;
     }
 
     /**
