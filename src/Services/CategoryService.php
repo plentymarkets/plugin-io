@@ -237,14 +237,12 @@ class CategoryService
         $categoryId = $branch['categoryId'];
 
         foreach ($categoryTree as $category) {
-            $isInBranch = $category['id'] === $branch[$branchKey];
-
-            if ($isInBranch && $category['id'] == $categoryId) {
+            if ($category['id'] !== $branch[$branchKey]) {
+                continue;
+            } elseif ($category['id'] == $categoryId) {
                 $result = $category;
                 break;
-            }
-
-            if ($isInBranch && count($category['children'])) {
+            } elseif (count($category['children'])) {
                 $result = $this->findInCategoryTree($category['children'], $branch, $level + 1);
                 break;
             }
