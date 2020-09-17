@@ -64,18 +64,22 @@ class PropertyNameFilter extends AbstractFilter
         }
 
         $propertyId = $property['propertyId'];
-        $propertyNames = $this->fromMemoryCache("propertyName.$propertyId", function() use ($propertyId, $lang)
-        {
-            return $this->authHelper->processUnguarded(function() use ($propertyId)
+        if(isset($property['name'])) {
+            return $property['name'];
+        } else {
+            $propertyNames = $this->fromMemoryCache("propertyName.$propertyId", function() use ($propertyId, $lang)
             {
-                return $this->propertyRepository->findById($propertyId)->names;
+                return $this->authHelper->processUnguarded(function() use ($propertyId)
+                {
+                    return $this->propertyRepository->findById($propertyId)->names;
+                });
             });
-        });
 
-        $propertyName = $propertyNames->firstWhere('lang', $lang);
-        if(!is_null($propertyName))
-        {
-            return $propertyName->name;
+            $propertyName = $propertyNames->firstWhere('lang', $lang);
+            if(!is_null($propertyName))
+            {
+                return $propertyName->name;
+            }
         }
 
         return "";
@@ -83,26 +87,32 @@ class PropertyNameFilter extends AbstractFilter
 
     public function getPropertySelectionValueName($property, $lang = null)
     {
-        $propertyId       = $property['propertyId'];
-        $selectionValueId = $property['value'];
+        if(is_numeric($property['value'])) {
+            $propertyId       = $property['propertyId'];
+            $selectionValueId = $property['value'];
 
-        if ($lang === null)
-        {
-            $lang = Utils::getLang();
-        }
-
-        if (is_null($this->propertySelectionRepository))
-        {
-            $this->propertySelectionRepository = pluginApp(PropertySelectionRepositoryContract::class);
-        }
-
-        $selectionValues = $this->fromMemoryCache("selectionValues.$propertyId.$lang", function() use ($propertyId, $lang)
-        {
-            return $this->authHelper->processUnguarded(function() use ($propertyId, $lang)
+            if ($lang === null)
             {
-                return $this->propertySelectionRepository->findByProperty($propertyId, $lang);
+                $lang = Utils::getLang();
+            }
+
+            if (is_null($this->propertySelectionRepository))
+            {
+                $this->propertySelectionRepository = pluginApp(PropertySelectionRepositoryContract::class);
+            }
+
+            $selectionValues = $this->fromMemoryCache("selectionValues.$propertyId.$lang", function() use ($propertyId, $lang)
+            {
+                return $this->authHelper->processUnguarded(function() use ($propertyId, $lang)
+                {
+                    return $this->propertySelectionRepository->findByProperty($propertyId, $lang);
+                });
             });
-        });
-        return $selectionValues->firstWhere('id', $selectionValueId)->name;
+            return $selectionValues->firstWhere('id', $selectionValueId)->name;
+        } elseif (strlen($property['value'])) {
+            return $property['value'];
+        }
+
+        return '';
     }
 }
