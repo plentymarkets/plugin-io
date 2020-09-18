@@ -299,6 +299,11 @@ class BasketService
     public function checkBasketItemsLang($language = '')
     {
         $basketItems = $this->getBasketItemsRaw();
+
+        if (count($basketItems) <= 0) {
+            return;
+        }
+
         $basketItemData = $this->getBasketItemData($basketItems, $language);
         $basketItems = $this->addVariationData($basketItems, $basketItemData, true);
 
