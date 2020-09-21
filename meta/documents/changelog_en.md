@@ -1,5 +1,44 @@
 # Release Notes for IO
 
+## v5.0.12 (2020-09-14) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.11...5.0.12" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
+
+### Fixed
+
+- The Twig function `query_string()` now only considers parameters from the URL query.
+- During the creation of an order, the customer wish was not passed on correctly if the customer had aborted the PayPal payment procedure. This behaviour has been fixed.
+- The order history displayed the wrong value of goods if an order had been created that included a customer class rebate. This has been fixed.
+- A notification is now displayed when an invalid gift card is removed from the shopping cart.
+- Under certain circumstances, the SingleItem template could not be detected, which could lead to display errors. This has been fixed.
+- Certain combinations of settings could lead to errors concerning the splitting of item bundles for returns. This has been fixed.
+- In the registration process, it was possible that a contact was created, even if a contradictory error message had been displayed. This behaviour has been fixed.
+
+## v5.0.11 (2020-09-01) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.10...5.0.11" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
+
+### Fixed
+
+- Blog entries of the Callisto blog were not correctly displayed if the route "Page not found" had been activated. This has been fixed.
+
+## v5.0.10 (2020-08-27) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.9...5.0.10" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
+
+### Fixed
+
+- URLs with more than 6 segments are now correctly recognized and displayed as 404 pages.
+
+## v5.0.9 (2020-08-25) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.8...5.0.9" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
+
+### Changed
+
+- The meta title for the item view can now be set to one of the 3 item names using a new setting in the Ceres assistant. This setting also controls which of the item names is used when generating the item URL.
+- The setting **pass through /blog to Callisto** was added to still display the blog from the old CMS despite the active category route.
+
+### Fixed
+
+- Filters were not displayed in the tag search and the sorting did not work correctly. This has been fixed.
+- Due to an error not all data was displayed in the **Order return** widget. This has been fixed.
+- If the setting to split item bundles is active, no error was displayed on the item page if an attempt was made to put more stock of an item into the basket than was available. This behavior has been fixed.
+- On the order confirmation page, it could happen that the wrong sales tax was displayed when paying with a foreign currency. This behavior has been fixed.
+- In the list of shipping profiles, under a certain constellation, it could happen that wrong prices were displayed. This behavior has been fixed.
+
 ## v5.0.8 (2020-08-05) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.7...5.0.8" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
 
 ### Fixed

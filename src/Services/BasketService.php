@@ -514,19 +514,15 @@ class BasketService
                     $basketData['quantity'] = $bundleComponent['quantity'];
                     $basketData['template'] = $data['template'];
 
-                    $this->addDataToBasket($basketData);
+                    $componentData = $this->addDataToBasket($basketData);
+                    if(count($componentData)) {
+                        return $componentData;
+                    }
                 }
-            } else {
-                $this->addDataToBasket($data);
-            }
-        } else {
-            $error = $this->addDataToBasket($data);
-            if (is_array($error) && array_key_exists("code", $error)) {
-                return $error;
+                return [];
             }
         }
-
-        return [];
+        return $this->addDataToBasket($data);
     }
 
     /**
@@ -613,6 +609,7 @@ class BasketService
             );
             return ["code" => $e->getCode()];
         }
+        return [];
     }
 
     /**
@@ -651,11 +648,8 @@ class BasketService
      */
     public function updateBasketItem(int $basketItemId, array $data): array
     {
-        $basket = $this->getBasket();
         $data['id'] = $basketItemId;
-        $basketItem = $this->getBasketItem($basketItemId);
         try {
-            $this->couponService->validateBasketItemUpdate($basket, $data, $basketItem);
             $this->basketItemRepository->updateBasketItem($basketItemId, $data);
         } catch (BasketItemQuantityCheckException $e) {
             $this->getLogger(__CLASS__)->warning(
@@ -721,12 +715,6 @@ class BasketService
      */
     public function deleteBasketItem(int $basketItemId)
     {
-        $basket = $this->getBasket();
-        $basketItem = $this->getBasketItem($basketItemId);
-
-        // Validate and on fail, remove coupon
-        $this->couponService->validateBasketItemDelete($basket, $basketItem);
-
         $this->basketItemRepository->removeBasketItem($basketItemId);
     }
 
