@@ -521,6 +521,12 @@ class ShopUrls
         return $this->getTemplateType() === $routeKey;
     }
 
+    /**
+     * Check if current page is in the list of legal pages.
+     * These contain cancellation rights, cancellation form,
+     * legal disclosure, terms and conditions and privacy
+     * policy.
+     */
     public function isLegalPage()
     {
         $currentRoute = $this->getTemplateType();
