@@ -69,14 +69,17 @@ class LiveShoppingService
 
     public function getLiveShoppingVariations($itemId, $sorting)
     {
-        /** @var SortingHelper $sortingHelper */
-        $sortingHelper = pluginApp(SortingHelper::class);
-
         $itemSearchOptions = [
             'itemId' => $itemId,
-            'sorting' => $sortingHelper->splitPathAndOrder($sorting),
             'resultFields' => $this->buildResultFields()
         ];
+                /** @var SortingHelper $sortingHelper */
+        $sortingHelper = pluginApp(SortingHelper::class);
+
+        $sorting = $sortingHelper->getSorting($sorting);
+        if (is_array($sorting) && count($sorting) == 1) {
+            $itemSearchOptions['sorting'] = ['path' => $sorting[0]['field'], 'order' => $sorting[0]['order']];
+        }
         /** @var ItemSearchService $itemSearchService */
         $itemSearchService = pluginApp(ItemSearchService::class);
         $itemList = $itemSearchService->getResults(

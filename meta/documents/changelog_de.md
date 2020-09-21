@@ -1,5 +1,17 @@
 # Release Notes für IO
 
+## v5.0.12 (2020-09-14) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.11...5.0.12" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
+
+### Behoben 
+
+- Die Twig-Funktion `query_string()` berücksichtig ab sofort nur noch Parameter aus der URL-Query.
+- Beim Anlegen eines Auftrags wurde der Kundenwunsch nicht korrekt weitergereicht, wenn die PayPal-Zahlung abgebrochen wurde. Dieses Verhalten wurde behoben.
+- In der Auftragshistorie wurde ein falscher Warenwert angezeigt, wenn ein Auftrag mit einem Kundenklassenrabatt angelegt wurde. Dies wurde behoben.
+- Ab sofort wird ein entsprechender Hinweis eingeblendet, nachdem ein ungültiger Gutschein aus dem Warenkorb entfernt wurde.
+- Unter bestimmten Umständen wurden SingleItem-Templates nicht richtig erkannt, was zu Darstellungsfehlern führen konne. Dies wurde behoben.
+- Bestimmte Kombinationen von Einstellungen konnten zu Fehlern beim Aufteilen von Artikelpaketen für Retouren führen. Dies wurde behoben.
+- Bei der Registrierung konnte es vorkommen, dass trotz eingeblendeter Fehlermeldung ein Kontakt angelegt wurde. Dieses Verhalten wurde behoben.
+
 ## v5.0.11 (2020-09-01) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.10...5.0.11" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
 
 ### Behoben

@@ -1,5 +1,17 @@
 # Release Notes for IO
 
+## v5.0.12 (2020-09-14) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.11...5.0.12" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
+
+### Fixed
+
+- The Twig function `query_string()` now only considers parameters from the URL query.
+- During the creation of an order, the customer wish was not passed on correctly if the customer had aborted the PayPal payment procedure. This behaviour has been fixed.
+- The order history displayed the wrong value of goods if an order had been created that included a customer class rebate. This has been fixed.
+- A notification is now displayed when an invalid gift card is removed from the shopping cart.
+- Under certain circumstances, the SingleItem template could not be detected, which could lead to display errors. This has been fixed.
+- Certain combinations of settings could lead to errors concerning the splitting of item bundles for returns. This has been fixed.
+- In the registration process, it was possible that a contact was created, even if a contradictory error message had been displayed. This behaviour has been fixed.
+
 ## v5.0.11 (2020-09-01) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.10...5.0.11" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
 
 ### Fixed
