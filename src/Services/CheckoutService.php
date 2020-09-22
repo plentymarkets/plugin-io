@@ -276,11 +276,17 @@ class CheckoutService
             $pattern = mb_substr($pattern, 0, 1) . " " . mb_substr($pattern, 1);
         }
 
+        $symbols = [];
+        foreach($this->getCurrencyList() as $currency) {
+            $symbols[$currency['name']] = $currency['symbol'];
+        }
+
         return [
             "separator_decimal" => $formatter->getSymbol(\NumberFormatter::MONETARY_SEPARATOR_SYMBOL),
             "separator_thousands" => $formatter->getSymbol(\NumberFormatter::MONETARY_GROUPING_SEPARATOR_SYMBOL),
             "number_decimals" => $formatter->getAttribute(\NumberFormatter::FRACTION_DIGITS),
-            "pattern" => $pattern
+            "pattern" => $pattern,
+            "symbols" => $symbols
         ];
     }
 
