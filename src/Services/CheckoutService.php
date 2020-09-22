@@ -99,7 +99,7 @@ class CheckoutService
      * @param CurrencyExchangeRepositoryContract $currencyExchangeRepo
      * @param BasketService $basketService
      * @param SessionStorageRepositoryContract $sessionStorageRepository
-     * @param WebstoreConfigurationService $webstoreConfigurationService
+     * @param WebstoreConfigurationRepositoryContract $webstoreConfigurationRepository
      * @param Dispatcher $dispatcher
      * @param CheckoutRepositoryContract $checkoutRepository
      * @param ContactRepositoryContract $contactRepository
@@ -142,7 +142,8 @@ class CheckoutService
     }
 
     /**
-     * Get the relevant data for the checkout
+     * Get the relevant data for the checkout.
+     *
      * @param bool $retry Try loading checkout again on failure (e.g. problems during calculating totals)
      * @return null|array
      */
@@ -173,7 +174,8 @@ class CheckoutService
     }
 
     /**
-     * Get the current currency from the session
+     * Get the current currency from the session.
+     *
      * @return string
      * @deprecated since 5.0.0 will be removed in 6.0.0
      * @see \Plenty\Modules\Webshop\Contracts\CheckoutRepositoryContract::getCurrency()
@@ -184,8 +186,9 @@ class CheckoutService
     }
 
     /**
-     * Set the current currency from the session
-     * @param string $currency
+     * Set the current currency in the session.
+     *
+     * @param string $currency The currency to be used.
      * @deprecated since 5.0.0 will be removed in 6.0.0
      * @see \Plenty\Modules\Webshop\Contracts\CheckoutRepositoryContract::setCurrency()
      */
@@ -218,6 +221,11 @@ class CheckoutService
     }
 
 
+    /**
+     * Get the name and the symbol for the currently selected currency.
+     *
+     * @return mixed
+     */
     public function getCurrencyData()
     {
         return $this->fromMemoryCache(
@@ -241,6 +249,16 @@ class CheckoutService
         );
     }
 
+    /**
+     * Get all required information about how to display monetary values.
+     *
+     * This contains the configured separators for thousands and decimals,
+     * the number fraction digits and a pattern in the ICU format
+     * describing the format of monetary values.
+     * Also includes a map of currency iso codes and their symbols.
+     *
+     * @return array
+     */
     public function getCurrencyPattern()
     {
         $currency = $this->checkoutRepository->getCurrency();
@@ -291,7 +309,8 @@ class CheckoutService
     }
 
     /**
-     * Get the ID of the current payment method
+     * Get the ID of the current payment method.
+     *
      * @return int
      */
     public function getMethodOfPaymentId()
@@ -321,8 +340,9 @@ class CheckoutService
     }
 
     /**
-     * Set the ID of the current payment method
-     * @param int $methodOfPaymentID
+     * Set the ID of the current payment method.
+     *
+     * @param int $methodOfPaymentID Id of the method of payment to be used.
      */
     public function setMethodOfPaymentId(int $methodOfPaymentID)
     {
@@ -331,8 +351,10 @@ class CheckoutService
     }
 
     /**
-     * Prepare the payment
+     * Prepare the payment.
+     *
      * @return array
+     * @throws \Plenty\Exceptions\ValidationException
      */
     public function preparePayment(): array
     {
@@ -399,7 +421,8 @@ class CheckoutService
     }
 
     /**
-     * List all available payment methods
+     * List all available payment methods.
+     *
      * @return array
      */
     public function getMethodOfPaymentList(): array
@@ -413,7 +436,8 @@ class CheckoutService
     }
 
     /**
-     * List all payment methods available for express checkout
+     * List all payment methods available for express checkout.
+     *
      * @return array
      */
     public function getMethodOfPaymentExpressCheckoutList(): array
@@ -422,7 +446,8 @@ class CheckoutService
     }
 
     /**
-     * Get a list of the payment method data
+     * Get a list of the payment method data.
+     *
      * @return array
      */
     public function getCheckoutPaymentDataList(): array
@@ -464,7 +489,8 @@ class CheckoutService
     }
 
     /**
-     * Get the shipping profile list
+     * Get the list of available shipping profiles.
+     *
      * @return array
      */
     public function getShippingProfileList()
@@ -592,8 +618,9 @@ class CheckoutService
     }
 
     /**
-     * Set the ID of thevcurrent shipping country
-     * @param int $shippingCountryId
+     * Set the id of the current shipping country.
+     *
+     * @param int $shippingCountryId Id of the shipping country to select.
      */
     public function setShippingCountryId(int $shippingCountryId)
     {
@@ -601,7 +628,8 @@ class CheckoutService
     }
 
     /**
-     * Get the ID of the current shipping profile
+     * Get the ID of the current shipping profile.
+     *
      * @return int
      */
     public function getShippingProfileId(): int
@@ -611,8 +639,9 @@ class CheckoutService
     }
 
     /**
-     * Set the ID of the current shipping profile
-     * @param int $shippingProfileId
+     * Set the ID of the current shipping profile.
+     *
+     * @param int $shippingProfileId Id of the shipping profile to select.
      */
     public function setShippingProfileId(int $shippingProfileId)
     {
@@ -620,7 +649,8 @@ class CheckoutService
     }
 
     /**
-     * Get the ID of the current delivery address
+     * Get the ID of the current delivery address.
+     *
      * @return int
      */
     public function getDeliveryAddressId()
@@ -629,8 +659,9 @@ class CheckoutService
     }
 
     /**
-     * Set the ID of the current delivery address
-     * @param int $deliveryAddressId
+     * Set the ID of the current delivery address.
+     *
+     * @param int $deliveryAddressId Id of the address to be used as delivery address when creating an order.
      */
     public function setDeliveryAddressId($deliveryAddressId)
     {
@@ -638,7 +669,9 @@ class CheckoutService
     }
 
     /**
-     * Get the ID of the current invoice address
+     * Get the ID of the current invoice address.
+     * Will return -99 if delivery address is equal to the shipping address.
+     *
      * @return int
      */
     public function getBillingAddressId()
@@ -658,8 +691,9 @@ class CheckoutService
     }
 
     /**
-     * Set the ID of the current invoice address
-     * @param int $billingAddressId
+     * Set the ID of the current invoice address.
+     *
+     * @param int $billingAddressId Id of the address to be used as billing address when creating an order.
      */
     public function setBillingAddressId($billingAddressId)
     {
@@ -668,12 +702,22 @@ class CheckoutService
         }
     }
 
+    /**
+     * Reset the current shipping country to the default defined in the webstore configuration.
+     */
     public function setDefaultShippingCountryId()
     {
         $defaultShippingCountryId = $this->webstoreConfigurationRepository->getDefaultShippingCountryId();
         $this->setShippingCountryId($defaultShippingCountryId);
     }
 
+    /**
+     * Get the maximum days of delivery for each shipping profile.
+     * Result contains an array with shipping profile ids as keys and maximum days of delivery as values.
+     *
+     * @return array
+     * @depreacted use ShippingService::getMaxDeliveryDays() instead.
+     */
     public function getMaxDeliveryDays()
     {
         /** @var ShippingService $shippingService */
@@ -681,6 +725,12 @@ class CheckoutService
         return $shippingService->getMaxDeliveryDays();
     }
 
+    /**
+     * Set the checkout to be readonly.
+     * This will be set from external checkout processes e.g. from third party payment providers.
+     *
+     * @param bool $readonly Enable/disable readonly mode for checkout.
+     */
     public function setReadOnlyCheckout($readonly)
     {
         if ($this->getReadOnlyCheckout() !== $readonly) {
@@ -694,6 +744,12 @@ class CheckoutService
         }
     }
 
+    /**
+     * Check if checkout should display data from external checkout processes in readonly mode.
+     * Any changes on checkout data will set this to false.
+     *
+     * @return bool
+     */
     public function getReadOnlyCheckout()
     {
         $readOnlyCheckout = $this->sessionStorageRepository->getSessionValue(
@@ -703,9 +759,9 @@ class CheckoutService
     }
 
     /**
-     * Returns the given contact wish
+     * Returns the given contact wish from session.
      *
-     * @return mixed
+     * @return string
      */
     public function getContactWish()
     {
