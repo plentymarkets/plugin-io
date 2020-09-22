@@ -29,8 +29,10 @@ class ItemSearchController extends LayoutController
     /**
      * Redirect to new search url from category when search route
      * is enabled and called.
+     *
+     * @param string $tagName tagName from route /tag/tagName convert to search string
      */
-    public function redirectToSearch()
+    public function redirectToSearch($tagName = null)
     {
         if (!is_null($categoryByUrl = $this->checkForExistingCategory())) {
             return $categoryByUrl;
@@ -42,6 +44,6 @@ class ItemSearchController extends LayoutController
         /** @var CategoryController $categoryController */
         $categoryController = pluginApp(CategoryController::class);
 
-        return $categoryController->redirectRoute(RouteConfig::SEARCH, ['query' => $request->get('query', null)]);
+        return $categoryController->redirectRoute(RouteConfig::SEARCH, ['query' => $tagName ?? $request->get('query', null)]);
     }
 }
