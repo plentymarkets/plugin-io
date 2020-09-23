@@ -189,6 +189,11 @@ class CategoryService
         return $children;
     }
 
+    /**
+     * Gets the children of the given categoryId or the current category if no categoryId is given.
+     * @param null $categoryId
+     * @return array|mixed|null
+     */
     public function getCurrentCategoryChildren($categoryId = null)
     {
         $category = $this->getCurrentCategory();
@@ -200,7 +205,6 @@ class CategoryService
             }
         }
 
-        $branches = ArrayHelper::toArray($category->branch);
         /** @var TemplateConfigService $templateConfigService */
         $templateConfigService = pluginApp(TemplateConfigService::class);
 
@@ -211,21 +215,40 @@ class CategoryService
             $this->contactRepository->getContactClassId()
         );
 
-        $children = [];
-        for ($level = 1; $level <= 6; $level++) {
-            if (!is_null($branches) && $branches['category' . $level . 'Id'] > 0) {
-                foreach ($tree as $childrenCategory) {
-                    if ($childrenCategory['id'] === $branches['category' . $level . 'Id']) {
-                        $children = $childrenCategory['children'];
-                        break;
-                    }
-                }
-            } else {
+        $foundCategory = $this->findInCategoryTree($tree, $category->branch->toArray());
+        if (isset($foundCategory) && isset($foundCategory['children'])) {
+            return $foundCategory['children'];
+        }
+
+        return null;
+    }
+
+    /**
+     * Is called recursive to iterate threw category tree and return the category with the given id.
+     * @param $categoryTree
+     * @param array $branch
+     * @param int $level
+     * @return mixed|null
+     */
+    protected function findInCategoryTree($categoryTree, $branch = [], $level = 1)
+    {
+        $result = null;
+        $branchKey = 'category' . $level . 'Id';
+        $categoryId = $branch['categoryId'];
+
+        foreach ($categoryTree as $category) {
+            if ($category['id'] !== $branch[$branchKey]) {
+                continue;
+            } elseif ($category['id'] == $categoryId) {
+                $result = $category;
+                break;
+            } elseif (count($category['children'])) {
+                $result = $this->findInCategoryTree($category['children'], $branch, $level + 1);
                 break;
             }
         }
 
-        return $children;
+        return $result;
     }
 
     /**
