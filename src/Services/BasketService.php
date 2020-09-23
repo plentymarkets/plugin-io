@@ -302,9 +302,18 @@ class BasketService
         return $newParams;
     }
 
+    /**
+     * @param string $language
+     */
     public function checkBasketItemsLang($language = '')
     {
         $basketItems = $this->getBasketItemsRaw();
+
+        // Don't check if no basket items.
+        if (count($basketItems) <= 0) {
+            return;
+        }
+
         $basketItemData = $this->getBasketItemData($basketItems, $language);
         $basketItems = $this->addVariationData($basketItems, $basketItemData, true);
 
