@@ -1,4 +1,4 @@
-<?php //strict
+<?php
 
 namespace IO\Services;
 
@@ -196,25 +196,31 @@ class CheckoutService
 
     public function getCurrencyList()
     {
-        /** @var CurrencyRepositoryContract $currencyRepository */
-        $currencyRepository = pluginApp(CurrencyRepositoryContract::class);
-
-        $currencyList = [];
         /** @var LocalizationRepositoryContract $localizationRepository */
         $localizationRepository = pluginApp(LocalizationRepositoryContract::class);
         $locale = $localizationRepository->getLocale();
 
-        foreach ($currencyRepository->getCurrencyList() as $currency) {
-            $formatter = numfmt_create(
-                $locale . "@currency=" . $currency->currency,
-                \NumberFormatter::CURRENCY
-            );
-            $currencyList[] = [
-                "name" => $currency->currency,
-                "symbol" => $formatter->getSymbol(\NumberFormatter::CURRENCY_SYMBOL)
-            ];
-        }
-        return $currencyList;
+        return $this->fromMemoryCache(
+            'currencyList'.$locale,
+            function () use ($locale) {
+                /** @var CurrencyRepositoryContract $currencyRepository */
+                $currencyRepository = pluginApp(CurrencyRepositoryContract::class);
+
+                $currencyList = [];
+
+                foreach ($currencyRepository->getCurrencyList() as $currency) {
+                    $formatter = numfmt_create(
+                        $locale . "@currency=" . $currency->currency,
+                        \NumberFormatter::CURRENCY
+                    );
+                    $currencyList[] = [
+                        "name" => $currency->currency,
+                        "symbol" => $formatter->getSymbol(\NumberFormatter::CURRENCY_SYMBOL)
+                    ];
+                }
+                return $currencyList;
+            }
+        );
     }
 
 
@@ -523,7 +529,7 @@ class CheckoutService
                 if (!is_null($order)) {
                     $isNet = $order->isNet;
                 }
-                if (($isNet && !(bool)$accountSettings->showShippingVat) ||  (!$isNet && $showNetPrice)) {
+                if (($isNet && !(bool)$accountSettings->showShippingVat) || (!$isNet && $showNetPrice)) {
                     $maxVatValue = $this->basketService->getMaxVatValue();
 
                     if (is_array($list)) {
@@ -703,7 +709,7 @@ class CheckoutService
      */
     public function getContactWish()
     {
-       return $this->sessionStorageRepository->getSessionValue(
+        return $this->sessionStorageRepository->getSessionValue(
             SessionStorageRepositoryContract::ORDER_CONTACT_WISH
         );
     }
