@@ -24,6 +24,8 @@ use Plenty\Modules\Webshop\Contracts\ContactRepositoryContract;
 use Plenty\Modules\Webshop\Contracts\LocalizationRepositoryContract;
 use Plenty\Modules\Webshop\Contracts\SessionStorageRepositoryContract;
 use Plenty\Modules\Webshop\Contracts\WebstoreConfigurationRepositoryContract;
+use Plenty\Modules\Webshop\Template\Contracts\TemplateConfigRepositoryContract;
+use Plenty\Modules\Webshop\Template\Repositories\TemplateConfigRepository;
 use Plenty\Plugin\ConfigRepository;
 use Plenty\Plugin\Events\Dispatcher;
 use Plenty\Plugin\Log\Loggable;
@@ -209,17 +211,23 @@ class CheckoutService
                 /** @var CurrencyRepositoryContract $currencyRepository */
                 $currencyRepository = pluginApp(CurrencyRepositoryContract::class);
 
+                /** @var TemplateConfigService $templateConfigService */
+                $templateConfigService = pluginApp(TemplateConfigService::class);
+                $activeCurrencies = explode(', ', $templateConfigService->get('currency.available_currencies', 'all'));
+
                 $currencyList = [];
 
                 foreach ($currencyRepository->getCurrencyList() as $currency) {
-                    $formatter = numfmt_create(
-                        $locale . "@currency=" . $currency->currency,
-                        \NumberFormatter::CURRENCY
-                    );
-                    $currencyList[] = [
-                        "name" => $currency->currency,
-                        "symbol" => $formatter->getSymbol(\NumberFormatter::CURRENCY_SYMBOL)
-                    ];
+                    if (in_array($currency->currency, $activeCurrencies) || in_array('all', $activeCurrencies)) {
+                        $formatter = numfmt_create(
+                            $locale . "@currency=" . $currency->currency,
+                            \NumberFormatter::CURRENCY
+                        );
+                        $currencyList[] = [
+                            "name" => $currency->currency,
+                            "symbol" => $formatter->getSymbol(\NumberFormatter::CURRENCY_SYMBOL)
+                        ];
+                    }
                 }
                 return $currencyList;
             }
