@@ -47,6 +47,8 @@ class VariationResource extends ApiResource
             ]
         );
 
+        $searchFactory->withPropertyGroups();
+
         $resultFieldTemplate = $this->request->get('resultFieldTemplate', '');
         if (strlen($resultFieldTemplate)) {
             $searchFactory->withResultFields(
