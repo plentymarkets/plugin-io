@@ -376,8 +376,8 @@ class IORouteServiceProvider extends RouteServiceProvider
                 ->where('itemId', '[0-9]+')
                 ->where('variationId', '[0-9]+');
 
-            $router->get('{slug}_{itemId}_{variationId?}', 'IO\Controllers\ItemController@showItem')
-                ->where('slug', '[^_]+')
+            $router->get('{slug}{itemId}_{variationId?}', 'IO\Controllers\ItemController@showItem')
+                ->where('slug', '[^_]*[^\/]_')
                 ->where('itemId', '[0-9]+')
                 ->where('variationId', '[0-9]+');
 
