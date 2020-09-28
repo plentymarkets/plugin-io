@@ -24,8 +24,6 @@ use Plenty\Modules\Webshop\Contracts\ContactRepositoryContract;
 use Plenty\Modules\Webshop\Contracts\LocalizationRepositoryContract;
 use Plenty\Modules\Webshop\Contracts\SessionStorageRepositoryContract;
 use Plenty\Modules\Webshop\Contracts\WebstoreConfigurationRepositoryContract;
-use Plenty\Modules\Webshop\Template\Contracts\TemplateConfigRepositoryContract;
-use Plenty\Modules\Webshop\Template\Repositories\TemplateConfigRepository;
 use Plenty\Plugin\ConfigRepository;
 use Plenty\Plugin\Events\Dispatcher;
 use Plenty\Plugin\Log\Loggable;
