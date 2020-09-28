@@ -54,6 +54,9 @@ class CountryService
                 self::$activeCountries[$lang][] = $country;
             }
         }
+        // sort Country List
+        $column = array_column(self::$activeCountries[$lang], "currLangName");
+        array_multisort($column, SORT_ASC, SORT_LOCALE_STRING, self::$activeCountries[$lang]);
 
         return self::$activeCountries[$lang];
     }
