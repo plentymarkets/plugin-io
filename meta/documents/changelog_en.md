@@ -4,7 +4,7 @@
 
 ### Added 
 
-- The class `ShpUrls` now includes the function `isLegalPage`. This function states whether the current page is a legal page, such as the cancellation rights or the terms and conditions.
+- The class `ShopUrls` now includes the function `isLegalPage`. This function states whether the current page is a legal page, such as the cancellation rights or the terms and conditions.
 
 ### Fixed
 
