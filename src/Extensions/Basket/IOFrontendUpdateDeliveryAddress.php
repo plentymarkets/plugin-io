@@ -7,6 +7,13 @@ use IO\Services\CheckoutService;
 use IO\Services\CustomerService;
 use Plenty\Modules\Frontend\Events\FrontendUpdateDeliveryAddress;
 
+// TODO When the class is moved into the core package, make sure this hook is processed after the current internal hooks
+
+/**
+ * Class IOFrontendUpdateDeliveryAddress
+ *
+ * Set the delivery address to basket and session object
+ */
 class IOFrontendUpdateDeliveryAddress
 {
     public function handle(FrontendUpdateDeliveryAddress $event)
