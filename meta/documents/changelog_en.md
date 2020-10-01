@@ -1,5 +1,18 @@
 # Release Notes for IO
 
+## v5.0.13 (2020-09-28) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.12...5.0.13" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
+
+### Added 
+
+- The class `ShopUrls` now includes the function `isLegalPage`. This function states whether the current page is a legal page, such as the cancellation rights or the terms and conditions.
+
+### Fixed
+
+- The step-by-step navigation calculated incorrect values. As a result, the "Load more" button was not always displayed. This has been fixed.
+- The selected sorting was not working properly in the live shopping widget. This behaviour has been fixed.
+- Due to an error, gross prices were displayed for export deliveries upon initial access of the online store. This has been fixed.
+- When accessing the route `/tag/tagname`, **tagName** was not added as a query parameter for the ShopBuilder search results page. This behaviour has been fixed.
+
 ## v5.0.12 (2020-09-14) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.11...5.0.12" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
 
 ### Fixed
