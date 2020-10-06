@@ -43,11 +43,10 @@ class VariationResource extends ApiResource
                 'sortingOrder' => $this->request->get('sortingOrder'),
                 'page' => $this->request->get('page'),
                 'itemsPerPage' => $this->request->get('itemsPerPage'),
-                'setPriceOnly' => $this->request->get('setPriceOnly') === 'true'
+                'setPriceOnly' => $this->request->get('setPriceOnly') === 'true',
+                'withVariationPropertyGroups' => true
             ]
         );
-
-        $searchFactory->withPropertyGroups();
 
         $resultFieldTemplate = $this->request->get('resultFieldTemplate', '');
         if (strlen($resultFieldTemplate)) {
