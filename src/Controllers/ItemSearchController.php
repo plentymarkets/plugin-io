@@ -41,6 +41,7 @@ class ItemSearchController extends LayoutController
         /** @var Request $request */
         $request = pluginApp(Request::class);
 
+        $params = [];
         if(!is_null($tagName)) {
             $params['query'] = $tagName;
         } else {
