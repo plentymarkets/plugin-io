@@ -40,10 +40,12 @@ class ItemSearchController extends LayoutController
 
         /** @var Request $request */
         $request = pluginApp(Request::class);
-        $params = $request->query();
-        unset($params['plentyMarkets']);
+
         if(!is_null($tagName)) {
             $params['query'] = $tagName;
+        } else {
+            $params = $request->query();
+            unset($params['plentyMarkets']);
         }
 
         /** @var CategoryController $categoryController */
