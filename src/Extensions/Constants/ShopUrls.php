@@ -456,58 +456,66 @@ class ShopUrls
      */
     public function getTemplateType()
     {
-        /** @var Request $request */
-        $request = pluginApp(Request::class);
+        return $this->fromMemoryCache('templateType', function() {
 
-        if ($request->has('templateType')) {
-            // template type is explicitly set via request param
-            return $request->get('templateType');
-        }
+            /** @var Request $request */
+            $request = pluginApp(Request::class);
 
-        /** @var ShopBuilderRequest $shopBuilderRequest */
-        $shopBuilderRequest = pluginApp(ShopBuilderRequest::class);
-        if($shopBuilderRequest->isShopBuilder() && ($previewType = $shopBuilderRequest->getPreviewContentType()) !== null) {
-            $previewTypeMap = [
-                'content' => RouteConfig::CATEGORY,
-                'checkout' => RouteConfig::CHECKOUT,
-                'myaccount' => RouteConfig::MY_ACCOUNT,
-                'singleitem' => RouteConfig::ITEM,
-                'categoryitem' => RouteConfig::CATEGORY,
-                'itemsearch' => RouteConfig::SEARCH,
-                'itemset' => RouteConfig::ITEM,
-            ];
+            /** @var ShopBuilderRequest $shopBuilderRequest */
+            $shopBuilderRequest = pluginApp(ShopBuilderRequest::class);
 
-            return $previewTypeMap[$previewType] ?? RouteConfig::CATEGORY;
-        }
-
-        // detect template type from request uri
-        $url = Utils::makeRelativeUrl(
-            explode('?', $request->getRequestUri())[0],
-            $this->includeLanguage
-        );
-
-        if (!strlen($url) || $url === '/') {
-            return RouteConfig::HOME;
-        }
-
-        foreach (RouteConfig::ALL as $routeKey) {
-            if ($this->equals($url, $this->getShopUrl($routeKey))) {
-                // current page is a special linked page
-                return $routeKey;
+            if ($request->has('templateType')) {
+                // template type is explicitly set via request param
+                return $request->get('templateType');
             }
-        }
 
-        // match url pattern
-        if (preg_match('/(?:a\-\d+|_\d+|_\d+_\d+)\/?$/m', $url) === 1) {
-            return RouteConfig::ITEM;
-        } elseif (preg_match('/_t\d+\/?$/m', $url) === 1) {
-            return RouteConfig::TAGS;
-        } elseif (preg_match('/confirmation\/\d+\/([A-Za-z]|\d)+\/?/m', $url) === 1) {
-            return RouteConfig::CONFIRMATION;
-        }
+            // detect template type from request uri
+            $url = Utils::makeRelativeUrl(
+                explode('?', $request->getRequestUri())[0],
+                $this->includeLanguage
+            );
 
-        // template type cannot be determined
-        return RouteConfig::CATEGORY;
+            if($shopBuilderRequest->isShopBuilder() && ($previewUri = $shopBuilderRequest->getPreviewUri()) !== null) {
+                $url = Utils::makeRelativeUrl($previewUri, $this->includeLanguage);
+            }
+
+            if (!strlen($url) || $url === '/') {
+                return RouteConfig::HOME;
+            }
+
+            foreach (RouteConfig::ALL as $routeKey) {
+                if ($this->equals($url, $this->getShopUrl($routeKey))) {
+                    // current page is a special linked page
+                    return $routeKey;
+                }
+            }
+
+            // match url pattern
+            if (preg_match('/(?:a\-\d+|_\d+|_\d+_\d+)\/?$/m', $url) === 1) {
+                return RouteConfig::ITEM;
+            } elseif (preg_match('/_t\d+\/?$/m', $url) === 1) {
+                return RouteConfig::TAGS;
+            } elseif (preg_match('/confirmation\/\d+\/([A-Za-z]|\d)+\/?/m', $url) === 1) {
+                return RouteConfig::CONFIRMATION;
+            }
+
+            if($shopBuilderRequest->isShopBuilder() && ($previewType = $shopBuilderRequest->getPreviewContentType()) !== null) {
+                $previewTypeMap = [
+                    'content' => RouteConfig::CATEGORY,
+                    'checkout' => RouteConfig::CHECKOUT,
+                    'myaccount' => RouteConfig::MY_ACCOUNT,
+                    'singleitem' => RouteConfig::ITEM,
+                    'categoryitem' => RouteConfig::CATEGORY,
+                    'itemsearch' => RouteConfig::SEARCH,
+                    'itemset' => RouteConfig::ITEM,
+                ];
+
+                return $previewTypeMap[$previewType] ?? RouteConfig::CATEGORY;
+            }
+
+            // template type cannot be determined
+            return RouteConfig::CATEGORY;
+        });
     }
 
     /**
