@@ -1,5 +1,57 @@
 # Release Notes für IO
 
+## v5.0.13 (2020-09-28) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.12...5.0.13" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
+
+### Hinzugefügt
+
+- Die Klasse `ShopUrls` wurde um die Funktion `isLegalPage` erweitert. Diese Funktion gibt an, ob man sich auf einer rechtlichen Seite befindet.
+
+### Behoben
+
+- Es wurden falsche Werte in der Step-By-Step-Navigation berechnet. Dies führte dazu, dass die "Mehr laden"-Schaltfläche nicht immer korrekt angezeigt wurde. Dies wurde behoben.
+- Im Live-Shopping-Widget funktionierte die eingestellte Sortierung nicht richtig. Dieses Verhalten wurde behoben.
+- Bei Ausfuhrlieferungen wurden beim ersten Aufruf des Webshops fälschlicherweise Brutto-Preise angezeigt. Dies wurde behoben.
+- Bei Aufrufen der Route `/tag/tagName` wurde **tagName** nicht als Suchparameter an die ShopBuilder-Suchergebnisseite angehangen. Dieses Verhalten wurde behoben.
+
+## v5.0.12 (2020-09-14) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.11...5.0.12" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
+
+### Behoben 
+
+- Die Twig-Funktion `query_string()` berücksichtig ab sofort nur noch Parameter aus der URL-Query.
+- Beim Anlegen eines Auftrags wurde der Kundenwunsch nicht korrekt weitergereicht, wenn die PayPal-Zahlung abgebrochen wurde. Dieses Verhalten wurde behoben.
+- In der Auftragshistorie wurde ein falscher Warenwert angezeigt, wenn ein Auftrag mit einem Kundenklassenrabatt angelegt wurde. Dies wurde behoben.
+- Ab sofort wird ein entsprechender Hinweis eingeblendet, nachdem ein ungültiger Gutschein aus dem Warenkorb entfernt wurde.
+- Unter bestimmten Umständen wurden SingleItem-Templates nicht richtig erkannt, was zu Darstellungsfehlern führen konne. Dies wurde behoben.
+- Bestimmte Kombinationen von Einstellungen konnten zu Fehlern beim Aufteilen von Artikelpaketen für Retouren führen. Dies wurde behoben.
+- Bei der Registrierung konnte es vorkommen, dass trotz eingeblendeter Fehlermeldung ein Kontakt angelegt wurde. Dieses Verhalten wurde behoben.
+
+## v5.0.11 (2020-09-01) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.10...5.0.11" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
+
+### Behoben
+
+- Beiträge des Callisto-Blogs wurden nicht korrekt angezeigt, wenn die Route "Seite nicht gefunden" aktiviert war. Dies wurde behoben.
+
+## v5.0.10 (2020-08-27) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.9...5.0.10" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
+
+### Behoben
+
+- URLs mit mehr als 6 Segmenten werden nun korrekt erkannt und als 404-Seite dargestellt.
+
+## v5.0.9 (2020-08-25) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.8...5.0.9" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
+
+### Geändert
+
+- Der Meta-Titel für die Artikelansicht kann jetzt mit einer neuen Einstellung im Ceres-Assistenten auf einen der 3 Artikelnamen festgelegt werden. Diese Einstellung steuert auch, welcher der Artikelnamen beim Generieren der Artikel-URL verwendet wird.
+- Es wurde die Einstellung **/blog in Callisto darstellen** hinzugefügt, um trotz aktiver Kategorie-Route weiterhin den Blog aus dem alten CMS anzuzeigen.
+
+### Behoben
+
+- Bei der Tag-Suche wurden die Filter nicht angezeigt. Zudem hat die Sortierung nicht korrekt funktioniert. Dies wurde behoben.
+- Durch einen Fehler wurden nicht alle Daten im **Retouren**-Widget angezeigt. Dies wurde behoben.
+- Bei aktiver Einstellung, dass Artikelpakete aufgeteilt werden sollen, wurde auf der Artikelseite kein Fehler ausgegeben, wenn versucht wurde, mehr Bestand eines Artikels in den Warenkorb zu legen als verfügbar war. Das Verhalten wurde behoben.
+- Auf der Bestellbestätigungsseite konnte es dazu kommen, dass bei Bezahlung mit einer Fremdwährung die falsche Umsatzsteuer angezeigt wurde. Das Verhalten wurde behoben.
+- In der Liste der Versandprofile konnte es unter einer bestimmten Konstellation dazu kommen, dass falsche Preise angezeigt wurden. Das Verhalten wurde behoben.
+
 ## v5.0.8 (2020-08-05) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.7...5.0.8" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
 
 ### Behoben

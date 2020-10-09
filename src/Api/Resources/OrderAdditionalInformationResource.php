@@ -1,8 +1,7 @@
-<?php //strict
+<?php
 
 namespace IO\Api\Resources;
 
-use IO\Services\SessionStorageService;
 use Plenty\Modules\Webshop\Contracts\SessionStorageRepositoryContract;
 use Plenty\Plugin\Http\Response;
 use Plenty\Plugin\Http\Request;
@@ -12,6 +11,7 @@ use IO\Api\ResponseCode;
 
 /**
  * Class OrderAdditionalInformationResource
+ *
  * @package IO\Api\Resources
  */
 class OrderAdditionalInformationResource extends ApiResource
@@ -38,16 +38,20 @@ class OrderAdditionalInformationResource extends ApiResource
         return $this->response->create('', ResponseCode::CREATED);
     }
 
+    /**
+     * Set the contact wish from the request
+     */
     private function setContactWish()
     {
         $orderContactWish = $this->request->get('orderContactWish', '');
 
-        if (strlen($orderContactWish)) {
-            $this->sessionStorageRepository->setSessionValue(
-                SessionStorageRepositoryContract::ORDER_CONTACT_WISH,
-                $orderContactWish
-            );
+        if (!strlen($orderContactWish)) {
+            $orderContactWish = null;
         }
+        $this->sessionStorageRepository->setSessionValue(
+            SessionStorageRepositoryContract::ORDER_CONTACT_WISH,
+            $orderContactWish
+        );
     }
 
     private function setCustomerSign()

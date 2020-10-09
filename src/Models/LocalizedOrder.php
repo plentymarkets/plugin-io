@@ -172,13 +172,19 @@ class LocalizedOrder extends ModelWrapper
         }
 
         $resultFields = ResultFieldTemplate::load(ResultFieldTemplate::TEMPLATE_LIST_ITEM);
+        /**
+         * TODO replace with order item template in upcoming version
+         */
         foreach (
             [
                 'attributes.attribute.names.*',
                 'attributes.value.names.*',
                 'images.all.urlPreview',
                 'images.variation.urlPreview',
-                'variationProperties.*'
+                'variationProperties.*',
+                'variation.number',
+                'texts.description',
+                'texts.shortDescription'
             ] as $field
         ) {
             if (!in_array($field, $resultFields)) {

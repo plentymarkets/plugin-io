@@ -2,6 +2,7 @@
 
 namespace IO\Providers;
 
+use Illuminate\Support\MessageBag;
 use IO\Config\IOConfig;
 use IO\Events\Basket\BeforeBasketItemToOrderItem;
 use IO\Extensions\Basket\IOFrontendShippingProfileChanged;
@@ -57,6 +58,7 @@ use IO\Services\TemplateConfigService;
 use IO\Services\TemplateService;
 use IO\Services\UnitService;
 use IO\Services\UrlService;
+use Plenty\Exceptions\ValidationException;
 use Plenty\Modules\Authentication\Events\AfterAccountAuthentication;
 use Plenty\Modules\Authentication\Events\AfterAccountContactLogout;
 use Plenty\Modules\Basket\Events\Basket\AfterBasketChanged;
@@ -221,10 +223,17 @@ class IOServiceProvider extends ServiceProvider
 
         $dispatcher->listen(
             AfterBasketChanged::class,
-            function ($event) {
+            function (/** @var AfterBasketChanged $event */ $event) {
                 /** @var CheckoutService $checkoutService */
                 $checkoutService = pluginApp(CheckoutService::class);
                 $checkoutService->setReadOnlyCheckout(false);
+
+                if(($error = $event->getCouponValidationError()) instanceof ValidationException) {
+                    $messageBag = $error->getMessageBag();
+                    /** @var NotificationService $notificationService */
+                    $notificationService = pluginApp(NotificationService::class);
+                    $notificationService->warn($messageBag->first(), 1000 + $messageBag->keys()[0]);
+                }
             }
         );
 

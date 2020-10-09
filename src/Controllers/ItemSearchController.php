@@ -29,8 +29,10 @@ class ItemSearchController extends LayoutController
     /**
      * Redirect to new search url from category when search route
      * is enabled and called.
+     *
+     * @param string $tagName tagName from route /tag/tagName convert to search string
      */
-    public function redirectToSearch()
+    public function redirectToSearch($tagName = null)
     {
         if (!is_null($categoryByUrl = $this->checkForExistingCategory())) {
             return $categoryByUrl;
@@ -39,9 +41,17 @@ class ItemSearchController extends LayoutController
         /** @var Request $request */
         $request = pluginApp(Request::class);
 
+        $params = [];
+        if(!is_null($tagName)) {
+            $params['query'] = $tagName;
+        } else {
+            $params = $request->query();
+            unset($params['plentyMarkets']);
+        }
+
         /** @var CategoryController $categoryController */
         $categoryController = pluginApp(CategoryController::class);
 
-        return $categoryController->redirectRoute(RouteConfig::SEARCH, ['query' => $request->get('query', null)]);
+        return $categoryController->redirectRoute(RouteConfig::SEARCH, $params);
     }
 }

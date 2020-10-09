@@ -61,13 +61,12 @@ class ItemNameFilter extends AbstractFilter
         $itemTexts = $itemData['texts'];
         $variationName = $itemData['variation']['name'];
 
-        $showName = '';
-
-        if ($configName === '1' && strlen($itemTexts['name2']))
+        $configName = intval($configName);
+        if ($configName === 1 && strlen($itemTexts['name2']))
         {
             $showName = $itemTexts['name2'];
         }
-        elseif ($configName === '2' && strlen($itemTexts['name3']))
+        elseif ($configName === 2 && strlen($itemTexts['name3']))
         {
             $showName = $itemTexts['name3'];
         }

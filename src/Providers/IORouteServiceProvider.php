@@ -376,8 +376,8 @@ class IORouteServiceProvider extends RouteServiceProvider
                 ->where('itemId', '[0-9]+')
                 ->where('variationId', '[0-9]+');
 
-            $router->get('{slug}_{itemId}_{variationId?}', 'IO\Controllers\ItemController@showItem')
-                ->where('slug', '[^_]+')
+            $router->get('{slug}{itemId}_{variationId?}', 'IO\Controllers\ItemController@showItem')
+                ->where('slug', '[^_]*[^\/]_')
                 ->where('itemId', '[0-9]+')
                 ->where('variationId', '[0-9]+');
 
@@ -399,15 +399,28 @@ class IORouteServiceProvider extends RouteServiceProvider
         }
 
         // CATEGORY ROUTES
-        if ( RouteConfig::isActive(RouteConfig::CATEGORY) )
+        if ( RouteConfig::isActive(RouteConfig::CATEGORY))
         {
-            $router->get('{level1?}/{level2?}/{level3?}/{level4?}/{level5?}/{level6?}', 'IO\Controllers\CategoryController@showCategory');
+            $categoryRoute = $router->get('{level1?}/{level2?}/{level3?}/{level4?}/{level5?}/{level6?}', 'IO\Controllers\CategoryController@showCategory');
+
+            if (RouteConfig::passThroughBlogRoutes()) {
+                // do not catch legacy blog-routes
+                $categoryRoute->where('level1', '(?:(?!blog)[^\/]*|[^\/]*(?<!blog))');
+            }
         }
 
         // NOT FOUND
         if ( RouteConfig::isActive(RouteConfig::PAGE_NOT_FOUND) )
         {
-            $router->get('{anything?}', 'IO\Controllers\StaticPagesController@showPageNotFound');
+            $fallbackRoute = $router->get('{level1?}/{anything?}', 'IO\Controllers\StaticPagesController@showPageNotFound');
+            if (RouteConfig::passThroughBlogRoutes()) {
+                // do not catch legacy blog-routes
+                $fallbackRoute
+                    ->where('level1', '(?:(?!blog)[^\/]*|[^\/]*(?<!blog))')
+                    ->where('anything', '.*');
+            } else {
+                $fallbackRoute->where('level1', '.*');
+            }
         }
 	}
 

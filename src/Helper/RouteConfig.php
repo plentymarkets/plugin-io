@@ -6,6 +6,11 @@ use Plenty\Plugin\ConfigRepository;
 
 class RouteConfig
 {
+    /*
+     * Constants representing a single route.
+     * Each route might be enabled/disabled by the plugin config.
+     * Use this constants to check the type of the currently displayed page by using ShopUrls::is().
+     */
     const BASKET                    = "basket";
     const CANCELLATION_RIGHTS       = "cancellation-rights";
     const CANCELLATION_FORM         = "cancellation-form";
@@ -69,6 +74,10 @@ class RouteConfig
     private static $enabledRoutes = null;
     private static $overrides = [];
 
+    /**
+     * Get all enabled routes from the plugin config.
+     * @return array
+     */
     public static function getEnabledRoutes()
     {
         if ( is_null(self::$enabledRoutes) )
@@ -90,6 +99,13 @@ class RouteConfig
         return self::$enabledRoutes;
     }
 
+    /**
+     * Check if a route is enabled and no category is linked for this page.
+     * If true the default route should be registered in the route service provider.
+     *
+     * @param string $route The route to check active state for.
+     * @return bool
+     */
     public static function isActive( $route )
     {
         self::getEnabledRoutes();
@@ -97,6 +113,13 @@ class RouteConfig
             && self::getCategoryId( $route ) === 0;
     }
 
+    /**
+     * Get the id of the category linked to a specific route.
+     * Returns 0 if no category is linked.
+     *
+     * @param string $route The route to get the linked category id for.
+     * @return int
+     */
     public static function getCategoryId( $route )
     {
         if ( array_key_exists( $route, self::$overrides ) )
@@ -107,8 +130,28 @@ class RouteConfig
         return (int) $config->get('IO.routing.category_' . $route, 0);
     }
 
+    /**
+     * Override the currently linked category id for a specific route.
+     * This is used by the shopbuilder to preview a category in a special context.
+     *
+     * @param string $route The route to override the linked category for.
+     * @param int $categoryId The id of the category to override.
+     */
     public static function overrideCategoryId( $route, $categoryId )
     {
         self::$overrides[$route] = $categoryId;
+    }
+
+    /**
+     * Check if blog routes should be recognized by the route service provider or not.
+     * If true it should pass requests to blog routes to the old CMS.
+     *
+     * @return bool
+     */
+    public static function passThroughBlogRoutes()
+    {
+        $config = pluginApp(ConfigRepository::class);
+        $value = $config->get('IO.routing.pass_through_blog');
+        return $value === "true" || $value === "1" || $value === 1;
     }
 }

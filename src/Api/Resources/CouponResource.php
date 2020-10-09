@@ -29,9 +29,12 @@ class CouponResource extends ApiResource
          * @var CouponService $couponService
          */
         $couponService = pluginApp(CouponService::class);
-        $response = $couponService->setCoupon($couponCode);
-        
-        return $this->response->create( $response, ResponseCode::CREATED );
+        try {
+            $response = $couponService->setCoupon($couponCode);
+            return $this->response->create( $response, ResponseCode::CREATED );
+        } catch (\Exception $e) {
+            return $this->response->create( null, Response::HTTP_UNPROCESSABLE_ENTITY);
+        }
     }
     
     public function destroy(string $selector):Response

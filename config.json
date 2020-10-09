@@ -312,6 +312,14 @@
                             }
                         ]
                     }
+                },
+                "routing.pass_through_blog": {
+                    "type": "checkBox",
+                    "required": false,
+                    "label": "Config.routingPassThroughBlog",
+                    "options": {
+                        "defaultValue": "false"
+                    }
                 }
             }
         }
