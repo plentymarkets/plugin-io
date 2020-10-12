@@ -55,7 +55,12 @@ class NumberFormatFilter extends AbstractFilter
      */
     public function formatDateTime($value):string
     {
-        return $this->numberFormatter->formatDateTime($value);
+        if(strpos($value, '+') === false && !is_object($value))
+        {
+            $value = str_replace(' ', '+', $value);
+        }
+
+        return $value;
     }
 
     /**
@@ -65,7 +70,7 @@ class NumberFormatFilter extends AbstractFilter
      */
     public function trimNewlines($value):string
     {
-        return $this->numberFormatter->trimNewlines($value);
+        return preg_replace('/\s+/', '', $value);
     }
 
     /**
