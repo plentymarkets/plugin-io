@@ -273,22 +273,22 @@ class BasketService
 
     private function removeInactiveBasketItems($basketItems = [])
     {
-        $deleted = false;
+        $items = [];
         foreach ($basketItems as $basketItem) {
             if (is_null($basketItem['variation'])) {
-                $this->basketItemRepository->removeBasketItem($basketItem['id']);
-                unset($basketItems[array_search($basketItem, $basketItems)]);
-                $deleted = true;
+                $this->basketItemRepository->removeBasketItem($basketItem['id'], false);
+            } else {
+                $items[] = $basketItem;
             }
         }
 
-        if ($deleted) {
+        if (count($items) != count($basketItems)) {
             /** @var Dispatcher $pluginEventDispatcher */
             $pluginEventDispatcher = pluginApp(Dispatcher::class);
             $pluginEventDispatcher->fire(pluginApp(AfterBasketChanged::class), []);
         }
-        
-        return array_values($basketItems);
+
+        return $items;
     }
 
     private function getSortedBasketItemOrderParams($basketItem): array
