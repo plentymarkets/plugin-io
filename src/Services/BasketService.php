@@ -264,7 +264,31 @@ class BasketService
             $basketItems
         );
 
+        if ($appendItemData) {
+            $basketItems = $this->removeInactiveBasketItems($basketItems);
+        }
+
         return $basketItems;
+    }
+
+    private function removeInactiveBasketItems($basketItems = [])
+    {
+        $items = [];
+        foreach ($basketItems as $basketItem) {
+            if (is_null($basketItem['variation'])) {
+                $this->basketItemRepository->removeBasketItem($basketItem['id'], false);
+            } else {
+                $items[] = $basketItem;
+            }
+        }
+
+        if (count($items) != count($basketItems)) {
+            /** @var Dispatcher $pluginEventDispatcher */
+            $pluginEventDispatcher = pluginApp(Dispatcher::class);
+            $pluginEventDispatcher->fire(pluginApp(AfterBasketChanged::class), []);
+        }
+
+        return $items;
     }
 
     private function getSortedBasketItemOrderParams($basketItem): array
