@@ -2,14 +2,9 @@
 
 ## v5.0.14 (2020-10-20) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.13...5.0.14" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
 
-### Hinzugefügt
-
-
 ### Geändert
 
 - Die Performanz der Events für zusätzliche Sortierungen wurde verbessert.
-
-
 
 ### Behoben
 
@@ -18,6 +13,7 @@
 - Beim Sprachwechsel im Checkout und Mein Konto-Bereich wurden Besucher auf die Startseite geleitet. Dies wurde behoben. Ab sofort werden Besucher beim Sprachwechsel auf die entsprechende Seite weitergeleitet, sofern diese Seite für diese Sprache übersetzt ist.
 - Es kam zu einer falschen Darstellung der Summen, wenn sich ein inaktiver Artikel im Warenkorb befand. Dieses Verhalten wurde behoben.
 - Unter bestimmten Umständen wurde die Eingabe von Firmenadressen nicht korrekt validiert, obwohl alle Eingabefelder korrekt ausgefüllt waren. Dieses Verhalten wurde behoben.
+- Der Erkennung des Template-Typs im ShopBuilder wurde korrigiert.
 
 ## v5.0.13 (2020-09-28) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.12...5.0.13" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
 
