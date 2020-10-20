@@ -2,12 +2,9 @@
 
 ## v5.0.14 (2020-10-20) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.13...5.0.14" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
 
-### Added
-
 ### Changed
 
 - The performance of events for additional sorting has been improved.
-
 
 ### Fixed
 
@@ -16,13 +13,7 @@
 - Users who changed the language in the checkout or my account area were redirected to the homepage. This has been fixed. From now on, users who change the language are redirected to the corresponding page as long as this page has been translated for the language.
 - If the shopping cart contained an inactive item, incorrect totals were displayed. This behaviour has been fixed.
 - Under certain circumstances, company addresses were not correctly validated, even though all input fields had been filled out correctly. This behaviour has been fixed.
-
-
-
-
-
-
-
+- The recognition of the template type in the ShopBuilder has been corrected.
 
 ## v5.0.13 (2020-09-28) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.12...5.0.13" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
 
