@@ -125,7 +125,10 @@ class UrlService
                     return null;
                 }
 
-                if (substr(TemplateService::$currentTemplate, 0, 12) === 'tpl.category') {
+                if (substr(TemplateService::$currentTemplate, 0, 12) === 'tpl.category' ||
+                    substr(TemplateService::$currentTemplate, 0, 12) === 'tpl.checkout' ||
+                    substr(TemplateService::$currentTemplate, 0, 14) === 'tpl.my-account'){
+
                     $currentCategory = $categoryService->getCurrentCategory();
 
                     if ($currentCategory !== null) {

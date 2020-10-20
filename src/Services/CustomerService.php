@@ -221,6 +221,9 @@ class CustomerService
 
         try {
             if (!is_null($newBillingAddressData)) {
+                if ((isset($newBillingAddressData['gender']) && empty($newBillingAddressData['gender'])) || $newBillingAddressData['gender'] == 'company') {
+                    $newBillingAddressData['gender'] = null;
+                }
                 AddressValidator::validateOrFail($newBillingAddressData);
             }
 

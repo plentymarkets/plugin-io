@@ -862,6 +862,9 @@ class ItemService
      */
     public function getAdditionalItemSorting()
     {
+        if (count($this->additionalItemSortingMap)) {
+            return $this->additionalItemSortingMap;
+        }
         EventDispatcher::fire('initAdditionalSorting', [$this]);
         return $this->additionalItemSortingMap;
     }
