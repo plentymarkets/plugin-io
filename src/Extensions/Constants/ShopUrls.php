@@ -169,6 +169,8 @@ class ShopUrls
      */
     public $orderDocument = '';
 
+    private $templateType = null;
+
     public function __construct(Dispatcher $dispatcher)
     {
         $this->init(Utils::getLang());
@@ -456,7 +458,7 @@ class ShopUrls
      */
     public function getTemplateType()
     {
-        return $this->fromMemoryCache('templateType', function() {
+        return $this->templateType ?? $this->fromMemoryCache('templateType', function() {
 
             /** @var Request $request */
             $request = pluginApp(Request::class);
@@ -516,6 +518,17 @@ class ShopUrls
             // template type cannot be determined
             return RouteConfig::CATEGORY;
         });
+    }
+
+    /**
+     * Set the template type from a custom controller. If not defined the template type
+     * will fallback to {@see RouteConfig::CATEGORY} on custom routes.
+     *
+     * @param $type
+     */
+    public function setTemplateType($type)
+    {
+        $this->templateType = $type;
     }
 
     /**
