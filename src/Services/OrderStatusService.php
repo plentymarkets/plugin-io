@@ -74,13 +74,9 @@ class OrderStatusService
                         // status with 0 means the creation of an order is not completed, caused by an error
                         if ($statusHistory[0]->statusId > 0) {
                             try {
-                                $newStatus = $orderStatusRepo->get($entry->statusId);
-
-                                if ($newStatus->isFrontendVisible) {
-                                    $statusHistoryNew[$entryKey] = $newStatus;
-                                }
+                                $statusHistoryNew[$entryKey] = $orderStatusRepo->get($entry->statusId);
                             } catch (\Exception $e) {
-                                $logger->error("IO::Debug.OrderStatusService_getOrderSatus", [
+                                $logger->error("IO::Debug.OrderStatusService_getOrderStatus", [
                                     'code' => $e->getCode(),
                                     'message' => $e->getMessage(),
                                     'entryKey' => $entryKey
