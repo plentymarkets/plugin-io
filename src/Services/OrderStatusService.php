@@ -72,7 +72,7 @@ class OrderStatusService
                     $statusHistoryNew = [];
                     foreach ($statusHistory as $entryKey => $entry) {
                         // status with 0 means the creation of an order is not completed, caused by an error
-                        if ($statusHistory[0]->statusId > 0) {
+                        if ($entry->statusId > 0) {
                             try {
                                 $statusHistoryNew[$entryKey] = $orderStatusRepo->get($entry->statusId);
                             } catch (\Exception $e) {
