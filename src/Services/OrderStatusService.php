@@ -38,7 +38,7 @@ class OrderStatusService
         $this->orderStatusRepo = $orderStatusRepo;
         $this->statusHistoryRepo = $statusHistoryRepo;
     }
-    
+
     /**
      * @param int $orderId
      * @param float $orderStatusId
@@ -49,16 +49,17 @@ class OrderStatusService
         $lang               = Utils::getLang();
         $orderStatusRepo    = $this->orderStatusRepo;
         $statusHistoryRepo  = $this->statusHistoryRepo;
-        $logger             = $this->getLogger(__CLASS__);
+        $logger             = $this->getLogger(__CLASS__)->addReference('orderId', $orderId);
 
         $orderStatus = $this->authHelper->processUnguarded( function() use ($orderId, $orderStatusId, $lang, $orderStatusRepo, $statusHistoryRepo, $logger)
         {
+            $statusHistory = $statusHistoryRepo->getStatusHistoryByOrderId($orderId);
             $orderStatus = $orderStatusRepo->get($orderStatusId);
-            if ( !is_null($orderStatus) && $orderStatus->isFrontendVisible )
+            if (!is_null($orderStatus) && $orderStatus->isFrontendVisible)
             {
                 return str_replace('['.$orderStatus->statusId.']', '', $orderStatus->names->get($lang));
             }
-            elseif( !is_null($orderStatus) )
+            elseif(!is_null($orderStatus))
             {
                 $statusHistory = $statusHistoryRepo->getStatusHistoryByOrderId($orderId);
                 if(count($statusHistory))
@@ -66,16 +67,24 @@ class OrderStatusService
                     $statusHistoryNew = [];
                     foreach($statusHistory as $entryKey => $entry)
                     {
-                        try
-                        {
-                            $statusHistoryNew[$entryKey] =  $orderStatusRepo->get($entry->statusId);
-                        }catch(\Exception $e)
-                        {
-                            $logger->error("IO::Debug.OrderStatusService_getOrderSatus", [
-                                'code' => $e->getCode(),
-                                'message' => $e->getMessage()
-                            ]);
+                        // status with 0 means the creation of an order is not completed, caused by an error
+                        if ($statusHistory[0]->statusId > 0) {
+                            try
+                            {
+                                $newStatus = $orderStatusRepo->get($entry->statusId);
 
+                                if ($newStatus->isFrontendVisible) {
+                                    $statusHistoryNew[$entryKey] =  $newStatus;
+                                }
+                            }catch(\Exception $e)
+                            {
+                                $logger->error("IO::Debug.OrderStatusService_getOrderSatus", [
+                                    'code' => $e->getCode(),
+                                    'message' => $e->getMessage(),
+                                    'entryKey' => $entryKey
+                                ]);
+
+                            }
                         }
                     }
 
@@ -92,10 +101,10 @@ class OrderStatusService
                     }
                 }
             }
-    
+
             return '';
         });
-        
+
         return $orderStatus;
     }
 }
