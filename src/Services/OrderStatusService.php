@@ -32,8 +32,11 @@ class OrderStatusService
      * @param OrderStatusRepositoryContract $orderStatusRepo
      * @param StatusHistoryRepositoryContract $statusHistoryRepo
      */
-    public function __construct(AuthHelper $authHelper, OrderStatusRepositoryContract $orderStatusRepo, StatusHistoryRepositoryContract $statusHistoryRepo)
-    {
+    public function __construct(
+        AuthHelper $authHelper,
+        OrderStatusRepositoryContract $orderStatusRepo,
+        StatusHistoryRepositoryContract $statusHistoryRepo
+    ) {
         $this->authHelper = $authHelper;
         $this->orderStatusRepo = $orderStatusRepo;
         $this->statusHistoryRepo = $statusHistoryRepo;
@@ -46,38 +49,37 @@ class OrderStatusService
      */
     public function getOrderStatus($orderId, $orderStatusId)
     {
-        $lang               = Utils::getLang();
-        $orderStatusRepo    = $this->orderStatusRepo;
-        $statusHistoryRepo  = $this->statusHistoryRepo;
-        $logger             = $this->getLogger(__CLASS__)->addReference('orderId', $orderId);
+        $lang = Utils::getLang();
+        $orderStatusRepo = $this->orderStatusRepo;
+        $statusHistoryRepo = $this->statusHistoryRepo;
+        $logger = $this->getLogger(__CLASS__)->addReference('orderId', $orderId);
 
-        $orderStatus = $this->authHelper->processUnguarded( function() use ($orderId, $orderStatusId, $lang, $orderStatusRepo, $statusHistoryRepo, $logger)
-        {
+        $orderStatus = $this->authHelper->processUnguarded(function () use (
+            $orderId,
+            $orderStatusId,
+            $lang,
+            $orderStatusRepo,
+            $statusHistoryRepo,
+            $logger
+        ) {
             $statusHistory = $statusHistoryRepo->getStatusHistoryByOrderId($orderId);
             $orderStatus = $orderStatusRepo->get($orderStatusId);
-            if (!is_null($orderStatus) && $orderStatus->isFrontendVisible)
-            {
-                return str_replace('['.$orderStatus->statusId.']', '', $orderStatus->names->get($lang));
-            }
-            elseif(!is_null($orderStatus))
-            {
+            if (!is_null($orderStatus) && $orderStatus->isFrontendVisible) {
+                return str_replace('[' . $orderStatus->statusId . ']', '', $orderStatus->names->get($lang));
+            } elseif (!is_null($orderStatus)) {
                 $statusHistory = $statusHistoryRepo->getStatusHistoryByOrderId($orderId);
-                if(count($statusHistory))
-                {
+                if (count($statusHistory)) {
                     $statusHistoryNew = [];
-                    foreach($statusHistory as $entryKey => $entry)
-                    {
+                    foreach ($statusHistory as $entryKey => $entry) {
                         // status with 0 means the creation of an order is not completed, caused by an error
                         if ($statusHistory[0]->statusId > 0) {
-                            try
-                            {
+                            try {
                                 $newStatus = $orderStatusRepo->get($entry->statusId);
 
                                 if ($newStatus->isFrontendVisible) {
-                                    $statusHistoryNew[$entryKey] =  $newStatus;
+                                    $statusHistoryNew[$entryKey] = $newStatus;
                                 }
-                            }catch(\Exception $e)
-                            {
+                            } catch (\Exception $e) {
                                 $logger->error("IO::Debug.OrderStatusService_getOrderSatus", [
                                     'code' => $e->getCode(),
                                     'message' => $e->getMessage(),
@@ -88,14 +90,12 @@ class OrderStatusService
                         }
                     }
 
-                    if(count($statusHistoryNew))
-                    {
-                        for($i = count($statusHistoryNew)-1; $i >= 0; $i--)
-                        {
+                    if (count($statusHistoryNew)) {
+                        for ($i = count($statusHistoryNew) - 1; $i >= 0; $i--) {
                             $statusEntry = $statusHistoryNew[$i];
-                            if($statusEntry instanceof OrderStatus && $statusEntry->statusId < $orderStatusId && $statusEntry->isFrontendVisible)
-                            {
-                                return str_replace('['.$statusEntry->statusId.']', '', $statusEntry->names->get($lang));
+                            if ($statusEntry instanceof OrderStatus && $statusEntry->statusId < $orderStatusId && $statusEntry->isFrontendVisible) {
+                                return str_replace('[' . $statusEntry->statusId . ']', '',
+                                    $statusEntry->names->get($lang));
                             }
                         }
                     }
