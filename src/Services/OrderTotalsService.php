@@ -11,6 +11,7 @@ namespace IO\Services;
 use IO\Builder\Order\OrderItemType;
 use Plenty\Modules\Accounting\Contracts\AccountingLocationRepositoryContract;
 use Plenty\Modules\Frontend\Services\VatService;
+use Plenty\Modules\Order\Date\Models\OrderDateType;
 use Plenty\Modules\Order\Models\Order;
 use Plenty\Modules\Order\Models\OrderItem;
 use Plenty\Modules\Order\Shipping\Contracts\EUCountryCodesServiceContract;
@@ -74,7 +75,8 @@ class OrderTotalsService
 
                     if ((bool)$accountSettings->showShippingVat && $euCountryCodesServiceContract->isExportDelivery(
                             $order->deliveryAddress->countryId,
-                            $item->countryVatId
+                            $item->countryVatId,
+                            $order->getDateValue(OrderDateType::ORDER_ENTRY_AT)->format("Y-m-d")
                         )) {
                         $shippingNet = $shippingGross;
                     }
