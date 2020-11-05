@@ -11,7 +11,6 @@ namespace IO\Services;
 use IO\Builder\Order\OrderItemType;
 use Plenty\Modules\Accounting\Contracts\AccountingLocationRepositoryContract;
 use Plenty\Modules\Frontend\Services\VatService;
-use Plenty\Modules\Order\Date\Models\OrderDateType;
 use Plenty\Modules\Order\Models\Order;
 use Plenty\Modules\Order\Models\OrderItem;
 use Plenty\Modules\Order\Shipping\Contracts\EUCountryCodesServiceContract;
