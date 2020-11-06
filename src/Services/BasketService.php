@@ -176,6 +176,7 @@ class BasketService
 
         $basket["isExportDelivery"] = $euCountryService->isExportDelivery(
             $basket["shippingCountryId"] ?? $this->webstoreConfigurationRepository->getDefaultShippingCountryId(),
+            null,
             date("Y-m-d", $basket['createdAt'])
         );
 
