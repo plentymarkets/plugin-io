@@ -77,7 +77,7 @@ class OrderTotalsService
                     if ((bool)$accountSettings->showShippingVat && $euCountryCodesServiceContract->isExportDelivery(
                             $order->deliveryAddress->countryId,
                             $item->countryVatId,
-                            $entryDate->date->toDateTimeString()
+                            $entryDate->date->toDateString()
                         )) {
                         $shippingNet = $shippingGross;
                     }
