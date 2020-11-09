@@ -175,9 +175,7 @@ class BasketService
         $basket = $this->couponService->checkCoupon($basket);
 
         $basket["isExportDelivery"] = $euCountryService->isExportDelivery(
-            $basket["shippingCountryId"] ?? $this->webstoreConfigurationRepository->getDefaultShippingCountryId(),
-            null,
-            date("Y-m-d", $basket['createdAt'])
+            $basket["shippingCountryId"] ?? $this->webstoreConfigurationRepository->getDefaultShippingCountryId()
         );
 
         $basket["shopCountryId"] = $determineShopCountry->getCountryId();
