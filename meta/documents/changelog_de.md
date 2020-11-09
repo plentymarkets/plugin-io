@@ -1,5 +1,14 @@
 # Release Notes für IO
 
+## v5.0.15 (2020-11-09) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.14...5.0.15" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
+
+### Behoben
+
+- Bei dem Runden von Preisen mit mehr als 2 Nachkommastellen konnte es zu Fehlern kommen. Dies wurde behoben.
+- Bei Artikelsets wurden die Eigenschaften der initial angezeigten Varianten nicht korrekt geladen. Dies wurde behoben.
+- Beim Aufrufen der Bestellbestätigungsseite kam es unter bestimmten Umständen zu Fehlermeldungen im Log. Dies wurde behoben.
+- Im ShopBuilder wurden nicht immer alle Beispieldaten eines Artikels angezeigt, wenn diese den Wert 0 hatten. Dies wurde behoben.
+
 ## v5.0.14 (2020-10-20) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.13...5.0.14" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
 
 ### Geändert
