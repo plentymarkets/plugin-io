@@ -20,8 +20,8 @@ use Plenty\Plugin\Http\Request;
 /**
  * Class ShopUrls
  *
- * Helper to get configured urls to be used in the webshop.
- * Generated URLs consider configured categories for several webshop pages and settings for trailing slashes or item url patterns.
+ * Helper to get configured URLs to be used in the webshop.
+ * Generated URLs consider configured categories for several webshop pages and settings for trailing slashes or item URL patterns.
  *
  * @package IO\Extensions\Constants
  */
@@ -37,134 +37,134 @@ class ShopUrls
     ];
 
     /**
-     * @var bool Define if a trailing slash should be appended to urls or not.
+     * @var bool Define if a trailing slash should be appended to URLS or not.
      *           Consider this option to avoid unnecessary 301 redirects.
      */
     public $appendTrailingSlash = false;
 
     /**
-     * @var string Suffix to append to urls containing a trailing slash if required.
+     * @var string Suffix to append to URLs containing a trailing slash if required.
      */
     public $trailingSlashSuffix = '';
 
     /**
-     * @var bool Indicates if the language should be included in urls.
+     * @var bool Indicate if the language should be included in URLs.
      *           This is false if the current language equals the default language of the webstore.
-     *           Otherwise the language should be included in the url to be detected correctly.
+     *           Otherwise the language should be included in the URLs to be detected correctly.
      */
     public $includeLanguage = false;
 
     /**
-     * @var string Relative url of the basket view.
+     * @var string Relative URL of the basket view.
      */
     public $basket = '';
 
     /**
-     * @var string Relative url of the cancellation form view.
+     * @var string Relative URL of the cancellation form view.
      */
     public $cancellationForm = '';
 
     /**
-     * @var string Relative url of the cancellation rights view.
+     * @var string Relative URL of the cancellation rights view.
      */
     public $cancellationRights = '';
 
     /**
-     * @var string Relative url of the checkout view.
+     * @var string Relative URL of the checkout view.
      */
     public $checkout = '';
 
     /**
-     * @var string Relative url to the order confirmation view of the most recent order.
-     *             Use orderConfirmation() to get the url for the order confirmation view of a specific order-
+     * @var string Relative URL of the order confirmation view of the most recent order.
+     *             Use orderConfirmation() to get the URL for the order confirmation view of a specific order.
      */
     public $confirmation = '';
 
     /**
-     * @var string Relative url of the contact view.
+     * @var string Relative URL of the contact view.
      */
     public $contact = '';
 
     /**
-     * @var string Relative url of the view showing the general terms and conditions.
+     * @var string Relative URL of the general terms and conditions view.
      */
     public $gtc = '';
 
     /**
-     * @var string Relative url for the home page.
+     * @var string Relative URL of the home page.
      */
     public $home = '';
 
     /**
-     * @var string Relative url for the page displaying the legal disclosure.
+     * @var string Relative URL of the legal disclosure view.
      */
     public $legalDisclosure = '';
 
     /**
-     * @var string Relative url of the login page.
+     * @var string Relative URL of the login page.
      */
     public $login = '';
 
     /**
-     * @var string Relative url of the my-account view
+     * @var string Relative URL of the my-account view.
      */
     public $myAccount = '';
 
     /**
-     * @var string Relative url of the view displaying the form to reset a password
+     * @var string Relative URL of the view displaying the form to reset a password.
      */
     public $passwordReset = '';
 
     /**
-     * @var string Relative url of the privacy policy.
+     * @var string Relative URL of the privacy policy.
      */
     public $privacyPolicy = '';
 
     /**
-     * @var string Relative url to the registration form.
+     * @var string Relative URL of the registration form.
      */
     public $registration = '';
 
     /**
-     * @var string Relative url to the item search view.
+     * @var string Relative URL of the item search view.
      */
     public $search = '';
 
     /**
-     * @var string Relative url of the view showing the general terms and conditions.
+     * @var string Relative URL of the general terms and conditions view.
      * @deprecated since 5.0.12. Use $gtc instead.
      */
     public $termsConditions = '';
 
     /**
-     * @var string Relative url to the wish list view.
+     * @var string Relative URL of the wish list view.
      */
     public $wishList = '';
 
     /**
-     * @var string  Relative url to the returns form for the most recent order.
-     *              Use returns() to get the url for the returns form for a specific order.
+     * @var string  Relative URL of the returns form for the most recent order.
+     *              Use returns() to get the URL for the returns form for a specific order.
      */
     public $returns = '';
 
     /**
-     * @var string Relative url to the order return confirmation.
+     * @var string Relative URL of the order return confirmation.
      * @deprecated since 5.0.12. This is not in use anymore since only a success message will be displayed after submitting a return.
      */
     public $returnConfirmation = '';
 
     /**
-     * @var string Relative url to the form to change a customers mail.
+     * @var string Relative URL of the form to change a customer's mail.
      */
     public $changeMail = '';
 
     /**
-     * @var string Relative url to the form to unsubscribe from a newsletter
+     * @var string Relative URL of the form to unsubscribe from a newsletter.
      */
     public $newsletterOptOut = '';
 
     /**
-     * @var string
+     * @var string Get a preview URL for an order document.
      * @deprecated since 5.0.12. Not in use anymore. Use orderDocumentPreview() instead.
      */
     public $orderDocument = '';
@@ -210,7 +210,7 @@ class ShopUrls
             $this->contact = $dataForCache['contact'] = $this->getShopUrl(RouteConfig::CONTACT);
             $this->gtc = $dataForCache['gtc'] = $this->getShopUrl(RouteConfig::TERMS_CONDITIONS);
 
-            // Homepage URL may not be used from category. Even if linked to category, the homepage url should be '/'
+            // Homepage URL may not be used from category. Even if linked to category, the homepage URL should be '/'
             $this->home = $dataForCache['home'] = Utils::makeRelativeUrl('/', $this->includeLanguage);
             $this->legalDisclosure = $dataForCache['legalDisclosure'] = $this->getShopUrl(
                 RouteConfig::LEGAL_DISCLOSURE
@@ -269,7 +269,7 @@ class ShopUrls
     }
 
     /**
-     * Get the url to the return form for a specific order.
+     * Get the URL of the return form for a specific order.
      *
      * @param string|int $orderId The id of the order to return items for.
      * @param string $orderAccessKey Access key to authorize accessing the order. Required for guest accounts.
@@ -296,7 +296,7 @@ class ShopUrls
     }
 
     /**
-     * Get the url to a file stored in an order property.
+     * Get the URL of a file stored in an order property.
      *
      * @param string $path The path to the file read from the value of the order property.
      * @return string
@@ -307,7 +307,7 @@ class ShopUrls
     }
 
     /**
-     * Get a preview url for an order document.
+     * Get a preview URL for an order document.
      *
      * @param string|int $documentId Id of the order document to get order.
      * @param string|int $orderId Id of the order the document belongs to.
@@ -332,9 +332,9 @@ class ShopUrls
     }
 
     /**
-     * Get tracking url for a specific order id.
+     * Get tracking URL for a specific order id.
      *
-     * @param string|int $orderId Id of the order to get the tracking url for.
+     * @param string|int $orderId Id of the order to get the tracking URL for.
      * @return string
      */
     public function tracking($orderId)
@@ -360,9 +360,9 @@ class ShopUrls
     }
 
     /**
-     * Get the url of the order confirmation page for a specific order id.
+     * Get the URL of the order confirmation page for a specific order id.
      *
-     * @param string|int $orderId   Id of the order to get the confirmation url for.
+     * @param string|int $orderId Id of the order to get the confirmation URL for.
      * @return string
      */
     public function orderConfirmation($orderId)
@@ -371,7 +371,7 @@ class ShopUrls
             $suffix = '?orderId=' . $orderId;
         } else {
             // if there is no trailing slash we must add a slash before the orderID to divide the suffix
-            // from the given url path else we have to add ad slasg after the orderID to show a correct url
+            // from the given URL path else we have to add a slash after the orderID to show a correct URL
             $suffix = $this->appendTrailingSlash ? $orderId . '/' : '/' . $orderId;
         }
         return $this->confirmation . $suffix;
@@ -437,10 +437,9 @@ class ShopUrls
     /**
      * Check if two routes are equal but ignore trailing slashes.
      *
-     * @param string $urlA First URL to compare
-     * @param string $urlB Second URL to compare
-     *
-     * @return bool
+     * @param string $urlA First URL to compare.
+     * @param string $urlB Second URL to compare.
+     * @return bool True if the two URLs are equal.
      */
     public function equals($urlA, $urlB)
     {
@@ -524,7 +523,7 @@ class ShopUrls
      * Set the template type from a custom controller. If not defined the template type
      * will fallback to {@see RouteConfig::CATEGORY} on custom routes.
      *
-     * @param $type
+     * @param $type @Meyer hier fehlt der Type des Params?
      */
     public function setTemplateType($type)
     {
