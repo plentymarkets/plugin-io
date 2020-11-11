@@ -523,7 +523,7 @@ class ShopUrls
      * Set the template type from a custom controller. If not defined the template type
      * will fallback to {@see RouteConfig::CATEGORY} on custom routes.
      *
-     * @param $type @Meyer hier fehlt der Type des Params?
+     * @param string $type The type of the template.
      */
     public function setTemplateType($type)
     {
