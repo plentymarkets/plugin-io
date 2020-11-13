@@ -52,7 +52,7 @@ class QueryString extends AbstractFunction
             return '';
         }
 
-        $queryParameters = http_build_query($queryParameters);
+        $queryParameters = http_build_query($queryParameters, null, '&', PHP_QUERY_RFC3986);
         return strlen($queryParameters) > 0 ? '?' . $queryParameters : '';
     }
 }
