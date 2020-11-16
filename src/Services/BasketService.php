@@ -395,6 +395,12 @@ class BasketService
     public function checkBasketItemsByPrice()
     {
         $basketItems = $this->getBasketItemsRaw();
+
+        // Don't check if no basket items.
+        if (count($basketItems) <= 0) {
+            return 0;
+        }
+
         $basketItemData = $this->getBasketItemData($basketItems);
         $basketItems = $this->addVariationData($basketItems, $basketItemData, true);
 
