@@ -61,6 +61,9 @@ class ItemLastSeenResource extends ApiResource
         );
     }
 
+    /**
+     * @depreacted will be removed in 5.1.0 or greater
+     */
     public function update(string $variationId): Response
     {
         if ((int)$variationId > 0) {

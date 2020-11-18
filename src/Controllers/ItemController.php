@@ -5,6 +5,7 @@ namespace IO\Controllers;
 use IO\Api\ResponseCode;
 use IO\Helper\Utils;
 use IO\Services\CategoryService;
+use IO\Services\ItemLastSeenService;
 use IO\Services\ItemListService;
 use IO\Services\ItemSearch\Factories\VariationSearchResultFactory;
 use IO\Services\TemplateConfigService;
@@ -168,6 +169,14 @@ class ItemController extends LayoutController
 
         $attributeSelectDefaultOption = (int)$webstoreConfiguration->attributeSelectDefaultOption;
         $itemResult['initPleaseSelectOption'] = $variationId <= 0 && $attributeSelectDefaultOption === 1;
+
+
+        /** @var ItemLastSeenService $itemLastSeenService */
+        $itemLastSeenService = pluginApp(ItemLastSeenService::class);
+
+        $lastSeenVariation = $variationId > 0 ? $variationId : $itemResult['item']['documents'][0]['id'];
+        $itemLastSeenService->setLastSeenItem((int)$lastSeenVariation);
+
         return $this->renderTemplate(
             'tpl.item',
             $itemResult
