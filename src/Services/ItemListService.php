@@ -33,7 +33,8 @@ class ItemListService
         $sorting = null,
         $maxItems = 0,
         $crossSellingRelationType = null,
-        $withCategories = false
+        $withCategories = false,
+        $variationIds = []
     ) {
         /** @var ItemSearchService $searchService */
         $searchService = pluginApp(ItemSearchService::class);
@@ -65,9 +66,9 @@ class ItemListService
                 $cachingRepository = pluginApp(CachingRepository::class);
                 $basketRepository = pluginApp(BasketRepositoryContract::class);
 
-                $variationIds = $cachingRepository->get(
-                    SessionStorageRepositoryContract::LAST_SEEN_ITEMS . '_' . $basketRepository->load()->id
-                );
+                if (count($variationIds) === 0) {
+                     $variationIds = $cachingRepository->get(SessionStorageRepositoryContract::LAST_SEEN_ITEMS . '_' . $basketRepository->load()->id);
+                }
                 $variationIds = array_slice($variationIds, 0, $maxItems);
 
                 if (!is_null($variationIds) && count($variationIds) > 0) {
