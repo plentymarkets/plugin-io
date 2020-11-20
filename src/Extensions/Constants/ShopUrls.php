@@ -199,43 +199,31 @@ class ShopUrls
                 )->defaultLanguage;
 
             $this->basket = $dataForCache['basket'] = $this->getShopUrl(RouteConfig::BASKET);
-            $this->cancellationForm = $dataForCache['cancellationForm'] = $this->getShopUrl(
-                RouteConfig::CANCELLATION_FORM
-            );
-            $this->cancellationRights = $dataForCache['cancellationRights'] = $this->getShopUrl(
-                RouteConfig::CANCELLATION_RIGHTS
-            );
-            $this->checkout = $dataForCache['checkout'] = $this->getShopUrl(RouteConfig::CHECKOUT);
-            $this->confirmation = $dataForCache['confirmation'] = $this->getShopUrl(RouteConfig::CONFIRMATION);
-            $this->contact = $dataForCache['contact'] = $this->getShopUrl(RouteConfig::CONTACT);
-            $this->gtc = $dataForCache['gtc'] = $this->getShopUrl(RouteConfig::TERMS_CONDITIONS);
+            $this->cancellationForm = $dataForCache['cancellationForm'] = $this->getShopUrl([], [], null, $lang);
+            $this->cancellationRights = $dataForCache['cancellationRights'] = $this->getShopUrl(RouteConfig::CANCELLATION_RIGHTS, [], [], null, $lang);
+            $this->checkout = $dataForCache['checkout'] = $this->getShopUrl(RouteConfig::CHECKOUT, [], [], null, $lang);
+            $this->confirmation = $dataForCache['confirmation'] = $this->getShopUrl(RouteConfig::CONFIRMATION, [], [], null, $lang);
+            $this->contact = $dataForCache['contact'] = $this->getShopUrl(RouteConfig::CONTACT, [], [], null, $lang);
+            $this->gtc = $dataForCache['gtc'] = $this->getShopUrl(RouteConfig::TERMS_CONDITIONS, [], [], null, $lang);
 
             // Homepage URL may not be used from category. Even if linked to category, the homepage URL should be '/'
             $this->home = $dataForCache['home'] = Utils::makeRelativeUrl('/', $this->includeLanguage);
-            $this->legalDisclosure = $dataForCache['legalDisclosure'] = $this->getShopUrl(
-                RouteConfig::LEGAL_DISCLOSURE
-            );
-            $this->login = $dataForCache['login'] = $this->getShopUrl(RouteConfig::LOGIN);
-            $this->myAccount = $dataForCache['myAccount'] = $this->getShopUrl(RouteConfig::MY_ACCOUNT);
-            $this->passwordReset = $dataForCache['passwordReset'] = $this->getShopUrl(RouteConfig::PASSWORD_RESET);
-            $this->privacyPolicy = $dataForCache['privacyPolicy'] = $this->getShopUrl(RouteConfig::PRIVACY_POLICY);
-            $this->registration = $dataForCache['registration'] = $this->getShopUrl(RouteConfig::REGISTER);
-            $this->search = $dataForCache['search'] = $this->getShopUrl(RouteConfig::SEARCH);
-            $this->termsConditions = $dataForCache['termsConditions'] = $this->getShopUrl(
-                RouteConfig::TERMS_CONDITIONS
-            );
-            $this->wishList = $dataForCache['wishList'] = $this->getShopUrl(RouteConfig::WISH_LIST);
-            $this->returns = $dataForCache['returns'] = $this->getShopUrl(RouteConfig::ORDER_RETURN);
-            $this->returnConfirmation = $dataForCache['returnConfirmation'] = $this->getShopUrl(
-                RouteConfig::ORDER_RETURN_CONFIRMATION
-            );
-            $this->changeMail = $dataForCache['changeMail'] = $this->getShopUrl(RouteConfig::CHANGE_MAIL);
-            $this->newsletterOptOut = $dataForCache['newsletterOptOut'] = $this->getShopUrl(
-                RouteConfig::NEWSLETTER_OPT_OUT
-            );
+            $this->legalDisclosure = $dataForCache['legalDisclosure'] = $this->getShopUrl(RouteConfig::LEGAL_DISCLOSURE, [], [], null, $lang);
+            $this->login = $dataForCache['login'] = $this->getShopUrl(RouteConfig::LOGIN, [], [], null, $lang);
+            $this->myAccount = $dataForCache['myAccount'] = $this->getShopUrl(RouteConfig::MY_ACCOUNT, [], [], null, $lang);
+            $this->passwordReset = $dataForCache['passwordReset'] = $this->getShopUrl(RouteConfig::PASSWORD_RESET, [], [], null, $lang);
+            $this->privacyPolicy = $dataForCache['privacyPolicy'] = $this->getShopUrl(RouteConfig::PRIVACY_POLICY, [], [], null, $lang);
+            $this->registration = $dataForCache['registration'] = $this->getShopUrl(RouteConfig::REGISTER, [], [], null, $lang);
+            $this->search = $dataForCache['search'] = $this->getShopUrl(RouteConfig::SEARCH, [], [], null, $lang);
+            $this->termsConditions = $dataForCache['termsConditions'] = $this->getShopUrl(RouteConfig::TERMS_CONDITIONS, [], [], null, $lang);
+            $this->wishList = $dataForCache['wishList'] = $this->getShopUrl(RouteConfig::WISH_LIST, [], [], null, $lang);
+            $this->returns = $dataForCache['returns'] = $this->getShopUrl(RouteConfig::ORDER_RETURN, [], [], null, $lang);
+            $this->returnConfirmation = $dataForCache['returnConfirmation'] = $this->getShopUrl(RouteConfig::ORDER_RETURN_CONFIRMATION, [], [], null, $lang);
+            $this->changeMail = $dataForCache['changeMail'] = $this->getShopUrl(RouteConfig::CHANGE_MAIL, [], [], null, $lang);
+            $this->newsletterOptOut = $dataForCache['newsletterOptOut'] = $this->getShopUrl(RouteConfig::NEWSLETTER_OPT_OUT, [], [], null, $lang);
             $this->orderDocument = $dataForCache['orderDocument'] = $this->getShopUrl(RouteConfig::ORDER_DOCUMENT);
 
-            Utils::putCacheKey('shopUrls_'. $lang, $dataForCache, 5);
+            Utils::putCacheKey('shopUrls_' . $lang, $dataForCache, 5);
         }
     }
 
@@ -377,7 +365,7 @@ class ShopUrls
         return $this->confirmation . $suffix;
     }
 
-    private function getShopUrl($route, $routeParams = [], $urlParams = [], $overrideUrl = null)
+    private function getShopUrl($route, $routeParams = [], $urlParams = [], $overrideUrl = null, $language = null)
     {
         $key = $route;
 
@@ -391,7 +379,7 @@ class ShopUrls
 
         return $this->fromMemoryCache(
             $key,
-            function () use ($route, $routeParams, $urlParams, $overrideUrl) {
+            function () use ($route, $routeParams, $urlParams, $overrideUrl, $language) {
                 $categoryId = RouteConfig::getCategoryId($route);
                 if ($categoryId > 0) {
                     /** @var CategoryService $categoryService */
@@ -412,7 +400,7 @@ class ShopUrls
 
                 $url = $overrideUrl ?? $this->urlMap[$route] ?? null;
                 return $this->applyParams(
-                    pluginApp(UrlQuery::class, ['path' => ($url ?? $route)]),
+                    pluginApp(UrlQuery::class, ['path' => ($url ?? $route), 'lang' => $language]),
                     $routeParams,
                     $urlParams
                 );
@@ -443,10 +431,18 @@ class ShopUrls
      */
     public function equals($urlA, $urlB)
     {
-        if (substr($urlA, 0, 1) !== '/') $urlA = '/' . $urlA;
-        if (substr($urlA, -1, 1) !== '/') $urlA = $urlA . '/';
-        if (substr($urlB, 0, 1) !== '/') $urlB = '/' . $urlB;
-        if (substr($urlB, -1, 1) !== '/') $urlB = $urlB . '/';
+        if (substr($urlA, 0, 1) !== '/') {
+            $urlA = '/' . $urlA;
+        }
+        if (substr($urlA, -1, 1) !== '/') {
+            $urlA = $urlA . '/';
+        }
+        if (substr($urlB, 0, 1) !== '/') {
+            $urlB = '/' . $urlB;
+        }
+        if (substr($urlB, -1, 1) !== '/') {
+            $urlB = $urlB . '/';
+        }
         return $urlA === $urlB;
     }
 
@@ -457,66 +453,70 @@ class ShopUrls
      */
     public function getTemplateType()
     {
-        return $this->templateType ?? $this->fromMemoryCache('templateType', function() {
+        return $this->templateType ?? $this->fromMemoryCache(
+                'templateType',
+                function () {
+                    /** @var Request $request */
+                    $request = pluginApp(Request::class);
 
-            /** @var Request $request */
-            $request = pluginApp(Request::class);
+                    /** @var ShopBuilderRequest $shopBuilderRequest */
+                    $shopBuilderRequest = pluginApp(ShopBuilderRequest::class);
 
-            /** @var ShopBuilderRequest $shopBuilderRequest */
-            $shopBuilderRequest = pluginApp(ShopBuilderRequest::class);
+                    if ($request->has('templateType')) {
+                        // template type is explicitly set via request param
+                        return $request->get('templateType');
+                    }
 
-            if ($request->has('templateType')) {
-                // template type is explicitly set via request param
-                return $request->get('templateType');
-            }
+                    // detect template type from request uri
+                    $url = Utils::makeRelativeUrl(
+                        explode('?', $request->getRequestUri())[0],
+                        $this->includeLanguage
+                    );
 
-            // detect template type from request uri
-            $url = Utils::makeRelativeUrl(
-                explode('?', $request->getRequestUri())[0],
-                $this->includeLanguage
-            );
+                    if ($shopBuilderRequest->isShopBuilder() && ($previewUri = $shopBuilderRequest->getPreviewUri(
+                        )) !== null) {
+                        $url = Utils::makeRelativeUrl($previewUri, $this->includeLanguage);
+                    }
 
-            if($shopBuilderRequest->isShopBuilder() && ($previewUri = $shopBuilderRequest->getPreviewUri()) !== null) {
-                $url = Utils::makeRelativeUrl($previewUri, $this->includeLanguage);
-            }
+                    if (!strlen($url) || $url === '/') {
+                        return RouteConfig::HOME;
+                    }
 
-            if (!strlen($url) || $url === '/') {
-                return RouteConfig::HOME;
-            }
+                    foreach (RouteConfig::ALL as $routeKey) {
+                        if ($this->equals($url, $this->getShopUrl($routeKey))) {
+                            // current page is a special linked page
+                            return $routeKey;
+                        }
+                    }
 
-            foreach (RouteConfig::ALL as $routeKey) {
-                if ($this->equals($url, $this->getShopUrl($routeKey))) {
-                    // current page is a special linked page
-                    return $routeKey;
+                    // match url pattern
+                    if (preg_match('/(?:a\-\d+|_\d+|_\d+_\d+)\/?$/m', $url) === 1) {
+                        return RouteConfig::ITEM;
+                    } elseif (preg_match('/_t\d+\/?$/m', $url) === 1) {
+                        return RouteConfig::TAGS;
+                    } elseif (preg_match('/confirmation\/\d+\/([A-Za-z]|\d)+\/?/m', $url) === 1) {
+                        return RouteConfig::CONFIRMATION;
+                    }
+
+                    if ($shopBuilderRequest->isShopBuilder(
+                        ) && ($previewType = $shopBuilderRequest->getPreviewContentType()) !== null) {
+                        $previewTypeMap = [
+                            'content' => RouteConfig::CATEGORY,
+                            'checkout' => RouteConfig::CHECKOUT,
+                            'myaccount' => RouteConfig::MY_ACCOUNT,
+                            'singleitem' => RouteConfig::ITEM,
+                            'categoryitem' => RouteConfig::CATEGORY,
+                            'itemsearch' => RouteConfig::SEARCH,
+                            'itemset' => RouteConfig::ITEM,
+                        ];
+
+                        return $previewTypeMap[$previewType] ?? RouteConfig::CATEGORY;
+                    }
+
+                    // template type cannot be determined
+                    return RouteConfig::CATEGORY;
                 }
-            }
-
-            // match url pattern
-            if (preg_match('/(?:a\-\d+|_\d+|_\d+_\d+)\/?$/m', $url) === 1) {
-                return RouteConfig::ITEM;
-            } elseif (preg_match('/_t\d+\/?$/m', $url) === 1) {
-                return RouteConfig::TAGS;
-            } elseif (preg_match('/confirmation\/\d+\/([A-Za-z]|\d)+\/?/m', $url) === 1) {
-                return RouteConfig::CONFIRMATION;
-            }
-
-            if($shopBuilderRequest->isShopBuilder() && ($previewType = $shopBuilderRequest->getPreviewContentType()) !== null) {
-                $previewTypeMap = [
-                    'content' => RouteConfig::CATEGORY,
-                    'checkout' => RouteConfig::CHECKOUT,
-                    'myaccount' => RouteConfig::MY_ACCOUNT,
-                    'singleitem' => RouteConfig::ITEM,
-                    'categoryitem' => RouteConfig::CATEGORY,
-                    'itemsearch' => RouteConfig::SEARCH,
-                    'itemset' => RouteConfig::ITEM,
-                ];
-
-                return $previewTypeMap[$previewType] ?? RouteConfig::CATEGORY;
-            }
-
-            // template type cannot be determined
-            return RouteConfig::CATEGORY;
-        });
+            );
     }
 
     /**
@@ -531,10 +531,10 @@ class ShopUrls
     }
 
     /**
-     * Check if current page is of a given type. @see RouteConfig for available type values.
-     *
-     * @param string $routeKey Type to check current page against.
+     * Check if current page is of a given type. @param string $routeKey Type to check current page against.
      * @return bool True if current page matches the given type.
+     * @see RouteConfig for available type values.
+     *
      */
     public function is($routeKey)
     {
