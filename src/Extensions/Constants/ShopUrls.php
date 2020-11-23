@@ -532,10 +532,11 @@ class ShopUrls
     }
 
     /**
-     * Check if current page is of a given type. @param string $routeKey Type to check current page against.
-     * @return bool True if current page matches the given type.
-     * @see RouteConfig for available type values.
+     * Check if current page is of a given type. @see RouteConfig for available type values.
      *
+     * @return bool True if current page matches the given type.
+     *
+     * @param string $routeKey Type to check current page against.
      */
     public function is($routeKey)
     {
