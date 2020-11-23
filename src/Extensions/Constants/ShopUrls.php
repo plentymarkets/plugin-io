@@ -199,28 +199,28 @@ class ShopUrls
                 )->defaultLanguage;
 
             $this->basket = $dataForCache['basket'] = $this->getShopUrl(RouteConfig::BASKET);
-            $this->cancellationForm = $dataForCache['cancellationForm'] = $this->getShopUrl(RouteConfig::CANCELLATION_FORM, [], [], null, $lang);
-            $this->cancellationRights = $dataForCache['cancellationRights'] = $this->getShopUrl(RouteConfig::CANCELLATION_RIGHTS, [], [], null, $lang);
-            $this->checkout = $dataForCache['checkout'] = $this->getShopUrl(RouteConfig::CHECKOUT, [], [], null, $lang);
-            $this->confirmation = $dataForCache['confirmation'] = $this->getShopUrl(RouteConfig::CONFIRMATION, [], [], null, $lang);
-            $this->contact = $dataForCache['contact'] = $this->getShopUrl(RouteConfig::CONTACT, [], [], null, $lang);
-            $this->gtc = $dataForCache['gtc'] = $this->getShopUrl(RouteConfig::TERMS_CONDITIONS, [], [], null, $lang);
+            $this->cancellationForm = $dataForCache['cancellationForm'] = $this->getShopUrl(RouteConfig::CANCELLATION_FORM, $lang);
+            $this->cancellationRights = $dataForCache['cancellationRights'] = $this->getShopUrl(RouteConfig::CANCELLATION_RIGHTS, $lang);
+            $this->checkout = $dataForCache['checkout'] = $this->getShopUrl(RouteConfig::CHECKOUT, $lang);
+            $this->confirmation = $dataForCache['confirmation'] = $this->getShopUrl(RouteConfig::CONFIRMATION, $lang);
+            $this->contact = $dataForCache['contact'] = $this->getShopUrl(RouteConfig::CONTACT, $lang);
+            $this->gtc = $dataForCache['gtc'] = $this->getShopUrl(RouteConfig::TERMS_CONDITIONS, $lang);
 
             // Homepage URL may not be used from category. Even if linked to category, the homepage URL should be '/'
             $this->home = $dataForCache['home'] = Utils::makeRelativeUrl('/', $this->includeLanguage);
-            $this->legalDisclosure = $dataForCache['legalDisclosure'] = $this->getShopUrl(RouteConfig::LEGAL_DISCLOSURE, [], [], null, $lang);
-            $this->login = $dataForCache['login'] = $this->getShopUrl(RouteConfig::LOGIN, [], [], null, $lang);
-            $this->myAccount = $dataForCache['myAccount'] = $this->getShopUrl(RouteConfig::MY_ACCOUNT, [], [], null, $lang);
-            $this->passwordReset = $dataForCache['passwordReset'] = $this->getShopUrl(RouteConfig::PASSWORD_RESET, [], [], null, $lang);
-            $this->privacyPolicy = $dataForCache['privacyPolicy'] = $this->getShopUrl(RouteConfig::PRIVACY_POLICY, [], [], null, $lang);
-            $this->registration = $dataForCache['registration'] = $this->getShopUrl(RouteConfig::REGISTER, [], [], null, $lang);
-            $this->search = $dataForCache['search'] = $this->getShopUrl(RouteConfig::SEARCH, [], [], null, $lang);
-            $this->termsConditions = $dataForCache['termsConditions'] = $this->getShopUrl(RouteConfig::TERMS_CONDITIONS, [], [], null, $lang);
-            $this->wishList = $dataForCache['wishList'] = $this->getShopUrl(RouteConfig::WISH_LIST, [], [], null, $lang);
-            $this->returns = $dataForCache['returns'] = $this->getShopUrl(RouteConfig::ORDER_RETURN, [], [], null, $lang);
-            $this->returnConfirmation = $dataForCache['returnConfirmation'] = $this->getShopUrl(RouteConfig::ORDER_RETURN_CONFIRMATION, [], [], null, $lang);
-            $this->changeMail = $dataForCache['changeMail'] = $this->getShopUrl(RouteConfig::CHANGE_MAIL, [], [], null, $lang);
-            $this->newsletterOptOut = $dataForCache['newsletterOptOut'] = $this->getShopUrl(RouteConfig::NEWSLETTER_OPT_OUT, [], [], null, $lang);
+            $this->legalDisclosure = $dataForCache['legalDisclosure'] = $this->getShopUrl(RouteConfig::LEGAL_DISCLOSURE, $lang);
+            $this->login = $dataForCache['login'] = $this->getShopUrl(RouteConfig::LOGIN, $lang);
+            $this->myAccount = $dataForCache['myAccount'] = $this->getShopUrl(RouteConfig::MY_ACCOUNT, $lang);
+            $this->passwordReset = $dataForCache['passwordReset'] = $this->getShopUrl(RouteConfig::PASSWORD_RESET, $lang);
+            $this->privacyPolicy = $dataForCache['privacyPolicy'] = $this->getShopUrl(RouteConfig::PRIVACY_POLICY, $lang);
+            $this->registration = $dataForCache['registration'] = $this->getShopUrl(RouteConfig::REGISTER, $lang);
+            $this->search = $dataForCache['search'] = $this->getShopUrl(RouteConfig::SEARCH, $lang);
+            $this->termsConditions = $dataForCache['termsConditions'] = $this->getShopUrl(RouteConfig::TERMS_CONDITIONS, $lang);
+            $this->wishList = $dataForCache['wishList'] = $this->getShopUrl(RouteConfig::WISH_LIST, $lang);
+            $this->returns = $dataForCache['returns'] = $this->getShopUrl(RouteConfig::ORDER_RETURN, $lang);
+            $this->returnConfirmation = $dataForCache['returnConfirmation'] = $this->getShopUrl(RouteConfig::ORDER_RETURN_CONFIRMATION, $lang);
+            $this->changeMail = $dataForCache['changeMail'] = $this->getShopUrl(RouteConfig::CHANGE_MAIL, $lang);
+            $this->newsletterOptOut = $dataForCache['newsletterOptOut'] = $this->getShopUrl(RouteConfig::NEWSLETTER_OPT_OUT, $lang);
             $this->orderDocument = $dataForCache['orderDocument'] = $this->getShopUrl(RouteConfig::ORDER_DOCUMENT);
 
             Utils::putCacheKey('shopUrls_' . $lang, $dataForCache, 5);
@@ -277,10 +277,10 @@ class ShopUrls
                 'orderAccessKey' => $orderAccessKey
             ];
 
-            return $this->getShopUrl(RouteConfig::ORDER_RETURN, null, $params);
+            return $this->getShopUrl(RouteConfig::ORDER_RETURN, Utils::getLang(),null, $params);
         }
 
-        return $this->getShopUrl(RouteConfig::ORDER_RETURN, [$orderId, $orderAccessKey]);
+        return $this->getShopUrl(RouteConfig::ORDER_RETURN, Utils::getLang(), [$orderId, $orderAccessKey]);
     }
 
     /**
@@ -291,7 +291,7 @@ class ShopUrls
      */
     public function orderPropertyFile($path)
     {
-        return $this->getShopUrl(RouteConfig::ORDER_PROPERTY_FILE, null, $path);
+        return $this->getShopUrl(RouteConfig::ORDER_PROPERTY_FILE, Utils::getLang(),null, $path);
     }
 
     /**
@@ -312,6 +312,7 @@ class ShopUrls
 
         $url = $this->getShopUrl(
             RouteConfig::ORDER_DOCUMENT,
+            Utils::getLang(),
             ['documentId' => $documentId],
             ['orderId' => $orderId, 'accessKey' => $orderAccessKey],
             'order-document/preview'
@@ -365,7 +366,7 @@ class ShopUrls
         return $this->confirmation . $suffix;
     }
 
-    private function getShopUrl($route, $routeParams = [], $urlParams = [], $overrideUrl = null, $language = null)
+    private function getShopUrl($route, $language = null, $routeParams = [], $urlParams = [], $overrideUrl = null)
     {
         $key = $route;
 
