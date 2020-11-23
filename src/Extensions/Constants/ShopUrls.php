@@ -199,7 +199,7 @@ class ShopUrls
                 )->defaultLanguage;
 
             $this->basket = $dataForCache['basket'] = $this->getShopUrl(RouteConfig::BASKET);
-            $this->cancellationForm = $dataForCache['cancellationForm'] = $this->getShopUrl([], [], null, $lang);
+            $this->cancellationForm = $dataForCache['cancellationForm'] = $this->getShopUrl(RouteConfig::CANCELLATION_FORM, [], [], null, $lang);
             $this->cancellationRights = $dataForCache['cancellationRights'] = $this->getShopUrl(RouteConfig::CANCELLATION_RIGHTS, [], [], null, $lang);
             $this->checkout = $dataForCache['checkout'] = $this->getShopUrl(RouteConfig::CHECKOUT, [], [], null, $lang);
             $this->confirmation = $dataForCache['confirmation'] = $this->getShopUrl(RouteConfig::CONFIRMATION, [], [], null, $lang);
