@@ -68,6 +68,7 @@ use Plenty\Modules\Frontend\Events\FrontendLanguageChanged;
 use Plenty\Modules\Frontend\Events\FrontendReferrerChanged;
 use Plenty\Modules\Frontend\Events\FrontendShippingProfileChanged;
 use Plenty\Modules\Frontend\Events\FrontendUpdateDeliveryAddress;
+use Plenty\Modules\Frontend\Events\FrontendUpdateInvoiceAddress;
 use Plenty\Modules\Frontend\Session\Events\AfterSessionCreate;
 use Plenty\Modules\Frontend\Session\Storage\Contracts\FrontendSessionStorageFactoryContract;
 use Plenty\Modules\Item\ItemCoupon\Hooks\CheckItemRestriction;
@@ -259,39 +260,6 @@ class IOServiceProvider extends ServiceProvider
         $facetExtensionContainer = pluginApp(FacetExtensionContainer::class);
         $facetExtensionContainer->addFacetExtension(pluginApp(CategoryFacet::class));
 
-
-        $dispatcher->listen(
-            FrontendCurrencyChanged::class,
-            function ($event) {
-                $sessionStorage = pluginApp(FrontendSessionStorageFactoryContract::class);
-                $sessionStorage->getPlugin()->setValue(SessionStorageRepositoryContract::CURRENCY, $event->getCurrency());
-                 /** @var BasketService $basketService */
-                $basketService = pluginApp(BasketService::class);
-                $removedItems = $basketService->checkBasketItemsByPrice();
-                if ($removedItems > 0) {
-                    /** @var NotificationService $notificationService */
-                    $notificationService = pluginApp(NotificationService::class);
-                    // Message will be overridden in Ceres
-                    $notificationService->warn('Items not available for new currency.', 14);
-                }
-            }
-        );
-
-        $dispatcher->listen(
-            FrontendReferrerChanged::class,
-            function ($event) {
-                /** @var BasketService $basketService */
-                $basketService = pluginApp(BasketService::class);
-                $removedItems = $basketService->checkBasketItemsByPrice();
-                if ($removedItems > 0) {
-                    /** @var NotificationService $notificationService */
-                    $notificationService = pluginApp(NotificationService::class);
-                    // Message will be overridden in Ceres
-                    $notificationService->warn('Items not available for new referrer.', 9);
-                }
-            }
-        );
-
         $dispatcher->listen(
             FrontendLanguageChanged::class,
             function ($event) {
@@ -305,7 +273,39 @@ class IOServiceProvider extends ServiceProvider
         $dispatcher->listen(FrontendShippingProfileChanged::class, IOFrontendShippingProfileChanged::class);
         $dispatcher->listen(FrontendUpdateDeliveryAddress::class, IOFrontendUpdateDeliveryAddress::class);
 
+        $dispatcher->listen(FrontendCurrencyChanged::class,
+            function ($event){
+                $sessionStorage = pluginApp(FrontendSessionStorageFactoryContract::class);
+                $sessionStorage->getPlugin()->setValue(SessionStorageRepositoryContract::CURRENCY, $event->getCurrency());
+                $this->checkBasketItems('Items not available for new currency.', 14);
+            }
+        );
+        $dispatcher->listen(FrontendReferrerChanged::class, function($event) {
+            $this->checkBasketItems('Items not available for new referrer.', 9);
+        });
+        $dispatcher->listen(FrontendUpdateInvoiceAddress::class, function($event) {
+            $this->checkBasketItems('Items not available for delivery country.', 14);
+        });
+
+        $dispatcher->listen(FrontendUpdateDeliveryAddress::class, function($event) {
+            $this->checkBasketItems('Items not available for new delivery country.', 15);
+        });
+
         $cronContainer->add(CronContainer::DAILY, CleanupUserDataHashes::class);
+    }
+
+
+    private function checkBasketItems($message, $code)
+    {
+         /** @var BasketService $basketService */
+        $basketService = pluginApp(BasketService::class);
+        $removedItems = $basketService->checkBasketItemsByPrice();
+        if ($removedItems > 0) {
+            /** @var NotificationService $notificationService */
+            $notificationService = pluginApp(NotificationService::class);
+            // Message will be overridden in Ceres
+            $notificationService->warn($message, $code);
+        }
     }
 
     private function registerSingletons($classes)
