@@ -66,9 +66,9 @@ use Plenty\Modules\Cron\Services\CronContainer;
 use Plenty\Modules\Frontend\Events\FrontendCurrencyChanged;
 use Plenty\Modules\Frontend\Events\FrontendLanguageChanged;
 use Plenty\Modules\Frontend\Events\FrontendReferrerChanged;
+use Plenty\Modules\Frontend\Events\FrontendShippingCountryChanged;
 use Plenty\Modules\Frontend\Events\FrontendShippingProfileChanged;
 use Plenty\Modules\Frontend\Events\FrontendUpdateDeliveryAddress;
-use Plenty\Modules\Frontend\Events\FrontendUpdateInvoiceAddress;
 use Plenty\Modules\Frontend\Session\Events\AfterSessionCreate;
 use Plenty\Modules\Frontend\Session\Storage\Contracts\FrontendSessionStorageFactoryContract;
 use Plenty\Modules\Item\ItemCoupon\Hooks\CheckItemRestriction;
@@ -283,13 +283,10 @@ class IOServiceProvider extends ServiceProvider
         $dispatcher->listen(FrontendReferrerChanged::class, function($event) {
             $this->checkBasketItems('Items not available for new referrer.', 9);
         });
-        $dispatcher->listen(FrontendUpdateInvoiceAddress::class, function($event) {
-            $this->checkBasketItems('Items not available for delivery country.', 14);
-        });
-
-        $dispatcher->listen(FrontendUpdateDeliveryAddress::class, function($event) {
+        $dispatcher->listen(FrontendShippingCountryChanged::class, function($event) {
             $this->checkBasketItems('Items not available for new delivery country.', 15);
         });
+
 
         $cronContainer->add(CronContainer::DAILY, CleanupUserDataHashes::class);
     }
