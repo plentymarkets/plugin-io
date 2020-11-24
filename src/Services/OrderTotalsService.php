@@ -92,8 +92,8 @@ class OrderTotalsService
 
             if ($firstAmount->discount > 0) {
                 if ($firstAmount->isPercentage) {
-                    $itemSumRebateGross += $item->quantity * $firstAmount->priceOriginalGross * $firstAmount->discount / 100;
-                    $itemSumRebateNet += $item->quantity * $firstAmount->priceOriginalNet * $firstAmount->discount / 100;
+                    $itemSumRebateGross += round($item->quantity * $firstAmount->priceOriginalGross * $firstAmount->discount / 100,2);
+                    $itemSumRebateNet += round($item->quantity * $firstAmount->priceOriginalNet * $firstAmount->discount / 100,2);
                 } else {
                     $itemSumRebateGross += $item->quantity * $firstAmount->discount;
                 }
