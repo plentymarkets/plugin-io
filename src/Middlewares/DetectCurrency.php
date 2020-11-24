@@ -11,6 +11,14 @@ use Plenty\Plugin\Middleware;
 
 class DetectCurrency extends Middleware
 {
+    public static $allCurrencies = [
+        'AED', 'ARS', 'AUD', 'BGN', 'BHD', 'BRL',
+        'CAD', 'CHF', 'CNY', 'CZK', 'DKK', 'EUR',
+        'GBP', 'HKD', 'HRK', 'HUF', 'IDR', 'INR',
+        'JPY', 'MXN', 'MYR', 'NOK', 'NZD', 'PHP',
+        'PLN', 'QAR', 'RON', 'RUB', 'SEK', 'SGD',
+        'THB', 'TRY', 'TWD', 'UAH', 'USD', 'VND', 'XCD', 'ZAR'];
+
     /**
      * @param Request $request
      */
@@ -23,8 +31,7 @@ class DetectCurrency extends Middleware
             /** @var TemplateConfigService $templateConfigService */
             $templateConfigService = pluginApp(TemplateConfigService::class);
             $enabledCurrencies = explode(', ', $templateConfigService->get('currency.available_currencies'));
-
-            if (in_array($currency, $enabledCurrencies) || array_pop($enabledCurrencies) == 'all') {
+            if (in_array($currency, $enabledCurrencies) || (array_pop($enabledCurrencies) == 'all' && in_array(strtoupper($currency), self::$allCurrencies))) {
                 /** @var CheckoutService $checkoutService */
                 $checkoutService = pluginApp(CheckoutService::class);
                 $checkoutService->setCurrency($currency);
