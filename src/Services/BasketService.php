@@ -177,6 +177,7 @@ class BasketService
         $basket["isExportDelivery"] = $euCountryService->isExportDelivery(
             $basket["shippingCountryId"] ?? $this->webstoreConfigurationRepository->getDefaultShippingCountryId()
         );
+
         $basket["shopCountryId"] = $determineShopCountry->getCountryId();
 
         $basket["itemWishListIds"] = $wishListService->getItemWishList();
