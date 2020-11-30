@@ -11,6 +11,7 @@ use Plenty\Plugin\Middleware;
 
 class DetectCurrency extends Middleware
 {
+    // TODO: move check to the core after 5.0.X
     public static $allCurrencies = [
         'AED', 'ARS', 'AUD', 'BGN', 'BHD', 'BRL',
         'CAD', 'CHF', 'CNY', 'CZK', 'DKK', 'EUR',
