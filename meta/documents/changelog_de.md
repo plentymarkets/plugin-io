@@ -1,5 +1,18 @@
 # Release Notes für IO
 
+## v5.0.16 (2020-12-01) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.15...5.0.16" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
+
+### Hinzugefügt
+
+- Das Newsletter-Widget verwendet jetzt Google reCAPTCHA.
+
+### Behoben
+
+- Auf der Bestellbestätigung konnte es zu Rundungsfehlern kommen. Dieses Verhalten wurde behoben.
+- Bei einem Standard-Lieferland mit Ausfuhrlieferungen wurden beim ersten Aufruf Bruttopreise angezeigt. Dieses Verhalten wurde behoben.
+- Unter bestimmten Umständen konnte es zu Problemen mit URLs in verschiedenen Sprache kommen. Dieses Verhalten wurde behoben.
+- Wenn die Ceres Währungseinstellungen noch nie gespeichert wurden, konnte man über einen Währungsparameter eine nicht valide Währung im Webshop setzen. Dieses Verhalten wurde behoben.
+
 ## v5.0.15 (2020-11-09) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.14...5.0.15" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
 
 ### Behoben
