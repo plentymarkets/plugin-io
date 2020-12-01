@@ -491,7 +491,7 @@ class ShopUrls
                     }
 
                     // match url pattern
-                    if (preg_match('/(?:a\-\d+|_\d+|_\d+_\d+)\/?$/m', $url) === 1) {
+                    if (preg_match('/(?:a\-\d+|_\d+|_\d+_\d+)\/?$/m', $url) === 1 || preg_match('(\/\d+\/?$)', $url) === 1) {
                         return RouteConfig::ITEM;
                     } elseif (preg_match('/_t\d+\/?$/m', $url) === 1) {
                         return RouteConfig::TAGS;
