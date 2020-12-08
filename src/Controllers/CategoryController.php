@@ -140,8 +140,11 @@ class CategoryController extends LayoutController
 
         $this->categoryService->setCurrentCategory($category);
         if ($this->categoryService->isHidden($category->id)) {
+            /** @var ShopUrls $shopUrls */
+            $shopUrls = pluginApp(ShopUrls::class);
+            /** @var AuthGuard $guard */
             $guard = pluginApp(AuthGuard::class);
-            $guard->assertOrRedirect(true, '/login');
+            $guard->assertOrRedirect(true, $shopUrls->login);
         }
 
         /** @var ShopBuilderRequest $shopBuilderRequest */

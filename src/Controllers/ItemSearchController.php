@@ -41,9 +41,17 @@ class ItemSearchController extends LayoutController
         /** @var Request $request */
         $request = pluginApp(Request::class);
 
+        $params = [];
+        if(!is_null($tagName)) {
+            $params['query'] = $tagName;
+        } else {
+            $params = $request->query();
+            unset($params['plentyMarkets']);
+        }
+
         /** @var CategoryController $categoryController */
         $categoryController = pluginApp(CategoryController::class);
 
-        return $categoryController->redirectRoute(RouteConfig::SEARCH, ['query' => $tagName ?? $request->get('query', null)]);
+        return $categoryController->redirectRoute(RouteConfig::SEARCH, $params);
     }
 }

@@ -20,8 +20,8 @@ use Plenty\Plugin\Http\Request;
 /**
  * Class ShopUrls
  *
- * Helper to get configured urls to be used in the webshop.
- * Generated URLs consider configured categories for several webshop pages and settings for trailing slashes or item url patterns.
+ * Helper to get configured URLs to be used in the webshop.
+ * Generated URLs consider configured categories for several webshop pages and settings for trailing slashes or item URL patterns.
  *
  * @package IO\Extensions\Constants
  */
@@ -37,137 +37,139 @@ class ShopUrls
     ];
 
     /**
-     * @var bool Define if a trailing slash should be appended to urls or not.
+     * @var bool Define if a trailing slash should be appended to URLS or not.
      *           Consider this option to avoid unnecessary 301 redirects.
      */
     public $appendTrailingSlash = false;
 
     /**
-     * @var string Suffix to append to urls containing a trailing slash if required.
+     * @var string Suffix to append to URLs containing a trailing slash if required.
      */
     public $trailingSlashSuffix = '';
 
     /**
-     * @var bool Indicates if the language should be included in urls.
+     * @var bool Indicate if the language should be included in URLs.
      *           This is false if the current language equals the default language of the webstore.
-     *           Otherwise the language should be included in the url to be detected correctly.
+     *           Otherwise the language should be included in the URLs to be detected correctly.
      */
     public $includeLanguage = false;
 
     /**
-     * @var string Relative url of the basket view.
+     * @var string Relative URL of the basket view.
      */
     public $basket = '';
 
     /**
-     * @var string Relative url of the cancellation form view.
+     * @var string Relative URL of the cancellation form view.
      */
     public $cancellationForm = '';
 
     /**
-     * @var string Relative url of the cancellation rights view.
+     * @var string Relative URL of the cancellation rights view.
      */
     public $cancellationRights = '';
 
     /**
-     * @var string Relative url of the checkout view.
+     * @var string Relative URL of the checkout view.
      */
     public $checkout = '';
 
     /**
-     * @var string Relative url to the order confirmation view of the most recent order.
-     *             Use orderConfirmation() to get the url for the order confirmation view of a specific order-
+     * @var string Relative URL of the order confirmation view of the most recent order.
+     *             Use orderConfirmation() to get the URL for the order confirmation view of a specific order.
      */
     public $confirmation = '';
 
     /**
-     * @var string Relative url of the contact view.
+     * @var string Relative URL of the contact view.
      */
     public $contact = '';
 
     /**
-     * @var string Relative url of the view showing the general terms and conditions.
+     * @var string Relative URL of the general terms and conditions view.
      */
     public $gtc = '';
 
     /**
-     * @var string Relative url for the home page.
+     * @var string Relative URL of the home page.
      */
     public $home = '';
 
     /**
-     * @var string Relative url for the page displaying the legal disclosure.
+     * @var string Relative URL of the legal disclosure view.
      */
     public $legalDisclosure = '';
 
     /**
-     * @var string Relative url of the login page.
+     * @var string Relative URL of the login page.
      */
     public $login = '';
 
     /**
-     * @var string Relative url of the my-account view
+     * @var string Relative URL of the my-account view.
      */
     public $myAccount = '';
 
     /**
-     * @var string Relative url of the view displaying the form to reset a password
+     * @var string Relative URL of the view displaying the form to reset a password.
      */
     public $passwordReset = '';
 
     /**
-     * @var string Relative url of the privacy policy.
+     * @var string Relative URL of the privacy policy.
      */
     public $privacyPolicy = '';
 
     /**
-     * @var string Relative url to the registration form.
+     * @var string Relative URL of the registration form.
      */
     public $registration = '';
 
     /**
-     * @var string Relative url to the item search view.
+     * @var string Relative URL of the item search view.
      */
     public $search = '';
 
     /**
-     * @var string Relative url of the view showing the general terms and conditions.
+     * @var string Relative URL of the general terms and conditions view.
      * @deprecated since 5.0.12. Use $gtc instead.
      */
     public $termsConditions = '';
 
     /**
-     * @var string Relative url to the wish list view.
+     * @var string Relative URL of the wish list view.
      */
     public $wishList = '';
 
     /**
-     * @var string  Relative url to the returns form for the most recent order.
-     *              Use returns() to get the url for the returns form for a specific order.
+     * @var string  Relative URL of the returns form for the most recent order.
+     *              Use returns() to get the URL for the returns form for a specific order.
      */
     public $returns = '';
 
     /**
-     * @var string Relative url to the order return confirmation.
+     * @var string Relative URL of the order return confirmation.
      * @deprecated since 5.0.12. This is not in use anymore since only a success message will be displayed after submitting a return.
      */
     public $returnConfirmation = '';
 
     /**
-     * @var string Relative url to the form to change a customers mail.
+     * @var string Relative URL of the form to change a customer's mail.
      */
     public $changeMail = '';
 
     /**
-     * @var string Relative url to the form to unsubscribe from a newsletter
+     * @var string Relative URL of the form to unsubscribe from a newsletter.
      */
     public $newsletterOptOut = '';
 
     /**
-     * @var string
+     * @var string Get a preview URL for an order document.
      * @deprecated since 5.0.12. Not in use anymore. Use orderDocumentPreview() instead.
      */
     public $orderDocument = '';
+
+    private $templateType = null;
 
     public function __construct(Dispatcher $dispatcher)
     {
@@ -197,43 +199,31 @@ class ShopUrls
                 )->defaultLanguage;
 
             $this->basket = $dataForCache['basket'] = $this->getShopUrl(RouteConfig::BASKET);
-            $this->cancellationForm = $dataForCache['cancellationForm'] = $this->getShopUrl(
-                RouteConfig::CANCELLATION_FORM
-            );
-            $this->cancellationRights = $dataForCache['cancellationRights'] = $this->getShopUrl(
-                RouteConfig::CANCELLATION_RIGHTS
-            );
-            $this->checkout = $dataForCache['checkout'] = $this->getShopUrl(RouteConfig::CHECKOUT);
-            $this->confirmation = $dataForCache['confirmation'] = $this->getShopUrl(RouteConfig::CONFIRMATION);
-            $this->contact = $dataForCache['contact'] = $this->getShopUrl(RouteConfig::CONTACT);
-            $this->gtc = $dataForCache['gtc'] = $this->getShopUrl(RouteConfig::TERMS_CONDITIONS);
+            $this->cancellationForm = $dataForCache['cancellationForm'] = $this->getShopUrl(RouteConfig::CANCELLATION_FORM, $lang);
+            $this->cancellationRights = $dataForCache['cancellationRights'] = $this->getShopUrl(RouteConfig::CANCELLATION_RIGHTS, $lang);
+            $this->checkout = $dataForCache['checkout'] = $this->getShopUrl(RouteConfig::CHECKOUT, $lang);
+            $this->confirmation = $dataForCache['confirmation'] = $this->getShopUrl(RouteConfig::CONFIRMATION, $lang);
+            $this->contact = $dataForCache['contact'] = $this->getShopUrl(RouteConfig::CONTACT, $lang);
+            $this->gtc = $dataForCache['gtc'] = $this->getShopUrl(RouteConfig::TERMS_CONDITIONS, $lang);
 
-            // Homepage URL may not be used from category. Even if linked to category, the homepage url should be '/'
+            // Homepage URL may not be used from category. Even if linked to category, the homepage URL should be '/'
             $this->home = $dataForCache['home'] = Utils::makeRelativeUrl('/', $this->includeLanguage);
-            $this->legalDisclosure = $dataForCache['legalDisclosure'] = $this->getShopUrl(
-                RouteConfig::LEGAL_DISCLOSURE
-            );
-            $this->login = $dataForCache['login'] = $this->getShopUrl(RouteConfig::LOGIN);
-            $this->myAccount = $dataForCache['myAccount'] = $this->getShopUrl(RouteConfig::MY_ACCOUNT);
-            $this->passwordReset = $dataForCache['passwordReset'] = $this->getShopUrl(RouteConfig::PASSWORD_RESET);
-            $this->privacyPolicy = $dataForCache['privacyPolicy'] = $this->getShopUrl(RouteConfig::PRIVACY_POLICY);
-            $this->registration = $dataForCache['registration'] = $this->getShopUrl(RouteConfig::REGISTER);
-            $this->search = $dataForCache['search'] = $this->getShopUrl(RouteConfig::SEARCH);
-            $this->termsConditions = $dataForCache['termsConditions'] = $this->getShopUrl(
-                RouteConfig::TERMS_CONDITIONS
-            );
-            $this->wishList = $dataForCache['wishList'] = $this->getShopUrl(RouteConfig::WISH_LIST);
-            $this->returns = $dataForCache['returns'] = $this->getShopUrl(RouteConfig::ORDER_RETURN);
-            $this->returnConfirmation = $dataForCache['returnConfirmation'] = $this->getShopUrl(
-                RouteConfig::ORDER_RETURN_CONFIRMATION
-            );
-            $this->changeMail = $dataForCache['changeMail'] = $this->getShopUrl(RouteConfig::CHANGE_MAIL);
-            $this->newsletterOptOut = $dataForCache['newsletterOptOut'] = $this->getShopUrl(
-                RouteConfig::NEWSLETTER_OPT_OUT
-            );
+            $this->legalDisclosure = $dataForCache['legalDisclosure'] = $this->getShopUrl(RouteConfig::LEGAL_DISCLOSURE, $lang);
+            $this->login = $dataForCache['login'] = $this->getShopUrl(RouteConfig::LOGIN, $lang);
+            $this->myAccount = $dataForCache['myAccount'] = $this->getShopUrl(RouteConfig::MY_ACCOUNT, $lang);
+            $this->passwordReset = $dataForCache['passwordReset'] = $this->getShopUrl(RouteConfig::PASSWORD_RESET, $lang);
+            $this->privacyPolicy = $dataForCache['privacyPolicy'] = $this->getShopUrl(RouteConfig::PRIVACY_POLICY, $lang);
+            $this->registration = $dataForCache['registration'] = $this->getShopUrl(RouteConfig::REGISTER, $lang);
+            $this->search = $dataForCache['search'] = $this->getShopUrl(RouteConfig::SEARCH, $lang);
+            $this->termsConditions = $dataForCache['termsConditions'] = $this->getShopUrl(RouteConfig::TERMS_CONDITIONS, $lang);
+            $this->wishList = $dataForCache['wishList'] = $this->getShopUrl(RouteConfig::WISH_LIST, $lang);
+            $this->returns = $dataForCache['returns'] = $this->getShopUrl(RouteConfig::ORDER_RETURN, $lang);
+            $this->returnConfirmation = $dataForCache['returnConfirmation'] = $this->getShopUrl(RouteConfig::ORDER_RETURN_CONFIRMATION, $lang);
+            $this->changeMail = $dataForCache['changeMail'] = $this->getShopUrl(RouteConfig::CHANGE_MAIL, $lang);
+            $this->newsletterOptOut = $dataForCache['newsletterOptOut'] = $this->getShopUrl(RouteConfig::NEWSLETTER_OPT_OUT, $lang);
             $this->orderDocument = $dataForCache['orderDocument'] = $this->getShopUrl(RouteConfig::ORDER_DOCUMENT);
 
-            Utils::putCacheKey('shopUrls_'. $lang, $dataForCache, 5);
+            Utils::putCacheKey('shopUrls_' . $lang, $dataForCache, 5);
         }
     }
 
@@ -267,7 +257,7 @@ class ShopUrls
     }
 
     /**
-     * Get the url to the return form for a specific order.
+     * Get the URL of the return form for a specific order.
      *
      * @param string|int $orderId The id of the order to return items for.
      * @param string $orderAccessKey Access key to authorize accessing the order. Required for guest accounts.
@@ -287,25 +277,25 @@ class ShopUrls
                 'orderAccessKey' => $orderAccessKey
             ];
 
-            return $this->getShopUrl(RouteConfig::ORDER_RETURN, null, $params);
+            return $this->getShopUrl(RouteConfig::ORDER_RETURN, Utils::getLang(),null, $params);
         }
 
-        return $this->getShopUrl(RouteConfig::ORDER_RETURN, [$orderId, $orderAccessKey]);
+        return $this->getShopUrl(RouteConfig::ORDER_RETURN, Utils::getLang(), [$orderId, $orderAccessKey]);
     }
 
     /**
-     * Get the url to a file stored in an order property.
+     * Get the URL of a file stored in an order property.
      *
      * @param string $path The path to the file read from the value of the order property.
      * @return string
      */
     public function orderPropertyFile($path)
     {
-        return $this->getShopUrl(RouteConfig::ORDER_PROPERTY_FILE, null, $path);
+        return $this->getShopUrl(RouteConfig::ORDER_PROPERTY_FILE, Utils::getLang(),null, $path);
     }
 
     /**
-     * Get a preview url for an order document.
+     * Get a preview URL for an order document.
      *
      * @param string|int $documentId Id of the order document to get order.
      * @param string|int $orderId Id of the order the document belongs to.
@@ -322,6 +312,7 @@ class ShopUrls
 
         $url = $this->getShopUrl(
             RouteConfig::ORDER_DOCUMENT,
+            Utils::getLang(),
             ['documentId' => $documentId],
             ['orderId' => $orderId, 'accessKey' => $orderAccessKey],
             'order-document/preview'
@@ -330,9 +321,9 @@ class ShopUrls
     }
 
     /**
-     * Get tracking url for a specific order id.
+     * Get tracking URL for a specific order id.
      *
-     * @param string|int $orderId Id of the order to get the tracking url for.
+     * @param string|int $orderId Id of the order to get the tracking URL for.
      * @return string
      */
     public function tracking($orderId)
@@ -358,9 +349,9 @@ class ShopUrls
     }
 
     /**
-     * Get the url of the order confirmation page for a specific order id.
+     * Get the URL of the order confirmation page for a specific order id.
      *
-     * @param string|int $orderId   Id of the order to get the confirmation url for.
+     * @param string|int $orderId Id of the order to get the confirmation URL for.
      * @return string
      */
     public function orderConfirmation($orderId)
@@ -369,13 +360,13 @@ class ShopUrls
             $suffix = '?orderId=' . $orderId;
         } else {
             // if there is no trailing slash we must add a slash before the orderID to divide the suffix
-            // from the given url path else we have to add ad slasg after the orderID to show a correct url
+            // from the given URL path else we have to add a slash after the orderID to show a correct URL
             $suffix = $this->appendTrailingSlash ? $orderId . '/' : '/' . $orderId;
         }
         return $this->confirmation . $suffix;
     }
 
-    private function getShopUrl($route, $routeParams = [], $urlParams = [], $overrideUrl = null)
+    private function getShopUrl($route, $language = null, $routeParams = [], $urlParams = [], $overrideUrl = null)
     {
         $key = $route;
 
@@ -389,7 +380,7 @@ class ShopUrls
 
         return $this->fromMemoryCache(
             $key,
-            function () use ($route, $routeParams, $urlParams, $overrideUrl) {
+            function () use ($route, $routeParams, $urlParams, $overrideUrl, $language) {
                 $categoryId = RouteConfig::getCategoryId($route);
                 if ($categoryId > 0) {
                     /** @var CategoryService $categoryService */
@@ -410,7 +401,7 @@ class ShopUrls
 
                 $url = $overrideUrl ?? $this->urlMap[$route] ?? null;
                 return $this->applyParams(
-                    pluginApp(UrlQuery::class, ['path' => ($url ?? $route)]),
+                    pluginApp(UrlQuery::class, ['path' => ($url ?? $route), 'lang' => $language]),
                     $routeParams,
                     $urlParams
                 );
@@ -435,17 +426,24 @@ class ShopUrls
     /**
      * Check if two routes are equal but ignore trailing slashes.
      *
-     * @param string $urlA First URL to compare
-     * @param string $urlB Second URL to compare
-     *
-     * @return bool
+     * @param string $urlA First URL to compare.
+     * @param string $urlB Second URL to compare.
+     * @return bool True if the two URLs are equal.
      */
     public function equals($urlA, $urlB)
     {
-        if (substr($urlA, 0, 1) !== '/') $urlA = '/' . $urlA;
-        if (substr($urlA, -1, 1) !== '/') $urlA = $urlA . '/';
-        if (substr($urlB, 0, 1) !== '/') $urlB = '/' . $urlB;
-        if (substr($urlB, -1, 1) !== '/') $urlB = $urlB . '/';
+        if (substr($urlA, 0, 1) !== '/') {
+            $urlA = '/' . $urlA;
+        }
+        if (substr($urlA, -1, 1) !== '/') {
+            $urlA = $urlA . '/';
+        }
+        if (substr($urlB, 0, 1) !== '/') {
+            $urlB = '/' . $urlB;
+        }
+        if (substr($urlB, -1, 1) !== '/') {
+            $urlB = $urlB . '/';
+        }
         return $urlA === $urlB;
     }
 
@@ -456,65 +454,90 @@ class ShopUrls
      */
     public function getTemplateType()
     {
-        /** @var Request $request */
-        $request = pluginApp(Request::class);
+        return $this->templateType ?? $this->fromMemoryCache(
+                'templateType',
+                function () {
+                    /** @var Request $request */
+                    $request = pluginApp(Request::class);
 
-        if ($request->has('templateType')) {
-            // template type is explicitly set via request param
-            return $request->get('templateType');
-        }
+                    /** @var ShopBuilderRequest $shopBuilderRequest */
+                    $shopBuilderRequest = pluginApp(ShopBuilderRequest::class);
 
-        /** @var ShopBuilderRequest $shopBuilderRequest */
-        $shopBuilderRequest = pluginApp(ShopBuilderRequest::class);
-        if($shopBuilderRequest->isShopBuilder() && ($previewType = $shopBuilderRequest->getPreviewContentType()) !== null) {
-            $previewTypeMap = [
-                'content' => RouteConfig::CATEGORY,
-                'checkout' => RouteConfig::CHECKOUT,
-                'myaccount' => RouteConfig::MY_ACCOUNT,
-                'singleitem' => RouteConfig::ITEM,
-                'categoryitem' => RouteConfig::CATEGORY,
-                'itemsearch' => RouteConfig::SEARCH,
-                'itemset' => RouteConfig::ITEM,
-            ];
+                    if ($request->has('templateType')) {
+                        // template type is explicitly set via request param
+                        return $request->get('templateType');
+                    }
 
-            return $previewTypeMap[$previewType] ?? RouteConfig::CATEGORY;
-        }
+                    // detect template type from request uri
+                    $url = Utils::makeRelativeUrl(
+                        explode('?', $request->getRequestUri())[0],
+                        $this->includeLanguage
+                    );
 
-        // detect template type from request uri
-        $url = Utils::makeRelativeUrl(
-            explode('?', $request->getRequestUri())[0],
-            $this->includeLanguage
-        );
+                    if ($shopBuilderRequest->isShopBuilder() && ($previewUri = $shopBuilderRequest->getPreviewUri(
+                        )) !== null) {
+                        $url = Utils::makeRelativeUrl($previewUri, $this->includeLanguage);
+                    }
 
-        if (!strlen($url) || $url === '/') {
-            return RouteConfig::HOME;
-        }
+                    if (!strlen($url) || $url === '/') {
+                        return RouteConfig::HOME;
+                    }
 
-        foreach (RouteConfig::ALL as $routeKey) {
-            if ($this->equals($url, $this->getShopUrl($routeKey))) {
-                // current page is a special linked page
-                return $routeKey;
-            }
-        }
+                    foreach (RouteConfig::ALL as $routeKey) {
+                        if ($this->equals($url, $this->getShopUrl($routeKey))) {
+                            // current page is a special linked page
+                            return $routeKey;
+                        }
+                    }
 
-        // match url pattern
-        if (preg_match('/(?:a\-\d+|_\d+|_\d+_\d+)\/?$/m', $url) === 1) {
-            return RouteConfig::ITEM;
-        } elseif (preg_match('/_t\d+\/?$/m', $url) === 1) {
-            return RouteConfig::TAGS;
-        } elseif (preg_match('/confirmation\/\d+\/([A-Za-z]|\d)+\/?/m', $url) === 1) {
-            return RouteConfig::CONFIRMATION;
-        }
+                    // match url pattern
+                    if (preg_match('/(?:a\-\d+|_\d+|_\d+_\d+)\/?$/m', $url) === 1) {
+                        return RouteConfig::ITEM;
+                    } elseif (preg_match('/_t\d+\/?$/m', $url) === 1) {
+                        return RouteConfig::TAGS;
+                    } elseif (preg_match('/confirmation\/\d+\/([A-Za-z]|\d)+\/?/m', $url) === 1) {
+                        return RouteConfig::CONFIRMATION;
+                    }
 
-        // template type cannot be determined
-        return RouteConfig::CATEGORY;
+                    if ($shopBuilderRequest->isShopBuilder(
+                        ) && ($previewType = $shopBuilderRequest->getPreviewContentType()) !== null) {
+                        $previewTypeMap = [
+                            'content' => RouteConfig::CATEGORY,
+                            'checkout' => RouteConfig::CHECKOUT,
+                            'myaccount' => RouteConfig::MY_ACCOUNT,
+                            'singleitem' => RouteConfig::ITEM,
+                            'categoryitem' => RouteConfig::CATEGORY,
+                            'itemsearch' => RouteConfig::SEARCH,
+                            'itemset' => RouteConfig::ITEM,
+                        ];
+
+                        return $previewTypeMap[$previewType] ?? RouteConfig::CATEGORY;
+                    }
+
+                    // template type cannot be determined
+                    return RouteConfig::CATEGORY;
+                }
+            );
+    }
+
+    /**
+     * Set the template type from a custom controller. If not defined the template type
+     * will fallback to {@see RouteConfig::CATEGORY} on custom routes.
+     *
+     * @param string $type The type of the template.
+     */
+    public function setTemplateType($type)
+    {
+        $this->templateType = $type;
     }
 
     /**
      * Check if current page is of a given type. @see RouteConfig for available type values.
      *
      * @param string $routeKey Type to check current page against.
+     *
      * @return bool True if current page matches the given type.
+     *
      */
     public function is($routeKey)
     {

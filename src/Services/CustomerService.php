@@ -221,6 +221,9 @@ class CustomerService
 
         try {
             if (!is_null($newBillingAddressData)) {
+                if ((isset($newBillingAddressData['gender']) && empty($newBillingAddressData['gender'])) || $newBillingAddressData['gender'] == 'company') {
+                    $newBillingAddressData['gender'] = null;
+                }
                 AddressValidator::validateOrFail($newBillingAddressData);
             }
 
@@ -484,7 +487,7 @@ class CustomerService
                     );
                 }
             );
-            $hashService->delete($hash);
+            $hashService->delete($hash, $contactId);
         } else {
             $contact = $this->updateContact(
                 [
@@ -492,6 +495,7 @@ class CustomerService
                     'password' => $newPassword
                 ]
             );
+            $hashService->delete($hash, $contact->id);
         }
 
         if ($contact instanceof Contact && $contact->id > 0) {

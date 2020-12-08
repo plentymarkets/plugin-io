@@ -66,7 +66,8 @@ class VariationFaker extends AbstractFaker
             "automaticClientVisibility"             => $this->number(0, 3),
             "automaticListVisibility"               => $this->number(0, 3),
             "isHiddenInCategoryList"                => $this->boolean(),
-            "availability"                          => $this->makeAvailability()
+            "availability"                          => $this->makeAvailability(),
+            "customsTariffNumber"                   => $this->serial()
         ];
 
         $this->merge($data, $default);

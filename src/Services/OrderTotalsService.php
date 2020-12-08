@@ -11,6 +11,7 @@ namespace IO\Services;
 use IO\Builder\Order\OrderItemType;
 use Plenty\Modules\Accounting\Contracts\AccountingLocationRepositoryContract;
 use Plenty\Modules\Frontend\Services\VatService;
+use Plenty\Modules\Order\Date\Models\OrderDateType;
 use Plenty\Modules\Order\Models\Order;
 use Plenty\Modules\Order\Models\OrderItem;
 use Plenty\Modules\Order\Shipping\Contracts\EUCountryCodesServiceContract;
@@ -71,10 +72,12 @@ class OrderTotalsService
 
                     $shippingGross += $firstAmount->priceGross;
                     $shippingNet += $firstAmount->priceNet;
+                    $entryDate = $order->dates->where('typeId', OrderDateType::ORDER_ENTRY_AT)->first();
 
                     if ((bool)$accountSettings->showShippingVat && $euCountryCodesServiceContract->isExportDelivery(
                             $order->deliveryAddress->countryId,
-                            $item->countryVatId
+                            $item->countryVatId,
+                            isset($entryDate) ? $entryDate->date->toDateString() : $order->createdAt->toDateString()
                         )) {
                         $shippingNet = $shippingGross;
                     }
@@ -92,8 +95,8 @@ class OrderTotalsService
 
             if ($firstAmount->discount > 0) {
                 if ($firstAmount->isPercentage) {
-                    $itemSumRebateGross += $item->quantity * $firstAmount->priceOriginalGross * $firstAmount->discount / 100;
-                    $itemSumRebateNet += $item->quantity * $firstAmount->priceOriginalNet * $firstAmount->discount / 100;
+                    $itemSumRebateGross += round($item->quantity * $firstAmount->priceOriginalGross * $firstAmount->discount / 100,2);
+                    $itemSumRebateNet += round($item->quantity * $firstAmount->priceOriginalNet * $firstAmount->discount / 100,2);
                 } else {
                     $itemSumRebateGross += $item->quantity * $firstAmount->discount;
                 }

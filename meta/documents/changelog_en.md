@@ -1,5 +1,42 @@
 # Release Notes for IO
 
+## v5.0.16 (2020-12-01) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.15...5.0.16" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
+
+### Added
+
+- The newsletter widget now uses Google reCAPTCHA.
+
+### Changed
+
+- Under certain circumstances, the order confirmation could contain rounding errors. This behaviour has been fixed.
+- For a default country of delivery that supports export deliveries, gross prices were displayed when the online shop was accessed the first time. This behaviour has been fixed.
+- Under certain circumstances, the language selection could lead to errors in combination with URLs. This has been fixed.
+- If the currency settings in the Ceres plugin had never been saved, it was possible to set an invalid currency via a currency parameter. This behaviour has been fixed.
+
+## v5.0.15 (2020-11-09) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.14...5.0.15" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
+
+### Fixed
+
+- Rounding prices with more than 2 decimal places could lead to errors. This has been fixed. 
+- The properties of the initially displayed variations of item sets were not loaded correctly. This has been fixed.
+- Under certain circumstances, accessing the order confirmation page could lead to error notifications in the log. This has been fixed.
+- The ShopBuilder did not display all sample data of an item, if this data had the value 0. This has been fixed.
+
+## v5.0.14 (2020-10-20) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.13...5.0.14" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
+
+### Changed
+
+- The performance of events for additional sorting has been improved.
+
+### Fixed
+
+- Several places in the online store did not consider currency icons for displaying currencies.
+- Additional URL parameters were missing when redirecting to the ShopBuilder search results page. This has been fixed.
+- Users who changed the language in the checkout or my account area were redirected to the homepage. This has been fixed. From now on, users who change the language are redirected to the corresponding page as long as this page has been translated for the language.
+- If the shopping cart contained an inactive item, incorrect totals were displayed. This behaviour has been fixed.
+- Under certain circumstances, company addresses were not correctly validated, even though all input fields had been filled out correctly. This behaviour has been fixed.
+- The recognition of the template type in the ShopBuilder has been corrected.
+
 ## v5.0.13 (2020-09-28) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.12...5.0.13" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
 
 ### Added 

@@ -1,5 +1,42 @@
 # Release Notes für IO
 
+## v5.0.16 (2020-12-01) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.15...5.0.16" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
+
+### Hinzugefügt
+
+- Das Newsletter-Widget verwendet jetzt Google reCAPTCHA.
+
+### Behoben
+
+- Auf der Bestellbestätigung konnte es zu Rundungsfehlern kommen. Dieses Verhalten wurde behoben.
+- Bei einem Standard-Lieferland mit Ausfuhrlieferungen wurden beim ersten Aufruf Bruttopreise angezeigt. Dieses Verhalten wurde behoben.
+- Unter bestimmten Umständen konnte es zu Problemen mit URLs in verschiedenen Sprache kommen. Dieses Verhalten wurde behoben.
+- Wenn die Ceres Währungseinstellungen noch nie gespeichert wurden, konnte man über einen Währungsparameter eine nicht valide Währung im Webshop setzen. Dieses Verhalten wurde behoben.
+
+## v5.0.15 (2020-11-09) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.14...5.0.15" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
+
+### Behoben
+
+- Bei dem Runden von Preisen mit mehr als 2 Nachkommastellen konnte es zu Fehlern kommen. Dies wurde behoben.
+- Bei Artikelsets wurden die Eigenschaften der initial angezeigten Varianten nicht korrekt geladen. Dies wurde behoben.
+- Beim Aufrufen der Bestellbestätigungsseite kam es unter bestimmten Umständen zu Fehlermeldungen im Log. Dies wurde behoben.
+- Im ShopBuilder wurden nicht immer alle Beispieldaten eines Artikels angezeigt, wenn diese den Wert 0 hatten. Dies wurde behoben.
+
+## v5.0.14 (2020-10-20) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.13...5.0.14" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
+
+### Geändert
+
+- Die Performanz der Events für zusätzliche Sortierungen wurde verbessert.
+
+### Behoben
+
+- Die Darstellung von Währungen als Währungssymbol wurde an einigen Stellen nicht berücksichtigt. Dies wurde behoben.
+- Bei der Weiterleitung auf die ShopBuilder-Suchergebnisseite wurden zusätzliche URL-Parameter nicht mitgegeben. Dies wurde behoben.
+- Beim Sprachwechsel im Checkout und Mein Konto-Bereich wurden Besucher auf die Startseite geleitet. Dies wurde behoben. Ab sofort werden Besucher beim Sprachwechsel auf die entsprechende Seite weitergeleitet, sofern diese Seite für diese Sprache übersetzt ist.
+- Es kam zu einer falschen Darstellung der Summen, wenn sich ein inaktiver Artikel im Warenkorb befand. Dieses Verhalten wurde behoben.
+- Unter bestimmten Umständen wurde die Eingabe von Firmenadressen nicht korrekt validiert, obwohl alle Eingabefelder korrekt ausgefüllt waren. Dieses Verhalten wurde behoben.
+- Der Erkennung des Template-Typs im ShopBuilder wurde korrigiert.
+
 ## v5.0.13 (2020-09-28) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.12...5.0.13" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
 
 ### Hinzugefügt
