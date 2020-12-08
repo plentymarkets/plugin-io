@@ -24,6 +24,7 @@ use Plenty\Plugin\Http\Request;
  * Generated URLs consider configured categories for several webshop pages and settings for trailing slashes or item URL patterns.
  *
  * @package IO\Extensions\Constants
+ * @deprecated use xxjxjjx
  */
 class ShopUrls
 {
