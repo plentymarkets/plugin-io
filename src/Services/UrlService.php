@@ -272,7 +272,7 @@ class UrlService
 
     /**
      * Redirects to the given URL
-     * @param $redirectURL
+     * @param string $redirectURL
      * @return mixed
      */
     public function redirectTo($redirectURL)
@@ -292,7 +292,7 @@ class UrlService
 
     /**
      * Check if route is enabled or category is linked to route.
-     * @param $route
+     * @param string $route
      * @return bool
      */
     public function isRouteEnabled($route)

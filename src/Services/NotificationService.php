@@ -139,7 +139,7 @@ class NotificationService
     }
 
     /**
-     * @param $type
+     * @param string $type
      * @param int $code
      * @param array|null $placeholder
      */

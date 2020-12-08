@@ -426,10 +426,10 @@ class IORouteServiceProvider extends RouteServiceProvider
 
     /**
      * @param Router $router
-     * @param $route
-     * @param $shopUrl
+     * @param string $route
+     * @param string $shopUrl
      * @param string $legacyController
-     * @param $redirectController
+     * @param string $redirectController
      * @throws \Plenty\Plugin\Routing\Exceptions\RouteReservedException
      */
 	private function registerRedirectedRoute(

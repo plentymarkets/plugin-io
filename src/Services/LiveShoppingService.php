@@ -19,8 +19,8 @@ class LiveShoppingService
     private $ownLimitation = false;
 
     /**
-     * @param $liveShoppingId
-     * @param $sorting
+     * @param int $liveShoppingId
+     * @param string $sorting
      * @return array
      */
     public function getLiveShoppingData($liveShoppingId, $sorting = null)
@@ -92,7 +92,7 @@ class LiveShoppingService
     }
 
     /**
-     * @param $itemList
+     * @param object $itemList
      * @return array
      */
     public function filterLiveShoppingVariations($itemList)
@@ -117,8 +117,8 @@ class LiveShoppingService
     /**
      * Check if item is limited to net stock and modify quantitySold to reflect the limited stock
      *
-     * @param $data
-     * @param $item
+     * @param object $data
+     * @param object $item
      */
     private function checkStockLimit(&$data, $item)
     {

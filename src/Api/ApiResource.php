@@ -21,8 +21,7 @@ class ApiResource extends Controller
 	protected $response;
 
     /**
-     * loll
-     * @var int
+     * @var Request
      */
 	protected $request;
 

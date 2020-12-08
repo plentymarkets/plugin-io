@@ -5,7 +5,7 @@ namespace IO\Helper;
 class ArrayHelper
 {
     /**
-     * @param $mixed
+     * @param mixed $mixed
      *
      * @return array
      */

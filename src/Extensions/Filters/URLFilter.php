@@ -42,7 +42,7 @@ class URLFilter extends AbstractFilter
 
     /**
      * Build the URL for the item by item ID or variation ID
-     * @param $itemData
+     * @param object $itemData
      * @param bool $withVariationId
      * @return string
      */
