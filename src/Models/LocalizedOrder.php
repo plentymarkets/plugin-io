@@ -34,8 +34,9 @@ class LocalizedOrder extends ModelWrapper
         OrderItemType::TYPE_GIFT_CARD,
         OrderItemType::TYPE_SHIPPING_COSTS,
         OrderItemType::TYPE_UNASSIGEND_VARIATION,
+        OrderItemType::TYPE_DEPOSIT,
         OrderItemType::TYPE_ITEM_SET,
-        OrderItemType::TYPE_SET_COMPONENT
+        OrderItemType::TYPE_SET_COMPONENT,
     ];
     /**
      * @var Order

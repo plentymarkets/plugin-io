@@ -3,6 +3,7 @@
 namespace IO\Services\Order\Factories\Faker;
 
 use IO\Services\ItemSearch\Factories\Faker\AbstractFaker;
+use Plenty\Modules\Webshop\Helpers\NumberFormatter;
 
 class TotalsFaker extends AbstractFaker
 {
@@ -17,7 +18,10 @@ class TotalsFaker extends AbstractFaker
         $rebateGross   = $rebateNet + ($rebateNet * $vatRate) / 100;
         $shippingNet   = $this->number(1, $itemSumNet / 50);
         $shippingGross = $shippingNet + ($shippingNet * $vatRate) / 100;
-        
+
+        /** @var NumberFormatter $numberFormatter */
+        $numberFormatter = pluginApp(NumberFormatter::class);
+
         $default = [
             'itemSumGross'       => $itemSumGross,
             'itemSumNet'         => $itemSumNet,
@@ -38,12 +42,22 @@ class TotalsFaker extends AbstractFaker
                     'rate'  => $vatRate,
                     'value' => $vatValue
                 ]
+            ],
+            'additionalCosts' => [
+                [
+                    'id' => $this->number(1, 100),
+                    'quantity' => 3,
+                    'name' => $this->text(1, 3),
+                    'price' => $this->number(1, 5),
+                    'currency' => 'EUR',
+                    'formattedTotalPrice' => $numberFormatter->formatMonetary($this->number(1, 5), 'EUR')
+                ]
             ]
         ];
-        
+
         $this->merge($data, $default);
         return $data;
     }
-    
-    
+
+
 }
