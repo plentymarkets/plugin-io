@@ -556,7 +556,7 @@ class BaseSearchFactory
     }
 
     /**
-     * @param $sortingField
+     * @param string $sortingField
      * @return string
      *
      * @deprecated since 5.0.0 will be deleted in 6.0.0

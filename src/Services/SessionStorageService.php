@@ -14,7 +14,7 @@ use Plenty\Plugin\Http\Request;
  * @package IO\Services
  *
  * @deprecated since 5.0.0 will be removed in 6.0.0
- * @see \Plenty\Modules\Webshop\Contracts\SessionStorageRepositoryContract;
+ * @see \Plenty\Modules\Webshop\Contracts\SessionStorageRepositoryContract
  */
 class SessionStorageService
 {
@@ -41,7 +41,7 @@ class SessionStorageService
     /**
      * Set the value in the session
      * @param string $name
-     * @param $value
+     * @param mixed $value
      *
      * @deprecated since 5.0.0 will be removed in 6.0.0
      * @see \Plenty\Modules\Webshop\Contracts\SessionStorageRepositoryContract::setSessionValue()

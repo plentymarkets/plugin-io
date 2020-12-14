@@ -162,8 +162,8 @@ class VariationPriceList
     }
 
     /**
-     * @param $unitPrice
-     * @param $currency
+     * @param float $unitPrice
+     * @param string $currency
      * @param null $lang
      * @return string
      * @deprecated since 5.0.0 will be removed in 6.0.0
@@ -277,7 +277,7 @@ class VariationPriceList
     }
 
     /**
-     * @param $value
+     * @param float $value
      * @return float|int
      * @deprecated since 5.0.0 will be removed in 6.0.0
      * @see \Plenty\Modules\Webshop\Helpers\VariationPriceList::convertCurrency()

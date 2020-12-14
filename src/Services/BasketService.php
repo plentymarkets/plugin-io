@@ -567,7 +567,7 @@ class BasketService
 
     /**
      * Add the given data to the basket
-     * @param $data
+     * @param object $data
      * @return array
      */
     private function addDataToBasket($data)

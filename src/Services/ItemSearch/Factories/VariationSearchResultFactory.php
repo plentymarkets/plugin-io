@@ -35,7 +35,7 @@ use Plenty\Modules\Webshop\ItemSearch\Helpers\LoadResultFields;
  * @package IO\Services\ItemSearch\Factories
  *
  * @deprecated since 5.0.0 will be deleted in 6.0.0
- * @see //TODO
+ * @see
  */
 class VariationSearchResultFactory
 {

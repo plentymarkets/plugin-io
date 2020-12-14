@@ -32,7 +32,7 @@ class ItemImagesFilter extends AbstractFilter
     }
 
     /**
-     * @param $images
+     * @param object $images
      * @param string $imageAccessor
      * @return array
      */

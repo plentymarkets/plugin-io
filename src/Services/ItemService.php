@@ -189,7 +189,7 @@ class ItemService
     }
 
     /**
-     * @param $itemId
+     * @param int $itemId
      * @return array
      */
     public function getVariationIds($itemId): array

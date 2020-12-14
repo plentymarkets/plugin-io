@@ -51,7 +51,7 @@ class ResultFieldTemplate
     }
 
     /**
-     * @param $template
+     * @param string $template
      * @return array
      * @deprecated since 5.0.0 will be deleted in 6.0.0
      */
@@ -92,7 +92,7 @@ class ResultFieldTemplate
 
     /**
      * Set multiple templates to read result fields from.
-     * @param $templateMap
+     * @param object $templateMap
      * @deprecated since 5.0.0 will be deleted in 6.0.0
      */
     public function setTemplates( $templateMap )

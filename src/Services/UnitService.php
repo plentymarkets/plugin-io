@@ -71,7 +71,7 @@ class UnitService
     }
 
     /**
-     * @param $unitKey
+     * @param string $unitKey
      * @param null $lang
      * @return mixed
      * @deprecated since 5.0.0 will be removed in 6.0.0

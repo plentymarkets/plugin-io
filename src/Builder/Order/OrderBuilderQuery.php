@@ -216,8 +216,8 @@ class OrderBuilderQuery
      * Add an order option to the order
      * @param int $type
      * @param int $subType
-     * @param $value
-     * @param $required
+     * @param string $value
+     * @param boolean $required
      * @return OrderBuilderQuery
      */
 	public function withOrderProperty(int $type, int $subType, $value, $required = true):OrderBuilderQuery
