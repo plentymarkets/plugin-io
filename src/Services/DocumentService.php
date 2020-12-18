@@ -24,7 +24,7 @@ class DocumentService
     }
     
     /**
-     * @param $orderId
+     * @param int $orderId
      * @return null|\Plenty\Repositories\Models\PaginatedResult
      */
     public function getDocumentsByOrderId($orderId)

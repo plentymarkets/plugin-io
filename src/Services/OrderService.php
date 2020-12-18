@@ -155,8 +155,8 @@ class OrderService
     /**
      * Subscribe the customer to the newsletter, if stored in the session
      *
-     * @param $email
-     * @param $billingAddressId
+     * @param string $email
+     * @param int $billingAddressId
      */
     public function subscribeToNewsletter($email, $billingAddressId)
     {
@@ -505,7 +505,7 @@ class OrderService
     }
 
     /**
-     * @param $orderId
+     * @param int $orderId
      * @param string $orderAccessKey
      * @return LocalizedOrder
      */
@@ -606,7 +606,7 @@ class OrderService
     }
 
     /**
-     * @param $paymentMethodId
+     * @param int $paymentMethodId
      * @param int $orderId
      * @return bool
      */
@@ -645,8 +645,8 @@ class OrderService
 
 
     /**
-     * @param $orderId
-     * @param $paymentMethodId
+     * @param int $orderId
+     * @param int $paymentMethodId
      * @return LocalizedOrder|null
      */
     public function switchPaymentMethodForOrder($orderId, $paymentMethodId)

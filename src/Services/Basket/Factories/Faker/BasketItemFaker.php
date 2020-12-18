@@ -37,7 +37,7 @@ class BasketItemFaker extends AbstractFaker
     }
 
     /**
-     * @param $rawBasketitems
+     * @param object $rawBasketitems
      */
     public function setRawBasketItems($rawBasketitems)
     {

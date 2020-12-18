@@ -20,7 +20,7 @@ class TemplateConfigService
     }
 
     /**
-     * @param $key
+     * @param string $key
      * @param null $default
      * @return mixed|null
      */
@@ -30,7 +30,7 @@ class TemplateConfigService
     }
 
     /**
-     * @param $key
+     * @param string $key
      * @param bool $default
      * @return mixed
      */
@@ -47,7 +47,7 @@ class TemplateConfigService
     }
 
     /**
-     * @param $key
+     * @param string $key
      * @param int $default
      * @return mixed
      */

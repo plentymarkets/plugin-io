@@ -53,7 +53,7 @@ class TemplateService
     }
 
     /**
-     * @param $templateToCheck
+     * @param string $templateToCheck
      * @return bool
      * @deprecated Use ShopUrls::is() instead
      */

@@ -76,7 +76,7 @@ class ItemSearchService
     }
 
     /**
-     * @param $result
+     * @param object $result
      * @return mixed
      * @deprecated since 5.0.0 will be deleted in 6.0.0
      * @see \Plenty\Modules\Webshop\ItemSearch\Services\ItemSearchService::normalizeResult()

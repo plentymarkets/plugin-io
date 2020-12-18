@@ -32,11 +32,11 @@ use IO\Builder\Item\Params\ItemColumnsParams;
 class ItemColumnBuilder
 {
 	/**
-	 * @var array>
+	 * @var array
 	 */
 	private $columnFields = [];
 	/**
-	 * @var array>
+	 * @var array
 	 */
 	private $columnParams = [];
 
