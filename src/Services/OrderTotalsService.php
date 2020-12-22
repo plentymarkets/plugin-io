@@ -15,6 +15,7 @@ use Plenty\Modules\Order\Date\Models\OrderDateType;
 use Plenty\Modules\Order\Models\Order;
 use Plenty\Modules\Order\Models\OrderItem;
 use Plenty\Modules\Order\Shipping\Contracts\EUCountryCodesServiceContract;
+use Plenty\Modules\Webshop\Helpers\NumberFormatter;
 
 /**
  * Calculate order totals
@@ -46,11 +47,14 @@ class OrderTotalsService
         $isNet = $order->amounts[$amountId]->isNet;
         $itemSumRebateGross = 0;
         $itemSumRebateNet = 0;
+        $additionalCosts = [];
 
         $orderItems = $order->orderItems;
 
         $accountRepo = pluginApp(AccountingLocationRepositoryContract::class);
         $vatService = pluginApp(VatService::class);
+        /** @var NumberFormatter $numberFormatter */
+        $numberFormatter = pluginApp(NumberFormatter::class);
         /**
          * @var EUCountryCodesServiceContract $euCountryCodesServiceContract
          */
@@ -88,6 +92,21 @@ class OrderTotalsService
                     $couponValue += $firstAmount->priceGross;
                     $itemNameArray = explode(' ', rtrim($item->orderItemName));
                     $couponCode = end($itemNameArray);
+                    break;
+                case OrderItemType::DEPOSIT;
+                    if (!empty($item->amounts)) {
+                        $price = $item->amounts[0]->priceGross;
+                        $currency = $item->amounts[0]->currency;
+                        $additionalCosts[] = [
+                            'id' => $item->id,
+                            'quantity' => $item->quantity,
+                            'name' => $item->orderItemName,
+                            'price' => $price,
+                            'currency' => $currency,
+                            'formattedTotalPrice'
+                                => $numberFormatter->formatMonetary($price * $item->quantity, $currency)
+                        ];
+                    }
                     break;
                 default:
                     // noop
@@ -140,7 +159,8 @@ class OrderTotalsService
             'totalGross',
             'totalNet',
             'currency',
-            'isNet'
+            'isNet',
+            'additionalCosts'
         );
     }
 
