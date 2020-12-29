@@ -57,33 +57,44 @@ class BasketService
     private $basketRepository;
 
     /**
-     * @var Checkout
+     * @var Checkout This service is used to manipulate the checkout
      */
     private $checkout;
 
     /**
-     * @var VatService
+     * @var VatService This service provides methods for VAT related tasks
      */
     private $vatService;
 
     /**
-     * @var ContactRepositoryContract $contactRepository
+     * @var ContactRepositoryContract $contactRepository This repository is used to manipulate Contacts
      */
     private $contactRepository;
 
     /**
-     * @var CouponService $couponService
+     * @var CouponService $couponService This service provides functionality related to coupons
      */
     private $couponService;
 
-    /** @var WebstoreConfigurationRepositoryContract $webstoreConfigurationRepository */
+    /**
+     * @var WebstoreConfigurationRepositoryContract $webstoreConfigurationRepository This repository is used to read webstore configuration
+     */
     private $webstoreConfigurationRepository;
 
-    /** @var SessionStorageRepositoryContract $sessionStorageRepository */
+    /**
+     * @var SessionStorageRepositoryContract $sessionStorageRepository This repository is used to read and write data of the session
+     */
     private $sessionStorageRepository;
 
+    /**
+     * @var BasketItem[] Contains all current BasketItems
+     */
     private $basketItems;
 
+    /**
+     * @var string Unused property
+     * @deprecated 
+     */
     private $template = '';
 
     /**
