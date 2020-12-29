@@ -32,6 +32,10 @@ use IO\Helper\Utils;
 
 /**
  * Class CheckoutService
+ *
+ * This service class contains methods for manipulating the checkout.
+ * All public functions are available in the Twig template renderer.
+ *
  * @package IO\Services
  */
 class CheckoutService

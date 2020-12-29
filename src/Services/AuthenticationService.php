@@ -13,7 +13,7 @@ use Plenty\Plugin\Log\Loggable;
  * Class AuthenticationService
  *
  * This service class contains various methods for authenticating customers and related tasks.
- *
+ * All public functions are available in the Twig template renderer.
  *
  * @package IO\Services
  */

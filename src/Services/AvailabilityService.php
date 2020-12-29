@@ -9,6 +9,7 @@ use Plenty\Modules\Item\Availability\Models\Availability;
  * Class AvailabilityService
  *
  * This service class contains various methods for getting item availabilities.
+ * All public functions are available in the Twig template renderer.
  *
  * @package IO\Services
  */

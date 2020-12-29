@@ -21,6 +21,10 @@ use Plenty\Repositories\Models\PaginatedResult;
 
 /**
  * Class CategoryService
+ *
+ * This service class contains methods related to Category models.
+ * All public functions are available in the Twig template renderer.
+ *
  * @package IO\Services
  */
 class CategoryService
