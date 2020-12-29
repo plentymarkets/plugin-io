@@ -93,7 +93,7 @@ class BasketService
 
     /**
      * @var string Unused property
-     * @deprecated 
+     * @deprecated
      */
     private $template = '';
 
