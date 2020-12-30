@@ -6,7 +6,7 @@ use Plenty\Modules\Item\Availability\Contracts\AvailabilityRepositoryContract;
 use Plenty\Modules\Item\Availability\Models\Availability;
 
 /**
- * Class AvailabilityService
+ * Service Class AvailabilityService
  *
  * This service class contains various methods for getting item availabilities.
  * All public functions are available in the Twig template renderer.

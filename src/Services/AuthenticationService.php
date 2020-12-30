@@ -10,7 +10,7 @@ use Plenty\Modules\Webshop\Contracts\SessionStorageRepositoryContract;
 use Plenty\Plugin\Log\Loggable;
 
 /**
- * Class AuthenticationService
+ * Service Class AuthenticationService
  *
  * This service class contains various methods for authenticating customers and related tasks.
  * All public functions are available in the Twig template renderer.

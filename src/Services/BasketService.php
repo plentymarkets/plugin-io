@@ -35,7 +35,7 @@ use Plenty\Plugin\Events\Dispatcher;
 use Plenty\Plugin\Log\Loggable;
 
 /**
- * Class BasketService
+ * Service Class BasketService
  *
  * This service class contains various methods used for manipulating the customers basket.
  * All public functions are available in the Twig template renderer.
