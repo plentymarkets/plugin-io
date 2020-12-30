@@ -1,9 +1,4 @@
 <?php
-/**
- * Created by IntelliJ IDEA.
- * User: ihussein
- * Date: 01.08.17
- */
 
 namespace IO\Services;
 
@@ -13,13 +8,24 @@ use Plenty\Modules\Webshop\Contracts\ContactRepositoryContract;
 use Plenty\Modules\Webshop\Contracts\SessionStorageRepositoryContract;
 
 /**
- * Class WishListService
+ * Service Class WishListService
+ *
+ * This service class contains functions related to the customers wish list.
+ * All public functions are available in the Twig template renderer.
+ *
  * @package IO\Services
  */
 class ItemWishListService
 {
+    /**
+     * @var mixed
+     */
     private $itemWishListRepo;
 
+    /**
+     * ItemWishListService constructor.
+     * @param SessionStorageRepositoryContract $sessionStorageRepositoryContract
+     */
     public function __construct(SessionStorageRepositoryContract $sessionStorageRepositoryContract)
     {
         if ($sessionStorageRepositoryContract->getSessionValue(
@@ -45,8 +51,9 @@ class ItemWishListService
     }
 
     /**
-     * @param int $variationId
-     * @param int $quantity
+     * Add a variation to the wish list
+     * @param int $variationId An variation id
+     * @param int $quantity The desired quantity of the variation
      * @return mixed
      */
     public function addItemWishListEntry(int $variationId, int $quantity)
@@ -55,7 +62,8 @@ class ItemWishListService
     }
 
     /**
-     * @param int $variationId
+     * Check if a variation is in the wish list
+     * @param int $variationId An variation id
      * @return bool
      */
     public function isItemInWishList(int $variationId)
@@ -64,6 +72,7 @@ class ItemWishListService
     }
 
     /**
+     * Get a list of all variation ids in the wish list
      * @return array
      */
     public function getItemWishList()
@@ -72,6 +81,7 @@ class ItemWishListService
     }
 
     /**
+     * Get number of entries in wish list
      * @return int
      */
     public function getCountedItemWishList()
@@ -80,7 +90,8 @@ class ItemWishListService
     }
 
     /**
-     * @param int $variationId
+     * Remove a variation from the wish list
+     * @param int $variationId An variation id
      * @return bool
      */
     public function removeItemWishListEntry(int $variationId)
@@ -88,6 +99,10 @@ class ItemWishListService
         return $this->itemWishListRepo->removeItemWishListEntry($variationId);
     }
 
+    /**
+     * Migrates a guest wish list into a contacts wish list.
+     * @throws \Exception
+     */
     public function migrateGuestItemWishList()
     {
         /**
