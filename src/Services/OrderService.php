@@ -27,7 +27,6 @@ use Plenty\Modules\Order\Property\Contracts\OrderPropertyRepositoryContract;
 use Plenty\Modules\Order\Property\Models\OrderProperty;
 use Plenty\Modules\Order\Property\Models\OrderPropertyType;
 use Plenty\Modules\Order\Status\Contracts\OrderStatusRepositoryContract;
-use Plenty\Modules\Order\Status\Models\OrderStatus;
 use Plenty\Modules\Payment\Contracts\PaymentRepositoryContract;
 use Plenty\Modules\Payment\Method\Contracts\PaymentMethodRepositoryContract;
 use Plenty\Modules\Webshop\Contracts\ContactRepositoryContract;
