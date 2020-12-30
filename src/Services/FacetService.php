@@ -2,11 +2,20 @@
 
 namespace IO\Services;
 
+/**
+ * Service Class FacetService
+ *
+ * This service class contains functions related to facets.
+ * All public functions are available in the Twig template renderer.
+ *
+ * @package IO\Services
+ */
 class FacetService
 {
     /**
-     * @param array $facets
-     * @param string $type
+     * Check if facet data exists
+     * @param array $facets All available facets
+     * @param array $type Allowed facet type
      * @return bool
      */
     public function facetDataExists($facets, $type): bool

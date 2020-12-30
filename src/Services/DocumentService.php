@@ -7,7 +7,7 @@ use Plenty\Modules\Webshop\Contracts\ContactRepositoryContract;
 use Plenty\Repositories\Models\PaginatedResult;
 
 /**
- * Class DocumentService
+ * Service Class DocumentService
  *
  * This service class contains functions related to order documents.
  * All public functions are available in the Twig template renderer.
