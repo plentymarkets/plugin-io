@@ -7,7 +7,11 @@ use IO\Middlewares\ClearNotifications;
 use Plenty\Modules\Webshop\Contracts\SessionStorageRepositoryContract;
 
 /**
- * Class BasketService
+ * Service Class NotificationService
+ *
+ * This service class contains functions related to the notification functionality.
+ * All public functions are available in the Twig template renderer.
+ *
  * @package IO\Services
  */
 class NotificationService
@@ -26,7 +30,8 @@ class NotificationService
     }
 
     /**
-     * @param bool $clear
+     * Get a list of all notifications stored in the session
+     * @param bool $clear Optional: If true, notifications are cleared from the session afterwards (Default: true)
      * @return array
      */
     public function getNotifications($clear = true): array
@@ -54,10 +59,11 @@ class NotificationService
     }
 
     /**
-     * @param string $message
-     * @param string $type
-     * @param int $code
-     * @param array|null $placeholder
+     * Add a notification to the sessions notification list
+     * @param string $message The notifications message
+     * @param string $type The type of notification, see /IO/Constants/LogLevel
+     * @param int $code Optional: Message code (Default: 0)
+     * @param array|null $placeholder Optional: A placeholder
      */
     private function addNotification(string $message, string $type, int $code = 0, array $placeholder = null)
     {
@@ -89,9 +95,10 @@ class NotificationService
     }
 
     /**
-     * @param string $message
-     * @param int $code
-     * @param array $placeholder
+     * Shorthand for addNotification() with LogLevel::LOG
+     * @param string $message The notifications message
+     * @param int $code Optional: Message code (Default: 0)
+     * @param array|null $placeholder Optional: A placeholder
      */
     public function log(string $message, $code = 0, array $placeholder = null)
     {
@@ -99,9 +106,10 @@ class NotificationService
     }
 
     /**
-     * @param string $message
-     * @param int $code
-     * @param array|null $placeholder
+     * Shorthand for addNotification() with LogLevel::INFO
+     * @param string $message The notifications message
+     * @param int $code Optional: Message code (Default: 0)
+     * @param array|null $placeholder Optional: A placeholder
      */
     public function info(string $message, $code = 0, array $placeholder = null)
     {
@@ -109,9 +117,10 @@ class NotificationService
     }
 
     /**
-     * @param string $message
-     * @param int $code
-     * @param array|null $placeholder
+     * Shorthand for addNotification() with LogLevel::WARN
+     * @param string $message The notifications message
+     * @param int $code Optional: Message code (Default: 0)
+     * @param array|null $placeholder Optional: A placeholder
      */
     public function warn(string $message, $code = 0, array $placeholder = null)
     {
@@ -119,9 +128,10 @@ class NotificationService
     }
 
     /**
-     * @param string $message
-     * @param int $code
-     * @param array|null $placeholder
+     * Shorthand for addNotification() with LogLevel::ERROR
+     * @param string $message The notifications message
+     * @param int $code Optional: Message code (Default: 0)
+     * @param array|null $placeholder Optional: A placeholder
      */
     public function error(string $message, $code = 0, array $placeholder = null)
     {
@@ -129,9 +139,10 @@ class NotificationService
     }
 
     /**
-     * @param string $message
-     * @param int $code
-     * @param array|null $placeholder
+     * Shorthand for addNotification() with LogLevel::SUCCESS
+     * @param string $message The notifications message
+     * @param int $code Optional: Message code (Default: 0)
+     * @param array|null $placeholder Optional: A placeholder
      */
     public function success(string $message, $code = 0, array $placeholder = null)
     {
@@ -139,9 +150,10 @@ class NotificationService
     }
 
     /**
-     * @param string $type
-     * @param int $code
-     * @param array|null $placeholder
+     * Shorthand for addNotification() with empty message and variable type
+     * @param string $type The type of notification
+     * @param int $code Optional: Message code (Default: 0)
+     * @param array|null $placeholder Optional: A placeholder
      */
     public function addNotificationCode($type, int $code = 0, array $placeholder = null)
     {
@@ -149,6 +161,7 @@ class NotificationService
     }
 
     /**
+     * Check if the session currently has any notifications
      * @return bool
      */
     public function hasNotifications()
