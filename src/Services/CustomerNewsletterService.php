@@ -7,21 +7,46 @@ use Plenty\Modules\Account\Newsletter\Contracts\NewsletterRepositoryContract;
 use Plenty\Modules\Account\Newsletter\Models\Recipient;
 use Plenty\Modules\Authorization\Services\AuthHelper;
 
+/**
+ * Service Class CustomerNewsletterService
+ *
+ * This service class contains functions used for handling newsletter related tasks.
+ * All public functions are available in the Twig template renderer.
+ *
+ * @package IO\Services
+ */
 class CustomerNewsletterService
 {
     /** @var NewsletterRepositoryContract */
     private $newsletterRepo;
 
+    /**
+     * CustomerNewsletterService constructor.
+     * @param NewsletterRepositoryContract $newsletterRepo
+     */
     public function __construct(NewsletterRepositoryContract $newsletterRepo)
     {
         $this->newsletterRepo = $newsletterRepo;
     }
 
+    /**
+     * @param $email
+     * @param $emailFolder
+     * @param string $firstName
+     * @param string $lastName
+     */
     public function saveNewsletterData($email, $emailFolder, $firstName = '', $lastName = '')
     {
         $this->saveMultipleNewsletterData($email, [$emailFolder], $firstName, $lastName);
     }
 
+    /**
+     * @param $email
+     * @param $emailFolders
+     * @param string $firstName
+     * @param string $lastName
+     * @throws \Throwable
+     */
     public function saveMultipleNewsletterData($email, $emailFolders, $firstName = '', $lastName = '')
     {
         if (strlen($email) && count($emailFolders))
@@ -50,6 +75,12 @@ class CustomerNewsletterService
         }
     }
 
+    /**
+     * @param $authString
+     * @param $newsletterEmailId
+     * @return bool
+     * @throws \Throwable
+     */
     public function updateOptInStatus($authString, $newsletterEmailId)
     {
         /** @var AuthHelper $authHelper */
