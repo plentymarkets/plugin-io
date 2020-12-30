@@ -16,17 +16,36 @@ use Plenty\Modules\Webshop\ItemSearch\SearchPresets\VariationList;
 use Plenty\Modules\Webshop\ItemSearch\Services\ItemSearchService;
 use Plenty\Plugin\CachingRepository;
 
+/**
+ * Service Class ItemListService
+ *
+ * This service class contains function related to item listings.
+ * All public functions are available in the Twig template renderer.
+ *
+ * @package IO\Service
+ */
 class ItemListService
 {
-    const TYPE_CATEGORY           = 'category';
-    const TYPE_LAST_SEEN          = 'last_seen';
-    const TYPE_TAG                = 'tag_list';
-    const TYPE_RANDOM             = 'random';
-    const TYPE_MANUFACTURER       = 'manufacturer';
-    const TYPE_CROSS_SELLER       = 'cross_selling';
-    const TYPE_WISH_LIST          = 'wish_list';
-    const TYPE_SEARCH_SUGGESTIONS = 'search_suggestions';
+    public const TYPE_CATEGORY = 'category';
+    public const TYPE_LAST_SEEN = 'last_seen';
+    public const TYPE_TAG = 'tag_list';
+    public const TYPE_RANDOM = 'random';
+    public const TYPE_MANUFACTURER = 'manufacturer';
+    public const TYPE_CROSS_SELLER = 'cross_selling';
+    public const TYPE_WISH_LIST = 'wish_list';
+    public const TYPE_SEARCH_SUGGESTIONS = 'search_suggestions';
 
+    /**
+     * Gets a list of items based on parameters
+     * @param string $type Type of item list
+     * @param int|null $id Optional: Contains an identifier depending on the type
+     * @param string|null $sorting Optional: Type of sorting
+     * @param int $maxItems Optional: Maximum number of items (Default: 0)
+     * @param string|null $crossSellingRelationType Optional: Type of cross selling relation
+     * @param bool $withCategories Optional: If true, load category data (Default: false)
+     * @return array|null
+     * @throws \Exception
+     */
     public function getItemList(
         $type,
         $id = null,
@@ -34,7 +53,8 @@ class ItemListService
         $maxItems = 0,
         $crossSellingRelationType = null,
         $withCategories = false
-    ) {
+    )
+    {
         /** @var ItemSearchService $searchService */
         $searchService = pluginApp(ItemSearchService::class);
         $searchFactory = null;

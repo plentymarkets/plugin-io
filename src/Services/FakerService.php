@@ -6,7 +6,7 @@ use IO\Services\Basket\Factories\BasketResultFactory;
 use IO\Services\ItemSearch\Factories\Faker\FacetFaker;
 
 /**
- * Class FakerService
+ * Service Class FakerService
  *
  * This service class contains functions related to faking test data for the shop builder.
  * All public functions are available in the Twig template renderer.

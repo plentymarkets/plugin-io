@@ -8,7 +8,7 @@ use Plenty\Modules\Webshop\ItemSearch\Helpers\SortingHelper;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\ElasticSearch;
 
 /**
- * Class ItemCrossSellingService
+ * Service Class ItemCrossSellingService
  *
  * This service class contains functions that are related to cross selling of items.
  * All public functions are available in the Twig template renderer.
