@@ -43,7 +43,7 @@ use Plenty\Plugin\Application;
 
 
 /**
- * Class ItemService
+ * Service Class ItemService
  *
  * This service class contains functions related to common item tasks.
  * All public functions are available in the Twig template renderer.

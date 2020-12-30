@@ -8,7 +8,7 @@ use Plenty\Modules\Frontend\LegalInformation\Models\LegalInformation;
 use Plenty\Plugin\Application;
 
 /**
- * Class LegalInformationService
+ * Service Class LegalInformationService
  *
  * This service class contains functions related to the legal information widgets.
  * All public functions are available in the Twig template renderer.
