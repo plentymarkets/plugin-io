@@ -130,7 +130,7 @@ class UserDataHashService
         }
 
         return $entry->data;
-    }‚‚
+    }
 
     /**
      * Create a new entry and assign data to the hash for later usage.
