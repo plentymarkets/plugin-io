@@ -1,5 +1,15 @@
 # Release Notes for IO
 
+## v5.0.18 (2021-01-04) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.17...5.0.18" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
+
+### Added 
+
+- You can now determine the search operator of the online shop search in the Ceres assistant. You can either select an **And** or an **Or** operator.
+
+### Changed
+
+- The order sums now include the additional costs of characteristics.
+
 ## v5.0.17 (2020-12-21) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.16...5.0.17" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
 
 ### Changed
