@@ -163,7 +163,7 @@ class CategoryService
     }
 
     /**
-     * @param $categoryId
+     * @param int $categoryId
      * @param null $lang
      * @return mixed
      *
@@ -225,7 +225,7 @@ class CategoryService
 
     /**
      * Is called recursive to iterate threw category tree and return the category with the given id.
-     * @param $categoryTree
+     * @param object $categoryTree
      * @param array $branch
      * @param int $level
      * @return mixed|null
@@ -298,8 +298,8 @@ class CategoryService
     }
 
     /**
-     * @param $category
-     * @param $lang
+     * @param Category $category
+     * @param string $lang
      * @return CategoryDetails|null
      */
     public function getDetails($category, $lang)

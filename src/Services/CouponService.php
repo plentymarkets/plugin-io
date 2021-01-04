@@ -74,7 +74,7 @@ class CouponService
     }
 
     /**
-     * @param $basket
+     * @param object $basket
      * @return array
      */
     public function checkCoupon($basket): array
@@ -141,7 +141,7 @@ class CouponService
     /**
      * Checks, if the minimal order value is still reached by the new basket
      * @param Basket $basket
-     * @param $data Pseudo-BasketItem
+     * @param object $data Pseudo-BasketItem
      * @param array $basketItem
      * @param CouponCampaign $campaign
      * @return bool

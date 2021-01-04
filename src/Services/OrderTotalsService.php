@@ -11,9 +11,11 @@ namespace IO\Services;
 use IO\Builder\Order\OrderItemType;
 use Plenty\Modules\Accounting\Contracts\AccountingLocationRepositoryContract;
 use Plenty\Modules\Frontend\Services\VatService;
+use Plenty\Modules\Order\Date\Models\OrderDateType;
 use Plenty\Modules\Order\Models\Order;
 use Plenty\Modules\Order\Models\OrderItem;
 use Plenty\Modules\Order\Shipping\Contracts\EUCountryCodesServiceContract;
+use Plenty\Modules\Webshop\Helpers\NumberFormatter;
 
 /**
  * Calculate order totals
@@ -45,11 +47,14 @@ class OrderTotalsService
         $isNet = $order->amounts[$amountId]->isNet;
         $itemSumRebateGross = 0;
         $itemSumRebateNet = 0;
+        $additionalCosts = [];
 
         $orderItems = $order->orderItems;
 
         $accountRepo = pluginApp(AccountingLocationRepositoryContract::class);
         $vatService = pluginApp(VatService::class);
+        /** @var NumberFormatter $numberFormatter */
+        $numberFormatter = pluginApp(NumberFormatter::class);
         /**
          * @var EUCountryCodesServiceContract $euCountryCodesServiceContract
          */
@@ -71,10 +76,12 @@ class OrderTotalsService
 
                     $shippingGross += $firstAmount->priceGross;
                     $shippingNet += $firstAmount->priceNet;
+                    $entryDate = $order->dates->where('typeId', OrderDateType::ORDER_ENTRY_AT)->first();
 
                     if ((bool)$accountSettings->showShippingVat && $euCountryCodesServiceContract->isExportDelivery(
                             $order->deliveryAddress->countryId,
-                            $item->countryVatId
+                            $item->countryVatId,
+                            isset($entryDate) ? $entryDate->date->toDateString() : $order->createdAt->toDateString()
                         )) {
                         $shippingNet = $shippingGross;
                     }
@@ -86,14 +93,29 @@ class OrderTotalsService
                     $itemNameArray = explode(' ', rtrim($item->orderItemName));
                     $couponCode = end($itemNameArray);
                     break;
+                case OrderItemType::DEPOSIT;
+                    if (!empty($item->amounts)) {
+                        $price = $item->amounts[0]->priceGross;
+                        $currency = $item->amounts[0]->currency;
+                        $additionalCosts[] = [
+                            'id' => $item->id,
+                            'quantity' => $item->quantity,
+                            'name' => $item->orderItemName,
+                            'price' => $price,
+                            'currency' => $currency,
+                            'formattedTotalPrice'
+                                => $numberFormatter->formatMonetary($price * $item->quantity, $currency)
+                        ];
+                    }
+                    break;
                 default:
                     // noop
             }
 
             if ($firstAmount->discount > 0) {
                 if ($firstAmount->isPercentage) {
-                    $itemSumRebateGross += $item->quantity * $firstAmount->priceOriginalGross * $firstAmount->discount / 100;
-                    $itemSumRebateNet += $item->quantity * $firstAmount->priceOriginalNet * $firstAmount->discount / 100;
+                    $itemSumRebateGross += round($item->quantity * $firstAmount->priceOriginalGross * $firstAmount->discount / 100,2);
+                    $itemSumRebateNet += round($item->quantity * $firstAmount->priceOriginalNet * $firstAmount->discount / 100,2);
                 } else {
                     $itemSumRebateGross += $item->quantity * $firstAmount->discount;
                 }
@@ -137,7 +159,8 @@ class OrderTotalsService
             'totalGross',
             'totalNet',
             'currency',
-            'isNet'
+            'isNet',
+            'additionalCosts'
         );
     }
 

@@ -8,6 +8,9 @@ use Plenty\Plugin\Http\Request;
 use IO\Api\ApiResource;
 use IO\Api\ApiResponse;
 use IO\Api\ResponseCode;
+use IO\Constants\LogLevel;
+use IO\Helper\ReCaptcha;
+use IO\Services\NotificationService;
 
 class CustomerNewsletterResource extends ApiResource
 {
@@ -32,6 +35,16 @@ class CustomerNewsletterResource extends ApiResource
         {
             // We can potentially expand on the honeypot handling with sending reports to spam protect services
             return $this->response->create(['containsHoneypot' => true], ResponseCode::OK);
+        }
+
+        if (!ReCaptcha::verify($this->request->get('recaptcha', null))) {
+            /**
+            * @var NotificationService $notificationService
+            */
+            $notificationService = pluginApp(NotificationService::class);
+            $notificationService->addNotificationCode(LogLevel::ERROR, 13);
+
+            return $this->response->create('', ResponseCode::BAD_REQUEST);
         }
 
         $email = $this->request->get('email', '');

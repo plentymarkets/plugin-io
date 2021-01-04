@@ -1,5 +1,33 @@
 # Release Notes for IO
 
+## v5.0.17 (2020-12-21) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.16...5.0.17" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
+
+### Changed
+
+- Code documentation as been updated in a number of placed by adding viable input types.
+
+## v5.0.16 (2020-12-01) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.15...5.0.16" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
+
+### Added
+
+- The newsletter widget now uses Google reCAPTCHA.
+
+### Changed
+
+- Under certain circumstances, the order confirmation could contain rounding errors. This behaviour has been fixed.
+- For a default country of delivery that supports export deliveries, gross prices were displayed when the online shop was accessed the first time. This behaviour has been fixed.
+- Under certain circumstances, the language selection could lead to errors in combination with URLs. This has been fixed.
+- If the currency settings in the Ceres plugin had never been saved, it was possible to set an invalid currency via a currency parameter. This behaviour has been fixed.
+
+## v5.0.15 (2020-11-09) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.14...5.0.15" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
+
+### Fixed
+
+- Rounding prices with more than 2 decimal places could lead to errors. This has been fixed. 
+- The properties of the initially displayed variations of item sets were not loaded correctly. This has been fixed.
+- Under certain circumstances, accessing the order confirmation page could lead to error notifications in the log. This has been fixed.
+- The ShopBuilder did not display all sample data of an item, if this data had the value 0. This has been fixed.
+
 ## v5.0.14 (2020-10-20) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.13...5.0.14" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
 
 ### Changed

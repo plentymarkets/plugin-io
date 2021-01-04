@@ -16,7 +16,7 @@ use IO\Services\LocalizationService;
 class LanguageResource extends ApiResource
 {
     /**
-    * @var
+    * @var LocalizationService
     */
     private $localizationService;
 

@@ -177,6 +177,7 @@ class BasketService
         $basket["isExportDelivery"] = $euCountryService->isExportDelivery(
             $basket["shippingCountryId"] ?? $this->webstoreConfigurationRepository->getDefaultShippingCountryId()
         );
+
         $basket["shopCountryId"] = $determineShopCountry->getCountryId();
 
         $basket["itemWishListIds"] = $wishListService->getItemWishList();
@@ -401,6 +402,12 @@ class BasketService
     public function checkBasketItemsByPrice()
     {
         $basketItems = $this->getBasketItemsRaw();
+
+        // Don't check if no basket items.
+        if (count($basketItems) <= 0) {
+            return 0;
+        }
+
         $basketItemData = $this->getBasketItemData($basketItems);
         $basketItems = $this->addVariationData($basketItems, $basketItemData, true);
 
@@ -579,7 +586,7 @@ class BasketService
 
     /**
      * Add the given data to the basket
-     * @param $data
+     * @param object $data
      * @return array
      */
     private function addDataToBasket($data)
