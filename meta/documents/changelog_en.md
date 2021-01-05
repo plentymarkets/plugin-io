@@ -1,5 +1,11 @@
 # Release Notes for IO
 
+## v5.0.19 (2021-01-05) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.18...5.0.19" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
+
+### Changed
+
+- In order to improve webshop performance, the caching time of the shop URLs that are linked in the ShopBuilder settings, which was introduced in version 5.0.7, has been increased from 5 minutes to 10 minutes. 
+
 ## v5.0.18 (2021-01-04) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.17...5.0.18" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
 
 ### Added 
