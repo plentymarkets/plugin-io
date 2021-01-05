@@ -223,7 +223,7 @@ class ShopUrls
             $this->newsletterOptOut = $dataForCache['newsletterOptOut'] = $this->getShopUrl(RouteConfig::NEWSLETTER_OPT_OUT, $lang);
             $this->orderDocument = $dataForCache['orderDocument'] = $this->getShopUrl(RouteConfig::ORDER_DOCUMENT);
 
-            Utils::putCacheKey('shopUrls_' . $lang, $dataForCache, 5);
+            Utils::putCacheKey('shopUrls_' . $lang, $dataForCache, 10);
         }
     }
 
