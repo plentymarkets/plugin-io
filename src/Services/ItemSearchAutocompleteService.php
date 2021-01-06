@@ -94,6 +94,7 @@ class ItemSearchAutocompleteService
                     'page' => 1,
                     'itemsPerPage' => 20,
                     'withCategories' => in_array('category', $searchTypes),
+                    'searchOperator' => $this->webstoreConfiguration->itemAutocompleteSearchOperator
                 ]
             )
         ];
