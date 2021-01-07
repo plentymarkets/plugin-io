@@ -2,6 +2,7 @@
 
 namespace IO\Models;
 
+use IO\Builder\Order\OrderType;
 use IO\Services\TemplateConfigService;
 use Plenty\Modules\Order\Models\OrderItem;
 use Plenty\Modules\Order\Models\OrderItemType;
@@ -33,6 +34,18 @@ class LocalizedOrder extends ModelWrapper
         OrderItemType::TYPE_PROMOTIONAL_COUPON,
         OrderItemType::TYPE_GIFT_CARD,
         OrderItemType::TYPE_SHIPPING_COSTS,
+        OrderItemType::TYPE_UNASSIGEND_VARIATION,
+        OrderItemType::TYPE_DEPOSIT,
+        OrderItemType::TYPE_ITEM_SET,
+        OrderItemType::TYPE_SET_COMPONENT,
+    ];
+
+    const WRAPPED_ORDERITEM_TYPES_FOR_RETURN = [
+        OrderItemType::TYPE_VARIATION,
+        OrderItemType::TYPE_ITEM_BUNDLE,
+        OrderItemType::TYPE_BUNDLE_COMPONENT,
+        OrderItemType::TYPE_PROMOTIONAL_COUPON,
+        OrderItemType::TYPE_GIFT_CARD,
         OrderItemType::TYPE_UNASSIGEND_VARIATION,
         OrderItemType::TYPE_DEPOSIT,
         OrderItemType::TYPE_ITEM_SET,
@@ -162,8 +175,10 @@ class LocalizedOrder extends ModelWrapper
         $instance->status = $orderStatusService->getOrderStatus($order->id, $order->statusId);
 
         $orderVariationIds = [];
+
+        $wrappedOrderitemTypes = $order->typeId === OrderType::RETURNS ? self::WRAPPED_ORDERITEM_TYPES_FOR_RETURN : self::WRAPPED_ORDERITEM_TYPES;
         foreach ($order->orderItems as $key => $orderItem) {
-            if (in_array((int)$orderItem->typeId, self::WRAPPED_ORDERITEM_TYPES)) {
+            if (in_array((int)$orderItem->typeId, $wrappedOrderitemTypes)) {
                 if ($orderItem->itemVariationId !== 0) {
                     $orderVariationIds[] = $orderItem->itemVariationId;
                 }
