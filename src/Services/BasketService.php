@@ -173,6 +173,7 @@ class BasketService
         }
 
         $basket = $this->couponService->checkCoupon($basket);
+        $determineShopCountry->initByPlentyId(Utils::getPlentyId());
 
         $basket["isExportDelivery"] = $euCountryService->isExportDelivery(
             $basket["shippingCountryId"] ?? $this->webstoreConfigurationRepository->getDefaultShippingCountryId()
