@@ -5,13 +5,20 @@ namespace IO\Services;
 use Plenty\Plugin\Application;
 
 /**
- * Class PropertyFileService
+ * Service Class PropertyFileService
+ *
+ * This service class contains functions related to file properties.a
+ * All public functions are available in the Twig template renderer.
+ *
  * @package IO\Services
  */
 class PropertyFileService
 {
-
-    public function getPropertyFileUrl():string
+    /**
+     * Get the URL where file properties are stored
+     * @return string
+     */
+    public function getPropertyFileUrl(): string
     {
         /**
          * @var Application $application

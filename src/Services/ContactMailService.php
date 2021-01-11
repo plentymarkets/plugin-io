@@ -9,21 +9,34 @@ use Plenty\Plugin\Mail\Models\ReplyTo;
 use Plenty\Plugin\Templates\Twig;
 use Plenty\Plugin\Translation\Translator;
 
+/**
+ * Class ContactMailService
+ *
+ * This service class contains a method for sending Emails.
+ * All public functions are available in the Twig template renderer.
+ *
+ * @package IO\Services
+ */
 class ContactMailService
 {
     use Loggable;
 
-    public function sendMail($mailTemplate, $mailData = [])
+    /**
+     * Send an email using a template and a data object
+     *
+     * @param string $mailTemplate The template for the email
+     * @param array $mailData Optional: Data for Email
+     * @return bool
+     */
+    public function sendMail(string $mailTemplate, $mailData = [])
     {
         $recipient = $mailData['recipient'];
 
-        if ( !strlen($recipient) )
-        {
+        if (!strlen($recipient)) {
             $recipient = Utils::getTemplateConfig('contact.shop_mail');
         }
 
-        if(!strlen($recipient) || !strlen($mailTemplate))
-        {
+        if (!strlen($recipient) || !strlen($mailTemplate)) {
             $this->getLogger(__CLASS__)->error("IO::Debug.ContactMailService_noRecipient");
             return false;
         }
@@ -36,8 +49,7 @@ class ContactMailService
             $mailData
         );
 
-        if(!strlen($mailBody))
-        {
+        if (!strlen($mailBody)) {
             $this->getLogger(__CLASS__)->error("IO::Debug.ContactMailService_noMailContent");
             return false;
         }
@@ -46,8 +58,7 @@ class ContactMailService
         $mailer = pluginApp(MailerContract::class);
 
         $replyTo = null;
-        if ( array_key_exists('replyTo', $mailData) )
-        {
+        if (array_key_exists('replyTo', $mailData)) {
             /** @var ReplyTo $replyTo */
             $replyTo = pluginApp(ReplyTo::class);
             $replyTo->mailAddress = $mailData['replyTo']['mail'];
@@ -59,15 +70,13 @@ class ContactMailService
             'Ceres::Template.contactMailSubject',
             [
                 'subject' => $mailData['subject'],
-                'data'    => $mailData['data']
+                'data' => $mailData['data']
             ]
         );
 
-        try
-        {
+        try {
             $mailer->sendHtml($mailBody, $recipient, $subject, $mailData['cc'] ?? [], $mailData['bcc'] ?? [], $replyTo);
-        }catch(\Exception $exception)
-        {
+        } catch (\Exception $exception) {
             return false;
         }
         return true;

@@ -7,14 +7,15 @@ use IO\Helper\RouteConfig;
 use Plenty\Plugin\Http\Request;
 
 /**
- * Class SeoService
+ * Service Class SeoService
+ *
+ * This service class contains functions related to search engine optimization.
+ * All public functions are available in the Twig template renderer.
  *
  * @package IO\Services
  */
 class SeoService
 {
-    public function __construct() {}
-
     /**
      * Get meta robot information
      *
@@ -22,8 +23,8 @@ class SeoService
      * and a default value when category data is not set $defaultValueWithoutCategoryData.
      * $defaultValueWithoutCategoryData can be changed after rule check
      *
-     * @param string $returnValueErrorCase
-     * @param string $defaultValueWithoutCategoryData
+     * @param string $returnValueErrorCase Optional: Value for error case (Default: 'NOINDEX')
+     * @param string $defaultValueWithoutCategoryData Optional: Default value when category data is not set (Default: 'ALL')
      * @return string
      */
     public function getRobotsInformation($returnValueErrorCase = 'NOINDEX', $defaultValueWithoutCategoryData = 'ALL'): string

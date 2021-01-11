@@ -10,6 +10,15 @@ use Plenty\Modules\Item\VariationCategory\Contracts\VariationCategoryRepositoryC
 use Plenty\Modules\Order\Coupon\Campaign\Contracts\CouponCampaignRepositoryContract;
 use Plenty\Modules\Order\Coupon\Campaign\Models\CouponCampaign;
 
+
+/**
+ * Service Class CouponService
+ *
+ * This service class contains functions related to coupons in the basket.
+ * All public functions are available in the Twig template renderer.
+ *
+ * @package IO\Services
+ */
 class CouponService
 {
     /**
@@ -33,8 +42,8 @@ class CouponService
     private $authHelper;
 
     // Info constants
-    const BELOW_MINIMAL_ORDER_VALUE = 301;
-    const NO_VALID_ITEM_IN_BASKET = 302;
+    public const BELOW_MINIMAL_ORDER_VALUE = 301;
+    public const NO_VALID_ITEM_IN_BASKET = 302;
 
     /**
      * CouponService constructor.
@@ -48,18 +57,29 @@ class CouponService
         BasketRepositoryContract $basketRepository,
         VariationCategoryRepositoryContract $variationCategoryRepository,
         AuthHelper $authHelper
-    ) {
+    )
+    {
         $this->couponCampaignRepository = $couponCampaignRepository;
         $this->basketRepository = $basketRepository;
         $this->variationCategoryRepository = $variationCategoryRepository;
         $this->authHelper = $authHelper;
     }
 
+    /**
+     * Setter for couponCode
+     * @param string $couponCode Code representing a coupon
+     * @return Basket
+     */
     public function setCoupon(string $couponCode)
     {
         return $this->basketRepository->setCouponCode($couponCode);
     }
 
+    /**
+     * Remove the coupon code from the basket and optionally throw a notification with a code.
+     * @param int|null $code Optional: Error code for notification
+     * @return Basket
+     */
     public function removeCoupon($code = null)
     {
         $response = $this->basketRepository->removeCouponCode();
@@ -74,7 +94,8 @@ class CouponService
     }
 
     /**
-     * @param object $basket
+     * Get a basket with applied coupon discounts
+     * @param array $basket The basket
      * @return array
      */
     public function checkCoupon($basket): array
@@ -96,7 +117,7 @@ class CouponService
 
     /**
      * Validate the basket for the coupon, and remove the coupon if invalid
-     * @param Basket $basket
+     * @param Basket $basket The basket
      * @param array $basketItem Current basketItem
      * @deprecated since 5.0.9. Validation is handled b the plentymarkets core from now.
      */
@@ -119,7 +140,7 @@ class CouponService
 
     /**
      * Validate the basket for the coupon, and remove the coupon if invalid
-     * @param Basket $basket
+     * @param Basket $basket The Basket
      * @param array $data New basketItem
      * @param array $basketItem Current basketItem
      * @deprecated since 5.0.9. Validation is handled b the plentymarkets core from now.
@@ -139,11 +160,27 @@ class CouponService
     }
 
     /**
+     * Checks, if the coupon's discount changes shipping costs.
+     * @param CouponCampaign $campaign Contains information about the campaign
+     * @return bool
+     */
+    public function effectsOnShippingCosts(CouponCampaign $campaign)
+    {
+        if (($campaign->includeShipping && $campaign->discountType == CouponCampaign::DISCOUNT_TYPE_FIXED) ||
+            $campaign->discountType == CouponCampaign::DISCOUNT_TYPE_SHIPPING
+        ) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /**
      * Checks, if the minimal order value is still reached by the new basket
-     * @param Basket $basket
-     * @param object $data Pseudo-BasketItem
-     * @param array $basketItem
-     * @param CouponCampaign $campaign
+     * @param Basket $basket The Basket
+     * @param array $data Pseudo-BasketItem
+     * @param array $basketItem Current BasketItem
+     * @param CouponCampaign $campaign Contains information about the campaign
      * @return bool
      */
     private function isCouponMinimalOrderOnUpdate($basket, $data, $basketItem, $campaign): bool
@@ -179,9 +216,9 @@ class CouponService
 
     /**
      * Checks, if the minimal order value is still reached by the new basket
-     * @param Basket $basket
-     * @param array $basketItem
-     * @param CouponCampaign $campaign
+     * @param Basket $basket The basket
+     * @param array $basketItem Current BasketItem
+     * @param CouponCampaign $campaign Contains information about the campaign
      * @return bool
      */
     private function isCouponMinimalOrderOnDelete($basket, $basketItem, $campaign): bool
@@ -194,9 +231,9 @@ class CouponService
     /**
      * Checks if at least one more item in the basket is valid for the coupon
      * Validity requires there to be > 1 valid items
-     * @param Basket $basket
-     * @param array $basketItem
-     * @param CouponCampaign $campaign
+     * @param Basket $basket The basket array
+     * @param array $basketItem Current BasketItem
+     * @param CouponCampaign $campaign Contains information about the campaign
      * @return bool
      */
     private function isCouponValidForBasketItems($basket, $basketItem, $campaign): bool
@@ -255,8 +292,8 @@ class CouponService
 
     /**
      * Get all items in basket, which are NOT associated with the current campaign
-     * @param Basket $basket
-     * @param CouponCampaign $campaign
+     * @param Basket $basket The Basket
+     * @param CouponCampaign $campaign Contains information about the campaign
      * @return array
      */
     private function getNormalBasketItems($basket, $campaign)
@@ -298,6 +335,7 @@ class CouponService
      * Get the categoryIds of an variationId
      * @param int $variationId
      * @return array
+     * @throws \Throwable
      */
     private function getCategoryIds($variationId)
     {
@@ -334,16 +372,5 @@ class CouponService
         }
 
         return array_unique($categoryIds);
-    }
-
-    public function effectsOnShippingCosts(CouponCampaign $campaign)
-    {
-        if (($campaign->includeShipping && $campaign->discountType == CouponCampaign::DISCOUNT_TYPE_FIXED) ||
-            $campaign->discountType == CouponCampaign::DISCOUNT_TYPE_SHIPPING
-        ) {
-            return true;
-        } else {
-            return false;
-        }
     }
 }

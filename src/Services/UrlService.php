@@ -13,7 +13,14 @@ use Plenty\Modules\Webshop\Contracts\WebstoreConfigurationRepositoryContract;
 use Plenty\Plugin\Http\Request;
 use Plenty\Plugin\Http\Response;
 
-
+/**
+ * Service Class UrlService
+ *
+ * This service class contains functions related to url generation etc.
+ * All public functions are available in the Twig template renderer.
+ *
+ * @package IO\Services
+ */
 class UrlService
 {
     use MemoryCache;
@@ -27,15 +34,16 @@ class UrlService
      */
     public function __construct(
         WebstoreConfigurationRepositoryContract $webstoreConfigurationRepository
-    ) {
+    )
+    {
         $this->webstoreConfigurationRepository = $webstoreConfigurationRepository;
     }
 
     /**
-     * Get canonical url for a category
-     * @param int $categoryId
-     * @param string|null $lang
-     * @param int|null $webstoreId
+     * Get canonical URL for a category
+     * @param int $categoryId A category id to get the URL for
+     * @param string|null $lang Optional: A language for the URL (ISO-639-1) (Default: The current language)
+     * @param int|null $webstoreId Optional: A webstore id (Default: The current webstore id)
      * @return UrlQuery
      */
     public function getCategoryURL($categoryId, $lang = null, $webstoreId = null)
@@ -44,8 +52,7 @@ class UrlService
             $lang = Utils::getLang();
         }
 
-        if ($webstoreId === null)
-        {
+        if ($webstoreId === null) {
             $webstoreId = Utils::getWebstoreId();
         }
         $categoryUrl = $this->fromMemoryCache(
@@ -61,10 +68,10 @@ class UrlService
     }
 
     /**
-     * Get canonical url for a variation
-     * @param int $itemId
-     * @param int $variationId
-     * @param string|null $lang
+     * Get canonical URL for a variation
+     * @param int $itemId An item id to get URL for
+     * @param int $variationId An variation id to get URL for
+     * @param string|null $lang Optional: A language to get URL for (ISO-639-1) (Default: The current language)
      * @return UrlQuery
      */
     public function getVariationURL($itemId, $variationId, $lang = null)
@@ -95,9 +102,9 @@ class UrlService
     }
 
     /**
-     * Get canonical url for current page
-     * @param string|null $lang
-     * @param bool $ignoreCanonical
+     * Get canonical URL for current page
+     * @param string|null $lang Optional: Language for the URL
+     * @param bool $ignoreCanonical Optional: If true, get canonical from category details (Default: false)
      * @return string|null
      */
     public function getCanonicalURL($lang = null, $ignoreCanonical = false)
@@ -127,7 +134,7 @@ class UrlService
 
                 if (substr(TemplateService::$currentTemplate, 0, 12) === 'tpl.category' ||
                     substr(TemplateService::$currentTemplate, 0, 12) === 'tpl.checkout' ||
-                    substr(TemplateService::$currentTemplate, 0, 14) === 'tpl.my-account'){
+                    substr(TemplateService::$currentTemplate, 0, 14) === 'tpl.my-account') {
 
                     $currentCategory = $categoryService->getCurrentCategory();
 
@@ -160,7 +167,7 @@ class UrlService
     }
 
     /**
-     * Get query string from uri, return an empty string if its an canonical link from category details
+     * Get query string from URI, return an empty string if its an canonical link from category details
      * @return  string
      */
     public function getCanonicalQueryString(): string
@@ -197,7 +204,7 @@ class UrlService
 
     /**
      * Check if the current URL is canonical
-     * @param null $lang
+     * @param string|null $lang Optional: A language for the check (Default: The current language)
      * @return bool
      */
     public function isCanonical($lang = null)
@@ -221,7 +228,7 @@ class UrlService
     }
 
     /**
-     * Get equivalent canonical urls for each active language
+     * Get equivalent canonical URLs for each active language
      * @return array
      */
     public function getLanguageURLs()
@@ -258,7 +265,7 @@ class UrlService
 
 
     /**
-     * Get language specific homepage url
+     * Get language specific homepage URL
      * @return string
      * @deprecated since 4.3.0
      * Use IO\Extensions\Constants\ShopUrls::$home instead.

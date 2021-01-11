@@ -8,6 +8,14 @@ use Plenty\Modules\Plugin\DataBase\Contracts\DataBase;
 use Plenty\Modules\Plugin\DataBase\Contracts\Model;
 use Plenty\Modules\Webshop\Contracts\ContactRepositoryContract;
 
+/**
+ * Service Class UserDataHashService
+ *
+ * This service class contains functions related to hashing and data storage.
+ * All public functions are available from the Twig template renderer.
+ *
+ * @package IO\Services
+ */
 class UserDataHashService
 {
     /** @var DataBase */
@@ -17,7 +25,7 @@ class UserDataHashService
     /**
      * UserDataHashService constructor.
      *
-     * @param DataBase              $dataBase
+     * @param DataBase $dataBase
      * @param TemplateConfigService $templateConfigService
      */
     public function __construct(DataBase $dataBase, TemplateConfigService $templateConfigService)
@@ -29,26 +37,23 @@ class UserDataHashService
     /**
      * Get entry by hash if exists
      *
-     * @param string    $hash           The hash to search an entry for
-     * @param int       $contactId      Optionally restrict results to a contact id. Otherwise use logged in contact
-     * @param int       $plentyId       Use a specific plentyId. Otherwise use id of current client.
+     * @param string $hash The hash to search an entry for
+     * @param int|null $contactId Optional: Restrict results to a contact id. Otherwise use logged in contact
+     * @param int|null $plentyId Optional: Use a specific plentyId. Otherwise use id of current client.
      *
      * @return null|UserDataHash
      */
-    public function find( $hash, $contactId = null, $plentyId = null )
+    public function find($hash, $contactId = null, $plentyId = null)
     {
-        if ( is_null($plentyId) )
-        {
+        if (is_null($plentyId)) {
             $plentyId = Utils::getPlentyId();
         }
 
-        if ( is_null($contactId) )
-        {
+        if (is_null($contactId)) {
             $contactId = $this->getContactId();
         }
 
-        if ( is_null($contactId) || $contactId <= 0 )
-        {
+        if (is_null($contactId) || $contactId <= 0) {
             return null;
         }
 
@@ -60,8 +65,7 @@ class UserDataHashService
             ->orWhere('expiresAt', '=', '')
             ->get();
 
-        if (count($results))
-        {
+        if (count($results)) {
             /** @var UserDataHash $entry */
             $entry = pluginApp(UserDataHash::class);
             $entry->fillByAttributes(json_decode(json_encode($results[0]), true));
@@ -73,38 +77,34 @@ class UserDataHashService
 
     /**
      * Get the hash of a specific type if exists and is not expired.
-     * @param string    $type           The type to get the hash for
-     * @param int       $contactId      Optionally restrict results to a contact id. Otherwise use logged in contact
-     * @param int       $plentyId       Use a specific plentyId. Otherwise use id of current client.
+     * @param string $type The type to get the hash for
+     * @param int|null $contactId Optional: Restrict results to a contact id. Otherwise use logged in contact
+     * @param int|null $plentyId Optional: Use a specific plentyId. Otherwise use id of current client.
      * @return null|string
      */
-    public function findHash( $type, $contactId = null, $plentyId = null )
+    public function findHash($type, $contactId = null, $plentyId = null)
     {
-        if ( is_null($plentyId) )
-        {
+        if (is_null($plentyId)) {
             $plentyId = Utils::getPlentyId();
         }
 
-        if ( is_null($contactId) )
-        {
+        if (is_null($contactId)) {
             $contactId = $this->getContactId();
         }
 
-        if ( is_null($contactId) || $contactId <= 0 )
-        {
+        if (is_null($contactId) || $contactId <= 0) {
             return null;
         }
 
         $results = $this->db->query(UserDataHash::class)
             ->where('contactId', '=', $contactId)
             ->where('plentyId', '=', $plentyId)
-            ->where('type', '=', $type )
+            ->where('type', '=', $type)
             ->where('expiresAt', '>', date("Y-m-d H:i:s"))
             ->orWhere('expiresAt', '=', '')
             ->get();
 
-        if (count($results))
-        {
+        if (count($results)) {
             /** @var UserDataHash $entry */
             $entry = $results[0];
             return $entry->hash;
@@ -116,17 +116,16 @@ class UserDataHashService
     /**
      * Get the decoded data assigned to a hash
      *
-     * @param string    $hash           The hash to search an entry for
-     * @param int       $contactId      Optionally restrict results to a contact id. Otherwise use logged in contact
-     * @param int       $plentyId       Use a specific plentyId. Otherwise use id of current client.
+     * @param string $hash The hash to search an entry for
+     * @param int|null $contactId Optional: Restrict results to a contact id. Otherwise use logged in contact
+     * @param int|null $plentyId Optional: Use a specific plentyId. Otherwise use id of current client.
      *
      * @return mixed|null
      */
-    public function getData( $hash, $contactId = null, $plentyId = null )
+    public function getData($hash, $contactId = null, $plentyId = null)
     {
-        $entry = $this->find( $hash, $contactId, $plentyId );
-        if (is_null($entry))
-        {
+        $entry = $this->find($hash, $contactId, $plentyId);
+        if (is_null($entry)) {
             return null;
         }
 
@@ -136,33 +135,29 @@ class UserDataHashService
     /**
      * Create a new entry and assign data to the hash for later usage.
      *
-     * @param mixed     $data           The data to assign to the generated hash entry
-     * @param string    $type           The type of the entry
-     * @param int       $ttl            Lifetime of the hash entry in hours. Will get the value from config if not defined.
-     * @param int       $contactId      Optionally restrict results to a contact id. Otherwise use logged in contact
-     * @param int       $plentyId       Use a specific plentyId. Otherwise use id of current client.
+     * @param mixed $data The data to assign to the generated hash entry
+     * @param string $type The type of the entry
+     * @param int|null $ttl Optional: Lifetime of the hash entry in hours. Will get the value from config if not defined.
+     * @param int|null $contactId Optional: Restrict results to a contact id. Otherwise use logged in contact
+     * @param int|null $plentyId Optional: Use a specific plentyId. Otherwise use id of current client.
      *
      * @return null|UserDataHash
      */
-    public function create( $data, $type, $ttl = null, $contactId = null, $plentyId = null )
+    public function create($data, $type, $ttl = null, $contactId = null, $plentyId = null)
     {
-        if ( is_null($plentyId) )
-        {
+        if (is_null($plentyId)) {
             $plentyId = Utils::getPlentyId();
         }
 
-        if ( is_null($contactId) )
-        {
+        if (is_null($contactId)) {
             $contactId = $this->getContactId();
         }
 
-        if ( is_null($contactId) || $contactId <= 0 )
-        {
+        if (is_null($contactId) || $contactId <= 0) {
             return null;
         }
 
-        if ( is_null($ttl) )
-        {
+        if (is_null($ttl)) {
             $ttl = $this->defaultTTL;
         }
         $existingEntries = $this->db->query(UserDataHash::class)
@@ -171,25 +166,21 @@ class UserDataHashService
             ->where('type', '=', $type)
             ->get();
 
-        foreach($existingEntries as $entry)
-        {
+        foreach ($existingEntries as $entry) {
             $this->db->delete($entry);
         }
 
         /** @var UserDataHash $entry */
         $entry = pluginApp(UserDataHash::class);
-        $entry->type        = $type;
-        $entry->plentyId    = $plentyId;
-        $entry->contactId   = $contactId;
-        $entry->hash        = sha1(microtime(true));
-        $entry->data        = json_encode( $data );
-        $entry->createdAt   = date("Y-m-d H:i:s");
-        if ( $ttl > 0 )
-        {
+        $entry->type = $type;
+        $entry->plentyId = $plentyId;
+        $entry->contactId = $contactId;
+        $entry->hash = sha1(microtime(true));
+        $entry->data = json_encode($data);
+        $entry->createdAt = date("Y-m-d H:i:s");
+        if ($ttl > 0) {
             $entry->expiresAt = date("Y-m-d H:i:s", time() + ($ttl * 60 * 60));
-        }
-        else
-        {
+        } else {
             $entry->expiresAt = '';
         }
 
@@ -205,17 +196,16 @@ class UserDataHashService
     /**
      * Remove a hash entry if exists.
      *
-     * @param string    $hash           The hash to search an entry for
-     * @param int       $contactId      Optionally restrict results to a contact id. Otherwise use logged in contact
-     * @param int       $plentyId       Use a specific plentyId. Otherwise use id of current client.
+     * @param string $hash The hash to search an entry for
+     * @param int|null $contactId Optional: Restrict results to a contact id. Otherwise use logged in contact
+     * @param int|null $plentyId Optional: Use a specific plentyId. Otherwise use id of current client.
      *
      * @return bool
      */
-    public function delete( $hash, $contactId = null, $plentyId = null )
+    public function delete($hash, $contactId = null, $plentyId = null)
     {
-        $entry = $this->find( $hash, $contactId, $plentyId );
-        if (!is_null($entry))
-        {
+        $entry = $this->find($hash, $contactId, $plentyId);
+        if (!is_null($entry)) {
             $this->db->delete($entry);
             return true;
         }
@@ -226,26 +216,23 @@ class UserDataHashService
     /**
      * Delete all entries
      *
-     * @param string    $type           Optional delete only entries for a specific type
-     * @param int       $contactId      Optionally restrict results to a contact id. Otherwise use logged in contact
-     * @param int       $plentyId       Use a specific plentyId. Otherwise use id of current client.
+     * @param string|null $type Optional: Delete only entries for a specific type
+     * @param int|null $contactId Optional: Restrict results to a contact id. Otherwise use logged in contact
+     * @param int|null $plentyId Optional: Use a specific plentyId. Otherwise use id of current client.
      *
      * @return bool
      */
-    public function deleteAll( $type = null, $contactId = null, $plentyId = null )
+    public function deleteAll($type = null, $contactId = null, $plentyId = null)
     {
-        if ( is_null($plentyId) )
-        {
+        if (is_null($plentyId)) {
             $plentyId = Utils::getPlentyId();
         }
 
-        if ( is_null($contactId) )
-        {
+        if (is_null($contactId)) {
             $contactId = $this->getContactId();
         }
 
-        if ( is_null($contactId) || $contactId <= 0 )
-        {
+        if (is_null($contactId) || $contactId <= 0) {
             return false;
         }
 
@@ -253,14 +240,16 @@ class UserDataHashService
             ->where('contactId', '=', $contactId)
             ->where('plentyId', '=', $plentyId);
 
-        if (!is_null($type))
-        {
+        if (!is_null($type)) {
             $query = $query->where('type', '=', $type);
         }
 
         return $query->delete();
     }
 
+    /**
+     * @return int
+     */
     private function getContactId()
     {
         /** @var ContactRepositoryContract $contactRepository */

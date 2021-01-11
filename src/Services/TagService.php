@@ -7,9 +7,12 @@ use Plenty\Modules\Authorization\Services\AuthHelper;
 use Plenty\Modules\Tag\Contracts\TagRepositoryContract;
 use Plenty\Modules\Tag\Models\Tag;
 
-
 /**
- * Class TagService
+ * Service Class TagService
+ *
+ * This service class contains functions related to tag functionality.
+ * All public functions are available in the Twig template renderer.
+ *
  * @package IO\Services
  */
 class TagService
@@ -29,8 +32,9 @@ class TagService
     /**
      * Get a tag by its id
      *
-     * @param int $tagId    The id of the tag
+     * @param int $tagId The id of the tag
      * @return Tag
+     * @throws \Throwable
      */
     public function getTagById(int $tagId)
     {
@@ -38,8 +42,7 @@ class TagService
         $authHelper = pluginApp(AuthHelper::class);
         $tagRepository = $this->tagRepository;
 
-        $tagData = $authHelper->processUnguarded( function() use ($tagRepository, $tagId)
-        {
+        $tagData = $authHelper->processUnguarded(function () use ($tagRepository, $tagId) {
             return $tagRepository->getTagById($tagId);
         });
 
@@ -49,28 +52,25 @@ class TagService
     /**
      * Get the name of a tag for a specific language
      *
-     * @param int       $tagId  The id of the tag
-     * @param string    $lang   The language to get the name in.
+     * @param int $tagId The id of the tag
+     * @param string|null $lang The language to get the name in (ISO-639-1)
      * @return string
+     * @throws \Throwable
      */
     public function getTagName(int $tagId, $lang = null)
     {
-        if ( $lang === null )
-        {
+        if ($lang === null) {
             $lang = Utils::getLang();
         }
 
         $tag = $this->getTagById($tagId);
 
-        if( is_null($tag) )
-        {
+        if (is_null($tag)) {
             return "";
         }
 
-        foreach( $tag->names as $tagName )
-        {
-            if ( $tagName->tagLang === $lang )
-            {
+        foreach ($tag->names as $tagName) {
+            if ($tagName->tagLang === $lang) {
                 return $tagName->tagName;
             }
         }

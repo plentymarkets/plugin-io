@@ -5,7 +5,11 @@ namespace IO\Services;
 use Plenty\Plugin\ConfigRepository;
 
 /**
- * Class TemplateConfigService
+ * Service Class TemplateConfigService
+ *
+ * This service class contains functions related to template configuration functionality.
+ * All public functions are available in the Twig template renderer.
+ *
  * @package IO\Services
  */
 class TemplateConfigService
@@ -13,6 +17,10 @@ class TemplateConfigService
     private $configRepository;
     private $templatePluginName;
 
+    /**
+     * TemplateConfigService constructor.
+     * @param ConfigRepository $configRepository
+     */
     public function __construct(ConfigRepository $configRepository)
     {
         $this->configRepository = $configRepository;
@@ -20,8 +28,9 @@ class TemplateConfigService
     }
 
     /**
-     * @param string $key
-     * @param null $default
+     * Get a config value by it's key
+     * @param string $key Key of the config value
+     * @param mixed $default Optional: A default to be returned, if no value for given key is set (Default: null)
      * @return mixed|null
      */
     public function get($key, $default = null)
@@ -30,9 +39,10 @@ class TemplateConfigService
     }
 
     /**
-     * @param string $key
-     * @param bool $default
-     * @return mixed
+     * Get a config value by it's key as a boolean
+     * @param string $key Key of the config value
+     * @param bool $default Optional: A default to be returned, if no value for given key is set (Default: false)
+     * @return bool
      */
     public function getBoolean($key, $default = false)
     {
@@ -47,9 +57,10 @@ class TemplateConfigService
     }
 
     /**
-     * @param string $key
-     * @param int $default
-     * @return mixed
+     * Get a config value by it's key as an integer
+     * @param string $key Key of the config value
+     * @param int $default Optional: A default to be returned, if no value for given key is set (Default: 0)
+     * @return int
      */
     public function getInteger($key, $default = 0)
     {
