@@ -38,7 +38,11 @@ use Plenty\Modules\Webshop\Events\ValidateVatNumber;
 use Plenty\Plugin\Events\Dispatcher;
 
 /**
- * Class CustomerService
+ * Service Class CustomerService
+ *
+ * This service class contains functions related to the customer.
+ * All public functions are available in the Twig template renderer.
+ *
  * @package IO\Services
  */
 class CustomerService
@@ -115,7 +119,8 @@ class CustomerService
     }
 
     /**
-     * @param int $contactClassId
+     * Get the data of a contact class
+     * @param int $contactClassId Unique id of a contact class
      * @return array|null
      * @deprecated since 5.0.0 will be removed in 6.0.0
      * @see \Plenty\Modules\Webshop\Contracts\ContactRepositoryContract::getContactClassData()
@@ -126,6 +131,7 @@ class CustomerService
     }
 
     /**
+     * Check if net prices should be shown
      * @return bool
      * @deprecated since 5.0.0 will be removed in 6.0.0
      * @see \Plenty\Modules\Webshop\Contracts\ContactRepositoryContract::showNetPrices()
@@ -136,7 +142,8 @@ class CustomerService
     }
 
     /**
-     * @param int $contactId
+     * Check if net prices should be shown for this contact
+     * @param int $contactId Unique id of a contact
      * @return bool
      */
     public function showNetPricesByContactId(int $contactId): bool
@@ -176,6 +183,7 @@ class CustomerService
     }
 
     /**
+     * Gets the minimum order quantity of the current contacts contact class
      * @return int
      */
     public function getContactClassMinimumOrderQuantity(): int
@@ -197,11 +205,11 @@ class CustomerService
 
     /**
      * Create a contact with addresses if specified
-     * @param array $contactData
-     * @param array $billingAddressData
-     * @param array $deliveryAddressData
+     * @param array $contactData The contacts data
+     * @param array|null $billingAddressData The contacts billing address
+     * @param array|null $deliveryAddressData The contacts delivery address
      * @return Contact
-     * @throws \Plenty\Exceptions\ValidationException
+     * @throws \Plenty\Exceptions\ValidationException|\Throwable
      */
     public function registerCustomer(array $contactData, $billingAddressData = null, $deliveryAddressData = null)
     {
@@ -265,32 +273,9 @@ class CustomerService
         return $contact;
     }
 
-    private function determineNewCustomerAddress($typeId, $addressData)
-    {
-        if (!is_null($addressData)) {
-            return $addressData;
-        }
-
-        /** @var BasketService $basketService */
-        $basketService = pluginApp(BasketService::class); //TODO class member
-
-        if ($typeId === AddressType::BILLING) {
-            $guestBillingAddressId = $basketService->getBillingAddressId();
-            if ((int)$guestBillingAddressId > 0) {
-                return $this->addressRepository->findAddressById($guestBillingAddressId)->toArray();
-            }
-        } elseif ($typeId === AddressType::DELIVERY) {
-            $guestDeliveryAddressId = $basketService->getDeliveryAddressId();
-            if ((int)$guestDeliveryAddressId > 0) {
-                return $this->addressRepository->findAddressById($guestDeliveryAddressId)->toArray();
-            }
-        }
-
-        return null;
-    }
-
     /**
-     * @param array $accountData
+     * Creates an user account
+     * @param array $accountData User account data
      * @return Account
      * @throws \Throwable
      */
@@ -309,22 +294,8 @@ class CustomerService
     }
 
     /**
-     * @param array $addressData
-     * @return array
-     */
-    private function mapAddressDataToAccount($addressData): array
-    {
-        return [
-            'companyName' => $addressData['name1'],
-            'taxIdNumber' => (isset($addressData['vatNumber']) && !is_null(
-                $addressData['vatNumber']
-            ) ? $addressData['vatNumber'] : ''),
-        ];
-    }
-
-    /**
      * Create a new contact
-     * @param array $contactData
+     * @param array $contactData The contacts data
      * @return Contact|array
      */
     public function createContact(array $contactData)
@@ -350,7 +321,7 @@ class CustomerService
     }
 
     /**
-     * Find the current contact by ID
+     * Find the current contact
      * @return null|Contact
      * @deprecated since 5.0.0 will be removed in 6.0.0
      * @see \Plenty\Modules\Webshop\Contracts\ContactRepositoryContract::getContact()
@@ -361,6 +332,7 @@ class CustomerService
     }
 
     /**
+     * Gets the current contact's contact class id
      * @return int
      * @deprecated since 5.0.0 will be removed in 6.0.0
      * @see \Plenty\Modules\Webshop\Contracts\ContactRepositoryContract::getContactClassId()
@@ -371,18 +343,8 @@ class CustomerService
     }
 
     /**
-     * @return int
-     * @deprecated since 5.0.0 will be removed in 6.0.0
-     * @see \Plenty\Modules\Webshop\Contracts\ContactRepositoryContract::getDefaultContactClassId()
-     */
-    private function getDefaultContactClassId(): int
-    {
-        return $this->contactRepository->getDefaultContactClassId();
-    }
-
-    /**
      * Update a contact
-     * @param array $contactData
+     * @param array $contactData New contact data
      * @return null|Contact
      * @throws \Plenty\Exceptions\ValidationException
      */
@@ -393,6 +355,54 @@ class CustomerService
         }
 
         return null;
+    }
+
+    private function determineNewCustomerAddress($typeId, $addressData)
+    {
+        if (!is_null($addressData)) {
+            return $addressData;
+        }
+
+        /** @var BasketService $basketService */
+        $basketService = pluginApp(BasketService::class); //TODO class member
+
+        if ($typeId === AddressType::BILLING) {
+            $guestBillingAddressId = $basketService->getBillingAddressId();
+            if ((int)$guestBillingAddressId > 0) {
+                return $this->addressRepository->findAddressById($guestBillingAddressId)->toArray();
+            }
+        } elseif ($typeId === AddressType::DELIVERY) {
+            $guestDeliveryAddressId = $basketService->getDeliveryAddressId();
+            if ((int)$guestDeliveryAddressId > 0) {
+                return $this->addressRepository->findAddressById($guestDeliveryAddressId)->toArray();
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * @param array $addressData
+     * @return array
+     */
+    private function mapAddressDataToAccount($addressData): array
+    {
+        return [
+            'companyName' => $addressData['name1'],
+            'taxIdNumber' => (isset($addressData['vatNumber']) && !is_null(
+                $addressData['vatNumber']
+            ) ? $addressData['vatNumber'] : ''),
+        ];
+    }
+
+    /**
+     * @return int
+     * @deprecated since 5.0.0 will be removed in 6.0.0
+     * @see \Plenty\Modules\Webshop\Contracts\ContactRepositoryContract::getDefaultContactClassId()
+     */
+    private function getDefaultContactClassId(): int
+    {
+        return $this->contactRepository->getDefaultContactClassId();
     }
 
     /**
@@ -458,9 +468,11 @@ class CustomerService
     }
 
     /**
-     * @param string $newPassword
-     * @param int $contactId
-     * @param string $hash
+     * Update a customers password
+     *
+     * @param string $newPassword The new password
+     * @param int $contactId Id of the contact
+     * @param string $hash Optional: Security hash
      * @return mixed|Contact|null
      * @throws \Plenty\Exceptions\ValidationException
      * @throws \Throwable
@@ -523,7 +535,7 @@ class CustomerService
 
     /**
      * List the addresses of a contact
-     * @param int $typeId
+     * @param int|null $typeId Type of address
      * @return array|\Illuminate\Database\Eloquent\Collection
      */
     public function getAddresses($typeId = null)
@@ -570,8 +582,8 @@ class CustomerService
 
     /**
      * Get an address by ID
-     * @param int $addressId
-     * @param int $typeId
+     * @param int $addressId Unique id of address
+     * @param int $typeId Type of address
      * @return Address
      */
     public function getAddress(int $addressId, int $typeId): Address
@@ -610,8 +622,8 @@ class CustomerService
 
     /**
      * Create an address with the specified address type
-     * @param array $addressData
-     * @param int $typeId
+     * @param array $addressData The address data
+     * @param int $typeId Type of address
      * @return Address
      * @throws \Plenty\Exceptions\ValidationException
      * @throws \Throwable
@@ -707,9 +719,9 @@ class CustomerService
     }
 
     /**
-     * @param array $options
-     * @param bool $isGuest
-     * @param array $addressData
+     * @param array $options Optional: Append to existing options data
+     * @param bool $isGuest Optional: True, when it's a guests email (Default: false)
+     * @param array $addressData Optional: Data of the address
      * @return array
      * @throws \Exception
      */
@@ -786,9 +798,9 @@ class CustomerService
 
     /**
      * Update an address
-     * @param int $addressId
-     * @param array $addressData
-     * @param int $typeId
+     * @param int $addressId Id of address to update
+     * @param array $addressData Updated address data
+     * @param int $typeId Type of address to update
      * @return Address
      * @throws \Plenty\Exceptions\ModelNotEditableException
      * @throws \Plenty\Exceptions\ValidationException
@@ -897,8 +909,8 @@ class CustomerService
 
     /**
      * Delete an address
-     * @param int $addressId
-     * @param int $typeId
+     * @param int $addressId Id of address to delete
+     * @param int $typeId Type of address to delete
      * @throws \Plenty\Exceptions\ModelNotEditableException
      * @throws \Plenty\Exceptions\ValidationException
      */
@@ -937,9 +949,9 @@ class CustomerService
 
     /**
      * Get a list of orders for the current contact
-     * @param int $page
-     * @param int $items
-     * @param array $filters
+     * @param int $page Optional: What page to get
+     * @param int $items Optional: How many items per page
+     * @param array $filters Optional: Additional filters
      * @return array|\Plenty\Repositories\Models\PaginatedResult
      */
     public function getOrders(int $page = 1, int $items = 10, array $filters = [])
@@ -963,6 +975,7 @@ class CustomerService
     }
 
     /**
+     * Check if a contact has made return orders
      * @return bool
      */
     public function hasReturns(): bool
@@ -976,6 +989,7 @@ class CustomerService
     }
 
     /**
+     * Get a list of return orders for the current contact
      * @param int $page
      * @param int $items
      * @param array $filters
@@ -1030,6 +1044,9 @@ class CustomerService
         );
     }
 
+    /**
+     * Resets the baskets current addresses if current contact is a guest
+     */
     public function resetGuestAddresses(): void
     {
         if ($this->contactRepository->getContactId() <= 0) {
@@ -1043,6 +1060,7 @@ class CustomerService
     }
 
     /**
+     * Gets the email address of the current contact
      * @return string
      */
     public function getEmail(): string
@@ -1062,7 +1080,8 @@ class CustomerService
     }
 
     /**
-     * @param int $contactId
+     * Gets a contacts contact number
+     * @param int $contactId Unique id of a contact
      * @return string|null
      * @throws \Throwable
      */
@@ -1085,6 +1104,11 @@ class CustomerService
         }
     }
 
+    /**
+     * Delete adresses that are not bound to a contact
+     * @throws \Plenty\Exceptions\ModelNotEditableException
+     * @throws \Plenty\Exceptions\ValidationException
+     */
     public function deleteGuestAddresses(): void
     {
         if ($this->contactRepository->getContactId() <= 0) {

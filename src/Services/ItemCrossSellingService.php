@@ -8,7 +8,11 @@ use Plenty\Modules\Webshop\ItemSearch\Helpers\SortingHelper;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\ElasticSearch;
 
 /**
- * Class ItemCrossSellingService
+ * Service Class ItemCrossSellingService
+ *
+ * This service class contains functions that are related to cross selling of items.
+ * All public functions are available in the Twig template renderer.
+ *
  * @package IO\Services
  */
 class ItemCrossSellingService
@@ -27,13 +31,15 @@ class ItemCrossSellingService
     public function __construct(
         SessionStorageRepositoryContract $sessionStorageRepository,
         SortingHelper $sortingHelper
-    ) {
+    )
+    {
         $this->sessionStorageRepository = $sessionStorageRepository;
         $this->sortingHelper = $sortingHelper;
     }
 
     /**
-     * @param string $type
+     * Set the type of cross selling
+     * @param string $type Type of cross selling
      */
     public function setType($type)
     {
@@ -45,11 +51,19 @@ class ItemCrossSellingService
         }
     }
 
+    /**
+     * Get the type of cross selling
+     * @return mixed|null
+     */
     public function getType()
     {
         return Utils::getTemplateConfig('item.lists.cross_selling_type', 'Similar');
     }
 
+    /**
+     * Set the sorting for cross selling
+     * @param string $sorting Sorting type for cross selling
+     */
     public function setSorting($sorting)
     {
         if (!strlen($sorting)) {
@@ -62,6 +76,10 @@ class ItemCrossSellingService
         );
     }
 
+    /**
+     * Get the sorting for cross selling
+     * @return string
+     */
     public function getSorting()
     {
         $sorting = Utils::getTemplateConfig('item.lists.cross_selling_sorting');

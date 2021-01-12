@@ -10,7 +10,11 @@ use Plenty\Modules\Webshop\Contracts\SessionStorageRepositoryContract;
 use Plenty\Plugin\Log\Loggable;
 
 /**
- * Class AuthenticationService
+ * Service Class AuthenticationService
+ *
+ * This service class contains various methods for authenticating customers and related tasks.
+ * All public functions are available in the Twig template renderer.
+ *
  * @package IO\Services
  */
 class AuthenticationService
@@ -18,28 +22,33 @@ class AuthenticationService
     use Loggable;
 
     /**
-     * @var ContactAuthenticationRepositoryContract
+     * @var ContactAuthenticationRepositoryContract The repository used for authenticating contacts
      */
     private $contactAuthRepository;
 
     /**
-     * @var SessionStorageRepositoryContract $sessionStorageRepository
+     * @var SessionStorageRepositoryContract $sessionStorageRepository The repository used for storing data in the session
      */
     private $sessionStorageRepository;
 
-    /** @var CustomerService */
+    /**
+     * @var CustomerService This service is used for various tasks relating to customers
+     */
     private $customerService;
 
     /**
      * AuthenticationService constructor.
-     * @param ContactAuthenticationRepositoryContract $contactAuthRepository
-     * @param SessionStorageRepositoryContract $sessionStorageRepository
+     *
+     * @param ContactAuthenticationRepositoryContract $contactAuthRepository The repository used for authenticating contacts
+     * @param SessionStorageRepositoryContract $sessionStorageRepository The repository used for storing data in the session
+     * @param CustomerService $customerService This service is used for various tasks relating to customers
      */
     public function __construct(
         ContactAuthenticationRepositoryContract $contactAuthRepository,
         SessionStorageRepositoryContract $sessionStorageRepository,
         CustomerService $customerService
-    ) {
+    )
+    {
         $this->contactAuthRepository = $contactAuthRepository;
         $this->sessionStorageRepository = $sessionStorageRepository;
         $this->customerService = $customerService;
@@ -47,8 +56,9 @@ class AuthenticationService
 
     /**
      * Perform the login with email and password
-     * @param string $email
-     * @param string $password
+     *
+     * @param string $email Contains the customers email address
+     * @param string $password Contains the password used for this login attempt
      * @return int|null
      */
     public function login(string $email, string $password)
@@ -67,8 +77,9 @@ class AuthenticationService
 
     /**
      * Perform the login with customer ID and password
-     * @param int $contactId
-     * @param string $password
+     *
+     * @param int $contactId Contains a id linked to a specific customer
+     * @param string $password Contains the password used for this login attempt
      */
     public function loginWithContactId(int $contactId, string $password): void
     {
@@ -92,7 +103,9 @@ class AuthenticationService
     }
 
     /**
-     * @param string $password
+     * Check if a password is valid. The customer is logged in as a side effect, if password is valid
+     *
+     * @param string $password Contains the password
      * @return bool
      */
     public function checkPassword($password): bool
@@ -122,6 +135,8 @@ class AuthenticationService
     }
 
     /**
+     * Check if the current user is logged in.
+     *
      * @return bool
      */
     public function isLoggedIn(): bool

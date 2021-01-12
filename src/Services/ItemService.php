@@ -43,7 +43,11 @@ use Plenty\Plugin\Application;
 
 
 /**
- * Class ItemService
+ * Service Class ItemService
+ *
+ * This service class contains functions related to common item tasks.
+ * All public functions are available in the Twig template renderer.
+ *
  * @package IO\Services
  */
 class ItemService
@@ -72,7 +76,8 @@ class ItemService
         Application $app,
         ItemDataLayerRepositoryContract $itemRepository,
         SessionStorageRepositoryContract $sessionStorageRepository
-    ) {
+    )
+    {
         $this->app = $app;
         $this->itemRepository = $itemRepository;
         $this->sessionStorageRepository = $sessionStorageRepository;
@@ -80,7 +85,7 @@ class ItemService
 
     /**
      * Get an item by ID
-     * @param int $itemId
+     * @param int $itemId An item id
      * @return array
      */
     public function getItem(int $itemId = 0): array
@@ -118,8 +123,8 @@ class ItemService
     }
 
     /**
-     * Get a list of items with the specified item IDs
-     * @param array $itemIds
+     * Get a list of items with the specified item ids
+     * @param array $itemIds List of item ids
      * @return array
      */
     public function getItems(array $itemIds): array
@@ -148,7 +153,7 @@ class ItemService
     }
 
     /**
-     * @param int $itemId
+     * @param int $itemId An item id
      * @return string
      */
     public function getItemImage(int $itemId = 0): string
@@ -163,9 +168,10 @@ class ItemService
     }
 
     /**
-     * Get an item variation by ID
-     * @param int $variationId
+     * Get an item variation by id
+     * @param int $variationId An variation id
      * @return array
+     * @throws \Exception
      */
     public function getVariation(int $variationId = 0)
     {
@@ -176,9 +182,10 @@ class ItemService
     }
 
     /**
-     * Get a list of item variations with the specified variation IDs
-     * @param array $variationIds
+     * Get a list of item variations with the specified variation ids
+     * @param array $variationIds A list of variation idss
      * @return array
+     * @throws \Exception
      */
     public function getVariations(array $variationIds): array
     {
@@ -189,10 +196,11 @@ class ItemService
     }
 
     /**
-     * @param int $itemId
+     * Get a list of active and salable variation ids associated with an item
+     * @param int $itemId An item id
      * @return array
      */
-    public function getVariationIds($itemId): array
+    public function getVariationIds(int $itemId): array
     {
         $variationIds = [];
 
@@ -235,8 +243,9 @@ class ItemService
     }
 
     /**
-     * @param int $itemId
-     * @param bool $withPrimary
+     * Get a list of variation ids associated with a specific item
+     * @param int $itemId An item id
+     * @param bool $withPrimary Optional: If true, load base variation too (Default: false)
      * @return array
      */
     public function getVariationList($itemId, bool $withPrimary = false): array
@@ -288,10 +297,12 @@ class ItemService
     }
 
     /**
-     * @param int $variationId
-     * @param string $imageAccessor
+     * Get image url of a variation
+     * @param int $variationId An variation id
+     * @param string $imageAccessor Optional: Key to image (Default: 'urlPreview')
      * @return string
      *
+     * @throws \Exception
      * @deprecated
      */
     public function getVariationImage(int $variationId = 0, string $imageAccessor = 'urlPreview'): string
@@ -308,7 +319,6 @@ class ItemService
             ]
         )[0];
 
-
         if (is_array($variation) && count($variation['documents'])) {
             /** @var ItemImagesFilter $itemImageFilter */
             $itemImageFilter = pluginApp(ItemImagesFilter::class);
@@ -320,9 +330,9 @@ class ItemService
 
     /**
      * Get all items for a specific category
-     * @param int $catID
-     * @param array $params
-     * @param int $page
+     * @param int $catID A category id
+     * @param array $params Optional: Parameters for Elastic Search, only itemsPerPage is used
+     * @param int $page Optional: What page to get (Default: 1)
      * @return array
      */
     public function getItemForCategory(int $catID, $params = [], int $page = 1): array
@@ -357,7 +367,7 @@ class ItemService
 
     /**
      * List the attributes of an item variation
-     * @param int $itemId
+     * @param int $itemId Optional: An item id
      * @return array
      */
     public function getVariationAttributeMap($itemId = 0): array
@@ -454,10 +464,11 @@ class ItemService
     }
 
     /**
-     * @param int $variationId
+     * Check, if variation is salable, meaning it has stock, has a price etc.
+     * @param int $variationId Optional: A variation id
      * @return bool
      */
-    public function getVariationIsSalable($variationId = 0): Bool
+    public function getVariationIsSalable($variationId = 0): bool
     {
         $isSalable = false;
 
@@ -509,8 +520,10 @@ class ItemService
     }
 
     /**
-     * @param int $itemId
+     * Get a list containing attributes and units related to an item
+     * @param int $itemId Optional: An item id
      * @return array
+     * @throws \Throwable
      */
     public function getAttributeNameMap($itemId = 0): array
     {
@@ -623,7 +636,7 @@ class ItemService
 
     /**
      * Get the item URL
-     * @param int $itemId
+     * @param int $itemId An item id
      * @return Record
      * @deprecated Use UrlService instead
      */
@@ -658,8 +671,8 @@ class ItemService
     }
 
     /**
-     * Get the name of an attribute by ID
-     * @param int $attributeId
+     * Get the name of an attribute by id
+     * @param int $attributeId Optional: An attribute id
      * @return string
      */
     public function getAttributeName(int $attributeId = 0): string
@@ -685,8 +698,8 @@ class ItemService
     }
 
     /**
-     * Get the name of an attribute value by ID
-     * @param int $attributeValueId
+     * Get the name of an attribute value by id
+     * @param int $attributeValueId Optional: An attribute value's id
      * @return string
      */
     public function getAttributeValueName(int $attributeValueId = 0): string
@@ -714,9 +727,9 @@ class ItemService
     }
 
     /**
-     * Get a list of cross-selling items for the specified item ID
-     * @param int $itemId
-     * @param string $crossSellingType
+     * Get a list of cross-selling items for the specified item id
+     * @param int $itemId Optional: An item's id
+     * @param string $crossSellingType Optional: The cross selling type (Default: 'similar')
      * @return array
      */
     public function getItemCrossSellingList($itemId = 0, string $crossSellingType = 'similar'): array
@@ -770,7 +783,8 @@ class ItemService
     }
 
     /**
-     * @param int $conditionId
+     * Get the text for a specific item condition
+     * @param int $conditionId An item condition's id
      * @return string
      */
     public function getItemConditionText(int $conditionId): string
@@ -779,8 +793,9 @@ class ItemService
     }
 
     /**
-     * @param int $limit
-     * @param int $categoryId
+     * Get a list of the latest items
+     * @param int $limit Optional: Maximum number of returned items (Default: 5)
+     * @param int $categoryId Optional: From which category should items be returned?
      * @return RecordList
      */
     public function getLatestItems(int $limit = 5, int $categoryId = 0)
@@ -820,9 +835,10 @@ class ItemService
     }
 
     /**
-     * @param string $searchString
-     * @param array $params
-     * @param int $page
+     * Search for items using a search string and return a result
+     * @param string $searchString A user inputted search string
+     * @param array $params Optional: Parameters for elastic search query, only itemsPerPage is used
+     * @param int $page Optional: Page number for pagination
      * @return array
      */
     public function searchItems(string $searchString, $params = [], int $page = 1): array
@@ -858,7 +874,8 @@ class ItemService
     }
 
     /**
-     *
+     * Get additional sortings
+     * @return array
      */
     public function getAdditionalItemSorting()
     {
@@ -870,8 +887,9 @@ class ItemService
     }
 
     /**
-     * @param string $key
-     * @param string $translationKey
+     * Add an additional sorting
+     * @param string $key A sorting key
+     * @param string $translationKey The translation key for the sorting
      */
     public function addAdditionalItemSorting($key, $translationKey)
     {

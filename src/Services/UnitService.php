@@ -11,7 +11,11 @@ use Plenty\Modules\Item\Unit\Contracts\UnitRepositoryContract;
 use IO\Helper\MemoryCache;
 
 /**
- * Class UnitService
+ * Service Class UnitService
+ *
+ * This service class contains functions related to units.
+ * All public functions are available in the Twig template renderer.
+ *
  * @package IO\Services
  * @deprecated since 5.0.0 will be removed in 6.0.0
  */
@@ -59,9 +63,9 @@ class UnitService
     }
 
     /**
-     * Get the unit by ID
-     * @param int $unitId
-     * @param string $lang
+     * Get the unit by id
+     * @param int $unitId An unit id
+     * @param string $lang Optional: Language to get unit for (ISO-639-1) (Default: 'de')
      * @return UnitName
      * @deprecated since 5.0.0 will be removed in 6.0.0
      */
@@ -71,8 +75,9 @@ class UnitService
     }
 
     /**
-     * @param string $unitKey
-     * @param null $lang
+     * Get the name of an unit by it's unit key
+     * @param string $unitKey A unit key
+     * @param string|null $lang Optional: Language of the name (ISO-639-1) (Default: The current language)
      * @return mixed
      * @deprecated since 5.0.0 will be removed in 6.0.0
      */

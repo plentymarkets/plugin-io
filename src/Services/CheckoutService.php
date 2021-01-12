@@ -32,6 +32,10 @@ use IO\Helper\Utils;
 
 /**
  * Class CheckoutService
+ *
+ * This service class contains methods for manipulating the checkout.
+ * All public functions are available in the Twig template renderer.
+ *
  * @package IO\Services
  */
 class CheckoutService
@@ -40,7 +44,7 @@ class CheckoutService
     use Loggable;
 
     /**
-     * @var FrontendPaymentMethodRepositoryContract
+     * @var FrontendPaymentMethodRepositoryContract This repository exposes functionality related to payment methods
      */
     private $frontendPaymentMethodRepository;
     /**
@@ -118,7 +122,8 @@ class CheckoutService
         Dispatcher $dispatcher,
         CheckoutRepositoryContract $checkoutRepository,
         ContactRepositoryContract $contactRepository
-    ) {
+    )
+    {
         $this->frontendPaymentMethodRepository = $frontendPaymentMethodRepository;
         $this->checkout = $checkout;
         $this->basketRepository = $basketRepository;
@@ -197,6 +202,12 @@ class CheckoutService
         $this->checkoutRepository->setCurrency($currency);
     }
 
+    /**
+     * Get array with all active currencies.
+     * The resulting currency array expose the name and the symbol of the currency.
+     *
+     * @return array
+     */
     public function getCurrencyList()
     {
         /** @var LocalizationRepositoryContract $localizationRepository */
@@ -204,7 +215,7 @@ class CheckoutService
         $locale = $localizationRepository->getLocale();
 
         return $this->fromMemoryCache(
-            'currencyList'.$locale,
+            'currencyList' . $locale,
             function () use ($locale) {
                 /** @var CurrencyRepositoryContract $currencyRepository */
                 $currencyRepository = pluginApp(CurrencyRepositoryContract::class);
@@ -236,7 +247,7 @@ class CheckoutService
     /**
      * Get the name and the symbol for the currently selected currency.
      *
-     * @return mixed
+     * @return array Contains keys: "name", "symbol"
      */
     public function getCurrencyData()
     {
@@ -264,6 +275,7 @@ class CheckoutService
     /**
      * Get all required information about how to display monetary values.
      *
+     * Get all required information about how to display monetary values.
      * This contains the configured separators for thousands and decimals,
      * the number fraction digits and a pattern in the ICU format
      * describing the format of monetary values.
@@ -307,7 +319,7 @@ class CheckoutService
         }
 
         $symbols = [];
-        foreach($this->getCurrencyList() as $currency) {
+        foreach ($this->getCurrencyList() as $currency) {
             $symbols[$currency['name']] = $currency['symbol'];
         }
 
@@ -321,7 +333,7 @@ class CheckoutService
     }
 
     /**
-     * Get the ID of the current payment method.
+     * Get the id of the current payment method.
      *
      * @return int
      */
@@ -352,7 +364,7 @@ class CheckoutService
     }
 
     /**
-     * Set the ID of the current payment method.
+     * Set the id of the current payment method.
      *
      * @param int $methodOfPaymentID Id of the method of payment to be used.
      */
@@ -598,26 +610,6 @@ class CheckoutService
         );
     }
 
-
-    private function filterShippingProfiles($shippingProfilesList)
-    {
-        $paymentMethodList = $this->getCheckoutPaymentDataList();
-        $list = [];
-        foreach ($shippingProfilesList as $shippingProfile) {
-            $shouldKeepShippingProfile = false;
-            foreach ($paymentMethodList as $paymentMethod) {
-                if (!in_array($paymentMethod['id'], $shippingProfile['excludedPaymentMethodIds'])) {
-                    $shouldKeepShippingProfile = true;
-                    $shippingProfile['allowedPaymentMethodNames'][] = $paymentMethod['name'];
-                }
-            }
-            if ($shouldKeepShippingProfile) {
-                $list[] = $shippingProfile;
-            }
-        }
-        return $list;
-    }
-
     /**
      * Get the ID of the current shipping country
      * @return int
@@ -780,5 +772,24 @@ class CheckoutService
         return $this->sessionStorageRepository->getSessionValue(
             SessionStorageRepositoryContract::ORDER_CONTACT_WISH
         );
+    }
+
+    private function filterShippingProfiles($shippingProfilesList)
+    {
+        $paymentMethodList = $this->getCheckoutPaymentDataList();
+        $list = [];
+        foreach ($shippingProfilesList as $shippingProfile) {
+            $shouldKeepShippingProfile = false;
+            foreach ($paymentMethodList as $paymentMethod) {
+                if (!in_array($paymentMethod['id'], $shippingProfile['excludedPaymentMethodIds'])) {
+                    $shouldKeepShippingProfile = true;
+                    $shippingProfile['allowedPaymentMethodNames'][] = $paymentMethod['name'];
+                }
+            }
+            if ($shouldKeepShippingProfile) {
+                $list[] = $shippingProfile;
+            }
+        }
+        return $list;
     }
 }

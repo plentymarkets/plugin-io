@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by IntelliJ IDEA.
- * User: chensink
- * Date: 27.11.17
- * Time: 11:11
- */
 
 namespace IO\Services;
 
@@ -18,15 +12,18 @@ use Plenty\Modules\Order\Shipping\Contracts\EUCountryCodesServiceContract;
 use Plenty\Modules\Webshop\Helpers\NumberFormatter;
 
 /**
- * Calculate order totals
+ * Service Class OrderTotalsService
+ *
+ * This service class contains functions related to the order totals calculation.
+ * All public functions are available in the Twig template renderer.
+ *
  * @package IO\Services
  */
 class OrderTotalsService
 {
     /**
      * Get all order totals which are relevant for the OrderDetails-modal
-     *
-     * @param Order $order
+     * @param Order $order The order to get order totals for
      * @return array
      */
     public function getAllTotals(Order $order)
@@ -104,7 +101,7 @@ class OrderTotalsService
                             'price' => $price,
                             'currency' => $currency,
                             'formattedTotalPrice'
-                                => $numberFormatter->formatMonetary($price * $item->quantity, $currency)
+                            => $numberFormatter->formatMonetary($price * $item->quantity, $currency)
                         ];
                     }
                     break;
@@ -114,8 +111,8 @@ class OrderTotalsService
 
             if ($firstAmount->discount > 0) {
                 if ($firstAmount->isPercentage) {
-                    $itemSumRebateGross += round($item->quantity * $firstAmount->priceOriginalGross * $firstAmount->discount / 100,2);
-                    $itemSumRebateNet += round($item->quantity * $firstAmount->priceOriginalNet * $firstAmount->discount / 100,2);
+                    $itemSumRebateGross += round($item->quantity * $firstAmount->priceOriginalGross * $firstAmount->discount / 100, 2);
+                    $itemSumRebateNet += round($item->quantity * $firstAmount->priceOriginalNet * $firstAmount->discount / 100, 2);
                 } else {
                     $itemSumRebateGross += $item->quantity * $firstAmount->discount;
                 }
@@ -164,6 +161,10 @@ class OrderTotalsService
         );
     }
 
+    /**
+     * @param $amounts
+     * @return int|string
+     */
     private function getCustomerAmountId($amounts)
     {
         foreach ($amounts as $index => $amount) {
@@ -175,6 +176,11 @@ class OrderTotalsService
         return 0;
     }
 
+    /**
+     * Check if the order has only net amounts or only net amounts should be shown
+     * @param Order $order
+     * @return bool
+     */
     public function highlightNetPrices(Order $order): bool
     {
         $isOrderNet = $order->amounts[0]->isNet;

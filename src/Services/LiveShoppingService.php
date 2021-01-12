@@ -10,7 +10,11 @@ use Plenty\Modules\Webshop\ItemSearch\SearchPresets\LiveShoppingItems;
 use Plenty\Modules\Webshop\ItemSearch\Services\ItemSearchService;
 
 /**
- * Class LiveShoppingService
+ * Service Class LiveShoppingService
+ *
+ * This service class contains functions related to the live shopping functionality.
+ * All public functions are available in the Twig template renderer.
+ *
  * @package IO\Services
  */
 class LiveShoppingService
@@ -19,8 +23,9 @@ class LiveShoppingService
     private $ownLimitation = false;
 
     /**
-     * @param int $liveShoppingId
-     * @param string $sorting
+     * Get required data for live shopping in the frontend
+     * @param int $liveShoppingId A live shopping id
+     * @param string|null $sorting Optional: Type of sorting for live shopping variations
      * @return array
      */
     public function getLiveShoppingData($liveShoppingId, $sorting = null)
@@ -67,13 +72,20 @@ class LiveShoppingService
         return null;
     }
 
+    /**
+     * Get list of variations for live shopping
+     * @param int $itemId An item id
+     * @param string|null $sorting Sorting for live shopping variations
+     * @return array|object
+     * @throws \Exception
+     */
     public function getLiveShoppingVariations($itemId, $sorting)
     {
         $itemSearchOptions = [
             'itemId' => $itemId,
             'resultFields' => $this->buildResultFields()
         ];
-                /** @var SortingHelper $sortingHelper */
+        /** @var SortingHelper $sortingHelper */
         $sortingHelper = pluginApp(SortingHelper::class);
 
         $sorting = $sortingHelper->getSorting($sorting);
@@ -92,7 +104,8 @@ class LiveShoppingService
     }
 
     /**
-     * @param object $itemList
+     * Filter list of variations for a specialOffer price
+     * @param array $itemList
      * @return array
      */
     public function filterLiveShoppingVariations($itemList)
@@ -117,8 +130,8 @@ class LiveShoppingService
     /**
      * Check if item is limited to net stock and modify quantitySold to reflect the limited stock
      *
-     * @param object $data
-     * @param object $item
+     * @param array $data
+     * @param array $item
      */
     private function checkStockLimit(&$data, $item)
     {
@@ -130,6 +143,10 @@ class LiveShoppingService
         }
     }
 
+    /**
+     * @return array
+     * @throws \Exception
+     */
     private function buildResultFields()
     {
         $resultFields = ResultFieldTemplate::load(ResultFieldTemplate::TEMPLATE_LIST_ITEM);
