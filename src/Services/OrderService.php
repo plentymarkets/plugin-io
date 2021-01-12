@@ -91,7 +91,7 @@ class OrderService
     /**
      * The OrderItem types that will be wrapped. All other OrderItems will be stripped from the order.
      */
-    public const WRAPPED_ORDERITEM_TYPES =
+    const WRAPPED_ORDERITEM_TYPES =
         [
             OrderItemType::VARIATION,
             OrderItemType::ITEM_BUNDLE,
@@ -103,7 +103,7 @@ class OrderService
     /**
      * The default visible order types
      */
-    public const VISIBLE_ORDER_TYPES = [
+    const VISIBLE_ORDER_TYPES = [
         OrderType::ORDER,
         OrderType::WARRANTY
     ];

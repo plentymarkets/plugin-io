@@ -26,14 +26,14 @@ use Plenty\Plugin\CachingRepository;
  */
 class ItemListService
 {
-    public const TYPE_CATEGORY = 'category';
-    public const TYPE_LAST_SEEN = 'last_seen';
-    public const TYPE_TAG = 'tag_list';
-    public const TYPE_RANDOM = 'random';
-    public const TYPE_MANUFACTURER = 'manufacturer';
-    public const TYPE_CROSS_SELLER = 'cross_selling';
-    public const TYPE_WISH_LIST = 'wish_list';
-    public const TYPE_SEARCH_SUGGESTIONS = 'search_suggestions';
+    const TYPE_CATEGORY = 'category';
+    const TYPE_LAST_SEEN = 'last_seen';
+    const TYPE_TAG = 'tag_list';
+    const TYPE_RANDOM = 'random';
+    const TYPE_MANUFACTURER = 'manufacturer';
+    const TYPE_CROSS_SELLER = 'cross_selling';
+    const TYPE_WISH_LIST = 'wish_list';
+    const TYPE_SEARCH_SUGGESTIONS = 'search_suggestions';
 
     /**
      * Gets a list of items based on parameters

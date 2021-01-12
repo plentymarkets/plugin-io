@@ -42,8 +42,8 @@ class CouponService
     private $authHelper;
 
     // Info constants
-    public const BELOW_MINIMAL_ORDER_VALUE = 301;
-    public const NO_VALID_ITEM_IN_BASKET = 302;
+    const BELOW_MINIMAL_ORDER_VALUE = 301;
+    const NO_VALID_ITEM_IN_BASKET = 302;
 
     /**
      * CouponService constructor.

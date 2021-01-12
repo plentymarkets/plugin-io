@@ -22,7 +22,7 @@ class ContactMapService
      */
     private $cachingRepository;
 
-    private const COORD_CACHE_KEY = 'ceresMapCoordinates';
+    const COORD_CACHE_KEY = 'ceresMapCoordinates';
 
     /**
      * ContactMapService constructor.
