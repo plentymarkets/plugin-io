@@ -481,54 +481,6 @@ class BasketService
     }
 
     /**
-     * Load the variation data for the basket item
-     *
-     * @param BasketItem[] $basketItems
-     * @param array $basketItemData
-     * @param boolean $sortOrderItems
-     *
-     * @return array
-     */
-    private function addVariationData($basketItems, $basketItemData, $sortOrderItems = false): array
-    {
-
-        $order = $this->sessionStorageRepository->getOrder();
-        $isNet = false;
-        if (!is_null($order)) {
-            $isNet = $order->isNet;
-        }
-        $showNetPrice = $this->contactRepository->showNetPrices();
-        $result = [];
-        foreach ($basketItems as $basketItem) {
-            if ($isNet || $showNetPrice) {
-                $basketItem->price = round($basketItem->price * 100 / (100.0 + $basketItem->vat), 2);
-            }
-
-            //load relation, do not remove
-            $temp = $basketItem->basketItemOrderParams;
-
-            $arr = $basketItem->toArray();
-
-            if (array_key_exists($basketItem->variationId, $basketItemData)) {
-                $arr["variation"] = $basketItemData[$basketItem->variationId];
-            } else {
-                $arr["variation"] = null;
-            }
-
-
-            if ($sortOrderItems && array_key_exists($basketItem->variationId, $basketItemData)) {
-                $arr['basketItemOrderParams'] = $this->getSortedBasketItemOrderParams($arr);
-            }
-
-            array_push(
-                $result,
-                $arr
-            );
-        }
-        return $result;
-    }
-
-    /**
      * Add an item to the basket or update the basket
      *
      * @param array $data Contains the basket item
@@ -790,6 +742,9 @@ class BasketService
             if ($isNet || $showNetPrice) {
                 $basketItem->price = round($basketItem->price * 100 / (100.0 + $basketItem->vat), 2);
             }
+
+            //load relation, do not remove
+            $temp = $basketItem->basketItemOrderParams;
 
             $arr = $basketItem->toArray();
 
