@@ -1,5 +1,12 @@
 # Release Notes für IO
 
+## v5.0.20 (2021-01-19) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.19...5.0.20" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
+
+### Behoben
+
+- Bei der Anzeige des Hinweistextes für Ausfuhrlieferungen kam es seit dem 01.01.2021 zu Problemen. Dieses Verhalten wurde behoben.
+- In der Retourenhistorie wurden Versandkosten als Artikel aufgelistet. Dieses Verhalten wurde behoben.
+
 ## v5.0.19 (2021-01-05) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.18...5.0.19" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
 
 ### Geändert

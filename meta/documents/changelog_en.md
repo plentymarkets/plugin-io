@@ -1,5 +1,12 @@
 # Release Notes for IO
 
+## v5.0.20 (2021-01-19) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.19...5.0.20" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
+
+### Fixed 
+
+- The information text for export deliveries has not been displayed correctly since 01 January 2021. This behaviour has been fixed.
+- The returns history displayed shipping costs as items. This behaviour has been fixed.
+
 ## v5.0.19 (2021-01-05) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.18...5.0.19" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
 
 ### Changed
