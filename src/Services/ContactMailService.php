@@ -94,7 +94,7 @@ class ContactMailService
         
             $response = $storageRepository->uploadObject('IO', false, self::STORAGE.$key . '/' . $key, $tmpFile);
         
-            return substr($response->key, strlen(static::STORAGE . '/'));
+            return $response->key;
         }
     }
 }
