@@ -23,7 +23,15 @@ class ContactMailService
     use Loggable;
     
     const STORAGE = 'contactMailFiles';
-
+    
+    /** @var StorageRepositoryContract $storageRepository */
+    private $storageRepository;
+    
+    public function __construct(StorageRepositoryContract $storageRepository)
+    {
+        $this->storageRepository = $storageRepository;
+    }
+    
     /**
      * Send an email using a template and a data object
      *
@@ -76,25 +84,42 @@ class ContactMailService
                 'data' => $mailData['data']
             ]
         );
+        
+        $attachments = [];
+        if (isset($mailData['fileKey']) && strlen($mailData['fileKey'])) {
+            $attachments[] = $this->getFile($mailData['fileKey']);
+        }
 
         try {
-            $mailer->sendHtml($mailBody, $recipient, $subject, $mailData['cc'] ?? [], $mailData['bcc'] ?? [], $replyTo);
+            $mailer->sendHtml($mailBody, $recipient, $subject, $mailData['cc'] ?? [], $mailData['bcc'] ?? [], $replyTo, $attachments);
         } catch (\Exception $exception) {
             return false;
         }
         return true;
     }
     
+    /**
+     * @param $fileData
+     * @return string
+     * @throws \Plenty\Modules\Plugin\Storage\Exceptions\StorageException
+     */
     public function uploadFile($fileData)
     {
-        /** @var StorageRepositoryContract $storageRepository */
-        $storageRepository = pluginApp(StorageRepositoryContract::class);
         if (is_file($tmpFile = $fileData['tmp_name'])) {
             $key = basename($fileData['name']);
         
-            $response = $storageRepository->uploadObject('IO', false, self::STORAGE.$key . '/' . $key, $tmpFile);
+            $response = $this->storageRepository->uploadObject('IO', false, self::STORAGE.$key . '/' . $key, $tmpFile);
         
             return $response->key;
         }
+    }
+    
+    /**
+     * @param $fileKey
+     * @return \Plenty\Modules\Cloud\Storage\Models\StorageObject
+     */
+    public function getFile($fileKey)
+    {
+        return $this->storageRepository->getObject('IO', $fileKey, false);
     }
 }
