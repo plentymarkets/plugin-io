@@ -5,7 +5,10 @@ namespace IO\Api\Resources;
 use IO\Api\ApiResource;
 use IO\Api\ApiResponse;
 use IO\Api\ResponseCode;
+use IO\Constants\LogLevel;
+use IO\Helper\ReCaptcha;
 use IO\Services\ContactMailService;
+use IO\Services\NotificationService;
 use Plenty\Plugin\Http\Request;
 use Plenty\Plugin\Http\Response;
 
@@ -36,7 +39,16 @@ class ContactMailFileResource extends ApiResource
      */
     public function store(): Response
     {
-        $_FILES['fileData'] = [];
+        if (!ReCaptcha::verify($this->request->get('recaptchaToken', null))) {
+            /**
+             * @var NotificationService $notificationService
+             */
+            $notificationService = pluginApp(NotificationService::class);
+            $notificationService->addNotificationCode(LogLevel::ERROR, 13);
+        
+            return $this->response->create([], ResponseCode::BAD_REQUEST);
+        }
+        
         if (isset($_FILES['fileData'])) {
             $response = $this->contactMailService->uploadFile($_FILES['fileData']);
             
