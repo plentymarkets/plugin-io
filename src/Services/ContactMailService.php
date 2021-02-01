@@ -3,6 +3,7 @@
 namespace IO\Services;
 
 use IO\Helper\Utils;
+use Plenty\Modules\Plugin\Storage\Contracts\StorageRepositoryContract;
 use Plenty\Plugin\Log\Loggable;
 use Plenty\Plugin\Mail\Contracts\MailerContract;
 use Plenty\Plugin\Mail\Models\ReplyTo;
@@ -20,6 +21,8 @@ use Plenty\Plugin\Translation\Translator;
 class ContactMailService
 {
     use Loggable;
+    
+    const STORAGE = 'contactMailFiles';
 
     /**
      * Send an email using a template and a data object
@@ -80,5 +83,18 @@ class ContactMailService
             return false;
         }
         return true;
+    }
+    
+    public function uploadFile($fileData)
+    {
+        /** @var StorageRepositoryContract $storageRepository */
+        $storageRepository = pluginApp(StorageRepositoryContract::class);
+        if (is_file($tmpFile = $fileData['tmp_name'])) {
+            $key = basename($fileData['name']);
+        
+            $response = $storageRepository->uploadObject('IO', false, self::STORAGE.$key . '/' . $key, $tmpFile);
+        
+            return substr($response->key, strlen(static::STORAGE . '/'));
+        }
     }
 }
