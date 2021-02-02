@@ -7,7 +7,6 @@ use IO\Api\ApiResponse;
 use IO\Api\ResponseCode;
 use IO\Constants\LogLevel;
 use IO\Helper\ReCaptcha;
-use IO\Services\ContactMailService;
 use IO\Services\NotificationService;
 use Plenty\Modules\Webshop\ContactForm\Contracts\ContactFormFileRepositoryContract;
 use Plenty\Plugin\Http\Request;
@@ -19,20 +18,16 @@ use Plenty\Plugin\Http\Response;
  */
 class ContactMailFileResource extends ApiResource
 {
-    private $contactMailService;
-    
     /**
-     * ContactMailResource constructor.
+     * ContactMailFileResource constructor.
      * @param Request $request
      * @param ApiResponse $response
      */
     public function __construct(
         Request $request,
-        ApiResponse $response,
-        ContactMailService $contactMailService
+        ApiResponse $response
     ) {
         parent::__construct($request, $response);
-        $this->contactMailService = $contactMailService;
     }
     
     /**
@@ -46,7 +41,7 @@ class ContactMailFileResource extends ApiResource
              */
             $notificationService = pluginApp(NotificationService::class);
             $notificationService->addNotificationCode(LogLevel::ERROR, 13);
-        
+            
             return $this->response->create([], ResponseCode::BAD_REQUEST);
         }
         
@@ -57,7 +52,7 @@ class ContactMailFileResource extends ApiResource
             
             try {
                 $response = $contactFormFileRepository->uploadFiles($_FILES['fileData']);
-            } catch(\Exception $exception) {
+            } catch (\Exception $exception) {
                 /** @var NotificationService $notificationService */
                 $notificationService = pluginApp(NotificationService::class);
                 $notificationService->addNotificationCode(LogLevel::ERROR, 0);
@@ -68,7 +63,7 @@ class ContactMailFileResource extends ApiResource
                 return $this->response->create(['fileKeys' => $response], ResponseCode::CREATED);
             }
         }
-    
+        
         return $this->response->create([], ResponseCode::BAD_REQUEST);
     }
 }
