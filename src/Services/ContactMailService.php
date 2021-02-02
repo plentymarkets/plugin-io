@@ -80,7 +80,6 @@ class ContactMailService
             /** @var ContactFormFileRepositoryContract $contactFormFileRepository */
             $contactFormFileRepository = pluginApp(ContactFormFileRepositoryContract::class);
             foreach ($mailData['fileKeys'] as $fileKey) {
-                //$attachments[] = $this->getFile($fileKey);
                 $attachments[] = $contactFormFileRepository->getFile($fileKey);
             }
         }
