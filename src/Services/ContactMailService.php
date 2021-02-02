@@ -3,7 +3,7 @@
 namespace IO\Services;
 
 use IO\Helper\Utils;
-use Plenty\Modules\Plugin\Storage\Contracts\StorageRepositoryContract;
+use Plenty\Modules\Webshop\ContactForm\Contracts\ContactFormFileRepositoryContract;
 use Plenty\Plugin\Log\Loggable;
 use Plenty\Plugin\Mail\Contracts\MailerContract;
 use Plenty\Plugin\Mail\Models\ReplyTo;
@@ -21,16 +21,6 @@ use Plenty\Plugin\Translation\Translator;
 class ContactMailService
 {
     use Loggable;
-    
-    const STORAGE = 'contactMailFiles';
-    
-    /** @var StorageRepositoryContract $storageRepository */
-    private $storageRepository;
-    
-    public function __construct(StorageRepositoryContract $storageRepository)
-    {
-        $this->storageRepository = $storageRepository;
-    }
     
     /**
      * Send an email using a template and a data object
@@ -86,8 +76,13 @@ class ContactMailService
         );
         
         $attachments = [];
-        if (isset($mailData['fileKey']) && strlen($mailData['fileKey'])) {
-            $attachments[] = $this->getFile($mailData['fileKey']);
+        if (isset($mailData['fileKeys']) && count($mailData['fileKeys'])) {
+            /** @var ContactFormFileRepositoryContract $contactFormFileRepository */
+            $contactFormFileRepository = pluginApp(ContactFormFileRepositoryContract::class);
+            foreach ($mailData['fileKeys'] as $fileKey) {
+                //$attachments[] = $this->getFile($fileKey);
+                $attachments[] = $contactFormFileRepository->getFile($fileKey);
+            }
         }
 
         try {
@@ -96,30 +91,5 @@ class ContactMailService
             return false;
         }
         return true;
-    }
-    
-    /**
-     * @param $fileData
-     * @return string
-     * @throws \Plenty\Modules\Plugin\Storage\Exceptions\StorageException
-     */
-    public function uploadFile($fileData)
-    {
-        if (is_file($tmpFile = $fileData['tmp_name'])) {
-            $key = basename($fileData['name']);
-        
-            $response = $this->storageRepository->uploadObject('IO', false, self::STORAGE.$key . '/' . $key, $tmpFile);
-        
-            return $response->key;
-        }
-    }
-    
-    /**
-     * @param $fileKey
-     * @return \Plenty\Modules\Cloud\Storage\Models\StorageObject
-     */
-    public function getFile($fileKey)
-    {
-        return $this->storageRepository->getObject('IO', $fileKey, false);
     }
 }

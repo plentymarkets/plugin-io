@@ -9,6 +9,7 @@ use IO\Constants\LogLevel;
 use IO\Helper\ReCaptcha;
 use IO\Services\ContactMailService;
 use IO\Services\NotificationService;
+use Plenty\Modules\Webshop\ContactForm\Contracts\ContactFormFileRepositoryContract;
 use Plenty\Plugin\Http\Request;
 use Plenty\Plugin\Http\Response;
 
@@ -49,14 +50,25 @@ class ContactMailFileResource extends ApiResource
             return $this->response->create([], ResponseCode::BAD_REQUEST);
         }
         
+        $response = null;
         if (isset($_FILES['fileData'])) {
-            $response = $this->contactMailService->uploadFile($_FILES['fileData']);
+            /** @var ContactFormFileRepositoryContract $contactFormFileRepository */
+            $contactFormFileRepository = pluginApp(ContactFormFileRepositoryContract::class);
             
-            if ($response) {
-                return $this->response->create(['fileKey' => $response], ResponseCode::CREATED);
+            try {
+                $response = $contactFormFileRepository->uploadFiles($_FILES['fileData']);
+            } catch(\Exception $exception) {
+                /** @var NotificationService $notificationService */
+                $notificationService = pluginApp(NotificationService::class);
+                $notificationService->addNotificationCode(LogLevel::ERROR, 0);
+            }
+            
+            
+            if (!is_null($response)) {
+                return $this->response->create(['fileKeys' => $response], ResponseCode::CREATED);
             }
         }
     
-        return $this->response->create(['fileKey' => null], ResponseCode::BAD_REQUEST);
+        return $this->response->create([], ResponseCode::BAD_REQUEST);
     }
 }
