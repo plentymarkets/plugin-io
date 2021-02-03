@@ -269,7 +269,7 @@ class ItemService
             $filter = $filterBuilder
                 ->hasId([$itemId]);
 
-            if ($withPrimary) {
+            if (!$withPrimary) {
                 $filter->variationIsChild();
             }
 
