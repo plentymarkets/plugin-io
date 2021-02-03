@@ -725,7 +725,7 @@ class CustomerService
      * @return array
      * @throws \Exception
      */
-    private function buildAddressEmailOptions(array $options = [], $isGuest = false, $addressData = []): array
+    private function buildAddressEmailOptions(array $options = [], $isGuest = false, $addressData = [], $keepEmptyValuesInOptions = false): array
     {
         if ($isGuest) {
             /** @var SessionStorageRepositoryContract $sessionStorageRepository */
@@ -747,35 +747,35 @@ class CustomerService
         }
 
         if (count($addressData)) {
-            if (isset($addressData['vatNumber']) && strlen($addressData['vatNumber'])) {
+            if (isset($addressData['vatNumber']) && (strlen($addressData['vatNumber']) || $keepEmptyValuesInOptions)) {
                 $options[] = [
                     'typeId' => AddressOption::TYPE_VAT_NUMBER,
                     'value' => $addressData['vatNumber']
                 ];
             }
 
-            if (isset($addressData['birthday']) && strlen($addressData['birthday'])) {
+            if (isset($addressData['birthday']) && (strlen($addressData['birthday']) || $keepEmptyValuesInOptions)) {
                 $options[] = [
                     'typeId' => AddressOption::TYPE_BIRTHDAY,
                     'value' => $addressData['birthday']
                 ];
             }
 
-            if (isset($addressData['title']) && strlen($addressData['title'])) {
+            if (isset($addressData['title']) && (strlen($addressData['title']) || $keepEmptyValuesInOptions)) {
                 $options[] = [
                     'typeId' => AddressOption::TYPE_TITLE,
                     'value' => $addressData['title']
                 ];
             }
 
-            if (isset($addressData['telephone']) && strlen($addressData['telephone'])) {
+            if (isset($addressData['telephone']) && (strlen($addressData['telephone']) || $keepEmptyValuesInOptions)) {
                 $options[] = [
                     'typeId' => AddressOption::TYPE_TELEPHONE,
                     'value' => $addressData['telephone']
                 ];
             }
 
-            if (isset($addressData['contactPerson']) && strlen($addressData['contactPerson'])) {
+            if (isset($addressData['contactPerson']) && (strlen($addressData['contactPerson']) || $keepEmptyValuesInOptions)) {
                 $options[] = [
                     'typeId' => AddressOption::TYPE_CONTACT_PERSON,
                     'value' => $addressData['contactPerson']
@@ -832,7 +832,7 @@ class CustomerService
         }
 
         if ((int)$this->contactRepository->getContactId() > 0) {
-            $addressData['options'] = $this->buildAddressEmailOptions([], false, $addressData);
+            $addressData['options'] = $this->buildAddressEmailOptions([], false, $addressData, true);
 
             if ($typeId == AddressType::BILLING && isset($addressData['name1']) && strlen($addressData['name1'])) {
                 $this->createAccount($this->mapAddressDataToAccount($addressData));
@@ -853,7 +853,7 @@ class CustomerService
             );
         } else {
             //case for guests
-            $addressData['options'] = $this->buildAddressEmailOptions([], true, $addressData);
+            $addressData['options'] = $this->buildAddressEmailOptions([], true, $addressData, true);
             $newAddress = $this->addressRepository->updateAddress($addressData, $addressId);
         }
 
