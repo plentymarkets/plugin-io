@@ -3,6 +3,7 @@
 namespace IO\Services;
 
 use IO\Helper\Utils;
+use Plenty\Modules\Webshop\ContactForm\Contracts\ContactFormFileRepositoryContract;
 use Plenty\Plugin\Log\Loggable;
 use Plenty\Plugin\Mail\Contracts\MailerContract;
 use Plenty\Plugin\Mail\Models\ReplyTo;
@@ -20,7 +21,7 @@ use Plenty\Plugin\Translation\Translator;
 class ContactMailService
 {
     use Loggable;
-
+    
     /**
      * Send an email using a template and a data object
      *
@@ -73,9 +74,18 @@ class ContactMailService
                 'data' => $mailData['data']
             ]
         );
+        
+        $attachments = [];
+        if (isset($mailData['fileKeys']) && count($mailData['fileKeys'])) {
+            /** @var ContactFormFileRepositoryContract $contactFormFileRepository */
+            $contactFormFileRepository = pluginApp(ContactFormFileRepositoryContract::class);
+            foreach ($mailData['fileKeys'] as $fileKey) {
+                $attachments[] = $contactFormFileRepository->getFile($fileKey);
+            }
+        }
 
         try {
-            $mailer->sendHtml($mailBody, $recipient, $subject, $mailData['cc'] ?? [], $mailData['bcc'] ?? [], $replyTo);
+            $mailer->sendHtml($mailBody, $recipient, $subject, $mailData['cc'] ?? [], $mailData['bcc'] ?? [], $replyTo, $attachments);
         } catch (\Exception $exception) {
             return false;
         }

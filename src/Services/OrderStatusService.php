@@ -83,7 +83,7 @@ class OrderStatusService
                             try {
                                 $statusHistoryNew[$entryKey] = $orderStatusRepo->get($entry->statusId);
                             } catch (\Exception $e) {
-                                $logger->error("IO::Debug.OrderStatusService_getOrderStatus", [
+                                $logger->debug("IO::Debug.OrderStatusService_getOrderStatus", [
                                     'code' => $e->getCode(),
                                     'message' => $e->getMessage(),
                                     'entryKey' => $entryKey
