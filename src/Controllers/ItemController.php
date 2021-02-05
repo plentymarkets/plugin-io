@@ -250,7 +250,6 @@ class ItemController extends LayoutController
                 [
                     'categoryId' => $category->id,
                     'itemsPerPage' => 1
-
                 ]
             )
         );
