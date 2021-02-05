@@ -55,13 +55,13 @@ class CheckoutController extends LayoutController
                     $shopUrls->login,
                     ["backlink" => AuthGuard::getUrl()]
                 );
-            } elseif (!count($basketItemRepository->all()) &&
-                $sessionStorageRepository->getSessionValue(SessionStorageRepositoryContract::LATEST_ORDER_ID)) {
-                $this->getLogger(__CLASS__)->info("IO::Debug.CheckoutController_emptyBasket");
-                AuthGuard::redirect($shopUrls->confirmation, []);
             } elseif (!count($basketItemRepository->all())) {
                 $this->getLogger(__CLASS__)->info("IO::Debug.CheckoutController_emptyBasket");
-                AuthGuard::redirect($shopUrls->home, []);
+                if($sessionStorageRepository->getSessionValue(SessionStorageRepositoryContract::LAST_ACCESSED_ORDER) > 0) {
+                    AuthGuard::redirect($shopUrls->confirmation, []);
+                } else {
+                    AuthGuard::redirect($shopUrls->home, []);
+                }
             }
         } elseif (is_null($category)) {
             /** @var CategoryController $categoryController */
