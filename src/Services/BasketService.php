@@ -635,7 +635,7 @@ class BasketService
         $basketItems = $this->getBasketItemsRaw();
 
         foreach ($basketItems as $basketItem) {
-            if ($basketItem->itemType !== BasketItem::BASKET_ITEM_TYPE_ITEM_SET_COMPONENT) {
+            if (!in_array($basketItem->itemType, [BasketItem::BASKET_ITEM_TYPE_ITEM_SET_COMPONENT, BasketItem::BASKET_ITEM_TYPE_VARIATION_ORDER_PROPERTY])) {
                 // dont fire events at this place
                 $this->basketItemRepository->removeBasketItem($basketItem->id, false);
             }
