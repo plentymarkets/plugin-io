@@ -75,7 +75,7 @@ class VariationSearchResultFactory
         $resultFields   = is_null($resultFieldsTemplate) ? [] : $this->loadResultFields($resultFieldsTemplate);
         $entries        = [];
 
-        if(!count($resultFields))
+        if(!count($resultFields) || in_array("*", $resultFields))
         {
             $resultFields = array_keys(self::FAKER_MAP);
         }
