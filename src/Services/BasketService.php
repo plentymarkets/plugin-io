@@ -344,7 +344,9 @@ class BasketService
 
         $basketItemIds = [];
         foreach ($basketItems as $basketItem) {
-            if ($basketItem['itemType'] === BasketItem::BASKET_ITEM_TYPE_ITEM_SET_COMPONENT) {
+            if ($basketItem['itemType'] === BasketItem::BASKET_ITEM_TYPE_VARIATION_ORDER_PROPERTY) {
+                continue;
+            } elseif ($basketItem['itemType'] === BasketItem::BASKET_ITEM_TYPE_ITEM_SET_COMPONENT) {
                 $basketItemId = $basketItem['itemBundleRowId'];
             } else {
                 $basketItemId = $basketItem['id'];
@@ -414,7 +416,9 @@ class BasketService
 
         $basketItemIds = [];
         foreach ($basketItems as $basketItem) {
-            if ($basketItem['itemType'] === BasketItem::BASKET_ITEM_TYPE_ITEM_SET_COMPONENT) {
+            if ($basketItem['itemType'] === BasketItem::BASKET_ITEM_TYPE_VARIATION_ORDER_PROPERTY) {
+                continue;
+            } elseif ($basketItem['itemType'] === BasketItem::BASKET_ITEM_TYPE_ITEM_SET_COMPONENT) {
                 $basketItemId = $basketItem['itemBundleRowId'];
             } else {
                 $basketItemId = $basketItem['id'];
