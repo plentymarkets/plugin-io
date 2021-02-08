@@ -57,7 +57,7 @@ class CheckoutController extends LayoutController
                 );
             } elseif (!count($basketItemRepository->all())) {
                 $this->getLogger(__CLASS__)->info("IO::Debug.CheckoutController_emptyBasket");
-                if($sessionStorageRepository->getSessionValue(SessionStorageRepositoryContract::LAST_ACCESSED_ORDER) > 0) {
+                if($sessionStorageRepository->getSessionValue(SessionStorageRepositoryContract::LATEST_ORDER_ID) > 0) {
                     AuthGuard::redirect($shopUrls->confirmation, []);
                 } else {
                     AuthGuard::redirect($shopUrls->home, []);
