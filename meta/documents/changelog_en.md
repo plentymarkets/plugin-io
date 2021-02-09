@@ -4,7 +4,7 @@
 
 ### TODO
 
-- If your theme uses the function `getVariationList($itemId, $withPrimary)` from the `ItemService`, you need to control whether the second parameter `$withPrimary` is interpreted as expected.
+- If your theme uses the function `getVariationList($itemId, $withPrimary)` from the `ItemService`, you need to check whether the second parameter `$withPrimary` is interpreted as expected.
 
 ### Added
 
