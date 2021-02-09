@@ -220,7 +220,7 @@ class BaseSearchFactory
         else
         {
             // load result fields from given resource
-            $this->resultFields = $this->loadResultFields( $fields );
+            $this->resultFields = $this->loadResultFields( (string)$fields );
         }
         return $this;
     }

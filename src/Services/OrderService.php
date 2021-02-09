@@ -787,12 +787,11 @@ class OrderService
 
         $this->sessionStorageRepository->setSessionValue(SessionStorageRepositoryContract::ORDER_CONTACT_WISH, null);
         $this->sessionStorageRepository->setSessionValue(SessionStorageRepositoryContract::ORDER_CUSTOMER_SIGN, null);
-        if ($this->contactRepository->getContactId() <= 0) {
-            $this->sessionStorageRepository->setSessionValue(
-                SessionStorageRepositoryContract::LATEST_ORDER_ID,
-                $order->id
-            );
-        }
+
+        $this->sessionStorageRepository->setSessionValue(
+            SessionStorageRepositoryContract::LATEST_ORDER_ID,
+            $order->id
+        );
     }
 
     /**
