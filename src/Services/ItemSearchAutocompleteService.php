@@ -70,7 +70,9 @@ class ItemSearchAutocompleteService
                     }
                 }
 
-                $searchString = str_replace($suggestion['text'], $selectedSuggestion['text'], $searchString);
+                if (!is_null($selectedSuggestion['text']) && strlen($selectedSuggestion['text'])) {
+                    $searchString = str_ireplace($suggestion['text'], $selectedSuggestion['text'], $searchString);
+                }
             }
         }
 
