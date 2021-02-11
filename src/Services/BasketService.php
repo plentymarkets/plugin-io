@@ -631,6 +631,14 @@ class BasketService
     }
 
     /**
+     * Delete basket for current session
+     */
+    public function deleteBasket()
+    {
+        $this->basketRepository->deleteBasket();
+    }
+
+    /**
      * Set the billing address id
      *
      * @param int $billingAddressId
