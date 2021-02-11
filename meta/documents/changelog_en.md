@@ -1,5 +1,11 @@
 # Release Notes for IO
 
+## v5.0.22 (2021-02-11) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.21...5.0.22" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
+
+### Fixed
+
+- Under certain circumstances the order confirmation displayed the wrong order status. This behaviour has been fixed.
+
 ## v5.0.21 (2021-02-09) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.20...5.0.21" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
 
 ### TODO
