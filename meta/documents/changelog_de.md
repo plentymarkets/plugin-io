@@ -1,5 +1,11 @@
 # Release Notes für IO
 
+## v5.0.22 (2021-02-11) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.21...5.0.22" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
+
+### Behoben
+
+- Unter bestimmten Umständen wurde auf der Bestellbestätigung der falsche Auftragsstatus angezeigt. Dieses Verhalten wurde behoben.
+
 ## v5.0.21 (2021-02-09) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.20...5.0.21" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
 
 ### TODO
