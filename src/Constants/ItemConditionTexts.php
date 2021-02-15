@@ -1,15 +1,18 @@
-<?php //strict
+<?php
 
 namespace IO\Constants;
 
 /**
  * Class ItemConditionTexts
+ *
+ * Container class for condition texts.
+ *
  * @package IO\Constants
  */
 class ItemConditionTexts
 {
     /**
-     * @var array
+     * @var array Id mapping to german condition texts.
      */
     public static $itemConditionTexts = [
         0 => 'Neu',

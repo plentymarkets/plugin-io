@@ -1,64 +1,195 @@
-<?php //strict
+<?php
 
 namespace IO\Constants;
 
 /**
  * Class Language
+ *
+ * Collection of language shortcuts
+ *
  * @package IO\Constants
  */
 class Language
 {
+    /**
+     * @var string Identifier for chinese language shortcut.
+     */
+    const CHINESE = "cn";
 
-	const CHINESE = "cn";
-	const CN      = "cn";
-	const ZH      = "cn";
+    /**
+     * @var string Identifier for chinese language shortcut.
+     */
+    const CN = "cn";
 
-	const CZECH = "cz";
-	const CS    = "cz";
-	const CZ    = "cz";
+    /**
+     * @var string Identifier for chinese language shortcut.
+     */
+    const ZH = "cn";
 
-	const DANISH = "da";
-	const DA     = "da";
+    /**
+     * @var string Identifier for czech language shortcut.
+     */
+    const CZECH = "cz";
 
-	const GERMAN = "de";
-	const DE     = "de";
+    /**
+     * @var string Identifier for czech language shortcut.
+     */
+    const CS = "cz";
 
-	const ENGLISH = "en";
-	const EN      = "en";
+    /**
+     * @var string Identifier for czech language shortcut.
+     */
+    const CZ = "cz";
 
-	const SPANISH = "es";
-	const ES      = "es";
+    /**
+     * @var string Identifier for danish language shortcut.
+     */
+    const DANISH = "da";
+    /**
+     * @var string Identifier for danish language shortcut.
+     */
+    const DA = "da";
 
-	const FRENCH = "fr";
-	const FR     = "fr";
+    /**
+     * @var string Identifier for german language shortcut.
+     */
+    const GERMAN = "de";
 
-	const ITALIAN = "it";
-	const IT      = "it";
+    /**
+     * @var string Identifier for german language shortcut.
+     */
+    const DE = "de";
 
-	const DUTCH = "nl";
-	const NL    = "nl";
+    /**
+     * @var string Identifier for english language shortcut.
+     */
+    const ENGLISH = "en";
+    /**
+     * @var string Identifier for english language shortcut.
+     */
+    const EN = "en";
 
-	const NORWEGIAN = "nn";
-	const NN        = "nn";
-	const NO        = "nn";
+    /**
+     * @var string Identifier for spanish language shortcut.
+     */
+    const SPANISH = "es";
 
-	const POLISH = "pl";
-	const PL     = "pl";
+    /**
+     * @var string Identifier for spanish language shortcut.
+     */
+    const ES = "es";
 
-	const RUSSIAN = "ru";
-	const RU      = "ru";
+    /**
+     * @var string Identifier for frensh language shortcut.
+     */
+    const FRENCH = "fr";
 
-	const SWEDISH = "se";
-	const SE      = "se";
-	const SV      = "se";
+    /**
+     * @var string Identifier for frensh language shortcut.
+     */
+    const FR = "fr";
 
-	const SLOVAK = "sk";
-	const SK     = "sk";
+    /**
+     * @var string Identifier for italian language shortcut.
+     */
+    const ITALIAN = "it";
 
-	const TURKISH = "tr";
-	const TR      = "tr";
+    /**
+     * @var string Identifier for italian language shortcut.
+     */
+    const IT = "it";
 
-	const VIETNAMESE = "vn";
-	const VN         = "vn";
-	const VI         = "vn";
+    /**
+     * @var string Identifier for dutch language shortcut.
+     */
+    const DUTCH = "nl";
+
+    /**
+     * @var string Identifier for dutch language shortcut.
+     */
+    const NL = "nl";
+
+    /**
+     * @var string Identifier for norwegian language shortcut.
+     */
+    const NORWEGIAN = "nn";
+
+    /**
+     * @var string Identifier for norwegian language shortcut.
+     */
+    const NN = "nn";
+
+    /**
+     * @var string Identifier for norwegian language shortcut.
+     */
+    const NO = "nn";
+
+    /**
+     * @var string Identifier for polish language shortcut.
+     */
+    const POLISH = "pl";
+
+    /**
+     * @var string Identifier for polish language shortcut.
+     */
+    const PL = "pl";
+
+    /**
+     * @var string Identifier for russian language shortcut.
+     */
+    const RUSSIAN = "ru";
+    /**
+     * @var string Identifier for russian language shortcut.
+     */
+    const RU = "ru";
+
+    /**
+     * @var string Identifier for swedish language shortcut.
+     */
+    const SWEDISH = "se";
+
+    /**
+     * @var string Identifier for swedish language shortcut.
+     */
+    const SE = "se";
+
+    /**
+     * @var string Identifier for swedish language shortcut.
+     */
+    const SV = "se";
+
+    /**
+     * @var string Identifier for slovak language shortcut.
+     */
+    const SLOVAK = "sk";
+
+    /**
+     * @var string Identifier for slovak language shortcut.
+     */
+    const SK = "sk";
+
+    /**
+     * @var string Identifier for turkish language shortcut.
+     */
+    const TURKISH = "tr";
+
+    /**
+     * @var string Identifier for turkish language shortcut.
+     */
+    const TR = "tr";
+
+    /**
+     * @var string Identifier for vietnamese language shortcut.
+     */
+    const VIETNAMESE = "vn";
+
+    /**
+     * @var string Identifier for vietnamese language shortcut.
+     */
+    const VN = "vn";
+
+    /**
+     * @var string Identifier for vietnamese language shortcut.
+     */
+    const VI = "vn";
 }
