@@ -6,10 +6,17 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model as BaseModel;
 use Plenty\Repositories\Models\PaginatedResult;
 
-
+/**
+ * Class ModelWrapper
+ *
+ * TODO
+ *
+ * @package Ceres\Models
+ */
 abstract class ModelWrapper extends BaseModel
 {
     /**
+     * TODO
      * @param mixed     $original
      * @param array     ...$args
      * @return mixed
@@ -17,6 +24,7 @@ abstract class ModelWrapper extends BaseModel
     public abstract static function wrap( $original, ...$args );
 
     /**
+     * TODO
      * @param array|Collection  $elements
      * @param array             ...$args
      * @return array
@@ -34,6 +42,7 @@ abstract class ModelWrapper extends BaseModel
     }
 
     /**
+     * TODO
      * @param PaginatedResult   $paginated
      * @param array             ...$args
      * @return PaginatedResult
