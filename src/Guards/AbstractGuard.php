@@ -1,4 +1,4 @@
-<?php // strict
+<?php
 
 namespace IO\Guards;
 
@@ -7,6 +7,9 @@ use Plenty\Plugin\Log\Loggable;
 
 /**
  * Class AbstractGuard
+ *
+ * Redirects to a uri or not in dependence to the assert.
+ *
  * @package IO\Guards
  */
 abstract class AbstractGuard
@@ -15,14 +18,16 @@ abstract class AbstractGuard
 
     /**
      * Returned value will be compared with asserted value to decide if it should redirect.
+     *
      * @return mixed
      */
     protected abstract function assert();
 
     /**
      * Redirect to given URI if expected value equals return value of AbstractGuard::assert()
-     * @param mixed $expected The value to compare with return value of AbstractGuard::asssert()
-     * @param string $redirectUri The URI to redirect to
+     *
+     * @param mixed $expected The value to compare with return value of AbstractGuard::asssert().
+     * @param string $redirectUri The URI to redirect to.
      */
     public function assertOrRedirect($expected, string $redirectUri)
     {
@@ -39,10 +44,9 @@ abstract class AbstractGuard
         }
     }
 
-    // TODO move to more general class
-
     /**
      * Redirect to a given URI. Appends params as query string.
+     *
      * @param string $uri The URI to redirect to.
      * @param array $params A map of params to append to URI as query string.
      */
@@ -67,8 +71,9 @@ abstract class AbstractGuard
 
     /**
      * Transform a given URI to an URL by prepending used protocol and server name.
-     * Will return current URL if $uri is null
-     * @param string|null $uri
+     * Will return current URL if $uri is null.
+     *
+     * @param string|null $uri Uri without protocol.
      * @return string
      */
     public static function getUrl(string $uri = null)
@@ -83,6 +88,4 @@ abstract class AbstractGuard
 
         return $domain . $uri;
     }
-
-
 }
