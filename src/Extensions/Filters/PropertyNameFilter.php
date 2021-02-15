@@ -11,6 +11,9 @@ use Plenty\Modules\Item\Property\Contracts\PropertySelectionRepositoryContract;
 
 /**
  * Class PropertySelectionValueNameFilter
+ *
+ * Contains twig filter to get order property names.
+ *
  * @package IO\Extensions\Filters
  */
 class PropertyNameFilter extends AbstractFilter
@@ -32,77 +35,92 @@ class PropertyNameFilter extends AbstractFilter
      */
     public function __construct(
         AuthHelper $authHelper
-    )
-    {
+    ) {
         parent::__construct();
 
-        $this->authHelper                   = $authHelper;
+        $this->authHelper = $authHelper;
     }
 
     /**
-     * Return the available filter methods
+     * Get the twig filter to method name mapping. (twig filter => method name)
+     *
      * @return array
      */
-    public function getFilters():array
+    public function getFilters(): array
     {
         return [
-            "propertyName"                  => "getPropertyName",
-            "propertySelectionValueName"    => "getPropertySelectionValueName"
+            "propertyName" => "getPropertyName",
+            "propertySelectionValueName" => "getPropertySelectionValueName"
         ];
     }
 
+    /**
+     * Gets the name of the giver order property.
+     *
+     * @param array $property Order property to get the name for.
+     * @param string $lang Lang to get the name in. Defaults to currently used webshop lang.
+     * @return string
+     */
     public function getPropertyName($property, $lang = null)
     {
-        if ($lang === null)
-        {
+        if ($lang === null) {
             $lang = Utils::getLang();
         }
 
-        if (is_null($this->propertyRepository))
-        {
+        if (is_null($this->propertyRepository)) {
             $this->propertyRepository = pluginApp(PropertyRepositoryContract::class);
         }
 
         $propertyId = $property['propertyId'];
-        $propertyNames = $this->fromMemoryCache("propertyName.$propertyId", function() use ($propertyId, $lang)
-        {
-            return $this->authHelper->processUnguarded(function() use ($propertyId)
-            {
-                return $this->propertyRepository->findById($propertyId)->names;
-            });
-        });
+        $propertyNames = $this->fromMemoryCache(
+            "propertyName.$propertyId",
+            function () use ($propertyId, $lang) {
+                return $this->authHelper->processUnguarded(
+                    function () use ($propertyId) {
+                        return $this->propertyRepository->findById($propertyId)->names;
+                    }
+                );
+            }
+        );
 
         $propertyName = $propertyNames->firstWhere('lang', $lang);
-        if(!is_null($propertyName))
-        {
+        if (!is_null($propertyName)) {
             return $propertyName->name;
         }
 
         return "";
     }
 
+    /**
+     * Gets the name of the giver order property from type selection.
+     *
+     * @param array $property Order property to get the name for.
+     * @param string $lang Lang to get the name in. Defaults to currently used webshop lang.
+     * @return mixed
+     */
     public function getPropertySelectionValueName($property, $lang = null)
     {
-        $propertyId       = $property['propertyId'];
+        $propertyId = $property['propertyId'];
         $selectionValueId = $property['value'];
 
-        if ($lang === null)
-        {
+        if ($lang === null) {
             $lang = Utils::getLang();
         }
 
-        if (is_null($this->propertySelectionRepository))
-        {
+        if (is_null($this->propertySelectionRepository)) {
             $this->propertySelectionRepository = pluginApp(PropertySelectionRepositoryContract::class);
         }
 
-        $selectionValues = $this->fromMemoryCache("selectionValues.$propertyId.$lang", function() use ($propertyId, $lang)
-        {
-            return $this->authHelper->processUnguarded(function() use ($propertyId, $lang)
-            {
-                return $this->propertySelectionRepository->findByProperty($propertyId, $lang);
-            });
-        });
+        $selectionValues = $this->fromMemoryCache(
+            "selectionValues.$propertyId.$lang",
+            function () use ($propertyId, $lang) {
+                return $this->authHelper->processUnguarded(
+                    function () use ($propertyId, $lang) {
+                        return $this->propertySelectionRepository->findByProperty($propertyId, $lang);
+                    }
+                );
+            }
+        );
         return $selectionValues->firstWhere('id', $selectionValueId)->name;
     }
 }

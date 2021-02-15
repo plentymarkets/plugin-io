@@ -2,6 +2,7 @@
 
 namespace IO\Extensions\Filters;
 
+use Exception;
 use IO\Extensions\AbstractFilter;
 use IO\Helper\Utils;
 use IO\Services\ItemService;
@@ -9,6 +10,9 @@ use Plenty\Modules\Webshop\Contracts\UrlBuilderRepositoryContract;
 
 /**
  * Class URLFilter
+ *
+ * Contains twig filter to get item urls with.
+ *
  * @package IO\Extensions\Filters
  */
 class URLFilter extends AbstractFilter
@@ -29,7 +33,8 @@ class URLFilter extends AbstractFilter
     }
 
     /**
-     * Return the available filter methods
+     * Get the twig filter to method name mapping. (twig filter => method name)
+     *
      * @return array
      */
     public function getFilters(): array
@@ -41,9 +46,10 @@ class URLFilter extends AbstractFilter
     }
 
     /**
-     * Build the URL for the item by item ID or variation ID
-     * @param object $itemData
-     * @param bool $withVariationId
+     * Build the URL for the item by item ID or variation ID.
+     *
+     * @param array $itemData Item data to build the url from.
+     * @param bool $withVariationId Determines if the variation id suffix should be added.
      * @return string
      */
     public function buildItemURL($itemData, $withVariationId = true): string
@@ -71,9 +77,12 @@ class URLFilter extends AbstractFilter
     }
 
     /**
-     * @param int $variationId
+     * Gets the item url based on the variation id.
+     *
+     * @param int $variationId Variation id to get the url with.
      * @return string
      *
+     * @throws Exception
      * @deprecated
      */
     public function buildVariationURL($variationId = 0): string

@@ -6,6 +6,9 @@ use IO\Extensions\AbstractFilter;
 
 /**
  * Class SpecialOfferFilter
+ *
+ *
+ *
  * @package IO\Extensions\Filters
  */
 class SpecialOfferFilter extends AbstractFilter
@@ -19,10 +22,11 @@ class SpecialOfferFilter extends AbstractFilter
     }
 
     /**
-     * Return the available filter methods
+     * Get the twig filter to method name mapping. (twig filter => method name)
+     *
      * @return array
      */
-    public function getFilters():array
+    public function getFilters(): array
     {
         return [
             "specialOffer" => "specialOffer"
@@ -30,33 +34,28 @@ class SpecialOfferFilter extends AbstractFilter
     }
 
     /**
-     * Build the item name from the configuration
-     * @param string $defaultPrice
-     * @param object $prices
-     * @param string $priceType
-	 * @param string $exact
+     * Gets the special offer price.
+     *
+     * @param string $defaultPrice Default price if no special offer price is set.
+     * @param array $prices Price object based on which the special offer price is returned.
+     * @param string $priceType Price type accessor.
+     * @param string $exact ??? Accessor TODO
      * @return string
      */
-    public function specialOffer( $defaultPrice, $prices, $priceType, $exact = null )
+    public function specialOffer($defaultPrice, $prices, $priceType, $exact = null)
     {
-		$price = "";
+        $price = "";
 
-		if ($prices["specialOffer"])
-		{
-			if ($exact)
-			{
-				$price = $prices["specialOffer"][$priceType][$exact] ? $prices["specialOffer"][$priceType][$exact] : $defaultPrice;
-			}
-			else
-			{
-				$price = $prices["specialOffer"][$priceType] ? $prices["specialOffer"][$priceType] : $defaultPrice;
-			}
-		}
-		else
-		{
-			$price = $defaultPrice;
-		}
+        if ($prices["specialOffer"]) {
+            if ($exact) {
+                $price = $prices["specialOffer"][$priceType][$exact] ? $prices["specialOffer"][$priceType][$exact] : $defaultPrice;
+            } else {
+                $price = $prices["specialOffer"][$priceType] ? $prices["specialOffer"][$priceType] : $defaultPrice;
+            }
+        } else {
+            $price = $defaultPrice;
+        }
 
-		return $price;
+        return $price;
     }
 }
