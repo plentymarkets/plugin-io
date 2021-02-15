@@ -9,9 +9,20 @@ use Plenty\Plugin\Http\Request;
 use Plenty\Plugin\Http\Response;
 use Plenty\Plugin\Middleware;
 
+/**
+ * Class DetectShippingCountry
+ *
+ * Set shipping country if necessary
+ *
+ * @package IO\Middlewares
+ */
 class DetectShippingCountry extends Middleware
 {
     /**
+     * Before the request is processed, the shipping country is changed if necessary
+     *
+     * Example request: ?ShipToCountry=COUNTRYID
+     *
      * @param Request $request
      */
     public function before(Request $request)
@@ -34,6 +45,8 @@ class DetectShippingCountry extends Middleware
     }
 
     /**
+     * After the request is processed, do nothing here.
+     *
      * @param Request $request
      * @param Response $response
      * @return Response

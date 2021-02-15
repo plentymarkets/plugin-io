@@ -9,9 +9,20 @@ use Plenty\Plugin\Http\Request;
 use Plenty\Plugin\Http\Response;
 use Plenty\Plugin\Middleware;
 
+/**
+ * Class HandleNewsletter
+ *
+ * Redirect to newsletter subscribe site if necessary
+ *
+ * @package IO\Middlewares
+ */
 class HandleNewsletter extends Middleware
 {
     /**
+     * Before the request is processed, check the request and redirect to newsletter page if necessary.
+     *
+     * Example request: ?authString=AUTHSTRING&newsletterEmailId=EMAILDIRID
+     *
      * @param Request $request
      */
     public function before(Request $request)
@@ -35,6 +46,8 @@ class HandleNewsletter extends Middleware
     }
 
     /**
+     * After the request is processed, do nothing here.
+     *
      * @param Request $request
      * @param Response $response
      * @return Response

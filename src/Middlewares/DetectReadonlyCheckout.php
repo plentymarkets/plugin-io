@@ -8,9 +8,20 @@ use Plenty\Plugin\Http\Request;
 use Plenty\Plugin\Http\Response;
 use Plenty\Plugin\Middleware;
 
+/**
+ * Class DetectReadonlyCheckout
+ *
+ * Set read only flag if readOnlyCheckout is in given request
+ *
+ * @package IO\Middlewares
+ */
 class DetectReadonlyCheckout extends Middleware
 {
     /**
+     * Set read only checkout if necessary
+     *
+     * Example request: ?readOnlyCheckout=1
+     *
      * @param Request $request
      */
     public function before(Request $request)
@@ -26,6 +37,8 @@ class DetectReadonlyCheckout extends Middleware
     }
 
     /**
+     * After the request is processed, do nothing here.
+     *
      * @param Request $request
      * @param Response $response
      * @return Response
