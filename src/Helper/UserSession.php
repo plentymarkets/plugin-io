@@ -10,13 +10,13 @@ use Plenty\Modules\Frontend\Services\AccountService;
  * Helper class for the user session.
  *
  * @package IO\Helper
- * @deprecated since 4.3.0
+ * @deprecated since 4.3.0.
  * @see \Plenty\Modules\Frontend\Services\AccountService
  */
 class UserSession
 {
 	/**
-	 * @var AccountService $accountService The accountService backing the functionality
+	 * @var AccountService $accountService The accountService backing the functionality.
 	 */
 	private $accountService;
 
@@ -30,10 +30,10 @@ class UserSession
 	}
 
     /**
-     * Get the current contact id
+     * Get the current contact ID.
      * @return int
      *
-     * @deprecated since 4.3.0
+     * @deprecated since 4.3.0.
      * @see AccountService::getAccountContactId
      */
 	public function getCurrentContactId():int
@@ -42,7 +42,7 @@ class UserSession
 	}
 
     /**
-     * Check whether contact is logged in
+     * Check whether contact is logged in.
      * @return bool
      *
      * @deprecated since 4.3.0
