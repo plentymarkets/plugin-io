@@ -12,17 +12,17 @@ namespace IO\Helper;
 class CategoryKey
 {
     /**
-     * @var string Previously referred to the home category
+     * @var string Previously referred to the home category.
      * @deprecated
      */
 	const HOME           = "home";
     /**
-     * @var string Previously referred to the 404 category
+     * @var string Previously referred to the 404 category.
      * @deprecated
      */
 	const PAGE_NOT_FOUND = "page_not_found";
     /**
-     * @var string Previously referred to the 404 category for items
+     * @var string Previously referred to the 404 category for items.
      * @deprecated
      */
 	const ITEM_NOT_FOUND = "item_not_found";
