@@ -13,7 +13,7 @@ use Plenty\Plugin\Middleware;
 /**
  * Class CheckNotFound
  *
- * Return the template for page not found if necessary
+ * Return the template for "Page not found", if necessary.
  *
  * @package IO\Middlewares
  */
@@ -34,7 +34,7 @@ class CheckNotFound extends Middleware
     }
 
     /**
-     * After the request is processed, check if page not found template should be returned.
+     * After the request is processed, check if "Page not found" template should be returned.
      *
      * @param Request $request
      * @param Response $response
