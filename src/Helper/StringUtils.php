@@ -8,16 +8,16 @@ namespace IO\Helper;
  * Helper class with utilities for string processing.
  *
  * @package IO\Helper
- * @deprecated since 5.0.0 will be removed in 6.0.0
+ * @deprecated since 5.0.0 will be removed in 6.0.0.
  */
 class StringUtils
 {
     /**
-     * Converts a string to be url safe
+     * Converts a string to be URL-safe.
      *
-     * @param string $n A string to be converted
+     * @param string $n A string to be converted.
      * @return false|string|string[]|null
-     * @deprecated since 5.0.0 will be removed in 6.0.0
+     * @deprecated since 5.0.0 will be removed in 6.0.0.
      */
     public static function string4URL($n)
     {
