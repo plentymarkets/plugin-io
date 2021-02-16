@@ -17,7 +17,7 @@ use IO\Services\ShippingService;
 class ShippingResource extends ApiResource
 {
 	/**
-	 * @var ShippingService
+	 * @var ShippingService $shippingService The instance of the current ShippingService.
 	 */
 	private $shippingService;
 
@@ -33,10 +33,9 @@ class ShippingResource extends ApiResource
 		$this->shippingService = $shippingService;
 	}
 
-	// Put/patch
     /**
-     * Set the shipping profile
-     * @param string $shippingProfileId
+     * Update the selected shipping profile.
+     * @param string $shippingProfileId The id of the shipping profile, to switch on.
      * @return Response
      */
 	public function update(string $shippingProfileId):Response

@@ -31,7 +31,7 @@ class OrderResource extends ApiResource
 	}
 
     /**
-     * List the orders of the customer
+     * List the orders of the customer.
      * @return Response
      */
 	public function index():Response
@@ -46,7 +46,7 @@ class OrderResource extends ApiResource
 	}
 
     /**
-     * Create an order
+     * Place an order.
      * @return Response
      */
 	public function store():Response

@@ -17,14 +17,28 @@ use IO\Services\OrderService;
  */
 class OrderReturnResource extends ApiResource
 {
+    /**
+     * @var OrderService $orderService The instance of the OrderService.
+     */
     private $orderService;
-    
+
+
+    /**
+     * OrderReturnResource constructor.
+     * @param Request $request
+     * @param ApiResponse $response
+     * @param OrderService $orderService
+     */
     public function __construct(Request $request, ApiResponse $response, OrderService $orderService)
     {
         parent::__construct($request, $response);
         $this->orderService = $orderService;
     }
-    
+
+    /**
+     * Create a return order for a specific order.
+     * @return Response
+     */
     public function store():Response
     {
         $returnOrder = $this->orderService->createOrderReturn(
@@ -33,7 +47,7 @@ class OrderReturnResource extends ApiResource
             $this->request->get('variationIds', []),
             $this->request->get('returnNote', '')
         );
-        
+
         return $this->response->create($returnOrder, ResponseCode::OK);
     }
 }

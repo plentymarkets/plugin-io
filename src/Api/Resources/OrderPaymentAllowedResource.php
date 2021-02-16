@@ -17,14 +17,15 @@ use IO\Services\OrderService;
 class OrderPaymentAllowedResource extends ApiResource
 {
     /**
-     * @var OrderService
+     * @var OrderService $orderService The instance of the OrderService.
      */
     private $orderService;
 
     /**
-     * OrderPaymentResource constructor.
+     * OrderPaymentAllowedResource constructor.
      * @param Request $request
      * @param ApiResponse $response
+     * @param OrderService $orderService
      */
     public function __construct(Request $request, ApiResponse $response, OrderService $orderService)
     {

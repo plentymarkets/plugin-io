@@ -47,8 +47,8 @@ class ApiResource extends Controller
         }
     }
 
-	// Get all
     /**
+     * Triggered on REST calls with the type GET.
      * @return Response
      */
 	public function index():Response
@@ -56,8 +56,8 @@ class ApiResource extends Controller
 		return $this->response->create(null, $this->defaultCode);
 	}
 
-	// Post
     /**
+     * Triggered on REST calls with the type POST.
      * @return Response
      */
 	public function store():Response
@@ -65,8 +65,8 @@ class ApiResource extends Controller
 		return $this->response->create(null, $this->defaultCode);
 	}
 
-	// Get
     /**
+     * Triggered on REST calls with the type GET.
      * @param string $selector
      * @return Response
      */
@@ -75,8 +75,8 @@ class ApiResource extends Controller
 		return $this->response->create(null, $this->defaultCode);
 	}
 
-	// Put/patch
     /**
+     * Triggered on REST calls with the type PUT.
      * @param string $selector
      * @return Response
      */
@@ -85,8 +85,8 @@ class ApiResource extends Controller
 		return $this->response->create(null, $this->defaultCode);
 	}
 
-	// Delete
     /**
+     * Triggered on REST calls with the type DELETE.
      * @param string $selector
      * @return Response
      */

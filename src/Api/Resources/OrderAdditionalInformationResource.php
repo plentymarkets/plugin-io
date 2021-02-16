@@ -17,9 +17,17 @@ use IO\Api\ResponseCode;
  */
 class OrderAdditionalInformationResource extends ApiResource
 {
-
+    /**
+     * @var SessionStorageRepositoryContract $sessionStorageRepository The instance of the SessionStorageRepository.
+     */
     private $sessionStorageRepository;
 
+    /**
+     * OrderAdditionalInformationResource constructor.
+     * @param Request $request
+     * @param ApiResponse $response
+     * @param SessionStorageRepositoryContract $sessionStorageRepository
+     */
     public function __construct(
         Request $request,
         ApiResponse $response,
@@ -29,6 +37,14 @@ class OrderAdditionalInformationResource extends ApiResource
         $this->sessionStorageRepository = $sessionStorageRepository;
     }
 
+    /**
+     * Store additional information about the order in the current session.
+     * - contact wish
+     * - customer sign
+     * - shipping privacy hint
+     * - newsletter subscriptions
+     * @return Response
+     */
     public function store(): Response
     {
         $this->setContactWish();
@@ -40,7 +56,7 @@ class OrderAdditionalInformationResource extends ApiResource
     }
 
     /**
-     * Set the contact wish from the request
+     * Set the contact wish for the current session, taken from the request.
      */
     private function setContactWish()
     {
@@ -55,6 +71,9 @@ class OrderAdditionalInformationResource extends ApiResource
         );
     }
 
+    /**
+     * Set the customer sign for the current session, taken from the request.
+     */
     private function setCustomerSign()
     {
         $orderCustomerSign = $this->request->get('orderCustomerSign', '');
@@ -67,6 +86,9 @@ class OrderAdditionalInformationResource extends ApiResource
         }
     }
 
+    /**
+     * Set the shipping privacy hint for the current session, taken from the request.
+     */
     private function setShippingPrivacyHint()
     {
         $this->sessionStorageRepository->setSessionValue(
@@ -75,6 +97,9 @@ class OrderAdditionalInformationResource extends ApiResource
         );
     }
 
+    /**
+     * Set the newsletter subscriptions for the current session, taken from the request.
+     */
     private function setNewsletterSubscriptions()
     {
         $this->sessionStorageRepository->setSessionValue(

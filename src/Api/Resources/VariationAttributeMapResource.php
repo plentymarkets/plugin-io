@@ -18,7 +18,7 @@ use IO\Api\ResponseCode;
 class VariationAttributeMapResource extends ApiResource
 {
     /**
-     * Get variation combinations
+     * Get variation combinations for the given item id.
      * @return Response
      */
     public function index():Response
