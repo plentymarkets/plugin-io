@@ -29,10 +29,10 @@ class GetCdnMetadata extends AbstractFunction
     }
 
     /**
-     * Get the metadata for a file stored on plentymarkets cdn
-     * @param string $imageUrl Resource url to get metadata for
-     * @param string $key Metadata key to get value for
-     * @param mixed $default Default value to return if no value is stored in metadata
+     * Get the metadata for a file stored on plentymarkets cdn.
+     * @param string $imageUrl Resource URL to get metadata for.
+     * @param string $key Metadata key to get value for.
+     * @param mixed $default Default value to return if no value is stored in metadata.
      *
      * @return mixed
      */
