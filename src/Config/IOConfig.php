@@ -12,7 +12,7 @@ namespace IO\Config;
 class IOConfig
 {
     /**
-     * @var IONumberFormatConfig IO Configuration data for number format.
+     * @var IONumberFormatConfig IO configuration data for number format.
      */
     public $format;
 
