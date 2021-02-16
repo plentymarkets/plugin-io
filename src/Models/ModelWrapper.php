@@ -9,48 +9,50 @@ use Plenty\Repositories\Models\PaginatedResult;
 /**
  * Class ModelWrapper
  *
- * TODO
+ * Abstract class to wrap an model to an other data representation.
  *
- * @package Ceres\Models
+ * @package IO\Models
  */
 abstract class ModelWrapper extends BaseModel
 {
     /**
-     * TODO
-     * @param mixed     $original
-     * @param array     ...$args
+     * Abstract wrapping function must be implemented in in inherting class.
+     *
+     * @param mixed $original Original data model.
+     * @param array ...$args Additional params.
      * @return mixed
      */
-    public abstract static function wrap( $original, ...$args );
+    public abstract static function wrap($original, ...$args);
 
     /**
-     * TODO
-     * @param array|Collection  $elements
-     * @param array             ...$args
+     * Get an array with multiple wrapped instances.
+     *
+     * @param array|Collection $elements Array or Collection with not wrapped elements.
+     * @param array ...$args
      * @return array
      */
-    public static function wrapList( $elements, ...$args ):array
+    public static function wrapList($elements, ...$args): array
     {
         $result = [];
-        foreach( $elements as $element )
-        {
-            $newElement = static::wrap( $element, ...$args );
-            array_push( $result, $newElement );
+        foreach ($elements as $element) {
+            $newElement = static::wrap($element, ...$args);
+            array_push($result, $newElement);
         }
 
         return $result;
     }
 
     /**
-     * TODO
-     * @param PaginatedResult   $paginated
-     * @param array             ...$args
+     * Get an paginated result with wrapped instances.
+     *
+     * @param PaginatedResult $paginated Paginated result with not wrapped elements.
+     * @param array ...$args Additional params.
      * @return PaginatedResult
      */
-    public static function wrapPaginated( PaginatedResult $paginated, ...$args ):PaginatedResult
+    public static function wrapPaginated(PaginatedResult $paginated, ...$args): PaginatedResult
     {
-        $result = self::wrapList( $paginated->getResult(), ...$args );
-        $paginated->setResult( $result );
+        $result = self::wrapList($paginated->getResult(), ...$args);
+        $paginated->setResult($result);
         return $paginated;
     }
 }

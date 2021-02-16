@@ -25,9 +25,9 @@ use Plenty\Modules\Webshop\ItemSearch\Services\ItemSearchService;
 /**
  * Class LocalizedOrder
  *
- * TODO
+ * Data representation for an order.
  *
- * @package Ceres\Models
+ * @package IO\Models
  */
 class LocalizedOrder extends ModelWrapper
 {
@@ -45,7 +45,7 @@ class LocalizedOrder extends ModelWrapper
         OrderItemType::TYPE_SET_COMPONENT,
     ];
 
-    /** @var array The OrderItem types that will be wrapped. All other OrderItems will be stripped from the return. */
+    /** @var array The OrderItem types that will be wrapped. All other OrderItems will be stripped from the return order. */
     const WRAPPED_ORDERITEM_TYPES_FOR_RETURN = [
         OrderItemType::TYPE_VARIATION,
         OrderItemType::TYPE_ITEM_BUNDLE,
@@ -58,48 +58,49 @@ class LocalizedOrder extends ModelWrapper
         OrderItemType::TYPE_SET_COMPONENT,
     ];
 
-    /** @var array $order TODO */
+    /** @var array $order Specific order data. */
     public $order = null;
-    /** @var array $orderData TODO */
+    /** @var array $orderData Specific order data, should be filled with an return order. */
     public $orderData = [];
-    /** @var string $status Name of the status (example: return) */
+    /** @var string $status Name of the order status (example: return). */
     public $status = null;
-    /** @var string $shippingProvider Name of the shipping provider (example: DHL) */
+    /** @var string $shippingProvider Name of the shipping provider (example: DHL). */
     public $shippingProvider = "";
-    /** @var string $shippingProfileName The ID of the name of the shipping profile */
+    /** @var string $shippingProfileName Name of the shipping profile. */
     public $shippingProfileName = "";
-    /** @var int $shippingProfileId The ID of the shipping profile (Default: 0) */
+    /** @var int $shippingProfileId The ID of the shipping profile (Default: 0). */
     public $shippingProfileId = 0;
-    /** @var string $trackingURL Tracking URL for the order from shipping provider */
+    /** @var string $trackingURL Tracking URL for the order from shipping provider. */
     public $trackingURL = "";
-    /** @var string $paymentMethodName The name of the payment method */
+    /** @var string $paymentMethodName Name of the payment method. */
     public $paymentMethodName = "";
-    /** @var string $paymentMethodIcon URL of payment icon image */
+    /** @var string $paymentMethodIcon URL of payment method icon image. */
     public $paymentMethodIcon = "";
-    /** @var string $paymentStatus Payment status see IO/Constants/OderPaymentStatus */
+    /** @var string $paymentStatus Payment status see IO/Constants/OderPaymentStatus. */
     public $paymentStatus = "";
 
-    /** @var array $variations Item variations and their data inside the order */
+    /** @var array $variations Item variations and their data inside the order. */
     public $variations = [];
-    /** @var array $itemURLs URLs of item variations */
+    /** @var array $itemURLs URLs of item variations. */
     public $itemURLs = [];
-    /** @var array $itemImages URLs to images of item variations */
+    /** @var array $itemImages URLs to images of item variations. */
     public $itemImages = [];
-    /** @var bool $isReturnable Indicate if order is returnable */
+    /** @var bool $isReturnable Indicate if order is returnable. */
     public $isReturnable = false;
 
-    /** @var bool $highlightNetPrices Indicate if net prices should be shown/highlighted */
+    /** @var bool $highlightNetPrices Indicate if net prices should be shown/highlighted. */
     public $highlightNetPrices = false;
-    /** @var array $totals Totals data of the order */
+    /** @var array $totals Totals data of the order. */
     public $totals = [];
 
-    /** @var bool $allowPaymentMethodSwitchFrom Indicate if is possible to switch to another payment method from the chosen one */
+    /** @var bool $allowPaymentMethodSwitchFrom Indicate if is possible to switch to another payment method from the chosen one. */
     public $allowPaymentMethodSwitchFrom = false;
-    /** @var array $paymentMethodListForSwitch List all payment methods available for switch */
+    /** @var array $paymentMethodListForSwitch List all payment methods available for switch. */
     public $paymentMethodListForSwitch = [];
 
     /**
-     * TODO
+     * Data preperation for the specific order and params.
+     *
      * @param Order $order TODO
      * @param array ...$data TODO
      * @return LocalizedOrder|null
@@ -317,7 +318,8 @@ class LocalizedOrder extends ModelWrapper
     }
 
     /**
-     * Creates an array of data from the localized order
+     * Get an array for the current instance.
+     *
      * @return array
      */
     public function toArray(): array
@@ -353,7 +355,8 @@ class LocalizedOrder extends ModelWrapper
     }
 
     /**
-     * Checks if order is returnable
+     * Checks if order is returnable.
+     *
      * @return bool
      */
     public function isReturnable()
@@ -402,6 +405,8 @@ class LocalizedOrder extends ModelWrapper
     }
 
     /**
+     * Get all set components from order items for a specific order item id.
+     *
      * @param int $setOrderItemId Id of setitem
      * @param OrderItem[] $orderItems List of items of the order
      * @return array
