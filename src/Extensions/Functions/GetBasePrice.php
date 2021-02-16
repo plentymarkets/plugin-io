@@ -16,7 +16,7 @@ use IO\Extensions\AbstractFunction;
 /**
  * Class GetBasePrice
  *
- * Contains twig functions that get the base price based on an variation id.
+ * Contains twig functions that get the base price based on an variation ID.
  *
  * @package IO\Extensions\Functions
  */
@@ -82,7 +82,7 @@ class GetBasePrice extends AbstractFunction
     /**
      * Get the base price for the specified variation.
      *
-     * @param int $variationId Variation id to get the base price from.
+     * @param int $variationId Variation ID to get the base price from.
      * @return array
      */
     public function getBasePrice(int $variationId): array
@@ -93,7 +93,7 @@ class GetBasePrice extends AbstractFunction
     /**
      * Get base prices for a list of variations.
      *
-     * @param array $variationIds Variation ids to get the base prices from.
+     * @param array $variationIds Variation IDs to get the base prices from.
      * @return array
      */
     public function getBasePriceList($variationIds): array
