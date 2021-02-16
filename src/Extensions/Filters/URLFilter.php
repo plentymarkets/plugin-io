@@ -11,7 +11,7 @@ use Plenty\Modules\Webshop\Contracts\UrlBuilderRepositoryContract;
 /**
  * Class URLFilter
  *
- * Contains twig filter to get item urls with.
+ * Contains twig filter to get item URLs with.
  *
  * @package IO\Extensions\Filters
  */
@@ -48,8 +48,8 @@ class URLFilter extends AbstractFilter
     /**
      * Build the URL for the item by item ID or variation ID.
      *
-     * @param array $itemData Item data to build the url from.
-     * @param bool $withVariationId Determines if the variation id suffix should be added.
+     * @param array $itemData Item data to build the URL from.
+     * @param bool $withVariationId Determines if the variation ID suffix should be added.
      * @return string
      */
     public function buildItemURL($itemData, $withVariationId = true): string
@@ -77,9 +77,9 @@ class URLFilter extends AbstractFilter
     }
 
     /**
-     * Gets the item url based on the variation id.
+     * Gets the item URL based on the variation ID.
      *
-     * @param int $variationId Variation id to get the url with.
+     * @param int $variationId Variation ID to get the URL with.
      * @return string
      *
      * @throws Exception
