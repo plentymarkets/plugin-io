@@ -9,7 +9,7 @@ use Plenty\Plugin\Http\Request;
 /**
  * Class UniqueId
  *
- * Contains global helper function to get a unique id from.
+ * Contains global helper function to get a unique ID from.
  *
  * @package IO\Extensions\Functions
  */
@@ -32,9 +32,9 @@ class UniqueId extends AbstractFunction
     }
 
     /**
-     * Gets an unique id with an optional prefix.
+     * Gets an unique ID with an optional prefix.
      *
-     * @param string $prefix Optional prefix that gets attached to the unique id.
+     * @param string $prefix Optional prefix that gets attached to the unique ID.
      * @return string
      */
     public function generateUniqueId($prefix = "")
