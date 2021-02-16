@@ -12,14 +12,14 @@ use Plenty\Plugin\Middleware;
 /**
  * Class HandleNewsletter
  *
- * Redirect to newsletter subscribe site if necessary
+ * Redirect to newsletter subscribe page, if necessary.
  *
  * @package IO\Middlewares
  */
 class HandleNewsletter extends Middleware
 {
     /**
-     * Before the request is processed, check the request and redirect to newsletter page if necessary.
+     * Before the request is processed, check the request and redirect to newsletter page, if necessary.
      *
      * Example request: ?authString=AUTHSTRING&newsletterEmailId=EMAILDIRID
      *
