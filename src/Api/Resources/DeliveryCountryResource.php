@@ -13,6 +13,7 @@ use IO\Services\CountryService;
 /**
  * Class DeliveryCountryResource
  * @package IO\Api\Resources
+ * @deprecated will be removed in 6.0.0.
  */
 class DeliveryCountryResource extends ApiResource
 {

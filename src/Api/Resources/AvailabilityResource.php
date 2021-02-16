@@ -12,7 +12,7 @@ use IO\Services\AvailabilityService;
 /**
  * Class AvailabilityResource
  *
- * Resource class for the route "io/item/availability"
+ * Resource class for the route "io/item/availability".
  * @package IO\Api\Resources
  */
 class AvailabilityResource extends ApiResource

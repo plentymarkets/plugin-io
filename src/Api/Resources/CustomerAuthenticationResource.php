@@ -13,7 +13,7 @@ use Plenty\Plugin\Log\Loggable;
 /**
  * Class CustomerAuthenticationResource
  *
- * Resource class for the route "io/customer/login"
+ * Resource class for the route "io/customer/login".
  * @package IO\Api\Resources
  */
 class CustomerAuthenticationResource extends ApiResource

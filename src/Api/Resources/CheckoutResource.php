@@ -14,7 +14,7 @@ use IO\Builder\Order\AddressType;
 /**
  * Class CheckoutResource
  *
- * Resource class for the route "io/checkout"
+ * Resource class for the route "io/checkout".
  * @package IO\Api\Resources
  */
 class CheckoutResource extends ApiResource

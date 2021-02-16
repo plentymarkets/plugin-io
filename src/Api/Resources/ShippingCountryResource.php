@@ -12,7 +12,7 @@ use IO\Services\CheckoutService;
 /**
  * Class ShippingCountryResource
  *
- * Resource class for the route "io/shipping/country"
+ * Resource class for the route "io/shipping/country".
  * @package IO\Api\Resources
  */
 class ShippingCountryResource extends ApiResource

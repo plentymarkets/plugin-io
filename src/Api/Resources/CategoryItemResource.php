@@ -14,7 +14,7 @@ use IO\Api\ResponseCode;
 /**
  * Class CategoryItemResource
  *
- * Resource class for the route "io/category"
+ * Resource class for the route "io/category".
  * @package IO\Api\Resources
  */
 class CategoryItemResource extends ApiResource

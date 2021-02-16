@@ -12,7 +12,7 @@ use Plenty\Plugin\Http\Response;
 /**
  * Class CheckoutSetShippingIdResource
  *
- * Resource class for the route "io/checkout/shippingId"
+ * Resource class for the route "io/checkout/shippingId".
  * @package IO\Api\Resources
  */
 class CheckoutSetShippingIdResource extends ApiResource

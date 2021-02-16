@@ -11,9 +11,9 @@ use IO\Api\ApiResponse;
 use IO\Api\ResponseCode;
 
 /**
- * Class BasketItemResource
+ * Class ItemWishListResource
  *
- * Resource class for the route "io/itemWishList"
+ * Resource class for the route "io/itemWishList".
  * @package IO\Api\Resources
  */
 class ItemWishListResource extends ApiResource

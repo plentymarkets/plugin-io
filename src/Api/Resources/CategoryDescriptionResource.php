@@ -13,7 +13,7 @@ use IO\Services\CategoryService;
 /**
  * Class CategoryDescriptionResource
  *
- * Resource class for the route "io/category/description"
+ * Resource class for the route "io/category/description".
  * @package IO\Api\Resources
  */
 class CategoryDescriptionResource extends ApiResource

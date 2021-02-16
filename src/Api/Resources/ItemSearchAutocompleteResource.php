@@ -14,7 +14,7 @@ use IO\Api\ResponseCode;
 /**
  * Class ItemSearchAutocompleteResource
  *
- * Resource class for the route "io/item/search/autocomplete"
+ * Resource class for the route "io/item/search/autocomplete".
  * @package IO\Api\Resources
  */
 class ItemSearchAutocompleteResource extends ApiResource

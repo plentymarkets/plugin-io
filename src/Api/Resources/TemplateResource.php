@@ -13,7 +13,7 @@ use IO\Api\ResponseCode;
 /**
  * Class TemplateResource
  *
- * Resource class for the route "io/template"
+ * Resource class for the route "io/template".
  * @package IO\Api\Resources
  */
 class TemplateResource extends ApiResource

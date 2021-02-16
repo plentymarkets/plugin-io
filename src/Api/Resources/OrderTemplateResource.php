@@ -17,7 +17,7 @@ use IO\Services\TemplateService;
 /**
  * Class OrderTemplateResource
  *
- * Resource class for the route "io/order/template"
+ * Resource class for the route "io/order/template".
  * @package IO\Api\Resources
  */
 class OrderTemplateResource extends ApiResource

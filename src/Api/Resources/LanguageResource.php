@@ -12,7 +12,7 @@ use IO\Services\LocalizationService;
 /**
  * Class LanguageResource
  *
- * Resource class for the route "io/localization/language"
+ * Resource class for the route "io/localization/language".
  * @package IO\Api\Resources
  */
 class LanguageResource extends ApiResource

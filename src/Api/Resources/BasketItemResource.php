@@ -12,7 +12,7 @@ use IO\Services\BasketService;
 /**
  * Class BasketItemResource
  *
- * Resource class for the route "io/basket/items"
+ * Resource class for the route "io/basket/items".
  * @package IO\Api\Resources
  */
 class BasketItemResource extends ApiResource
