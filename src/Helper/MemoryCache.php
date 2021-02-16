@@ -18,9 +18,9 @@ trait MemoryCache
     private static $cache = [];
 
     /**
-     * Store the result of a operation in the memory cache
-     * @param string $key A cache key to store result under
-     * @param \Closure $callack The operation, of which the result is to be stored
+     * Store the result of a operation in the memory cache.
+     * @param string $key A cache key to store result under.
+     * @param \Closure $callack The operation of which the result is to be stored.
      * @return mixed
      */
     protected function fromMemoryCache($key, \Closure $callack)
@@ -37,8 +37,8 @@ trait MemoryCache
     }
 
     /**
-     * Reset a key or the whole memory cache for the current class
-     * @param string|null $key A cache key to delete. If null, delete the whole cache
+     * Reset a key or the whole memory cache for the current class.
+     * @param string|null $key A cache key to delete. If null, delete the whole cache.
      */
     protected function resetMemoryCache($key = null)
     {
