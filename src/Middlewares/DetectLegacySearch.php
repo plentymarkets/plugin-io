@@ -12,14 +12,14 @@ use Plenty\Plugin\Middleware;
 /**
  * Class DetectLegacySearch
  *
- * Redirect to search site if necessary
+ * Redirect to search page, if necessary.
  *
  * @package IO\Middlewares
  */
 class DetectLegacySearch extends Middleware
 {
     /**
-     * Before the request is processed, check the request and redirect to search if necessary
+     * Before the request is processed, check the request and redirect to search, if necessary.
      *
      * Example request: ?ActionCall=WebActionArticleSearch&Params[SearchParams]=SEARCHQUERY
      *
