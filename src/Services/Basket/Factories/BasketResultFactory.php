@@ -10,7 +10,7 @@ use Plenty\Modules\Webshop\ItemSearch\Services\ItemSearchService;
 
 /**
  * Class BasketResultFactory
- * Factory class to generate fake basket date to be used during the preview in the ShopBuilder.
+ * Factory class to generate fake basket data to be used during the preview in the ShopBuilder.
  *
  * @package IO\Services\Basket\Factories
  */
