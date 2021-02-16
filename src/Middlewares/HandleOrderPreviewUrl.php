@@ -9,9 +9,18 @@ use Plenty\Plugin\Http\Request;
 use Plenty\Plugin\Http\Response;
 use Plenty\Plugin\Middleware;
 
+/**
+ * Class HandleOrderPreviewUrl
+ *
+ * Redirect to order confirmation, if necessary.
+ *
+ * @package IO\Middlewares
+ */
 class HandleOrderPreviewUrl extends Middleware
 {
     /**
+     * Before the request is processed, check the request and redirect to order confirmation page, if necessary.
+     *
      * @param Request $request
      */
     public function before(Request $request)
@@ -41,6 +50,8 @@ class HandleOrderPreviewUrl extends Middleware
     }
 
     /**
+     * After the request is processed, do nothing here.
+     *
      * @param Request $request
      * @param Response $response
      * @return Response
