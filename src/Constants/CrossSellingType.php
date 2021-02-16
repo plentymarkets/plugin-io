@@ -5,29 +5,29 @@ namespace IO\Constants;
 /**
  * Class CrossSellingType
  *
- * Collection of crosselling type constants
+ * Collection of cross-selling type constants
  *
  * @package IO\Constants
  */
 class CrossSellingType
 {
     /**
-     * @var string Identifier for crossselling type similiar.
+     * @var string Identifier for cross-selling type similiar.
      */
     const SIMILAR = 'Similar';
 
     /**
-     * @var string Identifier for crossselling type episode.
+     * @var string Identifier for cross-selling type episode.
      */
     const EPISODE = 'Episode';
 
     /**
-     * @var string Identifier for crossselling type season.
+     * @var string Identifier for cross-selling type season.
      */
     const SEASON = 'Season';
 
     /**
-     * @var string Identifier for crossselling type bundle.
+     * @var string Identifier for cross-selling type bundle.
      */
     const BUNDLE = 'Bundle';
 
@@ -37,52 +37,52 @@ class CrossSellingType
     const COMPONENT = 'Component';
 
     /**
-     * @var string Identifier for crossselling type variation.
+     * @var string Identifier for cross-selling type variation.
      */
     const VARIATION = 'Variation';
 
     /**
-     * @var string Identifier for crossselling type display set.
+     * @var string Identifier for cross-selling type display set.
      */
     const DISPLAY_SET = 'DisplaySet';
 
     /**
-     * @var string Identifier for crossselling type collection.
+     * @var string Identifier for cross-selling type collection.
      */
     const COLLECTION = 'Collection';
 
     /**
-     * @var string Identifier for crossselling type accessory.
+     * @var string Identifier for cross-selling type accessory.
      */
     const ACCESSORY = 'Accessory';
 
     /**
-     * @var string Identifier for crossselling type customized.
+     * @var string Identifier for cross-selling type customized.
      */
     const CUSTOMIZED = 'Customized';
 
     /**
-     * @var string Identifier for crossselling type part.
+     * @var string Identifier for cross-selling type part.
      */
     const PART = 'Part';
 
     /**
-     * @var string Identifier for crossselling type complements.
+     * @var string Identifier for cross-selling type complements.
      */
     const COMPLEMENTS = 'Complements';
 
     /**
-     * @var string Identifier for crossselling type piece.
+     * @var string Identifier for cross-selling type piece.
      */
     const PIECE = 'Piece';
 
     /**
-     * @var string Identifier for crossselling type necessary.
+     * @var string Identifier for cross-selling type necessary.
      */
     const NECCESSARY = 'Necessary';
 
     /**
-     * @var string Identifier for crossselling type replacement part.
+     * @var string Identifier for cross-selling type replacement part.
      */
     const REPLACEMENT_PART = 'ReplacementPart';
 }
