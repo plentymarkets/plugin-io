@@ -1,5 +1,27 @@
 # Release Notes for IO
 
+## v5.0.22 (2021-02-11) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.21...5.0.22" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
+
+### Fixed
+
+- Under certain circumstances the order confirmation displayed the wrong order status. This behaviour has been fixed.
+
+## v5.0.21 (2021-02-09) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.20...5.0.21" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
+
+### TODO
+
+- If your theme uses the function `getVariationList($itemId, $withPrimary)` from the `ItemService`, you need to check whether the second parameter `$withPrimary` is interpreted as expected.
+
+### Added
+
+- The email attachment widget was added to the ShopBuilder. The widget makes it possible to attach files to emails that are sent via the contact form.
+
+### Fixed 
+
+- Opening single item views in categories without items could lead to errors in the ShopBuilder. This behaviour has been fixed.
+- Due to an error, empty values could not be saved for individual input fields of existing addresses. This behaviour has been fixed.
+- The function `getVariationList($itemId, $withPrimary)` in the `ItemService` misinterpreted the second parameter. As a result, `$withPrimary == true` returned only sub-variations and `$withPrimary == false` also returned the main variation. This has been fixed.
+
 ## v5.0.20 (2021-01-19) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.19...5.0.20" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
 
 ### Fixed 

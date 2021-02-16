@@ -1,5 +1,27 @@
 # Release Notes für IO
 
+## v5.0.22 (2021-02-11) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.21...5.0.22" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
+
+### Behoben
+
+- Unter bestimmten Umständen wurde auf der Bestellbestätigung der falsche Auftragsstatus angezeigt. Dieses Verhalten wurde behoben.
+
+## v5.0.21 (2021-02-09) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.20...5.0.21" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
+
+### TODO
+
+- Falls du die Funktion `getVariationList($itemId, $withPrimary)` aus dem `ItemService` in einem Theme verwendest, solltest du überprüfen, ob der Parameter `$withPrimary` wie gewünscht interpretiert wird.
+
+### Hinzugefügt
+
+- Das Widget E-Mail-Anhang wurde zum ShopBuilder hinzugefügt. Es wird damit ermöglicht, Dateien an E-Mails anzuhängen, die über das Kontaktformular versendet werden.
+
+### Behoben
+
+- Im ShopBuilder kam es beim Öffnen von Artikelansichten in Kategorien ohne Artikel zu Fehlern. Dieses Verhalten wurde behoben.
+- Die einzelnen Eingabefelder bestehender Adressen konnten nicht leer gespeichert werden. Dieses Verhalten wurde behoben.
+- Die Funktion `getVariationList($itemId, $withPrimary)` aus dem `ItemService` hat den zweiten Paramater falsch interpretiert. Dadurch lieferte `$withPrimary == true` fälschlicherweise nur Untervarianten und `$withPrimary == false` auch die Hauptvariante. Dies wurde behoben.
+
 ## v5.0.20 (2021-01-19) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.19...5.0.20" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
 
 ### Behoben
