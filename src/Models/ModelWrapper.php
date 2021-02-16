@@ -9,14 +9,14 @@ use Plenty\Repositories\Models\PaginatedResult;
 /**
  * Class ModelWrapper
  *
- * Abstract class to wrap an model to an other data representation.
+ * Abstract class to wrap a model to another data representation.
  *
  * @package IO\Models
  */
 abstract class ModelWrapper extends BaseModel
 {
     /**
-     * Abstract wrapping function must be implemented in in inherting class.
+     * Abstract wrapping function must be implemented in an inherting class.
      *
      * @param mixed $original Original data model.
      * @param array ...$args Additional params.
