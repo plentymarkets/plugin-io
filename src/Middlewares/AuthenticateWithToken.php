@@ -10,14 +10,14 @@ use Plenty\Plugin\Middleware;
 /**
  * Class AuthenticateWithToken
  *
- * Authenticate a contact if in the request a token is given.
+ * Authenticate a contact if a token is given in the request.
  *
  * @package IO\Middlewares
  */
 class AuthenticateWithToken extends Middleware
 {
     /**
-     * Before the request is processed, the contact is authenticated first if necessary.
+     * Before the request is processed, the contact is authenticated first, if necessary.
      *
      * Example request: ?token=TOKENVALUE
      *
