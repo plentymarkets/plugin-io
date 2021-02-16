@@ -12,7 +12,7 @@ use Plenty\Plugin\Middleware;
 /**
  * Class DetectCurrency
  *
- * Set currency from request if necessary
+ * Set currency from request, if necessary.
  *
  * @package IO\Middlewares
  */
@@ -31,7 +31,7 @@ class DetectCurrency extends Middleware
         'THB', 'TRY', 'TWD', 'UAH', 'USD', 'VND', 'XCD', 'ZAR'];
 
     /**
-     * Before the request is processed, the currency is changed if necessary
+     * Before the request is processed, the currency is changed, if necessary.
      *
      * Example request: ?currency=EUR or ?Currency=EUR
      *
