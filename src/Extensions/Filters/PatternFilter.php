@@ -27,9 +27,9 @@ class PatternFilter extends AbstractFilter
     }
 
     /**
-     * Returns value from given object with the given key. ??? TODO
+     * Object that gets json_encoded and decoded and than the value based on the key accessor is returned.
      *
-     * @param $object Object to return value from.
+     * @param mixed $object Object to return value from.
      * @param string $key Object key to return value from.
      * @return string
      */
