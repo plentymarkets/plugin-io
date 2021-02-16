@@ -7,7 +7,7 @@ use IO\Helper\Utils;
 /**
  * Class AuthGuard
  *
- * Extends from AbstractGuard and implement an own assert function.
+ * Extends from AbstractGuard and implements an own assert function.
  *
  * @package IO\Guards
  */
