@@ -5,7 +5,7 @@ namespace IO\Helper;
 /**
  * Class SafeGetter
  *
- * Helper class for getting nested properties out of array and objects
+ * Helper class for getting nested properties out of array and objects.
  *
  * @package IO\Helper
  */
@@ -15,10 +15,10 @@ class SafeGetter
      * Get a nested property of an object/array.
      * Will return null if any nested property is empty.
      *
-     * @param mixed     $object     The object / array to get the property from
+     * @param mixed     $object     The object / array to get the property from.
      * @param string    $path       The path of the property (e.g. "path.to.property").
      *                              To query list entries you can pass paths like "list.{id, 5}.name".
-     *                              This will query the first list entry having the id '5'
+     *                              This will query the first list entry having the id '5'.
      * @return mixed
      */
     public static function get($object, $path)
