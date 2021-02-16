@@ -12,8 +12,19 @@ use Plenty\Plugin\Application;
 use Plenty\Plugin\CachingRepository;
 use Plenty\Plugin\Translation\Translator;
 
+/**
+ * Class Utils
+ *
+ * General utility class for often used functions.
+ *
+ * @package IO\Helper
+ */
 class Utils
 {
+    /**
+     * Get the plenty ID (The plenty ID is often a large number).
+     * @return int
+     */
     public static function getPlentyId()
     {
         /** @var Application $app */
@@ -21,6 +32,10 @@ class Utils
         return (int)$app->getPlentyId();
     }
 
+    /**
+     * Get the webstore ID (The webstore ID is often a low number)
+     * @return int
+     */
     public static function getWebstoreId()
     {
         /** @var Application $app */
@@ -28,6 +43,10 @@ class Utils
         return (int)$app->getWebstoreId();
     }
 
+    /**
+     * Get the currently active language.
+     * @return string
+     */
     public static function getLang()
     {
         /** @var LocalizationRepositoryContract $localizationRepository */
@@ -35,6 +54,10 @@ class Utils
         return $localizationRepository->getLanguage();
     }
 
+    /**
+     * Get the default language.
+     * @return string
+     */
     public static function getDefaultLang()
     {
         /** @var WebstoreConfigurationRepositoryContract $webstoreConfigurationRepository */
@@ -42,6 +65,10 @@ class Utils
         return $webstoreConfigurationRepository->getWebstoreConfiguration()->defaultLanguage;
     }
 
+    /**
+     * Get all enabled languages.
+     * @return array
+     */
     public static function getLanguageList()
     {
         /** @var WebstoreConfigurationRepositoryContract $webstoreConfigurationRepository */
@@ -49,6 +76,10 @@ class Utils
         return $webstoreConfigurationRepository->getActiveLanguageList();
     }
 
+    /**
+     * Check if the admin preview is active.
+     * @return bool
+     */
     public static function isAdminPreview()
     {
         /** @var Application $app */
@@ -56,6 +87,10 @@ class Utils
         return $app->isAdminPreview();
     }
 
+    /**
+     * Check if the current request is a shopBuilder request.
+     * @return bool
+     */
     public static function isShopBuilder()
     {
         /** @var ShopBuilderRequest $sbRequest */
@@ -63,6 +98,10 @@ class Utils
         return $sbRequest->isShopBuilder();
     }
 
+    /**
+     * Check if the current contact is logged in.
+     * @return bool
+     */
     public static function isContactLoggedIn()
     {
         /** @var AccountService $accountService */
@@ -70,6 +109,12 @@ class Utils
         return $accountService->getIsAccountLoggedIn();
     }
 
+    /**
+     * Get a value from the template config.
+     * @param string $key Key for the setting.
+     * @param mixed $default Default value if the setting is empty.
+     * @return mixed|null
+     */
     public static function getTemplateConfig($key, $default = null)
     {
         /** @var TemplateConfigService $templateConfigService */
@@ -77,6 +122,13 @@ class Utils
         return $templateConfigService->get($key, $default);
     }
 
+    /**
+     * Translate a multilingualism key.
+     * @param string $key Multilingualism key to be translated.
+     * @param array $params Additional parameters for the translation.
+     * @param string|null $locale Locale for translation. If null, use active locale.
+     * @return array|string|null
+     */
     public static function translate($key, $params = [], $locale = null)
     {
         /** @var Translator $translator */
@@ -84,6 +136,12 @@ class Utils
         return $translator->trans($key, $params, $locale);
     }
 
+    /**
+     * Transform an absolute URL into a relative URL.
+     * @param string|null $path An absolute URL.
+     * @param bool $includeLanguage Should the URL include the language (Default: false).
+     * @return string|null
+     */
     public static function makeRelativeUrl($path = null, $includeLanguage = false)
     {
         /** @var UrlQuery $query */
@@ -91,7 +149,12 @@ class Utils
         return $query->toRelativeUrl($includeLanguage);
     }
 
-
+    /**
+     * Put a value into the redis cache.
+     * @param string $key A cache key.
+     * @param mixed $value The value to be cached.
+     * @param int $timeInMinutes How long should the value be cached in minutes?
+     */
     public static function putCacheKey($key, $value, $timeInMinutes)
     {
          /** @var Application $app */
@@ -104,6 +167,12 @@ class Utils
         $cachingRepository->put($key,$value, $timeInMinutes);
     }
 
+    /**
+     * Get a value from the redis cache.
+     * @param string $key A cache key.
+     * @param mixed $defaultValue A default value if the cache value does not exist.
+     * @return mixed
+     */
     public static function getCacheKey($key, $defaultValue = null)
     {
          /** @var Application $app */

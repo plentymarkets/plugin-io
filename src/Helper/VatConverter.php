@@ -8,9 +8,10 @@ use Plenty\Modules\Webshop\Contracts\ContactRepositoryContract;
 /**
  * Class VatConverter
  *
- * @package IO\Helper
+ * Helper class for adding value added tax to net prices.
  *
- * @depreacted since 5.0.0 will be removed in 6.0.0
+ * @package IO\Helper
+ * @depreacted since 5.0.0 will be removed in 6.0.0.
  */
 class VatConverter
 {
@@ -27,6 +28,7 @@ class VatConverter
     }
 
     /**
+     * Get the default vat rate
      * @return mixed
      */
     public function getDefaultVat()
@@ -36,10 +38,10 @@ class VatConverter
     }
 
     /**
-     * @param float $amount
+     * Convert a net price into a gross price.
+     * @param float $amount Net price to be converted.
      *
      * @return float|int
-     * @throws \ErrorException
      */
     public function convertToGross($amount)
     {

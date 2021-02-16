@@ -17,30 +17,37 @@ use Plenty\Plugin\Application;
 
 /**
  * Class VariationPriceList
+ *
+ * Helper class for getting prices for variations.
+ *
  * @package IO\Helper
- * @deprecated since 5.0.0 will be removed in 6.0.0
+ * @deprecated since 5.0.0 will be removed in 6.0.0.
  * @see \Plenty\Modules\Webshop\Helpers\VariationPriceList
  */
 class VariationPriceList
 {
     use MemoryCache;
 
+    /** @var string Represents the default price. */
     const TYPE_DEFAULT          = 'default';
+    /** @var string Represents the recommended retail price. */
     const TYPE_RRP              = 'rrp';
+    /** @var string Represents the special offer price. */
     const TYPE_SPECIAL_OFFER    = 'specialOffer';
 
+    /** @var array Contains the base prices (without units etc.). */
     public static $basePrices = [];
 
-    /** @var int $itemId */
+    /** @var int $itemId Item ID to fetch prices for. */
     public $itemId = 0;
 
-    /** @var int $variationId */
+    /** @var int $variationId Variation ID to fetch prices for. */
     public $variationId = 0;
 
-    /** @var float $minimumOrderQuantity */
+    /** @var float $minimumOrderQuantity The minimum order quantity. */
     public $minimumOrderQuantity = 0.0;
 
-    /** @var float $maximumOrderQuantity */
+    /** @var float $maximumOrderQuantity The maximum order quantity. */
     public $maximumOrderQuantity = null;
 
     public $lot;
@@ -98,10 +105,10 @@ class VariationPriceList
 
         $instance->init( $variationId, $itemId, $minimumOrderQuantity, $maximumOrderQuantity, $lot, $unit );
 
-        // check if default price for minimum order quantity exists
+        // check if default price for minimum order quantity exists.
         if ( $instance->findPriceForQuantity( $minimumOrderQuantity ) === null )
         {
-            // set minimum order quantity to first graduated price
+            // set minimum order quantity to first graduated price.
             $minimumGraduatedQuantity = -1;
             foreach( $instance->getGraduatedPrices() as $price )
             {
@@ -116,10 +123,11 @@ class VariationPriceList
     }
 
     /**
+     * Get a price for a specific quantity.
      * @param float $quantity
      * @param string $type
      * @return mixed|SalesPriceSearchResponse|null
-     * @deprecated since 5.0.0 will be removed in 6.0.0
+     * @deprecated since 5.0.0 will be removed in 6.0.0.
      * @see \Plenty\Modules\Webshop\Helpers\VariationPriceList::findPriceForQuantity()
      */
     public function findPriceForQuantity( float $quantity, $type = self::TYPE_DEFAULT )
@@ -141,9 +149,10 @@ class VariationPriceList
     }
 
     /**
+     * Get the graduated prices.
      * @param bool $showNetPrice
      * @return array
-     * @deprecated since 5.0.0 will be removed in 6.0.0
+     * @deprecated since 5.0.0 will be removed in 6.0.0.
      * @see \Plenty\Modules\Webshop\Helpers\VariationPriceList::getGraduatedPrices()
      */
     public function getGraduatedPrices( $showNetPrice = false )
@@ -166,7 +175,7 @@ class VariationPriceList
      * @param string $currency
      * @param null $lang
      * @return string
-     * @deprecated since 5.0.0 will be removed in 6.0.0
+     * @deprecated since 5.0.0 will be removed in 6.0.0.
      * @see \Plenty\Modules\Webshop\Helpers\VariationPriceList::getBasePrice()
      */
     public function getBasePrice( $unitPrice, $currency, $lang = null )
@@ -199,7 +208,7 @@ class VariationPriceList
     /**
      * @param null $quantity
      * @return array
-     * @deprecated since 5.0.0 will be removed in 6.0.0
+     * @deprecated since 5.0.0 will be removed in 6.0.0.
      * @see \Plenty\Modules\Webshop\Helpers\VariationPriceList::toArray()
      */
     public function toArray( $quantity = null )
@@ -228,7 +237,7 @@ class VariationPriceList
     /**
      * @param null $quantity
      * @return array
-     * @deprecated since 5.0.0 will be removed in 6.0.0
+     * @deprecated since 5.0.0 will be removed in 6.0.0.
      * @see \Plenty\Modules\Webshop\Helpers\VariationPriceList::getCalculatedPrices()
      */
     public function getCalculatedPrices( $quantity = null)
@@ -277,9 +286,10 @@ class VariationPriceList
     }
 
     /**
-     * @param float $value
+     * Convert to active currency.
+     * @param float $value A price to convert.
      * @return float|int
-     * @deprecated since 5.0.0 will be removed in 6.0.0
+     * @deprecated since 5.0.0 will be removed in 6.0.0.
      * @see \Plenty\Modules\Webshop\Helpers\VariationPriceList::convertCurrency()
      */
     public function convertCurrency( $value )
@@ -288,27 +298,34 @@ class VariationPriceList
         return $value * $defaultPrice->conversionFactor;
     }
 
+    /**
+     * Converts a price from net to gross or from gross to net.
+     * @param float $value A price to convert.
+     * @param false $isNet Is this price a net price?
+     * @return float|int
+     */
     public function convertGrossNet( $value, $isNet = false )
     {
         $defaultPrice = $this->getDefaultPrice();
         if ( $this->showNetPrice && !$isNet )
         {
-            // convert from gross to net
+            // convert from gross to net.
             return $value / (1 + ($defaultPrice->vatValue / 100));
         }
         else if ( !$this->showNetPrice && $isNet )
         {
-            // convert from net to gross
+            // convert from net to gross.
             return $value * (1 + ($defaultPrice->vatValue / 100));
         }
 
-        // no conversion
+        // no conversion.
         return $value;
     }
 
     /**
+     * Getter for the default price.
      * @return mixed|SalesPriceSearchResponse|null
-     * @deprecated since 5.0.0 will be removed in 6.0.0
+     * @deprecated since 5.0.0 will be removed in 6.0.0.
      * @see \Plenty\Modules\Webshop\Helpers\VariationPriceList::getDefaultPrice()
      */
     public function getDefaultPrice()
