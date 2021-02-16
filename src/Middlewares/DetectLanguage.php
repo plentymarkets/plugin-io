@@ -17,7 +17,7 @@ use Plenty\Plugin\Middleware;
 /**
  * Class DetectLanguage
  *
- * Set language if necessary
+ * Set language, if necessary.
  *
  * @package IO\Middlewares
  */
@@ -26,12 +26,12 @@ class DetectLanguage extends Middleware
     const WEB_AJAX_BASE = '/WebAjaxBase.php';
 
     /**
-     * @var string|null $DETECTED_LANGUAGE Detected language
+     * @var string|null $DETECTED_LANGUAGE Detected language.
      */
     public static $DETECTED_LANGUAGE = null;
 
     /**
-     * Before the request is processed, the language is changed if necessary
+     * Before the request is processed, the language is changed, if necessary.
      *
      * @param Request $request
      */
@@ -55,11 +55,11 @@ class DetectLanguage extends Middleware
                     } else {
                         CategoryController::$LANGUAGE_FROM_URL = Utils::getDefaultLang();
                     }
-                    // Do not cache content if detected language does not match the language of the url
+                    // Do not cache content if detected language does not match the language of the URL.
                     TemplateService::$shouldBeCached = false;
                 }
             } elseif (strpos(end($splittedURL), '.') === false) {
-                // language has not been detected. check if url points to default language
+                // language has not been detected. Check if URL points to default language.
                 $this->setLanguage($splittedURL[0], $webstoreConfig);
             }
         }
@@ -78,10 +78,10 @@ class DetectLanguage extends Middleware
     }
 
     /**
-     * Set language to locale service and change currency if necessary
+     * Set language to locale service and change currency, if necessary.
      *
-     * @param string $language Language to be set
-     * @param WebstoreConfiguration $webstoreConfiguration WebstoreConfiguration from the current request
+     * @param string $language Language to be set.
+     * @param WebstoreConfiguration $webstoreConfiguration WebstoreConfiguration from the current request.
      */
     private function setLanguage($language, $webstoreConfiguration)
     {
@@ -91,7 +91,7 @@ class DetectLanguage extends Middleware
         }
 
         if ($language === Utils::getLang()) {
-            // language has not changed
+            // language has not changed.
             return;
         }
 
