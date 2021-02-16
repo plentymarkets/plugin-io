@@ -10,14 +10,14 @@ use Plenty\Plugin\Middleware;
 /**
  * Class DetectReferrer
  *
- * Set referrer if necessary
+ * Set referrer, if necessary.
  *
  * @package IO\Middlewares
  */
 class DetectReferrer extends Middleware
 {
     /**
-     * Before the request is processed, the referrer is changed if necessary
+     * Before the request is processed, the referrer is changed, if necessary.
      *
      * Example request: ?ReferrerID=REFERRERID
      *
