@@ -12,7 +12,7 @@ namespace IO\Helper;
 class DataFilter
 {
     /**
-     * Filter data via result fields
+     * Filter data via result fields.
      * @param $data
      * @param $resultFields
      * @return array
