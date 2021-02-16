@@ -10,6 +10,12 @@ use IO\Api\ApiResource;
 use IO\Api\ApiResponse;
 use IO\Api\ResponseCode;
 
+/**
+ * Class GuestResource
+ *
+ * Resource class for the route `io/guest`.
+ * @package IO\Api\Resources
+ */
 class GuestResource extends ApiResource
 {
     /** @var CustomerService $customerService */

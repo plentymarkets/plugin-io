@@ -9,6 +9,12 @@ use IO\Api\ApiResponse;
 use IO\Api\ResponseCode;
 use IO\Services\CustomerService;
 
+/**
+ * Class CustomerOrderReturnResource
+ *
+ * Resource class for the route `io/customer/order/return`.
+ * @package IO\Api\Resources
+ */
 class CustomerOrderReturnResource extends ApiResource
 {
     private $customerService;

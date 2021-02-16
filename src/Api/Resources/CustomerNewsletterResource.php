@@ -12,6 +12,12 @@ use IO\Constants\LogLevel;
 use IO\Helper\ReCaptcha;
 use IO\Services\NotificationService;
 
+/**
+ * Class CustomerNewsletterResource
+ *
+ * Resource class for the route `io/customer/newsletter`.
+ * @package IO\Api\Resources
+ */
 class CustomerNewsletterResource extends ApiResource
 {
     /** @var CustomerNewsletterService */

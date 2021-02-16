@@ -9,6 +9,12 @@ use IO\Api\ApiResponse;
 use IO\Api\ResponseCode;
 use IO\Services\CouponService;
 
+/**
+ * Class CouponResource
+ *
+ * Resource class for the route `io/coupon`.
+ * @package IO\Api\Resources
+ */
 class CouponResource extends ApiResource
 {
     public function __construct(Request $request, ApiResponse $response)

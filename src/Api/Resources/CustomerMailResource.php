@@ -27,6 +27,12 @@ use Plenty\Plugin\Http\Request;
 use Plenty\Plugin\Http\Response;
 use Plenty\Plugin\Log\Loggable;
 
+/**
+ * Class CustomerMailResource
+ *
+ * Resource class for the route `io/customer/mail`.
+ * @package IO\Api\Resources
+ */
 class CustomerMailResource extends ApiResource
 {
     use Loggable;

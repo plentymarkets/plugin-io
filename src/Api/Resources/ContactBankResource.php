@@ -9,6 +9,12 @@ use IO\Api\ApiResponse;
 use IO\Api\ResponseCode;
 use IO\Services\ContactBankService;
 
+/**
+ * Class ContactBankResource
+ *
+ * Resource class for the route `io/customer/bank_data`.
+ * @package IO\Api\Resources
+ */
 class ContactBankResource extends ApiResource
 {
     private $contactBankService;
