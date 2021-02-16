@@ -10,7 +10,7 @@ use Plenty\Plugin\ConfigRepository;
 /**
  * Class NumberFormatFilter
  *
- * Contains twig filters that help working with number and formatting them.
+ * Contains twig filters that help working with numbers and formatting them.
  *
  * @package IO\Extensions\Filters
  */
@@ -55,7 +55,7 @@ class NumberFormatFilter extends AbstractFilter
     /**
      * Format incorrect JSON ENCODED dateTimeFormat.
      *
-     * @param string $value Incorrect formatted date.
+     * @param string $value Incorrectly formatted date.
      * @return string
      */
     public function formatDateTime($value): string
