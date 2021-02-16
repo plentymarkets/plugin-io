@@ -139,9 +139,9 @@ class RouteConfig
 
     /**
      * Check if a route is enabled and no category is linked for this page.
-     * If true the default route should be registered in the route service provider.
+     * If true, the default route should be registered in the route service provider.
      *
-     * @param string $route The route to check active state for.
+     * @param string $route The route to check the active state for.
      * @return bool
      */
     public static function isActive( $route )
@@ -152,10 +152,10 @@ class RouteConfig
     }
 
     /**
-     * Get the id of the category linked to a specific route.
+     * Get the ID of the category linked to a specific route.
      * Returns 0 if no category is linked.
      *
-     * @param string $route The route to get the linked category id for.
+     * @param string $route The route to get the linked category ID for.
      * @return int
      */
     public static function getCategoryId( $route )
@@ -169,11 +169,11 @@ class RouteConfig
     }
 
     /**
-     * Override the currently linked category id for a specific route.
-     * This is used by the shopbuilder to preview a category in a special context.
+     * Override the currently linked category ID for a specific route.
+     * This is used by the shopBuilder to preview a category in a special context.
      *
      * @param string $route The route to override the linked category for.
-     * @param int $categoryId The id of the category to override.
+     * @param int $categoryId The ID of the category to override.
      */
     public static function overrideCategoryId( $route, $categoryId )
     {
@@ -182,7 +182,7 @@ class RouteConfig
 
     /**
      * Check if blog routes should be recognized by the route service provider or not.
-     * If true it should pass requests to blog routes to the old CMS.
+     * If true, it should pass requests to blog routes to the old CMS.
      *
      * @return bool
      */
