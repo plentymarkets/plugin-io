@@ -55,10 +55,10 @@ class PropertyNameFilter extends AbstractFilter
     }
 
     /**
-     * Gets the name of the giver order property.
+     * Gets the name of the given order property.
      *
      * @param array $property Order property to get the name for.
-     * @param string $lang Lang to get the name in. Defaults to currently used webshop lang.
+     * @param string $lang Language to get the name in. Defaults to current webshop language.
      * @return string
      */
     public function getPropertyName($property, $lang = null)
@@ -92,10 +92,10 @@ class PropertyNameFilter extends AbstractFilter
     }
 
     /**
-     * Gets the name of the giver order property from type selection.
+     * Gets the name of the given order property from type selection.
      *
      * @param array $property Order property to get the name for.
-     * @param string $lang Lang to get the name in. Defaults to currently used webshop lang.
+     * @param string $lang Language to get the name in. Defaults to current webshop language.
      * @return mixed
      */
     public function getPropertySelectionValueName($property, $lang = null)
