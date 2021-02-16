@@ -5,8 +5,20 @@ namespace IO\Helper;
 use IO\Services\TemplateConfigService;
 use Plenty\Modules\Webshop\Consent\Contracts\ConsentRepositoryContract;
 
+/**
+ * Class ReCaptcha
+ *
+ * Helper class for Google ReCaptcha.
+ *
+ * @package IO\Helper
+ */
 class ReCaptcha
 {
+    /**
+     * Send a recaptcha request to the API and return the result
+     * @param string $token The users recaptcha token
+     * @return bool
+     */
     public static function verify($token)
     {
         /** @var TemplateConfigService $templateConfigService */

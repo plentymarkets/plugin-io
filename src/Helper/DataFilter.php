@@ -2,8 +2,21 @@
 
 namespace IO\Helper;
 
+/**
+ * Class DataFilter
+ *
+ * This class is used to filter data via result fields.
+ *
+ * @package IO\Helper
+ */
 class DataFilter
 {
+    /**
+     * Filter data via result fields
+     * @param $data
+     * @param $resultFields
+     * @return array
+     */
     public function getFilteredData( $data, $resultFields )
     {
         if ( !count( $resultFields ) || in_array( "*", $resultFields ) )

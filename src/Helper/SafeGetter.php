@@ -2,6 +2,13 @@
 
 namespace IO\Helper;
 
+/**
+ * Class SafeGetter
+ *
+ * Helper class for getting nested properties out of array and objects
+ *
+ * @package IO\Helper
+ */
 class SafeGetter
 {
     /**

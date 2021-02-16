@@ -4,13 +4,18 @@ namespace IO\Helper;
 
 /**
  * Class StringUtils
+ *
+ * Helper class with utilities for string processing.
+ *
  * @package IO\Helper
  * @deprecated since 5.0.0 will be removed in 6.0.0
  */
 class StringUtils
 {
     /**
-     * @param string $n
+     * Converts a string to be url safe
+     *
+     * @param string $n A string to be converted
      * @return false|string|string[]|null
      * @deprecated since 5.0.0 will be removed in 6.0.0
      */

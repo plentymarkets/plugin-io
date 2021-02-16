@@ -2,19 +2,21 @@
 namespace IO\Helper;
 
 /**
- * Container to pass current component between separate theme plugins and this plugin.
  * Class ComponentContainer
+ *
+ * Container to pass current component between separate theme plugins and this plugin.
+ *
  * @package IO\Helper
  */
 class ComponentContainer
 {
     /**
-     * @var string
+     * @var string The original component template
      */
     private $originComponentTemplate = '';
     
     /**
-     * @var string
+     * @var string The new component template
      */
     private $newComponentTemplate = '';
     
@@ -28,6 +30,7 @@ class ComponentContainer
     }
     
     /**
+     * Getter for the originComponentTemplate property
      * @return string
      */
     public function getOriginComponentTemplate(): string
@@ -36,6 +39,7 @@ class ComponentContainer
     }
     
     /**
+     * Getter for the newComponentTemplate property
      * @return string
      */
     public function getNewComponentTemplate(): string
@@ -44,6 +48,7 @@ class ComponentContainer
     }
     
     /**
+     * Setter for the newComponentTemplate property
      * @param string $newComponentTemplate
      * @return $this
      */

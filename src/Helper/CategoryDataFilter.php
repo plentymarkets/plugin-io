@@ -4,8 +4,22 @@ namespace IO\Helper;
 
 use Plenty\Modules\Category\Models\Category;
 
+/**
+ * Class CategoryDataFilter
+ *
+ * A data filter for categories.
+ * Please refer to the parent class for more information.
+ *
+ * @package IO\Helper
+ */
 class CategoryDataFilter extends DataFilter
 {
+    /**
+     * Filter a list of categories via resultfields
+     * @param array $categoryList A list of categories
+     * @param array|null $resultFields Optional: A list of resultfields for filtering
+     * @return array
+     */
     public function applyResultFields( $categoryList, $resultFields = null )
     {
         $result = [];
@@ -43,5 +57,4 @@ class CategoryDataFilter extends DataFilter
 
         return $result;
     }
-
 }

@@ -4,12 +4,16 @@ namespace IO\Helper;
 
 /**
  * Class DefaultSearchResult
+ *
+ * This class contains a structural blueprint for a search result.
+ *
  * @package IO\Helper
  * @deprecated since 5.0.0 will be deleted in 6.0.0
  * @see \Plenty\Modules\Webshop\ItemSearch\Helpers\DefaultSearchResult
  */
 class DefaultSearchResult
 {
+    /** @var array The blueprint for a search result */
     const DEFAULT_RESULT = [
         'images' => [
             'all'       => [],
@@ -36,7 +40,8 @@ class DefaultSearchResult
         'attributes'                => [],
         'properties'                => []
     ];
-    
+
+    /** @var array Additional blueprint for an admin preview search result */
     const ADMIN_PREVIEW_DEFAULT_RESULT = [
         'texts'                     => [
             'name1'                 => 'N / A',
@@ -58,6 +63,11 @@ class DefaultSearchResult
         ]
     ];
 
+    /**
+     * Merge the blueprint in the search result
+     * @param array $data A search result
+     * @return array|mixed
+     */
     public static function merge( $data )
     {
         $defaults = self::DEFAULT_RESULT;

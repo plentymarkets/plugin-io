@@ -4,6 +4,13 @@ namespace IO\Helper;
 
 use Plenty\Plugin\ConfigRepository;
 
+/**
+ * Class RouteConfig
+ *
+ * Helper class for checking status of routes.
+ *
+ * @package IO\Helper
+ */
 class RouteConfig
 {
     /*
@@ -11,35 +18,64 @@ class RouteConfig
      * Each route might be enabled/disabled by the plugin config.
      * Use this constants to check the type of the currently displayed page by using ShopUrls::is().
      */
+    /** @var string Represents the basket route */
     const BASKET                    = "basket";
+    /** @var string Represents the cancellation rights route */
     const CANCELLATION_RIGHTS       = "cancellation-rights";
+    /** @var string Represents the cancellation form route */
     const CANCELLATION_FORM         = "cancellation-form";
+    /** @var string Represents the category routes */
     const CATEGORY                  = "category";
+    /** @var string Represents the change mail route */
     const CHANGE_MAIL               = "change-mail";
+    /** @var string Represents the checkout route */
     const CHECKOUT                  = "checkout";
+    /** @var string Represents the confirmation route */
     const CONFIRMATION              = "confirmation";
+    /** @var string Represents the contact route */
     const CONTACT                   = "contact";
+    /** @var string Represents the home route */
     const HOME                      = "home";
+    /** @var string Represents the item routes */
     const ITEM                      = "item";
+    /** @var string Represents the legal disclosure route */
     const LEGAL_DISCLOSURE          = "legal-disclosure";
+    /** @var string Represents the login route */
     const LOGIN                     = "login";
+    /** @var string Represents the my account route */
     const MY_ACCOUNT                = "my-account";
+    /** @var string Represents the newsletter opt in route */
     const NEWSLETTER_OPT_IN         = "newsletter-opt-in";
+    /** @var string Represents the newsletter opt out route */
     const NEWSLETTER_OPT_OUT        = "newsletter-opt-out";
+    /** @var string Represents the order document route */
     const ORDER_DOCUMENT            = "order-document";
+    /** @var string Represents the order property file route */
     const ORDER_PROPERTY_FILE       = "order-property-file";
+    /** @var string Represents the order return route */
     const ORDER_RETURN              = "order-return";
+    /** @var string Represents the order return confirmation route */
     const ORDER_RETURN_CONFIRMATION = "order-return-confirmation";
+    /** @var string Represents the password reset route */
     const PASSWORD_RESET            = "password-reset";
+    /** @var string Represents the place order route */
     const PLACE_ORDER               = "place-order";
+    /** @var string Represents the privacy policy route */
     const PRIVACY_POLICY            = "privacy-policy";
+    /** @var string Represents the register route */
     const REGISTER                  = "register";
+    /** @var string Represents the search route */
     const SEARCH                    = "search";
+    /** @var string Represents the terms and conditions route */
     const TERMS_CONDITIONS          = "gtc";
+    /** @var string Represents the wish list route */
     const WISH_LIST                 = "wish-list";
+    /** @var string Represents the 404 route */
     const PAGE_NOT_FOUND            = "page-not-found";
+    /** @var string Represents the tags route */
     const TAGS                      = "tags";
 
+    /** @var string[] Represents all routes */
     const ALL = [
         self::BASKET,
         self::CANCELLATION_RIGHTS,
@@ -71,7 +107,9 @@ class RouteConfig
         self::PAGE_NOT_FOUND
     ];
 
+    /** @var array $enabledRoutes Contains all active routes  */
     private static $enabledRoutes = null;
+    /** @var array Contains overriden routes. Used for preview purposes in the shopBuilder */
     private static $overrides = [];
 
     /**

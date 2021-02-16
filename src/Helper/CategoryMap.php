@@ -6,7 +6,11 @@ use Plenty\Plugin\Events\Dispatcher;
 
 /**
  * Class CategoryMap
+ *
+ * This class was previously used to build a map of categories.
+ *
  * @package IO\Helper
+ * @deprecated
  */
 class CategoryMap
 {
@@ -30,6 +34,7 @@ class CategoryMap
     /**
      * Set the category map
      * @param array $categoryMap
+     * @deprecated
      */
 	public function setCategoryMap(array $categoryMap)
 	{
@@ -40,6 +45,7 @@ class CategoryMap
      * Get the category ID by key
      * @param string $key
      * @return int
+     * @deprecated
      */
 	public function getID(string $key):int
 	{
