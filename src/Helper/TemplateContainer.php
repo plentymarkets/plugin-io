@@ -15,9 +15,9 @@ class TemplateContainer
     use Loggable;
 
     /**
-     * Get an instance of TemplateContainer based on the templateKey and additional data
-     * @param string $templateKey Key for the template
-     * @param array $data Additional data for the template
+     * Get an instance of TemplateContainer based on the templateKey and additional data.
+     * @param string $templateKey Key for the template.
+     * @param array $data Additional data for the template.
      * @return mixed
      */
     public static function get($templateKey, $data = [])
@@ -121,7 +121,7 @@ class TemplateContainer
 	}
 
 	/**
-     * Getter for the templateKey property
+     * Getter for the templateKey property.
 	 * @return string
 	 */
 	public function getTemplateKey()
@@ -130,7 +130,7 @@ class TemplateContainer
 	}
 
 	/**
-     * Setter for the templateKey property
+     * Setter for the templateKey property.
 	 * @param string $templateKey
 	 * @return $this
 	 */
@@ -141,7 +141,7 @@ class TemplateContainer
 	}
 
     /**
-     * Setter for the contextClass property
+     * Setter for the contextClass property.
      * @param $contextClass
      */
 	public function setContext($contextClass)
@@ -157,7 +157,7 @@ class TemplateContainer
     }
 
     /**
-     * Getter for the contextClass property
+     * Getter for the contextClass property.
      * @return string|null
      */
     public function getContext()
@@ -168,7 +168,7 @@ class TemplateContainer
 	/**
 	 * Add additional template data to the existing values.
 	 * @param mixed $data The data to add to map.
-	 * @param string $identifier An identifying string to access the given data
+	 * @param string $identifier An identifying string to access the given data.
 	 * @return TemplateContainer
 	 */
 	public function withData($data, string $identifier):TemplateContainer
