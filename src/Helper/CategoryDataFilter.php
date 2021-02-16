@@ -15,9 +15,9 @@ use Plenty\Modules\Category\Models\Category;
 class CategoryDataFilter extends DataFilter
 {
     /**
-     * Filter a list of categories via resultfields
-     * @param array $categoryList A list of categories
-     * @param array|null $resultFields Optional: A list of resultfields for filtering
+     * Filter a list of categories via result fields.
+     * @param array $categoryList A list of categories.
+     * @param array|null $resultFields Optional: A list of result fields for filtering.
      * @return array
      */
     public function applyResultFields( $categoryList, $resultFields = null )
