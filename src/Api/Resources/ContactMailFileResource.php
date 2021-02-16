@@ -34,7 +34,7 @@ class ContactMailFileResource extends ApiResource
 
     /**
      * Save a file for a mail.
-     * @return Response The file keys, if the saving went well.
+     * @return Response
      */
     public function store(): Response
     {

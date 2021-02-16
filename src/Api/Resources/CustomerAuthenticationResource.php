@@ -39,7 +39,7 @@ class CustomerAuthenticationResource extends ApiResource
 
     /**
      * Perform the login with email and password.
-     * @return Response Null.
+     * @return Response
      */
 	public function store():Response
 	{

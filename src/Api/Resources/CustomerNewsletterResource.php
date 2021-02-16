@@ -40,7 +40,7 @@ class CustomerNewsletterResource extends ApiResource
 
     /**
      * Subscribe an email address to a newsletter.
-     * @return Response The email address.
+     * @return Response
      */
     public function store(): Response
     {
@@ -74,7 +74,7 @@ class CustomerNewsletterResource extends ApiResource
     /**
      * Unsubscribe an email address of a newsletter.
      * @param string $selector Email address.
-     * @return Response Indicator if the unsubscription worked.
+     * @return Response
      */
     public function destroy(string $selector): Response
     {

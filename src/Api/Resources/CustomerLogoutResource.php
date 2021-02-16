@@ -36,7 +36,7 @@ class CustomerLogoutResource extends ApiResource
 
     /**
      * Log out the current user.
-     * @return Response Null.
+     * @return Response
      */
 	public function store():Response
 	{

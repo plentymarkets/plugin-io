@@ -50,7 +50,7 @@ class CustomerMailResource extends ApiResource
 
     /**
      * Trigger the creation of an email with instructions to change the email.
-     * @return Response Null.
+     * @return Response
      */
     public function store(): Response
     {
@@ -130,7 +130,7 @@ class CustomerMailResource extends ApiResource
     /**
      * Update the email of a contact.
      * @param string $contactId The id of the contact.
-     * @return Response Updated contact.
+     * @return Response
      */
     public function update(string $contactId): Response
     {

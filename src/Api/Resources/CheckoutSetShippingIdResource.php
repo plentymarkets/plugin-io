@@ -45,7 +45,7 @@ class CheckoutSetShippingIdResource extends ApiResource
 
     /**
      * Set the shipping id and the method of payment id.
-     * @return Response Id of the shipping id to switch on.
+     * @return Response
      */
     public function store(): Response
     {

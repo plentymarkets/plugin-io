@@ -45,7 +45,7 @@ class CheckoutResource extends ApiResource
 
     /**
      * Get all relevant information for the checkout view.
-     * @return Response Array of checkout data.
+     * @return Response
      */
 	public function index():Response
 	{
@@ -61,7 +61,7 @@ class CheckoutResource extends ApiResource
     /**
      * Set the selected method of payment, shipping country id, shipping profile id and the delivery address.
      * Create addresses if required.
-     * @return Response The response of the index method in this class.
+     * @return Response
      */
 	public function store():Response
 	{
@@ -109,7 +109,7 @@ class CheckoutResource extends ApiResource
     /**
      * Update the checkout information.
      * @param string $selector Unused.
-     * @return Response The response of the index method in this class.
+     * @return Response
      */
 	public function update(string $selector = ''):Response
     {

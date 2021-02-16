@@ -53,7 +53,7 @@ class CustomerAddressResource extends ApiResource
 
     /**
      * Get an address of the customer by type.
-     * @return Response Address.
+     * @return Response
      */
     public function index(): Response
     {
@@ -64,7 +64,7 @@ class CustomerAddressResource extends ApiResource
 
     /**
      * Create an address with the given type.
-     * @return Response The created address, or an exception.
+     * @return Response
      */
     public function store(): Response
     {
@@ -102,7 +102,7 @@ class CustomerAddressResource extends ApiResource
     /**
      * Update the address with the given address id.
      * @param string $addressId Id of the address to update.
-     * @return Response Id of the address.
+     * @return Response
      */
     public function update(string $addressId): Response
     {
@@ -131,7 +131,7 @@ class CustomerAddressResource extends ApiResource
     /**
      * Delete the address with the given id.
      * @param string $addressId Id of the address to delete.
-     * @return Response Return the result of the index method.
+     * @return Response
      */
     public function destroy(string $addressId): Response
     {

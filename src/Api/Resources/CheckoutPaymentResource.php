@@ -36,7 +36,7 @@ class CheckoutPaymentResource extends ApiResource
 
     /**
      * Prepare the payment before creating a new order.
-     * @return Response Response of the payment preparation.
+     * @return Response
      */
     public function store():Response
     {

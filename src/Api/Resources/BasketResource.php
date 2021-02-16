@@ -44,7 +44,7 @@ class BasketResource extends ApiResource
 
     /**
      * Get the basket.
-     * @return Response The basket.
+     * @return Response
      */
     public function index(): Response
     {

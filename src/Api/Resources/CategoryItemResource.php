@@ -36,7 +36,7 @@ class CategoryItemResource extends ApiResource
 
     /**
      * Get the items of a category by categoryId.
-     * @return Response Items of the category.
+     * @return Response
      */
     public function index():Response
     {

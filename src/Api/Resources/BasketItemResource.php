@@ -36,7 +36,7 @@ class BasketItemResource extends ApiResource
 
     /**
      * Get basket items.
-     * @return Response Basket items.
+     * @return Response
      */
     public function index(): Response
     {
@@ -51,7 +51,7 @@ class BasketItemResource extends ApiResource
 
     /**
      * Add an item in the basket.
-     * @return Response True, or an thrown error.
+     * @return Response
      */
     public function store(): Response
     {
@@ -71,7 +71,7 @@ class BasketItemResource extends ApiResource
     /**
      * Get a basket item by id.
      * @param string $selector Id of the basket item.
-     * @return Response The item in the basket.
+     * @return Response
      */
     public function show(string $selector): Response
     {
@@ -91,7 +91,7 @@ class BasketItemResource extends ApiResource
     /**
      * Update a basket item by id.
      * @param string $selector Id of the basket item.
-     * @return Response True, or an thrown error.
+     * @return Response
      */
     public function update(string $selector): Response
     {
@@ -119,7 +119,7 @@ class BasketItemResource extends ApiResource
     /**
      * Delete an item from the basket by id.
      * @param string $selector Id of the basket item.
-     * @return Response True.
+     * @return Response
      */
     public function destroy(string $selector): Response
     {

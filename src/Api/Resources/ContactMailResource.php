@@ -52,7 +52,7 @@ class ContactMailResource extends ApiResource
 
     /**
      * Create a contact mail of the given data.
-     * @return Response Boolean value, if the creating went well.
+     * @return Response
      */
     public function store(): Response
     {

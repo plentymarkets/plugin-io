@@ -36,7 +36,7 @@ class CheckoutSetPaymentResource extends ApiResource
 
     /**
      * Set the method of payment id.
-     * @return Response Id of the method of payment to switch on.
+     * @return Response
      */
     public function store():Response
     {

@@ -29,7 +29,7 @@ class CouponResource extends ApiResource
 
     /**
      * Empty method.
-     * @return Response Empty array.
+     * @return Response
      */
     public function index():Response
     {
@@ -38,7 +38,7 @@ class CouponResource extends ApiResource
 
     /**
      * Redeem a coupon in the basket.
-     * @return Response Result of the redeeming.
+     * @return Response
      */
     public function store():Response
     {
@@ -59,7 +59,7 @@ class CouponResource extends ApiResource
     /**
      * Remove a coupon out of the basket.
      * @param string $selector Not used.
-     * @return Response Response of the coupon removal.
+     * @return Response
      */
     public function destroy(string $selector):Response
     {

@@ -59,7 +59,7 @@ class CategoryTreeResource extends ApiResource
 
     /**
      * Get the category tree, beginning with a given categoryId.
-     * @return Response Category tree.
+     * @return Response
      */
     public function index(): Response
     {
@@ -72,7 +72,7 @@ class CategoryTreeResource extends ApiResource
 
     /**
      * Get the children of a category with a given categoryId.
-     * @return Response Children of the category.
+     * @return Response
      */
     public function getChildren(): Response
     {
@@ -104,7 +104,7 @@ class CategoryTreeResource extends ApiResource
 
     /**
      * Get rendered markup via TWIG for the side navigation.
-     * @return Response Markup with navigation.
+     * @return Response
      */
     public function getTemplateForChildren(): Response
     {
