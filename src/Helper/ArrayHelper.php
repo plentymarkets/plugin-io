@@ -12,8 +12,8 @@ namespace IO\Helper;
 class ArrayHelper
 {
     /**
-     * Transform a object to an array. Returns an empty array, when parameter cannot be array-ified.
-     * @param mixed $mixed The object to transform
+     * Transform an object to an array. Returns an empty array if parameter cannot be array-ified.
+     * @param mixed $mixed The object to transform.
      *
      * @return array
      */
@@ -31,8 +31,8 @@ class ArrayHelper
     }
 
     /**
-     * Check if parameter is an associative array
-     * @param mixed $mixed An object
+     * Check if parameter is an associative array.
+     * @param mixed $mixed An object.
      * @return bool
      */
     public static function isAssoc( $mixed )
@@ -46,10 +46,10 @@ class ArrayHelper
     }
 
     /**
-     * Compare two arrays and return keys, that have different values
-     * @param array $arr1 An array to compare
-     * @param array $arr2 Another array to compare
-     * @param array|null $fields Optional: What keys to compare
+     * Compare two arrays and return keys that have different values.
+     * @param array $arr1 An array to compare.
+     * @param array $arr2 Another array to compare.
+     * @param array|null $fields Optional: What keys to compare.
      * @return array
      */
     public static function compare( $arr1, $arr2, $fields = null )
@@ -71,9 +71,9 @@ class ArrayHelper
     }
 
     /**
-     * Get an value from an array
-     * @param array $arr The array to get the value from
-     * @param int|string $key A key to the value, can be nested ('depth1.depth2.value3')
+     * Get a value from an array.
+     * @param array $arr The array to get the value from.
+     * @param int|string $key A key to the value, can be nested ('depth1.depth2.value3').
      * @return mixed|null
      */
     public static function get( $arr, $key )
@@ -94,9 +94,9 @@ class ArrayHelper
     }
 
     /**
-     * Recursively get all keys of an array
-     * @param array $arr The array
-     * @param string $prefix Optional: Previous key, used in the recursion
+     * Recursively get all keys of an array.
+     * @param array $arr The array.
+     * @param string $prefix Optional: Previous key, used in the recursion.
      * @return array
      */
     public static function getKeys( $arr, $prefix = "" )
