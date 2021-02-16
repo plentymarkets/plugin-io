@@ -5,10 +5,10 @@ namespace IO\Helper;
 /**
  * Class LanguageMap
  *
- * Previously used for localization purposes, this class has been replaced with a repository in the core.
+ * Previously used for localization purposes. This class has been replaced with a repository in the core.
  *
  * @package IO\Helper
- * @deprecated since 5.0.0 will be removed in 6.0.0
+ * @deprecated since 5.0.0 will be removed in 6.0.0.
  * @see \Plenty\Modules\Webshop\Contracts\LocalizationRepositoryContract
  */
 class LanguageMap
@@ -58,10 +58,10 @@ class LanguageMap
     );
 
     /**
-     * Get the locale
+     * Get the locale.
      *
      * @return string
-     * @deprecated sin  ce 5.0.0 will be removed in 6.0.0
+     * @deprecated sin  ce 5.0.0 will be removed in 6.0.0.
      * @see \Plenty\Modules\Webshop\Contracts\LocalizationRepositoryContract::getLocale()
      */
     public static function getLocale(): string
@@ -75,9 +75,9 @@ class LanguageMap
     }
 
     /**
-     * Get the language code
+     * Get the language code.
      *
-     * @param string $countryCode A country code
+     * @param string $countryCode A country code.
      *
      * @return string
      * @see \Plenty\Modules\Webshop\Contracts\LocalizationRepositoryContract::getLanguageCode()
@@ -93,12 +93,12 @@ class LanguageMap
     }
 
     /**
-     * Get the country code
+     * Get the country code.
      *
-     * @param string $language A language to detect the country code by
+     * @param string $language A language to detect the country code by.
      *
      * @return string
-     * @deprecated since 5.0.0 will be removed in 6.0.0
+     * @deprecated since 5.0.0 will be removed in 6.0.0.
      */
     public static function getCountryCode($language = null)
     {
