@@ -15,6 +15,7 @@ use Plenty\Modules\Basket\Exceptions\BasketItemCheckException;
 use Plenty\Modules\Webshop\Contracts\SessionStorageRepositoryContract;
 use Plenty\Modules\Webshop\Events\AfterBasketItemToOrderItem;
 use Plenty\Modules\Webshop\Events\ValidateVatNumber;
+use Plenty\Modules\Webshop\Exceptions\VatNumberException;
 use Plenty\Modules\Webshop\Helpers\UrlQuery;
 use Plenty\Plugin\Events\Dispatcher;
 use Plenty\Plugin\Http\Request;
@@ -49,6 +50,7 @@ class PlaceOrderController extends LayoutController
             $eventDispatcher = pluginApp(Dispatcher::class);
             /** @var ValidateVatNumber $val */
 
+            $fallbackStatus = null;
             $eventDispatcher->listen(
                 AfterBasketItemToOrderItem::class,
                 function ($event) {
@@ -75,6 +77,7 @@ class PlaceOrderController extends LayoutController
                     $val = pluginApp(ValidateVatNumber::class, [$vatOption->value]);
                     $eventDispatcher->fire($val);
                 }
+                $fallbackStatus = $val->getServiceUnavailableFallbackStatus();
             }
 
             $deliveryAddressId = $basketService->getDeliveryAddressId();
@@ -85,6 +88,10 @@ class PlaceOrderController extends LayoutController
                     $val = pluginApp(ValidateVatNumber::class, [$vatOption->value]);
                     $eventDispatcher->fire($val);
                 }
+                if (is_null($fallbackStatus)) {
+                    $fallbackStatus = $val->getServiceUnavailableFallbackStatus();
+                }
+
             }
         } catch (\Exception $exception) {
             return $this->handlePlaceOrderException($exception);
@@ -103,7 +110,7 @@ class PlaceOrderController extends LayoutController
         $sessionStorageRepository->setSessionValue(SessionStorageRepositoryContract::LAST_PLACE_ORDER_TRY, time());
 
         try {
-            $orderData = $orderService->placeOrder();
+            $orderData = $orderService->placeOrder($fallbackStatus);
         } catch (\Exception $exception) {
             return $this->handlePlaceOrderException($exception);
         }
@@ -115,6 +122,13 @@ class PlaceOrderController extends LayoutController
             ]
         );
 
+        if(!is_null($fallbackStatus)) {
+            /**
+             * @var NotificationService $notificationService
+             */
+            $notificationService = pluginApp(NotificationService::class);
+            $notificationService->addNotificationCode('warn', 212);
+        }
         try {
             $orderService->complete($orderData->order);
         } catch (\Exception $exception) {
