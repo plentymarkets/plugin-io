@@ -22,7 +22,7 @@ use Plenty\Plugin\Translation\Translator;
 class Utils
 {
     /**
-     * Get the plenty id (The plenty id is often a large number)
+     * Get the plenty ID (The plenty ID is often a large number).
      * @return int
      */
     public static function getPlentyId()
@@ -33,7 +33,7 @@ class Utils
     }
 
     /**
-     * Get the webstore id (The webstore id is often a low number)
+     * Get the webstore ID (The webstore ID is often a low number)
      * @return int
      */
     public static function getWebstoreId()
@@ -44,7 +44,7 @@ class Utils
     }
 
     /**
-     * Get the currently active language
+     * Get the currently active language.
      * @return string
      */
     public static function getLang()
@@ -55,7 +55,7 @@ class Utils
     }
 
     /**
-     * Get the default language
+     * Get the default language.
      * @return string
      */
     public static function getDefaultLang()
@@ -66,7 +66,7 @@ class Utils
     }
 
     /**
-     * Get all enabled languages
+     * Get all enabled languages.
      * @return array
      */
     public static function getLanguageList()
@@ -77,7 +77,7 @@ class Utils
     }
 
     /**
-     * Check if the admin preview is active
+     * Check if the admin preview is active.
      * @return bool
      */
     public static function isAdminPreview()
@@ -88,7 +88,7 @@ class Utils
     }
 
     /**
-     * Check if the current request is a shopbuilder request
+     * Check if the current request is a shopBuilder request.
      * @return bool
      */
     public static function isShopBuilder()
@@ -99,7 +99,7 @@ class Utils
     }
 
     /**
-     * Check if the current contact is logged in
+     * Check if the current contact is logged in.
      * @return bool
      */
     public static function isContactLoggedIn()
@@ -110,9 +110,9 @@ class Utils
     }
 
     /**
-     * Get a value from the template config
-     * @param string $key Key for the setting
-     * @param mixed $default Default value, if the setting is empty
+     * Get a value from the template config.
+     * @param string $key Key for the setting.
+     * @param mixed $default Default value if the setting is empty.
      * @return mixed|null
      */
     public static function getTemplateConfig($key, $default = null)
@@ -123,10 +123,10 @@ class Utils
     }
 
     /**
-     * Translate a multilingualism key
-     * @param string $key Multilingualism key to be translated
-     * @param array $params Additional parameters for the translation
-     * @param string|null $locale Locale for translation. If null, use active locale
+     * Translate a multilingualism key.
+     * @param string $key Multilingualism key to be translated.
+     * @param array $params Additional parameters for the translation.
+     * @param string|null $locale Locale for translation. If null, use active locale.
      * @return array|string|null
      */
     public static function translate($key, $params = [], $locale = null)
@@ -137,9 +137,9 @@ class Utils
     }
 
     /**
-     * Transform a absolute url into a relative url
-     * @param string|null $path An absolute url
-     * @param bool $includeLanguage Should the url include the language (Default: false)
+     * Transform an absolute URL into a relative URL.
+     * @param string|null $path An absolute URL.
+     * @param bool $includeLanguage Should the URL include the language (Default: false).
      * @return string|null
      */
     public static function makeRelativeUrl($path = null, $includeLanguage = false)
@@ -150,9 +150,9 @@ class Utils
     }
 
     /**
-     * Put a value into the redis cache
-     * @param string $key A cache key
-     * @param mixed $value The value to be cached
+     * Put a value into the redis cache.
+     * @param string $key A cache key.
+     * @param mixed $value The value to be cached.
      * @param int $timeInMinutes How long should the value be cached in minutes?
      */
     public static function putCacheKey($key, $value, $timeInMinutes)
@@ -168,9 +168,9 @@ class Utils
     }
 
     /**
-     * Get a value from the redis cache
-     * @param string $key A cache key
-     * @param mixed $defaultValue A default value, if the cache value does not exist
+     * Get a value from the redis cache.
+     * @param string $key A cache key.
+     * @param mixed $defaultValue A default value if the cache value does not exist.
      * @return mixed
      */
     public static function getCacheKey($key, $defaultValue = null)
