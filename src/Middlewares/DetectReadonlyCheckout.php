@@ -11,14 +11,14 @@ use Plenty\Plugin\Middleware;
 /**
  * Class DetectReadonlyCheckout
  *
- * Set read only flag if readOnlyCheckout is in given request
+ * Set read only flag if readOnlyCheckout is in given request.
  *
  * @package IO\Middlewares
  */
 class DetectReadonlyCheckout extends Middleware
 {
     /**
-     * Set read only checkout if necessary
+     * Set read only checkout, if necessary.
      *
      * Example request: ?readOnlyCheckout=1
      *
