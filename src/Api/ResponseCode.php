@@ -5,12 +5,11 @@ namespace IO\Api;
 /**
  * Class ResponseCode
  *
- * Contains HTTP status codes.
+ * Enum with HTTP status codes.
  * @package IO\Api
  */
 class ResponseCode
 {
-
     /**
      * @var int CONTINUE HTTP status code 100 Continue.
      */
@@ -25,7 +24,6 @@ class ResponseCode
      * @var int PROCESSING HTTP status code 102 Processing.
      */
     const PROCESSING = 102; // RFC2518
-
 
     /**
      * @var int OK HTTP status code 200 OK.
@@ -77,7 +75,6 @@ class ResponseCode
      */
     const IM_USED = 226; // RFC3229
 
-
     /**
      * @var int MULTIPLE_CHOICES HTTP status code 300 Multiple Choices.
      */
@@ -122,7 +119,6 @@ class ResponseCode
      * @var int PERMANENTLY_REDIRECT HTTP status code 308 Permanent Redirect.
      */
     const PERMANENTLY_REDIRECT = 308; // RFC7238
-
 
     /**
      * @var int BAD_REQUEST HTTP status code 400 Bad Request.
@@ -263,7 +259,6 @@ class ResponseCode
      * @var int UNAVAILABLE_FOR_LEGAL_REASONS HTTP status code 451 Unavailable For Legal Reasons.
      */
     const UNAVAILABLE_FOR_LEGAL_REASONS = 451;
-
 
     /**
      * @var int INTERNAL_SERVER_ERROR HTTP status code 500 Internal Server Error.
