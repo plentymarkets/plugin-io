@@ -12,10 +12,10 @@ use IO\Services\ShippingService;
 /**
  * Class ShippingResource
  * @package IO\Api\Resources
+ * @deprecated will be removed in 6.0.0.
  */
 class ShippingResource extends ApiResource
 {
-
 	/**
 	 * @var ShippingService
 	 */

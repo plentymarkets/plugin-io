@@ -12,6 +12,7 @@ use IO\Services\OrderService;
 /**
  * Class OrderPaymentAllowedResource
  * @package IO\Api\Resources
+ * @deprecated will be removed in 6.0.0.
  */
 class OrderPaymentAllowedResource extends ApiResource
 {
@@ -19,7 +20,7 @@ class OrderPaymentAllowedResource extends ApiResource
      * @var OrderService
      */
     private $orderService;
-    
+
     /**
      * OrderPaymentResource constructor.
      * @param Request $request
@@ -30,13 +31,16 @@ class OrderPaymentAllowedResource extends ApiResource
         parent::__construct($request, $response);
         $this->orderService = $orderService;
     }
-    
+
+    /**
+     * @inheritDoc
+     */
     public function index():Response
     {
         $paymentMethodId = $this->request->get('paymentMethodId', 0);
         $orderId = $this->request->get('orderId', 0);
         $response = $this->orderService->allowPaymentMethodSwitchFrom($paymentMethodId, $orderId);
-        
+
         return $this->response->create($response, ResponseCode::OK);
     }
 }
