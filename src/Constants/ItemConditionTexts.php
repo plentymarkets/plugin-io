@@ -12,7 +12,7 @@ namespace IO\Constants;
 class ItemConditionTexts
 {
     /**
-     * @var array Id mapping to german condition texts.
+     * @var array ID mapping to German condition texts.
      */
     public static $itemConditionTexts = [
         0 => 'Neu',
