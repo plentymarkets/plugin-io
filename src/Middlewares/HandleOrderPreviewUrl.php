@@ -12,14 +12,14 @@ use Plenty\Plugin\Middleware;
 /**
  * Class HandleOrderPreviewUrl
  *
- * Redirect to confirmation if necessary
+ * Redirect to order confirmation, if necessary.
  *
  * @package IO\Middlewares
  */
 class HandleOrderPreviewUrl extends Middleware
 {
     /**
-     * Before the request is processed, check the request and redirect to confirmation page if necessary
+     * Before the request is processed, check the request and redirect to order confirmation page, if necessary.
      *
      * @param Request $request
      */
