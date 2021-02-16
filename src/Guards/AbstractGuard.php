@@ -8,7 +8,7 @@ use Plenty\Plugin\Log\Loggable;
 /**
  * Class AbstractGuard
  *
- * Redirects to a uri or not in dependence to the assert.
+ * Redirects to a uri or not, depending on the assert.
  *
  * @package IO\Guards
  */
@@ -26,7 +26,7 @@ abstract class AbstractGuard
     /**
      * Redirect to given URI if expected value equals return value of AbstractGuard::assert()
      *
-     * @param mixed $expected The value to compare with return value of AbstractGuard::asssert().
+     * @param mixed $expected The value to compare with return value of AbstractGuard::assert().
      * @param string $redirectUri The URI to redirect to.
      */
     public function assertOrRedirect($expected, string $redirectUri)
