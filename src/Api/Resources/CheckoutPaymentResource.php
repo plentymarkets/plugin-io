@@ -18,7 +18,7 @@ use Plenty\Plugin\Http\Response;
 class CheckoutPaymentResource extends ApiResource
 {
     /**
-     * @var CheckoutService
+     * @var CheckoutService $checkoutService Instance of the CheckoutService.
      */
     private $checkoutService;
 
@@ -35,8 +35,8 @@ class CheckoutPaymentResource extends ApiResource
     }
 
     /**
-     * Prepare the payment
-     * @return Response
+     * Prepare the payment before creating a new order.
+     * @return Response Response of the payment preparation.
      */
     public function store():Response
     {

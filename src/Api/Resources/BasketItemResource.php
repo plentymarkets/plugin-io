@@ -18,7 +18,7 @@ use IO\Services\BasketService;
 class BasketItemResource extends ApiResource
 {
     /**
-     * @var BasketService
+     * @var BasketService $basketService Instance of the BasketService.
      */
     private $basketService;
 
@@ -35,8 +35,8 @@ class BasketItemResource extends ApiResource
     }
 
     /**
-     * List basket items
-     * @return Response
+     * Get basket items.
+     * @return Response Basket items.
      */
     public function index(): Response
     {
@@ -44,11 +44,14 @@ class BasketItemResource extends ApiResource
         return $this->response->create($basketItems, ResponseCode::OK);
     }
 
-    // Post
-
     /**
      * Add an item to the basket
      * @return Response
+     */
+
+    /**
+     * Add an item in the basket.
+     * @return Response True, or an thrown error.
      */
     public function store(): Response
     {
@@ -65,12 +68,10 @@ class BasketItemResource extends ApiResource
         return $this->response->create(true, ResponseCode::CREATED);
     }
 
-    // Get
-
     /**
-     * Get a basket item
-     * @param string $selector
-     * @return Response
+     * Get a basket item by id.
+     * @param string $selector Id of the basket item.
+     * @return Response The item in the basket.
      */
     public function show(string $selector): Response
     {
@@ -85,6 +86,12 @@ class BasketItemResource extends ApiResource
      * Update the basket item
      * @param string $selector
      * @return Response
+     */
+
+    /**
+     * Update a basket item by id.
+     * @param string $selector Id of the basket item.
+     * @return Response True, or an thrown error.
      */
     public function update(string $selector): Response
     {
@@ -107,6 +114,12 @@ class BasketItemResource extends ApiResource
      * Delete an item from the basket
      * @param string $selector
      * @return Response
+     */
+
+    /**
+     * Delete an item from the basket by id.
+     * @param string $selector Id of the basket item.
+     * @return Response True.
      */
     public function destroy(string $selector): Response
     {

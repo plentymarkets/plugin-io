@@ -18,7 +18,7 @@ use IO\Services\AvailabilityService;
 class AvailabilityResource extends ApiResource
 {
     /**
-     * @var AvailabilityService
+     * @var AvailabilityService $availabilityService Instance of the AvailabilityService.
      */
     private $availabilityService;
 
@@ -35,10 +35,11 @@ class AvailabilityResource extends ApiResource
     }
 
     /**
-     * Get the Availability by Id
+     * Get the Availability by Id.
      * @param string $availabilityId
      * @return Response
      */
+
     public function show(string $availabilityId):Response
     {
         $availability = null;

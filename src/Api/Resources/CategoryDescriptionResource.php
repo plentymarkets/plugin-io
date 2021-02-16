@@ -29,9 +29,9 @@ class CategoryDescriptionResource extends ApiResource
     }
 
     /**
-     * Get Category Items
+     * Get the description1 and description2 of a category by categoryId.
      * @param string $categoryId
-     * @return Response
+     * @return Response Array with 'description1' and 'description2'
      */
     public function show(string $categoryId):Response
     {

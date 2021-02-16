@@ -28,16 +28,21 @@ class CategoryItemResource extends ApiResource
     {
         parent::__construct($request, $response);
     }
-    
+
     /**
      * Get Category Items
      * @return Response
+     */
+
+    /**
+     * Get the items of a category by categoryId.
+     * @return Response Items of the category.
      */
     public function index():Response
     {
         $categoryId = $this->request->get('categoryId', 0);
         $template = $this->request->get('template', '');
-        
+
         if((int)$categoryId > 0)
         {
             $itemListOptions = [
@@ -62,6 +67,6 @@ class CategoryItemResource extends ApiResource
         {
             return $this->response->create( null, ResponseCode::BAD_REQUEST );
         }
-        
+
     }
 }
