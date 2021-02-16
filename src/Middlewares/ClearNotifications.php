@@ -10,14 +10,14 @@ use Plenty\Plugin\Middleware;
 /**
  * Class ClearNotifications
  *
- * Clear notifications if necessary
+ * Clear notifications if necessary.
  *
  * @package IO\Middlewares
  */
 class ClearNotifications extends Middleware
 {
     /**
-     * @var bool $CLEAR_NOTIFICATIONS Force clear notifications status
+     * @var bool $CLEAR_NOTIFICATIONS Force clear notifications status.
      */
     public static $CLEAR_NOTIFICATIONS = false;
 
