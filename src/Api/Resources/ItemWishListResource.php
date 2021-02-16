@@ -19,7 +19,7 @@ use IO\Api\ResponseCode;
 class ItemWishListResource extends ApiResource
 {
     /**
-     * @var ItemWishListService
+     * @var ItemWishListService $itemWishListService Instance of the ItemWishListService.
      */
     private $itemWishListService;
 
@@ -37,7 +37,7 @@ class ItemWishListResource extends ApiResource
     }
 
     /**
-     * List itemWishList for contact
+     * Return the wishlist items of the current customer.
      * @return Response
      */
     public function index():Response
@@ -49,9 +49,8 @@ class ItemWishListResource extends ApiResource
         return $this->response->create($items, ResponseCode::OK);
     }
 
-    // Post
     /**
-     * Add an item to the basket
+     * Add an item to the wishlist.
      * @return Response
      */
     public function store():Response
@@ -64,11 +63,9 @@ class ItemWishListResource extends ApiResource
         return $this->response->create($itemWishList, ResponseCode::CREATED);
     }
 
-    // Delete
     /**
-     * Delete an item from the basket
+     * Remove an item from the wishlist.
      * @param string $selector
-     * @return Response
      */
     public function destroy(string $selector):Response
     {

@@ -37,7 +37,7 @@ class CustomerPasswordResetResource extends ApiResource
     }
 
     /**
-     * Set the password for the contact
+     * Reset the password for the contact.
      * @return Response
      */
     public function store(): Response

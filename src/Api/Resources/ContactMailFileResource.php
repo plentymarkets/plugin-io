@@ -31,9 +31,10 @@ class ContactMailFileResource extends ApiResource
     ) {
         parent::__construct($request, $response);
     }
-    
+
     /**
-     * @return Response
+     * Save a file for a mail.
+     * @return Response The file keys, if the saving went well.
      */
     public function store(): Response
     {
@@ -43,15 +44,15 @@ class ContactMailFileResource extends ApiResource
              */
             $notificationService = pluginApp(NotificationService::class);
             $notificationService->addNotificationCode(LogLevel::ERROR, 13);
-            
+
             return $this->response->create([], ResponseCode::BAD_REQUEST);
         }
-        
+
         $response = null;
         if (isset($_FILES['fileData'])) {
             /** @var ContactFormFileRepositoryContract $contactFormFileRepository */
             $contactFormFileRepository = pluginApp(ContactFormFileRepositoryContract::class);
-            
+
             try {
                 $response = $contactFormFileRepository->uploadFiles($_FILES['fileData']);
             } catch (\Exception $exception) {
@@ -59,13 +60,13 @@ class ContactMailFileResource extends ApiResource
                 $notificationService = pluginApp(NotificationService::class);
                 $notificationService->addNotificationCode(LogLevel::ERROR, 0);
             }
-            
-            
+
+
             if (!is_null($response)) {
                 return $this->response->create(['fileKeys' => $response], ResponseCode::CREATED);
             }
         }
-        
+
         return $this->response->create([], ResponseCode::BAD_REQUEST);
     }
 }

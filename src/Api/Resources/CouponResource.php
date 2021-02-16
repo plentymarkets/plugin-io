@@ -17,20 +17,33 @@ use IO\Services\CouponService;
  */
 class CouponResource extends ApiResource
 {
+    /**
+     * CouponResource constructor.
+     * @param Request $request
+     * @param ApiResponse $response
+     */
     public function __construct(Request $request, ApiResponse $response)
     {
         parent::__construct($request, $response);
     }
-    
+
+    /**
+     * Empty method.
+     * @return Response Empty array.
+     */
     public function index():Response
     {
         return $this->response->create([], ResponseCode::OK);
     }
-    
+
+    /**
+     * Redeem a coupon in the basket.
+     * @return Response Result of the redeeming.
+     */
     public function store():Response
     {
         $couponCode = $this->request->get('couponCode', '');
-    
+
         /**
          * @var CouponService $couponService
          */
@@ -42,7 +55,12 @@ class CouponResource extends ApiResource
             return $this->response->create( null, Response::HTTP_UNPROCESSABLE_ENTITY);
         }
     }
-    
+
+    /**
+     * Remove a coupon out of the basket.
+     * @param string $selector Not used.
+     * @return Response Response of the coupon removal.
+     */
     public function destroy(string $selector):Response
     {
         /**
@@ -50,7 +68,7 @@ class CouponResource extends ApiResource
          */
         $couponService = pluginApp(CouponService::class);
         $response = $couponService->removeCoupon();
-    
+
         return $this->response->create( $response, ResponseCode::CREATED );
     }
 }

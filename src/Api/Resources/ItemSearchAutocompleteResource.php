@@ -20,7 +20,7 @@ use IO\Api\ResponseCode;
 class ItemSearchAutocompleteResource extends ApiResource
 {
     /**
-     * ItemSearchResource constructor.
+     * ItemSearchAutocompleteResource constructor.
      * @param Request $request
      * @param ApiResponse $response
      */
@@ -30,7 +30,7 @@ class ItemSearchAutocompleteResource extends ApiResource
     }
 
     /**
-     * Search items
+     * Execute a search for a list of autocomplete suggestions for a given query.
      * @return Response
      */
     public function index(): Response

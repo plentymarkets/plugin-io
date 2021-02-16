@@ -48,6 +48,10 @@ class CustomerMailResource extends ApiResource
         parent::__construct($request, $response);
     }
 
+    /**
+     * Trigger the creation of an email with instructions to change the email.
+     * @return Response Null.
+     */
     public function store(): Response
     {
         $newMail = $this->request->get('newMail', null);
@@ -123,6 +127,11 @@ class CustomerMailResource extends ApiResource
         return $this->response->create(null, ResponseCode::OK);
     }
 
+    /**
+     * Update the email of a contact.
+     * @param string $contactId The id of the contact.
+     * @return Response Updated contact.
+     */
     public function update(string $contactId): Response
     {
         $password = $this->request->get('password');

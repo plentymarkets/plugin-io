@@ -30,8 +30,9 @@ class ItemSearchResource extends ApiResource
     }
 
     /**
-     * Search items
+     * Execute a search for items for a given query.
      * @return Response
+     * @throws \Exception
      */
     public function index(): Response
     {

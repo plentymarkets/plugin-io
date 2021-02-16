@@ -20,10 +20,13 @@ use IO\Builder\Order\AddressType;
  */
 class CustomerAddressResource extends ApiResource
 {
+    /**
+     * @var int ADDRESS_NOT_SET Dummy id, if no address is select, or to unselect an address.
+     */
     const ADDRESS_NOT_SET = -99;
 
     /**
-     * @var CustomerService
+     * @var CustomerService $customerService Instance of the CustomerService.
      */
     private $customerService;
 
@@ -40,8 +43,8 @@ class CustomerAddressResource extends ApiResource
     }
 
     /**
-     * Get the address type from the request
-     * @return int
+     * Get the address type from the current request.
+     * @return int Type of the address.
      */
     private function getAddressType(): int
     {
@@ -49,8 +52,8 @@ class CustomerAddressResource extends ApiResource
     }
 
     /**
-     * Get an address by type
-     * @return Response
+     * Get an address of the customer by type.
+     * @return Response Address.
      */
     public function index(): Response
     {
@@ -60,8 +63,8 @@ class CustomerAddressResource extends ApiResource
     }
 
     /**
-     * Create an address with the given type
-     * @return Response
+     * Create an address with the given type.
+     * @return Response The created address, or an exception.
      */
     public function store(): Response
     {
@@ -97,9 +100,9 @@ class CustomerAddressResource extends ApiResource
     }
 
     /**
-     * Update the address with the given ID
-     * @param string $addressId
-     * @return Response
+     * Update the address with the given address id.
+     * @param string $addressId Id of the address to update.
+     * @return Response Id of the address.
      */
     public function update(string $addressId): Response
     {
@@ -126,9 +129,9 @@ class CustomerAddressResource extends ApiResource
     }
 
     /**
-     * Delete the address with the given ID
-     * @param string $addressId
-     * @return Response
+     * Delete the address with the given id.
+     * @param string $addressId Id of the address to delete.
+     * @return Response Return the result of the index method.
      */
     public function destroy(string $addressId): Response
     {

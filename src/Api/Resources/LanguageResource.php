@@ -18,7 +18,7 @@ use IO\Services\LocalizationService;
 class LanguageResource extends ApiResource
 {
     /**
-    * @var LocalizationService
+    * @var LocalizationService $localizationService Instance of the LocalizationService.
     */
     private $localizationService;
 
@@ -26,6 +26,7 @@ class LanguageResource extends ApiResource
      * LanguageResource constructor.
      * @param Request $request
      * @param ApiResponse $response
+     * @param LocalizationService $localizationService
      */
 	public function __construct(Request $request, ApiResponse $response, LocalizationService $localizationService)
 	{
@@ -34,7 +35,7 @@ class LanguageResource extends ApiResource
 	}
 
     /**
-     * Updates the shop language. (put)
+     * Update the language.
      * @param string $newLanguage
      * @return Response
      */

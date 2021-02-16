@@ -18,12 +18,13 @@ use IO\Services\CountryService;
 class DeliveryCountryResource extends ApiResource
 {
 	/**
-	 * @var BasketService
+	 * @var BasketService $basketService Instance of the BasketService.
 	 */
 	private $basketService;
-	/**
-	 * @var CountryService
-	 */
+
+    /**
+     * @var CountryService $countryService Instance of the CountryService.
+     */
 	private $countryService;
 
     /**
@@ -40,10 +41,8 @@ class DeliveryCountryResource extends ApiResource
 		$this->countryService = $countryService;
 	}
 
-
-	// Put/patch
     /**
-     * Set the shipping country
+     * Set the shipping country.
      * @param string $shippingCountryId
      * @return Response
      */

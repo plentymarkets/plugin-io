@@ -20,9 +20,9 @@ class CustomerAuthenticationResource extends ApiResource
 {
     use Loggable;
 
-	/**
-	 * @var AuthenticationService
-	 */
+    /**
+     * @var AuthenticationService $authService Instance of the AuthenticationService.
+     */
 	private $authService;
 
     /**
@@ -38,8 +38,8 @@ class CustomerAuthenticationResource extends ApiResource
 	}
 
     /**
-     * Perform the login with email and password
-     * @return Response
+     * Perform the login with email and password.
+     * @return Response Null.
      */
 	public function store():Response
 	{
