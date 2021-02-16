@@ -11,12 +11,12 @@ namespace IO\Helper;
 class ComponentContainer
 {
     /**
-     * @var string The original component template
+     * @var string The original component template.
      */
     private $originComponentTemplate = '';
     
     /**
-     * @var string The new component template
+     * @var string The new component template.
      */
     private $newComponentTemplate = '';
     
@@ -30,7 +30,7 @@ class ComponentContainer
     }
     
     /**
-     * Getter for the originComponentTemplate property
+     * Getter for the originComponentTemplate property.
      * @return string
      */
     public function getOriginComponentTemplate(): string
@@ -39,7 +39,7 @@ class ComponentContainer
     }
     
     /**
-     * Getter for the newComponentTemplate property
+     * Getter for the newComponentTemplate property.
      * @return string
      */
     public function getNewComponentTemplate(): string
@@ -48,7 +48,7 @@ class ComponentContainer
     }
     
     /**
-     * Setter for the newComponentTemplate property
+     * Setter for the newComponentTemplate property.
      * @param string $newComponentTemplate
      * @return $this
      */
