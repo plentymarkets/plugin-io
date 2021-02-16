@@ -6,6 +6,13 @@ use Plenty\Plugin\Events\Dispatcher;
 use IO\Extensions\AbstractFunction;
 use Plenty\Plugin\Http\Request;
 
+/**
+ * Class UniqueId
+ *
+ * Contains global helper function to get a unique id from.
+ *
+ * @package IO\Extensions\Functions
+ */
 class UniqueId extends AbstractFunction
 {
     public function construct()
@@ -13,16 +20,23 @@ class UniqueId extends AbstractFunction
     }
 
     /**
-     * Return the available methods
+     * Get the twig function to internal method name mapping. (twig function => internal method)
+     *
      * @return array
      */
-    public function getFunctions():array
+    public function getFunctions(): array
     {
         return [
             "uid" => "generateUniqueId"
         ];
     }
 
+    /**
+     * Gets an unique id with an optional prefix.
+     *
+     * @param string $prefix Optional prefix that gets attached to the unique id.
+     * @return string
+     */
     public function generateUniqueId($prefix = "")
     {
         return uniqid($prefix);
