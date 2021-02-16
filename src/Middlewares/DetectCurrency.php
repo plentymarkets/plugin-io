@@ -9,9 +9,19 @@ use Plenty\Plugin\Http\Request;
 use Plenty\Plugin\Http\Response;
 use Plenty\Plugin\Middleware;
 
+/**
+ * Class DetectCurrency
+ *
+ * Set currency from request, if necessary.
+ *
+ * @package IO\Middlewares
+ */
 class DetectCurrency extends Middleware
 {
     // TODO: move check to the core after 5.0.X
+    /**
+     * @var string[] $allCurrencies List of all possible currencies
+     */
     public static $allCurrencies = [
         'AED', 'ARS', 'AUD', 'BGN', 'BHD', 'BRL',
         'CAD', 'CHF', 'CNY', 'CZK', 'DKK', 'EUR',
@@ -21,6 +31,10 @@ class DetectCurrency extends Middleware
         'THB', 'TRY', 'TWD', 'UAH', 'USD', 'VND', 'XCD', 'ZAR'];
 
     /**
+     * Before the request is processed, the currency is changed, if necessary.
+     *
+     * Example request: ?currency=EUR or ?Currency=EUR
+     *
      * @param Request $request
      */
     public function before(Request $request)
@@ -45,6 +59,8 @@ class DetectCurrency extends Middleware
     }
 
     /**
+     * After the request is processed, do nothing here.
+     *
      * @param Request $request
      * @param Response $response
      * @return Response
