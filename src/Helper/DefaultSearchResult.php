@@ -13,7 +13,7 @@ namespace IO\Helper;
  */
 class DefaultSearchResult
 {
-    /** @var array The blueprint for a search result */
+    /** @var array The blueprint for a search result. */
     const DEFAULT_RESULT = [
         'images' => [
             'all'       => [],
@@ -41,7 +41,7 @@ class DefaultSearchResult
         'properties'                => []
     ];
 
-    /** @var array Additional blueprint for an admin preview search result */
+    /** @var array Additional blueprint for an admin preview search result. */
     const ADMIN_PREVIEW_DEFAULT_RESULT = [
         'texts'                     => [
             'name1'                 => 'N / A',
@@ -64,8 +64,8 @@ class DefaultSearchResult
     ];
 
     /**
-     * Merge the blueprint in the search result
-     * @param array $data A search result
+     * Merge the blueprint in the search result.
+     * @param array $data A search result.
      * @return array|mixed
      */
     public static function merge( $data )
