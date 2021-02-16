@@ -32,7 +32,7 @@ class CategoryMap
 	}
 
     /**
-     * Set the category map
+     * Set the category map.
      * @param array $categoryMap
      * @deprecated
      */
@@ -42,7 +42,7 @@ class CategoryMap
 	}
 
     /**
-     * Get the category ID by key
+     * Get the category ID by key.
      * @param string $key
      * @return int
      * @deprecated
