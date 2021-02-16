@@ -95,11 +95,11 @@ class LocalizedOrder extends ModelWrapper
 
     /** @var bool $allowPaymentMethodSwitchFrom Indicate if is possible to switch to another payment method from the chosen one. */
     public $allowPaymentMethodSwitchFrom = false;
-    /** @var array $paymentMethodListForSwitch List all payment methods available for switch. */
+    /** @var array $paymentMethodListForSwitch List all payment methods that can be switched to. */
     public $paymentMethodListForSwitch = [];
 
     /**
-     * Data preperation for the specific order and params.
+     * Data preparation for the specific order and params.
      *
      * @param Order $order TODO
      * @param array ...$data TODO
@@ -405,9 +405,9 @@ class LocalizedOrder extends ModelWrapper
     }
 
     /**
-     * Get all set components from order items for a specific order item id.
+     * Get all set components from order items for a specific order item ID.
      *
-     * @param int $setOrderItemId Id of setitem
+     * @param int $setOrderItemId ID of set item
      * @param OrderItem[] $orderItems List of items of the order
      * @return array
      */
