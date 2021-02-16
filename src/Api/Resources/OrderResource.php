@@ -13,7 +13,7 @@ use IO\Services\CustomerService;
 /**
  * Class OrderResource
  *
- * Resource class for the route "io/order".
+ * Resource class for the route `io/order`.
  * @package IO\Api\Resources
  */
 class OrderResource extends ApiResource

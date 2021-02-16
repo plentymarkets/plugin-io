@@ -12,7 +12,7 @@ use IO\Api\ResponseCode;
 /**
  * Class OrderPropertyFileResource
  *
- * Resource class for the route "io/order/property/file".
+ * Resource class for the route `io/order/property/file`.
  * @package IO\Api\Resources
  */
 class OrderPropertyFileResource extends ApiResource

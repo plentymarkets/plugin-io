@@ -15,7 +15,7 @@ use IO\Builder\Order\AddressType;
 /**
  * Class CustomerAddressResource
  *
- * Resource class for the route "io/customer/address".
+ * Resource class for the route `io/customer/address`.
  * @package IO\Api\Resources
  */
 class CustomerAddressResource extends ApiResource

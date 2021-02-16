@@ -14,7 +14,7 @@ use IO\Api\ResponseCode;
 /**
  * Class ItemSearchResource
  *
- * Resource class for the route "io/item/search".
+ * Resource class for the route `io/item/search`.
  * @package IO\Api\Resources
  */
 class ItemSearchResource extends ApiResource

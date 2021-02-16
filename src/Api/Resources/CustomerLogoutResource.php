@@ -12,7 +12,7 @@ use IO\Services\AuthenticationService;
 /**
  * Class CustomerLogoutResource
  *
- * Resource class for the route "io/customer/logout".
+ * Resource class for the route `io/customer/logout`.
  * @package IO\Api\Resources
  */
 class CustomerLogoutResource extends ApiResource

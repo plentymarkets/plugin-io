@@ -12,7 +12,7 @@ use Plenty\Plugin\Http\Response;
 /**
  * Class CheckoutSetPaymentResource
  *
- * Resource class for the route "io/checkout/paymentId".
+ * Resource class for the route `io/checkout/paymentId`.
  * @package IO\Api\Resources
  */
 class CheckoutSetPaymentResource extends ApiResource
