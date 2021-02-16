@@ -101,8 +101,8 @@ class LocalizedOrder extends ModelWrapper
     /**
      * Data preparation for the specific order and params.
      *
-     * @param Order $order TODO
-     * @param array ...$data TODO
+     * @param Order $order Specific order model.
+     * @param array ...$data Additional params.
      * @return LocalizedOrder|null
      */
     public static function wrap($order, ...$data)
