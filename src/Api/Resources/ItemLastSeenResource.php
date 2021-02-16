@@ -13,6 +13,8 @@ use Plenty\Plugin\Templates\Twig;
 
 /**
  * Class ItemLastSeenResource
+ *
+ * Resource class for the route "io/item/last_seen"
  * @package IO\Api\Resources
  */
 class ItemLastSeenResource extends ApiResource

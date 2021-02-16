@@ -12,6 +12,8 @@ use IO\Services\BasketService;
 
 /**
  * Class BasketResource
+ *
+ * Resource class for the route "io/basket"
  * @package IO\Api\Resources
  */
 class BasketResource extends ApiResource

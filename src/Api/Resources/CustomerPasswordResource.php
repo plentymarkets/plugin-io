@@ -12,6 +12,8 @@ use IO\Services\CustomerService;
 
 /**
  * Class CustomerPasswordResource
+ *
+ * Resource class for the route "io/customer/password"
  * @package IO\Api\Resources
  */
 class CustomerPasswordResource extends ApiResource

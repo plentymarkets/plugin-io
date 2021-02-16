@@ -12,6 +12,7 @@ use IO\Api\ResponseCode;
 /**
  * Class OrderAdditionalInformationResource
  *
+ * Resource class for the route "io/order/additional_information"
  * @package IO\Api\Resources
  */
 class OrderAdditionalInformationResource extends ApiResource

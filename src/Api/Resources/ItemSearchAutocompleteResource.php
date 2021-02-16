@@ -12,8 +12,9 @@ use IO\Api\ApiResponse;
 use IO\Api\ResponseCode;
 
 /**
- * Class ItemSearchResource
+ * Class ItemSearchAutocompleteResource
  *
+ * Resource class for the route "io/item/search/autocomplete"
  * @package IO\Api\Resources
  */
 class ItemSearchAutocompleteResource extends ApiResource

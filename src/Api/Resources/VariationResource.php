@@ -14,6 +14,8 @@ use IO\Api\ResponseCode;
 
 /**
  * Class VariationResource
+ *
+ * Resource class for the route "io/variations"
  * @package IO\Api\Resources
  */
 class VariationResource extends ApiResource

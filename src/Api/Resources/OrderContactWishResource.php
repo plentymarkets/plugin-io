@@ -11,6 +11,8 @@ use IO\Api\ResponseCode;
 
 /**
  * Class OrderContactWishResource
+ *
+ * Resource class for the route "io/order/contactWish"
  * @package IO\Api\Resources
  */
 class OrderContactWishResource extends ApiResource

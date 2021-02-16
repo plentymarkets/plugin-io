@@ -12,6 +12,8 @@ use IO\Services\ItemService;
 
 /**
  * Class ItemConditionResource
+ *
+ * Resource class for the route "io/item/condition"
  * @package IO\Api\Resources
  */
 class ItemConditionResource extends ApiResource

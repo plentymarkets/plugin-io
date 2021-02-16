@@ -11,6 +11,8 @@ use IO\Services\OrderService;
 
 /**
  * Class OrderPaymentResource
+ *
+ * Resource class for the route "io/order/payment"
  * @package IO\Api\Resources
  */
 class OrderPaymentResource extends ApiResource

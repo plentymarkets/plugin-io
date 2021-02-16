@@ -11,6 +11,8 @@ use IO\Services\AvailabilityService;
 
 /**
  * Class AvailabilityResource
+ *
+ * Resource class for the route "io/item/availability"
  * @package IO\Api\Resources
  */
 class AvailabilityResource extends ApiResource
@@ -19,7 +21,7 @@ class AvailabilityResource extends ApiResource
      * @var AvailabilityService
      */
     private $availabilityService;
-    
+
     /**
      * AvailabilityResource constructor.
      * @param Request $request
@@ -31,7 +33,7 @@ class AvailabilityResource extends ApiResource
         parent::__construct($request, $response);
         $this->availabilityService = $availabilityService;
     }
-    
+
     /**
      * Get the Availability by Id
      * @param string $availabilityId
@@ -40,12 +42,12 @@ class AvailabilityResource extends ApiResource
     public function show(string $availabilityId):Response
     {
         $availability = null;
-        
+
         if((int)$availabilityId > 0)
         {
             $availability = $this->availabilityService->getAvailabilityById((int)$availabilityId);
         }
-    
+
         return $this->response->create($availability, ResponseCode::OK);
     }
 }

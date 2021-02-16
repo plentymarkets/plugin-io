@@ -18,6 +18,8 @@ use IO\Services\CustomerService;
 
 /**
  * Class CustomerResource
+ *
+ * Resource class for the route "io/customer"
  * @package IO\Api\Resources
  */
 class CustomerResource extends ApiResource

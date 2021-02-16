@@ -14,6 +14,8 @@ use Plenty\Plugin\Http\Response;
 
 /**
  * Class ContactMailFileResource
+ *
+ * Resource class for the route "io/customer/contact/mail/file"
  * @package IO\Api\Resources
  */
 class ContactMailFileResource extends ApiResource

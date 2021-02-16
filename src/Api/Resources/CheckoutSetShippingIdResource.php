@@ -10,7 +10,9 @@ use IO\Services\CheckoutService;
 use Plenty\Plugin\Http\Response;
 
 /**
- * Class CheckoutPaymentResource
+ * Class CheckoutSetShippingIdResource
+ *
+ * Resource class for the route "io/checkout/shippingId"
  * @package IO\Api\Resources
  */
 class CheckoutSetShippingIdResource extends ApiResource

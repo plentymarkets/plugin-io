@@ -15,6 +15,8 @@ use Plenty\Plugin\Templates\Twig;
 
 /**
  * Class CategoryTreeResource
+ *
+ * Resource class for the route "io/categorytree"
  * @package IO\Api\Resources
  */
 class CategoryTreeResource extends ApiResource

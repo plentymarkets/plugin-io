@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by IntelliJ IDEA.
- * User: ihussein
- * Date: 01.08.17
- * Time: 14:58
- */
 
 namespace IO\Api\Resources;
 
@@ -18,6 +12,8 @@ use IO\Api\ResponseCode;
 
 /**
  * Class BasketItemResource
+ *
+ * Resource class for the route "io/itemWishList"
  * @package IO\Api\Resources
  */
 class ItemWishListResource extends ApiResource

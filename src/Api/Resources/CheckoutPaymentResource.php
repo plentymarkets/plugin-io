@@ -11,6 +11,8 @@ use Plenty\Plugin\Http\Response;
 
 /**
  * Class CheckoutPaymentResource
+ *
+ * Resource class for the route "io/checkout/payment"
  * @package IO\Api\Resources
  */
 class CheckoutPaymentResource extends ApiResource

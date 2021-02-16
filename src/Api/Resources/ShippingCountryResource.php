@@ -10,7 +10,9 @@ use IO\Api\ResponseCode;
 use IO\Services\CheckoutService;
 
 /**
- * Class ShippingCountryIdResource
+ * Class ShippingCountryResource
+ *
+ * Resource class for the route "io/shipping/country"
  * @package IO\Api\Resources
  */
 class ShippingCountryResource extends ApiResource
