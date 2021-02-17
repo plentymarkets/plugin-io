@@ -57,7 +57,7 @@ class CouponResource extends ApiResource
     }
 
     /**
-     * Remove a coupon out of the basket.
+     * Remove a coupon from the basket.
      * @param string $selector Not used.
      * @return Response
      */
