@@ -100,8 +100,8 @@ class CustomerAddressResource extends ApiResource
     }
 
     /**
-     * Update the address with the given address id.
-     * @param string $addressId Id of the address to update.
+     * Update the address with the given address ID.
+     * @param string $addressId ID of the address to update.
      * @return Response
      */
     public function update(string $addressId): Response
@@ -129,8 +129,8 @@ class CustomerAddressResource extends ApiResource
     }
 
     /**
-     * Delete the address with the given id.
-     * @param string $addressId Id of the address to delete.
+     * Delete the address with the given ID.
+     * @param string $addressId ID of the address to delete.
      * @return Response
      */
     public function destroy(string $addressId): Response
