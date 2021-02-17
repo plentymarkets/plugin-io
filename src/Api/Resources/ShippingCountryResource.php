@@ -35,7 +35,7 @@ class ShippingCountryResource extends ApiResource
 	}
 
     /**
-     * Save the given shipping country id to the current session.
+     * Save the given shipping country ID to the current session.
      * @return Response
      */
 	public function store():Response
