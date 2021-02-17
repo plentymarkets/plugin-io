@@ -36,8 +36,8 @@ class ItemConditionResource extends ApiResource
     }
 
     /**
-     * Get the text for a specific item condition
-     * @param string $conditionId Id of the item condition.
+     * Get the text for a specific item condition.
+     * @param string $conditionId ID of the item condition.
      * @return Response
      */
     public function show(string $conditionId):Response
