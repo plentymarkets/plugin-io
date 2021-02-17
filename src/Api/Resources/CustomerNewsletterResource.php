@@ -72,7 +72,7 @@ class CustomerNewsletterResource extends ApiResource
     }
 
     /**
-     * Unsubscribe an email address of a newsletter.
+     * Unsubscribe an email address from a newsletter.
      * @param string $selector Email address.
      * @return Response
      */
