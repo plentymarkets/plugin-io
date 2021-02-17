@@ -11,7 +11,7 @@ use Plenty\Plugin\Translation\Translator;
  * Class OrderFaker
  *
  * This is a faker class for orders.
- * Faker classes are used for creating preview objects for use in the shop builder.
+ * Faker classes are used for creating preview objects for use in the shopBuilder.
  *
  * @package IO\Services\Order\Factories\Faker
  */
@@ -20,8 +20,8 @@ class OrderFaker extends AbstractFaker
     public $variations = [];
 
     /**
-     * Fill the order array $data with faked order data
-     * @param array $data An order array
+     * Fill the order array $data with faked order data.
+     * @param array $data An order array.
      * @return mixed
      */
     public function fill($data)
