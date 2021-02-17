@@ -9,15 +9,15 @@ use Plenty\Modules\Webshop\Helpers\NumberFormatter;
  * Class TotalsFaker
  *
  * This is a faker class for order totals.
- * Faker classes are used for creating preview objects for use in the shop builder.
+ * Faker classes are used for creating preview objects for use in the shopBuilder.
  *
  * @package IO\Services\Order\Factories\Faker
  */
 class TotalsFaker extends AbstractFaker
 {
     /**
-     * Fill the order array $data with faked order totals data
-     * @param array $data An order array
+     * Fill the order array $data with faked order totals data.
+     * @param array $data An order array.
      * @return mixed
      */
     public function fill($data)
