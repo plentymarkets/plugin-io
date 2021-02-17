@@ -69,8 +69,8 @@ class BasketItemResource extends ApiResource
     }
 
     /**
-     * Get a basket item by id.
-     * @param string $selector Id of the basket item.
+     * Get a basket item by ID.
+     * @param string $selector ID of the basket item.
      * @return Response
      */
     public function show(string $selector): Response
@@ -83,14 +83,14 @@ class BasketItemResource extends ApiResource
     // Put/patch
 
     /**
-     * Update the basket item
+     * Update the basket item.
      * @param string $selector
      * @return Response
      */
 
     /**
-     * Update a basket item by id.
-     * @param string $selector Id of the basket item.
+     * Update a basket item by ID.
+     * @param string $selector ID of the basket item.
      * @return Response
      */
     public function update(string $selector): Response
@@ -111,14 +111,14 @@ class BasketItemResource extends ApiResource
     // Delete
 
     /**
-     * Delete an item from the basket
+     * Delete an item from the basket.
      * @param string $selector
      * @return Response
      */
 
     /**
-     * Delete an item from the basket by id.
-     * @param string $selector Id of the basket item.
+     * Delete an item from the basket by ID.
+     * @param string $selector ID of the basket item.
      * @return Response
      */
     public function destroy(string $selector): Response

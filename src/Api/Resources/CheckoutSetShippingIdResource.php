@@ -35,7 +35,7 @@ class CheckoutSetShippingIdResource extends ApiResource
     }
 
     /**
-     * Prepare the payment
+     * Prepare the payment.
      * @return Response
      */
 
@@ -44,7 +44,7 @@ class CheckoutSetShippingIdResource extends ApiResource
      */
 
     /**
-     * Set the shipping id and the method of payment id.
+     * Set the shipping ID and the method of payment ID.
      * @return Response
      */
     public function store(): Response

@@ -142,7 +142,7 @@ class CategoryTreeResource extends ApiResource
     /**
      * Find a category in a tree. Recursive method.
      * @param array $tree Category tree to search.
-     * @param int $categoryId Id of the category to find.
+     * @param int $categoryId ID of the category to find.
      * @return array Found category.
      */
     private function findInTree($tree, $categoryId)

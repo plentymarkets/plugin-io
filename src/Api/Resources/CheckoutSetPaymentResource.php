@@ -35,7 +35,7 @@ class CheckoutSetPaymentResource extends ApiResource
     }
 
     /**
-     * Set the method of payment id.
+     * Set the method of payment ID.
      * @return Response
      */
     public function store():Response

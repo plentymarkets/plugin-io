@@ -86,10 +86,10 @@ class ContactMailResource extends ApiResource
     }
 
     /**
-     * Verify a Recaptcha token
-     * @param string $secret The recaptcha secret.
-     * @param string $token The recaptcha token.
-     * @return bool Validation result for the recaptcha.
+     * Verify a reCAPTCHA token
+     * @param string $secret The reCAPTCHA secret.
+     * @param string $token The reCAPTCHA token.
+     * @return bool Validation result for the reCAPTCHA.
      */
     public function verifyRecaptcha($secret, $token)
     {

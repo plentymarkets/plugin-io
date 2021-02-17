@@ -35,7 +35,7 @@ class AvailabilityResource extends ApiResource
     }
 
     /**
-     * Get the Availability by Id.
+     * Get the availability by ID.
      * @param string $availabilityId
      * @return Response
      */

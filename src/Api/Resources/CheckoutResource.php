@@ -59,7 +59,7 @@ class CheckoutResource extends ApiResource
      */
 
     /**
-     * Set the selected method of payment, shipping country id, shipping profile id and the delivery address.
+     * Set the selected method of payment, shipping country ID, shipping profile ID, and the delivery address.
      * Create addresses if required.
      * @return Response
      */
@@ -102,7 +102,7 @@ class CheckoutResource extends ApiResource
 	}
 
     /**
-     * Update the checkout information
+     * Update the checkout information.
      * @return Response
      */
 
