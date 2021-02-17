@@ -7,8 +7,13 @@ use IO\Services\Order\Factories\Faker\LocalizedOrderFaker;
 use IO\Services\Order\Factories\Faker\OrderFaker;
 use IO\Services\Order\Factories\Faker\TotalsFaker;
 
+/**
+ * Class OrderResultFactory
+ * @package IO\Services\Order\Factories
+ */
 class OrderResultFactory
 {
+    /** @var array The structure of an order filled with defaults. */
     const ORDER_STRUCTURE = [
         'order' => [
             'id'                => 0,
@@ -83,12 +88,17 @@ class OrderResultFactory
         'allowPaymentMethodSwitchFrom' => true,
         'paymentMethodListForSwitch'   => []
     ];
-    
+
+    /** @var string[] Fakers for order and totals. */
     const FAKER_MAP = [
         'order' => OrderFaker::class,
         'totals' => TotalsFaker::class,
     ];
-    
+
+    /**
+     * Return an order filled with faked data. This is used for shopBuilder previews.
+     * @return mixed
+     */
     public function fillOrderResult()
     {
         $orderResult = [];
