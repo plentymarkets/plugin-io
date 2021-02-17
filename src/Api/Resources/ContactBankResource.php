@@ -35,8 +35,8 @@ class ContactBankResource extends ApiResource
     }
 
     /**
-     * Find a ContactBank model by Id.
-     * @param string $contactBankId Id of ContactBank to find.
+     * Find a ContactBank model by ID.
+     * @param string $contactBankId ID of ContactBank to find.
      * @return Response
      */
     public function show( string $contactBankId ):Response
@@ -58,7 +58,7 @@ class ContactBankResource extends ApiResource
 
     /**
      * Delete a bank account.
-     * @param string $contactBankId Id of the ContactBank model to be deleted.
+     * @param string $contactBankId ID of the ContactBank model to be deleted.
      * @return Response
      */
     public function destroy( string $contactBankId ):Response
@@ -69,7 +69,7 @@ class ContactBankResource extends ApiResource
 
     /**
      * Update a bank account.
-     * @param string $contactBankId Id of the ContactBank model to update.
+     * @param string $contactBankId ID of the ContactBank model to update.
      * @return Response
      */
     public function update( string $contactBankId ):Response
