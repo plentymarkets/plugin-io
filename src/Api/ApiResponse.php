@@ -265,9 +265,9 @@ class ApiResponse
     }
 
     /**
-     * Throw an frontend error messsage.
+     * Throw a frontend error messsage.
      * @param int $code Message code (Default: 0)
-     * @param null $message Optional: The notifications message
+     * @param null $message Optional: The notifications message.
      * @return ApiResponse
      * @deprecated will be removed in 6.0.0.
      */
@@ -278,9 +278,9 @@ class ApiResponse
     }
 
     /**
-     * Throw an frontend success message.
+     * Throw a frontend success message.
      * @param int $code Message code (Default: 0)
-     * @param null $message Optional: The notifications message
+     * @param null $message Optional: The notifications message.
      * @return ApiResponse
      * @deprecated will be removed in 6.0.0.
      */
@@ -291,9 +291,9 @@ class ApiResponse
     }
 
     /**
-     * Throw an frontend info message.
+     * Throw n frontend info message.
      * @param int $code Message code (Default: 0)
-     * @param null $message Optional: The notifications message
+     * @param null $message Optional: The notifications message.
      * @return ApiResponse
      * @deprecated will be removed in 6.0.0.
      */
@@ -304,7 +304,7 @@ class ApiResponse
     }
 
     /**
-     * Set a given value to the $headers array, with the given key.
+     * Set a given value to the $headers array with the given key.
      * @param string $key Key.
      * @param string $value Value.
      * @return ApiResponse
@@ -332,7 +332,7 @@ class ApiResponse
 
         $responseData["events"] = $this->eventData;
 
-        // FIX: Set basket data after "showNetPrice" has been recalculated
+        // FIX: Set basket data after "showNetPrice" has been recalculated.
         if (array_key_exists('AfterBasketChanged', $responseData['events'])) {
             /** @var BasketService $basketService */
             $basketService = pluginApp(BasketService::class);
