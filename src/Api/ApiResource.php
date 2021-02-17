@@ -66,7 +66,7 @@ class ApiResource extends Controller
 	}
 
     /**
-     * Triggered on REST calls with the type GET.
+     * Triggered on REST calls with the type GET with path parameters.
      * @param string $selector
      * @return Response
      */
