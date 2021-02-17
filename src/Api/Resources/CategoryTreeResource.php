@@ -15,14 +15,25 @@ use Plenty\Plugin\Templates\Twig;
 
 /**
  * Class CategoryTreeResource
+ *
+ * Resource class for the route `io/categorytree`.
  * @package IO\Api\Resources
  */
 class CategoryTreeResource extends ApiResource
 {
+    /**
+     * @var CategoryService $categoryService Instance of the CategoryService.
+     */
     private $categoryService;
 
+    /**
+     * @var CustomerService $customerService Instance of the CustomerService.
+     */
     private $customerService;
 
+    /**
+     * @var SessionStorageService $sessionStorageService Instance of the SessionStorageService.
+     */
     private $sessionStorageService;
 
     /**
@@ -47,7 +58,7 @@ class CategoryTreeResource extends ApiResource
     }
 
     /**
-     * Get Category Items
+     * Get the category tree, beginning with a given categoryId.
      * @return Response
      */
     public function index(): Response
@@ -59,6 +70,10 @@ class CategoryTreeResource extends ApiResource
         return $this->response->create($response, ResponseCode::OK);
     }
 
+    /**
+     * Get the children of a category with a given categoryId.
+     * @return Response
+     */
     public function getChildren(): Response
     {
         $categoryId = $this->request->get('categoryId', null);
@@ -87,6 +102,10 @@ class CategoryTreeResource extends ApiResource
         return $this->response->create($children, ResponseCode::OK);
     }
 
+    /**
+     * Get rendered markup via TWIG for the side navigation.
+     * @return Response
+     */
     public function getTemplateForChildren(): Response
     {
         /** @var Twig $twig */
@@ -120,6 +139,12 @@ class CategoryTreeResource extends ApiResource
         return $this->response->create($renderedTemplate, ResponseCode::OK);
     }
 
+    /**
+     * Find a category in a tree. Recursive method.
+     * @param array $tree Category tree to search.
+     * @param int $categoryId ID of the category to find.
+     * @return array Found category.
+     */
     private function findInTree($tree, $categoryId)
     {
         $result = null;

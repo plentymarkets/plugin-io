@@ -10,18 +10,20 @@ use IO\Services\CheckoutService;
 use Plenty\Plugin\Http\Response;
 
 /**
- * Class CheckoutPaymentResource
+ * Class CheckoutSetPaymentResource
+ *
+ * Resource class for the route `io/checkout/paymentId`.
  * @package IO\Api\Resources
  */
 class CheckoutSetPaymentResource extends ApiResource
 {
     /**
-     * @var CheckoutService
+     * @var CheckoutService $checkoutService Instance of the CheckoutService.
      */
     private $checkoutService;
 
     /**
-     * CheckoutPaymentResource constructor.
+     * CheckoutSetPaymentResource constructor.
      * @param Request $request
      * @param ApiResponse $response
      * @param CheckoutService $checkoutService
@@ -33,7 +35,7 @@ class CheckoutSetPaymentResource extends ApiResource
     }
 
     /**
-     * Prepare the payment
+     * Set the method of payment ID.
      * @return Response
      */
     public function store():Response

@@ -18,14 +18,20 @@ use IO\Services\CustomerService;
 
 /**
  * Class CustomerResource
+ *
+ * Resource class for the route `io/customer`.
  * @package IO\Api\Resources
  */
 class CustomerResource extends ApiResource
 {
-    /** @var CustomerService */
+    /**
+     * @var CustomerService $customerService Instance of the CustomerService.
+     */
     private $customerService;
 
-    /** @var ContactRepositoryContract $contactRepository */
+    /**
+     * @var ContactRepositoryContract $contactRepository Instance of the ContactRepository.
+     */
     private $contactRepository;
 
     /**
@@ -33,6 +39,7 @@ class CustomerResource extends ApiResource
      * @param Request $request
      * @param ApiResponse $response
      * @param CustomerService $customerService
+     * @param ContactRepositoryContract $contactRepository
      */
     public function __construct(
         Request $request,
@@ -46,7 +53,7 @@ class CustomerResource extends ApiResource
     }
 
     /**
-     * Get the contact
+     * Get the contact.
      * @return Response
      */
     public function index(): Response
@@ -56,9 +63,10 @@ class CustomerResource extends ApiResource
     }
 
     /**
-     * Save the contact
+     * Save the contact.
      * @return Response
      * @throws \Plenty\Exceptions\ValidationException
+     * @throws \Throwable
      */
     public function store(): Response
     {

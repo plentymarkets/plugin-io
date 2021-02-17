@@ -10,17 +10,35 @@ use IO\Api\ApiResource;
 use IO\Api\ApiResponse;
 use IO\Api\ResponseCode;
 
+/**
+ * Class GuestResource
+ *
+ * Resource class for the route `io/guest`.
+ * @package IO\Api\Resources
+ */
 class GuestResource extends ApiResource
 {
-    /** @var CustomerService $customerService */
+    /**
+     * @var CustomerService $customerService Instance of the CustomerService.
+     */
     private $customerService;
 
+    /**
+     * GuestResource constructor.
+     * @param Request $request
+     * @param ApiResponse $response
+     * @param CustomerService $customerService
+     */
     public function __construct(Request $request, ApiResponse $response, CustomerService $customerService)
     {
         parent::__construct($request, $response);
         $this->customerService = $customerService;
     }
 
+    /**
+     * Logs the user in as a guest.
+     * @return Response
+     */
     public function store(): Response
     {
         /** @var SessionStorageRepositoryContract $sessionStorageRepository */

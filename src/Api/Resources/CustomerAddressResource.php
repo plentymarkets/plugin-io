@@ -14,14 +14,19 @@ use IO\Builder\Order\AddressType;
 
 /**
  * Class CustomerAddressResource
+ *
+ * Resource class for the route `io/customer/address`.
  * @package IO\Api\Resources
  */
 class CustomerAddressResource extends ApiResource
 {
+    /**
+     * @var int ADDRESS_NOT_SET Dummy id, if no address is select, or to unselect an address.
+     */
     const ADDRESS_NOT_SET = -99;
 
     /**
-     * @var CustomerService
+     * @var CustomerService $customerService Instance of the CustomerService.
      */
     private $customerService;
 
@@ -38,8 +43,8 @@ class CustomerAddressResource extends ApiResource
     }
 
     /**
-     * Get the address type from the request
-     * @return int
+     * Get the address type from the current request.
+     * @return int Type of the address.
      */
     private function getAddressType(): int
     {
@@ -47,7 +52,7 @@ class CustomerAddressResource extends ApiResource
     }
 
     /**
-     * Get an address by type
+     * Get an address of the customer by type.
      * @return Response
      */
     public function index(): Response
@@ -58,7 +63,7 @@ class CustomerAddressResource extends ApiResource
     }
 
     /**
-     * Create an address with the given type
+     * Create an address with the given type.
      * @return Response
      */
     public function store(): Response
@@ -95,8 +100,8 @@ class CustomerAddressResource extends ApiResource
     }
 
     /**
-     * Update the address with the given ID
-     * @param string $addressId
+     * Update the address with the given address ID.
+     * @param string $addressId ID of the address to update.
      * @return Response
      */
     public function update(string $addressId): Response
@@ -124,8 +129,8 @@ class CustomerAddressResource extends ApiResource
     }
 
     /**
-     * Delete the address with the given ID
-     * @param string $addressId
+     * Delete the address with the given ID.
+     * @param string $addressId ID of the address to delete.
      * @return Response
      */
     public function destroy(string $addressId): Response

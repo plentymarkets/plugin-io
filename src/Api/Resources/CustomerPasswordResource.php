@@ -12,12 +12,14 @@ use IO\Services\CustomerService;
 
 /**
  * Class CustomerPasswordResource
+ *
+ * Resource class for the route `io/customer/password`.
  * @package IO\Api\Resources
  */
 class CustomerPasswordResource extends ApiResource
 {
 	/**
-	 * @var CustomerService
+	 * @var CustomerService $customerService Instance of the CustomerService.
 	 */
 	private $customerService;
 
@@ -34,7 +36,7 @@ class CustomerPasswordResource extends ApiResource
 	}
 
     /**
-     * Set the password for the contact
+     * Set a new password for the current user.
      * @return Response
      */
 	public function store():Response
@@ -76,7 +78,9 @@ class CustomerPasswordResource extends ApiResource
 	}
 
     /**
-     * Checks if the password meets the requirements
+     * Checks if the password meets the requirements.
+     * @param $password
+     * @return false|int
      */
     static public function isValidPassword($password)
     {

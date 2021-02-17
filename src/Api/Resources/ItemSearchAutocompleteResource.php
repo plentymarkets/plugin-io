@@ -12,14 +12,15 @@ use IO\Api\ApiResponse;
 use IO\Api\ResponseCode;
 
 /**
- * Class ItemSearchResource
+ * Class ItemSearchAutocompleteResource
  *
+ * Resource class for the route `io/item/search/autocomplete`.
  * @package IO\Api\Resources
  */
 class ItemSearchAutocompleteResource extends ApiResource
 {
     /**
-     * ItemSearchResource constructor.
+     * ItemSearchAutocompleteResource constructor.
      * @param Request $request
      * @param ApiResponse $response
      */
@@ -29,7 +30,7 @@ class ItemSearchAutocompleteResource extends ApiResource
     }
 
     /**
-     * Search items
+     * Execute a search for a list of autocomplete suggestions for a given query.
      * @return Response
      */
     public function index(): Response
