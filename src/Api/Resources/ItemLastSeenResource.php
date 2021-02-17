@@ -64,8 +64,8 @@ class ItemLastSeenResource extends ApiResource
     }
 
     /**
-     * Add a new variation id to the list of the last seen items.
-     * @param string $variationId The id of the variation to add.
+     * Add a new variation ID to the list of the last seen items.
+     * @param string $variationId The ID of the variation to add.
      * @return Response
      */
     public function update(string $variationId): Response
