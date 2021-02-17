@@ -35,7 +35,7 @@ class ShippingResource extends ApiResource
 
     /**
      * Update the selected shipping profile.
-     * @param string $shippingProfileId The id of the shipping profile, to switch on.
+     * @param string $shippingProfileId The ID of the shipping profile to switch to.
      * @return Response
      */
 	public function update(string $shippingProfileId):Response
