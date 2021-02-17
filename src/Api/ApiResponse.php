@@ -291,7 +291,7 @@ class ApiResponse
     }
 
     /**
-     * Throw n frontend info message.
+     * Throw a frontend info message.
      * @param int $code Message code (Default: 0)
      * @param null $message Optional: The notifications message.
      * @return ApiResponse
