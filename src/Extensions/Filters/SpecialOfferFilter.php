@@ -39,7 +39,7 @@ class SpecialOfferFilter extends AbstractFilter
      * @param string $defaultPrice Default price if no special offer price is set.
      * @param array $prices Price object based on which the special offer price is returned.
      * @param string $priceType Price type accessor.
-     * @param string $exact Accessor to return from the object if passed.
+     * @param string $exact Accessor to return from the object, if passed.
      * @return string
      */
     public function specialOffer($defaultPrice, $prices, $priceType, $exact = null): string
