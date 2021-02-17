@@ -13,7 +13,7 @@ use IO\Services\Order\Factories\Faker\TotalsFaker;
  */
 class OrderResultFactory
 {
-    /** @var array The structure of an order filled with defaults */
+    /** @var array The structure of an order filled with defaults. */
     const ORDER_STRUCTURE = [
         'order' => [
             'id'                => 0,
@@ -89,14 +89,14 @@ class OrderResultFactory
         'paymentMethodListForSwitch'   => []
     ];
 
-    /** @var string[] Fakers for Order and Totals */
+    /** @var string[] Fakers for order and totals. */
     const FAKER_MAP = [
         'order' => OrderFaker::class,
         'totals' => TotalsFaker::class,
     ];
 
     /**
-     * Return an order filled with faked data. This is used for shopbuilder previews.
+     * Return an order filled with faked data. This is used for shopBuilder previews.
      * @return mixed
      */
     public function fillOrderResult()
