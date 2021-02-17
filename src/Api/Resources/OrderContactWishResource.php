@@ -28,7 +28,7 @@ class OrderContactWishResource extends ApiResource
     }
 
     /**
-     * Set the order contact wish for the current session, taken from the request.
+     * Set the order contact wish for the current session taken from the request.
      * @return Response
      */
     public function store(): Response
