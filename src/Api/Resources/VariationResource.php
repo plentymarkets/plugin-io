@@ -65,8 +65,8 @@ class VariationResource extends ApiResource
     }
 
     /**
-     * Get variation by id.
-     * @param string $variationId The id of the variation to get.
+     * Get variation by ID.
+     * @param string $variationId The ID of the variation to get.
      * @return Response
      */
     public function show(string $variationId): Response
