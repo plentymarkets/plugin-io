@@ -56,7 +56,7 @@ class OrderAdditionalInformationResource extends ApiResource
     }
 
     /**
-     * Set the contact wish for the current session, taken from the request.
+     * Set the contact wish for the current session taken from the request.
      */
     private function setContactWish()
     {
@@ -72,7 +72,7 @@ class OrderAdditionalInformationResource extends ApiResource
     }
 
     /**
-     * Set the customer sign for the current session, taken from the request.
+     * Set the customer sign for the current session taken from the request.
      */
     private function setCustomerSign()
     {
@@ -87,7 +87,7 @@ class OrderAdditionalInformationResource extends ApiResource
     }
 
     /**
-     * Set the shipping privacy hint for the current session, taken from the request.
+     * Set the shipping privacy hint for the current session taken from the request.
      */
     private function setShippingPrivacyHint()
     {
@@ -98,7 +98,7 @@ class OrderAdditionalInformationResource extends ApiResource
     }
 
     /**
-     * Set the newsletter subscriptions for the current session, taken from the request.
+     * Set the newsletter subscriptions for the current session taken from the request.
      */
     private function setNewsletterSubscriptions()
     {
