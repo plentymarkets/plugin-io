@@ -49,20 +49,20 @@ class CheckoutController extends LayoutController
         $shopBuilderRequest->setMainContentType('checkout');
 
         if (!$shopBuilderRequest->isShopBuilder()) {
-            if ($sessionStorageRepository->getSessionValue(SessionStorageRepositoryContract::GUEST_EMAIL) == null
-                && $contactRepository->getContactId() <= 0) {
-                $this->getLogger(__CLASS__)->info("IO::Debug.CheckoutController_notLoggedIn");
-                AuthGuard::redirect(
-                    $shopUrls->login,
-                    ["backlink" => AuthGuard::getUrl()]
-                );
-            } elseif (!count($basketItemRepository->all())) {
+            if (!count($basketItemRepository->all())) {
                 $this->getLogger(__CLASS__)->info("IO::Debug.CheckoutController_emptyBasket");
                 if ($sessionStorageRepository->getSessionValue(SessionStorageRepositoryContract::LATEST_ORDER_ID) > 0) {
                     AuthGuard::redirect($shopUrls->confirmation, []);
                 } else {
                     AuthGuard::redirect($shopUrls->home, []);
                 }
+            } elseif ($sessionStorageRepository->getSessionValue(SessionStorageRepositoryContract::GUEST_EMAIL) == null
+                && $contactRepository->getContactId() <= 0) {
+                $this->getLogger(__CLASS__)->info("IO::Debug.CheckoutController_notLoggedIn");
+                AuthGuard::redirect(
+                    $shopUrls->login,
+                    ["backlink" => AuthGuard::getUrl()]
+                );
             }
         } elseif (is_null($category)) {
             /** @var CategoryController $categoryController */
