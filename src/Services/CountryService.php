@@ -58,6 +58,12 @@ class CountryService
                 self::$activeCountries[$lang][] = $country;
             }
         }
+        /**
+         * Todo: Remove JS Sort in Ceres
+         * Sort active Country List
+         */
+        $column = array_column(self::$activeCountries[$lang], "currLangName");
+        array_multisort($column, SORT_ASC, SORT_LOCALE_STRING, self::$activeCountries[$lang]);
 
         return self::$activeCountries[$lang];
     }
