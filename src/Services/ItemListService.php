@@ -34,6 +34,7 @@ class ItemListService
     const TYPE_CROSS_SELLER = 'cross_selling';
     const TYPE_WISH_LIST = 'wish_list';
     const TYPE_SEARCH_SUGGESTIONS = 'search_suggestions';
+    const TYPE_ALL_ITEMS = 'all';
 
     /**
      * Gets a list of items based on parameters
@@ -65,13 +66,22 @@ class ItemListService
                     self::TYPE_LAST_SEEN,
                     self::TYPE_CROSS_SELLER,
                     self::TYPE_WISH_LIST,
-                    self::TYPE_SEARCH_SUGGESTIONS
+                    self::TYPE_SEARCH_SUGGESTIONS,
+                    self::TYPE_ALL_ITEMS
                 ]
             ))) {
             $type = self::TYPE_RANDOM;
         }
 
         switch ($type) {
+            case self:: TYPE_ALL_ITEMS:
+                 $searchFactory = CategoryItems::getSearchFactory(
+                    [
+                        'categoryId' => null,
+                        'sorting' => $sorting
+                    ]
+                );
+                break;
             case self::TYPE_CATEGORY:
                 $searchFactory = CategoryItems::getSearchFactory(
                     [

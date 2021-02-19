@@ -12,9 +12,11 @@ use Plenty\Modules\Category\Models\Category;
 use Plenty\Modules\ShopBuilder\Helper\ShopBuilderRequest;
 use Plenty\Modules\Webshop\Contracts\WebstoreConfigurationRepositoryContract;
 use Plenty\Modules\Webshop\ItemSearch\Helpers\ResultFieldTemplate;
+use Plenty\Modules\Webshop\ItemSearch\SearchPresets\CategoryItems;
 use Plenty\Modules\Webshop\ItemSearch\SearchPresets\SingleItem;
 use Plenty\Modules\Webshop\ItemSearch\SearchPresets\VariationAttributeMap;
 use Plenty\Modules\Webshop\ItemSearch\Services\ItemSearchService;
+use Plenty\Plugin\Http\Request;
 use Plenty\Plugin\Http\Response;
 use Plenty\Plugin\Log\Loggable;
 
@@ -126,6 +128,36 @@ class ItemController extends LayoutController
                 ResultFieldTemplate::get(ResultFieldTemplate::TEMPLATE_SINGLE_ITEM)
             );
 
+            // variation attribute map does not contain initial variation if it is completely faked for the preview.
+            // need to filter null values from variation list to avoid errors in the frontend
+            $hasInitialVariation = false;
+            $itemResult['variationAttributeMap']['variations'] = array_filter(
+                $itemResult['variationAttributeMap']['variations'],
+                function ($variation) use ($itemResult) {
+                    if(!empty($variation)) {
+                        if($variation['variationId'] === $itemResult['documents'][0]['data']['variation']['id']) {
+                            $hasInitialVariation = true;
+                        }
+                        return true;
+                    }
+
+                    return false;
+                }
+            );
+
+            if(!$hasInitialVariation && count($itemResult['variationAttributeMap']['variations'])) {
+                // fake entry in the variation attribute make for the faked initial variation
+                $firstVariation = $itemResult['variationAttributeMap']['variations'][0];
+                $itemResult['variationAttributeMap']['variations'][] = [
+                    'variationId' => $itemResult['documents'][0]['data']['variation']['id'],
+                    'isSalable' => false,
+                    'unitCombinationId' => $firstVariation['unitCombinationId'],
+                    'unitId' => $firstVariation['unitId'],
+                    'unitName' => $firstVariation['unitName'],
+                    'attributes' => []
+                ];
+            }
+
             if($shopBuilderRequest->getPreviewContentType() === 'itemset')
             {
                 $previewSetComponentId = $itemResult['item']['documents'][0]['data']['setComponentVariationIds'][0];
@@ -203,9 +235,25 @@ class ItemController extends LayoutController
 
     public function showItemForCategory($category)
     {
-        /** @var ItemListService $itemListService */
-        $itemListService = pluginApp(ItemListService::class);
-        $itemList = $itemListService->getItemList(ItemListService::TYPE_CATEGORY, $category->id, null, 1);
+        /** @var Request $request */
+        $request = pluginApp(Request::class);
+        if(($previewVariationId = $request->get('previewVariationId', 0)) > 0) {
+            // load given variation for the preview in the shop builder
+            return $this->showItem('', 0, $previewVariationId, $category);
+        }
+
+        /** @var ItemSearchService $itemSearchService */
+        $itemSearchService = pluginApp(ItemSearchService::class);
+        // search for any item in the given category
+        $itemList = $itemSearchService->getResult(
+            CategoryItems::getSearchFactory(
+                [
+                    'categoryId' => $category->id,
+                    'itemsPerPage' => 1
+                ]
+            )
+        );
+
         if (count($itemList['documents'])) {
             return $this->showItem(
                 '',
@@ -215,6 +263,7 @@ class ItemController extends LayoutController
             );
         }
 
+        // if no items were found in the given category load any item.
         return $this->showItem(
             '',
             0,
