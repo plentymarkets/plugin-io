@@ -5,21 +5,44 @@ namespace IO\Services;
 use Plenty\Plugin\CachingRepository;
 use Plenty\Plugin\Log\Loggable;
 
+/**
+ * Class ContactMapService
+ *
+ * This service class exposes a method used for getting map coordinates from the Google Maps API.
+ * All public functions are available in the Twig template renderer.
+ *
+ * @package IO\Services
+ */
 class ContactMapService
 {
     use Loggable;
 
-    /** @var CachingRepository $cachingRepository */
+    /**
+     * @var CachingRepository $cachingRepository Repository for caching in Redis
+     */
     private $cachingRepository;
 
     const COORD_CACHE_KEY = 'ceresMapCoordinates';
 
+    /**
+     * ContactMapService constructor.
+     * @param CachingRepository $cachingRepository Repository for caching in Redis
+     */
     public function __construct(CachingRepository $cachingRepository)
     {
         $this->cachingRepository = $cachingRepository;
     }
 
-    public function getMapCoordinates($apiKey, $street, $zip = null)
+    /**
+     * Get coordinates for a street at a specific zipcode from Google Maps API.
+     * These coordinates are saved to the Redis cache and returned.
+     *
+     * @param string $apiKey Google Maps API Key
+     * @param string $street Name of the street, optionally with house number
+     * @param string|null $zip Optional: Zip code for address (Default: null)
+     * @return object
+     */
+    public function getMapCoordinates(string $apiKey, string $street, $zip = null)
     {
         return $this->cachingRepository->remember(
             self::COORD_CACHE_KEY,

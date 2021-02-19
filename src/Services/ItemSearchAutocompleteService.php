@@ -16,7 +16,11 @@ use Plenty\Modules\Webshop\ItemSearch\SearchPresets\SearchSuggestions;
 use Plenty\Modules\Webshop\ItemSearch\Services\ItemSearchService;
 
 /**
- * Class ItemSearchAutocompleteService
+ * Service Class ItemSearchAutocompleteService
+ *
+ * This service class contains functions for the autocompletion of the item search.
+ * All public functions are available in the Twig template renderer.
+ *
  * @package IO\Services
  */
 class ItemSearchAutocompleteService
@@ -30,16 +34,29 @@ class ItemSearchAutocompleteService
     /** @var WebstoreConfiguration $webstoreConfiguration */
     private $webstoreConfiguration;
 
+    /**
+     * ItemSearchAutocompleteService constructor.
+     * @param UrlBuilderRepositoryContract $urlBuilderRepository
+     * @param LocalizationRepositoryContract $localizationRepository
+     * @param WebstoreConfigurationRepositoryContract $webstoreConfigurationRepository
+     */
     public function __construct(
         UrlBuilderRepositoryContract $urlBuilderRepository,
         LocalizationRepositoryContract $localizationRepository,
         WebstoreConfigurationRepositoryContract $webstoreConfigurationRepository
-    ) {
+    )
+    {
         $this->urlBuilderRepository = $urlBuilderRepository;
         $this->localizationRepository = $localizationRepository;
         $this->webstoreConfiguration = $webstoreConfigurationRepository->getWebstoreConfiguration();
     }
 
+    /**
+     * Gets a "Did you mean X?" string based on suggestions
+     * @param string $searchString Original search string
+     * @param array $suggestions Search suggestions based on search string
+     * @return string
+     */
     public function getDidYouMeanSuggestionSearchString($searchString, $suggestions)
     {
         if (is_array($suggestions)) {
@@ -60,6 +77,13 @@ class ItemSearchAutocompleteService
         return $searchString;
     }
 
+    /**
+     * Get an item search result for the search string based on the chosen search types
+     * @param string $searchString The search string
+     * @param array $searchTypes What types of search to execute
+     * @return array
+     * @throws \Exception
+     */
     public function getResults($searchString, $searchTypes)
     {
         $searchFactories = [
@@ -70,6 +94,7 @@ class ItemSearchAutocompleteService
                     'page' => 1,
                     'itemsPerPage' => 20,
                     'withCategories' => in_array('category', $searchTypes),
+                    'searchOperator' => $this->webstoreConfiguration->itemAutocompleteSearchOperator
                 ]
             )
         ];
@@ -90,7 +115,8 @@ class ItemSearchAutocompleteService
     }
 
     /**
-     * @param array $itemSearchResult
+     * Transform the item search result into a flatter format
+     * @param array $itemSearchResult Raw item search result
      * @return array
      */
     public function transformResult($itemSearchResult)
@@ -189,10 +215,10 @@ class ItemSearchAutocompleteService
                     );
 
                     if (!is_null($categoryData) && $categoryService->isVisibleForWebstore(
-                        $categoryData,
-                        Utils::getWebstoreId(),
-                        $this->localizationRepository->getLanguage()
-                    )) {
+                            $categoryData,
+                            Utils::getWebstoreId(),
+                            $this->localizationRepository->getLanguage()
+                        )) {
                         $categoryResult[] = $this->buildResult(
                             $categoryData->details[0]->name,
                             $categoryData->details[0]->imagePath,
@@ -201,8 +227,7 @@ class ItemSearchAutocompleteService
                                 $this->localizationRepository->getLanguage(),
                                 Utils::getWebstoreId()
                             )->toRelativeUrl(
-                                $this->localizationRepository->getLanguage(
-                                ) !== $this->webstoreConfiguration->defaultLanguage
+                                $this->localizationRepository->getLanguage() !== $this->webstoreConfiguration->defaultLanguage
                             ),
                             $this->getCategoryBranch($categoryData->id),
                             '',

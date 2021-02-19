@@ -15,8 +15,8 @@ use Plenty\Modules\ShopBuilder\Helper\ShopBuilderRequest;
 class CustomerChangeMailController extends LayoutController
 {
     /**
-     * @param $contactId
-     * @param $hash
+     * @param int $contactId
+     * @param string $hash
      * @return string
      * @throws \ErrorException
      */

@@ -10,7 +10,11 @@ use Plenty\Modules\Order\StatusHistory\Contracts\StatusHistoryRepositoryContract
 use Plenty\Plugin\Log\Loggable;
 
 /**
- * Class OrderStatusService
+ * Service Class OrderStatusService
+ *
+ * This service class contains functions related to the order status.
+ * All public functions are available in the Twig template renderer.
+ *
  * @package IO\Services
  */
 class OrderStatusService
@@ -36,16 +40,19 @@ class OrderStatusService
         AuthHelper $authHelper,
         OrderStatusRepositoryContract $orderStatusRepo,
         StatusHistoryRepositoryContract $statusHistoryRepo
-    ) {
+    )
+    {
         $this->authHelper = $authHelper;
         $this->orderStatusRepo = $orderStatusRepo;
         $this->statusHistoryRepo = $statusHistoryRepo;
     }
 
     /**
-     * @param int $orderId
-     * @param float $orderStatusId
-     * @return mixed
+     * Get the status of a specific order
+     * @param int $orderId The id of the order to find order status for
+     * @param float $orderStatusId The id of the order status to find
+     * @return string
+     * @throws \Throwable
      */
     public function getOrderStatus($orderId, $orderStatusId)
     {
@@ -74,9 +81,9 @@ class OrderStatusService
                         // status with 0 means the creation of an order is not completed, caused by an error
                         if ($entry->statusId > 0) {
                             try {
-                                $statusHistoryNew[$entryKey] = $orderStatusRepo->get($entry->statusId);
+                                $statusHistoryNew[] = $orderStatusRepo->get($entry->statusId);
                             } catch (\Exception $e) {
-                                $logger->error("IO::Debug.OrderStatusService_getOrderStatus", [
+                                $logger->debug("IO::Debug.OrderStatusService_getOrderStatus", [
                                     'code' => $e->getCode(),
                                     'message' => $e->getMessage(),
                                     'entryKey' => $entryKey

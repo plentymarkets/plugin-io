@@ -10,7 +10,7 @@ class BasketFaker extends AbstractFaker
     private $rawBasketItems = [];
 
     /**
-     * @param $default
+     * @param object $default
      * @return mixed
      */
     public function fill($default)

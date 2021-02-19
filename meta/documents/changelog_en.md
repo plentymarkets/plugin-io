@@ -1,5 +1,56 @@
 # Release Notes for IO
 
+## v5.0.22 (2021-02-11) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.21...5.0.22" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
+
+### Fixed
+
+- Under certain circumstances the order confirmation displayed the wrong order status. This behaviour has been fixed.
+
+## v5.0.21 (2021-02-09) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.20...5.0.21" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
+
+### TODO
+
+- If your theme uses the function `getVariationList($itemId, $withPrimary)` from the `ItemService`, you need to check whether the second parameter `$withPrimary` is interpreted as expected.
+
+### Added
+
+- The email attachment widget was added to the ShopBuilder. The widget makes it possible to attach files to emails that are sent via the contact form.
+
+### Fixed 
+
+- Opening single item views in categories without items could lead to errors in the ShopBuilder. This behaviour has been fixed.
+- Due to an error, empty values could not be saved for individual input fields of existing addresses. This behaviour has been fixed.
+- The function `getVariationList($itemId, $withPrimary)` in the `ItemService` misinterpreted the second parameter. As a result, `$withPrimary == true` returned only sub-variations and `$withPrimary == false` also returned the main variation. This has been fixed.
+
+## v5.0.20 (2021-01-19) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.19...5.0.20" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
+
+### Fixed 
+
+- The information text for export deliveries has not been displayed correctly since 01 January 2021. This behaviour has been fixed.
+- The returns history displayed shipping costs as items. This behaviour has been fixed.
+
+## v5.0.19 (2021-01-05) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.18...5.0.19" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
+
+### Changed
+
+- In order to improve webshop performance, the caching time of the shop URLs that are linked in the ShopBuilder settings, which was introduced in version 5.0.7, has been increased from 5 minutes to 10 minutes. 
+
+## v5.0.18 (2021-01-04) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.17...5.0.18" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
+
+### Added 
+
+- You can now determine the search operator of the online shop search in the Ceres assistant. You can either select an **And** or an **Or** operator.
+
+### Changed
+
+- The order sums now include the additional costs of characteristics.
+
+## v5.0.17 (2020-12-21) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.16...5.0.17" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
+
+### Changed
+
+- Code documentation as been updated in a number of placed by adding viable input types.
+
 ## v5.0.16 (2020-12-01) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.15...5.0.16" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
 
 ### Added

@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by IntelliJ IDEA.
- * User: chensink
- * Date: 27.11.17
- * Time: 11:11
- */
 
 namespace IO\Services;
 
@@ -15,17 +9,21 @@ use Plenty\Modules\Order\Date\Models\OrderDateType;
 use Plenty\Modules\Order\Models\Order;
 use Plenty\Modules\Order\Models\OrderItem;
 use Plenty\Modules\Order\Shipping\Contracts\EUCountryCodesServiceContract;
+use Plenty\Modules\Webshop\Helpers\NumberFormatter;
 
 /**
- * Calculate order totals
+ * Service Class OrderTotalsService
+ *
+ * This service class contains functions related to the order totals calculation.
+ * All public functions are available in the Twig template renderer.
+ *
  * @package IO\Services
  */
 class OrderTotalsService
 {
     /**
      * Get all order totals which are relevant for the OrderDetails-modal
-     *
-     * @param Order $order
+     * @param Order $order The order to get order totals for
      * @return array
      */
     public function getAllTotals(Order $order)
@@ -46,11 +44,14 @@ class OrderTotalsService
         $isNet = $order->amounts[$amountId]->isNet;
         $itemSumRebateGross = 0;
         $itemSumRebateNet = 0;
+        $additionalCosts = [];
 
         $orderItems = $order->orderItems;
 
         $accountRepo = pluginApp(AccountingLocationRepositoryContract::class);
         $vatService = pluginApp(VatService::class);
+        /** @var NumberFormatter $numberFormatter */
+        $numberFormatter = pluginApp(NumberFormatter::class);
         /**
          * @var EUCountryCodesServiceContract $euCountryCodesServiceContract
          */
@@ -89,14 +90,29 @@ class OrderTotalsService
                     $itemNameArray = explode(' ', rtrim($item->orderItemName));
                     $couponCode = end($itemNameArray);
                     break;
+                case OrderItemType::DEPOSIT;
+                    if (!empty($item->amounts)) {
+                        $price = $item->amounts[0]->priceGross;
+                        $currency = $item->amounts[0]->currency;
+                        $additionalCosts[] = [
+                            'id' => $item->id,
+                            'quantity' => $item->quantity,
+                            'name' => $item->orderItemName,
+                            'price' => $price,
+                            'currency' => $currency,
+                            'formattedTotalPrice'
+                            => $numberFormatter->formatMonetary($price * $item->quantity, $currency)
+                        ];
+                    }
+                    break;
                 default:
                     // noop
             }
 
             if ($firstAmount->discount > 0) {
                 if ($firstAmount->isPercentage) {
-                    $itemSumRebateGross += round($item->quantity * $firstAmount->priceOriginalGross * $firstAmount->discount / 100,2);
-                    $itemSumRebateNet += round($item->quantity * $firstAmount->priceOriginalNet * $firstAmount->discount / 100,2);
+                    $itemSumRebateGross += round($item->quantity * $firstAmount->priceOriginalGross * $firstAmount->discount / 100, 2);
+                    $itemSumRebateNet += round($item->quantity * $firstAmount->priceOriginalNet * $firstAmount->discount / 100, 2);
                 } else {
                     $itemSumRebateGross += $item->quantity * $firstAmount->discount;
                 }
@@ -140,10 +156,15 @@ class OrderTotalsService
             'totalGross',
             'totalNet',
             'currency',
-            'isNet'
+            'isNet',
+            'additionalCosts'
         );
     }
 
+    /**
+     * @param $amounts
+     * @return int|string
+     */
     private function getCustomerAmountId($amounts)
     {
         foreach ($amounts as $index => $amount) {
@@ -155,6 +176,11 @@ class OrderTotalsService
         return 0;
     }
 
+    /**
+     * Check if the order has only net amounts or only net amounts should be shown
+     * @param Order $order
+     * @return bool
+     */
     public function highlightNetPrices(Order $order): bool
     {
         $isOrderNet = $order->amounts[0]->isNet;

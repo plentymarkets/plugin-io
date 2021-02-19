@@ -11,6 +11,7 @@ use Plenty\Modules\Category\Models\Category;
 use Plenty\Modules\ShopBuilder\Helper\ShopBuilderRequest;
 use Plenty\Modules\Webshop\Contracts\ContactRepositoryContract;
 use Plenty\Modules\Webshop\Contracts\SessionStorageRepositoryContract;
+use Plenty\Plugin\Http\Response;
 use Plenty\Plugin\Log\Loggable;
 
 /**
@@ -57,7 +58,11 @@ class CheckoutController extends LayoutController
                 );
             } elseif (!count($basketItemRepository->all())) {
                 $this->getLogger(__CLASS__)->info("IO::Debug.CheckoutController_emptyBasket");
-                AuthGuard::redirect($shopUrls->home, []);
+                if ($sessionStorageRepository->getSessionValue(SessionStorageRepositoryContract::LATEST_ORDER_ID) > 0) {
+                    AuthGuard::redirect($shopUrls->confirmation, []);
+                } else {
+                    AuthGuard::redirect($shopUrls->home, []);
+                }
             }
         } elseif (is_null($category)) {
             /** @var CategoryController $categoryController */
@@ -65,19 +70,30 @@ class CheckoutController extends LayoutController
             return $categoryController->showCategory("checkout");
         }
 
+        /**
+         * @var Response $response
+         */
+        $response = pluginApp(Response::class);
+        $headers = [
+            "Cache-Control" => "no-cache, no-store, must-revalidate",
+            "Pragma" => "no-cache",
+            "Expires" => "0"
+        ];
 
-        return $this->renderTemplate(
+        $responseData = $this->renderTemplate(
             "tpl.checkout",
             [
                 'category' => $category
             ],
             false
         );
+
+        return $response->make($responseData, 200, $headers);
     }
 
     public function redirect()
     {
-        if(!is_null($categoryByUrl = $this->checkForExistingCategory())) {
+        if (!is_null($categoryByUrl = $this->checkForExistingCategory())) {
             return $categoryByUrl;
         }
         /** @var CategoryController $categoryController */

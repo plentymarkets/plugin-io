@@ -84,10 +84,11 @@ class CustomerAddressResource extends ApiResource
             throw $validationException;
         } catch (\Exception $exception) {
             if (in_array($exception->getCode(), [210, 211])) {
-                throw $exception;
+                $this->response->error($exception->getCode(), $exception->getMessage());
+            } else {
+                $this->response->error(0, $exception->getMessage());
             }
-            $this->response->error(0, $exception->getMessage());
-            return $this->response->create($exception, ResponseCode::BAD_REQUEST);
+            return $this->response->create($exception, ResponseCode::UNPROCESSABLE_ENTITY);
         }
 
         return $this->response->create($newAddress, ResponseCode::CREATED);

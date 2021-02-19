@@ -62,7 +62,7 @@ class VariationSearchFactory extends BaseSearchFactory
     }
 
     /**
-     * @param $isAdminPreview
+     * @param bool $isAdminPreview
      * @return $this
      *
      * @deprecated since 5.0.0 will be deleted in 6.0.0
@@ -490,8 +490,8 @@ class VariationSearchFactory extends BaseSearchFactory
     }
 
     /**
-     * @param $priceMin
-     * @param $priceMax
+     * @param float $priceMin
+     * @param float $priceMax
      * @return $this
      * @throws \ErrorException
      *
@@ -525,7 +525,7 @@ class VariationSearchFactory extends BaseSearchFactory
     }
 
     /**
-     * @param $tagId
+     * @param int $tagId
      * @return $this
      *
      * @deprecated since 5.0.0 will be deleted in 6.0.0
@@ -537,7 +537,7 @@ class VariationSearchFactory extends BaseSearchFactory
     }
 
     /**
-     * @param $tagIds
+     * @param int $tagIds
      * @return $this
      *
      * @deprecated since 5.0.0 will be deleted in 6.0.0

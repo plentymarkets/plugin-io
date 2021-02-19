@@ -45,6 +45,7 @@ class IORouteServiceProvider extends RouteServiceProvider
             $api->resource('io/customer/password_reset', 'CustomerPasswordResetResource');
             $api->resource('io/customer/mail', 'CustomerMailResource');
             $api->resource('io/customer/contact/mail', 'ContactMailResource');
+            $api->resource('io/customer/contact/mail/file', 'ContactMailFileResource');
             $api->get('io/customer/order/list', 'CustomerOrderResource@index');
             $api->resource('io/customer/newsletter', 'CustomerNewsletterResource');
             $api->get('io/variations/map', 'VariationAttributeMapResource@index');
@@ -426,10 +427,10 @@ class IORouteServiceProvider extends RouteServiceProvider
 
     /**
      * @param Router $router
-     * @param $route
-     * @param $shopUrl
+     * @param string $route
+     * @param string $shopUrl
      * @param string $legacyController
-     * @param $redirectController
+     * @param string $redirectController
      * @throws \Plenty\Plugin\Routing\Exceptions\RouteReservedException
      */
 	private function registerRedirectedRoute(

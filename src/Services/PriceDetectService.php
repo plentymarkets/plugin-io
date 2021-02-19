@@ -13,9 +13,12 @@ use Plenty\Modules\Webshop\Contracts\ContactRepositoryContract;
 use Plenty\Modules\Webshop\Repositories\ContactRepository;
 use Plenty\Plugin\Application;
 
-
 /**
- * Class PriceDetectService
+ * Service Class PriceDetectService
+ *
+ * This service class contains functions related to getting the correct sales prices for customers.
+ * All public functions are available in the Twig template renderer.
+ *
  * @package IO\Services
  * @deprecated since 5.0.0 will be removed in 6.0.0
  * @see \Plenty\Modules\Webshop\Contracts\PriceDetectRepositoryContract
@@ -24,7 +27,6 @@ use Plenty\Plugin\Application;
 class PriceDetectService
 {
     use MemoryCache;
-
 
     private $classId = null;
     private $singleAccess = null;
@@ -106,21 +108,22 @@ class PriceDetectService
             $this->singleAccess = $contact->singleAccess;
         }
 
-        $this->classId           = $this->contactRepository->getContactClassId();
-        $this->currency          = $this->checkoutRepository->getCurrency();
+        $this->classId = $this->contactRepository->getContactClassId();
+        $this->currency = $this->checkoutRepository->getCurrency();
         $this->shippingCountryId = $this->checkoutRepository->getShippingCountryId();
-        $this->plentyId          = $this->app->getPlentyId();
+        $this->plentyId = $this->app->getPlentyId();
 
         $referrerId = (int)$this->basketService->getBasket()->referrerId;
-        $this->referrerId        = ((int)$referrerId > 0 ? $referrerId : 1);
+        $this->referrerId = ((int)$referrerId > 0 ? $referrerId : 1);
 
-        if(!$this->vatInitService->isInitialized())
-        {
+        if (!$this->vatInitService->isInitialized()) {
             $vat = $this->vatService->getVat();
         }
     }
 
     /**
+     * Get valid price ids for current contact
+     *
      * @return array
      * @deprecated since 5.0.0 will be removed in 6.0.0
      * @see \Plenty\Modules\Webshop\Contracts\PriceDetectRepositoryContract::getPriceIdsForCustomer()
@@ -136,22 +139,21 @@ class PriceDetectService
         $detectSalesPriceService = $this->detectSalesPriceService;
 
         $priceIds = $this->fromMemoryCache(
-	        "detectPriceIds.$accountType.$shippingCountryId.$currency.$customerClassId.$referrerId.$plentyId",
-            function() use ($accountType, $shippingCountryId, $currency, $customerClassId, $referrerId, $plentyId, $detectSalesPriceService)
-            {
-               $detectSalesPriceService->setAccountId(0)
-                ->setAccountType($accountType)
-                ->setCountryOfDelivery($shippingCountryId)
-                ->setCurrency($currency)
-                ->setCustomerClass($customerClassId)
-                ->setOrderReferrer($referrerId)
-                ->setPlentyId($plentyId)
-                ->setQuantity(-1)
-                ->setType(DetectSalesPriceService::PRICE_TYPE_DEFAULT);
-               return $detectSalesPriceService->detect();
+            "detectPriceIds.$accountType.$shippingCountryId.$currency.$customerClassId.$referrerId.$plentyId",
+            function () use ($accountType, $shippingCountryId, $currency, $customerClassId, $referrerId, $plentyId, $detectSalesPriceService) {
+                $detectSalesPriceService->setAccountId(0)
+                    ->setAccountType($accountType)
+                    ->setCountryOfDelivery($shippingCountryId)
+                    ->setCurrency($currency)
+                    ->setCustomerClass($customerClassId)
+                    ->setOrderReferrer($referrerId)
+                    ->setPlentyId($plentyId)
+                    ->setQuantity(-1)
+                    ->setType(DetectSalesPriceService::PRICE_TYPE_DEFAULT);
+                return $detectSalesPriceService->detect();
             }
         );
 
-	    return $priceIds;
+        return $priceIds;
     }
 }

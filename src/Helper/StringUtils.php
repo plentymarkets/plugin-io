@@ -10,7 +10,7 @@ namespace IO\Helper;
 class StringUtils
 {
     /**
-     * @param $n
+     * @param string $n
      * @return false|string|string[]|null
      * @deprecated since 5.0.0 will be removed in 6.0.0
      */

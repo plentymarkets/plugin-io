@@ -2,6 +2,7 @@
 
 namespace IO\Services;
 
+use Illuminate\Database\Eloquent\Collection;
 use IO\Builder\Order\AddressType;
 use IO\Builder\Order\OrderItemType;
 use IO\Builder\Order\OrderType;
@@ -23,9 +24,9 @@ use Plenty\Modules\Order\Date\Models\OrderDate;
 use Plenty\Modules\Order\Date\Models\OrderDateType;
 use Plenty\Modules\Order\Models\OrderReference;
 use Plenty\Modules\Order\Property\Contracts\OrderPropertyRepositoryContract;
+use Plenty\Modules\Order\Property\Models\OrderProperty;
 use Plenty\Modules\Order\Property\Models\OrderPropertyType;
 use Plenty\Modules\Order\Status\Contracts\OrderStatusRepositoryContract;
-use Plenty\Modules\Order\Status\Models\OrderStatus;
 use Plenty\Modules\Payment\Contracts\PaymentRepositoryContract;
 use Plenty\Modules\Payment\Method\Contracts\PaymentMethodRepositoryContract;
 use Plenty\Modules\Webshop\Contracts\ContactRepositoryContract;
@@ -37,7 +38,11 @@ use Plenty\Modules\Order\Models\Order;
 use Plenty\Modules\Webshop\Order\Contracts\OrderRepositoryContract as WebshopOrderRepositoryContract;
 
 /**
- * Class OrderService
+ * Service Class OrderService
+ *
+ * This service class contains function related to orders.
+ * All public functions are available in the Twig template renderer.
+ *
  * @package IO\Services
  */
 class OrderService
@@ -82,6 +87,7 @@ class OrderService
 
     /** @var GiftCardRepositoryContract $giftCardRepository */
     private $giftCardRepository;
+
     /**
      * The OrderItem types that will be wrapped. All other OrderItems will be stripped from the order.
      */
@@ -126,7 +132,8 @@ class OrderService
         CustomerService $customerService,
         ContactRepositoryContract $contactRepository,
         GiftCardRepositoryContract $giftCardRepository
-    ) {
+    )
+    {
         $this->orderRepository = $orderRepository;
         $this->basketService = $basketService;
         $this->sessionStorageRepository = $sessionStorageRepository;
@@ -155,8 +162,9 @@ class OrderService
     /**
      * Subscribe the customer to the newsletter, if stored in the session
      *
-     * @param $email
-     * @param $billingAddressId
+     * @param string $email
+     * @param int $billingAddressId
+     * @throws \Throwable
      */
     public function subscribeToNewsletter($email, $billingAddressId)
     {
@@ -204,7 +212,7 @@ class OrderService
      * Execute the payment for a given order.
      * @param int $orderId The order id to execute payment for
      * @param int $paymentId The MoP-ID to execute
-     * @return array            An array containing a type ("succes"|"error") and a value.
+     * @return array An array containing a type ("success"|"error") and a value.
      */
     public function executePayment(int $orderId, int $paymentId): array
     {
@@ -248,10 +256,10 @@ class OrderService
     }
 
     /**
-     * Find an order by ID
-     * @param int $orderId
-     * @param bool $wrap
-     * @return LocalizedOrder|mixed|Order
+     * Find an order by id
+     * @param int $orderId An order id to find order by
+     * @param bool $wrap Optional: Wrap order into an /IO/Models/LocalizedOrder (Default: true)
+     * @return LocalizedOrder|Order
      */
     public function findOrderById(int $orderId, $wrap = true)
     {
@@ -264,6 +272,12 @@ class OrderService
         return $order;
     }
 
+    /**
+     * Find an order by id and authorize it via accesskey
+     * @param int $orderId An order id find order by
+     * @param string $orderAccessKey An order access key to authorize search for order
+     * @return LocalizedOrder|null
+     */
     public function findOrderByAccessKey($orderId, $orderAccessKey)
     {
         /**
@@ -299,11 +313,11 @@ class OrderService
 
     /**
      * Get a list of orders for a contact
-     * @param int $contactId
-     * @param int $page
-     * @param int $items
-     * @param array $filters
-     * @param bool $wrapped
+     * @param int $contactId An contacts id
+     * @param int $page Optional: Page number for pagination (Default: 1)
+     * @param int $items Optional: How many items per page (Default: 50)
+     * @param array $filters Optional: Additional filters for search
+     * @param bool $wrapped Optional: Wrap orders /IO/Models/LocalizedOrder instances (Default: true)
      * @return PaginatedResult
      */
     public function getOrdersForContact(
@@ -312,7 +326,8 @@ class OrderService
         int $items = 50,
         array $filters = [],
         $wrapped = true
-    ) {
+    )
+    {
         if (!isset($filters['orderType']) && !isset($filters['orderTypes'])) {
             $filters['orderTypes'] = self::VISIBLE_ORDER_TYPES;
         }
@@ -332,6 +347,12 @@ class OrderService
         return $orders;
     }
 
+    /**
+     * Get a list of orders for a contact in a compact and reduced format
+     * @param int $page Optional: Page for pagination (Default: 1)
+     * @param int $items Optional: Number of items per page (Default: 50)
+     * @return PaginatedResult|null
+     */
     public function getOrdersCompact(int $page = 1, int $items = 50)
     {
         $orderResult = null;
@@ -404,7 +425,7 @@ class OrderService
 
     /**
      * Get the last order created by the current contact
-     * @param int $contactId
+     * @param int $contactId A contacts id to find orders for
      * @return LocalizedOrder|null
      */
     public function getLatestOrderForContact(int $contactId)
@@ -434,6 +455,12 @@ class OrderService
         return null;
     }
 
+    /**
+     * Find order properties of a specific type for a specific order
+     * @param int $orderId An order id to find order properties for
+     * @param int $typeId The type of order properties to find
+     * @return Collection|OrderProperty[]
+     */
     public function getOrderPropertyByOrderId($orderId, $typeId)
     {
         /**
@@ -443,11 +470,24 @@ class OrderService
         return $orderPropertyRepo->findByOrderId($orderId, $typeId);
     }
 
+    /**
+     * Check if the shop has activated return orders
+     * @return bool
+     */
     public function isReturnActive()
     {
         return RouteConfig::isActive(RouteConfig::ORDER_RETURN);
     }
 
+    /**
+     * Create a return order for a specific order
+     * @param int $orderId The order id to create a return order for
+     * @param string $orderAccessKey Optional: An order access key is needed for guests
+     * @param array $items Optional: Array of items to return
+     * @param string $returnNote Optional: A optional reason for returning items
+     * @return mixed|Order|null
+     * @throws \Throwable
+     */
     public function createOrderReturn($orderId, $orderAccessKey = '', $items = [], $returnNote = '')
     {
         $localizedOrder = $this->getReturnOrder($orderId, $orderAccessKey);
@@ -459,7 +499,7 @@ class OrderService
                 $returnQuantity = max((int)$items[$variationId], $orderItem->quantity);
 
                 $minQuantityToReturn = $this->giftCardRepository->getReturnQuantity($orderItem['id']);
-                if ($minQuantityToReturn > 0 && $returnQuantity !== $minQuantityToReturn)  {
+                if ($minQuantityToReturn > 0 && $returnQuantity !== $minQuantityToReturn) {
                     throw new \Exception("GiftCard is not returnable with this quantity", 502);
                 }
 
@@ -471,7 +511,7 @@ class OrderService
             }
 
             $returnOrder = [];
-            $returnOrder['quantities'] = array_map(function($returnOrderItem) {
+            $returnOrder['quantities'] = array_map(function ($returnOrderItem) {
                 return [
                     'orderItemId' => $returnOrderItem['id'],
                     'quantity' => $returnOrderItem['quantity']
@@ -505,9 +545,11 @@ class OrderService
     }
 
     /**
-     * @param $orderId
-     * @param string $orderAccessKey
+     * Find a return order by order id
+     * @param int $orderId An order id to find return order for
+     * @param string $orderAccessKey Optional: An order access key is needed to authorize guests
      * @return LocalizedOrder
+     * @throws \Throwable
      */
     public function getReturnOrder($orderId, $orderAccessKey = '')
     {
@@ -543,7 +585,8 @@ class OrderService
     }
 
     /**
-     * @param Order $order
+     * Get all items of an order that can be returned
+     * @param Order $order An order
      * @return array
      * @throws \Throwable
      */
@@ -591,9 +634,8 @@ class OrderService
 
     /**
      * List all payment methods available for switch in MyAccount
-     *
-     * @param int $currentPaymentMethodId
-     * @param null $orderId
+     * @param int $currentPaymentMethodId Optional: The id of the current payment method
+     * @param int|null $orderId Optional: An order id to find valid payment methods to switch to
      * @return \Illuminate\Support\Collection
      */
     public function getPaymentMethodListForSwitch($currentPaymentMethodId = 0, $orderId = null)
@@ -606,9 +648,11 @@ class OrderService
     }
 
     /**
-     * @param $paymentMethodId
-     * @param int $orderId
+     * Check if it is possible to switch to another payment method from a specific one
+     * @param int $paymentMethodId A payment method id to check switching from
+     * @param int|null $orderId Optional: An order id used for additional checks
      * @return bool
+     * @throws \Throwable
      */
     public function allowPaymentMethodSwitchFrom($paymentMethodId, $orderId = null)
     {
@@ -645,9 +689,11 @@ class OrderService
 
 
     /**
-     * @param $orderId
-     * @param $paymentMethodId
+     * Switch the payment method of an order to a new payment method
+     * @param int $orderId An order id to switch payment method for
+     * @param int $paymentMethodId A payment method id to switch to
      * @return LocalizedOrder|null
+     * @throws \Throwable
      */
     public function switchPaymentMethodForOrder($orderId, $paymentMethodId)
     {
@@ -741,14 +787,17 @@ class OrderService
 
         $this->sessionStorageRepository->setSessionValue(SessionStorageRepositoryContract::ORDER_CONTACT_WISH, null);
         $this->sessionStorageRepository->setSessionValue(SessionStorageRepositoryContract::ORDER_CUSTOMER_SIGN, null);
-        if ($this->contactRepository->getContactId() <= 0) {
-            $this->sessionStorageRepository->setSessionValue(
-                SessionStorageRepositoryContract::LATEST_ORDER_ID,
-                $order->id
-            );
-        }
+
+        $this->sessionStorageRepository->setSessionValue(
+            SessionStorageRepositoryContract::LATEST_ORDER_ID,
+            $order->id
+        );
     }
 
+    /**
+     * @param \Throwable $throwable
+     * @param null $message
+     */
     private function handleThrowable(\Throwable $throwable, $message = null)
     {
         $this->getLogger(__CLASS__)->error(
@@ -825,6 +874,10 @@ class OrderService
         return $paymentProperty;
     }
 
+    /**
+     * @return float|mixed
+     * @throws \Throwable
+     */
     private function getReturnOrderStatus()
     {
         $returnStatus = Utils::getTemplateConfig('my_account.order_return_initial_status', 9.0);

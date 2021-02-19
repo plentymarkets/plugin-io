@@ -10,6 +10,14 @@ use Plenty\Modules\Webshop\Contracts\CheckoutRepositoryContract;
 use Plenty\Modules\Webshop\Contracts\ContactRepositoryContract;
 use Plenty\Plugin\Application;
 
+/**
+ * Service Class SalesPriceService
+ *
+ * This service class contains functions related to sales prices.
+ * All public functions are available in the Twig template renderer.
+ *
+ * @package IO\Services
+ */
 class SalesPriceService
 {
     private $app;
@@ -43,17 +51,18 @@ class SalesPriceService
         BasketService $basketService
     )
     {
-        $this->app                  = $app;
+        $this->app = $app;
         $this->salesPriceSearchRepo = $salesPriceSearchRepo;
-        $this->contactRepository    = $contactRepository;
-        $this->checkoutRepository   = $checkoutRepository;
-        $this->basketService        = $basketService;
+        $this->contactRepository = $contactRepository;
+        $this->checkoutRepository = $checkoutRepository;
+        $this->basketService = $basketService;
 
         $this->init();
     }
 
     /**
-     * @param null $classId
+     * Set the contact class id used for calculations
+     * @param int $classId
      * @return $this
      */
     public function setClassId($classId)
@@ -63,7 +72,8 @@ class SalesPriceService
     }
 
     /**
-     * @param null $currency
+     * Set the currency used for calculations
+     * @param string $currency
      * @return $this
      */
     public function setCurrency($currency)
@@ -73,7 +83,8 @@ class SalesPriceService
     }
 
     /**
-     * @param null $shippingCountryId
+     * Set the id for the shipping country used for calculations
+     * @param int $shippingCountryId
      * @return $this
      */
     public function setShippingCountryId($shippingCountryId)
@@ -87,20 +98,21 @@ class SalesPriceService
         $contact = $this->contactRepository->getContact();
 
         if ($contact instanceof Contact) {
-            $this->classId      = $contact->classId;
+            $this->classId = $contact->classId;
             $this->singleAccess = $contact->singleAccess;
         }
 
-        $this->currency          = $this->checkoutRepository->getCurrency();
+        $this->currency = $this->checkoutRepository->getCurrency();
         $this->shippingCountryId = $this->checkoutRepository->getShippingCountryId();
-        $this->plentyId          = $this->app->getPlentyId();
-        $this->referrerId        = $this->basketService->getBasket()->referrerId;
+        $this->plentyId = $this->app->getPlentyId();
+        $this->referrerId = $this->basketService->getBasket()->referrerId;
     }
 
     /**
-     * @param int $variationId
-     * @param string $type
-     * @param int $quantity
+     * Get a sales price for a specific variation
+     * @param int $variationId A variation id to get sales price for
+     * @param string $type Optional: What type of sales price to get (Default: 'default')
+     * @param int $quantity Optional: Quantity of the variation. Used for graduated prices.
      * @return SalesPriceSearchResponse
      */
     public function getSalesPriceForVariation(int $variationId, $type = 'default', int $quantity = 1)
@@ -109,7 +121,7 @@ class SalesPriceService
          * @var SalesPriceSearchRequest $salesPriceSearchRequest
          */
         $salesPriceSearchRequest = $this->getSearchRequest($variationId, $type, $quantity);
-        
+
         /**
          * @var SalesPriceSearchResponse $salesPrice
          */
@@ -118,11 +130,11 @@ class SalesPriceService
 
         return $this->applyCurrencyConversion($salesPrice);
     }
-    
+
     /**
-     * @param int $variationId
-     * @param string $type
-     * @param int $quantity
+     * Get all sales prices of a single type for a specific variation
+     * @param int $variationId The variation to find sales prices for
+     * @param string $type The type of sales prices to find
      * @return array
      */
     public function getAllSalesPricesForVariation(int $variationId, $type = 'default')
@@ -131,55 +143,59 @@ class SalesPriceService
          * @var SalesPriceSearchRequest $salesPriceSearchRequest
          */
         $salesPriceSearchRequest = $this->getSearchRequest($variationId, $type, -1);
-    
+
         /**
          * @var array $salesPrices
          */
         $salesPrices = $this->salesPriceSearchRepo->searchAll($salesPriceSearchRequest);
 
         $convertedSalesPrices = [];
-        foreach( $salesPrices as $salesPrice )
-        {
-            $convertedSalesPrices[] = $this->applyCurrencyConversion( $salesPrice );
+        foreach ($salesPrices as $salesPrice) {
+            $convertedSalesPrices[] = $this->applyCurrencyConversion($salesPrice);
         }
 
         return $convertedSalesPrices;
     }
 
-    public function applyCurrencyConversion( SalesPriceSearchResponse $salesPrice ): SalesPriceSearchResponse
+    /**
+     * Apply currency conversions to the prices of a sales price
+     * @param SalesPriceSearchResponse $salesPrice A sales price
+     * @return SalesPriceSearchResponse
+     */
+    public function applyCurrencyConversion(SalesPriceSearchResponse $salesPrice): SalesPriceSearchResponse
     {
-        $salesPrice->price                      = $salesPrice->price * $salesPrice->conversionFactor;
-        $salesPrice->priceNet                   = $salesPrice->priceNet * $salesPrice->conversionFactor;
+        $salesPrice->price = $salesPrice->price * $salesPrice->conversionFactor;
+        $salesPrice->priceNet = $salesPrice->priceNet * $salesPrice->conversionFactor;
 //        $salesPrice->basePrice                  = $salesPrice->basePrice * $salesPrice->conversionFactor;
 //        $salesPrice->basePriceNet               = $salesPrice->basePriceNet * $salesPrice->conversionFactor;
 //        $salesPrice->unitPrice                  = $salesPrice->unitPrice * $salesPrice->conversionFactor;
 //        $salesPrice->unitPriceNet               = $salesPrice->unitPriceNet * $salesPrice->conversionFactor;
-        $salesPrice->customerClassDiscount      = $salesPrice->customerClassDiscount * $salesPrice->conversionFactor;
-        $salesPrice->customerClassDiscountNet   = $salesPrice->customerClassDiscountNet * $salesPrice->conversionFactor;
-        $salesPrice->categoryDiscount           = $salesPrice->categoryDiscount * $salesPrice->conversionFactor;
-        $salesPrice->categoryDiscountNet        = $salesPrice->categoryDiscountNet * $salesPrice->conversionFactor;
+        $salesPrice->customerClassDiscount = $salesPrice->customerClassDiscount * $salesPrice->conversionFactor;
+        $salesPrice->customerClassDiscountNet = $salesPrice->customerClassDiscountNet * $salesPrice->conversionFactor;
+        $salesPrice->categoryDiscount = $salesPrice->categoryDiscount * $salesPrice->conversionFactor;
+        $salesPrice->categoryDiscountNet = $salesPrice->categoryDiscountNet * $salesPrice->conversionFactor;
 
         return $salesPrice;
     }
 
-    private  function getSearchRequest(int $variationId, $type, int $quantity)
+    private function getSearchRequest(int $variationId, $type, int $quantity)
     {
         /**
          * @var SalesPriceSearchRequest $salesPriceSearchRequest
          */
         $salesPriceSearchRequest = pluginApp(SalesPriceSearchRequest::class);
-    
-        $salesPriceSearchRequest->variationId     = $variationId;
-        $salesPriceSearchRequest->accountId       = 0;
-        $salesPriceSearchRequest->accountType     = $this->singleAccess;
-        $salesPriceSearchRequest->countryId       = $this->shippingCountryId;
-        $salesPriceSearchRequest->currency        = $this->currency;
+
+        $salesPriceSearchRequest->variationId = $variationId;
+        $salesPriceSearchRequest->accountId = 0;
+        $salesPriceSearchRequest->accountType = $this->singleAccess;
+        $salesPriceSearchRequest->countryId = $this->shippingCountryId;
+        $salesPriceSearchRequest->currency = $this->currency;
         $salesPriceSearchRequest->customerClassId = $this->classId;
-        $salesPriceSearchRequest->plentyId        = $this->plentyId;
-        $salesPriceSearchRequest->quantity        = $quantity;
-        $salesPriceSearchRequest->referrerId      = $this->referrerId;
-        $salesPriceSearchRequest->type            = $type;
-        
+        $salesPriceSearchRequest->plentyId = $this->plentyId;
+        $salesPriceSearchRequest->quantity = $quantity;
+        $salesPriceSearchRequest->referrerId = $this->referrerId;
+        $salesPriceSearchRequest->type = $type;
+
         return $salesPriceSearchRequest;
     }
 }

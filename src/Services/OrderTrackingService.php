@@ -9,7 +9,11 @@ use Plenty\Modules\Order\Shipping\ParcelService\Models\ParcelService;
 use Plenty\Plugin\Log\Loggable;
 
 /**
- * Class OrderTrackingService
+ * Service Class OrderTrackingService
+ *
+ * This service class contains functionality related to order tracking.
+ * All public functions are available in the Twig template renderer.
+ *
  * @package IO\Services
  */
 class OrderTrackingService
@@ -34,54 +38,49 @@ class OrderTrackingService
     }
 
     /**
-     * @param Order $order
-     * @param string $lang
+     * Get the tracking URL for a specific order
+     * @param Order $order The order to get the tracking URL for
+     * @param string $lang The desired language of the tracking URL (ISO-639-1)
      * @return string
      */
     public function getTrackingURL(Order $order, $lang)
     {
         $trackingURL = '';
 
-        try
-        {
-            $shippingProfile = $this->parcelServicePresetRepo->getPresetById( $order->shippingProfileId );
+        try {
+            $shippingProfile = $this->parcelServicePresetRepo->getPresetById($order->shippingProfileId);
             $parcelService = $shippingProfile->parcelService;
-            if($parcelService instanceof ParcelService)
-            {
+            if ($parcelService instanceof ParcelService) {
                 /** @var OrderRepositoryContract $orderRepo */
                 $orderRepo = pluginApp(OrderRepositoryContract::class);
                 $packageNumber = implode(',', $orderRepo->getPackageNumbers($order->id));
 
-                if(strlen($packageNumber))
-                {
+                if (strlen($packageNumber)) {
                     $trackingURL = $parcelService->trackingUrl;
 
 
                     $zip = $order->deliveryAddress->postalCode;
 
-                    if(strlen($trackingURL) && strlen($packageNumber))
-                    {
+                    if (strlen($trackingURL) && strlen($packageNumber)) {
                         $trackingURL = str_replace('[PaketNr]',
-                                                   $packageNumber,
-                                                   str_replace('[PLZ]',
-                                                               $zip,
-                                                               str_replace('[Lang]',
-                                                                           $lang,
-                                                                           $trackingURL)));
+                            $packageNumber,
+                            str_replace('[PLZ]',
+                                $zip,
+                                str_replace('[Lang]',
+                                    $lang,
+                                    $trackingURL)));
 
                         $trackingURL = str_replace('$PaketNr',
-                                                   $packageNumber,
-                                                   str_replace('$PLZ',
-                                                               $zip,
-                                                               str_replace('$Lang',
-                                                                           $lang,
-                                                                           $trackingURL)));
+                            $packageNumber,
+                            str_replace('$PLZ',
+                                $zip,
+                                str_replace('$Lang',
+                                    $lang,
+                                    $trackingURL)));
                     }
                 }
             }
-        }
-        catch (\Exception $e)
-        {
+        } catch (\Exception $e) {
             $this->getLogger(__CLASS__)->error("IO::Debug.OrderTrackingService_getTrackingURL", [
                 'code' => $e->getCode(),
                 'message' => $e->getMessage()
