@@ -37,6 +37,11 @@ class ShopUrls
     ];
 
     /**
+     * @var array Data array with values for each language if already initialized.
+     */
+    private static $shopUrls = [];
+
+    /**
      * @var bool Define if a trailing slash should be appended to URLS or not.
      *           Consider this option to avoid unnecessary 301 redirects.
      */
@@ -184,7 +189,12 @@ class ShopUrls
 
     private function init($lang)
     {
-        $shopUrls = Utils::getCacheKey('shopUrls_' . $lang, null);
+        if (isset(self::$shopUrls[$lang])) {
+            $shopUrls = self::$shopUrls[$lang];
+        } else {
+            $shopUrls = Utils::getCacheKey('shopUrls_' . $lang, null);
+            self::$shopUrls[$lang] = $shopUrls;
+        }
 
         if (!is_null($shopUrls)) {
             $this->initByCache($shopUrls);
