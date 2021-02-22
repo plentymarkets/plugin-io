@@ -1,5 +1,19 @@
 # Release Notes for IO
 
+## v5.0.23 (2021-02-22) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.22...5.0.23" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
+
+### Added 
+
+- The item list widget now contains the option to create a list that contains items from the entire range of products.
+
+### Changed
+
+- The sorting of countries of delivery is now rendered server-side.
+
+### Fixed 
+
+- Login pages that were not created with the ShopBuilder did not have a canonical tag. This behaviour has been fixed.
+
 ## v5.0.22 (2021-02-11) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.21...5.0.22" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
 
 ### Fixed
