@@ -442,10 +442,13 @@ class OrderService
                     }
                 }
             }
-        } elseif ($latestOrderId = $this->sessionStorageRepository->getSessionValue(SessionStorageRepositoryContract::LATEST_ORDER_ID > 0)) {
-            $order = $this->orderRepository->findOrderById(
-                $latestOrderId
-            );
+        } else {
+            $latestOrderId = $this->sessionStorageRepository->getSessionValue(SessionStorageRepositoryContract::LATEST_ORDER_ID);
+            if ($latestOrderId > 0) {
+                $order = $this->orderRepository->findOrderById(
+                    $latestOrderId
+                );
+            }
         }
 
         if (!is_null($order)) {
