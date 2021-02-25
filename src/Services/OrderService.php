@@ -442,9 +442,9 @@ class OrderService
                     }
                 }
             }
-        } else {
+        } elseif ($latestOrderId = $this->sessionStorageRepository->getSessionValue(SessionStorageRepositoryContract::LATEST_ORDER_ID > 0)) {
             $order = $this->orderRepository->findOrderById(
-                $this->sessionStorageRepository->getSessionValue(SessionStorageRepositoryContract::LATEST_ORDER_ID)
+                $latestOrderId
             );
         }
 
