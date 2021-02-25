@@ -52,6 +52,7 @@ class LocalizedOrder extends ModelWrapper
         OrderItemType::TYPE_DEPOSIT,
         OrderItemType::TYPE_ITEM_SET,
         OrderItemType::TYPE_SET_COMPONENT,
+        OrderItemType::TYPE_ORDER_PROPERTY
     ];
     /**
      * @var Order
