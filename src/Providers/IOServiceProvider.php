@@ -243,7 +243,7 @@ class IOServiceProvider extends ServiceProvider
                 try {
                      /** @var BasketService $basketService */
                     $basketService = pluginApp(BasketService::class);
-                    $basketService->resetBasket();
+                    $basketService->deleteBasket();
                 } catch (\Exception $exception) { } // Nothing to do}
 
                 /** @var CustomerService $customerService */
