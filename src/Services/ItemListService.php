@@ -44,7 +44,7 @@ class ItemListService
      * @param int $maxItems Optional: Maximum number of items (Default: 0)
      * @param string|null $crossSellingRelationType Optional: Type of cross selling relation
      * @param bool $withCategories Optional: If true, load category data (Default: false)
-     * @param array $variationIds VariationIds to return in item list.
+     * @param array $variationIds VariationIds to return in item list. Only relevant for type "last_seen"
      * @return array|null
      * @throws \Exception
      */
