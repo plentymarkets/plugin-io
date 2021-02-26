@@ -4,13 +4,20 @@ namespace IO\Services;
 
 use IO\Services\Basket\Factories\BasketResultFactory;
 use IO\Services\ItemSearch\Factories\Faker\FacetFaker;
-use IO\Services\ItemSearch\Factories\VariationSearchResultFactory;
-use Plenty\Modules\Webshop\ItemSearch\Helpers\ResultFieldTemplate;
 
+/**
+ * Service Class FakerService
+ *
+ * This service class contains functions related to faking test data for the shop builder.
+ * All public functions are available in the Twig template renderer.
+ *
+ * @package IO\Services
+ */
 class FakerService
 {
     /**
      * Get a faked basket for shopbuilder basket templates
+     * @return array
      */
     public function getBasket()
     {
@@ -19,6 +26,10 @@ class FakerService
         return $basketResultFactory->fillBasketResult();
     }
 
+    /**
+     * Get a faked facet result for shopbuilder category templates
+     * @return array
+     */
     public function getFacets()
     {
         /** @var FacetFaker $facetFaker */
@@ -30,6 +41,11 @@ class FakerService
         ];
     }
 
+    /**
+     * Get a faked selected facets array for shopbuilder category templates
+     * @param array $facets Available facets
+     * @return array
+     */
     public function getSelectedFacetIds($facets)
     {
         $selectedFacetIds = [];

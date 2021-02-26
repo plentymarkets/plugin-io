@@ -29,8 +29,8 @@ class OrderByKeyFilter extends AbstractFilter
     }
 
     /**
-     * @param $array
-     * @param $sortKey
+     * @param array $array
+     * @param string $sortKey
      * @return array
      */
     public function getItemsOrderedByKey ($array, $sortKey):array

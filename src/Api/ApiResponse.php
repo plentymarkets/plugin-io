@@ -315,7 +315,7 @@ class ApiResponse
     }
 
     /**
-     * @param $data
+     * @param array $data
      * @param int $code
      * @param array $headers
      * @return Response

@@ -1,5 +1,83 @@
 # Release Notes für IO
 
+## v5.0.23 (2021-02-22) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.22...5.0.23" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
+
+### Hinzugefügt
+
+- Das Artikellisten-Widget enthält nun die Option, eine Liste anzulegen, die Artikel des kompletten Sortiments enthält.
+
+### Geändert
+
+- Die Sortierung der Lieferländer wird nun serverseitig gerendert.
+
+### Behoben
+
+- Wenn eine Login-Seite nicht im ShopBuilder erstellt wurde, wurde sie ohne Canonical-Tag ausgeliefert. Dieses Verhalten wurde behoben.
+
+## v5.0.22 (2021-02-11) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.21...5.0.22" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
+
+### Behoben
+
+- Unter bestimmten Umständen wurde auf der Bestellbestätigung der falsche Auftragsstatus angezeigt. Dieses Verhalten wurde behoben.
+
+## v5.0.21 (2021-02-09) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.20...5.0.21" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
+
+### TODO
+
+- Falls du die Funktion `getVariationList($itemId, $withPrimary)` aus dem `ItemService` in einem Theme verwendest, solltest du überprüfen, ob der Parameter `$withPrimary` wie gewünscht interpretiert wird.
+
+### Hinzugefügt
+
+- Das Widget E-Mail-Anhang wurde zum ShopBuilder hinzugefügt. Es wird damit ermöglicht, Dateien an E-Mails anzuhängen, die über das Kontaktformular versendet werden.
+
+### Behoben
+
+- Im ShopBuilder kam es beim Öffnen von Artikelansichten in Kategorien ohne Artikel zu Fehlern. Dieses Verhalten wurde behoben.
+- Die einzelnen Eingabefelder bestehender Adressen konnten nicht leer gespeichert werden. Dieses Verhalten wurde behoben.
+- Die Funktion `getVariationList($itemId, $withPrimary)` aus dem `ItemService` hat den zweiten Paramater falsch interpretiert. Dadurch lieferte `$withPrimary == true` fälschlicherweise nur Untervarianten und `$withPrimary == false` auch die Hauptvariante. Dies wurde behoben.
+
+## v5.0.20 (2021-01-19) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.19...5.0.20" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
+
+### Behoben
+
+- Bei der Anzeige des Hinweistextes für Ausfuhrlieferungen kam es seit dem 01.01.2021 zu Problemen. Dieses Verhalten wurde behoben.
+- In der Retourenhistorie wurden Versandkosten als Artikel aufgelistet. Dieses Verhalten wurde behoben.
+
+## v5.0.19 (2021-01-05) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.18...5.0.19" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
+
+### Geändert
+
+- Um die Performance des Webshops zu verbessern, wurde die Caching-Zeit der Shop-URLs, die mit Version 5.0.7 eingebaut wurde, von 5 Minuten auf 10 Minuten erhöht.
+
+## v5.0.18 (2021-01-04) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.17...5.0.18" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
+
+### Hinzugefügt 
+
+- Im Schritt **Suche** des Assistenten kann nun eingestellt werden, ob die Webshop-Suche einen **Und**- oder einen **Oder**-Suchoperator verwendet.
+
+### Geändert
+
+- Die Zusatzkosten von Merkmalen sind nun in den Auftragssummen enthalten.
+
+## v5.0.17 (2020-12-21) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.16...5.0.17" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
+
+### Geändert
+
+- Die Code-Dokumentation wurde an einigen Stellen aktualisiert.
+
+## v5.0.16 (2020-12-01) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.15...5.0.16" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
+
+### Hinzugefügt
+
+- Das Newsletter-Widget verwendet jetzt Google reCAPTCHA.
+
+### Behoben
+
+- Auf der Bestellbestätigung konnte es zu Rundungsfehlern kommen. Dieses Verhalten wurde behoben.
+- Bei einem Standard-Lieferland mit Ausfuhrlieferungen wurden beim ersten Aufruf Bruttopreise angezeigt. Dieses Verhalten wurde behoben.
+- Unter bestimmten Umständen konnte es zu Problemen mit URLs in verschiedenen Sprache kommen. Dieses Verhalten wurde behoben.
+- Wenn die Ceres Währungseinstellungen noch nie gespeichert wurden, konnte man über einen Währungsparameter eine nicht valide Währung im Webshop setzen. Dieses Verhalten wurde behoben.
+
 ## v5.0.15 (2020-11-09) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.14...5.0.15" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
 
 ### Behoben

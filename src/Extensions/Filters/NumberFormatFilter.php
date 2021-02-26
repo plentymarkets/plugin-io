@@ -50,7 +50,7 @@ class NumberFormatFilter extends AbstractFilter
 
     /**
      * Format incorrect JSON ENCODED dateTimeFormat
-     * @param $value
+     * @param string $value
      * @return string
      */
     public function formatDateTime($value):string
@@ -86,8 +86,8 @@ class NumberFormatFilter extends AbstractFilter
 
     /**
      * Format the given value to currency
-     * @param $value
-     * @param $currencyISO
+     * @param float $value
+     * @param string $currencyISO
      * @return string
      */
     public function formatMonetary($value, $currencyISO):string

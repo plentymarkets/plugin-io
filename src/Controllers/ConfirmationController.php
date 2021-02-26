@@ -125,7 +125,9 @@ class ConfirmationController extends LayoutController
         }
 
         if (is_null($order)) {
-            $lastAccessedOrder = $sessionStorageRepository->getSessionValue(SessionStorageRepositoryContract::LAST_ACCESSED_ORDER);
+            $lastAccessedOrder = $sessionStorageRepository->getSessionValue(
+                SessionStorageRepositoryContract::LAST_ACCESSED_ORDER
+            );
             if (!is_null($lastAccessedOrder) && is_array($lastAccessedOrder)) {
                 try {
                     $order = $orderService->findOrderByAccessKey(
@@ -146,6 +148,10 @@ class ConfirmationController extends LayoutController
                     );
                 }
             }
+        }
+
+        if ($contactRepository->getContactId() > 0) {
+            $sessionStorageRepository->setSessionValue(SessionStorageRepositoryContract::LATEST_ORDER_ID, null);
         }
 
         if (!is_null($order) && $order instanceof LocalizedOrder) {
@@ -227,7 +233,7 @@ class ConfirmationController extends LayoutController
 
     public function redirect($orderId = 0, $accessKey = '')
     {
-        if(!is_null($categoryByUrl = $this->checkForExistingCategory())) {
+        if (!is_null($categoryByUrl = $this->checkForExistingCategory())) {
             return $categoryByUrl;
         }
 

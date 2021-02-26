@@ -16,17 +16,38 @@ use Plenty\Modules\Webshop\ItemSearch\SearchPresets\VariationList;
 use Plenty\Modules\Webshop\ItemSearch\Services\ItemSearchService;
 use Plenty\Plugin\CachingRepository;
 
+/**
+ * Service Class ItemListService
+ *
+ * This service class contains function related to item listings.
+ * All public functions are available in the Twig template renderer.
+ *
+ * @package IO\Service
+ */
 class ItemListService
 {
-    const TYPE_CATEGORY           = 'category';
-    const TYPE_LAST_SEEN          = 'last_seen';
-    const TYPE_TAG                = 'tag_list';
-    const TYPE_RANDOM             = 'random';
-    const TYPE_MANUFACTURER       = 'manufacturer';
-    const TYPE_CROSS_SELLER       = 'cross_selling';
-    const TYPE_WISH_LIST          = 'wish_list';
+    const TYPE_CATEGORY = 'category';
+    const TYPE_LAST_SEEN = 'last_seen';
+    const TYPE_TAG = 'tag_list';
+    const TYPE_RANDOM = 'random';
+    const TYPE_MANUFACTURER = 'manufacturer';
+    const TYPE_CROSS_SELLER = 'cross_selling';
+    const TYPE_WISH_LIST = 'wish_list';
     const TYPE_SEARCH_SUGGESTIONS = 'search_suggestions';
+    const TYPE_ALL_ITEMS = 'all';
 
+    /**
+     * Gets a list of items based on parameters
+     * @param string $type Type of item list
+     * @param int|null $id Optional: Contains an identifier depending on the type
+     * @param string|null $sorting Optional: Type of sorting
+     * @param int $maxItems Optional: Maximum number of items (Default: 0)
+     * @param string|null $crossSellingRelationType Optional: Type of cross selling relation
+     * @param bool $withCategories Optional: If true, load category data (Default: false)
+     * @param array $variationIds VariationIds to return in item list.
+     * @return array|null
+     * @throws \Exception
+     */
     public function getItemList(
         $type,
         $id = null,
@@ -46,13 +67,22 @@ class ItemListService
                     self::TYPE_LAST_SEEN,
                     self::TYPE_CROSS_SELLER,
                     self::TYPE_WISH_LIST,
-                    self::TYPE_SEARCH_SUGGESTIONS
+                    self::TYPE_SEARCH_SUGGESTIONS,
+                    self::TYPE_ALL_ITEMS
                 ]
             ))) {
             $type = self::TYPE_RANDOM;
         }
 
         switch ($type) {
+            case self:: TYPE_ALL_ITEMS:
+                 $searchFactory = CategoryItems::getSearchFactory(
+                    [
+                        'categoryId' => null,
+                        'sorting' => $sorting
+                    ]
+                );
+                break;
             case self::TYPE_CATEGORY:
                 $searchFactory = CategoryItems::getSearchFactory(
                     [
@@ -62,13 +92,6 @@ class ItemListService
                 );
                 break;
             case self::TYPE_LAST_SEEN:
-                /** @var CachingRepository $cachingRepository */
-                $cachingRepository = pluginApp(CachingRepository::class);
-                $basketRepository = pluginApp(BasketRepositoryContract::class);
-
-                if (count($variationIds) === 0) {
-                     $variationIds = $cachingRepository->get(SessionStorageRepositoryContract::LAST_SEEN_ITEMS . '_' . $basketRepository->load()->id);
-                }
                 $variationIds = array_slice($variationIds, 0, $maxItems);
 
                 if (!is_null($variationIds) && count($variationIds) > 0) {

@@ -7,7 +7,11 @@ use Plenty\Modules\System\Models\WebstoreConfiguration;
 use Plenty\Modules\Webshop\Contracts\WebstoreConfigurationRepositoryContract;
 
 /**
- * Class WebstoreConfigurationService
+ * Service Class WebstoreConfigurationService
+ *
+ * This service class contains functions for getting data from the webstore configuration.
+ * All public functions are available in the Twig template renderer.
+ *
  * @package IO\Services
  *
  * @deprecated since 5.0.0 will be removed in 6.0.0
@@ -16,7 +20,7 @@ use Plenty\Modules\Webshop\Contracts\WebstoreConfigurationRepositoryContract;
 class WebstoreConfigurationService
 {
     /**
-     * Get the plenty-id
+     * Get the plentyId
      * @deprecated since 4.3.0
      * @see \IO\Helper\Utils::getPlentyId() instead
      */
@@ -73,7 +77,7 @@ class WebstoreConfigurationService
     }
 
     /**
-     * Get the default parcel-service-Id of the webstore
+     * Get the default parcel-service-id of the webstore
      *
      * @deprecated since 5.0.0 will be removed in 6.0.0
      * @see \Plenty\Modules\Webshop\Contracts\WebstoreConfigurationRepositoryContract::getDefaultParcelServiceId()
@@ -84,7 +88,7 @@ class WebstoreConfigurationService
     }
 
     /**
-     * Get the default parcel-service-preset-Id of the webstore
+     * Get the default parcel-service-preset-id of the webstore
      *
      * @deprecated since 5.0.0 will be removed in 6.0.0
      * @see \Plenty\Modules\Webshop\Contracts\WebstoreConfigurationRepositoryContract::getDefaultParcelServicePresetId()
@@ -95,7 +99,7 @@ class WebstoreConfigurationService
     }
 
     /**
-     * Get the default shipping-country-Id of the webstore
+     * Get the default shipping-country-id of the webstore
      *
      * @deprecated since 5.0.0 will be removed in 6.0.0
      * @see \Plenty\Modules\Webshop\Contracts\WebstoreConfigurationRepositoryContract::getDefaultShippingCountryId()
