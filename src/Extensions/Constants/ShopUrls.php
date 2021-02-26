@@ -301,7 +301,7 @@ class ShopUrls
      */
     public function orderPropertyFile($path)
     {
-        return $this->getShopUrl(RouteConfig::ORDER_PROPERTY_FILE, Utils::getLang(),null, $path);
+        return $this->getShopUrl(RouteConfig::ORDER_PROPERTY_FILE, Utils::getLang(), [$path]);
     }
 
     /**
