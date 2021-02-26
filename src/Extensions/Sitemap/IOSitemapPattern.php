@@ -15,7 +15,9 @@ class IOSitemapPattern
         RouteConfig::LEGAL_DISCLOSURE,
         RouteConfig::PRIVACY_POLICY,
         RouteConfig::TERMS_CONDITIONS,
-        RouteConfig::CONTACT
+        RouteConfig::CONTACT,
+        RouteConfig::REGISTER,
+        RouteConfig::LOGIN
     ];
 
     /**
