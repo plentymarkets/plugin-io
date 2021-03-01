@@ -148,16 +148,13 @@ class OrderService
 
     /**
      * Place an order
-     *
-     * @param float|null order status for new order.
-     *
      * @return LocalizedOrder
      */
-    public function placeOrder($orderStatus = null): LocalizedOrder
+    public function placeOrder(): LocalizedOrder
     {
         /** @var WebshopOrderRepositoryContract $webshopOrderRepository */
         $webshopOrderRepository = pluginApp(WebshopOrderRepositoryContract::class);
-        $order = $webshopOrderRepository->placeOrder($orderStatus);
+        $order = $webshopOrderRepository->placeOrder();
 
         return LocalizedOrder::wrap($order, Utils::getLang());
     }
