@@ -50,7 +50,6 @@ class PlaceOrderController extends LayoutController
             $eventDispatcher = pluginApp(Dispatcher::class);
             /** @var ValidateVatNumber $val */
 
-            $fallbackStatus = null;
             $eventDispatcher->listen(
                 AfterBasketItemToOrderItem::class,
                 function ($event) {
@@ -77,7 +76,6 @@ class PlaceOrderController extends LayoutController
                     $val = pluginApp(ValidateVatNumber::class, [$vatOption->value]);
                     $eventDispatcher->fire($val);
                 }
-                $fallbackStatus = $val->getServiceUnavailableFallbackStatus();
             }
 
             $deliveryAddressId = $basketService->getDeliveryAddressId();
@@ -88,10 +86,6 @@ class PlaceOrderController extends LayoutController
                     $val = pluginApp(ValidateVatNumber::class, [$vatOption->value]);
                     $eventDispatcher->fire($val);
                 }
-                if (is_null($fallbackStatus)) {
-                    $fallbackStatus = $val->getServiceUnavailableFallbackStatus();
-                }
-
             }
         } catch (\Exception $exception) {
             return $this->handlePlaceOrderException($exception);
@@ -110,7 +104,7 @@ class PlaceOrderController extends LayoutController
         $sessionStorageRepository->setSessionValue(SessionStorageRepositoryContract::LAST_PLACE_ORDER_TRY, time());
 
         try {
-            $orderData = $orderService->placeOrder($fallbackStatus);
+            $orderData = $orderService->placeOrder();
         } catch (\Exception $exception) {
             return $this->handlePlaceOrderException($exception);
         }
@@ -122,7 +116,7 @@ class PlaceOrderController extends LayoutController
             ]
         );
 
-        if(!is_null($fallbackStatus)) {
+        if(!is_null(ValidateVatNumber::$fallbackStatusServiceUnavailable)) {
             /**
              * @var NotificationService $notificationService
              */
