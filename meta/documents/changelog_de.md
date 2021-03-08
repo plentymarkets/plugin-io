@@ -4,7 +4,7 @@
 
 ### Geändert
 
-- Beim Bestellabschluss wird nicht mehr der vorhandene Warenkorb geleert, sondern durch ein neuen bereits leeren Warenkorb ersetzt. Dies beschleunigt die Auftragsanlage vor allem bei größeren Warenkörben.
+- Beim Bestellabschluss wird nicht mehr der vorhandene Warenkorb geleert, sondern durch einen neuen bereits leeren Warenkorb ersetzt. Dies beschleunigt die Auftragsanlage vor allem bei größeren Warenkörben.
 
 ### Behoben
 
