@@ -8,7 +8,7 @@
 
 ### Fixed 
 
-- In case the routes /login and /register were not linked to a category, they were not available in the sitemap. This has been fixed.
+- In case the routes /login and /register were not linked to a category, they were not listed in the sitemap. This has been fixed.
 - When linking a category, the 404 route wasn't identified correctly. This has been fixed.
 - Search suggestions partially showed different results. This depended on the usage of upper and lower case letters.
 
