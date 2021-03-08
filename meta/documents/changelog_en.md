@@ -1,5 +1,17 @@
 # Release Notes for IO
 
+## v5.0.24 (2021-03-08) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.23...5.0.24" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
+
+### Changed
+
+- In the checkout, the existing shopping cart is no longer emptied, but replaced by a new empty one instead. This speeds up order creation especially for bigger shopping carts.
+
+### Fixed 
+
+- In case the routes /login and /register were not linked to a category, they were not available in the sitemap. This has been fixed.
+- When linking a category, the 404 route wasn't identified correctly. This has been fixed.
+- Search suggestions partially showed different results. This depended on the usage of upper and lower case letters.
+
 ## v5.0.23 (2021-02-22) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.22...5.0.23" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
 
 ### Added 
