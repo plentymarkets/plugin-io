@@ -44,6 +44,7 @@ class ItemListService
      * @param int $maxItems Optional: Maximum number of items (Default: 0)
      * @param string|null $crossSellingRelationType Optional: Type of cross selling relation
      * @param bool $withCategories Optional: If true, load category data (Default: false)
+     * @param bool $withVariationProperties Optional: If true, load variation properties (Default: false)
      * @return array|null
      * @throws \Exception
      */
@@ -53,7 +54,8 @@ class ItemListService
         $sorting = null,
         $maxItems = 0,
         $crossSellingRelationType = null,
-        $withCategories = false
+        $withCategories = false,
+        $withVariationProperties = false
     )
     {
         /** @var ItemSearchService $searchService */
@@ -181,6 +183,12 @@ class ItemListService
 
         if ($withCategories) {
             $searchFactory->withCategories();
+        }
+
+        if ($withVariationProperties) {
+            $searchFactory->withResultFields(
+                array_merge($searchFactory->getResultFields(), ['variationProperties.*'])
+            );
         }
 
         if ($maxItems > 0) {
