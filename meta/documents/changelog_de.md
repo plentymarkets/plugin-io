@@ -1,5 +1,17 @@
 # Release Notes für IO
 
+## v5.0.24 (2021-03-08) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.23...5.0.24" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
+
+### Geändert
+
+- Beim Bestellabschluss wird nicht mehr der vorhandene Warenkorb geleert, sondern durch einen neuen bereits leeren Warenkorb ersetzt. Dies beschleunigt die Auftragsanlage vor allem bei größeren Warenkörben.
+
+### Behoben
+
+- Wurden die Routen /login und /register nicht mit einer Kategorie verknüpft, waren diese nicht in der Sitemap vorhanden. Dies wurde behoben.
+- Die 404-Route wurde nicht korrekt erkannt, wenn eine Kategorie verknüpft wurde. Dies wurde behoben.
+- Bei den Suchvorschlägen kam es teilweise zu unterschiedlichen Ergebnissen. Dies hing von der Groß- und Kleinschreibung des Suchworts ab.
+
 ## v5.0.23 (2021-02-22) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.22...5.0.23" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
 
 ### Hinzugefügt
