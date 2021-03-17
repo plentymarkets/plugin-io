@@ -1,5 +1,10 @@
 # Release Notes für IO
 
+## v5.0.25
+
+### Added
+- Parameter hinzugefügt, um Variationseigenschaften über den item list service abzurufen
+
 ## v5.0.24 (2021-03-08) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.23...5.0.24" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
 
 ### Geändert

@@ -1,5 +1,10 @@
 # Release Notes for IO
 
+## v5.0.25
+
+### Added
+ - added parameter to get variation properties through the item list service
+
 ## v5.0.24 (2021-03-08) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.23...5.0.24" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
 
 ### Changed
