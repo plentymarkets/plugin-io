@@ -16,6 +16,7 @@ use IO\Models\LocalizedOrder;
 use Plenty\Modules\Account\Address\Contracts\AddressRepositoryContract;
 use Plenty\Modules\Account\Address\Models\AddressOption;
 use Plenty\Modules\Authorization\Services\AuthHelper;
+use Plenty\Modules\Frontend\Contracts\Checkout;
 use Plenty\Modules\Frontend\PaymentMethod\Contracts\FrontendPaymentMethodRepositoryContract;
 use Plenty\Modules\Helper\AutomaticEmail\Models\AutomaticEmailOrder;
 use Plenty\Modules\Helper\AutomaticEmail\Models\AutomaticEmailTemplate;
@@ -26,6 +27,7 @@ use Plenty\Modules\Order\Models\OrderReference;
 use Plenty\Modules\Order\Property\Contracts\OrderPropertyRepositoryContract;
 use Plenty\Modules\Order\Property\Models\OrderProperty;
 use Plenty\Modules\Order\Property\Models\OrderPropertyType;
+use Plenty\Modules\Order\SalesOrder\Contracts\SalesOrderRepositoryContract;
 use Plenty\Modules\Order\Status\Contracts\OrderStatusRepositoryContract;
 use Plenty\Modules\Payment\Contracts\PaymentRepositoryContract;
 use Plenty\Modules\Payment\Method\Contracts\PaymentMethodRepositoryContract;
@@ -728,15 +730,97 @@ class OrderService
                     }
                 }
             }
-
+            
+            $originalOrder = $order;
+            $order = $order->toArray();
+            $order['properties'] = $newOrderProperties;
+            
+            /** @var FrontendPaymentMethodRepositoryContract $paymentMethodRepo */
+            $paymentMethodRepo = app(FrontendPaymentMethodRepositoryContract::class);
+            $paymentFee = $paymentMethodRepo->getPaymentMethodFeeById($paymentMethodId);
+            $oldPaymentFee = $paymentMethodRepo->getPaymentMethodFeeById($currentPaymentMethodId);
+            $shippingOrderItemId = 0;
+            
+            foreach ($order['orderItems'] as $orderItemKey => $orderItem) {
+                if ($orderItem['typeId'] == OrderItemType::SHIPPING_COSTS) {
+                    //if (($paymentFee > 0))  {
+                        /*$shippingCosts = $order['orderItems'][$orderItemKey]['amounts'][0]['priceOriginalGross'] - $oldPaymentFee;
+                        $order['orderItems'][$orderItemKey]['amounts'][0]['priceOriginalGross'] = $shippingCosts;//$shippingCosts - $oldPaymentFee + $paymentFee;
+                        unset( $order['orderItems'][$orderItemKey]['amounts'][0]['priceOriginalNet']);
+                        unset($order['orderItems'][$orderItemKey]['amounts'][0]['priceNet']);
+                        unset($order['orderItems'][$orderItemKey]['amounts'][0]['priceGross']);*/
+        
+                        if ($paymentFee > 0) {
+                            $order['orderItems'][] = [
+                                'typeId' => OrderItemType::PAYMENT_SURCHARGE,
+                                'referrerId' => $order['orderItems'][$orderItemKey]['referrerId'],
+                                'quantity' => 1,
+                                'orderItemName' => 'payment surcharge',
+                                'countryVatId' => $order['orderItems'][$orderItemKey]['countryVatId'],
+                                'vatField' => $order['orderItems'][$orderItemKey]['vatField'],
+                                'amounts' => [
+                                    [
+                                        'currency' => $orderItem['amounts'][0]['currency'], //TODO ?
+                                        'priceOriginalGross' => $paymentFee
+                                    ]
+                                ]
+                            ];
+                        }
+        
+                    //}
+                    $shippingOrderItemId = $orderItem['id'];
+                    unset($order['orderItems'][$orderItemKey]);
+                }
+                foreach ($orderItem['amounts'] as $amountKey => $amount) {
+                    unset($order['orderItems'][$orderItemKey]['amounts'][$amountKey]['discount']);
+                    unset($order['orderItems'][$orderItemKey]['amounts'][$amountKey]['isPercentage']);
+                    unset($order['orderItems'][$orderItemKey]['amounts'][$amountKey]['surcharge']);
+                }
+            }
+            
             if ($paymentMethodId !== $currentPaymentMethodId) {
                 if ($this->frontendPaymentMethodRepository->getPaymentMethodSwitchableFromById(
                         $currentPaymentMethodId,
                         $orderId
                     ) && $this->frontendPaymentMethodRepository->getPaymentMethodSwitchableToById($paymentMethodId)) {
                     $order = $authHelper->processUnguarded(
-                        function () use ($orderId, $newOrderProperties, $orderRepo) {
-                            return $orderRepo->updateOrder(['properties' => $newOrderProperties], $orderId);
+                        function () use ($order, $paymentFee, $shippingOrderItemId) {
+                            
+                            /** @var SalesOrderRepositoryContract $salesOrderRepository */
+                            $salesOrderRepository = pluginApp(SalesOrderRepositoryContract::class);
+                            $previewOrder = $salesOrderRepository->previewCreate($order);
+                            //$previewOrder = [];
+                            
+                            foreach ($order['orderItems'] as $orderItemKey => $orderItem) {
+                                /*$matchingOrderItems = array_filter($previewOrder['orderItems'], function($previewOrderItem) use ($orderItem) {
+                                   return $previewOrderItem['id'] === $orderItem['id'];
+                                });
+                                $matchingOrderItem = reset($matchingOrderItems);
+                                $test = true;*/
+                                
+                                if ($orderItem['typeId'] === OrderItemType::PAYMENT_SURCHARGE) {
+                                    unset($order['orderItems'][$orderItemKey]);
+                                }
+                                
+                                /*if ($orderItem['typeId'] !== OrderItemType::SHIPPING_COSTS && $orderItem['typeId'] !== OrderItemType::PAYMENT_SURCHARGE) {
+                                    foreach ($orderItem['amounts'] as $amountKey => $amount) {
+                                        if (isset($previewOrder['orderItems'][$orderItemKey])) {//&& $order['orderItems'][$orderItemKey]['typeId'] !== OrderItemType::SHIPPING_COSTS) {
+                                            $order['orderItems'][$orderItemKey]['amounts'][$amountKey] = $previewOrder['orderItems'][$orderItemKey]['amounts'][$amountKey];
+                                        }
+                                    }
+                                }*/
+                            }
+                     
+                            $newShippingCostsOrderItems = array_filter($previewOrder['orderItems'], function($previewOrderItem) {
+                                return $previewOrderItem['typeId'] == OrderItemType::SHIPPING_COSTS;
+                            });
+                            $newShippingCostsOrderItem = reset($newShippingCostsOrderItems);
+                            $newShippingCostsOrderItem['id'] = $shippingOrderItemId;
+                            
+                            $order['orderItems'][] = $newShippingCostsOrderItem;
+                            
+                            return $salesOrderRepository->update($order['id'], $order);
+                            //return $orderRepo->updateOrder(['properties' => $newOrderProperties], $orderId);
                         }
                     );
 
