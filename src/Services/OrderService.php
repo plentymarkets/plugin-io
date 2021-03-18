@@ -748,7 +748,7 @@ class OrderService
             }
     
             /** @var FrontendPaymentMethodRepositoryContract $paymentMethodRepo */
-            $paymentMethodRepo = app(FrontendPaymentMethodRepositoryContract::class);
+            $paymentMethodRepo = pluginApp(FrontendPaymentMethodRepositoryContract::class);
             $paymentFee = $paymentMethodRepo->getPaymentMethodFeeById($paymentMethodId);
             if ($paymentFee > 0) {
                 $order['orderItems'][] = [
