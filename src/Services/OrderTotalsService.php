@@ -80,7 +80,7 @@ class OrderTotalsService
                             $item->countryVatId,
                             isset($entryDate) ? $entryDate->date->toDateString() : $order->createdAt->toDateString()
                         )) {
-                        $shippingNet = $shippingGross;
+                        $shippingGross = $shippingNet;
                     }
                     break;
                 case OrderItemType::PROMOTIONAL_COUPON:
