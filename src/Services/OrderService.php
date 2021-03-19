@@ -16,7 +16,6 @@ use IO\Models\LocalizedOrder;
 use Plenty\Modules\Account\Address\Contracts\AddressRepositoryContract;
 use Plenty\Modules\Account\Address\Models\AddressOption;
 use Plenty\Modules\Authorization\Services\AuthHelper;
-use Plenty\Modules\Frontend\Contracts\Checkout;
 use Plenty\Modules\Frontend\PaymentMethod\Contracts\FrontendPaymentMethodRepositoryContract;
 use Plenty\Modules\Helper\AutomaticEmail\Models\AutomaticEmailOrder;
 use Plenty\Modules\Helper\AutomaticEmail\Models\AutomaticEmailTemplate;
@@ -26,8 +25,6 @@ use Plenty\Modules\Order\Date\Models\OrderDateType;
 use Plenty\Modules\Order\Models\OrderReference;
 use Plenty\Modules\Order\Property\Contracts\OrderPropertyRepositoryContract;
 use Plenty\Modules\Order\Property\Models\OrderProperty;
-use Plenty\Modules\Order\Property\Models\OrderPropertyType;
-use Plenty\Modules\Order\SalesOrder\Contracts\SalesOrderRepositoryContract;
 use Plenty\Modules\Order\Status\Contracts\OrderStatusRepositoryContract;
 use Plenty\Modules\Payment\Contracts\PaymentRepositoryContract;
 use Plenty\Modules\Payment\Method\Contracts\PaymentMethodRepositoryContract;
@@ -702,116 +699,12 @@ class OrderService
      */
     public function switchPaymentMethodForOrder($orderId, $paymentMethodId)
     {
-        if ((int)$orderId > 0) {
-            $currentPaymentMethodId = 0;
-
-            /** @var AuthHelper $authHelper */
-            $authHelper = pluginApp(AuthHelper::class);
-            $orderRepo = $this->orderRepository;
-
-            $order = $authHelper->processUnguarded(
-                function () use ($orderId, $orderRepo) {
-                    return $orderRepo->findOrderById($orderId);
-                }
-            );
-
-            $newOrderProperties = [];
-            $orderProperties = $order->properties;
-
-            if (count($orderProperties)) {
-                foreach ($orderProperties as $key => $orderProperty) {
-                    $newOrderProperties[$key] = [
-                        'typeId' => $orderProperty->typeId,
-                        'value' => (string)$orderProperty->value
-                    ];
-                    if ($orderProperty->typeId == OrderPropertyType::PAYMENT_METHOD) {
-                        $currentPaymentMethodId = (int)$orderProperty->value;
-                        $newOrderProperties[$key]['value'] = (string)$paymentMethodId;
-                    }
-                }
-            }
-            
-            $order = $order->toArray();
-            $order['properties'] = $newOrderProperties;
-            
-            $shippingOrderItemId = 0;
-            foreach ($order['orderItems'] as $orderItemKey => $orderItem) {
-                if ($orderItem['typeId'] == OrderItemType::SHIPPING_COSTS) {
-                    $shippingOrderItemId = $orderItem['id'];
-                    unset($order['orderItems'][$orderItemKey]);
-                }
-                foreach ($orderItem['amounts'] as $amountKey => $amount) {
-                    unset($order['orderItems'][$orderItemKey]['amounts'][$amountKey]['discount']);
-                    unset($order['orderItems'][$orderItemKey]['amounts'][$amountKey]['isPercentage']);
-                    unset($order['orderItems'][$orderItemKey]['amounts'][$amountKey]['surcharge']);
-                }
-            }
-    
-            /** @var FrontendPaymentMethodRepositoryContract $paymentMethodRepo */
-            $paymentMethodRepo = pluginApp(FrontendPaymentMethodRepositoryContract::class);
-            $paymentFee = $paymentMethodRepo->getPaymentMethodFeeById($paymentMethodId);
-            if ($paymentFee > 0) {
-                $order['orderItems'][] = [
-                    'typeId' => OrderItemType::PAYMENT_SURCHARGE,
-                    'referrerId' => $order['orderItems'][$orderItemKey]['referrerId'],
-                    'quantity' => 1,
-                    'orderItemName' => 'payment surcharge',
-                    'countryVatId' => $order['orderItems'][$orderItemKey]['countryVatId'],
-                    'vatField' => $order['orderItems'][$orderItemKey]['vatField'],
-                    'amounts' => [
-                        [
-                            'currency' => $orderItem['amounts'][0]['currency'], //TODO ?
-                            'priceOriginalGross' => $paymentFee
-                        ]
-                    ]
-                ];
-            }
-            
-            if ($paymentMethodId !== $currentPaymentMethodId) {
-                if ($this->frontendPaymentMethodRepository->getPaymentMethodSwitchableFromById(
-                        $currentPaymentMethodId,
-                        $orderId
-                    ) && $this->frontendPaymentMethodRepository->getPaymentMethodSwitchableToById($paymentMethodId)) {
-                    $order = $authHelper->processUnguarded(
-                        function () use ($order, $paymentFee, $shippingOrderItemId) {
-                            
-                            /** @var SalesOrderRepositoryContract $salesOrderRepository */
-                            $salesOrderRepository = pluginApp(SalesOrderRepositoryContract::class);
-                            $previewOrder = $salesOrderRepository->previewCreate($order);
-                            $previewOrder['orderItems'] = array_values($previewOrder['orderItems']);
-                            
-                            foreach ($order['orderItems'] as $orderItemKey => $orderItem) {
-                                if ($orderItem['typeId'] === OrderItemType::PAYMENT_SURCHARGE) {
-                                    unset($order['orderItems'][$orderItemKey]);
-                                }
-                                
-                                if ($orderItem['typeId'] == OrderItemType::VARIATION) {
-                                    
-                                    if (isset($previewOrder['orderItems'][$orderItemKey])) {
-                                        foreach ($orderItem['amounts'] as $amountKey => $amount) {
-                                            $order['orderItems'][$orderItemKey]['amounts'][$amountKey] = $previewOrder['orderItems'][$orderItemKey]['amounts'][$amountKey];
-                                        }
-                                    }
-                                }
-                            }
-                     
-                            $newShippingCostsOrderItems = array_filter($previewOrder['orderItems'], function($previewOrderItem) {
-                                return $previewOrderItem['typeId'] == OrderItemType::SHIPPING_COSTS;
-                            });
-                            $newShippingCostsOrderItem = reset($newShippingCostsOrderItems);
-                            $newShippingCostsOrderItem['id'] = $shippingOrderItemId;
-                            
-                            $order['orderItems'][] = $newShippingCostsOrderItem;
-                            
-                            return $salesOrderRepository->update($order['id'], $order);
-                        }
-                    );
-
-                    if (!is_null($order)) {
-                        return LocalizedOrder::wrap($order, Utils::getLang());
-                    }
-                }
-            }
+        /** @var \Plenty\Modules\Webshop\Order\Contracts\OrderRepositoryContract $orderRepostory */
+        $orderRepostory = pluginApp(\Plenty\Modules\Webshop\Order\Contracts\OrderRepositoryContract::class);
+        $order = $orderRepostory->switchPaymentMethodForOrder($orderId, $paymentMethodId);
+        
+        if (!is_null($order)) {
+            return LocalizedOrder::wrap($order, Utils::getLang());
         }
 
         return null;
