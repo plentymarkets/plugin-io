@@ -75,12 +75,12 @@ class OrderTotalsService
                     $shippingNet += $firstAmount->priceNet;
                     $entryDate = $order->dates->where('typeId', OrderDateType::ORDER_ENTRY_AT)->first();
 
-                    if ((bool)$accountSettings->showShippingVat && $euCountryCodesServiceContract->isExportDelivery(
+                    if (!(bool)$accountSettings->showShippingVat && $euCountryCodesServiceContract->isExportDelivery(
                             $order->deliveryAddress->countryId,
                             $item->countryVatId,
                             isset($entryDate) ? $entryDate->date->toDateString() : $order->createdAt->toDateString()
                         )) {
-                        $shippingGross = $shippingNet;
+                        $shippingNet = $shippingGross;
                     }
                     break;
                 case OrderItemType::PROMOTIONAL_COUPON:
