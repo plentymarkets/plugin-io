@@ -1,5 +1,11 @@
 # Release Notes für IO
 
+## v5.0.25 (2021-03-22) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.24...5.0.25" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
+
+### Behoben
+
+- Bei Ausfuhrlieferungen wurden unter Umständen die Versandkosten auf der Auftragsbestätigungsseite nicht korrekt angezeigt. Dies wurde behoben.
+
 ## v5.0.24 (2021-03-08) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.23...5.0.24" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
 
 ### Geändert
