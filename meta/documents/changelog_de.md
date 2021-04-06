@@ -1,5 +1,11 @@
 # Release Notes für IO
 
+## v5.0.26 (2021-04-06) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.25...5.0.26" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
+
+### Geändert
+
+- Das Event `AfterBasketItemUpdate` enthält nun den aktualisierten Grundpreis.
+
 ## v5.0.25 (2021-03-22) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.24...5.0.25" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
 
 ### Behoben
