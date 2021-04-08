@@ -44,6 +44,7 @@ class ItemListService
      * @param int $maxItems Optional: Maximum number of items (Default: 0)
      * @param string|null $crossSellingRelationType Optional: Type of cross selling relation
      * @param bool $withCategories Optional: If true, load category data (Default: false)
+     * @param array $variationIds VariationIds to return in item list. Only relevant for type "last_seen"
      * @return array|null
      * @throws \Exception
      */
@@ -53,9 +54,9 @@ class ItemListService
         $sorting = null,
         $maxItems = 0,
         $crossSellingRelationType = null,
-        $withCategories = false
-    )
-    {
+        $withCategories = false,
+        $variationIds = []
+    ) {
         /** @var ItemSearchService $searchService */
         $searchService = pluginApp(ItemSearchService::class);
         $searchFactory = null;
@@ -91,13 +92,6 @@ class ItemListService
                 );
                 break;
             case self::TYPE_LAST_SEEN:
-                /** @var CachingRepository $cachingRepository */
-                $cachingRepository = pluginApp(CachingRepository::class);
-                $basketRepository = pluginApp(BasketRepositoryContract::class);
-
-                $variationIds = $cachingRepository->get(
-                    SessionStorageRepositoryContract::LAST_SEEN_ITEMS . '_' . $basketRepository->load()->id
-                );
                 $variationIds = array_slice($variationIds, 0, $maxItems);
 
                 if (!is_null($variationIds) && count($variationIds) > 0) {

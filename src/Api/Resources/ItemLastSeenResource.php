@@ -40,7 +40,8 @@ class ItemLastSeenResource extends ApiResource
         $twig = pluginApp(Twig::class);
 
         $items = $this->request->get('items', 20);
-        $lastSeenItems = $itemListService->getItemList(ItemListService::TYPE_LAST_SEEN, null, null, $items);
+        $variationIds = $this->request->get('variationIds', []);
+        $lastSeenItems = $itemListService->getItemList(ItemListService::TYPE_LAST_SEEN, null, null, $items, null, false, $variationIds);
         $lastSeenContainers = [];
 
         foreach ($lastSeenItems['documents'] as $item) {
@@ -61,6 +62,12 @@ class ItemLastSeenResource extends ApiResource
         );
     }
 
+    /**
+     * @param string $variationId
+     * @return Response
+     *
+     * @depreacted will be removed in 5.1.0 or greater
+     */
     public function update(string $variationId): Response
     {
         if ((int)$variationId > 0) {
