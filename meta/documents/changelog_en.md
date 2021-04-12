@@ -1,5 +1,17 @@
 # Release Notes for IO
 
+## v5.0.26 (2021-04-06) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.25...5.0.26" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
+
+### Changed
+
+- The event `AfterBasketItemUpdate` now also contains the updated base price.
+
+## v5.0.25 (2021-03-22) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.24...5.0.25" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
+
+### Fixed
+
+- For export deliveries, shipping costs were sometimes displayed incorrectly on the order confirmation page. This has been fixed.
+
 ## v5.0.24 (2021-03-08) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.23...5.0.24" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
 
 ### Changed
