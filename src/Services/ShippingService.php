@@ -2,11 +2,15 @@
 
 namespace IO\Services;
 
+use IO\Helper\Utils;
+use Plenty\Modules\Basket\Contracts\BasketRepositoryContract;
 use Plenty\Modules\Frontend\Contracts\Checkout;
 use Plenty\Modules\Order\Shipping\Contracts\ParcelServicePresetRepositoryContract;
 use Plenty\Modules\Order\Shipping\Countries\Contracts\CountryRepositoryContract;
 use Plenty\Modules\Order\Shipping\Countries\Models\Country;
 use Plenty\Modules\Order\Shipping\ParcelService\Models\ParcelServicePreset;
+use Plenty\Modules\Webshop\Contracts\SessionStorageRepositoryContract;
+use Plenty\Modules\Webshop\Contracts\ShippingRepositoryContract;
 use Plenty\Plugin\Log\Loggable;
 
 /**
@@ -67,12 +71,17 @@ class ShippingService
             $parcelServicepresetRepo = pluginApp(ParcelServicePresetRepositoryContract::class);
 
             foreach ($shippingProfileList as $shippingProfile) {
-                $parcelServicePreset = $parcelServicepresetRepo->getPresetById($shippingProfile['parcelServicePresetId']);
+                $parcelServicePreset = $parcelServicepresetRepo->getPresetById(
+                    $shippingProfile['parcelServicePresetId']
+                );
 
                 if ($parcelServicePreset instanceof ParcelServicePreset) {
                     $generalSettings = [];
 
-                    $regionConstraint = $parcelServicePreset->parcelServiceRegionConstraint->where('shippingRegionId', $country->shippingDestinationId)->first();
+                    $regionConstraint = $parcelServicePreset->parcelServiceRegionConstraint->where(
+                        'shippingRegionId',
+                        $country->shippingDestinationId
+                    )->first();
                     if (!is_null($regionConstraint)) {
                         $generalSettings = $regionConstraint->constraint->first()->generalSettings;
                     } else {
@@ -86,7 +95,9 @@ class ShippingService
                         );
                     }
 
-                    if (isset($generalSettings['termOfDelivery']) && !is_null($generalSettings['termOfDelivery']) && $generalSettings['termOfDelivery'] !== '') {
+                    if (isset($generalSettings['termOfDelivery']) && !is_null(
+                            $generalSettings['termOfDelivery']
+                        ) && $generalSettings['termOfDelivery'] !== '') {
                         $maxDeliveryDays[$shippingProfile['parcelServicePresetId']] = $generalSettings['termOfDelivery'];
                     }
                 }
@@ -108,13 +119,30 @@ class ShippingService
                 }
 
                 if ($maxItemAvailability > 0) {
-                    $maxDeliveryDays = array_map(function ($days) use ($maxItemAvailability) {
-                        return (int)$days + (int)$maxItemAvailability;
-                    }, $maxDeliveryDays);
+                    $maxDeliveryDays = array_map(
+                        function ($days) use ($maxItemAvailability) {
+                            return (int)$days + (int)$maxItemAvailability;
+                        },
+                        $maxDeliveryDays
+                    );
                 }
             }
         }
 
         return $maxDeliveryDays;
+    }
+
+    public function hasAnyPostOfficePreset()
+    {
+        /** @var ShippingRepositoryContract $shippingRepository */
+        $shippingRepository = pluginApp(ShippingRepositoryContract::class);
+        return $shippingRepository->hasAnyPostOfficePreset();
+    }
+
+    public function hasAnyParcelBoxPreset()
+    {
+        /** @var ShippingRepositoryContract $shippingRepository */
+        $shippingRepository = pluginApp(ShippingRepositoryContract::class);
+        return $shippingRepository->hasAnyParcelBoxPreset();
     }
 }
