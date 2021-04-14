@@ -376,7 +376,7 @@ class IORouteServiceProvider extends RouteServiceProvider
 
         // NOT FOUND
         if (in_array(RouteConfig::PAGE_NOT_FOUND, RouteConfig::getEnabledRoutes())) {
-            $fallbackRoute = $router->get('{level1?}/{anything?}', 'IO\Controllers\StaticPagesController@showPageNotFound');
+            $fallbackRoute = $router->get('{level1?}/{anything?}', 'IO\Controllers\StaticPagesController@getPageNotFoundStatusResponse');
             if (RouteConfig::passThroughBlogRoutes()) {
                 // do not catch legacy blog-routes
                 $fallbackRoute
