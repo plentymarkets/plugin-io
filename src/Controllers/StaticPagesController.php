@@ -1,7 +1,10 @@
-<?php //strict
+<?php
+
 namespace IO\Controllers;
 
+use IO\Api\ResponseCode;
 use IO\Helper\RouteConfig;
+use Plenty\Plugin\Http\Response;
 
 /**
  * Class HomepageController
@@ -14,7 +17,7 @@ class StaticPagesController extends LayoutController
      * @return string
      * @throws \ErrorException
      */
-    public function showCancellationRights():string
+    public function showCancellationRights(): string
     {
         return $this->renderTemplate(
             "tpl.cancellation-rights",
@@ -37,7 +40,7 @@ class StaticPagesController extends LayoutController
      * @return string
      * @throws \ErrorException
      */
-    public function showCancellationForm():string
+    public function showCancellationForm(): string
     {
         return $this->renderTemplate(
             "tpl.cancellation-form",
@@ -60,7 +63,7 @@ class StaticPagesController extends LayoutController
      * @return string
      * @throws \ErrorException
      */
-    public function showLegalDisclosure():string
+    public function showLegalDisclosure(): string
     {
         return $this->renderTemplate(
             "tpl.legal-disclosure",
@@ -83,7 +86,7 @@ class StaticPagesController extends LayoutController
      * @return string
      * @throws \ErrorException
      */
-    public function showPrivacyPolicy():string
+    public function showPrivacyPolicy(): string
     {
         return $this->renderTemplate(
             "tpl.privacy-policy",
@@ -106,7 +109,7 @@ class StaticPagesController extends LayoutController
      * @return string
      * @throws \ErrorException
      */
-    public function showTermsAndConditions():string
+    public function showTermsAndConditions(): string
     {
         return $this->renderTemplate(
             "tpl.terms-conditions",
@@ -129,7 +132,7 @@ class StaticPagesController extends LayoutController
      * @return string
      * @throws \ErrorException
      */
-    public function showPageNotFound():string
+    public function showPageNotFound(): string
     {
         return $this->renderTemplate(
             "tpl.page-not-found",
@@ -138,6 +141,18 @@ class StaticPagesController extends LayoutController
             ],
             false
         );
+    }
+
+    /**
+     * Return page not found status response
+     * @return Response
+     */
+    public function getPageNotFoundStatusResponse(): Response
+    {
+        /** @var Response $response */
+        $response = pluginApp(Response::class);
+        $response->forceStatus(ResponseCode::NOT_FOUND);
+        return $response;
     }
 
     /**
@@ -152,7 +167,7 @@ class StaticPagesController extends LayoutController
 
     private function redirect($route)
     {
-        if(!is_null($categoryByUrl = $this->checkForExistingCategory())) {
+        if (!is_null($categoryByUrl = $this->checkForExistingCategory())) {
             return $categoryByUrl;
         }
 
