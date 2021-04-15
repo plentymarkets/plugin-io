@@ -2,14 +2,11 @@
 
 namespace IO\Services;
 
-use IO\Helper\Utils;
-use Plenty\Modules\Basket\Contracts\BasketRepositoryContract;
 use Plenty\Modules\Frontend\Contracts\Checkout;
 use Plenty\Modules\Order\Shipping\Contracts\ParcelServicePresetRepositoryContract;
 use Plenty\Modules\Order\Shipping\Countries\Contracts\CountryRepositoryContract;
 use Plenty\Modules\Order\Shipping\Countries\Models\Country;
 use Plenty\Modules\Order\Shipping\ParcelService\Models\ParcelServicePreset;
-use Plenty\Modules\Webshop\Contracts\SessionStorageRepositoryContract;
 use Plenty\Modules\Webshop\Contracts\ShippingRepositoryContract;
 use Plenty\Plugin\Log\Loggable;
 
@@ -132,6 +129,11 @@ class ShippingService
         return $maxDeliveryDays;
     }
 
+    /**
+     * Check if any parcel service preset exists for the current user that allows sending to a post office.
+     *
+     * @return boolean
+     */
     public function hasAnyPostOfficePreset()
     {
         /** @var ShippingRepositoryContract $shippingRepository */
@@ -139,6 +141,11 @@ class ShippingService
         return $shippingRepository->hasAnyPostOfficePreset();
     }
 
+    /**
+     * Check if any parcel service preset exists for the current user that allows sending to a parcel box.
+     *
+     * @return boolean
+     */
     public function hasAnyParcelBoxPreset()
     {
         /** @var ShippingRepositoryContract $shippingRepository */
