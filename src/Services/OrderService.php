@@ -407,6 +407,7 @@ class OrderService
                         'parentOrderId' => $order->parentOrder->id,
                         'type' => $order->typeId,
                         'total' => $highlightNetPrices ? $totals['totalNet'] : $totals['totalGross'],
+                        'currency' =>  $totals['currency'],
                         'status' => $orderStatusName,
                         'creationDate' => $creationDate,
                         'shippingDate' => $shippingDate,
@@ -702,7 +703,7 @@ class OrderService
         /** @var \Plenty\Modules\Webshop\Order\Contracts\OrderRepositoryContract $orderRepostory */
         $orderRepostory = pluginApp(\Plenty\Modules\Webshop\Order\Contracts\OrderRepositoryContract::class);
         $order = $orderRepostory->switchPaymentMethodForOrder($orderId, $paymentMethodId);
-        
+
         if (!is_null($order)) {
             return LocalizedOrder::wrap($order, Utils::getLang());
         }
