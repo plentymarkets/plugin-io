@@ -25,7 +25,6 @@ use Plenty\Modules\Order\Date\Models\OrderDateType;
 use Plenty\Modules\Order\Models\OrderReference;
 use Plenty\Modules\Order\Property\Contracts\OrderPropertyRepositoryContract;
 use Plenty\Modules\Order\Property\Models\OrderProperty;
-use Plenty\Modules\Order\Property\Models\OrderPropertyType;
 use Plenty\Modules\Order\Status\Contracts\OrderStatusRepositoryContract;
 use Plenty\Modules\Payment\Contracts\PaymentRepositoryContract;
 use Plenty\Modules\Payment\Method\Contracts\PaymentMethodRepositoryContract;
@@ -700,51 +699,12 @@ class OrderService
      */
     public function switchPaymentMethodForOrder($orderId, $paymentMethodId)
     {
-        if ((int)$orderId > 0) {
-            $currentPaymentMethodId = 0;
-
-            /** @var AuthHelper $authHelper */
-            $authHelper = pluginApp(AuthHelper::class);
-            $orderRepo = $this->orderRepository;
-
-            $order = $authHelper->processUnguarded(
-                function () use ($orderId, $orderRepo) {
-                    return $orderRepo->findOrderById($orderId);
-                }
-            );
-
-            $newOrderProperties = [];
-            $orderProperties = $order->properties;
-
-            if (count($orderProperties)) {
-                foreach ($orderProperties as $key => $orderProperty) {
-                    $newOrderProperties[$key] = [
-                        'typeId' => $orderProperty->typeId,
-                        'value' => (string)$orderProperty->value
-                    ];
-                    if ($orderProperty->typeId == OrderPropertyType::PAYMENT_METHOD) {
-                        $currentPaymentMethodId = (int)$orderProperty->value;
-                        $newOrderProperties[$key]['value'] = (string)$paymentMethodId;
-                    }
-                }
-            }
-
-            if ($paymentMethodId !== $currentPaymentMethodId) {
-                if ($this->frontendPaymentMethodRepository->getPaymentMethodSwitchableFromById(
-                        $currentPaymentMethodId,
-                        $orderId
-                    ) && $this->frontendPaymentMethodRepository->getPaymentMethodSwitchableToById($paymentMethodId)) {
-                    $order = $authHelper->processUnguarded(
-                        function () use ($orderId, $newOrderProperties, $orderRepo) {
-                            return $orderRepo->updateOrder(['properties' => $newOrderProperties], $orderId);
-                        }
-                    );
-
-                    if (!is_null($order)) {
-                        return LocalizedOrder::wrap($order, Utils::getLang());
-                    }
-                }
-            }
+        /** @var \Plenty\Modules\Webshop\Order\Contracts\OrderRepositoryContract $orderRepostory */
+        $orderRepostory = pluginApp(\Plenty\Modules\Webshop\Order\Contracts\OrderRepositoryContract::class);
+        $order = $orderRepostory->switchPaymentMethodForOrder($orderId, $paymentMethodId);
+        
+        if (!is_null($order)) {
+            return LocalizedOrder::wrap($order, Utils::getLang());
         }
 
         return null;
