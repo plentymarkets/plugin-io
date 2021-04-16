@@ -115,7 +115,7 @@ class PlaceOrderController extends LayoutController
             ]
         );
 
-        if(!is_null(ValidateVatNumber::$fallbackStatusServiceUnavailable)) {
+        if(!is_null(ValidateVatNumber::getFallbackStatusServiceUnavailable())) {
             /**
              * @var NotificationService $notificationService
              */
