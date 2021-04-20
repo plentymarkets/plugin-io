@@ -10,7 +10,7 @@
 
 ### Geändert
 
-- Das länderspezifische Präfix der Umssatzsteuer-Identifikationsnummer wird nun validiert.
+- Das länderspezifische Präfix der Umsatzsteuer-Identifikationsnummer wird nun validiert.
 
 ## v5.0.26 (2021-04-06) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.25...5.0.26" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
 
