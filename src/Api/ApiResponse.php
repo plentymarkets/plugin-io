@@ -7,9 +7,12 @@ use IO\Services\BasketService;
 use IO\Services\CheckoutService;
 use IO\Services\LocalizationService;
 use IO\Services\NotificationService;
+use Plenty\Legacy\Services\Item\Variation\SalesPriceService;
 use Plenty\Modules\Basket\Models\BasketItem;
 use Plenty\Modules\Item\Stock\Events\BasketItemWarnOversell;
+use Plenty\Modules\Webshop\Contracts\CheckoutRepositoryContract;
 use Plenty\Modules\Webshop\Contracts\ContactRepositoryContract;
+use Plenty\Modules\Webshop\Helpers\BasePrice;
 use Plenty\Plugin\Http\Response;
 use Plenty\Modules\Account\Events\FrontendUpdateCustomerSettings;
 use Plenty\Modules\Authentication\Events\AfterAccountAuthentication;
@@ -130,10 +133,18 @@ class ApiResponse
                 /** @var BasketService $basketService */
                 $basketService = pluginApp(BasketService::class);
                 $basketItem = $event->getBasketItem();
-                $this->eventData["AfterBasketItemUpdate"]["basketItems"][] = $basketService->getBasketItem(
+                $basketItem =  $basketService->getBasketItem(
                     $basketItem,
                     false
                 );
+
+                /** @var CheckoutRepositoryContract $checkoutRepository */
+                $checkoutRepository = pluginApp(CheckoutRepositoryContract::class);
+
+                /** @var BasePrice $basePriceHelper */
+                $basePriceHelper = pluginApp(BasePrice::class);
+                $basketItem['basePrice'] = $basePriceHelper->getFormattedBasePrice($basketItem['variationId'], $basketItem['price'], $checkoutRepository->getCurrency());
+                $this->eventData["AfterBasketItemUpdate"]["basketItems"][] = $basketItem;
             },
             0
         );

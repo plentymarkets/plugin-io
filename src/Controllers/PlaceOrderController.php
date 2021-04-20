@@ -72,7 +72,7 @@ class PlaceOrderController extends LayoutController
                 $billingAddressData = $customerService->getAddress($billingAddressId, AddressType::BILLING);
                 $vatOption = $billingAddressData->options->where('typeId', AddressOption::TYPE_VAT_NUMBER)->first();
                 if (!is_null($vatOption)) {
-                    $val = pluginApp(ValidateVatNumber::class, [$vatOption->value]);
+                    $val = pluginApp(ValidateVatNumber::class, [$vatOption->value, $billingAddressData->countryId]);
                     $eventDispatcher->fire($val);
                 }
             }
@@ -82,7 +82,7 @@ class PlaceOrderController extends LayoutController
                 $deliveryAddressData = $customerService->getAddress($deliveryAddressId, AddressType::DELIVERY);
                 $vatOption = $deliveryAddressData->options->where('typeId', AddressOption::TYPE_VAT_NUMBER)->first();
                 if (!is_null($vatOption)) {
-                    $val = pluginApp(ValidateVatNumber::class, [$vatOption->value]);
+                    $val = pluginApp(ValidateVatNumber::class, [$vatOption->value, $deliveryAddressData->countryId]);
                     $eventDispatcher->fire($val);
                 }
             }
@@ -115,6 +115,13 @@ class PlaceOrderController extends LayoutController
             ]
         );
 
+        if(!is_null(ValidateVatNumber::getFallbackStatusServiceUnavailable())) {
+            /**
+             * @var NotificationService $notificationService
+             */
+            $notificationService = pluginApp(NotificationService::class);
+            $notificationService->addNotificationCode('warn', 212);
+        }
         try {
             $orderService->complete($orderData->order);
         } catch (\Exception $exception) {
