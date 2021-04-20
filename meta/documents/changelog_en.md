@@ -1,5 +1,15 @@
 # Release Notes for IO
 
+## v5.0.28 (2021-04-20) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.26...5.0.28" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
+
+- The routing for 404 pages returned the wrong HTTP status code. This behaviour has been fixed.
+- Payment method dependent surcharges and rebates are now taken into account if the payment method of an already existing order is changed.  
+- Under certain circumstances, the currency was displayed incorrectly in the order overview in the My Account section. This behaviour has been fixed.
+
+### Changed
+
+- The country-specific prefix of the VAT identification number is now validated.
+
 ## v5.0.26 (2021-04-06) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.25...5.0.26" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
 
 ### Changed

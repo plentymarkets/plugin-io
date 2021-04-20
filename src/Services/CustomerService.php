@@ -634,7 +634,7 @@ class CustomerService
             /** @var Dispatcher $eventDispatcher */
             $eventDispatcher = pluginApp(Dispatcher::class);
             /** @var ValidateVatNumber $val */
-            $val = pluginApp(ValidateVatNumber::class, [$addressData['vatNumber']]);
+            $val = pluginApp(ValidateVatNumber::class, [$addressData['vatNumber'], $addressData['countryId']]);
             $eventDispatcher->fire($val);
         }
 
@@ -812,7 +812,7 @@ class CustomerService
             /** @var Dispatcher $eventDispatcher */
             $eventDispatcher = pluginApp(Dispatcher::class);
             /** @var ValidateVatNumber $val */
-            $val = pluginApp(ValidateVatNumber::class, [$addressData['vatNumber']]);
+            $val = pluginApp(ValidateVatNumber::class, [$addressData['vatNumber'], $addressData['countryId']]);
             $eventDispatcher->fire($val);
         }
 
