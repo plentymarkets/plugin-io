@@ -493,13 +493,6 @@ class ShopUrls
                         return RouteConfig::HOME;
                     }
 
-                    foreach (RouteConfig::ALL as $routeKey) {
-                        if ($this->equals($url, $this->getUrl($routeKey))) {
-                            // current page is a special linked page
-                            return $routeKey;
-                        }
-                    }
-
                     // match url pattern
                     if (preg_match('/(?:a\-\d+|_\d+|_\d+_\d+)\/?$/m', $url) === 1) {
                         return RouteConfig::ITEM;
@@ -507,6 +500,13 @@ class ShopUrls
                         return RouteConfig::TAGS;
                     } elseif (preg_match('/confirmation\/\d+\/([A-Za-z]|\d)+\/?/m', $url) === 1) {
                         return RouteConfig::CONFIRMATION;
+                    }
+
+                    foreach (RouteConfig::ALL as $routeKey) {
+                        if ($this->equals($url, $this->getUrl($routeKey))) {
+                            // current page is a special linked page
+                            return $routeKey;
+                        }
                     }
 
                     if ($shopBuilderRequest->isShopBuilder(
