@@ -1,5 +1,29 @@
 # Release Notes für IO
 
+## v5.0.28 (2021-04-20) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.26...5.0.28" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
+
+### Behoben 
+
+- Das Routing für 404-Seiten lieferte den falschen HTTP-Statuscode. Dieses Verhalten wurde behoben.
+- Zahlungsartenrabatte und -aufschläge werden jetzt bei einer nachträglichen Änderung der Zahlungsart eines bestehenden Auftrags berücksichtigt.
+- Unter bestimmten Umständen wurde die Währung in der Auftragsübersicht im Mein Konto-Bereich falsch angezeigt. Dieses Verhalten wurde behoben.
+
+### Geändert
+
+- Das länderspezifische Präfix der Umsatzsteuer-Identifikationsnummer wird nun validiert.
+
+## v5.0.26 (2021-04-06) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.25...5.0.26" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
+
+### Geändert
+
+- Das Event `AfterBasketItemUpdate` enthält nun den aktualisierten Grundpreis.
+
+## v5.0.25 (2021-03-22) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.24...5.0.25" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
+
+### Behoben
+
+- Bei Ausfuhrlieferungen wurden unter Umständen die Versandkosten auf der Auftragsbestätigungsseite nicht korrekt angezeigt. Dies wurde behoben.
+
 ## v5.0.24 (2021-03-08) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.23...5.0.24" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
 
 ### Geändert
