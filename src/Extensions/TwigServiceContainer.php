@@ -31,6 +31,7 @@ use IO\Services\PropertyFileService;
 use IO\Services\SalesPriceService;
 use IO\Services\SeoService;
 use IO\Services\SessionStorageService;
+use IO\Services\ShippingService;
 use IO\Services\TagService;
 use IO\Services\TemplateService;
 use IO\Services\UnitService;
@@ -231,5 +232,10 @@ class TwigServiceContainer
     public function getSEO(): SeoService
     {
         return pluginApp(SeoService::class);
+    }
+
+    public function getShipping(): ShippingService
+    {
+        return pluginApp(ShippingService::class);
     }
 }
