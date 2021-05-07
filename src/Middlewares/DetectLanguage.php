@@ -3,6 +3,7 @@
 namespace IO\Middlewares;
 
 use IO\Controllers\CategoryController;
+use IO\Guards\AuthGuard;
 use IO\Helper\Utils;
 use IO\Services\CheckoutService;
 use IO\Services\LocalizationService;
@@ -32,20 +33,10 @@ class DetectLanguage extends Middleware
             $splittedURL = explode('/', $request->get('plentyMarkets'));
 
             // request uri is not "/webAjaxBase.php"
-            if (!is_null(self::$DETECTED_LANGUAGE)) {
-                // language has been detected by plentymarkets core
-                $this->setLanguage(self::$DETECTED_LANGUAGE, $webstoreConfig);
+            if (!is_null(self::$DETECTED_LANGUAGE) && !array_key_exists($splittedURL[0], Utils::getLanguageList())) {
+                // language has been detected by plentymarkets core and url does not contain a valid language
+                AuthGuard::redirect('/' . self::$DETECTED_LANGUAGE);
 
-                if ($splittedURL[0] !== self::$DETECTED_LANGUAGE) {
-                    $isValidLang = array_key_exists($splittedURL[0], Utils::getLanguageList());
-                    if ($isValidLang) {
-                        CategoryController::$LANGUAGE_FROM_URL = $splittedURL[0];
-                    } else {
-                        CategoryController::$LANGUAGE_FROM_URL = Utils::getDefaultLang();
-                    }
-                    // Do not cache content if detected language does not match the language of the url
-                    TemplateService::$shouldBeCached = false;
-                }
             } elseif (strpos(end($splittedURL), '.') === false) {
                 // language has not been detected. check if url points to default language
                 $this->setLanguage($request->get('Lang', $splittedURL[0]), $webstoreConfig);
