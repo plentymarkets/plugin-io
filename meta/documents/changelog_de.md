@@ -1,5 +1,15 @@
 # Release Notes für IO
 
+## v5.0.29 (2021-05-10) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.28...5.0.29" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
+
+### Hinzugefügt
+
+- Es ist nun möglich, Seiten mit Query-Parametern mit dem ShopBooster zu cachen.
+
+### Geändert
+
+- Die Performance der Ermittlung des aktuellen Seitentyps wurde verbessert.
+
 ## v5.0.28 (2021-04-20) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.26...5.0.28" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
 
 ### Behoben 
