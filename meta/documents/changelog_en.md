@@ -1,5 +1,15 @@
 # Release Notes for IO
 
+## v5.0.29 (2021-05-11) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.28...5.0.29" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
+
+### Added
+
+- ShopBooster now also caches pages with query parameters.
+
+### Changed 
+
+- The performance of the detection of the current page type has been improved.
+
 ## v5.0.28 (2021-04-20) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.26...5.0.28" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
 
 - The routing for 404 pages returned the wrong HTTP status code. This behaviour has been fixed.
