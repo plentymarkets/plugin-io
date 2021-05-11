@@ -250,8 +250,11 @@ class BasketService
      */
     public function getBasketQuantity()
     {
-        $itemQuantity = 0;
+        if (!is_array($this->basketItems)) {
+            return $this->basketItemRepository->getBasketItemQuantity();
+        }
 
+        $itemQuantity = 0;
         foreach ($this->getBasketItemsRaw() as $item) {
             if ($item->variationId > 0) {
                 $itemQuantity += $item->quantity;
