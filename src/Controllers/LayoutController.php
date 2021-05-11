@@ -170,7 +170,11 @@ abstract class LayoutController extends Controller
                 );
                 /** @var ContentCacheRepositoryContract $cacheRepository */
                 $cacheRepository = pluginApp(ContentCacheRepositoryContract::class);
-                $cacheRepository->enableCacheForResponse();
+                $cacheRepository->enableCacheForResponse(
+                    [
+                        'enableQueryParams' => true
+                    ]
+                );
             }
 
             // Render the received plugin
