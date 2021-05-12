@@ -1,5 +1,11 @@
 # Release Notes für IO
 
+## v5.0.30 (2021-05-12) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.29...5.0.30" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
+
+### Geändert
+
+- Die Shop-Performance beim Laden der Anzahl der Artikel im Warenkorb wurde erhöht. 
+
 ## v5.0.29 (2021-05-11) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.28...5.0.29" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
 
 ### Hinzugefügt
