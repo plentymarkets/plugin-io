@@ -1,11 +1,12 @@
-<?php //strict
+<?php
 
 namespace IO\Extensions\Functions;
 
 use IO\Extensions\AbstractFunction;
 
 /**
- * Class Component
+ * Class FindItemVariation
+ *
  * @package IO\Extensions\Functions
  */
 class FindItemVariation extends AbstractFunction
@@ -23,16 +24,21 @@ class FindItemVariation extends AbstractFunction
     }
 
     /**
-     * Find item variation by id
-     * @param int $variationId Id to find
-     * @param array $variations variations to filter
+     * Find item variation by id in given variation array
+     *
+     * @param int $variationId Variation ID to find in $variations
+     * @param array $variations An array of variation documents
      *
      * @return mixed variation
      */
-    public function findItemVariationById( $variationId, $variations )
+    public function findItemVariationById(int $variationId, array $variations = [])
     {
-        return array_shift(array_filter($variations, function ($variation) use ($variationId) {
-            return $variation['data']['variation']['id'] == $variationId;
-        }));
+        $array = array_filter(
+            $variations,
+            function ($variation) use ($variationId) {
+                return $variation['data']['variation']['id'] == $variationId;
+            }
+        );
+        return array_shift($array);
     }
 }
