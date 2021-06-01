@@ -1,5 +1,15 @@
 # Release Notes for IO
 
+## v5.0.32 (2021-06-01) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.30...5.0.32" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
+
+### Added
+
+- We added a Twig helper function which allows filtering of item variations.
+
+### Fixed
+
+- In the translations of the subject of the contact form, not all entered data could be accessed. This has been fixed.
+
 ## v5.0.30 (2021-05-14) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.29...5.0.30" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
 
 ### Changed

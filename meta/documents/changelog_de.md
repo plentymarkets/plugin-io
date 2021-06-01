@@ -1,5 +1,15 @@
 # Release Notes für IO
 
+## v5.0.32 (2021-06-01) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.30...5.0.32" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
+
+### Hinzugefügt
+
+- Es wurde eine Twig-Hilfsfunktion hinzugefügt, die das Filtern von Artikelvarianten ermöglicht.
+
+### Behoben
+
+- In den Übersetzungen des Betreffs des Kontaktformulars konnte nicht auf alle eingegebenen Daten zugegriffen werden. Dies wurde behoben.
+
 ## v5.0.30 (2021-05-14) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.29...5.0.30" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
 
 ### Geändert
