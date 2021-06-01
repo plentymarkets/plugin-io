@@ -4,7 +4,7 @@
 
 ### Added
 
-- Twig helper function added that allows filtering of item variations.
+- We added a Twig helper function which allows filtering of item variations.
 
 ### Fixed
 
