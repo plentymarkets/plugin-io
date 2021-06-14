@@ -186,6 +186,7 @@ class ItemService
     /**
      * Get a list of item variations with the specified variation ids
      * @param array $variationIds A list of variation idss
+     * @param string $resultFieldTemplate Specify a result field template to filter the search response
      * @return array
      * @throws \Exception
      */
