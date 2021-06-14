@@ -727,7 +727,10 @@ class CustomerService
      */
     private function buildAddressEmailOptions(array $options = [], $isGuest = false, $addressData = [], $keepEmptyValuesInOptions = false): array
     {
-        if ($isGuest) {
+        if(isset($addressData['email'])) {
+            $email = $addressData['email'];
+        }
+        elseif ($isGuest) {
             /** @var SessionStorageRepositoryContract $sessionStorageRepository */
             $sessionStorageRepository = pluginApp(SessionStorageRepositoryContract::class);
             $email = $sessionStorageRepository->getSessionValue(SessionStorageRepositoryContract::GUEST_EMAIL);
