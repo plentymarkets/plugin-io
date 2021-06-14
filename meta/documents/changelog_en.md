@@ -1,5 +1,17 @@
 # Release Notes for IO
 
+## v5.0.33 (2021-06-014) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.32...5.0.33" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
+
+### Added 
+
+- The method `getVariations` in the ItemService can now overwrite the result fields of the search result via a parameter. 
+
+### Fixed
+
+- Components of item sets now contain values in order characteristics of the type selection.
+- Due to an error, shipping costs were displayed incorrectly on the order confirmation page. This has been fixed.
+- An order's date of creation was not updated on the order confirmation page and in the My Account area if it had been changed in the backend. This has been fixed. 
+ 
 ## v5.0.32 (2021-06-01) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.30...5.0.32" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
 
 ### Added
