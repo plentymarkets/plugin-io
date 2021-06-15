@@ -2,19 +2,20 @@
 
 namespace IO\Api\Resources;
 
-use IO\Constants\LogLevel;
-use IO\Helper\ReCaptcha;
-use IO\Services\NotificationService;
-use Plenty\Modules\Account\Contact\Models\Contact;
-use Plenty\Modules\Webshop\Contracts\ContactRepositoryContract;
-use Plenty\Modules\Webshop\Events\ValidateVatNumber;
-use Plenty\Plugin\Events\Dispatcher;
-use Plenty\Plugin\Http\Response;
-use Plenty\Plugin\Http\Request;
 use IO\Api\ApiResource;
 use IO\Api\ApiResponse;
 use IO\Api\ResponseCode;
+use IO\Constants\LogLevel;
+use IO\Helper\ReCaptcha;
 use IO\Services\CustomerService;
+use IO\Services\NotificationService;
+use Plenty\Modules\Account\Contact\Models\Contact;
+use Plenty\Modules\Webshop\Contracts\ContactRepositoryContract;
+use Plenty\Modules\Webshop\Contracts\SessionStorageRepositoryContract;
+use Plenty\Modules\Webshop\Events\ValidateVatNumber;
+use Plenty\Plugin\Events\Dispatcher;
+use Plenty\Plugin\Http\Request;
+use Plenty\Plugin\Http\Response;
 
 /**
  * Class CustomerResource
@@ -52,6 +53,21 @@ class CustomerResource extends ApiResource
     public function index(): Response
     {
         $contact = $this->contactRepository->getContact();
+
+        if (is_null($contact)) {
+            /** @var SessionStorageRepositoryContract $sessionStorageRepository */
+            $sessionStorageRepository = pluginApp(SessionStorageRepositoryContract::class);
+
+            $guestEmail = $sessionStorageRepository->getSessionValue(SessionStorageRepositoryContract::GUEST_EMAIL);
+
+            if (strlen($guestEmail)) {
+                $contact = [
+                    'isGuest' => true,
+                    'email' => $guestEmail
+                ];
+            }
+        }
+
         return $this->response->create($contact, ResponseCode::OK);
     }
 
