@@ -715,9 +715,9 @@ class CustomerService
             }
         }
 
-        if ((int)$this->contactRepository->getContactId() <= 0 &&
-            $typeId == AddressType::BILLING &&
-            $addressData['email']) {
+        if ($typeId == AddressType::BILLING &&
+            $addressData['email'] &&
+            (int)$this->contactRepository->getContactId() <= 0) {
             /** @var SessionStorageRepositoryContract $sessionStorageRepository */
             $sessionStorageRepository = pluginApp(SessionStorageRepositoryContract::class);
             $sessionStorageRepository->setSessionValue(
@@ -901,9 +901,9 @@ class CustomerService
             }
         );
 
-        if ((int)$this->contactRepository->getContactId() <= 0 &&
-            $typeId == AddressType::BILLING &&
-            $addressData['email']) {
+        if ($typeId == AddressType::BILLING &&
+            $addressData['email'] &&
+            (int)$this->contactRepository->getContactId() <= 0) {
             /** @var SessionStorageRepositoryContract $sessionStorageRepository */
             $sessionStorageRepository = pluginApp(SessionStorageRepositoryContract::class);
             $sessionStorageRepository->setSessionValue(
