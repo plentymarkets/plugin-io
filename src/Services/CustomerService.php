@@ -715,6 +715,17 @@ class CustomerService
             }
         }
 
+        if ((int)$this->contactRepository->getContactId() <= 0 &&
+            $typeId == AddressType::BILLING &&
+            $addressData['email']) {
+            /** @var SessionStorageRepositoryContract $sessionStorageRepository */
+            $sessionStorageRepository = pluginApp(SessionStorageRepositoryContract::class);
+            $sessionStorageRepository->setSessionValue(
+                SessionStorageRepositoryContract::GUEST_EMAIL,
+                $addressData['email']
+            );
+        }
+
         return $newAddress;
     }
 
@@ -725,12 +736,15 @@ class CustomerService
      * @return array
      * @throws \Exception
      */
-    private function buildAddressEmailOptions(array $options = [], $isGuest = false, $addressData = [], $keepEmptyValuesInOptions = false): array
-    {
-        if(isset($addressData['email'])) {
+    private function buildAddressEmailOptions(
+        array $options = [],
+        $isGuest = false,
+        $addressData = [],
+        $keepEmptyValuesInOptions = false
+    ): array {
+        if (isset($addressData['email'])) {
             $email = $addressData['email'];
-        }
-        elseif ($isGuest) {
+        } elseif ($isGuest) {
             /** @var SessionStorageRepositoryContract $sessionStorageRepository */
             $sessionStorageRepository = pluginApp(SessionStorageRepositoryContract::class);
             $email = $sessionStorageRepository->getSessionValue(SessionStorageRepositoryContract::GUEST_EMAIL);
@@ -778,7 +792,9 @@ class CustomerService
                 ];
             }
 
-            if (isset($addressData['contactPerson']) && (strlen($addressData['contactPerson']) || $keepEmptyValuesInOptions)) {
+            if (isset($addressData['contactPerson']) && (strlen(
+                        $addressData['contactPerson']
+                    ) || $keepEmptyValuesInOptions)) {
                 $options[] = [
                     'typeId' => AddressOption::TYPE_CONTACT_PERSON,
                     'value' => $addressData['contactPerson']
@@ -884,6 +900,17 @@ class CustomerService
                 }
             }
         );
+
+        if ((int)$this->contactRepository->getContactId() <= 0 &&
+            $typeId == AddressType::BILLING &&
+            $addressData['email']) {
+            /** @var SessionStorageRepositoryContract $sessionStorageRepository */
+            $sessionStorageRepository = pluginApp(SessionStorageRepositoryContract::class);
+            $sessionStorageRepository->setSessionValue(
+                SessionStorageRepositoryContract::GUEST_EMAIL,
+                $addressData['email']
+            );
+        }
 
         /** @var Dispatcher $pluginEventDispatcher */
         $pluginEventDispatcher = pluginApp(Dispatcher::class);
