@@ -67,12 +67,15 @@ class ContactMailService
         }
 
         $translator = pluginApp(Translator::class);
+        
+        $translationMailData = array_map(function($mailDataEntry) {
+           return $mailDataEntry['value'];
+        }, $mailData['data']);
+        $translationMailData['subject'] = $mailData['subject'];
+        
         $subject = $translator->trans(
             'Ceres::Template.contactMailSubject',
-            [
-                'subject' => $mailData['subject'],
-                'data' => $mailData['data']
-            ]
+            $translationMailData
         );
         
         $attachments = [];

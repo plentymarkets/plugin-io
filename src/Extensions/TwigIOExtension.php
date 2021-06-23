@@ -27,6 +27,7 @@ use IO\Extensions\Functions\GetBasePrice;
 use IO\Extensions\Functions\Partial;
 use IO\Extensions\Functions\QueryString;
 use IO\Extensions\Functions\UniqueId;
+use IO\Extensions\Functions\FindItemVariation;
 
 /**
  * Provide services and helper functions to twig engine
@@ -67,7 +68,8 @@ class TwigIOExtension extends Twig_Extension
         AddressOptionTypeFilter $addressOptionTypeFilter,
         TabFilter $tabFilter,
         GetCdnMetadata $cdnMetadata,
-        PropertyNameFilter $propertySelectionValueNameFilter
+        PropertyNameFilter $propertySelectionValueNameFilter,
+        FindItemVariation $findItemVariation
     ) {
         $this->twig = $twig;
         $this->request = $request;

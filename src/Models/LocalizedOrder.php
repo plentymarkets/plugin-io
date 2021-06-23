@@ -4,6 +4,7 @@ namespace IO\Models;
 
 use IO\Builder\Order\OrderType;
 use IO\Services\TemplateConfigService;
+use Plenty\Modules\Order\Date\Models\OrderDateType;
 use Plenty\Modules\Order\Models\OrderItem;
 use Plenty\Modules\Order\Models\OrderItemType;
 use Plenty\Modules\Webshop\Contracts\GiftCardRepositoryContract;
@@ -116,6 +117,9 @@ class LocalizedOrder extends ModelWrapper
 
         $instance = pluginApp(self::class);
         $instance->order = $order;
+        
+        $creationDate = $order->getDate(OrderDateType::ORDER_ENTRY_AT);
+        $instance->order->createdAt = $creationDate->date;
 
         $instance->status = [];
         $instance->totals = $orderTotalsService->getAllTotals($order);
