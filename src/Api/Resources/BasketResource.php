@@ -2,6 +2,9 @@
 
 namespace IO\Api\Resources;
 
+use IO\Middlewares\DetectCurrency;
+use IO\Middlewares\DetectReferrer;
+use IO\Middlewares\DetectShippingCountry;
 use Plenty\Modules\Frontend\Services\VatService;
 use Plenty\Plugin\Http\Response;
 use Plenty\Plugin\Http\Request;
@@ -48,6 +51,18 @@ class BasketResource extends ApiResource
      */
     public function index(): Response
     {
+        /** @var DetectReferrer $detectReferrer */
+        $detectReferrer = pluginApp(DetectReferrer::class);
+        $detectReferrer->before($this->request);
+        
+        /** @var DetectShippingCountry $detectShippingCountry */
+        $detectShippingCountry = pluginApp(DetectShippingCountry::class);
+        $detectShippingCountry->before($this->request);
+        
+        /** @var DetectCurrency $detectCurrency */
+        $detectCurrency = pluginApp(DetectCurrency::class);
+        $detectCurrency->before($this->request);
+        
         $basket                  = $this->basketService->getBasketForTemplate();
         $basket['totalVats']     = $this->vatService->getCurrentTotalVats();
 

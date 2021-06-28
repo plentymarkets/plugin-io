@@ -59,8 +59,8 @@ class DetectLanguage extends Middleware
                     TemplateService::$shouldBeCached = false;
                 }
             } elseif (strpos(end($splittedURL), '.') === false) {
-                // language has not been detected. Check if URL points to default language.
-                $this->setLanguage($splittedURL[0], $webstoreConfig);
+                // language has not been detected. check if url points to default language
+                $this->setLanguage($request->get('Lang', $splittedURL[0]), $webstoreConfig);
             }
         }
     }

@@ -634,7 +634,7 @@ class CustomerService
             /** @var Dispatcher $eventDispatcher */
             $eventDispatcher = pluginApp(Dispatcher::class);
             /** @var ValidateVatNumber $val */
-            $val = pluginApp(ValidateVatNumber::class, [$addressData['vatNumber']]);
+            $val = pluginApp(ValidateVatNumber::class, [$addressData['vatNumber'], $addressData['countryId']]);
             $eventDispatcher->fire($val);
         }
 
@@ -715,6 +715,17 @@ class CustomerService
             }
         }
 
+        if ($typeId == AddressType::BILLING &&
+            $addressData['email'] &&
+            (int)$this->contactRepository->getContactId() <= 0) {
+            /** @var SessionStorageRepositoryContract $sessionStorageRepository */
+            $sessionStorageRepository = pluginApp(SessionStorageRepositoryContract::class);
+            $sessionStorageRepository->setSessionValue(
+                SessionStorageRepositoryContract::GUEST_EMAIL,
+                $addressData['email']
+            );
+        }
+
         return $newAddress;
     }
 
@@ -725,9 +736,15 @@ class CustomerService
      * @return array
      * @throws \Exception
      */
-    private function buildAddressEmailOptions(array $options = [], $isGuest = false, $addressData = [], $keepEmptyValuesInOptions = false): array
-    {
-        if ($isGuest) {
+    private function buildAddressEmailOptions(
+        array $options = [],
+        $isGuest = false,
+        $addressData = [],
+        $keepEmptyValuesInOptions = false
+    ): array {
+        if (isset($addressData['email'])) {
+            $email = $addressData['email'];
+        } elseif ($isGuest) {
             /** @var SessionStorageRepositoryContract $sessionStorageRepository */
             $sessionStorageRepository = pluginApp(SessionStorageRepositoryContract::class);
             $email = $sessionStorageRepository->getSessionValue(SessionStorageRepositoryContract::GUEST_EMAIL);
@@ -775,7 +792,9 @@ class CustomerService
                 ];
             }
 
-            if (isset($addressData['contactPerson']) && (strlen($addressData['contactPerson']) || $keepEmptyValuesInOptions)) {
+            if (isset($addressData['contactPerson']) && (strlen(
+                        $addressData['contactPerson']
+                    ) || $keepEmptyValuesInOptions)) {
                 $options[] = [
                     'typeId' => AddressOption::TYPE_CONTACT_PERSON,
                     'value' => $addressData['contactPerson']
@@ -812,7 +831,7 @@ class CustomerService
             /** @var Dispatcher $eventDispatcher */
             $eventDispatcher = pluginApp(Dispatcher::class);
             /** @var ValidateVatNumber $val */
-            $val = pluginApp(ValidateVatNumber::class, [$addressData['vatNumber']]);
+            $val = pluginApp(ValidateVatNumber::class, [$addressData['vatNumber'], $addressData['countryId']]);
             $eventDispatcher->fire($val);
         }
 
@@ -881,6 +900,17 @@ class CustomerService
                 }
             }
         );
+
+        if ($typeId == AddressType::BILLING &&
+            $addressData['email'] &&
+            (int)$this->contactRepository->getContactId() <= 0) {
+            /** @var SessionStorageRepositoryContract $sessionStorageRepository */
+            $sessionStorageRepository = pluginApp(SessionStorageRepositoryContract::class);
+            $sessionStorageRepository->setSessionValue(
+                SessionStorageRepositoryContract::GUEST_EMAIL,
+                $addressData['email']
+            );
+        }
 
         /** @var Dispatcher $pluginEventDispatcher */
         $pluginEventDispatcher = pluginApp(Dispatcher::class);

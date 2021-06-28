@@ -1,5 +1,93 @@
 # Release Notes für IO
 
+## v5.0.33 (2021-06-14) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.32...5.0.33" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
+
+### Hinzugefügt
+
+- Die Methode `getVariations` im ItemService kann nun per Parameter die Ergebnisfelder für das Suchergebnis überschreiben.
+
+### Behoben
+
+- Bestandteile von Artikelsets enthalten nun Werte in den Bestellmerkmalen vom Typ Auswahl.
+- Auf der Bestellbestätigungsseite konnte es zu einer fehlerhaften Darstellung der Versandkosten kommen. Das Verhalten wurde behoben.
+- Das Erstellungsdatum eines Auftrags wurde auf der Bestellbestätigungsseite und im Mein-Konto-Bereich nicht aktualisiert, wenn es über das Backend verändert wurde. Dies wurde behoben.
+
+## v5.0.32 (2021-06-01) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.30...5.0.32" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
+
+### Hinzugefügt
+
+- Es wurde eine Twig-Hilfsfunktion hinzugefügt, die das Filtern von Artikelvarianten ermöglicht.
+
+### Behoben
+
+- In den Übersetzungen des Betreffs des Kontaktformulars konnte nicht auf alle eingegebenen Daten zugegriffen werden. Dies wurde behoben.
+
+## v5.0.30 (2021-05-14) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.29...5.0.30" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
+
+### Geändert
+
+- Die Shop-Performance beim Laden der Anzahl der Artikel im Warenkorb wurde erhöht. 
+
+## v5.0.29 (2021-05-11) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.28...5.0.29" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
+
+### Hinzugefügt
+
+- Es ist nun möglich, Seiten mit Query-Parametern mit dem ShopBooster zu cachen.
+
+### Geändert
+
+- Die Performance der Ermittlung des aktuellen Seitentyps wurde verbessert.
+
+## v5.0.28 (2021-04-20) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.26...5.0.28" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
+
+### Behoben 
+
+- Das Routing für 404-Seiten lieferte den falschen HTTP-Statuscode. Dieses Verhalten wurde behoben.
+- Zahlungsartenrabatte und -aufschläge werden jetzt bei einer nachträglichen Änderung der Zahlungsart eines bestehenden Auftrags berücksichtigt.
+- Unter bestimmten Umständen wurde die Währung in der Auftragsübersicht im Mein Konto-Bereich falsch angezeigt. Dieses Verhalten wurde behoben.
+
+### Geändert
+
+- Das länderspezifische Präfix der Umsatzsteuer-Identifikationsnummer wird nun validiert.
+
+## v5.0.26 (2021-04-06) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.25...5.0.26" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
+
+### Geändert
+
+- Das Event `AfterBasketItemUpdate` enthält nun den aktualisierten Grundpreis.
+
+## v5.0.25 (2021-03-22) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.24...5.0.25" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
+
+### Behoben
+
+- Bei Ausfuhrlieferungen wurden unter Umständen die Versandkosten auf der Auftragsbestätigungsseite nicht korrekt angezeigt. Dies wurde behoben.
+
+## v5.0.24 (2021-03-08) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.23...5.0.24" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
+
+### Geändert
+
+- Beim Bestellabschluss wird nicht mehr der vorhandene Warenkorb geleert, sondern durch einen neuen bereits leeren Warenkorb ersetzt. Dies beschleunigt die Auftragsanlage vor allem bei größeren Warenkörben.
+
+### Behoben
+
+- Wurden die Routen /login und /register nicht mit einer Kategorie verknüpft, waren diese nicht in der Sitemap vorhanden. Dies wurde behoben.
+- Die 404-Route wurde nicht korrekt erkannt, wenn eine Kategorie verknüpft wurde. Dies wurde behoben.
+- Bei den Suchvorschlägen kam es teilweise zu unterschiedlichen Ergebnissen. Dies hing von der Groß- und Kleinschreibung des Suchworts ab.
+
+## v5.0.23 (2021-02-22) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.22...5.0.23" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
+
+### Hinzugefügt
+
+- Das Artikellisten-Widget enthält nun die Option, eine Liste anzulegen, die Artikel des kompletten Sortiments enthält.
+
+### Geändert
+
+- Die Sortierung der Lieferländer wird nun serverseitig gerendert.
+
+### Behoben
+
+- Wenn eine Login-Seite nicht im ShopBuilder erstellt wurde, wurde sie ohne Canonical-Tag ausgeliefert. Dieses Verhalten wurde behoben.
+
 ## v5.0.22 (2021-02-11) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.21...5.0.22" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
 
 ### Behoben

@@ -1,5 +1,91 @@
 # Release Notes for IO
 
+## v5.0.33 (2021-06-014) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.32...5.0.33" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
+
+### Added 
+
+- The method `getVariations` in the ItemService can now overwrite the result fields of the search result via a parameter. 
+
+### Fixed
+
+- Components of item sets now contain values in order characteristics of the type selection.
+- Due to an error, shipping costs were displayed incorrectly on the order confirmation page. This has been fixed.
+- An order's date of creation was not updated on the order confirmation page and in the My Account area if it had been changed in the backend. This has been fixed. 
+ 
+## v5.0.32 (2021-06-01) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.30...5.0.32" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
+
+### Added
+
+- We added a Twig helper function which allows filtering of item variations.
+
+### Fixed
+
+- In the translations of the subject of the contact form, not all entered data could be accessed. This has been fixed.
+
+## v5.0.30 (2021-05-14) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.29...5.0.30" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
+
+### Changed
+
+- The shop performance regarding the loading of the number of items in the shopping cart has been improved.
+
+## v5.0.29 (2021-05-11) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.28...5.0.29" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
+
+### Added
+
+- ShopBooster now also caches pages with query parameters.
+
+### Changed 
+
+- The performance of the detection of the current page type has been improved.
+
+## v5.0.28 (2021-04-20) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.26...5.0.28" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
+
+- The routing for 404 pages returned the wrong HTTP status code. This behaviour has been fixed.
+- Payment method dependent surcharges and rebates are now taken into account if the payment method of an already existing order is changed.  
+- Under certain circumstances, the currency was displayed incorrectly in the order overview in the My Account section. This behaviour has been fixed.
+
+### Changed
+
+- The country-specific prefix of the VAT identification number is now validated.
+
+## v5.0.26 (2021-04-06) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.25...5.0.26" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
+
+### Changed
+
+- The event `AfterBasketItemUpdate` now also contains the updated base price.
+
+## v5.0.25 (2021-03-22) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.24...5.0.25" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
+
+### Fixed
+
+- For export deliveries, shipping costs were sometimes displayed incorrectly on the order confirmation page. This has been fixed.
+
+## v5.0.24 (2021-03-08) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.23...5.0.24" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
+
+### Changed
+
+- In the checkout, the existing shopping cart is no longer emptied, but replaced by a new empty one instead. This speeds up order creation especially for bigger shopping carts.
+
+### Fixed 
+
+- In case the routes /login and /register were not linked to a category, they were not listed in the sitemap. This has been fixed.
+- When linking a category, the 404 route wasn't identified correctly. This has been fixed.
+- Search suggestions partially showed different results. This depended on the usage of upper and lower case letters.
+
+## v5.0.23 (2021-02-22) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.22...5.0.23" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
+
+### Added 
+
+- The item list widget now contains the option to create a list that contains items from the entire range of products.
+
+### Changed
+
+- The sorting of countries of delivery is now rendered server-side.
+
+### Fixed 
+
+- Login pages that were not created with the ShopBuilder did not have a canonical tag. This behaviour has been fixed.
+
 ## v5.0.22 (2021-02-11) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.21...5.0.22" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
 
 ### Fixed

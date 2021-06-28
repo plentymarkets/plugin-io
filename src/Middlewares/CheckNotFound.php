@@ -39,6 +39,7 @@ class CheckNotFound extends Middleware
      * @param Request $request
      * @param Response $response
      * @return Response
+     * @throws \ErrorException
      */
     public function after(Request $request, Response $response)
     {

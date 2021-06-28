@@ -3,12 +3,8 @@
 namespace IO\Services;
 
 use IO\Builder\Order\OrderItemType;
-use Plenty\Modules\Accounting\Contracts\AccountingLocationRepositoryContract;
-use Plenty\Modules\Frontend\Services\VatService;
-use Plenty\Modules\Order\Date\Models\OrderDateType;
 use Plenty\Modules\Order\Models\Order;
 use Plenty\Modules\Order\Models\OrderItem;
-use Plenty\Modules\Order\Shipping\Contracts\EUCountryCodesServiceContract;
 use Plenty\Modules\Webshop\Helpers\NumberFormatter;
 
 /**
@@ -48,14 +44,8 @@ class OrderTotalsService
 
         $orderItems = $order->orderItems;
 
-        $accountRepo = pluginApp(AccountingLocationRepositoryContract::class);
-        $vatService = pluginApp(VatService::class);
         /** @var NumberFormatter $numberFormatter */
         $numberFormatter = pluginApp(NumberFormatter::class);
-        /**
-         * @var EUCountryCodesServiceContract $euCountryCodesServiceContract
-         */
-        $euCountryCodesServiceContract = pluginApp(EUCountryCodesServiceContract::class);
         foreach ($orderItems as $item) {
             $itemAmountId = $this->getCustomerAmountId($item->amounts);
             /** @var OrderItem $item */
@@ -68,20 +58,8 @@ class OrderTotalsService
                     $itemSumNet += $firstAmount->priceNet * $item->quantity;
                     break;
                 case OrderItemType::SHIPPING_COSTS:
-                    $locationId = $vatService->getLocationId($item->countryVatId);
-                    $accountSettings = $accountRepo->getSettings($locationId);
-
                     $shippingGross += $firstAmount->priceGross;
                     $shippingNet += $firstAmount->priceNet;
-                    $entryDate = $order->dates->where('typeId', OrderDateType::ORDER_ENTRY_AT)->first();
-
-                    if ((bool)$accountSettings->showShippingVat && $euCountryCodesServiceContract->isExportDelivery(
-                            $order->deliveryAddress->countryId,
-                            $item->countryVatId,
-                            isset($entryDate) ? $entryDate->date->toDateString() : $order->createdAt->toDateString()
-                        )) {
-                        $shippingNet = $shippingGross;
-                    }
                     break;
                 case OrderItemType::PROMOTIONAL_COUPON:
                 case OrderItemType::GIFT_CARD:

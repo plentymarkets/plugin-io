@@ -40,6 +40,8 @@ use Plenty\Modules\Webshop\ItemSearch\SearchPresets\SingleItem;
 use Plenty\Modules\Webshop\ItemSearch\SearchPresets\VariationList;
 use Plenty\Modules\Webshop\ItemSearch\Services\ItemSearchService;
 use Plenty\Plugin\Application;
+use Plenty\Modules\Webshop\ItemSearch\Helpers\ResultFieldTemplate;
+
 
 
 /**
@@ -184,15 +186,22 @@ class ItemService
     /**
      * Get a list of item variations with the specified variation ids
      * @param array $variationIds A list of variation idss
+     * @param string $resultFieldTemplate Specify a result field template to filter the search response
      * @return array
      * @throws \Exception
      */
-    public function getVariations(array $variationIds): array
+    public function getVariations(array $variationIds, string $resultFieldTemplate = ''): array
     {
         /** @var ItemSearchService $itemSearchService */
         $itemSearchService = pluginApp(ItemSearchService::class);
+        $searchFactory = VariationList::getSearchFactory(['variationIds' => $variationIds]);
 
-        return $itemSearchService->getResults([VariationList::getSearchFactory(['variationIds' => $variationIds])])[0];
+        if (strlen($resultFieldTemplate)) {
+            $searchFactory->withResultFields(
+                ResultFieldTemplate::load($resultFieldTemplate)
+            );
+        }
+        return $itemSearchService->getResult($searchFactory);
     }
 
     /**

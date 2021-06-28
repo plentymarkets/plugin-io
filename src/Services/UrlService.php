@@ -152,10 +152,11 @@ class UrlService
                             ->toAbsoluteUrl($includeLanguage);
                     }
                     return null;
-                }
-
-                if (TemplateService::$currentTemplate === 'tpl.home' || TemplateService::$currentTemplate === 'tpl.home.category') {
+                } elseif (TemplateService::$currentTemplate === 'tpl.home' || TemplateService::$currentTemplate === 'tpl.home.category')   {
                     return pluginApp(UrlQuery::class, ['path' => "", 'lang' => $lang])
+                        ->toAbsoluteUrl($includeLanguage);
+                } elseif (TemplateService::$currentTemplate === 'tpl.login') {
+                    return pluginApp(UrlQuery::class, ['path' => "login", 'lang' => $lang])
                         ->toAbsoluteUrl($includeLanguage);
                 }
 

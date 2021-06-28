@@ -37,6 +37,11 @@ class ShopUrls
     ];
 
     /**
+     * @var array Data array with values for each language if already initialized.
+     */
+    private static $shopUrls = [];
+
+    /**
      * @var bool Define if a trailing slash should be appended to URLS or not.
      *           Consider this option to avoid unnecessary 301 redirects.
      */
@@ -184,7 +189,12 @@ class ShopUrls
 
     private function init($lang)
     {
-        $shopUrls = Utils::getCacheKey('shopUrls_' . $lang, null);
+        if (isset(self::$shopUrls[$lang])) {
+            $shopUrls = self::$shopUrls[$lang];
+        } else {
+            $shopUrls = Utils::getCacheKey('shopUrls_' . $lang, null);
+            self::$shopUrls[$lang] = $shopUrls;
+        }
 
         if (!is_null($shopUrls)) {
             $this->initByCache($shopUrls);
@@ -291,7 +301,7 @@ class ShopUrls
      */
     public function orderPropertyFile($path)
     {
-        return $this->getShopUrl(RouteConfig::ORDER_PROPERTY_FILE, Utils::getLang(),null, $path);
+        return $this->getShopUrl(RouteConfig::ORDER_PROPERTY_FILE, Utils::getLang(), [$path]);
     }
 
     /**
@@ -483,13 +493,6 @@ class ShopUrls
                         return RouteConfig::HOME;
                     }
 
-                    foreach (RouteConfig::ALL as $routeKey) {
-                        if ($this->equals($url, $this->getShopUrl($routeKey))) {
-                            // current page is a special linked page
-                            return $routeKey;
-                        }
-                    }
-
                     // match url pattern
                     if (preg_match('/(?:a\-\d+|_\d+|_\d+_\d+)\/?$/m', $url) === 1) {
                         return RouteConfig::ITEM;
@@ -497,6 +500,13 @@ class ShopUrls
                         return RouteConfig::TAGS;
                     } elseif (preg_match('/confirmation\/\d+\/([A-Za-z]|\d)+\/?/m', $url) === 1) {
                         return RouteConfig::CONFIRMATION;
+                    }
+
+                    foreach (RouteConfig::ALL as $routeKey) {
+                        if ($this->equals($url, $this->getUrl($routeKey))) {
+                            // current page is a special linked page
+                            return $routeKey;
+                        }
                     }
 
                     if ($shopBuilderRequest->isShopBuilder(
@@ -564,5 +574,34 @@ class ShopUrls
                 RouteConfig::PRIVACY_POLICY
             ]
         );
+    }
+
+    private function getUrl($routeKey)
+    {
+        switch ($routeKey) {
+            case RouteConfig::BASKET:               return $this->basket;
+            case RouteConfig::CANCELLATION_RIGHTS:  return $this->cancellationRights;
+            case RouteConfig::CANCELLATION_FORM:    return $this->cancellationForm;
+            case RouteConfig::CHANGE_MAIL:          return $this->changeMail;
+            case RouteConfig::CHECKOUT:             return $this->checkout;
+            case RouteConfig::CONFIRMATION:         return $this->confirmation;
+            case RouteConfig::CONTACT:              return $this->contact;
+            case RouteConfig::HOME:                 return $this->home;
+            case RouteConfig::LEGAL_DISCLOSURE:     return $this->legalDisclosure;
+            case RouteConfig::LOGIN:                return $this->login;
+            case RouteConfig::MY_ACCOUNT:           return $this->myAccount;
+            case RouteConfig::NEWSLETTER_OPT_OUT:   return $this->newsletterOptOut;
+            case RouteConfig::ORDER_DOCUMENT:       return $this->orderDocument;
+            case RouteConfig::ORDER_RETURN:         return $this->returns;
+            case RouteConfig::ORDER_RETURN_CONFIRMATION: return $this->returnConfirmation;
+            case RouteConfig::PASSWORD_RESET:       return $this->passwordReset;
+            case RouteConfig::PRIVACY_POLICY:       return $this->privacyPolicy;
+            case RouteConfig::REGISTER:             return $this->registration;
+            case RouteConfig::SEARCH:               return $this->search;
+            case RouteConfig::TERMS_CONDITIONS:     return $this->gtc;
+            case RouteConfig::WISH_LIST:            return $this->wishList;
+            default:                                return null;
+        }
+
     }
 }

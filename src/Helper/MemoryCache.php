@@ -2,6 +2,9 @@
 
 namespace IO\Helper;
 
+use Plenty\Plugin\Http\Request;
+use Plenty\Plugin\Log\Loggable;
+
 /**
  * Trait MemoryCache
  *
@@ -15,7 +18,10 @@ namespace IO\Helper;
  */
 trait MemoryCache
 {
+    use Loggable;
+
     private static $cache = [];
+    private static $request;
 
     /**
      * Store the result of a operation in the memory cache.
@@ -30,7 +36,13 @@ trait MemoryCache
         }
 
         if (!array_key_exists($key, self::$cache[self::class])) {
+            $start = microtime(true);
             self::$cache[self::class][$key] = $callack->call($this);
+            /** @var Request $request */
+            $request = pluginApp(Request::class);
+            if($request->get('debug') === 'performance') {
+                $this->getLogger(__CLASS__)->error('MemoryCache: ' . self::class . '.' . $key . ': ' . (microtime(true) - $start));
+            }
         }
 
         return self::$cache[self::class][$key];

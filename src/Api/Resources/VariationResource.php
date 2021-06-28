@@ -48,7 +48,8 @@ class VariationResource extends ApiResource
                 'page' => $this->request->get('page'),
                 'itemsPerPage' => $this->request->get('itemsPerPage'),
                 'setPriceOnly' => $this->request->get('setPriceOnly') === 'true',
-                'withVariationPropertyGroups' => true
+                'withVariationPropertyGroups' => true,
+                'withOrderPropertySelectionValues' => true
             ]
         );
 
