@@ -16,17 +16,19 @@ use IO\Services\TemplateService;
 
 /**
  * Class OrderTemplateResource
+ *
+ * Resource class for the route `io/order/template`.
  * @package IO\Api\Resources
  */
 class OrderTemplateResource extends ApiResource
 {
     /**
-     * @var OrderRepositoryContract
+     * @var OrderRepositoryContract $orderRepository The instance of the OrderRepository.
      */
     private $orderRepository;
 
     /**
-     * @var TemplateService
+     * @var TemplateService $templateService The instance of the TemplateService.
      */
     private $templateService;
 
@@ -72,5 +74,4 @@ class OrderTemplateResource extends ApiResource
 
         return $this->response->create($renderedTemplate, ResponseCode::OK);
     }
-
 }

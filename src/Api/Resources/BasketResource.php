@@ -15,16 +15,19 @@ use IO\Services\BasketService;
 
 /**
  * Class BasketResource
+ *
+ * Resource class for the route `io/basket`.
  * @package IO\Api\Resources
  */
 class BasketResource extends ApiResource
 {
     /**
-     * @var BasketService
+     * @var BasketService $basketService Instance of the BasketService.
      */
     private $basketService;
+
     /**
-     * @var VatService
+     * @var VatService $vatService Instance of the BasketService.
      */
     private $vatService;
 
@@ -43,7 +46,7 @@ class BasketResource extends ApiResource
     }
 
     /**
-     * Get the basket
+     * Get the basket.
      * @return Response
      */
     public function index(): Response

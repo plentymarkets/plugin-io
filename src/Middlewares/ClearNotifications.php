@@ -7,11 +7,23 @@ use Plenty\Plugin\Http\Request;
 use Plenty\Plugin\Http\Response;
 use Plenty\Plugin\Middleware;
 
+/**
+ * Class ClearNotifications
+ *
+ * Clear notifications if necessary.
+ *
+ * @package IO\Middlewares
+ */
 class ClearNotifications extends Middleware
 {
+    /**
+     * @var bool $CLEAR_NOTIFICATIONS Force clear notifications status.
+     */
     public static $CLEAR_NOTIFICATIONS = false;
 
     /**
+     * Before the request is processed, do nothing here.
+     *
      * @param Request $request
      */
     public function before(Request $request)
@@ -19,6 +31,8 @@ class ClearNotifications extends Middleware
     }
 
     /**
+     * After the request is processed, check if the notifications should be cleared.
+     *
      * @param Request $request
      * @param Response $response
      * @return Response

@@ -7,6 +7,9 @@ use IO\Services\TemplateConfigService;
 
 /**
  * Class ItemNameFilter
+ *
+ * Contains twig filter to get the item name.
+ *
  * @package IO\Extensions\Filters
  */
 class ItemNameFilter extends AbstractFilter
@@ -20,7 +23,7 @@ class ItemNameFilter extends AbstractFilter
     public function __construct()
     {
         /** @var TemplateConfigService $configService */
-        $configService = pluginApp( TemplateConfigService::class );
+        $configService = pluginApp(TemplateConfigService::class);
 
         $this->defaultConfigItemName = $configService->get('item.name');
         $this->defaultConfigItemDisplayName = $configService->get('item.displayName');
@@ -29,10 +32,11 @@ class ItemNameFilter extends AbstractFilter
     }
 
     /**
-     * Return the available filter methods
+     * Get the twig filter to method name mapping. (twig filter => method name)
+     *
      * @return array
      */
-    public function getFilters():array
+    public function getFilters(): array
     {
         return [
             "itemName" => "itemName"
@@ -40,21 +44,22 @@ class ItemNameFilter extends AbstractFilter
     }
 
     /**
-     * Build the item name from the configuration
-     * @param object $itemData
-     * @param string $configName
-     * @param string $displayName
+     * Gets the item name which is configured to be shown in the shop.
+     *
+     * @param array $itemData Item data from which the name is returned.
+     * @param string $configName What item name to get.
+     *                               Use name that is set in the plugin config if nothing or null is given.
+     * @param string $displayName Decides if the variation name is attached, only shown or not shown at all.
+     *                                Defaults to the value set in the plugin config.
      * @return string
      */
-    public function itemName( $itemData, $configName = null, $displayName = null )
+    public function itemName($itemData, $configName = null, $displayName = null)
     {
-        if ( $configName === null )
-        {
+        if ($configName === null) {
             $configName = $this->defaultConfigItemName;
         }
 
-        if ( $displayName === null )
-        {
+        if ($displayName === null) {
             $displayName = $this->defaultConfigItemDisplayName;
         }
 
@@ -62,26 +67,19 @@ class ItemNameFilter extends AbstractFilter
         $variationName = $itemData['variation']['name'];
 
         $configName = intval($configName);
-        if ($configName === 1 && strlen($itemTexts['name2']))
-        {
+        if ($configName === 1 && strlen($itemTexts['name2'])) {
             $showName = $itemTexts['name2'];
-        }
-        elseif ($configName === 2 && strlen($itemTexts['name3']))
-        {
+        } elseif ($configName === 2 && strlen($itemTexts['name3'])) {
             $showName = $itemTexts['name3'];
-        }
-        else
-        {
+        } else {
             $showName = $itemTexts['name1'];
         }
 
-        if ($displayName === 'itemNameVariationName' && strlen($variationName))
-        {
+        if ($displayName === 'itemNameVariationName' && strlen($variationName)) {
             $showName .= ' ' . $variationName;
         }
 
-        if ($displayName === 'variationName' && strlen($variationName))
-        {
+        if ($displayName === 'variationName' && strlen($variationName)) {
             $showName = $variationName;
         }
 

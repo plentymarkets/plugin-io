@@ -4,14 +4,22 @@ namespace IO\Helper;
 use Plenty\Plugin\Log\Loggable;
 
 /**
- * Container to pass current template between separate layout plugins and this plugin.
  * Class TemplateContainer
+ *
+ * Container to pass current template between separate layout plugins and this plugin.
+ *
  * @package IO\Helper
  */
 class TemplateContainer
 {
     use Loggable;
 
+    /**
+     * Get an instance of TemplateContainer based on the templateKey and additional data.
+     * @param string $templateKey Key for the template.
+     * @param array $data Additional data for the template.
+     * @return mixed
+     */
     public static function get($templateKey, $data = [])
     {
         $container = pluginApp(self::class);
@@ -113,6 +121,7 @@ class TemplateContainer
 	}
 
 	/**
+     * Getter for the templateKey property.
 	 * @return string
 	 */
 	public function getTemplateKey()
@@ -121,6 +130,7 @@ class TemplateContainer
 	}
 
 	/**
+     * Setter for the templateKey property.
 	 * @param string $templateKey
 	 * @return $this
 	 */
@@ -130,6 +140,10 @@ class TemplateContainer
 		return $this;
 	}
 
+    /**
+     * Setter for the contextClass property.
+     * @param $contextClass
+     */
 	public function setContext($contextClass)
     {
         $this->getLogger(__CLASS__)->debug(
@@ -142,6 +156,10 @@ class TemplateContainer
         $this->contextClass = $contextClass;
     }
 
+    /**
+     * Getter for the contextClass property.
+     * @return string|null
+     */
     public function getContext()
     {
         return $this->contextClass;
@@ -150,7 +168,7 @@ class TemplateContainer
 	/**
 	 * Add additional template data to the existing values.
 	 * @param mixed $data The data to add to map.
-	 * @param string $identifier An identifying string to access the given data
+	 * @param string $identifier An identifying string to access the given data.
 	 * @return TemplateContainer
 	 */
 	public function withData($data, string $identifier):TemplateContainer

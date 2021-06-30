@@ -16,19 +16,28 @@ use Plenty\Plugin\Http\Response;
 
 /**
  * Class ContactMailResource
+ *
+ * Resource class for the route `io/customer/contact/mail`.
  * @package IO\Api\Resources
  */
 class ContactMailResource extends ApiResource
 {
+    /**
+     * @var ContactMailService $contactMailService Instance of the ContactMailService.
+     */
     private $contactMailService;
 
-    /** @var TemplateConfigService */
+    /**
+     * @var TemplateConfigService $templateConfigService Instance of the TemplateConfigService
+     */
     private $templateConfigService;
 
     /**
      * ContactMailResource constructor.
      * @param Request $request
      * @param ApiResponse $response
+     * @param ContactMailService $contactMailService
+     * @param TemplateConfigService $templateConfigService
      */
     public function __construct(
         Request $request,
@@ -41,6 +50,10 @@ class ContactMailResource extends ApiResource
         $this->templateConfigService = $templateConfigService;
     }
 
+    /**
+     * Create a contact mail of the given data.
+     * @return Response
+     */
     public function store(): Response
     {
         // Honeypot check
@@ -72,6 +85,12 @@ class ContactMailResource extends ApiResource
         return $this->response->create($response, ResponseCode::BAD_REQUEST);
     }
 
+    /**
+     * Verify a reCAPTCHA token
+     * @param string $secret The reCAPTCHA secret.
+     * @param string $token The reCAPTCHA token.
+     * @return bool Validation result for the reCAPTCHA.
+     */
     public function verifyRecaptcha($secret, $token)
     {
         if (!strlen($secret)) {

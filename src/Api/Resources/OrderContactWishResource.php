@@ -11,6 +11,8 @@ use IO\Api\ResponseCode;
 
 /**
  * Class OrderContactWishResource
+ *
+ * Resource class for the route `io/order/contactWish`.
  * @package IO\Api\Resources
  */
 class OrderContactWishResource extends ApiResource
@@ -25,6 +27,10 @@ class OrderContactWishResource extends ApiResource
         parent::__construct($request, $response);
     }
 
+    /**
+     * Set the order contact wish for the current session taken from the request.
+     * @return Response
+     */
     public function store(): Response
     {
         $orderContactWish = $this->request->get('orderContactWish', '');

@@ -38,32 +38,32 @@ use Plenty\Plugin\Events\Dispatcher;
 class ApiResponse
 {
     /**
-     * @var array
+     * @var array $eventData Data of the server-side events.
      */
     public $eventData = [];
 
     /**
-     * @var Dispatcher
+     * @var Dispatcher $dispatcher Dispatcher to listen to the thrown events.
      */
     private $dispatcher;
 
     /**
-     * @var mixed
+     * @var mixed $data Unused.
      */
     private $data = null;
 
     /**
-     * @var array
+     * @var array $headers The response headers.
      */
     private $headers = [];
 
     /**
-     * @var null|Response
+     * @var Response $response The response.
      */
     private $response = null;
 
     /**
-     * @var NotificationService
+     * @var NotificationService $notificationService The instance of the NotificationService.
      */
     private $notificationService;
 
@@ -276,11 +276,11 @@ class ApiResponse
     }
 
     /**
-     * @param int $code
-     * @param null $message
+     * Throw a frontend error messsage.
+     * @param int $code Message code (Default: 0)
+     * @param null $message Optional: The notifications message.
      * @return ApiResponse
-     * @deprecated
-     *
+     * @deprecated will be removed in 6.0.0.
      */
     public function error(int $code, $message = null): ApiResponse
     {
@@ -289,11 +289,11 @@ class ApiResponse
     }
 
     /**
-     * @param int $code
-     * @param null $message
+     * Throw a frontend success message.
+     * @param int $code Message code (Default: 0)
+     * @param null $message Optional: The notifications message.
      * @return ApiResponse
-     * @deprecated
-     *
+     * @deprecated will be removed in 6.0.0.
      */
     public function success(int $code, $message = null): ApiResponse
     {
@@ -302,11 +302,11 @@ class ApiResponse
     }
 
     /**
-     * @param int $code
-     * @param null $message
+     * Throw a frontend info message.
+     * @param int $code Message code (Default: 0)
+     * @param null $message Optional: The notifications message.
      * @return ApiResponse
-     * @deprecated
-     *
+     * @deprecated will be removed in 6.0.0.
      */
     public function info(int $code, $message = null): ApiResponse
     {
@@ -315,8 +315,9 @@ class ApiResponse
     }
 
     /**
-     * @param string $key
-     * @param string $value
+     * Set a given value to the $headers array with the given key.
+     * @param string $key Key.
+     * @param string $value Value.
      * @return ApiResponse
      */
     public function header(string $key, string $value): ApiResponse
@@ -326,9 +327,10 @@ class ApiResponse
     }
 
     /**
-     * @param array $data
-     * @param int $code
-     * @param array $headers
+     * Create a response.
+     * @param array $data Response data.
+     * @param int $code Response code.
+     * @param array $headers Response headers.
      * @return Response
      */
     public function create($data, int $code = ResponseCode::OK, array $headers = []): Response
@@ -341,7 +343,7 @@ class ApiResponse
 
         $responseData["events"] = $this->eventData;
 
-        // FIX: Set basket data after "showNetPrice" has been recalculated
+        // FIX: Set basket data after "showNetPrice" has been recalculated.
         if (array_key_exists('AfterBasketChanged', $responseData['events'])) {
             /** @var BasketService $basketService */
             $basketService = pluginApp(BasketService::class);
@@ -367,6 +369,13 @@ class ApiResponse
         return $this->response->make(json_encode($responseData), $code, $this->headers);
     }
 
+    /**
+     * Append notifications to the $data array.
+     * @param array $data The data.
+     * @param string $type Unused.
+     * @param null $notifications The notifications.
+     * @return array|null
+     */
     private function appendNotifications($data = null, $type = null, $notifications = null)
     {
         if (is_null($data)) {

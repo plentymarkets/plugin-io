@@ -13,6 +13,8 @@ use Plenty\Plugin\Templates\Twig;
 
 /**
  * Class ItemLastSeenResource
+ *
+ * Resource class for the route `io/item/last_seen`.
  * @package IO\Api\Resources
  */
 class ItemLastSeenResource extends ApiResource
@@ -28,7 +30,7 @@ class ItemLastSeenResource extends ApiResource
     }
 
     /**
-     * Return last seen items
+     * Return a list of the last seen items.
      * @return Response
      */
     public function index(): Response
@@ -61,6 +63,11 @@ class ItemLastSeenResource extends ApiResource
         );
     }
 
+    /**
+     * Add a new variation ID to the list of the last seen items.
+     * @param string $variationId The ID of the variation to add.
+     * @return Response
+     */
     public function update(string $variationId): Response
     {
         if ((int)$variationId > 0) {

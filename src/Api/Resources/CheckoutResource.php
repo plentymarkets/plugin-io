@@ -13,17 +13,20 @@ use IO\Builder\Order\AddressType;
 
 /**
  * Class CheckoutResource
+ *
+ * Resource class for the route `io/checkout`.
  * @package IO\Api\Resources
  */
 class CheckoutResource extends ApiResource
 {
 	/**
-	 * @var CheckoutService
+	 * @var CheckoutService $checkoutService Instance of the CheckoutService.
 	 */
 	private $checkoutService;
-	/**
-	 * @var CustomerService
-	 */
+
+    /**
+     * @var CustomerService Instance of the CustomerService.
+     */
 	private $customerService;
 
     /**
@@ -41,7 +44,7 @@ class CheckoutResource extends ApiResource
 	}
 
     /**
-     * Get the checkout
+     * Get all relevant information for the checkout view.
      * @return Response
      */
 	public function index():Response
@@ -52,6 +55,12 @@ class CheckoutResource extends ApiResource
 
     /**
      * Save adresses and set the checkout data
+     * @return Response
+     */
+
+    /**
+     * Set the selected method of payment, shipping country ID, shipping profile ID, and the delivery address.
+     * Create addresses if required.
      * @return Response
      */
 	public function store():Response
@@ -91,25 +100,31 @@ class CheckoutResource extends ApiResource
 
 		return $this->index();
 	}
-    
+
     /**
-     * Update the checkout information
+     * Update the checkout information.
+     * @return Response
+     */
+
+    /**
+     * Update the checkout information.
+     * @param string $selector Unused.
      * @return Response
      */
 	public function update(string $selector = ''):Response
     {
         $billingAddressId = (int)$this->request->get("billingAddressId");
         $this->checkoutService->setBillingAddressId($billingAddressId);
-    
+
         $deliveryAddressId = (int)$this->request->get("deliveryAddressId");
         $this->checkoutService->setDeliveryAddressId($deliveryAddressId);
-        
+
         $methodOfPaymentId = (int)$this->request->get("methodOfPaymentId");
         $this->checkoutService->setMethodOfPaymentId($methodOfPaymentId);
-    
+
         $shippingProfileId = (int)$this->request->get("shippingProfileId");
         $this->checkoutService->setShippingProfileId($shippingProfileId);
-        
+
         return $this->index();
     }
 }

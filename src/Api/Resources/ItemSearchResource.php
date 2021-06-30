@@ -13,6 +13,8 @@ use IO\Api\ResponseCode;
 
 /**
  * Class ItemSearchResource
+ *
+ * Resource class for the route `io/item/search`.
  * @package IO\Api\Resources
  */
 class ItemSearchResource extends ApiResource
@@ -28,8 +30,9 @@ class ItemSearchResource extends ApiResource
     }
 
     /**
-     * Search items
+     * Execute a search for items for a given query.
      * @return Response
+     * @throws \Exception
      */
     public function index(): Response
     {

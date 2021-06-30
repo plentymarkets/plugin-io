@@ -19,7 +19,7 @@ class QueryString extends AbstractFunction
     }
 
     /**
-     * Return all available twig functions to be registered globally.
+     * Get the twig function to internal method name mapping. (twig function => internal method)
      *
      * @return array
      */

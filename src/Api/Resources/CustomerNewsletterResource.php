@@ -12,11 +12,25 @@ use IO\Constants\LogLevel;
 use IO\Helper\ReCaptcha;
 use IO\Services\NotificationService;
 
+/**
+ * Class CustomerNewsletterResource
+ *
+ * Resource class for the route `io/customer/newsletter`.
+ * @package IO\Api\Resources
+ */
 class CustomerNewsletterResource extends ApiResource
 {
-    /** @var CustomerNewsletterService */
+    /**
+     * @var CustomerNewsletterService $newsletterService Instance of the CustomerNewsletterService.
+     */
     private $newsletterService;
 
+    /**
+     * CustomerNewsletterResource constructor.
+     * @param Request $request
+     * @param ApiResponse $response
+     * @param CustomerNewsletterService $newsletterService
+     */
     public function __construct(Request $request, ApiResponse $response, CustomerNewsletterService $newsletterService)
     {
         parent::__construct($request, $response);
@@ -25,7 +39,7 @@ class CustomerNewsletterResource extends ApiResource
     }
 
     /**
-     * Add an email to a newsletter
+     * Subscribe an email address to a newsletter.
      * @return Response
      */
     public function store(): Response
@@ -58,10 +72,9 @@ class CustomerNewsletterResource extends ApiResource
     }
 
     /**
-     * Remove an email from the newsletter
-     * @param string $selector the email to be removed
+     * Unsubscribe an email address from a newsletter.
+     * @param string $selector Email address.
      * @return Response
-     * @throws \Throwable
      */
     public function destroy(string $selector): Response
     {

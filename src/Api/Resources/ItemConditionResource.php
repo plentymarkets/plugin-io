@@ -12,16 +12,17 @@ use IO\Services\ItemService;
 
 /**
  * Class ItemConditionResource
+ *
+ * Resource class for the route `io/item/condition`.
  * @package IO\Api\Resources
  */
 class ItemConditionResource extends ApiResource
 {
     /**
-     * @var ItemService
+     * @var ItemService $itemService Instance of the ItemService.
      */
     private $itemService;
-    
-    
+
     /**
      * ItemConditionResource constructor.
      * @param Request $request
@@ -33,20 +34,21 @@ class ItemConditionResource extends ApiResource
         parent::__construct($request, $response);
         $this->itemService = $itemService;
     }
-    
+
     /**
-     * @param string $conditionId
+     * Get the text for a specific item condition.
+     * @param string $conditionId ID of the item condition.
      * @return Response
      */
     public function show(string $conditionId):Response
     {
         $conditionText = '';
-        
+
         if((int)$conditionId > 0)
         {
             $conditionText = $this->itemService->getItemConditionText((int)$conditionId);
         }
-        
+
         return $this->response->create($conditionText, ResponseCode::OK);
     }
 }

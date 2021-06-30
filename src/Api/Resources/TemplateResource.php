@@ -12,6 +12,8 @@ use IO\Api\ResponseCode;
 
 /**
  * Class TemplateResource
+ *
+ * Resource class for the route `io/template`.
  * @package IO\Api\Resources
  */
 class TemplateResource extends ApiResource
@@ -27,7 +29,7 @@ class TemplateResource extends ApiResource
     }
 
     /**
-     * Return the given rendered template
+     * Return a rendered template via TWIG with given parameters.
      * @return Response
      */
     public function index():Response
@@ -56,5 +58,5 @@ class TemplateResource extends ApiResource
 
         return $this->response->create($renderedTemplate, ResponseCode::OK);
     }
-    
+
 }

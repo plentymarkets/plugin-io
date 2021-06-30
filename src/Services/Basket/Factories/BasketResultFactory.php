@@ -8,6 +8,12 @@ use Plenty\Modules\Webshop\ItemSearch\Helpers\ResultFieldTemplate;
 use Plenty\Modules\Webshop\ItemSearch\SearchPresets\VariationList;
 use Plenty\Modules\Webshop\ItemSearch\Services\ItemSearchService;
 
+/**
+ * Class BasketResultFactory
+ * Factory class to generate fake basket data to be used during the preview in the ShopBuilder.
+ *
+ * @package IO\Services\Basket\Factories
+ */
 class BasketResultFactory
 {
     /** @var BasketFaker $basketFaker */
@@ -29,7 +35,8 @@ class BasketResultFactory
     }
 
     /**
-     * Faker function for the basket view
+     * Create random data for the basket and basket items to be used in the ShopBuilder preview.
+     *
      * @return array
      */
     public function fillBasketResult()
@@ -45,8 +52,9 @@ class BasketResultFactory
 
     /**
      * Get random amount of items between 1 and 5 with random quantities between 1 and 3
-     * Format of array is [item, quantity]
+     *
      * @return array
+     * @throws \Exception
      */
     private function makeRawBasketItems()
     {

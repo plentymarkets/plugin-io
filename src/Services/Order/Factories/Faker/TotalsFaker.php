@@ -5,8 +5,21 @@ namespace IO\Services\Order\Factories\Faker;
 use IO\Services\ItemSearch\Factories\Faker\AbstractFaker;
 use Plenty\Modules\Webshop\Helpers\NumberFormatter;
 
+/**
+ * Class TotalsFaker
+ *
+ * This is a faker class for order totals.
+ * Faker classes are used for creating preview objects for use in the shopBuilder.
+ *
+ * @package IO\Services\Order\Factories\Faker
+ */
 class TotalsFaker extends AbstractFaker
 {
+    /**
+     * Fill the order array $data with faked order totals data.
+     * @param array $data An order array.
+     * @return mixed
+     */
     public function fill($data)
     {
         $vatRate       = 19;
@@ -58,6 +71,4 @@ class TotalsFaker extends AbstractFaker
         $this->merge($data, $default);
         return $data;
     }
-
-
 }

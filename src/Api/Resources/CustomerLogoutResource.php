@@ -11,12 +11,14 @@ use IO\Services\AuthenticationService;
 
 /**
  * Class CustomerLogoutResource
+ *
+ * Resource class for the route `io/customer/logout`.
  * @package IO\Api\Resources
  */
 class CustomerLogoutResource extends ApiResource
 {
 	/**
-	 * @var AuthenticationService
+	 * @var AuthenticationService $authService Instance of the AuthenticationService.
 	 */
 	private $authService;
 
@@ -31,8 +33,9 @@ class CustomerLogoutResource extends ApiResource
 		parent::__construct($request, $response);
 		$this->authService = $authService;
 	}
-    
+
     /**
+     * Log out the current user.
      * @return Response
      */
 	public function store():Response
