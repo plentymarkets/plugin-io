@@ -1,5 +1,11 @@
 # Release Notes for IO
 
+## v5.0.34 (2021-06-28) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.33...5.0.34" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
+
+### Changed
+
+- When creating and updating addresses, the field **Email** can now be used to influence address options.
+
 ## v5.0.33 (2021-06-014) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.32...5.0.33" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
 
 ### Added 

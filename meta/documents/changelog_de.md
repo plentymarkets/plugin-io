@@ -1,5 +1,11 @@
 # Release Notes für IO
 
+## v5.0.34 (2021-06-28) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.33...5.0.34" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
+
+### Geändert
+
+- Beim Anlegen und Aktualisieren der Adressen kann nun das Feld **E-mail** mitgegeben werden, um die E-Mail-Adressoption zu beeinflussen.
+
 ## v5.0.33 (2021-06-14) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.32...5.0.33" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
 
 ### Hinzugefügt
