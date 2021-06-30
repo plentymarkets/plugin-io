@@ -237,6 +237,7 @@ class IOServiceProvider extends ServiceProvider
             }
         );
 
+        /** TEST */
         $dispatcher->listen(
             ExecutePayment::class,
             function ($event) {
