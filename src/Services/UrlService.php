@@ -156,7 +156,10 @@ class UrlService
                     return pluginApp(UrlQuery::class, ['path' => "", 'lang' => $lang])
                         ->toAbsoluteUrl($includeLanguage);
                 } elseif (TemplateService::$currentTemplate === 'tpl.login') {
-                    return pluginApp(UrlQuery::class, ['path' => "login", 'lang' => $lang])
+                    return pluginApp(UrlQuery::class, ['path' => RouteConfig::LOGIN, 'lang' => $lang])
+                        ->toAbsoluteUrl($includeLanguage);
+                } elseif (TemplateService::$currentTemplate === 'tpl.search') {
+                    return pluginApp(UrlQuery::class, ['path' => RouteConfig::SEARCH, 'lang' => $lang])
                         ->toAbsoluteUrl($includeLanguage);
                 }
 
