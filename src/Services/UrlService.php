@@ -151,7 +151,11 @@ class UrlService
                         return $this
                             ->getCategoryURL($currentCategory->id, $lang)
                             ->toAbsoluteUrl($includeLanguage);
+                    } elseif (substr(TemplateService::$currentTemplate, 0, 11) === 'tpl.search') {
+                        return pluginApp(UrlQuery::class, ['path' => RouteConfig::SEARCH, 'lang' => $lang])
+                        ->toAbsoluteUrl($includeLanguage);
                     }
+
                     return null;
                 } elseif (TemplateService::$currentTemplate === 'tpl.home' || TemplateService::$currentTemplate === 'tpl.home.category')   {
                     return pluginApp(UrlQuery::class, ['path' => "", 'lang' => $lang])
