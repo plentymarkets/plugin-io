@@ -134,7 +134,8 @@ class UrlService
 
                 if (substr(TemplateService::$currentTemplate, 0, 12) === 'tpl.category' ||
                     substr(TemplateService::$currentTemplate, 0, 12) === 'tpl.checkout' ||
-                    substr(TemplateService::$currentTemplate, 0, 14) === 'tpl.my-account') {
+                    substr(TemplateService::$currentTemplate, 0, 14) === 'tpl.my-account' ||
+                    substr(TemplateService::$currentTemplate, 0, 11) === 'tpl.search') {
 
                     $currentCategory = $categoryService->getCurrentCategory();
 
@@ -150,7 +151,11 @@ class UrlService
                         return $this
                             ->getCategoryURL($currentCategory->id, $lang)
                             ->toAbsoluteUrl($includeLanguage);
+                    } elseif (substr(TemplateService::$currentTemplate, 0, 11) === 'tpl.search') {
+                        return pluginApp(UrlQuery::class, ['path' => RouteConfig::SEARCH, 'lang' => $lang])
+                        ->toAbsoluteUrl($includeLanguage);
                     }
+
                     return null;
                 } elseif (TemplateService::$currentTemplate === 'tpl.home' || TemplateService::$currentTemplate === 'tpl.home.category')   {
                     return pluginApp(UrlQuery::class, ['path' => "", 'lang' => $lang])
