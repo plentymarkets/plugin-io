@@ -80,7 +80,7 @@ class IORouteServiceProvider extends RouteServiceProvider
             $api->resource('io/checkout/payment', 'CheckoutPaymentResource');
             $api->resource('io/customer/bank_data', 'ContactBankResource');
             $api->resource('io/customer/order/return', 'CustomerOrderReturnResource');
-            $api->resource('io/order/additional_information', 'OrderAdditionalInformationResource');
+            $api->post('io/order/additional_information', 'OrderAdditionalInformationResource@store')->middleware('sanitize:orderContactWish');
         });
 
         /** @var ShopUrls $shopUrls */
