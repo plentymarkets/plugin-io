@@ -1,5 +1,12 @@
 # Release Notes for IO
 
+## v5.0.35 (2021-07-12) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.34...5.0.35" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
+
+### Fixed
+
+- It was not possible to save an empty string in the input field **Thousands separator** if the option **No** had been selected for the setting **Use customer-specific price format** in then number formats section of the IO settings. This has been fixed.
+- An incorrect canonical URL was used for the search results page. This has been fixed.
+
 ## v5.0.34 (2021-06-28) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.33...5.0.34" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
 
 ### Changed
