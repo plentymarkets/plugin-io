@@ -78,7 +78,10 @@ class IORouteServiceProvider extends RouteServiceProvider
             $api->post('io/checkout', 'CheckoutResource@store');
             $api->put('io/checkout', 'CheckoutResource@update');
             $api->resource('io/checkout/payment', 'CheckoutPaymentResource');
-            $api->resource('io/customer/bank_data', 'ContactBankResource');
+            $api->get('io/customer/bank_data', 'ContactBankResource@show');
+            $api->delete('io/customer/bank_data', 'ContactBankResource@destroy');
+            $api->post('io/customer/bank_data', 'ContactBankResource@store')->middleware('sanitize:accountOwner,bankName,iban,bic');
+            $api->put('io/customer/bank_data', 'ContactBankResource@update')->middleware('sanitize:accountOwner,bankName,iban,bic');
             $api->resource('io/customer/order/return', 'CustomerOrderReturnResource');
             $api->post('io/order/additional_information', 'OrderAdditionalInformationResource@store')->middleware('sanitize:orderContactWish');
         });
