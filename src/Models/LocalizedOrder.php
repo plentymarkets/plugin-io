@@ -21,6 +21,7 @@ use Plenty\Modules\Order\Shipping\Contracts\ParcelServicePresetRepositoryContrac
 use IO\Extensions\Filters\URLFilter;
 use IO\Extensions\Filters\ItemImagesFilter;
 use Plenty\Modules\Webshop\ItemSearch\Helpers\ResultFieldTemplate;
+use Plenty\Modules\Webshop\ItemSearch\Helpers\VariationPropertyConverter;
 use Plenty\Modules\Webshop\ItemSearch\Services\ItemSearchService;
 
 /**
@@ -44,6 +45,7 @@ class LocalizedOrder extends ModelWrapper
         OrderItemType::TYPE_DEPOSIT,
         OrderItemType::TYPE_ITEM_SET,
         OrderItemType::TYPE_SET_COMPONENT,
+        OrderItemType::TYPE_ORDER_PROPERTY
     ];
 
     /** @var array The OrderItem types that will be wrapped. All other OrderItems will be stripped from the return order. */
@@ -57,6 +59,7 @@ class LocalizedOrder extends ModelWrapper
         OrderItemType::TYPE_DEPOSIT,
         OrderItemType::TYPE_ITEM_SET,
         OrderItemType::TYPE_SET_COMPONENT,
+        OrderItemType::TYPE_ORDER_PROPERTY
     ];
 
     /** @var array $order Specific order data. */
@@ -313,6 +316,12 @@ class LocalizedOrder extends ModelWrapper
             unset($instance->order->relations['orderItems'][$setComponentKey]);
             unset($instance->order->orderItems[$setComponentKey]);
         }
+
+        /** @var VariationPropertyConverter $variationPropertyConverter */
+        $variationPropertyConverter = pluginApp(VariationPropertyConverter::class);
+        $instance->order->relations['orderItems'] = $variationPropertyConverter->convertVariationPropertyOrderItems(
+            $instance->order->relations['orderItems']
+        );
 
         /** @var OrderTotalsService $orderTotalsService */
         $orderTotalsService = pluginApp(OrderTotalsService::class);
