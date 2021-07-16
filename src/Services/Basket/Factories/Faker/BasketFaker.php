@@ -5,12 +5,21 @@ namespace IO\Services\Basket\Factories\Faker;
 use IO\Services\ItemSearch\Factories\Faker\AbstractFaker;
 use Plenty\Modules\Frontend\Services\VatService;
 
+/**
+ * Class BasketFaker
+ * Factory to generate random basket data to be used in the ShopBuilder preview.
+ *
+ * @package IO\Services\Basket\Factories\Faker
+ */
 class BasketFaker extends AbstractFaker
 {
     private $rawBasketItems = [];
 
     /**
-     * @param object $default
+     * Fill existing basket data with random values.
+     *
+     * @param array $default Existing basket data to be filled with random values.
+     *
      * @return mixed
      */
     public function fill($default)
@@ -37,7 +46,7 @@ class BasketFaker extends AbstractFaker
             'orderId'                       => null,
             'orderTimestamp'                => null,
             'paymentAmount'                 => 0,
-            'reffererId'                    => 0,
+            'referrerId'                    => 0,
             'sessionId'                     => '',
             'shippingAmount'                => 0.0,
             'shippingAmountNet'             => 0.0,
@@ -57,6 +66,13 @@ class BasketFaker extends AbstractFaker
         return $data;
     }
 
+    /**
+     * Set the list of basket item data to be considered while generating the totals of a random basket object.
+     *
+     * @param array $rawBasketItems List of raw basket item data.
+     *
+     * @see BasketItemFaker to generate list of random basket items.
+     */
     public function setRawBasketItems($rawBasketItems)
     {
         $this->rawBasketItems = $rawBasketItems;

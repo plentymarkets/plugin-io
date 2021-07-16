@@ -9,6 +9,12 @@ use IO\Api\ApiResource;
 use IO\Api\ApiResponse;
 use IO\Api\ResponseCode;
 
+/**
+ * Class LiveShoppingResource
+ *
+ * Resource class for the route `io/live-shopping`.
+ * @package IO\Api\Resources
+ */
 class LiveShoppingResource extends ApiResource
 {
     /** @var LiveShoppingService $liveShoppingService */

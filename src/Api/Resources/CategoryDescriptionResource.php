@@ -12,6 +12,8 @@ use IO\Services\CategoryService;
 
 /**
  * Class CategoryDescriptionResource
+ *
+ * Resource class for the route `io/category/description`.
  * @package IO\Api\Resources
  */
 class CategoryDescriptionResource extends ApiResource
@@ -27,7 +29,7 @@ class CategoryDescriptionResource extends ApiResource
     }
 
     /**
-     * Get Category Items
+     * Get the description1 and description2 of a category by categoryId.
      * @param string $categoryId
      * @return Response
      */

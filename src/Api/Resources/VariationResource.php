@@ -14,6 +14,8 @@ use IO\Api\ResponseCode;
 
 /**
  * Class VariationResource
+ *
+ * Resource class for the route `io/variations`.
  * @package IO\Api\Resources
  */
 class VariationResource extends ApiResource
@@ -23,13 +25,15 @@ class VariationResource extends ApiResource
      * @param Request $request
      * @param ApiResponse $response
      */
-    public function __construct(
-        Request $request,
-        ApiResponse $response
-    ) {
+    public function __construct(Request $request, ApiResponse $response)
+    {
         parent::__construct($request, $response);
     }
 
+    /**
+     * Return a list of items with the given parameters.
+     * @return Response
+     */
     public function index(): Response
     {
         /** @var ItemSearchService $itemSearchService */
@@ -62,8 +66,8 @@ class VariationResource extends ApiResource
     }
 
     /**
-     * Get variation by id
-     * @param string $variationId
+     * Get variation by ID.
+     * @param string $variationId The ID of the variation to get.
      * @return Response
      */
     public function show(string $variationId): Response

@@ -8,9 +8,10 @@ use Plenty\Modules\Webshop\Contracts\CheckoutRepositoryContract;
 /**
  * Class CurrencyConverter
  *
+ * This class was used to convert a non-default currency to the default currency.
  * @package IO\Helper
  *
- * @depreacted since 5.0.0 will be removed in 6.0.0
+ * @deprecated since 5.0.0 will be removed in 6.0.0.
  */
 class CurrencyConverter
 {
@@ -27,6 +28,7 @@ class CurrencyConverter
     }
 
     /**
+     * Check whether the current currency is the default currency.
      * @return bool
      * @throws \ErrorException
      */
@@ -36,6 +38,7 @@ class CurrencyConverter
     }
 
     /**
+     * Get the default currency.
      * @return string
      */
     public function getDefaultCurrency()
@@ -44,6 +47,7 @@ class CurrencyConverter
     }
 
     /**
+     * Get the current currency.
      * @return string
      * @throws \ErrorException
      */
@@ -55,7 +59,8 @@ class CurrencyConverter
     }
 
     /**
-     * @param float $amount
+     * If current currency is not the default, convert an amount to the default currency.
+     * @param float $amount An amount of currency.
      * @return float
      * @throws \ErrorException
      */

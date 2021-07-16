@@ -13,8 +13,23 @@ use Plenty\Modules\Order\Status\Models\OrderStatus;
 use Plenty\Modules\Payment\Method\Models\PaymentMethod;
 use Plenty\Plugin\Translation\Translator;
 
+/**
+ * Class LocalizedOrderFaker
+ *
+ * This is a faker class for LocalizedOrder data.
+ * Faker classes are used for creating preview objects for use in the shopBuilder.
+ *
+ * @package IO\Services\Order\Factories\Faker
+ */
 class LocalizedOrderFaker extends AbstractFaker
 {
+    /**
+     * Fill the order array $data with additional data that is normally added by LocalizedOrder.
+     * @param array $data A faked order array.
+     * @param array $variations Faked variations.
+     * @return mixed
+     * @throws \Throwable
+     */
     public function fill($data, $variations = [])
     {
         /** @var Translator $translator */

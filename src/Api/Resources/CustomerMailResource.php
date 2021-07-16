@@ -27,6 +27,12 @@ use Plenty\Plugin\Http\Request;
 use Plenty\Plugin\Http\Response;
 use Plenty\Plugin\Log\Loggable;
 
+/**
+ * Class CustomerMailResource
+ *
+ * Resource class for the route `io/customer/mail`.
+ * @package IO\Api\Resources
+ */
 class CustomerMailResource extends ApiResource
 {
     use Loggable;
@@ -42,6 +48,10 @@ class CustomerMailResource extends ApiResource
         parent::__construct($request, $response);
     }
 
+    /**
+     * Trigger the creation of an email with instructions to change the email.
+     * @return Response
+     */
     public function store(): Response
     {
         $newMail = $this->request->get('newMail', null);
@@ -117,6 +127,11 @@ class CustomerMailResource extends ApiResource
         return $this->response->create(null, ResponseCode::OK);
     }
 
+    /**
+     * Update the email of a contact.
+     * @param string $contactId The id of the contact.
+     * @return Response
+     */
     public function update(string $contactId): Response
     {
         $password = $this->request->get('password');

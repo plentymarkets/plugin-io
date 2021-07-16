@@ -14,13 +14,25 @@ use Plenty\Plugin\Http\Request;
 use Plenty\Plugin\Http\Response;
 use Plenty\Plugin\Middleware;
 
+/**
+ * Class DetectLanguage
+ *
+ * Set language, if necessary.
+ *
+ * @package IO\Middlewares
+ */
 class DetectLanguage extends Middleware
 {
     const WEB_AJAX_BASE = '/WebAjaxBase.php';
 
+    /**
+     * @var string|null $DETECTED_LANGUAGE Detected language.
+     */
     public static $DETECTED_LANGUAGE = null;
 
     /**
+     * Before the request is processed, the language is changed, if necessary.
+     *
      * @param Request $request
      */
     public function before(Request $request)
@@ -43,7 +55,7 @@ class DetectLanguage extends Middleware
                     } else {
                         CategoryController::$LANGUAGE_FROM_URL = Utils::getDefaultLang();
                     }
-                    // Do not cache content if detected language does not match the language of the url
+                    // Do not cache content if detected language does not match the language of the URL.
                     TemplateService::$shouldBeCached = false;
                 }
             } elseif (strpos(end($splittedURL), '.') === false) {
@@ -54,6 +66,8 @@ class DetectLanguage extends Middleware
     }
 
     /**
+     * After the request is processed, do nothing here.
+     *
      * @param Request $request
      * @param Response $response
      * @return Response
@@ -64,18 +78,20 @@ class DetectLanguage extends Middleware
     }
 
     /**
-     * @param string $language
-     * @param WebstoreConfiguration $webstoreConfig
+     * Set language to locale service and change currency, if necessary.
+     *
+     * @param string $language Language to be set.
+     * @param WebstoreConfiguration $webstoreConfiguration WebstoreConfiguration from the current request.
      */
-    private function setLanguage($language, $webstoreConfig)
+    private function setLanguage($language, $webstoreConfiguration)
     {
-        if (is_null($language) || strlen($language) !== 2 || !in_array($language, $webstoreConfig->languageList)) {
+        if (is_null($language) || strlen($language) !== 2 || !in_array($language, $webstoreConfiguration->languageList)) {
             // language is not valid. set default language
-            $language = $webstoreConfig->defaultLanguage;
+            $language = $webstoreConfiguration->defaultLanguage;
         }
 
         if ($language === Utils::getLang()) {
-            // language has not changed
+            // language has not changed.
             return;
         }
 
@@ -85,7 +101,7 @@ class DetectLanguage extends Middleware
         /** @var TemplateConfigService $templateConfigService */
         $templateConfigService = pluginApp(TemplateConfigService::class);
         $enabledCurrencies = explode(', ', $templateConfigService->get('currency.available_currencies'));
-        $currency = $webstoreConfig->defaultCurrencyList[$language];
+        $currency = $webstoreConfiguration->defaultCurrencyList[$language];
         if (!is_null($currency) && (in_array(
                     $currency,
                     $enabledCurrencies

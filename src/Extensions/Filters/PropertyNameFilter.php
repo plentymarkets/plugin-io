@@ -11,6 +11,9 @@ use Plenty\Modules\Item\Property\Contracts\PropertySelectionRepositoryContract;
 
 /**
  * Class PropertySelectionValueNameFilter
+ *
+ * Contains twig filter to get order property names.
+ *
  * @package IO\Extensions\Filters
  */
 class PropertyNameFilter extends AbstractFilter
@@ -32,25 +35,32 @@ class PropertyNameFilter extends AbstractFilter
      */
     public function __construct(
         AuthHelper $authHelper
-    )
-    {
+    ) {
         parent::__construct();
 
-        $this->authHelper                   = $authHelper;
+        $this->authHelper = $authHelper;
     }
 
     /**
-     * Return the available filter methods
+     * Get the twig filter to method name mapping. (twig filter => method name)
+     *
      * @return array
      */
-    public function getFilters():array
+    public function getFilters(): array
     {
         return [
-            "propertyName"                  => "getPropertyName",
-            "propertySelectionValueName"    => "getPropertySelectionValueName"
+            "propertyName" => "getPropertyName",
+            "propertySelectionValueName" => "getPropertySelectionValueName"
         ];
     }
 
+    /**
+     * Gets the name of the given order property.
+     *
+     * @param array $property Order property to get the name for.
+     * @param string $lang Language to get the name in. Defaults to current webshop language.
+     * @return string
+     */
     public function getPropertyName($property, $lang = null)
     {
         if ($lang === null)
@@ -63,10 +73,10 @@ class PropertyNameFilter extends AbstractFilter
             $this->propertyRepository = pluginApp(PropertyRepositoryContract::class);
         }
 
-        $propertyId = $property['propertyId'];
-        if(isset($property['name'])) {
+        if (isset($property['name'])) {
             return $property['name'];
         } else {
+            $propertyId = $property['propertyId'];
             $propertyNames = $this->fromMemoryCache("propertyName.$propertyId", function() use ($propertyId, $lang)
             {
                 return $this->authHelper->processUnguarded(function() use ($propertyId)
@@ -81,10 +91,16 @@ class PropertyNameFilter extends AbstractFilter
                 return $propertyName->name;
             }
         }
-
-        return "";
+        return '';
     }
 
+    /**
+     * Gets the name of the given order property from type selection.
+     *
+     * @param array $property Order property to get the name for.
+     * @param string $lang Language to get the name in. Defaults to current webshop language.
+     * @return mixed
+     */
     public function getPropertySelectionValueName($property, $lang = null)
     {
         if(is_numeric($property['value'])) {

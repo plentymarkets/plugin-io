@@ -11,12 +11,14 @@ use IO\Services\BasketService;
 
 /**
  * Class BasketItemResource
+ *
+ * Resource class for the route `io/basket/items`.
  * @package IO\Api\Resources
  */
 class BasketItemResource extends ApiResource
 {
     /**
-     * @var BasketService
+     * @var BasketService $basketService Instance of the BasketService.
      */
     private $basketService;
 
@@ -33,7 +35,7 @@ class BasketItemResource extends ApiResource
     }
 
     /**
-     * List basket items
+     * Get basket items.
      * @return Response
      */
     public function index(): Response
@@ -42,10 +44,13 @@ class BasketItemResource extends ApiResource
         return $this->response->create($basketItems, ResponseCode::OK);
     }
 
-    // Post
-
     /**
      * Add an item to the basket
+     * @return Response
+     */
+
+    /**
+     * Add an item in the basket.
      * @return Response
      */
     public function store(): Response
@@ -63,11 +68,9 @@ class BasketItemResource extends ApiResource
         return $this->response->create(true, ResponseCode::CREATED);
     }
 
-    // Get
-
     /**
-     * Get a basket item
-     * @param string $selector
+     * Get a basket item by ID.
+     * @param string $selector ID of the basket item.
      * @return Response
      */
     public function show(string $selector): Response
@@ -80,8 +83,14 @@ class BasketItemResource extends ApiResource
     // Put/patch
 
     /**
-     * Update the basket item
+     * Update the basket item.
      * @param string $selector
+     * @return Response
+     */
+
+    /**
+     * Update a basket item by ID.
+     * @param string $selector ID of the basket item.
      * @return Response
      */
     public function update(string $selector): Response
@@ -102,8 +111,14 @@ class BasketItemResource extends ApiResource
     // Delete
 
     /**
-     * Delete an item from the basket
+     * Delete an item from the basket.
      * @param string $selector
+     * @return Response
+     */
+
+    /**
+     * Delete an item from the basket by ID.
+     * @param string $selector ID of the basket item.
      * @return Response
      */
     public function destroy(string $selector): Response

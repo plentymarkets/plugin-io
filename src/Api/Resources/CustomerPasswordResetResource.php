@@ -18,6 +18,8 @@ use Plenty\Plugin\Http\Response;
 
 /**
  * Class CustomerPasswordResetResource
+ *
+ * Resource class for the route `io/customer/password_reset`.
  * @package IO\Api\Resources
  */
 class CustomerPasswordResetResource extends ApiResource
@@ -35,7 +37,7 @@ class CustomerPasswordResetResource extends ApiResource
     }
 
     /**
-     * Set the password for the contact
+     * Reset the password for the contact.
      * @return Response
      */
     public function store(): Response

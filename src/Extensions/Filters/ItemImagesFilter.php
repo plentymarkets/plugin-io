@@ -7,6 +7,8 @@ use IO\Extensions\AbstractFilter;
 /**
  * Class ItemImagesFilter
  *
+ * Contains item image helper twig filters.
+ *
  * @package IO\Extensions\Filters
  */
 class ItemImagesFilter extends AbstractFilter
@@ -20,6 +22,8 @@ class ItemImagesFilter extends AbstractFilter
     }
 
     /**
+     * Get the twig filter to method name mapping. (twig filter => method name)
+     *
      * @return array
      */
     public function getFilters(): array
@@ -32,8 +36,10 @@ class ItemImagesFilter extends AbstractFilter
     }
 
     /**
-     * @param object $images
-     * @param string $imageAccessor
+     * Get the item images for the given accessor.
+     *
+     * @param array $images Item image object to get the images from.
+     * @param string $imageAccessor Accessor to get the image data from.
      * @return array
      */
     public function getItemImages($images, string $imageAccessor = 'url'): array
@@ -53,7 +59,14 @@ class ItemImagesFilter extends AbstractFilter
         return $imageUrls;
     }
 
-    public function getFirstItemImage($images, $imageAccessor = 'url')
+    /**
+     * Gets the first item image for the given accessor.
+     *
+     * @param array|object $images Item image object from which the image gets returned.
+     * @param string $imageAccessor Accessor to get the image data from.
+     * @return array
+     */
+    public function getFirstItemImage($images, $imageAccessor = 'url'): array
     {
         $images = $this->getItemImages($images, $imageAccessor);
         $itemImage = [];
@@ -66,7 +79,14 @@ class ItemImagesFilter extends AbstractFilter
         return $itemImage;
     }
 
-    public function getFirstItemImageUrl($images, $imageAccessor = 'url')
+    /**
+     * Gets the first item image url for the given accessor.
+     *
+     * @param array|object $images Item image object from which the url gets returned.
+     * @param string $imageAccessor Accessor to get the url from.
+     * @return string
+     */
+    public function getFirstItemImageUrl($images, $imageAccessor = 'url'): string
     {
         $itemImage = $this->getFirstItemImage($images, $imageAccessor);
         if ($itemImage !== null && $itemImage['url'] !== null) {

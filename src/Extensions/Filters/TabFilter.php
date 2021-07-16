@@ -4,6 +4,13 @@ namespace IO\Extensions\Filters;
 
 use IO\Extensions\AbstractFilter;
 
+/**
+ * Class TabFilter
+ *
+ * Contains twig filter that filters tab symbols out of a string.
+ *
+ * @package IO\Extensions\Filters
+ */
 class TabFilter extends AbstractFilter
 {
     /**
@@ -13,18 +20,26 @@ class TabFilter extends AbstractFilter
     {
         parent::__construct();
     }
-    
+
     /**
+     * Get the twig filter to method name mapping. (twig filter => method name)
+     *
      * @return array
      */
-    public function getFilters():array
+    public function getFilters(): array
     {
         return [
             'filterTabs' => 'filterTabs'
         ];
     }
-    
-    public function filterTabs( $string )
+
+    /**
+     * Gets string that contains no tab symbols.
+     *
+     * @param string $string String that gets filtered.
+     * @return string|string[]|null
+     */
+    public function filterTabs(string $string)
     {
         return preg_replace('/\s+/', ' ', $string);
     }

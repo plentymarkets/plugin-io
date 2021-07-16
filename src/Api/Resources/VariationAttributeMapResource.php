@@ -11,12 +11,14 @@ use IO\Api\ResponseCode;
 
 /**
  * Class VariationAttributeMapResource
+ *
+ * Resource class for the route `io/variations/map`.
  * @package IO\Api\Resources
  */
 class VariationAttributeMapResource extends ApiResource
 {
     /**
-     * Get variation combinations
+     * Get variation combinations for the given item ID.
      * @return Response
      */
     public function index():Response

@@ -12,15 +12,17 @@ use Plenty\Plugin\Log\Loggable;
 
 /**
  * Class CustomerAuthenticationResource
+ *
+ * Resource class for the route `io/customer/login`.
  * @package IO\Api\Resources
  */
 class CustomerAuthenticationResource extends ApiResource
 {
     use Loggable;
 
-	/**
-	 * @var AuthenticationService
-	 */
+    /**
+     * @var AuthenticationService $authService Instance of the AuthenticationService.
+     */
 	private $authService;
 
     /**
@@ -36,7 +38,7 @@ class CustomerAuthenticationResource extends ApiResource
 	}
 
     /**
-     * Perform the login with email and password
+     * Perform the login with email and password.
      * @return Response
      */
 	public function store():Response

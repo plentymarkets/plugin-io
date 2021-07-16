@@ -2,7 +2,15 @@
 
 namespace IO\Helper\Notifications;
 
-
+/**
+ * Class Notification
+ *
+ * Helper class for notifications.
+ *
+ * @package IO\Helper\Notifications
+ * @deprecated since 5.0.0, will be removed in 6.0.0.
+ * @see \IO\Services\NotificationService
+ */
 class Notification
 {
     /**

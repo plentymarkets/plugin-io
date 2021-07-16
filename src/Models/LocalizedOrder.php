@@ -24,11 +24,16 @@ use Plenty\Modules\Webshop\ItemSearch\Helpers\ResultFieldTemplate;
 use Plenty\Modules\Webshop\ItemSearch\Helpers\VariationPropertyConverter;
 use Plenty\Modules\Webshop\ItemSearch\Services\ItemSearchService;
 
+/**
+ * Class LocalizedOrder
+ *
+ * Data representation for an order.
+ *
+ * @package IO\Models
+ */
 class LocalizedOrder extends ModelWrapper
 {
-    /**
-     * The OrderItem types that will be wrapped. All other OrderItems will be stripped from the order.
-     */
+    /** @var array The OrderItem types that will be wrapped. All other OrderItems will be stripped from the order. */
     const WRAPPED_ORDERITEM_TYPES = [
         OrderItemType::TYPE_VARIATION,
         OrderItemType::TYPE_ITEM_BUNDLE,
@@ -43,6 +48,7 @@ class LocalizedOrder extends ModelWrapper
         OrderItemType::TYPE_ORDER_PROPERTY
     ];
 
+    /** @var array The OrderItem types that will be wrapped. All other OrderItems will be stripped from the return order. */
     const WRAPPED_ORDERITEM_TYPES_FOR_RETURN = [
         OrderItemType::TYPE_VARIATION,
         OrderItemType::TYPE_ITEM_BUNDLE,
@@ -55,36 +61,52 @@ class LocalizedOrder extends ModelWrapper
         OrderItemType::TYPE_SET_COMPONENT,
         OrderItemType::TYPE_ORDER_PROPERTY
     ];
-    /**
-     * @var Order
-     */
+
+    /** @var array $order Specific order data. */
     public $order = null;
-
+    /** @var array $orderData Specific order data, should be filled with an return order. */
     public $orderData = [];
-
+    /** @var string $status Name of the order status (example: return). */
     public $status = null;
+    /** @var string $shippingProvider Name of the shipping provider (example: DHL). */
     public $shippingProvider = "";
+    /** @var string $shippingProfileName Name of the shipping profile. */
     public $shippingProfileName = "";
+    /** @var int $shippingProfileId The ID of the shipping profile (Default: 0). */
     public $shippingProfileId = 0;
+    /** @var string $trackingURL Tracking URL for the order from shipping provider. */
     public $trackingURL = "";
+    /** @var string $paymentMethodName Name of the payment method. */
     public $paymentMethodName = "";
+    /** @var string $paymentMethodIcon URL of payment method icon image. */
     public $paymentMethodIcon = "";
-    public $paymentStatus = '';
+    /** @var string $paymentStatus Payment status see IO/Constants/OderPaymentStatus. */
+    public $paymentStatus = "";
 
+    /** @var array $variations Item variations and their data inside the order. */
     public $variations = [];
+    /** @var array $itemURLs URLs of item variations. */
     public $itemURLs = [];
+    /** @var array $itemImages URLs to images of item variations. */
     public $itemImages = [];
+    /** @var bool $isReturnable Indicate if order is returnable. */
     public $isReturnable = false;
 
+    /** @var bool $highlightNetPrices Indicate if net prices should be shown/highlighted. */
     public $highlightNetPrices = false;
+    /** @var array $totals Totals data of the order. */
     public $totals = [];
 
+    /** @var bool $allowPaymentMethodSwitchFrom Indicate if is possible to switch to another payment method from the chosen one. */
     public $allowPaymentMethodSwitchFrom = false;
+    /** @var array $paymentMethodListForSwitch List all payment methods that can be switched to. */
     public $paymentMethodListForSwitch = [];
 
     /**
-     * @param Order $order
-     * @param array ...$data
+     * Data preparation for the specific order and params.
+     *
+     * @param Order $order Specific order model.
+     * @param array ...$data Additional params.
      * @return LocalizedOrder|null
      */
     public static function wrap($order, ...$data)
@@ -309,6 +331,8 @@ class LocalizedOrder extends ModelWrapper
     }
 
     /**
+     * Get an array for the current instance.
+     *
      * @return array
      */
     public function toArray(): array
@@ -343,6 +367,11 @@ class LocalizedOrder extends ModelWrapper
         return $data;
     }
 
+    /**
+     * Checks if order is returnable.
+     *
+     * @return bool
+     */
     public function isReturnable()
     {
         $order = $this->order->toArray();
@@ -389,8 +418,10 @@ class LocalizedOrder extends ModelWrapper
     }
 
     /**
-     * @param int $setOrderItemId
-     * @param OrderItem[] $orderItems
+     * Get all set components from order items for a specific order item ID.
+     *
+     * @param int $setOrderItemId ID of set item
+     * @param OrderItem[] $orderItems List of items of the order
      * @return array
      */
     private static function filterSetComponents($setOrderItemId, $orderItems)

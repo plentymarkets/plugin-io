@@ -10,18 +10,20 @@ use IO\Api\ResponseCode;
 use IO\Services\CheckoutService;
 
 /**
- * Class ShippingCountryIdResource
+ * Class ShippingCountryResource
+ *
+ * Resource class for the route `io/shipping/country`.
  * @package IO\Api\Resources
  */
 class ShippingCountryResource extends ApiResource
 {
 	/**
-	 * @var CheckoutService
+	 * @var CheckoutService $checkoutService The instance of the CheckoutService.
 	 */
 	private $checkoutService;
 
     /**
-     * CheckoutResource constructor.
+     * ShippingCountryResource constructor.
      * @param Request $request
      * @param ApiResponse $response
      * @param CheckoutService $checkoutService
@@ -33,7 +35,7 @@ class ShippingCountryResource extends ApiResource
 	}
 
     /**
-     * Save shippingCountryId to the session
+     * Save the given shipping country ID to the current session.
      * @return Response
      */
 	public function store():Response
