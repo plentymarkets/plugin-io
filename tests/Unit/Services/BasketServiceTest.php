@@ -39,6 +39,9 @@ class BasketServiceTest extends TestCase
         $errorCode = 111;
         $basketItemCheckException = new BasketItemCheckException(BasketItemCheckException::NOT_ENOUGH_STOCK_FOR_VARIATION);
 
+        // allow method `all()` to be called but dont report an error, if it isn't
+        $this->basketItemRepositoryMock->allows(['all' => []]);
+
         $this->basketItemRepositoryMock->shouldReceive('findExistingOneByData')
             ->once()
             ->andReturn(null);
@@ -59,6 +62,9 @@ class BasketServiceTest extends TestCase
         $item1 = ['variationId' => 1, 'quantity' => 1, 'template' => 'test'];
         $errorCode = 404;
         $exception = new \Exception('', $errorCode);
+
+        // allow method `all()` to be called but dont report an error, if it isn't
+        $this->basketItemRepositoryMock->allows(['all' => []]);
 
         $this->basketItemRepositoryMock->shouldReceive('findExistingOneByData')
             ->once()

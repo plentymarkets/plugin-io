@@ -5,6 +5,9 @@ namespace IO\Tests\Feature;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use IO\Services\CheckoutService;
 use IO\Tests\TestCase;
+use Mockery;
+use Plenty\Modules\Basket\Repositories\BasketItemRepository;
+use Plenty\Modules\Frontend\Contracts\Checkout;
 use Plenty\Modules\Frontend\Session\Storage\Contracts\FrontendSessionStorageFactoryContract;
 use Plenty\Modules\Plugin\PluginSet\Models\PluginSet;
 use Plenty\Modules\System\Models\Webstore;
@@ -29,6 +32,8 @@ class CheckoutServiceCurrencyConfigTest extends TestCase
     /** @var SessionStorageRepositoryContract $sessionStorageRepository */
     protected $sessionStorageRepository;
 
+    protected $checkoutMock;
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -37,6 +42,9 @@ class CheckoutServiceCurrencyConfigTest extends TestCase
         $this->sessionStorageRepository = pluginApp(SessionStorageRepositoryContract::class);
         $this->checkoutService = pluginApp(CheckoutService::class);
         $this->checkoutRepository = pluginApp(CheckoutRepositoryContract::class);
+
+        $this->checkoutMock = Mockery::mock(Checkout::class);
+        $this->replaceInstanceByMock(Checkout::class, $this->checkoutMock);
     }
 
     /** @test */
@@ -64,6 +72,8 @@ class CheckoutServiceCurrencyConfigTest extends TestCase
             ]
         );
         $expectedCurrency = "EUR";
+
+        $this->checkoutMock->shouldReceive('setCurrency');
 
         $currency = $this->checkoutRepository->getCurrency();
 
