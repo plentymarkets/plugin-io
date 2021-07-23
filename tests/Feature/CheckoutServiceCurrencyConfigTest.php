@@ -43,7 +43,7 @@ class CheckoutServiceCurrencyConfigTest extends TestCase
         $this->checkoutService = pluginApp(CheckoutService::class);
         $this->checkoutRepository = pluginApp(CheckoutRepositoryContract::class);
 
-        $this->checkoutMock = Mockery::mock(Checkout::class);
+        $this->checkoutMock = Mockery::mock(Checkout::class)->makePartial();
         $this->replaceInstanceByMock(Checkout::class, $this->checkoutMock);
     }
 
