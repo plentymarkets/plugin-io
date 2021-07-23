@@ -14,6 +14,7 @@ use Plenty\Modules\System\Models\Webstore;
 use Plenty\Modules\Webshop\Contracts\CheckoutRepositoryContract;
 use Plenty\Modules\Webshop\Contracts\SessionStorageRepositoryContract;
 use Plenty\Plugin\ConfigRepository;
+use Plenty\Modules\Frontend\Services\CheckoutService as CoreCheckoutService;
 
 /**
  * User: mklaes
@@ -43,7 +44,8 @@ class CheckoutServiceCurrencyConfigTest extends TestCase
         $this->checkoutService = pluginApp(CheckoutService::class);
         $this->checkoutRepository = pluginApp(CheckoutRepositoryContract::class);
 
-        $this->checkoutMock = Mockery::mock(Checkout::class)->makePartial();
+        $this->checkoutMock = Mockery::mock(CoreCheckoutService::class)->makePartial();
+        app()->instance(CoreCheckoutService::class, $this->checkoutMock);
         $this->replaceInstanceByMock(Checkout::class, $this->checkoutMock);
     }
 
