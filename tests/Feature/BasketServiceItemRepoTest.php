@@ -16,6 +16,8 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 
 
 use Illuminate\Support\Facades\Session;
+use Plenty\Modules\Item\VariationDescription\Contracts\VariationDescriptionRepositoryContract;
+use Plenty\Modules\Item\VariationDescription\Models\VariationDescription;
 
 /**
  * User: mklaes
@@ -78,6 +80,11 @@ class BasketServiceItemRepoTest extends TestCase
             ->shouldReceive('getResults')
             ->with(Mockery::any())
             ->andReturn($esMockData);
+
+       $variationDescriptionRepoMock = Mockery::mock(VariationDescriptionRepositoryContract::class);
+       $variationDescriptionRepoMock->shouldReceive('find')->andReturn(
+           factory(VariationDescription::class)
+       );
 
        $basket = factory(Basket::class)->create();
        Session::shouldReceive('getId')
