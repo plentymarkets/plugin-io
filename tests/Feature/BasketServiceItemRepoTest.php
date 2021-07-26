@@ -85,6 +85,7 @@ class BasketServiceItemRepoTest extends TestCase
        $variationDescriptionRepoMock->shouldReceive('find')->andReturn(
            factory(VariationDescription::class)
        );
+       $this->replaceInstanceByMock(VariationDescriptionRepositoryContract::class, $variationDescriptionRepoMock);
 
        $basket = factory(Basket::class)->create();
        Session::shouldReceive('getId')
