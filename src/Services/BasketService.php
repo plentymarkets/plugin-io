@@ -3,6 +3,7 @@
 namespace IO\Services;
 
 use IO\Helper\Utils;
+use Plenty\Exceptions\ValidationException;
 use Plenty\Modules\Accounting\Contracts\DetermineShopCountryContract;
 use Plenty\Modules\Accounting\Vat\Contracts\VatInitContract;
 use Plenty\Modules\Accounting\Vat\Models\VatRate;
@@ -786,6 +787,7 @@ class BasketService
                 $this->basketItemRepository->addBasketItem($data);
             }
         } catch (BasketItemQuantityCheckException $e) {
+            echo $e->getMessage();
             $this->getLogger(__CLASS__)->warning(
                 'IO::Debug.BasketService_addItemQuantityCheckFailed',
                 [
@@ -809,6 +811,8 @@ class BasketService
             }
             return ["code" => $code];
         } catch (BasketItemCheckException $e) {
+            echo $e->getMessage();
+
             $this->getLogger(__CLASS__)->warning(
                 'IO::Debug.BasketService_addItemCheckFailed',
                 [
@@ -833,6 +837,12 @@ class BasketService
             }
             return ["code" => $code, 'placeholder' => $placeholder];
         } catch (\Exception $e) {
+
+            if($e instanceof \Plenty\Exceptions\ValidationException) {
+                echo json_encode($e->getMessageBag());
+            } else {
+                echo $e->getMessage();
+            }
             $this->getLogger(__CLASS__)->warning(
                 'IO::Debug.BasketService_cannotAddItem',
                 [
