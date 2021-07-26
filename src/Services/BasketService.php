@@ -787,7 +787,6 @@ class BasketService
                 $this->basketItemRepository->addBasketItem($data);
             }
         } catch (BasketItemQuantityCheckException $e) {
-            echo $e->getMessage();
             $this->getLogger(__CLASS__)->warning(
                 'IO::Debug.BasketService_addItemQuantityCheckFailed',
                 [
@@ -811,8 +810,6 @@ class BasketService
             }
             return ["code" => $code];
         } catch (BasketItemCheckException $e) {
-            echo $e->getMessage();
-
             $this->getLogger(__CLASS__)->warning(
                 'IO::Debug.BasketService_addItemCheckFailed',
                 [
@@ -837,14 +834,6 @@ class BasketService
             }
             return ["code" => $code, 'placeholder' => $placeholder];
         } catch (\Exception $e) {
-
-            if($e instanceof \Plenty\Exceptions\ValidationException) {
-                echo $e->getTraceAsString();
-                echo json_encode($e->getMessageBag());
-            } else {
-                echo $e->getTraceAsString();
-                echo $e->getMessage();
-            }
             $this->getLogger(__CLASS__)->warning(
                 'IO::Debug.BasketService_cannotAddItem',
                 [
