@@ -839,8 +839,10 @@ class BasketService
         } catch (\Exception $e) {
 
             if($e instanceof \Plenty\Exceptions\ValidationException) {
+                echo $e->getTraceAsString();
                 echo json_encode($e->getMessageBag());
             } else {
+                echo $e->getTraceAsString();
                 echo $e->getMessage();
             }
             $this->getLogger(__CLASS__)->warning(
