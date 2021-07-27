@@ -75,7 +75,7 @@ class CheckoutServiceCurrencyConfigTest extends TestCase
         );
         $expectedCurrency = "EUR";
 
-        $this->checkoutMock->shouldReceive('setCurrency');
+        $this->checkoutMock->shouldReceive('setCurrency')->andReturnNull();
 
         $currency = $this->checkoutRepository->getCurrency();
 
