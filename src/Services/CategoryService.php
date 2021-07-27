@@ -326,11 +326,13 @@ class CategoryService
         if (is_null($webstoreId)) {
             $webstoreId = Utils::getWebstoreId();
         }
+        $defaultLanguage = $this->webstoreConfigurationRepository->getWebstoreConfiguration()->defaultLanguage;
 
-        return $this->fromMemoryCache(
+        return  $this->fromMemoryCache(
             "categoryUrl.$categoryId.$lang.$webstoreId",
-            function () use ($categoryId, $lang, $webstoreId) {
-                return $this->urlBuilderRepository->buildCategoryUrl($categoryId, $lang, $webstoreId);
+            function () use ($categoryId, $lang, $webstoreId, $defaultLanguage) {
+                $categoryURL = $this->urlBuilderRepository->buildCategoryUrl($categoryId, $lang, $webstoreId);
+                return $categoryURL->toRelativeUrl($lang !== $defaultLanguage);
             }
         );
     }
