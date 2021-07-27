@@ -99,6 +99,7 @@ class CategoryService
         $this->authGuard = $authGuard;
         $this->webstoreId = Utils::getWebstoreId();
         $this->contactRepository = $contactRepository;
+        $this->urlBuilderRepository = $urlBuilderRepository;
     }
 
     /**
