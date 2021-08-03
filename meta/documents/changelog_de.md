@@ -1,10 +1,11 @@
 # Release Notes für IO
 
-## v5.0.36 (2021-08-02) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.35...5.0.36" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
+## v5.0.36 (2021-08-03) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.35...5.0.36" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
 
 ### Geändert
 
 - Für eine schnellere Auslieferungszeit werden Kategoriedaten jetzt über neue Schnittstellen geladen.
+- Das Laden von Kundendaten, Warenkorb und Warenkorb-Artikeln wurde unter einer Abfrage zusammengefasst.
 
 ### Behoben
 
