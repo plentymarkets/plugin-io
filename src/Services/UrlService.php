@@ -139,6 +139,12 @@ class UrlService
 
                     $currentCategory = $categoryService->getCurrentCategory();
 
+                    if(RouteConfig::getCategoryId(RouteConfig::HOME) === $currentCategory->id) {
+                        // FIX return homepage url as canonical when showing homepage category
+                        return pluginApp(UrlQuery::class, ['path' => "", 'lang' => $lang])
+                            ->toAbsoluteUrl($includeLanguage);
+                    }
+
                     if ($currentCategory !== null) {
                         $categoryDetails = $categoryService->getDetails($currentCategory, $lang);
 
