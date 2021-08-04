@@ -1,5 +1,16 @@
 # Release Notes for IO
 
+## v5.0.36 (2021-08-04) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.35...5.0.36" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
+
+### Changed
+
+- Category data is now loaded via new interfaces in order to improve performance.
+- The loading of customer data, the shopping cart, and shopping cart items are now subsumed under a single query.
+
+### Fixed
+
+- The correct canonical URL is now generated for the homepage category.
+
 ## v5.0.35 (2021-07-12) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.34...5.0.35" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
 
 ### Fixed
