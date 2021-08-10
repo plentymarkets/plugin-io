@@ -591,9 +591,14 @@ class CategoryService
      * @param bool $filterCategories Filter categories
      * @return array The parents of the category
      */
-    public function getHierarchy(int $catID = 0, bool $bottomUp = false, bool $filterCategories = false): array
+    public function getHierarchy(int $catID = 0, bool $bottomUp = false, bool $filterCategories = false, $restore = false): array
     {
         if ($catID > 0) {
+
+            if ($restore) {
+                $oldCategory = $this->currentCategory;
+                $oldCategoryTree = $this->currentCategoryTree;
+            }
             $this->setCurrentCategoryID($catID);
         }
 
@@ -618,6 +623,11 @@ class CategoryService
         if (count($this->currentItem)) {
             $lang = Utils::getLang();
             array_push($hierarchy, $this->currentItem['texts'][$lang]);
+        }
+
+        if ($restore) {
+             $this->currentCategory = $oldCategory;
+             $this->currentCategoryTree = $oldCategoryTree;
         }
 
         return $hierarchy;
@@ -678,7 +688,7 @@ class CategoryService
             return false;
         }
         $isHidden = false;
-        foreach ($this->getHierarchy($categoryId) as $category) {
+        foreach ($this->getHierarchy($categoryId, false, false, true) as $category) {
             if ($category->right === 'customer') {
                 $isHidden = true;
                 break;
