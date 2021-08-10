@@ -589,13 +589,14 @@ class CategoryService
      * @param int $catID The category id to get the parents for or 0 to use current category
      * @param bool $bottomUp Set true to order result from bottom (deepest category) to top (= level 1)
      * @param bool $filterCategories Filter categories
+     * @param bool $restoreOldValues Restore old category data and category tree after the method call.
      * @return array The parents of the category
      */
-    public function getHierarchy(int $catID = 0, bool $bottomUp = false, bool $filterCategories = false, $restore = false): array
+    public function getHierarchy(int $catID = 0, bool $bottomUp = false, bool $filterCategories = false, $restoreOldValues = false): array
     {
         if ($catID > 0) {
 
-            if ($restore) {
+            if ($restoreOldValues) {
                 $oldCategory = $this->currentCategory;
                 $oldCategoryTree = $this->currentCategoryTree;
             }
@@ -625,7 +626,7 @@ class CategoryService
             array_push($hierarchy, $this->currentItem['texts'][$lang]);
         }
 
-        if ($restore) {
+        if ($restoreOldValues) {
              $this->currentCategory = $oldCategory;
              $this->currentCategoryTree = $oldCategoryTree;
         }
