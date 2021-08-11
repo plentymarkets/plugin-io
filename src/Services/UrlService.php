@@ -169,6 +169,12 @@ class UrlService
                 } elseif (TemplateService::$currentTemplate === 'tpl.login') {
                     return pluginApp(UrlQuery::class, ['path' => "login", 'lang' => $lang])
                         ->toAbsoluteUrl($includeLanguage);
+                } elseif (TemplateService::$currentTemplate === "tpl.tags") {
+                    /** @var Request $request */
+                    $request = pluginApp(Request::class);
+                    $path = explode('?', $request->getRequestUri());
+                    return pluginApp(UrlQuery::class, ['path' => $path[0], 'lang' => $lang])
+                        ->toAbsoluteUrl($includeLanguage);
                 }
 
                 return null;
