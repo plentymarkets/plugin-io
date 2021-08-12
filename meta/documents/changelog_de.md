@@ -1,5 +1,12 @@
 # Release Notes für IO
 
+## v5.0.37 (2021-08-16) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.36...5.0.37" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
+
+### Behoben
+
+- Die Seitennummerierung auf der Ergebnisseite einer Tag-Route war teilweise fehlerhaft. Dies wurde behoben.
+- Die Seitennummerierung auf der Suchergebnisseite war teilweise fehlerhaft. Dies wurde behoben.
+
 ## v5.0.36 (2021-08-05) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.35...5.0.36" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
 
 ### Geändert
