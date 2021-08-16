@@ -1,5 +1,12 @@
 # Release Notes for IO
 
+## v5.0.37 (2021-08-17) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.36...5.0.37" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
+
+### Fixed
+
+- The pagination on the results page of a tag route was partially faulty. This has been fixed.
+- The pagination on the search results page was partially faulty. This has been fixed.
+
 ## v5.0.36 (2021-08-05) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.35...5.0.36" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
 
 ### Changed
