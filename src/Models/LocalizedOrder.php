@@ -328,11 +328,12 @@ class LocalizedOrder extends ModelWrapper
      */
     public function toArray(): array
     {
+        $accessKey = $this->order->access_key;
         $order = $this->order->toArray();
         $order['billingAddress'] = $this->order->billingAddress->toArray();
         $order['deliveryAddress'] = $this->order->deliveryAddress->toArray();
         $order['documents'] = $this->order->documents->toArray();
-
+        $order['accessKey'] = $accessKey;
         if (count($this->orderData)) {
             $order = $this->orderData;
         }
