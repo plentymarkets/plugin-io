@@ -4,6 +4,8 @@ namespace IO\Models;
 
 use IO\Builder\Order\OrderType;
 use IO\Services\TemplateConfigService;
+use Plenty\Modules\Authorization\Services\AuthHelper;
+use Plenty\Modules\Order\Contracts\OrderRepositoryContract;
 use Plenty\Modules\Order\Date\Models\OrderDateType;
 use Plenty\Modules\Order\Models\OrderItem;
 use Plenty\Modules\Order\Models\OrderItemType;
@@ -328,12 +330,11 @@ class LocalizedOrder extends ModelWrapper
      */
     public function toArray(): array
     {
-        $accessKey = $this->order->access_key;
         $order = $this->order->toArray();
         $order['billingAddress'] = $this->order->billingAddress->toArray();
         $order['deliveryAddress'] = $this->order->deliveryAddress->toArray();
         $order['documents'] = $this->order->documents->toArray();
-        $order['accessKey'] = $accessKey;
+        $order['accessKey'] = $this->getAccessKey($this->order->id);
         if (count($this->orderData)) {
             $order = $this->orderData;
         }
@@ -357,6 +358,20 @@ class LocalizedOrder extends ModelWrapper
         ];
 
         return $data;
+    }
+
+
+    private function getAccessKey($orderId) {
+        /** @var OrderRepositoryContract $orderRepository */
+        $orderRepository = pluginApp(OrderRepositoryContract::class);
+        /** @var AuthHelper $authHelper */
+        $authHelper = pluginApp(AuthHelper::class);
+        return $authHelper->processUnguarded(
+            function () use ($orderId, $orderRepository) {
+                return $orderRepository->generateAccessKey($orderId);
+            }
+        );
+
     }
 
     /**
