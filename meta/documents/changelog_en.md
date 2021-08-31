@@ -1,5 +1,11 @@
 # Release Notes for IO
 
+## v5.0.38 (2021-08-31) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.37...5.0.38" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
+
+### Changed
+
+- For the changing of payment methods, the `accessKey` for the order is now also passed. 
+
 ## v5.0.37 (2021-08-17) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.36...5.0.37" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
 
 ### Fixed
