@@ -6,6 +6,7 @@ use IO\Helper\Utils;
 use IO\Services\CategoryService;
 use Plenty\Modules\Webshop\Contracts\WebstoreConfigurationRepositoryContract;
 use Plenty\Plugin\Log\Loggable;
+use Redis;
 
 /**
  * Class CategoryUrlBuilder
@@ -30,6 +31,8 @@ class CategoryUrlBuilder
         if ($lang === null) {
             $lang = Utils::getLang();
         }
+
+        // Redis::mget();
 
         /** @var CategoryService $categoryService */
         $categoryService = pluginApp(CategoryService::class);

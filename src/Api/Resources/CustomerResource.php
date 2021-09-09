@@ -22,7 +22,7 @@ use IO\Services\CustomerService;
  * Resource class for the route `io/customer`.
  * @package IO\Api\Resources
  */
-class CustomerResource extends ApiResource
+class CustomerResource extends SessionResource
 {
     /**
      * @var CustomerService $customerService Instance of the CustomerService.
@@ -30,26 +30,18 @@ class CustomerResource extends ApiResource
     private $customerService;
 
     /**
-     * @var ContactRepositoryContract $contactRepository Instance of the ContactRepository.
-     */
-    private $contactRepository;
-
-    /**
      * CustomerResource constructor.
      * @param Request $request
      * @param ApiResponse $response
      * @param CustomerService $customerService
-     * @param ContactRepositoryContract $contactRepository
      */
     public function __construct(
         Request $request,
         ApiResponse $response,
-        CustomerService $customerService,
-        ContactRepositoryContract $contactRepository
+        CustomerService $customerService
     ) {
         parent::__construct($request, $response);
         $this->customerService = $customerService;
-        $this->contactRepository = $contactRepository;
     }
 
     /**
@@ -58,8 +50,7 @@ class CustomerResource extends ApiResource
      */
     public function index(): Response
     {
-        $contact = $this->contactRepository->getContact();
-        return $this->response->create($contact, ResponseCode::OK);
+        return $this->response->create($this->indexCustomer(), ResponseCode::OK);
     }
 
     /**

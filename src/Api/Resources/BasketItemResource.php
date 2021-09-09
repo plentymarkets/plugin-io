@@ -15,7 +15,7 @@ use IO\Services\BasketService;
  * Resource class for the route `io/basket/items`.
  * @package IO\Api\Resources
  */
-class BasketItemResource extends ApiResource
+class BasketItemResource extends SessionResource
 {
     /**
      * @var BasketService $basketService Instance of the BasketService.
@@ -40,8 +40,8 @@ class BasketItemResource extends ApiResource
      */
     public function index(): Response
     {
-        $basketItems = $this->basketService->getBasketItemsForTemplate($this->request->get('template', ''));
-        return $this->response->create($basketItems, ResponseCode::OK);
+
+        return $this->response->create($this->indexBasketItems(), ResponseCode::OK);
     }
 
     /**

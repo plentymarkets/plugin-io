@@ -139,6 +139,12 @@ class UrlService
 
                     $currentCategory = $categoryService->getCurrentCategory();
 
+                    if(RouteConfig::getCategoryId(RouteConfig::HOME) === $currentCategory->id) {
+                        // FIX return homepage url as canonical when showing homepage category
+                        return pluginApp(UrlQuery::class, ['path' => "", 'lang' => $lang])
+                            ->toAbsoluteUrl($includeLanguage);
+                    }
+
                     if ($currentCategory !== null) {
                         $categoryDetails = $categoryService->getDetails($currentCategory, $lang);
 
@@ -162,6 +168,12 @@ class UrlService
                         ->toAbsoluteUrl($includeLanguage);
                 } elseif (TemplateService::$currentTemplate === 'tpl.login') {
                     return pluginApp(UrlQuery::class, ['path' => "login", 'lang' => $lang])
+                        ->toAbsoluteUrl($includeLanguage);
+                } elseif (TemplateService::$currentTemplate === "tpl.tags") {
+                    /** @var Request $request */
+                    $request = pluginApp(Request::class);
+                    $path = explode('?', $request->getRequestUri());
+                    return pluginApp(UrlQuery::class, ['path' => $path[0], 'lang' => $lang])
                         ->toAbsoluteUrl($includeLanguage);
                 }
 

@@ -1,5 +1,29 @@
 # Release Notes for IO
 
+## v5.0.38 (2021-08-31) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.37...5.0.38" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
+
+### Changed
+
+- For the changing of payment methods, the `accessKey` for the order is now also passed. 
+
+## v5.0.37 (2021-08-17) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.36...5.0.37" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
+
+### Fixed
+
+- The pagination on the results page of a tag route was partially faulty. This has been fixed.
+- The pagination on the search results page was partially faulty. This has been fixed.
+
+## v5.0.36 (2021-08-05) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.35...5.0.36" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
+
+### Changed
+
+- Category data is now loaded via new interfaces in order to improve performance.
+- The loading of customer data, the shopping cart, and shopping cart items are now subsumed under a single query.
+
+### Fixed
+
+- The correct canonical URL is now generated for the homepage category.
+
 ## v5.0.35 (2021-07-12) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.34...5.0.35" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
 
 ### Fixed

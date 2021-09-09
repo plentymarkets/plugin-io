@@ -1,5 +1,29 @@
 # Release Notes für IO
 
+## v5.0.38 (2021-08-31) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.37...5.0.38" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
+
+### Geändert
+
+- Zum Ändern der Zahlungsart wird nun zusätzlich der `accessKey` für den Auftrag übergeben.
+
+## v5.0.37 (2021-08-17) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.36...5.0.37" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
+
+### Behoben
+
+- Die Seitennummerierung auf der Ergebnisseite einer Tag-Route war teilweise fehlerhaft. Dies wurde behoben.
+- Die Seitennummerierung auf der Suchergebnisseite war teilweise fehlerhaft. Dies wurde behoben.
+
+## v5.0.36 (2021-08-05) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.35...5.0.36" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
+
+### Geändert
+
+- Für eine schnellere Auslieferungszeit werden Kategoriedaten jetzt über neue Schnittstellen geladen.
+- Das Laden von Kundendaten, Warenkorb und Warenkorb-Artikeln wurde unter einer Abfrage zusammengefasst.
+
+### Behoben
+
+- Für die Startseiten-Kategorie wird jetzt die richtige Canonical-URL generiert.
+
 ## v5.0.35 (2021-07-12) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.34...5.0.35" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
 
 ### Behoben
