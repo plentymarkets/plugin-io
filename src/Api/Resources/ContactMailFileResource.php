@@ -38,7 +38,7 @@ class ContactMailFileResource extends ApiResource
      */
     public function store(): Response
     {
-        if (!ReCaptcha::verify($this->request->get('recaptchaToken', null))) {
+        if (!ReCaptcha::verify($this->request->get('recaptchaToken', null), true)) {
             /**
              * @var NotificationService $notificationService
              */
