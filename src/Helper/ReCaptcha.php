@@ -17,9 +17,10 @@ class ReCaptcha
     /**
      * Send a recaptcha request to the API and return the result.
      * @param string $token The user's recaptcha token.
+     * @param bool $strict Decides if the recaptcha should return true or false if no cookie is accepted but recaptcha is used.
      * @return bool
      */
-    public static function verify($token)
+    public static function verify($token, $strict = false)
     {
         /** @var TemplateConfigService $templateConfigService */
         $templateConfigService = pluginApp(TemplateConfigService::class);
@@ -35,7 +36,7 @@ class ReCaptcha
             // No secret defined in config => skip reCAPTCHA validation
             return true;
         }
-        else if ($blockCookies && !$isConsented)
+        else if ($blockCookies && !$isConsented && !$strict)
         {
             // page has to operate without cookies
             return true;
