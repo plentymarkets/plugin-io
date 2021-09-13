@@ -1,5 +1,11 @@
 # Release Notes for IO
 
+## v5.0.39 (2021-09-13) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.38...5.0.39" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
+
+### Changed
+
+- It's no longer possible to send the contact form if reCaptcha is active and the corresponding cookie was not accepted by the user.
+
 ## v5.0.38 (2021-08-31) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.37...5.0.38" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
 
 ### Changed
