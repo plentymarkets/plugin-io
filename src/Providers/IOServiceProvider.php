@@ -298,7 +298,6 @@ class IOServiceProvider extends ServiceProvider
                 /** @var BasketService $basketService */
                 $basketService = pluginApp(BasketService::class);
                 $basketService->checkBasketItemsLang($event->getLanguage());
-                DetectLanguage::$DETECTED_LANGUAGE = $event->getLanguage();
             }
         );
 
