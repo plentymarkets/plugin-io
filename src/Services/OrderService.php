@@ -493,9 +493,20 @@ class OrderService
      */
     public function createOrderReturn($orderId, $orderAccessKey = '', $items = [], $returnNote = '')
     {
-        $localizedOrder = $this->getReturnOrder($orderId, $orderAccessKey);
+        $localizedOrder = $this->getReturnOrder($orderId, $orderAccessKey, true);
         if ($localizedOrder->isReturnable()) {
             $returnOrderData = $localizedOrder->orderData;
+
+            $orderPropertyItems = [];
+
+            foreach ($returnOrderData['orderItems'] as $orderItem) {
+                if ($orderItem['typeId'] === OrderItemType::TYPE_ORDER_PROPERTY &&
+                    $orderItem['references'][0]['referenceType'] === 'order_property') {
+                    $orderPropertyItems[$orderItem['references'][0]['referenceOrderItemId']][] = $orderItem;
+                }
+            }
+
+            $returnOrder = [];
 
             foreach ($returnOrderData['orderItems'] as $i => $orderItem) {
                 $variationId = $orderItem['itemVariationId'];
@@ -507,19 +518,24 @@ class OrderService
                 }
 
                 if ($returnQuantity > 0) {
-                    $returnOrderData['orderItems'][$i]['quantity'] = $returnQuantity;
+                    $returnOrder['quantities'][] = [
+                        'orderItemId' => $orderItem['id'],
+                        'quantity' => $returnQuantity
+                    ];
+
+                    // also return all referenced order properties
+                    if ($orderPropertyItems[$orderItem['id']]) {
+                        foreach ($orderPropertyItems[$orderItem['id']] as $orderPropertyItem) {
+                            $returnOrder['quantities'][] = [
+                                'orderItemId' => $orderPropertyItem['id'],
+                                'quantity' => $returnQuantity
+                            ];
+                        }
+                    }
                 } else {
                     unset($returnOrderData['orderItems'][$i]);
                 }
             }
-
-            $returnOrder = [];
-            $returnOrder['quantities'] = array_map(function ($returnOrderItem) {
-                return [
-                    'orderItemId' => $returnOrderItem['id'],
-                    'quantity' => $returnOrderItem['quantity']
-                ];
-            }, $returnOrderData['orderItems']);
 
             $returnOrder['statusId'] = $this->getReturnOrderStatus();
 
@@ -554,7 +570,7 @@ class OrderService
      * @return LocalizedOrder
      * @throws \Throwable
      */
-    public function getReturnOrder($orderId, $orderAccessKey = '')
+    public function getReturnOrder($orderId, $orderAccessKey = '', $includeOrderPropertyItems = false)
     {
         $localizedOrder = strlen($orderAccessKey)
             ? $this->findOrderByAccessKey($orderId, $orderAccessKey)
@@ -564,7 +580,7 @@ class OrderService
         $order = $localizedOrder->order;
 
         $orderData = $order->toArray();
-        $orderData['orderItems'] = $this->getReturnableItems($order);
+        $orderData['orderItems'] = $this->getReturnableItems($order, $includeOrderPropertyItems);
 
         /** @var PropertyNameFilter $propertyNameFilter */
         $propertyNameFilter = pluginApp(PropertyNameFilter::class);
@@ -593,7 +609,7 @@ class OrderService
      * @return array
      * @throws \Throwable
      */
-    public function getReturnableItems($order)
+    public function getReturnableItems($order, $includeOrderPropertyItems = false)
     {
         /** @var AuthHelper $authHelper */
         $authHelper = pluginApp(AuthHelper::class);
@@ -622,7 +638,7 @@ class OrderService
             }
 
             if ($newQuantity > 0
-                && in_array($orderItem->typeId, self::WRAPPED_ORDERITEM_TYPES)
+                && (in_array($orderItem->typeId, self::WRAPPED_ORDERITEM_TYPES) || ($includeOrderPropertyItems && $orderItem->typeId === OrderItemType::TYPE_ORDER_PROPERTY))
                 && !($orderItem->bundleType === 'bundle_item' && count($orderItem->references) > 0)
                 && $this->giftCardRepository->isReturnable($orderItem->id)) {
                 $orderItemData = $orderItem->toArray();
