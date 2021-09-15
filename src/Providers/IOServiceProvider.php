@@ -295,9 +295,12 @@ class IOServiceProvider extends ServiceProvider
         $dispatcher->listen(
             FrontendLanguageChanged::class,
             function ($event) {
-                /** @var BasketService $basketService */
-                $basketService = pluginApp(BasketService::class);
-                $basketService->checkBasketItemsLang($event->getLanguage());
+
+                if (!$event->isDetectedByBrowserLanguage()) {
+                    /** @var BasketService $basketService */
+                    $basketService = pluginApp(BasketService::class);
+                    $basketService->checkBasketItemsLang($event->getLanguage());
+                }
             }
         );
 
