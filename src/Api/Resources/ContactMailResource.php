@@ -63,7 +63,7 @@ class ContactMailResource extends ApiResource
 
         $mailTemplate = TemplateContainer::get('tpl.mail.contact')->getTemplate();
 
-        if (!ReCaptcha::verify($this->request->get('recaptchaToken', null))) {
+        if (!ReCaptcha::verify($this->request->get('recaptchaToken', null), true)) {
             /**
              * @var NotificationService $notificationService
              */
