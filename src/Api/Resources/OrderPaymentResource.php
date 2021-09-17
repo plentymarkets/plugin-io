@@ -55,10 +55,13 @@ class OrderPaymentResource extends ApiResource
     {
         $orderId = $this->request->get('orderId', 0);
         $paymentMethodId = $this->request->get('paymentMethodId', 0);
+        $accessKey = $this->request->get('accessKey', '');
 
-        $response = $this->orderService->switchPaymentMethodForOrder($orderId, $paymentMethodId);
-
-        return $this->response->create($response, ResponseCode::CREATED);
+        if(strlen($accessKey)) {
+            $response = $this->orderService->switchPaymentMethodForOrder($orderId, $paymentMethodId, $accessKey);
+            return $this->response->create($response, ResponseCode::CREATED);
+        }
+        return $this->response->create(null, ResponseCode::UNAUTHORIZED);
     }
 
     /**

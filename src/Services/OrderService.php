@@ -695,14 +695,16 @@ class OrderService
      * Switch the payment method of an order to a new payment method
      * @param int $orderId An order id to switch payment method for
      * @param int $paymentMethodId A payment method id to switch to
+     * @param string $accessKey The access key must be compatible with order id
+     *
      * @return LocalizedOrder|null
      * @throws \Throwable
      */
-    public function switchPaymentMethodForOrder($orderId, $paymentMethodId)
+    public function switchPaymentMethodForOrder($orderId, $paymentMethodId, $accessKey)
     {
         /** @var \Plenty\Modules\Webshop\Order\Contracts\OrderRepositoryContract $orderRepostory */
         $orderRepostory = pluginApp(\Plenty\Modules\Webshop\Order\Contracts\OrderRepositoryContract::class);
-        $order = $orderRepostory->switchPaymentMethodForOrder($orderId, $paymentMethodId);
+        $order = $orderRepostory->switchPaymentMethodForOrder($orderId, $paymentMethodId, $accessKey);
 
         if (!is_null($order)) {
             return LocalizedOrder::wrap($order, Utils::getLang());

@@ -4,10 +4,10 @@ namespace IO\Services;
 
 use IO\Constants\CategoryType;
 use IO\Guards\AuthGuard;
-use IO\Helper\ArrayHelper;
 use IO\Helper\CategoryDataFilter;
 use IO\Helper\MemoryCache;
 use IO\Helper\Utils;
+use Plenty\Modules\Webshop\Contracts\UrlBuilderRepositoryContract;
 use Plenty\Modules\Webshop\Helpers\UrlQuery;
 use Plenty\Modules\Category\Models\Category;
 use Plenty\Modules\Category\Contracts\CategoryRepositoryContract;
@@ -17,7 +17,6 @@ use Plenty\Modules\Webshop\Contracts\ContactRepositoryContract;
 use Plenty\Modules\Webshop\Contracts\WebstoreConfigurationRepositoryContract;
 use Plenty\Modules\Webshop\ItemSearch\Helpers\LoadResultFields;
 use Plenty\Modules\Webshop\ItemSearch\Helpers\ResultFieldTemplate;
-use Plenty\Repositories\Models\PaginatedResult;
 
 /**
  * Class CategoryService
@@ -46,6 +45,11 @@ class CategoryService
      * @var ContactRepositoryContract $contactRepository This repository is used to manipulate Contact models.
      */
     private $contactRepository;
+
+    /**
+     * @var UrlBuilderRepositoryContract Repository to build category urls
+     */
+    private $urlBuilderRepository;
 
     // is set from controllers
     /**
@@ -80,12 +84,14 @@ class CategoryService
      * @param WebstoreConfigurationRepositoryContract $webstoreConfigurationRepository This repository is used to read the webstore configuration.
      * @param AuthGuard $authGuard Guard class to check for login status.
      * @param ContactRepositoryContract $contactRepository This repository is used to manipulate Contact models.
+     * @param UrlBuilderRepositoryContract $urlBuilderRepository Repository to build category urls
      */
     public function __construct(
         CategoryRepositoryContract $categoryRepository,
         WebstoreConfigurationRepositoryContract $webstoreConfigurationRepository,
         AuthGuard $authGuard,
-        ContactRepositoryContract $contactRepository
+        ContactRepositoryContract $contactRepository,
+        UrlBuilderRepositoryContract $urlBuilderRepository
     )
     {
         $this->categoryRepository = $categoryRepository;
@@ -93,6 +99,7 @@ class CategoryService
         $this->authGuard = $authGuard;
         $this->webstoreId = Utils::getWebstoreId();
         $this->contactRepository = $contactRepository;
+        $this->urlBuilderRepository = $urlBuilderRepository;
     }
 
     /**
@@ -290,38 +297,16 @@ class CategoryService
      *
      * @param Category $category The category to get the URL for
      * @param string|null $lang The language to get the URL for (ISO-639-1)
-     * @param int|null $webstoreId
+     * @param int|null $webstoreId Id of the webstore to get the category url for
      * @return string|null
      */
     public function getURL($category, $lang = null, $webstoreId = null)
     {
-        $defaultLanguage = $this->webstoreConfigurationRepository->getWebstoreConfiguration()->defaultLanguage;
-        if ($lang === null) {
-            $lang = Utils::getLang();
+        if (!$category instanceof Category || $category->details->first() === null) {
+            return null;
         }
 
-        if (is_null($webstoreId)) {
-            $webstoreId = $this->webstoreConfigurationRepository->getWebstoreConfiguration()->webstoreId;
-        }
-
-        $categoryUrl = $this->fromMemoryCache(
-            "categoryUrl.$category->id.$lang.$webstoreId",
-            function () use ($category, $lang, $defaultLanguage, $webstoreId) {
-                if (!$category instanceof Category || $category->details->first() === null) {
-                    return null;
-                }
-                $categoryURL = pluginApp(
-                    UrlQuery::class,
-                    [
-                        'path' => $this->categoryRepository->getUrl($category->id, $lang, false, $webstoreId),
-                        'lang' => $lang
-                    ]
-                );
-                return $categoryURL->toRelativeUrl($lang !== $defaultLanguage);
-            }
-        );
-
-        return $categoryUrl;
+        return $this->getURLById($category->id, $lang, $webstoreId);
     }
 
     /**
@@ -329,14 +314,27 @@ class CategoryService
      *
      * @param int $categoryId Id of category to fetch
      * @param string|null $lang Language in format ISO-639-1
+     * @param int|null $webstoreId Id of the webstore to get the category url for
      * @return string|null
      */
-    public function getURLById($categoryId, $lang = null)
+    public function getURLById($categoryId, $lang = null, $webstoreId = null)
     {
         if ($lang === null) {
             $lang = Utils::getLang();
         }
-        return $this->getURL($this->get($categoryId, $lang), $lang);
+
+        if (is_null($webstoreId)) {
+            $webstoreId = Utils::getWebstoreId();
+        }
+        $defaultLanguage = $this->webstoreConfigurationRepository->getWebstoreConfiguration()->defaultLanguage;
+
+        return  $this->fromMemoryCache(
+            "categoryUrl.$categoryId.$lang.$webstoreId",
+            function () use ($categoryId, $lang, $webstoreId, $defaultLanguage) {
+                $categoryURL = $this->urlBuilderRepository->buildCategoryUrl($categoryId, $lang, $webstoreId);
+                return $categoryURL->toRelativeUrl($lang !== $defaultLanguage);
+            }
+        );
     }
 
     /**
@@ -591,11 +589,17 @@ class CategoryService
      * @param int $catID The category id to get the parents for or 0 to use current category
      * @param bool $bottomUp Set true to order result from bottom (deepest category) to top (= level 1)
      * @param bool $filterCategories Filter categories
+     * @param bool $restoreOldValues Restore old category data and category tree after the method call.
      * @return array The parents of the category
      */
-    public function getHierarchy(int $catID = 0, bool $bottomUp = false, bool $filterCategories = false): array
+    public function getHierarchy(int $catID = 0, bool $bottomUp = false, bool $filterCategories = false, $restoreOldValues = false): array
     {
         if ($catID > 0) {
+
+            if ($restoreOldValues) {
+                $oldCategory = $this->currentCategory;
+                $oldCategoryTree = $this->currentCategoryTree;
+            }
             $this->setCurrentCategoryID($catID);
         }
 
@@ -620,6 +624,11 @@ class CategoryService
         if (count($this->currentItem)) {
             $lang = Utils::getLang();
             array_push($hierarchy, $this->currentItem['texts'][$lang]);
+        }
+
+        if ($restoreOldValues) {
+             $this->currentCategory = $oldCategory;
+             $this->currentCategoryTree = $oldCategoryTree;
         }
 
         return $hierarchy;
@@ -680,7 +689,7 @@ class CategoryService
             return false;
         }
         $isHidden = false;
-        foreach ($this->getHierarchy($categoryId) as $category) {
+        foreach ($this->getHierarchy($categoryId, false, false, true) as $category) {
             if ($category->right === 'customer') {
                 $isHidden = true;
                 break;

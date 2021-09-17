@@ -3,6 +3,7 @@
 namespace IO\Services;
 
 use IO\Helper\Utils;
+use Plenty\Exceptions\ValidationException;
 use Plenty\Modules\Accounting\Contracts\DetermineShopCountryContract;
 use Plenty\Modules\Accounting\Vat\Contracts\VatInitContract;
 use Plenty\Modules\Accounting\Vat\Models\VatRate;
