@@ -1,5 +1,11 @@
 # Release Notes für IO
 
+## v5.0.39 (2021-09-13) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.38...5.0.39" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
+
+### Geändert
+
+- Das Kontaktformular lässt sich nun bei aktiviertem reCaptcha nicht mehr absenden, wenn der entsprechende Cookie nicht akzeptiert wurde.
+
 ## v5.0.38 (2021-08-31) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.37...5.0.38" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
 
 ### Geändert
