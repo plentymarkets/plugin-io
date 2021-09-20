@@ -73,7 +73,10 @@ class IORouteServiceProvider extends RouteServiceProvider
             $api->post('io/order', 'OrderResource@store');
             $api->resource('io/order/payment', 'OrderPaymentResource');
             $api->resource('io/checkout/paymentId', 'CheckoutSetPaymentResource');
-            $api->resource('io/customer/address', 'CustomerAddressResource');
+            $api->get('io/customer/address', 'CustomerAddressResource@index');
+            $api->post('io/customer/address', 'CustomerAddressResource@store')->middleware('sanitize:*');
+            $api->put('io/customer/address', 'CustomerAddressResource@update')->middleware('sanitize:*');
+            $api->delete('io/customer/address', 'CustomerAddressResource@destroy');
             $api->resource('io/checkout/shippingId', 'CheckoutSetShippingIdResource');
             $api->resource('io/order/contactWish', 'OrderContactWishResource');
             $api->post('io/order/return', 'OrderReturnResource@store')->middleware('sanitize:returnNote');
