@@ -31,6 +31,7 @@ class IORouteServiceProvider extends RouteServiceProvider
         $api->version(['v1'], ['namespace' => 'IO\Api\Resources'], function (ApiRouter $api) {
             $api->get('io/basket', 'BasketResource@index');
             $api->resource('io/basket/items', 'BasketItemResource');
+            $api->post('io/basket/items', 'BasketItemResource')->middleware('sanitize:basketItemOrderParams.*');
             $api->get('io/order', 'OrderResource@index');
             $api->get('io/order/paymentMethods', 'OrderPaymentResource@paymentMethodListForSwitch');
             $api->resource('io/order/template', 'OrderTemplateResource');
