@@ -43,7 +43,7 @@ class IORouteServiceProvider extends RouteServiceProvider
             $api->resource('io/customer/password', 'CustomerPasswordResource');
             $api->resource('io/customer/password_reset', 'CustomerPasswordResetResource');
             $api->resource('io/customer/mail', 'CustomerMailResource');
-            $api->resource('io/customer/contact/mail', 'ContactMailResource');
+            $api->post('io/customer/contact/mail', 'ContactMailResource@store')->middleware('sanitize:replyTo.mail,replyTo.name,subject,data.*');
             $api->resource('io/customer/contact/mail/file', 'ContactMailFileResource');
             $api->get('io/customer/order/list', 'CustomerOrderResource@index');
             $api->post('io/customer/newsletter', 'CustomerNewsletterResource@store')->middleware('sanitize:email,firstName,lastName');
@@ -85,7 +85,7 @@ class IORouteServiceProvider extends RouteServiceProvider
             $api->post('io/customer/bank_data', 'ContactBankResource@store')->middleware('sanitize:accountOwner,bankName,iban,bic');
             $api->put('io/customer/bank_data', 'ContactBankResource@update')->middleware('sanitize:accountOwner,bankName,iban,bic');
             $api->resource('io/customer/order/return', 'CustomerOrderReturnResource');
-            $api->post('io/order/additional_information', 'OrderAdditionalInformationResource@store')->middleware('sanitize:orderContactWish');
+            $api->post('io/order/additional_information', 'OrderAdditionalInformationResource@store')->middleware('sanitize:orderContactWish,orderCustomerSign');
         });
 
         /** @var ShopUrls $shopUrls */
