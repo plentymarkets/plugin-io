@@ -792,16 +792,41 @@ class OrderService
      */
     private function removeOrderItemPrefix(string $name, int $orderItemTypeId): string
     {
-        /** @var OrderSettingsRepositoryContract $settingsRepository */
-        $settingsRepository = pluginApp(OrderSettingsRepositoryContract::class);
-        $settings = $settingsRepository->get();
-        $prefix = $settings->orderItemPrefixes[$orderItemTypeId] ?? null;
-
+        $prefix = $this->getOrderItemPrefix($orderItemTypeId);
         if ($prefix !== null && (substr($name, 0, strlen($prefix)) == $prefix)) {
             $name = substr($name, strlen($prefix));
         }
 
         return $name;
+    }
+
+    /**
+     * Check if the prefix for components is included in the name
+     *
+     * @param string $name
+     * @return bool
+     */
+    public function containsComponentPrefix(string $name): bool
+    {
+        $prefix = $this->getOrderItemPrefix(\Plenty\Modules\Order\Models\OrderItemType::TYPE_BUNDLE_COMPONENT);
+        if ($prefix !== null && (substr($name, 0, strlen($prefix)) == $prefix)) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Get prefix for item type id
+     *
+     * @param int $orderItemTypeId
+     * @return int|null
+     */
+    public function getOrderItemPrefix(int $orderItemTypeId)
+    {
+        /** @var OrderSettingsRepositoryContract $settingsRepository */
+        $settingsRepository = pluginApp(OrderSettingsRepositoryContract::class);
+        $settings = $settingsRepository->get();
+        return $settings->orderItemPrefixes[$orderItemTypeId] ?? null;
     }
 
     /**
