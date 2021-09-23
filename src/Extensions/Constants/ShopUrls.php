@@ -2,6 +2,7 @@
 
 namespace IO\Extensions\Constants;
 
+use Illuminate\Support\Str;
 use IO\Helper\MemoryCache;
 use IO\Helper\RouteConfig;
 use IO\Helper\Utils;
@@ -302,6 +303,14 @@ class ShopUrls
     public function orderPropertyFile($path)
     {
         return $this->getShopUrl(RouteConfig::ORDER_PROPERTY_FILE, Utils::getLang(), [$path]);
+    }
+
+    public function variationOrderPropertyFile($fileUrl)
+    {
+        preg_match('/orderPropertyFiles\/\d*\/\d*\//', $fileUrl, $regexResult);
+        $fileKeys = str_replace('orderPropertyFiles/', null, $regexResult[0]);
+
+        return $this->getShopUrl(RouteConfig::VARIATION_ORDER_PROPERTY_FILE, Utils::getLang(), [$fileKeys]);
     }
 
     /**

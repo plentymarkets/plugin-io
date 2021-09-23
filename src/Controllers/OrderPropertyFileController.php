@@ -54,6 +54,31 @@ class OrderPropertyFileController extends LayoutController
         }
         return $response;
     }
+    
+    public function downloadPropertyFile(string $hash1, string $hash2 = '')
+    {
+        /** @var Request $request */
+        $request = pluginApp(Request::class);
+        $filename = $request->get('filename', '');
+
+        if (strlen($hash1) && strlen($filename)) {
+            $key = $hash1.'/';
+            if(strlen($hash2))
+            {
+                $key .= $hash2.'/';
+            }
+            $key .= $filename;
+            $response = $this->download($key);
+        }
+
+        if (!$response instanceof Response) {
+            /** @var Response $response */
+            $response = pluginApp(Response::class);
+            $response->forceStatus(ResponseCode::NOT_FOUND);
+            CheckNotFound::$FORCE_404 = true;
+        }
+        return $response;
+    }
 
     /**
      * @param string $key
