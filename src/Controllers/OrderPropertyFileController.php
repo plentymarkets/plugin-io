@@ -4,6 +4,7 @@ namespace IO\Controllers;
 
 use IO\Api\ResponseCode;
 use IO\Middlewares\CheckNotFound;
+use Plenty\Modules\Cloud\Storage\Contracts\StorageRepositoryContract;
 use Plenty\Modules\Frontend\Services\OrderPropertyFileService;
 use Plenty\Plugin\Http\Response;
 use Plenty\Plugin\Http\Request;
@@ -32,19 +33,8 @@ class OrderPropertyFileController extends LayoutController
 
     public function downloadFile(string $hash1, string $hash2 = '')
     {
-        /** @var Request $request */
-        $request = pluginApp(Request::class);
-        $filename = $request->get('filename', '');
-
-        if (strlen($hash1) && strlen($filename)) {
-            $key = $hash1.'/';
-            if(strlen($hash2))
-            {
-                $key .= $hash2.'/';
-            }
-            $key .= $filename;
-            $response = $this->download($key);
-        }
+        $key = $this->getFileKey($hash1, $hash2);
+        $response = $this->download($key);
 
         if (!$response instanceof Response) {
             /** @var Response $response */
@@ -54,8 +44,36 @@ class OrderPropertyFileController extends LayoutController
         }
         return $response;
     }
-    
-    public function downloadPropertyFile(string $hash1, string $hash2 = '')
+
+    public function downloadPropertyFile(string $hash1, string $hash2 = '') {
+        /** @var StorageRepositoryContract $storage */
+        $storage = app(StorageRepositoryContract::class);
+
+        /** @var Response $response */
+        $response = pluginApp(Response::class);
+
+        $key = 'orderPropertyFiles/' . $this->getFileKey($hash1, $hash2);
+
+        $fileExists = $storage->doesObjectExist('plentymarkets-documents', $key, false, 15);
+
+        if ($fileExists) {
+            $objectFile = $storage->getObject('plentymarkets-documents', $key, false, 15);
+
+            return $response->make($objectFile->body, 200,
+                [
+                    'Content-Type' => $objectFile->contentType,
+                    'Content-Length' => $objectFile->contentLength
+                ]
+            );
+        }
+
+        $response->forceStatus(ResponseCode::NOT_FOUND);
+        CheckNotFound::$FORCE_404 = true;
+
+        return $response;
+    }
+
+    private function getFileKey(string $hash1, string $hash2)
     {
         /** @var Request $request */
         $request = pluginApp(Request::class);
@@ -68,16 +86,9 @@ class OrderPropertyFileController extends LayoutController
                 $key .= $hash2.'/';
             }
             $key .= $filename;
-            $response = $this->download($key);
-        }
 
-        if (!$response instanceof Response) {
-            /** @var Response $response */
-            $response = pluginApp(Response::class);
-            $response->forceStatus(ResponseCode::NOT_FOUND);
-            CheckNotFound::$FORCE_404 = true;
+            return $key;
         }
-        return $response;
     }
 
     /**
