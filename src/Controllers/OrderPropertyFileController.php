@@ -34,8 +34,19 @@ class OrderPropertyFileController extends LayoutController
 
     public function downloadFile(string $hash1, string $hash2 = '')
     {
-        $key = $this->getFileKey($hash1, $hash2);
-        $response = $this->download($key);
+        /** @var Request $request */
+        $request = pluginApp(Request::class);
+        $filename = $request->get('filename', '');
+
+        if (strlen($hash1) && strlen($filename)) {
+            $key = $hash1.'/';
+            if(strlen($hash2))
+            {
+                $key .= $hash2.'/';
+            }
+            $key .= $filename;
+            $response = $this->download($key);
+        }
 
         if (!$response instanceof Response) {
             /** @var Response $response */
@@ -59,24 +70,6 @@ class OrderPropertyFileController extends LayoutController
                 'Content-Length' => $fileObject->contentLength
             ]
         );
-    }
-
-    private function getFileKey(string $hash1, string $hash2)
-    {
-        /** @var Request $request */
-        $request = pluginApp(Request::class);
-        $filename = $request->get('filename', '');
-
-        if (strlen($hash1) && strlen($filename)) {
-            $key = $hash1.'/';
-            if(strlen($hash2))
-            {
-                $key .= $hash2.'/';
-            }
-            $key .= $filename;
-
-            return $key;
-        }
     }
 
     /**
