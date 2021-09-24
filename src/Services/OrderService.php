@@ -412,7 +412,7 @@ class OrderService
                         'creationDate' => $creationDate,
                         'shippingDate' => $shippingDate,
                         'trackingURL' => $orderTrackingService->getTrackingURL($order, $lang),
-                        'confirmationURL' => $shopUrls->orderConfirmation($order->id)
+                        'confirmationURL' => $shopUrls->orderConfirmation($order->id),
                     ];
                 }
             };
@@ -565,6 +565,7 @@ class OrderService
 
         $orderData = $order->toArray();
         $orderData['orderItems'] = $this->getReturnableItems($order);
+        $orderData['accessKey'] = $this->getAccessKey($order->id);
 
         /** @var PropertyNameFilter $propertyNameFilter */
         $propertyNameFilter = pluginApp(PropertyNameFilter::class);
@@ -875,5 +876,25 @@ class OrderService
             }
         }
         return 9.0;
+    }
+
+    /**
+     * Get the order access key for an specific order.
+     *
+     * @param $orderId The ID of the order.
+     * @return mixed
+     * @throws \Throwable
+     */
+    public function getAccessKey($orderId) {
+        /** @var OrderRepositoryContract $orderRepository */
+        $orderRepository = pluginApp(OrderRepositoryContract::class);
+        /** @var AuthHelper $authHelper */
+        $authHelper = pluginApp(AuthHelper::class);
+        return $authHelper->processUnguarded(
+            function () use ($orderId, $orderRepository) {
+                return $orderRepository->generateAccessKey($orderId);
+            }
+        );
+
     }
 }

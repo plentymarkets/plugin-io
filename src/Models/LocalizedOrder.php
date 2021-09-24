@@ -371,16 +371,10 @@ class LocalizedOrder extends ModelWrapper
 
 
     private function getAccessKey($orderId) {
-        /** @var OrderRepositoryContract $orderRepository */
-        $orderRepository = pluginApp(OrderRepositoryContract::class);
-        /** @var AuthHelper $authHelper */
-        $authHelper = pluginApp(AuthHelper::class);
-        return $authHelper->processUnguarded(
-            function () use ($orderId, $orderRepository) {
-                return $orderRepository->generateAccessKey($orderId);
-            }
-        );
+        /** @var OrderService $orderService */
+        $orderService = pluginApp(OrderService::class);
 
+        return $orderService->getAccessKey($orderId);
     }
 
     /**
