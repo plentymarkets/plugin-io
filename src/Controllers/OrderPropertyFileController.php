@@ -6,6 +6,7 @@ use IO\Api\ResponseCode;
 use IO\Middlewares\CheckNotFound;
 use Plenty\Modules\Cloud\Storage\Contracts\StorageRepositoryContract;
 use Plenty\Modules\Frontend\Services\OrderPropertyFileService;
+use Plenty\Modules\Webshop\Order\Services\OrderPropertyService;
 use Plenty\Plugin\Http\Response;
 use Plenty\Plugin\Http\Request;
 
@@ -26,7 +27,7 @@ class OrderPropertyFileController extends LayoutController
             /** @var Response $response */
             $response = pluginApp(Response::class);
             $response->forceStatus(ResponseCode::NOT_FOUND);
-            CheckNotFound::$FORCE_404 = true;
+            StorageRepositoryContractCheckNotFound::$FORCE_404 = true;
         }
         return $response;
     }
@@ -45,32 +46,19 @@ class OrderPropertyFileController extends LayoutController
         return $response;
     }
 
-    public function downloadPropertyFile(string $hash1, string $hash2 = '') {
-        /** @var StorageRepositoryContract $storage */
-        $storage = app(StorageRepositoryContract::class);
+    public function downloadPropertyFile(string $hash1, string $hash2, string $filename, string $orderAccessKey) {
+        /** @var OrderPropertyService $orderPropertyService */
+        $orderPropertyService = pluginApp(OrderPropertyService::class);
+        $fileObject = $orderPropertyService->downloadPropertyFile($hash1, $hash2, $filename, $orderAccessKey);
 
         /** @var Response $response */
         $response = pluginApp(Response::class);
-
-        $key = 'orderPropertyFiles/' . $this->getFileKey($hash1, $hash2);
-
-        $fileExists = $storage->doesObjectExist('plentymarkets-documents', $key, false, 15);
-
-        if ($fileExists) {
-            $objectFile = $storage->getObject('plentymarkets-documents', $key, false, 15);
-
-            return $response->make($objectFile->body, 200,
-                [
-                    'Content-Type' => $objectFile->contentType,
-                    'Content-Length' => $objectFile->contentLength
-                ]
-            );
-        }
-
-        $response->forceStatus(ResponseCode::NOT_FOUND);
-        CheckNotFound::$FORCE_404 = true;
-
-        return $response;
+        return $response->make($fileObject->body, 200,
+            [
+                'Content-Type' => $fileObject->contentType,
+                'Content-Length' => $fileObject->contentLength
+            ]
+        );
     }
 
     private function getFileKey(string $hash1, string $hash2)

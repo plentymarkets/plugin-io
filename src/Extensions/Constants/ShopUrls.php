@@ -305,12 +305,12 @@ class ShopUrls
         return $this->getShopUrl(RouteConfig::ORDER_PROPERTY_FILE, Utils::getLang(), [$path]);
     }
 
-    public function variationOrderPropertyFile($fileUrl)
+    public function variationOrderPropertyFile($fileUrl, $filename, $orderAccessKey)
     {
         preg_match('/orderPropertyFiles\/\d*\/\d*\//', $fileUrl, $regexResult);
-        $fileKeys = str_replace('orderPropertyFiles/', null, $regexResult[0]);
+        $fileKeys = str_replace('orderPropertyFiles/', '', $regexResult[0]);
 
-        return $this->getShopUrl(RouteConfig::VARIATION_ORDER_PROPERTY_FILE, Utils::getLang(), [$fileKeys]);
+        return $this->getShopUrl(RouteConfig::VARIATION_ORDER_PROPERTY_FILE, Utils::getLang(), [$fileKeys, $filename, $orderAccessKey]);
     }
 
     /**
