@@ -27,7 +27,7 @@ class OrderPropertyFileController extends LayoutController
             /** @var Response $response */
             $response = pluginApp(Response::class);
             $response->forceStatus(ResponseCode::NOT_FOUND);
-            StorageRepositoryContractCheckNotFound::$FORCE_404 = true;
+            CheckNotFound::$FORCE_404 = true;
         }
         return $response;
     }
