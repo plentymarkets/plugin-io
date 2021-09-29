@@ -322,7 +322,7 @@ class LocalizedOrder extends ModelWrapper
         /** @var VariationPropertyConverter $variationPropertyConverter */
         $variationPropertyConverter = pluginApp(VariationPropertyConverter::class);
         $instance->order->relations['orderItems'] = $variationPropertyConverter->convertVariationPropertyOrderItems(
-            $instance->order->relations['orderItems']
+            $instance->order
         );
 
         /** @var OrderTotalsService $orderTotalsService */
