@@ -36,7 +36,7 @@ class ItemLastSeenService
      */
     public function setLastSeenItem(int $variationId)
     {
-        $lastSeenItems = $this->cachingRepository->get(SessionStorageRepositoryContract::LAST_SEEN_ITEMS . '_' . $this->basketRepository->load()->id);
+        $lastSeenItems = $this->cachingRepository->get(SessionStorageRepositoryContract::LAST_SEEN_ITEMS . '_' . $this->basketRepository->load()->sessionId);
 
         if (is_null($lastSeenItems)) {
             $lastSeenItems = [];
@@ -48,7 +48,7 @@ class ItemLastSeenService
             }
 
             array_unshift($lastSeenItems, $variationId);
-            $this->cachingRepository->put(SessionStorageRepositoryContract::LAST_SEEN_ITEMS . '_' . $this->basketRepository->load()->id, $lastSeenItems, 60);
+            $this->cachingRepository->put(SessionStorageRepositoryContract::LAST_SEEN_ITEMS . '_' . $this->basketRepository->load()->sessionId, $lastSeenItems, 60);
         }
     }
 }
