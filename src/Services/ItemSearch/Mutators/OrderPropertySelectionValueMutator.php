@@ -34,7 +34,7 @@ class OrderPropertySelectionValueMutator extends BaseMutator
         
         foreach($data['properties'] as $key => $property)
         {
-            if($property['property']['valueType'] == 'selection' && $property['property']['isOderProperty'])
+            if($property['property']['valueType'] == 'selection' && $property['property']['isOderProperty'] && !isset($property['property']['selectionValues']))
             {
                 $selectionValues = $authHelper->processUnguarded(function() use ($propertySelectionRepo, $property, $lang) {
                     return $propertySelectionRepo->findByProperty($property['property']['id'], $lang);

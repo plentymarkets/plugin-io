@@ -54,6 +54,7 @@ class OrderTotalsService
             switch ($item->typeId) {
                 case OrderItemType::VARIATION:
                 case OrderItemType::ITEM_BUNDLE:
+                case OrderItemType::TYPE_ORDER_PROPERTY:
                     $itemSumGross += $firstAmount->priceGross * $item->quantity;
                     $itemSumNet += $firstAmount->priceNet * $item->quantity;
                     break;
