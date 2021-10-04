@@ -26,11 +26,6 @@ class DetectLanguage extends Middleware
     const WEB_AJAX_BASE = '/WebAjaxBase.php';
 
     /**
-     * @var string|null $DETECTED_LANGUAGE Detected language.
-     */
-    public static $DETECTED_LANGUAGE = null;
-
-    /**
      * Before the request is processed, the language is changed, if necessary.
      *
      * @param Request $request
@@ -43,22 +38,9 @@ class DetectLanguage extends Middleware
             $webstoreConfig = $webstoreConfigurationRepository->getWebstoreConfiguration();
             $splittedURL = explode('/', $request->get('plentyMarkets'));
 
-            // request uri is not "/webAjaxBase.php"
-            if (!is_null(self::$DETECTED_LANGUAGE)) {
-                // language has been detected by plentymarkets core
-                $this->setLanguage(self::$DETECTED_LANGUAGE, $webstoreConfig);
+            CategoryController::$LANGUAGE_FROM_URL = $splittedURL[0] ?:  Utils::getDefaultLang();
 
-                if ($splittedURL[0] !== self::$DETECTED_LANGUAGE) {
-                    $isValidLang = array_key_exists($splittedURL[0], Utils::getLanguageList());
-                    if ($isValidLang) {
-                        CategoryController::$LANGUAGE_FROM_URL = $splittedURL[0];
-                    } else {
-                        CategoryController::$LANGUAGE_FROM_URL = Utils::getDefaultLang();
-                    }
-                    // Do not cache content if detected language does not match the language of the URL.
-                    TemplateService::$shouldBeCached = false;
-                }
-            } elseif (strpos(end($splittedURL), '.') === false) {
+            if (strpos(end($splittedURL), '.') === false) {
                 // language has not been detected. check if url points to default language
                 $this->setLanguage($request->get('Lang', $splittedURL[0]), $webstoreConfig);
             }

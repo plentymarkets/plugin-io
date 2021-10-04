@@ -21,4 +21,5 @@ class OrderItemType
 	const ORDER                = 11;
     const TYPE_ITEM_SET        = 13;
     const TYPE_SET_COMPONENT   = 14;
+    const TYPE_ORDER_PROPERTY  = 15;
 }
