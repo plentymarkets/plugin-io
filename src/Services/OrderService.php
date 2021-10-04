@@ -25,6 +25,7 @@ use Plenty\Modules\Order\Date\Models\OrderDateType;
 use Plenty\Modules\Order\Models\OrderReference;
 use Plenty\Modules\Order\Property\Contracts\OrderPropertyRepositoryContract;
 use Plenty\Modules\Order\Property\Models\OrderProperty;
+use Plenty\Modules\Order\Settings\Contracts\OrderSettingsRepositoryContract;
 use Plenty\Modules\Order\Status\Contracts\OrderStatusRepositoryContract;
 use Plenty\Modules\Payment\Contracts\PaymentRepositoryContract;
 use Plenty\Modules\Payment\Method\Contracts\PaymentMethodRepositoryContract;
@@ -758,6 +759,74 @@ class OrderService
             SessionStorageRepositoryContract::LATEST_ORDER_ID,
             $order->id
         );
+    }
+
+    /**
+     * Remove the bundle prefix from the order item name.
+     * Default prefix is "[BUNDLE] "
+     * 
+     * @param string $name
+     * @return string
+     */
+    public function removeBundlePrefix(string $name): string
+    {
+        return $this->removeOrderItemPrefix($name, \Plenty\Modules\Order\Models\OrderItemType::TYPE_ITEM_BUNDLE);
+    }
+
+    /**
+     * Remove the bundle component prefix from the order item name.
+     * Default prefix is "[-] "
+     * 
+     * @param string $name
+     * @return string
+     */
+    public function removeBundleComponentPrefix(string $name): string
+    {
+        return $this->removeOrderItemPrefix($name, \Plenty\Modules\Order\Models\OrderItemType::TYPE_BUNDLE_COMPONENT);
+    }
+
+    /**
+     * @param string $name
+     * @param int $orderItemTypeId
+     * @return string
+     */
+    private function removeOrderItemPrefix(string $name, int $orderItemTypeId): string
+    {
+        $prefix = $this->getOrderItemPrefix($orderItemTypeId);
+        if ($prefix !== null && (substr($name, 0, strlen($prefix)) == $prefix)) {
+            $name = substr($name, strlen($prefix));
+        }
+
+        return $name;
+    }
+
+    /**
+     * Check if the prefix for components is included in the name
+     *
+     * @param string $name
+     * @return bool
+     */
+    public function containsComponentPrefix(string $name): bool
+    {
+        $prefix = $this->getOrderItemPrefix(\Plenty\Modules\Order\Models\OrderItemType::TYPE_BUNDLE_COMPONENT);
+        if ($prefix !== null && (substr($name, 0, strlen($prefix)) == $prefix)) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Get prefix for item type id
+     *
+     * @param int $orderItemTypeId
+     * @return int|null
+     */
+    public function getOrderItemPrefix(int $orderItemTypeId)
+    {
+        /** @var OrderSettingsRepositoryContract $settingsRepository */
+        $settingsRepository = pluginApp(OrderSettingsRepositoryContract::class);
+        $settings = $settingsRepository->get();
+        return $settings->orderItemPrefixes[$orderItemTypeId] ?? null;
     }
 
     /**
