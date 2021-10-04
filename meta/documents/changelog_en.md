@@ -1,5 +1,16 @@
 # Release Notes for IO
 
+## v5.0.40 (2021-10-05) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.39...5.0.40" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
+
+### ToDo
+
+* In order to provide the redirect upon detected diverging browser langage to your customers, you need to implement the ShopBuilder widget **Language detection**.
+
+### Changed
+
+* plentyShop is now able to react to a future order setting with which prefixes for item bundles and components can be customised. Note that changing these prefixes may lead to a faulty display of older orders.
+* The redirect for automatic browser language detection has been deactivated.
+
 ## v5.0.39 (2021-09-13) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.38...5.0.39" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
 
 ### Changed
