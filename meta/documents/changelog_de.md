@@ -9,7 +9,11 @@
 ### Geändert
 
 * plentyShop kann jetzt auf eine zukünftige Auftragseinstellung reagieren, mit der Präfixe für Artikelpakete und Komponenten angepasst werden können. Beachte, dass es bei Änderungen an diesen Präfixen zu einer fehlerhaften Darstellugn von älteren Aufträgen kommen kann.
-* Der automatische Inhaltswechsel bei automatischer Browserspracherkennung wurde deaktiviert. 
+* Der automatische Inhaltswechsel bei automatischer Browserspracherkennung wurde deaktiviert.
+
+### Behoben
+
+* Tag-Ergebnisseiten wurden nicht an allen Stellen als Suchergebnisseiten behandelt. Dieses Verhalten wurde behoben.
 
 ## v5.0.39 (2021-09-13) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.38...5.0.39" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
 
