@@ -154,7 +154,7 @@ class TemplateService
     {
         /** @var ShopUrls $shopUrls */
         $shopUrls = pluginApp(ShopUrls::class);
-        return $shopUrls->is(RouteConfig::SEARCH);
+        return $shopUrls->is(RouteConfig::SEARCH) || $shopUrls->is(RouteConfig::TAGS);
     }
 
     /**
