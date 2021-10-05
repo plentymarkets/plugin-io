@@ -11,6 +11,10 @@
 * plentyShop is now able to react to a future order setting with which prefixes for item bundles and components can be customised. Note that changing these prefixes may lead to a faulty display of older orders.
 * The redirect for automatic browser language detection has been deactivated.
 
+### Fixed
+
+* Tag result pages were not always treated as search result pages. This behaviour has been fixed.
+
 ## v5.0.39 (2021-09-13) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.38...5.0.39" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
 
 ### Changed
