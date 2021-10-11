@@ -1155,7 +1155,8 @@ class BasketService
             'basketItemOrderParams' => $basketItem['basketItemOrderParams'] ?? null,
             'inputLength' => $basketItem['inputLength'] ?? 0,
             'inputWidth' => $basketItem['inputWidth'] ?? 0,
-            'setComponents' => $basketItem['setComponents'] ?? []
+            'setComponents' => $basketItem['setComponents'] ?? [],
+            'itemType' => $basketItem['itemType']
         ];
     }
 }
