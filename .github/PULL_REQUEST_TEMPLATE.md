@@ -5,4 +5,4 @@
 - [ ] Changes have been tested by the reviewer
 - [ ] Plugin can be built
 
-@plentymarkets/ceres-io
+@plentymarkets/plentyshop
