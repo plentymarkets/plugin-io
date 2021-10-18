@@ -526,7 +526,7 @@ class BasketService
                     $basketData = [];
 
                     $basketData['variationId'] = $bundleComponent['data']['variation']['id'];
-                    $basketData['quantity'] = $bundleComponent['quantity'];
+                    $basketData['quantity'] = $bundleComponent['quantity'] * ($data['quantity'] ?? 1);
                     $basketData['template'] = $data['template'];
 
                     $componentData = $this->addDataToBasket($basketData);
