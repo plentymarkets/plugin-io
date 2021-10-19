@@ -11,6 +11,7 @@ use Plenty\Modules\Pim\SearchService\Aggregations\Processors\CategoryAllTermsAgg
 use Plenty\Modules\Pim\SearchService\Filter\CategoryFilter;
 use Plenty\Modules\Webshop\Contracts\LocalizationRepositoryContract;
 use Plenty\Modules\Webshop\ItemSearch\Contracts\FacetExtension;
+use Plenty\Plugin\Http\Request;
 
 class CategoryFacet implements FacetExtension
 {
@@ -66,10 +67,10 @@ class CategoryFacet implements FacetExtension
                     $categoryBranch = $currentCategory->branch()->get()[0];
                     $categoryBranch = array_unique(array_values($categoryBranch->toArray()));
                 }
-
+                /** @var Request $request */
+                $request = pluginApp(Request::class);
                 foreach ($result as $categoryId => $count) {
                     $category = $categoryService->getForPlentyId($categoryId, Utils::getLang());
-
                     if (!is_null($category) && (!is_null($categoryBranch) || !in_array(
                                 $categoryId,
                                 $categoryBranch
@@ -80,6 +81,7 @@ class CategoryFacet implements FacetExtension
                             'id' => 'category-' . $categoryId,
                             'name' => $category->details[0]->name,
                             'count' => $count,
+                            'selected' => strpos($request->getQueryString(),'category-' . $categoryId)
                         ];
 
                         if (count($categoryFacet['values']) === self::MAX_RESULT_COUNT) {
