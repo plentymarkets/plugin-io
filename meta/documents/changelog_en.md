@@ -1,5 +1,14 @@
 # Release Notes for IO
 
+## v5.0.41 (2021-10-20) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.40...5.0.41" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
+
+### Fixed
+
+* Package components are now added to the shopping cart with the correct quantity if the option **Replace item package with basic item** is active.
+* When adding set items to the shopping cart, the set components were not included the first time. This has been fixed.
+* Due to an error, no value was displayed for order properties of the type **Selection**. This has been fixed.
+* When a value was selected from the category facet, it was not displayed as selected.
+
 ## v5.0.40 (2021-10-05) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.39...5.0.40" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
 
 ### ToDo
