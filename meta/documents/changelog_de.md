@@ -1,5 +1,14 @@
 # Release Notes für IO
 
+## v5.0.41 (2021-10-20) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.40...5.0.41" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
+
+### Behoben
+
+* Paketbestandteile werden nun mit der korrekten Menge in den Warenkorb gelegt, wenn die Option "Artikelpaket durch Basisartikel ersetzen" aktiv ist.
+* Beim Legen in den Warenkorb von Set Artikeln wurden beim 1. Mal die Set Komponenten nicht mitgeliefert. Dies wurde behoben.
+* Durch einen Fehler wurden bei Bestelleigenschaften vom Typ "Auswahl" kein Wert angezeigt. Dies wurde behoben.
+* Wenn ein Wert von der Kategoriefacette ausgewählt wurde, wurde dieser nicht als selektiert angezeigt.
+
 ## v5.0.40 (2021-10-05) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.39...5.0.40" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
 
 ### ToDo
