@@ -4,7 +4,7 @@
 
 ### Behoben
 
-* Paketbestandteile werden nun mit der korrekten Menge in den Warenkorb gelegt, wenn die Option "Artikelpaket durch Basisartikel ersetzen" aktiv ist.
+* Paketbestandteile werden nun mit der korrekten Menge in den Warenkorb gelegt, wenn die Option **Artikelpaket durch Basisartikel** ersetzen aktiv ist.
 * Beim Legen in den Warenkorb von Set Artikeln wurden beim 1. Mal die Set Komponenten nicht mitgeliefert. Dies wurde behoben.
 * Durch einen Fehler wurden bei Bestelleigenschaften vom Typ "Auswahl" kein Wert angezeigt. Dies wurde behoben.
 * Wenn ein Wert von der Kategoriefacette ausgewählt wurde, wurde dieser nicht als selektiert angezeigt.
