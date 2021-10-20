@@ -4,7 +4,7 @@
 
 ### Fixed
 
-* Package components are now added to the shopping cart with the correct quantity if the option "Replace item package with basic item" is active.
+* Package components are now added to the shopping cart with the correct quantity if the option **Replace item package with basic item** is active.
 * When adding set items to the shopping cart, the set components were not included the first time. This has been fixed.
 * Due to an error, no value was displayed for order properties of the type "Selection". This has been fixed.
 * When a value was selected from the category facet, it was not displayed as selected.
