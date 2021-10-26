@@ -105,7 +105,8 @@ class ItemListService
                         [
                             'variationIds' => $variationIds,
                             'sorting' => $sorting,
-                            'excludeFromCache' => true
+                            'excludeFromCache' => true,
+                            'withVariationPropertyGroups' => true
                         ]
                     );
                 }
