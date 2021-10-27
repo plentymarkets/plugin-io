@@ -526,7 +526,7 @@ class BasketService
                     $basketData = [];
 
                     $basketData['variationId'] = $bundleComponent['data']['variation']['id'];
-                    $basketData['quantity'] = $bundleComponent['quantity'];
+                    $basketData['quantity'] = $bundleComponent['quantity'] * ($data['quantity'] ?? 1);
                     $basketData['template'] = $data['template'];
 
                     $componentData = $this->addDataToBasket($basketData);
@@ -1088,6 +1088,7 @@ class BasketService
                     $basketItem['price'] += $variationProperty['price'];
                     $basketItem['attributeTotalMarkup'] += $variationProperty['price'];
                     $variationProperty['basketItemOrderParams'][0]['price'] = $variationProperty['price'];
+                    $variationProperty['basketItemOrderParams'][0]['basketItemId'] = $basketItem['id'];
                     // map order params from variation property item to origin basket item
                     // each variation property basket item contains exactly one order param
                     $basketItem['basketItemOrderParams'][] = $variationProperty['basketItemOrderParams'][0];
