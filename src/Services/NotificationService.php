@@ -64,8 +64,9 @@ class NotificationService
      * @param string $type The type of notification, see /IO/Constants/LogLevel
      * @param int $code Optional: Message code (Default: 0)
      * @param array|null $placeholder Optional: A placeholder
+     * @param bool $keepAfterReload Optional: Keep this notification for one page reload or redirect. Will be automatically deleted afterwards.
      */
-    private function addNotification(string $message, string $type, int $code = 0, array $placeholder = null)
+    private function addNotification(string $message, string $type, int $code = 0, array $placeholder = null, $keepAfterReload = false)
     {
         $notifications = $this->getNotifications(false);
         if (!array_key_exists($type, $notifications)) {
@@ -76,7 +77,8 @@ class NotificationService
             'message' => $message,
             'code' => $code,
             'stackTrace' => [],
-            'placeholder' => $placeholder
+            'placeholder' => $placeholder,
+            'keepAfterReload' => $keepAfterReload
         ];
         $lastNotification = $notifications[$type];
 
@@ -99,10 +101,11 @@ class NotificationService
      * @param string $message The notifications message
      * @param int $code Optional: Message code (Default: 0)
      * @param array|null $placeholder Optional: A placeholder
+     * @param bool $keepAfterReload Optional: Keep this notification for one page reload or redirect. Will be automatically deleted afterwards.
      */
-    public function log(string $message, $code = 0, array $placeholder = null)
+    public function log(string $message, $code = 0, array $placeholder = null, $keepAfterReload = false)
     {
-        $this->addNotification($message, LogLevel::LOG, $code, $placeholder);
+        $this->addNotification($message, LogLevel::LOG, $code, $placeholder, $keepAfterReload);
     }
 
     /**
@@ -110,10 +113,11 @@ class NotificationService
      * @param string $message The notifications message
      * @param int $code Optional: Message code (Default: 0)
      * @param array|null $placeholder Optional: A placeholder
+     * @param bool $keepAfterReload Optional: Keep this notification for one page reload or redirect. Will be automatically deleted afterwards.
      */
-    public function info(string $message, $code = 0, array $placeholder = null)
+    public function info(string $message, $code = 0, array $placeholder = null, $keepAfterReload = false)
     {
-        $this->addNotification($message, LogLevel::INFO, $code, $placeholder);
+        $this->addNotification($message, LogLevel::INFO, $code, $placeholder, $keepAfterReload);
     }
 
     /**
@@ -121,10 +125,11 @@ class NotificationService
      * @param string $message The notifications message
      * @param int $code Optional: Message code (Default: 0)
      * @param array|null $placeholder Optional: A placeholder
+     * @param bool $keepAfterReload Optional: Keep this notification for one page reload or redirect. Will be automatically deleted afterwards.
      */
-    public function warn(string $message, $code = 0, array $placeholder = null)
+    public function warn(string $message, $code = 0, array $placeholder = null, $keepAfterReload = false)
     {
-        $this->addNotification($message, LogLevel::WARN, $code, $placeholder);
+        $this->addNotification($message, LogLevel::WARN, $code, $placeholder, $keepAfterReload);
     }
 
     /**
@@ -132,10 +137,11 @@ class NotificationService
      * @param string $message The notifications message
      * @param int $code Optional: Message code (Default: 0)
      * @param array|null $placeholder Optional: A placeholder
+     * @param bool $keepAfterReload Optional: Keep this notification for one page reload or redirect. Will be automatically deleted afterwards.
      */
-    public function error(string $message, $code = 0, array $placeholder = null)
+    public function error(string $message, $code = 0, array $placeholder = null, $keepAfterReload = false)
     {
-        $this->addNotification($message, LogLevel::ERROR, $code, $placeholder);
+        $this->addNotification($message, LogLevel::ERROR, $code, $placeholder, $keepAfterReload);
     }
 
     /**
@@ -143,10 +149,11 @@ class NotificationService
      * @param string $message The notifications message
      * @param int $code Optional: Message code (Default: 0)
      * @param array|null $placeholder Optional: A placeholder
+     * @param bool $keepAfterReload Optional: Keep this notification for one page reload or redirect. Will be automatically deleted afterwards.
      */
-    public function success(string $message, $code = 0, array $placeholder = null)
+    public function success(string $message, $code = 0, array $placeholder = null, $keepAfterReload = false)
     {
-        $this->addNotification($message, LogLevel::SUCCESS, $code, $placeholder);
+        $this->addNotification($message, LogLevel::SUCCESS, $code, $placeholder, $keepAfterReload);
     }
 
     /**
@@ -154,10 +161,11 @@ class NotificationService
      * @param string $type The type of notification
      * @param int $code Optional: Message code (Default: 0)
      * @param array|null $placeholder Optional: A placeholder
+     * @param bool $keepAfterReload Optional: Keep this notification for one page reload or redirect. Will be automatically deleted afterwards.
      */
-    public function addNotificationCode($type, int $code = 0, array $placeholder = null)
+    public function addNotificationCode($type, int $code = 0, array $placeholder = null, $keepAfterReload = false)
     {
-        $this->addNotification("", $type, $code, $placeholder);
+        $this->addNotification("", $type, $code, $placeholder, $keepAfterReload);
     }
 
     /**
@@ -178,6 +186,14 @@ class NotificationService
      */
     public function clearNotifications()
     {
-        $this->sessionStorageRepository->setSessionValue(SessionStorageRepositoryContract::NOTIFICATIONS, json_encode([]));
+        $notifications = $this->getNotifications(false);
+        foreach ($notifications as $notificationKey => $notification) {
+            if($notification['keepAfterReload'] === true) {
+                $notifications[$notificationKey]['keepAfterReload'] = false;
+            } else {
+                unset($notifications[$notificationKey]);
+            }
+        }
+        $this->sessionStorageRepository->setSessionValue(SessionStorageRepositoryContract::NOTIFICATIONS, json_encode($notifications));
     }
 }

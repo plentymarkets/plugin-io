@@ -2,6 +2,7 @@
 
 namespace IO\Api\Resources;
 
+use IO\Services\NotificationService;
 use Plenty\Plugin\Http\Response;
 use Plenty\Plugin\Http\Request;
 use IO\Api\ApiResource;
@@ -47,7 +48,11 @@ class OrderReturnResource extends ApiResource
             $this->request->get('variationIds', []),
             $this->request->get('returnNote', '')
         );
-
+    
+        /** @var NotificationService $notificationService */
+        $notificationService = pluginApp(NotificationService::class);
+        $notificationService->success('return has been received', 1344, null, (bool)$this->request->get('keepNotificationAfterReload', false));
+        
         return $this->response->create($returnOrder, ResponseCode::OK);
     }
 }
