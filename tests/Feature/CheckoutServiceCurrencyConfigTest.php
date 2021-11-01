@@ -52,7 +52,7 @@ class CheckoutServiceCurrencyConfigTest extends TestCase
     /** @test */
     public function check_method_get_currency_session_storage()
     {
-        $expectedCurrency = $this->fake->currencyCode;
+        $expectedCurrency = 'GBP';
 
         $this->sessionStorageRepository->setSessionValue(SessionStorageRepositoryContract::CURRENCY, $expectedCurrency);
 
