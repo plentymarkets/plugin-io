@@ -138,9 +138,14 @@ class CategoryService
 
         // List parent/open categories
         $this->currentCategory = $cat;
-        while ($cat !== null && $cat->parentCategoryId != null) {
+        while ($cat !== null) {
             $this->currentCategoryTree[$cat->level] = $cat;
-            $cat = $this->webshopCategoryRepository->get($cat->parentCategoryId, $lang, $this->webstoreId);
+
+            if($cat->parentCategoryId != null){
+                $cat = $this->webshopCategoryRepository->get($cat->parentCategoryId, $lang, $this->webstoreId);
+            } else {
+                $cat = null;
+            }
         }
     }
 
