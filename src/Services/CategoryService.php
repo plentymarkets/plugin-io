@@ -11,6 +11,7 @@ use Plenty\Modules\Webshop\Contracts\UrlBuilderRepositoryContract;
 use Plenty\Modules\Webshop\Helpers\UrlQuery;
 use Plenty\Modules\Category\Models\Category;
 use Plenty\Modules\Category\Contracts\CategoryRepositoryContract;
+use Plenty\Modules\Webshop\Category\Contracts\CategoryRepositoryContract as WebshopCategoryRepositoryContract;
 use Plenty\Modules\Category\Models\CategoryClient;
 use Plenty\Modules\Category\Models\CategoryDetails;
 use Plenty\Modules\Webshop\Contracts\ContactRepositoryContract;
@@ -36,6 +37,10 @@ class CategoryService
      */
     private $categoryRepository;
 
+    /**
+     * @var WebshopCategoryRepositoryContract This repository is used to manipulate Category models.
+     */
+    private $webshopCategoryRepository;
     /**
      * @var WebstoreConfigurationRepositoryContract This repository is used to read the webstore configuration.
      */
@@ -91,7 +96,8 @@ class CategoryService
         WebstoreConfigurationRepositoryContract $webstoreConfigurationRepository,
         AuthGuard $authGuard,
         ContactRepositoryContract $contactRepository,
-        UrlBuilderRepositoryContract $urlBuilderRepository
+        UrlBuilderRepositoryContract $urlBuilderRepository,
+        WebshopCategoryRepositoryContract $webshopCategoryRepositoryContract
     )
     {
         $this->categoryRepository = $categoryRepository;
@@ -100,6 +106,7 @@ class CategoryService
         $this->webstoreId = Utils::getWebstoreId();
         $this->contactRepository = $contactRepository;
         $this->urlBuilderRepository = $urlBuilderRepository;
+        $this->webshopCategoryRepository = $webshopCategoryRepositoryContract;
     }
 
     /**
@@ -110,7 +117,7 @@ class CategoryService
     public function setCurrentCategoryID(int $catID = 0)
     {
         $this->setCurrentCategory(
-            $this->categoryRepository->get($catID, Utils::getLang(), $this->webstoreId)
+            $this->webshopCategoryRepository->get($catID, Utils::getLang(), $this->webstoreId)
         );
     }
 
@@ -131,9 +138,9 @@ class CategoryService
 
         // List parent/open categories
         $this->currentCategory = $cat;
-        while ($cat !== null) {
+        while ($cat !== null && $cat->parentCategoryId != null) {
             $this->currentCategoryTree[$cat->level] = $cat;
-            $cat = $this->categoryRepository->get($cat->parentCategoryId, $lang, $this->webstoreId);
+            $cat = $this->webshopCategoryRepository->get($cat->parentCategoryId, $lang, $this->webstoreId);
         }
     }
 
@@ -164,7 +171,7 @@ class CategoryService
         $category = $this->fromMemoryCache(
             "category.$catID.$lang",
             function () use ($catID, $lang, $webstoreId) {
-                $category = $this->categoryRepository->get($catID, $lang, $webstoreId);
+                $category = $this->webshopCategoryRepository->get($catID, $lang, $webstoreId);
                 return $category;
             }
         );
