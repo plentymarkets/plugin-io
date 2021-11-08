@@ -168,6 +168,10 @@ class CategoryService
      */
     public function get($catID = 0, $lang = null)
     {
+        if(is_null($catID) || strlen($catID) == 0) {
+            return null;
+        }
+
         if ($lang === null) {
             $lang = Utils::getLang();
         }
