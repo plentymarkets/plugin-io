@@ -62,6 +62,7 @@ use Plenty\Exceptions\ValidationException;
 use Plenty\Modules\Authentication\Events\AfterAccountAuthentication;
 use Plenty\Modules\Authentication\Events\AfterAccountContactLogout;
 use Plenty\Modules\Basket\Events\Basket\AfterBasketChanged;
+use Plenty\Modules\ContentCache\Contracts\ContentCacheQueryParamsRepositoryContract;
 use Plenty\Modules\Cron\Services\CronContainer;
 use Plenty\Modules\Frontend\Events\FrontendCurrencyChanged;
 use Plenty\Modules\Frontend\Events\FrontendLanguageChanged;
@@ -324,6 +325,16 @@ class IOServiceProvider extends ServiceProvider
         $dispatcher->listen(FrontendUpdateDeliveryAddress::class, IOFrontendUpdateDeliveryAddress::class);
 
         $cronContainer->add(CronContainer::DAILY, CleanupUserDataHashes::class);
+    
+        /** @var ContentCacheQueryParamsRepositoryContract $contentCacheQueryParamsRepository */
+        $contentCacheQueryParamsRepository = pluginApp(ContentCacheQueryParamsRepositoryContract::class);
+        $contentCacheQueryParamsRepository->registerIncluded([
+                                                                'attr',
+                                                                 'test'
+                                                                 //'attr[rot]',
+                                                                 //'attr[blau]',
+                                                                 //'attr[gelb]'
+                                                             ]);
     }
 
     private function registerSingletons($classes)
