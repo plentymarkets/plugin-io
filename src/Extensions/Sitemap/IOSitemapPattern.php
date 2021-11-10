@@ -45,7 +45,7 @@ class IOSitemapPattern
 
         $seoSitemapService->setItemPattern($itemPattern);
 
-        $contentRoutes = [];
+        $contentRoutes = ['/'];
         foreach ($this->contentRoutes as $route) {
             if (RouteConfig::isActive($route)) {
                 $contentRoutes[] = ['url' => $route];
