@@ -75,6 +75,7 @@ class TwigTemplateContextExtension extends Twig_Extension
                         ]);
                         return [];
                     }
+                    return $result;
                 }
             }
         } catch (\Exception $exception) {
