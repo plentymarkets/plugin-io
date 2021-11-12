@@ -65,11 +65,13 @@ class TwigTemplateContextExtension extends Twig_Extension
                 $context = pluginApp($contextClass);
                 if($context instanceof ContextInterface) {
                     $context->init(TemplateService::$currentTemplateData);
+                    $tmp = json_encode($context);
                     $result = ArrayHelper::toArray($context);
                     if(is_null($result))
                     {
                         $this->getLogger(__CLASS__)->error('context is null', [
                             'contextClass' => $contextClass,
+                            'contextLength' => strlen($tmp),
                             'event' => $contextEvent
                         ]);
                         return [];
