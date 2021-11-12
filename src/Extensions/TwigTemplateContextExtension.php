@@ -73,6 +73,7 @@ class TwigTemplateContextExtension extends Twig_Extension
                             'context' => $context,
                             'event' => $contextEvent
                         ]);
+                        return [];
                     }
                 }
             }
