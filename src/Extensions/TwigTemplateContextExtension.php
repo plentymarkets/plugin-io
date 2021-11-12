@@ -61,9 +61,12 @@ class TwigTemplateContextExtension extends Twig_Extension
             EventDispatcher::fire($contextEvent, [$templateContainer]);
 
             $contextClass = $templateContainer->getContext();
-            if (strlen($contextClass) && ($context = pluginApp($contextClass)) instanceof ContextInterface) {
-                $context->init(TemplateService::$currentTemplateData);
-                return ArrayHelper::toArray($context) ?? [];
+            if (strlen($contextClass)) {
+                $context = pluginApp($contextClass);
+                if($context instanceof ContextInterface) {
+                    $context->init(TemplateService::$currentTemplateData);
+                    return ArrayHelper::toArray($context) ?? [];
+                }
             }
         } catch (\Exception $exception) {
             $this->getLogger(__CLASS__)->logException($exception);
