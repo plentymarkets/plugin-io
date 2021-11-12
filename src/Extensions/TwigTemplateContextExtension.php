@@ -65,7 +65,7 @@ class TwigTemplateContextExtension extends Twig_Extension
                 $context = pluginApp($contextClass);
                 if($context instanceof ContextInterface) {
                     $context->init(TemplateService::$currentTemplateData);
-                    return ArrayHelper::toArray($context) ?? [];
+                    return ArrayHelper::toArray($context);
                 }
             }
         } catch (\Exception $exception) {
