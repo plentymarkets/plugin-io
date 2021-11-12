@@ -70,7 +70,6 @@ class TwigTemplateContextExtension extends Twig_Extension
                     {
                         $this->getLogger(__CLASS__)->error('context is null', [
                             'contextClass' => $contextClass,
-                            'context' => $context,
                             'event' => $contextEvent
                         ]);
                         return [];
