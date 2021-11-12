@@ -7,10 +7,12 @@ use IO\Helper\ContextInterface;
 use IO\Helper\EventDispatcher;
 use IO\Helper\TemplateContainer;
 use IO\Services\TemplateService;
+use Plenty\Plugin\Log\Loggable;
 use Plenty\Plugin\Templates\Extensions\Twig_Extension;
 
 class TwigTemplateContextExtension extends Twig_Extension
 {
+    use Loggable;
 
     /**
      * Return the name of the extension. The name must be unique.
@@ -61,10 +63,15 @@ class TwigTemplateContextExtension extends Twig_Extension
         if (strlen($contextClass)) {
             $context = pluginApp($contextClass);
             if ($context instanceof ContextInterface) {
-                $context->init(TemplateService::$currentTemplateData);
+                try {
+                    $context->init(TemplateService::$currentTemplateData);
+                } catch (\Exception $exception) {
+                    $this->getLogger(__CLASS__)->logException($exception);
+                    return [];
+                }
             }
 
-            return ArrayHelper::toArray($context);
+            return ArrayHelper::toArray($context) ?? [];
         }
 
         return [];
