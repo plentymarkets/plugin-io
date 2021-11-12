@@ -50,30 +50,24 @@ class TwigTemplateContextExtension extends Twig_Extension
      */
     public function getGlobals(): array
     {
-        $contextEvent = 'ctx.default';
-        if (strlen(TemplateService::$currentTemplate)) {
-            $contextEvent = 'ctx' . substr(TemplateService::$currentTemplate, 3);
-        }
-
-        /** @var TemplateContainer $templateContainer */
-        $templateContainer = pluginApp(TemplateContainer::class);
-        EventDispatcher::fire($contextEvent, [$templateContainer]);
-
-        $contextClass = $templateContainer->getContext();
-        if (strlen($contextClass)) {
-            $context = pluginApp($contextClass);
-            if ($context instanceof ContextInterface) {
-                try {
-                    $context->init(TemplateService::$currentTemplateData);
-                } catch (\Exception $exception) {
-                    $this->getLogger(__CLASS__)->logException($exception);
-                    return [];
-                }
+        try {
+            $contextEvent = 'ctx.default';
+            if (strlen(TemplateService::$currentTemplate)) {
+                $contextEvent = 'ctx' . substr(TemplateService::$currentTemplate, 3);
             }
 
-            return ArrayHelper::toArray($context) ?? [];
-        }
+            /** @var TemplateContainer $templateContainer */
+            $templateContainer = pluginApp(TemplateContainer::class);
+            EventDispatcher::fire($contextEvent, [$templateContainer]);
 
+            $contextClass = $templateContainer->getContext();
+            if (strlen($contextClass) && ($context = pluginApp($contextClass)) instanceof ContextInterface) {
+                $context->init(TemplateService::$currentTemplateData);
+                return ArrayHelper::toArray($context) ?? [];
+            }
+        } catch (\Exception $exception) {
+            $this->getLogger(__CLASS__)->logException($exception);
+        }
         return [];
     }
 }
