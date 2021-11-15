@@ -1,5 +1,19 @@
 # Release Notes for IO
 
+## v5.0.42 (2021-11-15) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.41...5.0.42" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
+
+### Changed
+
+- The meta data for files in the webspace are now collected from the plentymarkets core, which leads to an improved TTFB.
+- Additional category data is now loaded via the lazyloader, in order to reduce database traffic.
+- The performance of data procurement for linked variations in ShopBuilder has been improved. 
+
+### Fixed
+
+- Invalid items were not removed from the shopping cart when a user changed the country of delivery. This has been fixed.
+- The data of properties is now correctly displayed for items in **Last seen** item lists.
+- If errors occur during the initialisation of the context classes, the corresponding page is no longer cached in ShopBooster.
+
 ## v5.0.41 (2021-10-20) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.40...5.0.41" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
 
 ### Fixed
