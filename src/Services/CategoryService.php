@@ -180,7 +180,7 @@ class CategoryService
         $category = $this->fromMemoryCache(
             "category.$catID.$lang",
             function () use ($catID, $lang, $webstoreId) {
-                $category = $this->webshopCategoryRepository->get($catID, $lang, $webstoreId);
+                $category = $this->webshopCategoryRepository->get((int)$catID, $lang, $webstoreId);
                 return $category;
             }
         );
