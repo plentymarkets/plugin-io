@@ -1,5 +1,11 @@
 # Release Notes für IO
 
+## v5.0.43 (2021-11-30) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.42...5.0.43" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
+
+### Behoben
+
+- Es wurde ein Fehler im CategoryService behoben.
+
 ## v5.0.42 (2021-11-15) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.41...5.0.42" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
 
 ### Geändert
