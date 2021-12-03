@@ -62,6 +62,8 @@ use Plenty\Exceptions\ValidationException;
 use Plenty\Modules\Authentication\Events\AfterAccountAuthentication;
 use Plenty\Modules\Authentication\Events\AfterAccountContactLogout;
 use Plenty\Modules\Basket\Events\Basket\AfterBasketChanged;
+use Plenty\Modules\ContentCache\Contracts\ContentCacheQueryParamsRepositoryContract;
+use Plenty\Modules\ContentCache\Contracts\ContentCacheRepositoryContract;
 use Plenty\Modules\Cron\Services\CronContainer;
 use Plenty\Modules\Frontend\Events\FrontendCurrencyChanged;
 use Plenty\Modules\Frontend\Events\FrontendLanguageChanged;
@@ -324,7 +326,23 @@ class IOServiceProvider extends ServiceProvider
         $dispatcher->listen(FrontendUpdateDeliveryAddress::class, IOFrontendUpdateDeliveryAddress::class);
 
         $cronContainer->add(CronContainer::DAILY, CleanupUserDataHashes::class);
+    
+        $trackingParams = 'gclid,idealoid,vmtrack_id,vmst_id,utm_source,utm_medium,utm_campaign';
+        $contentParams = '';
+        
+        $trackingParamsArray = explode(",",preg_replace('/\s+/', '',$trackingParams));
+        $contentParamsArray = explode(",",preg_replace('/\s+/', '',$contentParams));
+    
+        /** @var ContentCacheQueryParamsRepositoryContract $contentCacheQueryParamsRepository */
+        $contentCacheQueryParamsRepository = pluginApp(ContentCacheQueryParamsRepositoryContract::class);
+        if(count($trackingParamsArray) > 0){
+            $contentCacheQueryParamsRepository->registerExcluded($trackingParamsArray);
+        }
+        if(count($contentParamsArray) > 0) {
+            $contentCacheQueryParamsRepository->registerIncluded($contentParamsArray);
+        }
     }
+    
 
     private function registerSingletons($classes)
     {
