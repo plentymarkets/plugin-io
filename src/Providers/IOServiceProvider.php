@@ -231,9 +231,16 @@ class IOServiceProvider extends ServiceProvider
 
                 if(($error = $event->getCouponValidationError()) instanceof ValidationException) {
                     $messageBag = $error->getMessageBag();
+                    if (is_null($messageBag)) {
+                        $message = $error->getMessage();
+                        $code = $error->getCode();
+                    } else {
+                        $message = $messageBag->first();
+                        $code = $messageBag->keys()[0];
+                    }
                     /** @var NotificationService $notificationService */
                     $notificationService = pluginApp(NotificationService::class);
-                    $notificationService->warn($messageBag->first(), 1000 + $messageBag->keys()[0]);
+                    $notificationService->warn($message, 1000 + $code);
                 }
             }
         );
