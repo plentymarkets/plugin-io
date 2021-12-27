@@ -1,5 +1,12 @@
 # Release Notes für IO
 
+## v5.0.44 (2021-12-27) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.43...5.0.44" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
+
+### Behoben
+
+- Unter bestimmten Bedingungen konnte es zur falschen Darstellung des Warenkorbs kommen. Dies wurde behoben.
+- Die Variable `CategoryController::$LANGUAGE_FROM_URL` wurde unter bestimmten Umständen mit falschen Werten befüllt. Dies wurde behoben.
+
 ## v5.0.43 (2021-11-30) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.42...5.0.43" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
 
 ### Behoben

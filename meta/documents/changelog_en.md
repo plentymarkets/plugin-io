@@ -1,5 +1,12 @@
 # Release Notes for IO
 
+## v5.0.44 (2021-12-27) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.43...5.0.44" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
+
+### Fixed
+
+- Under certain circumstances, the shopping cart was not displayed correctly. This has been fixed.
+- Under certain circumstances, the variable `CategoryController::$LANGUAGE_FROM_URL` was filled with the wrong values. This has been fixed.
+
 ## v5.0.43 (2021-11-30) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.42...5.0.43" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
 
 ### Fixed
