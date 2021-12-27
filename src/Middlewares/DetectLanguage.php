@@ -38,11 +38,15 @@ class DetectLanguage extends Middleware
             $webstoreConfig = $webstoreConfigurationRepository->getWebstoreConfiguration();
             $splittedURL = explode('/', $request->get('plentyMarkets'));
 
-            CategoryController::$LANGUAGE_FROM_URL = $splittedURL[0] ?:  Utils::getDefaultLang();
+            $isValidLang = in_array($splittedURL[0], Utils::getLanguageList());
+            if ($isValidLang) {
+                CategoryController::$LANGUAGE_FROM_URL = $splittedURL[0];
+            } else {
+                CategoryController::$LANGUAGE_FROM_URL = Utils::getDefaultLang();
+            }
 
             if (strpos(end($splittedURL), '.') === false) {
-                // language has not been detected. check if url points to default language
-                $this->setLanguage($request->get('Lang', $splittedURL[0]), $webstoreConfig);
+                $this->setLanguage($request->get('Lang', CategoryController::$LANGUAGE_FROM_URL), $webstoreConfig);
             }
         }
     }

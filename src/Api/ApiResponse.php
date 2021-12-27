@@ -350,13 +350,13 @@ class ApiResponse
             /** @var CheckoutService $checkoutService */
             $checkoutService = pluginApp(CheckoutService::class);
 
+            $responseData['events']['CheckoutChanged']['checkout'] = $checkoutService->getCheckout();
             $responseData['events']['AfterBasketChanged']['basket'] = $basketService->getBasketForTemplate();
             $responseData['events']['AfterBasketChanged']['showNetPrices'] = $contactRepository->showNetPrices();
             $responseData['events']['AfterBasketChanged']['basketItems'] = $basketService->getBasketItemsForTemplate(
                 '',
                 false
             );
-            $responseData['events']['CheckoutChanged']['checkout'] = $checkoutService->getCheckout();
         }
 
         $responseData["data"] = $data;
