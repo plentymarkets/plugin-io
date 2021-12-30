@@ -71,8 +71,8 @@ class PlaceOrderController extends LayoutController
             if (!is_null($billingAddressId)) {
                 $billingAddressData = $customerService->getAddress($billingAddressId, AddressType::BILLING);
                 $vatOption = $billingAddressData->options->where('typeId', AddressOption::TYPE_VAT_NUMBER)->first();
-                if (!is_null($vatOption)) {
-                    $val = pluginApp(ValidateVatNumber::class, [$vatOption->value, $billingAddressData->countryId]);
+                if (!is_null($vatOption) && strlen(trim($vatOption->value)) > 0) {
+                    $val = pluginApp(ValidateVatNumber::class, [trim($vatOption->value), $billingAddressData->countryId]);
                     $eventDispatcher->fire($val);
                 }
             }
@@ -81,8 +81,8 @@ class PlaceOrderController extends LayoutController
             if (!is_null($deliveryAddressId) && $deliveryAddressId > 0) {
                 $deliveryAddressData = $customerService->getAddress($deliveryAddressId, AddressType::DELIVERY);
                 $vatOption = $deliveryAddressData->options->where('typeId', AddressOption::TYPE_VAT_NUMBER)->first();
-                if (!is_null($vatOption)) {
-                    $val = pluginApp(ValidateVatNumber::class, [$vatOption->value, $deliveryAddressData->countryId]);
+                if (!is_null($vatOption) && strlen(trim($vatOption->value)) > 0) {
+                    $val = pluginApp(ValidateVatNumber::class, [trim($vatOption->value), $deliveryAddressData->countryId]);
                     $eventDispatcher->fire($val);
                 }
             }
