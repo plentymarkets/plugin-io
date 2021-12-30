@@ -76,7 +76,7 @@ class CheckoutServiceCurrencyTest extends TestCase
     /** @test */
     public function it_returns_the_currency_from_session_storage()
     {
-        $expectedCurrency = $this->fake->currencyCode;
+        $expectedCurrency = 'GBP';
 
         $this->sessionStorageRepositoryMock->shouldReceive('getSessionValue')->with(SessionStorageRepositoryContract::CURRENCY)->andReturn($expectedCurrency);
         $currency = $this->checkoutRepository->getCurrency();

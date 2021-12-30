@@ -1,5 +1,32 @@
 # Release Notes für IO
 
+## v5.0.44 (2021-12-27) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.43...5.0.44" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
+
+### Behoben
+
+- Unter bestimmten Bedingungen konnte es zur falschen Darstellung des Warenkorbs kommen. Dies wurde behoben.
+- Die Variable `CategoryController::$LANGUAGE_FROM_URL` wurde unter bestimmten Umständen mit falschen Werten befüllt. Dies wurde behoben.
+
+## v5.0.43 (2021-11-30) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.42...5.0.43" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
+
+### Behoben
+
+- Es wurde ein Fehler im CategoryService behoben.
+
+## v5.0.42 (2021-11-15) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.41...5.0.42" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
+
+### Geändert
+
+- Die Metadaten zu Dateien, die im Webspace liegen, werden jetzt kernseitig bezogen. Dies führt zu einer Verbesserung der TTFB.
+- Weitere Kategoriedaten werden jetzt über den Lazyloader bezogen, um die Datenbank zu entlasten.
+- Die Performance im Bereich ausgeführter Datenbeschaffungen für verlinkte Varianten im ShopBuilder wurde optimiert.
+
+### Behoben
+
+- Beim Lieferlandwechsel wurden ungültig Artikel nicht aus dem Warenkorb entfernt. Dies wurde behoben.
+- Die Daten von Eigenschaften werden nun bei Artikeln in der **Zuletzt angesehen**-Artikelliste korrekt ausgegeben.
+- Bei Fehlern während der Initialisierung der Kontext-Klassen wird die entsprechende Seite nicht mehr im ShopBooster gecached.
+
 ## v5.0.41 (2021-10-20) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.40...5.0.41" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
 
 ### Behoben
