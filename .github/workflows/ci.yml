@@ -59,7 +59,7 @@ jobs:
         image: ghcr.io/plentymarkets/prewarm-db:stable7
         credentials:
           username: ${{ github.repository_owner }}
-          password: ${{ secrets.GHCR_READ_ONLY }}
+          password: changeme # ${{ secrets.GHCR_READ_ONLY }}
         ports:
           - 127.0.0.1:3306:3306
         env:
