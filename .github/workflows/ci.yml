@@ -53,22 +53,6 @@ jobs:
     # Start containers with specific services that are needed to run the unit test suite.
     # In this case we need mariadb and redis.
     # The used versions match the ones used in production.
-    services:
-      mariadb:
-        # Uses a prewarmed db image here to speedup the migrations https://github.com/plentymarkets/prewarm-db
-        image: ghcr.io/plentymarkets/prewarm-db:stable7
-        credentials:
-          username: ${{ github.repository_owner }}
-          password: changeme # ${{ secrets.GHCR_READ_ONLY }}
-        ports:
-          - 127.0.0.1:3306:3306
-        env:
-          MARIADB_ROOT_PASSWORD: ${{ env.DB_PASSWORD }}
-          MARIADB_DATABASE: ${{ env.DB_DATABASE }}
-      redis:
-        image: redis:4.0.8
-        ports:
-          - 127.0.0.1:6379:6379
 
     steps:
       - name: Checkout github-actions repository
