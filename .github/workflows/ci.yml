@@ -149,10 +149,11 @@ jobs:
           repository: "plentymarkets/plugin-test-suite"
           token: ${{ secrets.PLENTY_ACTION_TOKEN }}
           path: "pl/packages/plentymarkets/plugin-test-suite/"
-      - name: Checkout plugin test suite branch # NEEDED?
+      # - name: Checkout plugin test suite branch # NEEDED?
       - name: Install test suite dependencies
         working-directory: pl/packages/plentymarkets/plugin-test-suite
         run: composer update --prefer-dist --no-suggest --no-progress
       - name: Checkout IO branch
         working-directory: pl/packages/plentymarkets/plugin-test-suite/vendor/plentymarkets/plugin-io
         run: git fetch && git checkout -b ${{github.ref_name}} origin/${{github.ref_name}} && git pull origin ${{github.ref_name}}
+      # - name: Run tests
