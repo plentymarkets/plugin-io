@@ -84,6 +84,7 @@ jobs:
         uses: ./.tmp/github-actions/checkout_pl_py_ps/
         with:
           token: ${{ secrets.PAT_PLENTYMONKEY_READ_ALL_REPOS }}
+          ref-forced: stable7
 
       - name: Checkout module
         uses: actions/checkout@v2
