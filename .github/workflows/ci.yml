@@ -26,6 +26,8 @@ jobs:
       IS_JENKINS: true
       PLENTY_ID_HASH: 1000
       WORKSPACE: ${{ github.workspace }}
+      INC_DIR: ${{ github.workspace }}/pl/packages/plentymarkets/plugin-test-suite/tests/includes
+      TEST_SUITE_DIR: ${{ github.workspace }}/pl/packages/plentymarkets/plugin-test-suite
 
       # Database variables
       DB_HOST: "127.0.0.1"
@@ -161,8 +163,4 @@ jobs:
           path: pl/packages/plentymarkets/plugin-test-suite/vendor/plentymarkets/plugin-io
       - name: Run tests
         working-directory: pl/packages/plentymarkets/plugin-test-suite
-        run: vendor/bin/phpunit plugin-test-suite/vendor/plentymarkets/plugin-io
-        env:
-          WORKSPACE: /home/runner/work/plugin-io/plugin-io
-          INC_DIR: /home/runner/work/plugin-io/plugin-io/pl/packages/plentymarkets/plugin-test-suite/tests/includes
-          TEST_SUITE_DIR: /home/runner/work/plugin-io/plugin-io/pl/packages/plentymarkets/plugin-test-suite
+        run: vendor/bin/phpunit vendor/plentymarkets/plugin-io
