@@ -156,6 +156,7 @@ jobs:
         working-directory: pl/packages/plentymarkets/plugin-test-suite
         run: composer update --prefer-dist --no-suggest --no-progress
       - name: Checkout IO branch
-        working-directory: pl/packages/plentymarkets/plugin-test-suite/vendor/plentymarkets/plugin-io
-        run: git fetch && git checkout -b ${{github.ref_name}} origin/${{github.ref_name}} && git pull origin ${{github.ref_name}}
+        uses: actions/checkout@v2
+        with:
+          path: pl/packages/plentymarkets/plugin-test-suite/vendor/plentymarkets/plugin-io
       # - name: Run tests
