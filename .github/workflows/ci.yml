@@ -86,22 +86,23 @@ jobs:
           token: ${{ secrets.PAT_PLENTYMONKEY_READ_ALL_REPOS }}
           ref-forced: stable7
 
-      - name: Checkout module
-        uses: actions/checkout@v2
-        with:
-          path: "plenty-module"
+      # remove
+      # - name: Checkout module
+      #   uses: actions/checkout@v2
+      #   with:
+      #     path: "plenty-module"
 
-      - name: Read package name from module's composer.json
-        working-directory: plenty-module
-        run: |
-          FULL_PACKAGE_NAME=$(jq -r ".name" ./composer.json)
-          PACKAGE_NAME=${FULL_PACKAGE_NAME#"plentymarkets/"}
-          echo "package name is: ${PACKAGE_NAME}"
-          echo "PACKAGE_NAME=${PACKAGE_NAME}" >> $GITHUB_ENV
-      - name: Move module to destination (pl/packages/plentymarkets/${{ env.PACKAGE_NAME }})
-        run: |
-          mkdir -p pl/packages/plentymarkets
-          mv "plenty-module" "pl/packages/plentymarkets/${{ env.PACKAGE_NAME }}"
+      # - name: Read package name from module's composer.json
+      #   working-directory: plenty-module
+      #   run: |
+      #     FULL_PACKAGE_NAME=$(jq -r ".name" ./composer.json)
+      #     PACKAGE_NAME=${FULL_PACKAGE_NAME#"plentymarkets/"}
+      #     echo "package name is: ${PACKAGE_NAME}"
+      #     echo "PACKAGE_NAME=${PACKAGE_NAME}" >> $GITHUB_ENV
+      # - name: Move module to destination (pl/packages/plentymarkets/${{ env.PACKAGE_NAME }})
+      #   run: |
+      #     mkdir -p pl/packages/plentymarkets
+      #     mv "plenty-module" "pl/packages/plentymarkets/${{ env.PACKAGE_NAME }}"
       # Set PHP version and install PHP if neccessary
       - name: Setup php
         uses: shivammathur/setup-php@v2
