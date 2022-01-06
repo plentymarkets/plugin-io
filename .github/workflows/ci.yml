@@ -159,4 +159,7 @@ jobs:
         uses: actions/checkout@v2
         with:
           path: pl/packages/plentymarkets/plugin-test-suite/vendor/plentymarkets/plugin-io
-      # - name: Run tests
+      - name: Run tests
+        working-directory: pl/packages/plentymarkets/plugin-test-suite
+        run: vendor/bin/phpunit plugin-test-suite/vendor/plentymarkets/plugin-io
+        
