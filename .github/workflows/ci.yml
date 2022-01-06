@@ -53,6 +53,22 @@ jobs:
     # Start containers with specific services that are needed to run the unit test suite.
     # In this case we need mariadb and redis.
     # The used versions match the ones used in production.
+    services:
+      mariadb:
+        # Uses a prewarmed db image here to speedup the migrations https://github.com/plentymarkets/prewarm-db
+        image: ghcr.io/plentymarkets/prewarm-db:stable7
+        credentials:
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GHCR_READ_ONLY }}
+        ports:
+          - 127.0.0.1:3306:3306
+        env:
+          MARIADB_ROOT_PASSWORD: ${{ env.DB_PASSWORD }}
+          MARIADB_DATABASE: ${{ env.DB_DATABASE }}
+      redis:
+        image: redis:4.0.8
+        ports:
+          - 127.0.0.1:6379:6379
 
     steps:
       - name: Checkout github-actions repository
@@ -60,14 +76,14 @@ jobs:
         with:
           repository: plentymarkets/github-actions
           ref: main
-          token: ${{ secrets.PLENTY_ACTION_TOKEN }}
+          token: ${{ secrets.PAT_PLENTYMONKEY_READ_ALL_REPOS }}
           path: .tmp/github-actions
 
       - name: Checkout PL PY PS
         id: branches
         uses: ./.tmp/github-actions/checkout_pl_py_ps/
         with:
-          token: ${{ secrets.PLENTY_ACTION_TOKEN }}
+          token: ${{ secrets.PAT_PLENTYMONKEY_READ_ALL_REPOS }}
 
       - name: Checkout module
         uses: actions/checkout@v2
@@ -131,7 +147,7 @@ jobs:
         uses: actions/checkout@v2
         with:
           repository: "plentymarkets/plugin-test-suite"
-          token: ${{ secrets.PLENTY_ACTION_TOKEN }}
+          token: ${{ secrets.PAT_PLENTYMONKEY_READ_ALL_REPOS }}
           path: "pl/packages/plentymarkets/plugin-test-suite/"
       # - name: Checkout plugin test suite branch # NEEDED?
       - name: Install test suite dependencies
