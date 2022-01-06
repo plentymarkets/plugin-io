@@ -162,4 +162,5 @@ jobs:
       - name: Run tests
         working-directory: pl/packages/plentymarkets/plugin-test-suite
         run: vendor/bin/phpunit plugin-test-suite/vendor/plentymarkets/plugin-io
-        
+        env:
+          WORKSPACE: /home/runner/work/plugin-io/plugin-io
