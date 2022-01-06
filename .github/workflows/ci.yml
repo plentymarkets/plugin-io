@@ -164,3 +164,5 @@ jobs:
         run: vendor/bin/phpunit plugin-test-suite/vendor/plentymarkets/plugin-io
         env:
           WORKSPACE: /home/runner/work/plugin-io/plugin-io
+          INC_DIR: /home/runner/work/plugin-io/plugin-io/pl/packages/plentymarkets/plugin-test-suite/tests/includes
+          TEST_SUITE_DIR: /home/runner/work/plugin-io/plugin-io/pl/packages/plentymarkets/plugin-test-suite
