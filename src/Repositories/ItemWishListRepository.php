@@ -37,7 +37,6 @@ class ItemWishListRepository
     public function getItemWishList()
     {
         $variationIds = [];
-        $tempVariationIds = [];
         $plentyId = Utils::getPlentyId();
 
         /** @var Query $query */
@@ -45,35 +44,14 @@ class ItemWishListRepository
 
         $contactId = $this->contactRepository->getContactId();
 
-        if($contactId > 0)
-        {
+        if ($contactId > 0) {
             $rows = $query->where('contactId', '=', $contactId)->where('plentyId', '=', $plentyId)->get();
 
             /** @var ItemWishList $wishListModel */
-            foreach($rows as $wishListModel)
-            {
-                $tempVariationIds[] = $wishListModel->variationId;
+            foreach ($rows as $wishListModel) {
+                $variationIds[] = $wishListModel->variationId;
             }
         }
-
-        if(count($tempVariationIds) > 0)
-        {
-            /** @var ItemSearchService $itemSearchService */
-            $itemSearchService = pluginApp( ItemSearchService::class );
-            $variatonFactory = VariationList::getSearchFactory([
-                    'variationIds'  => $tempVariationIds
-                    ]);
-            $variatonFactory->withResultFields(['id']);
-            $variations = $itemSearchService->getResults($variatonFactory);
-
-            foreach($variations['documents'] as $variation)
-            {
-                $variationIds[] = $variation['id'];
-            }
-        }
-
-
-
         return $variationIds;
     }
 
@@ -94,19 +72,19 @@ class ItemWishListRepository
     public function isItemInWishList(int $variationId = 0)
     {
         $contactId = $this->contactRepository->getContactId();
-        $plentyId  = Utils::getPlentyId();
+        $plentyId = Utils::getPlentyId();
 
-        if($variationId > 0)
-        {
-            $wishListEntry = $this->db->query(ItemWishList::NAMESPACE)->where('contactId', '=', $contactId)->where('variationId', '=', $variationId)->where('plentyId', '=', $plentyId)->get();
-        }
-        else
-        {
+        if ($variationId > 0) {
+            $wishListEntry = $this->db->query(ItemWishList::NAMESPACE)->where('contactId', '=', $contactId)->where(
+                'variationId',
+                '=',
+                $variationId
+            )->where('plentyId', '=', $plentyId)->get();
+        } else {
             throw new \Exception('ItemWishListRepository::isItemInWishList - variationId undefined', 400);
         }
 
-        if(!count($wishListEntry))
-        {
+        if (!count($wishListEntry)) {
             return false;
         }
 
@@ -122,14 +100,16 @@ class ItemWishListRepository
     public function addItemWishListEntry(int $variationId, int $quantity = 1)
     {
         $contactId = $this->contactRepository->getContactId();
-        $plentyId  = Utils::getPlentyId();
+        $plentyId = Utils::getPlentyId();
 
-        if($contactId > 0 && $variationId > 0)
-        {
-            $wishListModels = $this->db->query(ItemWishList::NAMESPACE)->where('contactId', '=', $contactId)->where('variationId', '=', $variationId)->where('plentyId', '=', $plentyId)->get();
+        if ($contactId > 0 && $variationId > 0) {
+            $wishListModels = $this->db->query(ItemWishList::NAMESPACE)->where('contactId', '=', $contactId)->where(
+                'variationId',
+                '=',
+                $variationId
+            )->where('plentyId', '=', $plentyId)->get();
 
-            if(empty($wishListModels))
-            {
+            if (empty($wishListModels)) {
                 $wishListEntry = pluginApp(ItemWishList::class);
                 $wishListEntry->contactId = $contactId;
                 $wishListEntry->variationId = $variationId;
@@ -144,18 +124,16 @@ class ItemWishListRepository
                 $newEntry->fillByAttributes(json_decode(json_encode($createdWishListEntry), true));
 
                 return $newEntry;
-            }
-            else
-            {
+            } else {
                 $newEntry = pluginApp(ItemWishList::class);
                 $newEntry->fillByAttributes(json_decode(json_encode($wishListModels[0]), true));
 
                 return $newEntry;
             }
-        }
-        else
-        {
-            throw new \Exception('ItemWishListRepository::addItemWishListEntry - user not logged in or variationId undefined', 401);
+        } else {
+            throw new \Exception(
+                'ItemWishListRepository::addItemWishListEntry - user not logged in or variationId undefined', 401
+            );
         }
     }
 
@@ -166,24 +144,26 @@ class ItemWishListRepository
      */
     public function removeItemWishListEntry(int $variationId)
     {
-        $response  = false;
+        $response = false;
         $contactId = $this->contactRepository->getContactId();
-        $plentyId  = Utils::getPlentyId();
+        $plentyId = Utils::getPlentyId();
 
-        if($contactId > 0 && $variationId > 0)
-        {
-            $wishListModels = $this->db->query(ItemWishList::NAMESPACE)->where('contactId', '=', $contactId)->where('variationId', '=', $variationId)->where('plentyId', '=', $plentyId)->get();
+        if ($contactId > 0 && $variationId > 0) {
+            $wishListModels = $this->db->query(ItemWishList::NAMESPACE)->where('contactId', '=', $contactId)->where(
+                'variationId',
+                '=',
+                $variationId
+            )->where('plentyId', '=', $plentyId)->get();
 
-            foreach ($wishListModels as $wishListModel)
-            {
+            foreach ($wishListModels as $wishListModel) {
                 $response = $this->db->delete($wishListModel);
             }
 
             return $response;
-        }
-        else
-        {
-            throw new \Exception('ItemWishListRepository::removeItemWishListEntry - user not logged in or variationId undefined', 401);
+        } else {
+            throw new \Exception(
+                'ItemWishListRepository::removeItemWishListEntry - user not logged in or variationId undefined', 401
+            );
         }
     }
 }
