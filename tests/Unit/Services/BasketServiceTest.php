@@ -8,10 +8,6 @@ use IO\Services\BasketService;
 use Plenty\Modules\Basket\Exceptions\BasketItemCheckException;
 use Plenty\Modules\Basket\Repositories\BasketItemRepository;
 
-/**
- * User: mklaes
- * Date: 08.08.18
- */
 class BasketServiceTest extends TestCase
 {
 
