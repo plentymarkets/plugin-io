@@ -159,6 +159,7 @@ jobs:
         run: |
           composer install
           rm .env
+          touch .env
       - name: Checkout IO branch
         uses: actions/checkout@v2
         with:
