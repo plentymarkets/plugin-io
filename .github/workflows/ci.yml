@@ -41,14 +41,6 @@ jobs:
 
       # AWS environment variables
       AWS_REGION: eu-central-1
-      # Uncomment following env variables if needed
-      #
-      # AWS_S3_ACCESS_KEY_ID: ${{ secrets.AWS_S3_ACCESS_KEY_ID }}
-      # AWS_S3_SECRET_ACCESS_KEY: ${{ secrets.AWS_S3_SECRET_ACCESS_KEY }}
-      # AWS_DDB_ACCESS_KEY_ID: ${{ secrets.AWS_DDB_ACCESS_KEY }}
-      # AWS_DDB_SECRET_ACCESS_KEY: ${{ secrets.AWS_DDB_SECRET_ACCESS_KEY }}
-      # AWS_DDB_CONNECTION: test
-      # DYNAMODB_LOCAL_ENDPOINT: http://localhost:8085
 
     runs-on: ubuntu-latest
 
@@ -88,23 +80,6 @@ jobs:
           token: ${{ secrets.PAT_PLENTYMONKEY_READ_ALL_REPOS }}
           ref-forced: stable7
 
-      # remove
-      # - name: Checkout module
-      #   uses: actions/checkout@v2
-      #   with:
-      #     path: "plenty-module"
-
-      # - name: Read package name from module's composer.json
-      #   working-directory: plenty-module
-      #   run: |
-      #     FULL_PACKAGE_NAME=$(jq -r ".name" ./composer.json)
-      #     PACKAGE_NAME=${FULL_PACKAGE_NAME#"plentymarkets/"}
-      #     echo "package name is: ${PACKAGE_NAME}"
-      #     echo "PACKAGE_NAME=${PACKAGE_NAME}" >> $GITHUB_ENV
-      # - name: Move module to destination (pl/packages/plentymarkets/${{ env.PACKAGE_NAME }})
-      #   run: |
-      #     mkdir -p pl/packages/plentymarkets
-      #     mv "plenty-module" "pl/packages/plentymarkets/${{ env.PACKAGE_NAME }}"
       # Set PHP version and install PHP if neccessary
       - name: Setup php
         uses: shivammathur/setup-php@v2
@@ -153,7 +128,6 @@ jobs:
           repository: "plentymarkets/plugin-test-suite"
           token: ${{ secrets.PAT_PLENTYMONKEY_READ_ALL_REPOS }}
           path: "pl/packages/plentymarkets/plugin-test-suite/"
-      # - name: Checkout plugin test suite branch # NEEDED?
       - name: Install test suite dependencies
         working-directory: pl/packages/plentymarkets/plugin-test-suite
         run: |
