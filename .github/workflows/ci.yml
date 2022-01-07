@@ -156,7 +156,9 @@ jobs:
       # - name: Checkout plugin test suite branch # NEEDED?
       - name: Install test suite dependencies
         working-directory: pl/packages/plentymarkets/plugin-test-suite
-        run: composer install
+        run: |
+          composer install
+          touch .env
       - name: Checkout IO branch
         uses: actions/checkout@v2
         with:
