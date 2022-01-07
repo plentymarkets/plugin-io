@@ -158,10 +158,7 @@ jobs:
         working-directory: pl/packages/plentymarkets/plugin-test-suite
         run: |
           composer install
-      - name: Copy .env
-        working-directory: pl
-        run: |
-          cp .env vendor/plentymarkets/plugin-test-suite/
+          touch .env
       - name: Checkout IO branch
         uses: actions/checkout@v2
         with:
