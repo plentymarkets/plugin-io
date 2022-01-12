@@ -52,11 +52,9 @@ class DetectLanguage extends Middleware
             } else {
                 CategoryController::$LANGUAGE_FROM_URL = Utils::getDefaultLang();
             }
-        
-            /** @var LocalizationRepositoryContract $localizationRepository */
-            $localizationRepository = app(LocalizationRepositoryContract::class);
+            
             $langFromUrl = $request->get('Lang', CategoryController::$LANGUAGE_FROM_URL);
-            if (strpos(end($splittedURL), '.') === false && $langFromUrl !== $localizationRepository->getLanguage()) {
+            if (strpos(end($splittedURL), '.') === false) {
                 $this->setLanguage($langFromUrl, $webstoreConfig);
             }
         }
