@@ -40,10 +40,8 @@ class CategoryFacet implements FacetExtension
         $templateConfigService = pluginApp(TemplateConfigService::class);
 
 
-        if ($templateConfigService->get('item.show_category_filter') == 'true') {
+        if ($templateConfigService->getBoolean('item.show_category_filter', false)) {
             if (count($result)) {
-                /** @var LocalizationRepositoryContract $localizationRepository */
-                $localizationRepository = pluginApp(LocalizationRepositoryContract::class);
                 $categoryFacet = [
                     'id' => 'category',
                     'name' => 'Categories',
