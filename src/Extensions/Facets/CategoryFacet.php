@@ -9,7 +9,6 @@ use Plenty\Modules\Cloud\ElasticSearch\Lib\Search\Aggregation\AggregationInterfa
 use Plenty\Modules\Pim\SearchService\Aggregations\CategoryAllTermsAggregation;
 use Plenty\Modules\Pim\SearchService\Aggregations\Processors\CategoryAllTermsAggregationProcessor;
 use Plenty\Modules\Pim\SearchService\Filter\CategoryFilter;
-use Plenty\Modules\Webshop\Contracts\LocalizationRepositoryContract;
 use Plenty\Modules\Webshop\ItemSearch\Contracts\FacetExtension;
 use Plenty\Plugin\Http\Request;
 
@@ -40,10 +39,8 @@ class CategoryFacet implements FacetExtension
         $templateConfigService = pluginApp(TemplateConfigService::class);
 
 
-        if ($templateConfigService->get('item.show_category_filter') == 'true') {
+        if ($templateConfigService->getBoolean('item.show_category_filter', false)) {
             if (count($result)) {
-                /** @var LocalizationRepositoryContract $localizationRepository */
-                $localizationRepository = pluginApp(LocalizationRepositoryContract::class);
                 $categoryFacet = [
                     'id' => 'category',
                     'name' => 'Categories',
