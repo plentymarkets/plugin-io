@@ -9,7 +9,6 @@ use Plenty\Modules\Cloud\ElasticSearch\Lib\Search\Aggregation\AggregationInterfa
 use Plenty\Modules\Pim\SearchService\Aggregations\CategoryAllTermsAggregation;
 use Plenty\Modules\Pim\SearchService\Aggregations\Processors\CategoryAllTermsAggregationProcessor;
 use Plenty\Modules\Pim\SearchService\Filter\CategoryFilter;
-use Plenty\Modules\Webshop\Contracts\LocalizationRepositoryContract;
 use Plenty\Modules\Webshop\ItemSearch\Contracts\FacetExtension;
 use Plenty\Plugin\Http\Request;
 
