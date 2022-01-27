@@ -103,6 +103,11 @@ class PropertyNameFilter extends AbstractFilter
      */
     public function getPropertySelectionValueName($property, $lang = null)
     {
+        $propertyValueDecoded = json_decode($property['value'], true);
+        if(is_array($propertyValueDecoded) && count($propertyValueDecoded)) {
+            $property['value'] = array_slice($propertyValueDecoded, 0, 1)[0];
+        }
+        
         if(is_numeric($property['value'])) {
             $propertyId       = $property['propertyId'];
             $selectionValueId = $property['value'];
