@@ -40,7 +40,7 @@ jobs:
       DB_NAME: mysql-test
 
       # AWS environment variables
-      AWS_REGION: eu-central-1
+      # AWS_REGION: eu-central-1
 
     runs-on: ubuntu-latest
 
