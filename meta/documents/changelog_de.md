@@ -1,5 +1,12 @@
 # Release Notes für IO
 
+## v5.0.45 (2022-01-18) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.44...5.0.45" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
+
+### Behoben
+
+- Unter bestimmten Umständen wurden für angemeldete Kunden nicht alle Artikel in der Wunschliste angezeigt. Dies wurde behoben.
+- Beim Ausführen des Session-REST-Calls wird jetzt auch ein Sprachwechsel geprüft, um die korrekte Funktionsweise des ShopBoosters bei mehrsprachigen Shops zu gewährleisten.
+
 ## v5.0.44 (2021-12-27) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.43...5.0.44" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
 
 ### Behoben
