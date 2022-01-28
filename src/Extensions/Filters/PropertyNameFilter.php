@@ -105,7 +105,7 @@ class PropertyNameFilter extends AbstractFilter
     {
         $propertyValueDecoded = json_decode($property['value'], true);
         if(is_array($propertyValueDecoded) && count($propertyValueDecoded)) {
-            $property['value'] = array_slice($propertyValueDecoded, 0, 1)[0];
+            $property['value'] = array_shift($propertyValueDecoded);
         }
         
         if(is_numeric($property['value'])) {
