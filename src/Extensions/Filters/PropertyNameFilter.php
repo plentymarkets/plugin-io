@@ -104,7 +104,7 @@ class PropertyNameFilter extends AbstractFilter
     public function getPropertySelectionValueName($property, $lang = null)
     {
         $propertyValueDecoded = json_decode($property['value'], true);
-        if(is_array($propertyValueDecoded) && count($propertyValueDecoded)) {
+        if (is_array($propertyValueDecoded) && count($propertyValueDecoded)) {
             $property['value'] = array_shift($propertyValueDecoded);
         }
         
