@@ -3,6 +3,7 @@
 namespace IO\Extensions\Sitemap;
 
 use IO\Helper\RouteConfig;
+use IO\Services\CategoryService;
 use IO\Services\TemplateConfigService;
 use Plenty\Modules\Plugin\Events\LoadSitemapPattern;
 use Plenty\Modules\Plugin\Services\PluginSeoSitemapService;
@@ -52,8 +53,26 @@ class IOSitemapPattern
             }
         }
 
+        $removeRoutes = [];
+        if (RouteConfig::isActive(RouteConfig::HOME)) {
+            $contentRoutes[] = ['url' => ''];
+        } elseif (RouteConfig::getCategoryId(RouteConfig::HOME) > 0) {
+            $categoryId = RouteConfig::getCategoryId(RouteConfig::HOME);
+
+            /** @var CategoryService $categoryService */
+            $categoryService = pluginApp(CategoryService::class);
+            $category = $categoryService->get($categoryId);
+
+            if ($category->sitemap == 'Y') {
+                $contentRoutes[] = ['url' => ''];
+                $url = $categoryService->getURLById($categoryId);
+                $removeRoutes[] = ltrim($url, '/');
+            }
+        }
         if (count($contentRoutes)) {
-            $seoSitemapService->setContentCategoryPattern(['pattern' => '', 'container' => $contentRoutes]);
+            $seoSitemapService->setContentCategoryPattern(
+                ['pattern' => '', 'container' => $contentRoutes, 'removeRoutes' => $removeRoutes]
+            );
         }
     }
 }
