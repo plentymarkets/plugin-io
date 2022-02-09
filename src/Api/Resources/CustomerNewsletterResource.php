@@ -66,6 +66,12 @@ class CustomerNewsletterResource extends ApiResource
         $lastName = $this->request->get('lastName', '');
         $emailFolder = $this->request->get('emailFolder', 0);
 
+        $filter_url_pattern = '/[.:\/\d]/';
+        if (preg_match_all($filter_url_pattern, $firstName) !== false || preg_match_all($filter_url_pattern, $lastName) !== false)
+        {
+            return $this->response->create('', ResponseCode::BAD_REQUEST);
+        }
+
         $this->newsletterService->saveNewsletterData($email, $emailFolder, $firstName, $lastName);
 
         return $this->response->create($email, ResponseCode::OK);
