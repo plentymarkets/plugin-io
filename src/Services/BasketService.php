@@ -189,6 +189,9 @@ class BasketService
             $campaignRepository = pluginApp(CouponCampaignRepositoryContract::class);
             $campaign = $campaignRepository->findById($couponValidation->campaignId);
 
+            if ($isNet) {
+                $basket['couponDiscount'] = $couponValidation->salesDiscountNet;
+            }
 
             if ($this->couponService->effectsOnShippingCosts($campaign)) {
                 $basket['shippingAmountNet'] -= $couponValidation->shippingDiscountNet;
