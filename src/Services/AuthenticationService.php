@@ -149,4 +149,16 @@ class AuthenticationService
 
         return $contactId > 0 || !empty(trim($email));
     }
+
+    /**
+     * Perform the login with email and password and logout other devices
+     *
+     * @param string $email Contains the customers email address
+     * @param string $password Contains the password used for this login attempt
+     */
+    public function loginAndLogoutOtherDevices(string $email, string $password)
+    {
+        $result = $this->login($email, $password);
+        $this->contactAuthRepository->logoutOtherDevices($password);
+    }
 }
