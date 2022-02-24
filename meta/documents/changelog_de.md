@@ -1,5 +1,21 @@
 # Release Notes für IO
 
+## v5.0.46 (2022-02-24) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.45...5.0.46" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
+
+### Geändert
+
+- Vor- und Nachname werden jetzt in der Newsletter-Anmeldung auf unzulässige Zeichen überprüft, um Spam von Bots zu verhindern.
+
+### Behoben
+
+- Auf der Route `/place-order` wird die Umsatzsteueridentifikationsnummer nun hinsichtlich der Länge überprüft, bevor sie validiert wird.
+- Die Option **Kategorien als Filteroptionen bei Suchergebnissen anzeigen** wurde umbenannt. Weiterhin wurde ein Fehler beim Speichern dieser Option behoben.
+- Die URL der Domain wird nun der Sitemap hinzugefügt.
+- Ein Darstellungsfehler bei auswählbaren Werten von Bestelleigenschaften auf der Auftragsbestätigungsseite und im **Mein Konto**-Bereich wurde behoben.
+- Im Warenkorb wurden Gutscheine immer mit Bruttowerten angezeigt, auch wenn es sich bei dem Auftrag um eine Ausfuhrlieferung handelte. Dies wurde behoben.
+- Ein Fehler bei der Erkennung der Artikeleinzelansicht wurde behoben.
+- Bei einer Passwortänderung wird der betroffene Account nun aus allen verknüpften Geräten ausgeloggt.
+
 ## v5.0.45 (2022-01-18) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.44...5.0.45" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
 
 ### Behoben

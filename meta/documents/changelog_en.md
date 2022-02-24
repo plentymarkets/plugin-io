@@ -1,5 +1,21 @@
 # Release Notes for IO
 
+## v5.0.46 (2022-02-24) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.45...5.0.46" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
+
+### Changed
+
+- In the newsletter registration, first and last names are now checked for invalid characters in order to prevent spam.
+
+### Fixed
+
+- For the route `/place-order`, the VAT identification number is now checked for length before it is validated.
+- The setting **Show categories as filter options for search results** has been renamed and an error that occurred during saving was fixed.
+- The URL of the domain is now added to the sitemap.
+- Due to an error, selectable values of order properties were incorrectly displayed in the **My Account** area and on the order confirmation page.
+- In the shopping cart, coupons were always displayed with gross values, even if the order was an export delivery. This has been fixed.
+- Due to an error, single item pages were not always detected by the plugin. This has been fixed.
+- When a user changes their password, the affected account is now logged out of all linked devices.
+
 ## v5.0.45 (2022-01-18) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.44...5.0.45" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
 
 ### Fixed
