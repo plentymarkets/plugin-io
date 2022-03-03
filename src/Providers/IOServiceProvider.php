@@ -66,6 +66,7 @@ use Plenty\Modules\Cron\Services\CronContainer;
 use Plenty\Modules\Frontend\Events\FrontendCurrencyChanged;
 use Plenty\Modules\Frontend\Events\FrontendLanguageChanged;
 use Plenty\Modules\Frontend\Events\FrontendReferrerChanged;
+use Plenty\Modules\Frontend\Events\FrontendShippingCountryChanged;
 use Plenty\Modules\Frontend\Events\FrontendShippingProfileChanged;
 use Plenty\Modules\Frontend\Events\FrontendUpdateDeliveryAddress;
 use Plenty\Modules\Frontend\Session\Events\AfterSessionCreate;
@@ -230,9 +231,16 @@ class IOServiceProvider extends ServiceProvider
 
                 if(($error = $event->getCouponValidationError()) instanceof ValidationException) {
                     $messageBag = $error->getMessageBag();
+                    if (is_null($messageBag)) {
+                        $message = $error->getMessage();
+                        $code = $error->getCode();
+                    } else {
+                        $message = $messageBag->first();
+                        $code = $messageBag->keys()[0];
+                    }
                     /** @var NotificationService $notificationService */
                     $notificationService = pluginApp(NotificationService::class);
-                    $notificationService->warn($messageBag->first(), 1000 + $messageBag->keys()[0]);
+                    $notificationService->warn($message, 1000 + $code);
                 }
             }
         );
@@ -288,6 +296,21 @@ class IOServiceProvider extends ServiceProvider
                     $notificationService = pluginApp(NotificationService::class);
                     // Message will be overridden in Ceres
                     $notificationService->warn('Items not available for new referrer.', 9);
+                }
+            }
+        );
+
+        $dispatcher->listen(
+            FrontendShippingCountryChanged::class,
+            function ($event) {
+                /** @var BasketService $basketService */
+                $basketService = pluginApp(BasketService::class);
+                $removedItems = $basketService->checkBasketItemsByPrice();
+                if ($removedItems > 0) {
+                    /** @var NotificationService $notificationService */
+                    $notificationService = pluginApp(NotificationService::class);
+                    // Message will be overridden in Ceres
+                    $notificationService->warn('Items not available for new shipping country.', 15);
                 }
             }
         );

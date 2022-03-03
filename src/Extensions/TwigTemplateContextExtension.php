@@ -7,6 +7,7 @@ use IO\Helper\ContextInterface;
 use IO\Helper\EventDispatcher;
 use IO\Helper\TemplateContainer;
 use IO\Services\TemplateService;
+use Plenty\Modules\ContentCache\Contracts\ContentCacheRepositoryContract;
 use Plenty\Plugin\Templates\Extensions\Twig_Extension;
 
 class TwigTemplateContextExtension extends Twig_Extension
@@ -64,7 +65,14 @@ class TwigTemplateContextExtension extends Twig_Extension
                 $context->init(TemplateService::$currentTemplateData);
             }
 
-            return ArrayHelper::toArray($context);
+            $contextArray = ArrayHelper::toArray($context);
+            if(is_null($contextArray)) {
+                /** @var ContentCacheRepositoryContract $contentCacheRepository */
+                $contentCacheRepository = pluginApp(ContentCacheRepositoryContract::class);
+                $contentCacheRepository->disableCacheForResponse('Twig context could not be initialized');
+                return [];
+            }
+            return $contextArray;
         }
 
         return [];

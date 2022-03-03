@@ -7,29 +7,29 @@ use IO\Services\BasketService;
 use IO\Services\CheckoutService;
 use IO\Services\LocalizationService;
 use IO\Services\NotificationService;
-use Plenty\Legacy\Services\Item\Variation\SalesPriceService;
-use Plenty\Modules\Basket\Models\BasketItem;
-use Plenty\Modules\Item\Stock\Events\BasketItemWarnOversell;
-use Plenty\Modules\Webshop\Contracts\CheckoutRepositoryContract;
-use Plenty\Modules\Webshop\Contracts\ContactRepositoryContract;
-use Plenty\Modules\Webshop\Helpers\BasePrice;
-use Plenty\Plugin\Http\Response;
+use Plenty\Http\Events\CsrfTokenMismatch;
 use Plenty\Modules\Account\Events\FrontendUpdateCustomerSettings;
 use Plenty\Modules\Authentication\Events\AfterAccountAuthentication;
 use Plenty\Modules\Authentication\Events\AfterAccountContactLogout;
+use Plenty\Modules\Basket\Events\Basket\AfterBasketChanged;
+use Plenty\Modules\Basket\Events\Basket\AfterBasketCreate;
 use Plenty\Modules\Basket\Events\BasketItem\AfterBasketItemAdd;
 use Plenty\Modules\Basket\Events\BasketItem\AfterBasketItemRemove;
 use Plenty\Modules\Basket\Events\BasketItem\AfterBasketItemUpdate;
 use Plenty\Modules\Frontend\Events\FrontendCurrencyChanged;
 use Plenty\Modules\Frontend\Events\FrontendLanguageChanged;
+use Plenty\Modules\Frontend\Events\FrontendPaymentMethodChanged;
+use Plenty\Modules\Frontend\Events\FrontendShippingProfileChanged;
 use Plenty\Modules\Frontend\Events\FrontendUpdateDeliveryAddress;
 use Plenty\Modules\Frontend\Events\FrontendUpdatePaymentSettings;
 use Plenty\Modules\Frontend\Events\FrontendUpdateShippingSettings;
-use Plenty\Modules\Frontend\Events\FrontendPaymentMethodChanged;
-use Plenty\Modules\Frontend\Events\FrontendShippingProfileChanged;
-use Plenty\Modules\Basket\Events\Basket\AfterBasketChanged;
-use Plenty\Modules\Basket\Events\Basket\AfterBasketCreate;
+use Plenty\Modules\Frontend\Session\Events\AfterSessionDestroyed;
+use Plenty\Modules\Item\Stock\Events\BasketItemWarnOversell;
+use Plenty\Modules\Webshop\Contracts\CheckoutRepositoryContract;
+use Plenty\Modules\Webshop\Contracts\ContactRepositoryContract;
+use Plenty\Modules\Webshop\Helpers\BasePrice;
 use Plenty\Plugin\Events\Dispatcher;
+use Plenty\Plugin\Http\Response;
 
 /**
  * Class ApiResponse
@@ -233,6 +233,21 @@ class ApiResponse
             0
         );
 
+        // session gets destroyed, because the csrf token has expired
+        $this->dispatcher->listen(
+            CsrfTokenMismatch::class,
+            function ($event) {
+                $this->notificationService->error(
+                    $event->exception->getMessage(),
+                    $event->exception->getCode()
+                );
+
+                // will probably have no effect, because of the exception thrown
+                $this->eventData["CsrfTokenMismatch"] = [$event];
+            },
+            0
+        );
+
         // Register auth events
         $this->dispatcher->listen(
             AfterAccountAuthentication::class,
@@ -350,13 +365,13 @@ class ApiResponse
             /** @var CheckoutService $checkoutService */
             $checkoutService = pluginApp(CheckoutService::class);
 
+            $responseData['events']['CheckoutChanged']['checkout'] = $checkoutService->getCheckout();
             $responseData['events']['AfterBasketChanged']['basket'] = $basketService->getBasketForTemplate();
             $responseData['events']['AfterBasketChanged']['showNetPrices'] = $contactRepository->showNetPrices();
             $responseData['events']['AfterBasketChanged']['basketItems'] = $basketService->getBasketItemsForTemplate(
                 '',
                 false
             );
-            $responseData['events']['CheckoutChanged']['checkout'] = $checkoutService->getCheckout();
         }
 
         $responseData["data"] = $data;

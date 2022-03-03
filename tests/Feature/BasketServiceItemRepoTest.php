@@ -10,6 +10,12 @@ use IO\Tests\TestCase;
 use IO\Services\BasketService;
 use Plenty\Modules\Basket\Hooks\BasketItem\CheckNewItemQuantity;
 use Plenty\Modules\Frontend\Session\Events\AfterSessionCreate;
+use Plenty\Modules\Item\DataLayer\Contracts\ItemDataLayerRepositoryContract;
+use Plenty\Modules\Item\DataLayer\Models\ItemBase;
+use Plenty\Modules\Item\DataLayer\Models\Record;
+use Plenty\Modules\Item\DataLayer\Models\RecordList;
+use Plenty\Modules\Item\DataLayer\Models\VariationBase;
+use Plenty\Modules\Item\DataLayer\Models\VariationRetailPrice;
 use Plenty\Modules\Item\Stock\Hooks\CheckItemStock;
 use Plenty\Modules\Item\Variation\Models\Variation;
 use Plenty\Modules\Basket\Models\Basket;
@@ -89,6 +95,38 @@ class BasketServiceItemRepoTest extends TestCase
        );
        $this->replaceInstanceByMock(VariationDescriptionRepositoryContract::class, $variationDescriptionRepoMock);
 
+
+        /** @var VariationRetailPrice $variationRetailPrice */
+        $variationRetailPrice = pluginApp(VariationRetailPrice::class);
+        $variationRetailPrice->price = 10.0;
+
+        /** @var VariationBase $variationBase */
+        $variationBase = pluginApp(VariationBase::class);
+        $variationBase->id = $this->variation['id'];
+        $variationBase->itemId = $this->variation['itemId'];
+
+        /** @var ItemBase $itemBase */
+        $itemBase = pluginApp(ItemBase::class);
+        $itemBase->type = 'default';
+
+        $recordMock = Mockery::mock(Record::class)->makePartial();
+        $recordMock->variationBase = $variationBase;
+        $recordMock->variationRetailPrice = $variationRetailPrice;
+        $recordMock->itemBase = $itemBase;
+        $recordMock->shouldReceive('getVariationRetailPrice')->andReturn($variationRetailPrice);
+        $recordMock->shouldReceive('getVariationBase')->andReturn($variationBase);
+        $recordMock->shouldReceive('getItemBase')->andReturn($itemBase);
+
+
+        $recordListMock = Mockery::mock(RecordList::class);
+        $recordListMock->shouldReceive('count')->andReturn(1);
+        $recordListMock->shouldReceive('current')->andReturn($recordMock);
+
+        $itemDataLayerRepositoryMock = Mockery::mock(ItemDataLayerRepositoryContract::class);
+        $itemDataLayerRepositoryMock->shouldReceive('search')->andReturn($recordListMock);
+        $this->replaceInstanceByMock(ItemDataLayerRepositoryContract::class, $itemDataLayerRepositoryMock);
+
+
        $basket = factory(Basket::class)->create();
        Session::shouldReceive('getId')
             ->andReturn($basket->sessionId);
@@ -114,8 +152,6 @@ class BasketServiceItemRepoTest extends TestCase
     /** @test */
     public function it_updates_an_item_in_the_basket()
     {
-        $this->markTestSkipped('Needs to be fixed later');
-
         $item1 = ['variationId' => $this->variation['id'], 'quantity' => 1, 'template' => ''];
 
         $this->basketService->addBasketItem($item1);

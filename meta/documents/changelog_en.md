@@ -1,5 +1,55 @@
 # Release Notes for IO
 
+## v5.0.46 (2022-02-24) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.45...5.0.46" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
+
+### Changed
+
+- In the newsletter registration, first and last names are now checked for invalid characters in order to prevent spam.
+
+### Fixed
+
+- For the route `/place-order`, the VAT identification number is now checked for length before it is validated.
+- The setting **Show categories as filter options for search results** has been renamed and an error that occurred during saving was fixed.
+- The URL of the domain is now added to the sitemap.
+- Due to an error, selectable values of order properties were incorrectly displayed in the **My Account** area and on the order confirmation page.
+- In the shopping cart, coupons were always displayed with gross values, even if the order was an export delivery. This has been fixed.
+- Due to an error, single item pages were not always detected by the plugin. This has been fixed.
+- When a user changes their password, the affected account is now logged out of all linked devices.
+
+## v5.0.45 (2022-01-18) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.44...5.0.45" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
+
+### Fixed
+
+- Under certain circumstances the wish list did not display all relevant items for customers who were logged in. This has been fixed.
+- Executing the session REST call now also detects the language in order to ensure that ShopBooster works properly for multilingual shops.  
+
+## v5.0.44 (2021-12-27) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.43...5.0.44" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
+
+### Fixed
+
+- Under certain circumstances, the shopping cart was not displayed correctly. This has been fixed.
+- Under certain circumstances, the variable `CategoryController::$LANGUAGE_FROM_URL` was filled with the wrong values. This has been fixed.
+
+## v5.0.43 (2021-11-30) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.42...5.0.43" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
+
+### Fixed
+
+- We fixed an error in the CategoryService.
+
+## v5.0.42 (2021-11-15) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.41...5.0.42" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
+
+### Changed
+
+- The meta data for files in the webspace are now collected from the plentymarkets core, which leads to an improved TTFB.
+- Additional category data is now loaded via the lazyloader, in order to reduce database traffic.
+- The performance of data procurement for linked variations in ShopBuilder has been improved. 
+
+### Fixed
+
+- Invalid items were not removed from the shopping cart when a user changed the country of delivery. This has been fixed.
+- The data of properties is now correctly displayed for items in **Last seen** item lists.
+- If errors occur during the initialisation of the context classes, the corresponding page is no longer cached in ShopBooster.
+
 ## v5.0.41 (2021-10-20) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.40...5.0.41" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
 
 ### Fixed

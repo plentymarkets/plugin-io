@@ -9,6 +9,7 @@ use IO\Services\LocalizationService;
 use IO\Services\TemplateConfigService;
 use IO\Services\TemplateService;
 use Plenty\Modules\System\Models\WebstoreConfiguration;
+use Plenty\Modules\Webshop\Contracts\LocalizationRepositoryContract;
 use Plenty\Modules\Webshop\Contracts\WebstoreConfigurationRepositoryContract;
 use Plenty\Plugin\Http\Request;
 use Plenty\Plugin\Http\Response;
@@ -32,17 +33,29 @@ class DetectLanguage extends Middleware
      */
     public function before(Request $request)
     {
+        $this->detectLanguage($request);
+    }
+    
+    public function detectLanguage($request, $url = null)
+    {
         if (substr($request->getRequestUri(), 0, strlen(self::WEB_AJAX_BASE)) !== self::WEB_AJAX_BASE) {
+            $requestUri = $url ?? $request->get('plentyMarkets');
+            
             /** @var WebstoreConfigurationRepositoryContract $webstoreConfigurationRepository */
             $webstoreConfigurationRepository = pluginApp(WebstoreConfigurationRepositoryContract::class);
             $webstoreConfig = $webstoreConfigurationRepository->getWebstoreConfiguration();
-            $splittedURL = explode('/', $request->get('plentyMarkets'));
-
-            CategoryController::$LANGUAGE_FROM_URL = $splittedURL[0] ?:  Utils::getDefaultLang();
-
+            $splittedURL = explode('/', $requestUri);
+        
+            $isValidLang = in_array($splittedURL[0], Utils::getLanguageList());
+            if ($isValidLang) {
+                CategoryController::$LANGUAGE_FROM_URL = $splittedURL[0];
+            } else {
+                CategoryController::$LANGUAGE_FROM_URL = Utils::getDefaultLang();
+            }
+            
+            $langFromUrl = $request->get('Lang', CategoryController::$LANGUAGE_FROM_URL);
             if (strpos(end($splittedURL), '.') === false) {
-                // language has not been detected. check if url points to default language
-                $this->setLanguage($request->get('Lang', $splittedURL[0]), $webstoreConfig);
+                $this->setLanguage($langFromUrl, $webstoreConfig);
             }
         }
     }

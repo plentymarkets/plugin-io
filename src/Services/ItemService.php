@@ -42,8 +42,6 @@ use Plenty\Modules\Webshop\ItemSearch\Services\ItemSearchService;
 use Plenty\Plugin\Application;
 use Plenty\Modules\Webshop\ItemSearch\Helpers\ResultFieldTemplate;
 
-
-
 /**
  * Service Class ItemService
  *
@@ -67,6 +65,9 @@ class ItemService
 
     /** @var array */
     private $additionalItemSortingMap = [];
+
+    /** @var array */
+    private static $singleVariations = [];
 
     /**
      * ItemService constructor.
@@ -177,10 +178,13 @@ class ItemService
      */
     public function getVariation(int $variationId = 0)
     {
+        if (isset(self::$singleVariations[$variationId])) {
+            return self::$singleVariations[$variationId];
+        }
         /** @var ItemSearchService $itemSearchService */
         $itemSearchService = pluginApp(ItemSearchService::class);
-
-        return $itemSearchService->getResults([SingleItem::getSearchFactory(['variationId' => $variationId])])[0];
+        self::$singleVariations[$variationId] = $itemSearchService->getResults([SingleItem::getSearchFactory(['variationId' => $variationId])])[0];
+        return self::$singleVariations[$variationId];
     }
 
     /**
@@ -301,7 +305,6 @@ class ItemService
                 array_push($variationIds, $variation->variationBase->id);
             }
         }
-
         return $variationIds;
     }
 
@@ -333,7 +336,6 @@ class ItemService
             $itemImageFilter = pluginApp(ItemImagesFilter::class);
             return $itemImageFilter->getFirstItemImageUrl($variation['documents'][0]['data']['images'], $imageAccessor);
         }
-
         return '';
     }
 
@@ -468,7 +470,6 @@ class ItemService
                 return $variations;
             }
         );
-
         return $attributeMap;
     }
 
@@ -524,7 +525,6 @@ class ItemService
         $record = $this->itemRepository->search($columns, $filter, $params)->current();
 
         $isSalable = $record['variationBase']['limitOrderByStockSelect'] == 1 && $record['variationStock']['stockPhysical'] <= 0;
-
         return $isSalable;
     }
 
@@ -636,7 +636,6 @@ class ItemService
                 }
             }
         }
-
         return [
             'attributes' => $attributeList,
             'units' => $unitList
@@ -702,7 +701,6 @@ class ItemService
                 return $name;
             }
         );
-
         return $attributeName;
     }
 
@@ -731,7 +729,6 @@ class ItemService
                 return $name;
             }
         );
-
         return $attributeValueName;
     }
 
@@ -786,8 +783,6 @@ class ItemService
                 }
             }
         }
-
-
         return $crossSellingItems;
     }
 
@@ -839,7 +834,6 @@ class ItemService
             ->withParam(ItemColumnsParams::ORDER_BY, ["orderBy.variationCreateTimestamp" => "desc"])
             ->withParam(ItemColumnsParams::LIMIT, $limit)
             ->build();
-
         return $this->itemRepository->search($columns, $filter, $params);
     }
 
@@ -878,7 +872,6 @@ class ItemService
             ->addFilter($variationFilter)
             ->addFilter($searchFilter)
             ->setPage($page, $params['itemsPerPage']);
-
         return $elasticSearchRepo->execute();
     }
 
@@ -904,42 +897,4 @@ class ItemService
     {
         $this->additionalItemSortingMap[$key] = $translationKey;
     }
-
-    /**
-     * @param string $searchString
-     * @return array
-     */
-    /*public function searchItemsAutocomplete(string $searchString):array
-    {
-        /** @var IncludeSource $includeSource */
-    /*$includeSource = pluginApp(IncludeSource::class);
-    $includeSource->activate('test', 'test');
-
-    $documentProcessor = pluginApp(DocumentProcessor::class);
-    $documentSearch    = pluginApp(DocumentSearch::class, [$documentProcessor]);
-
-    /** @var VariationElasticSearchSearchRepositoryContract $elasticSearchRepo */
-    /*$elasticSearchRepo = pluginApp(VariationElasticSearchSearchRepositoryContract::class);
-    $elasticSearchRepo->addSearch($documentSearch);
-
-    /** @var VariationBaseFilter $variationFilter */
-    /*$variationFilter = pluginApp(VariationBaseFilter::class);
-    $variationFilter->isActive();
-
-    /** @var ClientFilter $clientFilter */
-    /*$clientFilter = pluginApp(ClientFilter::class);
-    $clientFilter->isVisibleForClient($this->app->getPlentyId());
-
-    /** @var SearchFilter $searchFilter */
-    /*$searchFilter = pluginApp(SearchFilter::class);
-    $searchFilter->setSearchString($searchString, ElasticSearch::SEARCH_TYPE_AUTOCOMPLETE);
-
-    $documentSearch
-        ->addFilter($clientFilter)
-        ->addFilter($variationFilter)
-        ->addFilter($searchFilter)
-        ->addSource($includeSource);
-
-    return $elasticSearchRepo->execute();
-}*/
 }

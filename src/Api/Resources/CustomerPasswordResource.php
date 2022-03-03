@@ -49,11 +49,10 @@ class CustomerPasswordResource extends ApiResource
 
 		if(strlen($newPassword) && strlen($newPassword2) && $newPassword == $newPassword2 && $this->isValidPassword($newPassword))
 		{
+            /** @var AuthenticationService $authService */
+            $authService = pluginApp(AuthenticationService::class);
 		    if (!strlen($hash))
 		    {
-		        /** @var AuthenticationService $authService */
-                $authService = pluginApp(AuthenticationService::class);
-
                 if(!$authService->checkPassword($oldPassword))
                 {
                     unset($this->response->eventData['AfterAccountAuthentication']);
@@ -63,14 +62,17 @@ class CustomerPasswordResource extends ApiResource
                 }
             }
 
-			$result = $this->customerService->updatePassword($newPassword, $contactId, $hash);
+			$contact = $this->customerService->updatePassword($newPassword, $contactId, $hash);
 
-            if($result === null)
+            if($contact === null)
             {
-                return $this->response->create($result, ResponseCode::BAD_REQUEST);
+                return $this->response->create($contact, ResponseCode::BAD_REQUEST);
             }
 
-			return $this->response->create($result, ResponseCode::OK);
+            // login
+            $authService->loginAndLogoutOtherDevices($contact->email, $newPassword);
+
+			return $this->response->create($contact, ResponseCode::OK);
 		}
 
 		$this->response->error(4, "Missing password or new passwords are not equal");
