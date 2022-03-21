@@ -1,5 +1,12 @@
 # Release Notes für IO
 
+## v5.0.48 (2022-03-21) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.46...5.0.48" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
+
+### Behoben
+
+- Durch einen Fehler waren Kategorien teilweise nicht sichtbar. Dies wurde behoben.
+- Eine Fehlerbehebung in Version 5.0.46 führte zu Folgefehlern. Dies wurde behoben.
+
 ## v5.0.46 (2022-02-24) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.45...5.0.46" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
 
 ### Geändert
