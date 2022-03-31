@@ -15,6 +15,7 @@ use Plenty\Modules\Basket\Exceptions\BasketItemCheckException;
 use Plenty\Modules\Basket\Exceptions\BasketItemQuantityCheckException;
 use Plenty\Modules\Basket\Models\Basket;
 use Plenty\Modules\Basket\Models\BasketItem;
+use Plenty\Modules\Core\Data\Factories\LazyLoaderFactory;
 use Plenty\Modules\Frontend\Contracts\Checkout;
 use Plenty\Modules\Frontend\Services\VatService;
 use IO\Constants\LogLevel;
@@ -24,6 +25,7 @@ use Plenty\Modules\Item\VariationDescription\Contracts\VariationDescriptionRepos
 use Plenty\Modules\Item\VariationDescription\Models\VariationDescription;
 use Plenty\Modules\Order\Coupon\Campaign\Contracts\CouponCampaignRepositoryContract;
 use Plenty\Modules\Order\Shipping\Contracts\EUCountryCodesServiceContract;
+use Plenty\Modules\Property\V2\Models\Property;
 use Plenty\Modules\Webshop\Contracts\CheckoutRepositoryContract;
 use Plenty\Modules\Webshop\Contracts\ContactRepositoryContract;
 use Plenty\Modules\Webshop\Contracts\SessionStorageRepositoryContract;
@@ -1082,13 +1084,25 @@ class BasketService
                 return true;
             }
         );
-
         foreach ($basketItems as &$basketItem) {
             if (isset($variationProperties[$basketItem['id']])) {
                 $basketItem['basketItemOrderParams'] = $basketItem['basketItemOrderParams'] ?? [];
-
+                $ll = LazyLoaderFactory::getLazyLoaderFor(Property::class);
                 foreach ($variationProperties[$basketItem['id']] as $variationProperty) {
-                    $basketItem['price'] += $variationProperty['price'];
+                    $property = $ll->getById($variationProperty['basketItemOrderParams'][0]['propertyId']);
+                    $isAdditionalCost = false;
+                    $hasTax = false;
+                    foreach ($property['options'] as $option) {
+                        if ($option['type'] === 'vatId' && ($option['value'] !== 'none' || $option['value'] !== null)) {
+                            $hasTax = true;
+                        }
+                        if ($option['value'] === 'displayAsAdditionalCosts') {
+                            $isAdditionalCost = true;
+                        }
+                    }
+                    if (!$isAdditionalCost && $hasTax) {
+                        $basketItem['price'] += $variationProperty['price'];
+                    }
                     $basketItem['attributeTotalMarkup'] += $variationProperty['price'];
                     $variationProperty['basketItemOrderParams'][0]['price'] = $variationProperty['price'];
                     $variationProperty['basketItemOrderParams'][0]['basketItemId'] = $basketItem['id'];
