@@ -15,6 +15,7 @@ use Plenty\Modules\Basket\Exceptions\BasketItemCheckException;
 use Plenty\Modules\Basket\Exceptions\BasketItemQuantityCheckException;
 use Plenty\Modules\Basket\Models\Basket;
 use Plenty\Modules\Basket\Models\BasketItem;
+use Plenty\Modules\Basket\Repositories\BasketItemRepository;
 use Plenty\Modules\Core\Data\Factories\LazyLoaderFactory;
 use Plenty\Modules\Frontend\Contracts\Checkout;
 use Plenty\Modules\Frontend\Services\VatService;
@@ -229,8 +230,12 @@ class BasketService
      */
     private function getSubAmount($basketAmountNet): float
     {
-        return $basketAmountNet - 20;
+        /** @var BasketRepositoryContract $basketRepository */
+        $basketRepository = pluginApp(BasketRepositoryContract::class);
+        $taxFreeAmount = $basketRepository->getTaxFreeAmount();
+        return $basketAmountNet - $taxFreeAmount;
     }
+
     /**
      * Return the basket model
      *
