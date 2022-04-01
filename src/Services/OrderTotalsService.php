@@ -3,8 +3,11 @@
 namespace IO\Services;
 
 use IO\Builder\Order\OrderItemType;
+use Plenty\Modules\Core\Data\Factories\LazyLoaderFactory;
 use Plenty\Modules\Order\Models\Order;
 use Plenty\Modules\Order\Models\OrderItem;
+use Plenty\Modules\Order\Property\Models\OrderPropertyType;
+use Plenty\Modules\Property\V2\Models\Property;
 use Plenty\Modules\Webshop\Helpers\NumberFormatter;
 
 /**
@@ -41,6 +44,7 @@ class OrderTotalsService
         $itemSumRebateGross = 0;
         $itemSumRebateNet = 0;
         $additionalCosts = [];
+        $additionalCostsWithTax = [];
 
         $orderItems = $order->orderItems;
 
@@ -57,7 +61,14 @@ class OrderTotalsService
                 case OrderItemType::TYPE_ORDER_PROPERTY:
                     $itemSumGross += $firstAmount->priceGross * $item->quantity;
                     $itemSumNet += $firstAmount->priceNet * $item->quantity;
-                    break;
+
+                    list($additionalCosts, $additionalCostsWithTax) = $this->addAdditionalCost(
+                        $item,
+                        $numberFormatter,
+                        $additionalCosts,
+                        $additionalCostsWithTax
+                    );
+                break;
                 case OrderItemType::SHIPPING_COSTS:
                     $shippingGross += $firstAmount->priceGross;
                     $shippingNet += $firstAmount->priceNet;
@@ -90,8 +101,14 @@ class OrderTotalsService
 
             if ($firstAmount->discount > 0) {
                 if ($firstAmount->isPercentage) {
-                    $itemSumRebateGross += round($item->quantity * $firstAmount->priceOriginalGross * $firstAmount->discount / 100, 2);
-                    $itemSumRebateNet += round($item->quantity * $firstAmount->priceOriginalNet * $firstAmount->discount / 100, 2);
+                    $itemSumRebateGross += round(
+                        $item->quantity * $firstAmount->priceOriginalGross * $firstAmount->discount / 100,
+                        2
+                    );
+                    $itemSumRebateNet += round(
+                        $item->quantity * $firstAmount->priceOriginalNet * $firstAmount->discount / 100,
+                        2
+                    );
                 } else {
                     $itemSumRebateGross += $item->quantity * $firstAmount->discount;
                 }
@@ -136,7 +153,8 @@ class OrderTotalsService
             'totalNet',
             'currency',
             'isNet',
-            'additionalCosts'
+            'additionalCosts',
+            'additionalCostsWithTax'
         );
     }
 
@@ -177,5 +195,63 @@ class OrderTotalsService
         $showNet = $customerService->showNetPricesByContactId($orderContactId);
 
         return $showNet || $isOrderNet;
+    }
+
+    /**
+     * @param OrderItem $item
+     * @param NumberFormatter $numberFormatter
+     * @param array $additionalCosts
+     * @param array $additionalCostsWithTax
+     * @return array
+     * @throws \Plenty\Modules\Core\Data\Exceptions\ModelFlattenerException
+     */
+    private function addAdditionalCost(
+        OrderItem $item,
+        NumberFormatter $numberFormatter,
+        array $additionalCosts,
+        array $additionalCostsWithTax
+    ): array {
+        $propertyId = null;
+        foreach ($item->properties as $property) {
+            if ($property->typeId === OrderPropertyType::ORDER_PROPERTY_ID) {
+                $propertyId = $property->value;
+            }
+        }
+        if (isset($propertyId)) {
+            $ll = LazyLoaderFactory::getLazyLoaderFor(Property::class);
+            $property = $ll->getById($propertyId);
+            $isAdditionalCost = false;
+            $hasTax = false;
+            foreach ($property['options'] as $option) {
+                if ($option['type'] === 'vatId' && ($option['value'] !== 'none' || $option['value'] !== null)) {
+                    $hasTax = true;
+                }
+                if ($option['value'] === 'displayAsAdditionalCosts') {
+                    $isAdditionalCost = true;
+                }
+            }
+            $price = $item->amounts[0]->priceGross;
+            $currency = $item->amounts[0]->currency;
+
+            $newProperty = [
+                'id' => $item->id,
+                'quantity' => $item->quantity,
+                'name' => $item->orderItemName,
+                'price' => $price,
+                'currency' => $currency,
+                'formattedTotalPrice'
+                => $numberFormatter->formatMonetary($price * $item->quantity, $currency)
+            ];
+
+            if (($isAdditionalCost && !$hasTax) || (!$isAdditionalCost && !$hasTax)) {
+
+                $additionalCosts[] = $newProperty;
+            }
+            elseif ($isAdditionalCost && $hasTax) {
+                $additionalCostsWithTax[] = $newProperty;
+            }
+
+        }
+        return array($additionalCosts, $additionalCostsWithTax);
     }
 }
