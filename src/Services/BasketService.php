@@ -205,7 +205,10 @@ class BasketService
             $basket["itemSum"] = $basket["itemSumNet"];
             $basket["basketAmount"] = $basket["basketAmountNet"];
             $basket["shippingAmount"] = $basket["shippingAmountNet"];
+
         }
+        $basket['subAmount'] = $this->getSubAmount($basket["itemSumNet"]);
+
 
         $basket = $this->couponService->checkCoupon($basket);
         $determineShopCountry->initByPlentyId(Utils::getPlentyId());
@@ -221,6 +224,10 @@ class BasketService
         return $basket;
     }
 
+    private function getSubAmount($itemSumNet): float
+    {
+        return $itemSumNet - 20;
+    }
     /**
      * Return the basket model
      *
