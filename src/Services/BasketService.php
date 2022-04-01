@@ -207,7 +207,7 @@ class BasketService
             $basket["shippingAmount"] = $basket["shippingAmountNet"];
 
         }
-        $basket['subAmount'] = $this->getSubAmount($basket["itemSumNet"]);
+        $basket['subAmount'] = $this->getSubAmount($basket["basketAmountNet"]);
 
 
         $basket = $this->couponService->checkCoupon($basket);
@@ -224,9 +224,12 @@ class BasketService
         return $basket;
     }
 
-    private function getSubAmount($itemSumNet): float
+    /**
+     * Return subAmount
+     */
+    private function getSubAmount($basketAmountNet): float
     {
-        return $itemSumNet - 20;
+        return $basketAmountNet - 20;
     }
     /**
      * Return the basket model
