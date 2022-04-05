@@ -110,7 +110,7 @@ class CategoryFacet implements FacetExtension
     {
         $categoryIds = [];
 
-        if (count($filtersList)) {
+        if (is_array($filtersList) && count($filtersList)) {
             foreach ($filtersList as $filter) {
                 if (strpos($filter, 'category-') === 0) {
                     $e = explode('-', $filter);
