@@ -45,6 +45,9 @@ class OrderTotalsService
         $itemSumRebateNet = 0;
         $additionalCosts = [];
         $additionalCostsWithTax = [];
+        $subAmount = 0;
+        $taxlessAmount = 0;
+
 
         $orderItems = $order->orderItems;
 
@@ -62,11 +65,12 @@ class OrderTotalsService
                     $itemSumGross += $firstAmount->priceGross * $item->quantity;
                     $itemSumNet += $firstAmount->priceNet * $item->quantity;
 
-                    list($additionalCosts, $additionalCostsWithTax) = $this->addAdditionalCost(
+                    $this->addAdditionalCost(
                         $item,
                         $numberFormatter,
                         $additionalCosts,
-                        $additionalCostsWithTax
+                        $additionalCostsWithTax,
+                        $taxlessAmount
                     );
                 break;
                 case OrderItemType::SHIPPING_COSTS:
@@ -117,6 +121,9 @@ class OrderTotalsService
 
         $itemSumGross += $itemSumRebateGross;
         $itemSumNet += $itemSumRebateNet;
+        $itemSumNet -= $taxlessAmount;
+        $itemSumGross -= $taxlessAmount;
+        $subAmount = $totalNet - $taxlessAmount;
 
         foreach ($order->amounts[$amountId]->vats as $vat) {
             $vats[] = [
@@ -154,7 +161,8 @@ class OrderTotalsService
             'currency',
             'isNet',
             'additionalCosts',
-            'additionalCostsWithTax'
+            'additionalCostsWithTax',
+            'subAmount'
         );
     }
 
@@ -202,15 +210,15 @@ class OrderTotalsService
      * @param NumberFormatter $numberFormatter
      * @param array $additionalCosts
      * @param array $additionalCostsWithTax
-     * @return array
      * @throws \Plenty\Modules\Core\Data\Exceptions\ModelFlattenerException
      */
     private function addAdditionalCost(
         OrderItem $item,
         NumberFormatter $numberFormatter,
-        array $additionalCosts,
-        array $additionalCostsWithTax
-    ): array {
+        array &$additionalCosts,
+        array &$additionalCostsWithTax,
+        &$taxlessAmount
+    ) {
         $propertyId = null;
         foreach ($item->properties as $property) {
             if ($property->typeId === OrderPropertyType::ORDER_PROPERTY_ID) {
@@ -243,15 +251,13 @@ class OrderTotalsService
                 => $numberFormatter->formatMonetary($price * $item->quantity, $currency)
             ];
 
-            if (($isAdditionalCost && !$hasTax) || (!$isAdditionalCost && !$hasTax)) {
-
+            if (!$hasTax) {
                 $additionalCosts[] = $newProperty;
+                $taxlessAmount += $price * $item->quantity;
             }
-            elseif ($isAdditionalCost && $hasTax) {
+            elseif($isAdditionalCost) {
                 $additionalCostsWithTax[] = $newProperty;
             }
-
         }
-        return array($additionalCosts, $additionalCostsWithTax);
     }
 }
