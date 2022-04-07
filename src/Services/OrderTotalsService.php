@@ -206,10 +206,11 @@ class OrderTotalsService
     }
 
     /**
-     * @param OrderItem $item
+     * @param OrderItem       $item
      * @param NumberFormatter $numberFormatter
-     * @param array $additionalCosts
-     * @param array $additionalCostsWithTax
+     * @param array           $additionalCosts
+     * @param array           $additionalCostsWithTax
+     * @param Number          $taxlessAmount
      * @throws \Plenty\Modules\Core\Data\Exceptions\ModelFlattenerException
      */
     private function addAdditionalCost(
