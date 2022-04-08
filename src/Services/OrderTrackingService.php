@@ -61,22 +61,13 @@ class OrderTrackingService
 
                     $zip = $order->deliveryAddress->postalCode;
 
-                    if (strlen($trackingURL) && strlen($packageNumber)) {
-                        $trackingURL = str_replace('[PaketNr]',
-                            $packageNumber,
-                            str_replace('[PLZ]',
-                                $zip,
-                                str_replace('[Lang]',
-                                    $lang,
-                                    $trackingURL)));
+                    if (strlen($trackingURL)) {
 
-                        $trackingURL = str_replace('$PaketNr',
-                            $packageNumber,
-                            str_replace('$PLZ',
-                                $zip,
-                                str_replace('$Lang',
-                                    $lang,
-                                    $trackingURL)));
+                        $trackingURL = str_replace(
+                            ['[PaketNr]', '$PaketNr', '[PLZ]', '$PLZ', '[Lang]', '$Lang'],
+                            [urlencode($packageNumber), urlencode($packageNumber), urlencode($zip), urlencode($zip), $lang, $lang],
+                            $trackingURL
+                        );
                     }
                 }
             }
