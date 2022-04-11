@@ -1,6 +1,6 @@
 <?php
 
-namespace IO\Tests;
+namespace IO\Helper;
 
 trait MemoryCache
 {
