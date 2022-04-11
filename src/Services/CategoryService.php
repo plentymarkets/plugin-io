@@ -771,7 +771,7 @@ class CategoryService
     {
         // Filter children not having texts in current language
         $category['children'] = array_filter(
-            $category['children'],
+            $category['children'] ?? [],
             function ($child) {
                 return count($child['details']);
             }
