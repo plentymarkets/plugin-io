@@ -217,6 +217,10 @@ class TemplateService
         $sorting = $sortingHelper->mapToInnerSorting($sorting);
 
         $dynamicInheritSorting = $templateConfigRepository->get('sorting.dynamicInherit', []);
+        if (is_string($dynamicInheritSorting)) {
+            $dynamicInheritSorting = explode(',' , $dynamicInheritSorting);
+        }
+
         if (in_array($sorting, $dynamicInheritSorting)) {
             if ($sorting === 'filter.prices.price_asc') {
                 return true;
