@@ -67,7 +67,6 @@ class OrderTotalsService
 
                     $this->addAdditionalCost(
                         $item,
-                        $numberFormatter,
                         $additionalCosts,
                         $additionalCostsWithTax,
                         $taxlessAmount
@@ -207,7 +206,6 @@ class OrderTotalsService
 
     /**
      * @param OrderItem       $item
-     * @param NumberFormatter $numberFormatter
      * @param array           $additionalCosts
      * @param array           $additionalCostsWithTax
      * @param Number          $taxlessAmount
@@ -215,11 +213,12 @@ class OrderTotalsService
      */
     private function addAdditionalCost(
         OrderItem $item,
-        NumberFormatter $numberFormatter,
         array &$additionalCosts,
         array &$additionalCostsWithTax,
         &$taxlessAmount
     ) {
+        /** @var NumberFormatter $numberFormatter */
+        $numberFormatter = pluginApp(NumberFormatter::class);
         $propertyId = null;
         foreach ($item->properties as $property) {
             if ($property->typeId === OrderPropertyType::ORDER_PROPERTY_ID) {
@@ -227,38 +226,71 @@ class OrderTotalsService
             }
         }
         if (isset($propertyId)) {
-            $ll = LazyLoaderFactory::getLazyLoaderFor(Property::class);
-            $property = $ll->getById($propertyId);
-            $isAdditionalCost = false;
-            $hasTax = false;
-            foreach ($property['options'] as $option) {
-                if ($option['type'] === 'vatId' && ($option['value'] !== 'none' || $option['value'] !== null)) {
-                    $hasTax = true;
-                }
-                if ($option['value'] === 'displayAsAdditionalCosts') {
-                    $isAdditionalCost = true;
-                }
-            }
-            $price = $item->amounts[0]->priceGross;
-            $currency = $item->amounts[0]->currency;
 
-            $newProperty = [
-                'id' => $item->id,
-                'quantity' => $item->quantity,
-                'name' => $item->orderItemName,
-                'price' => $price,
-                'currency' => $currency,
-                'formattedTotalPrice'
-                => $numberFormatter->formatMonetary($price * $item->quantity, $currency)
-            ];
-
-            if (!$hasTax) {
-                $additionalCosts[] = $newProperty;
-                $taxlessAmount += $price * $item->quantity;
+            if (isset($additionalCosts[$propertyId]))
+            {
+                $tempProperty =& $additionalCosts[$propertyId];
+                $additionalCosts[$propertyId]['quantity'] += $item->quantity;
+                $additionalCosts[$propertyId]['formattedTotalPrice'] = $numberFormatter->formatMonetary($tempProperty['price'] * $tempProperty['quantity'], $tempProperty['currency']);
+                $taxlessAmount += $item->amounts[0]->priceGross * $item->quantity;
             }
-            elseif($isAdditionalCost) {
-                $additionalCostsWithTax[] = $newProperty;
+
+            elseif (isset($additionalCostsWithTax[$propertyId])){
+                $tempProperty =& $additionalCostsWithTax[$propertyId];
+                $additionalCostsWithTax[$propertyId]['quantity'] += $item->quantity;
+                $additionalCostsWithTax[$propertyId]['formattedTotalPrice'] = $numberFormatter->formatMonetary($tempProperty['price'] * $tempProperty['quantity'], $tempProperty['currency']);
+            }
+
+            else {
+                list($isAdditionalCost, $hasTax, $newProperty) = $this->getPropertyWithMoreDetails($propertyId, $item);
+                if (!$hasTax) {
+                    $additionalCosts[$propertyId] = $newProperty;
+                    $taxlessAmount += $item->amounts[0]->priceGross * $item->quantity;
+                }
+                elseif($isAdditionalCost) {
+                    $additionalCostsWithTax[$propertyId] = $newProperty;
+                }
             }
         }
+    }
+
+    /**
+     * @param string $propertyId
+     * @param OrderItem $item
+     * @return array
+     * @throws \Plenty\Modules\Core\Data\Exceptions\ModelFlattenerException
+     */
+    private function getPropertyWithMoreDetails(
+        string $propertyId,
+        OrderItem $item
+    ): array {
+        /** @var NumberFormatter $numberFormatter */
+        $numberFormatter = pluginApp(NumberFormatter::class);
+
+        $ll = LazyLoaderFactory::getLazyLoaderFor(Property::class);
+
+        $property = $ll->getById($propertyId);
+        $isAdditionalCost = false;
+        $hasTax = false;
+
+        foreach ($property['options'] as $option) {
+            if ($option['type'] === 'vatId' && ($option['value'] !== 'none' || $option['value'] !== null)) {
+                $hasTax = true;
+            }
+            if ($option['value'] === 'displayAsAdditionalCosts') {
+                $isAdditionalCost = true;
+            }
+        }
+
+        $newProperty = [
+            'id' => $item->id,
+            'quantity' => $item->quantity,
+            'name' => $item->orderItemName,
+            'price' => $item->amounts[0]->priceGross,
+            'currency' => $item->amounts[0]->currency,
+            'formattedTotalPrice' => $numberFormatter->formatMonetary($item->amounts[0]->priceGross * $item->quantity, $item->amounts[0]->currency)
+        ];
+
+        return array($isAdditionalCost, $hasTax, $newProperty);
     }
 }
