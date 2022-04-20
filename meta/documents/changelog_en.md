@@ -1,5 +1,11 @@
 # Release Notes for IO
 
+## v5.0.49 (2022-04-11) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.48...5.0.49" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
+
+### Fixed
+
+- An error with inheritance from outer to inner sorting was fixed.
+
 ## v5.0.48 (2022-03-21) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.46...5.0.48" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
 
 ### Fixed
