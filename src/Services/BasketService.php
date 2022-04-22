@@ -1140,7 +1140,10 @@ class BasketService
         if ($appendVariation) {
             $basketItems = $this->getBasketItems() ;
         } else {
-            $basketItems = $this->getBasketItemsRaw()->toArray();
+            $basketItems = $this->getBasketItemsRaw();
+            if(!is_array($basketItems)) {
+                $basketItems = $basketItems->toArray();
+            }
         }
 
         return array_filter(
