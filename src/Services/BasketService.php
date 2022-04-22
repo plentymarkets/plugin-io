@@ -1141,14 +1141,14 @@ class BasketService
         if ($appendVariation) {
             $basketItems = $this->getBasketItems() ;
         } else {
-            $basketItems = $this->getBasketItemsRaw();
-            $basketItems = $this->getBasketItemData($basketItems);
+            $temp = $this->getBasketItemsRaw();
 
+            $basketItems = [];
+            foreach($temp as $basketItem) {
+                $basketItems[] = $basketItem;
+            }
         }
 
-        if ($basketItems instanceof Collection) {
-            $basketItems = $basketItems->toArray();
-        }
 
         return array_filter(
             $basketItems,
