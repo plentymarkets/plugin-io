@@ -15,6 +15,7 @@ use Plenty\Modules\Order\Contracts\OrderRepositoryContract;
 use Plenty\Modules\Order\Date\Models\OrderDateType;
 use Plenty\Modules\Order\Models\Order;
 use Plenty\Modules\ShopBuilder\Helper\ShopBuilderRequest;
+use Plenty\Modules\Webshop\Contracts\ConfirmationRepositoryContract;
 use Plenty\Modules\Webshop\Contracts\ContactRepositoryContract;
 use Plenty\Modules\Webshop\Contracts\SessionStorageRepositoryContract;
 use Plenty\Plugin\ConfigRepository;
@@ -201,34 +202,9 @@ class ConfirmationController extends LayoutController
 
     private function checkValidity(Order $order)
     {
-        /** @var TemplateConfigService $templateConfigService */
-        $templateConfigService = pluginApp(TemplateConfigService::class);
-        $expiration = $templateConfigService->get('my_account.confirmation_link_expiration', 'always');
-
-        if ($expiration !== 'always') {
-            $now = time();
-
-            $orderDates = $order->dates;
-            $orderCreationDate = $orderDates->filter(
-                function ($date) {
-                    return $date->typeId == OrderDateType::ORDER_ENTRY_AT;
-                }
-            )->first()->date->timestamp;
-
-            if ($now > $orderCreationDate + ((int)$expiration * (24 * 60 * 60))) {
-                $this->getLogger(__CLASS__)->warning(
-                    "IO::Debug.ConfirmationController_confirmationLinkExpired",
-                    [
-                        "order" => $order,
-                        "creationDate" => $orderCreationDate,
-                        "expiration" => $expiration
-                    ]
-                );
-                return false;
-            }
-        }
-
-        return true;
+        /** @var ConfirmationRepositoryContract $confirmationRepository */
+        $confirmationRepository = pluginApp(ConfirmationRepositoryContract::class);
+        return $confirmationRepository->checkValidity($order);
     }
 
     public function redirect($orderId = 0, $accessKey = '')
