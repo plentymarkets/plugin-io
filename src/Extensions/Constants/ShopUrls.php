@@ -381,8 +381,8 @@ class ShopUrls
         $key = $route;
 
         // Sanitize inputs
-        $routeParams = !is_null($routeParams) ? $routeParams : [];
-        $urlParams = !is_null($urlParams) ? $urlParams : [];
+        $routeParams = $routeParams ?? [];
+        $urlParams = $urlParams ?? [];
 
         if (count($routeParams) || count($urlParams)) {
             $key .= '.' . implode('.', $routeParams) . '.' . json_encode($urlParams);
