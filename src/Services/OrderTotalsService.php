@@ -274,7 +274,7 @@ class OrderTotalsService
         $hasTax = false;
 
         foreach ($property['options'] as $option) {
-            if ($option['type'] === 'vatId' && ($option['value'] !== 'none' || $option['value'] !== null)) {
+            if ($option['type'] === 'vatId' && ($option['value'] !== 'none' && $option['value'] !== null)) {
                 $hasTax = true;
             }
             if ($option['value'] === 'displayAsAdditionalCosts') {
