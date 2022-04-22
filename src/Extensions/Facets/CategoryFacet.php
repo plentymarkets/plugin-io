@@ -40,7 +40,7 @@ class CategoryFacet implements FacetExtension
 
 
         if ($templateConfigService->getBoolean('item.show_category_filter', false)) {
-            if (count($result)) {
+            if (is_array($result) && count($result)) {
                 $categoryFacet = [
                     'id' => 'category',
                     'name' => 'Categories',
@@ -92,7 +92,7 @@ class CategoryFacet implements FacetExtension
                 $categoryService->setCurrentCategoryID($currentCategory->id);
             }
 
-            if (count($categoryFacet['values']) > 0) {
+            if (is_array($categoryFacet['values']) && count($categoryFacet['values']) > 0) {
                 $categoryFacet['count'] = count($categoryFacet['values']);
             } else {
                 $categoryFacet = [];
