@@ -1143,6 +1143,11 @@ class BasketService
         } else {
             $basketItems = $this->getBasketItemsRaw();
             $basketItems = $this->getBasketItemData($basketItems);
+
+        }
+
+        if ($basketItems instanceof Collection) {
+            $basketItems = $basketItems->toArray();
         }
 
         return array_filter(
