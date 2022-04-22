@@ -34,6 +34,7 @@ use Plenty\Modules\Webshop\ItemSearch\SearchPresets\BasketItems;
 use Plenty\Modules\Webshop\ItemSearch\Services\ItemSearchService;
 use Plenty\Plugin\Events\Dispatcher;
 use Plenty\Plugin\Log\Loggable;
+use Illuminate\Database\Eloquent\Collection;
 
 /**
  * Service Class BasketService
@@ -1140,7 +1141,10 @@ class BasketService
         if ($appendVariation) {
             $basketItems = $this->getBasketItems() ;
         } else {
-            $basketItems = $this->basketItemRepository->all()->toArray();
+            $basketItems = $this->basketItemRepository->all();
+            if ($basketItems instanceof Collection) {
+                $basketItems = $basketItems->toArray();
+            }
         }
 
         return array_filter(
