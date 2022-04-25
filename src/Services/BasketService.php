@@ -1134,7 +1134,16 @@ class BasketService
 
     private function getSetComponents($basketItemId, $appendVariation = true)
     {
-        $basketItems = $appendVariation ? $this->getBasketItems() : $this->basketRepository->load()->toArray();
+        if ($appendVariation) {
+            $basketItems = $this->getBasketItems() ;
+        } else {
+            $temp = $this->getBasketItemsRaw();
+
+            $basketItems = [];
+            foreach($temp as $basketItem) {
+                $basketItems[] = $basketItem;
+            }
+        }
 
         return array_filter(
             $basketItems,
