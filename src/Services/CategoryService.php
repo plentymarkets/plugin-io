@@ -726,9 +726,7 @@ class CategoryService
 
         $result = array_map(
             function ($category) {
-                /** @var $category Category */
-                $category->children = $this->filterVisibleCategories($category->children);
-
+                $category['children'] = $this->filterVisibleCategories($category['children']);
                 return $category;
             },
             $result
@@ -757,16 +755,12 @@ class CategoryService
                     $category['url']
                 );
                 $result[] = $category;
-            } else {
-                if ($isInBranch && $isCurrentLevel) {
-                    $this->appendBranchFields($category, $siblingCount, $urlPrefix, 2);
-                    $result[] = $category;
-                } else {
-                    if (!$isInBranch && $isCurrentLevel) {
-                        $this->appendBranchFields($category, $siblingCount, $urlPrefix, 0);
-                        $result[] = $category;
-                    }
-                }
+            } elseif ($isInBranch && $isCurrentLevel) {
+                $this->appendBranchFields($category, $siblingCount, $urlPrefix, 2);
+                $result[] = $category;
+            } elseif (!$isInBranch && $isCurrentLevel) {
+                $this->appendBranchFields($category, $siblingCount, $urlPrefix, 0);
+                $result[] = $category;
             }
         }
 
