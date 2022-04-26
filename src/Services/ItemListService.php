@@ -100,7 +100,7 @@ class ItemListService
                 , []);
                 $variationIds = array_slice($variationIds, 0, $maxItems);
 
-                if (!is_null($variationIds) && count($variationIds) > 0) {
+                if (count($variationIds) > 0) {
                     $searchFactory = VariationList::getSearchFactory(
                         [
                             'variationIds' => $variationIds,
