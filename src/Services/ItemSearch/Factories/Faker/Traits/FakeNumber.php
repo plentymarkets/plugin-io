@@ -8,7 +8,7 @@ trait FakeNumber
     {
         if ( $max < $min )
         {
-            return rand($min);
+            $max = 999999;
         }
 
         return rand($min, $max);
