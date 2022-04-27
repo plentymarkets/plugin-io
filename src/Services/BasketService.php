@@ -2,35 +2,32 @@
 
 namespace IO\Services;
 
+use IO\Constants\LogLevel;
 use IO\Helper\Utils;
-use Plenty\Exceptions\ValidationException;
 use Plenty\Modules\Accounting\Contracts\DetermineShopCountryContract;
 use Plenty\Modules\Accounting\Vat\Contracts\VatInitContract;
 use Plenty\Modules\Accounting\Vat\Models\VatRate;
 use Plenty\Modules\Authorization\Services\AuthHelper;
-use Plenty\Modules\Basket\Contracts\BasketRepositoryContract;
 use Plenty\Modules\Basket\Contracts\BasketItemRepositoryContract;
+use Plenty\Modules\Basket\Contracts\BasketRepositoryContract;
 use Plenty\Modules\Basket\Events\Basket\AfterBasketChanged;
 use Plenty\Modules\Basket\Exceptions\BasketItemCheckException;
 use Plenty\Modules\Basket\Exceptions\BasketItemQuantityCheckException;
 use Plenty\Modules\Basket\Models\Basket;
 use Plenty\Modules\Basket\Models\BasketItem;
-use Plenty\Modules\Basket\Repositories\BasketItemRepository;
-use Plenty\Modules\Core\Data\Factories\LazyLoaderFactory;
 use Plenty\Modules\Frontend\Contracts\Checkout;
 use Plenty\Modules\Frontend\Services\VatService;
-use IO\Constants\LogLevel;
 use Plenty\Modules\Item\Variation\Contracts\VariationRepositoryContract;
 use Plenty\Modules\Item\Variation\Models\Variation;
 use Plenty\Modules\Item\VariationDescription\Contracts\VariationDescriptionRepositoryContract;
 use Plenty\Modules\Item\VariationDescription\Models\VariationDescription;
 use Plenty\Modules\Order\Coupon\Campaign\Contracts\CouponCampaignRepositoryContract;
 use Plenty\Modules\Order\Shipping\Contracts\EUCountryCodesServiceContract;
-use Plenty\Modules\Property\V2\Models\Property;
 use Plenty\Modules\Webshop\Contracts\CheckoutRepositoryContract;
 use Plenty\Modules\Webshop\Contracts\ContactRepositoryContract;
 use Plenty\Modules\Webshop\Contracts\SessionStorageRepositoryContract;
 use Plenty\Modules\Webshop\Contracts\WebstoreConfigurationRepositoryContract;
+use Plenty\Modules\Webshop\Helpers\PropertyHelper;
 use Plenty\Modules\Webshop\Helpers\UnitUtils;
 use Plenty\Modules\Webshop\ItemSearch\Factories\VariationSearchFactory;
 use Plenty\Modules\Webshop\ItemSearch\SearchPresets\BasketItems;
@@ -1102,9 +1099,8 @@ class BasketService
         foreach ($basketItems as &$basketItem) {
             if (isset($variationProperties[$basketItem['id']])) {
                 $basketItem['basketItemOrderParams'] = $basketItem['basketItemOrderParams'] ?? [];
-                $ll = LazyLoaderFactory::getLazyLoaderFor(Property::class);
                 foreach ($variationProperties[$basketItem['id']] as $variationProperty) {
-                    $property = $ll->getById($variationProperty['basketItemOrderParams'][0]['propertyId']);
+                    $property = PropertyHelper::getPropertyById($variationProperty['basketItemOrderParams'][0]['propertyId']);
                     $isAdditionalCost = false;
                     $hasTax = false;
                     foreach ($property['options'] as $option) {

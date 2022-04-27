@@ -3,12 +3,11 @@
 namespace IO\Services;
 
 use IO\Builder\Order\OrderItemType;
-use Plenty\Modules\Core\Data\Factories\LazyLoaderFactory;
 use Plenty\Modules\Order\Models\Order;
 use Plenty\Modules\Order\Models\OrderItem;
 use Plenty\Modules\Order\Property\Models\OrderPropertyType;
-use Plenty\Modules\Property\V2\Models\Property;
 use Plenty\Modules\Webshop\Helpers\NumberFormatter;
+use Plenty\Modules\Webshop\Helpers\PropertyHelper;
 
 /**
  * Service Class OrderTotalsService
@@ -267,9 +266,7 @@ class OrderTotalsService
         /** @var NumberFormatter $numberFormatter */
         $numberFormatter = pluginApp(NumberFormatter::class);
 
-        $ll = LazyLoaderFactory::getLazyLoaderFor(Property::class);
-
-        $property = $ll->getById($propertyId);
+        $property = PropertyHelper::getPropertyById($propertyId);
         $isAdditionalCost = false;
         $hasTax = false;
 
