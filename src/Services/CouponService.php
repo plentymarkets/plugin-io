@@ -166,9 +166,8 @@ class CouponService
      */
     public function effectsOnShippingCosts(CouponCampaign $campaign)
     {
-        if (($campaign->includeShipping && $campaign->discountType == CouponCampaign::DISCOUNT_TYPE_FIXED) ||
-            $campaign->discountType == CouponCampaign::DISCOUNT_TYPE_SHIPPING
-        ) {
+        if ($campaign->couponType != CouponCampaign::COUPON_TYPE_SALES && (($campaign->includeShipping && $campaign->discountType == CouponCampaign::DISCOUNT_TYPE_FIXED) ||
+            $campaign->discountType == CouponCampaign::DISCOUNT_TYPE_SHIPPING)) {
             return true;
         } else {
             return false;
