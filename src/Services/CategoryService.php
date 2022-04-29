@@ -718,7 +718,7 @@ class CategoryService
     private function filterVisibleCategories($categoryList = [])
     {
         $result = array_filter(
-            $categoryList,
+            $categoryList ?? [],
             function ($category) {
                 return $category['right'] !== 'customer';
             }
@@ -771,7 +771,7 @@ class CategoryService
     {
         // Filter children not having texts in current language
         $category['children'] = array_filter(
-            $category['children'],
+            $category['children'] ?? [],
             function ($child) {
                 return count($child['details']);
             }
