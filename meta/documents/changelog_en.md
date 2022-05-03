@@ -8,6 +8,9 @@
 - The amount already paid is now displayed on the order confirmation page.
 - The order confirmation page can now display multiple redeemed coupon values.
 - The IO plugin is now compatible with PHP 8.
+- Order properties and characteristics configured as additional costs are now shown as separate items in the totals.
+- For order properties and characteristics, it is now displayed in the single item view, in the shopping cart, and in the order confirmation whether the costs are inclusive or additional.
+- Required, pre-selected order properties that have been configured as additional costs are now displayed without a checkbox below the item price on the single item view.
 
 ### Fixed
 
