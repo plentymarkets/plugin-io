@@ -169,7 +169,7 @@ class OrderTotalsService
             'isNet',
             'additionalCosts',
             'additionalCostsWithTax',
-            'subAmount'
+            'subAmount',
             'promotionalCouponsValue',
             'giftCardsValue',
             'paidAmount'
