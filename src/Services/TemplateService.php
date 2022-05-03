@@ -221,7 +221,7 @@ class TemplateService
             $dynamicInheritSorting = explode(',' , $dynamicInheritSorting);
         }
 
-        if (in_array($sorting, $dynamicInheritSorting)) {
+        if (is_array($dynamicInheritSorting) && in_array($sorting, $dynamicInheritSorting)) {
             if ($sorting === 'filter.prices.price_asc') {
                 return true;
             }

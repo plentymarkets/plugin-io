@@ -38,6 +38,7 @@ class OrderTotalsService
         $amountId = $this->getCustomerAmountId($order->amounts);
         $totalNet = $order->amounts[$amountId]->netTotal;
         $totalGross = $order->amounts[$amountId]->grossTotal;
+        $paidAmount = $order->amounts[$amountId]->paidAmount;
         $currency = $order->amounts[$amountId]->currency;
         $isNet = $order->amounts[$amountId]->isNet;
         $itemSumRebateGross = 0;
@@ -46,7 +47,8 @@ class OrderTotalsService
         $additionalCostsWithTax = [];
         $subAmount = 0;
         $taxlessAmount = 0;
-
+        $promotionalCouponsValue = 0;
+        $giftCardsValue = 0;
 
         $orderItems = $order->orderItems;
 
@@ -77,6 +79,11 @@ class OrderTotalsService
                     break;
                 case OrderItemType::PROMOTIONAL_COUPON:
                 case OrderItemType::GIFT_CARD:
+                    if ($item->typeId == OrderItemType::GIFT_CARD) {
+                        $giftCardsValue += $firstAmount->priceGross;
+                    } else {
+                        $promotionalCouponsValue += $firstAmount->priceGross;
+                    }
                     $couponType = $item->typeId;
                     $couponValue += $firstAmount->priceGross;
                     $itemNameArray = explode(' ', rtrim($item->orderItemName));
@@ -135,12 +142,14 @@ class OrderTotalsService
             $totalGross = $totalNet;
         }
 
+
         if ($couponType == OrderItemType::GIFT_CARD) {
             $couponType = 'sales';
-            $openAmount = $totalGross + $couponValue;
         } elseif ($couponType == OrderItemType::PROMOTIONAL_COUPON) {
             $couponType = 'promotional';
         }
+
+        $openAmount = $totalGross - $paidAmount + $giftCardsValue;
 
         return compact(
             'itemSumGross',
@@ -161,6 +170,9 @@ class OrderTotalsService
             'additionalCosts',
             'additionalCostsWithTax',
             'subAmount'
+            'promotionalCouponsValue',
+            'giftCardsValue',
+            'paidAmount'
         );
     }
 
