@@ -1,5 +1,19 @@
 # Release Notes for IO
 
+## v5.0.50 (2022-05-03) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.49...5.0.50" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
+
+### Changed
+
+- The logic for checking the validity of an order confirmation page was transferred from the plugin to the core.
+- The amount already paid is now displayed on the order confirmation page.
+- The order confirmation page can now display multiple redeemed coupon values.
+- The IO plugin is now compatible with PHP 8.
+
+### Fixed
+
+- Shipping costs could be displayed incorrectly in the shopping cart if a sales coupon affected both the value of goods and the shipping costs. This has been fixed.
+- For addresses that contained a postcode with white spaces, incorrect links could occur for the shipment tracking function. This has been fixed.
+
 ## v5.0.49 (2022-04-11) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.48...5.0.49" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
 
 ### Fixed
