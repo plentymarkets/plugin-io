@@ -72,7 +72,7 @@ class OrderTotalsService
                         $additionalCostsWithTax,
                         $taxlessAmount
                     );
-                break;
+                    break;
                 case OrderItemType::SHIPPING_COSTS:
                     $shippingGross += $firstAmount->priceGross;
                     $shippingNet += $firstAmount->priceNet;
@@ -216,10 +216,10 @@ class OrderTotalsService
     }
 
     /**
-     * @param OrderItem       $item
-     * @param array           $additionalCosts
-     * @param array           $additionalCostsWithTax
-     * @param Number          $taxlessAmount
+     * @param OrderItem $item
+     * @param array $additionalCosts
+     * @param array $additionalCostsWithTax
+     * @param Number $taxlessAmount
      * @throws \Plenty\Modules\Core\Data\Exceptions\ModelFlattenerException
      */
     private function addAdditionalCost(
@@ -237,28 +237,27 @@ class OrderTotalsService
             }
         }
         if (isset($propertyId)) {
-
-            if (isset($additionalCosts[$propertyId]))
-            {
+            if (isset($additionalCosts[$propertyId])) {
                 $tempProperty =& $additionalCosts[$propertyId];
                 $additionalCosts[$propertyId]['quantity'] += $item->quantity;
-                $additionalCosts[$propertyId]['formattedTotalPrice'] = $numberFormatter->formatMonetary($tempProperty['price'] * $tempProperty['quantity'], $tempProperty['currency']);
+                $additionalCosts[$propertyId]['formattedTotalPrice'] = $numberFormatter->formatMonetary(
+                    $tempProperty['price'] * $tempProperty['quantity'],
+                    $tempProperty['currency']
+                );
                 $taxlessAmount += $item->amounts[0]->priceGross * $item->quantity;
-            }
-
-            elseif (isset($additionalCostsWithTax[$propertyId])){
+            } elseif (isset($additionalCostsWithTax[$propertyId])) {
                 $tempProperty =& $additionalCostsWithTax[$propertyId];
                 $additionalCostsWithTax[$propertyId]['quantity'] += $item->quantity;
-                $additionalCostsWithTax[$propertyId]['formattedTotalPrice'] = $numberFormatter->formatMonetary($tempProperty['price'] * $tempProperty['quantity'], $tempProperty['currency']);
-            }
-
-            else {
+                $additionalCostsWithTax[$propertyId]['formattedTotalPrice'] = $numberFormatter->formatMonetary(
+                    $tempProperty['price'] * $tempProperty['quantity'],
+                    $tempProperty['currency']
+                );
+            } else {
                 list($isAdditionalCost, $hasTax, $newProperty) = $this->getPropertyWithMoreDetails($propertyId, $item);
                 if (!$hasTax) {
                     $additionalCosts[$propertyId] = $newProperty;
                     $taxlessAmount += $item->amounts[0]->priceGross * $item->quantity;
-                }
-                elseif($isAdditionalCost) {
+                } elseif ($isAdditionalCost) {
                     $additionalCostsWithTax[$propertyId] = $newProperty;
                 }
             }
@@ -297,7 +296,10 @@ class OrderTotalsService
             'name' => $item->orderItemName,
             'price' => $item->amounts[0]->priceGross,
             'currency' => $item->amounts[0]->currency,
-            'formattedTotalPrice' => $numberFormatter->formatMonetary($item->amounts[0]->priceGross * $item->quantity, $item->amounts[0]->currency)
+            'formattedTotalPrice' => $numberFormatter->formatMonetary(
+                $item->amounts[0]->priceGross * $item->quantity,
+                $item->amounts[0]->currency
+            )
         ];
 
         return array($isAdditionalCost, $hasTax, $newProperty);

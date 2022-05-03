@@ -22,6 +22,7 @@ use Plenty\Modules\Item\Variation\Models\Variation;
 use Plenty\Modules\Item\VariationDescription\Contracts\VariationDescriptionRepositoryContract;
 use Plenty\Modules\Item\VariationDescription\Models\VariationDescription;
 use Plenty\Modules\Order\Coupon\Campaign\Contracts\CouponCampaignRepositoryContract;
+use Plenty\Modules\Order\Models\OrderItemType;
 use Plenty\Modules\Order\Shipping\Contracts\EUCountryCodesServiceContract;
 use Plenty\Modules\Webshop\Contracts\CheckoutRepositoryContract;
 use Plenty\Modules\Webshop\Contracts\ContactRepositoryContract;
@@ -230,7 +231,14 @@ class BasketService
     {
         /** @var BasketRepositoryContract $basketRepository */
         $basketRepository = pluginApp(BasketRepositoryContract::class);
-        $taxFreeAmount = $basketRepository->getTaxFreeAmount();
+
+        if ($this->webstoreConfigurationRepository->getWebstoreConfiguration()->useVariationOrderProperties) {
+            $taxFreeAmount = $basketRepository->getTaxFreeAmount();
+        } else {
+           $basketItems = $this->getBasketItems();
+           $taxFreeAmount = $basketRepository->getTaxFreeAmount($basketItems);
+        }
+
         return $basketAmountNet - $taxFreeAmount;
     }
 
