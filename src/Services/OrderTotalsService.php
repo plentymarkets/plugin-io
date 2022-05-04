@@ -5,7 +5,9 @@ namespace IO\Services;
 use IO\Builder\Order\OrderItemType;
 use Plenty\Modules\Order\Models\Order;
 use Plenty\Modules\Order\Models\OrderItem;
+use Plenty\Modules\Order\Property\Models\OrderPropertyType;
 use Plenty\Modules\Webshop\Helpers\NumberFormatter;
+use Plenty\Modules\Webshop\Helpers\PropertyHelper;
 
 /**
  * Service Class OrderTotalsService
@@ -42,6 +44,9 @@ class OrderTotalsService
         $itemSumRebateGross = 0;
         $itemSumRebateNet = 0;
         $additionalCosts = [];
+        $additionalCostsWithTax = [];
+        $subAmount = 0;
+        $taxlessAmount = 0;
         $promotionalCouponsValue = 0;
         $giftCardsValue = 0;
 
@@ -60,6 +65,13 @@ class OrderTotalsService
                 case OrderItemType::TYPE_ORDER_PROPERTY:
                     $itemSumGross += $firstAmount->priceGross * $item->quantity;
                     $itemSumNet += $firstAmount->priceNet * $item->quantity;
+
+                    $this->addAdditionalCost(
+                        $item,
+                        $additionalCosts,
+                        $additionalCostsWithTax,
+                        $taxlessAmount
+                    );
                     break;
                 case OrderItemType::SHIPPING_COSTS:
                     $shippingGross += $firstAmount->priceGross;
@@ -98,8 +110,14 @@ class OrderTotalsService
 
             if ($firstAmount->discount > 0) {
                 if ($firstAmount->isPercentage) {
-                    $itemSumRebateGross += round($item->quantity * $firstAmount->priceOriginalGross * $firstAmount->discount / 100, 2);
-                    $itemSumRebateNet += round($item->quantity * $firstAmount->priceOriginalNet * $firstAmount->discount / 100, 2);
+                    $itemSumRebateGross += round(
+                        $item->quantity * $firstAmount->priceOriginalGross * $firstAmount->discount / 100,
+                        2
+                    );
+                    $itemSumRebateNet += round(
+                        $item->quantity * $firstAmount->priceOriginalNet * $firstAmount->discount / 100,
+                        2
+                    );
                 } else {
                     $itemSumRebateGross += $item->quantity * $firstAmount->discount;
                 }
@@ -108,6 +126,9 @@ class OrderTotalsService
 
         $itemSumGross += $itemSumRebateGross;
         $itemSumNet += $itemSumRebateNet;
+        $itemSumNet -= $taxlessAmount;
+        $itemSumGross -= $taxlessAmount;
+        $subAmount = $totalNet - $taxlessAmount;
 
         foreach ($order->amounts[$amountId]->vats as $vat) {
             $vats[] = [
@@ -147,6 +168,8 @@ class OrderTotalsService
             'currency',
             'isNet',
             'additionalCosts',
+            'additionalCostsWithTax',
+            'subAmount',
             'promotionalCouponsValue',
             'giftCardsValue',
             'paidAmount'
@@ -190,5 +213,95 @@ class OrderTotalsService
         $showNet = $customerService->showNetPricesByContactId($orderContactId);
 
         return $showNet || $isOrderNet;
+    }
+
+    /**
+     * @param OrderItem $item
+     * @param array $additionalCosts
+     * @param array $additionalCostsWithTax
+     * @param Number $taxlessAmount
+     * @throws \Plenty\Modules\Core\Data\Exceptions\ModelFlattenerException
+     */
+    private function addAdditionalCost(
+        OrderItem $item,
+        array &$additionalCosts,
+        array &$additionalCostsWithTax,
+        &$taxlessAmount
+    ) {
+        /** @var NumberFormatter $numberFormatter */
+        $numberFormatter = pluginApp(NumberFormatter::class);
+        $propertyId = null;
+        foreach ($item->properties as $property) {
+            if ($property->typeId === OrderPropertyType::ORDER_PROPERTY_ID) {
+                $propertyId = $property->value;
+            }
+        }
+        if (isset($propertyId)) {
+            if (isset($additionalCosts[$propertyId])) {
+                $tempProperty =& $additionalCosts[$propertyId];
+                $additionalCosts[$propertyId]['quantity'] += $item->quantity;
+                $additionalCosts[$propertyId]['formattedTotalPrice'] = $numberFormatter->formatMonetary(
+                    $tempProperty['price'] * $tempProperty['quantity'],
+                    $tempProperty['currency']
+                );
+                $taxlessAmount += $item->amounts[0]->priceGross * $item->quantity;
+            } elseif (isset($additionalCostsWithTax[$propertyId])) {
+                $tempProperty =& $additionalCostsWithTax[$propertyId];
+                $additionalCostsWithTax[$propertyId]['quantity'] += $item->quantity;
+                $additionalCostsWithTax[$propertyId]['formattedTotalPrice'] = $numberFormatter->formatMonetary(
+                    $tempProperty['price'] * $tempProperty['quantity'],
+                    $tempProperty['currency']
+                );
+            } else {
+                list($isAdditionalCost, $hasTax, $newProperty) = $this->getPropertyWithMoreDetails($propertyId, $item);
+                if (!$hasTax) {
+                    $additionalCosts[$propertyId] = $newProperty;
+                    $taxlessAmount += $item->amounts[0]->priceGross * $item->quantity;
+                } elseif ($isAdditionalCost) {
+                    $additionalCostsWithTax[$propertyId] = $newProperty;
+                }
+            }
+        }
+    }
+
+    /**
+     * @param string $propertyId
+     * @param OrderItem $item
+     * @return array
+     * @throws \Plenty\Modules\Core\Data\Exceptions\ModelFlattenerException
+     */
+    private function getPropertyWithMoreDetails(
+        string $propertyId,
+        OrderItem $item
+    ): array {
+        /** @var NumberFormatter $numberFormatter */
+        $numberFormatter = pluginApp(NumberFormatter::class);
+
+        $property = PropertyHelper::getPropertyById($propertyId);
+        $isAdditionalCost = false;
+        $hasTax = false;
+
+        foreach ($property['options'] as $option) {
+            if ($option['type'] === 'vatId' && ($option['value'] !== 'none' && $option['value'] !== null)) {
+                $hasTax = true;
+            }
+            if ($option['value'] === 'displayAsAdditionalCosts') {
+                $isAdditionalCost = true;
+            }
+        }
+
+        $newProperty = [
+            'id' => $item->id,
+            'quantity' => $item->quantity,
+            'name' => $item->orderItemName,
+            'price' => $item->amounts[0]->priceGross,
+            'currency' => $item->amounts[0]->currency,
+            'formattedTotalPrice' => $numberFormatter->formatMonetary(
+                $item->amounts[0]->priceGross * $item->quantity,
+                $item->amounts[0]->currency
+            )
+        ];
+
+        return array($isAdditionalCost, $hasTax, $newProperty);
     }
 }
