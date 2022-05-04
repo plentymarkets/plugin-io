@@ -2,6 +2,10 @@
 
 ## v5.0.50 (2022-05-03) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.49...5.0.50" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
 
+### TODO für externe Entwickler:innen
+
+- Das Laden des Warenkorbs wurde aus dem `BasketController` entfernt, da der Warenkorb bereits im `GlobalContext` geladen wird. Externe Entwickler:innen, die den `GlobalContext` überschreiben und hier den Aufruf des Warenkorbs dort entfernt haben, müssen diesen Aufruf wieder hinzufügen. Andernfalls kann es zu Fehlern beim Laden des Warenkorbs kommen.
+
 ### Geändert
 
 - Die Logik für die Prüfung der Gültigkeit einer Bestellbestätigungsseite wurde aus dem Plugin in den Kern überführt.

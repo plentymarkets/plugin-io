@@ -2,6 +2,10 @@
 
 ## v5.0.50 (2022-05-03) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.49...5.0.50" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
 
+### TODO for external developers
+
+- The loading of the shopping cart has been removed from the `BasketController` because the shopping cart is already loaded in the `GlobalContext`. External developers who overwrite the `GlobalContext` in their theme and have removed the shopping cart call must add this call again. Otherwise errors may occur when loading the shopping cart.
+
 ### Changed
 
 - The logic for checking the validity of an order confirmation page was transferred from the plugin to the core.
