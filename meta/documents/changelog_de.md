@@ -1,5 +1,26 @@
 # Release Notes für IO
 
+## v5.0.50 (2022-05-04) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.49...5.0.50" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
+
+### TODO für externe Entwickler:innen
+
+- Das Laden des Warenkorbs wurde aus dem `BasketController` entfernt, da der Warenkorb bereits im `GlobalContext` geladen wird. Externe Entwickler:innen, die den `GlobalContext` überschreiben und hier den Aufruf des Warenkorbs dort entfernt haben, müssen diesen Aufruf wieder hinzufügen. Andernfalls kann es zu Fehlern beim Laden des Warenkorbs kommen.
+
+### Geändert
+
+- Die Logik für die Prüfung der Gültigkeit einer Bestellbestätigungsseite wurde aus dem Plugin in den Kern überführt.
+- Auf der Bestellbestätigungsseite wird nun der bereits bezahlte Betrag angezeigt.
+- Auf der Bestellbestätigungsseite können nun mehrere eingelöste Gutscheinwerte aufgelistet werden.
+- Das IO-Plugin ist nun kompatibel mit PHP 8.
+- Bestelleigenschaften und Merkmale, die als Zusatzkosten konfiguriert wurden, werden jetzt als seperate Posten in den Summen dargestellt.
+- Für Bestelleigenschaften und Merkmale wird nun auf der Artikeleinzelansicht, im Warenkorb und auf der Bestellbestätigung angezeigt, ob es sich um inklusive oder zusätzliche Kosten handelt.
+- Verpflichtende, vorausgewählte Bestelleigenschaften, die als Zusatzkosten konfiguriert wurden, werden nun ohne Checkbox unter dem Artikelpreis auf der Artikeleinzelansicht dargestellt.
+
+### Behoben
+
+- Im Warenkorb konnte es zu einer fehlerhaften Darstellung der Versandkosten kommen, wenn ein Verkaufsgutschein sowohl Warenwert als auch Verandkosten getilgt hat. Dies wurde behoben.
+- Bei Addressen, die eine Postleitzahl mit Leerzeichen enthielten, konnte es zu fehlerhaften Links bei der Sendungsverfolgung kommen. Dies wurde behoben.
+
 ## v5.0.49 (2022-04-11) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.48...5.0.49" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
 
 ### Behoben
