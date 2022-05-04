@@ -25,6 +25,7 @@ class BasketController extends LayoutController
 
 		return $this->renderTemplate(
 		    'tpl.basket',
+            [],
             false
 		);
 	}
