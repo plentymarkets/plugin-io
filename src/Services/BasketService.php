@@ -2,14 +2,14 @@
 
 namespace IO\Services;
 
+use IO\Constants\LogLevel;
 use IO\Helper\Utils;
-use Plenty\Exceptions\ValidationException;
 use Plenty\Modules\Accounting\Contracts\DetermineShopCountryContract;
 use Plenty\Modules\Accounting\Vat\Contracts\VatInitContract;
 use Plenty\Modules\Accounting\Vat\Models\VatRate;
 use Plenty\Modules\Authorization\Services\AuthHelper;
-use Plenty\Modules\Basket\Contracts\BasketRepositoryContract;
 use Plenty\Modules\Basket\Contracts\BasketItemRepositoryContract;
+use Plenty\Modules\Basket\Contracts\BasketRepositoryContract;
 use Plenty\Modules\Basket\Events\Basket\AfterBasketChanged;
 use Plenty\Modules\Basket\Exceptions\BasketItemCheckException;
 use Plenty\Modules\Basket\Exceptions\BasketItemQuantityCheckException;
@@ -17,17 +17,18 @@ use Plenty\Modules\Basket\Models\Basket;
 use Plenty\Modules\Basket\Models\BasketItem;
 use Plenty\Modules\Frontend\Contracts\Checkout;
 use Plenty\Modules\Frontend\Services\VatService;
-use IO\Constants\LogLevel;
 use Plenty\Modules\Item\Variation\Contracts\VariationRepositoryContract;
 use Plenty\Modules\Item\Variation\Models\Variation;
 use Plenty\Modules\Item\VariationDescription\Contracts\VariationDescriptionRepositoryContract;
 use Plenty\Modules\Item\VariationDescription\Models\VariationDescription;
 use Plenty\Modules\Order\Coupon\Campaign\Contracts\CouponCampaignRepositoryContract;
+use Plenty\Modules\Order\Models\OrderItemType;
 use Plenty\Modules\Order\Shipping\Contracts\EUCountryCodesServiceContract;
 use Plenty\Modules\Webshop\Contracts\CheckoutRepositoryContract;
 use Plenty\Modules\Webshop\Contracts\ContactRepositoryContract;
 use Plenty\Modules\Webshop\Contracts\SessionStorageRepositoryContract;
 use Plenty\Modules\Webshop\Contracts\WebstoreConfigurationRepositoryContract;
+use Plenty\Modules\Webshop\Helpers\PropertyHelper;
 use Plenty\Modules\Webshop\Helpers\UnitUtils;
 use Plenty\Modules\Webshop\ItemSearch\Factories\VariationSearchFactory;
 use Plenty\Modules\Webshop\ItemSearch\SearchPresets\BasketItems;
@@ -204,7 +205,10 @@ class BasketService
             $basket["itemSum"] = $basket["itemSumNet"];
             $basket["basketAmount"] = $basket["basketAmountNet"];
             $basket["shippingAmount"] = $basket["shippingAmountNet"];
+
         }
+        $basket['subAmount'] = $this->getSubAmount($basket["basketAmountNet"]);
+
 
         $basket = $this->couponService->checkCoupon($basket);
         $determineShopCountry->initByPlentyId(Utils::getPlentyId());
@@ -218,6 +222,24 @@ class BasketService
         $basket["itemWishListIds"] = $wishListService->getItemWishList();
 
         return $basket;
+    }
+
+    /**
+     * Return subAmount
+     */
+    private function getSubAmount($basketAmountNet): float
+    {
+        /** @var BasketRepositoryContract $basketRepository */
+        $basketRepository = pluginApp(BasketRepositoryContract::class);
+
+        if ($this->webstoreConfigurationRepository->getWebstoreConfiguration()->useVariationOrderProperties) {
+            $taxFreeAmount = $basketRepository->getTaxFreeAmount();
+        } else {
+           $basketItems = $this->getBasketItems();
+           $taxFreeAmount = $basketRepository->getTaxFreeAmount($basketItems);
+        }
+
+        return $basketAmountNet - $taxFreeAmount;
     }
 
     /**
@@ -1083,13 +1105,24 @@ class BasketService
                 return true;
             }
         );
-
         foreach ($basketItems as &$basketItem) {
             if (isset($variationProperties[$basketItem['id']])) {
                 $basketItem['basketItemOrderParams'] = $basketItem['basketItemOrderParams'] ?? [];
-
                 foreach ($variationProperties[$basketItem['id']] as $variationProperty) {
-                    $basketItem['price'] += $variationProperty['price'];
+                    $property = PropertyHelper::getPropertyById($variationProperty['basketItemOrderParams'][0]['propertyId']);
+                    $isAdditionalCost = false;
+                    $hasTax = false;
+                    foreach ($property['options'] as $option) {
+                        if ($option['type'] === 'vatId' && ($option['value'] !== 'none' || $option['value'] !== null)) {
+                            $hasTax = true;
+                        }
+                        if ($option['value'] === 'displayAsAdditionalCosts') {
+                            $isAdditionalCost = true;
+                        }
+                    }
+                    if (!$isAdditionalCost && $hasTax) {
+                        $basketItem['price'] += $variationProperty['price'];
+                    }
                     $basketItem['attributeTotalMarkup'] += $variationProperty['price'];
                     $variationProperty['basketItemOrderParams'][0]['price'] = $variationProperty['price'];
                     $variationProperty['basketItemOrderParams'][0]['basketItemId'] = $basketItem['id'];
