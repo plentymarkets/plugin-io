@@ -31,6 +31,7 @@ class IORouteServiceProvider extends RouteServiceProvider
         $api->version(['v1'], ['namespace' => 'IO\Api\Resources'], function (ApiRouter $api) {
             $api->get('io/basket', 'BasketResource@index');
             $api->resource('io/basket/items', 'BasketItemResource');
+            $api->post('io/basket/items', 'BasketItemResource')->middleware(['sanitize:basketItemOrderParams.*']);
             $api->get('io/order', 'OrderResource@index');
             $api->get('io/order/paymentMethods', 'OrderPaymentResource@paymentMethodListForSwitch');
             $api->resource('io/order/template', 'OrderTemplateResource');
@@ -43,10 +44,11 @@ class IORouteServiceProvider extends RouteServiceProvider
             $api->resource('io/customer/password', 'CustomerPasswordResource');
             $api->resource('io/customer/password_reset', 'CustomerPasswordResetResource');
             $api->resource('io/customer/mail', 'CustomerMailResource');
-            $api->resource('io/customer/contact/mail', 'ContactMailResource');
+            $api->post('io/customer/contact/mail', 'ContactMailResource@store')->middleware(['sanitize:replyTo.mail,replyTo.name,subject,data.*']);
             $api->resource('io/customer/contact/mail/file', 'ContactMailFileResource');
             $api->get('io/customer/order/list', 'CustomerOrderResource@index');
-            $api->resource('io/customer/newsletter', 'CustomerNewsletterResource');
+            $api->post('io/customer/newsletter', 'CustomerNewsletterResource@store')->middleware(['sanitize:email,firstName,lastName']);
+            $api->delete('io/customer/newsletter', 'CustomerNewsletterResource@destroy');
             $api->get('io/variations/map', 'VariationAttributeMapResource@index');
             $api->resource('io/variations', 'VariationResource');
             $api->resource('io/item/availability', 'AvailabilityResource');
@@ -72,16 +74,22 @@ class IORouteServiceProvider extends RouteServiceProvider
             $api->post('io/order', 'OrderResource@store');
             $api->resource('io/order/payment', 'OrderPaymentResource');
             $api->resource('io/checkout/paymentId', 'CheckoutSetPaymentResource');
-            $api->resource('io/customer/address', 'CustomerAddressResource');
+            $api->get('io/customer/address', 'CustomerAddressResource@index');
+            $api->post('io/customer/address', 'CustomerAddressResource@store')->middleware(['sanitize:*']);
+            $api->put('io/customer/address', 'CustomerAddressResource@update')->middleware(['sanitize:*']);
+            $api->delete('io/customer/address', 'CustomerAddressResource@destroy');
             $api->resource('io/checkout/shippingId', 'CheckoutSetShippingIdResource');
             $api->resource('io/order/contactWish', 'OrderContactWishResource');
-            $api->resource('io/order/return', 'OrderReturnResource');
+            $api->post('io/order/return', 'OrderReturnResource@store')->middleware(['sanitize:returnNote']);
             $api->post('io/checkout', 'CheckoutResource@store');
             $api->put('io/checkout', 'CheckoutResource@update');
             $api->resource('io/checkout/payment', 'CheckoutPaymentResource');
-            $api->resource('io/customer/bank_data', 'ContactBankResource');
+            $api->get('io/customer/bank_data', 'ContactBankResource@show');
+            $api->delete('io/customer/bank_data', 'ContactBankResource@destroy');
+            $api->post('io/customer/bank_data', 'ContactBankResource@store')->middleware(['sanitize:accountOwner,bankName,iban,bic']);
+            $api->put('io/customer/bank_data', 'ContactBankResource@update')->middleware(['sanitize:accountOwner,bankName,iban,bic']);
             $api->resource('io/customer/order/return', 'CustomerOrderReturnResource');
-            $api->resource('io/order/additional_information', 'OrderAdditionalInformationResource');
+            $api->post('io/order/additional_information', 'OrderAdditionalInformationResource@store')->middleware(['sanitize:orderContactWish,orderCustomerSign']);
         });
 
         /** @var ShopUrls $shopUrls */
