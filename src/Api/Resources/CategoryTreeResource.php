@@ -130,7 +130,7 @@ class CategoryTreeResource extends ApiResource
                 break;
             }
 
-            if (is_null($result) && count($category['children'])) {
+            if (is_null($result) && is_array($category['children']) && count($category['children'])) {
                 $result = $this->findInTree($category['children'], $categoryId);
             }
         }
