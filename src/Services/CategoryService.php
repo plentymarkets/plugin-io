@@ -415,8 +415,7 @@ class CategoryService
 
         $result = array_map(
             function ($category) {
-                /** @var $category Category */
-                $category->children = $this->filterVisibleCategories($category->children);
+                $category['children'] = $this->filterVisibleCategories($category['children']);
 
                 return $category;
             },
