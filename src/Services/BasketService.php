@@ -31,6 +31,7 @@ use Plenty\Modules\Webshop\ItemSearch\Factories\VariationSearchFactory;
 use Plenty\Modules\Webshop\ItemSearch\SearchPresets\BasketItems;
 use Plenty\Modules\Webshop\ItemSearch\Services\ItemSearchService;
 use Plenty\Plugin\Log\Loggable;
+use Illuminate\Database\Eloquent\Collection;
 
 /**
  * Class BasketService
@@ -947,7 +948,16 @@ class BasketService
 
     private function getSetComponents($basketItemId, $appendVariation = true)
     {
-        $basketItems = $appendVariation ? $this->getBasketItems() : $this->basketRepository->load()->toArray();
+        if ($appendVariation) {
+            $basketItems = $this->getBasketItems() ;
+        } else {
+            $temp = $this->getBasketItemsRaw();
+
+            $basketItems = [];
+            foreach($temp as $basketItem) {
+                $basketItems[] = $basketItem;
+            }
+        }
 
         return array_filter(
             $basketItems,
