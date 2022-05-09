@@ -33,7 +33,7 @@ class CategoryDataFilter extends DataFilter
                 $resultData = $this->getFilteredData( $categoryData, $resultFields );
             }
 
-            if ( count( $categoryData["children"] ) )
+            if (is_array($categoryData['children']) && count( $categoryData["children"] ) )
             {
                 $resultData["children"] = $this->applyResultFields( $categoryData["children"], $resultFields );
             }
