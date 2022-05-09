@@ -440,7 +440,7 @@ class CategoryService
     private function filterVisibleCategories($categoryList = [])
     {
         $result = array_filter(
-            $categoryList,
+            $categoryList ?? [],
             function ($category) {
                 return $category['right'] !== 'customer';
             }
@@ -448,8 +448,7 @@ class CategoryService
 
         $result = array_map(
             function ($category) {
-                /** @var $category Category */
-                $category->children = $this->filterVisibleCategories($category->children);
+                $category['children'] = $this->filterVisibleCategories($category['children']);
 
                 return $category;
             },
@@ -537,16 +536,12 @@ class CategoryService
                     $category['url']
                 );
                 $result[] = $category;
-            } else {
-                if ($isInBranch && $isCurrentLevel) {
-                    $this->appendBranchFields($category, $siblingCount, $urlPrefix, 2);
-                    $result[] = $category;
-                } else {
-                    if (!$isInBranch && $isCurrentLevel) {
-                        $this->appendBranchFields($category, $siblingCount, $urlPrefix, 0);
-                        $result[] = $category;
-                    }
-                }
+            } elseif ($isInBranch && $isCurrentLevel) {
+                $this->appendBranchFields($category, $siblingCount, $urlPrefix, 2);
+                $result[] = $category;
+            } elseif (!$isInBranch && $isCurrentLevel) {
+                $this->appendBranchFields($category, $siblingCount, $urlPrefix, 0);
+                $result[] = $category;
             }
         }
 
@@ -557,7 +552,7 @@ class CategoryService
     {
         // Filter children not having texts in current language
         $category['children'] = array_filter(
-            $category['children'],
+            $category['children'] ?? [],
             function ($child) {
                 return count($child['details']);
             }
