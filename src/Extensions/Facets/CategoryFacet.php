@@ -38,7 +38,6 @@ class CategoryFacet implements FacetExtension
         /** @var TemplateConfigService $templateConfigService */
         $templateConfigService = pluginApp(TemplateConfigService::class);
 
-
         if ($templateConfigService->getBoolean('item.show_category_filter', false)) {
             if (is_array($result) && count($result)) {
                 $categoryFacet = [

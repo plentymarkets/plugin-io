@@ -1182,7 +1182,6 @@ class BasketService
             }
         }
 
-
         return array_filter(
             $basketItems,
             function ($bItem) use ($basketItemId) {
