@@ -407,7 +407,7 @@ class CategoryService
     private function filterVisibleCategories($categoryList = [])
     {
         $result = array_filter(
-            $categoryList,
+            $categoryList ?? [],
             function ($category) {
                 return $category['right'] !== 'customer';
             }
