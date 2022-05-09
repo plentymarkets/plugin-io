@@ -43,7 +43,7 @@ class CategoryFacet implements FacetExtension
 
 
         if ($templateConfigService->get('item.show_category_filter') == 'true') {
-            if (count($result)) {
+            if (is_array($result) && count($result)) {
                 /** @var LocalizationRepositoryContract $localizationRepository */
                 $localizationRepository = pluginApp(LocalizationRepositoryContract::class);
                 $categoryFacet = [
@@ -96,7 +96,7 @@ class CategoryFacet implements FacetExtension
                 $categoryService->setCurrentCategoryID($currentCategory->id);
             }
 
-            if (count($categoryFacet['values']) > 0) {
+            if (is_array($categoryFacet['values']) && count($categoryFacet['values']) > 0) {
                 $categoryFacet['count'] = count($categoryFacet['values']);
             } else {
                 $categoryFacet = [];
@@ -114,7 +114,7 @@ class CategoryFacet implements FacetExtension
     {
         $categoryIds = [];
 
-        if (count($filtersList)) {
+        if (is_array($filtersList) && count($filtersList)) {
             foreach ($filtersList as $filter) {
                 if (strpos($filter, 'category-') === 0) {
                     $e = explode('-', $filter);
