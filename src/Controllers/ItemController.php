@@ -103,7 +103,7 @@ class ItemController extends LayoutController
         /** @var ShopBuilderRequest $shopBuilderRequest */
         $shopBuilderRequest = pluginApp(ShopBuilderRequest::class);
 
-        $defaultCategories = $itemResult['item']['documents'][0]['data']['defaultCategories'];
+        $defaultCategories = $itemResult['item']['documents'][0]['data']['defaultCategories'] ?? [];
         $defaultCategory = array_filter(
             $defaultCategories,
             function ($category) {

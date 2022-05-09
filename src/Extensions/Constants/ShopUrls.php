@@ -370,6 +370,10 @@ class ShopUrls
     {
         $key = $route;
 
+        // Sanitize inputs
+        $routeParams = $routeParams ?? [];
+        $urlParams = $urlParams ?? [];
+
         if (count($routeParams) || count($urlParams)) {
             $key .= '.' . implode('.', $routeParams) . '.' . json_encode($urlParams);
         }
