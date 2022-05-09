@@ -9,7 +9,7 @@ class ImageFaker extends AbstractFaker
         $itemImages = [];
         $variationImages = [];
 
-        if (!count($data["all"]) && count($data["variation"]))
+        if (is_array($data["all"]) && is_array($data["variation"]) && !count($data["all"]) && count($data["variation"]))
         {
             $variationImages = $this->makeImageList($data["variation"]);
         }
