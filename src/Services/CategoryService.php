@@ -504,16 +504,12 @@ class CategoryService
                     $category['url']
                 );
                 $result[] = $category;
-            } else {
-                if ($isInBranch && $isCurrentLevel) {
-                    $this->appendBranchFields($category, $siblingCount, $urlPrefix, 2);
-                    $result[] = $category;
-                } else {
-                    if (!$isInBranch && $isCurrentLevel) {
-                        $this->appendBranchFields($category, $siblingCount, $urlPrefix, 0);
-                        $result[] = $category;
-                    }
-                }
+            } elseif ($isInBranch && $isCurrentLevel) {
+                $this->appendBranchFields($category, $siblingCount, $urlPrefix, 2);
+                $result[] = $category;
+            } elseif (!$isInBranch && $isCurrentLevel) {
+                $this->appendBranchFields($category, $siblingCount, $urlPrefix, 0);
+                $result[] = $category;
             }
         }
 
