@@ -96,8 +96,9 @@ class ItemListService
                 $basketRepository = pluginApp(BasketRepositoryContract::class);
 
                 $variationIds = $cachingRepository->get(
-                    SessionStorageRepositoryContract::LAST_SEEN_ITEMS . '_' . $basketRepository->load()->sessionId
-                , []);
+                    SessionStorageRepositoryContract::LAST_SEEN_ITEMS . '_' . $basketRepository->load()->sessionId,
+                    []
+                );
                 $variationIds = array_slice($variationIds, 0, $maxItems);
 
                 if (count($variationIds) > 0) {
