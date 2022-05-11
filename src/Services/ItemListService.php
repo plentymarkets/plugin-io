@@ -15,6 +15,7 @@ use Plenty\Modules\Webshop\ItemSearch\SearchPresets\TagItems;
 use Plenty\Modules\Webshop\ItemSearch\SearchPresets\VariationList;
 use Plenty\Modules\Webshop\ItemSearch\Services\ItemSearchService;
 use Plenty\Plugin\CachingRepository;
+use Plenty\Plugin\Log\Loggable;
 
 /**
  * Service Class ItemListService
@@ -26,6 +27,8 @@ use Plenty\Plugin\CachingRepository;
  */
 class ItemListService
 {
+    use Loggable;
+
     const TYPE_CATEGORY = 'category';
     const TYPE_LAST_SEEN = 'last_seen';
     const TYPE_TAG = 'tag_list';
@@ -56,151 +59,159 @@ class ItemListService
         $withCategories = false
     )
     {
-        /** @var ItemSearchService $searchService */
-        $searchService = pluginApp(ItemSearchService::class);
-        $searchFactory = null;
+        $itemListResult = [];
+        try {
+            /** @var ItemSearchService $searchService */
+            $searchService = pluginApp(ItemSearchService::class);
+            $searchFactory = null;
 
-        if (!$this->isValidId($id) && !(in_array(
-                $type,
-                [
-                    self::TYPE_LAST_SEEN,
-                    self::TYPE_CROSS_SELLER,
-                    self::TYPE_WISH_LIST,
-                    self::TYPE_SEARCH_SUGGESTIONS,
-                    self::TYPE_ALL_ITEMS
-                ]
-            ))) {
-            $type = self::TYPE_RANDOM;
-        }
-
-        switch ($type) {
-            case self:: TYPE_ALL_ITEMS:
-                 $searchFactory = CategoryItems::getSearchFactory(
+            if (!$this->isValidId($id) && !(in_array(
+                    $type,
                     [
-                        'categoryId' => null,
-                        'sorting' => $sorting
+                        self::TYPE_LAST_SEEN,
+                        self::TYPE_CROSS_SELLER,
+                        self::TYPE_WISH_LIST,
+                        self::TYPE_SEARCH_SUGGESTIONS,
+                        self::TYPE_ALL_ITEMS
                     ]
-                );
-                break;
-            case self::TYPE_CATEGORY:
-                $searchFactory = CategoryItems::getSearchFactory(
-                    [
-                        'categoryId' => is_array($id) ? $id[0] : $id,
-                        'sorting' => $sorting
-                    ]
-                );
-                break;
-            case self::TYPE_LAST_SEEN:
-                /** @var CachingRepository $cachingRepository */
-                $cachingRepository = pluginApp(CachingRepository::class);
-                $basketRepository = pluginApp(BasketRepositoryContract::class);
+                ))) {
+                $type = self::TYPE_RANDOM;
+            }
 
-                $variationIds = $cachingRepository->get(
-                    SessionStorageRepositoryContract::LAST_SEEN_ITEMS . '_' . $basketRepository->load()->sessionId,
-                    []
-                );
-                $variationIds = array_slice($variationIds, 0, $maxItems);
-
-                if (count($variationIds) > 0) {
-                    $searchFactory = VariationList::getSearchFactory(
+            switch ($type) {
+                case self:: TYPE_ALL_ITEMS:
+                    $searchFactory = CategoryItems::getSearchFactory(
                         [
-                            'variationIds' => $variationIds,
-                            'sorting' => $sorting,
-                            'excludeFromCache' => true,
-                            'withVariationPropertyGroups' => true
+                            'categoryId' => null,
+                            'sorting' => $sorting
                         ]
                     );
-                }
-                break;
-            case self::TYPE_TAG:
-                $searchFactory = TagItems::getSearchFactory(
-                    [
-                        'tagIds' => is_array($id) ? $id : [$id],
-                        'sorting' => $sorting
-                    ]
+                    break;
+                case self::TYPE_CATEGORY:
+                    $searchFactory = CategoryItems::getSearchFactory(
+                        [
+                            'categoryId' => is_array($id) ? $id[0] : $id,
+                            'sorting' => $sorting
+                        ]
+                    );
+                    break;
+                case self::TYPE_LAST_SEEN:
+                    /** @var CachingRepository $cachingRepository */
+                    $cachingRepository = pluginApp(CachingRepository::class);
+                    $basketRepository = pluginApp(BasketRepositoryContract::class);
+
+                    $variationIds = $cachingRepository->get(
+                        SessionStorageRepositoryContract::LAST_SEEN_ITEMS . '_' . $basketRepository->load()->sessionId,
+                        []
+                    );
+                    $variationIds = array_slice($variationIds, 0, $maxItems);
+
+                    if (count($variationIds) > 0) {
+                        $searchFactory = VariationList::getSearchFactory(
+                            [
+                                'variationIds' => $variationIds,
+                                'sorting' => $sorting,
+                                'excludeFromCache' => true,
+                                'withVariationPropertyGroups' => true
+                            ]
+                        );
+                    }
+                    break;
+                case self::TYPE_TAG:
+                    $searchFactory = TagItems::getSearchFactory(
+                        [
+                            'tagIds' => is_array($id) ? $id : [$id],
+                            'sorting' => $sorting
+                        ]
+                    );
+                    break;
+                case self::TYPE_RANDOM:
+                    $searchFactory = VariationList::getSearchFactory(
+                        [
+                            'sorting' => $sorting
+                        ]
+                    );
+                    break;
+                case self::TYPE_MANUFACTURER:
+                    $searchFactory = ManufacturerItems::getSearchFactory(
+                        [
+                            'manufacturerId' => $id,
+                            'page' => 1,
+                            'itemsPerPage' => $maxItems,
+                            'sorting' => $sorting
+                        ]
+                    );
+                    break;
+                case self::TYPE_CROSS_SELLER:
+                    if (!isset($id) || !strlen($id)) {
+                        /** @var CategoryService $categoryService */
+                        $categoryService = pluginApp(CategoryService::class);
+
+                        $currentItem = $categoryService->getCurrentItem();
+                        $id = $currentItem['item']['id'] ?? 0;
+                    }
+                    $searchFactory = CrossSellingItems::getSearchFactory(
+                        [
+                            'itemId' => $id,
+                            'relation' => $crossSellingRelationType,
+                            'sorting' => $sorting
+                        ]
+                    );
+                    break;
+                case self::TYPE_WISH_LIST:
+                    /** @var ItemWishListService $wishListService */
+                    $wishListService = pluginApp(ItemWishListService::class);
+                    $wishListVariationIds = $wishListService->getItemWishList();
+
+                    $searchFactory = BasketItems::getSearchFactory(
+                        [
+                            'variationIds' => $wishListVariationIds,
+                            'quantities' => 1,
+                            'itemsPerPage' => count($wishListVariationIds)
+                        ]
+                    );
+                    break;
+                case self::TYPE_SEARCH_SUGGESTIONS:
+                    $searchFactory = SearchSuggestions::getSearchFactory(
+                        [
+                            'query' => '',
+                        ]
+                    );
+                    break;
+                default:
+                    break;
+            }
+
+            if (is_null($searchFactory)) {
+                return null;
+            }
+
+            if ($withCategories) {
+                $searchFactory->withCategories();
+            }
+
+            if ($maxItems > 0) {
+                $searchFactory->setPage(1, $maxItems);
+            }
+
+            $itemListResult = $searchService->getResult($searchFactory);
+
+            /** @var ShopBuilderRequest $shopBuilderRequest */
+            $shopBuilderRequest = pluginApp(ShopBuilderRequest::class);
+
+            if ($shopBuilderRequest->isShopBuilder()) {
+                /** @var VariationSearchResultFactory $searchResultFactory */
+                $searchResultFactory = pluginApp(VariationSearchResultFactory::class);
+                $itemListResult = $searchResultFactory->fillSearchResults(
+                    $itemListResult,
+                    null
                 );
-                break;
-            case self::TYPE_RANDOM:
-                $searchFactory = VariationList::getSearchFactory(
-                    [
-                        'sorting' => $sorting
-                    ]
-                );
-                break;
-            case self::TYPE_MANUFACTURER:
-                $searchFactory = ManufacturerItems::getSearchFactory(
-                    [
-                        'manufacturerId' => $id,
-                        'page' => 1,
-                        'itemsPerPage' => $maxItems,
-                        'sorting' => $sorting
-                    ]
-                );
-                break;
-            case self::TYPE_CROSS_SELLER:
-                if (!isset($id) || !strlen($id)) {
-                    /** @var CategoryService $categoryService */
-                    $categoryService = pluginApp(CategoryService::class);
-
-                    $currentItem = $categoryService->getCurrentItem();
-                    $id = $currentItem['item']['id'] ?? 0;
-                }
-                $searchFactory = CrossSellingItems::getSearchFactory(
-                    [
-                        'itemId' => $id,
-                        'relation' => $crossSellingRelationType,
-                        'sorting' => $sorting
-                    ]
-                );
-                break;
-            case self::TYPE_WISH_LIST:
-                /** @var ItemWishListService $wishListService */
-                $wishListService = pluginApp(ItemWishListService::class);
-                $wishListVariationIds = $wishListService->getItemWishList();
-
-                $searchFactory = BasketItems::getSearchFactory(
-                    [
-                        'variationIds' => $wishListVariationIds,
-                        'quantities' => 1,
-                        'itemsPerPage' => count($wishListVariationIds)
-                    ]
-                );
-                break;
-            case self::TYPE_SEARCH_SUGGESTIONS:
-                $searchFactory = SearchSuggestions::getSearchFactory(
-                    [
-                        'query' => '',
-                    ]
-                );
-                break;
-            default:
-                break;
-        }
-
-        if (is_null($searchFactory)) {
-            return null;
-        }
-
-        if ($withCategories) {
-            $searchFactory->withCategories();
-        }
-
-        if ($maxItems > 0) {
-            $searchFactory->setPage(1, $maxItems);
-        }
-
-        $itemListResult = $searchService->getResult($searchFactory);
-
-        /** @var ShopBuilderRequest $shopBuilderRequest */
-        $shopBuilderRequest = pluginApp(ShopBuilderRequest::class);
-
-        if ($shopBuilderRequest->isShopBuilder()) {
-            /** @var VariationSearchResultFactory $searchResultFactory */
-            $searchResultFactory = pluginApp(VariationSearchResultFactory::class);
-            $itemListResult = $searchResultFactory->fillSearchResults(
-                $itemListResult,
-                null
-            );
+            }
+        } catch (\Exception $exception) {
+            $this->getLogger(__METHOD__)->error('ITEMLIST ERROR', [
+                'message' => $exception->getMessage(),
+                'trace' => $exception->getTrace()
+            ]);
         }
 
         return $itemListResult;
