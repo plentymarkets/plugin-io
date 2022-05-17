@@ -4,7 +4,7 @@
 
 ## Setting up IO in plentymarkets
 
-The **IO** plugin only needs to be provisioned in plentymarkets. No additional setup is required.
+The **IO** plugin only needs to be provisioned in plentymarkets. For further setup information, refer to the [plentymarkets manual](https://knowledge.plentymarkets.com/en-gb/manual/main/online-store/setting-up-io.html).
 
 <div class="alert alert-warning" role="alert">
   It is absolutely essential, however, that <b>IO</b> is assigned the highest <b>Plugin position</b> (e.g. 999) via the <b>Set position</b> action in the plugin overview.
