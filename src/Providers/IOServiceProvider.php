@@ -330,7 +330,7 @@ class IOServiceProvider extends ServiceProvider
         $dispatcher->listen(FrontendShippingProfileChanged::class, IOFrontendShippingProfileChanged::class);
         $dispatcher->listen(FrontendUpdateDeliveryAddress::class, IOFrontendUpdateDeliveryAddress::class);
 
-        $cronContainer->add(CronContainer::PHP_8, CleanupUserDataHashes::class);
+        $cronContainer->add(CronContainer::DAILY, CleanupUserDataHashes::class);
     }
 
     private function registerSingletons($classes)
