@@ -64,7 +64,8 @@ class ConfirmationController extends LayoutController
                 [
                     "category" => $category,
                     "data" => null,
-                    "showAdditionalPaymentInformation" => true
+                    "showAdditionalPaymentInformation" => true,
+                    "isOrderValid" => true
                 ],
                 false
             );
@@ -156,36 +157,27 @@ class ConfirmationController extends LayoutController
         }
 
         if (!is_null($order) && $order instanceof LocalizedOrder) {
-            if ($this->checkValidity($order->order)) {
-                if ($category instanceof Category && $contactRepository->getContactId() <= 0) {
-                    /** @var ConfigRepository $config */
-                    $config = pluginApp(ConfigRepository::class);
-                    $categoryGuestId = (int)$config->get('IO.routing.category_confirmation-guest', 0);
-                    if ($categoryGuestId > 0) {
-                        /** @var CategoryService $categoryService */
-                        $categoryService = pluginApp(CategoryService::class);
-                        $category = $categoryService->get($categoryGuestId);
-                    }
+            if ($category instanceof Category && $contactRepository->getContactId() <= 0) {
+                /** @var ConfigRepository $config */
+                $config = pluginApp(ConfigRepository::class);
+                $categoryGuestId = (int)$config->get('IO.routing.category_confirmation-guest', 0);
+                if ($categoryGuestId > 0) {
+                    /** @var CategoryService $categoryService */
+                    $categoryService = pluginApp(CategoryService::class);
+                    $category = $categoryService->get($categoryGuestId);
                 }
-
-                return $this->renderTemplate(
-                    "tpl.confirmation",
-                    [
-                        "category" => $category,
-                        "data" => $order,
-                        "showAdditionalPaymentInformation" => true
-                    ],
-                    false
-                );
-            } else {
-                /** @var Response $response */
-                $response = pluginApp(Response::class);
-                $response->forceStatus(ResponseCode::NOT_FOUND);
-
-                CheckNotFound::$FORCE_404 = true;
-
-                return $response;
             }
+
+            return $this->renderTemplate(
+                "tpl.confirmation",
+                [
+                    "category" => $category,
+                    "data" => $order,
+                    "showAdditionalPaymentInformation" => true,
+                    "isOrderValid" => $this->checkValidity($order->order)
+                ],
+                false
+            );
         } elseif (!$order instanceof LocalizedOrder && !is_null($order)) {
             return $order;
         } else {
