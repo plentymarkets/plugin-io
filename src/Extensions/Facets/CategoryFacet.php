@@ -102,7 +102,7 @@ class CategoryFacet implements FacetExtension
     {
         $categoryIds = [];
 
-        if(count($filtersList))
+        if(is_array($filtersList) && count($filtersList))
         {
             foreach ($filtersList as $filter)
             {
