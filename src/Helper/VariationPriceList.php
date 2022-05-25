@@ -122,10 +122,9 @@ class VariationPriceList
      * @param float $quantity
      * @return array|null
      */
-    public function findSubscriptionPriceForQuantity(float $quantity  )
+    public function findSubscriptionPriceForQuantity(float $quantity)
     {
-        $result = null;
-        $minimumOrderQuantity = -1.0;
+        $result = [];
         if ( array_key_exists( self::TYPE_SUBSCRIPTION, $this->prices ) )
         {
             foreach($this->prices[self::TYPE_SUBSCRIPTION] as $price )
