@@ -21,7 +21,7 @@ class VariationUrlBuilder
         $itemId = $itemData['item']['id'];
         $variationId = $itemData['variation']['id'];
         $defaultCategory = 0;
-        if ( count($itemData['defaultCategories']) )
+        if (is_array($itemData['defaultCategories']) && count($itemData['defaultCategories']))
         {
             $defaultCategory = $itemData['defaultCategories'][0]['id'];
         }
