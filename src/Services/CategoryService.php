@@ -140,7 +140,7 @@ class CategoryService
                     }
                 }
 
-                if(count($currentDetail))
+                if($currentDetail instanceof CategoryDetails)
                 {
                     $category->details = pluginApp(Collection::class, [ [$currentDetail] ]);
                 }
