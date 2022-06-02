@@ -38,7 +38,7 @@ class PriceSearchExtension implements ItemSearchExtension
      */
     public function transformResult($baseResult, $extensionResult)
     {
-        if( count($baseResult['documents'] ) )
+        if(is_array($baseResult['documents']) && count($baseResult['documents']))
         {
             /** @var CustomerService $customerService */
             $customerService = pluginApp(CustomerService::class);
