@@ -132,7 +132,7 @@ class ItemController extends LayoutController
             // need to filter null values from variation list to avoid errors in the frontend
             $hasInitialVariation = false;
             $itemResult['variationAttributeMap']['variations'] = array_filter(
-                $itemResult['variationAttributeMap']['variations'],
+                $itemResult['variationAttributeMap']['variations'] ?? [],
                 function ($variation) use ($itemResult) {
                     if(!empty($variation)) {
                         if($variation['variationId'] === $itemResult['documents'][0]['data']['variation']['id']) {
@@ -254,7 +254,7 @@ class ItemController extends LayoutController
             )
         );
 
-        if (count($itemList['documents'])) {
+        if (is_array($itemList['documents']) && count($itemList['documents'])) {
             return $this->showItem(
                 '',
                 $itemList['documents'][0]['data']['item']['id'],
