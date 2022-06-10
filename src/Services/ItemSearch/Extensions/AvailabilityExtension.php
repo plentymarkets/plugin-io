@@ -17,7 +17,7 @@ class AvailabilityExtension implements ItemSearchExtension
      */
     public function transformResult($baseResult, $extensionResult)
     {
-        if(count($baseResult['documents']))
+        if(is_array($baseResult['documents']) && count($baseResult['documents']))
         {
             foreach($baseResult['documents'] as $key => $extensionDocument)
             {
