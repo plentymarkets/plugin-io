@@ -44,7 +44,7 @@ class LiveShoppingService
         if ($liveShopping instanceof LiveShopping) {
             $itemList = $this->getLiveShoppingVariations($liveShopping->itemId, $sorting);
 
-            if (count($itemList[0]['documents'])) {
+            if (is_array($itemList[0]['documents']) && count($itemList[0]['documents'])) {
                 $liveShoppingItem = array_slice($itemList[0]['documents'], 0, 1);
                 $liveShoppingItem = $liveShoppingItem[0]['data'];
             }

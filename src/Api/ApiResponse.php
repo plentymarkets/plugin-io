@@ -343,8 +343,8 @@ class ApiResponse
 
         $responseData["events"] = $this->eventData;
 
-        // FIX: Set basket data after "showNetPrice" has been recalculated.
-        if (array_key_exists('AfterBasketChanged', $responseData['events'])) {
+        // FIX: Set basket data after "showNetPrice" has been recalculated
+        if (is_array($responseData['events']) && array_key_exists('AfterBasketChanged', $responseData['events'])) {
             /** @var BasketService $basketService */
             $basketService = pluginApp(BasketService::class);
 
