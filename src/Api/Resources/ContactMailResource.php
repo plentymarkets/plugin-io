@@ -103,7 +103,8 @@ class ContactMailResource extends ApiResource
 
         $result = json_decode($content, true);
 
-        return $result['success']
+        return is_array($result)
+            && $result['success']
             && (!array_key_exists('score', $result)
                 || $result['score'] >= $this->templateConfigService->get('global.google_recaptcha_threshold')
             );
