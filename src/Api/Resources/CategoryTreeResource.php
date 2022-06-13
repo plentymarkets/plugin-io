@@ -67,7 +67,7 @@ class CategoryTreeResource extends ApiResource
 
         $partialTree = $this->categoryService->getPartialTree($categoryId);
         $tree = $this->findInTree($partialTree, $categoryId);
-        $children = $tree['children'];
+        $children = $tree['children'] ?? [];
 
         if (!is_null($maxCount)) {
             $maxCount = (int)$maxCount;

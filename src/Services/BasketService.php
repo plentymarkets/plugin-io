@@ -699,9 +699,12 @@ class BasketService
 
     private function hasTexts($basketItemData)
     {
-        return count($basketItemData['texts']) && (strlen($basketItemData['texts']['name1']) || strlen(
-                    $basketItemData['texts']['name2']
-                ) || !strlen($basketItemData['texts']['name3']));
+        return is_array($basketItemData['texts'])
+            && count($basketItemData['texts'])
+            && (strlen($basketItemData['texts']['name1'])
+                || strlen($basketItemData['texts']['name2'])
+                || !strlen($basketItemData['texts']['name3'])
+            );
     }
 
     /**
