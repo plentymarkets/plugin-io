@@ -661,7 +661,7 @@ class CategoryService
             $hierarchy = array_reverse($hierarchy);
         }
 
-        if (count($this->currentItem)) {
+        if (is_array($this->currentItem) && count($this->currentItem)) {
             $lang = Utils::getLang();
             array_push($hierarchy, $this->currentItem['texts'][$lang]);
         }
