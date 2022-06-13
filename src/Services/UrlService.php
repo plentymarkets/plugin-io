@@ -123,7 +123,7 @@ class UrlService
                 $categoryService = pluginApp(CategoryService::class);
                 if (TemplateService::$currentTemplate === 'tpl.item') {
                     $currentItem = $categoryService->getCurrentItem();
-                    if (count($currentItem) > 0) {
+                    if (is_array($currentItem) && count($currentItem) > 0) {
                         return $this
                             ->getVariationURL($currentItem['item']['id'], $currentItem['variation']['id'], $lang)
                             ->toAbsoluteUrl($includeLanguage);

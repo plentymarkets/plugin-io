@@ -254,7 +254,7 @@ class ItemController extends LayoutController
             )
         );
 
-        if (count($itemList['documents'])) {
+        if (is_array($itemList['documents']) && count($itemList['documents'])) {
             return $this->showItem(
                 '',
                 $itemList['documents'][0]['data']['item']['id'],
