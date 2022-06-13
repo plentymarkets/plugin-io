@@ -112,7 +112,7 @@ class ItemColumnBuilder
 		$columns = [];
 		foreach($this->columnFields as $columnName => $columnFields)
 		{
-			if(count($this->columnParams[$columnName]) > 0)
+			if(is_array($this->columnParams[$columnName]) && count($this->columnParams[$columnName]) > 0)
 			{
 				// column has params
 				$columns[$columnName] = [
@@ -155,7 +155,7 @@ class ItemColumnBuilder
 	private function addColumnFields(string $columnKey, array $columnValues)
 	{
 		$column = $this->columnFields[$columnKey];
-		if(count($column) === 0)
+		if(!is_array($column) || count($column) === 0)
 		{
 			$column = $columnValues;
 		}
