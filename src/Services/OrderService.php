@@ -174,7 +174,7 @@ class OrderService
             SessionStorageRepositoryContract::NEWSLETTER_SUBSCRIPTIONS
         );
 
-        if (count($newsletterSubscriptions) && strlen($email)) {
+        if (is_array($newsletterSubscriptions) && count($newsletterSubscriptions) && strlen($email)) {
             $firstName = '';
             $lastName = '';
 

@@ -63,8 +63,8 @@ class ItemUrlExtension implements ItemSearchExtension
         foreach ($extensionResult['documents'] as $key => $urlDocument) {
             VariationUrlBuilder::fillItemUrl($urlDocument['data']);
             $document = $baseResult['documents'][$key];
-            if (count($document)
-                && count($document['data']['texts'])
+            if (is_array($document)
+                && is_array($document['data']['texts'])
                 && strlen($document['data']['texts']['urlPath']) <= 0) {
                 // attach generated item url if not defined
                 $itemUrl = $urlBuilderRepository->buildVariationUrl(
