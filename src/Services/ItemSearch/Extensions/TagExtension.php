@@ -55,7 +55,7 @@ class TagExtension implements ItemSearchExtension
     private function getTagIds($baseResult)
     {
         $tagIds = [];
-        if(count($baseResult['documents']))
+        if(is_array($baseResult['documents']) && count($baseResult['documents']))
         {
             foreach($baseResult['documents'] as $item)
             {
