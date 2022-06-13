@@ -150,7 +150,7 @@ class MultiSearchFactory
             // get result of primary search
             $result = $rawResults[$searchName];
 
-            if(array_key_exists('success', $result) && $result['success'] === false)
+            if(is_array($result) && array_key_exists('success', $result) && $result['success'] === false)
             {
                 /** @var TemplateService $templateService */
                 $templateService = pluginApp(TemplateService::class);
