@@ -18,6 +18,9 @@
     "require"           : [],
     "namespace"         : "IO",
     "serviceProvider"   : "IO\\Providers\\IOServiceProvider",
+    "platform": {
+        "php": ">=7.3 <8.1"
+    },
     "javaScriptFiles"   : [],
     "containers"        : [],
     "dataProviders"     : [],
