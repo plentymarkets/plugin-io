@@ -19,7 +19,7 @@ class DataFilter
      */
     public function getFilteredData( $data, $resultFields )
     {
-        if ( !count( $resultFields ) || in_array( "*", $resultFields ) )
+        if ( !is_array( $resultFields ) || !count( $resultFields ) || in_array( "*", $resultFields ) )
         {
             return $data;
         }

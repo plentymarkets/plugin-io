@@ -22,7 +22,6 @@ use Plenty\Modules\Item\Variation\Models\Variation;
 use Plenty\Modules\Item\VariationDescription\Contracts\VariationDescriptionRepositoryContract;
 use Plenty\Modules\Item\VariationDescription\Models\VariationDescription;
 use Plenty\Modules\Order\Coupon\Campaign\Contracts\CouponCampaignRepositoryContract;
-use Plenty\Modules\Order\Models\OrderItemType;
 use Plenty\Modules\Order\Shipping\Contracts\EUCountryCodesServiceContract;
 use Plenty\Modules\Webshop\Contracts\CheckoutRepositoryContract;
 use Plenty\Modules\Webshop\Contracts\ContactRepositoryContract;
@@ -35,7 +34,6 @@ use Plenty\Modules\Webshop\ItemSearch\SearchPresets\BasketItems;
 use Plenty\Modules\Webshop\ItemSearch\Services\ItemSearchService;
 use Plenty\Plugin\Events\Dispatcher;
 use Plenty\Plugin\Log\Loggable;
-use Illuminate\Database\Eloquent\Collection;
 
 /**
  * Service Class BasketService
@@ -756,9 +754,12 @@ class BasketService
 
     private function hasTexts($basketItemData)
     {
-        return count($basketItemData['texts']) && (strlen($basketItemData['texts']['name1']) || strlen(
-                    $basketItemData['texts']['name2']
-                ) || !strlen($basketItemData['texts']['name3']));
+        return is_array($basketItemData['texts'])
+            && count($basketItemData['texts'])
+            && (strlen($basketItemData['texts']['name1'])
+                || strlen($basketItemData['texts']['name2'])
+                || !strlen($basketItemData['texts']['name3'])
+            );
     }
 
     /**

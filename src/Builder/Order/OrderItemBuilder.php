@@ -114,7 +114,7 @@ class OrderItemBuilder
                 array_push($orderItems, $this->basketItemToOrderItem($item, $basket->basketRebate));
     
                 //convert tax free properties to order items
-                if(count($item['variation']['data']['properties']))
+                if(is_array($item['variation']['data']['properties']) && count($item['variation']['data']['properties']))
                 {
                     foreach($item['variation']['data']['properties'] as $property)
                     {
@@ -170,9 +170,11 @@ class OrderItemBuilder
 
             foreach($itemsWithoutStock as $itemWithoutStock)
             {
-                $updatedItem = array_shift(array_filter($items, function($filterItem) use ($itemWithoutStock) {
+
+                $filteredWithoutStock = array_filter($items, function($filterItem) use ($itemWithoutStock) {
                     return $filterItem['id'] == $itemWithoutStock['item']['id'];
-                }));
+                });
+                $updatedItem = array_shift($filteredWithoutStock);
 
                 $quantity = $itemWithoutStock['stockNet'];
 

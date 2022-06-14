@@ -26,7 +26,7 @@ class VariationAttributeMapExtension implements ItemSearchExtension
             'variations' => []
         ];
 
-        if(count($baseResult['documents']))
+        if(is_array($baseResult['documents']) && count($baseResult['documents']))
         {
             /** @var NumberFormatFilter $numberFormatFilter */
             $numberFormatFilter = pluginApp(NumberFormatFilter::class);
@@ -45,7 +45,7 @@ class VariationAttributeMapExtension implements ItemSearchExtension
                     'attributes'        => [],
                 ];
 
-                if(count($extensionDocument['data']['attributes']))
+                if(is_array($extensionDocument['data']['attributes']))
                 {
                     foreach($extensionDocument['data']['attributes'] as $attribute)
                     {
@@ -72,7 +72,7 @@ class VariationAttributeMapExtension implements ItemSearchExtension
                         {
                             $attributeImageUrl = '/images/produkte/grp/'.$attribute['value']['image'];
                         }
-                        elseif(count($extensionDocument['data']['images']['variation']))
+                        elseif(is_array($extensionDocument['data']['images']['variation']))
                         {
                             /** @var ItemImagesFilter $itemImageFilter */
                             $itemImageFilter = pluginApp(ItemImagesFilter::class);
