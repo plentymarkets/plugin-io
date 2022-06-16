@@ -80,9 +80,7 @@ class CustomerAddressResource extends ApiResource
         }
 
         try {
-            if (!is_null($addressId) && (int)$addressId > 0) {
-                $newAddress = $this->customerService->updateAddress((int)$addressId, $address, (int)$type);
-            } else {
+            if (!(!is_null($addressId) && (int)$addressId > 0)) {
                 $newAddress = $this->customerService->createAddress($address, $type);
             }
         } catch (\Plenty\Exceptions\ValidationException $validationException) {
