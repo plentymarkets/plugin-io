@@ -5,6 +5,7 @@ namespace IO\Middlewares;
 use IO\Extensions\Constants\ShopUrls;
 use IO\Guards\AuthGuard;
 use IO\Helper\RouteConfig;
+use IO\Services\OrderService;
 use Plenty\Plugin\Http\Request;
 use Plenty\Plugin\Http\Response;
 use Plenty\Plugin\Middleware;
@@ -25,27 +26,17 @@ class HandleOrderPreviewUrl extends Middleware
      */
     public function before(Request $request)
     {
-        /** @var ShopUrls $shopUrls */
-        $shopUrls = pluginApp(ShopUrls::class);
+        $orderId = $request->get('id', 0);
+        $orderAccessKey = $request->get('ak', '');
 
-        // access 'Kaufabwicklungslink'
-        if (RouteConfig::isActive(RouteConfig::CONFIRMATION)) {
-            $orderId = $request->get('id', 0);
-            $orderAccessKey = $request->get('ak', '');
+        if (strlen($orderAccessKey) && (int)$orderId > 0) {
+            /** @var ShopUrls $shopUrls */
+            $shopUrls = pluginApp(ShopUrls::class);
 
-            if (strlen($orderAccessKey) && (int)$orderId > 0) {
-                $confirmationRoute = $shopUrls->confirmation . '/' . $orderId . '/' . $orderAccessKey;
-                AuthGuard::redirect($confirmationRoute);
-            }
-        } elseif (in_array(RouteConfig::CONFIRMATION, RouteConfig::getEnabledRoutes())
-            && RouteConfig::getCategoryId(RouteConfig::CONFIRMATION) > 0) {
-            $orderId = $request->get('id', 0);
-            $orderAccessKey = $request->get('ak', '');
-
-            if (strlen($orderAccessKey) && (int)$orderId > 0) {
-                $confirmationRoute = $shopUrls->confirmation . '?orderId=' . $orderId . '&accessKey=' . $orderAccessKey;
-                AuthGuard::redirect($confirmationRoute);
-            }
+            /** @var OrderService $orderService */
+            $orderService = pluginApp(OrderService::class);
+            $confirmationUrl = $orderService->getConfirmationUrl($shopUrls->confirmation, $orderId, $orderAccessKey);
+            AuthGuard::redirect($confirmationUrl);
         }
     }
 
