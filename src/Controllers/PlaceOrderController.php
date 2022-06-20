@@ -268,14 +268,10 @@ class PlaceOrderController extends LayoutController
                 $basketService = pluginApp(BasketService::class);
 
                 foreach ($itemsWithoutStock as $itemWithoutStock) {
-                    $updatedItem = array_shift(
-                        array_filter(
-                            $basketItems,
-                            function ($filterItem) use ($itemWithoutStock) {
-                                return $filterItem['id'] == $itemWithoutStock['item']['id'];
-                            }
-                        )
-                    );
+                    $filteredWithoutStock = array_filter($basketItems, function($filterItem) use ($itemWithoutStock) {
+                        return $filterItem['id'] == $itemWithoutStock['item']['id'];
+                    });
+                    $updatedItem = array_shift($filteredWithoutStock);
 
                     $quantity = $itemWithoutStock['stockNet'];
 
