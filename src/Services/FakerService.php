@@ -36,9 +36,7 @@ class FakerService
         $facetFaker = pluginApp(FacetFaker::class);
         $facetResult = $facetFaker->fill([]);
 
-        return [
-            $facetResult[0]
-        ];
+        return $facetResult;
     }
 
     /**
