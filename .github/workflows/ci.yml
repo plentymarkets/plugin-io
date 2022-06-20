@@ -128,6 +128,7 @@ jobs:
           repository: "plentymarkets/plugin-test-suite"
           token: ${{ secrets.PUBLIC_PAT_CICD4_PUBLIC }}
           path: "pl/packages/plentymarkets/plugin-test-suite/"
+          ref: "core/php8.0"
       - name: Install test suite dependencies
         working-directory: pl/packages/plentymarkets/plugin-test-suite
         run: |
