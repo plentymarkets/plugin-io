@@ -68,12 +68,12 @@ class CategoryFacet implements FacetExtension
                 $request = pluginApp(Request::class);
                 foreach ($result as $categoryId => $count) {
                     $category = $categoryService->getForPlentyId($categoryId, Utils::getLang());
-                    if (!is_null($category) && (!is_null($categoryBranch) || !in_array(
-                                $categoryId,
-                                $categoryBranch
-                            )) && (!$categoryService->isHidden(
-                                $category->id
-                            ) || $loggedIn || Utils::isAdminPreview())) {
+                    if (!is_null($category) &&
+                        (is_null($categoryBranch) || !in_array($categoryId, $categoryBranch ?? [])) &&
+                        (!$categoryService->isHidden($category->id) ||
+                            $loggedIn ||
+                            Utils::isAdminPreview())
+                    ) {
                         $categoryFacet['values'][] = [
                             'id' => 'category-' . $categoryId,
                             'name' => $category->details[0]->name,
