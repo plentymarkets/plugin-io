@@ -10,6 +10,7 @@ use IO\Constants\OrderPaymentStatus;
 use IO\Extensions\Constants\ShopUrls;
 use IO\Extensions\Filters\PropertyNameFilter;
 use IO\Extensions\Mail\SendMail;
+use IO\Guards\AuthGuard;
 use IO\Helper\RouteConfig;
 use IO\Helper\Utils;
 use IO\Models\LocalizedOrder;
@@ -300,15 +301,38 @@ class OrderService
                 if ((int)$this->contactRepository->getContactId() <= 0) {
                     /** @var ShopUrls $shopUrls */
                     $shopUrls = pluginApp(ShopUrls::class);
-                    return $this->urlService->redirectTo(
-                        $shopUrls->login . '?backlink=' . $shopUrls->confirmation . '/' . $orderId . '/' . $orderAccessKey
-                    );
+                    $backlink = $this->getConfirmationUrl($shopUrls->confirmation, $orderId, $orderAccessKey);
+                    AuthGuard::redirect($shopUrls->login . '?backlink=' . $backlink);
                 } elseif ((int)$orderContactId !== (int)$this->contactRepository->getContactId()) {
                     return null;
                 }
             }
         }
         return LocalizedOrder::wrap($order, Utils::getLang());
+    }
+
+    /**
+     * Get a confirmation url with correct structure and parameter
+     *
+     * @param string $confirmationBaseUrl
+     * @param int $orderId
+     * @param string $orderAccessKey
+     *
+     * @return string
+     */
+    public function getConfirmationUrl(string $confirmationBaseUrl, int $orderId, string $orderAccessKey): string
+    {
+        if (RouteConfig::isActive(RouteConfig::CONFIRMATION)) {
+            if (strlen($orderAccessKey) && (int)$orderId > 0) {
+                $confirmationBaseUrl .= '/' . $orderId . '/' . $orderAccessKey;
+            }
+        } elseif (in_array(RouteConfig::CONFIRMATION, RouteConfig::getEnabledRoutes())
+            && RouteConfig::getCategoryId(RouteConfig::CONFIRMATION) > 0) {
+            if (strlen($orderAccessKey) && (int)$orderId > 0) {
+                $confirmationBaseUrl .= '?orderId=' . $orderId . '&accessKey=' . $orderAccessKey;
+            }
+        }
+        return $confirmationBaseUrl;
     }
 
     /**
