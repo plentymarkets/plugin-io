@@ -9,8 +9,6 @@ use Plenty\Modules\Webshop\ItemSearch\Factories\VariationSearchFactory;
 use Plenty\Modules\Webshop\ItemSearch\SearchPresets\BasketItems;
 use Plenty\Modules\Webshop\ItemSearch\Services\ItemSearchService;
 
-use function _PHPStan_ccec86fc8\Symfony\Component\String\s;
-
 /**
  * Class BundleComponentExtension
  * @package IO\Services\ItemSearch\Extensions
