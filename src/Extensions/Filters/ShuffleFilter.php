@@ -39,7 +39,7 @@ class ShuffleFilter extends AbstractFilter
      * @param array $arrayToShuffle Array that gets shuffled.
      * @return array
      */
-    public function shuffle(array $arrayToShuffle): array
+    public function shuffle($arrayToShuffle): array
     {
         if (is_array($arrayToShuffle) && count($arrayToShuffle)) {
             shuffle($arrayToShuffle);
