@@ -202,6 +202,12 @@ class TemplateService
         $templateConfigRepository = pluginApp(TemplateConfigService::class);
 
         $sorting = pluginApp(Request::class)->get('sorting', '');
+        if (is_array($sorting)) {
+            // only one sorting value is accepted
+            // reset sorting value
+            $sorting = '';
+        }
+
         if (strlen($sorting) === 0) {
             /** @var ShopUrls $shopUrls */
             $shopUrls = pluginApp(ShopUrls::class);
