@@ -27,8 +27,8 @@ class ShuffleFilter extends AbstractFilter
             'shuffle' => 'shuffle'
         ];
     }
-
-    public function shuffle( $arrayToShuffle ):array
+    
+    public function shuffle($arrayToShuffle): array
     {
         if(is_array($arrayToShuffle) && count($arrayToShuffle))
         {
