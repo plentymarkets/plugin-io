@@ -44,8 +44,7 @@ class VariationAttributeMapExtension implements ItemSearchExtension
                     'isSalable'         => $extensionDocument['data']['filter']['isSalable'],
                     'attributes'        => [],
                 ];
-
-                if(is_array($extensionDocument['data']['attributes']))
+                if(is_array($extensionDocument['data']['attributes']) && count($extensionDocument['data']['attributes']))
                 {
                     foreach($extensionDocument['data']['attributes'] as $attribute)
                     {
@@ -72,7 +71,7 @@ class VariationAttributeMapExtension implements ItemSearchExtension
                         {
                             $attributeImageUrl = '/images/produkte/grp/'.$attribute['value']['image'];
                         }
-                        elseif(is_array($extensionDocument['data']['images']['variation']))
+                        elseif(is_array($extensionDocument['data']['images']['variation']) && count($extensionDocument['data']['images']['variation']))
                         {
                             /** @var ItemImagesFilter $itemImageFilter */
                             $itemImageFilter = pluginApp(ItemImagesFilter::class);
