@@ -1,5 +1,16 @@
 # Release Notes für IO
 
+## v5.0.52 (2022-06-29) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.50...5.0.52" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
+
+### Geändert
+
+- Die Einstellung **Kunden zur Login-Seite weiterleiten, wenn sie den Link in der Bestellbestätigung klicken** wurde aus den plentyShop LTS-Einstellungen und aus dem plentyShop-Assistenten entfernt. Das Standardverhalten ist zukünftig so, dass Kund:innen immer zuerst auf die Login-Seite geleitet werden.
+
+### Behoben
+
+- Im ShopBuilder wurden Kategoriefilter nicht angezeigt. Dies wurde behoben.
+- Es wurde ein Problem bei der Erstellung des Backlinks behoben, wenn man von der Bestellbestätigungsseite zur Login-Seite weitergeleitet wurde.
+
 ## v5.0.50 (2022-05-04) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.49...5.0.50" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
 
 ### TODO für externe Entwickler:innen
