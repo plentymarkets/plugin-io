@@ -281,31 +281,23 @@ class OrderService
      */
     public function findOrderByAccessKey($orderId, $orderAccessKey)
     {
-        /**
-         * @var TemplateConfigService $templateConfigService
-         */
-        $templateConfigService = pluginApp(TemplateConfigService::class);
-        $redirectToLogin = $templateConfigService->getBoolean('my_account.confirmation_link_login_redirect');
-
         $order = $this->orderRepository->findOrderByAccessKey($orderId, $orderAccessKey);
 
-        if ($redirectToLogin) {
-            $orderContactId = 0;
-            foreach ($order->relations as $relation) {
-                if ($relation['referenceType'] == 'contact' && (int)$relation['referenceId'] > 0) {
-                    $orderContactId = $relation['referenceId'];
-                }
+        $orderContactId = 0;
+        foreach ($order->relations as $relation) {
+            if ($relation['referenceType'] == 'contact' && (int)$relation['referenceId'] > 0) {
+                $orderContactId = $relation['referenceId'];
             }
+        }
 
-            if ((int)$orderContactId > 0) {
-                if ((int)$this->contactRepository->getContactId() <= 0) {
-                    /** @var ShopUrls $shopUrls */
-                    $shopUrls = pluginApp(ShopUrls::class);
-                    $backlink = $this->getConfirmationUrl($shopUrls->confirmation, $orderId, $orderAccessKey);
-                    AuthGuard::redirect($shopUrls->login . '?backlink=' . $backlink);
-                } elseif ((int)$orderContactId !== (int)$this->contactRepository->getContactId()) {
-                    return null;
-                }
+        if ((int)$orderContactId > 0) {
+            if ((int)$this->contactRepository->getContactId() <= 0) {
+                /** @var ShopUrls $shopUrls */
+                $shopUrls = pluginApp(ShopUrls::class);
+                $backlink = $this->getConfirmationUrl($shopUrls->confirmation, $orderId, $orderAccessKey);
+                AuthGuard::redirect($shopUrls->login . '?backlink=' . $backlink);
+            } elseif ((int)$orderContactId !== (int)$this->contactRepository->getContactId()) {
+                return null;
             }
         }
         return LocalizedOrder::wrap($order, Utils::getLang());
