@@ -734,7 +734,7 @@ class CategoryService
 
         return $result;
     }
-    
+
     private function filterBranchEntries($tree, $branch = [], $level = 1, $urlPrefix = '')
     {
         $branchKey = "category" . $level . "Id";
