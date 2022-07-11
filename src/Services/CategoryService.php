@@ -503,27 +503,6 @@ class CategoryService
         );
     }
 
-    private function filterVisibleCategories($categoryList = [])
-    {
-        $result = array_filter(
-            $categoryList ?? [],
-            function ($category) {
-                return $category['right'] !== 'customer';
-            }
-        );
-
-        $result = array_map(
-            function ($category) {
-                $category['children'] = $this->filterVisibleCategories($category['children']);
-
-                return $category;
-            },
-            $result
-        );
-
-        return $result;
-    }
-
     /**
      * Builds a partial tree of starting from the given category id
      *
@@ -735,7 +714,27 @@ class CategoryService
 
         return $isHidden;
     }
-    
+
+    private function filterVisibleCategories($categoryList = [])
+    {
+        $result = array_filter(
+            $categoryList ?? [],
+            function ($category) {
+                return $category['right'] !== 'customer';
+            }
+        );
+
+        $result = array_map(
+            function ($category) {
+                $category['children'] = $this->filterVisibleCategories($category['children']);
+                return $category;
+            },
+            $result
+        );
+
+        return $result;
+    }
+
     private function filterBranchEntries($tree, $branch = [], $level = 1, $urlPrefix = '')
     {
         $branchKey = "category" . $level . "Id";
