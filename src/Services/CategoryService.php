@@ -637,7 +637,7 @@ class CategoryService
             $hierarchy = array_reverse($hierarchy);
         }
 
-        if (count($this->currentItem)) {
+        if (is_array($this->currentItem) && count($this->currentItem)) {
             $lang = Utils::getLang();
             array_push($hierarchy, $this->currentItem['texts'][$lang]);
         }
@@ -756,11 +756,11 @@ class CategoryService
                 );
                 $result[] = $category;
             } elseif ($isInBranch && $isCurrentLevel) {
-                    $this->appendBranchFields($category, $siblingCount, $urlPrefix, 2);
-                    $result[] = $category;
+                $this->appendBranchFields($category, $siblingCount, $urlPrefix, 2);
+                $result[] = $category;
             } elseif (!$isInBranch && $isCurrentLevel) {
-                    $this->appendBranchFields($category, $siblingCount, $urlPrefix, 0);
-                    $result[] = $category;
+                $this->appendBranchFields($category, $siblingCount, $urlPrefix, 0);
+                $result[] = $category;
             }
         }
 
