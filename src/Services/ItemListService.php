@@ -98,7 +98,7 @@ class ItemListService
                 $variationIds = $cachingRepository->get(
                     SessionStorageRepositoryContract::LAST_SEEN_ITEMS . '_' . $basketRepository->load()->id, []
                 );
-                $variationIds = array_slice($variationIds, 0, $maxItems);
+                $variationIds = array_slice($variationIds ?? [], 0, $maxItems);
 
                 if (count($variationIds) > 0) {
                     $searchFactory = VariationList::getSearchFactory(
