@@ -37,8 +37,12 @@ class GetCdnMetadata extends AbstractFunction
      */
     public function getCdnMetadata($imageUrl, $key = null, $default = null)
     {
-        if (is_null($imageUrl)) {
+        if (is_null($imageUrl) && is_null($key)) {
+            // return an empty metadata object
             return [];
+        } else if (is_null($imageUrl) && !is_null($key)) {
+            // return default value as image url is not defined but key is.
+            return $default;
         }
         /** @var WebspaceRepositoryContract $webspaceRepository */
         $webspaceRepository = pluginApp(WebspaceRepositoryContract::class);
