@@ -19,7 +19,7 @@ class DetectLegacySearch extends Middleware
         if (RouteConfig::isActive(RouteConfig::SEARCH) && $request->get('ActionCall') == 'WebActionArticleSearch') {
             /** @var ShopUrls $shopUrls */
             $shopUrls = pluginApp(ShopUrls::class);
-            AuthGuard::redirect($shopUrls->search, ['query' => $request->get('Params')['SearchParam']]);
+            AuthGuard::redirect($shopUrls->search, ['query' => $request->get('Params')['SearchParam'] ?? '']);
         }
     }
 
