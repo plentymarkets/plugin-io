@@ -267,6 +267,10 @@
                                 "caption": "Config.routingEnabledRoutesPossibleValueContact"
                             },
                             {
+                                "value": "contact-mail-api",
+                                "caption": "Config.routingEnabledRoutesPossibleValueContactMailApi"
+                            },
+                            {
                                 "value": "item",
                                 "caption": "Config.routingEnabledRoutesPossibleValueItem"
                             },
