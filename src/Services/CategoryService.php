@@ -741,7 +741,7 @@ class CategoryService
         $branchKey = "category" . $level . "Id";
         $isCurrentLevel = $branch[$branchKey] === $branch["categoryId"];
         $result = [];
-        $siblingCount = count($tree);
+        $siblingCount = count($tree ?? []);
 
         foreach ($tree as $category) {
             $isInBranch = $category['id'] === $branch[$branchKey];
