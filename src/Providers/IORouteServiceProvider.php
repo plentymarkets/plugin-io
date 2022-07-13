@@ -154,7 +154,7 @@ class IORouteServiceProvider extends RouteServiceProvider
             || in_array(RouteConfig::CONFIRMATION, RouteConfig::getEnabledRoutes())
             || RouteConfig::getCategoryId(RouteConfig::CONFIRMATION) > 0)
         {
-            $router->get('-/akQQ{orderAccessKey}/idQQ{orderId}', 'IO\Controllers\ConfirmationEmailController@showConfirmation');
+            $router->get('-/akQQ{orderAccessKey}/idQQ{orderId}(.html)?$', 'IO\Controllers\ConfirmationEmailController@showConfirmation');
             $router->get('_py-/akQQ{orderAccessKey}/idQQ{orderId}', 'IO\Controllers\ConfirmationEmailController@showConfirmation');
             $router->get('_py_/akQQ{orderAccessKey}/idQQ{orderId}', 'IO\Controllers\ConfirmationEmailController@showConfirmation');
             $router->get('_plentyShop__/akQQ{orderAccessKey}/idQQ{orderId}', 'IO\Controllers\ConfirmationEmailController@showConfirmation');
