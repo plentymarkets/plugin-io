@@ -161,7 +161,7 @@ class ItemSearchAutocompleteService
                 }
 
                 $defaultCategoryId = 0;
-                if (count($variation['data']['defaultCategories'])) {
+                if (is_array($variation['data']['defaultCategories']) && count($variation['data']['defaultCategories'])) {
                     foreach ($variation['data']['defaultCategories'] as $defaultCategory) {
                         if ((int)$defaultCategory['plentyId'] == Utils::getPlentyId()) {
                             $defaultCategoryId = $defaultCategory['id'];
