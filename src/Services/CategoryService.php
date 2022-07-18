@@ -283,7 +283,7 @@ class CategoryService
             } elseif ($category['id'] == $categoryId) {
                 $result = $category;
                 break;
-            } elseif (count($category['children'])) {
+            } elseif (is_array($category['children']) && count($category['children'])) {
                 $result = $this->findInCategoryTree($category['children'], $branch, $level + 1);
                 break;
             }
