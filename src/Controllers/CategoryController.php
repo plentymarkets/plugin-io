@@ -174,6 +174,21 @@ class CategoryController extends LayoutController
             return $checkoutController->showCheckout($category);
         }
 
+        if (RouteConfig::getCategoryId(RouteConfig::BASKET) === $category->id){
+            $this->getLogger(__CLASS__)->info(
+                "IO::Debug.CategoryController_showBasketCategory",
+                [
+                    "category" => $category,
+                    "previewContentType" => $shopBuilderRequest->getPreviewContentType()
+                ]
+            );
+            RouteConfig::overrideCategoryId(RouteConfig::BASKET, $category->id);
+
+            /** @var CheckoutController $checkoutController */
+            $basketController = pluginApp(BasketController::class);
+            return $basketController->showBasket($category);
+        }
+
         if (RouteConfig::getCategoryId(RouteConfig::MY_ACCOUNT) === $category->id || $shopBuilderRequest->getPreviewContentType() === 'myaccount') {
             $this->getLogger(__CLASS__)->info(
                 "IO::Debug.CategoryController_showMyAccountCategory",
