@@ -75,7 +75,7 @@ class ContactMailService
         
         $subject = $translator->trans(
             'Ceres::Template.contactMailSubject',
-            $translationMailData['subject']
+            $translationMailData
         );
         
         $attachments = [];
