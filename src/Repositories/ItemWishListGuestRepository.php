@@ -95,8 +95,8 @@ class ItemWishListGuestRepository
         $wishListEntry->createdAt = date("Y-m-d H:i:s");
 
         $wishListComplete = $this->getItemWishListForAllPlentyIds();
-        if ($this->plentyId) {
-            $wishList = $wishListComplete[$this->plentyId];
+        if (is_array($wishListComplete)) {
+            $wishList = $wishListComplete[$this->plentyId] ?? [];
         }
 
         if($this->isItemInWishList($variationId))
