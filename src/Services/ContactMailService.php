@@ -71,8 +71,13 @@ class ContactMailService
         $translationMailData = array_map(function($mailDataEntry) {
            return $mailDataEntry['value'];
         }, $mailData['data']);
+
+        $translationMailData = array_filter($translationMailData, function($entry) {
+            return !is_array($entry);
+        });
+
         $translationMailData['subject'] = $mailData['subject'];
-        
+
         $subject = $translator->trans(
             'Ceres::Template.contactMailSubject',
             $translationMailData
