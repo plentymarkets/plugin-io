@@ -34,6 +34,8 @@ class RouteConfig
     const CONFIRMATION              = "confirmation";
     /** @var string Represents the contact route */
     const CONTACT                   = "contact";
+    /** @var string Represents the contact mail api route */
+    const CONTACT_MAIL_API          = "contact-mail-api";
     /** @var string Represents the home route */
     const HOME                      = "home";
     /** @var string Represents the item routes */
@@ -85,6 +87,7 @@ class RouteConfig
         self::CHECKOUT,
         self::CONFIRMATION,
         self::CONTACT,
+        self::CONTACT_MAIL_API,
         self::HOME,
         self::ITEM,
         self::LEGAL_DISCLOSURE,
