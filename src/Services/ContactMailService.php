@@ -59,7 +59,7 @@ class ContactMailService
             'Ceres::Template.contactMailSubject',
             [
                 'subject' => $mailData['subject'],
-                'data'    => $mailData['data']
+                'data'    => ''
             ]
         );
 
