@@ -140,12 +140,13 @@ class Utils
      * Transform an absolute URL into a relative URL.
      * @param string|null $path An absolute URL.
      * @param bool $includeLanguage Should the URL include the language (Default: false).
+     * @param string $lang Language which should be added.
      * @return string|null
      */
-    public static function makeRelativeUrl($path = null, $includeLanguage = false)
+    public static function makeRelativeUrl($path = null, $includeLanguage = false, $lang = null)
     {
         /** @var UrlQuery $query */
-        $query = pluginApp(UrlQuery::class, ['path' => $path]);
+        $query = pluginApp(UrlQuery::class, ['path' => $path, 'lang' => $lang]);
         return $query->toRelativeUrl($includeLanguage);
     }
 
