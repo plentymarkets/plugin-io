@@ -63,6 +63,8 @@ class OrderTotalsService
                 case OrderItemType::VARIATION:
                 case OrderItemType::ITEM_BUNDLE:
                 case OrderItemType::TYPE_ORDER_PROPERTY:
+                case OrderItemType::TYPE_ITEM_SET:
+                case OrderItemType::TYPE_SET_COMPONENT:
                     $itemSumGross += $firstAmount->priceGross * $item->quantity;
                     $itemSumNet += $firstAmount->priceNet * $item->quantity;
 
