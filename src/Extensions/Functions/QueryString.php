@@ -3,6 +3,7 @@
 namespace IO\Extensions\Functions;
 
 use IO\Extensions\AbstractFunction;
+use IO\Helper\Utils;
 use Plenty\Plugin\Http\Request;
 
 /**
@@ -38,19 +39,15 @@ class QueryString extends AbstractFunction
      *
      * @return string A query string containing all query parameters of the current request and all defined parameters. Already includes a leading '?'.
      */
-    public function getQueryString($params = [])
+    public function getQueryString($params = []): string
     {
         /** @var Request $request */
         $request = pluginApp(Request::class);
 
         // FIX use $request->query() instead of $request->all() to avoid appending params from request body while rendering twig via POST calls, e.g. via the shop builder.
         $queryParameters = $request->query();
-        unset($queryParameters['plentyMarkets']);
+        $queryParameters = Utils::cleanUpExcludesContentCacheParams($queryParameters);
         $queryParameters = array_replace($queryParameters, $params);
-
-        if (!is_array($queryParameters)) {
-            return '';
-        }
 
         $queryParameters = http_build_query($queryParameters, null, '&', PHP_QUERY_RFC3986);
         return strlen($queryParameters) > 0 ? '?' . $queryParameters : '';
