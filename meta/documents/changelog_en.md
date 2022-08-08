@@ -1,5 +1,22 @@
 # Release Notes for IO
 
+## v5.0.54 (2022-08-08) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.53...5.0.54" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
+
+### TODO
+
+- If you are using the plentyShop contact form (either the standard template or via a ShopBuilder content), please make sure that the route `/contact-mail-api` is activated in the IO plugin. To check this, open the IO setting in your plugin set. Open the tab **Configuration**. In the setting **Activate routes**, activate the route `/contact-mail-api` and save your changes. If you do *not* use a plentyShop contact form, please make sure that the route `/contact-mail-api` is deactivated.
+
+### Added
+
+- The route `/contact-mail-api` has been added. You can use it to activate and deactivate the sending of mail via the contact form independently of the `/contact` route.
+
+### Fixed
+
+- For multilingual shops, errors could occurr in regards to the shopping cart URL. This has been fixed.
+- If pages were called with parameters that were excluded from ShopBooster, faulty markup could be generated. This has been fixed.
+- On mobile devices, the combination of language selection and ShopBooster could result in the mobile navigation being displayed in the previously selected language. This behaviour has been fixed.
+- Item sets with set components that contained order characteristics could cause an incorrect display of the value of goods. This has been fixed.
+
 ## v5.0.53 (2022-07-04) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.52...5.0.53" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
 
 ### Behoben
