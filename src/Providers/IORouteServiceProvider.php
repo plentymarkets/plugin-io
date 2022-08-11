@@ -155,9 +155,12 @@ class IORouteServiceProvider extends RouteServiceProvider
         {
             $router->get('-/akQQ{orderAccessKey}/idQQ{orderId}.html', 'IO\Controllers\ConfirmationEmailController@showConfirmation')->where('orderId', '\d+');
             $router->get('-/akQQ{orderAccessKey}/idQQ{orderId}', 'IO\Controllers\ConfirmationEmailController@showConfirmation')->where('orderId', '\d+');
-            $router->get('_py-/akQQ{orderAccessKey}/idQQ{orderId}', 'IO\Controllers\ConfirmationEmailController@showConfirmation');
-            $router->get('_py_/akQQ{orderAccessKey}/idQQ{orderId}', 'IO\Controllers\ConfirmationEmailController@showConfirmation');
-            $router->get('_plentyShop__/akQQ{orderAccessKey}/idQQ{orderId}', 'IO\Controllers\ConfirmationEmailController@showConfirmation');
+            $router->get('_py-/akQQ{orderAccessKey}/idQQ{orderId}.html', 'IO\Controllers\ConfirmationEmailController@showConfirmation')->where('orderId', '\d+');
+            $router->get('_py-/akQQ{orderAccessKey}/idQQ{orderId}', 'IO\Controllers\ConfirmationEmailController@showConfirmation')->where('orderId', '\d+');
+            $router->get('_py_/akQQ{orderAccessKey}/idQQ{orderId}.html', 'IO\Controllers\ConfirmationEmailController@showConfirmation')->where('orderId', '\d+');
+            $router->get('_py_/akQQ{orderAccessKey}/idQQ{orderId}', 'IO\Controllers\ConfirmationEmailController@showConfirmation')->where('orderId', '\d+');
+            $router->get('_plentyShop__/akQQ{orderAccessKey}/idQQ{orderId}.html', 'IO\Controllers\ConfirmationEmailController@showConfirmation')->where('orderId', '\d+');
+            $router->get('_plentyShop__/akQQ{orderAccessKey}/idQQ{orderId}', 'IO\Controllers\ConfirmationEmailController@showConfirmation')->where('orderId', '\d+');
         }
 
         if (RouteConfig::isActive(RouteConfig::CONFIRMATION)) {
