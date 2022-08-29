@@ -73,7 +73,7 @@ class IORouteServiceProvider extends RouteServiceProvider
             });
         }
 
-        $api->version(['v1'], ['namespace' => 'IO\Api\Resources', 'middleware' => ['csrf']], function (ApiRouter $api) {
+        $api->version(['v1'], ['namespace' => 'IO\Api\Resources'], function (ApiRouter $api) {
             $api->post('io/order', 'OrderResource@store');
             $api->resource('io/order/payment', 'OrderPaymentResource');
             $api->resource('io/checkout/paymentId', 'CheckoutSetPaymentResource');
