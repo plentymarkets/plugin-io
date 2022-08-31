@@ -64,6 +64,7 @@ class IORouteServiceProvider extends RouteServiceProvider
             $api->get('io/categorytree/template_for_children', 'CategoryTreeResource@getTemplateForChildren');
             $api->resource('io/categorytree', 'CategoryTreeResource');
             $api->get('io/session', 'SessionResource@index');
+            $api->resource('io/checkout/shipping-profiles', 'CheckoutShippingProfilesResource');
         });
 
         if (RouteConfig::isActive(RouteConfig::CONTACT_MAIL_API)) {
@@ -79,7 +80,6 @@ class IORouteServiceProvider extends RouteServiceProvider
             $api->resource('io/checkout/paymentId', 'CheckoutSetPaymentResource');
             $api->resource('io/customer/address', 'CustomerAddressResource');
             $api->resource('io/checkout/shippingId', 'CheckoutSetShippingIdResource');
-            $api->resource('io/checkout/shipping-profiles', 'CheckoutShippingProfilesResource');
             $api->resource('io/order/contactWish', 'OrderContactWishResource');
             $api->resource('io/order/return', 'OrderReturnResource');
             $api->post('io/checkout', 'CheckoutResource@store');
