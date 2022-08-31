@@ -37,7 +37,6 @@ class IORouteServiceProvider extends RouteServiceProvider
             $api->resource('io/order/property/file', 'OrderPropertyFileResource');
             $api->get('io/checkout', 'CheckoutResource@index');
             $api->resource('io/category/description', 'CategoryDescriptionResource');
-            $api->resource('io/customer', 'CustomerResource');
             $api->resource('io/customer/login', 'CustomerAuthenticationResource');
             $api->resource('io/customer/logout', 'CustomerLogoutResource');
             $api->resource('io/customer/password', 'CustomerPasswordResource');
@@ -74,7 +73,7 @@ class IORouteServiceProvider extends RouteServiceProvider
             });
         }
 
-        $api->version(['v1'], ['namespace' => 'IO\Api\Resources', 'middleware' => ['csrf']], function (ApiRouter $api) {
+        $api->version(['v1'], ['namespace' => 'IO\Api\Resources'], function (ApiRouter $api) {
             $api->post('io/order', 'OrderResource@store');
             $api->resource('io/order/payment', 'OrderPaymentResource');
             $api->resource('io/checkout/paymentId', 'CheckoutSetPaymentResource');
@@ -88,6 +87,7 @@ class IORouteServiceProvider extends RouteServiceProvider
             $api->resource('io/customer/bank_data', 'ContactBankResource');
             $api->resource('io/customer/order/return', 'CustomerOrderReturnResource');
             $api->resource('io/order/additional_information', 'OrderAdditionalInformationResource');
+            $api->resource('io/customer', 'CustomerResource');
         });
 
         /** @var ShopUrls $shopUrls */
