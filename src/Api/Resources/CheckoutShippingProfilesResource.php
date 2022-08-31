@@ -40,7 +40,7 @@ class CheckoutShippingProfilesResource extends ApiResource
         $shippingProfileId = $this->checkoutService->getShippingProfileId();
 
         foreach ($shippingProfileList as $key => $shippingProfile) {
-            if ($shippingProfile['parcelServicePresetId'] === $shippingProfileId) {
+            if ($shippingProfile['parcelServicePresetId'] == $shippingProfileId) {
                 $shippingProfile['selected'] = true;
             }
         }
