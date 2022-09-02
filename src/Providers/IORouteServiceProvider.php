@@ -64,8 +64,7 @@ class IORouteServiceProvider extends RouteServiceProvider
             $api->resource('io/categorytree', 'CategoryTreeResource');
             $api->get('io/session', 'SessionResource@index');
             $api->resource('io/checkout/shipping-profiles', 'CheckoutShippingProfilesResource');
-            // $api->resource('io/active_countries', 'ActiveShippingCountriesResource');
-            $api->get('io/active_countries', 'CountryService@getActiveCountriesList');
+            $api->resource('io/active_countries', 'ActiveShippingCountriesResource');
         });
 
         if (RouteConfig::isActive(RouteConfig::CONTACT_MAIL_API)) {
