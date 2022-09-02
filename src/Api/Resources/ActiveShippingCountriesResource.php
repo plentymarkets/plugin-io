@@ -37,6 +37,6 @@ class ActiveShippingCountriesResource extends ApiResource
         $lang = $this->request->get('lang', null);
         $countries = $this->countryService->getActiveCountriesList($lang);
 
-        $this->response->create($countries, ResponseCode::OK);
+        return $this->response->create($countries, ResponseCode::OK);
     }
 }
