@@ -14,7 +14,7 @@ class SortingBuilder
     {
         $sortingParameter =  self::filterSortingString($sortingString);
 
-        if(strpos($sortingString, 'texts.name') !== false)
+        if(str_contains($sortingString, 'texts.name'))
         {
             $singleSortingInterface = pluginApp(NameSorting::class, [self::buildNameSorting($sortingParameter["sortingPath"]), Utils::getLang(), $sortingParameter["sortingOrder"]]);
         }
@@ -142,7 +142,7 @@ class SortingBuilder
     private static function filterSortingInterface($usedSortingPriority)
     {
         $sortingParameter1 = self::filterSortingString($usedSortingPriority);
-        if(strpos($sortingParameter1["sortingPath"], 'texts.name') !== false)
+        if(str_contains($sortingParameter1["sortingPath"], 'texts.name'))
         {
             /** @var TemplateConfigService $templateConfigService */
             $templateConfigService = pluginApp(TemplateConfigService::class);

@@ -324,7 +324,7 @@ class BaseSearchFactory
         }
 
         $sortingInterface = null;
-        if ( strpos( $field, 'texts.name' ) !== false )
+        if ( str_contains( $field, 'texts.name' ) )
         {
             $sortingInterface = pluginApp(
                 NameSorting::class,
@@ -337,7 +337,7 @@ class BaseSearchFactory
         }
         else if ( strlen($field) )
         {
-            if ( strpos( $field, 'sorting.price.') !== false )
+            if ( str_contains( $field, 'sorting.price.') )
             {
                 $field = sprintf(
                     'sorting.priceByClientDynamic.%d.%s',
