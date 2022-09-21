@@ -331,7 +331,14 @@ class IOServiceProvider extends ServiceProvider
         /** @var ContentCacheQueryParamsRepositoryContract $contentCacheQueryParamsRepo */
         $contentCacheQueryParamsRepo = pluginApp(ContentCacheQueryParamsRepositoryContract::class);
         $contentCacheQueryParamsRepo->registerIncluded([
-            'attrib'
+            'attrib',
+            'multi'
+        ]);
+
+        $contentCacheQueryParamsRepo->registerExcluded([
+            'bla',
+            'foo',
+            'bar'
         ]);
 
         $dispatcher->listen(FrontendShippingProfileChanged::class, IOFrontendShippingProfileChanged::class);
