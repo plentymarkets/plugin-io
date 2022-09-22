@@ -1,14 +1,10 @@
 # Release Notes für IO
 
-## v5.0.55 (2022-?-?)
-
-### TODO
-
-### Hinzugefügt
+## v5.0.55 (2022-09-22) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.54...5.0.55" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
 
 ### Behoben
 
-- Die Vorschau der Confirmationseite wurde,infolge eines Fehlers bei der Auslesung von Beispielpreisen, im ShopBuilder nicht angezeigt . Fehlverhalten wurden behoben.
+- Die Vorschau der Auftragsbestätigungsseite wurde durch einen Fehler beim Auslesen von Beispielpreisen im ShopBuilder nicht angezeigt. Dieses Verhalten wurde behoben.
 
 ## v5.0.54 (2022-08-08) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.53...5.0.54" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
 
