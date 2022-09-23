@@ -84,7 +84,7 @@ jobs:
       - name: Setup php
         uses: shivammathur/setup-php@v2
         with:
-          php-version: "7.3"
+          php-version: "8.0"
         env:
           COMPOSER_TOKEN: ${{ secrets.PUBLIC_PAT_CICD4_PUBLIC }}
 
