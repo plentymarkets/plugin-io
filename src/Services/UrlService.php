@@ -298,7 +298,7 @@ class UrlService
      */
     public function redirectTo($redirectURL)
     {
-        if (str_contains($redirectURL, 'http:') && str_contains($redirectURL, 'https:')) {
+        if (strpos($redirectURL, 'http:') !== 0 && strpos($redirectURL, 'https:') !== 0) {
             /** @var UrlQuery $query */
             $query = pluginApp(UrlQuery::class, ['path' => $redirectURL]);
             $redirectURL = $query->toAbsoluteUrl(
