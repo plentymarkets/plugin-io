@@ -969,4 +969,20 @@ class OrderService
         }
         return 9.0;
     }
+
+    /**
+     * Return email for the confirmation page as a guest
+     * @param $order
+     * @return string
+     */
+    public function getGuestEmail($order): string
+    {
+        $email = $order['billingAddress']['options'][0]['value'];
+
+        if (is_null($email)) {
+            $email = '';
+        }
+
+        return $email;
+    }
 }
