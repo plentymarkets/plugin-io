@@ -407,22 +407,18 @@ class CategoryService
         );
     }
 
-    private function filterVisibleCategories( $categoryList = [])
+    private function filterVisibleCategories($categoryList = [])
     {
         $result = array_filter(
-            $categoryList,
-            function($category)
-            {
+            $categoryList ?? [],
+            function ($category) {
                 return $category['right'] !== 'customer';
             }
         );
 
         $result = array_map(
-            function($category)
-            {
-                /** @var $category Category */
-                $category->children = $this->filterVisibleCategories($category->children);
-
+            function ($category) {
+                $category['children'] = $this->filterVisibleCategories($category['children']);
                 return $category;
             },
             $result
