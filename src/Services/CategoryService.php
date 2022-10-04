@@ -416,15 +416,13 @@ class CategoryService
             }
         );
 
-        $result = array_map(
+        return array_map(
             function ($category) {
                 $category['children'] = $this->filterVisibleCategories($category['children']);
                 return $category;
             },
             $result
         );
-
-        return $result;
     }
 
 
