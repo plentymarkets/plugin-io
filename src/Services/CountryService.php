@@ -42,7 +42,7 @@ class CountryService
             $lang = Utils::getLang();
         }
         $list = $this->countryRepository->getCountriesList(null, ['names']);
-        return $list;
+        return $list->toArray();
     }
 
     /**
