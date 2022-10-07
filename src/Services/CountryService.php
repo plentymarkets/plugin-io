@@ -41,8 +41,22 @@ class CountryService
         if ($lang === null) {
             $lang = Utils::getLang();
         }
-        $list = $this->countryRepository->getCountriesList(null, ['names']);
-        return $list->toArray();
+
+        if (!isset(self::$activeCountries[$lang])) {
+            $list = $this->countryRepository->getCountriesList(null, ['names']);
+
+            foreach ($list as $country) {
+                $country->currLangName = $country->names->contains('language', $lang) ?
+                    $country->names->where('language', $lang)->first()->name :
+                    $country->names->first()->name;
+                self::$activeCountries[$lang][] = $country;
+            }
+        }
+
+        $column = array_column(self::$activeCountries[$lang], "currLangName");
+        array_multisort($column, SORT_ASC, SORT_LOCALE_STRING, self::$activeCountries[$lang]);
+
+        return self::$activeCountries[$lang];
     }
 
     /**
