@@ -36,6 +36,15 @@ class CountryService
         $this->countryRepository = $countryRepository;
     }
 
+    public function getAllCountries($lang = null): array
+    {
+        if ($lang === null) {
+            $lang = Utils::getLang();
+        }
+        $list = $this->countryRepository->getCountriesList();
+        return $list;
+    }
+
     /**
      * List all active countries
      *
