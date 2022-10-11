@@ -42,7 +42,13 @@ class CountryService
         if ($lang === null) {
             $lang = Utils::getLang();
         }
-        $list = $this->countryRepository->getCountriesList(null, []);
+        $list = $this->countryRepository->getCountriesList(null, ['states', 'names']);
+
+        foreach ($list as $country) {
+            $country->currLangName = $country->names->contains('language', $lang) ?
+                $country->names->where('language', $lang)->first()->name :
+                $country->names->first()->name;
+        }
         return $list->toArray();
     }
 
