@@ -18,20 +18,13 @@ use IO\Services\CountryService;
 class CountriesResource extends ApiResource
 {
     /**
-    * @var CountryService $countryService Instance of the CountryService.
-    */
-    private $countryService;
-
-    /**
      * LanguageResource constructor.
      * @param Request $request
      * @param ApiResponse $response
-     * @param CountryService $countryService
      */
-	public function __construct(Request $request, ApiResponse $response, CountryService $countryService)
+	public function __construct(Request $request, ApiResponse $response)
 	{
 		parent::__construct($request, $response);
-        $this->$countryService = $countryService;
 	}
 
     /**
@@ -41,7 +34,12 @@ class CountriesResource extends ApiResource
      */
     public function index(): Response
     {
-        $response = $this->countryService->getAllCountries();
-        return $this->response->create($response, ResponseCode::OK);
+        /**
+        * @var CountryService $countryService Instance of the CountryService.
+        */
+        $countryService = pluginApp(CountryService::class);
+        $result = $countryService->getAllCountries();
+
+        return $this->response->create($result, ResponseCode::OK);
     }
 }

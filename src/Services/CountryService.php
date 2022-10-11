@@ -48,6 +48,17 @@ class CountryService
                 $country->names->where('language', $lang)->first()->name :
                 $country->names->first()->name;
         }
+
+        $list = $list->map(function ($country) {
+           return [
+             'id' => $country->id,
+             'currLangName' => $country->currLangName,
+             'isoCode2' => $country->isoCode2,
+             'states' => $country->states,
+             'vatCodes' => $country->vatCodes
+           ];
+        });
+
         return $list->toArray();
     }
 
