@@ -6,7 +6,6 @@ use IO\Helper\Utils;
 use Plenty\Modules\Order\Shipping\Countries\Contracts\CountryRepositoryContract;
 use Plenty\Modules\Order\Shipping\Countries\Models\Country;
 use Plenty\Modules\Frontend\Contracts\Checkout;
-use IO\Helper\ArrayHelper;
 
 /**
  * Class CountryService

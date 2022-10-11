@@ -724,7 +724,7 @@ class BasketService
     public function getDeliveryAddressId()
     {
         return $this->checkout->getCustomerShippingAddressId();
-    } 
+    }
 
     /**
      * Get the maximum vat value in basket.
