@@ -42,8 +42,8 @@ class CountryService
         if ($lang === null) {
             $lang = Utils::getLang();
         }
-        $list = array_column($this->countryRepository->getCountriesList(null, []));
-        return $list;
+        $list = $this->countryRepository->getCountriesList(null, []);
+        return $list->toArray();
     }
 
     /**
