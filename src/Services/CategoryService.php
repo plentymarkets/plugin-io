@@ -299,7 +299,7 @@ class CategoryService
             } elseif ($category['id'] == $categoryId) {
                 $result = $category;
                 break;
-            } elseif (count($category['children'])) {
+            } elseif (is_array($category['children']) && count($category['children'])) {
                 $result = $this->findInCategoryTree($category['children'], $branch, $level + 1);
                 break;
             }
@@ -740,7 +740,7 @@ class CategoryService
         $branchKey = "category" . $level . "Id";
         $isCurrentLevel = $branch[$branchKey] === $branch["categoryId"];
         $result = [];
-        $siblingCount = count($tree);
+        $siblingCount = count($tree ?? []);
 
         foreach ($tree as $category) {
             $isInBranch = $category['id'] === $branch[$branchKey];
@@ -756,11 +756,11 @@ class CategoryService
                 );
                 $result[] = $category;
             } elseif ($isInBranch && $isCurrentLevel) {
-                    $this->appendBranchFields($category, $siblingCount, $urlPrefix, 2);
-                    $result[] = $category;
+                $this->appendBranchFields($category, $siblingCount, $urlPrefix, 2);
+                $result[] = $category;
             } elseif (!$isInBranch && $isCurrentLevel) {
-                    $this->appendBranchFields($category, $siblingCount, $urlPrefix, 0);
-                    $result[] = $category;
+                $this->appendBranchFields($category, $siblingCount, $urlPrefix, 0);
+                $result[] = $category;
             }
         }
 

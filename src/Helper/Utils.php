@@ -4,6 +4,7 @@ namespace IO\Helper;
 
 use IO\Services\TemplateConfigService;
 use IO\Services\UrlBuilder\UrlQuery;
+use Plenty\Modules\ContentCache\Contracts\ContentCacheQueryParamsRepositoryContract;
 use Plenty\Modules\Frontend\Services\AccountService;
 use Plenty\Modules\ShopBuilder\Helper\ShopBuilderRequest;
 use Plenty\Modules\Webshop\Contracts\LocalizationRepositoryContract;
@@ -140,12 +141,13 @@ class Utils
      * Transform an absolute URL into a relative URL.
      * @param string|null $path An absolute URL.
      * @param bool $includeLanguage Should the URL include the language (Default: false).
+     * @param string $lang Language which should be added.
      * @return string|null
      */
-    public static function makeRelativeUrl($path = null, $includeLanguage = false)
+    public static function makeRelativeUrl($path = null, $includeLanguage = false, $lang = null)
     {
         /** @var UrlQuery $query */
-        $query = pluginApp(UrlQuery::class, ['path' => $path]);
+        $query = pluginApp(UrlQuery::class, ['path' => $path, 'lang' => $lang]);
         return $query->toRelativeUrl($includeLanguage);
     }
 
@@ -182,5 +184,27 @@ class Utils
 
         $key = $app->getPlentyId() . '_' . pluginSetId() . '_' . $key;
         return $cachingRepository->get($key, $defaultValue);
+    }
+
+    /**
+     * Removes all parameters which are registered as excluded for the content cache
+     *
+     * @param array $queryParameters
+     * @return array
+     */
+    public static function cleanUpExcludesContentCacheParams(array $queryParameters): array
+    {
+        /** @var ContentCacheQueryParamsRepositoryContract $contentCacheQueryParamsRepository */
+        $contentCacheQueryParamsRepository = pluginApp(ContentCacheQueryParamsRepositoryContract::class);
+        $registeredParameters = $contentCacheQueryParamsRepository->getRegistered();
+        unset($queryParameters['plentyMarkets']);
+        if (is_array($registeredParameters['excluded'])) {
+            foreach ($registeredParameters['excluded'] as $registeredParameter) {
+                if (is_array($queryParameters) && array_key_exists($registeredParameter, $queryParameters)) {
+                    unset($queryParameters[$registeredParameter]);
+                }
+            }
+        }
+        return $queryParameters;
     }
 }

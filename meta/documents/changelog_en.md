@@ -1,5 +1,45 @@
 # Release Notes for IO
 
+## v5.0.55 (2022-09-22) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.54...5.0.55" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
+
+### Fixed
+
+- The preview of the order confirmation page was not displayed in the ShopBuilder due to an error related to sample prices. This has been fixed.
+
+## v5.0.54 (2022-08-08) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.53...5.0.54" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
+
+### TODO
+
+- If you are using the plentyShop contact form (either the standard template or via a ShopBuilder content), please make sure that the route `/contact-mail-api` is activated in the IO plugin. To check this, open the IO setting in your plugin set. Open the tab **Configuration**. In the setting **Activate routes**, activate the route `/contact-mail-api` and save your changes. If you do *not* use a plentyShop contact form, please make sure that the route `/contact-mail-api` is deactivated.
+
+### Added
+
+- The route `/contact-mail-api` has been added. You can use it to activate and deactivate the sending of mail via the contact form independently of the `/contact` route.
+
+### Fixed
+
+- For multilingual shops, errors could occurr in regards to the shopping cart URL. This has been fixed.
+- If pages were called with parameters that were excluded from ShopBooster, faulty markup could be generated. This has been fixed.
+- On mobile devices, the combination of language selection and ShopBooster could result in the mobile navigation being displayed in the previously selected language. This behaviour has been fixed.
+- Item sets with set components that contained order characteristics could cause an incorrect display of the value of goods. This has been fixed.
+
+## v5.0.53 (2022-07-04) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.52...5.0.53" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
+
+### Behoben
+
+- The setting **Forward to login page after clicking link in order confirmation** has been added back to plentyShop LTS settings and plentyShop wizard. These settings were removed in version 5.0.52, which resulted in the order confirmation of manually created orders not being accessible. We have therefore reverted this change.
+
+## v5.0.52 (2022-06-29) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.50...5.0.52" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
+
+### Changed
+
+- The setting **Forward to login page after clicking link in order confirmation** has been removed from the plentyShop LTS settings and the plentyShop assistant. Now, the default behaviour is that customers are always forwarded to the login page. 
+
+### Fixed
+
+- Category filters were not displayed in the ShopBuilder. This has been fixed.
+- We fixed an error concerning the generation of the backlink when users were forwarded from the order confirmation to the login page.
+
 ## v5.0.50 (2022-05-04) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.49...5.0.50" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
 
 ### TODO for external developers

@@ -2,12 +2,15 @@
 
 namespace IO\Api;
 
+use IO\Middlewares\DetectCurrency;
+use IO\Middlewares\DetectLanguage;
+use IO\Middlewares\DetectReferrer;
+use IO\Middlewares\DetectShippingCountry;
 use IO\Services\TemplateService;
 use Plenty\Plugin\Http\Response;
 use Plenty\Plugin\Controller;
 use Plenty\Plugin\Http\Request;
-use IO\Api\ApiResponse;
-use IO\Api\ResponseCode;
+use Plenty\Modules\Webshop\Contracts\SessionStorageRepositoryContract;
 
 /**
  * Class ApiResource
@@ -37,14 +40,41 @@ class ApiResource extends Controller
      */
 	public function __construct(Request $request, ApiResponse $response)
 	{
-		$this->response = $response;
+        $this->response = $response;
 		$this->request  = $request;
+        $initialRestCall = $request->get('initialRestCall', false);
+
+        if ($initialRestCall) {
+            $this->detectData();
+        }
 
         $templateEvent = $request->get('templateEvent', '');
         if(empty(TemplateService::$currentTemplate) && strlen($templateEvent))
         {
             TemplateService::$currentTemplate = $templateEvent;
         }
+    }
+
+    private function detectData()
+    {
+        /** @var DetectReferrer $detectReferrer */
+        $detectReferrer = pluginApp(DetectReferrer::class);
+        $detectReferrer->before($this->request);
+
+        /** @var DetectShippingCountry $detectShippingCountry */
+        $detectShippingCountry = pluginApp(DetectShippingCountry::class);
+        $detectShippingCountry->before($this->request);
+
+        /** @var DetectCurrency $detectCurrency */
+        $detectCurrency = pluginApp(DetectCurrency::class);
+        $detectCurrency->before($this->request);
+
+        /** @var SessionStorageRepositoryContract $sessionStorageRepository */
+        $sessionStorageRepository = pluginApp(SessionStorageRepositoryContract::class);
+
+        /** @var DetectLanguage $detectLanguage */
+        $detectLanguage = pluginApp(DetectLanguage::class);
+        $detectLanguage->detectLanguage($this->request, $sessionStorageRepository->getHttpReferrerUri());
     }
 
     /**

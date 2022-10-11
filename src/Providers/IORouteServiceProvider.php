@@ -43,8 +43,6 @@ class IORouteServiceProvider extends RouteServiceProvider
             $api->resource('io/customer/password', 'CustomerPasswordResource');
             $api->resource('io/customer/password_reset', 'CustomerPasswordResetResource');
             $api->resource('io/customer/mail', 'CustomerMailResource');
-            $api->resource('io/customer/contact/mail', 'ContactMailResource');
-            $api->resource('io/customer/contact/mail/file', 'ContactMailFileResource');
             $api->get('io/customer/order/list', 'CustomerOrderResource@index');
             $api->resource('io/customer/newsletter', 'CustomerNewsletterResource');
             $api->get('io/variations/map', 'VariationAttributeMapResource@index');
@@ -67,6 +65,13 @@ class IORouteServiceProvider extends RouteServiceProvider
             $api->resource('io/categorytree', 'CategoryTreeResource');
             $api->get('io/session', 'SessionResource@index');
         });
+
+        if (RouteConfig::isActive(RouteConfig::CONTACT_MAIL_API)) {
+            $api->version(['v1'], ['namespace' => 'IO\Api\Resources'], function (ApiRouter $api) {
+                $api->resource('io/customer/contact/mail', 'ContactMailResource');
+                $api->resource('io/customer/contact/mail/file', 'ContactMailFileResource');
+            });
+        }
 
         $api->version(['v1'], ['namespace' => 'IO\Api\Resources', 'middleware' => ['csrf']], function (ApiRouter $api) {
             $api->post('io/order', 'OrderResource@store');
@@ -146,11 +151,16 @@ class IORouteServiceProvider extends RouteServiceProvider
         // CONFIRMATION
         if (RouteConfig::isActive(RouteConfig::CONFIRMATION)
             || in_array(RouteConfig::CONFIRMATION, RouteConfig::getEnabledRoutes())
-            || RouteConfig::getCategoryId(RouteConfig::CONFIRMATION) > 0) {
-            $router->get('-/akQQ{orderAccessKey}/idQQ{orderId}', 'IO\Controllers\ConfirmationEmailController@showConfirmation');
-            $router->get('_py-/akQQ{orderAccessKey}/idQQ{orderId}', 'IO\Controllers\ConfirmationEmailController@showConfirmation');
-            $router->get('_py_/akQQ{orderAccessKey}/idQQ{orderId}', 'IO\Controllers\ConfirmationEmailController@showConfirmation');
-            $router->get('_plentyShop__/akQQ{orderAccessKey}/idQQ{orderId}', 'IO\Controllers\ConfirmationEmailController@showConfirmation');
+            || RouteConfig::getCategoryId(RouteConfig::CONFIRMATION) > 0)
+        {
+            $router->get('-/akQQ{orderAccessKey}/idQQ{orderId}.html', 'IO\Controllers\ConfirmationEmailController@showConfirmation')->where('orderId', '\d+');
+            $router->get('-/akQQ{orderAccessKey}/idQQ{orderId}', 'IO\Controllers\ConfirmationEmailController@showConfirmation')->where('orderId', '\d+');
+            $router->get('_py-/akQQ{orderAccessKey}/idQQ{orderId}.html', 'IO\Controllers\ConfirmationEmailController@showConfirmation')->where('orderId', '\d+');
+            $router->get('_py-/akQQ{orderAccessKey}/idQQ{orderId}', 'IO\Controllers\ConfirmationEmailController@showConfirmation')->where('orderId', '\d+');
+            $router->get('_py_/akQQ{orderAccessKey}/idQQ{orderId}.html', 'IO\Controllers\ConfirmationEmailController@showConfirmation')->where('orderId', '\d+');
+            $router->get('_py_/akQQ{orderAccessKey}/idQQ{orderId}', 'IO\Controllers\ConfirmationEmailController@showConfirmation')->where('orderId', '\d+');
+            $router->get('_plentyShop__/akQQ{orderAccessKey}/idQQ{orderId}.html', 'IO\Controllers\ConfirmationEmailController@showConfirmation')->where('orderId', '\d+');
+            $router->get('_plentyShop__/akQQ{orderAccessKey}/idQQ{orderId}', 'IO\Controllers\ConfirmationEmailController@showConfirmation')->where('orderId', '\d+');
         }
 
         if (RouteConfig::isActive(RouteConfig::CONFIRMATION)) {
