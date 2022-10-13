@@ -334,6 +334,10 @@ class IOServiceProvider extends ServiceProvider
             'gclid'
         ]);
 
+        $qp->registerIncluded([
+            'exc'
+        ]);
+
         $dispatcher->listen(FrontendShippingProfileChanged::class, IOFrontendShippingProfileChanged::class);
         $dispatcher->listen(FrontendUpdateDeliveryAddress::class, IOFrontendUpdateDeliveryAddress::class);
 
