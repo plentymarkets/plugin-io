@@ -62,6 +62,7 @@ use Plenty\Exceptions\ValidationException;
 use Plenty\Modules\Authentication\Events\AfterAccountAuthentication;
 use Plenty\Modules\Authentication\Events\AfterAccountContactLogout;
 use Plenty\Modules\Basket\Events\Basket\AfterBasketChanged;
+use Plenty\Modules\ContentCache\Contracts\ContentCacheQueryParamsRepositoryContract;
 use Plenty\Modules\Cron\Services\CronContainer;
 use Plenty\Modules\Frontend\Events\FrontendCurrencyChanged;
 use Plenty\Modules\Frontend\Events\FrontendLanguageChanged;
@@ -326,6 +327,12 @@ class IOServiceProvider extends ServiceProvider
                 }
             }
         );
+
+        /** @var ContentCacheQueryParamsRepositoryContract $qp */
+        $qp = pluginApp(ContentCacheQueryParamsRepositoryContract::class);
+        $qp->registerExcluded([
+            'gclid'
+        ]);
 
         $dispatcher->listen(FrontendShippingProfileChanged::class, IOFrontendShippingProfileChanged::class);
         $dispatcher->listen(FrontendUpdateDeliveryAddress::class, IOFrontendUpdateDeliveryAddress::class);
