@@ -72,7 +72,15 @@ class OrderStatusService
             $statusHistory = $statusHistoryRepo->getStatusHistoryByOrderId($orderId);
             $orderStatus = $orderStatusRepo->get($orderStatusId);
             if (!is_null($orderStatus) && $orderStatus->isFrontendVisible) {
-                return str_replace('[' . $orderStatus->statusId . ']', '', $orderStatus->names->get($lang));
+                $status = explode(".", (string)$orderStatus->statusId);
+                if (is_array($status) && isset($status[1]))
+                {
+                    $search = '[' . $orderStatus->statusId . ']';
+                } else {
+                    $search = sprintf("[%.1f]", $orderStatus->statusId);
+                }
+
+                return str_replace($search, '', $orderStatus->names->get($lang));
             } elseif (!is_null($orderStatus)) {
                 $statusHistory = $statusHistoryRepo->getStatusHistoryByOrderId($orderId);
                 if (count($statusHistory)) {
@@ -97,8 +105,14 @@ class OrderStatusService
                         for ($i = count($statusHistoryNew) - 1; $i >= 0; $i--) {
                             $statusEntry = $statusHistoryNew[$i];
                             if ($statusEntry instanceof OrderStatus && $statusEntry->statusId < $orderStatusId && $statusEntry->isFrontendVisible) {
-                                return str_replace('[' . $statusEntry->statusId . ']', '',
-                                    $statusEntry->names->get($lang));
+                                $status = explode(".", (string)$statusEntry->statusId);
+                                if (is_array($status) && isset($status[1]))
+                                {
+                                    $search = '[' . $statusEntry->statusId . ']';
+                                } else {
+                                    $search = sprintf("[%.1f]", $statusEntry->statusId);
+                                }
+                                return str_replace($search, '', $statusEntry->names->get($lang));
                             }
                         }
                     }
