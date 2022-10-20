@@ -56,7 +56,7 @@ class OrderStatusService
      */
     public function getOrderStatus($orderId, $orderStatusId)
     {
-        $lang = Utils::getLang();
+        $language = Utils::getLang();
         $orderStatusRepo = $this->orderStatusRepo;
         $statusHistoryRepo = $this->statusHistoryRepo;
         $logger = $this->getLogger(__CLASS__)->addReference('orderId', $orderId);
@@ -64,23 +64,14 @@ class OrderStatusService
         $orderStatus = $this->authHelper->processUnguarded(function () use (
             $orderId,
             $orderStatusId,
-            $lang,
+            $language,
             $orderStatusRepo,
             $statusHistoryRepo,
             $logger
         ) {
-            $statusHistory = $statusHistoryRepo->getStatusHistoryByOrderId($orderId);
             $orderStatus = $orderStatusRepo->get($orderStatusId);
             if (!is_null($orderStatus) && $orderStatus->isFrontendVisible) {
-                $status = explode(".", (string)$orderStatus->statusId);
-                if (is_array($status) && isset($status[1]))
-                {
-                    $search = '[' . $orderStatus->statusId . ']';
-                } else {
-                    $search = sprintf("[%.1f]", $orderStatus->statusId);
-                }
-
-                return str_replace($search, '', $orderStatus->names->get($lang));
+                return $this->replaceStatusCode($orderStatus, $language);
             } elseif (!is_null($orderStatus)) {
                 $statusHistory = $statusHistoryRepo->getStatusHistoryByOrderId($orderId);
                 if (count($statusHistory)) {
@@ -105,14 +96,7 @@ class OrderStatusService
                         for ($i = count($statusHistoryNew) - 1; $i >= 0; $i--) {
                             $statusEntry = $statusHistoryNew[$i];
                             if ($statusEntry instanceof OrderStatus && $statusEntry->statusId < $orderStatusId && $statusEntry->isFrontendVisible) {
-                                $status = explode(".", (string)$statusEntry->statusId);
-                                if (is_array($status) && isset($status[1]))
-                                {
-                                    $search = '[' . $statusEntry->statusId . ']';
-                                } else {
-                                    $search = sprintf("[%.1f]", $statusEntry->statusId);
-                                }
-                                return str_replace($search, '', $statusEntry->names->get($lang));
+                                return $this->replaceStatusCode($statusEntry, $language);
                             }
                         }
                     }
@@ -123,5 +107,25 @@ class OrderStatusService
         });
 
         return $orderStatus;
+    }
+
+    /**
+     * Replace the status code from status name and return it
+     *
+     * @param OrderStatus $orderStatus
+     * @param string $language
+     *
+     * @return string
+     */
+    private function replaceStatusCode(OrderStatus $orderStatus, string $language)
+    {
+        $status = explode(".", (string)$orderStatus->statusId);
+        if (is_array($status) && isset($status[1]))
+        {
+            $search = '[' . $orderStatus->statusId . ']';
+        } else {
+            $search = sprintf("[%.1f]", $orderStatus->statusId);
+        }
+        return str_replace($search, '', $orderStatus->names->get($language));
     }
 }
