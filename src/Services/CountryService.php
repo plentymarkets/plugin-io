@@ -2,7 +2,9 @@
 
 namespace IO\Services;
 
+use Elasticsearch\Endpoints\Security\EnableUser;
 use IO\Helper\Utils;
+use Plenty\Legacy\Services\Shipping\EUCountryCodesService;
 use Plenty\Modules\Order\Shipping\Countries\Contracts\CountryRepositoryContract;
 use Plenty\Modules\Order\Shipping\Countries\Models\Country;
 use Plenty\Modules\Frontend\Contracts\Checkout;
@@ -36,30 +38,34 @@ class CountryService
         $this->countryRepository = $countryRepository;
     }
 
-    public function getAllCountries($lang = null): array
+    public function getEUCountriesList($lang = null): array
     {
         if ($lang === null) {
             $lang = Utils::getLang();
         }
         $list = $this->countryRepository->getCountriesList(null, ['states', 'names']);
 
+        /** @var EUCountryCodesService $euCountryService */
+        $euCountryService = pluginApp(EUCountryCodesService::class);
+        $euCountryList = [];
+
         foreach ($list as $country) {
-            $country->currLangName = $country->names->contains('language', $lang) ?
-                $country->names->where('language', $lang)->first()->name :
-                $country->names->first()->name;
+            if ($euCountryService->isEUCountry($country->id)) {
+                $country->currLangName = $country->names->contains('language', $lang) ?
+                    $country->names->where('language', $lang)->first()->name :
+                    $country->names->first()->name;
+
+                $euCountryList[] = [
+                    'id' => $country->id,
+                    'currLangName' => $country->currLangName,
+                    'isoCode2' => $country->isoCode2,
+                    'states' => $country->states,
+                    'vatCodes' => $country->vatCodes
+                ];
+            }
         }
 
-        $list = $list->map(function ($country) {
-           return [
-             'id' => $country->id,
-             'currLangName' => $country->currLangName,
-             'isoCode2' => $country->isoCode2,
-             'states' => $country->states,
-             'vatCodes' => $country->vatCodes
-           ];
-        });
-
-        return $list->toArray();
+        return $euCountryList;
     }
 
     /**
@@ -89,6 +95,11 @@ class CountryService
         array_multisort($column, SORT_ASC, SORT_LOCALE_STRING, self::$activeCountries[$lang]);
 
         return self::$activeCountries[$lang];
+    }
+
+    public function getEUCountriesList(): array
+    {
+        return [];
     }
 
     /**
