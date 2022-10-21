@@ -97,11 +97,6 @@ class CountryService
         return self::$activeCountries[$lang];
     }
 
-    public function getEUCountriesList(): array
-    {
-        return [];
-    }
-
     /**
      * Get a list of names for the active countries
      *
