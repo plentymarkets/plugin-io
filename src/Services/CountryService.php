@@ -2,12 +2,11 @@
 
 namespace IO\Services;
 
-use Elasticsearch\Endpoints\Security\EnableUser;
 use IO\Helper\Utils;
-use Plenty\Legacy\Services\Shipping\EUCountryCodesService;
+use Plenty\Modules\Frontend\Contracts\Checkout;
+use Plenty\Modules\Order\Shipping\Contracts\EUCountryCodesServiceContract;
 use Plenty\Modules\Order\Shipping\Countries\Contracts\CountryRepositoryContract;
 use Plenty\Modules\Order\Shipping\Countries\Models\Country;
-use Plenty\Modules\Frontend\Contracts\Checkout;
 
 /**
  * Class CountryService
@@ -45,8 +44,8 @@ class CountryService
         }
         $list = $this->countryRepository->getCountriesList(null, ['states', 'names']);
 
-        /** @var EUCountryCodesService $euCountryService */
-        $euCountryService = pluginApp(EUCountryCodesService::class);
+        /** @var EUCountryCodesServiceContract $euCountryService */
+        $euCountryService = pluginApp(EUCountryCodesServiceContract::class);
         $euCountryList = [];
 
         foreach ($list as $country) {
