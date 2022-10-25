@@ -157,6 +157,7 @@ class ConfirmationController extends LayoutController
         }
 
         if (!is_null($order) && $order instanceof LocalizedOrder) {
+            $orderAccessStatus = $this->checkOrderAccessStatus($order->order);
             if ($category instanceof Category && $contactRepository->getContactId() <= 0) {
                 /** @var ConfigRepository $config */
                 $config = pluginApp(ConfigRepository::class);
@@ -168,35 +169,37 @@ class ConfirmationController extends LayoutController
                 }
             }
 
-            return $this->renderTemplate(
-                "tpl.confirmation",
-                [
-                    "category" => $category,
-                    "data" => $order,
-                    "showAdditionalPaymentInformation" => true,
-                    "isOrderValid" => $this->checkValidity($order->order)
-                ],
-                false
-            );
+            if($orderAccessStatus !== ConfirmationRepositoryContract::STATUS_ORDER_CONFIRMATION_INVALID) {
+                return $this->renderTemplate(
+                    "tpl.confirmation",
+                    [
+                        'category' => $category,
+                        'data' => $order,
+                        'showAdditionalPaymentInformation' => true,
+                        "isOrderValid" => $orderAccessStatus === ConfirmationRepositoryContract::STATUS_ORDER_CONFIRMATION_SOFTLOGIN ? true : false
+                    ],
+                    false
+                );
+            }
         } elseif (!$order instanceof LocalizedOrder && !is_null($order)) {
             return $order;
-        } else {
-            $this->getLogger(__CLASS__)->warning("IO::Debug.ConfirmationController_orderNotFound");
-            /** @var Response $response */
-            $response = pluginApp(Response::class);
-            $response->forceStatus(ResponseCode::NOT_FOUND);
-
-            CheckNotFound::$FORCE_404 = true;
-
-            return $response;
         }
+
+        $this->getLogger(__CLASS__)->warning("IO::Debug.ConfirmationController_orderNotFound");
+        /** @var Response $response */
+        $response = pluginApp(Response::class);
+        $response->forceStatus(ResponseCode::NOT_FOUND);
+
+        CheckNotFound::$FORCE_404 = true;
+
+        return $response;
     }
 
-    private function checkValidity(Order $order)
+    private function checkOrderAccessStatus(Order $order)
     {
         /** @var ConfirmationRepositoryContract $confirmationRepository */
         $confirmationRepository = pluginApp(ConfirmationRepositoryContract::class);
-        return $confirmationRepository->checkValidity($order);
+        return $confirmationRepository->checkOrderAccessStatus($order);
     }
 
     public function redirect($orderId = 0, $accessKey = '')
