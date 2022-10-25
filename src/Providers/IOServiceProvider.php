@@ -27,6 +27,7 @@ use IO\Middlewares\DetectReferrer;
 use IO\Middlewares\DetectShippingCountry;
 use IO\Middlewares\HandleNewsletter;
 use IO\Middlewares\HandleOrderPreviewUrl;
+use IO\Middlewares\HandleQueryParamNotifications;
 use IO\Services\AuthenticationService;
 use IO\Services\AvailabilityService;
 use IO\Services\BasketService;
@@ -107,7 +108,8 @@ class IOServiceProvider extends ServiceProvider
                 HandleNewsletter::class,
                 HandleOrderPreviewUrl::class,
                 ClearNotifications::class,
-                CheckNotFound::class
+                CheckNotFound::class,
+                HandleQueryParamNotifications::class
             ]
         );
         $this->getApplication()->register(IORouteServiceProvider::class);
