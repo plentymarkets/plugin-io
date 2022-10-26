@@ -107,9 +107,9 @@ class IOServiceProvider extends ServiceProvider
                 DetectShippingCountry::class,
                 HandleNewsletter::class,
                 HandleOrderPreviewUrl::class,
+                HandleQueryParamNotifications::class,
                 ClearNotifications::class,
-                CheckNotFound::class,
-                HandleQueryParamNotifications::class
+                CheckNotFound::class
             ]
         );
         $this->getApplication()->register(IORouteServiceProvider::class);
