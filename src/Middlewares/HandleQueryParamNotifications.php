@@ -32,18 +32,17 @@ class HandleQueryParamNotifications extends Middleware {
      * @param Request $request
      * @param Response $response
      * @return Response
-     * * @var NotificationService $notificationService
      */
     public function after(Request $request, Response $response)
     {
-        $request = pluginApp(Request::class);
-        if($request->has('generateAccessKeyStatus')) {
+        if($request->has('generateAccessKeySuccess')) {
+            /** @var NotificationService $notificationService */
             $notificationService = pluginApp(NotificationService::class);
-            $successStatus = $request->get('generateAccessKeyStatus');
+            $successStatus = $request->get('generateAccessKeySuccess');
             if($successStatus == 1) {
-                $notificationService->success('Hat geplappt');
+                $notificationService->success('success', 1401);
             } else {
-                $notificationService->error('Fehlschlag');
+                $notificationService->error('fail', 1402);
             }
         }
         return $response;
