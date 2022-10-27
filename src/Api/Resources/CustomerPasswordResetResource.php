@@ -72,7 +72,7 @@ class CustomerPasswordResetResource extends ApiResource
             $hashService = pluginApp(UserDataHashService::class);
             $hashService->create(['mail' => $email], UserDataHash::TYPE_RESET_PASSWORD, null, $contact->id);
 
-            $params = ['test' => $contact->id];
+            $params = ['contactId' => $contact->id];
 
             try {
                 $this->sendMail(AutomaticEmailTemplate::CONTACT_NEW_PASSWORD, AutomaticEmailContact::class, $params);
