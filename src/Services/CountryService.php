@@ -167,6 +167,14 @@ class CountryService
         return "";
     }
 
+    /**
+     * Get country name for given language
+     * Fall back to ID if no name found
+     * 
+     * @param object $country Country with a name
+     * @param string $lang Language for country name
+     * @return string
+     */
     private function getCountryNameByLang($country, $lang): string {
         if ($country->currLangName = $country->names->contains('language', $lang)) {
             return $country->names->where('language', $lang)->first()->name;
