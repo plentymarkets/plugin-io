@@ -171,6 +171,6 @@ class CountryService
         if ($country->currLangName = $country->names->contains('language', $lang)) {
             return $country->names->where('language', $lang)->first()->name;
         }
-        return $country->names->first()->name ?? 'Country ID: ' . $country->id;
+        return $country->names->first()->name ?? 'ID: ' . $country->id;
     }
 }
