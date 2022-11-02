@@ -57,7 +57,6 @@ class IORouteServiceProvider extends RouteServiceProvider
             $api->resource('io/category', 'CategoryItemResource');
             $api->resource('io/template', 'TemplateResource');
             $api->resource('io/localization/language', 'LanguageResource');
-            $api->resource('io/localization/countries', 'CountriesResource');
             $api->resource('io/itemWishList', 'ItemWishListResource');
             $api->resource('io/shipping/country', 'ShippingCountryResource');
             $api->resource('io/live-shopping', 'LiveShoppingResource');
