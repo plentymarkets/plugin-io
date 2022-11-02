@@ -338,7 +338,8 @@ class IOServiceProvider extends ServiceProvider
         $contentCacheQueryParamsRepo->registerExcluded([
             'bla',
             'foo',
-            'bar'
+            'bar',
+            'ReferrerID'
         ]);
 
         $dispatcher->listen(FrontendShippingProfileChanged::class, IOFrontendShippingProfileChanged::class);
