@@ -50,13 +50,9 @@ class CountryService
 
         foreach ($list as $country) {
             if ($euCountryService->isEUCountry($country->id)) {
-                $country->currLangName = $country->names->contains('language', $lang) ?
-                    $country->names->where('language', $lang)->first()->name :
-                    $country->names->first()->name;
-
                 $euCountryList[] = [
                     'id' => $country->id,
-                    'currLangName' => $country->currLangName ?? 'Country ID: ' . $country->id,
+                    'currLangName' => $this->getCountryNameByLang($country, $lang),
                     'isoCode2' => $country->isoCode2,
                     'states' => $country->states,
                     'vatCodes' => $country->vatCodes
@@ -83,9 +79,7 @@ class CountryService
             $list = $this->countryRepository->getActiveCountriesList();
 
             foreach ($list as $country) {
-                $country->currLangName = $country->names->contains('language', $lang) ?
-                    $country->names->where('language', $lang)->first()->name :
-                    $country->names->first()->name;
+                $country->currLangName = $this->getCountryNameByLang($country, $lang);
                 self::$activeCountries[$lang][] = $country;
             }
         }
@@ -171,5 +165,12 @@ class CountryService
             return $country->names[0]->name;
         }
         return "";
+    }
+
+    private function getCountryNameByLang($country, $lang): string {
+        if ($country->currLangName = $country->names->contains('language', $lang)) {
+            return $country->names->where('language', $lang)->first()->name;
+        }
+        return $country->names->first()->name ?? 'Country ID: ' . $country->id;
     }
 }
