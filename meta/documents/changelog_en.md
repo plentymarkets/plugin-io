@@ -1,5 +1,11 @@
 # Release Notes for IO
 
+## v5.0.56 (2022-XX-XX) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.55...5.0.56" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
+
+### Fixed
+
+- On the "Forgot password" page, an error message is only displayed if there is a problem with dispatching the e-mail.
+
 ## v5.0.55 (2022-09-22) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.54...5.0.55" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
 
 ### Fixed
