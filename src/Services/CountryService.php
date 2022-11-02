@@ -56,7 +56,7 @@ class CountryService
 
                 $euCountryList[] = [
                     'id' => $country->id,
-                    'currLangName' => $country->currLangName,
+                    'currLangName' => $country->currLangName ?? '',
                     'isoCode2' => $country->isoCode2,
                     'states' => $country->states,
                     'vatCodes' => $country->vatCodes
