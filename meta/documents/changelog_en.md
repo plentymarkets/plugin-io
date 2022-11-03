@@ -1,10 +1,15 @@
 # Release Notes for IO
 
-## v5.0.56 (2022-XX-XX) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.55...5.0.56" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
+## v5.0.56 (2022-11-03) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.55...5.0.56" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
+
+### Added
+
+- The middleware **HandleQueryParamNotifications** was added to be able to generate URL-parameter-dependent shop notifications.
 
 ### Fixed
 
-- On the "Forgot password" page, an error message is only displayed if there is a problem with dispatching the e-mail.
+- On the "Forgot password" page, an error message is now only displayed if there is a problem with sending the email.
+- Due to an error, some status names were displayed with the status ID in the My Account area and on the order confirmation. This has been fixed. The status IDs are now filtered out completely.
 
 ## v5.0.55 (2022-09-22) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.54...5.0.55" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
 
