@@ -7,6 +7,7 @@ use Plenty\Modules\Frontend\Contracts\Checkout;
 use Plenty\Modules\Order\Shipping\Contracts\EUCountryCodesServiceContract;
 use Plenty\Modules\Order\Shipping\Countries\Contracts\CountryRepositoryContract;
 use Plenty\Modules\Order\Shipping\Countries\Models\Country;
+use Plenty\Plugin\Log\Loggable;
 
 /**
  * Class CountryService
@@ -18,6 +19,8 @@ use Plenty\Modules\Order\Shipping\Countries\Models\Country;
  */
 class CountryService
 {
+    use Loggable;
+
     /**
      * @var CountryRepositoryContract Repository used for manipulating country data
      */
@@ -179,6 +182,16 @@ class CountryService
         if ($country->currLangName = $country->names->contains('language', $lang)) {
             return $country->names->where('language', $lang)->first()->name;
         }
-        return $country->names->first()->name ?? 'ID: ' . $country->id;
+        if ($country->names->first()->name) {
+            return $country->names->first()->name;
+        }
+
+        $this
+            ->getLogger(__CLASS__)
+            ->error('IO::Debug.CountryService_noNameFound', [
+                'id' => $country->id
+            ]);
+
+        return 'ID: ' . $country->id;
     }
 }
