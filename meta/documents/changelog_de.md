@@ -6,6 +6,10 @@
 
 - Es wurde die Middleware **HandleQueryParamNotifications** zur Erzeugung URL-parameterabhängiger Shop Notifikationen ergänzt.
 
+### Behoben
+
+- Auf der Seite "Passwort vergessen" wird nur dann eine Fehlermeldung ausgegeben, wenn ein Problem mit dem E-Mail-Versand besteht.
+
 ## v5.0.55 (2022-09-22) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.54...5.0.55" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
 
 ### Behoben
