@@ -2,6 +2,10 @@
 
 ## v5.0.56 (2022-XX-XX) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.55...5.0.56" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
 
+### Added
+
+- The middleware **HandleQueryParamNotifications** for generating URL-parameter-dependent shop notifications has been added.
+
 ### Fixed
 
 - On the "Forgot password" page, an error message is only displayed if there is a problem with dispatching the e-mail.
