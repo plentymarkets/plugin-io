@@ -6,6 +6,10 @@
 
 - Die Middleware **HandleQueryParamNotifications** wurde hinzugefügt, um URL-parameterabhängige Shop-Benachrichtigungen erzeugen zu können.
 
+### Hinzugefügt
+
+- Es wurde die Middleware **HandleQueryParamNotifications** zur Erzeugung URL-parameterabhängiger Shop Notifikationen ergänzt.
+
 ### Behoben
 
 - Auf der **Passwort vergessen**-Seite wird nur noch dann eine Fehlermeldung ausgegeben, wenn ein Problem mit dem E-Mail-Versand besteht.

@@ -6,6 +6,10 @@
 
 - The middleware **HandleQueryParamNotifications** was added to be able to generate URL-parameter-dependent shop notifications.
 
+### Added
+
+- The middleware **HandleQueryParamNotifications** for generating URL-parameter-dependent shop notifications has been added.
+
 ### Fixed
 
 - On the "Forgot password" page, an error message is now only displayed if there is a problem with sending the email.
