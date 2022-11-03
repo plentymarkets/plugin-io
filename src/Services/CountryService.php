@@ -3,9 +3,11 @@
 namespace IO\Services;
 
 use IO\Helper\Utils;
+use Plenty\Modules\Frontend\Contracts\Checkout;
+use Plenty\Modules\Order\Shipping\Contracts\EUCountryCodesServiceContract;
 use Plenty\Modules\Order\Shipping\Countries\Contracts\CountryRepositoryContract;
 use Plenty\Modules\Order\Shipping\Countries\Models\Country;
-use Plenty\Modules\Frontend\Contracts\Checkout;
+use Plenty\Plugin\Log\Loggable;
 
 /**
  * Class CountryService
@@ -17,6 +19,8 @@ use Plenty\Modules\Frontend\Contracts\Checkout;
  */
 class CountryService
 {
+    use Loggable;
+
     /**
      * @var CountryRepositoryContract Repository used for manipulating country data
      */
@@ -36,6 +40,32 @@ class CountryService
         $this->countryRepository = $countryRepository;
     }
 
+    public function getEUCountriesList($lang = null): array
+    {
+        if ($lang === null) {
+            $lang = Utils::getLang();
+        }
+        $list = $this->countryRepository->getCountriesList(null, ['states', 'names']);
+
+        /** @var EUCountryCodesServiceContract $euCountryService */
+        $euCountryService = pluginApp(EUCountryCodesServiceContract::class);
+        $euCountryList = [];
+
+        foreach ($list as $country) {
+            if ($euCountryService->isEUCountry($country->id)) {
+                $euCountryList[] = [
+                    'id' => $country->id,
+                    'currLangName' => $this->getCountryNameByLang($country, $lang),
+                    'isoCode2' => $country->isoCode2,
+                    'states' => $country->states,
+                    'vatCodes' => $country->vatCodes
+                ];
+            }
+        }
+
+        return $euCountryList;
+    }
+
     /**
      * List all active countries
      *
@@ -52,9 +82,7 @@ class CountryService
             $list = $this->countryRepository->getActiveCountriesList();
 
             foreach ($list as $country) {
-                $country->currLangName = $country->names->contains('language', $lang) ?
-                    $country->names->where('language', $lang)->first()->name :
-                    $country->names->first()->name;
+                $country->currLangName = $this->getCountryNameByLang($country, $lang);
                 self::$activeCountries[$lang][] = $country;
             }
         }
@@ -140,5 +168,31 @@ class CountryService
             return $country->names[0]->name;
         }
         return "";
+    }
+
+    /**
+     * Get country name for given language
+     * Fall back to ID if no name found
+     * 
+     * @param Country $country Country with a name
+     * @param string $lang Language for country name
+     * @return string
+     */
+    private function getCountryNameByLang($country, $lang): string
+    {
+        if ($country->currLangName = $country->names->contains('language', $lang)) {
+            return $country->names->where('language', $lang)->first()->name;
+        }
+        if ($country->names->first()->name) {
+            return $country->names->first()->name;
+        }
+
+        $this
+            ->getLogger(__CLASS__)
+            ->error('IO::Debug.CountryService_noNameFound', [
+                'id' => $country->id
+            ]);
+
+        return 'ID: ' . $country->id;
     }
 }
