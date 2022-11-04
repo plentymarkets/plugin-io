@@ -1,14 +1,10 @@
 # Release Notes für IO
 
-## v5.0.56 (2022-11-03) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.55...5.0.56" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
+## v5.0.56 (2022-11-07) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.55...5.0.56" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
 
 ### Hinzugefügt
 
 - Die Middleware **HandleQueryParamNotifications** wurde hinzugefügt, um URL-parameterabhängige Shop-Benachrichtigungen erzeugen zu können.
-
-### Hinzugefügt
-
-- Es wurde die Middleware **HandleQueryParamNotifications** zur Erzeugung URL-parameterabhängiger Shop Notifikationen ergänzt.
 
 ### Behoben
 
