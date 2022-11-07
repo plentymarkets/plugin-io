@@ -26,6 +26,9 @@ class CountryService
      */
     private $countryRepository;
 
+    /** @var EUCountryCodesServiceContract */
+    private $euCountryService;
+
     /**
      * @var Country[][] Active countries
      */
@@ -35,9 +38,22 @@ class CountryService
      * CountryService constructor.
      * @param CountryRepositoryContract $countryRepository Repository used for manipulating country data
      */
-    public function __construct(CountryRepositoryContract $countryRepository)
+    public function __construct(CountryRepositoryContract $countryRepository, EUCountryCodesServiceContract $euCountryService)
     {
         $this->countryRepository = $countryRepository;
+        $this->euCountryService = $euCountryService;
+    }
+
+    public function hasEUShippingCountry()
+    {
+        $activeCountriesList = $this->getActiveCountriesList();
+        foreach ($activeCountriesList as $activeCountry) {
+            if($this->euCountryService->isEUCountry($activeCountry->id)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public function getEUCountriesList($lang = null): array
@@ -45,14 +61,12 @@ class CountryService
         if ($lang === null) {
             $lang = Utils::getLang();
         }
+
         $list = $this->countryRepository->getCountriesList(null, ['states', 'names']);
 
-        /** @var EUCountryCodesServiceContract $euCountryService */
-        $euCountryService = pluginApp(EUCountryCodesServiceContract::class);
         $euCountryList = [];
-
         foreach ($list as $country) {
-            if ($euCountryService->isEUCountry($country->id)) {
+            if ($this->euCountryService->isEUCountry($country->id)) {
                 $euCountryList[] = [
                     'id' => $country->id,
                     'currLangName' => $this->getCountryNameByLang($country, $lang),
