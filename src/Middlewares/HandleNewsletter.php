@@ -34,7 +34,7 @@ class HandleNewsletter extends Middleware
         $newsletterEmailId = $request->get('newsletterEmailId', 0);
 
         if (strlen($authString) && (int)$newsletterEmailId > 0 && RouteConfig::isActive(RouteConfig::NEWSLETTER_OPT_IN)) {
-            AuthGuard::redirect('/newsletter/subscribe/' . $authString . '/' . $newsletterEmailId);
+            AuthGuard::redirect('/newsletter/subscribe/' . $authString . '/' . $newsletterEmailId . '?noCache=true');
         }
 
         $orderShow = $request->get('OrderShow', '');
