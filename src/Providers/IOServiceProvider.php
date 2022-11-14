@@ -27,6 +27,7 @@ use IO\Middlewares\DetectReferrer;
 use IO\Middlewares\DetectShippingCountry;
 use IO\Middlewares\HandleNewsletter;
 use IO\Middlewares\HandleOrderPreviewUrl;
+use IO\Middlewares\HandleQueryParamNotifications;
 use IO\Services\AuthenticationService;
 use IO\Services\AvailabilityService;
 use IO\Services\BasketService;
@@ -106,6 +107,7 @@ class IOServiceProvider extends ServiceProvider
                 DetectShippingCountry::class,
                 HandleNewsletter::class,
                 HandleOrderPreviewUrl::class,
+                HandleQueryParamNotifications::class,
                 ClearNotifications::class,
                 CheckNotFound::class
             ]
