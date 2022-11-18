@@ -352,7 +352,7 @@ class CheckoutService
          * @var PaymentMethod $methodOfPayment
          */
         foreach ($methodOfPaymentList as $methodOfPaymentKey => $methodOfPayment) {
-            if($this->basketRepository->load()->basketAmount <= 0 && $methodOfPayment->paymentKey !== 'ALREADYPAID') {
+            if($this->basketRepository->load()->basketAmount <= 0 && $methodOfPayment->paymentKey !== 'ALREADY_PAID') {
                 unset($methodOfPaymentList[$methodOfPaymentKey]);
                 continue;
             }
@@ -363,7 +363,7 @@ class CheckoutService
         }
 
         if ($methodOfPaymentID === null || !$methodOfPaymentValid) {
-            $methodOfPayment = array_first($methodOfPaymentList);
+            $methodOfPayment = array_shift($methodOfPaymentList);
             if(!is_null($methodOfPayment)) {
                 $methodOfPaymentID = $methodOfPayment->id;
             }
@@ -384,12 +384,15 @@ class CheckoutService
     public function setMethodOfPaymentId(int $methodOfPaymentID)
     {
         /** @var PaymentMethodRepositoryContract $paymentMethodRepository */
-        $paymentMethodRepository = pluginApp(PaymentMethodRepositoryContract::class);
-        $paymentMethod = $paymentMethodRepository->findByPaymentMethodId($methodOfPaymentID);
-        if ($paymentMethod instanceof PaymentMethod && $paymentMethod->active) {
+
+        //TODO active check
+        //$paymentMethodRepository = pluginApp(PaymentMethodRepositoryContract::class);
+        //$paymentMethod = $paymentMethodRepository->findByPaymentMethodId($methodOfPaymentID);
+
+        //if ($paymentMethod instanceof PaymentMethod && $paymentMethod->active) {
             $this->checkout->setPaymentMethodId($methodOfPaymentID);
             $this->sessionStorageRepository->setSessionValue('MethodOfPaymentID', $methodOfPaymentID);
-        }
+        //}
     }
 
     /**
@@ -479,7 +482,7 @@ class CheckoutService
         $methodOfPaymentList = [];
         if ($this->basketRepository->load()->basketAmount <= 0) {
             $methodOfPaymentList = array_filter($methodOfPaymentListOriginal, function($methodOfPayment) {
-                return $methodOfPayment->paymentKey === 'ALREADYPAID';
+                return $methodOfPayment->paymentKey === 'ALREADY_PAID';
             });
         }
 
