@@ -1,5 +1,11 @@
 # Release Notes für IO
 
+## v5.0.57 (xxxx-xx-xx) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.56...5.0.57" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
+
+### Behoben
+
+- Bei dem Aufruf der Seite für den Newsletter-Opt-in wurde nach Erfolg auf die Startseite weitergeleitet, ohne eine Erfolgsmeldung auszugeben, wenn der ShopBooster aktiv ist. Dies wurde behoben.
+
 ## v5.0.56 (2022-11-08) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.55...5.0.56" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
 
 ### Hinzugefügt
