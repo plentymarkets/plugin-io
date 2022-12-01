@@ -1,5 +1,22 @@
 # Release Notes für IO
 
+## v5.0.57 (xxxx-xx-xx) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.56...5.0.57" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
+
+### Behoben
+
+- Bei dem Aufruf der Seite für den Newsletter-Opt-in wurde nach Erfolg auf die Startseite weitergeleitet, ohne eine Erfolgsmeldung auszugeben, wenn der ShopBooster aktiv ist. Dies wurde behoben.
+
+## v5.0.56 (2022-11-08) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.55...5.0.56" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
+
+### Hinzugefügt
+
+- Die Middleware **HandleQueryParamNotifications** wurde hinzugefügt, um URL-parameterabhängige Shop-Benachrichtigungen erzeugen zu können.
+
+### Behoben
+
+- Auf der **Passwort vergessen**-Seite wird nur noch dann eine Fehlermeldung ausgegeben, wenn ein Problem mit dem E-Mail-Versand besteht.
+- Durch einen Fehler wurden im Mein Konto-Bereich und auf der Auftragsbestätigung manche Statusnamen mit der Status-ID angezeigt. Dies wurde behoben. Die Status-IDs werden nun vollständig herausgefiltert.
+
 ## v5.0.55 (2022-09-22) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.54...5.0.55" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
 
 ### Behoben
