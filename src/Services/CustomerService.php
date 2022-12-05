@@ -541,18 +541,42 @@ class CustomerService
     public function getAddresses($typeId = null)
     {
         if ($this->contactRepository->getContactId() > 0) {
+            $basketService = pluginApp(BasketService::class);
             $addresses = $this->contactAddressRepository->getAddresses(
                 $this->contactRepository->getContactId(),
                 $typeId
             );
+            $addressId = null;
+            if ($typeId == AddressType::BILLING && $basketService->getBillingAddressId() > 0) {
+                $addressId = $basketService->getBillingAddressId();
+            }
+
+            if ($typeId == AddressType::DELIVERY && $basketService->getDeliveryAddressId() > 0) {
+                $addressId = $basketService->getDeliveryAddressId();
+            }
+
+
 
             if (count($addresses)) {
                 foreach ($addresses as $key => $address) {
                     if (is_null($address->gender)) {
                         $addresses[$key]->gender = 'company';
                     }
+                    if (!is_null($addressId)) {
+                        $addresses[$key]->primary = ($addressId === $addresses[$key]->id) ? 1 : 0;
+                    }
+                    else {
+                        $addresses[$key]->primary = 0;
+                    }
                 }
             }
+
+            $addresses = $addresses->toArray();
+
+            usort($addresses, function($a, $b) {
+                if($a['primary']==$b['primary']) return 0;
+                return $a['primary'] < $b['primary']?1:-1;
+            });
 
             return $addresses;
         } else {
