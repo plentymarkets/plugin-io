@@ -25,7 +25,7 @@ class NewsletterOptInController extends LayoutController
             $notificationService = pluginApp(NotificationService::class);
             $notificationService->addNotificationCode(LogLevel::SUCCESS, 8);
 
-            return $response->redirectTo('/');
+            return $response->redirectTo('/?noCache=true');
         }
 
         $response->forceStatus(ResponseCode::NOT_FOUND);
