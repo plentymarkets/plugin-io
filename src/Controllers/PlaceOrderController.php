@@ -269,17 +269,23 @@ class PlaceOrderController extends LayoutController
                 $basketService = pluginApp(BasketService::class);
 
                 foreach ($itemsWithoutStock as $itemWithoutStock) {
-                    if ($itemWithoutStock['item']['itemType'] !== BasketItem::BASKET_ITEM_TYPE_ITEM_SET_COMPONENT && $itemWithoutStock['item']['itemType'] !== BasketItem::BASKET_ITEM_TYPE_BUNDLE_COMPONENT) {
-                        $filteredWithoutStock = array_filter($basketItems, function ($filterItem) use ($itemWithoutStock) {
-                            return $filterItem['id'] == $itemWithoutStock['item']['id'];
-                        });
-                        $updatedItem = array_shift($filteredWithoutStock);
+                    if ($itemWithoutStock['item']['itemType'] !== BasketItem::BASKET_ITEM_TYPE_ITEM_SET_COMPONENT &&
+                        $itemWithoutStock['item']['itemType'] !== BasketItem::BASKET_ITEM_TYPE_BUNDLE_COMPONENT) {
+
+                        $updatedArray = array_filter(
+                            $basketItems,
+                            function ($filterItem) use ($itemWithoutStock) {
+                                return $filterItem['id'] == $itemWithoutStock['item']['id'];
+                            }
+                        );
+
+                        $updatedItem = array_shift($updatedArray);
 
                         $quantity = $itemWithoutStock['stockNet'];
 
                         if ($quantity <= 0 && (int)$updatedItem['id'] > 0) {
                             $basketService->deleteBasketItem($updatedItem['id']);
-                        } elseif ((int)$updatedItem['id'] > 0) {
+                        } elseif ((int)$updatedItem['id'] > 0 && $quantity !== $itemWithoutStock['item']['quantity']) {
                             $updatedItem['quantity'] = $quantity;
                             $basketService->updateBasketItem($updatedItem['id'], $updatedItem);
                         }
