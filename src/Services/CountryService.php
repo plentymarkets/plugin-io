@@ -71,7 +71,7 @@ class CountryService
      * @param string|null $lang Optional: Language for country names
      * @return Country[]
      */
-    public function getActiveCountriesList($lang = null)
+    public function getActiveCountriesList($lang = null): array
     {
         if ($lang === null) {
             $lang = Utils::getLang();
