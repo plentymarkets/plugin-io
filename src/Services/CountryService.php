@@ -30,20 +30,6 @@ class CountryService
     /** @var EUCountryCodesServiceContract */
     private $euCountryService;
 
-    private static $ewrCountries = [
-        20,     //Norwegen
-        34,     //Liechtenstein
-        144     //Iceland
-    ];
-
-    private static $ulgCountries = [
-        77,     // Aruba (Niederländische Antillen)
-        258,    // Curaçao (Niederländische Antillen)
-        259,    // Sint Maarten (Niederländische Antillen)
-        260,    // BES-Inseln (Niederländische Antillen)
-        261     // Saint-Barthélemy (kleine Antillen, Frankreich)
-    ];
-
     /**
      * @var Country[][] Active countries
      */
