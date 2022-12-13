@@ -7,6 +7,7 @@ use Plenty\Modules\Frontend\Contracts\Checkout;
 use Plenty\Modules\Order\Shipping\Contracts\EUCountryCodesServiceContract;
 use Plenty\Modules\Order\Shipping\Countries\Contracts\CountryRepositoryContract;
 use Plenty\Modules\Order\Shipping\Countries\Models\Country;
+use Plenty\Modules\Webshop\Contracts\CountryRepositoryContract as WebshopCountryRepositoryContract;
 use Plenty\Plugin\Log\Loggable;
 
 /**
@@ -28,6 +29,20 @@ class CountryService
 
     /** @var EUCountryCodesServiceContract */
     private $euCountryService;
+
+    private static $ewrCountries = [
+        20,     //Norwegen
+        34,     //Liechtenstein
+        144     //Iceland
+    ];
+
+    private static $ulgCountries = [
+        77,     // Aruba (Niederländische Antillen)
+        258,    // Curaçao (Niederländische Antillen)
+        259,    // Sint Maarten (Niederländische Antillen)
+        260,    // BES-Inseln (Niederländische Antillen)
+        261     // Saint-Barthélemy (kleine Antillen, Frankreich)
+    ];
 
     /**
      * @var Country[][] Active countries
@@ -62,20 +77,9 @@ class CountryService
             $lang = Utils::getLang();
         }
 
-        $list = $this->countryRepository->getCountriesList(null, ['states', 'names']);
-
-        $euCountryList = [];
-        foreach ($list as $country) {
-            if ($this->euCountryService->isEUCountry($country->id)) {
-                $euCountryList[] = [
-                    'id' => $country->id,
-                    'currLangName' => $this->getCountryNameByLang($country, $lang),
-                    'isoCode2' => $country->isoCode2,
-                    'states' => $country->states,
-                    'vatCodes' => $country->vatCodes
-                ];
-            }
-        }
+        /** @var WebshopCountryRepositoryContract $countryRepository*/
+        $countryRepository = pluginApp(WebshopCountryRepositoryContract::class);
+        $euCountryList = $countryRepository->getEUCountriesList($lang);
 
         return $euCountryList;
     }
