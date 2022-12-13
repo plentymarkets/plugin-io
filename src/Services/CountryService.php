@@ -31,11 +31,6 @@ class CountryService
     private $euCountryService;
 
     /**
-     * @var Country[][] Active countries
-     */
-    private static $activeCountries = [];
-
-    /**
      * CountryService constructor.
      * @param CountryRepositoryContract $countryRepository Repository used for manipulating country data
      */
@@ -76,25 +71,15 @@ class CountryService
      * @param string|null $lang Optional: Language for country names
      * @return Country[]
      */
-    public function getActiveCountriesList($lang = null): array
+    public function getActiveCountriesList($lang = null)
     {
         if ($lang === null) {
             $lang = Utils::getLang();
         }
 
-        if (!isset(self::$activeCountries[$lang])) {
-            $list = $this->countryRepository->getActiveCountriesList();
-
-            foreach ($list as $country) {
-                $country->currLangName = $this->getCountryNameByLang($country, $lang);
-                self::$activeCountries[$lang][] = $country;
-            }
-        }
-
-        $column = array_column(self::$activeCountries[$lang], "currLangName");
-        array_multisort($column, SORT_ASC, SORT_LOCALE_STRING, self::$activeCountries[$lang]);
-
-        return self::$activeCountries[$lang];
+        /** @var WebshopCountryRepositoryContract $countryRepository*/
+        $countryRepository = pluginApp(WebshopCountryRepositoryContract::class);
+        return $countryRepository->getActiveCountriesList($lang);
     }
 
     /**
