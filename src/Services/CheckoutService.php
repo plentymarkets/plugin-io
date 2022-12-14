@@ -385,14 +385,8 @@ class CheckoutService
     {
         /** @var PaymentMethodRepositoryContract $paymentMethodRepository */
 
-        //TODO active check
-        //$paymentMethodRepository = pluginApp(PaymentMethodRepositoryContract::class);
-        //$paymentMethod = $paymentMethodRepository->findByPaymentMethodId($methodOfPaymentID);
-
-        //if ($paymentMethod instanceof PaymentMethod && $paymentMethod->active) {
-            $this->checkout->setPaymentMethodId($methodOfPaymentID);
-            $this->sessionStorageRepository->setSessionValue('MethodOfPaymentID', $methodOfPaymentID);
-        //}
+        $this->checkout->setPaymentMethodId($methodOfPaymentID);
+        $this->sessionStorageRepository->setSessionValue('MethodOfPaymentID', $methodOfPaymentID);
     }
 
     /**
