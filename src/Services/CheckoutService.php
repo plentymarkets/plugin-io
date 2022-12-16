@@ -93,6 +93,8 @@ class CheckoutService
     /** @var ContactRepositoryContract $contactRepository */
     private $contactRepository;
 
+    const ALREADY_PAID_PAYMENT_KEY = 'ALREADY_PAID';
+
     /**
      * CheckoutService constructor.
      * @param FrontendPaymentMethodRepositoryContract $frontendPaymentMethodRepository
@@ -347,12 +349,14 @@ class CheckoutService
         $methodOfPaymentList = array_merge($methodOfPaymentList, $methodOfPaymentExpressCheckoutList);
 
         $methodOfPaymentValid = false;
+
+        $basketAmount = $this->basketRepository->load()->basketAmount;
         /**
          * @var int $methodOfPaymentKey
          * @var PaymentMethod $methodOfPayment
          */
         foreach ($methodOfPaymentList as $methodOfPaymentKey => $methodOfPayment) {
-            if($this->basketRepository->load()->basketAmount <= 0 && $methodOfPayment->paymentKey !== 'ALREADY_PAID') {
+            if($basketAmount <= 0 && $methodOfPayment->paymentKey !== self::ALREADY_PAID_PAYMENT_KEY) {
                 unset($methodOfPaymentList[$methodOfPaymentKey]);
                 continue;
             }
@@ -476,7 +480,7 @@ class CheckoutService
         $methodOfPaymentList = [];
         if ($this->basketRepository->load()->basketAmount <= 0) {
             $methodOfPaymentList = array_filter($methodOfPaymentListOriginal, function($methodOfPayment) {
-                return $methodOfPayment->paymentKey === 'ALREADY_PAID';
+                return $methodOfPayment->paymentKey === self::ALREADY_PAID_PAYMENT_KEY;
             });
         }
 
