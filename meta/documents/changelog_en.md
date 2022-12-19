@@ -5,6 +5,8 @@
 ### Fixed
 
 - When calling the page for the newsletter opt-in, the user was redirected to the start page after success without displaying a success message if the ShopBooster is active. This has been fixed.
+- Overseas countries and territories have been removed from the list of selectable countries of the billing address.
+- Countries of the European Economic Area have been added to the list of selectable countries for the billing address.
 
 ## v5.0.56 (2022-11-08) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.55...5.0.56" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
 
