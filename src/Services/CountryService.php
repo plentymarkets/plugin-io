@@ -1,4 +1,4 @@
-<?php //strict
+<?php
 
 namespace IO\Services;
 
@@ -34,8 +34,10 @@ class CountryService
      * CountryService constructor.
      * @param CountryRepositoryContract $countryRepository Repository used for manipulating country data
      */
-    public function __construct(CountryRepositoryContract $countryRepository, EUCountryCodesServiceContract $euCountryService)
-    {
+    public function __construct(
+        CountryRepositoryContract $countryRepository,
+        EUCountryCodesServiceContract $euCountryService
+    ) {
         $this->countryRepository = $countryRepository;
         $this->euCountryService = $euCountryService;
     }
@@ -44,7 +46,7 @@ class CountryService
     {
         $activeCountriesList = $this->getActiveCountriesList();
         foreach ($activeCountriesList as $activeCountry) {
-            if($this->euCountryService->isEUCountry($activeCountry->id)) {
+            if ($this->euCountryService->isEUCountry($activeCountry->id)) {
                 return true;
             }
         }
@@ -58,11 +60,9 @@ class CountryService
             $lang = Utils::getLang();
         }
 
-        /** @var WebshopCountryRepositoryContract $countryRepository*/
+        /** @var WebshopCountryRepositoryContract $countryRepository */
         $countryRepository = pluginApp(WebshopCountryRepositoryContract::class);
-        $euCountryList = $countryRepository->getEUCountriesList($lang);
-
-        return $euCountryList;
+        return $countryRepository->getEUCountriesList($lang);
     }
 
     /**
@@ -77,7 +77,7 @@ class CountryService
             $lang = Utils::getLang();
         }
 
-        /** @var WebshopCountryRepositoryContract $countryRepository*/
+        /** @var WebshopCountryRepositoryContract $countryRepository */
         $countryRepository = pluginApp(WebshopCountryRepositoryContract::class);
         return $countryRepository->getActiveCountriesList($lang);
     }
@@ -157,31 +157,5 @@ class CountryService
             return $country->names[0]->name;
         }
         return "";
-    }
-
-    /**
-     * Get country name for given language
-     * Fall back to ID if no name found
-     * 
-     * @param Country $country Country with a name
-     * @param string $lang Language for country name
-     * @return string
-     */
-    private function getCountryNameByLang($country, $lang): string
-    {
-        if ($country->currLangName = $country->names->contains('language', $lang)) {
-            return $country->names->where('language', $lang)->first()->name;
-        }
-        if ($country->names->first()->name) {
-            return $country->names->first()->name;
-        }
-
-        $this
-            ->getLogger(__CLASS__)
-            ->error('IO::Debug.CountryService_noNameFound', [
-                'id' => $country->id
-            ]);
-
-        return 'ID: ' . $country->id;
     }
 }
