@@ -352,7 +352,7 @@ class PlaceOrderController extends LayoutController
                             // the set or bundle components to $alreadyUpdatedVariationIds
                             $alreadyUpdatedVariationIds = array_merge(
                                 $alreadyUpdatedVariationIds,
-                                $this->getVariationIds($updatedItem, $itemComponents),
+                                $this->getVariationIds($updatedItem, $itemComponents)
                             );
                             $basketService->deleteBasketItem($updatedItem['id']);
                         } elseif ((int)$updatedItem['id'] > 0 && $quantity !== $itemWithoutStock['item']['quantity']) {
@@ -361,7 +361,7 @@ class PlaceOrderController extends LayoutController
                             $subtractedQty = $itemWithoutStock['item']['quantity'] - $quantity;
                             $alreadyUpdatedVariationIds = array_merge(
                                 $alreadyUpdatedVariationIds,
-                                $this->getVariationIds($updatedItem, $itemComponents, $subtractedQty),
+                                $this->getVariationIds($updatedItem, $itemComponents, $subtractedQty)
                             );
                             $basketService->updateBasketItem($updatedItem['id'], $updatedItem);
                         }
@@ -441,7 +441,7 @@ class PlaceOrderController extends LayoutController
         ];
 
         /** @var ItemDataLayerRepositoryContract $itemDataLayer */
-        $itemDataLayer = \App::make(ItemDataLayerRepositoryContract::class);
+        $itemDataLayer = pluginApp(ItemDataLayerRepositoryContract::class);
 
         return $itemDataLayer->search($columns, $filter)->current();
     }
