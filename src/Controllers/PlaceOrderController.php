@@ -22,6 +22,7 @@ use Plenty\Plugin\Log\Loggable;
 use Plenty\Modules\Basket\Models\BasketItem;
 use Plenty\Modules\Item\VariationBundle\Contracts\VariationBundleRepositoryContract;
 use Plenty\Modules\Authorization\Services\AuthHelper;
+use Plenty\Modules\Item\DataLayer\Contracts\ItemDataLayerRepositoryContract;
 
 /**
  * Class PlaceOrderController
@@ -288,6 +289,8 @@ class PlaceOrderController extends LayoutController
                     $itemsWithoutStock = $additionalData['itemsWithoutStock'];
                 }
 
+                $totalVariationQuantities = $this->getTotalBasketItemQuantities($itemsWithoutStock, $basketItems);
+
                 /** @var BasketService $basketService */
                 $basketService = pluginApp(BasketService::class);
 
@@ -295,6 +298,12 @@ class PlaceOrderController extends LayoutController
                 foreach ($itemsWithoutStock as $itemWithoutStock) {
                     if ($itemWithoutStock['item']['itemType'] !== BasketItem::BASKET_ITEM_TYPE_ITEM_SET_COMPONENT &&
                         $itemWithoutStock['item']['itemType'] !== BasketItem::BASKET_ITEM_TYPE_BUNDLE_COMPONENT) {
+
+                        $variationsToCompareWith = [];
+                        foreach ($alreadyUpdatedVariationIds as $item) {
+                            $variationsToCompareWith[$item['variationId']]['updatedQuantity'] += $item['updatedQuantity'];
+                            $variationsToCompareWith[$item['variationId']]['stockLeft'] = $item['stockLeft'];
+                        }
 
                         $updatedArray = array_filter(
                             $basketItems,
@@ -315,7 +324,7 @@ class PlaceOrderController extends LayoutController
                         }
 
                         //if the variationId was already updated
-                        if (in_array($updatedItem['variationId'], $alreadyUpdatedVariationIds)) {
+                        if (array_key_exists($updatedItem['variationId'], $variationsToCompareWith)) {
                             continue;
                         } else {
                             //check if it's a set item
@@ -325,7 +334,9 @@ class PlaceOrderController extends LayoutController
                             ) {
                                 //get the set components and see if one of it is in the $alreadyUpdatedVariationIds
                                 foreach ($itemComponents as $itemComponent) {
-                                    if (in_array($itemComponent['variationId'], $alreadyUpdatedVariationIds)) {
+                                    if (array_key_exists($itemComponent['variationId'], $variationsToCompareWith) &&
+                                        $variationsToCompareWith[$itemComponent['variationId']]['stockLeft'] >= $totalVariationQuantities[$itemComponent['variationId']] - $variationsToCompareWith[$itemComponent['variationId']]['updatedQuantity']
+                                    ) {
                                         $variationAlreadyUpdated = true;
                                     }
                                 }
@@ -341,15 +352,16 @@ class PlaceOrderController extends LayoutController
                             // the set or bundle components to $alreadyUpdatedVariationIds
                             $alreadyUpdatedVariationIds = array_merge(
                                 $alreadyUpdatedVariationIds,
-                                $this->getVariationIds($updatedItem, $itemComponents)
+                                $this->getVariationIds($updatedItem, $itemComponents),
                             );
                             $basketService->deleteBasketItem($updatedItem['id']);
                         } elseif ((int)$updatedItem['id'] > 0 && $quantity !== $itemWithoutStock['item']['quantity']) {
                             //if the update of item is happening we need to add those set components to $alreadyUpdatedVariationIds
                             $updatedItem['quantity'] = $quantity;
+                            $subtractedQty = $itemWithoutStock['item']['quantity'] - $quantity;
                             $alreadyUpdatedVariationIds = array_merge(
                                 $alreadyUpdatedVariationIds,
-                                $this->getVariationIds($updatedItem, $itemComponents)
+                                $this->getVariationIds($updatedItem, $itemComponents, $subtractedQty),
                             );
                             $basketService->updateBasketItem($updatedItem['id'], $updatedItem);
                         }
@@ -378,17 +390,98 @@ class PlaceOrderController extends LayoutController
      * @param array $itemComponents
      * @return array
      */
-    private function getVariationIds(array $updatedItem, array $itemComponents)
+    private function getVariationIds(array $updatedItem, array $itemComponents,  $subtractedQty = 0)
     {
         $result = [];
         if ($updatedItem['itemType'] === BasketItem::BASKET_ITEM_TYPE_ITEM_SET ||
             $updatedItem['itemType'] === BasketItem::BASKET_ITEM_TYPE_BUNDLE
         ) {
             foreach ($itemComponents as $itemComponent) {
-                $result[] = $itemComponent['variationId'];
+                $result[] = [
+                    'variationId' => $itemComponent['variationId'],
+                    'updatedQuantity' => ($subtractedQty == 0) ? $updatedItem['quantity'] : $subtractedQty,
+                    'stockLeft' => $this->getStockLeft($itemComponent['variationId'])->getVariationStock()->stockNet
+                ];
             }
         } else {
-            $result[] = $updatedItem['variationId'];
+            $result[] = [
+                'variationId' => $updatedItem['variationId'],
+                'updatedQuantity' => ($subtractedQty == 0) ? $updatedItem['quantity'] : $subtractedQty,
+                'stockLeft' => $this->getStockLeft($updatedItem['variationId'])->getVariationStock()->stockNet
+            ];
+        }
+
+        return $result;
+    }
+
+
+    /**
+     * @param int $variationId
+     * @return mixed
+     */
+    private function getStockLeft(int $variationId)
+    {
+        $columns = [
+            'variationStock' => [
+                'fields' => [
+                    'stockNet',
+                ],
+                'params' => [
+                    'type' => 'virtual',
+                ],
+            ],
+            'variationBase' => [
+                'id',
+                'limitOrderByStockSelect',
+            ],
+        ];
+
+        $filter = [
+            'variationBase.hasId' => ['id' => $variationId],
+        ];
+
+        /** @var ItemDataLayerRepositoryContract $itemDataLayer */
+        $itemDataLayer = \App::make(ItemDataLayerRepositoryContract::class);
+
+        return $itemDataLayer->search($columns, $filter)->current();
+    }
+
+    /**
+     * @param array $itemsWithoutStockUnordered
+     * @param array $basketItems
+     * @return array
+     * @throws \Throwable
+     */
+    private function getTotalBasketItemQuantities(array $itemsWithoutStockUnordered, array $basketItems)
+    {
+        $result = [];
+        foreach ($itemsWithoutStockUnordered as $key => $itemWithoutStock) {
+            if ($itemWithoutStock['item']['itemType'] !== BasketItem::BASKET_ITEM_TYPE_ITEM_SET_COMPONENT &&
+                $itemWithoutStock['item']['itemType'] !== BasketItem::BASKET_ITEM_TYPE_BUNDLE_COMPONENT) {
+
+                $updatedArray = array_filter(
+                    $basketItems,
+                    function ($filterItem) use ($itemWithoutStock) {
+                        return $filterItem['id'] == $itemWithoutStock['item']['id'];
+                    }
+                );
+
+                $updatedItem = array_shift($updatedArray);
+
+                if ($updatedItem['itemType'] === BasketItem::BASKET_ITEM_TYPE_ITEM_SET) {
+                    $itemComponents = $itemWithoutStock['item']['setComponents'];
+                    foreach ($itemComponents as $item) {
+                        $result[$item['variationId']] += $itemWithoutStock['item']['quantity'];
+                    }
+                } elseif ($updatedItem['itemType'] === BasketItem::BASKET_ITEM_TYPE_BUNDLE) {
+                    $itemComponents = $this->getBundleComponents($updatedItem);
+                    foreach ($itemComponents as $item) {
+                        $result[$item['variationId']] += $itemWithoutStock['item']['quantity'];
+                    }
+                } else {
+                    $result[$itemWithoutStock['item']['variationId']] += $itemWithoutStock['item']['quantity'];
+                }
+            }
         }
 
         return $result;
