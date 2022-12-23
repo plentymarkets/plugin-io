@@ -521,26 +521,10 @@ class BasketService
     public function addBasketItem(array $data): array
     {
         if ($this->webstoreConfigurationRepository->getWebstoreConfiguration()->dontSplitItemBundle === 0) {
-            /** @var ItemSearchService $itemSearchService */
-            $itemSearchService = pluginApp(ItemSearchService::class);
+            $item = $this->isBundleType($data['variationId']);
+            $bundleType = $item['documents']['0']['data']['variation']['bundleType'];
 
-            /** @var VariationSearchFactory $searchFactory */
-            $searchFactory = pluginApp(VariationSearchFactory::class);
-
-            $item = $itemSearchService->getResults(
-                [
-                    $searchFactory
-                        ->hasVariationId($data['variationId'])
-                        ->withBundleComponents()
-                        ->withResultFields(
-                            [
-                                'variation.bundleType'
-                            ]
-                        )
-                ]
-            )[0];
-
-            if ($item['documents']['0']['data']['variation']['bundleType'] === 'bundle') {
+            if ($bundleType === 'bundle') {
                 /** @var NotificationService $notificationService */
                 $notificationService = pluginApp(NotificationService::class);
 
@@ -560,6 +544,14 @@ class BasketService
                 }
                 return [];
             }
+        }
+
+        $item = $this->isBundleType($data['variationId']);
+        $bundleType = $item['documents']['0']['data']['variation']['bundleType'];
+
+        if ($bundleType === 'bundle') {
+            $data['itemType'] = 'bundle';
+            $data['bundleComponents'] = $item['documents']['0']['data']['bundleComponents'];
         }
         return $this->addDataToBasket($data);
     }
@@ -1206,5 +1198,27 @@ class BasketService
             'setComponents' => $basketItem['setComponents'] ?? [],
             'itemType' => $basketItem['itemType']
         ];
+    }
+
+    private function isBundleType(int $variationId)
+    {
+        /** @var ItemSearchService $itemSearchService */
+        $itemSearchService = pluginApp(ItemSearchService::class);
+
+        /** @var VariationSearchFactory $searchFactory */
+        $searchFactory = pluginApp(VariationSearchFactory::class);
+
+        return $itemSearchService->getResults(
+            [
+                $searchFactory
+                    ->hasVariationId($variationId)
+                    ->withBundleComponents()
+                    ->withResultFields(
+                        [
+                            'variation.bundleType'
+                        ]
+                    )
+            ]
+        )[0];
     }
 }

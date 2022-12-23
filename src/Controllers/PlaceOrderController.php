@@ -19,6 +19,10 @@ use Plenty\Modules\Webshop\Helpers\UrlQuery;
 use Plenty\Plugin\Events\Dispatcher;
 use Plenty\Plugin\Http\Request;
 use Plenty\Plugin\Log\Loggable;
+use Plenty\Modules\Basket\Models\BasketItem;
+use Plenty\Modules\Item\VariationBundle\Contracts\VariationBundleRepositoryContract;
+use Plenty\Modules\Authorization\Services\AuthHelper;
+use Plenty\Modules\Item\DataLayer\Contracts\ItemDataLayerRepositoryContract;
 
 /**
  * Class PlaceOrderController
@@ -261,25 +265,106 @@ class PlaceOrderController extends LayoutController
                 $notificationService->error('promotion coupon required', 501);
             } elseif ($exception->getCode() == BasketItemCheckException::NOT_ENOUGH_STOCK_FOR_VARIATIONS) {
                 $additionalData = $exception->getAdditionalData();
-                $itemsWithoutStock = $additionalData['itemsWithoutStock'];
+                $itemsWithoutStockUnordered = $additionalData['itemsWithoutStock'];
                 $basketItems = $additionalData['basketItems'];
+
+                //prepend the simple item variations and append the rest(sets and bundles)
+                $orderedIndexArr = [];
+                $simpleItemsExist = false;
+                foreach ($itemsWithoutStockUnordered as $key => $itemWithoutStock) {
+                    if ($itemWithoutStock['item']['itemType'] === 0) {
+                        array_unshift($orderedIndexArr, $key);
+                        $simpleItemsExist = true;
+                    } elseif ($itemWithoutStock['item']['itemType'] === BasketItem::BASKET_ITEM_TYPE_ITEM_SET ||
+                        $itemWithoutStock['item']['itemType'] === BasketItem::BASKET_ITEM_TYPE_BUNDLE
+                    ) {
+                        $orderedIndexArr[] = $key;
+                    }
+                }
+
+                //if there are no simple items in the basket we should not even bother to order
+                if ($simpleItemsExist) {
+                    $itemsWithoutStock = array_replace(array_flip($orderedIndexArr), $itemsWithoutStockUnordered);
+                } else {
+                    $itemsWithoutStock = $additionalData['itemsWithoutStock'];
+                }
+
+                $totalVariationQuantities = $this->getTotalBasketItemQuantities($itemsWithoutStock, $basketItems);
 
                 /** @var BasketService $basketService */
                 $basketService = pluginApp(BasketService::class);
 
+                $alreadyUpdatedVariationIds = [];
                 foreach ($itemsWithoutStock as $itemWithoutStock) {
-                    $filteredWithoutStock = array_filter($basketItems, function ($filterItem) use ($itemWithoutStock) {
-                        return $filterItem['id'] == $itemWithoutStock['item']['id'];
-                    });
-                    $updatedItem = array_shift($filteredWithoutStock);
+                    if ($itemWithoutStock['item']['itemType'] !== BasketItem::BASKET_ITEM_TYPE_ITEM_SET_COMPONENT &&
+                        $itemWithoutStock['item']['itemType'] !== BasketItem::BASKET_ITEM_TYPE_BUNDLE_COMPONENT) {
 
-                    $quantity = $itemWithoutStock['stockNet'];
+                        $variationsToCompareWith = [];
+                        foreach ($alreadyUpdatedVariationIds as $item) {
+                            $variationsToCompareWith[$item['variationId']]['updatedQuantity'] += $item['updatedQuantity'];
+                            $variationsToCompareWith[$item['variationId']]['stockLeft'] = $item['stockLeft'];
+                        }
 
-                    if ($quantity <= 0 && (int)$updatedItem['id'] > 0) {
-                        $basketService->deleteBasketItem($updatedItem['id']);
-                    } elseif ((int)$updatedItem['id'] > 0) {
-                        $updatedItem['quantity'] = $quantity;
-                        $basketService->updateBasketItem($updatedItem['id'], $updatedItem);
+                        $updatedArray = array_filter(
+                            $basketItems,
+                            function ($filterItem) use ($itemWithoutStock) {
+                                return $filterItem['id'] == $itemWithoutStock['item']['id'];
+                            }
+                        );
+
+                        $updatedItem = array_shift($updatedArray);
+
+                        $quantity = $itemWithoutStock['stockNet'];
+
+                        $itemComponents = [];
+                        if ($updatedItem['itemType'] === BasketItem::BASKET_ITEM_TYPE_ITEM_SET) {
+                            $itemComponents = $itemWithoutStock['item']['setComponents'];
+                        } elseif ($updatedItem['itemType'] === BasketItem::BASKET_ITEM_TYPE_BUNDLE) {
+                            $itemComponents = $this->getBundleComponents($updatedItem);
+                        }
+
+                        //if the variationId was already updated
+                        if (array_key_exists($updatedItem['variationId'], $variationsToCompareWith)) {
+                            continue;
+                        } else {
+                            //check if it's a set item
+                            $variationAlreadyUpdated = false;
+                            if ($updatedItem['itemType'] === BasketItem::BASKET_ITEM_TYPE_ITEM_SET ||
+                                $updatedItem['itemType'] === BasketItem::BASKET_ITEM_TYPE_BUNDLE
+                            ) {
+                                //get the set components and see if one of it is in the $alreadyUpdatedVariationIds
+                                foreach ($itemComponents as $itemComponent) {
+                                    if (array_key_exists($itemComponent['variationId'], $variationsToCompareWith) &&
+                                        $variationsToCompareWith[$itemComponent['variationId']]['stockLeft'] >= $totalVariationQuantities[$itemComponent['variationId']] - $variationsToCompareWith[$itemComponent['variationId']]['updatedQuantity']
+                                    ) {
+                                        $variationAlreadyUpdated = true;
+                                    }
+                                }
+                            }
+
+                            if ($variationAlreadyUpdated) {
+                                continue;
+                            }
+                        }
+
+                        if ($quantity <= 0 && (int)$updatedItem['id'] > 0) {
+                            //if the action of delete item is happening we need to add those variationIds of
+                            // the set or bundle components to $alreadyUpdatedVariationIds
+                            $alreadyUpdatedVariationIds = array_merge(
+                                $alreadyUpdatedVariationIds,
+                                $this->getVariationIds($updatedItem, $itemComponents)
+                            );
+                            $basketService->deleteBasketItem($updatedItem['id']);
+                        } elseif ((int)$updatedItem['id'] > 0 && $quantity !== $itemWithoutStock['item']['quantity']) {
+                            //if the update of item is happening we need to add those set components to $alreadyUpdatedVariationIds
+                            $updatedItem['quantity'] = $quantity;
+                            $subtractedQty = $itemWithoutStock['item']['quantity'] - $quantity;
+                            $alreadyUpdatedVariationIds = array_merge(
+                                $alreadyUpdatedVariationIds,
+                                $this->getVariationIds($updatedItem, $itemComponents, $subtractedQty)
+                            );
+                            $basketService->updateBasketItem($updatedItem['id'], $updatedItem);
+                        }
                     }
                 }
 
@@ -297,5 +382,142 @@ class PlaceOrderController extends LayoutController
         }
 
         return $this->urlService->redirectTo($shopUrls->checkout);
+    }
+
+
+    /**
+     * @param array $updatedItem
+     * @param array $itemComponents
+     * @return array
+     */
+    private function getVariationIds(array $updatedItem, array $itemComponents,  $subtractedQty = 0)
+    {
+        $result = [];
+        if ($updatedItem['itemType'] === BasketItem::BASKET_ITEM_TYPE_ITEM_SET ||
+            $updatedItem['itemType'] === BasketItem::BASKET_ITEM_TYPE_BUNDLE
+        ) {
+            foreach ($itemComponents as $itemComponent) {
+                $result[] = [
+                    'variationId' => $itemComponent['variationId'],
+                    'updatedQuantity' => ($subtractedQty == 0) ? $updatedItem['quantity'] : $subtractedQty,
+                    'stockLeft' => $this->getStockLeft($itemComponent['variationId'])->getVariationStock()->stockNet
+                ];
+            }
+        } else {
+            $result[] = [
+                'variationId' => $updatedItem['variationId'],
+                'updatedQuantity' => ($subtractedQty == 0) ? $updatedItem['quantity'] : $subtractedQty,
+                'stockLeft' => $this->getStockLeft($updatedItem['variationId'])->getVariationStock()->stockNet
+            ];
+        }
+
+        return $result;
+    }
+
+
+    /**
+     * @param int $variationId
+     * @return mixed
+     */
+    private function getStockLeft(int $variationId)
+    {
+        $columns = [
+            'variationStock' => [
+                'fields' => [
+                    'stockNet',
+                ],
+                'params' => [
+                    'type' => 'virtual',
+                ],
+            ],
+            'variationBase' => [
+                'id',
+                'limitOrderByStockSelect',
+            ],
+        ];
+
+        $filter = [
+            'variationBase.hasId' => ['id' => $variationId],
+        ];
+
+        /** @var ItemDataLayerRepositoryContract $itemDataLayer */
+        $itemDataLayer = pluginApp(ItemDataLayerRepositoryContract::class);
+
+        return $itemDataLayer->search($columns, $filter)->current();
+    }
+
+    /**
+     * @param array $itemsWithoutStockUnordered
+     * @param array $basketItems
+     * @return array
+     * @throws \Throwable
+     */
+    private function getTotalBasketItemQuantities(array $itemsWithoutStockUnordered, array $basketItems)
+    {
+        $result = [];
+        foreach ($itemsWithoutStockUnordered as $key => $itemWithoutStock) {
+            if ($itemWithoutStock['item']['itemType'] !== BasketItem::BASKET_ITEM_TYPE_ITEM_SET_COMPONENT &&
+                $itemWithoutStock['item']['itemType'] !== BasketItem::BASKET_ITEM_TYPE_BUNDLE_COMPONENT) {
+
+                $updatedArray = array_filter(
+                    $basketItems,
+                    function ($filterItem) use ($itemWithoutStock) {
+                        return $filterItem['id'] == $itemWithoutStock['item']['id'];
+                    }
+                );
+
+                $updatedItem = array_shift($updatedArray);
+
+                if ($updatedItem['itemType'] === BasketItem::BASKET_ITEM_TYPE_ITEM_SET) {
+                    $itemComponents = $itemWithoutStock['item']['setComponents'];
+                    foreach ($itemComponents as $item) {
+                        $result[$item['variationId']] += $itemWithoutStock['item']['quantity'];
+                    }
+                } elseif ($updatedItem['itemType'] === BasketItem::BASKET_ITEM_TYPE_BUNDLE) {
+                    $itemComponents = $this->getBundleComponents($updatedItem);
+                    foreach ($itemComponents as $item) {
+                        $result[$item['variationId']] += $itemWithoutStock['item']['quantity'];
+                    }
+                } else {
+                    $result[$itemWithoutStock['item']['variationId']] += $itemWithoutStock['item']['quantity'];
+                }
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * Get all components of the bundle
+     *
+     * @param $basketItem
+     * @return array
+     * @throws \Throwable
+     */
+    private function getBundleComponents($basketItem)
+    {
+        $variationIds = [];
+
+        /** @var AuthHelper $authHelper */
+        $authHelper = pluginApp(AuthHelper::class);
+
+        /** @var VariationBundleRepositoryContract $bundleRepository */
+        $variationBundleRepository = pluginApp( VariationBundleRepositoryContract::class );
+
+        $bundleItems = $authHelper->processUnguarded(function() use ($variationBundleRepository, $basketItem) {
+            return $variationBundleRepository->findByVariationId($basketItem['variationId']);
+        });
+
+        if(count($bundleItems)) {
+            foreach ($bundleItems->toArray() as $bundleItem) {
+                if($bundleItem['componentVariationId'] !== $basketItem['variationId']) {
+                    $variationIds[] = [
+                        'variationId' => $bundleItem['componentVariationId']
+                    ];
+                }
+            }
+        }
+
+        return $variationIds;
     }
 }
