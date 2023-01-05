@@ -748,17 +748,6 @@ class OrderService
     {
         if ($order instanceof Order && $order->id > 0) {
             try {
-                $params = [
-                    'orderId' => $order->id,
-                    'webstoreId' => Utils::getWebstoreId(),
-                    'language' => Utils::getLang()
-                ];
-                $this->sendMail(AutomaticEmailTemplate::SHOP_ORDER, AutomaticEmailOrder::class, $params);
-            } catch (\Throwable $throwable) {
-                $this->handleThrowable($throwable, "IO::Debug.OrderService_orderCompleteErrorSendMail");
-            }
-
-            try {
                 if (($order->amounts[0]->invoiceTotal == 0) || ($order->amounts[0]->invoiceTotal == $order->amounts[0]->giftCardAmount)) {
                     $this->createAndAssignDummyPayment($order);
                 }
