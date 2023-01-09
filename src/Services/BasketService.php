@@ -516,9 +516,10 @@ class BasketService
      * Add an item to the basket or update the basket
      *
      * @param array $data Contains the basket item
+     * @param bool $fireEvent
      * @return array
      */
-    public function addBasketItem(array $data): array
+    public function addBasketItem(array $data, $fireEvent = true): array
     {
         if ($this->webstoreConfigurationRepository->getWebstoreConfiguration()->dontSplitItemBundle === 0) {
             /** @var ItemSearchService $itemSearchService */
@@ -553,7 +554,7 @@ class BasketService
                     $basketData['quantity'] = $bundleComponent['quantity'] * ($data['quantity'] ?? 1);
                     $basketData['template'] = $data['template'];
 
-                    $componentData = $this->addDataToBasket($basketData);
+                    $componentData = $this->addDataToBasket($basketData, $fireEvent);
                     if (count($componentData)) {
                         return $componentData;
                     }
@@ -561,7 +562,26 @@ class BasketService
                 return [];
             }
         }
-        return $this->addDataToBasket($data);
+        return $this->addDataToBasket($data, $fireEvent);
+    }
+
+    /**
+     * Add multiple basket items
+     *
+     * @param array $basketItems
+     * @return array
+     */
+    public function addBasketItems(array $basketItems): array {
+        $lastKey = array_key_last($basketItems);
+        $result = [];
+        foreach($basketItems as $key => $basketItem) {
+            $fireEvent = $key === $lastKey;
+            $tempResult = $this->addBasketItem($basketItem, $fireEvent);
+            if (isset($tempResult['code'])) {
+                $result = $tempResult;
+            }
+        }
+        return $result;
     }
 
     /**
@@ -815,7 +835,7 @@ class BasketService
      * @param object $data
      * @return array
      */
-    private function addDataToBasket($data)
+    private function addDataToBasket($data, $fireEvent = true)
     {
         if (isset($data['basketItemOrderParams'])
             && is_array($data['basketItemOrderParams'])
@@ -834,7 +854,7 @@ class BasketService
                 $data['quantity'] = (float)$data['quantity'] + $basketItem->quantity;
                 $this->basketItemRepository->updateBasketItem($basketItem->id, $data);
             } else {
-                $this->basketItemRepository->addBasketItem($data);
+                $this->basketItemRepository->addBasketItem($data, $fireEvent);
             }
         } catch (BasketItemQuantityCheckException $e) {
             $this->getLogger(__CLASS__)->warning(
