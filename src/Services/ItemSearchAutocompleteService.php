@@ -2,6 +2,7 @@
 
 namespace IO\Services;
 
+use Ceres\Helper\SearchOptions;
 use IO\Extensions\Filters\ItemImagesFilter;
 use IO\Helper\Utils;
 use Plenty\Modules\Category\Contracts\CategoryRepositoryContract;
@@ -88,17 +89,18 @@ class ItemSearchAutocompleteService
      */
     public function getResults($searchString, $searchTypes)
     {
+        $itemListOptions = [
+            'query' => $searchString,
+            'autocomplete' => true,
+            'page' => 1,
+            'itemsPerPage' => 20,
+            'withCategories' => in_array('category', $searchTypes),
+            'searchOperator' => $this->webstoreConfiguration->itemAutocompleteSearchOperator
+        ];
+        $itemListOptions = SearchOptions::validateItemListOptions($itemListOptions, SearchOptions::SCOPE_SEARCH);
+
         $searchFactories = [
-            'items' => SearchItems::getSearchFactory(
-                [
-                    'query' => $searchString,
-                    'autocomplete' => true,
-                    'page' => 1,
-                    'itemsPerPage' => 20,
-                    'withCategories' => in_array('category', $searchTypes),
-                    'searchOperator' => $this->webstoreConfiguration->itemAutocompleteSearchOperator
-                ]
-            )
+            'items' => SearchItems::getSearchFactory($itemListOptions)
         ];
 
         if (in_array('suggestion', $searchTypes)) {

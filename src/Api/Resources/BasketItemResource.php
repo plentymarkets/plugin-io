@@ -56,7 +56,11 @@ class BasketItemResource extends SessionResource
     public function store(): Response
     {
         $this->basketService->setTemplate($this->request->get('template', ''));
-        $result = $this->basketService->addBasketItem($this->request->all());
+        if ($this->request->get('basketItems')) {
+            $result = $this->basketService->addBasketItems($this->request->get('basketItems'));
+        } else {
+            $result = $this->basketService->addBasketItem($this->request->all());
+        }
 
         if (array_key_exists("code", $result)) {
             return $this->response->create(
