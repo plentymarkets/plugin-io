@@ -35,7 +35,7 @@ abstract class ModelWrapper extends BaseModel
     {
         $result = [];
         foreach ($elements as $element) {
-            $newElement = static::wrap($element, ...$args)->toArray();
+            $newElement = static::wrap($element, ...$args);
             array_push($result, $newElement);
         }
 
