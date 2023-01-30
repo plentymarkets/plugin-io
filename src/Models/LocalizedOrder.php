@@ -141,10 +141,10 @@ class LocalizedOrder extends ModelWrapper
 
         $instance = pluginApp(self::class);
         $instance->order = $order;
-        
+
         $creationDate = $order->getDate(OrderDateType::ORDER_ENTRY_AT);
         $instance->order->createdAt = $creationDate->date;
-
+        $instance->order->accessKey = self::getAccessKey($order->id);
         $instance->status = [];
         $instance->totals = $orderTotalsService->getAllTotals($order);
 
@@ -343,7 +343,6 @@ class LocalizedOrder extends ModelWrapper
         $order['billingAddress'] = $this->order->billingAddress->toArray();
         $order['deliveryAddress'] = $this->order->deliveryAddress->toArray();
         $order['documents'] = $this->order->documents->toArray();
-        $order['accessKey'] = $this->getAccessKey($this->order->id);
         if (count($this->orderData)) {
             $order = $this->orderData;
         }
@@ -370,7 +369,7 @@ class LocalizedOrder extends ModelWrapper
     }
 
 
-    private function getAccessKey($orderId) {
+    private static function getAccessKey($orderId) {
         /** @var OrderRepositoryContract $orderRepository */
         $orderRepository = pluginApp(OrderRepositoryContract::class);
         /** @var AuthHelper $authHelper */

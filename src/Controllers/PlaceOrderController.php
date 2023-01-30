@@ -215,7 +215,11 @@ class PlaceOrderController extends LayoutController
                     ]
                 );
                 // send errors
-                $notificationService->error($paymentResult["value"]);
+                $error = null;
+                if (is_array($paymentResult["value"])) {
+                    $error = $paymentResult["value"][0];
+                }
+                $notificationService->error($error ?? $paymentResult["value"]);
             }
         } catch (\Exception $exception) {
             $this->getLogger(__CLASS__)->warning(
