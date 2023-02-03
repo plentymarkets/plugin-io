@@ -54,7 +54,7 @@ class CurrentCategoryExtension implements ItemSearchExtension
             $data = $extensionResult['documents'][0]['data'];
             $defaultCategories = $data['defaultCategories'];
 
-            if(count($defaultCategories))
+            if(is_array($defaultCategories) && count($defaultCategories))
             {
                 $currentCategoryId = 0;
                 foreach($defaultCategories as $defaultCategory)
