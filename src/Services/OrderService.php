@@ -822,7 +822,7 @@ class OrderService
     public function containsComponentPrefix(string $name): bool
     {
         $prefix = $this->getOrderItemPrefix(\Plenty\Modules\Order\Models\OrderItemType::TYPE_BUNDLE_COMPONENT);
-        if ($prefix !== null && (substr($name, 0, strlen($prefix)) == $prefix)) {
+        if (!empty($prefix) && (substr($name, 0, strlen($prefix)) == $prefix)) {
             return true;
         }
         return false;

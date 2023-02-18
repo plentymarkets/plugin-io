@@ -90,7 +90,7 @@ class OrderFaker extends AbstractFaker
             'postalCode' => $translator->trans('IO::Faker.addressPostalCode'),
             'town'       => $translator->trans('IO::Faker.addressTown'),
             'countryId'  => 1,
-            'stateId'    => null,
+            'stateId'    => 1,
         ];
     }
 
