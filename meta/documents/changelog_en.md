@@ -1,12 +1,12 @@
 # Release Notes for IO
 
-## v5.0.59 (2023-xx-xx) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.57...5.0.59" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
+## v5.0.59 (2023-02-21) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.57...5.0.59" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
 
 ### Fixed
 
-- Added logic to remove shopping cart items that are no longer compatible with the updated customer class when the customer class is changed.
+- We added logic to remove shopping cart items that are no longer compatible with the updated customer class when the customer class is changed.
 
-## v5.0.57 (2022-01-09) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.56...5.0.57" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
+## v5.0.57 (2023-01-09) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.56...5.0.57" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
 
 ### Fixed
 
