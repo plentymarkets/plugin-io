@@ -5,6 +5,9 @@
 ### Fixed
 
 - We added logic to remove shopping cart items that are no longer compatible with the updated customer class when the customer class is changed.
+- On the single item view, the currency symbol was not used when displaying the sales price if the corresponding currency was not active in the **Available Currencies** setting of the plentyShop LTS plugin. This has been fixed.
+- Due to an error, routes were always shown as activated in the global settings of the ShopBuilder, even if they were not active in the settings of the plugin IO. This has been fixed.
+- "Forgot password" emails that are sent via the backend now take the correct client into account.
 
 ## v5.0.57 (2023-01-09) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.56...5.0.57" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
 
