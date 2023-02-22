@@ -6,6 +6,12 @@
 
 - Es wurde eine Logik ergänzt, die bei der Änderung der Kundenklasse Warenkorbartikel entfernt, welche nicht mehr mit der aktualisierten Kundenklasse kompatibel sind.
 
+- Auf der Artikeldetailseite wurde nicht das Währungssymbol bei der Verkaufspreisanzeige nicht genutzt, wenn zeitgleich die Währung nicht für die Währungswechsel Einstellung freigegeben war.
+
+- Die Anzeige in den Routing Einstellungen in den Globalen Einstlelungen im ShopBuilder wurde behoben.
+
+- Passwort vergessen Emails die über das Backend gesendet werden, berücksichtigen jetzt den richtigen Mandant.
+
 ## v5.0.57 (2023-01-09) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.56...5.0.57" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
 
 ### Behoben
