@@ -19,63 +19,63 @@ class RouteConfig
      * Use this constants to check the type of the currently displayed page by using ShopUrls::is().
      */
     /** @var string Represents the basket route */
-    const BASKET                    = "basket";
+    const BASKET = "basket";
     /** @var string Represents the cancellation rights route */
-    const CANCELLATION_RIGHTS       = "cancellation-rights";
+    const CANCELLATION_RIGHTS = "cancellation-rights";
     /** @var string Represents the cancellation form route */
-    const CANCELLATION_FORM         = "cancellation-form";
+    const CANCELLATION_FORM = "cancellation-form";
     /** @var string Represents the category routes */
-    const CATEGORY                  = "category";
+    const CATEGORY = "category";
     /** @var string Represents the change mail route */
-    const CHANGE_MAIL               = "change-mail";
+    const CHANGE_MAIL = "change-mail";
     /** @var string Represents the checkout route */
-    const CHECKOUT                  = "checkout";
+    const CHECKOUT = "checkout";
     /** @var string Represents the confirmation route */
-    const CONFIRMATION              = "confirmation";
+    const CONFIRMATION = "confirmation";
     /** @var string Represents the contact route */
-    const CONTACT                   = "contact";
+    const CONTACT = "contact";
     /** @var string Represents the contact mail api route */
-    const CONTACT_MAIL_API          = "contact-mail-api";
+    const CONTACT_MAIL_API = "contact-mail-api";
     /** @var string Represents the home route */
-    const HOME                      = "home";
+    const HOME = "home";
     /** @var string Represents the item routes */
-    const ITEM                      = "item";
+    const ITEM = "item";
     /** @var string Represents the legal disclosure route */
-    const LEGAL_DISCLOSURE          = "legal-disclosure";
+    const LEGAL_DISCLOSURE = "legal-disclosure";
     /** @var string Represents the login route */
-    const LOGIN                     = "login";
+    const LOGIN = "login";
     /** @var string Represents the my account route */
-    const MY_ACCOUNT                = "my-account";
+    const MY_ACCOUNT = "my-account";
     /** @var string Represents the newsletter opt in route */
-    const NEWSLETTER_OPT_IN         = "newsletter-opt-in";
+    const NEWSLETTER_OPT_IN = "newsletter-opt-in";
     /** @var string Represents the newsletter opt out route */
-    const NEWSLETTER_OPT_OUT        = "newsletter-opt-out";
+    const NEWSLETTER_OPT_OUT = "newsletter-opt-out";
     /** @var string Represents the order document route */
-    const ORDER_DOCUMENT            = "order-document";
+    const ORDER_DOCUMENT = "order-document";
     /** @var string Represents the order property file route */
-    const ORDER_PROPERTY_FILE       = "order-property-file";
+    const ORDER_PROPERTY_FILE = "order-property-file";
     /** @var string Represents the order return route */
-    const ORDER_RETURN              = "order-return";
+    const ORDER_RETURN = "order-return";
     /** @var string Represents the order return confirmation route */
     const ORDER_RETURN_CONFIRMATION = "order-return-confirmation";
     /** @var string Represents the password reset route */
-    const PASSWORD_RESET            = "password-reset";
+    const PASSWORD_RESET = "password-reset";
     /** @var string Represents the place order route */
-    const PLACE_ORDER               = "place-order";
+    const PLACE_ORDER = "place-order";
     /** @var string Represents the privacy policy route */
-    const PRIVACY_POLICY            = "privacy-policy";
+    const PRIVACY_POLICY = "privacy-policy";
     /** @var string Represents the register route */
-    const REGISTER                  = "register";
+    const REGISTER = "register";
     /** @var string Represents the search route */
-    const SEARCH                    = "search";
+    const SEARCH = "search";
     /** @var string Represents the terms and conditions route */
-    const TERMS_CONDITIONS          = "gtc";
+    const TERMS_CONDITIONS = "gtc";
     /** @var string Represents the wish list route */
-    const WISH_LIST                 = "wish-list";
+    const WISH_LIST = "wish-list";
     /** @var string Represents the 404 route */
-    const PAGE_NOT_FOUND            = "page-not-found";
+    const PAGE_NOT_FOUND = "page-not-found";
     /** @var string Represents the tags route */
-    const TAGS                      = "tags";
+    const TAGS = "tags";
 
     /** @var string[] Represents all routes */
     const ALL = [
@@ -110,33 +110,40 @@ class RouteConfig
         self::PAGE_NOT_FOUND
     ];
 
-    /** @var array $enabledRoutes Contains all active routes  */
+    /** @var array $enabledRoutes Contains all active routes */
     private static $enabledRoutes = null;
     /** @var array Contains overriden routes. Used for preview purposes in the shopBuilder */
     private static $overrides = [];
 
     /**
      * Get all enabled routes from the plugin config.
+     *
+     * @param bool $ignoreIsShopBuilder
+     *
      * @return array
      */
-    public static function getEnabledRoutes()
+    public static function getEnabledRoutes(bool $ignoreIsShopBuilder = false)
     {
-        if ( is_null(self::$enabledRoutes) )
-        {
+        if (Utils::isShopBuilder() && $ignoreIsShopBuilder) {
+            $config = pluginApp(ConfigRepository::class);
+            $configValue = $config->get("IO.routing.enabled_routes");
+            if ($configValue === "all") {
+                return self::ALL;
+            } else {
+                return explode(", ", $configValue);
+            }
+        }
+
+        if (is_null(self::$enabledRoutes) || $ignoreIsShopBuilder) {
             $config = pluginApp(ConfigRepository::class);
             $configValue = $config->get("IO.routing.enabled_routes");
 
-            if ( $configValue === "all" || Utils::isShopBuilder() )
-            {
+            if ($configValue === "all" || Utils::isShopBuilder()) {
                 self::$enabledRoutes = self::ALL;
+            } else {
+                self::$enabledRoutes = explode(", ", $configValue);
             }
-            else
-            {
-                self::$enabledRoutes = explode(", ",  $configValue );
-            }
-
         }
-
         return self::$enabledRoutes;
     }
 
@@ -147,11 +154,11 @@ class RouteConfig
      * @param string $route The route to check the active state for.
      * @return bool
      */
-    public static function isActive( $route )
+    public static function isActive($route)
     {
         self::getEnabledRoutes();
         return in_array($route, self::$enabledRoutes)
-            && self::getCategoryId( $route ) === 0;
+            && self::getCategoryId($route) === 0;
     }
 
     /**
@@ -161,14 +168,13 @@ class RouteConfig
      * @param string $route The route to get the linked category ID for.
      * @return int
      */
-    public static function getCategoryId( $route )
+    public static function getCategoryId($route)
     {
-        if ( array_key_exists( $route, self::$overrides ) )
-        {
+        if (array_key_exists($route, self::$overrides)) {
             return self::$overrides[$route];
         }
         $config = pluginApp(ConfigRepository::class);
-        return (int) $config->get('IO.routing.category_' . $route, 0);
+        return (int)$config->get('IO.routing.category_' . $route, 0);
     }
 
     /**
@@ -178,7 +184,7 @@ class RouteConfig
      * @param string $route The route to override the linked category for.
      * @param int $categoryId The ID of the category to override.
      */
-    public static function overrideCategoryId( $route, $categoryId )
+    public static function overrideCategoryId($route, $categoryId)
     {
         self::$overrides[$route] = $categoryId;
     }

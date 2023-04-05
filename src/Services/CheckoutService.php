@@ -246,6 +246,43 @@ class CheckoutService
         );
     }
 
+    /**
+     * Get current currency symbol data
+     *
+     * @param string $currency
+     * @return array
+     */
+    public function getCurrencySymbol(string $currency): array
+    {
+        /** @var LocalizationRepositoryContract $localizationRepository */
+        $localizationRepository = pluginApp(LocalizationRepositoryContract::class);
+        $locale = $localizationRepository->getLocale();
+
+        return $this->fromMemoryCache(
+            'currencySymbol' . $locale . $currency,
+            function () use ($locale, $currency) {
+                /** @var CurrencyRepositoryContract $currencyRepository */
+                $currencyRepository = pluginApp(CurrencyRepositoryContract::class);
+
+                $currencySymbol = [];
+
+                foreach ($currencyRepository->getCurrencyList() as $currencyListItem) {
+                    if ($currencyListItem->currency == $currency) {
+                        $formatter = numfmt_create(
+                            $locale . "@currency=" . $currencyListItem->currency,
+                            \NumberFormatter::CURRENCY
+                        );
+                        $currencySymbol = [
+                            "name" => $currencyListItem->currency,
+                            "symbol" => $formatter->getSymbol(\NumberFormatter::CURRENCY_SYMBOL)
+                        ];
+                        break;
+                    }
+                }
+                return $currencySymbol;
+            }
+        );
+    }
 
     /**
      * Get the name and the symbol for the currently selected currency.
@@ -322,7 +359,22 @@ class CheckoutService
         }
 
         $symbols = [];
-        foreach ($this->getCurrencyList() as $currency) {
+        $currencyList = $this->getCurrencyList();
+
+        $currentCurrency = $this->checkoutRepository->getCurrency();
+        $isCurrentCurrencyIn = false;
+        foreach ($currencyList as $currencyListItem) {
+            if ($currencyListItem['name'] == $currentCurrency) {
+                $isCurrentCurrencyIn = true;
+                break;
+            }
+        }
+
+        if (!$isCurrentCurrencyIn) {
+            $currencyList[] = $this->getCurrencySymbol($currentCurrency);
+        }
+
+        foreach ($currencyList as $currency) {
             $symbols[$currency['name']] = $currency['symbol'];
         }
 

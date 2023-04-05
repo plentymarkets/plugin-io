@@ -36,7 +36,8 @@ class IOSendMail
             [
                 "template" => $pluginSendMail->getTemplate(),
                 "email" => $pluginSendMail->getContactEmail(),
-                "callFunction" => $pluginSendMail->getCallFunction()
+                "callFunction" => $pluginSendMail->getCallFunction(),
+                "webstoreId" => $pluginSendMail->getWebstoreId() ?? null
             ]
         );
 
@@ -59,8 +60,13 @@ class IOSendMail
 
             if (in_array(RouteConfig::PASSWORD_RESET, RouteConfig::getEnabledRoutes())  && strlen($pluginSendMail->getContactEmail())) {
                 /** @var ContactRepositoryContract $contactRepository */
+
+                $filter = [];
+                if (!is_null($pluginSendMail->getWebstoreId())) {
+                    $filter['webstoreId'] = $pluginSendMail->getWebstoreId();
+                }
                 $contactRepository = pluginApp(ContactRepositoryContract::class);
-                $contactId = $contactRepository->getContactIdByEmail($pluginSendMail->getContactEmail());
+                $contactId = $contactRepository->getContactIdByEmail($pluginSendMail->getContactEmail(), $filter);
 
                 if ($contactId === null) {
                     $this->setPlaceholderValue('Link_NewPassword', '');

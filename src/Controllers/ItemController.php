@@ -5,7 +5,6 @@ namespace IO\Controllers;
 use IO\Api\ResponseCode;
 use IO\Helper\Utils;
 use IO\Services\CategoryService;
-use IO\Services\ItemListService;
 use IO\Services\ItemSearch\Factories\VariationSearchResultFactory;
 use IO\Services\TemplateConfigService;
 use Plenty\Modules\Category\Models\Category;
