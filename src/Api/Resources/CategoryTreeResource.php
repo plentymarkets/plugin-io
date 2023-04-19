@@ -118,8 +118,10 @@ class CategoryTreeResource extends ApiResource
         $spacingPadding = $this->request->get('spacingPadding', '');
         $inlinePadding = $this->request->get('inlinePadding', '');
         $xssPattern = '/[<>()="]/g';
-        $inlinePadding = preg_replace($xssPattern, '', $inlinePadding);
+        
+        // $inlinePadding = preg_replace($xssPattern, '', $inlinePadding);
 
+        $inlinePadding = strip_tags($inlinePadding);
 
         $partialTree = $this->categoryService->getPartialTree($categoryId);
         $children = $this->findInTree($partialTree, $categoryId);
