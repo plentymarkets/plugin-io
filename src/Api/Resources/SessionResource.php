@@ -47,14 +47,7 @@ class SessionResource extends ApiResource
     {
         /** @var BasketService $basketService */
         $basketService = pluginApp(BasketService::class);
-
-        /** @var VatService $vatService */
-        $vatService = pluginApp(VatService::class);
-
-        $basket = $basketService->getBasketForTemplate();
-        $basket['totalVats'] = $vatService->getCurrentTotalVats();
-
-        return $basket;
+        return $basketService->getBasketForTemplate();
     }
 
     protected function indexBasketItems()
