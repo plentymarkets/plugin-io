@@ -37,7 +37,7 @@ class NotificationService
     public function getNotifications($clear = true): array
     {
         $notifications = json_decode(
-            $this->sessionStorageRepository->getSessionValue(SessionStorageRepositoryContract::NOTIFICATIONS) ?? [],
+            $this->sessionStorageRepository->getSessionValue(SessionStorageRepositoryContract::NOTIFICATIONS) ?? '',
             true
         );
 

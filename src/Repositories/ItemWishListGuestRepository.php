@@ -50,7 +50,7 @@ class ItemWishListGuestRepository
 
     public function getItemWishListForAllPlentyIds()
     {
-        return json_decode($this->sessionStorageRepository->getSessionValue(SessionStorageRepositoryContract::GUEST_WISHLIST) ?? [], true);
+        return json_decode($this->sessionStorageRepository->getSessionValue(SessionStorageRepositoryContract::GUEST_WISHLIST) ?? '', true) ?? [];
     }
 
     /**
