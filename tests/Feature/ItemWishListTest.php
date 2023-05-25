@@ -198,7 +198,7 @@ class ItemWishListTest extends TestCase
 
         $response = $this->wishListService->removeItemWishListEntry($variationId);
 
-        $wishList = json_decode($this->sessionStorageRepository->getSessionValue(SessionStorageRepositoryContract::GUEST_WISHLIST), true);
+        $wishList = json_decode($this->sessionStorageRepository->getSessionValue(SessionStorageRepositoryContract::GUEST_WISHLIST) ?? [], true);
         $whishListItem = $wishList[$this->plentyId][$variationId] ?? null;
 
         $this->assertNull($whishListItem);
