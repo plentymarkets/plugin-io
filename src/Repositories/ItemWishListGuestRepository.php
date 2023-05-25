@@ -36,7 +36,7 @@ class ItemWishListGuestRepository
 
         if(isset($wishList))
         {
-            $variationIds = array_keys($wishList[$this->plentyId]);
+            $variationIds = array_keys($wishList[$this->plentyId] ?? []);
         }
 
         return $variationIds;
@@ -118,7 +118,7 @@ class ItemWishListGuestRepository
     {
         $wishListComplete = $this->getItemWishListForAllPlentyIds();
 
-        if(isset($wishListComplete) && array_key_exists($variationId, $wishListComplete[$this->plentyId]))
+        if(isset($wishListComplete) && array_key_exists($variationId, $wishListComplete[$this->plentyId] ?? []))
         {
             unset($wishListComplete[$this->plentyId][$variationId]);
             $this->sessionStorageRepository->setSessionValue(SessionStorageRepositoryContract::GUEST_WISHLIST, json_encode($wishListComplete));
