@@ -93,11 +93,10 @@ jobs:
 
       # Cache dependencies to reduce traffic and cpu usage
       - name: Cache pl dependencies
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: "pl/vendor"
-          key: ${{ runner.os }}-composer-pl-${{ hashFiles('pl/composer.lock') }}
-          restore-keys: ${{ runner.os }}-composer-pl-
+          key: composer-pl-${{ steps.extract_branch.outputs.branch }}
 
       # Install dependencies
       - name: Install dependencies
