@@ -73,6 +73,9 @@ jobs:
           - 127.0.0.1:6379:6379
 
     steps:
+      - name: Cleanup Runner
+        uses: plentymarkets/github-runner-cleanup@main
+
       - name: Checkout github-actions repository
         uses: actions/checkout@v3
         with:
@@ -80,7 +83,6 @@ jobs:
           ref: main
           token: ${{ secrets.PUBLIC_PAT_CICD4_PUBLIC }}
           path: .tmp/github-actions
-          php-version: ${{ matrix.php.version }}
 
       - name: Checkout PL PY PS
         id: branches
@@ -88,7 +90,6 @@ jobs:
         with:
           token: ${{ secrets.PUBLIC_PAT_CICD4_PUBLIC }}
           ref-forced: stable7
-          php-version: ${{ matrix.php.version }}
 
       # Cache dependencies to reduce traffic and cpu usage
       - name: Cache pl dependencies
