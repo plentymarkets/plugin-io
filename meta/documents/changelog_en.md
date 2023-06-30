@@ -1,5 +1,109 @@
 # Release Notes for IO
 
+## v5.0.59 (2023-02-23) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.57...5.0.59" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
+
+### Fixed
+
+- We added logic to remove shopping cart items that are no longer compatible with the updated customer class when the customer class is changed.
+- On the single item view, the currency symbol was not used when displaying the sales price if the corresponding currency was not active in the **Available Currencies** setting of the plentyShop LTS plugin. This has been fixed.
+- Due to an error, routes were always shown as activated in the global settings of the ShopBuilder, even if they were not active in the settings of the plugin IO. This has been fixed.
+- "Forgot password" emails that are sent via the backend now take the correct client into account.
+
+## v5.0.57 (2023-01-09) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.56...5.0.57" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
+
+### Fixed
+
+- Overseas countries and territories have been removed from the list of selectable countries of the billing address.
+- Countries of the European Economic Area have been added to the list of selectable countries for the billing address.
+- In the quick search, the stored sort order was not used for the search results page. This has been fixed.
+- A function to add several shopping basket items at the same time was added to the BasketService.
+- The sending of emails on order completion has been removed.
+
+## v5.0.56 (2022-11-08) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.55...5.0.56" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
+
+### Added
+
+- The middleware **HandleQueryParamNotifications** was added to be able to generate URL-parameter-dependent shop notifications.
+
+### Fixed
+
+- On the "Forgot password" page, an error message is now only displayed if there is a problem with sending the email.
+- Due to an error, some status names were displayed with the status ID in the My Account area and on the order confirmation. This has been fixed. The status IDs are now filtered out completely.
+
+## v5.0.55 (2022-09-22) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.54...5.0.55" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
+
+### Fixed
+
+- The preview of the order confirmation page was not displayed in the ShopBuilder due to an error related to sample prices. This has been fixed.
+
+## v5.0.54 (2022-08-08) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.53...5.0.54" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
+
+### TODO
+
+- If you are using the plentyShop contact form (either the standard template or via a ShopBuilder content), please make sure that the route `/contact-mail-api` is activated in the IO plugin. To check this, open the IO setting in your plugin set. Open the tab **Configuration**. In the setting **Activate routes**, activate the route `/contact-mail-api` and save your changes. If you do *not* use a plentyShop contact form, please make sure that the route `/contact-mail-api` is deactivated.
+
+### Added
+
+- The route `/contact-mail-api` has been added. You can use it to activate and deactivate the sending of mail via the contact form independently of the `/contact` route.
+
+### Fixed
+
+- For multilingual shops, errors could occurr in regards to the shopping cart URL. This has been fixed.
+- If pages were called with parameters that were excluded from ShopBooster, faulty markup could be generated. This has been fixed.
+- On mobile devices, the combination of language selection and ShopBooster could result in the mobile navigation being displayed in the previously selected language. This behaviour has been fixed.
+- Item sets with set components that contained order characteristics could cause an incorrect display of the value of goods. This has been fixed.
+
+## v5.0.53 (2022-07-04) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.52...5.0.53" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
+
+### Behoben
+
+- The setting **Forward to login page after clicking link in order confirmation** has been added back to plentyShop LTS settings and plentyShop wizard. These settings were removed in version 5.0.52, which resulted in the order confirmation of manually created orders not being accessible. We have therefore reverted this change.
+
+## v5.0.52 (2022-06-29) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.50...5.0.52" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
+
+### Changed
+
+- The setting **Forward to login page after clicking link in order confirmation** has been removed from the plentyShop LTS settings and the plentyShop assistant. Now, the default behaviour is that customers are always forwarded to the login page. 
+
+### Fixed
+
+- Category filters were not displayed in the ShopBuilder. This has been fixed.
+- We fixed an error concerning the generation of the backlink when users were forwarded from the order confirmation to the login page.
+
+## v5.0.50 (2022-05-04) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.49...5.0.50" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
+
+### TODO for external developers
+
+- The loading of the shopping cart has been removed from the `BasketController` because the shopping cart is already loaded in the `GlobalContext`. External developers who overwrite the `GlobalContext` in their theme and have removed the shopping cart call must add this call again. Otherwise errors may occur when loading the shopping cart.
+
+### Changed
+
+- The logic for checking the validity of an order confirmation page was transferred from the plugin to the core.
+- The amount already paid is now displayed on the order confirmation page.
+- The order confirmation page can now display multiple redeemed coupon values.
+- The IO plugin is now compatible with PHP 8.
+- Order properties and characteristics configured as additional costs are now shown as separate items in the totals.
+- For order properties and characteristics, it is now displayed in the single item view, in the shopping cart, and in the order confirmation whether the costs are inclusive or additional.
+- Required, pre-selected order properties that have been configured as additional costs are now displayed without a checkbox below the item price on the single item view.
+
+### Fixed
+
+- Shipping costs could be displayed incorrectly in the shopping cart if a sales coupon affected both the value of goods and the shipping costs. This has been fixed.
+- For addresses that contained a postcode with white spaces, incorrect links could occur for the shipment tracking function. This has been fixed.
+
+## v5.0.49 (2022-04-11) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.48...5.0.49" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
+
+### Fixed
+
+- An error with inheritance from outer to inner sorting was fixed.
+
+## v5.0.48 (2022-03-21) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.46...5.0.48" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
+
+### Fixed
+
+- Due to an error, categories were unintentionally not visible. This has been fixed.
+- A fix in version 5.0.46 led to another error. This has been fixed.
+
 ## v5.0.46 (2022-02-24) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.45...5.0.46" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
 
 ### Changed

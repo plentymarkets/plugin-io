@@ -2,15 +2,10 @@
 
 namespace IO\Api\Resources;
 
-use IO\Middlewares\DetectCurrency;
-use IO\Middlewares\DetectLanguage;
-use IO\Middlewares\DetectReferrer;
-use IO\Middlewares\DetectShippingCountry;
 use IO\Services\BasketService;
 use IO\Services\ItemLastSeenService;
 use Plenty\Modules\Frontend\Services\VatService;
 use Plenty\Modules\Webshop\Contracts\ContactRepositoryContract;
-use Plenty\Modules\Webshop\Contracts\SessionStorageRepositoryContract;
 use Plenty\Plugin\Http\Response;
 use IO\Api\ApiResource;
 use IO\Api\ResponseCode;
@@ -50,35 +45,9 @@ class SessionResource extends ApiResource
 
     protected function indexBasket()
     {
-        /** @var DetectReferrer $detectReferrer */
-        $detectReferrer = pluginApp(DetectReferrer::class);
-        $detectReferrer->before($this->request);
-
-        /** @var DetectShippingCountry $detectShippingCountry */
-        $detectShippingCountry = pluginApp(DetectShippingCountry::class);
-        $detectShippingCountry->before($this->request);
-
-        /** @var DetectCurrency $detectCurrency */
-        $detectCurrency = pluginApp(DetectCurrency::class);
-        $detectCurrency->before($this->request);
-
-        /** @var SessionStorageRepositoryContract $sessionStorageRepository */
-        $sessionStorageRepository = pluginApp(SessionStorageRepositoryContract::class);
-        
-        /** @var DetectLanguage $detectLanguage */
-        $detectLanguage = pluginApp(DetectLanguage::class);
-        $detectLanguage->detectLanguage($this->request, $sessionStorageRepository->getHttpReferrerUri());
-
         /** @var BasketService $basketService */
         $basketService = pluginApp(BasketService::class);
-
-        /** @var VatService $vatService */
-        $vatService = pluginApp(VatService::class);
-
-        $basket = $basketService->getBasketForTemplate();
-        $basket['totalVats'] = $vatService->getCurrentTotalVats();
-
-        return $basket;
+        return $basketService->getBasketForTemplate();
     }
 
     protected function indexBasketItems()

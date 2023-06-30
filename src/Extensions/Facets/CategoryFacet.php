@@ -38,9 +38,8 @@ class CategoryFacet implements FacetExtension
         /** @var TemplateConfigService $templateConfigService */
         $templateConfigService = pluginApp(TemplateConfigService::class);
 
-
         if ($templateConfigService->getBoolean('item.show_category_filter', false)) {
-            if (count($result)) {
+            if (is_array($result) && count($result)) {
                 $categoryFacet = [
                     'id' => 'category',
                     'name' => 'Categories',
@@ -68,9 +67,9 @@ class CategoryFacet implements FacetExtension
                 $request = pluginApp(Request::class);
                 foreach ($result as $categoryId => $count) {
                     $category = $categoryService->getForPlentyId($categoryId, Utils::getLang());
-                    if (!is_null($category) && (!is_null($categoryBranch) || !in_array(
+                    if (!is_null($category) && (is_null($categoryBranch) || !in_array(
                                 $categoryId,
-                                $categoryBranch
+                                $categoryBranch ?? []
                             )) && (!$categoryService->isHidden(
                                 $category->id
                             ) || $loggedIn || Utils::isAdminPreview())) {
@@ -92,7 +91,7 @@ class CategoryFacet implements FacetExtension
                 $categoryService->setCurrentCategoryID($currentCategory->id);
             }
 
-            if (count($categoryFacet['values']) > 0) {
+            if (is_array($categoryFacet['values']) && count($categoryFacet['values']) > 0) {
                 $categoryFacet['count'] = count($categoryFacet['values']);
             } else {
                 $categoryFacet = [];
@@ -110,7 +109,7 @@ class CategoryFacet implements FacetExtension
     {
         $categoryIds = [];
 
-        if (count($filtersList)) {
+        if (is_array($filtersList) && count($filtersList)) {
             foreach ($filtersList as $filter) {
                 if (strpos($filter, 'category-') === 0) {
                     $e = explode('-', $filter);

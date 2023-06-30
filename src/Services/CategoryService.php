@@ -299,7 +299,7 @@ class CategoryService
             } elseif ($category['id'] == $categoryId) {
                 $result = $category;
                 break;
-            } elseif (count($category['children'])) {
+            } elseif (is_array($category['children']) && count($category['children'])) {
                 $result = $this->findInCategoryTree($category['children'], $branch, $level + 1);
                 break;
             }
@@ -637,7 +637,7 @@ class CategoryService
             $hierarchy = array_reverse($hierarchy);
         }
 
-        if (count($this->currentItem)) {
+        if (is_array($this->currentItem) && count($this->currentItem)) {
             $lang = Utils::getLang();
             array_push($hierarchy, $this->currentItem['texts'][$lang]);
         }
@@ -718,7 +718,7 @@ class CategoryService
     private function filterVisibleCategories($categoryList = [])
     {
         $result = array_filter(
-            $categoryList,
+            $categoryList ?? [],
             function ($category) {
                 return $category['right'] !== 'customer';
             }
@@ -726,9 +726,7 @@ class CategoryService
 
         $result = array_map(
             function ($category) {
-                /** @var $category Category */
-                $category->children = $this->filterVisibleCategories($category->children);
-
+                $category['children'] = $this->filterVisibleCategories($category['children']);
                 return $category;
             },
             $result
@@ -742,7 +740,7 @@ class CategoryService
         $branchKey = "category" . $level . "Id";
         $isCurrentLevel = $branch[$branchKey] === $branch["categoryId"];
         $result = [];
-        $siblingCount = count($tree);
+        $siblingCount = count($tree ?? []);
 
         foreach ($tree as $category) {
             $isInBranch = $category['id'] === $branch[$branchKey];
@@ -757,16 +755,12 @@ class CategoryService
                     $category['url']
                 );
                 $result[] = $category;
-            } else {
-                if ($isInBranch && $isCurrentLevel) {
-                    $this->appendBranchFields($category, $siblingCount, $urlPrefix, 2);
-                    $result[] = $category;
-                } else {
-                    if (!$isInBranch && $isCurrentLevel) {
-                        $this->appendBranchFields($category, $siblingCount, $urlPrefix, 0);
-                        $result[] = $category;
-                    }
-                }
+            } elseif ($isInBranch && $isCurrentLevel) {
+                $this->appendBranchFields($category, $siblingCount, $urlPrefix, 2);
+                $result[] = $category;
+            } elseif (!$isInBranch && $isCurrentLevel) {
+                $this->appendBranchFields($category, $siblingCount, $urlPrefix, 0);
+                $result[] = $category;
             }
         }
 
@@ -777,7 +771,7 @@ class CategoryService
     {
         // Filter children not having texts in current language
         $category['children'] = array_filter(
-            $category['children'],
+            $category['children'] ?? [],
             function ($child) {
                 return count($child['details']);
             }

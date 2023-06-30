@@ -5,7 +5,6 @@ namespace IO\Controllers;
 use IO\Api\ResponseCode;
 use IO\Helper\Utils;
 use IO\Services\CategoryService;
-use IO\Services\ItemListService;
 use IO\Services\ItemSearch\Factories\VariationSearchResultFactory;
 use IO\Services\TemplateConfigService;
 use Plenty\Modules\Category\Models\Category;
@@ -103,7 +102,7 @@ class ItemController extends LayoutController
         /** @var ShopBuilderRequest $shopBuilderRequest */
         $shopBuilderRequest = pluginApp(ShopBuilderRequest::class);
 
-        $defaultCategories = $itemResult['item']['documents'][0]['data']['defaultCategories'];
+        $defaultCategories = $itemResult['item']['documents'][0]['data']['defaultCategories'] ?? [];
         $defaultCategory = array_filter(
             $defaultCategories,
             function ($category) {
@@ -132,7 +131,7 @@ class ItemController extends LayoutController
             // need to filter null values from variation list to avoid errors in the frontend
             $hasInitialVariation = false;
             $itemResult['variationAttributeMap']['variations'] = array_filter(
-                $itemResult['variationAttributeMap']['variations'],
+                $itemResult['variationAttributeMap']['variations'] ?? [],
                 function ($variation) use ($itemResult) {
                     if(!empty($variation)) {
                         if($variation['variationId'] === $itemResult['documents'][0]['data']['variation']['id']) {
@@ -254,7 +253,7 @@ class ItemController extends LayoutController
             )
         );
 
-        if (count($itemList['documents'])) {
+        if (is_array($itemList['documents']) && count($itemList['documents'])) {
             return $this->showItem(
                 '',
                 $itemList['documents'][0]['data']['item']['id'],

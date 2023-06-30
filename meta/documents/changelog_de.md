@@ -1,5 +1,109 @@
 # Release Notes für IO
 
+## v5.0.59 (2023-02-23) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.57...5.0.59" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
+
+### Behoben
+
+- Es wurde eine Logik ergänzt, die bei der Änderung der Kundenklasse Warenkorbartikel entfernt, welche nicht mehr mit der aktualisierten Kundenklasse kompatibel sind.
+- Auf der Artikeldetailseite wurde das Währungssymbol bei der Anzeige des Verkaufspreises nicht genutzt, wenn die entsprechende Währung nicht in der Einstellung **Verfügbare Währungen** des plentyShop LTS-Plugins aktiv war. Dies wurde behoben.
+- Durch einen Anzeigefehler wurden Routen in den globalen Einstellungen des ShopBuilders immer als aktiviert angezeigt, selbst wenn diese in den Einstellungen des Plugins IO nicht aktiv waren. Dies wurde behoben.
+- "Passwort vergessen"-E-Mails, die über das Backend versendet werden, berücksichtigen jetzt den richtigen Mandanten.
+
+## v5.0.57 (2023-01-09) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.56...5.0.57" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
+
+### Behoben
+
+- Überseeische Länder und Hoheitsgebiete wurden aus der Liste der auswählbaren Länder der Rechnungsadresse entfernt.
+- Länder des europäischen Wirtschaftsraums wurden in die Liste der auswählbaren Länder der Rechnungsadresse ergänzt.
+- In der Schnellsuche wurde nicht die hinterlegte Sortierung für die Suchergebnisseite genutzt. Das wurde behoben.
+- Eine Funktion zum gleichzeitigen hinzufügen von mehreren Warenkorbartikeln wurde im BasketService hinzugefügt.
+- Das versenden von Emails bei Auftragsabschluss wurde entfernt.
+
+## v5.0.56 (2022-11-08) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.55...5.0.56" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
+
+### Hinzugefügt
+
+- Die Middleware **HandleQueryParamNotifications** wurde hinzugefügt, um URL-parameterabhängige Shop-Benachrichtigungen erzeugen zu können.
+
+### Behoben
+
+- Auf der **Passwort vergessen**-Seite wird nur noch dann eine Fehlermeldung ausgegeben, wenn ein Problem mit dem E-Mail-Versand besteht.
+- Durch einen Fehler wurden im Mein Konto-Bereich und auf der Auftragsbestätigung manche Statusnamen mit der Status-ID angezeigt. Dies wurde behoben. Die Status-IDs werden nun vollständig herausgefiltert.
+
+## v5.0.55 (2022-09-22) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.54...5.0.55" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
+
+### Behoben
+
+- Die Vorschau der Auftragsbestätigungsseite wurde durch einen Fehler beim Auslesen von Beispielpreisen im ShopBuilder nicht angezeigt. Dieses Verhalten wurde behoben.
+
+## v5.0.54 (2022-08-08) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.53...5.0.54" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
+
+### TODO
+
+- Die neue Route `/contact-mail-api` wurde hinzugefügt. Wenn du das plentyShop Kontaktformular verwendest (egal ob Standard oder per ShopBuilder-Inhalt), stelle sicher, dass diese Route im IO-Plugin aktiviert ist. Öffne dazu die Einstellungen des IO-Plugins in deinem Plugin-Set. Öffne den Reiter **Konfiguration**. Aktiviere in der Einstellung **Routen aktivieren** die Route `/contact-mail-api` und speichere deine Einstellungen. Wenn du das Kontaktformular *nicht* verwendest, stelle sicher, dass diese Route deaktiviert ist.
+
+### Hinzugefügt
+
+- Es wurde eine weitere Route `/contact-mail-api` geschaffen, über die du nun unabhängig von der Route `/contact` den Mail-Versand über das Kontaktformular aktivieren oder deaktivieren kannst. Beachte das TODO.
+
+### Behoben
+
+- Bei mehrsprachigen Shops konnte es zu Problemen bei der Warenkorb-URL kommen. Dies wurde behoben.
+- Wenn Seiten mit Parameter aufgerufen wurden, die für den ShopBooster exkludiert wurden, konnte es zu fehlerhaftem Markup kommen. Dies wurde behoben.
+- Auf mobilen Geräten konnte es bei der Kombination von Sprachwechsel und ShopBooster dazu kommen, dass die mobile Navigation in der zuvor ausgewählten Sprache angezeigt wurde. Dieses Verhalten wurde behoben.
+- Bei Artikelsets mit Set-Komponenten, die Bestellmerkmale enthalten, kam es zur fehlerhaften Darstellung des Warenwerts. Dies wurde behoben.
+
+## v5.0.53 (2022-07-04) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.52...5.0.53" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
+
+### Behoben
+
+- Die Einstellung **Kunden zur Login-Seite weiterleiten, wenn sie den Link in der Bestellbestätigung klicken** wurde wieder zu den plentyShop LTS-Einstellungen und dem plentyShop-Assistenten hinzugefügt. Diese Einstellungen wurden in der Version 5.0.52 entfernt, was dazu führte, dass die Bestellbestätigung von manuell angelegten Aufträgen nicht zugänglich war. Wir haben diese Änderung daher rückgängig gemacht.
+
+## v5.0.52 (2022-06-29) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.50...5.0.52" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
+
+### Geändert
+
+- Die Einstellung **Kunden zur Login-Seite weiterleiten, wenn sie den Link in der Bestellbestätigung klicken** wurde aus den plentyShop LTS-Einstellungen und aus dem plentyShop-Assistenten entfernt. Das Standardverhalten ist zukünftig so, dass Kund:innen immer zuerst auf die Login-Seite geleitet werden.
+
+### Behoben
+
+- Im ShopBuilder wurden Kategoriefilter nicht angezeigt. Dies wurde behoben.
+- Es wurde ein Problem bei der Erstellung des Backlinks behoben, wenn man von der Bestellbestätigungsseite zur Login-Seite weitergeleitet wurde.
+
+## v5.0.50 (2022-05-04) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.49...5.0.50" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
+
+### TODO für externe Entwickler:innen
+
+- Das Laden des Warenkorbs wurde aus dem `BasketController` entfernt, da der Warenkorb bereits im `GlobalContext` geladen wird. Externe Entwickler:innen, die den `GlobalContext` überschreiben und hier den Aufruf des Warenkorbs dort entfernt haben, müssen diesen Aufruf wieder hinzufügen. Andernfalls kann es zu Fehlern beim Laden des Warenkorbs kommen.
+
+### Geändert
+
+- Die Logik für die Prüfung der Gültigkeit einer Bestellbestätigungsseite wurde aus dem Plugin in den Kern überführt.
+- Auf der Bestellbestätigungsseite wird nun der bereits bezahlte Betrag angezeigt.
+- Auf der Bestellbestätigungsseite können nun mehrere eingelöste Gutscheinwerte aufgelistet werden.
+- Das IO-Plugin ist nun kompatibel mit PHP 8.
+- Bestelleigenschaften und Merkmale, die als Zusatzkosten konfiguriert wurden, werden jetzt als seperate Posten in den Summen dargestellt.
+- Für Bestelleigenschaften und Merkmale wird nun auf der Artikeleinzelansicht, im Warenkorb und auf der Bestellbestätigung angezeigt, ob es sich um inklusive oder zusätzliche Kosten handelt.
+- Verpflichtende, vorausgewählte Bestelleigenschaften, die als Zusatzkosten konfiguriert wurden, werden nun ohne Checkbox unter dem Artikelpreis auf der Artikeleinzelansicht dargestellt.
+
+### Behoben
+
+- Im Warenkorb konnte es zu einer fehlerhaften Darstellung der Versandkosten kommen, wenn ein Verkaufsgutschein sowohl Warenwert als auch Verandkosten getilgt hat. Dies wurde behoben.
+- Bei Addressen, die eine Postleitzahl mit Leerzeichen enthielten, konnte es zu fehlerhaften Links bei der Sendungsverfolgung kommen. Dies wurde behoben.
+
+## v5.0.49 (2022-04-11) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.48...5.0.49" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
+
+### Behoben
+
+- Ein Fehler bei der Vererbung von äußere auf innere Sortierung wurde behoben.
+
+## v5.0.48 (2022-03-21) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.46...5.0.48" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
+
+### Behoben
+
+- Durch einen Fehler waren Kategorien teilweise nicht sichtbar. Dies wurde behoben.
+- Eine Fehlerbehebung in Version 5.0.46 führte zu Folgefehlern. Dies wurde behoben.
+
 ## v5.0.46 (2022-02-24) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.45...5.0.46" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
 
 ### Geändert

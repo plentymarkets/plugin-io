@@ -16,6 +16,7 @@ use Plenty\Modules\Frontend\PaymentMethod\Contracts\FrontendPaymentMethodReposit
 use Plenty\Modules\Frontend\Services\VatService;
 use Plenty\Modules\Frontend\Session\Storage\Contracts\FrontendSessionStorageFactoryContract;
 use Plenty\Modules\Order\Currency\Contracts\CurrencyRepositoryContract;
+use Plenty\Modules\Order\Payment\Method\Models\PaymentMethod;
 use Plenty\Modules\Order\Shipping\Contracts\ParcelServicePresetRepositoryContract;
 use Plenty\Modules\Payment\Events\Checkout\GetPaymentMethodContent;
 use Plenty\Modules\Payment\Method\Contracts\PaymentMethodRepositoryContract;
@@ -91,6 +92,8 @@ class CheckoutService
 
     /** @var ContactRepositoryContract $contactRepository */
     private $contactRepository;
+
+    const ALREADY_PAID_PAYMENT_KEY = 'ALREADY_PAID';
 
     /**
      * CheckoutService constructor.
@@ -243,6 +246,43 @@ class CheckoutService
         );
     }
 
+    /**
+     * Get current currency symbol data
+     *
+     * @param string $currency
+     * @return array
+     */
+    public function getCurrencySymbol(string $currency): array
+    {
+        /** @var LocalizationRepositoryContract $localizationRepository */
+        $localizationRepository = pluginApp(LocalizationRepositoryContract::class);
+        $locale = $localizationRepository->getLocale();
+
+        return $this->fromMemoryCache(
+            'currencySymbol' . $locale . $currency,
+            function () use ($locale, $currency) {
+                /** @var CurrencyRepositoryContract $currencyRepository */
+                $currencyRepository = pluginApp(CurrencyRepositoryContract::class);
+
+                $currencySymbol = [];
+
+                foreach ($currencyRepository->getCurrencyList() as $currencyListItem) {
+                    if ($currencyListItem->currency == $currency) {
+                        $formatter = numfmt_create(
+                            $locale . "@currency=" . $currencyListItem->currency,
+                            \NumberFormatter::CURRENCY
+                        );
+                        $currencySymbol = [
+                            "name" => $currencyListItem->currency,
+                            "symbol" => $formatter->getSymbol(\NumberFormatter::CURRENCY_SYMBOL)
+                        ];
+                        break;
+                    }
+                }
+                return $currencySymbol;
+            }
+        );
+    }
 
     /**
      * Get the name and the symbol for the currently selected currency.
@@ -319,7 +359,22 @@ class CheckoutService
         }
 
         $symbols = [];
-        foreach ($this->getCurrencyList() as $currency) {
+        $currencyList = $this->getCurrencyList();
+
+        $currentCurrency = $this->checkoutRepository->getCurrency();
+        $isCurrentCurrencyIn = false;
+        foreach ($currencyList as $currencyListItem) {
+            if ($currencyListItem['name'] == $currentCurrency) {
+                $isCurrentCurrencyIn = true;
+                break;
+            }
+        }
+
+        if (!$isCurrentCurrencyIn) {
+            $currencyList[] = $this->getCurrencySymbol($currentCurrency);
+        }
+
+        foreach ($currencyList as $currency) {
             $symbols[$currency['name']] = $currency['symbol'];
         }
 
@@ -346,14 +401,29 @@ class CheckoutService
         $methodOfPaymentList = array_merge($methodOfPaymentList, $methodOfPaymentExpressCheckoutList);
 
         $methodOfPaymentValid = false;
-        foreach ($methodOfPaymentList as $methodOfPayment) {
+
+        $basket = $this->basketRepository->load();
+        $basketAmount = $basket->basketAmount;
+        /**
+         * @var int $methodOfPaymentKey
+         * @var PaymentMethod $methodOfPayment
+         */
+        foreach ($methodOfPaymentList as $methodOfPaymentKey => $methodOfPayment) {
+            if($basket->id > 0 && $basketAmount <= 0 && $methodOfPayment->paymentKey !== self::ALREADY_PAID_PAYMENT_KEY) {
+                unset($methodOfPaymentList[$methodOfPaymentKey]);
+                continue;
+            }
+
             if ((int)$methodOfPaymentID == $methodOfPayment->id) {
                 $methodOfPaymentValid = true;
             }
         }
 
         if ($methodOfPaymentID === null || !$methodOfPaymentValid) {
-            $methodOfPaymentID = $methodOfPaymentList[0]->id;
+            $methodOfPayment = array_shift($methodOfPaymentList);
+            if(!is_null($methodOfPayment)) {
+                $methodOfPaymentID = $methodOfPayment->id;
+            }
 
             if (!is_null($methodOfPaymentID)) {
                 $this->setMethodOfPaymentId($methodOfPaymentID);
@@ -370,6 +440,8 @@ class CheckoutService
      */
     public function setMethodOfPaymentId(int $methodOfPaymentID)
     {
+        /** @var PaymentMethodRepositoryContract $paymentMethodRepository */
+
         $this->checkout->setPaymentMethodId($methodOfPaymentID);
         $this->sessionStorageRepository->setSessionValue('MethodOfPaymentID', $methodOfPaymentID);
     }
@@ -451,12 +523,26 @@ class CheckoutService
      */
     public function getMethodOfPaymentList(): array
     {
-        return $this->fromMemoryCache(
+        $methodOfPaymentListOriginal = $this->fromMemoryCache(
             'methodOfPaymentList',
             function () {
                 return $this->frontendPaymentMethodRepository->getCurrentPaymentMethodsList();
             }
         );
+
+        $methodOfPaymentList = [];
+        $basket = $this->basketRepository->load();
+        if ($basket->basketAmount <= 0 && $basket->id > 0) {
+            $methodOfPaymentList = array_filter($methodOfPaymentListOriginal, function($methodOfPayment) {
+                return $methodOfPayment->paymentKey === self::ALREADY_PAID_PAYMENT_KEY;
+            });
+        }
+
+        if(!count($methodOfPaymentList)) {
+            $methodOfPaymentList = $methodOfPaymentListOriginal;
+        }
+
+        return $methodOfPaymentList;
     }
 
     /**

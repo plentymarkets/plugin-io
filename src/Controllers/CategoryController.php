@@ -296,7 +296,8 @@ class CategoryController extends LayoutController
                 'itemsPerPage' => $request->get('items', null),
                 'page' => $request->get('page', null),
                 'facets' => $request->get('facets', '')
-            ]
+            ],
+            RouteConfig::getCategoryId(RouteConfig::BASKET) !== $category->id
         );
     }
 }

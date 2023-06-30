@@ -716,7 +716,7 @@ class CustomerService
         }
 
         if ($typeId == AddressType::BILLING &&
-            $addressData['email'] &&
+            !empty($addressData['email']) &&
             (int)$this->contactRepository->getContactId() <= 0) {
             /** @var SessionStorageRepositoryContract $sessionStorageRepository */
             $sessionStorageRepository = pluginApp(SessionStorageRepositoryContract::class);
@@ -902,7 +902,7 @@ class CustomerService
         );
 
         if ($typeId == AddressType::BILLING &&
-            $addressData['email'] &&
+            !empty($addressData['email']) &&
             (int)$this->contactRepository->getContactId() <= 0) {
             /** @var SessionStorageRepositoryContract $sessionStorageRepository */
             $sessionStorageRepository = pluginApp(SessionStorageRepositoryContract::class);

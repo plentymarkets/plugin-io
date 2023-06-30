@@ -208,7 +208,7 @@ class ShopUrls
             $this->includeLanguage = $dataForCache['includeLanguage'] = $lang !== $webstoreConfigurationRepository->getWebstoreConfiguration(
                 )->defaultLanguage;
 
-            $this->basket = $dataForCache['basket'] = $this->getShopUrl(RouteConfig::BASKET);
+            $this->basket = $dataForCache['basket'] = $this->getShopUrl(RouteConfig::BASKET, $lang);
             $this->cancellationForm = $dataForCache['cancellationForm'] = $this->getShopUrl(RouteConfig::CANCELLATION_FORM, $lang);
             $this->cancellationRights = $dataForCache['cancellationRights'] = $this->getShopUrl(RouteConfig::CANCELLATION_RIGHTS, $lang);
             $this->checkout = $dataForCache['checkout'] = $this->getShopUrl(RouteConfig::CHECKOUT, $lang);
@@ -217,7 +217,7 @@ class ShopUrls
             $this->gtc = $dataForCache['gtc'] = $this->getShopUrl(RouteConfig::TERMS_CONDITIONS, $lang);
 
             // Homepage URL may not be used from category. Even if linked to category, the homepage URL should be '/'
-            $this->home = $dataForCache['home'] = Utils::makeRelativeUrl('/', $this->includeLanguage);
+            $this->home = $dataForCache['home'] = Utils::makeRelativeUrl('/', $this->includeLanguage, $lang);
             $this->legalDisclosure = $dataForCache['legalDisclosure'] = $this->getShopUrl(RouteConfig::LEGAL_DISCLOSURE, $lang);
             $this->login = $dataForCache['login'] = $this->getShopUrl(RouteConfig::LOGIN, $lang);
             $this->myAccount = $dataForCache['myAccount'] = $this->getShopUrl(RouteConfig::MY_ACCOUNT, $lang);
@@ -380,6 +380,10 @@ class ShopUrls
     {
         $key = $route;
 
+        // Sanitize inputs
+        $routeParams = $routeParams ?? [];
+        $urlParams = $urlParams ?? [];
+
         if (count($routeParams) || count($urlParams)) {
             $key .= '.' . implode('.', $routeParams) . '.' . json_encode($urlParams);
         }
@@ -494,7 +498,7 @@ class ShopUrls
                     }
 
                     // match url pattern
-                    if (preg_match('/(?:a\-\d+|_?\d+|_\d+_\d+)\/?$/m', $url) === 1) {
+                    if (preg_match('/(?:a\-\d+|_\d+|_\d+_\d+|^\/\d+)\/?$/m', $url) === 1) {
                         return RouteConfig::ITEM;
                     } elseif (preg_match('/_t\d+\/?$/m', $url) === 1) {
                         return RouteConfig::TAGS;

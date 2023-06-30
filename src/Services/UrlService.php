@@ -123,7 +123,7 @@ class UrlService
                 $categoryService = pluginApp(CategoryService::class);
                 if (TemplateService::$currentTemplate === 'tpl.item') {
                     $currentItem = $categoryService->getCurrentItem();
-                    if (count($currentItem) > 0) {
+                    if (is_array($currentItem) && count($currentItem) > 0) {
                         return $this
                             ->getVariationURL($currentItem['item']['id'], $currentItem['variation']['id'], $lang)
                             ->toAbsoluteUrl($includeLanguage);
@@ -210,11 +210,7 @@ class UrlService
         /** @var Request $request */
         $request = pluginApp(Request::class);
         $queryParameters = $request->all();
-        unset($queryParameters['plentyMarkets']);
-
-        if (!is_array($queryParameters)) {
-            return '';
-        }
+        $queryParameters = Utils::cleanUpExcludesContentCacheParams($queryParameters);
 
         $queryParameters = http_build_query($queryParameters);
         return strlen($queryParameters) > 0 ? '?' . $queryParameters : '';

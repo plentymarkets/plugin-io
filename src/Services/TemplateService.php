@@ -202,6 +202,12 @@ class TemplateService
         $templateConfigRepository = pluginApp(TemplateConfigService::class);
 
         $sorting = pluginApp(Request::class)->get('sorting', '');
+        if (is_array($sorting)) {
+            // only one sorting value is accepted
+            // reset sorting value
+            $sorting = '';
+        }
+
         if (strlen($sorting) === 0) {
             /** @var ShopUrls $shopUrls */
             $shopUrls = pluginApp(ShopUrls::class);
@@ -217,7 +223,11 @@ class TemplateService
         $sorting = $sortingHelper->mapToInnerSorting($sorting);
 
         $dynamicInheritSorting = $templateConfigRepository->get('sorting.dynamicInherit', []);
-        if (in_array($sorting, $dynamicInheritSorting)) {
+        if (is_string($dynamicInheritSorting)) {
+            $dynamicInheritSorting = explode(',' , $dynamicInheritSorting);
+        }
+
+        if (is_array($dynamicInheritSorting) && in_array($sorting, $dynamicInheritSorting)) {
             if ($sorting === 'filter.prices.price_asc') {
                 return true;
             }

@@ -2,7 +2,6 @@
 
 namespace IO\Providers;
 
-use Illuminate\Support\MessageBag;
 use IO\Config\IOConfig;
 use IO\Events\Basket\BeforeBasketItemToOrderItem;
 use IO\Extensions\Basket\IOFrontendShippingProfileChanged;
@@ -27,6 +26,7 @@ use IO\Middlewares\DetectReferrer;
 use IO\Middlewares\DetectShippingCountry;
 use IO\Middlewares\HandleNewsletter;
 use IO\Middlewares\HandleOrderPreviewUrl;
+use IO\Middlewares\HandleQueryParamNotifications;
 use IO\Services\AuthenticationService;
 use IO\Services\AvailabilityService;
 use IO\Services\BasketService;
@@ -59,6 +59,7 @@ use IO\Services\TemplateService;
 use IO\Services\UnitService;
 use IO\Services\UrlService;
 use Plenty\Exceptions\ValidationException;
+use Plenty\Modules\Account\Contact\Events\AfterContactUpdate;
 use Plenty\Modules\Authentication\Events\AfterAccountAuthentication;
 use Plenty\Modules\Authentication\Events\AfterAccountContactLogout;
 use Plenty\Modules\Basket\Events\Basket\AfterBasketChanged;
@@ -77,6 +78,7 @@ use Plenty\Modules\Payment\Events\Checkout\ExecutePayment;
 use Plenty\Modules\Plugin\Events\AfterBuildPlugins;
 use Plenty\Modules\Plugin\Events\LoadSitemapPattern;
 use Plenty\Modules\Plugin\Events\PluginSendMail;
+use Plenty\Modules\Webshop\Contracts\ContactRepositoryContract;
 use Plenty\Modules\Webshop\Contracts\SessionStorageRepositoryContract;
 use Plenty\Modules\Webshop\ItemSearch\Helpers\FacetExtensionContainer;
 use Plenty\Modules\Webshop\Template\Contracts\TemplateConfigRepositoryContract;
@@ -106,6 +108,7 @@ class IOServiceProvider extends ServiceProvider
                 DetectShippingCountry::class,
                 HandleNewsletter::class,
                 HandleOrderPreviewUrl::class,
+                HandleQueryParamNotifications::class,
                 ClearNotifications::class,
                 CheckNotFound::class
             ]
@@ -181,6 +184,28 @@ class IOServiceProvider extends ServiceProvider
                 $checkoutService = pluginApp(CheckoutService::class);
                 //validate methodOfPayment
                 $methodOfPaymentId = $checkoutService->getMethodOfPaymentId();
+            }
+        );
+
+        $dispatcher->listen(
+            AfterContactUpdate::class,
+            function ($event) {
+                $eventContact = $event->getContact();
+
+                /** @var ContactRepositoryContract $contactRepository */
+                $contactRepository = pluginApp(ContactRepositoryContract::class);
+
+                if ($eventContact->id === $contactRepository->getContact()->id) {
+                    /** @var BasketService $basketService */
+                    $basketService = pluginApp(BasketService::class);
+                    $removedItems = $basketService->checkBasketItemsByPrice();
+                    if ($removedItems > 0) {
+                        /** @var NotificationService $notificationService */
+                        $notificationService = pluginApp(NotificationService::class);
+                        // Message will be overridden in Ceres
+                        $notificationService->warn('Items not available for contact class.', 16);
+                    }
+                }
             }
         );
 

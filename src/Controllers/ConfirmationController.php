@@ -15,6 +15,7 @@ use Plenty\Modules\Order\Contracts\OrderRepositoryContract;
 use Plenty\Modules\Order\Date\Models\OrderDateType;
 use Plenty\Modules\Order\Models\Order;
 use Plenty\Modules\ShopBuilder\Helper\ShopBuilderRequest;
+use Plenty\Modules\Webshop\Contracts\ConfirmationRepositoryContract;
 use Plenty\Modules\Webshop\Contracts\ContactRepositoryContract;
 use Plenty\Modules\Webshop\Contracts\SessionStorageRepositoryContract;
 use Plenty\Plugin\ConfigRepository;
@@ -63,7 +64,8 @@ class ConfirmationController extends LayoutController
                 [
                     "category" => $category,
                     "data" => null,
-                    "showAdditionalPaymentInformation" => true
+                    "showAdditionalPaymentInformation" => true,
+                    "isOrderValid" => true
                 ],
                 false
             );
@@ -155,80 +157,49 @@ class ConfirmationController extends LayoutController
         }
 
         if (!is_null($order) && $order instanceof LocalizedOrder) {
-            if ($this->checkValidity($order->order)) {
-                if ($category instanceof Category && $contactRepository->getContactId() <= 0) {
-                    /** @var ConfigRepository $config */
-                    $config = pluginApp(ConfigRepository::class);
-                    $categoryGuestId = (int)$config->get('IO.routing.category_confirmation-guest', 0);
-                    if ($categoryGuestId > 0) {
-                        /** @var CategoryService $categoryService */
-                        $categoryService = pluginApp(CategoryService::class);
-                        $category = $categoryService->get($categoryGuestId);
-                    }
+            $orderAccessStatus = $this->checkOrderAccessStatus($order->order);
+            if ($category instanceof Category && $contactRepository->getContactId() <= 0) {
+                /** @var ConfigRepository $config */
+                $config = pluginApp(ConfigRepository::class);
+                $categoryGuestId = (int)$config->get('IO.routing.category_confirmation-guest', 0);
+                if ($categoryGuestId > 0) {
+                    /** @var CategoryService $categoryService */
+                    $categoryService = pluginApp(CategoryService::class);
+                    $category = $categoryService->get($categoryGuestId);
                 }
+            }
 
+            if($orderAccessStatus !== ConfirmationRepositoryContract::STATUS_ORDER_CONFIRMATION_INVALID) {
                 return $this->renderTemplate(
                     "tpl.confirmation",
                     [
-                        "category" => $category,
-                        "data" => $order,
-                        "showAdditionalPaymentInformation" => true
+                        'category' => $category,
+                        'data' => $order,
+                        'showAdditionalPaymentInformation' => true,
+                        "isOrderValid" => $orderAccessStatus === ConfirmationRepositoryContract::STATUS_ORDER_CONFIRMATION_SOFTLOGIN ? true : false
                     ],
                     false
                 );
-            } else {
-                /** @var Response $response */
-                $response = pluginApp(Response::class);
-                $response->forceStatus(ResponseCode::NOT_FOUND);
-
-                CheckNotFound::$FORCE_404 = true;
-
-                return $response;
             }
         } elseif (!$order instanceof LocalizedOrder && !is_null($order)) {
             return $order;
-        } else {
-            $this->getLogger(__CLASS__)->warning("IO::Debug.ConfirmationController_orderNotFound");
-            /** @var Response $response */
-            $response = pluginApp(Response::class);
-            $response->forceStatus(ResponseCode::NOT_FOUND);
-
-            CheckNotFound::$FORCE_404 = true;
-
-            return $response;
         }
+
+        $this->getLogger(__CLASS__)->warning("IO::Debug.ConfirmationController_orderNotFound");
+        /** @var Response $response */
+        $response = pluginApp(Response::class);
+        $response->forceStatus(ResponseCode::NOT_FOUND);
+
+        CheckNotFound::$FORCE_404 = true;
+
+        return $response;
     }
 
-    private function checkValidity(Order $order)
+    private function checkOrderAccessStatus(Order $order)
     {
-        /** @var TemplateConfigService $templateConfigService */
-        $templateConfigService = pluginApp(TemplateConfigService::class);
-        $expiration = $templateConfigService->get('my_account.confirmation_link_expiration', 'always');
-
-        if ($expiration !== 'always') {
-            $now = time();
-
-            $orderDates = $order->dates;
-            $orderCreationDate = $orderDates->filter(
-                function ($date) {
-                    return $date->typeId == OrderDateType::ORDER_ENTRY_AT;
-                }
-            )->first()->date->timestamp;
-
-            if ($now > $orderCreationDate + ((int)$expiration * (24 * 60 * 60))) {
-                $this->getLogger(__CLASS__)->warning(
-                    "IO::Debug.ConfirmationController_confirmationLinkExpired",
-                    [
-                        "order" => $order,
-                        "creationDate" => $orderCreationDate,
-                        "expiration" => $expiration
-                    ]
-                );
-                return false;
-            }
-        }
-
-        return true;
+        /** @var ConfirmationRepositoryContract $confirmationRepository */
+        $confirmationRepository = pluginApp(ConfirmationRepositoryContract::class);
+        return $confirmationRepository->checkOrderAccessStatus($order);
     }
 
     public function redirect($orderId = 0, $accessKey = '')

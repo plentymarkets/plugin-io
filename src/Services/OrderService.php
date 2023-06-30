@@ -10,6 +10,7 @@ use IO\Constants\OrderPaymentStatus;
 use IO\Extensions\Constants\ShopUrls;
 use IO\Extensions\Filters\PropertyNameFilter;
 use IO\Extensions\Mail\SendMail;
+use IO\Guards\AuthGuard;
 use IO\Helper\RouteConfig;
 use IO\Helper\Utils;
 use IO\Models\LocalizedOrder;
@@ -174,7 +175,7 @@ class OrderService
             SessionStorageRepositoryContract::NEWSLETTER_SUBSCRIPTIONS
         );
 
-        if (count($newsletterSubscriptions) && strlen($email)) {
+        if (is_array($newsletterSubscriptions) && count($newsletterSubscriptions) && strlen($email)) {
             $firstName = '';
             $lastName = '';
 
@@ -300,15 +301,38 @@ class OrderService
                 if ((int)$this->contactRepository->getContactId() <= 0) {
                     /** @var ShopUrls $shopUrls */
                     $shopUrls = pluginApp(ShopUrls::class);
-                    return $this->urlService->redirectTo(
-                        $shopUrls->login . '?backlink=' . $shopUrls->confirmation . '/' . $orderId . '/' . $orderAccessKey
-                    );
+                    $backlink = $this->getConfirmationUrl($shopUrls->confirmation, $orderId, $orderAccessKey);
+                    AuthGuard::redirect($shopUrls->login . '?backlink=' . $backlink);
                 } elseif ((int)$orderContactId !== (int)$this->contactRepository->getContactId()) {
                     return null;
                 }
             }
         }
         return LocalizedOrder::wrap($order, Utils::getLang());
+    }
+
+    /**
+     * Get a confirmation url with correct structure and parameter
+     *
+     * @param string $confirmationBaseUrl
+     * @param int $orderId
+     * @param string $orderAccessKey
+     *
+     * @return string
+     */
+    public function getConfirmationUrl(string $confirmationBaseUrl, int $orderId, string $orderAccessKey): string
+    {
+        if (RouteConfig::isActive(RouteConfig::CONFIRMATION)) {
+            if (strlen($orderAccessKey) && (int)$orderId > 0) {
+                $confirmationBaseUrl .= '/' . $orderId . '/' . $orderAccessKey;
+            }
+        } elseif (in_array(RouteConfig::CONFIRMATION, RouteConfig::getEnabledRoutes())
+            && RouteConfig::getCategoryId(RouteConfig::CONFIRMATION) > 0) {
+            if (strlen($orderAccessKey) && (int)$orderId > 0) {
+                $confirmationBaseUrl .= '?orderId=' . $orderId . '&accessKey=' . $orderAccessKey;
+            }
+        }
+        return $confirmationBaseUrl;
     }
 
     /**
@@ -724,17 +748,6 @@ class OrderService
     {
         if ($order instanceof Order && $order->id > 0) {
             try {
-                $params = [
-                    'orderId' => $order->id,
-                    'webstoreId' => Utils::getWebstoreId(),
-                    'language' => Utils::getLang()
-                ];
-                $this->sendMail(AutomaticEmailTemplate::SHOP_ORDER, AutomaticEmailOrder::class, $params);
-            } catch (\Throwable $throwable) {
-                $this->handleThrowable($throwable, "IO::Debug.OrderService_orderCompleteErrorSendMail");
-            }
-
-            try {
                 if (($order->amounts[0]->invoiceTotal == 0) || ($order->amounts[0]->invoiceTotal == $order->amounts[0]->giftCardAmount)) {
                     $this->createAndAssignDummyPayment($order);
                 }
@@ -809,7 +822,7 @@ class OrderService
     public function containsComponentPrefix(string $name): bool
     {
         $prefix = $this->getOrderItemPrefix(\Plenty\Modules\Order\Models\OrderItemType::TYPE_BUNDLE_COMPONENT);
-        if ($prefix !== null && (substr($name, 0, strlen($prefix)) == $prefix)) {
+        if (!empty($prefix) && (substr($name, 0, strlen($prefix)) == $prefix)) {
             return true;
         }
         return false;

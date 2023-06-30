@@ -609,7 +609,7 @@ class ItemService
                     $attributeId = $attribute->attributeId;
                     $attributeValueId = $attribute->attributeValueId;
                     $attributeList[$attributeId]["name"] = $this->getAttributeName($attributeId);
-                    if (!array_key_exists($attributeValueId, $attributeList[$attributeId]["values"])) {
+                    if (!is_array($attributeList[$attributeId]["values"]) || !array_key_exists($attributeValueId, $attributeList[$attributeId]["values"])) {
                         $attributeList[$attributeId]["values"][$attributeValueId] = $this->getAttributeValueName(
                             $attributeValueId
                         );
@@ -619,7 +619,7 @@ class ItemService
                 $unitId = $variation->variationBase->unitId;
                 $unitCombinationId = $variation->variationBase->unitCombinationId;
 
-                if (!in_array($unitCombinationId, $unitList)) {
+                if (is_array($unitList) && !in_array($unitCombinationId, $unitList)) {
                     $unitData = $authHelper->processUnguarded(
                         function () use ($unitId, $unitNameRepo) {
                             return $unitNameRepo->findOne($unitId, Utils::getLang());

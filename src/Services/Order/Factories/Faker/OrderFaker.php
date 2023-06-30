@@ -90,7 +90,7 @@ class OrderFaker extends AbstractFaker
             'postalCode' => $translator->trans('IO::Faker.addressPostalCode'),
             'town'       => $translator->trans('IO::Faker.addressTown'),
             'countryId'  => 1,
-            'stateId'    => null,
+            'stateId'    => 1,
         ];
     }
 
@@ -112,6 +112,9 @@ class OrderFaker extends AbstractFaker
         foreach($itemResult['items']['documents'] as $itemData)
         {
             $item = $itemData['data'];
+
+            $price = is_string($item['prices']['default']['price']['value']) ? $this->float(1, 200): $item['prices']['default']['price']['value'];
+
             $variationId = $item['variation']['id'];
             $this->variations[$variationId] = $item;
             $orderItems[] = [
@@ -143,10 +146,10 @@ class OrderFaker extends AbstractFaker
                         'surcharge'          => 0.0000,
                         'discount'           => 0.0000,
                         'isPercentage'       => 1,
-                        'priceOriginalNet'   => $item['prices']['default']['price']['value'],
-                        'priceNet'           => $item['prices']['default']['price']['value'],
-                        'priceOriginalGross' => $item['prices']['default']['price']['value'],
-                        'priceGross'         => $item['prices']['default']['price']['value']
+                        'priceOriginalNet'   => $price,
+                        'priceNet'           => $price,
+                        'priceOriginalGross' => $price,
+                        'priceGross'         => $price
                     ]
                 ]
             ];

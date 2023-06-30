@@ -1,11 +1,14 @@
-<?php //strict
+<?php
 
 namespace IO\Services;
 
 use IO\Helper\Utils;
+use Plenty\Modules\Frontend\Contracts\Checkout;
+use Plenty\Modules\Order\Shipping\Contracts\EUCountryCodesServiceContract;
 use Plenty\Modules\Order\Shipping\Countries\Contracts\CountryRepositoryContract;
 use Plenty\Modules\Order\Shipping\Countries\Models\Country;
-use Plenty\Modules\Frontend\Contracts\Checkout;
+use Plenty\Modules\Webshop\Contracts\CountryRepositoryContract as WebshopCountryRepositoryContract;
+use Plenty\Plugin\Log\Loggable;
 
 /**
  * Class CountryService
@@ -17,23 +20,49 @@ use Plenty\Modules\Frontend\Contracts\Checkout;
  */
 class CountryService
 {
+    use Loggable;
+
     /**
      * @var CountryRepositoryContract Repository used for manipulating country data
      */
     private $countryRepository;
 
-    /**
-     * @var Country[][] Active countries
-     */
-    private static $activeCountries = [];
+    /** @var EUCountryCodesServiceContract */
+    private $euCountryService;
 
     /**
      * CountryService constructor.
      * @param CountryRepositoryContract $countryRepository Repository used for manipulating country data
      */
-    public function __construct(CountryRepositoryContract $countryRepository)
-    {
+    public function __construct(
+        CountryRepositoryContract $countryRepository,
+        EUCountryCodesServiceContract $euCountryService
+    ) {
         $this->countryRepository = $countryRepository;
+        $this->euCountryService = $euCountryService;
+    }
+
+    public function hasEUShippingCountry()
+    {
+        $activeCountriesList = $this->getActiveCountriesList();
+        foreach ($activeCountriesList as $activeCountry) {
+            if ($this->euCountryService->isEUCountry($activeCountry->id)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public function getEUCountriesList($lang = null): array
+    {
+        if ($lang === null) {
+            $lang = Utils::getLang();
+        }
+
+        /** @var WebshopCountryRepositoryContract $countryRepository */
+        $countryRepository = pluginApp(WebshopCountryRepositoryContract::class);
+        return $countryRepository->getEUCountriesList($lang);
     }
 
     /**
@@ -48,21 +77,9 @@ class CountryService
             $lang = Utils::getLang();
         }
 
-        if (!isset(self::$activeCountries[$lang])) {
-            $list = $this->countryRepository->getActiveCountriesList();
-
-            foreach ($list as $country) {
-                $country->currLangName = $country->names->contains('language', $lang) ?
-                    $country->names->where('language', $lang)->first()->name :
-                    $country->names->first()->name;
-                self::$activeCountries[$lang][] = $country;
-            }
-        }
-
-        $column = array_column(self::$activeCountries[$lang], "currLangName");
-        array_multisort($column, SORT_ASC, SORT_LOCALE_STRING, self::$activeCountries[$lang]);
-
-        return self::$activeCountries[$lang];
+        /** @var WebshopCountryRepositoryContract $countryRepository */
+        $countryRepository = pluginApp(WebshopCountryRepositoryContract::class);
+        return $countryRepository->getActiveCountriesList($lang);
     }
 
     /**

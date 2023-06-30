@@ -73,12 +73,17 @@ class CustomerPasswordResetResource extends ApiResource
             $hashService->create(['mail' => $email], UserDataHash::TYPE_RESET_PASSWORD, null, $contact->id);
 
             $params = ['contactId' => $contact->id];
-            $this->sendMail(AutomaticEmailTemplate::CONTACT_NEW_PASSWORD, AutomaticEmailContact::class, $params);
 
-            return $this->response->create(true, ResponseCode::OK);
+            try {
+                $this->sendMail(AutomaticEmailTemplate::CONTACT_NEW_PASSWORD, AutomaticEmailContact::class, $params);
+
+                return $this->response->create(true, ResponseCode::OK);
+            } catch (\Exception $e) {
+                return $this->response->create( null, ResponseCode::INTERNAL_SERVER_ERROR);
+            }
         }
 
-        return $this->response->create(null, ResponseCode::BAD_REQUEST);
+        return $this->response->create(true, ResponseCode::OK);
     }
 
 }

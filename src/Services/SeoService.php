@@ -4,6 +4,7 @@ namespace IO\Services;
 
 use IO\Extensions\Constants\ShopUrls;
 use IO\Helper\RouteConfig;
+use IO\Helper\Utils;
 use Plenty\Plugin\Http\Request;
 
 /**
@@ -45,7 +46,7 @@ class SeoService
         /** @var Request $request */
         $request = pluginApp(Request::class);
         $queryParameters = $request->all();
-        unset($queryParameters['plentyMarkets']);
+        $queryParameters = Utils::cleanUpExcludesContentCacheParams($queryParameters);
 
         /** @var ShopUrls $shopUrls */
         $shopUrls = pluginApp(ShopUrls::class);

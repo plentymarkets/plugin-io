@@ -36,7 +36,7 @@ class ItemWishListGuestRepository
 
         if(isset($wishList))
         {
-            $variationIds = array_keys($wishList[$this->plentyId]);
+            $variationIds = array_keys($wishList[$this->plentyId] ?? []);
         }
 
         return $variationIds;
@@ -50,7 +50,7 @@ class ItemWishListGuestRepository
 
     public function getItemWishListForAllPlentyIds()
     {
-        return json_decode($this->sessionStorageRepository->getSessionValue(SessionStorageRepositoryContract::GUEST_WISHLIST), true);
+        return json_decode($this->sessionStorageRepository->getSessionValue(SessionStorageRepositoryContract::GUEST_WISHLIST) ?? '', true) ?? [];
     }
 
     /**
@@ -95,11 +95,13 @@ class ItemWishListGuestRepository
         $wishListEntry->createdAt = date("Y-m-d H:i:s");
 
         $wishListComplete = $this->getItemWishListForAllPlentyIds();
-        $wishList = $wishListComplete[$this->plentyId];
+        if (is_array($wishListComplete)) {
+            $wishList = $wishListComplete[$this->plentyId] ?? [];
+        }
 
         if($this->isItemInWishList($variationId))
         {
-            $wishListEntry->quantity += $wishList[$variationId]['quantity'];
+            $wishListEntry->quantity += $wishList[$variationId]['quantity'] ?? 0;
         }
 
         $wishListComplete[$this->plentyId][$variationId] = $wishListEntry;
@@ -116,7 +118,7 @@ class ItemWishListGuestRepository
     {
         $wishListComplete = $this->getItemWishListForAllPlentyIds();
 
-        if(isset($wishListComplete) && array_key_exists($variationId, $wishListComplete[$this->plentyId]))
+        if(isset($wishListComplete) && array_key_exists($variationId, $wishListComplete[$this->plentyId] ?? []))
         {
             unset($wishListComplete[$this->plentyId][$variationId]);
             $this->sessionStorageRepository->setSessionValue(SessionStorageRepositoryContract::GUEST_WISHLIST, json_encode($wishListComplete));

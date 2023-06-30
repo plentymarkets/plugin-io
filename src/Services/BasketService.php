@@ -2,14 +2,14 @@
 
 namespace IO\Services;
 
+use IO\Constants\LogLevel;
 use IO\Helper\Utils;
-use Plenty\Exceptions\ValidationException;
 use Plenty\Modules\Accounting\Contracts\DetermineShopCountryContract;
 use Plenty\Modules\Accounting\Vat\Contracts\VatInitContract;
 use Plenty\Modules\Accounting\Vat\Models\VatRate;
 use Plenty\Modules\Authorization\Services\AuthHelper;
-use Plenty\Modules\Basket\Contracts\BasketRepositoryContract;
 use Plenty\Modules\Basket\Contracts\BasketItemRepositoryContract;
+use Plenty\Modules\Basket\Contracts\BasketRepositoryContract;
 use Plenty\Modules\Basket\Events\Basket\AfterBasketChanged;
 use Plenty\Modules\Basket\Exceptions\BasketItemCheckException;
 use Plenty\Modules\Basket\Exceptions\BasketItemQuantityCheckException;
@@ -17,7 +17,6 @@ use Plenty\Modules\Basket\Models\Basket;
 use Plenty\Modules\Basket\Models\BasketItem;
 use Plenty\Modules\Frontend\Contracts\Checkout;
 use Plenty\Modules\Frontend\Services\VatService;
-use IO\Constants\LogLevel;
 use Plenty\Modules\Item\Variation\Contracts\VariationRepositoryContract;
 use Plenty\Modules\Item\Variation\Models\Variation;
 use Plenty\Modules\Item\VariationDescription\Contracts\VariationDescriptionRepositoryContract;
@@ -28,6 +27,7 @@ use Plenty\Modules\Webshop\Contracts\CheckoutRepositoryContract;
 use Plenty\Modules\Webshop\Contracts\ContactRepositoryContract;
 use Plenty\Modules\Webshop\Contracts\SessionStorageRepositoryContract;
 use Plenty\Modules\Webshop\Contracts\WebstoreConfigurationRepositoryContract;
+use Plenty\Modules\Webshop\Helpers\PropertyHelper;
 use Plenty\Modules\Webshop\Helpers\UnitUtils;
 use Plenty\Modules\Webshop\ItemSearch\Factories\VariationSearchFactory;
 use Plenty\Modules\Webshop\ItemSearch\SearchPresets\BasketItems;
@@ -203,7 +203,10 @@ class BasketService
             $basket["itemSum"] = $basket["itemSumNet"];
             $basket["basketAmount"] = $basket["basketAmountNet"];
             $basket["shippingAmount"] = $basket["shippingAmountNet"];
+
         }
+        $basket['subAmount'] = $this->getSubAmount($basket["basketAmountNet"]);
+
 
         $basket = $this->couponService->checkCoupon($basket);
         $determineShopCountry->initByPlentyId(Utils::getPlentyId());
@@ -217,6 +220,24 @@ class BasketService
         $basket["itemWishListIds"] = $wishListService->getItemWishList();
 
         return $basket;
+    }
+
+    /**
+     * Return subAmount
+     */
+    private function getSubAmount($basketAmountNet): float
+    {
+        /** @var BasketRepositoryContract $basketRepository */
+        $basketRepository = pluginApp(BasketRepositoryContract::class);
+
+        if ($this->webstoreConfigurationRepository->getWebstoreConfiguration()->useVariationOrderProperties) {
+            $taxFreeAmount = $basketRepository->getTaxFreeAmount();
+        } else {
+           $basketItems = $this->getBasketItems();
+           $taxFreeAmount = $basketRepository->getTaxFreeAmount($basketItems);
+        }
+
+        return $basketAmountNet - $taxFreeAmount;
     }
 
     /**
@@ -495,9 +516,10 @@ class BasketService
      * Add an item to the basket or update the basket
      *
      * @param array $data Contains the basket item
+     * @param bool $fireEvent
      * @return array
      */
-    public function addBasketItem(array $data): array
+    public function addBasketItem(array $data, $fireEvent = true): array
     {
         if ($this->webstoreConfigurationRepository->getWebstoreConfiguration()->dontSplitItemBundle === 0) {
             /** @var ItemSearchService $itemSearchService */
@@ -532,7 +554,7 @@ class BasketService
                     $basketData['quantity'] = $bundleComponent['quantity'] * ($data['quantity'] ?? 1);
                     $basketData['template'] = $data['template'];
 
-                    $componentData = $this->addDataToBasket($basketData);
+                    $componentData = $this->addDataToBasket($basketData, $fireEvent);
                     if (count($componentData)) {
                         return $componentData;
                     }
@@ -540,7 +562,26 @@ class BasketService
                 return [];
             }
         }
-        return $this->addDataToBasket($data);
+        return $this->addDataToBasket($data, $fireEvent);
+    }
+
+    /**
+     * Add multiple basket items
+     *
+     * @param array $basketItems
+     * @return array
+     */
+    public function addBasketItems(array $basketItems): array {
+        $lastKey = array_key_last($basketItems);
+        $result = [];
+        foreach($basketItems as $key => $basketItem) {
+            $fireEvent = $key === $lastKey;
+            $tempResult = $this->addBasketItem($basketItem, $fireEvent);
+            if (isset($tempResult['code'])) {
+                $result = $tempResult;
+            }
+        }
+        return $result;
     }
 
     /**
@@ -733,9 +774,12 @@ class BasketService
 
     private function hasTexts($basketItemData)
     {
-        return count($basketItemData['texts']) && (strlen($basketItemData['texts']['name1']) || strlen(
-                    $basketItemData['texts']['name2']
-                ) || !strlen($basketItemData['texts']['name3']));
+        return is_array($basketItemData['texts'])
+            && count($basketItemData['texts'])
+            && (strlen($basketItemData['texts']['name1'])
+                || strlen($basketItemData['texts']['name2'])
+                || !strlen($basketItemData['texts']['name3'])
+            );
     }
 
     /**
@@ -791,7 +835,7 @@ class BasketService
      * @param object $data
      * @return array
      */
-    private function addDataToBasket($data)
+    private function addDataToBasket($data, $fireEvent = true)
     {
         if (isset($data['basketItemOrderParams'])
             && is_array($data['basketItemOrderParams'])
@@ -810,7 +854,7 @@ class BasketService
                 $data['quantity'] = (float)$data['quantity'] + $basketItem->quantity;
                 $this->basketItemRepository->updateBasketItem($basketItem->id, $data);
             } else {
-                $this->basketItemRepository->addBasketItem($data);
+                $this->basketItemRepository->addBasketItem($data, $fireEvent);
             }
         } catch (BasketItemQuantityCheckException $e) {
             $this->getLogger(__CLASS__)->warning(
@@ -1082,13 +1126,24 @@ class BasketService
                 return true;
             }
         );
-
         foreach ($basketItems as &$basketItem) {
             if (isset($variationProperties[$basketItem['id']])) {
                 $basketItem['basketItemOrderParams'] = $basketItem['basketItemOrderParams'] ?? [];
-
                 foreach ($variationProperties[$basketItem['id']] as $variationProperty) {
-                    $basketItem['price'] += $variationProperty['price'];
+                    $property = PropertyHelper::getPropertyById($variationProperty['basketItemOrderParams'][0]['propertyId']);
+                    $isAdditionalCost = false;
+                    $hasTax = false;
+                    foreach ($property['options'] as $option) {
+                        if ($option['type'] === 'vatId' && ($option['value'] !== 'none' || $option['value'] !== null)) {
+                            $hasTax = true;
+                        }
+                        if ($option['value'] === 'displayAsAdditionalCosts') {
+                            $isAdditionalCost = true;
+                        }
+                    }
+                    if (!$isAdditionalCost && $hasTax) {
+                        $basketItem['price'] += $variationProperty['price'];
+                    }
                     $basketItem['attributeTotalMarkup'] += $variationProperty['price'];
                     $variationProperty['basketItemOrderParams'][0]['price'] = $variationProperty['price'];
                     $variationProperty['basketItemOrderParams'][0]['basketItemId'] = $basketItem['id'];
@@ -1137,7 +1192,16 @@ class BasketService
 
     private function getSetComponents($basketItemId, $appendVariation = true)
     {
-        $basketItems = $appendVariation ? $this->getBasketItems() : $this->basketRepository->load()->toArray();
+        if ($appendVariation) {
+            $basketItems = $this->getBasketItems() ;
+        } else {
+            $temp = $this->getBasketItemsRaw();
+
+            $basketItems = [];
+            foreach($temp as $basketItem) {
+                $basketItems[] = $basketItem;
+            }
+        }
 
         return array_filter(
             $basketItems,

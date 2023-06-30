@@ -215,7 +215,11 @@ class PlaceOrderController extends LayoutController
                     ]
                 );
                 // send errors
-                $notificationService->error($paymentResult["value"]);
+                $error = null;
+                if (is_array($paymentResult["value"])) {
+                    $error = $paymentResult["value"][0];
+                }
+                $notificationService->error($error ?? $paymentResult["value"]);
             }
         } catch (\Exception $exception) {
             $this->getLogger(__CLASS__)->warning(
@@ -268,14 +272,10 @@ class PlaceOrderController extends LayoutController
                 $basketService = pluginApp(BasketService::class);
 
                 foreach ($itemsWithoutStock as $itemWithoutStock) {
-                    $updatedItem = array_shift(
-                        array_filter(
-                            $basketItems,
-                            function ($filterItem) use ($itemWithoutStock) {
-                                return $filterItem['id'] == $itemWithoutStock['item']['id'];
-                            }
-                        )
-                    );
+                    $filteredWithoutStock = array_filter($basketItems, function ($filterItem) use ($itemWithoutStock) {
+                        return $filterItem['id'] == $itemWithoutStock['item']['id'];
+                    });
+                    $updatedItem = array_shift($filteredWithoutStock);
 
                     $quantity = $itemWithoutStock['stockNet'];
 

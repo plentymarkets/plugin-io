@@ -19,17 +19,13 @@ class BasketController extends LayoutController
      */
 	public function showBasket(BasketService $basketService):string
 	{
-		$basket = $basketService->getBasketForTemplate();
-
         /** @var ShopBuilderRequest $shopBuilderRequest */
         $shopBuilderRequest = pluginApp(ShopBuilderRequest::class);
         $shopBuilderRequest->setMainContentType('checkout');
 
 		return $this->renderTemplate(
 		    'tpl.basket',
-			[
-			    'basket' => $basket
-            ],
+            [],
             false
 		);
 	}

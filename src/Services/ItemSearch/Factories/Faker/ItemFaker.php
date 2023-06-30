@@ -37,6 +37,15 @@ class ItemFaker extends AbstractFaker
             "isShippableByAmazon"   => $this->boolean(),
             "ownerId"               => $this->boolean(),
             "type"                  => $this->rand(['default', 'set', 'multiPack']),
+            "condition"          => [
+                "id"    => $this->number(0,4),
+                "names" => [
+                    [
+                        "lang" => $this->lang,
+                        "name" => $this->trans("IO::Faker.conditionApiName")
+                    ]
+                ]
+            ],
             "conditionApi"          => [
                 "id"    => $this->number(),
                 "names" => [
