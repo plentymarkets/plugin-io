@@ -83,41 +83,13 @@ jobs:
           ref: main
           token: ${{ secrets.PUBLIC_PAT_CICD4_PUBLIC }}
           path: .tmp/github-actions
-
-      - name: Checkout PL PY PS
-        id: branches
-        uses: ./.tmp/github-actions/checkout_pl_py_ps/
+          
+      - name: Prepare PHP main code
+        uses: ./.tmp/github-actions/prepare_php/
         with:
-          token: ${{ secrets.PUBLIC_PAT_CICD4_PUBLIC }}
-          ref-forced: stable7
-
-      # Cache dependencies to reduce traffic and cpu usage
-      - name: Cache pl dependencies
-        uses: actions/cache@v3
-        with:
-          path: "pl/vendor"
-          restore-key: composer-pl-stable7
-      # Install dependencies
-      - name: Install dependencies
-        # Change the path of the working directory to prevent running below script(s) in the workflow's working directory
-        working-directory: pl
-        # Remove locally stored Laravel files if they exist
-        # Execute composer install without executing scripts defined in 'composer.json'
-        # Search for modules
-        # Enable OpenSSL OAuth encryption
-        # Create an empty '.env' file ('autoloader' requires this file, even if it is empty)
-        run: |
-          rm -f bootstrap/cache/{services,packages}.php
-          composer update --no-progress --no-scripts
-          php artisan package:discover
-          php artisan passport:keys 
-          touch .env
-      # Prepare the test database
-      - name: Init db
-        working-directory: pl
-        run: |
-          php artisan migrate --database=mysql-test --env=testing
-          php artisan db:seed --database=mysql-test --env=testing
+          token: ${{ secrets.ORGA_PAT_CICD3_FULL_REPO_AND_PACKAGES }}
+          php-version: ${{ matrix.php.version }}
+          
       - name: Build plugin api
         working-directory: pl
         run: |
