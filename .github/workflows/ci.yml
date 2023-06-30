@@ -96,8 +96,7 @@ jobs:
         uses: actions/cache@v3
         with:
           path: "pl/vendor"
-          key: composer-pl-${{ steps.extract_branch.outputs.branch }}
-
+          restore-key: composer-pl-stable7
       # Install dependencies
       - name: Install dependencies
         # Change the path of the working directory to prevent running below script(s) in the workflow's working directory
@@ -131,7 +130,6 @@ jobs:
           token: ${{ secrets.PUBLIC_PAT_CICD4_PUBLIC }}
           path: "pl/packages/plentymarkets/plugin-test-suite/"
           ref: stable7
-          php-version: ${{ matrix.php.version }}
       - name: Install test suite dependencies
         working-directory: pl/packages/plentymarkets/plugin-test-suite
         run: |
@@ -142,7 +140,6 @@ jobs:
         uses: actions/checkout@v3
         with:
           path: pl/packages/plentymarkets/plugin-test-suite/vendor/plentymarkets/plugin-io
-          php-version: ${{ matrix.php.version }}
       - name: Run plugin migrations
         working-directory: pl
         run: php artisan plugin:install --database=mysql-test --env=testing
