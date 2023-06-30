@@ -1,5 +1,12 @@
 # Release Notes for IO
 
+## v5.0.60 (2023-07-XX) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.59...5.0.60" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
+
+### Fixed
+
+- Errors related to the "Already paid" payment method were fixed.
+- Error messages related to PHP 8.2 were fixed
+  
 ## v5.0.59 (2023-02-23) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.57...5.0.59" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
 
 ### Fixed
