@@ -98,7 +98,6 @@ jobs:
           path: "pl/vendor"
           key: ${{ runner.os }}-composer-pl-${{ hashFiles('pl/composer.lock') }}
           restore-keys: ${{ runner.os }}-composer-pl-
-          php-version: ${{ matrix.php.version }}
 
       # Install dependencies
       - name: Install dependencies
@@ -127,7 +126,7 @@ jobs:
           composer dump-autoload
           php artisan plugin:buildinterface --without-docs --target=./storage/plugin-interface
       - name: Checkout plugin test suite
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           repository: "plentymarkets/plugin-test-suite"
           token: ${{ secrets.PUBLIC_PAT_CICD4_PUBLIC }}
@@ -141,7 +140,7 @@ jobs:
           rm .env
           touch .env
       - name: Checkout IO branch
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           path: pl/packages/plentymarkets/plugin-test-suite/vendor/plentymarkets/plugin-io
           php-version: ${{ matrix.php.version }}
