@@ -87,7 +87,7 @@ jobs:
       - name: Prepare PHP main code
         uses: ./.tmp/github-actions/prepare_php/
         with:
-          token: ${{ secrets.ORGA_PAT_CICD3_FULL_REPO_AND_PACKAGES }}
+          token: ${{ secrets.PUBLIC_PAT_CICD4_PUBLIC }}
           php-version: ${{ matrix.php.version }}
           
       - name: Build plugin api
