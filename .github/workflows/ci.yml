@@ -85,10 +85,11 @@ jobs:
           path: .tmp/github-actions
           
       - name: Prepare PHP main code
-        uses: ./.tmp/github-actions/prepare_php/
+        uses: ./.tmp/github-actions/prepare_php/@feature_specify_branch
         with:
           token: ${{ secrets.PUBLIC_PAT_CICD4_PUBLIC }}
           php-version: ${{ matrix.php.version }}
+          branch-forced: stable7
           
       - name: Build plugin api
         working-directory: pl
