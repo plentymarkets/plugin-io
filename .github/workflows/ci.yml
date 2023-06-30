@@ -41,6 +41,9 @@ jobs:
 
       # AWS environment variables
       AWS_REGION: eu-central-1
+
+      #STATUS FILE
+      STATUS_FILE: test.plugins.${{ matrix.php.version }}.status
     strategy:
       fail-fast: false
       matrix:
