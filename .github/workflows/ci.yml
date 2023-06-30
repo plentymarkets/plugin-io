@@ -41,6 +41,14 @@ jobs:
 
       # AWS environment variables
       AWS_REGION: eu-central-1
+    strategy:
+      fail-fast: false
+      matrix:
+        php:
+          - version: "8.0"
+            required: true
+          - version: "8.2"
+            required: true
 
     runs-on: ubuntu-latest
 
@@ -66,12 +74,13 @@ jobs:
 
     steps:
       - name: Checkout github-actions repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           repository: plentymarkets/github-actions
           ref: main
           token: ${{ secrets.PUBLIC_PAT_CICD4_PUBLIC }}
           path: .tmp/github-actions
+          php-version: ${{ matrix.php.version }}
 
       - name: Checkout PL PY PS
         id: branches
@@ -79,14 +88,7 @@ jobs:
         with:
           token: ${{ secrets.PUBLIC_PAT_CICD4_PUBLIC }}
           ref-forced: stable7
-
-      # Set PHP version and install PHP if neccessary
-      - name: Setup php
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: "8.2"
-        env:
-          COMPOSER_TOKEN: ${{ secrets.PUBLIC_PAT_CICD4_PUBLIC }}
+          php-version: ${{ matrix.php.version }}
 
       # Cache dependencies to reduce traffic and cpu usage
       - name: Cache pl dependencies
@@ -95,6 +97,7 @@ jobs:
           path: "pl/vendor"
           key: ${{ runner.os }}-composer-pl-${{ hashFiles('pl/composer.lock') }}
           restore-keys: ${{ runner.os }}-composer-pl-
+          php-version: ${{ matrix.php.version }}
 
       # Install dependencies
       - name: Install dependencies
@@ -129,6 +132,7 @@ jobs:
           token: ${{ secrets.PUBLIC_PAT_CICD4_PUBLIC }}
           path: "pl/packages/plentymarkets/plugin-test-suite/"
           ref: stable7
+          php-version: ${{ matrix.php.version }}
       - name: Install test suite dependencies
         working-directory: pl/packages/plentymarkets/plugin-test-suite
         run: |
@@ -139,6 +143,7 @@ jobs:
         uses: actions/checkout@v2
         with:
           path: pl/packages/plentymarkets/plugin-test-suite/vendor/plentymarkets/plugin-io
+          php-version: ${{ matrix.php.version }}
       - name: Run plugin migrations
         working-directory: pl
         run: php artisan plugin:install --database=mysql-test --env=testing
