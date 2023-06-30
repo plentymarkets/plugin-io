@@ -99,6 +99,7 @@ jobs:
         run: |
           composer dump-autoload
           php artisan plugin:buildinterface --without-docs --target=./storage/plugin-interface
+          
       - name: Checkout plugin test suite
         uses: actions/checkout@v3
         with:
