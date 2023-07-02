@@ -1,5 +1,22 @@
 # Release Notes für IO
 
+## v5.0.60 (2023-07-XX) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.59...5.0.60" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
+
+### Behoben
+
+- Fehler im Bezug auf die "Bereits bezahlt" Zahlungsart wurden behoben
+- Fehlermeldungen in Bezug auf PHP 8.2 wurden behoben.
+
+## v5.0.57 (2023-01-09) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.56...5.0.57" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
+
+### Behoben
+
+- Überseeische Länder und Hoheitsgebiete wurden aus der Liste der auswählbaren Länder der Rechnungsadresse entfernt.
+- Länder des europäischen Wirtschaftsraums wurden in die Liste der auswählbaren Länder der Rechnungsadresse ergänzt.
+- In der Schnellsuche wurde nicht die hinterlegte Sortierung für die Suchergebnisseite genutzt. Das wurde behoben.
+- Eine Funktion zum gleichzeitigen hinzufügen von mehreren Warenkorbartikeln wurde im BasketService hinzugefügt.
+- Das versenden von Emails bei Auftragsabschluss wurde entfernt.
+
 ## v5.0.59 (2023-02-23) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.57...5.0.59" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
 
 ### Behoben
