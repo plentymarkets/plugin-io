@@ -144,7 +144,7 @@ jobs:
     # checks results of all previous jobs for failures
     needs: [unit-tests]
     name: Test overall status
-    runs-on: ["self-hosted", "stable", "medium", "spot"]
+    runs-on: ubuntu-latest
     if: always()
     steps:
       - uses: plentymarkets/github-runner-cleanup@main
