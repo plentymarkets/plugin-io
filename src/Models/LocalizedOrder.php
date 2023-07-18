@@ -216,6 +216,12 @@ class LocalizedOrder extends ModelWrapper
             } else {
                 unset($order->orderItems[$key]);
             }
+
+            // unset purchase price
+            foreach($order->orderItems[$key]->amounts as &$amount) {
+                unset($amount['purchasePrice']);
+            }
+            unset($amount);
         }
 
         $resultFields = ResultFieldTemplate::load(ResultFieldTemplate::TEMPLATE_LIST_ITEM);
