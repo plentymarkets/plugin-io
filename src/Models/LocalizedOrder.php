@@ -209,6 +209,12 @@ class LocalizedOrder extends ModelWrapper
 
         $wrappedOrderitemTypes = $order->typeId === OrderType::RETURNS ? self::WRAPPED_ORDERITEM_TYPES_FOR_RETURN : self::WRAPPED_ORDERITEM_TYPES;
         foreach ($order->orderItems as $key => $orderItem) {
+            // unset purchase price
+            foreach($order->orderItems[$key]->amounts as &$amount) {
+                unset($amount['purchasePrice']);
+            }
+            unset($amount);
+            
             if (in_array((int)$orderItem->typeId, $wrappedOrderitemTypes)) {
                 if ($orderItem->itemVariationId !== 0) {
                     $orderVariationIds[] = $orderItem->itemVariationId;
@@ -216,12 +222,6 @@ class LocalizedOrder extends ModelWrapper
             } else {
                 unset($order->orderItems[$key]);
             }
-
-            // unset purchase price
-            foreach($order->orderItems[$key]->amounts as &$amount) {
-                unset($amount['purchasePrice']);
-            }
-            unset($amount);
         }
 
         $resultFields = ResultFieldTemplate::load(ResultFieldTemplate::TEMPLATE_LIST_ITEM);
