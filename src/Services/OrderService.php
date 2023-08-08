@@ -604,6 +604,12 @@ class OrderService
                 }
             }
             unset($orderProperty);
+
+            // unset purchase price
+            foreach($orderItem['amounts'] as &$amount) {
+                unset($amount['purchasePrice']);
+            }
+            unset($amount);
         }
         unset($orderItem);
 

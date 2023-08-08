@@ -68,7 +68,7 @@ class IORouteServiceProvider extends RouteServiceProvider
         });
 
         if (RouteConfig::isActive(RouteConfig::CONTACT_MAIL_API)) {
-            $api->version(['v1'], ['namespace' => 'IO\Api\Resources'], function (ApiRouter $api) {
+            $api->version(['v1'], ['namespace' => 'IO\Api\Resources', 'middleware' => ['throttleFrontend:contact-form']], function (ApiRouter $api) {
                 $api->resource('io/customer/contact/mail', 'ContactMailResource');
                 $api->resource('io/customer/contact/mail/file', 'ContactMailFileResource');
             });

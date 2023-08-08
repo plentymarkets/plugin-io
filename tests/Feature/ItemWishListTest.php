@@ -120,15 +120,15 @@ class ItemWishListTest extends TestCase
 
         $response = $this->wishListService->addItemWishListEntry($variationId, $quantity);
 
-        $wihsList = json_decode($this->sessionStorageRepository->getSessionValue(SessionStorageRepositoryContract::GUEST_WISHLIST), true);
-        $whishListItem = $wihsList[$this->plentyId][$variationId];
+        $wishList = json_decode($this->sessionStorageRepository->getSessionValue(SessionStorageRepositoryContract::GUEST_WISHLIST) ?? '', true) ?? [];
+        $wishListItem = $wishList[$this->plentyId][$variationId];
 
-        $this->assertNotNull($whishListItem);
+        $this->assertNotNull($wishListItem);
         $this->assertInstanceOf(ItemWishList::class, $response);
         $this->assertEquals($variationId, $response->variationId);
         $this->assertEquals($variationId, $response->quantity);
-        $this->assertEquals($variationId, $whishListItem['variationId']);
-        $this->assertEquals($variationId, $whishListItem['quantity']);
+        $this->assertEquals($variationId, $wishListItem['variationId']);
+        $this->assertEquals($variationId, $wishListItem['quantity']);
     }
 
     /** @test */
@@ -146,7 +146,7 @@ class ItemWishListTest extends TestCase
         $this->wishListService->addItemWishListEntry($variationId, $quantity);
         $response = $this->wishListService->addItemWishListEntry($variationId, $quantity);
 
-        $wishList = json_decode($this->sessionStorageRepository->getSessionValue(SessionStorageRepositoryContract::GUEST_WISHLIST), true);
+        $wishList = json_decode($this->sessionStorageRepository->getSessionValue(SessionStorageRepositoryContract::GUEST_WISHLIST) ?? '', true) ?? [];
         $whishListItem = $wishList[$this->plentyId][$variationId];
 
         $this->assertNotNull($whishListItem);
@@ -173,7 +173,7 @@ class ItemWishListTest extends TestCase
         $this->wishListService->addItemWishListEntry($variationId, $quantity);
         $response = $this->wishListService->removeItemWishListEntry($variationId);
 
-        $wishList = json_decode($this->sessionStorageRepository->getSessionValue(SessionStorageRepositoryContract::GUEST_WISHLIST), true);
+        $wishList = json_decode($this->sessionStorageRepository->getSessionValue(SessionStorageRepositoryContract::GUEST_WISHLIST) ?? '', true) ?? [];
 
         if (array_key_exists($variationId, $wishList[$this->plentyId]))
         {
@@ -198,7 +198,7 @@ class ItemWishListTest extends TestCase
 
         $response = $this->wishListService->removeItemWishListEntry($variationId);
 
-        $wishList = json_decode($this->sessionStorageRepository->getSessionValue(SessionStorageRepositoryContract::GUEST_WISHLIST), true);
+        $wishList = json_decode($this->sessionStorageRepository->getSessionValue(SessionStorageRepositoryContract::GUEST_WISHLIST) ?? '', true) ?? [];
         $whishListItem = $wishList[$this->plentyId][$variationId] ?? null;
 
         $this->assertNull($whishListItem);

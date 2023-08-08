@@ -17,6 +17,7 @@ class ItemWishListRepositoryTest extends SimpleTestCase
      * @var ItemWishListRepository $itemWishListRepository
      */
     protected $itemWishListRepository;
+    protected $contactRepository;
 
     protected $databaseMock;
     protected $databaseQueryMock;
