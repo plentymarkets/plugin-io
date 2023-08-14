@@ -43,7 +43,7 @@ class OrderTrackingService
      * @param string $lang The desired language of the tracking URL (ISO-639-1)
      * @return array
      */
-    public function getTrackingURL(Order $order, $lang): array
+    public function getTrackingURLs(Order $order, $lang): array
     {
         $trackingURLs = [];
 

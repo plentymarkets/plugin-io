@@ -436,7 +436,7 @@ class OrderService
                         'status' => $orderStatusName,
                         'creationDate' => $creationDate,
                         'shippingDate' => $shippingDate,
-                        'trackingURLs' => $orderTrackingService->getTrackingURL($order, $lang),
+                        'trackingURLs' => $orderTrackingService->getTrackingURLs($order, $lang),
                         'confirmationURL' => $shopUrls->orderConfirmation($order->id)
                     ];
                 }

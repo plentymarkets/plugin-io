@@ -168,7 +168,7 @@ class LocalizedOrder extends ModelWrapper
 
             /** @var OrderTrackingService $orderTrackingService */
             $orderTrackingService = pluginApp(OrderTrackingService::class);
-            $instance->trackingURLs = $orderTrackingService->getTrackingURL($order, $lang);
+            $instance->trackingURLs = $orderTrackingService->getTrackingURLs($order, $lang);
         } catch (\Exception $e) {
         }
 

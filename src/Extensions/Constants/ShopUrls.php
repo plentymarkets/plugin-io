@@ -349,7 +349,7 @@ class ShopUrls
                         $orderTrackingService = pluginApp(OrderTrackingService::class);
 
                         $order = $orderRepository->findOrderById($orderId);
-                        return $orderTrackingService->getTrackingURL($order, $lang);
+                        return $orderTrackingService->getTrackingURLs($order, $lang);
                     }
                 );
 
