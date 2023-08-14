@@ -76,8 +76,8 @@ class LocalizedOrder extends ModelWrapper
     public $shippingProfileName = "";
     /** @var int $shippingProfileId The ID of the shipping profile (Default: 0). */
     public $shippingProfileId = 0;
-    /** @var string $trackingURL Tracking URL for the order from shipping provider. */
-    public $trackingURL = "";
+    /** @var array $trackingURLs Tracking URLs for the order from shipping provider. */
+    public $trackingURLs = [];
     /** @var string $paymentMethodName Name of the payment method. */
     public $paymentMethodName = "";
     /** @var string $paymentMethodIcon URL of payment method icon image. */
@@ -168,7 +168,7 @@ class LocalizedOrder extends ModelWrapper
 
             /** @var OrderTrackingService $orderTrackingService */
             $orderTrackingService = pluginApp(OrderTrackingService::class);
-            $instance->trackingURL = $orderTrackingService->getTrackingURL($order, $lang);
+            $instance->trackingURLs = $orderTrackingService->getTrackingURL($order, $lang);
         } catch (\Exception $e) {
         }
 
@@ -214,7 +214,7 @@ class LocalizedOrder extends ModelWrapper
                 unset($amount['purchasePrice']);
             }
             unset($amount);
-            
+
             if (in_array((int)$orderItem->typeId, $wrappedOrderitemTypes)) {
                 if ($orderItem->itemVariationId !== 0) {
                     $orderVariationIds[] = $orderItem->itemVariationId;

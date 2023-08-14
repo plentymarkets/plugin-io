@@ -343,7 +343,7 @@ class ShopUrls
             "tracking.{$orderId}",
             function () use ($orderId, $lang) {
                 $authHelper = pluginApp(AuthHelper::class);
-                $trackingURL = $authHelper->processUnguarded(
+                $trackingURLs = $authHelper->processUnguarded(
                     function () use ($orderId, $lang) {
                         $orderRepository = pluginApp(OrderRepositoryContract::class);
                         $orderTrackingService = pluginApp(OrderTrackingService::class);
@@ -353,7 +353,7 @@ class ShopUrls
                     }
                 );
 
-                return $trackingURL;
+                return $trackingURLs;
             }
         );
     }

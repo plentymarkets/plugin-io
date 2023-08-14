@@ -436,7 +436,7 @@ class OrderService
                         'status' => $orderStatusName,
                         'creationDate' => $creationDate,
                         'shippingDate' => $shippingDate,
-                        'trackingURL' => $orderTrackingService->getTrackingURL($order, $lang),
+                        'trackingURLs' => $orderTrackingService->getTrackingURL($order, $lang),
                         'confirmationURL' => $shopUrls->orderConfirmation($order->id)
                     ];
                 }
@@ -783,7 +783,7 @@ class OrderService
     /**
      * Remove the bundle prefix from the order item name.
      * Default prefix is "[BUNDLE] "
-     * 
+     *
      * @param string $name
      * @return string
      */
@@ -795,7 +795,7 @@ class OrderService
     /**
      * Remove the bundle component prefix from the order item name.
      * Default prefix is "[-] "
-     * 
+     *
      * @param string $name
      * @return string
      */

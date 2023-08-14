@@ -76,7 +76,7 @@ class OrderResultFactory
         'shippingProvider'             => null,
         'shippingProfileName'          => null,
         'shippingProfileId'            => 0,
-        'trackingURL'                  => '',
+        'trackingURLs'                 => [],
         'paymentMethodName'            => null,
         'paymentMethodIcon'            => null,
         'paymentStatus'                => 'unpaid',
@@ -123,11 +123,11 @@ class OrderResultFactory
                 $orderResult[$key] = $value;
             }
         }
-        
+
         /** @var LocalizedOrderFaker $localizedOrderFaker */
         $localizedOrderFaker = pluginApp(LocalizedOrderFaker::class);
         $orderResult = $localizedOrderFaker->fill($orderResult, $variations);
-        
+
         return $orderResult;
     }
 }

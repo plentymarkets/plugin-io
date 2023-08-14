@@ -41,11 +41,11 @@ class OrderTrackingService
      * Get the tracking URL for a specific order
      * @param Order $order The order to get the tracking URL for
      * @param string $lang The desired language of the tracking URL (ISO-639-1)
-     * @return string
+     * @return array
      */
-    public function getTrackingURL(Order $order, $lang)
+    public function getTrackingURL(Order $order, $lang): array
     {
-        $trackingURL = '';
+        $trackingURLs = [];
 
         try {
             $shippingProfile = $this->parcelServicePresetRepo->getPresetById($order->shippingProfileId);
@@ -53,22 +53,24 @@ class OrderTrackingService
             if ($parcelService instanceof ParcelService) {
                 /** @var OrderRepositoryContract $orderRepo */
                 $orderRepo = pluginApp(OrderRepositoryContract::class);
-                $packageNumber = implode(',', $orderRepo->getPackageNumbers($order->id));
+                $packageNumbers = $orderRepo->getPackageNumbers($order->id);
 
-                if (strlen($packageNumber)) {
-                    $trackingURL = $parcelService->trackingUrl;
+                $splitUrls = $parcelService->toArray()['splitTrackingUrl'] ?? false; // Direct property access doesn't work for some reason
+                $delimiter = $parcelService->toArray()['splitDelimiter'] ?? null; // Direct property access doesn't work for some reason
+                if (!$delimiter) {
+                    $delimiter = ',';
+                }
 
+                $trackingURL = $parcelService->trackingUrl;
 
-                    $zip = $order->deliveryAddress->postalCode;
-
-                    if (strlen($trackingURL)) {
-
-                        $trackingURL = str_replace(
-                            ['[PaketNr]', '$PaketNr', '[PLZ]', '$PLZ', '[Lang]', '$Lang'],
-                            [urlencode($packageNumber), urlencode($packageNumber), urlencode($zip), urlencode($zip), $lang, $lang],
-                            $trackingURL
-                        );
+                if ($splitUrls) {
+                    foreach ($packageNumbers as $packageNo) {
+                        $trackingURLs[] = $this->buildTrackingUrl($order, $trackingURL, $packageNo, $lang);
                     }
+                } else {
+                    $packageNumber = implode($delimiter, $packageNumbers);
+
+                    $trackingURLs[] = $this->buildTrackingUrl($order, $trackingURL, $packageNumber, $lang);
                 }
             }
         } catch (\Exception $e) {
@@ -78,6 +80,28 @@ class OrderTrackingService
             ]);
         }
 
-        return $trackingURL;
+        return $trackingURLs;
+    }
+
+    /**
+     * @param Order $order
+     * @param string $trackingURL
+     * @param string $packageNumber
+     * @param string $lang
+     * @return string
+     */
+    private function buildTrackingUrl(Order $order, string $trackingURL, string $packageNumber, string $lang): string
+    {
+        $zip = $order->deliveryAddress->postalCode;
+
+        if (!strlen($trackingURL) || !strlen($packageNumber)) {
+            return '';
+        }
+
+        return str_replace(
+            ['[PaketNr]', '$PaketNr', '[PLZ]', '$PLZ', '[Lang]', '$Lang'],
+            [urlencode($packageNumber), urlencode($packageNumber), urlencode($zip), urlencode($zip), $lang, $lang],
+            $trackingURL
+        );
     }
 }
