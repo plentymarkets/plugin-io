@@ -361,7 +361,7 @@ class IORouteServiceProvider extends RouteServiceProvider
 
             //old webshop routes mapping
             $router->get('{slug}/a-{itemId}', 'IO\Controllers\ItemController@showItemOld')
-                ->where('slug', '^\/?.*')
+                ->where('slug', '(^\/?|.*)')
                 ->where('itemId', '[0-9]+');
 
             $router->get('a-{itemId}', 'IO\Controllers\ItemController@showItemFromAdmin')
