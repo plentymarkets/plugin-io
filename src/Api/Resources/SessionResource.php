@@ -6,6 +6,7 @@ use IO\Services\BasketService;
 use IO\Services\ItemLastSeenService;
 use Plenty\Modules\Frontend\Services\VatService;
 use Plenty\Modules\Webshop\Contracts\ContactRepositoryContract;
+use Plenty\Modules\Webshop\Contracts\SessionStorageRepositoryContract;
 use Plenty\Plugin\Http\Response;
 use IO\Api\ApiResource;
 use IO\Api\ResponseCode;
@@ -33,11 +34,16 @@ class SessionResource extends ApiResource
             $itemLastSeenService->setLastSeenItem($variationId);
         }
 
+        /** @var SessionStorageRepositoryContract $sessionStorageRepository */
+        $sessionStorageRepository = pluginApp(SessionStorageRepositoryContract::class);
+        $guestMail = $sessionStorageRepository->getSessionValue(SessionStorageRepositoryContract::GUEST_EMAIL);
+
         return $this->response->create(
             [
                 'basket' => $this->indexBasket(),
                 'basketItems' => $this->indexBasketItems(),
-                'customer' => $this->indexCustomer()
+                'customer' => $this->indexCustomer(),
+                'guest' => $guestMail
             ],
             ResponseCode::OK
         );
