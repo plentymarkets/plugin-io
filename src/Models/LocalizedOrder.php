@@ -78,6 +78,8 @@ class LocalizedOrder extends ModelWrapper
     public $shippingProfileId = 0;
     /** @var string $trackingURL Tracking URL for the order from shipping provider. */
     public $trackingURL = "";
+    /** @var string $trackingURLs List of tracking URLs for the order from shipping provider. */
+    public $trackingURLs = "";
     /** @var string $paymentMethodName Name of the payment method. */
     public $paymentMethodName = "";
     /** @var string $paymentMethodIcon URL of payment method icon image. */
@@ -169,6 +171,8 @@ class LocalizedOrder extends ModelWrapper
             /** @var OrderTrackingService $orderTrackingService */
             $orderTrackingService = pluginApp(OrderTrackingService::class);
             $instance->trackingURL = $orderTrackingService->getTrackingURL($order, $lang);
+            $instance->trackingURLs = $orderTrackingService->getTrackingURLs($order, $lang);
+
         } catch (\Exception $e) {
         }
 
