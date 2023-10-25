@@ -69,7 +69,8 @@ class ItemFaker extends AbstractFaker
                 "name"          => $this->trans("IO::Faker.manufacturerName"),
                 "icon"          => $this->image(),
                 "externalName"  => $this->word(),
-                "position"      => $this->number(0, 100)
+                "position"      => $this->number(0, 100),
+                "logo"          => $this->image()
             ],
             "producingCountry"      => [
                 "id"        => $producingCountry->id,
