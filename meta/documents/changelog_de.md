@@ -1,5 +1,11 @@
 # Release Notes für IO
 
+## v5.0.61 (2023-10-26) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.60...5.0.61" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
+
+### Behoben
+
+- Fehlende Mockdata konnten zu Fehlern im ShopBuilder führen. Dies wurde behoben.
+
 ## v5.0.60 (2023-07-19) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.59...5.0.60" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
 
 ### Behoben
