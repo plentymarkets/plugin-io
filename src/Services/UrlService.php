@@ -135,6 +135,7 @@ class UrlService
                 if (substr(TemplateService::$currentTemplate, 0, 12) === 'tpl.category' ||
                     substr(TemplateService::$currentTemplate, 0, 12) === 'tpl.checkout' ||
                     substr(TemplateService::$currentTemplate, 0, 14) === 'tpl.my-account' ||
+                    substr(TemplateService::$currentTemplate, 0, 16) === 'tpl.confirmation' ||
                     substr(TemplateService::$currentTemplate, 0, 11) === 'tpl.search') {
 
                     $currentCategory = $categoryService->getCurrentCategory();
@@ -174,9 +175,6 @@ class UrlService
                     $request = pluginApp(Request::class);
                     $path = explode('?', $request->getRequestUri());
                     return pluginApp(UrlQuery::class, ['path' => $path[0], 'lang' => $lang])
-                        ->toAbsoluteUrl($includeLanguage);
-                } elseif (TemplateService::$currentTemplate === "tpl.confirmation") {
-                    return pluginApp(UrlQuery::class, ['path' => RouteConfig::CONFIRMATION, 'lang' => $lang])
                         ->toAbsoluteUrl($includeLanguage);
                 }
 
