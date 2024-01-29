@@ -175,6 +175,9 @@ class UrlService
                     $path = explode('?', $request->getRequestUri());
                     return pluginApp(UrlQuery::class, ['path' => $path[0], 'lang' => $lang])
                         ->toAbsoluteUrl($includeLanguage);
+                } elseif (TemplateService::$currentTemplate === "tpl.confirmation") {
+                    return pluginApp(UrlQuery::class, ['path' => RouteConfig::CONFIRMATION, 'lang' => $lang])
+                        ->toAbsoluteUrl($includeLanguage);
                 }
 
                 return null;
