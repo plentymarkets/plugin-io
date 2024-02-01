@@ -1,5 +1,11 @@
 # Release Notes für IO
 
+## v5.0.62 (2024-XX-XX) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.61...5.0.62" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
+
+### Behoben
+
+- Ein Fehler bei der Prüfung von kanonischen Urls in Kombination mit ausgeschlossenen ShopBooster Parametern, kann zu fehlenden alternate links führen. Dies wurde behoben.
+
 ## v5.0.61 (2023-10-30) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.60...5.0.61" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
 
 ### Behoben
