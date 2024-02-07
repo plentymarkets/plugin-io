@@ -242,6 +242,7 @@ class CustomerService
                 $authenticationService->loginWithContactId($contact->id, (string)$contactData['password']);
 
                 if ($newBillingAddressData !== null) {
+                    $newBillingAddress['pivot']['isPrimary'] = 1;
                     $newBillingAddress = $this->createAddress($newBillingAddressData, AddressType::BILLING);
                     $basketService->setBillingAddressId($newBillingAddress->id);
                 }
