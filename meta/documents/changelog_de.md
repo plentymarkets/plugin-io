@@ -1,10 +1,10 @@
 # Release Notes für IO
 
-## v5.0.62 (2024-02-14)
+## v5.0.62 (xxxx-xx-xx)
 
 ### Fixed
 
-- Solved a bug that manifested by redirecting the user to the homepage when the language was changed on order confirmation page.
+- Es wurde ein Fehler behoben, der dazu führte, dass der Benutzer auf die Homepage umgeleitet wurde, wenn die Sprache auf der Bestellbestätigungsseite geändert wurde.
 
 ## v5.0.61 (2023-10-30) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.60...5.0.61" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
 
