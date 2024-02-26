@@ -334,7 +334,7 @@ class ShopUrls
      * Get tracking URL for a specific order id.
      *
      * @param string|int $orderId Id of the order to get the tracking URL for.
-     * @return string
+     * @return string[]
      */
     public function tracking($orderId)
     {
