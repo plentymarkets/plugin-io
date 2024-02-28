@@ -135,6 +135,7 @@ class UrlService
                 if (substr(TemplateService::$currentTemplate, 0, 12) === 'tpl.category' ||
                     substr(TemplateService::$currentTemplate, 0, 12) === 'tpl.checkout' ||
                     substr(TemplateService::$currentTemplate, 0, 14) === 'tpl.my-account' ||
+                    substr(TemplateService::$currentTemplate, 0, 16) === 'tpl.confirmation' ||
                     substr(TemplateService::$currentTemplate, 0, 11) === 'tpl.search') {
 
                     $currentCategory = $categoryService->getCurrentCategory();
@@ -233,8 +234,19 @@ class UrlService
         $request = pluginApp(Request::class);
         $requestUri = $request->getRequestUri();
 
+        $url = explode('?', $requestUri)[0];
+
+        $queryParameters = $request->query();
+        $queryParameters = Utils::cleanUpExcludesContentCacheParams($queryParameters);
+        $queryParameters = http_build_query($queryParameters, null, '&', PHP_QUERY_RFC3986);
+        if (strlen($queryParameters) > 0)
+        {
+            $url .= '?' . $queryParameters;
+        }
+
+
         /** @var UrlQuery $urlQuery */
-        $urlQuery = pluginApp(UrlQuery::class, ['path' => $requestUri]);
+        $urlQuery = pluginApp(UrlQuery::class, ['path' => $url]);
         $requestUrl = $urlQuery->toAbsoluteUrl($lang !== $defaultLanguage);
         $canonical = $this->getCanonicalURL($lang);
 

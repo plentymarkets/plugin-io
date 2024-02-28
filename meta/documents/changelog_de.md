@@ -1,5 +1,23 @@
 # Release Notes für IO
 
+## v5.0.63 (2024-XX-XX)
+
+### Fixed
+
+- Es wurde ein Fehler behoben, der dazu führte, dass der Benutzer auf die Homepage umgeleitet wurde, wenn die Sprache auf der Bestellbestätigungsseite geändert wurde.
+
+## v5.0.62 (2024-XX-XX) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.61...5.0.62" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
+
+### Behoben
+
+- Ein Fehler bei der Prüfung von kanonischen Urls in Kombination mit ausgeschlossenen ShopBooster Parametern, kann zu fehlenden alternate links führen. Dies wurde behoben.
+
+## v5.0.61 (2023-10-30) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.60...5.0.61" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
+
+### Behoben
+
+- Fehlende Mockdata konnten zu Fehlern im ShopBuilder führen. Dies wurde behoben.
+
 ## v5.0.60 (2023-07-19) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.59...5.0.60" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
 
 ### Behoben

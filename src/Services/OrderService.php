@@ -324,6 +324,7 @@ class OrderService
     {
         if (RouteConfig::isActive(RouteConfig::CONFIRMATION)) {
             if (strlen($orderAccessKey) && (int)$orderId > 0) {
+                $confirmationBaseUrl = rtrim($confirmationBaseUrl, '/');
                 $confirmationBaseUrl .= '/' . $orderId . '/' . $orderAccessKey;
             }
         } elseif (in_array(RouteConfig::CONFIRMATION, RouteConfig::getEnabledRoutes())
