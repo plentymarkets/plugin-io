@@ -77,6 +77,7 @@ class OrderResultFactory
         'shippingProfileName'          => null,
         'shippingProfileId'            => 0,
         'trackingURL'                  => '',
+        'trackingURLs'                 => [],
         'paymentMethodName'            => null,
         'paymentMethodIcon'            => null,
         'paymentStatus'                => 'unpaid',

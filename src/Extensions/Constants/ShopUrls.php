@@ -334,7 +334,7 @@ class ShopUrls
      * Get tracking URL for a specific order id.
      *
      * @param string|int $orderId Id of the order to get the tracking URL for.
-     * @return string
+     * @return array
      */
     public function tracking($orderId)
     {
@@ -343,17 +343,17 @@ class ShopUrls
             "tracking.{$orderId}",
             function () use ($orderId, $lang) {
                 $authHelper = pluginApp(AuthHelper::class);
-                $trackingURL = $authHelper->processUnguarded(
+                $trackingURLs = $authHelper->processUnguarded(
                     function () use ($orderId, $lang) {
                         $orderRepository = pluginApp(OrderRepositoryContract::class);
                         $orderTrackingService = pluginApp(OrderTrackingService::class);
 
                         $order = $orderRepository->findOrderById($orderId);
-                        return $orderTrackingService->getTrackingURL($order, $lang);
+                        return $orderTrackingService->getTrackingURLs($order, $lang);
                     }
                 );
 
-                return $trackingURL;
+                return $trackingURLs;
             }
         );
     }
