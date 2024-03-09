@@ -165,6 +165,7 @@ class ItemListService
                         'itemsPerPage' => count($wishListVariationIds)
                     ]
                 );
+                $searchFactory->setOrder(array_reverse($wishListVariationIds));
                 break;
             case self::TYPE_SEARCH_SUGGESTIONS:
                 $searchFactory = SearchSuggestions::getSearchFactory(
