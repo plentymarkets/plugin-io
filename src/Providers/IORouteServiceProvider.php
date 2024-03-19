@@ -28,6 +28,14 @@ class IORouteServiceProvider extends RouteServiceProvider
      */
     public function map(Router $router, ApiRouter $api)
     {
+        $api->version(
+            ['v1'],
+            ['namespace' => 'IO\Api\Resources', 'middleware' => ['throttleFrontend:register-form']],
+            function (ApiRouter $api) {
+                $api->post('io/customer', 'CustomerResource@store');
+            }
+        );
+
         $api->version(['v1'], ['namespace' => 'IO\Api\Resources'], function (ApiRouter $api) {
             $api->get('io/basket', 'BasketResource@index');
             $api->resource('io/basket/items', 'BasketItemResource');
@@ -65,14 +73,6 @@ class IORouteServiceProvider extends RouteServiceProvider
             $api->resource('io/categorytree', 'CategoryTreeResource');
             $api->get('io/session', 'SessionResource@index');
         });
-
-        $api->version(
-            ['v1'],
-            ['namespace' => 'IO\Api\Resources', 'middleware' => ['throttleFrontend:register-form']],
-            function (ApiRouter $api) {
-                $api->post('io/customer', 'CustomerResource@store');
-            }
-        );
 
         if (RouteConfig::isActive(RouteConfig::CONTACT_MAIL_API)) {
             $api->version(
