@@ -8,6 +8,10 @@
 - Es wurde ein Fehler behoben, der dazu führte, dass der Benutzer auf die Homepage umgeleitet wurde, wenn die Sprache auf der Bestellbestätigungsseite geändert wurde.
 - Die Reihenfolge der Artikel auf der Wunschliste wird jetzt beibehalten.
 
+### Geändert
+
+- Die Route zur Kundenregistrierung enthält jetzt eine kernseitige Limitierung.
+
 ## v5.0.61 (2023-10-30) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.60...5.0.61" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
 
 ### Behoben
