@@ -1,20 +1,15 @@
-<?php //strict
+<?php
 
 namespace IO\Api\Resources;
 
-use IO\Constants\LogLevel;
-use IO\Helper\ReCaptcha;
-use IO\Services\NotificationService;
-use Plenty\Modules\Account\Contact\Models\Contact;
-use Plenty\Modules\Webshop\Contracts\ContactRepositoryContract;
-use Plenty\Modules\Webshop\Events\ValidateVatNumber;
-use Plenty\Plugin\Events\Dispatcher;
-use Plenty\Plugin\Http\Response;
-use Plenty\Plugin\Http\Request;
-use IO\Api\ApiResource;
 use IO\Api\ApiResponse;
 use IO\Api\ResponseCode;
 use IO\Services\CustomerService;
+use Plenty\Modules\Account\Contact\Models\Contact;
+use Plenty\Modules\Webshop\Events\ValidateVatNumber;
+use Plenty\Plugin\Events\Dispatcher;
+use Plenty\Plugin\Http\Request;
+use Plenty\Plugin\Http\Response;
 
 /**
  * Class CustomerResource
@@ -31,9 +26,9 @@ class CustomerResource extends SessionResource
 
     /**
      * CustomerResource constructor.
-     * @param Request $request
-     * @param ApiResponse $response
-     * @param CustomerService $customerService
+     * @param  Request  $request
+     * @param  ApiResponse  $response
+     * @param  CustomerService  $customerService
      */
     public function __construct(
         Request $request,
@@ -42,15 +37,6 @@ class CustomerResource extends SessionResource
     ) {
         parent::__construct($request, $response);
         $this->customerService = $customerService;
-    }
-
-    /**
-     * Get the contact.
-     * @return Response
-     */
-    public function index(): Response
-    {
-        return $this->response->create($this->indexCustomer(), ResponseCode::OK);
     }
 
     /**
@@ -64,16 +50,6 @@ class CustomerResource extends SessionResource
         // Honeypot check
         if (strlen($this->request->get('honeypot'))) {
             return $this->response->create(true, ResponseCode::OK);
-        }
-
-        if (!ReCaptcha::verify($this->request->get('recaptcha', null))) {
-            /**
-            * @var NotificationService $notificationService
-            */
-            $notificationService = pluginApp(NotificationService::class);
-            $notificationService->addNotificationCode(LogLevel::ERROR, 13);
-
-            return $this->response->create('', ResponseCode::BAD_REQUEST);
         }
 
         $contactData = $this->request->get('contact', null);
@@ -90,7 +66,7 @@ class CustomerResource extends SessionResource
             return $this->response->create(null, ResponseCode::BAD_REQUEST);
         }
 
-         /** @var Dispatcher $eventDispatcher */
+        /** @var Dispatcher $eventDispatcher */
         $eventDispatcher = pluginApp(Dispatcher::class);
 
         if (count($billingAddressData) === 0) {
@@ -122,5 +98,14 @@ class CustomerResource extends SessionResource
         }
 
         return $this->index();
+    }
+
+    /**
+     * Get the contact.
+     * @return Response
+     */
+    public function index(): Response
+    {
+        return $this->response->create($this->indexCustomer(), ResponseCode::OK);
     }
 }
