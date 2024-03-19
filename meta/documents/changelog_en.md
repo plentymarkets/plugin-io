@@ -10,7 +10,7 @@
 
 ### Changed
 
-- The route to customer registration now contains a core-side limitation.
+- The customer registration route now contains an IP-based limitation in the core.
 
 ## v5.0.61 (2023-10-30) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.60...5.0.61" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
 
