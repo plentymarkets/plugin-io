@@ -4,13 +4,13 @@
 
 ### Fixed
 
-- An error when checking canonical urls in combination with excluded ShopBooster parameters can lead to missing alternate links. This was fixed.
+- An error when checking canonical URLs in combination with excluded ShopBooster parameters could lead to missing alternate links. This has been fixed.
 - Solved a bug that manifested by redirecting the user to the homepage when the language was changed on order confirmation page.
 - The wish list now preserves the order of the items on the list.
 
 ### Changed
 
-- The customer registration route now contains an IP-based limitation in the core.
+- The customer registration route `/register` now contains an IP-based limitation in the plentysystems core.
 
 ## v5.0.61 (2023-10-30) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.60...5.0.61" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
 
