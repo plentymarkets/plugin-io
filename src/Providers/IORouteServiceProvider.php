@@ -1,4 +1,4 @@
-<?php //strict
+<?php
 
 namespace IO\Providers;
 
@@ -7,8 +7,8 @@ use IO\Extensions\Constants\ShopUrls;
 use IO\Helper\RouteConfig;
 use IO\Helper\Utils;
 use Plenty\Plugin\RouteServiceProvider;
-use Plenty\Plugin\Routing\Router;
 use Plenty\Plugin\Routing\ApiRouter;
+use Plenty\Plugin\Routing\Router;
 
 /**
  * Class IORouteServiceProvider
@@ -22,12 +22,20 @@ class IORouteServiceProvider extends RouteServiceProvider
 
     /**
      * Define the map routes to templates or REST resources
-     * @param Router $router
-     * @param ApiRouter $api
+     * @param  Router  $router
+     * @param  ApiRouter  $api
      * @throws \Plenty\Plugin\Routing\Exceptions\RouteReservedException
      */
     public function map(Router $router, ApiRouter $api)
     {
+        $api->version(
+            ['v1'],
+            ['namespace' => 'IO\Api\Resources', 'middleware' => ['throttleFrontend:register-form']],
+            function (ApiRouter $api) {
+                $api->post('io/customer', 'CustomerResource@store');
+            }
+        );
+
         $api->version(['v1'], ['namespace' => 'IO\Api\Resources'], function (ApiRouter $api) {
             $api->get('io/basket', 'BasketResource@index');
             $api->resource('io/basket/items', 'BasketItemResource');
@@ -37,7 +45,7 @@ class IORouteServiceProvider extends RouteServiceProvider
             $api->resource('io/order/property/file', 'OrderPropertyFileResource');
             $api->get('io/checkout', 'CheckoutResource@index');
             $api->resource('io/category/description', 'CategoryDescriptionResource');
-            $api->resource('io/customer', 'CustomerResource');
+            $api->get('io/customer', 'CustomerResource@index');
             $api->resource('io/customer/login', 'CustomerAuthenticationResource');
             $api->resource('io/customer/logout', 'CustomerLogoutResource');
             $api->resource('io/customer/password', 'CustomerPasswordResource');
@@ -67,10 +75,14 @@ class IORouteServiceProvider extends RouteServiceProvider
         });
 
         if (RouteConfig::isActive(RouteConfig::CONTACT_MAIL_API)) {
-            $api->version(['v1'], ['namespace' => 'IO\Api\Resources', 'middleware' => ['throttleFrontend:contact-form']], function (ApiRouter $api) {
-                $api->resource('io/customer/contact/mail', 'ContactMailResource');
-                $api->resource('io/customer/contact/mail/file', 'ContactMailFileResource');
-            });
+            $api->version(
+                ['v1'],
+                ['namespace' => 'IO\Api\Resources', 'middleware' => ['throttleFrontend:contact-form']],
+                function (ApiRouter $api) {
+                    $api->resource('io/customer/contact/mail', 'ContactMailResource');
+                    $api->resource('io/customer/contact/mail/file', 'ContactMailFileResource');
+                }
+            );
         }
 
         $api->version(['v1'], ['namespace' => 'IO\Api\Resources', 'middleware' => ['csrf']], function (ApiRouter $api) {
@@ -122,21 +134,28 @@ class IORouteServiceProvider extends RouteServiceProvider
         // CHANGE MAIL
         if (RouteConfig::isActive(RouteConfig::CHANGE_MAIL)) {
             $router->get('change-mail/{contactId}/{hash}', 'IO\Controllers\CustomerChangeMailController@show');
-        } else if (in_array(RouteConfig::CHANGE_MAIL, RouteConfig::getEnabledRoutes())
-            && RouteConfig::getCategoryId(RouteConfig::CHANGE_MAIL) > 0
-            && !$shopUrls->equals($shopUrls->changeMail, '/change-mail')
-        ) {
-            $router->get('change-mail/{contactId}/{hash}', 'IO\Controllers\CustomerChangeMailController@redirect');
+        } else {
+            if (
+                in_array(RouteConfig::CHANGE_MAIL, RouteConfig::getEnabledRoutes())
+                && RouteConfig::getCategoryId(RouteConfig::CHANGE_MAIL) > 0
+                && !$shopUrls->equals($shopUrls->changeMail, '/change-mail')
+            ) {
+                $router->get('change-mail/{contactId}/{hash}', 'IO\Controllers\CustomerChangeMailController@redirect');
+            }
         }
 
         if (RouteConfig::isActive(RouteConfig::MY_ACCOUNT)) {
             //My-account route
             $router->get('my-account', 'IO\Controllers\MyAccountController@showMyAccount');
-        } else if (in_array(RouteConfig::MY_ACCOUNT, RouteConfig::getEnabledRoutes())
-            && RouteConfig::getCategoryId(RouteConfig::MY_ACCOUNT) > 0
-            && !$shopUrls->equals($shopUrls->myAccount, '/my-account')) {
-            // my-account-route is activated and category is linked and category url is not '/my-account'
-            $router->get('my-account', 'IO\Controllers\MyAccountController@showMyAccount');
+        } else {
+            if (
+                in_array(RouteConfig::MY_ACCOUNT, RouteConfig::getEnabledRoutes())
+                && RouteConfig::getCategoryId(RouteConfig::MY_ACCOUNT) > 0
+                && !$shopUrls->equals($shopUrls->myAccount, '/my-account')
+            ) {
+                // my-account-route is activated and category is linked and category url is not '/my-account'
+                $router->get('my-account', 'IO\Controllers\MyAccountController@showMyAccount');
+            }
         }
 
         // CHECKOUT
@@ -149,31 +168,70 @@ class IORouteServiceProvider extends RouteServiceProvider
         );
 
         // CONFIRMATION
-        if (RouteConfig::isActive(RouteConfig::CONFIRMATION)
+        if (
+            RouteConfig::isActive(RouteConfig::CONFIRMATION)
             || in_array(RouteConfig::CONFIRMATION, RouteConfig::getEnabledRoutes())
-            || RouteConfig::getCategoryId(RouteConfig::CONFIRMATION) > 0)
-        {
-            $router->get('-/akQQ{orderAccessKey}/idQQ{orderId}.html', 'IO\Controllers\ConfirmationEmailController@showConfirmation')->where('orderId', '\d+');
-            $router->get('-/akQQ{orderAccessKey}/idQQ{orderId}', 'IO\Controllers\ConfirmationEmailController@showConfirmation')->where('orderId', '\d+');
-            $router->get('_py-/akQQ{orderAccessKey}/idQQ{orderId}.html', 'IO\Controllers\ConfirmationEmailController@showConfirmation')->where('orderId', '\d+');
-            $router->get('_py-/akQQ{orderAccessKey}/idQQ{orderId}', 'IO\Controllers\ConfirmationEmailController@showConfirmation')->where('orderId', '\d+');
-            $router->get('_py_/akQQ{orderAccessKey}/idQQ{orderId}.html', 'IO\Controllers\ConfirmationEmailController@showConfirmation')->where('orderId', '\d+');
-            $router->get('_py_/akQQ{orderAccessKey}/idQQ{orderId}', 'IO\Controllers\ConfirmationEmailController@showConfirmation')->where('orderId', '\d+');
-            $router->get('_plentyShop__/akQQ{orderAccessKey}/idQQ{orderId}.html', 'IO\Controllers\ConfirmationEmailController@showConfirmation')->where('orderId', '\d+');
-            $router->get('_plentyShop__/akQQ{orderAccessKey}/idQQ{orderId}', 'IO\Controllers\ConfirmationEmailController@showConfirmation')->where('orderId', '\d+');
+            || RouteConfig::getCategoryId(RouteConfig::CONFIRMATION) > 0
+        ) {
+            $router->get(
+                '-/akQQ{orderAccessKey}/idQQ{orderId}.html',
+                'IO\Controllers\ConfirmationEmailController@showConfirmation'
+            )->where('orderId', '\d+');
+            $router->get(
+                '-/akQQ{orderAccessKey}/idQQ{orderId}',
+                'IO\Controllers\ConfirmationEmailController@showConfirmation'
+            )->where('orderId', '\d+');
+            $router->get(
+                '_py-/akQQ{orderAccessKey}/idQQ{orderId}.html',
+                'IO\Controllers\ConfirmationEmailController@showConfirmation'
+            )->where('orderId', '\d+');
+            $router->get(
+                '_py-/akQQ{orderAccessKey}/idQQ{orderId}',
+                'IO\Controllers\ConfirmationEmailController@showConfirmation'
+            )->where('orderId', '\d+');
+            $router->get(
+                '_py_/akQQ{orderAccessKey}/idQQ{orderId}.html',
+                'IO\Controllers\ConfirmationEmailController@showConfirmation'
+            )->where('orderId', '\d+');
+            $router->get(
+                '_py_/akQQ{orderAccessKey}/idQQ{orderId}',
+                'IO\Controllers\ConfirmationEmailController@showConfirmation'
+            )->where('orderId', '\d+');
+            $router->get(
+                '_plentyShop__/akQQ{orderAccessKey}/idQQ{orderId}.html',
+                'IO\Controllers\ConfirmationEmailController@showConfirmation'
+            )->where('orderId', '\d+');
+            $router->get(
+                '_plentyShop__/akQQ{orderAccessKey}/idQQ{orderId}',
+                'IO\Controllers\ConfirmationEmailController@showConfirmation'
+            )->where('orderId', '\d+');
         }
 
         if (RouteConfig::isActive(RouteConfig::CONFIRMATION)) {
             //Confirmation route
-            $router->get('confirmation/{orderId?}/{orderAccessKey?}', 'IO\Controllers\ConfirmationController@showConfirmation');
-        } else if (in_array(RouteConfig::CONFIRMATION, RouteConfig::getEnabledRoutes())
-            && RouteConfig::getCategoryId(RouteConfig::CONFIRMATION) > 0
-            && !$shopUrls->equals($shopUrls->confirmation, '/confirmation')) {
-            // confirmation-route is activated and category is linked and category url is not '/confirmation'
-            $router->get('confirmation/{orderId?}/{orderAccessKey?}', 'IO\Controllers\ConfirmationController@redirect');
+            $router->get(
+                'confirmation/{orderId?}/{orderAccessKey?}',
+                'IO\Controllers\ConfirmationController@showConfirmation'
+            );
+        } else {
+            if (
+                in_array(RouteConfig::CONFIRMATION, RouteConfig::getEnabledRoutes())
+                && RouteConfig::getCategoryId(RouteConfig::CONFIRMATION) > 0
+                && !$shopUrls->equals($shopUrls->confirmation, '/confirmation')
+            ) {
+                // confirmation-route is activated and category is linked and category url is not '/confirmation'
+                $router->get(
+                    'confirmation/{orderId?}/{orderAccessKey?}',
+                    'IO\Controllers\ConfirmationController@redirect'
+                );
+            }
         }
 
-        if (RouteConfig::getCategoryId(RouteConfig::CONFIRMATION) > 0 && !RouteConfig::isActive(RouteConfig::CATEGORY)) {
+        if (
+            RouteConfig::getCategoryId(RouteConfig::CONFIRMATION) > 0 && !RouteConfig::isActive(
+                RouteConfig::CATEGORY
+            )
+        ) {
             $this->registerRedirectedRoute(
                 $router,
                 RouteConfig::CONFIRMATION,
@@ -183,7 +241,11 @@ class IORouteServiceProvider extends RouteServiceProvider
             );
         }
 
-        if (RouteConfig::getCategoryId(RouteConfig::ORDER_RETURN) > 0 && !RouteConfig::isActive(RouteConfig::CATEGORY)) {
+        if (
+            RouteConfig::getCategoryId(RouteConfig::ORDER_RETURN) > 0 && !RouteConfig::isActive(
+                RouteConfig::CATEGORY
+            )
+        ) {
             $this->registerSingleCategoryRoute($router, RouteConfig::ORDER_RETURN, $shopUrls->returns);
         }
 
@@ -200,9 +262,13 @@ class IORouteServiceProvider extends RouteServiceProvider
         if (RouteConfig::isActive(RouteConfig::HOME)) {
             //homepage route
             $router->get('', 'IO\Controllers\HomepageController@showHomepage');
-        } else if (in_array(RouteConfig::HOME, RouteConfig::getEnabledRoutes())
-            && RouteConfig::getCategoryId(RouteConfig::HOME) > 0) {
-            $router->get('', 'IO\Controllers\HomepageController@showHomepageCategory');
+        } else {
+            if (
+                in_array(RouteConfig::HOME, RouteConfig::getEnabledRoutes())
+                && RouteConfig::getCategoryId(RouteConfig::HOME) > 0
+            ) {
+                $router->get('', 'IO\Controllers\HomepageController@showHomepageCategory');
+            }
         }
 
         // LEGAL DISCLOSURE
@@ -234,17 +300,27 @@ class IORouteServiceProvider extends RouteServiceProvider
 
         // NEWSLETTER OPT IN
         if (RouteConfig::isActive(RouteConfig::NEWSLETTER_OPT_IN)) {
-            $router->get('newsletter/subscribe/{authString}/{newsletterEmailId}', 'IO\Controllers\NewsletterOptInController@showOptInConfirmation');
+            $router->get(
+                'newsletter/subscribe/{authString}/{newsletterEmailId}',
+                'IO\Controllers\NewsletterOptInController@showOptInConfirmation'
+            );
         }
 
         // NEWSLETTER OPT OUT
         if (RouteConfig::isActive(RouteConfig::NEWSLETTER_OPT_OUT)) {
             $router->get('newsletter/unsubscribe', 'IO\Controllers\NewsletterOptOutController@showOptOut');
-            $router->post('newsletter/unsubscribe', 'IO\Controllers\NewsletterOptOutConfirmationController@showOptOutConfirmation');
-        } else if (in_array(RouteConfig::NEWSLETTER_OPT_OUT, RouteConfig::getEnabledRoutes())
-            && RouteConfig::getCategoryId(RouteConfig::NEWSLETTER_OPT_OUT) > 0
-            && !$shopUrls->equals($shopUrls->newsletterOptOut, '/newsletter/unsubscribe')) {
-            $router->get('newsletter/unsubscribe', 'IO\Controllers\NewsletterOptOutController@redirect');
+            $router->post(
+                'newsletter/unsubscribe',
+                'IO\Controllers\NewsletterOptOutConfirmationController@showOptOutConfirmation'
+            );
+        } else {
+            if (
+                in_array(RouteConfig::NEWSLETTER_OPT_OUT, RouteConfig::getEnabledRoutes())
+                && RouteConfig::getCategoryId(RouteConfig::NEWSLETTER_OPT_OUT) > 0
+                && !$shopUrls->equals($shopUrls->newsletterOptOut, '/newsletter/unsubscribe')
+            ) {
+                $router->get('newsletter/unsubscribe', 'IO\Controllers\NewsletterOptOutController@redirect');
+            }
         }
 
         // ORDER DOCUMENT
@@ -255,32 +331,50 @@ class IORouteServiceProvider extends RouteServiceProvider
         // ORDER PROPERTY FILE
         if (RouteConfig::isActive(RouteConfig::ORDER_PROPERTY_FILE)) {
             $router->get('order-property-file/{hash1}', 'IO\Controllers\OrderPropertyFileController@downloadTempFile');
-            $router->get('order-property-file/{hash1}/{hash2}', 'IO\Controllers\OrderPropertyFileController@downloadFile');
+            $router->get(
+                'order-property-file/{hash1}/{hash2}',
+                'IO\Controllers\OrderPropertyFileController@downloadFile'
+            );
         }
 
         // ORDER RETURN
         if (RouteConfig::isActive(RouteConfig::ORDER_RETURN)) {
             $router->get('returns/{orderId}/{orderAccessKey?}', 'IO\Controllers\OrderReturnController@showOrderReturn');
-        } else if (in_array(RouteConfig::ORDER_RETURN, RouteConfig::getEnabledRoutes())
-            && RouteConfig::getCategoryId(RouteConfig::ORDER_RETURN) > 0
-            && !$shopUrls->equals($shopUrls->returns, '/returns')) {
-            $router->get('returns/{orderId}/{orderAccessKey?}', 'IO\Controllers\OrderReturnController@redirect');
-
+        } else {
+            if (
+                in_array(RouteConfig::ORDER_RETURN, RouteConfig::getEnabledRoutes())
+                && RouteConfig::getCategoryId(RouteConfig::ORDER_RETURN) > 0
+                && !$shopUrls->equals($shopUrls->returns, '/returns')
+            ) {
+                $router->get('returns/{orderId}/{orderAccessKey?}', 'IO\Controllers\OrderReturnController@redirect');
+            }
         }
 
         // ORDER RETURN CONFIRMATION
         if (RouteConfig::isActive(RouteConfig::ORDER_RETURN_CONFIRMATION)) {
-            $router->get('return-confirmation', 'IO\Controllers\OrderReturnConfirmationController@showOrderReturnConfirmation');
+            $router->get(
+                'return-confirmation',
+                'IO\Controllers\OrderReturnConfirmationController@showOrderReturnConfirmation'
+            );
         }
 
         // PASSWORD RESET
         if (RouteConfig::isActive(RouteConfig::PASSWORD_RESET)) {
-            $router->get('password-reset/{contactId}/{hash}', 'IO\Controllers\CustomerPasswordResetController@showReset');
-        } else if (in_array(RouteConfig::PASSWORD_RESET, RouteConfig::getEnabledRoutes())
-            && RouteConfig::getCategoryId(RouteConfig::PASSWORD_RESET) > 0
-            && !$shopUrls->equals($shopUrls->passwordReset, '/password-reset')
-        ) {
-            $router->get('password-reset/{contactId}/{hash}', 'IO\Controllers\CustomerPasswordResetController@redirect');
+            $router->get(
+                'password-reset/{contactId}/{hash}',
+                'IO\Controllers\CustomerPasswordResetController@showReset'
+            );
+        } else {
+            if (
+                in_array(RouteConfig::PASSWORD_RESET, RouteConfig::getEnabledRoutes())
+                && RouteConfig::getCategoryId(RouteConfig::PASSWORD_RESET) > 0
+                && !$shopUrls->equals($shopUrls->passwordReset, '/password-reset')
+            ) {
+                $router->get(
+                    'password-reset/{contactId}/{hash}',
+                    'IO\Controllers\CustomerPasswordResetController@redirect'
+                );
+            }
         }
 
         // PLACE ORDER
@@ -317,8 +411,10 @@ class IORouteServiceProvider extends RouteServiceProvider
         }
 
         // SEARCH
-        if (RouteConfig::isActive(RouteConfig::SEARCH) || in_array(RouteConfig::SEARCH, RouteConfig::getEnabledRoutes())
-            || RouteConfig::getCategoryId(RouteConfig::SEARCH) > 0) {
+        if (
+            RouteConfig::isActive(RouteConfig::SEARCH) || in_array(RouteConfig::SEARCH, RouteConfig::getEnabledRoutes())
+            || RouteConfig::getCategoryId(RouteConfig::SEARCH) > 0
+        ) {
             //Callisto Tag route
             $router->get('tag/{tagName}', 'IO\Controllers\ItemSearchController@redirectToSearch');
         }
@@ -377,7 +473,10 @@ class IORouteServiceProvider extends RouteServiceProvider
 
         // CATEGORY ROUTES
         if (RouteConfig::isActive(RouteConfig::CATEGORY)) {
-            $categoryRoute = $router->get('{level1?}/{level2?}/{level3?}/{level4?}/{level5?}/{level6?}', 'IO\Controllers\CategoryController@showCategory');
+            $categoryRoute = $router->get(
+                '{level1?}/{level2?}/{level3?}/{level4?}/{level5?}/{level6?}',
+                'IO\Controllers\CategoryController@showCategory'
+            );
 
             if (RouteConfig::passThroughBlogRoutes()) {
                 // do not catch legacy blog-routes
@@ -387,7 +486,10 @@ class IORouteServiceProvider extends RouteServiceProvider
 
         // NOT FOUND
         if (in_array(RouteConfig::PAGE_NOT_FOUND, RouteConfig::getEnabledRoutes())) {
-            $fallbackRoute = $router->get('{level1?}/{anything?}', 'IO\Controllers\StaticPagesController@getPageNotFoundStatusResponse');
+            $fallbackRoute = $router->get(
+                '{level1?}/{anything?}',
+                'IO\Controllers\StaticPagesController@getPageNotFoundStatusResponse'
+            );
             if (RouteConfig::passThroughBlogRoutes()) {
                 // do not catch legacy blog-routes
                 $fallbackRoute
@@ -400,11 +502,11 @@ class IORouteServiceProvider extends RouteServiceProvider
     }
 
     /**
-     * @param Router $router
-     * @param string $route
-     * @param string $shopUrl
-     * @param string $legacyController
-     * @param string $redirectController
+     * @param  Router  $router
+     * @param  string  $route
+     * @param  string  $shopUrl
+     * @param  string  $legacyController
+     * @param  string  $redirectController
      * @throws \Plenty\Plugin\Routing\Exceptions\RouteReservedException
      */
     private function registerRedirectedRoute(
@@ -413,10 +515,8 @@ class IORouteServiceProvider extends RouteServiceProvider
         $shopUrl,
         $legacyController,
         $redirectController
-    )
-    {
+    ) {
         if (in_array($route, RouteConfig::getEnabledRoutes())) {
-
             // legacy route is active
             if (RouteConfig::getCategoryId($route) <= 0) {
                 // no category is assigned => bind legacy controller
@@ -426,7 +526,11 @@ class IORouteServiceProvider extends RouteServiceProvider
             }
         }
 
-        if (!RouteConfig::isActive(RouteConfig::CATEGORY) && RouteConfig::getCategoryId($route) > 0 && !empty($shopUrl)) {
+        if (
+            !RouteConfig::isActive(RouteConfig::CATEGORY) && RouteConfig::getCategoryId(
+                $route
+            ) > 0 && !empty($shopUrl)
+        ) {
             $this->registerSingleCategoryRoute($router, $route, $shopUrl);
         }
     }
