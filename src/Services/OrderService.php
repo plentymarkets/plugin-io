@@ -692,35 +692,7 @@ class OrderService
      */
     public function allowPaymentMethodSwitchFrom($paymentMethodId, $orderId = null)
     {
-        /** @var TemplateConfigService $templateConfigService */
-        $templateConfigService = pluginApp(TemplateConfigService::class);
-        if (!$templateConfigService->getBoolean('my_account.change_payment')) {
-            return false;
-        }
-        if ($orderId != null) {
-            /** @var AuthHelper $authHelper */
-            $authHelper = pluginApp(AuthHelper::class);
-            $orderRepo = $this->orderRepository;
-
-            $order = $authHelper->processUnguarded(
-                function () use ($orderId, $orderRepo) {
-                    return $orderRepo->findOrderById($orderId);
-                }
-            );
-
-            if ($order->paymentStatus !== OrderPaymentStatus::UNPAID) {
-                // order was paid
-                return false;
-            }
-
-            $statusId = $order->statusId;
-            $orderCreatedDate = $order->createdAt;
-
-            if (!($statusId <= 3.4 || ($statusId == 5 && $orderCreatedDate->toDateString() == date('Y-m-d')))) {
-                return false;
-            }
-        }
-        return $this->frontendPaymentMethodRepository->getPaymentMethodSwitchableFromById($paymentMethodId, $orderId);
+        return true;
     }
 
 
