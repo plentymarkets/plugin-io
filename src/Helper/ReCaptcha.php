@@ -29,20 +29,15 @@ class ReCaptcha
 
         $secret = $templateConfigService->get('global.google_recaptcha_secret');
         $blockCookies = $templateConfigService->getBoolean('global.block_cookies');
-        $isConsented = $consentRepository->isConsented('media.reCaptcha');
+        $isConsented = $consentRepository->isConsented('media.reCaptcha') || $consentRepository->isConsented('necessary.reCaptcha');
 
-        if ( !strlen( $secret ) )
-        {
+        if (!strlen($secret)) {
             // No secret defined in config => skip reCAPTCHA validation
             return true;
-        }
-        else if ($blockCookies && !$isConsented && !$strict)
-        {
+        } elseif ($blockCookies && !$isConsented && !$strict) {
             // page has to operate without cookies
             return true;
-        }
-        else if ( !strlen( $token ) )
-        {
+        } elseif (!strlen($token)) {
             // reCAPTCHA is enabled by config but no token is given
             return false;
         }
@@ -59,8 +54,7 @@ class ReCaptcha
 
         $ch = curl_init();
 
-        foreach($options as $option => $value)
-        {
+        foreach ($options as $option => $value) {
             curl_setopt($ch, $option, $value);
         }
 
