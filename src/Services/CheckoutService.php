@@ -6,6 +6,7 @@ use IO\Builder\Order\AddressType;
 use IO\Events\Checkout\CheckoutReadonlyChanged;
 use IO\Helper\ArrayHelper;
 use IO\Helper\MemoryCache;
+use IO\Helper\Utils;
 use Plenty\Modules\Accounting\Contracts\AccountingLocationRepositoryContract;
 use Plenty\Modules\Basket\Contracts\BasketRepositoryContract;
 use Plenty\Modules\Basket\Events\Basket\AfterBasketChanged;
@@ -29,7 +30,6 @@ use Plenty\Plugin\ConfigRepository;
 use Plenty\Plugin\Events\Dispatcher;
 use Plenty\Plugin\Log\Loggable;
 use Plenty\Plugin\Translation\Translator;
-use IO\Helper\Utils;
 
 /**
  * Class CheckoutService
@@ -665,6 +665,24 @@ class CheckoutService
                 if (!is_null($order)) {
                     $isNet = $order->isNet;
                 }
+                $basket = $this->basketService->getBasket();
+                $fallbackShippingProfileId = null;
+                $exists = false;
+                if (is_array($list)) {
+                    foreach ($list as $key => $shippingProfile) {
+                        if (is_null($fallbackShippingProfileId)) {
+                            $fallbackShippingProfileId = $shippingProfile['parcelServicePresetId'];
+                        }
+                        if ($basket->shippingProfileId == $shippingProfile['parcelServicePresetId']) {
+                            $exists = true;
+                            break;
+                        }
+                    }
+                }
+                if ($exists === false && !is_null($fallbackShippingProfileId)) {
+                    $this->setShippingProfileId($fallbackShippingProfileId, true);
+                }
+
                 if (($isNet && !(bool)$accountSettings->showShippingVat) || (!$isNet && $showNetPrice)) {
                     $maxVatValue = $this->basketService->getMaxVatValue();
 
@@ -677,7 +695,6 @@ class CheckoutService
                     }
                 }
 
-                $basket = $this->basketService->getBasket();
                 if ($basket->currency !== $this->currencyExchangeRepo->getDefaultCurrency()) {
                     if (is_array($list)) {
                         foreach ($list as $key => $shippingProfile) {
