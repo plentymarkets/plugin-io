@@ -1,5 +1,11 @@
 # Release Notes for IO
 
+## v5.0.63 (2024-xx-xx) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.62...5.0.63" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
+
+### Changed
+
+- The status of `order-return` route is now checked on the order confirmation page for a guest users.
+
 ## v5.0.62 (2024-04-03) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.61...5.0.62" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
 
 ### Fixed
@@ -11,7 +17,6 @@
 ### Changed
 
 - The customer registration route `/register` now contains an IP-based limitation in the plentysystems core.
-- The status of `order-return` route is now checked on the order confirmation page for a guest users.
 
 ## v5.0.61 (2023-10-30) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.60...5.0.61" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
 
