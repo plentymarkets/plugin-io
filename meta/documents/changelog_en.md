@@ -11,7 +11,7 @@
 ### Changed
 
 - The customer registration route `/register` now contains an IP-based limitation in the plentysystems core.
-- Added the status of `order return` route to be checked on the `order confirmation` page for a guest user.
+- The status of `order-return` route is now checked on the order confirmation page for a guest users.
 
 ## v5.0.61 (2023-10-30) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.60...5.0.61" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
 
