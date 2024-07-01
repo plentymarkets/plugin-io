@@ -1,5 +1,11 @@
 # Release Notes für IO
 
+## v5.0.63 (2024-xx-xx) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.62...5.0.63" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
+
+### Geändert
+
+- Der Status der `order-return`-Route wird jetzt für die Bestellbestätigung für Gastbestellungen abgefragt.
+
 ## v5.0.62 (2024-04-03) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.61...5.0.62" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
 
 ### Behoben
