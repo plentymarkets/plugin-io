@@ -206,6 +206,10 @@ class CheckoutServiceShippingTest extends TestCase
 
         $this->checkoutMock->shouldReceive('getShippingCountryId')->andReturn(10);
 
+
+        $checkoutServiceMock = Mockery::mock(CheckoutService::class);
+        $checkoutServiceMock->shouldReceive('setShippingProfileId');
+
         $this->applicationMock->shouldReceive('getWebstoreId')->andReturn(1);
 
         $this->parcelServiceRepoMock->shouldReceive('getLastWeightedPresetCombinations')->with(
