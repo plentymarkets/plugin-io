@@ -409,7 +409,7 @@ class CheckoutService
          * @var PaymentMethod $methodOfPayment
          */
         foreach ($methodOfPaymentList as $methodOfPaymentKey => $methodOfPayment) {
-            if($basket->id > 0 && $basketAmount <= 0 && $methodOfPayment->paymentKey !== self::ALREADY_PAID_PAYMENT_KEY) {
+            if ($basket->id > 0 && $basketAmount <= 0 && $methodOfPayment->paymentKey !== self::ALREADY_PAID_PAYMENT_KEY) {
                 unset($methodOfPaymentList[$methodOfPaymentKey]);
                 continue;
             }
@@ -421,7 +421,7 @@ class CheckoutService
 
         if ($methodOfPaymentID === null || !$methodOfPaymentValid) {
             $methodOfPayment = array_shift($methodOfPaymentList);
-            if(!is_null($methodOfPayment)) {
+            if (!is_null($methodOfPayment)) {
                 $methodOfPaymentID = $methodOfPayment->id;
             }
 
@@ -461,9 +461,11 @@ class CheckoutService
         $basketService = pluginApp(BasketService::class);
 
         $validateCheckoutEvent = $this->checkout->validateCheckout();
-        if ($validateCheckoutEvent instanceof ValidateCheckoutEvent && !empty(
+        if (
+            $validateCheckoutEvent instanceof ValidateCheckoutEvent && !empty(
             $validateCheckoutEvent->getErrorKeysList()
-            )) {
+            )
+        ) {
             $dispatcher = pluginApp(Dispatcher::class);
             if ($dispatcher instanceof Dispatcher) {
                 $dispatcher->fire(pluginApp(AfterBasketChanged::class), []);
@@ -533,12 +535,12 @@ class CheckoutService
         $methodOfPaymentList = [];
         $basket = $this->basketRepository->load();
         if ($basket->basketAmount <= 0 && $basket->id > 0) {
-            $methodOfPaymentList = array_filter($methodOfPaymentListOriginal, function($methodOfPayment) {
+            $methodOfPaymentList = array_filter($methodOfPaymentListOriginal, function ($methodOfPayment) {
                 return $methodOfPayment->paymentKey === self::ALREADY_PAID_PAYMENT_KEY;
             });
         }
 
-        if(!count($methodOfPaymentList)) {
+        if (!count($methodOfPaymentList)) {
             $methodOfPaymentList = $methodOfPaymentListOriginal;
         }
 
@@ -749,10 +751,11 @@ class CheckoutService
      * Set the ID of the current shipping profile.
      *
      * @param int $shippingProfileId Id of the shipping profile to select.
+     * @param  bool  $force  Force to set the shipping profile id.
      */
-    public function setShippingProfileId(int $shippingProfileId)
+    public function setShippingProfileId(int $shippingProfileId, bool $force = false)
     {
-        $this->checkout->setShippingProfileId($shippingProfileId);
+        $this->checkout->setShippingProfileId($shippingProfileId, $force);
     }
 
     /**
