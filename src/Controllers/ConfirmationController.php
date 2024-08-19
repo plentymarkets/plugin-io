@@ -176,6 +176,10 @@ class ConfirmationController extends LayoutController
                         'category' => $category,
                         'data' => $order,
                         'showAdditionalPaymentInformation' => true,
+                        'isReturnEnabled' => in_array(
+                            RouteConfig::ORDER_RETURN,
+                            RouteConfig::getEnabledRoutes(true)
+                        ),
                         "isOrderValid" => $orderAccessStatus === ConfirmationRepositoryContract::STATUS_ORDER_CONFIRMATION_SOFTLOGIN ? true : false
                     ],
                     false
