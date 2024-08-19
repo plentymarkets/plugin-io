@@ -205,6 +205,18 @@ class CheckoutServiceShippingTest extends TestCase
             ->andReturn([]);
 
         $this->checkoutMock->shouldReceive('getShippingCountryId')->andReturn(10);
+        $this->checkoutMock->shouldReceive('setShippingProfileId')->with(
+            $shippingList[0]['parcelServicePresetId'],
+            true
+        );
+
+        $checkoutServiceMock = Mockery::mock(CheckoutService::class);
+        $this->replaceInstanceByMock(CheckoutService::class, $checkoutServiceMock);
+
+        $checkoutServiceMock->shouldReceive('setShippingProfileId')->with(
+            $shippingList[0]['parcelServicePresetId'],
+            true
+        );
 
         $this->applicationMock->shouldReceive('getWebstoreId')->andReturn(1);
 
