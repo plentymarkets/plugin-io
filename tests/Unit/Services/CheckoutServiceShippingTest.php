@@ -180,6 +180,8 @@ class CheckoutServiceShippingTest extends TestCase
 
         $this->webstoreConfigurationRepositoryMock->shouldReceive('getWebstoreConfiguration')->andReturn($webstoreConfiguration);
 
+        $this->sessionStorageRepositoryMock->shouldReceive('setSessionValue');
+
         $this->sessionStorageRepositoryMock->shouldReceive('getCustomer')
             ->andReturn(
                 (object)[
