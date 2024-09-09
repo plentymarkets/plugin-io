@@ -257,6 +257,9 @@ class CheckoutServiceShippingTest extends TestCase
 
         $this->currencyExchangeRepoMock->shouldReceive('getDefaultCurrency')->andReturn('EUR');
 
+
+        $this->currencyExchangeRepoMock->shouldReceive('getExchangeRatioByCurrency');
+
         $shippingProfileList = $this->checkoutService->getShippingProfileList();
 
 
