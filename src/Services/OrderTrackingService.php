@@ -93,14 +93,16 @@ class OrderTrackingService
 
                 $trackingURL = $parcelService->trackingUrl;
 
-                if ($splitUrls) {
-                    foreach ($packageNumbers as $packageNo) {
-                        $trackingURLs[] = $this->buildTrackingUrl($order, $trackingURL, $packageNo, $lang);
-                    }
-                } else {
-                    $packageNumber = implode($delimiter, $packageNumbers);
+                if (strlen($trackingURL)) {
+                    if ($splitUrls) {
+                        foreach ($packageNumbers as $packageNo) {
+                            $trackingURLs[] = $this->buildTrackingUrl($order, $trackingURL, $packageNo, $lang);
+                        }
+                    } else {
+                        $packageNumber = implode($delimiter, $packageNumbers);
 
-                    $trackingURLs[] = $this->buildTrackingUrl($order, $trackingURL, $packageNumber, $lang);
+                        $trackingURLs[] = $this->buildTrackingUrl($order, $trackingURL, $packageNumber, $lang);
+                    }
                 }
             }
         } catch (\Exception $e) {
