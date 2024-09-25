@@ -180,6 +180,8 @@ class CheckoutServiceShippingTest extends TestCase
 
         $this->webstoreConfigurationRepositoryMock->shouldReceive('getWebstoreConfiguration')->andReturn($webstoreConfiguration);
 
+        $this->sessionStorageRepositoryMock->shouldReceive('setSessionValue');
+
         $this->sessionStorageRepositoryMock->shouldReceive('getCustomer')
             ->andReturn(
                 (object)[
@@ -254,6 +256,9 @@ class CheckoutServiceShippingTest extends TestCase
 
 
         $this->currencyExchangeRepoMock->shouldReceive('getDefaultCurrency')->andReturn('EUR');
+
+
+        $this->currencyExchangeRepoMock->shouldReceive('getExchangeRatioByCurrency');
 
         $shippingProfileList = $this->checkoutService->getShippingProfileList();
 
