@@ -7,10 +7,10 @@ use IO\Builder\Order\AddressType;
 use IO\Services\BasketService;
 use IO\Services\CustomerService;
 use IO\Tests\TestCase;
+use Mockery;
 use Plenty\Modules\Account\Address\Models\Address;
 use Plenty\Modules\Authorization\Services\AuthHelper;
 use Plenty\Modules\Frontend\Services\CheckoutService;
-use \Mockery;
 use Plenty\Modules\Webshop\Contracts\SessionStorageRepositoryContract;
 use Plenty\Plugin\Events\Dispatcher;
 
@@ -228,6 +228,9 @@ class CustomerServiceFeatureTest extends TestCase
             ->shouldReceive('getShippingCountryId')
             ->andReturn(null);
 
+        $this->checkoutService
+            ->shouldReceive('setCurrency');
+        
         $this->createContact($email, $password);
         $this->performLogin($email, $password);
         $this->updateAddress($addressDataCreate, $addressDataUpdate, $addressType);
