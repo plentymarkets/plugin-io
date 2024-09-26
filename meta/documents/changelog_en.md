@@ -1,5 +1,11 @@
 # Release Notes for IO
 
+## v5.0.68 (2024-09-26) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.64...5.0.68" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
+
+### Fixed
+
+- Added an additional check for displaying the tracking link to ensure that the tracking link is only shown for shipping providers with tracking URLs.
+
 ## v5.0.64 (2024-08-19) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.62...5.0.64" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
 
 ### Changed
