@@ -166,10 +166,6 @@ class SalesPriceService
     {
         $salesPrice->price = $salesPrice->price * $salesPrice->conversionFactor;
         $salesPrice->priceNet = $salesPrice->priceNet * $salesPrice->conversionFactor;
-//        $salesPrice->basePrice                  = $salesPrice->basePrice * $salesPrice->conversionFactor;
-//        $salesPrice->basePriceNet               = $salesPrice->basePriceNet * $salesPrice->conversionFactor;
-//        $salesPrice->unitPrice                  = $salesPrice->unitPrice * $salesPrice->conversionFactor;
-//        $salesPrice->unitPriceNet               = $salesPrice->unitPriceNet * $salesPrice->conversionFactor;
         $salesPrice->customerClassDiscount = $salesPrice->customerClassDiscount * $salesPrice->conversionFactor;
         $salesPrice->customerClassDiscountNet = $salesPrice->customerClassDiscountNet * $salesPrice->conversionFactor;
         $salesPrice->categoryDiscount = $salesPrice->categoryDiscount * $salesPrice->conversionFactor;
