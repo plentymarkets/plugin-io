@@ -80,7 +80,7 @@ jobs:
         uses: plentymarkets/github-runner-cleanup@main
 
       - name: Checkout github-actions repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           repository: plentymarkets/github-actions
           ref: main
@@ -101,7 +101,7 @@ jobs:
           php artisan plugin:buildinterface --without-docs --target=./storage/plugin-interface
           
       - name: Checkout plugin test suite
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           repository: "plentymarkets/plugin-test-suite"
           token: ${{ secrets.PUBLIC_PAT_CICD4_PUBLIC }}
@@ -114,7 +114,7 @@ jobs:
           rm .env
           touch .env
       - name: Checkout IO branch
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           path: pl/packages/plentymarkets/plugin-test-suite/vendor/plentymarkets/plugin-io
       - name: Run plugin migrations
@@ -134,7 +134,7 @@ jobs:
           fi
 
       - name: Upload matrix status artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: always()
         with:
           name: job-status
@@ -150,7 +150,7 @@ jobs:
       - uses: plentymarkets/github-runner-cleanup@main
 
       - name: Download artifacts
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           path: ${{ runner.temp }}
 
