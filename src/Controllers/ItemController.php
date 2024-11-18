@@ -44,10 +44,14 @@ class ItemController extends LayoutController
         int $variationId = 0,
         $category = null
     ) {
+        /** @var TemplateConfigService $templateConfigService */
+        $templateConfigService = pluginApp(TemplateConfigService::class);
+
         $itemSearchOptions = [
             'itemId' => $itemId,
             'variationId' => $variationId,
-            'setCategory' => is_null($category)
+            'setCategory' => is_null($category),
+            'manufacturerFields' => $templateConfigService->get('item.manufacturer_fields', 'all'),
         ];
 
         $this->plentyId = Utils::getPlentyId();
@@ -57,8 +61,6 @@ class ItemController extends LayoutController
             'variationAttributeMap' => VariationAttributeMap::getSearchFactory($itemSearchOptions)
         ];
 
-        /** @var TemplateConfigService $templateConfigService */
-        $templateConfigService = pluginApp(TemplateConfigService::class);
 
         if ($variationId > 0 && $templateConfigService->getInteger('item.show_please_select') == 1) {
             unset($itemSearchOptions['variationId']);
