@@ -51,7 +51,7 @@ class ItemController extends LayoutController
             'itemId' => $itemId,
             'variationId' => $variationId,
             'setCategory' => is_null($category),
-            'manufacturerFields' => $templateConfigService->get('item.manufacturer_fields', 'all'),
+            'manufacturerFields' => $templateConfigService->get('item.manufacturer_data', 'all'),
         ];
 
         $this->plentyId = Utils::getPlentyId();
