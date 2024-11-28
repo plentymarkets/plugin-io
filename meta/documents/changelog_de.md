@@ -8,7 +8,7 @@
 
 ### Geändert
 
-- Der CategoryService benutzt jetzt eine Kernfunktion zur Ermittlung des Navigationsbaum.
+- Der CategoryService benutzt jetzt eine Kernfunktion zur Ermittlung des Navigationsbaum. Dies führt zu einer besseren Performance.
 
 ## v5.0.68 (2024-09-26) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.64...5.0.68" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
 

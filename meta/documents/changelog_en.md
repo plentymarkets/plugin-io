@@ -14,7 +14,7 @@
 
 ### Changed
 
-- The category service is now using a core method to get the navigation tree.
+- The category service is now using a core method to get the navigation tree. This change improves the performance.
 
 ## v5.0.64 (2024-08-19) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.62...5.0.64" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
 
