@@ -1,5 +1,11 @@
 # Release Notes für IO
 
+## v5.0.70 (2024-11-28) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.68...5.0.70" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
+
+### Hinzugefügt
+
+- Eine Möglichkeit zur Filterung der Herstellerdaten wurde hinzugefügt.
+
 ## v5.0.68 (2024-09-26) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.64...5.0.68" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
 
 ### Behoben
