@@ -152,7 +152,9 @@ jobs:
       - name: Download artifacts
         uses: actions/download-artifact@v4
         with:
-          path: ${{ runner.temp }}
+          path: ${{ runner.temp }}/job-status
+          pattern: job-status-*
+          merge-multiple: true
 
       - name: Summarize jobs status
         shell: bash
