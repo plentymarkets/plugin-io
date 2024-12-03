@@ -2,6 +2,7 @@
 
 namespace IO\Api\Resources;
 
+use IO\Services\TemplateConfigService;
 use Plenty\Modules\Webshop\ItemSearch\Helpers\ResultFieldTemplate;
 use Plenty\Modules\Webshop\ItemSearch\SearchPresets\SingleItem;
 use Plenty\Modules\Webshop\ItemSearch\SearchPresets\VariationList;
@@ -55,9 +56,11 @@ class VariationResource extends ApiResource
 
         $resultFieldTemplate = $this->request->get('resultFieldTemplate', '');
         if (strlen($resultFieldTemplate)) {
+            /** @var TemplateConfigService $templateConfigService */
+            $templateConfigService = pluginApp(TemplateConfigService::class);
             $searchFactory->withResultFields(
                 ResultFieldTemplate::load('Webshop.ResultFields.' . $resultFieldTemplate)
-            );
+            )->withReducedManufacturerData($templateConfigService->get('item.manufacturer_data', 'all'));
         }
 
         $variations = $itemSearchService->getResults($searchFactory);
