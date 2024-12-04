@@ -98,8 +98,7 @@ class CategoryService
         ContactRepositoryContract $contactRepository,
         UrlBuilderRepositoryContract $urlBuilderRepository,
         WebshopCategoryRepositoryContract $webshopCategoryRepositoryContract
-    )
-    {
+    ) {
         $this->categoryRepository = $categoryRepository;
         $this->webstoreConfigurationRepository = $webstoreConfigurationRepository;
         $this->authGuard = $authGuard;
@@ -141,7 +140,7 @@ class CategoryService
         while ($cat !== null) {
             $this->currentCategoryTree[$cat->level] = $cat;
 
-            if($cat->parentCategoryId != null){
+            if ($cat->parentCategoryId != null) {
                 $cat = $this->webshopCategoryRepository->get($cat->parentCategoryId, $lang, $this->webstoreId);
             } else {
                 $cat = null;
@@ -168,7 +167,7 @@ class CategoryService
      */
     public function get($catID = 0, $lang = null)
     {
-        if(is_null($catID) || strlen($catID) == 0) {
+        if (is_null($catID) || strlen($catID) == 0) {
             return null;
         }
 
@@ -467,39 +466,14 @@ class CategoryService
         string $lang = null,
         int $maxLevel = 2,
         int $customerClassId = 0
-    ): array
-    {
-        if (is_array($type) && count($type) === 0) {
-            return [];
-        }
-
-        if ($lang === null) {
-            $lang = Utils::getLang();
-        }
-
-        if (is_null($type)) {
-            $type = CategoryType::ALL;
-        }
-
-        $tree = $this->categoryRepository->getArrayTree(
-            $type,
+    ): array {
+        return $this->webshopCategoryRepository->getNavigationTree(
+            $type ?? ['all'],
             $lang,
             $this->webstoreConfigurationRepository->getWebstoreConfiguration()->webstoreId,
             $maxLevel,
             $customerClassId,
-            function ($category) {
-                return $category['linklist'] == 'Y';
-            }
-        );
-
-        if (Utils::isContactLoggedIn() === false && Utils::isAdminPreview() === false) {
-            $tree = $this->filterVisibleCategories($tree);
-        }
-
-        $categoryDataFilter = pluginApp(CategoryDataFilter::class);
-        return $categoryDataFilter->applyResultFields(
-            $tree,
-            ResultFieldTemplate::load(ResultFieldTemplate::TEMPLATE_CATEGORY_TREE)
+            ResultFieldTemplate::TEMPLATE_CATEGORY_TREE
         );
     }
 
@@ -611,7 +585,6 @@ class CategoryService
     public function getHierarchy(int $catID = 0, bool $bottomUp = false, bool $filterCategories = false, $restoreOldValues = false): array
     {
         if ($catID > 0) {
-
             if ($restoreOldValues) {
                 $oldCategory = $this->currentCategory;
                 $oldCategoryTree = $this->currentCategoryTree;
@@ -821,12 +794,11 @@ class CategoryService
         $loggedIn = Utils::isContactLoggedIn();
         $result = array_filter(
             $categoryList,
-
             function ($category) use ($types, $loggedIn) {
                 return in_array(
-                        $category->type,
-                        $types
-                    ) && ($category->right !== 'customer' || $loggedIn || Utils::isAdminPreview());
+                    $category->type,
+                    $types
+                ) && ($category->right !== 'customer' || $loggedIn || Utils::isAdminPreview());
             }
         );
 
