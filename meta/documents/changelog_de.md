@@ -1,5 +1,12 @@
 # Release Notes für IO
 
+## v5.0.72 (2024-XX-XX) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.71...5.0.72" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
+
+### Behoben
+
+- Der Standardwert für die Einstellung **Gültigkeit der URLs zum Ändern von Passwort bzw. E-Mail-Adresse** funktioniert wie angezeigt auch nach 1 Stunde.
+
+
 ## v5.0.71 (2024-12-12) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.70...5.0.71" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
 
 ### Hinzugefügt
