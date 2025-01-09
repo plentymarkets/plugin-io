@@ -31,7 +31,8 @@ class UserDataHashService
     public function __construct(DataBase $dataBase, TemplateConfigService $templateConfigService)
     {
         $this->db = $dataBase;
-        $this->defaultTTL = $templateConfigService->getInteger('global.user_data_hash_max_age', 24);
+        $ttl = $templateConfigService->getInteger('global.user_data_hash_max_age', 1);
+        $this->defaultTTL = $ttl == -1 ? 168 : $ttl;
     }
 
     /**

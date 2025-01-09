@@ -28,6 +28,7 @@ jobs:
       WORKSPACE: ${{ github.workspace }}
       INC_DIR: ${{ github.workspace }}/pl/packages/plentymarkets/plugin-test-suite/tests/includes
       TEST_SUITE_DIR: ${{ github.workspace }}/pl/packages/plentymarkets/plugin-test-suite
+      AWS_SUPPRESS_PHP_DEPRECATION_WARNING: true
 
       # Database variables
       DB_HOST: "127.0.0.1"
