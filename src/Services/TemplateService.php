@@ -224,7 +224,7 @@ class TemplateService
 
         $dynamicInheritSorting = $templateConfigRepository->get('sorting.dynamicInherit', []);
         if (is_string($dynamicInheritSorting)) {
-            $dynamicInheritSorting = explode(',' , $dynamicInheritSorting);
+            $dynamicInheritSorting = explode(',', $dynamicInheritSorting);
         }
 
         if (is_array($dynamicInheritSorting) && in_array($sorting, $dynamicInheritSorting)) {
@@ -245,5 +245,14 @@ class TemplateService
         }
 
         return false;
+    }
+
+    /**
+     * Check if the current template is the register template
+     * @return bool
+     */
+    public function isRegister(): bool
+    {
+        return ShopUrls::is(RouteConfig::REGISTER);
     }
 }

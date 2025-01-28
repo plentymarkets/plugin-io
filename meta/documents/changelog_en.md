@@ -2,6 +2,10 @@
 
 ## v5.0.72 (2024-XX-XX) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.71...5.0.72" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
 
+### Added
+
+- Added the `isRegister` method to verify if the current route corresponds to the registration page.
+
 ### Behoben
 
 - The default value for the option **Validity of URLs to change password and email address** works now with the same value like its displayed. The default value is 1 hour.
@@ -59,7 +63,7 @@
 
 - Errors related to the "Already paid" payment method were fixed.
 - Error messages related to PHP 8.2 were fixed
-  
+
 ## v5.0.59 (2023-02-23) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.57...5.0.59" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
 
 ### Fixed
@@ -123,7 +127,7 @@
 
 ### Changed
 
-- The setting **Forward to login page after clicking link in order confirmation** has been removed from the plentyShop LTS settings and the plentyShop assistant. Now, the default behaviour is that customers are always forwarded to the login page. 
+- The setting **Forward to login page after clicking link in order confirmation** has been removed from the plentyShop LTS settings and the plentyShop assistant. Now, the default behaviour is that customers are always forwarded to the login page.
 
 ### Fixed
 
@@ -185,7 +189,7 @@
 ### Fixed
 
 - Under certain circumstances the wish list did not display all relevant items for customers who were logged in. This has been fixed.
-- Executing the session REST call now also detects the language in order to ensure that ShopBooster works properly for multilingual shops.  
+- Executing the session REST call now also detects the language in order to ensure that ShopBooster works properly for multilingual shops.
 
 ## v5.0.44 (2021-12-27) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.43...5.0.44" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
 
@@ -206,7 +210,7 @@
 
 - The meta data for files in the webspace are now collected from the plentymarkets core, which leads to an improved TTFB.
 - Additional category data is now loaded via the lazyloader, in order to reduce database traffic.
-- The performance of data procurement for linked variations in ShopBuilder has been improved. 
+- The performance of data procurement for linked variations in ShopBuilder has been improved.
 
 ### Fixed
 
@@ -248,7 +252,7 @@
 
 ### Changed
 
-- For the changing of payment methods, the `accessKey` for the order is now also passed. 
+- For the changing of payment methods, the `accessKey` for the order is now also passed.
 
 ## v5.0.37 (2021-08-17) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.36...5.0.37" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
 
@@ -283,16 +287,16 @@
 
 ## v5.0.33 (2021-06-014) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.32...5.0.33" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
 
-### Added 
+### Added
 
-- The method `getVariations` in the ItemService can now overwrite the result fields of the search result via a parameter. 
+- The method `getVariations` in the ItemService can now overwrite the result fields of the search result via a parameter.
 
 ### Fixed
 
 - Components of item sets now contain values in order characteristics of the type selection.
 - Due to an error, shipping costs were displayed incorrectly on the order confirmation page. This has been fixed.
-- An order's date of creation was not updated on the order confirmation page and in the My Account area if it had been changed in the backend. This has been fixed. 
- 
+- An order's date of creation was not updated on the order confirmation page and in the My Account area if it had been changed in the backend. This has been fixed.
+
 ## v5.0.32 (2021-06-01) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.30...5.0.32" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
 
 ### Added
@@ -315,14 +319,14 @@
 
 - ShopBooster now also caches pages with query parameters.
 
-### Changed 
+### Changed
 
 - The performance of the detection of the current page type has been improved.
 
 ## v5.0.28 (2021-04-20) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.26...5.0.28" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
 
 - The routing for 404 pages returned the wrong HTTP status code. This behaviour has been fixed.
-- Payment method dependent surcharges and rebates are now taken into account if the payment method of an already existing order is changed.  
+- Payment method dependent surcharges and rebates are now taken into account if the payment method of an already existing order is changed.
 - Under certain circumstances, the currency was displayed incorrectly in the order overview in the My Account section. This behaviour has been fixed.
 
 ### Changed
@@ -347,7 +351,7 @@
 
 - In the checkout, the existing shopping cart is no longer emptied, but replaced by a new empty one instead. This speeds up order creation especially for bigger shopping carts.
 
-### Fixed 
+### Fixed
 
 - In case the routes /login and /register were not linked to a category, they were not listed in the sitemap. This has been fixed.
 - When linking a category, the 404 route wasn't identified correctly. This has been fixed.
@@ -355,7 +359,7 @@
 
 ## v5.0.23 (2021-02-22) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.22...5.0.23" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
 
-### Added 
+### Added
 
 - The item list widget now contains the option to create a list that contains items from the entire range of products.
 
@@ -363,7 +367,7 @@
 
 - The sorting of countries of delivery is now rendered server-side.
 
-### Fixed 
+### Fixed
 
 - Login pages that were not created with the ShopBuilder did not have a canonical tag. This behaviour has been fixed.
 
@@ -383,7 +387,7 @@
 
 - The email attachment widget was added to the ShopBuilder. The widget makes it possible to attach files to emails that are sent via the contact form.
 
-### Fixed 
+### Fixed
 
 - Opening single item views in categories without items could lead to errors in the ShopBuilder. This behaviour has been fixed.
 - Due to an error, empty values could not be saved for individual input fields of existing addresses. This behaviour has been fixed.
@@ -391,7 +395,7 @@
 
 ## v5.0.20 (2021-01-19) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.19...5.0.20" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
 
-### Fixed 
+### Fixed
 
 - The information text for export deliveries has not been displayed correctly since 01 January 2021. This behaviour has been fixed.
 - The returns history displayed shipping costs as items. This behaviour has been fixed.
@@ -400,11 +404,11 @@
 
 ### Changed
 
-- In order to improve webshop performance, the caching time of the shop URLs that are linked in the ShopBuilder settings, which was introduced in version 5.0.7, has been increased from 5 minutes to 10 minutes. 
+- In order to improve webshop performance, the caching time of the shop URLs that are linked in the ShopBuilder settings, which was introduced in version 5.0.7, has been increased from 5 minutes to 10 minutes.
 
 ## v5.0.18 (2021-01-04) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.17...5.0.18" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
 
-### Added 
+### Added
 
 - You can now determine the search operator of the online shop search in the Ceres assistant. You can either select an **And** or an **Or** operator.
 
@@ -435,7 +439,7 @@
 
 ### Fixed
 
-- Rounding prices with more than 2 decimal places could lead to errors. This has been fixed. 
+- Rounding prices with more than 2 decimal places could lead to errors. This has been fixed.
 - The properties of the initially displayed variations of item sets were not loaded correctly. This has been fixed.
 - Under certain circumstances, accessing the order confirmation page could lead to error notifications in the log. This has been fixed.
 - The ShopBuilder did not display all sample data of an item, if this data had the value 0. This has been fixed.
@@ -457,7 +461,7 @@
 
 ## v5.0.13 (2020-09-28) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.12...5.0.13" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
 
-### Added 
+### Added
 
 - The class `ShopUrls` now includes the function `isLegalPage`. This function states whether the current page is a legal page, such as the cancellation rights or the terms and conditions.
 
@@ -531,7 +535,7 @@
 
 ## v5.0.6 (2020-07-21) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.5...5.0.6" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
 
-### Fixed 
+### Fixed
 
 - Search suggestions also included categories that were not visible for the current client. This behaviour has been fixed.
 - URL redirections in the online store are now executed with the HTTP status code 301. Priorly, redirections had been executed with the HTTP status code 302.
@@ -567,7 +571,7 @@
 
 - We improved performance during the completion of orders.
 
-### Fixed 
+### Fixed
 
 - When a customer accessed a page for changing their email address or password that had been created with the ShopBuilder, the customer was not automatically logged out. As a result, input fields were not visible. This has been fixed.
 - If a user was already logged in, additional attempts to log into the online store could, under certain circumstances, lead to the deletion of addresses. This behaviour has been fixed.
@@ -579,7 +583,7 @@
 
 - The deprecated route **/io/facets** and the corresponding resource **FacetResource** have been removed from the plugin.
 
-### Fixed 
+### Fixed
 
 - Returns pages that are created via the ShopBuilder are now correctly displayed, even if the setting **Category routes** in IO is inactive.
 - Pages which display success, error, or warning notifications are no longer written into the cache by the ShoBooster.
@@ -607,11 +611,11 @@
 
 ### Fixed
 
-- The registration and contact forms could not be sent if Google reCAPTCHA and the Ceres setting **Block unaccepted cookies** were active and the user had not yet accepted the reCAPTCHA cookie. This behaviour has been fixed. 
+- The registration and contact forms could not be sent if Google reCAPTCHA and the Ceres setting **Block unaccepted cookies** were active and the user had not yet accepted the reCAPTCHA cookie. This behaviour has been fixed.
 
 ## v4.6.3 (2020-02-24) <a href="https://github.com/plentymarkets/plugin-io/compare/4.6.2...4.6.3" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
 
-### Fixed 
+### Fixed
 
 - Properties are now included again in the item data for all view. Property data had previously been removed from all views except the single item view.
 
@@ -634,7 +638,7 @@
 
 - Google reCAPTCHA is now only carried out after the online store user accepts the corresponding cookies. Forms that are subject to reCAPTCHA, such as the contact form or the customer registration, can therefore only be sent after the user's consent.
 
-### Added 
+### Added
 
 - You can now add a reference numeral for customers when creating orders.
 - The assistant now contains a setting via which you can activate the VAT number verification for the checkout, the creation of new addresses and changes to existing addresses.
@@ -648,7 +652,7 @@
 - The live shopping widget now displays an offer as ended if the corresponding item's stock is limited to net stock and the stock is depleted.
 - If a Google reCAPTCHA-related error occurs, a corresponding error notification is displayed.
 
-### Fixed 
+### Fixed
 
 - A permanent dependency to the Ceres plugin has been removed.
 - Updating the number of items in the shopping cart did not remove redeemed coupons with minimum order value. This behaviour has been fixed.
@@ -661,13 +665,13 @@
 
 ## v4.5.1 (2020-01-28) <a href="https://github.com/plentymarkets/plugin-io/compare/4.5.0...4.5.1" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
 
-### Fixed 
+### Fixed
 
 - Order documents of guest account orders can now be accessed again via the link in the order confirmation.
 
 ## v4.5.0 (2019-12-19) <a href="https://github.com/plentymarkets/plugin-io/compare/4.4.3...4.4.0" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
 
-### Added 
+### Added
 
 - The Ceres assistant now includes settings for the variation selection, with which the "Please select" option can be added and preselected.
 - The route `/rest/io/categorytree/children` has been added. It serves to return subcategories of a category.
@@ -687,34 +691,34 @@
 
 ## v4.4.3 (2019-11-29) <a href="https://github.com/plentymarkets/plugin-io/compare/4.4.2...4.4.3" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
 
-### Fixed 
+### Fixed
 
 - Due to an error, ShopBooster was unable to write item category pages to the cache. This has been fixed.
 
 ## v4.4.2 (2019-11-28) <a href="https://github.com/plentymarkets/plugin-io/compare/4.4.1...4.4.2" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
 
-### Fixed 
+### Fixed
 
 - Due to an error, ShopBooster was unable to write item category pages to the cache. This has been fixed.
 
 ## v4.4.1 (2019-11-19) <a href="https://github.com/plentymarkets/plugin-io/compare/4.4.0...4.4.1" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
 
-### Fixed 
+### Fixed
 
 - Due to an error, order characteristics were not displayed in the shopping cart and the checkout and were not included in the order. This behaviour has been fixed.
 
 ## v4.4.0 (2019-11-14) <a href="https://github.com/plentymarkets/plugin-io/compare/4.3.4...4.4.0" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
 
-### Added 
+### Added
 
 - The ShopBuilder now enables the display of properties of the type **file** in the single item view.
 
-### Changed 
+### Changed
 
 - During the completion of the order, the required item data is now loaded from the database in order to reduce susceptibility to errors.
 - The event **AfterBasketChanged** now also contains basketItems.
 
-### Fixed 
+### Fixed
 
 - If an order was split via an event procedure, an incorrect order was displayed in the order confirmation. This has been fixed.
 - Items for which the setting **Promotional coupon/POS discount: Purchasable with coupon only** is active can no longer be bought if no promotional coupon has been redeemed.
@@ -741,7 +745,7 @@
 
 - In order to use IO 4.3.3, you need to update the plugin Ceres to its current version 4.3.4.
 
-### Fixed 
+### Fixed
 
 - The ShopBuilder displayed a 404 page if a category was linked as the returns page. This has been fixed.
 - Due to an error, the order confirmation page was not displayed if a ShopBuilder category with the URL slug "/confirmation" was created and linked.
@@ -766,7 +770,7 @@
 
 ## v4.3.0 (2019-09-26) <a href="https://github.com/plentymarkets/plugin-io/compare/4.2.0...4.3.0" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
 
-### Added 
+### Added
 
 - Guest accounts can now return orders.
 - We added the link button widget to the ShopBuilder. It serves to provide buttons that link to returns and shipment tracking.
@@ -781,9 +785,9 @@
 - The REST route `io/itemWishList` now returns the entire item data of variations in the wish list instead of the variation IDs.
 - The shopping cart data now contains the IDs of variations in the wish list.
 - The ShopBooster now also caches the wish list view.
-- If a customer unsubscribes from a newsletter, they now only unsubscribe from one newsletter, depending on the link they followed. Previously, a customer unsubscribed from all newsletters at once. 
+- If a customer unsubscribes from a newsletter, they now only unsubscribe from one newsletter, depending on the link they followed. Previously, a customer unsubscribed from all newsletters at once.
 
-### Fixed 
+### Fixed
 
 - The dynamic grouping of variations now considers the result fields correctly and no longer loads unnecessary data.
 - The amount of properties per group that can be used as placeholders in the ShopBuilder is no longer limited to 50.
