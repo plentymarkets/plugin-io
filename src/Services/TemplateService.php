@@ -253,6 +253,8 @@ class TemplateService
      */
     public function isRegister(): bool
     {
-        return ShopUrls::is(RouteConfig::REGISTER);
+        /** @var ShopUrls $shopUrls */
+        $shopUrls = pluginApp(ShopUrls::class);
+        return $shopUrls->is(RouteConfig::REGISTER);
     }
 }
