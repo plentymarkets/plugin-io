@@ -95,7 +95,7 @@ class DetectLanguage extends Middleware
 
         /** @var TemplateConfigService $templateConfigService */
         $templateConfigService = pluginApp(TemplateConfigService::class);
-        $enabledCurrencies = explode(', ', $templateConfigService->get('currency.available_currencies'));
+        $enabledCurrencies = explode(', ', $templateConfigService->get('currency.available_currencies') ?? '');
         $currency = $webstoreConfiguration->defaultCurrencyList[$language];
         if (!is_null($currency) && (in_array(
                     $currency,
