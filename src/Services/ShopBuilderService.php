@@ -50,7 +50,7 @@ class ShopBuilderService
         if ($categoryId > 0) {
             $options = [
                 'containerName' => 'ShopBuilder::Category.' . $categoryId,
-                'type' => 'content',
+                // 'type' => 'content', // For now, rteturn contents of all types here
                 'pluginSetId' => $this->pluginSetId,
                 'language' => $this->lang,
                 'active' => 1
