@@ -26,7 +26,6 @@ class ShopBuilderService
     /** @var AuthHelper */
     private $authHelper;
 
-
     private $pluginSetId = 0;
     private $lang = "de";
 
@@ -91,6 +90,28 @@ class ShopBuilderService
         }
 
         return $markup;
+    }
+    public function getContentUpdatedAt($categoryId)
+    {
+        if ($categoryId > 0) {
+            $options = [
+                'containerName' => 'ShopBuilder::Category.' . $categoryId,
+                'pluginSetId' => $this->pluginSetId,
+                'language' => $this->lang,
+                'active' => 1
+            ];
+
+            $contentRepo = $this->contentRepo;
+            $contentLinks = $this->authHelper->processUnguarded(function () use ($contentRepo, $options) {
+                return $contentRepo->searchContents(200, 1, $options);
+            });
+            $entries = $contentLinks->getResult();
+
+            if (count($entries) <= 0)
+                return null;
+
+            return $entries[0]->updatedAt;
+        }
     }
 
     private function getContentMarkup($contentId = null)
