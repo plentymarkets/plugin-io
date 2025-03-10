@@ -190,7 +190,11 @@ class ItemSearchAutocompleteService
                     ),
                     $this->getCategoryBranch($defaultCategoryId),
                     '',
-                    0
+                    0,
+                    $itemImageFilter->getFirstItemImageAlt(
+                        $variation['data']['images'],
+                        'urlPreview'
+                    ),
                 );
             }
         }
@@ -274,17 +278,26 @@ class ItemSearchAutocompleteService
      * @param string $beforeLabel
      * @param string $afterLabel
      * @param int $count
+     * @param string $imageAlt
      * @return array
      */
-    private function buildResult($label, $image, $url, $beforeLabel, $afterLabel, $count)
-    {
+    private function buildResult(
+        string $label,
+        string $image,
+        string $url,
+        string $beforeLabel,
+        string $afterLabel,
+        int $count,
+        string $imageAlt = ''
+    ) {
         return [
-            'label' => $label,
-            'image' => $image,
-            'url' => $url,
-            'beforeLabel' => $beforeLabel,
-            'afterLabel' => $afterLabel,
-            'count' => $count
+            'label'         => $label,
+            'image'         => $image,
+            'url'           => $url,
+            'beforeLabel'   => $beforeLabel,
+            'afterLabel'    => $afterLabel,
+            'count'         => $count,
+            'imageAlt'      => $imageAlt
         ];
     }
 

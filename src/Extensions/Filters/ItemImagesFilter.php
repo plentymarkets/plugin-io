@@ -95,4 +95,14 @@ class ItemImagesFilter extends AbstractFilter
 
         return '';
     }
+
+    public function getFirstItemImageAlt($images, $imageAccessor = 'url'): string
+    {
+        $itemImage = $this->getFirstItemImage($images, $imageAccessor);
+        if ($itemImage !== null && $itemImage['alternate'] !== null) {
+            return $itemImage['alternate'];
+        };
+
+        return '';
+    }
 }
