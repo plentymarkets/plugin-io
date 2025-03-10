@@ -239,7 +239,8 @@ class ItemSearchAutocompleteService
                             ),
                             $this->getCategoryBranch($categoryData->id),
                             '',
-                            $count
+                            $count,
+                            ''
                         );
                     }
                 }
@@ -264,7 +265,8 @@ class ItemSearchAutocompleteService
                     '',
                     '',
                     '',
-                    $count
+                    $count,
+                    ''
                 );
             }
         }
