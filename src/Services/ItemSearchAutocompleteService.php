@@ -283,15 +283,8 @@ class ItemSearchAutocompleteService
      * @param string $imageAlt
      * @return array
      */
-    private function buildResult(
-        string $label,
-        string $image,
-        string $url,
-        string $beforeLabel,
-        string $afterLabel,
-        int $count,
-        string $imageAlt = ''
-    ) {
+    private function buildResult($label, $image, $url, $beforeLabel, $afterLabel, $count, $imageAlt)
+    {
         return [
             'label'         => $label,
             'image'         => $image,
