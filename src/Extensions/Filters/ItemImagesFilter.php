@@ -31,7 +31,8 @@ class ItemImagesFilter extends AbstractFilter
         return [
             'itemImages' => 'getItemImages',
             'firstItemImage' => 'getFirstItemImage',
-            'firstItemImageUrl' => 'getFirstItemImageUrl'
+            'firstItemImageUrl' => 'getFirstItemImageUrl',
+            'firstItemImageAlt' => 'getFirstItemImageAlt'
         ];
     }
 
