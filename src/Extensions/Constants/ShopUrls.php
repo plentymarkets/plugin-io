@@ -388,7 +388,7 @@ class ShopUrls
             $key .= '.' . implode('.', $routeParams) . '.' . json_encode($urlParams);
         }
 
-        if (strlen($overrideUrl)) {
+        if (is_string($overrideUrl) && strlen($overrideUrl)) {
             $key .= '.' . $overrideUrl;
         }
 
@@ -423,7 +423,7 @@ class ShopUrls
         );
     }
 
-    private function applyParams($url, $routeParams, $urlParams)
+    private function applyParams($url, $routeParams, $urlParams): string
     {
         $routeParam = array_shift($routeParams);
         while (!is_null($routeParam) && strlen($routeParam)) {
