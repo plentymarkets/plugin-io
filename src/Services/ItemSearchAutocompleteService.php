@@ -168,7 +168,7 @@ class ItemSearchAutocompleteService
                 }
 
                 // Naturwohnen not shown
-                if(strpos($brand['externalName'], 'Naturwohnen') !== false)
+                if(strpos($brand['name'], 'Naturwohnen') !== false)
                 {
                     continue;
                 }
