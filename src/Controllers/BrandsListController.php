@@ -25,6 +25,24 @@ class BrandsListController extends LayoutController
 
     public function showBrandsList($category = null)
     {
+
+        // Check for ?marke request in url.. 
+        $request = pluginApp(Request::class);
+        $marke = $request->get('marke', null);
+        if($marke && intval($marke) > 0) {
+            $url = $this->getManufacturerUrl($marke);
+            if($url) {
+                // Redirect to the manufacturer URL
+                $this->getLogger(__CLASS__)->error("Redirect Brand",
+                [
+                    "url" => $url,
+                    "manufacturerId" => $marke
+                ]);
+                return $this->urlService->redirectTo($url);
+            }
+        }
+
+
         $authHelper = pluginApp(AuthHelper::class);
         $manufacturerRepo = pluginApp(ManufacturerRepositoryContract::class);
 
@@ -53,17 +71,13 @@ class BrandsListController extends LayoutController
                 
                 // Check & optionally regenerate URL
                 // If the URL is empty or contains "http", we need to regenerate it.
-                $brandUrl = $manufacturer['url'];
-                if (empty($brandUrl) || strpos($brandUrl, 'http')) {
-                    // Regenerate the internal URL if any of the checks fail.
-                    $this->regenerateBrandUrl($manufacturer);
-                }
-
+                $url = $this->checkManufacturerUrl($manufacturer);
+               
                 $newManufacturerDataset = [
                     'id' => $manufacturer['id'],
                     'name' => StringUtils::removeSpecialChars($manufacturer['externalName']),
                     'logo' => $manufacturer['logo'],
-                    'url' => $manufacturer['url'],
+                    'url' => $url,
                     'position' => $manufacturer['position']
                 ];
             
@@ -107,7 +121,6 @@ class BrandsListController extends LayoutController
             $shopBuilderRequest->setMainCategory($category->id);     
         }
 
-        $request = pluginApp(Request::class);
         return $this->renderTemplate(
             'tpl.brands_list',
             [
@@ -121,6 +134,15 @@ class BrandsListController extends LayoutController
             ],
             false
         );
+    }
+
+    public function checkManufacturerUrl($manufacturer)
+    {
+        $url = $manufacturer['url'];
+        if (empty($url) || strpos($url, "http") !== false) {
+            return $this->regenerateBrandUrl($manufacturer);
+        }
+        return $url;
     }
 
     public function regenerateBrandUrl($brand)
@@ -149,8 +171,32 @@ class BrandsListController extends LayoutController
                 "updatedManufacturer" => $updatedManufacturer
             ]
         );
-        return;
+        return $urlName;
     }
+
+    public function getManufacturerUrl($manufacturerId)
+    {
+        $manufacturerRepo = pluginApp(ManufacturerRepositoryContract::class);
+        $authHelper = pluginApp(AuthHelper::class);
+        $manufacturer = $authHelper->processUnguarded(
+            function () use ($manufacturerRepo, $manufacturerId) {
+                return $manufacturerRepo->findById($manufacturerId);
+            }
+        );
+
+        if (!$manufacturer) {
+            return null;
+        }
+        // Check if the URL is already set
+        $url = $this->checkManufacturerUrl($manufacturer);
+
+        if ($url) {
+            // If the URL is set, return the URL
+            return RouteConfig::BRANDS_LIST . "/" . $url . "-" . $manufacturerId . "/";
+        }
+        return null;
+    }
+
 
     public function redirect()
     {
