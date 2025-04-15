@@ -5,6 +5,7 @@ namespace IO\Services;
 use Ceres\Helper\SearchOptions;
 use IO\Extensions\Filters\ItemImagesFilter;
 use IO\Helper\Utils;
+use IO\Services\BrandSearchService;
 use Plenty\Modules\Category\Contracts\CategoryRepositoryContract;
 use Plenty\Modules\Category\Models\Category;
 use Plenty\Modules\System\Models\WebstoreConfiguration;
@@ -15,6 +16,12 @@ use Plenty\Modules\Webshop\ItemSearch\Helpers\SortingHelper;
 use Plenty\Modules\Webshop\ItemSearch\SearchPresets\SearchItems;
 use Plenty\Modules\Webshop\ItemSearch\SearchPresets\SearchSuggestions;
 use Plenty\Modules\Webshop\ItemSearch\Services\ItemSearchService;
+use Plenty\Plugin\Log\Loggable;
+use IO\Services\TemplateConfigService;
+use IO\Services\CategoryService;
+use IO\Services\TagService;
+use IO\Helper\RouteConfig;
+
 
 /**
  * Service Class ItemSearchAutocompleteService
@@ -26,6 +33,8 @@ use Plenty\Modules\Webshop\ItemSearch\Services\ItemSearchService;
  */
 class ItemSearchAutocompleteService
 {
+    use Loggable;
+    
     /** @var UrlBuilderRepositoryContract $urlBuilderRepository */
     private $urlBuilderRepository;
 
@@ -115,6 +124,15 @@ class ItemSearchAutocompleteService
         $itemSearchService = pluginApp(ItemSearchService::class);
         $results = $itemSearchService->getResults($searchFactories);
 
+        /* Manufacturer Search */
+        if(in_array('brands', $searchTypes))
+        {
+            // $searchString
+            $brandSearchService = pluginApp(BrandSearchService::class); 
+            $brandResults = $brandSearchService->getResults($searchString);
+            $results['brands'] = $brandResults;
+        }
+
         return $results;
     }
 
@@ -129,11 +147,52 @@ class ItemSearchAutocompleteService
             'item' => $this->getItems($itemSearchResult['items']['documents']),
             'category' => $this->getCategories($itemSearchResult['items']['categories.all']),
             'suggestion' => $this->getSuggestions($itemSearchResult['suggestions']['searchSuggestions']),
+            'brands' => $this->getBrands($itemSearchResult['brands'] ?? null),
             'rawData' => $itemSearchResult
         ];
 
         return $newResult;
     }
+
+    private function getBrands($brands)
+    {
+        $brandResult = [];
+        if(is_array($brands))
+        {
+            foreach($brands as $brand)
+            {   
+                // Inactive brands are not shown
+                if(substr($brand['name'], 0, 1) == '_')
+                {
+                    continue;
+                }
+
+                // Naturwohnen not shown
+                if(strpos($brand['externalName'], 'Naturwohnen') !== false)
+                {
+                    continue;
+                }
+                
+                $brandDataset = [
+                    'id' => $brand['id'],
+                    'externalName' => $brand['externalName'],
+                    'logo' => $brand['logo'],
+                    'url' => RouteConfig::BRANDS_LIST."/" . $brand['url']."-".$brand['id'] . "/"
+                ];
+
+                $brandResult[] = $this->buildResult(
+                    $brandDataset['externalName'],
+                    $brandDataset['logo'],
+                    $brandDataset['url'],
+                    '',
+                    '',
+                    0
+                );
+            }   
+        }
+        return $brandResult;
+    }
+
 
     /**
      * @param array $items
