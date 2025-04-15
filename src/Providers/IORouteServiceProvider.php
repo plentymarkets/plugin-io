@@ -359,6 +359,16 @@ class IORouteServiceProvider extends RouteServiceProvider
         // deprecated / not in use anymore!
         $router->get('wishlist/{wishlistId}', 'IO\Controllers\ItemWishListController@showWishListDetail')->where('wishlistId', '[0-9]+');
 
+        // BRAND LIST
+        $router->get(RouteConfig::BRANDS_LIST . "/{brandSlug}", 'IO\Controllers\BrandsListController@showBrand');
+        $this->registerRedirectedRoute(
+            $router,
+            RouteConfig::BRANDS_LIST,
+            $shopUrls->brandsList,
+            'IO\Controllers\BrandsListController@showBrandsList',
+            'IO\Controllers\BrandsListController@redirect'
+        );
+
         // ITEM ROUTES
         if (RouteConfig::isActive(RouteConfig::ITEM)) {
             $router->get('{itemId}_{variationId?}', 'IO\Controllers\ItemController@showItemWithoutName')
@@ -385,6 +395,7 @@ class IORouteServiceProvider extends RouteServiceProvider
                 ->where('tagName', '[^\/]*')
                 ->where('tagId', '[0-9]+');
         }
+
 
         // CATEGORY ROUTES
         if (RouteConfig::isActive(RouteConfig::CATEGORY)) {

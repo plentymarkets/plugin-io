@@ -136,4 +136,15 @@ class StringUtils
 
         return $s;
     }
+
+    public static function removeSpecialChars($str)
+    {
+        // $str = str_replace("&", " und ", $str);
+        // $str = str_replace("'", "", $str);
+        // $str = str_replace('"', "", $str);
+        // $str = str_replace('&quot;', "", $str);
+        // $str = htmlspecialchars($str, ENT_QUOTES, 'UTF-8');
+        $str = htmlentities($str);
+        return $str;
+    }
 }

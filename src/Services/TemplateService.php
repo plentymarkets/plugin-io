@@ -156,6 +156,15 @@ class TemplateService
         $shopUrls = pluginApp(ShopUrls::class);
         return $shopUrls->is(RouteConfig::SEARCH) || $shopUrls->is(RouteConfig::TAGS);
     }
+    /**
+     * Check if the current template is the search template
+     * @deprecated Use ShopUrls::is(RouteConfig::BRANDS_LIST) instead
+     */
+    public function isBrandsList(): bool
+    {
+        $shopUrls = pluginApp(ShopUrls::class);
+        return $shopUrls->is(RouteConfig::BRANDS_LIST);
+    }
 
     /**
      * Check if the current template is the category template

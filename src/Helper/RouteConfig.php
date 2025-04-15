@@ -3,7 +3,7 @@
 namespace IO\Helper;
 
 use Plenty\Plugin\ConfigRepository;
-
+use IO\Helper\Utils;
 /**
  * Class RouteConfig
  *
@@ -76,7 +76,10 @@ class RouteConfig
     const PAGE_NOT_FOUND = "page-not-found";
     /** @var string Represents the tags route */
     const TAGS = "tags";
-
+    /** @var string Represents the brands list */
+    const BRANDS_LIST = "markenwelt";
+    const BRAND_LIST = "markenwelt";
+ 
     /** @var string[] Represents all routes */
     const ALL = [
         self::BASKET,
@@ -107,7 +110,8 @@ class RouteConfig
         self::TAGS,
         self::TERMS_CONDITIONS,
         self::WISH_LIST,
-        self::PAGE_NOT_FOUND
+        self::PAGE_NOT_FOUND,
+        self::BRANDS_LIST
     ];
 
     /** @var array $enabledRoutes Contains all active routes */

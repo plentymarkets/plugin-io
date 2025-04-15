@@ -189,6 +189,14 @@ class CategoryController extends LayoutController
             return $myAccountController->showMyAccount($category);
         }
 
+        if (RouteConfig::getCategoryId(RouteConfig::BRANDS_LIST) === $category->id || $shopBuilderRequest->getPreviewContentType() === 'brandslist') {
+            RouteConfig::overrideCategoryId(RouteConfig::BRANDS_LIST, $category->id);
+
+            /** @var MyAccountController $myAccountController */
+            $brandsListController = pluginApp(BrandsListController::class);
+            return $brandsListController->showBrandsList($category);
+        }
+
         if (RouteConfig::getCategoryId(RouteConfig::SEARCH) === $category->id || $shopBuilderRequest->getPreviewContentType() === 'itemsearch') {
             $this->getLogger(__CLASS__)->info(
                 "IO::Debug.CategoryController_showMyAccountCategory",

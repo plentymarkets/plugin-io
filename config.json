@@ -191,6 +191,12 @@
                     "label": "Config.routingCategoryPageNotFound",
                     "options": {}
                 },
+                "routing.category_markenwelt": {
+                    "type": "categoryPicker",
+                    "required": false,
+                    "label": "Config.routingBrandsList",
+                    "options": {}
+                },
                 "routing.enabled_routes": {
                     "type": "multiCheckBox",
                     "required": false,
@@ -313,6 +319,10 @@
                             {
                                 "value": "tags",
                                 "caption": "Config.routingEnabledRoutesPossibleValueTags"
+                            },
+                            {
+                                "value": "markenwelt",
+                                "caption": "Config.routingEnabledRoutesPossibleValueBrandsList"
                             }
                         ]
                     }

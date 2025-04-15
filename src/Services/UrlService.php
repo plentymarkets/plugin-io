@@ -12,6 +12,7 @@ use Plenty\Modules\Webshop\Contracts\LocalizationRepositoryContract;
 use Plenty\Modules\Webshop\Contracts\WebstoreConfigurationRepositoryContract;
 use Plenty\Plugin\Http\Request;
 use Plenty\Plugin\Http\Response;
+use IO\Services\CategoryService;
 
 /**
  * Service Class UrlService
@@ -38,7 +39,6 @@ class UrlService
     {
         $this->webstoreConfigurationRepository = $webstoreConfigurationRepository;
     }
-
     /**
      * Get canonical URL for a category
      * @param int $categoryId A category id to get the URL for
@@ -158,8 +158,16 @@ class UrlService
                             ->getCategoryURL($currentCategory->id, $lang)
                             ->toAbsoluteUrl($includeLanguage);
                     } elseif (substr(TemplateService::$currentTemplate, 0, 11) === 'tpl.search') {
-                        return pluginApp(UrlQuery::class, ['path' => RouteConfig::SEARCH, 'lang' => $lang])
-                        ->toAbsoluteUrl($includeLanguage);
+                        // BRAND search
+                        if(isset(TemplateService::$currentTemplateData['manufacturer']) && !is_null(TemplateService::$currentTemplateData['manufacturer'])) {
+                            $manufacturer = TemplateService::$currentTemplateData['manufacturer'];
+                            $url = $manufacturer['url'] ?? "";
+                            $baseUrl = RouteConfig::BRANDS_LIST;
+                            $path = ($url !== "") ? ($baseUrl . "/" . $url . "-" . TemplateService::$currentTemplateData['manufacturerId'] . "/") : $baseUrl;
+                            return pluginApp(UrlQuery::class, ['path' => $path, 'lang' => $lang])->toAbsoluteUrl($includeLanguage);
+                        }
+                        // "std" search
+                        return pluginApp(UrlQuery::class, ['path' => RouteConfig::SEARCH, 'lang' => $lang])->toAbsoluteUrl($includeLanguage);
                     }
 
                     return null;

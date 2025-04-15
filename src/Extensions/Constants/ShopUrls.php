@@ -167,6 +167,10 @@ class ShopUrls
      * @var string Relative URL of the form to unsubscribe from a newsletter.
      */
     public $newsletterOptOut = '';
+    /**
+     * @var string BrandsList URL
+     */
+    public $brandsList = '';
 
     /**
      * @var string Get a preview URL for an order document.
@@ -232,6 +236,7 @@ class ShopUrls
             $this->changeMail = $dataForCache['changeMail'] = $this->getShopUrl(RouteConfig::CHANGE_MAIL, $lang);
             $this->newsletterOptOut = $dataForCache['newsletterOptOut'] = $this->getShopUrl(RouteConfig::NEWSLETTER_OPT_OUT, $lang);
             $this->orderDocument = $dataForCache['orderDocument'] = $this->getShopUrl(RouteConfig::ORDER_DOCUMENT);
+            $this->brandsList = $dataForCache['brandsList'] = $this->getShopUrl(RouteConfig::BRANDS_LIST);
 
             Utils::putCacheKey('shopUrls_' . $lang, $dataForCache, 10);
         }
@@ -264,6 +269,7 @@ class ShopUrls
         $this->changeMail = $dataFromCache['changeMail'];
         $this->newsletterOptOut = $dataFromCache['newsletterOptOut'];
         $this->orderDocument = $dataFromCache['orderDocument'];
+        $this->brandsList = $dataFromCache['brandsList'];
     }
 
     /**
