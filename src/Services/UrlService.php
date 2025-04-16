@@ -13,6 +13,7 @@ use Plenty\Modules\Webshop\Contracts\WebstoreConfigurationRepositoryContract;
 use Plenty\Plugin\Http\Request;
 use Plenty\Plugin\Http\Response;
 use IO\Services\CategoryService;
+use Plenty\Plugin\Log\Loggable;
 
 /**
  * Service Class UrlService
@@ -25,6 +26,7 @@ use IO\Services\CategoryService;
 class UrlService
 {
     use MemoryCache;
+    use Loggable;
 
     /** @var WebstoreConfigurationRepositoryContract $webstoreConfigurationRepository */
     private $webstoreConfigurationRepository;
@@ -145,7 +147,7 @@ class UrlService
                             ->toAbsoluteUrl($includeLanguage);
                     }
 
-                    if ($currentCategory !== null) {
+                    if ($currentCategory !== null && !isset(TemplateService::$currentTemplateData['manufacturer'])) {
                         $categoryDetails = $categoryService->getDetails($currentCategory, $lang);
 
                         if ($categoryDetails !== null && strlen(
@@ -164,7 +166,15 @@ class UrlService
                             $url = $manufacturer['url'] ?? "";
                             $baseUrl = RouteConfig::BRANDS_LIST;
                             $path = ($url !== "") ? ($baseUrl . "/" . $url . "-" . TemplateService::$currentTemplateData['manufacturerId'] . "/") : $baseUrl;
-                            return pluginApp(UrlQuery::class, ['path' => $path, 'lang' => $lang])->toAbsoluteUrl($includeLanguage);
+                            $absoluteUrl = pluginApp(UrlQuery::class, ['path' => $path, 'lang' => $lang])->toAbsoluteUrl($includeLanguage);
+
+                            $this->getLogger(__CLASS__)->error("FINAL DEBUG",
+                            [
+                                'path' => $path,
+                                '$absoluteUrl' => $absoluteUrl,
+                                'TemplateService::$currentTemplateData' => TemplateService::$currentTemplateData,
+                            ]);
+                            return $absoluteUrl;
                         }
                         // "std" search
                         return pluginApp(UrlQuery::class, ['path' => RouteConfig::SEARCH, 'lang' => $lang])->toAbsoluteUrl($includeLanguage);
