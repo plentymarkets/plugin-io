@@ -1,11 +1,15 @@
 # Release Notes für IO
 
-## v5.0.72 (2024-XX-XX) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.71...5.0.72" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
+## v5.0.72 (2024-04-16) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.71...5.0.72" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
+
+### Hinzugefügt
+
+- Die Methode `isRegister` wurde hinzugefügt, um zu überprüfen, ob die aktuelle Route der Registrierungsseite entspricht.
 
 ### Behoben
 
 - Der Standardwert für die Einstellung **Gültigkeit der URLs zum Ändern von Passwort bzw. E-Mail-Adresse** funktioniert wie angezeigt auch nach 1 Stunde.
-
+- Einzelne Funktion wurden mit PHP 8.2 Kompatibel gemacht.
 
 ## v5.0.71 (2024-12-12) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.70...5.0.71" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
 
