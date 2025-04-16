@@ -167,13 +167,6 @@ class UrlService
                             $baseUrl = RouteConfig::BRANDS_LIST;
                             $path = ($url !== "") ? ($baseUrl . "/" . $url . "-" . TemplateService::$currentTemplateData['manufacturerId'] . "/") : $baseUrl;
                             $absoluteUrl = pluginApp(UrlQuery::class, ['path' => $path, 'lang' => $lang])->toAbsoluteUrl($includeLanguage);
-
-                            $this->getLogger(__CLASS__)->error("FINAL DEBUG",
-                            [
-                                'path' => $path,
-                                '$absoluteUrl' => $absoluteUrl,
-                                'TemplateService::$currentTemplateData' => TemplateService::$currentTemplateData,
-                            ]);
                             return $absoluteUrl;
                         }
                         // "std" search
