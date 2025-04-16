@@ -1,10 +1,10 @@
-# IO – Der Grundbaustein für plentymarkets Template-Plugins
+# IO – Der Grundbaustein für PlentyONE Template-Plugins
 
-**IO** ist das offizielle Logik-Plugin für den Standard-Webshop von plentymarkets. Im neuen Webshop für plentymarkets sind Design und Logik voneinander getrennt. Der Webshop wird über zwei Plugins in deinem plentymarkets System eingebunden. Das Plugin **plentyShop LTS** beinhaltet das Standard-Design des Webshops und kann nach deinen Wünschen angepasst werden. Das Plugin **IO** beinhaltet die Webshop-Logik, stellt eine allgemeine Grundlage für alle Design-Plugins dar und kann auch von anderen Plugins verwendet werden.
+**IO** ist das offizielle Logik-Plugin für den Standard-Webshop von PlentyONE. Im neuen Webshop für PlentyONE sind Design und Logik voneinander getrennt. Der Webshop wird über zwei Plugins in deinem PlentyONE System eingebunden. Das Plugin **plentyShop LTS** beinhaltet das Standard-Design des Webshops und kann nach deinen Wünschen angepasst werden. Das Plugin **IO** beinhaltet die Webshop-Logik, stellt eine allgemeine Grundlage für alle Design-Plugins dar und kann auch von anderen Plugins verwendet werden.
 
-## IO in plentymarkets einrichten
+## IO in PlentyONE einrichten
 
-Das Plugin **IO** selbst muss nur in plentymarkets bereitgestellt werden. Hinweise zur Einrichtung von IO findest du [im plentymarkets Handbuch](https://knowledge.plentymarkets.com/de-de/manual/main/webshop/io-einrichten.html).
+Das Plugin **IO** selbst muss nur in PlentyONE bereitgestellt werden. Hinweise zur Einrichtung von IO findest du [im PlentyONE Handbuch](https://knowledge.plentymarkets.com/de-de/manual/main/webshop/io-einrichten.html).
 
 <div class="alert alert-warning" role="alert">
   Bei der Einrichtung von IO ist es zwingend notwendig, dass <b>IO</b> in der Plugin-Übersicht mit der Aktion <b>Position festlegen</b> die höchste Positionsnummer (z.B. 999) zugewiesen wird, damit sämtliche Routen des Webshops korrekt abgerufen werden.
