@@ -54,7 +54,27 @@ class BrandSearchService
         {
             return [];
         }
+
+        $brands = $searchResult->getResult()->toArray();
+        $cleanOut = [];
+        foreach($brands as $brand)
+            {   
+                // Inactive brands are not shown
+                if(substr($brand['name'], 0, 1) == '_')
+                {
+                    continue;
+                }
+
+                // Naturwohnen not shown
+                if(strpos($brand['name'], 'Naturwohnen') !== false)
+                {
+                    continue;
+                }
+
+                $cleanOut[] = $brand;
+            }
+
         // Paginated Result of Manufatcturers -> getResult() is a Collection
-        return $searchResult->getResult()->toArray();
+        return $cleanOut;
     }
 }
