@@ -126,6 +126,11 @@ class ShopUrls
     public $privacyPolicy = '';
 
     /**
+     * @var string Relative URL of the declaration of accessibility.
+     */
+    public $declarationOfAccessibility = '';
+
+    /**
      * @var string Relative URL of the registration form.
      */
     public $registration = '';
@@ -223,6 +228,7 @@ class ShopUrls
             $this->myAccount = $dataForCache['myAccount'] = $this->getShopUrl(RouteConfig::MY_ACCOUNT, $lang);
             $this->passwordReset = $dataForCache['passwordReset'] = $this->getShopUrl(RouteConfig::PASSWORD_RESET, $lang);
             $this->privacyPolicy = $dataForCache['privacyPolicy'] = $this->getShopUrl(RouteConfig::PRIVACY_POLICY, $lang);
+            $this->declarationOfAccessibility = $dataForCache['declarationOfAccessibility'] = $this->getShopUrl(RouteConfig::DECLARATION_OF_ACCESSIBILITY, $lang);
             $this->registration = $dataForCache['registration'] = $this->getShopUrl(RouteConfig::REGISTER, $lang);
             $this->search = $dataForCache['search'] = $this->getShopUrl(RouteConfig::SEARCH, $lang);
             $this->termsConditions = $dataForCache['termsConditions'] = $this->getShopUrl(RouteConfig::TERMS_CONDITIONS, $lang);
@@ -255,6 +261,7 @@ class ShopUrls
         $this->myAccount = $dataFromCache['myAccount'];
         $this->passwordReset = $dataFromCache['passwordReset'];
         $this->privacyPolicy = $dataFromCache['privacyPolicy'];
+        $this->declarationOfAccessibility = $dataFromCache['declarationOfAccessibility'];
         $this->registration = $dataFromCache['registration'];
         $this->search = $dataFromCache['search'];
         $this->termsConditions = $dataFromCache['termsConditions'];
@@ -575,7 +582,8 @@ class ShopUrls
                 RouteConfig::CANCELLATION_FORM,
                 RouteConfig::LEGAL_DISCLOSURE,
                 RouteConfig::TERMS_CONDITIONS,
-                RouteConfig::PRIVACY_POLICY
+                RouteConfig::PRIVACY_POLICY,
+                RouteConfig::DECLARATION_OF_ACCESSIBILITY
             ]
         );
     }
@@ -600,6 +608,7 @@ class ShopUrls
             case RouteConfig::ORDER_RETURN_CONFIRMATION: return $this->returnConfirmation;
             case RouteConfig::PASSWORD_RESET:       return $this->passwordReset;
             case RouteConfig::PRIVACY_POLICY:       return $this->privacyPolicy;
+            case RouteConfig::DECLARATION_OF_ACCESSIBILITY:       return $this->declarationOfAccessibility;
             case RouteConfig::REGISTER:             return $this->registration;
             case RouteConfig::SEARCH:               return $this->search;
             case RouteConfig::TERMS_CONDITIONS:     return $this->gtc;
