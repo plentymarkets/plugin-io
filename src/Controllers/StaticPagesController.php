@@ -137,6 +137,14 @@ class StaticPagesController extends LayoutController
     /**
      * @return mixed
      */
+    public function redirectDeclarationOfAccessibility()
+    {
+        return $this->redirect(RouteConfig::DECLARATION_OF_ACCESSIBILITY);
+    }
+
+    /**
+     * @return mixed
+     */
     public function redirectTermsAndConditions()
     {
         return $this->redirect(RouteConfig::TERMS_CONDITIONS);

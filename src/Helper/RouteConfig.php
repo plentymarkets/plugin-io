@@ -104,6 +104,7 @@ class RouteConfig
         self::PASSWORD_RESET,
         self::PLACE_ORDER,
         self::PRIVACY_POLICY,
+        self::DECLARATION_OF_ACCESSIBILITY,
         self::REGISTER,
         self::SEARCH,
         self::TAGS,
