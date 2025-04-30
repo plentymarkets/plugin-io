@@ -401,8 +401,8 @@ class IORouteServiceProvider extends RouteServiceProvider
         $this->registerRedirectedRoute(
             $router,
             RouteConfig::DECLARATION_OF_ACCESSIBILITY,
-            $shopUrls->privacyPolicy,
-            'IO\Controllers\StaticPagesController@showDEclarationOfAccessibility',
+            $shopUrls->declarationOfAccessibility,
+            'IO\Controllers\StaticPagesController@showDeclarationOfAccessibility',
             'IO\Controllers\StaticPagesController@redirectDeclarationOfAccessibility'
         );
 

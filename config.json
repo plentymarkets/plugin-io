@@ -259,6 +259,10 @@
                                 "caption": "Config.routingEnabledRoutesPossibleValuePrivacyPolicy"
                             },
                             {
+                                "value": "declaration-of-accessibility",
+                                "caption": "Config.routingEnabledRoutesPossibleValueDeclarationOfAccessibility"
+                            },
+                            {
                                 "value": "gtc",
                                 "caption": "Config.routingEnabledRoutesPossibleValueGtc"
                             },
