@@ -72,6 +72,15 @@ class LegalInformationService
     }
 
     /**
+     * Get the LegalInformation model for the DeclarationOfAccessibility
+     * @return LegalInformation
+     */
+    public function getDeclarationOfAccessibility(): LegalInformation
+    {
+        return $this->legalInformationRepo->find($this->plentyId, $this->lang, LegalInformation::TYPE_DECLARATION_OF_ACCESSIBILITY);
+    }
+
+    /**
      * Get the LegalInformation model for the Withdrawal Form
      * @return LegalInformation
      */

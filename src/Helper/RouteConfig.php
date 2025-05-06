@@ -64,6 +64,8 @@ class RouteConfig
     const PLACE_ORDER = "place-order";
     /** @var string Represents the privacy policy route */
     const PRIVACY_POLICY = "privacy-policy";
+    /** @var string Represents the declaration of accessibility route */
+    const DECLARATION_OF_ACCESSIBILITY = "declaration-of-accessibility";
     /** @var string Represents the register route */
     const REGISTER = "register";
     /** @var string Represents the search route */
@@ -102,6 +104,7 @@ class RouteConfig
         self::PASSWORD_RESET,
         self::PLACE_ORDER,
         self::PRIVACY_POLICY,
+        self::DECLARATION_OF_ACCESSIBILITY,
         self::REGISTER,
         self::SEARCH,
         self::TAGS,

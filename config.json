@@ -137,6 +137,12 @@
                     "label": "Config.routingCategoryLegalDisclosure",
                     "options": {}
                 },
+                "routing.category_declaration-of-accessibility": {
+                    "type": "categoryPicker",
+                    "required": false,
+                    "label": "Config.routingCategoryDeclarationOfAccessibility",
+                    "options": {}
+                },
                 "routing.category_privacy-policy": {
                     "type": "categoryPicker",
                     "required": false,
@@ -257,6 +263,10 @@
                             {
                                 "value": "privacy-policy",
                                 "caption": "Config.routingEnabledRoutesPossibleValuePrivacyPolicy"
+                            },
+                            {
+                                "value": "declaration-of-accessibility",
+                                "caption": "Config.routingEnabledRoutesPossibleValueDeclarationOfAccessibility"
                             },
                             {
                                 "value": "gtc",
