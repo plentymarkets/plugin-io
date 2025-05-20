@@ -11,7 +11,8 @@ class FacetFaker extends AbstractFaker
         "category"     => "IO::Faker.facetNameCategory",
         "dynamic"      => "IO::Faker.facetNameDynamic",
         "price"        => "IO::Faker.facetNamePrice",
-        "producer"     => "IO::Faker.facetNameManufactuer"
+        "producer"     => "IO::Faker.facetNameManufactuer",
+        "feedback"     => "IO::Faker.facetNameFeedback",
     ];
 
     public function fill($data)
