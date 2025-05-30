@@ -1048,14 +1048,7 @@ class CustomerService
             foreach ($returnOrder->order->orderItems as $orderItem) {
                 foreach ($orderItem->orderProperties as $orderProperty) {
                     if (is_array($orderProperty)) {
-                        $this->getLogger(__CLASS__)->info(
-                            "IO::Debug.CustomerService_returnIsArray",
-                            [
-                                "orderProperty" => $orderProperty,
-                                "orderItem" => $orderItem,
-                            ]
-                        );
-                        continue;
+                        $orderProperty = (object)$orderProperty;
                     }
 
                     $orderProperty->name = $propertyNameFilter->getPropertyName($orderProperty);
