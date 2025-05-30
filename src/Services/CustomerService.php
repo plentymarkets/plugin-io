@@ -1051,7 +1051,7 @@ class CustomerService
                         $orderProperty = (object)$orderProperty;
                     }
 
-                    $orderProperty->name = $propertyNameFilter->getPropertyName($orderProperty);
+                    $orderProperty->name = $propertyNameFilter->getPropertyName((array)$orderProperty);
                     if ($orderProperty->type === 'selection') {
                         $orderProperty->selectionValueName = $propertyNameFilter->getPropertySelectionValueName(
                             $orderProperty
