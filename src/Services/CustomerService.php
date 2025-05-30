@@ -1047,6 +1047,17 @@ class CustomerService
         foreach ($returnOrders->getResult() as $returnOrder) {
             foreach ($returnOrder->order->orderItems as $orderItem) {
                 foreach ($orderItem->orderProperties as $orderProperty) {
+                    if (is_array($orderProperty)) {
+                        $this->getLogger(__CLASS__)->info(
+                            "IO::Debug.CustomerService::getReturns",
+                            [
+                                "orderProperty" => $orderProperty,
+                                "orderItem" => $orderItem,
+                            ]
+                        );
+                        continue;
+                    }
+
                     $orderProperty->name = $propertyNameFilter->getPropertyName($orderProperty);
                     if ($orderProperty->type === 'selection') {
                         $orderProperty->selectionValueName = $propertyNameFilter->getPropertySelectionValueName(
