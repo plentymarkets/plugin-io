@@ -1049,7 +1049,7 @@ class CustomerService
                 foreach ($orderItem->orderProperties as $orderProperty) {
                     if (is_array($orderProperty)) {
                         $this->getLogger(__CLASS__)->info(
-                            "IO::Debug.CustomerService::getReturns",
+                            "IO::Debug.CustomerService_returnIsArray",
                             [
                                 "orderProperty" => $orderProperty,
                                 "orderItem" => $orderItem,
