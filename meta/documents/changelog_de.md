@@ -1,5 +1,11 @@
 # Release Notes für IO
 
+## v5.0.73 (2025-06-02) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.72...5.0.73" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
+
+### Hinzugefügt
+
+- Die neue Rechtstext-Seite **Barrierefreiheitserklärung** wurde hinzugefügt. Die Barrierefreiheitserklärung kann im Menü **Einrichtung » Shop » [Shop auswählen] » Rechtliches** bearbeitet werden.
+
 ## v5.0.72 (2025-04-16) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.71...5.0.72" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
 
 ### Hinzugefügt
