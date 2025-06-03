@@ -1,5 +1,11 @@
 # Release Notes für IO
 
+## v5.0.74 (2025-06-xx) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.73...5.0.74" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
+
+### Behoben
+
+- Ein Problem mit der Anzeige der Retourenhistorie wurde behoben.
+
 ## v5.0.73 (2025-06-02) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.72...5.0.73" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
 
 ### Hinzugefügt
