@@ -1047,7 +1047,11 @@ class CustomerService
         foreach ($returnOrders->getResult() as $returnOrder) {
             foreach ($returnOrder->order->orderItems as $orderItem) {
                 foreach ($orderItem->orderProperties as $orderProperty) {
-                    $orderProperty->name = $propertyNameFilter->getPropertyName($orderProperty);
+                    if (is_array($orderProperty)) {
+                        $orderProperty = (object)$orderProperty;
+                    }
+
+                    $orderProperty->name = $propertyNameFilter->getPropertyName((array)$orderProperty);
                     if ($orderProperty->type === 'selection') {
                         $orderProperty->selectionValueName = $propertyNameFilter->getPropertySelectionValueName(
                             $orderProperty
