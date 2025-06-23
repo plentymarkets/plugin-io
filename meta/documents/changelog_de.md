@@ -10,7 +10,11 @@
 
 ### Hinzugefügt
 
-- Die neue Rechtstext-Seite **Barrierefreiheitserklärung** wurde hinzugefügt. Die Barrierefreiheitserklärung kann im Menü **Einrichtung » Shop » [Shop auswählen] » Rechtliches** bearbeitet werden.
+- Die neue Rechtstext-Seite **Barrierefreiheitserklärung** wurde hinzugefügt. Die Barrierefreiheitserklärung kann im Menü **Einrichtung » Shop » [Shop auswählen] » Rechtliches** bearbeitet werden. In diesem Zuge wurde die neue Route `/declaration-of-accessibility` hinzugefügt.
+
+### Behoben
+
+- Durch einen Fehler funktionierte der Feedback-Filter für Artikel im ShopBuilder nicht wie beabsichtigt. Dies wurde behoben.
 
 ## v5.0.72 (2025-04-16) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.71...5.0.72" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
 

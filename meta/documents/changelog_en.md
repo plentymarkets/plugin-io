@@ -10,7 +10,11 @@
 
 ### Added
 
-- The new legal page **Declaration of accessibility** has been added. You can edit the declaration of accessibility in the **Setup » Shop » [Select Shop] » Legal** menu.
+- The new legal page **Declaration of accessibility** has been added. You can edit the declaration of accessibility in the **Setup » Shop » [Select Shop] » Legal** menu. The new route `/declaration of accessibility` was added as part of this process.
+
+### Fixed
+
+- Due to an error, the feedback rating filter was not functioning properly in ShopBuilder. This has been fixed.
 
 ## v5.0.72 (2025-04-16) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.71...5.0.72" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
 
