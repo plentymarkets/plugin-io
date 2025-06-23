@@ -1,6 +1,5 @@
 # Release Notes for IO
 
-### Added
 
 ## v5.0.74 (2025-06-xx) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.73...5.0.74" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
 
