@@ -5,7 +5,7 @@
 ### Fixed
 
 - A problem with the display of the returns history has been fixed.
-- No notification for newsletter confirmation. This has been fixed.
+- In some cases the success message for the newsletter opt-in was not displayed. This has been fixed.
 
 ## v5.0.73 (2025-06-02) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.72...5.0.73" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
 

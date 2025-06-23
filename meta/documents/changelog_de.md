@@ -5,7 +5,7 @@
 ### Behoben
 
 - Ein Problem mit der Anzeige der Retourenhistorie wurde behoben.
-- Keine Benachrichtigung bei Newsletter-Bestätigung. Dies wurde behoben.
+- In einigen Fällen wurde die Erfolgsmeldung für das Newsletter-Opt-In nicht angezeigt. Dies wurde behoben.
 
 ## v5.0.73 (2025-06-02) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.72...5.0.73" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
 
