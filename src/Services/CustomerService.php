@@ -803,11 +803,13 @@ class CustomerService
 
             if ((strtoupper($addressData['address1']) == 'PACKSTATION' || strtoupper(
                         $addressData['address1']
-                    ) == 'POSTFILIALE') && isset($addressData['address2']) && isset($addressData['postNumber'])) {
+                    ) == 'POSTFILIALE') && isset($addressData['address2']) && $this->isPostNumberInOptions(
+                    $addressData
+                ) != '') {
                 $options[] =
                     [
                         'typeId' => AddressOption::TYPE_POST_NUMBER,
-                        'value' => $addressData['postNumber']
+                        'value' => $this->isPostNumberInOptions($addressData)
                     ];
             }
         }
@@ -815,6 +817,20 @@ class CustomerService
         return $options;
     }
 
+
+    private function isPostNumberInOptions(array $addressData): ?string
+    {
+        if (isset($addressData['postNumber'])) {
+            return $addressData['postNumber'];
+        }
+
+        foreach ($addressData['options'] as $option) {
+            if ($option['typeId'] == AddressOption::TYPE_POST_NUMBER) {
+                return $option['value'];
+            }
+        }
+        return '';
+    }
     /**
      * Update an address
      * @param int $addressId Id of address to update
