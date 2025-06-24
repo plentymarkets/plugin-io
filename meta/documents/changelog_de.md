@@ -6,6 +6,7 @@
 
 - Ein Problem mit der Anzeige der Retourenhistorie wurde behoben.
 - In einigen Fällen wurde die Erfolgsmeldung für das Newsletter-Opt-In nicht angezeigt. Dies wurde behoben.
+- Es wurden Schwierigkeiten im "Mein Konto"-Bereich behoben, die auftraten, wenn Benutzer versuchten, Adressen mit Bezug zu Packstationen zu ändern oder als primär festzulegen.
 
 ## v5.0.73 (2025-06-02) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.72...5.0.73" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
 
