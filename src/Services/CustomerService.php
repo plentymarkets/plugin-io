@@ -436,16 +436,16 @@ class CustomerService
         $addressToContactOptionsMap =
             [
                 AddressOption::TYPE_TELEPHONE =>
-                    [
-                        'typeId' => ContactOption::TYPE_PHONE,
-                        'subTypeId' => ContactOption::SUBTYPE_PRIVATE
-                    ],
+                [
+                    'typeId' => ContactOption::TYPE_PHONE,
+                    'subTypeId' => ContactOption::SUBTYPE_PRIVATE
+                ],
 
                 AddressOption::TYPE_EMAIL =>
-                    [
-                        'typeId' => ContactOption::TYPE_MAIL,
-                        'subTypeId' => ContactOption::SUBTYPE_PRIVATE
-                    ]
+                [
+                    'typeId' => ContactOption::TYPE_MAIL,
+                    'subTypeId' => ContactOption::SUBTYPE_PRIVATE
+                ]
 
 
             ];
@@ -668,7 +668,8 @@ class CustomerService
                     $account instanceof Account
                     && (int)$account->id > 0
                     && count($contact->addresses) === 1
-                    && $contact->addresses[0]->id === $newAddress->id) {
+                    && $contact->addresses[0]->id === $newAddress->id
+                ) {
                     $defaultClassId = (int)$this->contactRepository->getDefaultContactClassId();
 
                     // update contact class id only when current class id on contact is the default contact class id
@@ -691,8 +692,8 @@ class CustomerService
 
             $existingContact = $this->contactRepository->getContact();
             if ($typeId == AddressType::BILLING && !strlen($existingContact->firstName) && !strlen(
-                    $existingContact->lastName
-                )) {
+                $existingContact->lastName
+            )) {
                 $this->updateContactWithAddressData($newAddress);
             }
         } else {
@@ -715,9 +716,11 @@ class CustomerService
             }
         }
 
-        if ($typeId == AddressType::BILLING &&
+        if (
+            $typeId == AddressType::BILLING &&
             !empty($addressData['email']) &&
-            (int)$this->contactRepository->getContactId() <= 0) {
+            (int)$this->contactRepository->getContactId() <= 0
+        ) {
             /** @var SessionStorageRepositoryContract $sessionStorageRepository */
             $sessionStorageRepository = pluginApp(SessionStorageRepositoryContract::class);
             $sessionStorageRepository->setSessionValue(
@@ -793,26 +796,44 @@ class CustomerService
             }
 
             if (isset($addressData['contactPerson']) && (strlen(
-                        $addressData['contactPerson']
-                    ) || $keepEmptyValuesInOptions)) {
+                $addressData['contactPerson']
+            ) || $keepEmptyValuesInOptions)) {
                 $options[] = [
                     'typeId' => AddressOption::TYPE_CONTACT_PERSON,
                     'value' => $addressData['contactPerson']
                 ];
             }
 
-            if ((strtoupper($addressData['address1']) == 'PACKSTATION' || strtoupper(
-                        $addressData['address1']
-                    ) == 'POSTFILIALE') && isset($addressData['address2']) && isset($addressData['postNumber'])) {
-                $options[] =
-                    [
-                        'typeId' => AddressOption::TYPE_POST_NUMBER,
-                        'value' => $addressData['postNumber']
-                    ];
+            $postNumber = $this->getPostNumberFromAddress($addressData);
+
+            if (
+                isset($addressData['address2']) &&
+                in_array(strtoupper($addressData['address1']), ['PACKSTATION', 'POSTFILIALE'], true) &&
+                $postNumber !== null
+            ) {
+                $options[] = [
+                    'typeId' => AddressOption::TYPE_POST_NUMBER,
+                    'value' => $postNumber
+                ];
             }
         }
 
         return $options;
+    }
+
+    private function getPostNumberFromAddress(array $addressData): ?string
+    {
+        if (isset($addressData['postNumber'])) {
+            return $addressData['postNumber'];
+        }
+
+        foreach ($addressData['options'] ?? [] as $option) {
+            if ($option['typeId'] == AddressOption::TYPE_POST_NUMBER) {
+                return $option['value'];
+            }
+        }
+
+        return null;
     }
 
     /**
@@ -856,8 +877,8 @@ class CustomerService
             if ($typeId == AddressType::BILLING && isset($addressData['name1']) && strlen($addressData['name1'])) {
                 $this->createAccount($this->mapAddressDataToAccount($addressData));
             } elseif ($typeId == AddressType::BILLING && (!isset($addressData['name1']) || !strlen(
-                        $addressData['name1']
-                    ))) {
+                $addressData['name1']
+            ))) {
                 $existingAddress = $this->getAddress($addressId, AddressType::BILLING);
                 if ($existingAddress instanceof Address && strlen($existingAddress->name1)) {
                     $addressData['name1'] = $existingAddress->name1;
@@ -901,9 +922,11 @@ class CustomerService
             }
         );
 
-        if ($typeId == AddressType::BILLING &&
+        if (
+            $typeId == AddressType::BILLING &&
             !empty($addressData['email']) &&
-            (int)$this->contactRepository->getContactId() <= 0) {
+            (int)$this->contactRepository->getContactId() <= 0
+        ) {
             /** @var SessionStorageRepositoryContract $sessionStorageRepository */
             $sessionStorageRepository = pluginApp(SessionStorageRepositoryContract::class);
             $sessionStorageRepository->setSessionValue(
@@ -921,8 +944,8 @@ class CustomerService
         );
 
         if ($event && $existingAddress->countryId == $newAddress->countryId && count($addressDiff) && !(count(
-                    $addressDiff
-                ) === 1) && in_array('updatedAt', $addressDiff)) {
+            $addressDiff
+        ) === 1) && in_array('updatedAt', $addressDiff)) {
             $pluginEventDispatcher->fire($event);
             $pluginEventDispatcher->fire(pluginApp(AfterBasketChanged::class));
         }
@@ -1160,5 +1183,4 @@ class CustomerService
             }
         }
     }
-
 }
