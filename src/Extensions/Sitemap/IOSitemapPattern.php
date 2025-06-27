@@ -15,6 +15,7 @@ class IOSitemapPattern
         RouteConfig::CANCELLATION_FORM,
         RouteConfig::LEGAL_DISCLOSURE,
         RouteConfig::PRIVACY_POLICY,
+        RouteConfig::DECLARATION_OF_ACCESSIBILITY,
         RouteConfig::TERMS_CONDITIONS,
         RouteConfig::CONTACT,
         RouteConfig::REGISTER,

@@ -144,6 +144,29 @@ class StaticPagesController extends LayoutController
     }
 
     /**
+     * Prepare and render the data for the declaration of accessibility page
+     * @return string
+     * @throws \ErrorException
+     */
+    public function showDeclarationOfAccessibility(): string
+    {
+        return $this->renderTemplate(
+            "tpl.declaration-of-accessibility",
+            [
+                "object" => ""
+            ]
+        );
+    }
+
+    /**
+     * @return mixed
+     */
+    public function redirectDeclarationOfAccessibility()
+    {
+        return $this->redirect(RouteConfig::DECLARATION_OF_ACCESSIBILITY);
+    }
+
+    /**
      * Return page not found status response
      * @return Response
      */

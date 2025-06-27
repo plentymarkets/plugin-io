@@ -49,7 +49,7 @@ class QueryString extends AbstractFunction
         $queryParameters = Utils::cleanUpExcludesContentCacheParams($queryParameters);
         $queryParameters = array_replace($queryParameters, $params);
 
-        $queryParameters = http_build_query($queryParameters, null, '&', PHP_QUERY_RFC3986);
+        $queryParameters = http_build_query($queryParameters, '', '&', PHP_QUERY_RFC3986);
         return strlen($queryParameters) > 0 ? '?' . $queryParameters : '';
     }
 }

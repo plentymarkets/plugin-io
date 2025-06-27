@@ -31,7 +31,8 @@ class ItemImagesFilter extends AbstractFilter
         return [
             'itemImages' => 'getItemImages',
             'firstItemImage' => 'getFirstItemImage',
-            'firstItemImageUrl' => 'getFirstItemImageUrl'
+            'firstItemImageUrl' => 'getFirstItemImageUrl',
+            'firstItemImageAlt' => 'getFirstItemImageAlt'
         ];
     }
 
@@ -91,6 +92,17 @@ class ItemImagesFilter extends AbstractFilter
         $itemImage = $this->getFirstItemImage($images, $imageAccessor);
         if ($itemImage !== null && $itemImage['url'] !== null) {
             return $itemImage['url'];
+        };
+
+        return '';
+    }
+
+
+    public function getFirstItemImageAlt($images, $imageAccessor = 'url'): string
+    {
+        $itemImage = $this->getFirstItemImage($images, $imageAccessor);
+        if ($itemImage !== null && $itemImage['alternate'] !== null) {
+            return $itemImage['alternate'];
         };
 
         return '';
