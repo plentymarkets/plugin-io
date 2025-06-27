@@ -186,7 +186,9 @@ class ItemSearchAutocompleteService
                     $brandDataset['url'],
                     '',
                     '',
-                    0
+                    0,
+                    'Brand',
+                    null
                 );
             }   
         }
@@ -353,7 +355,7 @@ class ItemSearchAutocompleteService
      * @param int $count
      * @return array
      */
-    private function buildResult($label, $image, $url, $beforeLabel, $afterLabel, $count, $imageAlt, $other = null)
+    private function buildResult($label, $image, $url, $beforeLabel, $afterLabel, $count, $imageAlt = "", $other = null)
     {
         return [
             'label' => $label,
