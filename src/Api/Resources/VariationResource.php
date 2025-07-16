@@ -5,13 +5,15 @@ namespace IO\Api\Resources;
 use Plenty\Modules\Webshop\ItemSearch\Helpers\ResultFieldTemplate;
 use Plenty\Modules\Webshop\ItemSearch\SearchPresets\SingleItem;
 use Plenty\Modules\Webshop\ItemSearch\SearchPresets\VariationList;
+use Plenty\Modules\Webshop\ItemSearch\SearchPresets\BasketItems;
 use Plenty\Modules\Webshop\ItemSearch\Services\ItemSearchService;
 use Plenty\Plugin\Http\Request;
 use Plenty\Plugin\Http\Response;
 use IO\Api\ApiResource;
 use IO\Api\ApiResponse;
 use IO\Api\ResponseCode;
-
+use IO\Services\ItemSearch\SearchPresets\ShopTheLookPreset;
+use IO\Services\ItemUpdateService;
 /**
  * Class VariationResource
  *
@@ -65,6 +67,20 @@ class VariationResource extends ApiResource
         return $this->response->create($variations, ResponseCode::OK);
     }
 
+    public function update(string $variationId): Response 
+    {
+        $variationId = (int) $variationId;
+        $data = $this->request->get("data", null);
+
+        try {
+            $itemUpdateService = pluginApp(ItemUpdateService::class);
+            $variation = $itemUpdateService->updateVariation($data, $variationId);
+            return $this->response->create($variation, ResponseCode::OK);
+        } catch(Exception $e) {
+             return $this->response->create(['error bk_2529a'], ResponseCode::BAD_REQUEST);
+        }
+    }
+
     /**
      * Get variation by ID.
      * @param string $variationId The ID of the variation to get.
@@ -74,15 +90,41 @@ class VariationResource extends ApiResource
     {
         /** @var ItemSearchService $itemSearchService */
         $itemSearchService = pluginApp(ItemSearchService::class);
-        $variation = $itemSearchService->getResults(
-            SingleItem::getSearchFactory(
-                [
-                    'variationId' => $variationId,
-                    'setPriceOnly' => $this->request->get('setPriceOnly') === 'true'
-                ]
-            )
-        );
+        
+        $shopTheLook = $this->request->get('shopTheLook', null);
+        if(!is_null($shopTheLook) && $shopTheLook === "true")
+        {
 
+            // SHOP THE LOOK
+            // +
+            // +
+            // +
+            $variation = $itemSearchService->getResults(
+                BasketItems::getSearchFactory(
+                    [
+                        'variationIds' => [$variationId]
+                    ]
+                )->withReducedResults( true )
+                ->withPrices()
+                ->withResultFields("Ceres::ResultFields.ShopTheLook")
+            );
+            // +
+            // +
+            // +
+            // +
+
+
+        } else {
+            $variation = $itemSearchService->getResults(
+                SingleItem::getSearchFactory(
+                    [
+                        'variationId' => $variationId,
+                        'setPriceOnly' => $this->request->get('setPriceOnly') === 'true'
+                    ]
+                )
+            );
+        
+        }
         return $this->response->create($variation, ResponseCode::OK);
     }
 }

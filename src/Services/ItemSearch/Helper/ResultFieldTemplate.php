@@ -19,6 +19,7 @@ class ResultFieldTemplate
     const TEMPLATE_SINGLE_ITEM  = 'IO.ResultFields.SingleItem';
     const TEMPLATE_BASKET_ITEM  = 'IO.ResultFields.BasketItem';
     const TEMPLATE_AUTOCOMPLETE_ITEM_LIST = 'IO.ResultFields.AutoCompleteListItem';
+    const TEMPLATE_SHOPTHELOOK_ITEM  = 'IO.ResultFields.ShopTheLook';
     const TEMPLATE_CATEGORY_TREE = 'IO.ResultFields.CategoryTree';
     const TEMPLATE_VARIATION_ATTRIBUTE_MAP = 'IO.ResultFields.VariationAttributeMap';
 
@@ -31,8 +32,8 @@ class ResultFieldTemplate
         $dispatcher = pluginApp( Dispatcher::class );
 
         /** @var ResultFieldTemplate $container */
-        $container = pluginApp( ResultFieldTemplate::class );
-        $dispatcher->fire( $template, [$container] );
+        $container = pluginApp(ResultFieldTemplate::class);
+        $dispatcher->fire($template, [ResultFieldTemplate::class]);
 
         return $container;
     }
