@@ -1,10 +1,45 @@
 <?php
-
+/**
+ * UNUSED
+ * UNUSED
+ * UNUSED
+ * UNUSED
+ * UNUSED
+ * UNUSED
+ * UNUSED
+ * UNUSED
+ * UNUSED
+ * UNUSED
+ * UNUSED
+ * Did a test with this on Jul 16th, but dodnt work as i wanted.
+ * Now using internal servers + rest api for the updates... 
+ * RS Jul 17th, 25
+ * UNUSED
+ * UNUSED
+ * UNUSED
+ * UNUSED
+ * UNUSED
+ * UNUSED
+ * UNUSED
+ * UNUSED
+ * UNUSED
+ * UNUSED
+ * UNUSED
+ * UNUSED
+ * UNUSED
+ * UNUSED
+ * UNUSED
+ * UNUSED
+ * UNUSED
+ */
 namespace IO\Services;
 
 use IO\Helper\Utils;
 use Plenty\Modules\Authorization\Services\AuthHelper;
 use Plenty\Modules\Item\Variation\Contracts\VariationRepositoryContract;
+use Plenty\Modules\Pim\VariationDataInterface\Contracts\VariationDataInterfaceContract;
+use Plenty\Modules\Pim\VariationDataInterface\Model\DecoratedAttributes\Property;
+use Plenty\Modules\Pim\VariationDataInterface\Model\DecoratedAttributes\Base;
 use Plenty\Plugin\Log\Loggable;
 
 /**
@@ -58,15 +93,36 @@ class ItemUpdateService
         }
 
         try {
-            /** @var AuthHelper $authHelper */
-            $authHelper = pluginApp(AuthHelper::class);
-            $variationRepo = pluginApp(VariationRepositoryContract::class);
+            // /** @var AuthHelper $authHelper */
+            // $variationPimContract = pluginApp(VariationDataInterfaceContract::class);
+            // $base = pluginApp(Base::class);
+            // $property = pluginApp(Property::class);
+            // $authHelper = pluginApp(AuthHelper::class);
 
-            return $authHelper->processUnguarded(
-                function () use ($variationRepo, $data, $variationId) {
-                    return $variationRepo->update($data, $variationId);
-                }
-            );
+            // $this->getLogger(__CLASS__)
+            //     ->addReference('variationId', $variationId)
+            //     ->error('Trying new update.',
+            //         [
+            //             'data' => $data,
+            //             'variationId' => $variationId,
+            //             'isAdminPreview' => $this->isAdminPreview
+            //         ]
+            //     );
+            
+            // return $authHelper->processUnguarded(
+            //     function () use ($variationPimContract, $base, $property, $variationId) {
+            //         $createOrUpdate = $variationPimContract->createOrUpdate();
+            //         $base->setVariationId($variationId);
+
+            //         $property->propertyId = 22;
+            //         $property->groupId = 2;
+            //         $property->values = "321";
+
+            //         $createOrUpdate->add($property);
+            //         return $createOrUpdate->save();
+            //     }
+            // );
+
         } catch (\Exception $e) {
              $this->getLogger(__CLASS__)
                 ->addReference('variationId', $variationId)

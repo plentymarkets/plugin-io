@@ -67,19 +67,22 @@ class VariationResource extends ApiResource
         return $this->response->create($variations, ResponseCode::OK);
     }
 
-    public function update(string $variationId): Response 
-    {
-        $variationId = (int) $variationId;
-        $data = $this->request->get("data", null);
+    // DISABLED
+    // CHECK Services/ItemUpdateService for details
+    //
+    // public function update(string $variationId): Response 
+    // {
+    //     $variationId = (int) $variationId;
+    //     $data = $this->request->get("data", null);
 
-        try {
-            $itemUpdateService = pluginApp(ItemUpdateService::class);
-            $variation = $itemUpdateService->updateVariation($data, $variationId);
-            return $this->response->create($variation, ResponseCode::OK);
-        } catch(Exception $e) {
-             return $this->response->create(['error bk_2529a'], ResponseCode::BAD_REQUEST);
-        }
-    }
+    //     try {
+    //         $itemUpdateService = pluginApp(ItemUpdateService::class);
+    //         $variation = $itemUpdateService->updateVariation($data, $variationId);
+    //         return $this->response->create($variation, ResponseCode::OK);
+    //     } catch(Exception $e) {
+    //          return $this->response->create(['error bk_2529a'], ResponseCode::BAD_REQUEST);
+    //     }
+    // }
 
     /**
      * Get variation by ID.
