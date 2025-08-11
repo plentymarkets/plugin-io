@@ -104,12 +104,12 @@ class ContactMailResource extends ApiResource
             'response' => $token
         ];
 
-        $options = array(
+        $options = [
             CURLOPT_URL => "https://www.google.com/recaptcha/api/siteverify?secret=$secret&response=$token",
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_POST => true,
             CURLOPT_POSTFIELDS => json_encode($params)
-        );
+        ];
 
         $ch = curl_init();
 

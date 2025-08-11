@@ -121,8 +121,8 @@ class AuthenticationService
                     $password
                 );
                 return true;
-            } catch (\Exception $e) {
-                $this->getLogger(__CLASS__)->info(
+            } catch (\Exception) {
+                $this->getLogger(self::class)->info(
                     'IO::Debug.AuthenticationService_invalidPassword',
                     [
                         'contactId' => $contact->id

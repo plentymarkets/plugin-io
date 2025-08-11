@@ -155,11 +155,9 @@ class ShippingCountry
      */
     public static function getAddressFormat($countryId)
     {
-        switch ($countryId) {
-            case self::UNITED_KINGDOM:
-                return self::ADDRESS_FORMAT_EN;
-        }
-
-        return self::ADDRESS_FORMAT_DE;
+        return match ($countryId) {
+            self::UNITED_KINGDOM => self::ADDRESS_FORMAT_EN,
+            default => self::ADDRESS_FORMAT_DE,
+        };
     }
 }

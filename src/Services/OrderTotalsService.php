@@ -255,7 +255,7 @@ class OrderTotalsService
                     $tempProperty['currency']
                 );
             } else {
-                list($isAdditionalCost, $hasTax, $newProperty) = $this->getPropertyWithMoreDetails($propertyId, $item);
+                [$isAdditionalCost, $hasTax, $newProperty] = $this->getPropertyWithMoreDetails($propertyId, $item);
                 if (!$hasTax) {
                     $additionalCosts[$propertyId] = $newProperty;
                     $taxlessAmount += $item->amounts[0]->priceGross * $item->quantity;
@@ -304,6 +304,6 @@ class OrderTotalsService
             )
         ];
 
-        return array($isAdditionalCost, $hasTax, $newProperty);
+        return [$isAdditionalCost, $hasTax, $newProperty];
     }
 }

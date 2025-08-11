@@ -55,7 +55,7 @@ class OrderReturnController extends LayoutController
             $returnOrder = $orderService->getReturnOrder($orderId, $orderAccessKey);
 
             if (!$returnOrder->isReturnable()) {
-                $this->getLogger(__CLASS__)->info(
+                $this->getLogger(self::class)->info(
                     "IO::Debug.OrderReturnController_orderNotReturnable",
                     [
                         "category" => $category,
@@ -66,7 +66,7 @@ class OrderReturnController extends LayoutController
                 return $this->notFound();
             }
         } catch (\Exception $e) {
-            $this->getLogger(__CLASS__)->warning(
+            $this->getLogger(self::class)->warning(
                 "IO::Debug.OrderReturnController_cannotPrepareReturn",
                 [
                     "orderId" => $orderId,

@@ -489,12 +489,12 @@ class CheckoutService
                     }
                 }
 
-                $result = array(
+                $result = [
                     "type" => GetPaymentMethodContent::RETURN_TYPE_ERROR,
                     "value" => implode('<br>', $errors)
-                );
+                ];
 
-                $this->getLogger(__CLASS__)->error(
+                $this->getLogger(self::class)->error(
                     "IO::Debug.CheckoutService_preparePaymentFailed",
                     $result
                 );
@@ -505,7 +505,7 @@ class CheckoutService
 
         $mopId = $this->getMethodOfPaymentId();
         $result = $paymentMethodRepo->preparePaymentMethod($mopId);
-        $this->getLogger(__CLASS__)->debug(
+        $this->getLogger(self::class)->debug(
             "IO::Debug.CheckoutService_paymentPrepared",
             [
                 "type" => $result["type"],
@@ -567,11 +567,11 @@ class CheckoutService
         return $this->fromMemoryCache(
             'paymentDataList',
             function () {
-                $paymentDataList = array();
+                $paymentDataList = [];
                 $mopList = $this->getMethodOfPaymentList();
                 $lang = Utils::getLang();
                 foreach ($mopList as $paymentMethod) {
-                    $paymentData = array();
+                    $paymentData = [];
                     $paymentData['id'] = $paymentMethod->id;
                     $paymentData['name'] = $this->frontendPaymentMethodRepository->getPaymentMethodName(
                         $paymentMethod,
@@ -642,7 +642,7 @@ class CheckoutService
                     try {
                         $address = $this->customerService->getAddress($deliveryAddressId, $type);
                         $params['zipCode'] = $address->postalCode;
-                    } catch (\Exception $exception) {
+                    } catch (\Exception) {
                     }
                 }
 

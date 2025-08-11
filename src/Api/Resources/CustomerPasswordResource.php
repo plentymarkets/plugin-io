@@ -47,7 +47,7 @@ class CustomerPasswordResource extends ApiResource
 	    $contactId = $this->request->get('contactId', 0);
         $hash = $this->request->get('hash', '');
 
-		if(strlen($newPassword) && strlen($newPassword2) && $newPassword == $newPassword2 && $this->isValidPassword($newPassword))
+		if(strlen($newPassword) && strlen($newPassword2) && $newPassword == $newPassword2 && static::isValidPassword($newPassword))
 		{
             /** @var AuthenticationService $authService */
             $authService = pluginApp(AuthenticationService::class);

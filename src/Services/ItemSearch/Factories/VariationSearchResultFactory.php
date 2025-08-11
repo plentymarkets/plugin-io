@@ -100,7 +100,7 @@ class VariationSearchResultFactory
         if(is_null($searchResult))
         {
             $searchResult = [
-                'took'      => rand(1, 100),
+                'took'      => random_int(1, 100),
                 'total'     => $numberOfEntries,
                 'maxScore'  => 0,
                 'documents' => [],
@@ -115,7 +115,7 @@ class VariationSearchResultFactory
             {
                 $searchResult['documents'][$i] = [
                     'score' => 0,
-                    'id'    => rand(100, 100000),
+                    'id'    => random_int(100, 100000),
                     'data'  => []
                 ];
             }
@@ -177,7 +177,7 @@ class VariationSearchResultFactory
                 {
                     if ($faker->isList)
                     {
-                        $count = max(rand(...$faker->range), count($value));
+                        $count = max(random_int(...$faker->range), count($value));
                         for($i = 0; $i < $count; $i++)
                         {
                             $faker->index = $i;
@@ -192,7 +192,7 @@ class VariationSearchResultFactory
                     }
                 }
             }
-            catch(\Exception $e)
+            catch(\Exception)
             {
 
             }

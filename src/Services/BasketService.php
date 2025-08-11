@@ -487,7 +487,7 @@ class BasketService
         }
 
         if ($basketItem === null) {
-            return array();
+            return [];
         }
 
         if ($basketItem->itemType === BasketItem::BASKET_ITEM_TYPE_ITEM_SET) {
@@ -597,7 +597,7 @@ class BasketService
         try {
             $this->basketItemRepository->updateBasketItem($basketItemId, $data);
         } catch (BasketItemQuantityCheckException $e) {
-            $this->getLogger(__CLASS__)->warning(
+            $this->getLogger(self::class)->warning(
                 'IO::Debug.BasketService_updateItemQuantityCheckFailed',
                 [
                     'data' => $data,
@@ -605,22 +605,15 @@ class BasketService
                     'message' => $e->getMessage()
                 ]
             );
-            switch ($e->getCode()) {
-                case BasketItemQuantityCheckException::DID_REACH_MAXIMUM_QUANTITY_FOR_ITEM:
-                    $code = 112;
-                    break;
-                case BasketItemQuantityCheckException::DID_REACH_MAXIMUM_QUANTITY_FOR_VARIATION:
-                    $code = 113;
-                    break;
-                case BasketItemQuantityCheckException::DID_NOT_REACH_MINIMUM_QUANTITY_FOR_VARIATION:
-                    $code = 114;
-                    break;
-                default:
-                    $code = 0;
-            }
+            $code = match ($e->getCode()) {
+                BasketItemQuantityCheckException::DID_REACH_MAXIMUM_QUANTITY_FOR_ITEM => 112,
+                BasketItemQuantityCheckException::DID_REACH_MAXIMUM_QUANTITY_FOR_VARIATION => 113,
+                BasketItemQuantityCheckException::DID_NOT_REACH_MINIMUM_QUANTITY_FOR_VARIATION => 114,
+                default => 0,
+            };
             return ["code" => $code];
         } catch (BasketItemCheckException $e) {
-            $this->getLogger(__CLASS__)->warning(
+            $this->getLogger(self::class)->warning(
                 'IO::Debug.BasketService_updateItemCheckFailed',
                 [
                     'data' => $data,
@@ -641,7 +634,7 @@ class BasketService
             }
             return ["code" => $code, 'placeholder' => $placeholder];
         } catch (\Exception $e) {
-            $this->getLogger(__CLASS__)->warning(
+            $this->getLogger(self::class)->warning(
                 'IO::Debug.BasketService_cannotAddItem',
                 [
                     'data' => $data,
@@ -840,7 +833,7 @@ class BasketService
         if (isset($data['basketItemOrderParams'])
             && is_array($data['basketItemOrderParams'])
             && !isset($data['totalOrderParamsMarkup'])) {
-            list($data['basketItemOrderParams'], $data['totalOrderParamsMarkup']) = $this->parseBasketItemOrderParams(
+            [$data['basketItemOrderParams'], $data['totalOrderParamsMarkup']] = $this->parseBasketItemOrderParams(
                 $data['basketItemOrderParams']
             );
         }
@@ -857,7 +850,7 @@ class BasketService
                 $this->basketItemRepository->addBasketItem($data, $fireEvent);
             }
         } catch (BasketItemQuantityCheckException $e) {
-            $this->getLogger(__CLASS__)->warning(
+            $this->getLogger(self::class)->warning(
                 'IO::Debug.BasketService_addItemQuantityCheckFailed',
                 [
                     'data' => $data,
@@ -865,22 +858,15 @@ class BasketService
                     'message' => $e->getMessage()
                 ]
             );
-            switch ($e->getCode()) {
-                case BasketItemQuantityCheckException::DID_REACH_MAXIMUM_QUANTITY_FOR_ITEM:
-                    $code = 112;
-                    break;
-                case BasketItemQuantityCheckException::DID_REACH_MAXIMUM_QUANTITY_FOR_VARIATION:
-                    $code = 113;
-                    break;
-                case BasketItemQuantityCheckException::DID_NOT_REACH_MINIMUM_QUANTITY_FOR_VARIATION:
-                    $code = 114;
-                    break;
-                default:
-                    $code = 0;
-            }
+            $code = match ($e->getCode()) {
+                BasketItemQuantityCheckException::DID_REACH_MAXIMUM_QUANTITY_FOR_ITEM => 112,
+                BasketItemQuantityCheckException::DID_REACH_MAXIMUM_QUANTITY_FOR_VARIATION => 113,
+                BasketItemQuantityCheckException::DID_NOT_REACH_MINIMUM_QUANTITY_FOR_VARIATION => 114,
+                default => 0,
+            };
             return ["code" => $code];
         } catch (BasketItemCheckException $e) {
-            $this->getLogger(__CLASS__)->warning(
+            $this->getLogger(self::class)->warning(
                 'IO::Debug.BasketService_addItemCheckFailed',
                 [
                     'data' => $data,
@@ -904,7 +890,7 @@ class BasketService
             }
             return ["code" => $code, 'placeholder' => $placeholder];
         } catch (\Exception $e) {
-            $this->getLogger(__CLASS__)->warning(
+            $this->getLogger(self::class)->warning(
                 'IO::Debug.BasketService_cannotAddItem',
                 [
                     'data' => $data,
@@ -952,10 +938,10 @@ class BasketService
      * @return array
      * @throws \Exception
      */
-    private function getBasketItemData($basketItems = array(), string $language = ''): array
+    private function getBasketItemData($basketItems = [], string $language = ''): array
     {
         if (count($basketItems) <= 0) {
-            return array();
+            return [];
         }
 
         $basketItemVariationIds = [];
@@ -1001,10 +987,10 @@ class BasketService
      * @return array
      * @throws \Throwable
      */
-    private function getOrderItemData($basketItems = array()): array
+    private function getOrderItemData($basketItems = []): array
     {
         if (count($basketItems) <= 0) {
-            return array();
+            return [];
         }
 
         $variationRepository = pluginApp(VariationRepositoryContract::class);
@@ -1119,7 +1105,7 @@ class BasketService
             function ($basketItem) use (&$variationProperties) {
                 if ($basketItem['itemType'] === BasketItem::BASKET_ITEM_TYPE_VARIATION_ORDER_PROPERTY) {
                     $bundleRowId = $basketItem['itemBundleRowId'];
-                    $variationProperties[$bundleRowId] = $variationProperties[$bundleRowId] ?? [];
+                    $variationProperties[$bundleRowId] ??= [];
                     $variationProperties[$bundleRowId][] = $basketItem;
                     return false;
                 }
@@ -1128,7 +1114,7 @@ class BasketService
         );
         foreach ($basketItems as &$basketItem) {
             if (isset($variationProperties[$basketItem['id']])) {
-                $basketItem['basketItemOrderParams'] = $basketItem['basketItemOrderParams'] ?? [];
+                $basketItem['basketItemOrderParams'] ??= [];
                 foreach ($variationProperties[$basketItem['id']] as $variationProperty) {
                     $property = PropertyHelper::getPropertyById($variationProperty['basketItemOrderParams'][0]['propertyId']);
                     $isAdditionalCost = false;
@@ -1168,7 +1154,7 @@ class BasketService
                 if ($basketItem['itemType'] === BasketItem::BASKET_ITEM_TYPE_ITEM_SET_COMPONENT) {
                     // store set components to add them to the parent item later
                     $bundleRowId = $basketItem['itemBundleRowId'];
-                    $setComponents[$bundleRowId] = $setComponents[$bundleRowId] ?? [];
+                    $setComponents[$bundleRowId] ??= [];
                     $setComponents[$bundleRowId][] = $basketItem;
                     return false;
                 }

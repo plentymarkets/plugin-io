@@ -66,7 +66,7 @@ class ResultFieldTemplate
             foreach($resultFields as $resultField)
             {
                 $isWildcard = substr($resultField, strlen($resultField) - 1, 1 ) === "*";
-                $includesField = strpos($requiredField, substr($resultField, 0, strlen($resultField) - 1)) === 0;
+                $includesField = str_starts_with($requiredField, substr($resultField, 0, strlen($resultField) - 1));
                 if($resultField === $requiredField || ($isWildcard && $includesField))
                 {
                     break;
@@ -118,7 +118,7 @@ class ResultFieldTemplate
     {
         if( is_string($event) )
         {
-            $this->requiredFields[$event] = $this->requiredFields[$event] ?? [];
+            $this->requiredFields[$event] ??= [];
             if ( is_string($field) )
             {
                 $this->requiredFields[$event][] = $field;

@@ -55,7 +55,7 @@ class ContactMailFileResource extends ApiResource
 
             try {
                 $response = $contactFormFileRepository->uploadFiles($_FILES['fileData']);
-            } catch (\Exception $exception) {
+            } catch (\Exception) {
                 /** @var NotificationService $notificationService */
                 $notificationService = pluginApp(NotificationService::class);
                 $notificationService->addNotificationCode(LogLevel::ERROR, 0);

@@ -38,7 +38,7 @@ class ContactMailService
         }
 
         if (!strlen($recipient) || !strlen($mailTemplate)) {
-            $this->getLogger(__CLASS__)->error("IO::Debug.ContactMailService_noRecipient");
+            $this->getLogger(self::class)->error("IO::Debug.ContactMailService_noRecipient");
             return false;
         }
 
@@ -51,7 +51,7 @@ class ContactMailService
         );
 
         if (!strlen($mailBody)) {
-            $this->getLogger(__CLASS__)->error("IO::Debug.ContactMailService_noMailContent");
+            $this->getLogger(self::class)->error("IO::Debug.ContactMailService_noMailContent");
             return false;
         }
 
@@ -94,7 +94,7 @@ class ContactMailService
 
         try {
             $mailer->sendHtml($mailBody, $recipient, $subject, $mailData['cc'] ?? [], $mailData['bcc'] ?? [], $replyTo, $attachments);
-        } catch (\Exception $exception) {
+        } catch (\Exception) {
             return false;
         }
         return true;

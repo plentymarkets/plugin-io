@@ -28,7 +28,7 @@ class LoginController extends LayoutController
         $shopBuilderRequest = pluginApp(ShopBuilderRequest::class);
 
         if ($contactRepository->getContactId() > 0 && !$shopBuilderRequest->isShopBuilder()) {
-            $this->getLogger(__CLASS__)->info("IO::Debug.LoginController_alreadyLoggedIn");
+            $this->getLogger(self::class)->info("IO::Debug.LoginController_alreadyLoggedIn");
             AuthGuard::redirect($this->urlService->getHomepageURL(), []);
         }
 

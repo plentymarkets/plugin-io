@@ -73,10 +73,10 @@ class ContactMapService
 
                 curl_setopt_array(
                     $curl,
-                    array(
+                    [
                         CURLOPT_RETURNTRANSFER => 1,
                         CURLOPT_URL => $url
-                    )
+                    ]
                 );
 
                 $result_json = curl_exec($curl);
@@ -94,7 +94,7 @@ class ContactMapService
                 }
 
                 if (isset($result['error_message'])) {
-                    $this->getLogger(__CLASS__)->error(
+                    $this->getLogger(self::class)->error(
                         'Google Maps API error',
                         [
                             'status' => $result['status'],

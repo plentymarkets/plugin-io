@@ -108,7 +108,7 @@ class PlaceOrderController extends LayoutController
             return $this->handlePlaceOrderException($exception);
         }
 
-        $this->getLogger(__CLASS__)->debug(
+        $this->getLogger(self::class)->debug(
             "IO::Debug.PlaceOrderController_orderCreated",
             [
                 "order" => $orderData->order,
@@ -126,7 +126,7 @@ class PlaceOrderController extends LayoutController
             $orderService->complete($orderData->order);
         } catch (\Exception $exception) {
             // This should never happen since every exception should be caught inside this function!
-            $this->getLogger(__CLASS__)->error(
+            $this->getLogger(self::class)->error(
                 "IO::Debug.PlaceOrderController_cannotCompleteOrder",
                 [
                     "code" => $exception->getCode(),
@@ -166,7 +166,7 @@ class PlaceOrderController extends LayoutController
         int $orderId,
         int $paymentId = -1
     ) {
-        $this->getLogger(__CLASS__)->debug(
+        $this->getLogger(self::class)->debug(
             "IO::Debug.PlaceOrderController_executePayment",
             [
                 "orderId" => $orderId,
@@ -180,7 +180,7 @@ class PlaceOrderController extends LayoutController
         // find order by id to check if order really exists
         $orderData = $orderService->findOrderById($orderId);
         if ($orderData == null) {
-            $this->getLogger(__CLASS__)->warning(
+            $this->getLogger(self::class)->warning(
                 "IO::Debug.PlaceOrderController_orderNotDefined",
                 [
                     "orderId" => $orderId,
@@ -200,7 +200,7 @@ class PlaceOrderController extends LayoutController
         try {
             $paymentResult = $orderService->executePayment($orderId, $paymentId);
             if ($paymentResult["type"] === "redirectUrl") {
-                $this->getLogger(__CLASS__)->info(
+                $this->getLogger(self::class)->info(
                     "IO::Debug.PlaceOrderController_redirectToPaymentResult",
                     [
                         "paymentResult" => $paymentResult
@@ -208,7 +208,7 @@ class PlaceOrderController extends LayoutController
                 );
                 return $this->urlService->redirectTo($paymentResult["value"]);
             } elseif ($paymentResult["type"] === "error") {
-                $this->getLogger(__CLASS__)->warning(
+                $this->getLogger(self::class)->warning(
                     "IO::Debug.PlaceOrderController_errorFromPaymentProvider",
                     [
                         "paymentResult" => $paymentResult
@@ -222,7 +222,7 @@ class PlaceOrderController extends LayoutController
                 $notificationService->error($error ?? $paymentResult["value"]);
             }
         } catch (\Exception $exception) {
-            $this->getLogger(__CLASS__)->warning(
+            $this->getLogger(self::class)->warning(
                 "IO::Debug.PlaceOrderController_cannotExecutePayment",
                 [
                     "code" => $exception->getCode(),
@@ -235,7 +235,7 @@ class PlaceOrderController extends LayoutController
         // show confirmation page, even if payment execution failed because order has already been replaced.
         // in case of failure, the order should have been marked as "not payed"
         if (strlen($redirectParam)) {
-            $this->getLogger(__CLASS__)->info(
+            $this->getLogger(self::class)->info(
                 "IO::Debug.PlaceOrderController_redirectToParam",
                 [
                     "redirectParam" => $redirectParam
@@ -247,7 +247,7 @@ class PlaceOrderController extends LayoutController
     }
 
 
-    private function handlePlaceOrderException(\Exception $exception)
+    private function handlePlaceOrderException(\Throwable $exception)
     {
         /**
          * @var NotificationService $notificationService

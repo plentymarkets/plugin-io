@@ -48,9 +48,9 @@ class SpecialOfferFilter extends AbstractFilter
 
         if ($prices["specialOffer"]) {
             if ($exact) {
-                $price = $prices["specialOffer"][$priceType][$exact] ? $prices["specialOffer"][$priceType][$exact] : $defaultPrice;
+                $price = $prices["specialOffer"][$priceType][$exact] ?: $defaultPrice;
             } else {
-                $price = $prices["specialOffer"][$priceType] ? $prices["specialOffer"][$priceType] : $defaultPrice;
+                $price = $prices["specialOffer"][$priceType] ?: $defaultPrice;
             }
         } else {
             $price = $defaultPrice;

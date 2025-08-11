@@ -110,7 +110,7 @@ abstract class LayoutController extends Controller
      */
     protected function abort(int $code, string $message): string
     {
-        $this->getLogger(__CLASS__)->error(
+        $this->getLogger(self::class)->error(
             "IO::Debug.LayoutController_requestAborted.",
             [
                 "code" => $code,
@@ -161,7 +161,7 @@ abstract class LayoutController extends Controller
             // activate content cache
             $notificationService = pluginApp(NotificationService::class);
             if (TemplateService::$shouldBeCached && !$notificationService->hasNotifications()) {
-                $this->getLogger(__CLASS__)->info(
+                $this->getLogger(self::class)->info(
                     "IO::Debug.LayoutController_enableContentCache",
                     [
                         "template" => $templateEvent,
@@ -207,8 +207,8 @@ abstract class LayoutController extends Controller
                 $templateContainer->getTemplate(),
                 $templateData
             );
-        } catch (\Exception $e) {
-            $this->getLogger(__CLASS__)->error(
+        } catch (\Exception) {
+            $this->getLogger(self::class)->error(
                 "IO::Debug.LayoutController_cannotRenderTwigTemplate",
                 [
                     "templateKey" => $templateContainer->getTemplateKey(),
@@ -245,7 +245,7 @@ abstract class LayoutController extends Controller
         if (is_null($url)) {
             /** @var Request $request */
             $request = pluginApp(Request::class);
-            list($url, $queryString) = explode("?", $request->getRequestUri());
+            [$url, $queryString] = explode("?", $request->getRequestUri());
         }
 
         $branch = explode("/", trim($url, "/"));

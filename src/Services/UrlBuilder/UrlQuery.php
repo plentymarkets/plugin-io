@@ -43,7 +43,7 @@ class UrlQuery
         $this->path = $path;
 
         if ($path !== null) {
-            if (substr($this->path, 0, 1) !== "/") {
+            if (!str_starts_with($this->path, "/")) {
                 $this->path = "/" . $this->path;
             }
 
@@ -81,7 +81,7 @@ class UrlQuery
      */
     public function join($path): UrlQuery
     {
-        if (substr($path, 0, 1) !== "/" && substr($this->path, strlen($this->path) - 1, 1) !== "/") {
+        if (!str_starts_with($path, "/") && substr($this->path, strlen($this->path) - 1, 1) !== "/") {
             $path = "/" . $path;
         }
 
@@ -135,7 +135,7 @@ class UrlQuery
 
         $trailingSlash = self::shouldAppendTrailingSlash() ? "/" : "";
 
-        if ($includeLanguage && strpos($path, '/' . $this->lang) !== 0) {
+        if ($includeLanguage && !str_starts_with($path, '/' . $this->lang)) {
             return '/' . $this->lang . $path . $trailingSlash . $queryParams;
         } elseif (strlen($path) == 0) {
             return '/';

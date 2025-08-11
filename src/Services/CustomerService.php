@@ -310,7 +310,7 @@ class CustomerService
 
         try {
             $contact = $this->coreContactRepository->createContact($contactData);
-        } catch (\Exception $e) {
+        } catch (\Exception) {
             $contact = [
                 'code' => 1,
                 'message' => 'email already exists'
@@ -1021,7 +1021,7 @@ class CustomerService
                 $filters,
                 true
             );
-        } catch (\Exception $e) {
+        } catch (\Exception) {
         }
 
         return $orders;
@@ -1156,7 +1156,7 @@ class CustomerService
             );
 
             return $contact->number;
-        } catch (\Exception $exception) {
+        } catch (\Exception) {
             return null;
         }
     }

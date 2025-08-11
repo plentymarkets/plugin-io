@@ -43,7 +43,7 @@ class SortingHelper
         }
         else
         {
-            list($sortingField, $sortingOrder) = explode('_', $sortingConfig );
+            [$sortingField, $sortingOrder] = explode('_', $sortingConfig );
             if ( $sortingField === 'item.score' )
             {
                 $sortingField = '_score';

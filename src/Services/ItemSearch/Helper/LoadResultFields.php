@@ -34,7 +34,7 @@ trait LoadResultFields
 		/** @var LoggerFactory $loggerFactory */
 		$loggerFactory = pluginApp(LoggerFactory::class);
 		$loggerFactory
-            ->getLogger("IO", __CLASS__)
+            ->getLogger("IO", self::class)
             ->warning(
                 "IO::Debug.LoadResultFields_notFound",
                 [

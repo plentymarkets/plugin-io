@@ -11,13 +11,13 @@ trait FakeNumber
             $max = 999999;
         }
 
-        return rand($min, $max);
+        return random_int($min, $max);
     }
 
     protected function float($min = 0, $max = 9999, $numberOfDecimals = 2)
     {
-        $digit    = rand($min + 1, $max);
-        $tmp      = (rand() / rand());
+        $digit    = random_int($min + 1, $max);
+        $tmp      = (random_int(0, mt_getrandmax()) / random_int(0, mt_getrandmax()));
         $fraction = $tmp - ($tmp % 10);
         $result   = intval((($digit - 1) + $fraction) * $this->pow(10, $numberOfDecimals));
 

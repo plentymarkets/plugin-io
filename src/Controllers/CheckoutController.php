@@ -50,7 +50,7 @@ class CheckoutController extends LayoutController
 
         if (!$shopBuilderRequest->isShopBuilder()) {
             if (!count($basketItemRepository->all())) {
-                $this->getLogger(__CLASS__)->info("IO::Debug.CheckoutController_emptyBasket");
+                $this->getLogger(self::class)->info("IO::Debug.CheckoutController_emptyBasket");
                 if ($sessionStorageRepository->getSessionValue(SessionStorageRepositoryContract::LATEST_ORDER_ID) > 0) {
                     AuthGuard::redirect($shopUrls->confirmation, []);
                 } else {
@@ -58,7 +58,7 @@ class CheckoutController extends LayoutController
                 }
             } elseif ($sessionStorageRepository->getSessionValue(SessionStorageRepositoryContract::GUEST_EMAIL) == null
                 && $contactRepository->getContactId() <= 0) {
-                $this->getLogger(__CLASS__)->info("IO::Debug.CheckoutController_notLoggedIn");
+                $this->getLogger(self::class)->info("IO::Debug.CheckoutController_notLoggedIn");
                 AuthGuard::redirect(
                     $shopUrls->login,
                     ["backlink" => AuthGuard::getUrl()]

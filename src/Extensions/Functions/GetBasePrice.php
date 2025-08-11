@@ -98,7 +98,7 @@ class GetBasePrice extends AbstractFunction
      */
     public function getBasePriceList($variationIds): array
     {
-        $variations = array();
+        $variations = [];
         if (is_array($variationIds) && count($variationIds)) {
             $columns = $this->columnBuilder
                 ->withVariationBase(
@@ -132,7 +132,7 @@ class GetBasePrice extends AbstractFunction
             );
         }
 
-        $basePriceList = array();
+        $basePriceList = [];
 
         if (count($variations)) {
             foreach ($variations as $variation) {

@@ -110,7 +110,7 @@ class PriceSearchExtension implements ItemSearchExtension
 
                     if ( $variation['data']['prices']['default']['unitPrice']['value'] <= 0 || $variation['data']['prices']['default']['price']['value'] <= 0)
                     {
-                        $this->getLogger(__CLASS__)->warning('IO::Debug.PriceSearchExtension_freeItemFound', [
+                        $this->getLogger(self::class)->warning('IO::Debug.PriceSearchExtension_freeItemFound', [
                             'variation' => $variation,
                             'isAdminPreview' => Utils::isAdminPreview()
                         ]);

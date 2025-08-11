@@ -51,7 +51,7 @@ class CouponResource extends ApiResource
         try {
             $response = $couponService->setCoupon($couponCode);
             return $this->response->create( $response, ResponseCode::CREATED );
-        } catch (\Exception $e) {
+        } catch (\Exception) {
             return $this->response->create( null, Response::HTTP_UNPROCESSABLE_ENTITY);
         }
     }

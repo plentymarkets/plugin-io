@@ -180,7 +180,7 @@ class ItemController extends LayoutController
         }
 
         if (empty($itemResult['item']['documents'])) {
-            $this->getLogger(__CLASS__)->info(
+            $this->getLogger(self::class)->info(
                 "IO::Debug.ItemController_itemNotFound",
                 [
                     "slug" => $slug,

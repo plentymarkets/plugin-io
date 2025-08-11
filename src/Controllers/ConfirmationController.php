@@ -75,7 +75,7 @@ class ConfirmationController extends LayoutController
             try {
                 $order = $orderService->findOrderByAccessKey($orderId, $orderAccesskey);
             } catch (\Exception $e) {
-                $this->getLogger(__CLASS__)->warning(
+                $this->getLogger(self::class)->warning(
                     "IO::Debug.ConfirmationController_cannotFindOrderByAccessKey",
                     [
                         "orderId" => $orderId,
@@ -113,7 +113,7 @@ class ConfirmationController extends LayoutController
                     );
                 }
             } catch (\Exception $e) {
-                $this->getLogger(__CLASS__)->warning(
+                $this->getLogger(self::class)->warning(
                     "IO::Debug.ConfirmationController_cannotFindOrder",
                     [
                         "orderId" => $orderId,
@@ -137,7 +137,7 @@ class ConfirmationController extends LayoutController
                         $lastAccessedOrder['accessKey']
                     );
                 } catch (\Exception $e) {
-                    $this->getLogger(__CLASS__)->warning(
+                    $this->getLogger(self::class)->warning(
                         "IO::Debug.ConfirmationController_cannotFindLastOrderByAccessKey",
                         [
                             "orderId" => $lastAccessedOrder['orderId'],
@@ -189,7 +189,7 @@ class ConfirmationController extends LayoutController
             return $order;
         }
 
-        $this->getLogger(__CLASS__)->warning("IO::Debug.ConfirmationController_orderNotFound");
+        $this->getLogger(self::class)->warning("IO::Debug.ConfirmationController_orderNotFound");
         /** @var Response $response */
         $response = pluginApp(Response::class);
         $response->forceStatus(ResponseCode::NOT_FOUND);

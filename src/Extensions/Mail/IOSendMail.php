@@ -31,7 +31,7 @@ class IOSendMail
      */
     public function handle(PluginSendMail $pluginSendMail)
     {
-        $this->getLogger(__CLASS__)->debug(
+        $this->getLogger(self::class)->debug(
             "IO::Debug.IOSendMail_handleSendMail",
             [
                 "template" => $pluginSendMail->getTemplate(),
@@ -109,7 +109,7 @@ class IOSendMail
                 $this->setPlaceholderValue('Link_ChangePassword', '');
             }
 
-            $this->getLogger(__CLASS__)->debug(
+            $this->getLogger(self::class)->debug(
                 "IO::Debug.IOSendMail_placeholdersCollected",
                 [
                     "template" => $pluginSendMail->getTemplate(),

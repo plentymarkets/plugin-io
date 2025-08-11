@@ -52,7 +52,7 @@ class CustomerAuthenticationResource extends ApiResource
         }
         catch(\Exception $exception)
         {
-            $this->getLogger(__CLASS__)->warning(
+            $this->getLogger(self::class)->warning(
                 "IO::Debug.CustomerAuthenticationResource_loginFailed",
                 [
                     "code" => $exception->getCode(),

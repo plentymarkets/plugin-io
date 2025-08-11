@@ -388,8 +388,8 @@ class ShopUrls
         $key = $route;
 
         // Sanitize inputs
-        $routeParams = $routeParams ?? [];
-        $urlParams = $urlParams ?? [];
+        $routeParams ??= [];
+        $urlParams ??= [];
 
         if (count($routeParams) || count($urlParams)) {
             $key .= '.' . implode('.', $routeParams) . '.' . json_encode($urlParams);
@@ -453,16 +453,16 @@ class ShopUrls
      */
     public function equals($urlA, $urlB)
     {
-        if (substr($urlA, 0, 1) !== '/') {
+        if (!str_starts_with($urlA, '/')) {
             $urlA = '/' . $urlA;
         }
-        if (substr($urlA, -1, 1) !== '/') {
+        if (!str_ends_with($urlA, '/')) {
             $urlA = $urlA . '/';
         }
-        if (substr($urlB, 0, 1) !== '/') {
+        if (!str_starts_with($urlB, '/')) {
             $urlB = '/' . $urlB;
         }
-        if (substr($urlB, -1, 1) !== '/') {
+        if (!str_ends_with($urlB, '/')) {
             $urlB = $urlB . '/';
         }
         return $urlA === $urlB;
@@ -590,31 +590,31 @@ class ShopUrls
 
     private function getUrl($routeKey)
     {
-        switch ($routeKey) {
-            case RouteConfig::BASKET:               return $this->basket;
-            case RouteConfig::CANCELLATION_RIGHTS:  return $this->cancellationRights;
-            case RouteConfig::CANCELLATION_FORM:    return $this->cancellationForm;
-            case RouteConfig::CHANGE_MAIL:          return $this->changeMail;
-            case RouteConfig::CHECKOUT:             return $this->checkout;
-            case RouteConfig::CONFIRMATION:         return $this->confirmation;
-            case RouteConfig::CONTACT:              return $this->contact;
-            case RouteConfig::HOME:                 return $this->home;
-            case RouteConfig::LEGAL_DISCLOSURE:     return $this->legalDisclosure;
-            case RouteConfig::LOGIN:                return $this->login;
-            case RouteConfig::MY_ACCOUNT:           return $this->myAccount;
-            case RouteConfig::NEWSLETTER_OPT_OUT:   return $this->newsletterOptOut;
-            case RouteConfig::ORDER_DOCUMENT:       return $this->orderDocument;
-            case RouteConfig::ORDER_RETURN:         return $this->returns;
-            case RouteConfig::ORDER_RETURN_CONFIRMATION: return $this->returnConfirmation;
-            case RouteConfig::PASSWORD_RESET:       return $this->passwordReset;
-            case RouteConfig::PRIVACY_POLICY:       return $this->privacyPolicy;
-            case RouteConfig::DECLARATION_OF_ACCESSIBILITY:       return $this->declarationOfAccessibility;
-            case RouteConfig::REGISTER:             return $this->registration;
-            case RouteConfig::SEARCH:               return $this->search;
-            case RouteConfig::TERMS_CONDITIONS:     return $this->gtc;
-            case RouteConfig::WISH_LIST:            return $this->wishList;
-            default:                                return null;
-        }
+        return match ($routeKey) {
+            RouteConfig::BASKET => $this->basket,
+            RouteConfig::CANCELLATION_RIGHTS => $this->cancellationRights,
+            RouteConfig::CANCELLATION_FORM => $this->cancellationForm,
+            RouteConfig::CHANGE_MAIL => $this->changeMail,
+            RouteConfig::CHECKOUT => $this->checkout,
+            RouteConfig::CONFIRMATION => $this->confirmation,
+            RouteConfig::CONTACT => $this->contact,
+            RouteConfig::HOME => $this->home,
+            RouteConfig::LEGAL_DISCLOSURE => $this->legalDisclosure,
+            RouteConfig::LOGIN => $this->login,
+            RouteConfig::MY_ACCOUNT => $this->myAccount,
+            RouteConfig::NEWSLETTER_OPT_OUT => $this->newsletterOptOut,
+            RouteConfig::ORDER_DOCUMENT => $this->orderDocument,
+            RouteConfig::ORDER_RETURN => $this->returns,
+            RouteConfig::ORDER_RETURN_CONFIRMATION => $this->returnConfirmation,
+            RouteConfig::PASSWORD_RESET => $this->passwordReset,
+            RouteConfig::PRIVACY_POLICY => $this->privacyPolicy,
+            RouteConfig::DECLARATION_OF_ACCESSIBILITY => $this->declarationOfAccessibility,
+            RouteConfig::REGISTER => $this->registration,
+            RouteConfig::SEARCH => $this->search,
+            RouteConfig::TERMS_CONDITIONS => $this->gtc,
+            RouteConfig::WISH_LIST => $this->wishList,
+            default => null,
+        };
 
     }
 }

@@ -37,9 +37,9 @@ class PriceFaker extends AbstractFaker
 
     private function makeGraduatedPrices($defaultPrice)
     {
-        $price1 = $this->makePrice(rand(2, 5), $defaultPrice['unitPrice']['value']);
-        $price2 = $this->makePrice(rand(5, 25), $price1['unitPrice']['value']);
-        $price3 = $this->makePrice(rand(25, 100), $price2['unitPrice']['value']);
+        $price1 = $this->makePrice(random_int(2, 5), $defaultPrice['unitPrice']['value']);
+        $price2 = $this->makePrice(random_int(5, 25), $price1['unitPrice']['value']);
+        $price3 = $this->makePrice(random_int(25, 100), $price2['unitPrice']['value']);
 
         return [$price3, $price2, $price1];
     }

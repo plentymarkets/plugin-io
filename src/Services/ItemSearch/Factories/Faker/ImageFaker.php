@@ -30,14 +30,14 @@ class ImageFaker extends AbstractFaker
 
     public function makeImageList($imageList = [])
     {
-        $imageCount = rand(2, 4);
+        $imageCount = random_int(2, 4);
 
         $itemId = $this->global("itemId", $this->number());
         for($i = 0; $i < $imageCount; $i++)
         {
             $imageId        = $this->number();
-            $width          = rand(200, 500);
-            $height         = rand(200, 500);
+            $width          = random_int(200, 500);
+            $height         = random_int(200, 500);
             $imageName      = $this->trans("IO::Faker.itemImageName");
             $url            = $this->image($width, $height, $imageName);
             $default        = [
@@ -78,7 +78,7 @@ class ImageFaker extends AbstractFaker
                 ]
             ];
 
-            $imageList[$i] = $imageList[$i] ?? [];
+            $imageList[$i] ??= [];
             $this->merge($imageList[$i], $default);
         }
 

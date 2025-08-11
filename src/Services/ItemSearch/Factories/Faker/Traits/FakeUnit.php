@@ -61,7 +61,7 @@ trait FakeUnit
             'INH'
         ];
 
-        $index = rand(0, count($units));
+        $index = random_int(0, count($units));
         return $units[$index];
     }
 }

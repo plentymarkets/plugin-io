@@ -156,7 +156,7 @@ class MultiSearchFactory
                 $templateService = pluginApp(TemplateService::class);
                 $templateService->disableCacheForTemplate();
 
-                $this->getLogger(__CLASS__)->error(
+                $this->getLogger(self::class)->error(
                     "IO::Debug.MultiSearchFactory_searchResultError",
                     [
                         "resultName" => $searchName,

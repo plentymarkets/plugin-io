@@ -39,17 +39,17 @@ class UnitService
     /**
      * @var array
      */
-    public static $aMeasureUnits = array(
-        'MTR' => array('value' => self::METER, 'code' => 'm'),    //	Meter
-        'MTK' => array('value' => self::METER, 'code' => 'm'),    //	Quadratmeter
-        'SDM' => array('value' => self::DECIMETER, 'code' => 'dm'),    //	(?) Dezimeter
-        'CMT' => array('value' => self::CENTIMETER, 'code' => 'cm'),    //	Zentimeter
-        'SCM' => array('value' => self::CENTIMETER, 'code' => 'cm'),    //	Quadratzentimeter (kein Standard)
-        'CMK' => array('value' => self::CENTIMETER, 'code' => 'cm'),    //	Quadratzentimeter
-        'MMT' => array('value' => self::MILLIMETER, 'code' => 'mm'),    //	Millimeter
-        'MMK' => array('value' => self::MILLIMETER, 'code' => 'mm'),    //	Quadratmillimeter
-        'SMM' => array('value' => self::MILLIMETER, 'code' => 'mm'),    //	Quadratmillimeter (kein Standard)
-    );
+    public static $aMeasureUnits = [
+        'MTR' => ['value' => self::METER, 'code' => 'm'],    //	Meter
+        'MTK' => ['value' => self::METER, 'code' => 'm'],    //	Quadratmeter
+        'SDM' => ['value' => self::DECIMETER, 'code' => 'dm'],    //	(?) Dezimeter
+        'CMT' => ['value' => self::CENTIMETER, 'code' => 'cm'],    //	Zentimeter
+        'SCM' => ['value' => self::CENTIMETER, 'code' => 'cm'],    //	Quadratzentimeter (kein Standard)
+        'CMK' => ['value' => self::CENTIMETER, 'code' => 'cm'],    //	Quadratzentimeter
+        'MMT' => ['value' => self::MILLIMETER, 'code' => 'mm'],    //	Millimeter
+        'MMK' => ['value' => self::MILLIMETER, 'code' => 'mm'],    //	Quadratmillimeter
+        'SMM' => ['value' => self::MILLIMETER, 'code' => 'mm'],    //	Quadratmillimeter (kein Standard)
+    ];
 
     /**
      * UnitService constructor.

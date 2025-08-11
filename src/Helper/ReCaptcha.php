@@ -42,7 +42,7 @@ class ReCaptcha
             return false;
         }
 
-        $options = array(
+        $options = [
             CURLOPT_URL => "https://www.google.com/recaptcha/api/siteverify?secret=$secret&response=$token",
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_POST => true,
@@ -50,7 +50,7 @@ class ReCaptcha
                 "secret"   => $secret,
                 "response" => $token
             ])
-        );
+        ];
 
         $ch = curl_init();
 

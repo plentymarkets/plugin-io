@@ -193,7 +193,7 @@ class BaseSearchFactory
      */
     public function withFilter( $filter )
     {
-        $filterClass = get_class( $filter );
+        $filterClass = $filter::class;
         $this->filters[] = $filter;
         $this->filterInstances[$filterClass] = $filter;
         return $this;
@@ -324,7 +324,7 @@ class BaseSearchFactory
         }
 
         $sortingInterface = null;
-        if ( strpos( $field, 'texts.name' ) !== false )
+        if ( str_contains( $field, 'texts.name' ) )
         {
             $sortingInterface = pluginApp(
                 NameSorting::class,
@@ -337,7 +337,7 @@ class BaseSearchFactory
         }
         else if ( strlen($field) )
         {
-            if ( strpos( $field, 'sorting.price.') !== false )
+            if ( str_contains( $field, 'sorting.price.') )
             {
                 $field = sprintf(
                     'sorting.priceByClientDynamic.%d.%s',
@@ -440,12 +440,12 @@ class BaseSearchFactory
         {
             if ( $filter instanceof SearchFilter )
             {
-                $queryClasses[] = get_class($filter);
+                $queryClasses[] = $filter::class;
                 $search->addQuery( $filter );
             }
             else
             {
-                $filterClasses[] = get_class($filter);
+                $filterClasses[] = $filter::class;
                 $search->addFilter( $filter );
             }
         }
@@ -460,7 +460,7 @@ class BaseSearchFactory
         $aggregationClasses = [];
         foreach( $this->aggregations as $aggregation )
         {
-            $aggregationClasses[] = get_class($aggregation);
+            $aggregationClasses[] = $aggregation::class;
             $search->addAggregation( $aggregation );
         }
 
@@ -478,7 +478,7 @@ class BaseSearchFactory
 
         $search->addSource( $source );
 
-        $this->getLogger(__CLASS__)->debug(
+        $this->getLogger(self::class)->debug(
             "IO::Debug.BaseSearchFactory_buildSearch",
             [
                 "queries"       => $queryClasses,
@@ -541,10 +541,10 @@ class BaseSearchFactory
         foreach( $this->mutators as $mutator )
         {
             $processor->addMutator( $mutator );
-            $mutatorClasses[] = get_class($mutator);
+            $mutatorClasses[] = $mutator::class;
         }
 
-        $this->getLogger(__CLASS__)->debug(
+        $this->getLogger(self::class)->debug(
             "IO::Debug.BaseSearchFactory_prepareSearch",
             [
                 "hasCollapse"   => $collapse instanceof BaseCollapse,
