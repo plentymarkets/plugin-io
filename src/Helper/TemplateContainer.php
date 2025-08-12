@@ -59,7 +59,7 @@ class TemplateContainer
 	 */
 	public function setTemplate(string $template):TemplateContainer
 	{
-	    $this->getLogger(__CLASS__)->debug(
+	    $this->getLogger(self::class)->debug(
 	        "IO::Debug.TemplateContainer_setTemplate",
             [
                 "templateKey" => $this->templateKey,
@@ -106,7 +106,7 @@ class TemplateContainer
 	 */
 	public function setTemplateData( $customData )
 	{
-        $this->getLogger(__CLASS__)->debug(
+        $this->getLogger(self::class)->debug(
             "IO::Debug.TemplateContainer_setTemplateData",
             [
                 "templateKey" => $this->templateKey,
@@ -146,7 +146,7 @@ class TemplateContainer
      */
 	public function setContext($contextClass)
     {
-        $this->getLogger(__CLASS__)->debug(
+        $this->getLogger(self::class)->debug(
             "IO::Debug.TemplateContainer_setContext",
             [
                 "templateKey"  => $this->templateKey,
@@ -173,7 +173,7 @@ class TemplateContainer
 	 */
 	public function withData($data, string $identifier):TemplateContainer
 	{
-        $this->getLogger(__CLASS__)->debug(
+        $this->getLogger(self::class)->debug(
             "IO::Debug.TemplateContainer_mergeTemplateData",
             [
                 "templateKey" => $this->templateKey,

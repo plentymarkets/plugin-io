@@ -115,11 +115,11 @@ class IOServiceProvider extends ServiceProvider
         );
         $this->getApplication()->register(IORouteServiceProvider::class);
 
-        $this->getApplication()->singleton('IO\Helper\TemplateContainer');
+        $this->getApplication()->singleton(\IO\Helper\TemplateContainer::class);
 
-        $this->getApplication()->bind('IO\Builder\Item\ItemColumnBuilder');
-        $this->getApplication()->bind('IO\Builder\Item\ItemFilterBuilder');
-        $this->getApplication()->bind('IO\Builder\Item\ItemParamsBuilder');
+        $this->getApplication()->bind(\IO\Builder\Item\ItemColumnBuilder::class);
+        $this->getApplication()->bind(\IO\Builder\Item\ItemFilterBuilder::class);
+        $this->getApplication()->bind(\IO\Builder\Item\ItemParamsBuilder::class);
 
         // Register services
         $this->registerSingletons(
@@ -277,7 +277,7 @@ class IOServiceProvider extends ServiceProvider
                      /** @var BasketService $basketService */
                     $basketService = pluginApp(BasketService::class);
                     $basketService->deleteBasket();
-                } catch (\Exception $exception) { } // Nothing to do}
+                } catch (\Exception) { } // Nothing to do}
 
                 /** @var CustomerService $customerService */
                 $customerService = pluginApp(CustomerService::class);

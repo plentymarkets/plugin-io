@@ -30,7 +30,7 @@ class RegisterController extends LayoutController
         $shopBuilderRequest = pluginApp(ShopBuilderRequest::class);
 	    if($contactRepository->getContactId() > 0 && !$shopBuilderRequest->isShopBuilder())
         {
-            $this->getLogger(__CLASS__)->info("IO::Debug.RegisterController_alreadyLoggedIn");
+            $this->getLogger(self::class)->info("IO::Debug.RegisterController_alreadyLoggedIn");
             AuthGuard::redirect($urlService->getHomepageURL(), []);
         }
 

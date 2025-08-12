@@ -58,7 +58,7 @@ class OrderTrackingService
                 $trackingURL = $this->buildTrackingUrl($order, $parcelService->trackingUrl, $packageNumber, $lang);
             }
         } catch (\Exception $e) {
-            $this->getLogger(__CLASS__)->error("IO::Debug.OrderTrackingService_getTrackingURL", [
+            $this->getLogger(self::class)->error("IO::Debug.OrderTrackingService_getTrackingURL", [
                 'code' => $e->getCode(),
                 'message' => $e->getMessage()
             ]);
@@ -105,7 +105,7 @@ class OrderTrackingService
                 }
             }
         } catch (\Exception $e) {
-            $this->getLogger(__CLASS__)->error("IO::Debug.OrderTrackingService_getTrackingURL", [
+            $this->getLogger(self::class)->error("IO::Debug.OrderTrackingService_getTrackingURL", [
                 'code' => $e->getCode(),
                 'message' => $e->getMessage()
             ]);

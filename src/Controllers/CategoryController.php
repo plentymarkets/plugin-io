@@ -121,7 +121,7 @@ class CategoryController extends LayoutController
         $request = pluginApp(Request::class);
 
         if ($category === null || (($category->clients->count() == 0 || $category->details->count() == 0) && !$this->app->isAdminPreview())) {
-            $this->getLogger(__CLASS__)->warning(
+            $this->getLogger(self::class)->warning(
                 "IO::Debug.CategoryController_cannotDisplayCategory",
                 [
                     "category" => $category,
@@ -160,7 +160,7 @@ class CategoryController extends LayoutController
         $shopBuilderRequest->setMainCategory($category->id);
 
         if (RouteConfig::getCategoryId(RouteConfig::CHECKOUT) === $category->id || $shopBuilderRequest->getPreviewContentType() === 'checkout') {
-            $this->getLogger(__CLASS__)->info(
+            $this->getLogger(self::class)->info(
                 "IO::Debug.CategoryController_showCheckoutCategory",
                 [
                     "category" => $category,
@@ -175,7 +175,7 @@ class CategoryController extends LayoutController
         }
 
         if (RouteConfig::getCategoryId(RouteConfig::MY_ACCOUNT) === $category->id || $shopBuilderRequest->getPreviewContentType() === 'myaccount') {
-            $this->getLogger(__CLASS__)->info(
+            $this->getLogger(self::class)->info(
                 "IO::Debug.CategoryController_showMyAccountCategory",
                 [
                     "category" => $category,
@@ -190,7 +190,7 @@ class CategoryController extends LayoutController
         }
 
         if (RouteConfig::getCategoryId(RouteConfig::SEARCH) === $category->id || $shopBuilderRequest->getPreviewContentType() === 'itemsearch') {
-            $this->getLogger(__CLASS__)->info(
+            $this->getLogger(self::class)->info(
                 "IO::Debug.CategoryController_showMyAccountCategory",
                 [
                     "category" => $category,
@@ -206,7 +206,7 @@ class CategoryController extends LayoutController
         }
 
         if (RouteConfig::getCategoryId(RouteConfig::CONFIRMATION) === $category->id) {
-            $this->getLogger(__CLASS__)->info(
+            $this->getLogger(self::class)->info(
                 "IO::Debug.CategoryController_showConfirmationCategory",
                 [
                     "category" => $category,

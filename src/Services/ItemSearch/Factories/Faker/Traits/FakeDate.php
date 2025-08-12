@@ -6,7 +6,7 @@ trait FakeDate
 {
     protected function timestamp()
     {
-        return rand(0, time());
+        return random_int(0, time());
     }
 
     protected function dateString($format = "Y-m-d H:i:s")

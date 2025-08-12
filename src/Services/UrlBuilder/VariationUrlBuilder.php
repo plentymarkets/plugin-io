@@ -87,7 +87,7 @@ class VariationUrlBuilder
         }
 
         if (count(self::$urlPathMap[$itemId][$variationId]) <= 0) {
-            $this->getLogger(__CLASS__)->debug(
+            $this->getLogger(self::class)->debug(
                 'IO::Debug.VariationUrlBuilder_searchItem',
                 [
                     'itemId' => $itemId,
@@ -116,7 +116,7 @@ class VariationUrlBuilder
                     $authHelper = pluginApp(AuthHelper::class);
 
                     /** @var LoggerContract $logger */
-                    $logger = $this->getLogger(__CLASS__);
+                    $logger = $this->getLogger(self::class);
 
                     $authHelper->processUnguarded(
                         function () use ($variationId, $lang, $itemUrl, $logger) {
@@ -146,7 +146,7 @@ class VariationUrlBuilder
                 }
             }
         } else {
-            $this->getLogger(__CLASS__)->error(
+            $this->getLogger(self::class)->error(
                 'IO::Debug.VariationUrlBuilder_variationNotFound',
                 [
                     'itemId' => $itemId,
@@ -246,36 +246,28 @@ class VariationUrlBuilder
             return $this->buildUrlQuery($itemName4Url, $lang);
         }
 
-        switch ($urlPattern) {
-            case 'all':
-                // Fallback for variation based ceres-urls
-                return $this->getBranchUrl($itemData['defaultCategory'], $lang, 6)->join($itemName4Url);
-
-            case '':
-                // Default config for legacy callisto shops
-                // => /category_1/category_2/category_3/item_name
-                return $this->getBranchUrl($itemData['defaultCategory'], $lang, 3)->join($itemName4Url);
-            case 'cat1':
-                // => /category_1/name
-                return $this->getBranchUrl($itemData['defaultCategory'], $lang, 1)->join($itemName4Url);
-            case 'cat0':
-                // => /name
-                return $this->buildUrlQuery($itemName4Url, $lang);
-            case 'name_cat1':
-                // => /name/category_1
-                return $this->buildUrlQuery($itemName4Url, $lang)
-                    ->join(
-                        $this->getBranchUrl($itemData['defaultCategory'], $lang, 1)->getPath(false)
-                    );
-            case 'name_cat':
-                // => /name/category_1/category_2/category_3
-                return $this->buildUrlQuery($itemName4Url, $lang)
-                    ->join(
-                        $this->getBranchUrl($itemData['defaultCategory'], $lang, 3)->getPath(false)
-                    );
-            default:
-                return $this->getBranchUrl($itemData['defaultCategory'], $lang, 6)->join($itemName4Url);
-        }
+        return match ($urlPattern) {
+            // Fallback for variation based ceres-urls
+            'all' => $this->getBranchUrl($itemData['defaultCategory'], $lang, 6)->join($itemName4Url),
+            // Default config for legacy callisto shops
+            // => /category_1/category_2/category_3/item_name
+            '' => $this->getBranchUrl($itemData['defaultCategory'], $lang, 3)->join($itemName4Url),
+            // => /category_1/name
+            'cat1' => $this->getBranchUrl($itemData['defaultCategory'], $lang, 1)->join($itemName4Url),
+            // => /name
+            'cat0' => $this->buildUrlQuery($itemName4Url, $lang),
+            // => /name/category_1
+            'name_cat1' => $this->buildUrlQuery($itemName4Url, $lang)
+                ->join(
+                    $this->getBranchUrl($itemData['defaultCategory'], $lang, 1)->getPath(false)
+                ),
+            // => /name/category_1/category_2/category_3
+            'name_cat' => $this->buildUrlQuery($itemName4Url, $lang)
+                ->join(
+                    $this->getBranchUrl($itemData['defaultCategory'], $lang, 3)->getPath(false)
+                ),
+            default => $this->getBranchUrl($itemData['defaultCategory'], $lang, 6)->join($itemName4Url),
+        };
     }
 
     /**
@@ -305,7 +297,7 @@ class VariationUrlBuilder
                     }
                 }
             } else {
-                $this->getLogger(__CLASS__)->error(
+                $this->getLogger(self::class)->error(
                     'IO::Debug.VariationUrlBuilder_noCategoryBranch',
                     [
                         'categoryId' => $categoryId,
@@ -319,7 +311,7 @@ class VariationUrlBuilder
 
             return $categoryUrlBuilder->buildUrl($categoryId, $lang);
         } else {
-            $this->getLogger(__CLASS__)->warning(
+            $this->getLogger(self::class)->warning(
                 'IO::Debug.VariationUrlBuilder_categoryNotFound',
                 [
                     'categoryId' => $categoryId,

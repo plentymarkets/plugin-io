@@ -16,7 +16,7 @@ class Component extends AbstractFunction
     /**
      * @var array
      */
-    private $components = array();
+    private $components = [];
 
     /**
      * Get the twig function to internal method name mapping. (twig function => internal method)

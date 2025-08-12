@@ -49,7 +49,7 @@ class AvailabilityService
      */
     public function getAvailabilities(): array
     {
-        $availabilities = array();
+        $availabilities = [];
         for ($i = 1; $i <= 10; $i++) {
             $availability = $this->getAvailabilityById($i);
             if ($availability instanceof Availability) {

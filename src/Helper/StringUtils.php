@@ -28,7 +28,7 @@ class StringUtils
          */
 
         // replace "Basic Latin" and "Latin-1 Supplement" characters to a-z
-        $regex = array(
+        $regex = [
             '/&(a|o|u|A|O|U)ml;/u',
             // &aml; => ae, &oml; => oe, &uml; => ue, &Aml; => Ae, &Oml; => Oe, &Uml; =>Ue,
             '/[äÄ\xC6\xE6]/u',
@@ -57,16 +57,16 @@ class StringUtils
             // Ý,ý,ÿ => y
             '/[\\\\]/',
             // \ => empty string
-        );
+        ];
 
-        $replace = array('$1e', 'ae', 'oe', 'ue', 'ss', 'a', 'c', 'e', 'i', 'n', 'o', 'u', 'y', '');
+        $replace = ['$1e', 'ae', 'oe', 'ue', 'ss', 'a', 'c', 'e', 'i', 'n', 'o', 'u', 'y', ''];
 
         // if there are UTF-8 characters with Unicode above U+0077
         // add "Latin Extended-A"
         if (preg_match('/^[\x00-\xFF]+$/u', $n)) {
             $regex = array_merge(
                 $regex,
-                array(
+                [
                     '/[\x{0152}-\x{0153}]/u',            // Œ-œ => oe
                     '/[\x{0132}-\x{0133}]/u',            // Ĳ-ĳ => ij
                     '/[\x{017F}]/u',                    // ſ => ss
@@ -89,12 +89,12 @@ class StringUtils
                     '/[\x{0174}-\x{0175}]/u',            // Ŵ-ŵ => w
                     '/[\x{0176}-\x{0178}]/u',            // Ŷ-Ÿ => y
                     '/[\x{0179}-\x{017E}]/u'            // Ź-ž => z
-                )
+                ]
             );
 
             $replace = array_merge(
                 $replace,
-                array(
+                [
                     'oe',
                     'ij',
                     'ss',
@@ -117,7 +117,7 @@ class StringUtils
                     'w',
                     'y',
                     'z'
-                )
+                ]
             );
         }
 

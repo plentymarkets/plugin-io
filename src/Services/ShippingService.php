@@ -82,7 +82,7 @@ class ShippingService
                     if (!is_null($regionConstraint)) {
                         $generalSettings = $regionConstraint->constraint->first()->generalSettings;
                     } else {
-                        $this->getLogger(__CLASS__)->warning(
+                        $this->getLogger(self::class)->warning(
                             "IO::Debug.ShippingService_noShippingContraintFound",
                             [
                                 'country' => $country->toArray(),

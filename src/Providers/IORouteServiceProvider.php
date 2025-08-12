@@ -548,7 +548,7 @@ class IORouteServiceProvider extends RouteServiceProvider
     {
         // register single category url if global category route is disabled
         $lang = Utils::getLang();
-        if (strpos($shopUrl, "/{$lang}/") === 0) {
+        if (str_starts_with($shopUrl, "/{$lang}/")) {
             // remove language from shop url before registering the route
             $shopUrl = substr($shopUrl, strlen("/{$lang}/"));
         }

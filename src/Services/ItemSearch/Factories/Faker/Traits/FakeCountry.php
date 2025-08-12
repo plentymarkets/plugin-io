@@ -18,7 +18,7 @@ trait FakeCountry
             $this->countries = ArrayHelper::toArray($countryRepository->getCountriesList(null, []));
         }
 
-        $index = rand(0, count($this->countries));
+        $index = random_int(0, count($this->countries));
         return $this->countries[$index];
     }
 }

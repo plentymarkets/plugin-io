@@ -10,7 +10,7 @@ trait FakeString
 
     protected function text($minWords = 1, $maxWords = 100)
     {
-        $wordCount = rand($minWords, $maxWords);
+        $wordCount = random_int($minWords, $maxWords);
         $loremIpsum = explode(" ", FakeConstants::LOREM_IPSUM);
         $words = $loremIpsum;
         while(count($words) < $wordCount)
@@ -25,7 +25,7 @@ trait FakeString
     protected function word()
     {
         $words = explode(" ", FakeConstants::LOREM_IPSUM);
-        $index = rand(0, count($words));
+        $index = random_int(0, count($words));
         return $words[$index];
     }
 
@@ -45,7 +45,7 @@ trait FakeString
     protected function serial()
     {
         $tmp = strtoupper(uniqid());
-        return substr($tmp, 0, rand(1,3)) . "-" . substr($tmp, rand(3,5), rand(1,3)) . "-" . rand(0, 1000);
+        return substr($tmp, 0, random_int(1,3)) . "-" . substr($tmp, random_int(3,5), random_int(1,3)) . "-" . random_int(0, 1000);
     }
 
     protected function hash()
@@ -55,7 +55,7 @@ trait FakeString
 
     protected function url()
     {
-        $depth = rand(1, 5);
+        $depth = random_int(1, 5);
         $path = [];
         for($i = 0; $i < $depth; $i++)
         {
@@ -67,6 +67,6 @@ trait FakeString
 
     protected function hexColor()
     {
-        return "#".substr(md5(rand()), 0, 6);
+        return "#".substr(md5(random_int(0, mt_getrandmax())), 0, 6);
     }
 }

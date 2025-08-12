@@ -107,7 +107,7 @@ class DataFilter
             $resultFields,
             function( $prefixes, $resultField )
             {
-                if ( strpos($resultField, ".") !== false )
+                if ( str_contains($resultField, ".") )
                 {
                     $prefix = substr( $resultField, 0, strpos($resultField, ".") );
                     if ( !in_array( $prefix, $prefixes ) )
@@ -132,7 +132,7 @@ class DataFilter
                 {
                     $result[] = $resultField;
                 }
-                else if ( !is_null( $prefix ) && strpos( $resultField, $prefix . "." ) === 0 )
+                else if ( !is_null( $prefix ) && str_starts_with($resultField, $prefix . ".") )
                 {
                     $result[] = substr( $resultField, strlen($prefix) + 1 );
                 }

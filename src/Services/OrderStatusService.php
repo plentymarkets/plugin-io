@@ -59,7 +59,7 @@ class OrderStatusService
         $language = Utils::getLang();
         $orderStatusRepo = $this->orderStatusRepo;
         $statusHistoryRepo = $this->statusHistoryRepo;
-        $logger = $this->getLogger(__CLASS__)->addReference('orderId', $orderId);
+        $logger = $this->getLogger(self::class)->addReference('orderId', $orderId);
 
         $orderStatus = $this->authHelper->processUnguarded(function () use (
             $orderId,

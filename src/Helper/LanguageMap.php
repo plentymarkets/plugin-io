@@ -13,7 +13,7 @@ namespace IO\Helper;
  */
 class LanguageMap
 {
-    private static $locales = array(
+    private static $locales = [
         'de' => 'de_DE',
         'en' => 'en_GB',
         'bg' => 'de_DE',
@@ -33,9 +33,9 @@ class LanguageMap
         'sk' => 'sk_SK',
         'cn' => 'zh_CN',
         'vn' => 'vi_VN'
-    );
+    ];
 
-    private static $languages = array(
+    private static $languages = [
         'de' => 'de',
         'en' => 'en',
         'bg' => 'bg',
@@ -55,7 +55,7 @@ class LanguageMap
         'sk' => 'sk',
         'cn' => 'zh',
         'vn' => 'vi'
-    );
+    ];
 
     /**
      * Get the locale.

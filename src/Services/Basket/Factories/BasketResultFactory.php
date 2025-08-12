@@ -60,7 +60,7 @@ class BasketResultFactory
     {
         $itemSearchOptions = [
             'page'         => 1,
-            'itemsPerPage' => rand(1, 5),
+            'itemsPerPage' => random_int(1, 5),
             'sortingField' => 'item.random',
             'sortingOrder' => 'ASC'
         ];
@@ -83,7 +83,7 @@ class BasketResultFactory
             // Add urlPreview image to display in basket
             $itemData['data']['images']['all'][0]['urlPreview'] = $itemData['data']['images']['all'][0]['urlMiddle'];
 
-            $quantity = rand(1, 3);
+            $quantity = random_int(1, 3);
             $flatItemResult[] = [
                 'itemData' => $itemData,
                 'quantity' => $quantity

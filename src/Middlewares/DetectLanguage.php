@@ -38,7 +38,7 @@ class DetectLanguage extends Middleware
     
     public function detectLanguage($request, $url = null)
     {
-        if (substr($request->getRequestUri(), 0, strlen(self::WEB_AJAX_BASE)) !== self::WEB_AJAX_BASE) {
+        if (!str_starts_with($request->getRequestUri(), self::WEB_AJAX_BASE)) {
             $requestUri = $url ?? $request->get('plentyMarkets');
             
             /** @var WebstoreConfigurationRepositoryContract $webstoreConfigurationRepository */
@@ -54,7 +54,7 @@ class DetectLanguage extends Middleware
             }
             
             $langFromUrl = $request->get('Lang', CategoryController::$LANGUAGE_FROM_URL);
-            if (strpos(end($splittedURL), '.') === false) {
+            if (!str_contains(end($splittedURL), '.')) {
                 $this->setLanguage($langFromUrl, $webstoreConfig);
             }
         }

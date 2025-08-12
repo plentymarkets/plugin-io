@@ -32,7 +32,7 @@ abstract class AbstractGuard
     public function assertOrRedirect($expected, string $redirectUri)
     {
         if ($this->assert() !== $expected) {
-            $this->getLogger(__CLASS__)->info(
+            $this->getLogger(self::class)->info(
                 "IO::Debug.AbstractGuard_redirectToLogin",
                 [
                     "expected" => $expected,

@@ -41,7 +41,7 @@ trait MemoryCache
             /** @var Request $request */
             $request = pluginApp(Request::class);
             if($request->get('debug') === 'performance') {
-                $this->getLogger(__CLASS__)->error('MemoryCache: ' . self::class . '.' . $key . ': ' . (microtime(true) - $start));
+                $this->getLogger(self::class)->error('MemoryCache: ' . self::class . '.' . $key . ': ' . (microtime(true) - $start));
             }
         }
 

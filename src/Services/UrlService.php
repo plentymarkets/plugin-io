@@ -132,10 +132,10 @@ class UrlService
                     return null;
                 }
 
-                if (substr(TemplateService::$currentTemplate, 0, 12) === 'tpl.category' ||
-                    substr(TemplateService::$currentTemplate, 0, 12) === 'tpl.checkout' ||
-                    substr(TemplateService::$currentTemplate, 0, 14) === 'tpl.my-account' ||
-                    substr(TemplateService::$currentTemplate, 0, 16) === 'tpl.confirmation' ||
+                if (str_starts_with(TemplateService::$currentTemplate, 'tpl.category') ||
+                    str_starts_with(TemplateService::$currentTemplate, 'tpl.checkout') ||
+                    str_starts_with(TemplateService::$currentTemplate, 'tpl.my-account') ||
+                    str_starts_with(TemplateService::$currentTemplate, 'tpl.confirmation') ||
                     substr(TemplateService::$currentTemplate, 0, 11) === 'tpl.search') {
 
                     $currentCategory = $categoryService->getCurrentCategory();
@@ -193,7 +193,7 @@ class UrlService
     {
         $lang = Utils::getLang();
 
-        if (substr(TemplateService::$currentTemplate, 0, 12) === 'tpl.category') {
+        if (str_starts_with(TemplateService::$currentTemplate, 'tpl.category')) {
             /** @var CategoryService $categoryService */
             $categoryService = pluginApp(CategoryService::class);
             $currentCategory = $categoryService->getCurrentCategory();
@@ -310,7 +310,7 @@ class UrlService
      */
     public function redirectTo($redirectURL)
     {
-        if (strpos($redirectURL, 'http:') !== 0 && strpos($redirectURL, 'https:') !== 0) {
+        if (!str_starts_with($redirectURL, 'http:') && !str_starts_with($redirectURL, 'https:')) {
             /** @var UrlQuery $query */
             $query = pluginApp(UrlQuery::class, ['path' => $redirectURL]);
             $redirectURL = $query->toAbsoluteUrl(

@@ -102,7 +102,7 @@ class ItemDefaultImage implements ItemSearchExtension
 
         foreach( $resultFields as $field )
         {
-            if ( substr($field, 0, strlen($fieldPrefix)) === $fieldPrefix )
+            if ( str_starts_with($field, $fieldPrefix) )
             {
                 return true;
             }

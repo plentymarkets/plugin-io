@@ -6,6 +6,6 @@ trait FakeBoolean
 {
     protected function boolean()
     {
-        return rand() % 2 === 0;
+        return random_int(0, mt_getrandmax()) % 2 === 0;
     }
 }

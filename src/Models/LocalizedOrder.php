@@ -139,7 +139,7 @@ class LocalizedOrder extends ModelWrapper
         /** @var GiftCardRepositoryContract $giftCardRepository */
         $giftCardRepository = pluginApp(GiftCardRepositoryContract::class);
 
-        list($lang) = $data;
+        [$lang] = $data;
 
         $instance = pluginApp(self::class);
         $instance->order = $order;
@@ -187,7 +187,7 @@ class LocalizedOrder extends ModelWrapper
                 $order->methodOfPaymentId,
                 $lang
             );
-        } catch (\Exception $e) {
+        } catch (\Exception) {
         }
 
         $paymentStatusProperty = $order->properties->firstWhere('typeId', OrderPropertyType::PAYMENT_STATUS);

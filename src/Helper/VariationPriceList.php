@@ -193,7 +193,7 @@ class VariationPriceList
             else
             {
                 $basePrice = [];
-                list( $basePrice['lot'], $basePrice['price'], $basePrice['unitKey'] ) = $basePriceService->getUnitPrice($this->lot, $unitPrice, $this->unit);
+                [$basePrice['lot'], $basePrice['price'], $basePrice['unitKey']] = $basePriceService->getUnitPrice($this->lot, $unitPrice, $this->unit);
                 self::$basePrices[(string)$this->lot][(string)$unitPrice][$this->unit] = $basePrice;
             }
 

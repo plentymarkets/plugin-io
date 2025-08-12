@@ -222,7 +222,7 @@ class OrderService
             $paymentRepository = pluginApp(PaymentMethodRepositoryContract::class);
             $result = $paymentRepository->executePayment($paymentId, $orderId);
         } catch (\Exception $e) {
-            $this->getLogger(__CLASS__)->error(
+            $this->getLogger(self::class)->error(
                 'IO::Debug.OrderService_executePaymentFailed',
                 [
                     'orderId' => $orderId,
@@ -234,7 +234,7 @@ class OrderService
         }
 
         if ($result['type'] === "error") {
-            $this->getLogger(__CLASS__)->error(
+            $this->getLogger(self::class)->error(
                 'IO::Debug.OrderService_executePaymentError',
                 [
                     'orderId' => $orderId,
@@ -243,7 +243,7 @@ class OrderService
                 ]
             );
         } else {
-            $this->getLogger(__CLASS__)->debug(
+            $this->getLogger(self::class)->debug(
                 'IO::Debug.OrderService_executePayment',
                 [
                     'orderId' => $orderId,
@@ -814,7 +814,7 @@ class OrderService
     private function removeOrderItemPrefix(string $name, int $orderItemTypeId): string
     {
         $prefix = $this->getOrderItemPrefix($orderItemTypeId);
-        if ($prefix !== null && (substr($name, 0, strlen($prefix)) == $prefix)) {
+        if ($prefix !== null && (str_starts_with($name, $prefix))) {
             $name = substr($name, strlen($prefix));
         }
 
@@ -830,7 +830,7 @@ class OrderService
     public function containsComponentPrefix(string $name): bool
     {
         $prefix = $this->getOrderItemPrefix(\Plenty\Modules\Order\Models\OrderItemType::TYPE_BUNDLE_COMPONENT);
-        if (!empty($prefix) && (substr($name, 0, strlen($prefix)) == $prefix)) {
+        if (!empty($prefix) && (str_starts_with($name, $prefix))) {
             return true;
         }
         return false;
@@ -856,7 +856,7 @@ class OrderService
      */
     private function handleThrowable(\Throwable $throwable, $message = null)
     {
-        $this->getLogger(__CLASS__)->error(
+        $this->getLogger(self::class)->error(
             $message ?? "IO::Debug.OrderService_orderCompleteError",
             [
                 'message' => $throwable->getMessage()
@@ -955,8 +955,8 @@ class OrderService
                         return $returnStatus;
                     }
                 );
-            } catch (\Exception $e) {
-                $this->getLogger(__CLASS__)->warning(
+            } catch (\Exception) {
+                $this->getLogger(self::class)->warning(
                     'IO::Debug.OrderService_returnStatusNotFound',
                     [
                         'statusId' => $returnStatus

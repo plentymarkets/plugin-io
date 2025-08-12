@@ -25,7 +25,7 @@ trait FakeLanguage
             return $lang !== 'en' ? 'en' : 'de';
         }
 
-        $index = rand(0, count($languages));
+        $index = random_int(0, count($languages));
 
         return $languages[$index];
     }

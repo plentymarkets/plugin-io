@@ -33,12 +33,12 @@ class ExternalContent extends AbstractFunction
      */
     public function getExternalContent(string $url): array
     {
-        $options = array(
+        $options = [
             CURLOPT_URL => $url,
             CURLOPT_HEADER => 0,
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_TIMEOUT => 4
-        );
+        ];
 
         $ch = curl_init();
 

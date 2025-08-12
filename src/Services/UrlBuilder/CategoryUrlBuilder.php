@@ -51,7 +51,7 @@ class CategoryUrlBuilder
             );
         }
 
-        $this->getLogger(__CLASS__)->error(
+        $this->getLogger(self::class)->error(
             'IO::Debug.CategoryUrlBuilder_categoryNotFound',
             [
                 'categoryId' => $categoryId,

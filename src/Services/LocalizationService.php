@@ -75,7 +75,7 @@ class LocalizationService
 
         try {
             return $resource->load("$plugin::lang/$lang/$group")->getData();
-        } catch (\Exception $e) {
+        } catch (\Exception) {
             // TODO: get fallback language from webstore configuration
             return $resource->load("$plugin::lang/en/$group")->getData();
         }

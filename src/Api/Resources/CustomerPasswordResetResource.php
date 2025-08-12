@@ -78,7 +78,7 @@ class CustomerPasswordResetResource extends ApiResource
                 $this->sendMail(AutomaticEmailTemplate::CONTACT_NEW_PASSWORD, AutomaticEmailContact::class, $params);
 
                 return $this->response->create(true, ResponseCode::OK);
-            } catch (\Exception $e) {
+            } catch (\Exception) {
                 return $this->response->create( null, ResponseCode::INTERNAL_SERVER_ERROR);
             }
         }
