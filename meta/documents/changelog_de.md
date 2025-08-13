@@ -1,5 +1,11 @@
 # Release Notes für IO
 
+## v5.0.75 (2025-08-12) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.74...5.0.75" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
+
+### Behoben
+
+- Verbesserte Codequalität und Stabilität mit Rector
+
 ## v5.0.74 (2025-06-26) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.73...5.0.74" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
 
 ### Behoben
