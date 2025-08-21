@@ -75,7 +75,7 @@ class VariationUrlBuilder
             $lang = pluginApp( SessionStorageService::class )->getLang();
         }
 
-        if ( count( self::$urlPathMap[$itemId][$variationId] ) <= 0 )
+        if ( count( self::$urlPathMap[$itemId][$variationId] ?? [] ) <= 0 )
         {
             $this->searchItem( $itemId, $variationId, $lang );
 
