@@ -1,5 +1,11 @@
 # Release Notes for IO
 
+## v5.0.76 (2025-09-01) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.75...5.0.76" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
+
+### Fixed
+
+- Widgets in the ShopBuilder could not be loaded under certain circumstances. This has been fixed.
+
 ## v5.0.75 (2025-08-12) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.74...5.0.75" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
 
 ### Fixed
