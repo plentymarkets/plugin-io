@@ -10,7 +10,7 @@ trait FakeString
 
     protected function text($minWords = 1, $maxWords = 100)
     {
-        $wordCount = random_int($minWords, $maxWords);
+        $wordCount = random_int($minWords, max($minWords, $maxWords));
         $loremIpsum = explode(" ", FakeConstants::LOREM_IPSUM);
         $words = $loremIpsum;
         while(count($words) < $wordCount)
