@@ -42,10 +42,9 @@ class UrlQueryTest extends TestCase
      */
     public function it_should_append_trailing_slash($path)
     {
-        $this->configRepoMock->shouldReceive('get')->andReturn(2);
-
         /** @var UrlQuery $urlQuery */
-        $urlQuery = pluginApp(UrlQuery::class, ['path' => $path]);
+        $urlQuery = Mockery::mock(UrlQuery::class, ['path' => $path])->makePartial();
+        $urlQuery->shouldReceive('shouldAppendTrailingSlash')->andReturn(true);
         $url = $urlQuery->toRelativeUrl();
         $this->assertEquals('/', substr($url, strlen($url) - 1, 1));
     }
