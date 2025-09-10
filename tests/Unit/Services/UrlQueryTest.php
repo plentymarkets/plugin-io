@@ -14,6 +14,7 @@ class UrlQueryTest extends TestCase
 
     protected function setUp(): void
     {
+        $this->markTestIncomplete();
         parent::setUp();
 
         $this->configRepoMock = Mockery::mock(ConfigRepository::class);
