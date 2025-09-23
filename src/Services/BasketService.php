@@ -194,6 +194,13 @@ class BasketService
             }
 
             if ($this->couponService->effectsOnShippingCosts($campaign)) {
+                if ($couponValidation->shippingDiscountNet < 0) {
+                    $couponValidation->shippingDiscountNet *= -1;
+                }
+                if ($couponValidation->shippingDiscount < 0) {
+                    $couponValidation->shippingDiscount *= -1;
+                }
+
                 $basket['shippingAmountNet'] -= $couponValidation->shippingDiscountNet;
                 $basket['shippingAmount'] -= $couponValidation->shippingDiscount;
             }
