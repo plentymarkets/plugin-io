@@ -201,7 +201,7 @@ class BasketService
                 ]
             );
 
-            if ($this->couponService->effectsOnShippingCosts($campaign)) {
+            if ($this->couponService->effectsOnShippingCosts($campaign) && !$basket['shippingDeleteByCoupon']) {
                 if ($couponValidation->shippingDiscountNet < 0) {
                     $basket['shippingAmountNet'] += $couponValidation->shippingDiscountNet;
                 } else {
