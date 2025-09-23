@@ -193,6 +193,14 @@ class BasketService
                 $basket['couponDiscount'] = $couponValidation->salesDiscountNet;
             }
 
+            $this->getLogger(self::class)->debug(
+                "IO::Debug.TemplateContainer_setTemplate",
+                [
+                    "basket" => $basket,
+                    "couponValidation" => $couponValidation
+                ]
+            );
+
             if ($this->couponService->effectsOnShippingCosts($campaign)) {
                 if ($couponValidation->shippingDiscountNet < 0) {
                     $basket['shippingAmountNet'] += $couponValidation->shippingDiscountNet;
