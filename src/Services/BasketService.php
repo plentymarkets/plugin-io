@@ -195,14 +195,15 @@ class BasketService
 
             if ($this->couponService->effectsOnShippingCosts($campaign)) {
                 if ($couponValidation->shippingDiscountNet < 0) {
-                    $couponValidation->shippingDiscountNet *= -1;
+                    $basket['shippingAmountNet'] += $couponValidation->shippingDiscountNet;
+                } else {
+                    $basket['shippingAmountNet'] -= $couponValidation->shippingDiscountNet;
                 }
                 if ($couponValidation->shippingDiscount < 0) {
-                    $couponValidation->shippingDiscount *= -1;
+                    $basket['shippingAmount'] += $couponValidation->shippingDiscount;
+                } else {
+                    $basket['shippingAmount'] -= $couponValidation->shippingDiscount;
                 }
-
-                $basket['shippingAmountNet'] -= $couponValidation->shippingDiscountNet;
-                $basket['shippingAmount'] -= $couponValidation->shippingDiscount;
             }
         }
 
