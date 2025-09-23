@@ -194,7 +194,7 @@ class BasketService
             }
 
             $this->getLogger(self::class)->debug(
-                "IO::Debug.TemplateContainer_setTemplate",
+                "IO::Debug.BasketService_ShippingCheck",
                 [
                     "basket" => $basket,
                     "couponValidation" => $couponValidation
