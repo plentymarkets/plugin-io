@@ -201,12 +201,17 @@ class BasketService
                 ]
             );
 
-            if (
-                $this->couponService->effectsOnShippingCosts($campaign) &&
-                !$basket['shippingDeleteByCoupon']
-            ) {
-                $basket['shippingAmountNet'] -= abs($couponValidation->shippingDiscountNet);
-                $basket['shippingAmount'] -= abs($couponValidation->shippingDiscount);
+            if ($this->couponService->effectsOnShippingCosts($campaign) && !$basket['shippingDeleteByCoupon']) {
+                if ($couponValidation->shippingDiscountNet < 0) {
+                    $basket['shippingAmountNet'] += $couponValidation->shippingDiscountNet;
+                } else {
+                    $basket['shippingAmountNet'] -= $couponValidation->shippingDiscountNet;
+                }
+                if ($couponValidation->shippingDiscount < 0) {
+                    $basket['shippingAmount'] += $couponValidation->shippingDiscount;
+                } else {
+                    $basket['shippingAmount'] -= $couponValidation->shippingDiscount;
+                }
             }
         }
 
