@@ -193,6 +193,15 @@ class BasketService
                 $basket['couponDiscount'] = $couponValidation->salesDiscountNet;
             }
 
+            $this->getLogger(self::class)->debug(
+                "IO::Debug.BasketService_checkShipping",
+                [
+                    "basket" => $basket,
+                    "couponValidation" => $couponValidation,
+                    "order" => $order,
+                ]
+            );
+
             if ($this->couponService->effectsOnShippingCosts($campaign)) {
                 $basket['shippingAmountNet'] -= $couponValidation->shippingDiscountNet;
                 $basket['shippingAmount'] -= $couponValidation->shippingDiscount;
