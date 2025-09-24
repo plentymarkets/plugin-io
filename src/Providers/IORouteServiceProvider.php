@@ -36,6 +36,14 @@ class IORouteServiceProvider extends RouteServiceProvider
             }
         );
 
+        $api->version(
+            ['v1'],
+            ['namespace' => 'IO\Api\Resources', 'middleware' => ['throttleFrontend:password-reset']],
+            function (ApiRouter $api) {
+                $api->resource('io/customer/password_reset', 'CustomerPasswordResetResource');
+            }
+        );
+
         $api->version(['v1'], ['namespace' => 'IO\Api\Resources'], function (ApiRouter $api) {
             $api->get('io/basket', 'BasketResource@index');
             $api->resource('io/basket/items', 'BasketItemResource');
@@ -49,7 +57,6 @@ class IORouteServiceProvider extends RouteServiceProvider
             $api->resource('io/customer/login', 'CustomerAuthenticationResource');
             $api->resource('io/customer/logout', 'CustomerLogoutResource');
             $api->resource('io/customer/password', 'CustomerPasswordResource');
-            $api->resource('io/customer/password_reset', 'CustomerPasswordResetResource');
             $api->resource('io/customer/mail', 'CustomerMailResource');
             $api->get('io/customer/order/list', 'CustomerOrderResource@index');
             $api->resource('io/customer/newsletter', 'CustomerNewsletterResource');
