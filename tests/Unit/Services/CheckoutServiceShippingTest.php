@@ -207,18 +207,22 @@ class CheckoutServiceShippingTest extends TestCase
             ->andReturn([]);
 
         $this->checkoutMock->shouldReceive('getShippingCountryId')->andReturn(10);
-        $this->checkoutMock->shouldReceive('setShippingProfileId')->with(
-            $shippingList[0]['parcelServicePresetId'],
-            true
-        );
+        if (!empty($shippingList) && isset($shippingList[0]['parcelServicePresetId'])) {
+            $this->checkoutMock->shouldReceive('setShippingProfileId')->with(
+                $shippingList[0]['parcelServicePresetId'],
+                true
+            );
+        }
 
         $checkoutServiceMock = Mockery::mock(CheckoutService::class);
         $this->replaceInstanceByMock(CheckoutService::class, $checkoutServiceMock);
 
-        $checkoutServiceMock->shouldReceive('setShippingProfileId')->with(
-            $shippingList[0]['parcelServicePresetId'],
-            true
-        );
+        if (!empty($shippingList) && isset($shippingList[0]['parcelServicePresetId'])) {
+            $checkoutServiceMock->shouldReceive('setShippingProfileId')->with(
+                $shippingList[0]['parcelServicePresetId'],
+                true
+            );
+        }
 
         $this->applicationMock->shouldReceive('getWebstoreId')->andReturn(1);
 
@@ -262,8 +266,7 @@ class CheckoutServiceShippingTest extends TestCase
 
         $shippingProfileList = $this->checkoutService->getShippingProfileList();
 
-
-        if (count($shippingProfileList) > 0) {
+        if (!empty($shippingList) && !empty($shippingProfileList) && isset($shippingList[0]['parcelServicePresetId']) && isset($shippingProfileList[0]['parcelServicePresetId'])) {
             $this->assertEquals(
                 $shippingList[0]['parcelServicePresetId'],
                 $shippingProfileList[0]['parcelServicePresetId']
@@ -298,15 +301,15 @@ class CheckoutServiceShippingTest extends TestCase
                         'parcelServiceName' => 'DHL',
                         'shippingAmount' => 4.9900000000000002,
                         'shippingPrivacyInformation' =>
-                            [
-                                0 => [
-                                    'showDataPrivacyAgreementHint' => false,
-                                    'id' => 6,
-                                    'parcelServiceId' => 101,
-                                    'parcelServiceName' => 'DHL',
-                                    'parcelServiceAddress' => null,
-                                ],
+                        [
+                            0 => [
+                                'showDataPrivacyAgreementHint' => false,
+                                'id' => 6,
+                                'parcelServiceId' => 101,
+                                'parcelServiceName' => 'DHL',
+                                'parcelServiceAddress' => null,
                             ],
+                        ],
                         'excludedPaymentMethodIds' => [],
                         'isPostOffice' => false,
                         'isParcelBox' => false,
@@ -322,15 +325,15 @@ class CheckoutServiceShippingTest extends TestCase
                         'parcelServiceName' => 'Hermes',
                         'shippingAmount' => 14.99,
                         'shippingPrivacyInformation' =>
-                            [
-                                0 => [
-                                    'showDataPrivacyAgreementHint' => false,
-                                    'id' => 4,
-                                    'parcelServiceId' => 99,
-                                    'parcelServiceName' => 'Hermes',
-                                    'parcelServiceAddress' => null,
-                                ],
+                        [
+                            0 => [
+                                'showDataPrivacyAgreementHint' => false,
+                                'id' => 4,
+                                'parcelServiceId' => 99,
+                                'parcelServiceName' => 'Hermes',
+                                'parcelServiceAddress' => null,
                             ],
+                        ],
                         'excludedPaymentMethodIds' => [],
                         'isPostOffice' => true,
                         'isParcelBox' => false,

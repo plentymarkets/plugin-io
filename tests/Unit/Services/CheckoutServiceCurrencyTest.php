@@ -34,8 +34,8 @@ class CheckoutServiceCurrencyTest extends TestCase
     protected $checkoutMock;
     /** @var SessionStorageRepositoryContract $sessionStorageRepositoryMock */
     protected $sessionStorageRepositoryMock;
-    /** @var LocalizationRepositoryContract $localozationRepositoryMock */
-    protected $localozationRepositoryMock;
+    /** @var LocalizationRepositoryContract $localizationRepositoryMock */
+    protected $localizationRepositoryMock;
     /** @var MemoryCache $memoryCacheMock */
     protected $memoryCacheMock;
 
@@ -58,10 +58,10 @@ class CheckoutServiceCurrencyTest extends TestCase
             $this->webstoreConfigurationRepositoryMock
         );
 
-        $this->localozationRepositoryMock = Mockery::mock(LocalizationRepositoryContract::class);
+        $this->localizationRepositoryMock = Mockery::mock(LocalizationRepositoryContract::class);
         $this->replaceInstanceByMock(
             LocalizationRepositoryContract::class,
-            $this->localozationRepositoryMock
+            $this->localizationRepositoryMock
         );
 
         $this->checkoutMock = Mockery::mock(Checkout::class);
@@ -102,7 +102,7 @@ class CheckoutServiceCurrencyTest extends TestCase
 
         $this->checkoutMock->shouldReceive('setCurrency')->andReturn();
 
-        $this->localozationRepositoryMock->shouldReceive('getLanguage')->andReturn($webstoreConfiguration->defaultLanguage);
+        $this->localizationRepositoryMock->shouldReceive('getLanguage')->andReturn($webstoreConfiguration->defaultLanguage);
         $currency = $this->checkoutRepository->getCurrency();
 
         $this->assertNotNull($currency);
@@ -125,7 +125,6 @@ class CheckoutServiceCurrencyTest extends TestCase
         $this->sessionStorageMock->shouldReceive('getPlugin')->andReturn($this->pluginMock);
         $this->sessionStorageRepositoryMock->shouldIgnoreMissing();
 
-
         Session::shouldReceive('getLang')
             ->andReturn("");
 
@@ -133,10 +132,11 @@ class CheckoutServiceCurrencyTest extends TestCase
 
         $this->checkoutMock->shouldReceive('setCurrency')->andReturn();
 
+        $this->localizationRepositoryMock->shouldReceive('getLanguage')->andReturn('');
+
         $currency = $this->checkoutRepository->getCurrency();
 
         $this->assertNotNull($currency);
         $this->assertEquals($expectedCurrency, $currency);
     }
-
 }
