@@ -34,8 +34,7 @@ class UrlService
      */
     public function __construct(
         WebstoreConfigurationRepositoryContract $webstoreConfigurationRepository
-    )
-    {
+    ) {
         $this->webstoreConfigurationRepository = $webstoreConfigurationRepository;
     }
 
@@ -90,7 +89,6 @@ class UrlService
                 if ($variationUrl->getPath() !== null) {
                     $variationUrl->append(
                         $urlBuilderRepository->getSuffix($itemId, $variationId)
-
                     );
                 }
 
@@ -132,15 +130,16 @@ class UrlService
                     return null;
                 }
 
-                if (str_starts_with(TemplateService::$currentTemplate, 'tpl.category') ||
+                if (
+                    str_starts_with(TemplateService::$currentTemplate, 'tpl.category') ||
                     str_starts_with(TemplateService::$currentTemplate, 'tpl.checkout') ||
                     str_starts_with(TemplateService::$currentTemplate, 'tpl.my-account') ||
                     str_starts_with(TemplateService::$currentTemplate, 'tpl.confirmation') ||
-                    substr(TemplateService::$currentTemplate, 0, 11) === 'tpl.search') {
-
+                    substr(TemplateService::$currentTemplate, 0, 11) === 'tpl.search'
+                ) {
                     $currentCategory = $categoryService->getCurrentCategory();
 
-                    if(RouteConfig::getCategoryId(RouteConfig::HOME) === $currentCategory->id) {
+                    if (RouteConfig::getCategoryId(RouteConfig::HOME) === $currentCategory->id) {
                         // FIX return homepage url as canonical when showing homepage category
                         return pluginApp(UrlQuery::class, ['path' => "", 'lang' => $lang])
                             ->toAbsoluteUrl($includeLanguage);
@@ -149,9 +148,11 @@ class UrlService
                     if ($currentCategory !== null) {
                         $categoryDetails = $categoryService->getDetails($currentCategory, $lang);
 
-                        if ($categoryDetails !== null && strlen(
+                        if (
+                            $categoryDetails !== null && strlen(
                                 $categoryDetails->canonicalLink
-                            ) > 0 && $ignoreCanonical === false) {
+                            ) > 0 && $ignoreCanonical === false
+                        ) {
                             return $categoryDetails->canonicalLink;
                         }
 
@@ -164,7 +165,7 @@ class UrlService
                     }
 
                     return null;
-                } elseif (TemplateService::$currentTemplate === 'tpl.home' || TemplateService::$currentTemplate === 'tpl.home.category')   {
+                } elseif (TemplateService::$currentTemplate === 'tpl.home' || TemplateService::$currentTemplate === 'tpl.home.category') {
                     return pluginApp(UrlQuery::class, ['path' => "", 'lang' => $lang])
                         ->toAbsoluteUrl($includeLanguage);
                 } elseif (TemplateService::$currentTemplate === 'tpl.login') {
@@ -201,8 +202,10 @@ class UrlService
             if ($currentCategory !== null) {
                 $categoryDetails = $categoryService->getDetails($currentCategory, $lang);
 
-                if ($categoryDetails !== null &&
-                    strlen($categoryDetails->canonicalLink) > 0) {
+                if (
+                    $categoryDetails !== null &&
+                    strlen($categoryDetails->canonicalLink) > 0
+                ) {
                     return '';
                 }
             }
@@ -238,9 +241,8 @@ class UrlService
 
         $queryParameters = $request->query();
         $queryParameters = Utils::cleanUpExcludesContentCacheParams($queryParameters);
-        $queryParameters = http_build_query($queryParameters, null, '&', PHP_QUERY_RFC3986);
-        if (strlen($queryParameters) > 0)
-        {
+        $queryParameters = http_build_query($queryParameters, '', '&', PHP_QUERY_RFC3986);
+        if (strlen($queryParameters) > 0) {
             $url .= '?' . $queryParameters;
         }
 

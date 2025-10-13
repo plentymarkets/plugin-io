@@ -1,4 +1,4 @@
-<?php //strict
+<?php
 
 namespace IO\Services;
 
@@ -17,7 +17,7 @@ use Plenty\Modules\Webshop\Contracts\SessionStorageRepositoryContract;
 class NotificationService
 {
     /** @var SessionStorageRepositoryContract */
-    private $sessionStorageRepository;
+    private SessionStorageRepositoryContract $sessionStorageRepository;
 
     /**
      * BasketService constructor.
@@ -34,7 +34,7 @@ class NotificationService
      * @param bool $clear Optional: If true, notifications are cleared from the session afterwards (Default: true)
      * @return array
      */
-    public function getNotifications($clear = true): array
+    public function getNotifications(bool $clear = true): array
     {
         $notifications = json_decode(
             $this->sessionStorageRepository->getSessionValue(SessionStorageRepositoryContract::NOTIFICATIONS) ?? '',
@@ -65,7 +65,7 @@ class NotificationService
      * @param int $code Optional: Message code (Default: 0)
      * @param array|null $placeholder Optional: A placeholder
      */
-    private function addNotification(string $message, string $type, int $code = 0, array $placeholder = null)
+    private function addNotification(string $message, string $type, int $code = 0, array $placeholder = null): void
     {
         $notifications = $this->getNotifications(false);
         if (!array_key_exists($type, $notifications)) {
@@ -83,7 +83,7 @@ class NotificationService
         if (!is_null($lastNotification)) {
             $notification['stackTrace'] = $lastNotification['stackTrace'];
             $lastNotification['stackTrace'] = [];
-            array_push($notification['stackTrace'], $lastNotification);
+            $notification['stackTrace'][] = $lastNotification;
         }
 
         $notifications[$type] = $notification;
@@ -100,7 +100,7 @@ class NotificationService
      * @param int $code Optional: Message code (Default: 0)
      * @param array|null $placeholder Optional: A placeholder
      */
-    public function log(string $message, $code = 0, array $placeholder = null)
+    public function log(string $message, $code = 0, array $placeholder = null): void
     {
         $this->addNotification($message, LogLevel::LOG, $code, $placeholder);
     }
@@ -111,7 +111,7 @@ class NotificationService
      * @param int $code Optional: Message code (Default: 0)
      * @param array|null $placeholder Optional: A placeholder
      */
-    public function info(string $message, $code = 0, array $placeholder = null)
+    public function info(string $message, $code = 0, array $placeholder = null): void
     {
         $this->addNotification($message, LogLevel::INFO, $code, $placeholder);
     }
@@ -122,7 +122,7 @@ class NotificationService
      * @param int $code Optional: Message code (Default: 0)
      * @param array|null $placeholder Optional: A placeholder
      */
-    public function warn(string $message, $code = 0, array $placeholder = null)
+    public function warn(string $message, $code = 0, array $placeholder = null): void
     {
         $this->addNotification($message, LogLevel::WARN, $code, $placeholder);
     }
@@ -133,7 +133,7 @@ class NotificationService
      * @param int $code Optional: Message code (Default: 0)
      * @param array|null $placeholder Optional: A placeholder
      */
-    public function error(string $message, $code = 0, array $placeholder = null)
+    public function error(string $message, $code = 0, array $placeholder = null): void
     {
         $this->addNotification($message, LogLevel::ERROR, $code, $placeholder);
     }
@@ -144,7 +144,7 @@ class NotificationService
      * @param int $code Optional: Message code (Default: 0)
      * @param array|null $placeholder Optional: A placeholder
      */
-    public function success(string $message, $code = 0, array $placeholder = null)
+    public function success(string $message, $code = 0, array $placeholder = null): void
     {
         $this->addNotification($message, LogLevel::SUCCESS, $code, $placeholder);
     }
@@ -155,7 +155,7 @@ class NotificationService
      * @param int $code Optional: Message code (Default: 0)
      * @param array|null $placeholder Optional: A placeholder
      */
-    public function addNotificationCode($type, int $code = 0, array $placeholder = null)
+    public function addNotificationCode($type, int $code = 0, array $placeholder = null): void
     {
         $this->addNotification("", $type, $code, $placeholder);
     }
@@ -164,7 +164,7 @@ class NotificationService
      * Check if the session currently has any notifications
      * @return bool
      */
-    public function hasNotifications()
+    public function hasNotifications(): bool
     {
         $notifications = json_decode(
             $this->sessionStorageRepository->getSessionValue(SessionStorageRepositoryContract::NOTIFICATIONS) ?? '',
@@ -176,8 +176,11 @@ class NotificationService
     /**
      * Clear existing notifications
      */
-    public function clearNotifications()
+    public function clearNotifications(): void
     {
-        $this->sessionStorageRepository->setSessionValue(SessionStorageRepositoryContract::NOTIFICATIONS, json_encode([]));
+        $this->sessionStorageRepository->setSessionValue(
+            SessionStorageRepositoryContract::NOTIFICATIONS,
+            json_encode([])
+        );
     }
 }
