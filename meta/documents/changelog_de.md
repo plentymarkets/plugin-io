@@ -1,5 +1,11 @@
 # Release Notes für IO
 
+## v5.0.77 (2025-10-13) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.76...5.0.77" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
+
+### Behoben
+
+- Rate Limit für Passwort-Rücksetzungsanfragen.
+
 ## v5.0.76 (2025-09-01) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.75...5.0.76" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
 
 ### Behoben
