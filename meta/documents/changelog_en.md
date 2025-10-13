@@ -1,10 +1,10 @@
 # Release Notes for IO
 
-## v5.0.xx (2025-xx-xx) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.76...5.0.xx" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
+## v5.0.77 (2025-10-13) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.76...5.0.77" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
 
 ### Fixed
 
-- Added rate limit for request password reset.
+- Added rate limit for password reset request.
 
 ## v5.0.76 (2025-09-01) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.75...5.0.76" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
 
