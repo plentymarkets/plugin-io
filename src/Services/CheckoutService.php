@@ -640,7 +640,7 @@ class CheckoutService
                     try {
                         $address = $this->customerService->getAddress($deliveryAddressId, $type);
                         $params['zipCode'] = $address->postalCode;
-                    } catch (\Exception $exception) {
+                    } catch (\Exception) {
                     }
                 }
 
@@ -665,6 +665,24 @@ class CheckoutService
                 if (!is_null($order)) {
                     $isNet = $order->isNet;
                 }
+                $basket = $this->basketService->getBasket();
+                $fallbackShippingProfileId = null;
+                $exists = false;
+                if (is_array($list)) {
+                    foreach ($list as $key => $shippingProfile) {
+                        if (is_null($fallbackShippingProfileId)) {
+                            $fallbackShippingProfileId = $shippingProfile['parcelServicePresetId'];
+                        }
+                        if ($basket->shippingProfileId == $shippingProfile['parcelServicePresetId']) {
+                            $exists = true;
+                            break;
+                        }
+                    }
+                }
+                if ($exists === false && !is_null($fallbackShippingProfileId)) {
+                    $this->setShippingProfileId($fallbackShippingProfileId, true);
+                }
+
                 if (($isNet && !(bool)$accountSettings->showShippingVat) || (!$isNet && $showNetPrice)) {
                     $maxVatValue = $this->basketService->getMaxVatValue();
 
@@ -677,7 +695,6 @@ class CheckoutService
                     }
                 }
 
-                $basket = $this->basketService->getBasket();
                 if ($basket->currency !== $this->currencyExchangeRepo->getDefaultCurrency()) {
                     if (is_array($list)) {
                         foreach ($list as $key => $shippingProfile) {
