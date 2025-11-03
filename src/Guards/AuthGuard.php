@@ -1,5 +1,4 @@
 <?php
-
 namespace IO\Guards;
 
 use IO\Helper\Utils;
