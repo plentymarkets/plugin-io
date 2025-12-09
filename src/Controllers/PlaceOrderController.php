@@ -36,7 +36,6 @@ class PlaceOrderController extends LayoutController
      * @param SessionStorageRepositoryContract $sessionStorageRepository
      * @param ShopUrls $shopUrls
      *
-     * @return \Symfony\Component\HttpFoundation\Response
      */
     public function placeOrder(
         OrderService $orderService,
@@ -115,11 +114,7 @@ class PlaceOrderController extends LayoutController
             ]
         );
 
-        if(!is_null(ValidateVatNumber::getFallbackStatusServiceUnavailable())) {
-            /**
-             * @var NotificationService $notificationService
-             */
-            $notificationService = pluginApp(NotificationService::class);
+        if (!is_null(ValidateVatNumber::getFallbackStatusServiceUnavailable())) {
             $notificationService->addNotificationCode('warn', 212);
         }
         try {
@@ -138,7 +133,8 @@ class PlaceOrderController extends LayoutController
         $request = pluginApp(Request::class);
         $redirectParam = $request->get('redirectParam', '');
         $urlParams = [];
-        $url = "execute-payment/" . $orderData->order->id;
+        $orderId = $orderData->order->id;
+        $url = "execute-payment/".$orderId;
         $url .= UrlQuery::shouldAppendTrailingSlash() ? '/' : '';
 
         if (strlen($redirectParam)) {
@@ -156,7 +152,7 @@ class PlaceOrderController extends LayoutController
             }
         }
 
-        return $this->urlService->redirectTo($url);
+        return $this->executePayment($orderService, $notificationService, $shopUrls, $orderId);
     }
 
     public function executePayment(

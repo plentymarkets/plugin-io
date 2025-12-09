@@ -39,7 +39,7 @@ class DetectLanguage extends Middleware
     public function detectLanguage($request, $url = null)
     {
         if (!str_starts_with($request->getRequestUri(), self::WEB_AJAX_BASE)) {
-            $requestUri = $url ?? $request->get('plentyMarkets');
+            $requestUri = $url ?? $request->get('plentyMarkets') ?? '';
             
             /** @var WebstoreConfigurationRepositoryContract $webstoreConfigurationRepository */
             $webstoreConfigurationRepository = pluginApp(WebstoreConfigurationRepositoryContract::class);
