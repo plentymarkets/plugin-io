@@ -72,6 +72,14 @@ class ItemController extends LayoutController
         $itemSearchService = pluginApp(ItemSearchService::class);
         $itemResult = $itemSearchService->getResults($searches);
 
+        $this->getLogger(self::class)->info(
+            "IO::Debug.ItemController_itemNotFound",
+            [
+                "itemResult" => $itemResult,
+
+            ]
+        );
+
         if (!is_null($category)) {
             /** @var CategoryService $categoryService */
             $categoryService = pluginApp(CategoryService::class);
