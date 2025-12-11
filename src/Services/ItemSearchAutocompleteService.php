@@ -1,5 +1,4 @@
 <?php
-
 namespace IO\Services;
 
 use Ceres\Helper\SearchOptions;
@@ -25,7 +24,7 @@ use IO\Helper\RouteConfig;
 
 /**
  * Service Class ItemSearchAutocompleteService
- *
+ * 
  * This service class contains functions for the autocompletion of the item search.
  * All public functions are available in the Twig template renderer.
  *
