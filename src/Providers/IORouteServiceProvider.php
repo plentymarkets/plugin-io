@@ -47,7 +47,7 @@ class IORouteServiceProvider extends RouteServiceProvider
         $api->version(['v1'],
             [
                 'namespace' => 'IO\Api\Resources',
-                'middleware' => ['Plenty\Modules\Webshop\Storefront\Middlewares\SecurityToken']
+                'middleware' => ['SecurityToken']
             ],
             function (ApiRouter $api) {
             $api->get('io/basket', 'BasketResource@index');
