@@ -30,7 +30,7 @@ class IORouteServiceProvider extends RouteServiceProvider
     {
         $api->version(
             ['v1'],
-            ['namespace' => 'IO\Api\Resources', 'middleware' => ['throttleFrontend:register-form']],
+            ['namespace' => 'IO\Api\Resources', 'middleware' => ['throttleFrontend:register-form', 'SecurityToken']],
             function (ApiRouter $api) {
                 $api->post('io/customer', 'CustomerResource@store');
             }
