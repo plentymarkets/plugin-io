@@ -3,6 +3,8 @@
 namespace IO\Extensions\Filters;
 use IO\Extensions\AbstractFilter;
 use IO\Helper\Utils;
+use Plenty\Modules\Item\ItemImage\Contracts\ItemImageAvailabilityRepositoryContract;
+use Plenty\Modules\Authorization\Services\AuthHelper;
 
 /**
  * Class ItemImagesFilter
@@ -13,13 +15,21 @@ use IO\Helper\Utils;
  */
 class ItemImagesFilter extends AbstractFilter
 {
+
+    /** @var AuthHelper $authHelper */
+    private $authHelper;
+
     /**
      * ItemImagesFilter constructor.
      */
-    public function __construct()
-    {
+    public function __construct(
+        AuthHelper $authHelper
+    ) {
         parent::__construct();
+
+        $this->authHelper = $authHelper;
     }
+
 
     /**
      * Get the twig filter to method name mapping. (twig filter => method name)
@@ -49,29 +59,57 @@ class ItemImagesFilter extends AbstractFilter
         $imageObject = (empty($images['variation']) ? 'all' : 'variation');
 
         // Get current plentyId 
-        // $currentPlentyId = Utils::getPlentyId() ?? 17831;
+        $currentPlentyId = Utils::getPlentyId() ?? 17831;
+        $imageAvailabilityRepo = pluginApp(ItemImageAvailabilityRepositoryContract::class);
+
         foreach ($images[$imageObject] as $image) {
-            // $isAvailable = false;
-            // $mandanten = $image['availabilities']['mandant'] ?? [];
-            // if(count($mandanten) == 0)
-            //     continue;
+            $isAvailable = false;
 
-            // foreach($mandanten as $mandant)
-            // {
-            //     if($mandant == $currentPlentyId || $mandant == -1)
-            //     {
-            //         $isAvailable = true;
-            //     }
-            // }
+            // The image doesnt have availability present, so we request it
+            if(!isset($image['availabilities']))
+            {
+                $imageId = $image['id'] ?? null;
+                if(!$imageId)
+                {
+                    continue;
+                }
+                
+                $availabilities = $this->authHelper->processUnguarded(function() use ($imageId, $imageAvailabilityRepo)
+                {
+                    return $imageAvailabilityRepo->findByImageId($imageId);
+                });
 
-            // if(!$isAvailable)
-            //     continue;
+
+                foreach($availabilities as $availability)
+                {
+                    if($availability->type == "mandant" && ($availability->value == -1 || $availability->value == $currentPlentyId))
+                    {
+                        $isAvailable = true;
+                        break;
+                    }
+                }
+            }
+
+            $mandanten = $image['availabilities']['mandant'] ?? [];
+            if(count($mandanten) == 0 && !$isAvailable)
+                continue;
+
+            foreach($mandanten as $mandant)
+            {
+                if($mandant == $currentPlentyId || $mandant == -1)
+                {
+                    $isAvailable = true;
+                }
+            }
+
+            if(!$isAvailable)
+                continue;
             
             $imageUrls[] = [
                 'url' => $image[$imageAccessor],
                 'position' => $image['position'],
-                'alternate' => $image['names']['alternate'],
-                'name' => $image['names']['name']
+                'alternate' => $image['names']['alternate'] ?? "",
+                'name' => $image['names']['name'] ?? ""
             ];
         }
 
