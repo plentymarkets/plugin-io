@@ -49,23 +49,23 @@ class ItemImagesFilter extends AbstractFilter
         $imageObject = (empty($images['variation']) ? 'all' : 'variation');
 
         // Get current plentyId 
-        $currentPlentyId = Utils::getPlentyId() ?? 17831;
+        // $currentPlentyId = Utils::getPlentyId() ?? 17831;
         foreach ($images[$imageObject] as $image) {
-            $isAvailable = false;
-            $mandanten = $image['availabilities']['mandant'] ?? [];
-            if(count($mandanten) == 0)
-                continue;
+            // $isAvailable = false;
+            // $mandanten = $image['availabilities']['mandant'] ?? [];
+            // if(count($mandanten) == 0)
+            //     continue;
 
-            foreach($mandanten as $mandant)
-            {
-                if($mandant == $currentPlentyId || $mandant == -1)
-                {
-                    $isAvailable = true;
-                }
-            }
+            // foreach($mandanten as $mandant)
+            // {
+            //     if($mandant == $currentPlentyId || $mandant == -1)
+            //     {
+            //         $isAvailable = true;
+            //     }
+            // }
 
-            if(!$isAvailable)
-                continue;
+            // if(!$isAvailable)
+            //     continue;
             
             $imageUrls[] = [
                 'url' => $image[$imageAccessor],
