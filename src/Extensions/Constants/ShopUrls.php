@@ -451,7 +451,7 @@ class ShopUrls
      * @param string $urlB Second URL to compare.
      * @return bool True if the two URLs are equal.
      */
-    public function equals($urlA, $urlB)
+    public function equals($urlA = '', $urlB = '')
     {
         if (!str_starts_with($urlA, '/')) {
             $urlA = '/' . $urlA;
