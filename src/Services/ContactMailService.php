@@ -45,7 +45,7 @@ class ContactMailService
         /** @var Twig */
         $twig = pluginApp(Twig::class);
 
-        unset($mailData['username']['value']);
+        unset($mailData['data']['username']['value']);
         $mailBody = $twig->render(
             $mailTemplate,
             $mailData
