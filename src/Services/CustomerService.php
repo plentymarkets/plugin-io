@@ -71,6 +71,9 @@ class CustomerService
     /** @var SessionStorageRepositoryContract */
     private $sessionStorageRepository;
 
+    /** @var WebstoreConfigurationRepositoryContract */
+    private $webstoreConfigurationRepository;
+
     /**
      * CustomerService constructor.
      * @param ContactAccountRepositoryContract $accountRepository
@@ -80,6 +83,8 @@ class CustomerService
      * @param AddressRepositoryContract $addressRepository
      * @param ContactClassRepositoryContract $contactClassRepository
      * @param SessionStorageRepositoryContract $sessionStorageRepository
+     * @param WebstoreConfigurationRepositoryContract $webstoreConfigurationRepository
+     * @param Dispatcher $dispatcher
      */
     public function __construct(
         ContactAccountRepositoryContract $accountRepository,
@@ -89,6 +94,7 @@ class CustomerService
         AddressRepositoryContract $addressRepository,
         ContactClassRepositoryContract $contactClassRepository,
         SessionStorageRepositoryContract $sessionStorageRepository,
+        WebstoreConfigurationRepositoryContract $webstoreConfigurationRepository,
         Dispatcher $dispatcher
     ) {
         $this->accountRepository = $accountRepository;
@@ -98,6 +104,7 @@ class CustomerService
         $this->addressRepository = $addressRepository;
         $this->contactClassRepository = $contactClassRepository;
         $this->sessionStorageRepository = $sessionStorageRepository;
+        $this->webstoreConfigurationRepository = $webstoreConfigurationRepository;
 
         $dispatcher->listen(
             AfterBasketChanged::class,
@@ -511,11 +518,8 @@ class CustomerService
         }
 
         if ($contact instanceof Contact && $contact->id > 0) {
-            /** @var WebstoreConfigurationRepositoryContract $webstoreConfigurationRepository */
-            $webstoreConfigurationRepository = pluginApp(WebstoreConfigurationRepositoryContract::class);
-
             /** @var WebstoreConfiguration $webstoreConfiguration */
-            $webstoreConfiguration = $webstoreConfigurationRepository->findByPlentyId($contact->plentyId);
+            $webstoreConfiguration = $this->webstoreConfigurationRepository->findByPlentyId($contact->plentyId);
 
             $params = [
                 'contactId' => $contact->id,
@@ -675,9 +679,14 @@ class CustomerService
                     // update contact class id only when current class id on contact is the default contact class id
                     // default contact class id is set by default to contact
                     if ($defaultClassId > 0 && $contact->classId === $defaultClassId) {
+                        /** @var WebstoreConfiguration $webstoreConfiguration */
+                        $webstoreConfiguration = $this->webstoreConfigurationRepository
+                            ->findByPlentyId(Utils::getPlentyId());
+
                         /** @var TemplateConfigService $templateConfigService */
                         $templateConfigService = pluginApp(TemplateConfigService::class);
-                        $classId = $templateConfigService->getInteger('global.default_contact_class_b2b');
+                        $classId = $webstoreConfiguration->defaultCustomerB2BClassId
+                            ?? $templateConfigService->getInteger('global.default_contact_class_b2b');
 
                         if (!is_null($classId) && (int)$classId > 0 && $classId !== $defaultClassId) {
                             $this->updateContact(
