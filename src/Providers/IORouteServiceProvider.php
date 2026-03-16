@@ -44,6 +44,14 @@ class IORouteServiceProvider extends RouteServiceProvider
             }
         );
 
+        $api->version(
+            ['v1'],
+            ['namespace' => 'IO\Api\Resources', 'middleware' => ['throttleFrontend:coupon']],
+            function (ApiRouter $api) {
+                $api->post('io/coupon', 'CouponResource@store');
+            }
+        );
+
         $api->version(['v1'], ['namespace' => 'IO\Api\Resources'], function (ApiRouter $api) {
             $api->get('io/basket', 'BasketResource@index');
             $api->resource('io/basket/items', 'BasketItemResource');
