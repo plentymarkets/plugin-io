@@ -6,6 +6,7 @@
 
 - The honeypot is no longer included in the email for the contact form.
 - PHP 8.2 adjustments have been made.
+- Added rate limit for coupons.
 
 ## v5.0.78 (2025-10-17) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.77...5.0.78" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
 
