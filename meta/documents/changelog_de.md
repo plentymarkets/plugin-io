@@ -6,6 +6,7 @@
 
 - In der Email für das Kontaktformular wird der Honeypot nicht mehr mitgesendet.
 - PHP 8.2 Anpassungen wurden durchgeführt.
+- Eine Begrenzung für Gutscheine wurde hinzugefügt.
 
 ## v5.0.78 (2025-10-17) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.77...5.0.78" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
 
