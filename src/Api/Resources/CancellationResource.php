@@ -8,6 +8,7 @@ use IO\Api\ResponseCode;
 use IO\Constants\LogLevel;
 use IO\Helper\ReCaptcha;
 use IO\Services\NotificationService;
+use Plenty\Modules\Webshop\Storefront\Contracts\CancellationRepositoryContract;
 use Plenty\Plugin\Http\Request;
 use Plenty\Plugin\Http\Response;
 
@@ -20,13 +21,20 @@ use Plenty\Plugin\Http\Response;
 class CancellationResource extends ApiResource
 {
     /**
+     * @var CancellationRepositoryContract
+     */
+    private $cancellationRepository;
+
+    /**
      * CancellationResource constructor.
      * @param Request $request
      * @param ApiResponse $response
+     * @param CancellationRepositoryContract $cancellationRepository
      */
-    public function __construct(Request $request, ApiResponse $response)
+    public function __construct(Request $request, ApiResponse $response, CancellationRepositoryContract $cancellationRepository)
     {
         parent::__construct($request, $response);
+        $this->cancellationRepository = $cancellationRepository;
     }
 
     /**
@@ -43,8 +51,13 @@ class CancellationResource extends ApiResource
             return $this->response->create('', ResponseCode::BAD_REQUEST);
         }
 
-        $successMessage = [];
+        try {
+            $successMessage = $this->cancellationRepository->submitCancellationRequest();
+        } catch (\Exception $exception) {
+            $this->response->error($exception->getCode(), $exception->getMessage());
+            return $this->response->create($exception->getMessage(), ResponseCode::INTERNAL_SERVER_ERROR);
+        }
 
-        return $this->response->create($successMessage, ResponseCode::HTTP_CREATED);
+        return $this->response->create($successMessage, ResponseCode::OK);
     }
 }
