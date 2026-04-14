@@ -43,10 +43,8 @@ class CancellationResource extends ApiResource
             return $this->response->create('', ResponseCode::BAD_REQUEST);
         }
 
-        $payload = $this->request->all();
+        $successMessage = [];
 
-        // TODO: call shared cancellation service/repository
-
-        return $this->response->create([], ResponseCode::OK);
+        return $this->response->create($successMessage, ResponseCode::HTTP_CREATED);
     }
 }
