@@ -57,7 +57,8 @@ class CancellationResource extends ApiResource
                 $this->request->get('email', ''),
                 $this->request->get('name', ''),
                 $this->request->get('lang', ''),
-                (int) $this->request->get('orderId', 0)
+                (int) $this->request->get('orderId', 0),
+                $this->request->get('reason', '')
             );
 
             $successMessage = $this->cancellationRepository->submitCancellationRequest($cancellationFormDTO);
