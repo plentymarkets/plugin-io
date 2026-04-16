@@ -10,6 +10,7 @@ use IO\Helper\ReCaptcha;
 use IO\Services\NotificationService;
 use Plenty\Modules\Webshop\Storefront\Contracts\CancellationRepositoryContract;
 use Plenty\Modules\Webshop\Storefront\DTOs\CancellationFormDTO;
+use Plenty\Modules\Webshop\Storefront\Exceptions\StorefrontException;
 use Plenty\Plugin\Http\Request;
 use Plenty\Plugin\Http\Response;
 
@@ -62,11 +63,15 @@ class CancellationResource extends ApiResource
             );
 
             $successMessage = $this->cancellationRepository->submitCancellationRequest($cancellationFormDTO);
-        } catch (\Exception $exception) {
-            $this->response->error($exception->getCode(), $exception->getMessage());
-            return $this->response->create($exception->getMessage(), ResponseCode::INTERNAL_SERVER_ERROR);
-        }
 
-        return $this->response->create($successMessage, ResponseCode::OK);
+            return $this->response->create($successMessage, ResponseCode::OK);
+        } catch (StorefrontException $exception) {
+            $code = $exception->getCode() ?: ResponseCode::INTERNAL_SERVER_ERROR;
+            return $this->response->create($exception->getKey(), $code);
+        } catch (\Exception $exception) {
+            $code = $exception->getCode() ?: ResponseCode::INTERNAL_SERVER_ERROR;
+            $this->response->error($code, $exception->getMessage());
+            return $this->response->create($exception->getMessage(), $code);
+        }
     }
 }
