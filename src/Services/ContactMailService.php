@@ -32,12 +32,6 @@ class ContactMailService
     public function sendMail(string $mailTemplate, $mailData = [])
     {
         $recipient = $mailData['recipient'];
-        $this->getLogger(self::class)->info(
-            "IO::Debug.sendMail",
-            [
-                "mailData" => $mailData,
-            ]
-        );
 
         if (!strlen($recipient)) {
             $recipient = Utils::getTemplateConfig('contact.shop_mail');
