@@ -7,6 +7,7 @@ use IO\Api\ApiResponse;
 use IO\Api\ResponseCode;
 use IO\Constants\LogLevel;
 use IO\Helper\ReCaptcha;
+use IO\Helper\Utils;
 use IO\Services\NotificationService;
 use Plenty\Modules\Webshop\Storefront\Contracts\CancellationRepositoryContract;
 use Plenty\Modules\Webshop\Storefront\DTOs\CancellationFormDTO;
@@ -54,13 +55,21 @@ class CancellationResource extends ApiResource
         }
 
         try {
+            $requestData = $this->request->all();
+
+            $formData = [];
+            foreach ($requestData['data'] ?? [] as $key => $entry) {
+                $cleanKey = substr($key, strpos($key, '_') + 1);
+                $formData[$cleanKey] = $entry['value'];
+            }
+
             $cancellationFormDTO = pluginApp(CancellationFormDTO::class, [
-                'email' => $this->request->get('email', ''),
-                'name' => $this->request->get('name', ''),
-                'lang' => $this->request->get('lang', ''),
-                'orderId' => (int) $this->request->get('orderId', 0),
-                'reason' => $this->request->get('reason', ''),
-                'recipient' => $this->request->get('recipient', ''),
+                'email' => $formData['mail'] ?? '',
+                'name' => $formData['name'] ?? '',
+                'lang' => Utils::getLang(),
+                'orderId' => (int) ($formData['order'] ?? 0),
+                'reason' => $formData['message'] ?? '',
+                'recipient' => $formData['recipient'] ?? '',
             ]);
 
             $successMessage = $this->cancellationRepository->submitCancellationRequest($cancellationFormDTO);
