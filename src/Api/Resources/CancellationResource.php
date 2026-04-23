@@ -69,7 +69,7 @@ class CancellationResource extends ApiResource
                 'lang' => Utils::getLang(),
                 'orderId' => (int) ($formData['order'] ?? 0),
                 'reason' => $formData['message'] ?? '',
-                'recipient' => $formData['recipient'] ?? '',
+                'recipient' => $requestData['recipient'] ?? '',
             ]);
 
             $successMessage = $this->cancellationRepository->submitCancellationRequest($cancellationFormDTO);
