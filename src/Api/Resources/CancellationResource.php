@@ -10,7 +10,6 @@ use IO\Helper\ReCaptcha;
 use IO\Helper\Utils;
 use IO\Services\NotificationService;
 use Plenty\Modules\Webshop\Storefront\Contracts\CancellationRepositoryContract;
-use Plenty\Modules\Webshop\Storefront\DTOs\CancellationFormDTO;
 use Plenty\Modules\Webshop\Storefront\Exceptions\StorefrontException;
 use Plenty\Plugin\Http\Request;
 use Plenty\Plugin\Http\Response;
@@ -46,13 +45,14 @@ class CancellationResource extends ApiResource
      */
     public function store(): Response
     {
-        if (!ReCaptcha::verify($this->request->get('recaptchaToken', null), true)) {
-            /** @var NotificationService $notificationService */
-            $notificationService = pluginApp(NotificationService::class);
-            $notificationService->addNotificationCode(LogLevel::ERROR, 13);
-
-            return $this->response->create('', ResponseCode::BAD_REQUEST);
-        }
+        //TODO this will be uncommented after testing
+//        if (!ReCaptcha::verify($this->request->get('recaptchaToken', null), true)) {
+//            /** @var NotificationService $notificationService */
+//            $notificationService = pluginApp(NotificationService::class);
+//            $notificationService->addNotificationCode(LogLevel::ERROR, 13);
+//
+//            return $this->response->create('', ResponseCode::BAD_REQUEST);
+//        }
 
         try {
             $requestData = $this->request->all();
@@ -63,7 +63,7 @@ class CancellationResource extends ApiResource
                 $formData[$cleanKey] = $entry['value'];
             }
 
-            $cancellationFormDTO = pluginApp(CancellationFormDTO::class, [
+            $successMessage = $this->cancellationRepository->submitCancellationRequest([
                 'email' => $formData['mail'] ?? '',
                 'name' => $formData['name'] ?? '',
                 'lang' => Utils::getLang(),
@@ -71,8 +71,6 @@ class CancellationResource extends ApiResource
                 'reason' => $formData['message'] ?? '',
                 'recipient' => $requestData['recipient'] ?? '',
             ]);
-
-            $successMessage = $this->cancellationRepository->submitCancellationRequest($cancellationFormDTO);
 
             return $this->response->create($successMessage, ResponseCode::OK);
         } catch (StorefrontException $exception) {
