@@ -48,19 +48,22 @@ class CancellationResource extends ApiResource
      */
     public function store(): Response
     {
-        //TODO this will be uncommented after testing
-//        if (!ReCaptcha::verify($this->request->get('recaptchaToken', null), true)) {
-//            /** @var NotificationService $notificationService */
-//            $notificationService = pluginApp(NotificationService::class);
-//            $notificationService->addNotificationCode(LogLevel::ERROR, 13);
-//
-//            return $this->response->create('', ResponseCode::BAD_REQUEST);
-//        }
+       if (!ReCaptcha::verify($this->request->get('recaptchaToken', null), true)) {
+           /** @var NotificationService $notificationService */
+           $notificationService = pluginApp(NotificationService::class);
+           $notificationService->addNotificationCode(LogLevel::ERROR, 13);
+
+           return $this->response->create('', ResponseCode::BAD_REQUEST);
+       }
 
         try {
             $requestData = $this->request->all();
             $formData = $requestData['data'] ?? [];
             $errors = [];
+
+            if(empty($formData)){
+                return $this->response->create('Missing required fields', ResponseCode::BAD_REQUEST);
+            }
 
             foreach (['email', 'name', 'order'] as $field) {
                 if(empty($formData[$field]['value'])) {
