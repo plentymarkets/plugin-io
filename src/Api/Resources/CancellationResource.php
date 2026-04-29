@@ -26,6 +26,7 @@ class CancellationResource extends ApiResource
     use Loggable;
 
     const ERROR_MSG = 'Missing required fields';
+    const GENERIC_ERROR_MSG = 'An error occurred while submitting the cancellation request. Please try again later.';
 
     /**
      * @var CancellationRepositoryContract
@@ -101,8 +102,8 @@ class CancellationResource extends ApiResource
             return $this->response->create($successMessage, ResponseCode::OK);
         } catch (\Exception $exception) {
             $code = $exception->getCode() ?: ResponseCode::INTERNAL_SERVER_ERROR;
-            $this->response->error($code, $exception->getMessage());
-            return $this->response->create($exception->getMessage(), $code);
+            $this->response->error($code, self::GENERIC_ERROR_MSG);
+            return $this->response->create(null, $code);
         }
     }
 }
