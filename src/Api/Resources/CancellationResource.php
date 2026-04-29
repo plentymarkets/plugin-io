@@ -69,7 +69,7 @@ class CancellationResource extends ApiResource
             }
 
             if(!empty($errors)) {
-                $message = 'Keys ' . implode(', ', $errors) . " couldn't be mapped to the email template";
+                $message = 'Keys "' . implode('", "', $errors) . '" couldn\'t be mapped to the email template';
 
                 $this->getLogger(self::class)->warning(
                     "IO::Debug.CancellationResource_missingFields",
