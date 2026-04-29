@@ -74,9 +74,9 @@ class CancellationResource extends ApiResource
             }
 
             if(!empty($errors)) {
-                $message = 'Keys "' . implode('", "', $errors) . '" couldn\'t be mapped to the email template';
+                $message = 'Keys "' . implode('", "', $errors) . '" of the contract withdrawal form couldn\'t be mapped to the email template.';
 
-                $this->getLogger(self::class)->warning(
+                $this->getLogger(self::class)->error(
                     "IO::Debug.CancellationResource_missingFields",
                     [
                         "code" => ResponseCode::BAD_REQUEST,
