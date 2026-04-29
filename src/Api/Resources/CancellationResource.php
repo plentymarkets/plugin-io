@@ -62,13 +62,13 @@ class CancellationResource extends ApiResource
             $formData = $requestData['data'] ?? [];
             $errors = [];
 
-            if(!isset($formData['email'])) {
+            if(empty($formData['email'])) {
                 $errors[] = 'email';
             }
-            if(!isset($formData['name'])) {
+            if(empty($formData['name'])) {
                 $errors[] = 'name';
             }
-            if(!isset($formData['order'])) {
+            if(empty($formData['order'])) {
                 $errors[] = 'order';
             }
 
