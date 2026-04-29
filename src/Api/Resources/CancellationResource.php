@@ -58,21 +58,24 @@ class CancellationResource extends ApiResource
 //        }
 
         try {
-            $formData = $this->request->all()['data'] ?? [];
+            $requestData = $this->request->all();
+            $formData = $requestData['data'] ?? [];
             $errors = [];
 
-            foreach (['email', 'name', 'order'] as $value) {
-                if(empty($formData[$value])) {
-                    $errors[] = $value;
+            foreach (['email', 'name', 'order'] as $field) {
+                if(empty($formData[$field]['value'])) {
+                    $errors[] = $field;
                 }
             }
 
             if(!empty($errors)) {
+                $message = 'Keys ' . implode(', ', $errors) . " couldn't be mapped to the email template";
+
                 $this->getLogger(self::class)->warning(
                     "IO::Debug.CancellationResource_missingFields",
                     [
                         "code" => ResponseCode::BAD_REQUEST,
-                        "message" => 'Keys ' . implode(', ', $errors) . " couldn't be mapped to the email template"
+                        "message" => $message
                     ]
                 );
 
@@ -88,7 +91,7 @@ class CancellationResource extends ApiResource
                 'recipient' => $requestData['recipient'] ?? '',
             ]);
 
-            return $this->response->create($successMessage);
+            return $this->response->create($successMessage, ResponseCode::OK);
         } catch (\Exception $exception) {
             $code = $exception->getCode() ?: ResponseCode::INTERNAL_SERVER_ERROR;
             $this->response->error($code, $exception->getMessage());
