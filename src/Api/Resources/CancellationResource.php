@@ -58,18 +58,13 @@ class CancellationResource extends ApiResource
 //        }
 
         try {
-            $requestData = $this->request->all();
-            $formData = $requestData['data'] ?? [];
+            $formData = $this->request->all()['data'] ?? [];
             $errors = [];
 
-            if(empty($formData['email'])) {
-                $errors[] = 'email';
-            }
-            if(empty($formData['name'])) {
-                $errors[] = 'name';
-            }
-            if(empty($formData['order'])) {
-                $errors[] = 'order';
+            foreach (['email', 'name', 'order'] as $value) {
+                if(empty($formData[$value])) {
+                    $errors[] = $value;
+                }
             }
 
             if(!empty($errors)) {
@@ -85,18 +80,15 @@ class CancellationResource extends ApiResource
             }
 
             $successMessage = $this->cancellationRepository->submitCancellationRequest([
-                'email' => $formData['email'],
-                'name' => $formData['name'],
+                'email' => $formData['email']['value'],
+                'name' => $formData['name']['value'],
                 'lang' => Utils::getLang(),
-                'orderId' => (int) ($formData['order']),
-                'reason' => $formData['reason'] ?? '',
+                'orderId' => (int) ($formData['order']['value']),
+                'reason' => $formData['reason']['value'] ?? '',
                 'recipient' => $requestData['recipient'] ?? '',
             ]);
 
-            return $this->response->create($successMessage, ResponseCode::OK);
-        } catch (StorefrontException $exception) {
-            $code = $exception->getCode() ?: ResponseCode::INTERNAL_SERVER_ERROR;
-            return $this->response->create($exception->getKey(), $code);
+            return $this->response->create($successMessage);
         } catch (\Exception $exception) {
             $code = $exception->getCode() ?: ResponseCode::INTERNAL_SERVER_ERROR;
             $this->response->error($code, $exception->getMessage());
