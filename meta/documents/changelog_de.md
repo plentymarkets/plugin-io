@@ -8,6 +8,10 @@
 - PHP 8.2 Anpassungen wurden durchgeführt.
 - Eine Begrenzung für Gutscheine wurde hinzugefügt.
 
+### Behoben
+
+- Ein Fehler, welcher zu falschen Beträgen in der Versanddienstleister-Liste führte, wurde behoben.
+
 ## v5.0.78 (2025-10-17) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.77...5.0.78" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
 
 ### Behoben
