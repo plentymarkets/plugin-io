@@ -25,6 +25,8 @@ class CancellationResource extends ApiResource
 {
     use Loggable;
 
+    const ERROR_MSG = 'Missing required fields';
+
     /**
      * @var CancellationRepositoryContract
      */
@@ -62,7 +64,7 @@ class CancellationResource extends ApiResource
             $errors = [];
 
             if(empty($formData)){
-                return $this->response->create('Missing required fields', ResponseCode::BAD_REQUEST);
+                return $this->response->create(self::ERROR_MSG, ResponseCode::BAD_REQUEST);
             }
 
             foreach (['email', 'name', 'order'] as $field) {
@@ -82,7 +84,7 @@ class CancellationResource extends ApiResource
                     ]
                 );
 
-                return $this->response->create('Missing required fields', ResponseCode::BAD_REQUEST);
+                return $this->response->create(self::ERROR_MSG, ResponseCode::BAD_REQUEST);
             }
 
             $successMessage = $this->cancellationRepository->submitCancellationRequest([
