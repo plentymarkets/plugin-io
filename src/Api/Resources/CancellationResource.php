@@ -10,10 +10,9 @@ use IO\Helper\ReCaptcha;
 use IO\Helper\Utils;
 use IO\Services\NotificationService;
 use Plenty\Modules\Webshop\Storefront\Contracts\CancellationRepositoryContract;
-use Plenty\Modules\Webshop\Storefront\DTOs\CancellationFormDTO;
-use Plenty\Modules\Webshop\Storefront\Exceptions\StorefrontException;
 use Plenty\Plugin\Http\Request;
 use Plenty\Plugin\Http\Response;
+use Plenty\Plugin\Log\Loggable;
 
 /**
  * Class CancellationResource
@@ -23,6 +22,10 @@ use Plenty\Plugin\Http\Response;
  */
 class CancellationResource extends ApiResource
 {
+    use Loggable;
+
+    const ERROR_MSG = 'Missing required fields';
+
     /**
      * @var CancellationRepositoryContract
      */
@@ -46,39 +49,53 @@ class CancellationResource extends ApiResource
      */
     public function store(): Response
     {
-        if (!ReCaptcha::verify($this->request->get('recaptchaToken', null), true)) {
-            /** @var NotificationService $notificationService */
-            $notificationService = pluginApp(NotificationService::class);
-            $notificationService->addNotificationCode(LogLevel::ERROR, 13);
-
-            return $this->response->create('', ResponseCode::BAD_REQUEST);
-        }
+//        if (!ReCaptcha::verify($this->request->get('recaptchaToken', null), true)) {
+//            /** @var NotificationService $notificationService */
+//            $notificationService = pluginApp(NotificationService::class);
+//            $notificationService->addNotificationCode(LogLevel::ERROR, 13);
+//
+//            return $this->response->create('', ResponseCode::BAD_REQUEST);
+//        }
 
         try {
             $requestData = $this->request->all();
+            $formData = $requestData['data'] ?? [];
+            $errors = [];
 
-            $formData = [];
-            foreach ($requestData['data'] ?? [] as $key => $entry) {
-                $cleanKey = substr($key, strpos($key, '_') + 1);
-                $formData[$cleanKey] = $entry['value'];
+            if(empty($formData)){
+                return $this->response->create(self::ERROR_MSG, ResponseCode::BAD_REQUEST);
             }
 
-            /** @var CancellationFormDTO $cancellationFormDTO */
-            $cancellationFormDTO = pluginApp(CancellationFormDTO::class, [
-                'email' => $formData['mail'] ?? '',
-                'name' => $formData['name'] ?? '',
+            foreach (['email', 'name', 'order'] as $field) {
+                if(empty($formData[$field]['value'])) {
+                    $errors[] = $field;
+                }
+            }
+
+            if(!empty($errors)) {
+                $message = 'Keys "' . implode('", "', $errors) . '" of the contract withdrawal form couldn\'t be mapped to the email template.';
+
+                $this->getLogger(self::class)->error(
+                    "IO::Debug.CancellationResource_missingFields",
+                    [
+                        "code" => ResponseCode::BAD_REQUEST,
+                        "message" => $message
+                    ]
+                );
+
+                return $this->response->create(self::ERROR_MSG, ResponseCode::BAD_REQUEST);
+            }
+
+            $successMessage = $this->cancellationRepository->submitCancellationRequest([
+                'email' => $formData['email']['value'],
+                'name' => $formData['name']['value'],
                 'lang' => Utils::getLang(),
-                'orderId' => (int) ($formData['order'] ?? 0),
-                'reason' => $formData['message'] ?? '',
+                'orderId' => (int) ($formData['order']['value']),
+                'reason' => $formData['reason']['value'] ?? '',
                 'recipient' => $requestData['recipient'] ?? '',
             ]);
 
-            $successMessage = $this->cancellationRepository->submitCancellationRequest($cancellationFormDTO);
-
             return $this->response->create($successMessage, ResponseCode::OK);
-        } catch (StorefrontException $exception) {
-            $code = $exception->getCode() ?: ResponseCode::INTERNAL_SERVER_ERROR;
-            return $this->response->create($exception->getKey(), $code);
         } catch (\Exception $exception) {
             $code = $exception->getCode() ?: ResponseCode::INTERNAL_SERVER_ERROR;
             $this->response->error($code, $exception->getMessage());
