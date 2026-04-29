@@ -13,6 +13,7 @@ use Plenty\Modules\Webshop\Storefront\Contracts\CancellationRepositoryContract;
 use Plenty\Modules\Webshop\Storefront\Exceptions\StorefrontException;
 use Plenty\Plugin\Http\Request;
 use Plenty\Plugin\Http\Response;
+use Plenty\Plugin\Log\Loggable;
 
 /**
  * Class CancellationResource
@@ -22,6 +23,8 @@ use Plenty\Plugin\Http\Response;
  */
 class CancellationResource extends ApiResource
 {
+    use Loggable;
+
     /**
      * @var CancellationRepositoryContract
      */
@@ -56,19 +59,37 @@ class CancellationResource extends ApiResource
 
         try {
             $requestData = $this->request->all();
+            $formData = $requestData['data'] ?? [];
+            $errors = [];
 
-            $formData = [];
-            foreach ($requestData['data'] ?? [] as $key => $entry) {
-                $cleanKey = substr($key, strpos($key, '_') + 1);
-                $formData[$cleanKey] = $entry['value'];
+            if(!isset($formData['email'])) {
+                $errors[] = 'email';
+            }
+            if(!isset($formData['name'])) {
+                $errors[] = 'name';
+            }
+            if(!isset($formData['order'])) {
+                $errors[] = 'order';
+            }
+
+            if(!empty($errors)) {
+                $this->getLogger(self::class)->warning(
+                    "IO::Debug.CancellationResource_missingFields",
+                    [
+                        "code" => ResponseCode::BAD_REQUEST,
+                        "message" => 'Keys ' . implode(', ', $errors) . " couldn't be mapped to the email template"
+                    ]
+                );
+
+                return $this->response->create('Missing required fields', ResponseCode::BAD_REQUEST);
             }
 
             $successMessage = $this->cancellationRepository->submitCancellationRequest([
-                'email' => $formData['mail'] ?? '',
+                'email' => $formData['email'] ?? '',
                 'name' => $formData['name'] ?? '',
                 'lang' => Utils::getLang(),
                 'orderId' => (int) ($formData['order'] ?? 0),
-                'reason' => $formData['message'] ?? '',
+                'reason' => $formData['reason'] ?? '',
                 'recipient' => $requestData['recipient'] ?? '',
             ]);
 
