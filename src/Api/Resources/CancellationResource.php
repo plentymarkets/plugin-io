@@ -10,6 +10,7 @@ use IO\Helper\ReCaptcha;
 use IO\Helper\Utils;
 use IO\Services\NotificationService;
 use Plenty\Modules\Webshop\Storefront\Contracts\CancellationRepositoryContract;
+use Plenty\Modules\Webshop\Storefront\Exceptions\StorefrontException;
 use Plenty\Plugin\Http\Request;
 use Plenty\Plugin\Http\Response;
 use Plenty\Plugin\Log\Loggable;
@@ -25,6 +26,7 @@ class CancellationResource extends ApiResource
     use Loggable;
 
     const ERROR_MSG = 'Missing required fields';
+    const GENERIC_ERROR_MSG = 'An error occurred while submitting the cancellation request. Please try again later.';
 
     /**
      * @var CancellationRepositoryContract
@@ -63,7 +65,8 @@ class CancellationResource extends ApiResource
             $errors = [];
 
             if(empty($formData)){
-                return $this->response->create(self::ERROR_MSG, ResponseCode::BAD_REQUEST);
+                $this->response->error(ResponseCode::BAD_REQUEST, self::ERROR_MSG);
+                return $this->response->create(null, ResponseCode::BAD_REQUEST);
             }
 
             foreach (['email', 'name', 'order'] as $field) {
@@ -83,7 +86,8 @@ class CancellationResource extends ApiResource
                     ]
                 );
 
-                return $this->response->create(self::ERROR_MSG, ResponseCode::BAD_REQUEST);
+                $this->response->error(ResponseCode::BAD_REQUEST, self::ERROR_MSG);
+                return $this->response->create(null, ResponseCode::BAD_REQUEST);
             }
 
             $successMessage = $this->cancellationRepository->submitCancellationRequest([
@@ -98,8 +102,8 @@ class CancellationResource extends ApiResource
             return $this->response->create($successMessage, ResponseCode::OK);
         } catch (\Exception $exception) {
             $code = $exception->getCode() ?: ResponseCode::INTERNAL_SERVER_ERROR;
-            $this->response->error($code, $exception->getMessage());
-            return $this->response->create($exception->getMessage(), $code);
+            $this->response->error($code, self::GENERIC_ERROR_MSG);
+            return $this->response->create(null, $code);
         }
     }
 }
