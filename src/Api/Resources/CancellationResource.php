@@ -2,6 +2,7 @@
 
 namespace IO\Api\Resources;
 
+use Exception;
 use IO\Api\ApiResource;
 use IO\Api\ApiResponse;
 use IO\Api\ResponseCode;
@@ -25,8 +26,7 @@ class CancellationResource extends ApiResource
 {
     use Loggable;
 
-    const ERROR_MSG = 'Missing required fields';
-    const GENERIC_ERROR_MSG = 'An error occurred while submitting the cancellation request. Please try again later.';
+    const GENERIC_ERROR_MSG = 'Error submitting cancellation request.';
 
     /**
      * @var CancellationRepositoryContract
@@ -65,7 +65,8 @@ class CancellationResource extends ApiResource
             $errors = [];
 
             if(empty($formData)){
-                return $this->response->create('', ResponseCode::BAD_REQUEST);
+                $this->response->error(ResponseCode::BAD_REQUEST, self::GENERIC_ERROR_MSG);
+                return $this->response->create(null, ResponseCode::BAD_REQUEST);
             }
 
             foreach (['email', 'name', 'order'] as $field) {
@@ -85,7 +86,8 @@ class CancellationResource extends ApiResource
                     ]
                 );
 
-                return $this->response->create('', ResponseCode::BAD_REQUEST);
+                $this->response->error(ResponseCode::BAD_REQUEST, self::GENERIC_ERROR_MSG);
+                return $this->response->create(null, ResponseCode::BAD_REQUEST);
             }
 
             $successMessage = $this->cancellationRepository->submitCancellationRequest([
