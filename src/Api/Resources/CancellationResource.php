@@ -63,7 +63,7 @@ class CancellationResource extends ApiResource
             $errors = [];
 
             if(empty($formData)){
-                return $this->response->create('', ResponseCode::BAD_REQUEST);
+                return $this->response->create(false, ResponseCode::BAD_REQUEST);
             }
 
             foreach (['email', 'name', 'order'] as $field) {
@@ -83,7 +83,7 @@ class CancellationResource extends ApiResource
                     ]
                 );
 
-                return $this->response->create('', ResponseCode::BAD_REQUEST);
+                return $this->response->create(false, ResponseCode::BAD_REQUEST);
             }
 
             $successMessage = $this->cancellationRepository->submitCancellationRequest([
@@ -95,9 +95,9 @@ class CancellationResource extends ApiResource
                 'recipient' => $requestData['recipient'] ?? '',
             ]);
 
-            return $this->response->create($successMessage, ResponseCode::OK);
+            return $this->response->create(true, ResponseCode::OK);
         } catch (Exception) {
-            return $this->response->create('', ResponseCode::BAD_REQUEST);
+            return $this->response->create(false, ResponseCode::BAD_REQUEST);
         }
     }
 }
