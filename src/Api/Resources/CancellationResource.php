@@ -82,7 +82,6 @@ class CancellationResource extends ApiResource
                     ]
                 );
 
-                $this->response->error(ResponseCode::BAD_REQUEST, self::ERROR_MSG);
                 return $this->response->create(false, ResponseCode::BAD_REQUEST);
             }
 
