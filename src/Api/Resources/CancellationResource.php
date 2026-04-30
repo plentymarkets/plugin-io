@@ -65,8 +65,7 @@ class CancellationResource extends ApiResource
             $errors = [];
 
             if(empty($formData)){
-                $this->response->error(ResponseCode::BAD_REQUEST, self::GENERIC_ERROR_MSG);
-                return $this->response->create(null, ResponseCode::BAD_REQUEST);
+                return $this->response->create('', ResponseCode::BAD_REQUEST);
             }
 
             foreach (['email', 'name', 'order'] as $field) {
@@ -86,8 +85,7 @@ class CancellationResource extends ApiResource
                     ]
                 );
 
-                $this->response->error(ResponseCode::BAD_REQUEST, self::GENERIC_ERROR_MSG);
-                return $this->response->create(null, ResponseCode::BAD_REQUEST);
+                return $this->response->create('', ResponseCode::BAD_REQUEST);
             }
 
             $successMessage = $this->cancellationRepository->submitCancellationRequest([
@@ -100,10 +98,8 @@ class CancellationResource extends ApiResource
             ]);
 
             return $this->response->create($successMessage, ResponseCode::OK);
-        } catch (\Exception $exception) {
-            $code = $exception->getCode() ?: ResponseCode::INTERNAL_SERVER_ERROR;
-            $this->response->error($code, self::GENERIC_ERROR_MSG);
-            return $this->response->create(null, $code);
+        } catch (Exception) {
+            return $this->response->create('', ResponseCode::BAD_REQUEST);
         }
     }
 }
