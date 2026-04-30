@@ -65,8 +65,7 @@ class CancellationResource extends ApiResource
             $errors = [];
 
             if(empty($formData)){
-                $this->response->error(ResponseCode::BAD_REQUEST, self::ERROR_MSG);
-                return $this->response->create(null, ResponseCode::BAD_REQUEST);
+                return $this->response->create('', ResponseCode::BAD_REQUEST);
             }
 
             foreach (['email', 'name', 'order'] as $field) {
@@ -86,8 +85,7 @@ class CancellationResource extends ApiResource
                     ]
                 );
 
-                $this->response->error(ResponseCode::BAD_REQUEST, self::ERROR_MSG);
-                return $this->response->create(null, ResponseCode::BAD_REQUEST);
+                return $this->response->create('', ResponseCode::BAD_REQUEST);
             }
 
             $successMessage = $this->cancellationRepository->submitCancellationRequest([
