@@ -25,9 +25,6 @@ class CancellationResource extends ApiResource
 {
     use Loggable;
 
-    const ERROR_MSG = 'Missing required fields';
-    const GENERIC_ERROR_MSG = 'Error submitting cancellation request';
-
     /**
      * @var CancellationRepositoryContract
      */
@@ -65,8 +62,7 @@ class CancellationResource extends ApiResource
             $errors = [];
 
             if(empty($formData)){
-                $this->response->error(ResponseCode::BAD_REQUEST, self::ERROR_MSG);
-                return $this->response->create(null, ResponseCode::BAD_REQUEST);
+                return $this->response->create(false, ResponseCode::BAD_REQUEST);
             }
 
             foreach (['email', 'name', 'order'] as $field) {
@@ -87,10 +83,10 @@ class CancellationResource extends ApiResource
                 );
 
                 $this->response->error(ResponseCode::BAD_REQUEST, self::ERROR_MSG);
-                return $this->response->create(null, ResponseCode::BAD_REQUEST);
+                return $this->response->create(false, ResponseCode::BAD_REQUEST);
             }
 
-            $successMessage = $this->cancellationRepository->submitCancellationRequest([
+            $this->cancellationRepository->submitCancellationRequest([
                 'email' => $formData['email']['value'],
                 'name' => $formData['name']['value'],
                 'lang' => Utils::getLang(),
@@ -99,11 +95,10 @@ class CancellationResource extends ApiResource
                 'recipient' => $requestData['recipient'] ?? '',
             ]);
 
-            return $this->response->create($successMessage, ResponseCode::OK);
+            return $this->response->create(true, ResponseCode::OK);
         } catch (\Exception $exception) {
             $code = $exception->getCode() ?: ResponseCode::INTERNAL_SERVER_ERROR;
-            $this->response->error($code, self::GENERIC_ERROR_MSG);
-            return $this->response->create(null, $code);
+            return $this->response->create(false, $code);
         }
     }
 }
