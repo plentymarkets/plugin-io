@@ -26,8 +26,6 @@ class CancellationResource extends ApiResource
 {
     use Loggable;
 
-    const GENERIC_ERROR_MSG = 'Error submitting cancellation request.';
-
     /**
      * @var CancellationRepositoryContract
      */
