@@ -18,6 +18,7 @@ use Plenty\Modules\Frontend\Services\VatService;
 use Plenty\Modules\Frontend\Session\Storage\Contracts\FrontendSessionStorageFactoryContract;
 use Plenty\Modules\Order\Currency\Contracts\CurrencyRepositoryContract;
 use Plenty\Modules\Order\Payment\Method\Models\PaymentMethod;
+use Plenty\Modules\Order\Shipping\Contracts\EUCountryCodesServiceContract;
 use Plenty\Modules\Order\Shipping\Contracts\ParcelServicePresetRepositoryContract;
 use Plenty\Modules\Payment\Events\Checkout\GetPaymentMethodContent;
 use Plenty\Modules\Payment\Method\Contracts\PaymentMethodRepositoryContract;
@@ -685,7 +686,11 @@ class CheckoutService
                     $this->setShippingProfileId($fallbackShippingProfileId, true);
                 }
 
-                if (($isNet && !(bool)$accountSettings->showShippingVat) || (!$isNet && $showNetPrice)) {
+                /** @var EUCountryCodesServiceContract $euCountryService */
+                $euCountryService = pluginApp(EUCountryCodesServiceContract::class);
+
+                $isExportDelivery = $euCountryService->isExportDelivery($basket->shippingCountryId);
+                if (($isNet || $showNetPrice) && !((bool)$accountSettings->showShippingVat && $isExportDelivery)) {
                     $maxVatValue = $this->basketService->getMaxVatValue();
 
                     if (is_array($list)) {

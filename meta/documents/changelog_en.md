@@ -8,6 +8,10 @@
 - PHP 8.2 adjustments have been made.
 - Added rate limit for coupons.
 
+### Fixed
+
+- An issue which leads to wrong amounts for shipping providers in the shipping providers list.
+
 ## v5.0.78 (2025-10-17) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.77...5.0.78" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
 
 ### Fixed
