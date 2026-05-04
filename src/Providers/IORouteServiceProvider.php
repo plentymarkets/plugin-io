@@ -61,8 +61,7 @@ class IORouteServiceProvider extends RouteServiceProvider
         );
 
         $api->version(
-            ['v1'],
-            ['namespace' => 'IO\Api\Resources', 'middleware' => ['throttleFrontend:cancellation-form']],
+            ['v1'], ['namespace' => 'IO\Api\Resources', 'middleware' => ['throttleFrontend:cancellation-form']],
             function (ApiRouter $api) {
                 $api->post('io/cancellation', 'CancellationResource@store');
             }
