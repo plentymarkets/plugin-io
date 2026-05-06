@@ -52,6 +52,9 @@ class CategoryController extends LayoutController
                 if ($lvl1 && strlen($lvl1) === 2) {
                     $lvl1 = null;
                 }
+            } else if ($lvl1 && strlen($lvl1) === 2) {
+                $lang = $lvl1;
+                $lvl1 = null;
             }
         }
 
