@@ -40,18 +40,29 @@ class CategoryController extends LayoutController
         $lvl5 = null,
         $lvl6 = null
     ) {
+        /** @var ShopBuilderRequest $shopBuilderRequest */
+        $shopBuilderRequest = pluginApp(ShopBuilderRequest::class);
+
         $lang = Utils::getLang();
         $webstoreId = Utils::getWebstoreId();
+
+        if ($shopBuilderRequest->isShopBuilder()) {
+            if ($lvl1 === $lang || $lvl1 === self::$LANGUAGE_FROM_URL) {
+                $lvl1 = null;
+            }
+            if ($lvl2 === $lang || $lvl2 === self::$LANGUAGE_FROM_URL) {
+                $lvl2 = null;
+            }
+        }
+
         $category = $this->categoryRepo->findCategoryByUrl($lvl1, $lvl2, $lvl3, $lvl4, $lvl5, $lvl6, $webstoreId,
             $lang);
 
         if ($category === null) {
             $category = $this->categoryRepo->findCategoryByUrl($lvl1, $lvl2, $lvl3, $lvl4, $lvl5, $lvl6, $webstoreId,
-               self::$LANGUAGE_FROM_URL);
+                self::$LANGUAGE_FROM_URL);
         }
 
-        /** @var ShopBuilderRequest $shopBuilderRequest */
-        $shopBuilderRequest = pluginApp(ShopBuilderRequest::class);
         if ($shopBuilderRequest->isShopBuilder() && ($shopBuilderRequest->getPreviewContentType() === 'singleitem' || $shopBuilderRequest->getPreviewContentType() === 'itemset')) {
             /** @var ItemController $itemController */
             $itemController = pluginApp(ItemController::class);
