@@ -47,11 +47,11 @@ class CategoryController extends LayoutController
         $webstoreId = Utils::getWebstoreId();
 
         if ($shopBuilderRequest->isShopBuilder()) {
-            if ($lvl1 === $lang || $lvl1 === self::$LANGUAGE_FROM_URL) {
-                $lvl1 = null;
-            }
             if ($lvl2 === $lang || $lvl2 === self::$LANGUAGE_FROM_URL) {
                 $lvl2 = null;
+                if ($lvl1 && strlen($lvl1) === 2) {
+                    $lvl1 = null;
+                }
             }
         }
 
