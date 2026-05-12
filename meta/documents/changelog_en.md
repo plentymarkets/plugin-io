@@ -4,7 +4,7 @@
 
 ### Added
 
-- Cancellation route used for the default cancellation form page.
+- Added a route for the cancellation form.
 
 ### Changed
 
