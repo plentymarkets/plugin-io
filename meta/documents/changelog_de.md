@@ -2,6 +2,10 @@
 
 ## v5.0.79 (2026-XX-XX) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.78...5.0.79" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
 
+Hinzugefügt
+
+- Stornierungs-Route für die Standardseite des Stornierungsformulars.
+
 ### Geändert
 
 - In der Email für das Kontaktformular wird der Honeypot nicht mehr mitgesendet.

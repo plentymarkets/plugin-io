@@ -2,6 +2,10 @@
 
 ## v5.0.79 (2026-XX-XX) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.78...5.0.79" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
 
+### Added
+
+- Cancellation route used for the default cancellation form page.
+
 ### Changed
 
 - The honeypot is no longer included in the email for the contact form.
