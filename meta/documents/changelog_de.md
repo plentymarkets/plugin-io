@@ -1,10 +1,10 @@
 # Release Notes für IO
 
-## v5.0.79 (2026-XX-XX) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.78...5.0.79" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
+## v5.0.79 (2026-05-XX) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.78...5.0.79" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
 
 ### Hinzugefügt
 
-- Eine Route für das Stornierungsformulars wurde hinzugefügt.
+- Eine Route für das Widerrufsformular wurde hinzugefügt.
 
 ### Geändert
 
