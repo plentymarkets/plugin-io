@@ -1,6 +1,10 @@
 # Release Notes for IO
 
-## v5.0.79 (2026-XX-XX) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.78...5.0.79" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
+## v5.0.79 (2026-05-19) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.78...5.0.79" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>
+
+### Added
+
+- Added a route for the cancellation form.
 
 ### Changed
 
