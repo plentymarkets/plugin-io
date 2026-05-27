@@ -52,6 +52,10 @@ class IORouteServiceProvider extends RouteServiceProvider
             }
         );
 
+        $api->version(['v1'], ['namespace' => 'IO\Api\Resources'], function (ApiRouter $api) {
+            $api->get('io/variations/map', 'VariationAttributeMapResource@index');
+        });
+
         $api->version(
             ['v1'],
             ['namespace' => 'IO\Api\Resources', 'middleware' => ['throttleFrontend:variations']],
@@ -84,8 +88,6 @@ class IORouteServiceProvider extends RouteServiceProvider
             $api->resource('io/customer/mail', 'CustomerMailResource');
             $api->get('io/customer/order/list', 'CustomerOrderResource@index');
             $api->resource('io/customer/newsletter', 'CustomerNewsletterResource');
-            $api->get('io/variations/map', 'VariationAttributeMapResource@index');
-            $api->resource('io/variations', 'VariationResource');
             $api->resource('io/item/availability', 'AvailabilityResource');
             $api->resource('io/item/condition', 'ItemConditionResource');
             $api->resource('io/item/last_seen', 'ItemLastSeenResource');
