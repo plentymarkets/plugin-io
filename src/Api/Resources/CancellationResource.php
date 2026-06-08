@@ -65,15 +65,10 @@ class CancellationResource extends ApiResource
                 return $this->response->create(false, ResponseCode::BAD_REQUEST);
             }
 
-            $convertedKeysToLowerCase = array_change_key_case($formData, CASE_LOWER);
-            $this->getLogger(self::class)->error(
-                "IO::Debug.CancellationResource_missingFields",
-                [
-                    "convertedKeysToLowerCase" => $convertedKeysToLowerCase,
-                ]
-            );
+            $formData = array_change_key_case($formData, CASE_LOWER);
+
             foreach (['email', 'name', 'order'] as $field) {
-                if(empty($convertedKeysToLowerCase[$field]['value'])) {
+                if(empty($formData[$field]['value'])) {
                     $errors[] = $field;
                 }
             }
