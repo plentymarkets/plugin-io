@@ -66,7 +66,30 @@ class CancellationResource extends ApiResource
             }
 
             foreach (['email', 'name', 'order'] as $field) {
-                if(empty($formData[$field]['value'])) {
+                $pattern = '/^' . preg_quote($field, '/') . '$/i';
+
+                $matchingKeys = preg_grep($pattern, array_keys($formData));
+                $this->getLogger(self::class)->error(
+                    "IO::Debug.CancellationResource_missingFields",
+                    [
+                        "pattern" => $pattern,
+                        "matchingKeys" => $matchingKeys
+                    ]
+                );
+
+                if (!empty($matchingKeys)) {
+                    $actualKey = current($matchingKeys);
+                    $this->getLogger(self::class)->error(
+                        "IO::Debug.CancellationResource_missingFields",
+                        [
+                            "actualKey" => $actualKey
+                        ]
+                    );
+
+                    if (empty($formData[$actualKey]['value'])) {
+                        $errors[] = $field;
+                    }
+                } else {
                     $errors[] = $field;
                 }
             }
