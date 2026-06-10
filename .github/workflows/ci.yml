@@ -49,8 +49,6 @@ jobs:
       fail-fast: false
       matrix:
         php:
-          - version: "8.0"
-            required: true
           - version: "8.2"
             required: true
 
@@ -80,21 +78,22 @@ jobs:
       - name: Cleanup Runner
         uses: plentymarkets/github-runner-cleanup@main
 
-      - name: Checkout github-actions repository
-        uses: actions/checkout@v4
+      - name: Checkout plenty-in-one repository
+        uses: actions/checkout@v6
         with:
-          repository: plentymarkets/github-actions
-          ref: main
+          repository: plentymarkets/plenty-in-one
+          ref: stable7
           token: ${{ secrets.PUBLIC_PAT_CICD4_PUBLIC }}
-          path: .tmp/github-actions
-          
-      - name: Prepare PHP main code
-        uses: ./.tmp/github-actions/prepare_php/
+          path: .
+
+      - name: PHP setup
+        id: php-setup
+        uses: ./.github/actions/php-setup
         with:
           token: ${{ secrets.PUBLIC_PAT_CICD4_PUBLIC }}
-          php-version: ${{ matrix.php.version }}
-          branch-forced: stable7
-          
+          php-version: "8.2"
+          extensions: ast, gd, soap, redis, grpc
+
       - name: Build plugin api
         working-directory: pl
         run: |
