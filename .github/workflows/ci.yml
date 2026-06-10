@@ -78,21 +78,13 @@ jobs:
       - name: Cleanup Runner
         uses: plentymarkets/github-runner-cleanup@main
 
-      - name: Checkout github-actions repository
+      - name: Checkout plenty-in-one repository
         uses: actions/checkout@v6
         with:
           repository: plentymarkets/plenty-in-one
           ref: stable7
           token: ${{ secrets.PUBLIC_PAT_CICD4_PUBLIC }}
           path: .
-
-      - name: Checkout github-actions repository
-        uses: actions/checkout@v6
-        with:
-          repository: plentymarkets/github-actions
-          ref: main
-          token: ${{ secrets.PUBLIC_PAT_CICD4_PUBLIC }}
-          path: .tmp/github-actions
 
       - name: PHP setup
         id: php-setup
