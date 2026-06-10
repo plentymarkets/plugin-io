@@ -65,6 +65,7 @@ class CancellationResource extends ApiResource
                 return $this->response->create(false, ResponseCode::BAD_REQUEST);
             }
 
+            $formData = array_change_key_case($formData);
             foreach (['email', 'name', 'order'] as $field) {
                 if(empty($formData[$field]['value'])) {
                     $errors[] = $field;
