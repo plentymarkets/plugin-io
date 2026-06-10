@@ -99,10 +99,10 @@ jobs:
         uses: ./.github/actions/php-setup
         with:
           token: ${{ secrets.PUBLIC_PAT_CICD4_PUBLIC }}
-          php-version: ${{ matrix.php }}
+          php-version: "8.2"
           extensions: ast, gd, soap, redis, grpc
           is-eks-runner: true
-          
+
       - name: Build plugin api
         working-directory: pl
         run: |
