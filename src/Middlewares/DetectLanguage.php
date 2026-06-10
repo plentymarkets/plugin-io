@@ -44,7 +44,7 @@ class DetectLanguage extends Middleware
             /** @var WebstoreConfigurationRepositoryContract $webstoreConfigurationRepository */
             $webstoreConfigurationRepository = pluginApp(WebstoreConfigurationRepositoryContract::class);
             $webstoreConfig = $webstoreConfigurationRepository->getWebstoreConfiguration();
-            $splittedURL = explode('/', $requestUri);
+            $splittedURL = explode('/', $requestUri ?? '');
         
             $isValidLang = in_array($splittedURL[0], Utils::getLanguageList());
             if ($isValidLang) {

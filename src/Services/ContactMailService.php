@@ -21,7 +21,7 @@ use Plenty\Plugin\Translation\Translator;
 class ContactMailService
 {
     use Loggable;
-    
+
     /**
      * Send an email using a template and a data object
      *
@@ -45,6 +45,7 @@ class ContactMailService
         /** @var Twig */
         $twig = pluginApp(Twig::class);
 
+        unset($mailData['data']['username']);
         $mailBody = $twig->render(
             $mailTemplate,
             $mailData
@@ -67,12 +68,12 @@ class ContactMailService
         }
 
         $translator = pluginApp(Translator::class);
-        
-        $translationMailData = array_map(function($mailDataEntry) {
-           return $mailDataEntry['value'];
+
+        $translationMailData = array_map(function ($mailDataEntry) {
+            return $mailDataEntry['value'];
         }, $mailData['data']);
 
-        $translationMailData = array_filter($translationMailData, function($entry) {
+        $translationMailData = array_filter($translationMailData, function ($entry) {
             return !is_array($entry);
         });
 
@@ -82,7 +83,7 @@ class ContactMailService
             'Ceres::Template.contactMailSubject',
             $translationMailData
         );
-        
+
         $attachments = [];
         if (isset($mailData['fileKeys']) && count($mailData['fileKeys'])) {
             /** @var ContactFormFileRepositoryContract $contactFormFileRepository */

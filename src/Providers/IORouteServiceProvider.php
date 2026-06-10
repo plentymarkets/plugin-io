@@ -44,6 +44,34 @@ class IORouteServiceProvider extends RouteServiceProvider
             }
         );
 
+        $api->version(
+            ['v1'],
+            ['namespace' => 'IO\Api\Resources', 'middleware' => ['throttleFrontend:coupon']],
+            function (ApiRouter $api) {
+                $api->resource('io/coupon', 'CouponResource');
+            }
+        );
+
+        $api->version(['v1'], ['namespace' => 'IO\Api\Resources'], function (ApiRouter $api) {
+            $api->get('io/variations/map', 'VariationAttributeMapResource@index');
+        });
+
+        $api->version(
+            ['v1'],
+            ['namespace' => 'IO\Api\Resources', 'middleware' => ['throttleFrontend:variations']],
+            function (ApiRouter $api) {
+                $api->resource('io/variations', 'VariationResource');
+            }
+        );
+
+        $api->version(
+            ['v1'],
+            ['namespace' => 'IO\Api\Resources', 'middleware' => ['throttleFrontend:cancellation-form']],
+            function (ApiRouter $api) {
+                $api->post('io/cancellation', 'CancellationResource@store');
+            }
+        );
+
         $api->version(['v1'], ['namespace' => 'IO\Api\Resources'], function (ApiRouter $api) {
             $api->get('io/basket', 'BasketResource@index');
             $api->resource('io/basket/items', 'BasketItemResource');
@@ -60,14 +88,11 @@ class IORouteServiceProvider extends RouteServiceProvider
             $api->resource('io/customer/mail', 'CustomerMailResource');
             $api->get('io/customer/order/list', 'CustomerOrderResource@index');
             $api->resource('io/customer/newsletter', 'CustomerNewsletterResource');
-            $api->get('io/variations/map', 'VariationAttributeMapResource@index');
-            $api->resource('io/variations', 'VariationResource');
             $api->resource('io/item/availability', 'AvailabilityResource');
             $api->resource('io/item/condition', 'ItemConditionResource');
             $api->resource('io/item/last_seen', 'ItemLastSeenResource');
             $api->get('io/item/search', 'ItemSearchResource@index');
             $api->get('io/item/search/autocomplete', 'ItemSearchAutocompleteResource@index');
-            $api->resource('io/coupon', 'CouponResource');
             $api->resource('io/guest', 'GuestResource');
             $api->resource('io/category', 'CategoryItemResource');
             $api->resource('io/template', 'TemplateResource');
