@@ -86,7 +86,7 @@ class CancellationResource extends ApiResource
                 return $this->response->create(false, ResponseCode::BAD_REQUEST);
             }
 
-            $this->getLogger(self::class)->info(
+            $this->getLogger(self::class)->error(
                 "IO::Debug.CancellationResource_missingFields",
                 [
                     "code" => ResponseCode::BAD_REQUEST,
