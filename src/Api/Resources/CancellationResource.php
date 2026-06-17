@@ -90,7 +90,7 @@ class CancellationResource extends ApiResource
                 'email' => $formData['email']['value'],
                 'name' => $formData['name']['value'],
                 'lang' => Utils::getLang(),
-                'orderId' => (int) ($formData['order']['value']),
+                'orderId' => $formData['order']['value'],
                 'reason' => $formData['reason']['value'] ?? '',
                 'recipient' => $requestData['recipient'] ?? '',
             ]);
