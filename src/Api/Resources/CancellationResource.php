@@ -48,14 +48,6 @@ class CancellationResource extends ApiResource
      */
     public function store(): Response
     {
-       if (!ReCaptcha::verify($this->request->get('recaptchaToken', null), true)) {
-           /** @var NotificationService $notificationService */
-           $notificationService = pluginApp(NotificationService::class);
-           $notificationService->addNotificationCode(LogLevel::ERROR, 13);
-
-           return $this->response->create('', ResponseCode::BAD_REQUEST);
-       }
-
         try {
             $requestData = $this->request->all();
             $formData = $requestData['data'] ?? [];

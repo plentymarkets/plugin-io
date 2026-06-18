@@ -4,7 +4,8 @@
 
 ### Fixed
 
-- Allow lower case keys to withdrawal cancellation input identifiers
+- Cancellation form input identifiers are no longer case sensitive.
+- Submitting a cancellation form no longer requires consenting to Google reCAPTCHA.
 
 ## v5.0.80 (2026-05-27) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.79...5.0.80" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
 
