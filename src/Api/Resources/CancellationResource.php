@@ -56,12 +56,18 @@ class CancellationResource extends ApiResource
             $code = $exception->getCode() ?: ResponseCode::INTERNAL_SERVER_ERROR;
 
             return $this->response->create([
-                'error' => $exception->getMessage()
+                'key' => $exception->getKey(),
+                'message' => $exception->getMessage(),
+                'errors' => $exception->getErrors()
             ], $code);
         } catch (\Throwable $exception) {
             $code = $exception->getCode() ?: ResponseCode::INTERNAL_SERVER_ERROR;
 
-            return $this->response->create(false, $code);
+            return $this->response->create([
+                'key' => 'unknownError',
+                'message' => $exception->getMessage(),
+                'errors' => []
+            ], $code);
         }
     }
 }
