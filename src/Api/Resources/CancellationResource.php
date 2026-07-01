@@ -7,7 +7,6 @@ use IO\Api\ApiResponse;
 use IO\Api\ResponseCode;
 use IO\Helper\Utils;
 use Plenty\Modules\Webshop\Storefront\Contracts\CancellationRepositoryContract;
-use Plenty\Modules\Webshop\Storefront\Exceptions\StorefrontException;
 use Plenty\Plugin\Http\Request;
 use Plenty\Plugin\Http\Response;
 
