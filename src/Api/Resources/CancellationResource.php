@@ -10,7 +10,6 @@ use Plenty\Modules\Webshop\Storefront\Contracts\CancellationRepositoryContract;
 use Plenty\Modules\Webshop\Storefront\Exceptions\StorefrontException;
 use Plenty\Plugin\Http\Request;
 use Plenty\Plugin\Http\Response;
-use Plenty\Plugin\Log\Loggable;
 
 /**
  * Class CancellationResource
@@ -20,8 +19,6 @@ use Plenty\Plugin\Log\Loggable;
  */
 class CancellationResource extends ApiResource
 {
-    use Loggable;
-
     /**
      * @var CancellationRepositoryContract
      */
@@ -49,25 +46,12 @@ class CancellationResource extends ApiResource
             $requestData = $this->request->all();
             $requestData['lang'] = Utils::getLang();
 
-            $responseData = $this->cancellationRepository->submitCancellationRequest($requestData);
+            $this->cancellationRepository->submitCancellationRequest($requestData);
 
-            return $this->response->create($responseData, ResponseCode::OK);
-        } catch (StorefrontException $exception) {
+            return $this->response->create(true, ResponseCode::OK);
+        } catch (\Exception $exception) {
             $code = $exception->getCode() ?: ResponseCode::INTERNAL_SERVER_ERROR;
-
-            return $this->response->create([
-                'key' => $exception->getKey(),
-                'message' => $exception->getMessage(),
-                'errors' => $exception->getErrors()
-            ], $code);
-        } catch (\Throwable $exception) {
-            $code = $exception->getCode() ?: ResponseCode::INTERNAL_SERVER_ERROR;
-
-            return $this->response->create([
-                'key' => 'unknownError',
-                'message' => $exception->getMessage(),
-                'errors' => []
-            ], $code);
+            return $this->response->create(false, $code);
         }
     }
 }
