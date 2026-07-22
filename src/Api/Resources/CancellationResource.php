@@ -58,7 +58,7 @@ class CancellationResource extends ApiResource
             }
 
             $formData = array_change_key_case($formData);
-            foreach (['email', 'name', 'order'] as $field) {
+            foreach (['email', 'name'] as $field) {
                 if(empty($formData[$field]['value'])) {
                     $errors[] = $field;
                 }
