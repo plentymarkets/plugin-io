@@ -61,8 +61,8 @@ class CustomerServiceFeatureTest extends TestCase
      */
     public function should_add_a_new_address_as_logged_in_user($addressData, $addressType)
     {
-        $email = $this->fake->email;
-        $password = $this->fake->password;
+        $email = $this->faker->email;
+        $password = $this->faker->password;
 
         $this->checkoutService
             ->shouldReceive('getCustomerShippingAddressId')
@@ -83,7 +83,7 @@ class CustomerServiceFeatureTest extends TestCase
         /** @var SessionStorageRepositoryContract $sessionStorageRepository */
         $sessionStorageRepository = pluginApp(SessionStorageRepositoryContract::class);
 
-        $sessionStorageRepository->setSessionValue(SessionStorageRepositoryContract::GUEST_EMAIL, $this->fake->email);
+        $sessionStorageRepository->setSessionValue(SessionStorageRepositoryContract::GUEST_EMAIL, $this->faker->email);
 
         if ($addressType === AddressType::BILLING) {
             $this->checkoutService
@@ -128,8 +128,8 @@ class CustomerServiceFeatureTest extends TestCase
      */
     public function should_delete_an_address_as_logged_in_user($addressData, $addressType)
     {
-        $email = $this->fake->email;
-        $password = $this->fake->password;
+        $email = $this->faker->email;
+        $password = $this->faker->password;
 
         $this->checkoutService
             ->shouldReceive('getCustomerShippingAddressId')
@@ -153,7 +153,7 @@ class CustomerServiceFeatureTest extends TestCase
         /** @var SessionStorageRepositoryContract $sessionStorageRepository */
         $sessionStorageRepository = pluginApp(SessionStorageRepositoryContract::class);
 
-        $sessionStorageRepository->setSessionValue(SessionStorageRepositoryContract::GUEST_EMAIL, $this->fake->email);
+        $sessionStorageRepository->setSessionValue(SessionStorageRepositoryContract::GUEST_EMAIL, $this->faker->email);
 
         /** @var BasketService $basketService */
         $basketService = pluginApp(BasketService::class);
@@ -213,8 +213,8 @@ class CustomerServiceFeatureTest extends TestCase
      */
     public function should_update_an_address_as_logged_in_user($addressDataCreate, $addressDataUpdate, $addressType)
     {
-        $email = $this->fake->email;
-        $password = $this->fake->password;
+        $email = $this->faker->email;
+        $password = $this->faker->password;
 
         $this->checkoutService
             ->shouldReceive('getCustomerShippingAddressId')
@@ -242,7 +242,7 @@ class CustomerServiceFeatureTest extends TestCase
         /** @var SessionStorageRepositoryContract $sessionStorageRepository */
         $sessionStorageRepository = pluginApp(SessionStorageRepositoryContract::class);
 
-        $sessionStorageRepository->setSessionValue(SessionStorageRepositoryContract::GUEST_EMAIL, $this->fake->email);
+        $sessionStorageRepository->setSessionValue(SessionStorageRepositoryContract::GUEST_EMAIL, $this->faker->email);
 
         if ($addressType === AddressType::BILLING) {
             $this->checkoutService
@@ -284,17 +284,17 @@ class CustomerServiceFeatureTest extends TestCase
                 [
                     // Billing address with company and empty gender and stateId
                     'gender' => '',
-                    'name1' => $this->fake->company,
+                    'name1' => $this->faker->company,
                     'name2' => '',
                     'name3' => '',
                     'name4' => '',
-                    'address1' => $this->fake->streetName,
-                    'address2' => $this->fake->streetAddress,
-                    'postalCode' => $this->fake->postcode,
-                    'town' => $this->fake->city,
+                    'address1' => $this->faker->streetName,
+                    'address2' => $this->faker->streetAddress,
+                    'postalCode' => $this->faker->postcode,
+                    'town' => $this->faker->city,
                     'countryId' => 1,
                     'stateId' => '',
-                    'contactPerson' => $this->fake->name
+                    'contactPerson' => $this->faker->name
                 ],
                 AddressType::BILLING,
             ],
@@ -302,15 +302,15 @@ class CustomerServiceFeatureTest extends TestCase
             [
                 [
                     // Billing address
-                    'gender' => $this->fake->randomElement($this->genders),
+                    'gender' => $this->faker->randomElement($this->genders),
                     'name1' => '',
-                    'name2' => $this->fake->firstName,
-                    'name3' => $this->fake->lastName,
+                    'name2' => $this->faker->firstName,
+                    'name3' => $this->faker->lastName,
                     'name4' => '',
-                    'address1' => $this->fake->streetName,
-                    'address2' => $this->fake->streetAddress,
-                    'postalCode' => $this->fake->postcode,
-                    'town' => $this->fake->city,
+                    'address1' => $this->faker->streetName,
+                    'address2' => $this->faker->streetAddress,
+                    'postalCode' => $this->faker->postcode,
+                    'town' => $this->faker->city,
                     'countryId' => 1,
                     'stateId' => '',
                 ],
@@ -321,16 +321,16 @@ class CustomerServiceFeatureTest extends TestCase
                 [
                     // Delivery address with company
                     'gender' => '',
-                    'name1' => $this->fake->company,
+                    'name1' => $this->faker->company,
                     'name2' => '',
                     'name3' => '',
                     'name4' => '',
-                    'address1' => $this->fake->streetName,
-                    'address2' => $this->fake->streetAddress,
-                    'postalCode' => $this->fake->postcode,
-                    'town' => $this->fake->city,
+                    'address1' => $this->faker->streetName,
+                    'address2' => $this->faker->streetAddress,
+                    'postalCode' => $this->faker->postcode,
+                    'town' => $this->faker->city,
                     'countryId' => 1,
-                    'contactPerson' => $this->fake->name
+                    'contactPerson' => $this->faker->name
                 ],
                 AddressType::DELIVERY,
             ],
@@ -338,15 +338,15 @@ class CustomerServiceFeatureTest extends TestCase
             [
                 [
                     // Delivery address to 'Packstation'
-                    'gender' => $this->fake->randomElement($this->genders),
-                    'name1' => $this->fake->company,
-                    'name2' => $this->fake->firstName,
-                    'name3' => $this->fake->lastName,
+                    'gender' => $this->faker->randomElement($this->genders),
+                    'name1' => $this->faker->company,
+                    'name2' => $this->faker->firstName,
+                    'name3' => $this->faker->lastName,
                     'name4' => '',
                     'address1' => 'PACKSTATION',
-                    'address2' => $this->fake->streetAddress,
-                    'postalCode' => $this->fake->postcode,
-                    'town' => $this->fake->city,
+                    'address2' => $this->faker->streetAddress,
+                    'postalCode' => $this->faker->postcode,
+                    'town' => $this->faker->city,
                     'countryId' => 1,
                 ],
                 AddressType::DELIVERY,
@@ -355,15 +355,15 @@ class CustomerServiceFeatureTest extends TestCase
             [
                 [
                     // Delivery address to 'Postfiliale'
-                    'gender' => $this->fake->randomElement($this->genders),
-                    'name1' => $this->fake->company,
-                    'name2' => $this->fake->firstName,
-                    'name3' => $this->fake->lastName,
+                    'gender' => $this->faker->randomElement($this->genders),
+                    'name1' => $this->faker->company,
+                    'name2' => $this->faker->firstName,
+                    'name3' => $this->faker->lastName,
                     'name4' => '',
                     'address1' => 'POSTFILIALE',
-                    'address2' => $this->fake->streetAddress,
-                    'postalCode' => $this->fake->postcode,
-                    'town' => $this->fake->city,
+                    'address2' => $this->faker->streetAddress,
+                    'postalCode' => $this->faker->postcode,
+                    'town' => $this->faker->city,
                     'countryId' => 1,
                 ],
                 AddressType::DELIVERY,
@@ -378,15 +378,15 @@ class CustomerServiceFeatureTest extends TestCase
             [
                 [
                     // Billing address with company
-                    'gender' => $this->fake->randomElement($this->genders),
-                    'name1' => $this->fake->company,
-                    'name2' => $this->fake->firstName,
-                    'name3' => $this->fake->lastName,
+                    'gender' => $this->faker->randomElement($this->genders),
+                    'name1' => $this->faker->company,
+                    'name2' => $this->faker->firstName,
+                    'name3' => $this->faker->lastName,
                     'name4' => '',
-                    'address1' => $this->fake->streetName,
-                    'address2' => $this->fake->streetAddress,
-                    'postalCode' => $this->fake->postcode,
-                    'town' => $this->fake->city,
+                    'address1' => $this->faker->streetName,
+                    'address2' => $this->faker->streetAddress,
+                    'postalCode' => $this->faker->postcode,
+                    'town' => $this->faker->city,
                     'countryId' => 1,
                 ],
                 AddressType::BILLING,
@@ -395,15 +395,15 @@ class CustomerServiceFeatureTest extends TestCase
             [
                 [
                     // Billing address with company
-                    'gender' => $this->fake->randomElement($this->genders),
-                    'name1' => $this->fake->company,
-                    'name2' => $this->fake->firstName,
-                    'name3' => $this->fake->lastName,
+                    'gender' => $this->faker->randomElement($this->genders),
+                    'name1' => $this->faker->company,
+                    'name2' => $this->faker->firstName,
+                    'name3' => $this->faker->lastName,
                     'name4' => '',
-                    'address1' => $this->fake->streetName,
-                    'address2' => $this->fake->streetAddress,
-                    'postalCode' => $this->fake->postcode,
-                    'town' => $this->fake->city,
+                    'address1' => $this->faker->streetName,
+                    'address2' => $this->faker->streetAddress,
+                    'postalCode' => $this->faker->postcode,
+                    'town' => $this->faker->city,
                     'countryId' => 1,
                 ],
                 AddressType::DELIVERY,
@@ -416,7 +416,7 @@ class CustomerServiceFeatureTest extends TestCase
         return [
             [
                 [
-                    'gender' => $this->fake->randomElement($this->genders),
+                    'gender' => $this->faker->randomElement($this->genders),
                     'name1' => 'change',
                     'name2' => 'change',
                     'name3' => 'change',
@@ -429,15 +429,15 @@ class CustomerServiceFeatureTest extends TestCase
                     'stateId' => '',
                 ],
                 [
-                    'gender' => $this->fake->randomElement($this->genders),
-                    'name1' => $this->fake->company,
-                    'name2' => $this->fake->firstName,
-                    'name3' => $this->fake->lastName,
+                    'gender' => $this->faker->randomElement($this->genders),
+                    'name1' => $this->faker->company,
+                    'name2' => $this->faker->firstName,
+                    'name3' => $this->faker->lastName,
                     'name4' => '',
-                    'address1' => $this->fake->streetName,
-                    'address2' => $this->fake->streetAddress,
-                    'postalCode' => $this->fake->postcode,
-                    'town' => $this->fake->city,
+                    'address1' => $this->faker->streetName,
+                    'address2' => $this->faker->streetAddress,
+                    'postalCode' => $this->faker->postcode,
+                    'town' => $this->faker->city,
                     'countryId' => 1,
                     'stateId' => '',
                 ],
@@ -446,7 +446,7 @@ class CustomerServiceFeatureTest extends TestCase
 
             [
                 [
-                    'gender' => $this->fake->randomElement($this->genders),
+                    'gender' => $this->faker->randomElement($this->genders),
                     'name1' => 'change',
                     'name2' => 'change',
                     'name3' => 'change',
@@ -459,15 +459,15 @@ class CustomerServiceFeatureTest extends TestCase
                     'stateId' => '',
                 ],
                 [
-                    'gender' => $this->fake->randomElement($this->genders),
-                    'name1' => $this->fake->company,
-                    'name2' => $this->fake->firstName,
-                    'name3' => $this->fake->lastName,
+                    'gender' => $this->faker->randomElement($this->genders),
+                    'name1' => $this->faker->company,
+                    'name2' => $this->faker->firstName,
+                    'name3' => $this->faker->lastName,
                     'name4' => '',
                     'address1' => 'PACKSTATION',
-                    'address2' => $this->fake->streetAddress,
-                    'postalCode' => $this->fake->postcode,
-                    'town' => $this->fake->city,
+                    'address2' => $this->faker->streetAddress,
+                    'postalCode' => $this->faker->postcode,
+                    'town' => $this->faker->city,
                     'countryId' => 1,
                     'stateId' => '',
                 ],
@@ -476,7 +476,7 @@ class CustomerServiceFeatureTest extends TestCase
 
             [
                 [
-                    'gender' => $this->fake->randomElement($this->genders),
+                    'gender' => $this->faker->randomElement($this->genders),
                     'name1' => 'change',
                     'name2' => 'change',
                     'name3' => 'change',
@@ -489,15 +489,15 @@ class CustomerServiceFeatureTest extends TestCase
                     'stateId' => '',
                 ],
                 [
-                    'gender' => $this->fake->randomElement($this->genders),
-                    'name1' => $this->fake->company,
-                    'name2' => $this->fake->firstName,
-                    'name3' => $this->fake->lastName,
+                    'gender' => $this->faker->randomElement($this->genders),
+                    'name1' => $this->faker->company,
+                    'name2' => $this->faker->firstName,
+                    'name3' => $this->faker->lastName,
                     'name4' => '',
                     'address1' => 'POSTFILIALE',
-                    'address2' => $this->fake->streetAddress,
-                    'postalCode' => $this->fake->postcode,
-                    'town' => $this->fake->city,
+                    'address2' => $this->faker->streetAddress,
+                    'postalCode' => $this->faker->postcode,
+                    'town' => $this->faker->city,
                     'countryId' => 1,
                     'stateId' => '',
                 ],
