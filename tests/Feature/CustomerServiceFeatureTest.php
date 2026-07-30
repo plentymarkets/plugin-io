@@ -1,7 +1,7 @@
 <?php
 
 namespace IO\Tests\Feature;
-
+use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use IO\Builder\Order\AddressType;
 use IO\Services\BasketService;
@@ -17,6 +17,7 @@ use Plenty\Plugin\Events\Dispatcher;
 class CustomerServiceFeatureTest extends TestCase
 {
     use RefreshDatabase;
+    use WithFaker;
 
     /** @var CustomerService $customerService */
     protected $customerService;
