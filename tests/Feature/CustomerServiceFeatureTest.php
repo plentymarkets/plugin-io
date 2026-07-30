@@ -17,7 +17,6 @@ use Plenty\Plugin\Events\Dispatcher;
 class CustomerServiceFeatureTest extends TestCase
 {
     use RefreshDatabase;
-    use WithFaker;
 
     /** @var CustomerService $customerService */
     protected $customerService;
