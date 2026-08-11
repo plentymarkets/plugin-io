@@ -423,7 +423,7 @@ class CheckoutService
         if ($methodOfPaymentID === null || !$methodOfPaymentValid) {
             $methodOfPayment = array_shift($methodOfPaymentList);
 
-            $this->getLogger(self::class)->warning(
+            $this->getLogger(self::class)->info(
                 "IO::Debug.CheckoutService_paymentNotValid",
                 [
                     "methodOfPaymentID" => $methodOfPaymentID,
