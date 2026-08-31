@@ -44,7 +44,7 @@ class NotificationServiceFeatureTest extends TestCase
      */
     public function it_checks_addNotification_sets_session_storage_entry($message, $type, $code)
     {
-        $this->notificationService->{$type}($message, $code);
+        $this->notificationService->{$type}($message ?? '', $code);
         $sessionNotifications = json_decode(
             $this->sessionStorageRepository->getSessionValue(SessionStorageRepositoryContract::NOTIFICATIONS),
             true
