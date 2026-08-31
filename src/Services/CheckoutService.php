@@ -422,6 +422,16 @@ class CheckoutService
 
         if ($methodOfPaymentID === null || !$methodOfPaymentValid) {
             $methodOfPayment = array_shift($methodOfPaymentList);
+
+            $this->getLogger(self::class)->info(
+                "IO::Debug.CheckoutService_paymentNotValid",
+                [
+                    "methodOfPaymentID" => $methodOfPaymentID,
+                    "newPaymentMethod" => $methodOfPayment,
+                    "methodOfPaymentList" => $methodOfPaymentList
+                ]
+            );
+
             if (!is_null($methodOfPayment)) {
                 $methodOfPaymentID = $methodOfPayment->id;
             }
