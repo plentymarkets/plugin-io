@@ -1,10 +1,14 @@
 # Release Notes for IO
 
-## v5.0.82 (2026-08-31) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.81...5.0.82" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
+## v5.0.83 (2026-09-01) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.81...5.0.83" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
 
 ### Added
 
 - Extended logging for payment method changes.
+
+### Fixed
+
+- Fetching content from external sources, such as a CDN, now follows redirects.
 
 ## v5.0.81 (2026-06-18) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.80...5.0.81" target="_blank" rel="noopener"><b>Overview of all changes</b></a>
 
