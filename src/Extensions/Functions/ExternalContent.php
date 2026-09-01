@@ -37,7 +37,9 @@ class ExternalContent extends AbstractFunction
             CURLOPT_URL => $url,
             CURLOPT_HEADER => 0,
             CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_TIMEOUT => 4
+            CURLOPT_TIMEOUT => 4,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_MAXREDIRS => 5
         ];
 
         $ch = curl_init();
