@@ -277,7 +277,7 @@ class CheckoutServiceShippingTest extends TestCase
     }
 
 
-    public function dataProviderShippingCountryId()
+    public static function dataProviderShippingCountryId()
     {
         return [
             [0],
@@ -286,7 +286,7 @@ class CheckoutServiceShippingTest extends TestCase
     }
 
 
-    public function dataProviderShippingProfiles()
+    public static function dataProviderShippingProfiles()
     {
         return [
 

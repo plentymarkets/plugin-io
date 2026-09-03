@@ -117,7 +117,7 @@ class UrlQueryTest extends TestCase
         $this->assertNotEquals('/', substr($url, strlen($url) - strlen($queryString) - 1, 1));
     }
 
-    public function getUrlQueries()
+    public static function getUrlQueries()
     {
         $paths = ['%s', '%s/', '/%s', '/%s/'];
 

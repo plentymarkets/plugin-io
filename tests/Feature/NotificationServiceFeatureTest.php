@@ -67,31 +67,33 @@ class NotificationServiceFeatureTest extends TestCase
         $this->assertEquals($expectedEmptyArray, $notifications);
     }
 
-    public function dataProviderAddNotificationData()
+    public static function dataProviderAddNotificationData()
     {
+        $faker = \Faker\Factory::create();
+
         return [
             [
-                $this->fake->text,
+                $faker->text,
                 LogLevel::SUCCESS,
                 200
             ],
             [
-                $this->fake->text,
+                $faker->text,
                 LogLevel::ERROR,
                 404
             ],
             [
-                $this->fake->text,
+                $faker->text,
                 LogLevel::LOG,
                 200
             ],
             [
-                $this->fake->text,
+                $faker->text,
                 LogLevel::INFO,
                 200
             ],
             [
-                $this->fake->text,
+                $faker->text,
                 LogLevel::WARN,
                 301
             ]

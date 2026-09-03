@@ -28,7 +28,7 @@ class CustomerServiceFeatureTest extends TestCase
     /** @var Dispatcher $dispatcher */
     protected $dispatcher;
 
-    protected $genders = ['male', 'female', 'diverse'];
+    protected static $genders = ['male', 'female', 'diverse'];
 
     protected function setUp(): void
     {
@@ -277,7 +277,7 @@ class CustomerServiceFeatureTest extends TestCase
         }
     }
 
-    public function createAddressProvider()
+    public static function createAddressProvider()
     {
         $faker = \Faker\Factory::create();
 
@@ -304,7 +304,7 @@ class CustomerServiceFeatureTest extends TestCase
             [
                 [
                     // Billing address
-                    'gender' => $faker->randomElement($this->genders),
+                    'gender' => $faker->randomElement(self::$genders),
                     'name1' => '',
                     'name2' => $faker->firstName,
                     'name3' => $faker->lastName,
@@ -340,7 +340,7 @@ class CustomerServiceFeatureTest extends TestCase
             [
                 [
                     // Delivery address to 'Packstation'
-                    'gender' => $faker->randomElement($this->genders),
+                    'gender' => $faker->randomElement(self::$genders),
                     'name1' => $faker->company,
                     'name2' => $faker->firstName,
                     'name3' => $faker->lastName,
@@ -357,7 +357,7 @@ class CustomerServiceFeatureTest extends TestCase
             [
                 [
                     // Delivery address to 'Postfiliale'
-                    'gender' => $faker->randomElement($this->genders),
+                    'gender' => $faker->randomElement(self::$genders),
                     'name1' => $faker->company,
                     'name2' => $faker->firstName,
                     'name3' => $faker->lastName,
@@ -374,7 +374,7 @@ class CustomerServiceFeatureTest extends TestCase
         ];
     }
 
-    public function deleteAddressProvider()
+    public static function deleteAddressProvider()
     {
         $faker = \Faker\Factory::create();
 
@@ -382,7 +382,7 @@ class CustomerServiceFeatureTest extends TestCase
             [
                 [
                     // Billing address with company
-                    'gender' => $faker->randomElement($this->genders),
+                    'gender' => $faker->randomElement(self::$genders),
                     'name1' => $faker->company,
                     'name2' => $faker->firstName,
                     'name3' => $faker->lastName,
@@ -399,7 +399,7 @@ class CustomerServiceFeatureTest extends TestCase
             [
                 [
                     // Billing address with company
-                    'gender' => $faker->randomElement($this->genders),
+                    'gender' => $faker->randomElement(self::$genders),
                     'name1' => $faker->company,
                     'name2' => $faker->firstName,
                     'name3' => $faker->lastName,
@@ -415,14 +415,14 @@ class CustomerServiceFeatureTest extends TestCase
         ];
     }
 
-    public function updateAddressProvider()
+    public static function updateAddressProvider()
     {
         $faker = \Faker\Factory::create();
 
         return [
             [
                 [
-                    'gender' => $faker->randomElement($this->genders),
+                    'gender' => $faker->randomElement(self::$genders),
                     'name1' => 'change',
                     'name2' => 'change',
                     'name3' => 'change',
@@ -435,7 +435,7 @@ class CustomerServiceFeatureTest extends TestCase
                     'stateId' => '',
                 ],
                 [
-                    'gender' => $faker->randomElement($this->genders),
+                    'gender' => $faker->randomElement(self::$genders),
                     'name1' => $faker->company,
                     'name2' => $faker->firstName,
                     'name3' => $faker->lastName,
@@ -452,7 +452,7 @@ class CustomerServiceFeatureTest extends TestCase
 
             [
                 [
-                    'gender' => $faker->randomElement($this->genders),
+                    'gender' => $faker->randomElement(self::$genders),
                     'name1' => 'change',
                     'name2' => 'change',
                     'name3' => 'change',
@@ -465,7 +465,7 @@ class CustomerServiceFeatureTest extends TestCase
                     'stateId' => '',
                 ],
                 [
-                    'gender' => $faker->randomElement($this->genders),
+                    'gender' => $faker->randomElement(self::$genders),
                     'name1' => $faker->company,
                     'name2' => $faker->firstName,
                     'name3' => $faker->lastName,
@@ -482,7 +482,7 @@ class CustomerServiceFeatureTest extends TestCase
 
             [
                 [
-                    'gender' => $faker->randomElement($this->genders),
+                    'gender' => $faker->randomElement(self::$genders),
                     'name1' => 'change',
                     'name2' => 'change',
                     'name3' => 'change',
@@ -495,7 +495,7 @@ class CustomerServiceFeatureTest extends TestCase
                     'stateId' => '',
                 ],
                 [
-                    'gender' => $faker->randomElement($this->genders),
+                    'gender' => $faker->randomElement(self::$genders),
                     'name1' => $faker->company,
                     'name2' => $faker->firstName,
                     'name3' => $faker->lastName,
