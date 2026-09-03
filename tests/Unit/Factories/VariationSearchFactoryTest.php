@@ -146,7 +146,7 @@ class VariationSearchFactoryTest extends TestCase
         }
     }
 
-    public function dataProviderPriceRangeFilter()
+    public static function dataProviderPriceRangeFilter()
     {
         return [
             [
@@ -186,7 +186,7 @@ class VariationSearchFactoryTest extends TestCase
 
     }
 
-    public function dataProviderTagFilter()
+    public static function dataProviderTagFilter()
     {
         return [
             [
@@ -245,7 +245,7 @@ class VariationSearchFactoryTest extends TestCase
     }
 
 
-    public function dataProviderRightVariationBaseFilter()
+    public static function dataProviderRightVariationBaseFilter()
     {
 
         /*
