@@ -5,6 +5,7 @@ namespace IO\Middlewares;
 use IO\Extensions\Constants\ShopUrls;
 use IO\Guards\AuthGuard;
 use IO\Helper\RouteConfig;
+use IO\Helper\Utils;
 use Plenty\Plugin\Http\Request;
 use Plenty\Plugin\Http\Response;
 use Plenty\Plugin\Middleware;
@@ -30,11 +31,14 @@ class HandleNewsletter extends Middleware
         /** @var ShopUrls $shopUrls */
         $shopUrls = pluginApp(ShopUrls::class);
 
+        $lang = Utils::getLang();
+        $langPrefix = ($lang && $lang !== Utils::getDefaultLang()) ? '/'.$lang : '';
+
         $authString = $request->get('authString', '');
         $newsletterEmailId = $request->get('newsletterEmailId', 0);
 
         if (strlen($authString) && (int)$newsletterEmailId > 0 && RouteConfig::isActive(RouteConfig::NEWSLETTER_OPT_IN)) {
-            AuthGuard::redirect('/newsletter/subscribe/' . $authString . '/' . $newsletterEmailId);
+            AuthGuard::redirect($langPrefix . '/newsletter/subscribe/' . $authString . '/' . $newsletterEmailId);
         }
 
         $orderShow = $request->get('OrderShow', '');
