@@ -4,6 +4,7 @@ namespace IO\Controllers;
 
 use IO\Api\ResponseCode;
 use IO\Constants\LogLevel;
+use IO\Helper\Utils;
 use IO\Middlewares\CheckNotFound;
 use IO\Services\CustomerNewsletterService;
 use IO\Services\NotificationService;
@@ -25,7 +26,10 @@ class NewsletterOptInController extends LayoutController
             $notificationService = pluginApp(NotificationService::class);
             $notificationService->addNotificationCode(LogLevel::SUCCESS, 8);
 
-            return $response->redirectTo('/?newsletterConfirmationSuccess=1');
+            $lang = Utils::getLang();
+            $langPrefix = ($lang && $lang !== Utils::getDefaultLang()) ? '/'.$lang : '';
+
+            return $response->redirectTo($langPrefix.'/?newsletterConfirmationSuccess=1');
         }
 
         $response->forceStatus(ResponseCode::NOT_FOUND);
