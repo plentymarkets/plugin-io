@@ -459,7 +459,7 @@ class ShopUrls
         if (!str_ends_with($urlA, '/')) {
             $urlA = $urlA . '/';
         }
-        if (!str_starts_with($urlB, '/')) {
+        if (!str_starts_with((string)$urlB, '/')) {
             $urlB = '/' . $urlB;
         }
         if (!str_ends_with($urlB, '/')) {

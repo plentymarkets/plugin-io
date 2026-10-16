@@ -59,7 +59,6 @@ class ReCaptcha
         }
 
         $content = curl_exec($ch);
-        curl_close($ch);
 
         $result = json_decode($content, true);
 

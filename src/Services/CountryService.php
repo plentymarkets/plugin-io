@@ -141,7 +141,7 @@ class CountryService
      * @param string|null $lang Optional: Language for country name
      * @return string
      */
-    public function getCountryName(int $countryId, string $lang = null): string
+    public function getCountryName(int $countryId, ?string $lang = null): string
     {
         if ($lang === null) {
             $lang = Utils::getLang();

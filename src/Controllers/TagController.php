@@ -17,7 +17,7 @@ class TagController extends LayoutController
      * @param string $tagName
      * @param int $tagId
      */
-    public function showItemByTag(string $tagName = "", int $tagId = null)
+    public function showItemByTag(string $tagName = "", ?int $tagId = null)
     {
         $category = null;
         $request = pluginApp(Request::class);

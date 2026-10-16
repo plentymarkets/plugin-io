@@ -4,6 +4,7 @@
 
 ### Behoben
 
+- Die Route `io/template` rendert jetzt nur noch Namespace-Vorlagen von Plugins und löst keine Dateisystempfade mehr auf. Damit wird eine Local-File-Inclusion-Schwachstelle geschlossen. Außerdem werden Vorlagenparameter jetzt korrekt dekodiert, anstatt bei Nicht-JSON-Werten zu null zu werden.
 - Bei der Weiterleitung nach der Bestätigung der Newsletter-Anmeldung wird jetzt die Sprache des Shops beibehalten.
 
 ## v5.0.83 (2026-09-01) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.81...5.0.83" target="_blank" rel="noopener"><b>Übersicht aller Änderungen</b></a>

@@ -4,6 +4,7 @@
 
 ### Fixed
 
+- The `io/template` route now only renders namespaced plugin templates and no longer resolves filesystem paths, closing a local file inclusion vector. Template parameters are also decoded correctly instead of being turned into null on non-JSON values.
 - The newsletter opt-in confirmation redirect now keeps the shop's locale.
 
 ## v5.0.83 (2026-09-01) <a href="https://github.com/plentymarkets/plugin-io/compare/5.0.81...5.0.83" target="_blank" rel="noopener"><b>Overview of all changes</b></a>

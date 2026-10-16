@@ -82,8 +82,6 @@ class ContactMapService
                 $result_json = curl_exec($curl);
                 $result = json_decode($result_json, true);
 
-                curl_close($curl);
-
                 $lat = $result['results'][0]['geometry']['location']['lat'] ?? '';
                 $lng = $result['results'][0]['geometry']['location']['lng'] ?? '';
 
