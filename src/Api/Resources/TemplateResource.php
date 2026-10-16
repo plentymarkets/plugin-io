@@ -38,16 +38,29 @@ class TemplateResource extends ApiResource
         $params = $this->request->get('params', []);
         $renderedTemplate = '';
 
+        if (!is_array($params))
+        {
+            $params = [];
+        }
+
         foreach($params as $key => $value)
         {
+            // Only replace the value when it is valid JSON. json_decode() returns null on failure
+            // (never false), so the previous "!== false" check was always true and turned every
+            // non-JSON string into null. Guard on json_last_error() instead.
+            if (!is_string($value))
+            {
+                continue;
+            }
+
             $decoded = json_decode($value);
-            if($decoded !== false)
+            if(json_last_error() === JSON_ERROR_NONE)
             {
                 $params[$key] = $decoded;
             }
         }
 
-        if (strlen($template))
+        if (strlen($template) && $this->isRenderableTemplate($template))
         {
             /**
              * @var Twig $twig
@@ -57,6 +70,27 @@ class TemplateResource extends ApiResource
         }
 
         return $this->response->create($renderedTemplate, ResponseCode::OK);
+    }
+
+    /**
+     * Only render namespaced plugin template references (e.g. "Ceres::Checkout.OrderConfirmation").
+     * This public route must never be able to resolve a filesystem path, traversal sequence or
+     * stream wrapper as a template name (local file inclusion).
+     *
+     * @param string $template
+     * @return bool
+     */
+    private function isRenderableTemplate($template): bool
+    {
+        if (!is_string($template) || strpos($template, '::') === false)
+        {
+            return false;
+        }
+
+        return strpos($template, '/') === false
+            && strpos($template, '..') === false
+            && strpos($template, "\0") === false
+            && strpos($template, '://') === false;
     }
 
 }
