@@ -463,7 +463,7 @@ class CategoryService
      */
     public function getNavigationTree(
         $type = null,
-        string $lang = null,
+        ?string $lang = null,
         int $maxLevel = 2,
         int $customerClassId = 0
     ): array {
@@ -550,7 +550,7 @@ class CategoryService
      * @return array
      * @throws \Exception
      */
-    public function getNavigationList($type = CategoryType::ALL, string $lang = null): array
+    public function getNavigationList($type = CategoryType::ALL, ?string $lang = null): array
     {
         if ($lang === null) {
             $lang = Utils::getLang();

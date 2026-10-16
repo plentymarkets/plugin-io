@@ -21,7 +21,7 @@ class ItemUrlBuilder
      * @deprecated since 5.0.0 will be removed in 6.0.0
      * @see \Plenty\Modules\Webshop\Contracts\UrlBuilderRepositoryContract::buildItemUrl()
      */
-    public function buildUrl(int $itemId, string $lang = null )
+    public function buildUrl(int $itemId, ?string $lang = null )
     {
         if ( $lang === null )
         {
