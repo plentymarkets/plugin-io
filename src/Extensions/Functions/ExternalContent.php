@@ -49,7 +49,6 @@ class ExternalContent extends AbstractFunction
         }
 
         $content = curl_exec($ch);
-        curl_close($ch);
 
         return json_decode($content, true);
     }

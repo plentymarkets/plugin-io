@@ -65,7 +65,7 @@ class NotificationService
      * @param int $code Optional: Message code (Default: 0)
      * @param array|null $placeholder Optional: A placeholder
      */
-    private function addNotification(string $message, string $type, int $code = 0, array $placeholder = null): void
+    private function addNotification(string $message, string $type, int $code = 0, ?array $placeholder = null): void
     {
         $notifications = $this->getNotifications(false);
         if (!array_key_exists($type, $notifications)) {
@@ -100,7 +100,7 @@ class NotificationService
      * @param int $code Optional: Message code (Default: 0)
      * @param array|null $placeholder Optional: A placeholder
      */
-    public function log(string $message, $code = 0, array $placeholder = null): void
+    public function log(string $message, $code = 0, ?array $placeholder = null): void
     {
         $this->addNotification($message, LogLevel::LOG, $code, $placeholder);
     }
@@ -111,7 +111,7 @@ class NotificationService
      * @param int $code Optional: Message code (Default: 0)
      * @param array|null $placeholder Optional: A placeholder
      */
-    public function info(string $message, $code = 0, array $placeholder = null): void
+    public function info(string $message, $code = 0, ?array $placeholder = null): void
     {
         $this->addNotification($message, LogLevel::INFO, $code, $placeholder);
     }
@@ -122,7 +122,7 @@ class NotificationService
      * @param int $code Optional: Message code (Default: 0)
      * @param array|null $placeholder Optional: A placeholder
      */
-    public function warn(string $message, $code = 0, array $placeholder = null): void
+    public function warn(string $message, $code = 0, ?array $placeholder = null): void
     {
         $this->addNotification($message, LogLevel::WARN, $code, $placeholder);
     }
@@ -133,7 +133,7 @@ class NotificationService
      * @param int $code Optional: Message code (Default: 0)
      * @param array|null $placeholder Optional: A placeholder
      */
-    public function error(string $message, $code = 0, array $placeholder = null): void
+    public function error(string $message, $code = 0, ?array $placeholder = null): void
     {
         $this->addNotification($message, LogLevel::ERROR, $code, $placeholder);
     }
@@ -144,7 +144,7 @@ class NotificationService
      * @param int $code Optional: Message code (Default: 0)
      * @param array|null $placeholder Optional: A placeholder
      */
-    public function success(string $message, $code = 0, array $placeholder = null): void
+    public function success(string $message, $code = 0, ?array $placeholder = null): void
     {
         $this->addNotification($message, LogLevel::SUCCESS, $code, $placeholder);
     }
@@ -155,7 +155,7 @@ class NotificationService
      * @param int $code Optional: Message code (Default: 0)
      * @param array|null $placeholder Optional: A placeholder
      */
-    public function addNotificationCode($type, int $code = 0, array $placeholder = null): void
+    public function addNotificationCode($type, int $code = 0, ?array $placeholder = null): void
     {
         $this->addNotification("", $type, $code, $placeholder);
     }

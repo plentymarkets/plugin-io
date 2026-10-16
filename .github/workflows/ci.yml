@@ -51,6 +51,8 @@ jobs:
         php:
           - version: "8.2"
             required: true
+          - version: "8.5"
+            required: true
 
     runs-on: ubuntu-latest
 
@@ -91,7 +93,7 @@ jobs:
         uses: ./.github/actions/php-setup
         with:
           token: ${{ secrets.PUBLIC_PAT_CICD4_PUBLIC }}
-          php-version: "8.2"
+          php-version: ${{ matrix.php.version }}
           extensions: ast, gd, soap, redis, grpc
 
       - name: Build plugin api
