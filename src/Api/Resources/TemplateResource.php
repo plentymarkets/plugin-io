@@ -2,12 +2,12 @@
 
 namespace IO\Api\Resources;
 
-use Plenty\Plugin\Templates\Twig;
-use Plenty\Plugin\Http\Response;
-use Plenty\Plugin\Http\Request;
 use IO\Api\ApiResource;
 use IO\Api\ApiResponse;
 use IO\Api\ResponseCode;
+use Plenty\Plugin\Http\Request;
+use Plenty\Plugin\Http\Response;
+use Plenty\Plugin\Templates\Twig;
 
 
 /**
@@ -46,17 +46,21 @@ class TemplateResource extends ApiResource
         foreach($params as $key => $value)
         {
             // Only replace the value when it is valid JSON. json_decode() returns null on failure
-            // (never false), so the previous "!== false" check was always true and turned every
-            // non-JSON string into null. Guard on json_last_error() instead.
+            // (never false), so a "!== false" check would turn every non-JSON string into null.
+            // Decode with JSON_THROW_ON_ERROR so invalid JSON throws instead of needing
+            // json_last_error() (not an allowed plugin-interface function).
             if (!is_string($value))
             {
                 continue;
             }
 
-            $decoded = json_decode($value);
-            if(json_last_error() === JSON_ERROR_NONE)
+            try
             {
-                $params[$key] = $decoded;
+                $params[$key] = json_decode($value, false, 512, JSON_THROW_ON_ERROR);
+            }
+            catch (\JsonException $e)
+            {
+                // leave the original string value untouched
             }
         }
 
