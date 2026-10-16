@@ -76,7 +76,7 @@ abstract class AbstractGuard
      * @param string|null $uri Uri without protocol.
      * @return string
      */
-    public static function getUrl(string $uri = null)
+    public static function getUrl(?string $uri = null)
     {
         if ($uri === null) {
             $uri = $_SERVER['REQUEST_URI'];
