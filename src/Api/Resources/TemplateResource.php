@@ -7,6 +7,7 @@ use IO\Api\ApiResponse;
 use IO\Api\ResponseCode;
 use Plenty\Plugin\Http\Request;
 use Plenty\Plugin\Http\Response;
+use Plenty\Plugin\Log\Loggable;
 use Plenty\Plugin\Templates\Twig;
 
 
@@ -18,6 +19,8 @@ use Plenty\Plugin\Templates\Twig;
  */
 class TemplateResource extends ApiResource
 {
+    use Loggable;
+
     /**
      * TemplateResource constructor.
      * @param Request $request
@@ -69,8 +72,23 @@ class TemplateResource extends ApiResource
             /**
              * @var Twig $twig
              */
-            $twig             = pluginApp(Twig::class);
-            $renderedTemplate = $twig->render($template, $params);
+            $twig = pluginApp(Twig::class);
+
+            try
+            {
+                $renderedTemplate = $twig->render($template, $params);
+            }
+            catch (\Throwable $e)
+            {
+                // Don't leak the raw exception (app paths, class names) to this anonymous route;
+                // log it server-side and return a generic error.
+                $this->getLogger(self::class)->error('IO::Debug.TemplateResource_renderFailed', [
+                    'template' => $template,
+                    'message'  => $e->getMessage(),
+                ]);
+
+                return $this->response->create('', ResponseCode::INTERNAL_SERVER_ERROR);
+            }
         }
 
         return $this->response->create($renderedTemplate, ResponseCode::OK);

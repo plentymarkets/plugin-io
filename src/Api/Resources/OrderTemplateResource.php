@@ -6,6 +6,7 @@ use IO\Helper\Utils;
 use IO\Models\LocalizedOrder;
 use Plenty\Plugin\Http\Response;
 use Plenty\Plugin\Http\Request;
+use Plenty\Plugin\Log\Loggable;
 use Plenty\Modules\Order\Models\Order;
 use Plenty\Modules\Order\Contracts\OrderRepositoryContract;
 use IO\Services\OrderTotalsService;
@@ -22,6 +23,8 @@ use IO\Services\TemplateService;
  */
 class OrderTemplateResource extends ApiResource
 {
+    use Loggable;
+
     /**
      * @var OrderRepositoryContract $orderRepository The instance of the OrderRepository.
      */
@@ -65,10 +68,26 @@ class OrderTemplateResource extends ApiResource
             {
                 /** @var OrderTotalsService $orderTotalsService */
                 $orderTotalsService = pluginApp(OrderTotalsService::class);
-                $renderedTemplate = $this->templateService->renderTemplate($template, [
-                    'orderData' => LocalizedOrder::wrap($order, Utils::getLang())->toArray(),
-                    'totals'    => $orderTotalsService->getAllTotals($order)
-                ]);
+
+                try
+                {
+                    $renderedTemplate = $this->templateService->renderTemplate($template, [
+                        'orderData' => LocalizedOrder::wrap($order, Utils::getLang())->toArray(),
+                        'totals'    => $orderTotalsService->getAllTotals($order)
+                    ]);
+                }
+                catch (\Throwable $e)
+                {
+                    // Don't leak the raw exception (app paths, class names) to this anonymous route;
+                    // log it server-side and return a generic error.
+                    $this->getLogger(self::class)->error('IO::Debug.OrderTemplateResource_renderFailed', [
+                        'template' => $template,
+                        'orderId'  => $orderId,
+                        'message'  => $e->getMessage(),
+                    ]);
+
+                    return $this->response->create('', ResponseCode::INTERNAL_SERVER_ERROR);
+                }
             }
         }
 
