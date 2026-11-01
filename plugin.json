@@ -13,7 +13,7 @@
     "email"             : "sales@plentyone.com",
     "phone"             : "+49 561 98 681 100",
     "keywords"          : ["plentyone", "plugins", "layout", "template"],
-    "type"              : "template",
+    "type"              : "backend",
     "require"           : [],
     "namespace"         : "IO",
     "serviceProvider"   : "IO\\Providers\\IOServiceProvider",
